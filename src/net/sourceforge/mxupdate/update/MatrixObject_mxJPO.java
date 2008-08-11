@@ -33,6 +33,7 @@ import matrix.db.Context;
 import matrix.db.MQLCommand;
 import matrix.util.MatrixException;
 
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
 
 /**
@@ -147,23 +148,39 @@ public abstract class MatrixObject_mxJPO
                 // to be ignored ...
             } else if ("/adminProperties/propertyList/property".equals(_url))  {
                 this.propertiesStack.add(new Property());
+            } else if ("/adminProperties/propertyList/property/adminRef".equals(_url))  {
+                // to be ignored ...
+            } else if ("/adminProperties/propertyList/property/adminRef/adminName".equals(_url))  {
+                this.propertiesStack.peek().refAdminName = _content;
+            } else if ("/adminProperties/propertyList/property/adminRef/adminType".equals(_url))  {
+                this.propertiesStack.peek().refAdminType = _content;
+            } else if ("/adminProperties/propertyList/property/flags".equals(_url))  {
+                this.propertiesStack.peek().flags = _content;
             } else if ("/adminProperties/propertyList/property/name".equals(_url))  {
                 this.propertiesStack.peek().name = _content;
             } else if ("/adminProperties/propertyList/property/value".equals(_url))  {
                 this.propertiesStack.peek().value = _content;
-            } else if ("/adminProperties/propertyList/property/flags".equals(_url))  {
-                this.propertiesStack.peek().flags = _content;
             } else  {
-System.out.println(""+_url+"("+_content+")");
+System.err.println("unkown parsing url: "+_url+"("+_content+")");
             }
         }
 
-
+        /**
+         *
+         * @param _context      context for this request
+         * @throws MatrixException
+         */
         public void prepare(final Context _context)
                 throws MatrixException
         {
             for (final Property property : this.propertiesStack)  {
-                propertiesMap.put(property.name, property);
+                final StringBuilder key = new StringBuilder()
+                        .append(property.name);
+                if ((property.refAdminName != null) && (property.refAdminName != null))  {
+                    key.append("::").append(property.refAdminType)
+                       .append("::").append(property.refAdminName);
+                }
+                this.propertiesMap.put(key.toString(), property);
             }
         }
 
@@ -175,7 +192,7 @@ System.out.println(""+_url+"("+_content+")");
             if (this.suffix != null)  {
                 _out.append(" ").append(this.suffix);
             }
-            _out.append(" \\\n    description \"").append(net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert(this.description)).append("\"");
+            _out.append(" \\\n    description \"").append(convert(this.description)).append("\"");
             writeObject(_out);
             writeProperties(_out);
             writeEnd(_out);
@@ -241,13 +258,17 @@ System.out.println(""+_url+"("+_content+")");
     {
         for (final Property prop : this.propertiesMap.values())  {
             if (!IGNORED_PROPERTIES.contains(prop.name) && !prop.name.startsWith("%"))  {
-                _out.append("\nmql add property \"").append(net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert(prop.name)).append("\"")
+                _out.append("\nmql add property \"").append(convert(prop.name)).append("\"")
                 .append(" \\\n    on ").append(this.prefix).append(" \"${NAME}\"");
                 if (this.suffix != null)  {
                     _out.append(' ').append(this.suffix);
                 }
+                if ((prop.refAdminName) != null && (prop.refAdminType != null))  {
+                    _out.append("  \\\n    to ").append(prop.refAdminType)
+                        .append(" \"").append(convert(prop.refAdminName)).append("\"");
+                }
                 if (prop.value != null)  {
-                    _out.append("  \\\n    value \"").append(net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert(prop.value)).append("\"");
+                    _out.append("  \\\n    value \"").append(convert(prop.value)).append("\"");
                 }
             }
         }
@@ -289,6 +310,18 @@ System.out.println(""+_url+"("+_content+")");
          * Flag of the property.
          */
         String flags = null;
+
+        /**
+         * Type of the referenced administration object for this property (if
+         * defined).
+         */
+        String refAdminType = null;
+
+        /**
+         * Name of the referenced administration object for this property (if
+         * defined).
+         */
+        String refAdminName = null;
 
         /**
          * Getter method for instance variable {@link #name}.
