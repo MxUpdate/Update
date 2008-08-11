@@ -44,6 +44,15 @@ public class MxUpdate_mxJPO
     /**
      * Map with all user interface related classes and their tag names.
      */
+    final static Map<String,Class<? extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO>> TAGS_DM
+            = new HashMap<String,Class<? extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO>>();
+    static  {
+        TAGS_DM.put("type", net.sourceforge.mxupdate.update.datamodel.Type_mxJPO.class);
+    }
+
+    /**
+     * Map with all user interface related classes and their tag names.
+     */
     final static Map<String,Class<? extends net.sourceforge.mxupdate.update.userinterface.AbstractUIObject_mxJPO>> TAGS_UI
             = new HashMap<String,Class<? extends net.sourceforge.mxupdate.update.userinterface.AbstractUIObject_mxJPO>>();
     static  {
@@ -61,6 +70,7 @@ public class MxUpdate_mxJPO
     final static Map<String,Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>> TAGS_ALL
             = new HashMap<String,Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>>();
     static  {
+        TAGS_ALL.putAll(TAGS_DM);
         TAGS_ALL.putAll(TAGS_UI);
     }
 
