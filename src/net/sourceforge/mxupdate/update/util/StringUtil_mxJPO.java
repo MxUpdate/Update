@@ -39,6 +39,17 @@ public class StringUtil_mxJPO
                : "";
     }
 
+    /**
+     * The method is original implemented by the project on
+     * <a href="http://commons.apache.org/io">Apache Commons IO</a> and copied
+     * from method <code>wildcardMatch</code> within class
+     * <a href="http://commons.apache.org/io/xref/org/apache/commons/io/FilenameUtils.html">
+     * org.apache.commons.io.FilenameUtils</a>.
+     *
+     * @param filename
+     * @param wildcardMatcher
+     * @return
+     */
     public static boolean match(String filename, String wildcardMatcher) {
 
                      if (filename == null && wildcardMatcher == null) {
@@ -122,12 +133,17 @@ public class StringUtil_mxJPO
                  }
 
     /**
-      * Splits a string into a number of tokens.
-      *
-      * @param text  the text to split
-      * @return the tokens, never null
-      */
-     public static String[] splitOnTokens(String text) {
+     * The method is original implemented by the project on
+     * <a href="http://commons.apache.org/io">Apache Commons IO</a> and copied
+     * from method <code>splitOnTokens</code> within class
+     * <a href="http://commons.apache.org/io/xref/org/apache/commons/io/FilenameUtils.html">
+     * org.apache.commons.io.FilenameUtils</a>.
+     * Splits a string into a number of tokens.
+     *
+     * @param text  the text to split
+     * @return the tokens, never null
+     */
+    public static String[] splitOnTokens(String text) {
          // used by wildcardMatch
          // package level so a unit test may run on this
 

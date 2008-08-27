@@ -36,6 +36,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  *
  * @author tmoxter
  */
+@net.sourceforge.mxupdate.update.util.TagName_mxJPO("menu")
 public class Menu_mxJPO
         extends net.sourceforge.mxupdate.update.userinterface.Command_mxJPO
 {
@@ -80,7 +81,7 @@ public class Menu_mxJPO
     }
 
     @Override
-    public void prepare(final Context _context)
+    protected void prepare(final Context _context)
             throws MatrixException
     {
         MQLCommand mql = new MQLCommand();

@@ -28,6 +28,7 @@ import java.util.Stack;
  *
  * @author tmoxter
  */
+@net.sourceforge.mxupdate.update.util.TagName_mxJPO("table")
 public class Table_mxJPO
         extends net.sourceforge.mxupdate.update.userinterface.AbstractUIObject_mxJPO
 {

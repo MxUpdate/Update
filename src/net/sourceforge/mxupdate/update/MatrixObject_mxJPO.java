@@ -20,14 +20,25 @@
 
 package net.sourceforge.mxupdate.update;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 import matrix.db.Context;
 import matrix.db.MQLCommand;
@@ -107,7 +118,7 @@ public abstract class MatrixObject_mxJPO
     }
 
     public Set<String> getMatchingNames(final Context _context,
-                                        final String _match)
+                                        final Collection<String> _matches)
             throws MatrixException
     {
         final MQLCommand mql = new MQLCommand();
@@ -119,70 +130,72 @@ public abstract class MatrixObject_mxJPO
         mql.executeCommand(_context, cmd.toString());
         final Set<String> ret = new TreeSet<String>();
         for (final String name : mql.getResult().split("\n"))  {
-            if (match(name, _match))  {
-                ret.add(name);
+            for (final String match : _matches)  {
+                if (match(name, match))  {
+                    ret.add(name);
+                }
             }
         }
         return ret;
     }
 
-        public void parse(final String _url,
-                   final String _content)
-        {
-            if ("/adminProperties".equals(_url))  {
-                // to be ignored ...
-            } else if ("/adminProperties/creationInfo".equals(_url))  {
-                // to be ignored ...
-            } else if ("/adminProperties/creationInfo/datetime".equals(_url))  {
-                // to be ignored ...
-            } else if ("/adminProperties/modificationInfo".equals(_url))  {
-                // to be ignored ...
-            } else if ("/adminProperties/modificationInfo/datetime".equals(_url))  {
-                // to be ignored ...
-            } else if ("/adminProperties/name".equals(_url))  {
-                this.name = _content;
-            } else if ("/adminProperties/description".equals(_url))  {
-                this.description = _content;
+    public void parse(final String _url,
+                      final String _content)
+    {
+        if ("/adminProperties".equals(_url))  {
+            // to be ignored ...
+        } else if ("/adminProperties/creationInfo".equals(_url))  {
+            // to be ignored ...
+        } else if ("/adminProperties/creationInfo/datetime".equals(_url))  {
+            // to be ignored ...
+        } else if ("/adminProperties/modificationInfo".equals(_url))  {
+            // to be ignored ...
+        } else if ("/adminProperties/modificationInfo/datetime".equals(_url))  {
+            // to be ignored ...
+        } else if ("/adminProperties/name".equals(_url))  {
+            this.name = _content;
+        } else if ("/adminProperties/description".equals(_url))  {
+            this.description = _content;
 
-            } else if ("/adminProperties/propertyList".equals(_url))  {
-                // to be ignored ...
-            } else if ("/adminProperties/propertyList/property".equals(_url))  {
-                this.propertiesStack.add(new Property());
-            } else if ("/adminProperties/propertyList/property/adminRef".equals(_url))  {
-                // to be ignored ...
-            } else if ("/adminProperties/propertyList/property/adminRef/adminName".equals(_url))  {
-                this.propertiesStack.peek().refAdminName = _content;
-            } else if ("/adminProperties/propertyList/property/adminRef/adminType".equals(_url))  {
-                this.propertiesStack.peek().refAdminType = _content;
-            } else if ("/adminProperties/propertyList/property/flags".equals(_url))  {
-                this.propertiesStack.peek().flags = _content;
-            } else if ("/adminProperties/propertyList/property/name".equals(_url))  {
-                this.propertiesStack.peek().name = _content;
-            } else if ("/adminProperties/propertyList/property/value".equals(_url))  {
-                this.propertiesStack.peek().value = _content;
-            } else  {
+        } else if ("/adminProperties/propertyList".equals(_url))  {
+            // to be ignored ...
+        } else if ("/adminProperties/propertyList/property".equals(_url))  {
+            this.propertiesStack.add(new Property());
+        } else if ("/adminProperties/propertyList/property/adminRef".equals(_url))  {
+            // to be ignored ...
+        } else if ("/adminProperties/propertyList/property/adminRef/adminName".equals(_url))  {
+            this.propertiesStack.peek().refAdminName = _content;
+        } else if ("/adminProperties/propertyList/property/adminRef/adminType".equals(_url))  {
+            this.propertiesStack.peek().refAdminType = _content;
+        } else if ("/adminProperties/propertyList/property/flags".equals(_url))  {
+            this.propertiesStack.peek().flags = _content;
+        } else if ("/adminProperties/propertyList/property/name".equals(_url))  {
+            this.propertiesStack.peek().name = _content;
+        } else if ("/adminProperties/propertyList/property/value".equals(_url))  {
+            this.propertiesStack.peek().value = _content;
+        } else  {
 System.err.println("unkown parsing url: "+_url+"("+_content+")");
-            }
         }
+    }
 
-        /**
-         *
-         * @param _context      context for this request
-         * @throws MatrixException
-         */
-        public void prepare(final Context _context)
-                throws MatrixException
-        {
-            for (final Property property : this.propertiesStack)  {
-                final StringBuilder key = new StringBuilder()
-                        .append(property.name);
-                if ((property.refAdminName != null) && (property.refAdminName != null))  {
-                    key.append("::").append(property.refAdminType)
-                       .append("::").append(property.refAdminName);
-                }
-                this.propertiesMap.put(key.toString(), property);
+    /**
+     *
+     * @param _context      context for this request
+     * @throws MatrixException
+     */
+    protected void prepare(final Context _context)
+            throws MatrixException
+    {
+        for (final Property property : this.propertiesStack)  {
+            final StringBuilder key = new StringBuilder()
+            .append(property.name);
+            if ((property.refAdminName != null) && (property.refAdminName != null))  {
+                key.append("::").append(property.refAdminType)
+                   .append("::").append(property.refAdminName);
             }
+            this.propertiesMap.put(key.toString(), property);
         }
+    }
 
         public final void write(final Writer _out)
                 throws IOException
@@ -294,6 +307,12 @@ System.err.println("unkown parsing url: "+_url+"("+_content+")");
         return this.propertiesMap;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Property with name, value and referenced administration type. The kind
+     * of property (with reference, with value, ...) is stored as flag.
+     */
     protected class Property
     {
         /**
@@ -349,4 +368,133 @@ System.err.println("unkown parsing url: "+_url+"("+_content+")");
             return "[name="+name+", value="+value+", flags="+flags+"]";
         }
     }
+
+    public void export(final Context _context,
+                       final File _path,
+                       final String _name)
+            throws MatrixException, SAXException, IOException
+    {
+        parse(_context, _name);
+        final File file = new File(_path, getFileName());
+        if (!file.getParentFile().exists())  {
+            file.getParentFile().mkdirs();
+        }
+        final Writer out = new FileWriter(file);
+        write(out);
+        out.flush();
+        out.close();
+    }
+
+    protected void parse(final Context _context,
+                         final String _name)
+            throws MatrixException, SAXException, IOException
+    {
+        final MQLCommand mql = new MQLCommand();
+        mql.executeCommand(_context, "export " + this.prefix + " \"" + _name + "\" xml");
+        final String xml = mql.getResult();
+        // einen XML Reader erzeugen
+        XMLReader reader = XMLReaderFactory.createXMLReader();
+     // den eigenen Sax Content Handler registrieren
+        PadSaxHandler handler = new PadSaxHandler ();
+        reader.setContentHandler(handler);
+        reader.setDTDHandler(handler);
+        reader.setEntityResolver(handler);
+        // parse the XML string of the export
+        InputSource inputSource = new InputSource(new StringReader(xml));
+        inputSource.setEncoding("UTF8");
+        reader.parse(inputSource);
+        // prepare post preparation
+        prepare(_context);
+    }
+
+    public class PadSaxHandler extends DefaultHandler
+    {
+        final Stack<String> stack = new Stack<String>();
+        StringBuilder content = null;
+        private boolean called = false;
+
+        final Stack<Object> objects = new Stack<Object>();
+
+        private String getUrl()
+        {
+            final StringBuilder ret = new StringBuilder();
+            for (final String tag : stack.subList(2, stack.size()))  {
+                ret.append('/').append(tag);
+            }
+            return ret.toString();
+        }
+
+        /**
+         * An input source with a zero length strin is returned, because
+         * the XML parser wants to open file &quot;ematrixml.dtd&quot;.
+         */
+        @Override
+        public InputSource resolveEntity (final String _publicId,
+                                          final String _systemId)
+            throws IOException, SAXException
+        {
+            return new InputSource(new StringReader(""));
+        }
+
+        @Override
+        public void characters(final char[] _ch,
+                               final int _start,
+                               final int _length)
+            throws SAXException
+        {
+
+          if (_length > 0) {
+            final String content = new String (_ch,_start,_length);
+            if (!this.called)  {
+              if (this.content == null)  {
+                this.content = new StringBuilder();
+              }
+              this.content.append(content);
+            }
+          }
+        }
+
+        @Override
+        public void endElement (final String uri,
+                                final String localName,
+                                final String qName)
+                throws SAXException
+        {
+            if (!this.called)
+            {
+                evaluate();
+                this.called = true;
+            }
+            this.stack.pop();
+        }
+
+        @Override
+        public void startElement(final String _uri,
+                                 final String _localName,
+                                 final String _qName,
+                                 final Attributes _attributes)
+                throws SAXException
+        {
+            if (!this.called)
+            {
+                evaluate();
+            }
+            this.called = false;
+            this.content = null;
+
+            this.stack.add(_qName);
+        }
+
+        private void evaluate()
+        {
+            if (this.stack.size() > 2)  {
+                final String tag = this.stack.get(1);
+                if (!"creationProperties".equals(tag))  {
+                    MatrixObject_mxJPO.this.parse(getUrl(),
+                                                 (this.content != null) ? this.content.toString() : null);
+                }
+            }
+        }
+    }
+
 }

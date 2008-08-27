@@ -109,7 +109,7 @@ public abstract class AbstractDMObject_mxJPO
      * @see #triggersStack
      */
     @Override
-    public void prepare(final Context _context)
+    protected void prepare(final Context _context)
             throws MatrixException
     {
         // sort all triggers
