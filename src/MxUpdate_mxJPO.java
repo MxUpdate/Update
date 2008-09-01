@@ -145,6 +145,10 @@ user: --user
         PARAMS.put("--userinterface", PARAMS_UI);
         appendDescription("Export / Import of user interface administrational objects.",
                           "-u","--ui", "--userinterface");
+        defineParameter(null, PARAMS_UI,
+                        net.sourceforge.mxupdate.update.userinterface.Channel_mxJPO.class,
+                        "Export / Import of channels.",
+                        "channel");
         defineParameter('c', PARAMS_UI,
                         net.sourceforge.mxupdate.update.userinterface.Command_mxJPO.class,
                         "Export / Import of commands.",
