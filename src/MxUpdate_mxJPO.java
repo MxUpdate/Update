@@ -110,7 +110,7 @@ public class MxUpdate_mxJPO
 attribute: 'b' --attribute --attrib --attr --att
 expression: 'e' --expr --expression
 format: --format
-policy: 'p' --policy
+policy: --policy
 rule: --rule
 
 bus:
@@ -269,6 +269,8 @@ final Map<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>,Li
 //System.err.println("PARAM_MODE="  + Mode.IMPORT);
 
 boolean unknown = false;
+String pathStr = null;
+
 
         for (int idx = 0; idx < _args.length; idx++)  {
 //System.out.println(""+idx+"="+_args[idx]+"="+PARAMS.get(_args[idx]));
@@ -289,6 +291,9 @@ boolean unknown = false;
                     throw new Error("A mode is already defined and could not be defined twice!");
                 }
                 mode = PARAM_MODE.get(_args[idx]);
+            } else if ("--path".equals(_args[idx]))  {
+                idx++;
+                pathStr = _args[idx];
             } else  {
                 unknown = true;
 System.err.println("unknown pararameter "  + _args[idx]);
@@ -310,7 +315,6 @@ if (unknown || (Mode.HELP == mode))  {
     for (final Map.Entry<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>,Set<String>> entry : clazz2names.entrySet())  {
         for (final String name : entry.getValue())  {
             net.sourceforge.mxupdate.update.MatrixObject_mxJPO instance = entry.getKey().newInstance();
-String pathStr = "/Users/tim/Daten/Bosch/temp";
             final File path = new File(pathStr + File.separator + instance.getPath());
 System.out.println("export "+instance.getClass() + " '" + name + "'");
             instance.export(_context, path, name);
