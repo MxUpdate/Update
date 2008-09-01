@@ -60,7 +60,10 @@ eval  {
 
       # test for file date from file against file date in data base
       set sFileFileDate [file atime "${sOneFile}"]
-      set sMxFileData   [mql print prog "${sJPOName}" select property\[file date\].value dump]
+      set sMxFileData ""
+      if {[mql list prog "${sJPOName}"] != ""}  {
+        set sMxFileData [mql print prog "${sJPOName}" select property\[file date\].value dump]
+      }
       # update only needed if mx and file file date differs
       if {"${sFileFileDate}" != "${sMxFileData}"}  {
         puts "update '${sJPOName}'"
