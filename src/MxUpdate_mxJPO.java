@@ -165,6 +165,10 @@ user: --user
                         net.sourceforge.mxupdate.update.userinterface.Menu_mxJPO.class,
                         "Export / Import of menus.",
                         "menu");
+        defineParameter(null, PARAMS_UI,
+                        net.sourceforge.mxupdate.update.userinterface.Portal_mxJPO.class,
+                        "Export / Import of portal.",
+                        "portal");
         defineParameter('w', PARAMS_UI,
                         net.sourceforge.mxupdate.update.userinterface.Table_mxJPO.class,
                         "Export / Import of web tables.",
