@@ -33,6 +33,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 /**
  *
  * @author tmoxter
+ * @version $Id$
  */
 class TableColumn_mxJPO
 {

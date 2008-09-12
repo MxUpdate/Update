@@ -23,6 +23,11 @@ package net.sourceforge.mxupdate.update.util;
 import java.util.ArrayList;
 import java.util.Stack;
 
+/**
+ *
+ * @author tmoxter
+ * @version $Id$
+ */
 public class StringUtil_mxJPO
 {
 

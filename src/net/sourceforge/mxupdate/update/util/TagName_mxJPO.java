@@ -6,6 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 /**
  *
  * @author Tim Moxter
+ * @version $Id$
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TagName_mxJPO

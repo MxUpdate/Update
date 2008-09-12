@@ -36,7 +36,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * to update portals.
  *
  * @author tmoxter
- * @version $Rev$
+ * @version $Id$
  */
 public class Portal_mxJPO
          extends net.sourceforge.mxupdate.update.userinterface.AbstractUIObject_mxJPO

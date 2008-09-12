@@ -32,9 +32,10 @@ import matrix.util.MatrixException;
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 /**
-*
-* @author tmoxter
-*/
+ *
+ * @author tmoxter
+ * @version $Id$
+ */
 public class Channel_mxJPO
         extends net.sourceforge.mxupdate.update.userinterface.AbstractUIObject_mxJPO
 {
@@ -113,6 +114,8 @@ public class Channel_mxJPO
      * Order the command references.
      *
      * @param _context  context for this request
+     * @see #commandRefs        stack of not ordered commands references
+     * @see #orderCmds          instance of ordered commands references
      */
     @Override
     protected void prepare(final Context _context)

@@ -27,6 +27,7 @@ import java.util.Stack;
 /**
  *
  * @author tmoxter
+ * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("table")
 public class Table_mxJPO

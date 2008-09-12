@@ -23,6 +23,7 @@ package net.sourceforge.mxupdate.update.userinterface;
 /**
  *
  * @author tmoxter
+ * @version $Id$
  */
 class Setting_mxJPO
 {

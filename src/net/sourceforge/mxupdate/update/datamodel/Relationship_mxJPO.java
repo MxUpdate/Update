@@ -31,6 +31,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * Data model relationship class.
  *
  * @author tmoxter
+ * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("relationshipDef")
 public class Relationship_mxJPO

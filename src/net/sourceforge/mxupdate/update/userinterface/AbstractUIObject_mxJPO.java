@@ -20,6 +20,11 @@
 
 package net.sourceforge.mxupdate.update.userinterface;
 
+/**
+ *
+ * @author tmoxter
+ * @version $Id$
+ */
 public abstract class AbstractUIObject_mxJPO
         extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
 {

@@ -49,6 +49,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
 
 /**
  * @author tmoxter
+ * @version $Id$
  */
 public abstract class MatrixObject_mxJPO
 {

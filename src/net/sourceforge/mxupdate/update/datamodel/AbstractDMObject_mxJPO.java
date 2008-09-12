@@ -39,6 +39,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * objects!).
  *
  * @author tmoxter
+ * @version $Id$
  */
 public abstract class AbstractDMObject_mxJPO
         extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO

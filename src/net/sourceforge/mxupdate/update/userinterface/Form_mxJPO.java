@@ -29,6 +29,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 /**
  *
  * @author tmoxter
+ * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("form")
 public class Form_mxJPO

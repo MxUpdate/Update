@@ -28,6 +28,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 /**
  *
  * @author tmoxter
+ * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("inquiry")
 public class Inquiry_mxJPO
