@@ -29,7 +29,7 @@ import java.util.Stack;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.TagName_mxJPO("table")
+@net.sourceforge.mxupdate.update.util.TagName_mxJPO("web table")
 public class Table_mxJPO
         extends net.sourceforge.mxupdate.update.userinterface.AbstractUIObject_mxJPO
 {

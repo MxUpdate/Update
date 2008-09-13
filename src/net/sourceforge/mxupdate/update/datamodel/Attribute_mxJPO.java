@@ -36,6 +36,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
+@net.sourceforge.mxupdate.update.util.TagName_mxJPO("attribute")
 public class Attribute_mxJPO
         extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO
 {

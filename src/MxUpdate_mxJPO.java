@@ -328,7 +328,7 @@ if (unknown || (Mode.HELP == mode))  {
         for (final String name : entry.getValue())  {
             net.sourceforge.mxupdate.update.MatrixObject_mxJPO instance = entry.getKey().newInstance();
             final File path = new File(pathStr + File.separator + instance.getPath());
-System.out.println("export "+instance.getClass() + " '" + name + "'");
+System.out.println("export "+instance.getClass().getAnnotation(net.sourceforge.mxupdate.update.util.TagName_mxJPO.class).value() + " '" + name + "'");
             instance.export(_context, path, name);
         }
     }
