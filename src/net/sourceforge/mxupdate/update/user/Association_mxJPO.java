@@ -34,7 +34,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("user/association")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("association")
 public class Association_mxJPO
-        extends net.sourceforge.mxupdate.update.user.AbstractUserObject_mxJPO
+        extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
 {
     /**
      * Stores the definition of this association instance.

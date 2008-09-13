@@ -36,7 +36,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("user/group")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("group")
 public class Group_mxJPO
-        extends net.sourceforge.mxupdate.update.user.AbstractUserObject_mxJPO
+        extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
 {
     /**
      * Set to hold all parent groups.
