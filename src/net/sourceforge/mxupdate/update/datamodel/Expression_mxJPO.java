@@ -46,7 +46,7 @@ public class Expression_mxJPO
     private String expression = null;
 
     /**
-     * Parses all format specific URLs.
+     * Parses all expression specific expression URLs.
      *
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
@@ -84,7 +84,7 @@ public class Expression_mxJPO
     }
 
     /**
-     * Writes specific information about the cached format to the given
+     * Writes specific information about the cached expression to the given
      * writer instance.
      *
      * @param _out      writer instance
