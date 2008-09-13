@@ -102,6 +102,10 @@ public class MxUpdate_mxJPO
                         net.sourceforge.mxupdate.update.datamodel.Attribute_mxJPO.class,
                         "Export / Import of attributes.",
                         "attribute", "attrib", "attr", "att");
+        defineParameter(null, PARAMS_DM,
+                        net.sourceforge.mxupdate.update.datamodel.Format_mxJPO.class,
+                        "Export / Import of formats.",
+                        "format");
         defineParameter('r', PARAMS_DM,
                         net.sourceforge.mxupdate.update.datamodel.Relationship_mxJPO.class,
                         "Export / Import of relationships.",
@@ -113,7 +117,6 @@ public class MxUpdate_mxJPO
 /*
 // admin:
 expression: 'e' --expr --expression
-format: --format
 policy: --policy
 rule: --rule
 
