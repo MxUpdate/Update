@@ -33,6 +33,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
+@net.sourceforge.mxupdate.update.util.AdminType_mxJPO("relationship")
+@net.sourceforge.mxupdate.update.util.Path_mxJPO("datamodel/relationship")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("relation")
 public class Relationship_mxJPO
         extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO
@@ -116,11 +118,6 @@ public class Relationship_mxJPO
      * To side type list.
      */
     private final Set<String> toTypes = new TreeSet<String>();
-
-    public Relationship_mxJPO()
-    {
-        super("relationship");
-    }
 
     /**
      * @param _url      URL to parse

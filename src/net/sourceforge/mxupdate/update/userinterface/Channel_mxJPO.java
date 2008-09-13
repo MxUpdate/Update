@@ -36,6 +36,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
+@net.sourceforge.mxupdate.update.util.AdminType_mxJPO("channel")
+@net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/channel")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("channel")
 public class Channel_mxJPO
         extends net.sourceforge.mxupdate.update.userinterface.AbstractUIObject_mxJPO
@@ -75,14 +77,6 @@ public class Channel_mxJPO
      * @see #writeObject(Writer)
      */
     final Map<Integer,CommandRef> orderCmds = new TreeMap<Integer,CommandRef>();
-
-    /**
-     *
-     */
-    public Channel_mxJPO()
-    {
-        super("channel");
-    }
 
     @Override
     public void parse(final String _url,

@@ -66,17 +66,6 @@ public abstract class AbstractDMObject_mxJPO
     private boolean hidden = false;
 
     /**
-     * Constructor with prefix (suffix is not needed, because all data model
-     * administration objects do not need any suffix...).
-     *
-     * @param _prefix
-     */
-    protected AbstractDMObject_mxJPO(final String _prefix)
-    {
-        super("datamodel/" + _prefix, _prefix, null);
-    }
-
-    /**
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
      */

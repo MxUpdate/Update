@@ -33,6 +33,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
+@net.sourceforge.mxupdate.update.util.AdminType_mxJPO("type")
+@net.sourceforge.mxupdate.update.util.Path_mxJPO("datamodel/type")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("type")
 public class Type_mxJPO
         extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO
@@ -51,11 +53,6 @@ public class Type_mxJPO
      * List of all attributes for this type.
      */
     private final Set<String> attributes = new TreeSet<String>();
-
-    public Type_mxJPO()
-    {
-        super("type");
-    }
 
     /**
      * @param _url      URL to parse

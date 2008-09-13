@@ -37,6 +37,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
+@net.sourceforge.mxupdate.update.util.AdminType_mxJPO("menu")
+@net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/menu")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("menu")
 public class Menu_mxJPO
         extends net.sourceforge.mxupdate.update.userinterface.Command_mxJPO
@@ -47,7 +49,7 @@ public class Menu_mxJPO
 
     public Menu_mxJPO()
     {
-        super("menu");
+        super();
     }
 
     @Override

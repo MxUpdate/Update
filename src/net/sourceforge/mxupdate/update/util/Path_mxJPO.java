@@ -18,14 +18,22 @@
  * Last Changed By: $Author$
  */
 
-package net.sourceforge.mxupdate.update.userinterface;
+package net.sourceforge.mxupdate.update.util;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
+ * Path used to export.
  *
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
-public abstract class AbstractUIObject_mxJPO
-        extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Path_mxJPO
 {
+    /**
+     * Value of the type.
+     */
+    public String value();
 }

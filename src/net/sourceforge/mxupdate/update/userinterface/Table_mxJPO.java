@@ -29,6 +29,8 @@ import java.util.Stack;
  * @author tmoxter
  * @version $Id$
  */
+@net.sourceforge.mxupdate.update.util.AdminType_mxJPO(value="table",suffix="system")
+@net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/table")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("web table")
 public class Table_mxJPO
         extends net.sourceforge.mxupdate.update.userinterface.AbstractUIObject_mxJPO
@@ -38,7 +40,7 @@ public class Table_mxJPO
 
     public Table_mxJPO()
     {
-        super("table", "system");
+        super();
     }
 
     @Override

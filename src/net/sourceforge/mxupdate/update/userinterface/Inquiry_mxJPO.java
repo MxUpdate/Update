@@ -30,6 +30,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
+@net.sourceforge.mxupdate.update.util.AdminType_mxJPO("inquiry")
+@net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/inquiry")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("inquiry")
 public class Inquiry_mxJPO
        extends net.sourceforge.mxupdate.update.userinterface.AbstractUIObject_mxJPO
@@ -51,7 +53,7 @@ public class Inquiry_mxJPO
 
     public Inquiry_mxJPO()
     {
-        super("inquiry");
+        super();
     }
 
     @Override

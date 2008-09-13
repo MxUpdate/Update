@@ -18,14 +18,28 @@
  * Last Changed By: $Author$
  */
 
-package net.sourceforge.mxupdate.update.userinterface;
+package net.sourceforge.mxupdate.update.util;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
+ * Internal Matrix administration type name and (if required) suffix.
  *
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
-public abstract class AbstractUIObject_mxJPO
-        extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
+@Retention(RetentionPolicy.RUNTIME)
+public @interface AdminType_mxJPO
 {
+    /**
+     * Value of the type.
+     */
+    public String value();
+
+    /**
+     * Suffix of the administration type (if required, e.g. for web tables). If
+     * not defined the suffix is a zero length string.
+     */
+    public String suffix() default "";
 }
