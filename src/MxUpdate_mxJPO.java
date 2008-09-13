@@ -148,12 +148,15 @@ trigger: 'g' --trigger
                         "Export / Import of associations.",
                         "association", "asso");
         defineParameter(null, PARAMS_USER,
+                        net.sourceforge.mxupdate.update.user.Group_mxJPO.class,
+                        "Export / Import of groups.",
+                        "group");
+        defineParameter(null, PARAMS_USER,
                         net.sourceforge.mxupdate.update.user.Role_mxJPO.class,
                         "Export / Import of roles.",
                         "role");
 /*
 user:
---group
 --person
 */
     }
