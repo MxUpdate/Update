@@ -103,6 +103,10 @@ public class MxUpdate_mxJPO
                         "Export / Import of attributes.",
                         "attribute", "attrib", "attr", "att");
         defineParameter(null, PARAMS_DM,
+                        net.sourceforge.mxupdate.update.datamodel.Expression_mxJPO.class,
+                        "Export / Import of expressions.",
+                        "expression", "expr", "exp");
+        defineParameter(null, PARAMS_DM,
                         net.sourceforge.mxupdate.update.datamodel.Format_mxJPO.class,
                         "Export / Import of formats.",
                         "format");
@@ -120,9 +124,7 @@ public class MxUpdate_mxJPO
                         "type");
 /*
 // admin:
-expression: 'e' --expr --expression
 policy: --policy
-rule: --rule
 
 bus:
 numbergenerator: 'n' --numbergenerator
