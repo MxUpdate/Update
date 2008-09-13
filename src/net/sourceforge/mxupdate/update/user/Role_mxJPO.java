@@ -44,7 +44,7 @@ public class Role_mxJPO
     final Set<String> parentRoles = new TreeSet<String>();
 
     /**
-     * Parses all expression specific role URLs.
+     * Parses all role specific URLs.
      *
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
