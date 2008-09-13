@@ -98,6 +98,10 @@ public class MxUpdate_mxJPO
         PARAMS.put("--datamodel", PARAMS_DM);
         appendDescription("Export / Import of data model administrational objects.",
                           "-d","--dm", "--datamodel");
+        defineParameter('b', PARAMS_DM,
+                        net.sourceforge.mxupdate.update.datamodel.Attribute_mxJPO.class,
+                        "Export / Import of attributes.",
+                        "attribute", "attrib", "attr", "att");
         defineParameter('r', PARAMS_DM,
                         net.sourceforge.mxupdate.update.datamodel.Relationship_mxJPO.class,
                         "Export / Import of relationships.",
@@ -108,7 +112,6 @@ public class MxUpdate_mxJPO
                         "type");
 /*
 // admin:
-attribute: 'b' --attribute --attrib --attr --att
 expression: 'e' --expr --expression
 format: --format
 policy: --policy
