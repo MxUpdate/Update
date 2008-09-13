@@ -33,7 +33,7 @@ import java.util.Stack;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/table")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("web table")
 public class Table_mxJPO
-        extends net.sourceforge.mxupdate.update.userinterface.AbstractUIObject_mxJPO
+        extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
 {
 
     final Stack<net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO> columns = new Stack<net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO>();

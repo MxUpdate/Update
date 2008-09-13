@@ -36,7 +36,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/command")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("command")
 public class Command_mxJPO
-        extends net.sourceforge.mxupdate.update.userinterface.AbstractUIObject_mxJPO
+        extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
 {
     String alt = null;
 

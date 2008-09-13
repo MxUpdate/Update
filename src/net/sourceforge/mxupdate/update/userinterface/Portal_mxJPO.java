@@ -42,7 +42,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/portal")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("portal")
 public class Portal_mxJPO
-         extends net.sourceforge.mxupdate.update.userinterface.AbstractUIObject_mxJPO
+         extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
 {
     /**
      * Alt (label) of the portal.

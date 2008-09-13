@@ -40,7 +40,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/channel")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("channel")
 public class Channel_mxJPO
-        extends net.sourceforge.mxupdate.update.userinterface.AbstractUIObject_mxJPO
+        extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
 {
     /**
      * Alt (label) of the channel.

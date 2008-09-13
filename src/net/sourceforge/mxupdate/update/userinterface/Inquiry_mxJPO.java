@@ -34,7 +34,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/inquiry")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("inquiry")
 public class Inquiry_mxJPO
-       extends net.sourceforge.mxupdate.update.userinterface.AbstractUIObject_mxJPO
+       extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
 {
     /**
      * Code for the inquiry.

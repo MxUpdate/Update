@@ -35,7 +35,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/form")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("web form")
 public class Form_mxJPO
-        extends net.sourceforge.mxupdate.update.userinterface.AbstractUIObject_mxJPO
+        extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
 {
     final Stack<net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO> fields = new Stack<net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO>();
 
