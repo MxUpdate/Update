@@ -28,10 +28,10 @@ import java.util.TreeSet;
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 /**
-*
-* @author tmoxter
-* @version $Id$
-*/
+ *
+ * @author tmoxter
+ * @version $Id$
+ */
 @net.sourceforge.mxupdate.update.util.AdminType_mxJPO("role")
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("user/role")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("role")
