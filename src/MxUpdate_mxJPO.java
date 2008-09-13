@@ -134,14 +134,26 @@ trigger: 'g' --trigger
 */
     }
 
+    /**
+     * Holds all classes used for the data model import / export.
+     */
+    private final static Set<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>> PARAMS_USER
+            = new HashSet<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>>();
+    static  {
+        PARAMS.put("--user", PARAMS_USER);
+        appendDescription("Export / Import of user administrational objects.",
+                          "--user");
+        defineParameter(null, PARAMS_USER,
+                        net.sourceforge.mxupdate.update.user.Role_mxJPO.class,
+                        "Export / Import of roles.",
+                        "role");
 /*
-user: --user
+user:
 --association --asso
 --group
---role
 --person
 */
-
+    }
 /*
  'j' --jpo
  --program
