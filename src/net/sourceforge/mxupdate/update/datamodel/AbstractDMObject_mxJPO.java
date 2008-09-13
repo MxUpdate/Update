@@ -42,7 +42,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 public abstract class AbstractDMObject_mxJPO
-        extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
+        extends net.sourceforge.mxupdate.update.MatrixAdminObject_mxJPO
 {
     /**
      * Stack with all triggers for this type.
@@ -63,8 +63,8 @@ public abstract class AbstractDMObject_mxJPO
      * @param _content  content of the URL to parse
      */
     @Override
-    public void parse(final String _url,
-                      final String _content)
+    protected void parse(final String _url,
+                         final String _content)
     {
         if ("/triggerList".equals(_url))  {
             // to be ignored ...

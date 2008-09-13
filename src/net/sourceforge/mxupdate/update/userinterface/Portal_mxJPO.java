@@ -42,7 +42,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/portal")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("portal")
 public class Portal_mxJPO
-         extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
+         extends net.sourceforge.mxupdate.update.MatrixAdminObject_mxJPO
 {
     /**
      * Alt (label) of the portal.
@@ -74,14 +74,6 @@ public class Portal_mxJPO
     final Map<Integer,Map<Integer,ChannelRef>> orderedChannelRefs = new TreeMap<Integer,Map<Integer,ChannelRef>>();
 
     /**
-     * Constructor.
-     */
-    public Portal_mxJPO()
-    {
-        super();
-    }
-
-    /**
      * Parses the {@link #alt}, {@link #href}, {@link #label} and the channel
      * reference {@link #channelRefs}.
      *
@@ -89,8 +81,8 @@ public class Portal_mxJPO
      * @param _content  content of the XML tag
      */
     @Override
-    public void parse(final String _url,
-                      final String _content)
+    protected void parse(final String _url,
+                         final String _content)
     {
         if ("/alt".equals(_url))  {
             this.alt = _content;
@@ -157,7 +149,7 @@ public class Portal_mxJPO
             _out.append(" \\\n    alt \"").append(convert(this.alt)).append("\"");
         }
         // settings
-        for (final net.sourceforge.mxupdate.update.MatrixObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
+        for (final net.sourceforge.mxupdate.update.MatrixAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
             if (prop.getName().startsWith("%"))  {
                 _out.append(" \\\n    add setting \"").append(convert(prop.getName().substring(1))).append("\"")
                     .append(" \"").append(convert(prop.getValue())).append("\"");

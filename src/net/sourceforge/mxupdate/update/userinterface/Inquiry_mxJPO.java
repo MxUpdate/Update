@@ -34,7 +34,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/inquiry")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("inquiry")
 public class Inquiry_mxJPO
-       extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
+       extends net.sourceforge.mxupdate.update.MatrixAdminObject_mxJPO
 {
     /**
      * Code for the inquiry.
@@ -51,14 +51,9 @@ public class Inquiry_mxJPO
      */
     private String pattern = null;
 
-    public Inquiry_mxJPO()
-    {
-        super();
-    }
-
     @Override
-    public void parse(final String _url,
-                      final String _content)
+    protected void parse(final String _url,
+                         final String _content)
     {
         if ("/code".equals(_url))  {
             this.code = _content;
@@ -77,7 +72,7 @@ public class Inquiry_mxJPO
         _out.append(" \\\n    pattern \"").append(convert(this.pattern)).append("\"")
             .append(" \\\n    format \"").append(convert(this.format)).append("\"")
             .append(" \\\n    file \"${FILE}\"");
-        for (final net.sourceforge.mxupdate.update.MatrixObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
+        for (final net.sourceforge.mxupdate.update.MatrixAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
             if (prop.getName().startsWith("%"))  {
                 _out.append(" \\\n    add argument \"").append(convert(prop.getName().substring(1))).append("\"")
                     .append(" \"").append(convert(prop.getValue())).append("\"");

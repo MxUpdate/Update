@@ -52,8 +52,8 @@ public class Expression_mxJPO
      * @param _content  content of the URL to parse
      */
     @Override
-    public void parse(final String _url,
-                      final String _content)
+    protected void parse(final String _url,
+                         final String _content)
     {
         if (_url.startsWith("/expression"))  {
             // to be ignored and read from method prepare because

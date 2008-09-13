@@ -33,18 +33,15 @@ import java.util.Stack;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/table")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("web table")
 public class Table_mxJPO
-        extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
+        extends net.sourceforge.mxupdate.update.MatrixAdminObject_mxJPO
 {
-
+    /**
+     * Stores all table columns of this web table instance.
+     */
     final Stack<net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO> columns = new Stack<net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO>();
 
-    public Table_mxJPO()
-    {
-        super();
-    }
-
     @Override
-    public void parse(final String _url,
+    protected void parse(final String _url,
                       final String _content)
     {
         if ("/columnList".equals(_url))  {

@@ -34,7 +34,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("user/association")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("association")
 public class Association_mxJPO
-        extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
+        extends net.sourceforge.mxupdate.update.MatrixAdminObject_mxJPO
 {
     /**
      * Stores the definition of this association instance.
@@ -48,8 +48,8 @@ public class Association_mxJPO
      * @param _content  content of the URL to parse
      */
     @Override
-    public void parse(final String _url,
-                      final String _content)
+    protected void parse(final String _url,
+                         final String _content)
     {
         if ("/definition".equals(_url))  {
             this.definition = _content;

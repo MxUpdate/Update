@@ -73,8 +73,8 @@ public class Format_mxJPO
      * @param _content  content of the URL to parse
      */
     @Override
-    public void parse(final String _url,
-                      final String _content)
+    protected void parse(final String _url,
+                         final String _content)
     {
         if ("/editCommand".equals(_url))  {
             this.commandEdit = _content;

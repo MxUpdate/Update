@@ -53,8 +53,8 @@ public class Menu_mxJPO
     }
 
     @Override
-    public void parse(final String _url,
-                      final String _content)
+    protected void parse(final String _url,
+                         final String _content)
     {
         if ("/commandRefList".equals(_url))  {
             // to be ignored ...

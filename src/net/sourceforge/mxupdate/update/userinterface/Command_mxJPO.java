@@ -36,7 +36,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/command")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("command")
 public class Command_mxJPO
-        extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
+        extends net.sourceforge.mxupdate.update.MatrixAdminObject_mxJPO
 {
     String alt = null;
 
@@ -55,14 +55,9 @@ public class Command_mxJPO
      */
     final Set<String> users = new TreeSet<String>();
 
-    public Command_mxJPO()
-    {
-        super();
-    }
-
     @Override
-    public void parse(final String _url,
-                      final String _content)
+    protected void parse(final String _url,
+                         final String _content)
     {
         if ("/alt".equals(_url))  {
             this.alt = _content;
@@ -92,7 +87,7 @@ public class Command_mxJPO
         for (final String user : this.users)  {
             _out.append(" \\\n    add user \"").append(convert(user)).append("\"");
         }
-        for (final net.sourceforge.mxupdate.update.MatrixObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
+        for (final net.sourceforge.mxupdate.update.MatrixAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
             if (prop.getName().startsWith("%"))  {
                 _out.append(" \\\n    add setting \"").append(convert(prop.getName().substring(1))).append("\"")
                     .append(" \"").append(convert(prop.getValue())).append("\"");

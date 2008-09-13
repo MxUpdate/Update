@@ -59,8 +59,8 @@ public class Type_mxJPO
      * @param _content  content of the URL to parse
      */
     @Override
-    public void parse(final String _url,
-                      final String _content)
+    protected void parse(final String _url,
+                         final String _content)
     {
         if ("/abstract".equals(_url))  {
             this.abstractFlag = true;
