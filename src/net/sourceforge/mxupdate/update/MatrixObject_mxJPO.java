@@ -58,7 +58,17 @@ public abstract class MatrixObject_mxJPO
      */
     private String name = null;
 
-    String description = "";
+    /**
+     * Description of the matrix object.
+     */
+    private String description = "";
+
+    /**
+     * Is the matrix object hidden?
+     *
+     * @see #isHidden()
+     */
+    private boolean hidden = false;
 
     final Stack<Property> propertiesStack = new Stack<Property>();
 
@@ -144,6 +154,8 @@ public abstract class MatrixObject_mxJPO
             this.name = _content;
         } else if ("/adminProperties/description".equals(_url))  {
             this.description = _content;
+        } else if ("/adminProperties/hidden".equals(_url))  {
+            this.hidden = true;
 
         } else if ("/adminProperties/propertyList".equals(_url))  {
             // to be ignored ...
@@ -290,6 +302,16 @@ System.err.println("unkown parsing url: "+_url+"("+_content+")");
     protected String getName()
     {
         return this.name;
+    }
+
+    /**
+     * Getter method for instance variable {@link #hidden}.
+     *
+     * @return value of instance variable {@link #hidden}.
+     */
+    protected boolean isHidden()
+    {
+        return this.hidden;
     }
 
     /**

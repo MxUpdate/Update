@@ -73,6 +73,7 @@ public class Role_mxJPO
     protected void writeObject(final Writer _out)
             throws IOException
     {
+        _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden");
         for (final String role : this.parentRoles)  {
             _out.append("\nmql mod role \"")
                 .append(convert(role))

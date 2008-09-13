@@ -139,6 +139,9 @@ public class Rule_mxJPO
     protected void writeObject(final Writer _out)
             throws IOException
     {
+        // hidden?
+        _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden");
+
         // owner access
         _out.append(" \\\n    add owner \"");
         boolean first = true;

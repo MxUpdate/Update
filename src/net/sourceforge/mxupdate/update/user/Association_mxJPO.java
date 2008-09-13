@@ -69,6 +69,7 @@ public class Association_mxJPO
     protected void writeObject(final Writer _out)
             throws IOException
     {
-        _out.append(" \\\n    definition \"").append(convert(this.definition)).append("\"");
+        _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden")
+            .append(" \\\n    definition \"").append(convert(this.definition)).append("\"");
     }
 }

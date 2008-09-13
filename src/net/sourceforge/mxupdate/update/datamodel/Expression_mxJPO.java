@@ -93,6 +93,7 @@ public class Expression_mxJPO
     protected void writeObject(final Writer _out)
             throws IOException
     {
+        _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden");
         _out.append(" \\\n    value \"");
         final String expr = convert(this.expression);
         // bug-fix: expression with starting and ending ' (but without ')

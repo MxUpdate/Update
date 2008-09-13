@@ -85,7 +85,8 @@ public class Type_mxJPO
     @Override
     protected void writeObject(Writer _out) throws IOException
     {
-        _out.append(" \\\n    derived \"").append(convert(this.derived)).append("\"")
+        _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden")
+            .append(" \\\n    derived \"").append(convert(this.derived)).append("\"")
             .append(" \\\n    ").append(isHidden() ? "" : "!").append("hidden")
             .append(" \\\n    abstract ").append(Boolean.toString(this.abstractFlag));
         writeTriggers(_out);

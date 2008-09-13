@@ -59,13 +59,6 @@ public abstract class AbstractDMObject_mxJPO
     private final Map<String,Trigger> triggers = new TreeMap<String,Trigger>();
 
     /**
-     * Is the data model object hidden?
-     *
-     * @see #isHidden()
-     */
-    private boolean hidden = false;
-
-    /**
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
      */
@@ -73,10 +66,7 @@ public abstract class AbstractDMObject_mxJPO
     public void parse(final String _url,
                       final String _content)
     {
-        if ("/adminProperties/hidden".equals(_url))  {
-            this.hidden = true;
-
-        } else if ("/triggerList".equals(_url))  {
+        if ("/triggerList".equals(_url))  {
             // to be ignored ...
         } else if ("/triggerList/trigger".equals(_url))  {
             this.triggersStack.add(new Trigger());
@@ -125,17 +115,6 @@ public abstract class AbstractDMObject_mxJPO
             trigger.write(_out);
         }
     }
-
-    /**
-     * Getter method for instance variable {@link #hidden}.
-     *
-     * @return value of instance variable {@link #hidden}.
-     */
-    protected boolean isHidden()
-    {
-        return this.hidden;
-    }
-
 
     static class Trigger  {
         /**

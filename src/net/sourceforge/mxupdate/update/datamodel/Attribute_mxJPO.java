@@ -158,9 +158,7 @@ public class Attribute_mxJPO
     protected void writeObject(final Writer _out)
             throws IOException
     {
-        if (this.isHidden())  {
-            _out.append(" \\\n    hidden");
-        }
+        _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden");
         if ("string".equalsIgnoreCase(this.type))  {
             _out.append(" \\\n    ").append(this.multiline ? "" : "!").append("multiline");
         }
