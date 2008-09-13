@@ -110,6 +110,10 @@ public class MxUpdate_mxJPO
                         net.sourceforge.mxupdate.update.datamodel.Relationship_mxJPO.class,
                         "Export / Import of relationships.",
                         "relation", "relationship");
+        defineParameter(null, PARAMS_DM,
+                        net.sourceforge.mxupdate.update.datamodel.Rule_mxJPO.class,
+                        "Export / Import of rules.",
+                        "rule");
         defineParameter('t', PARAMS_DM,
                         net.sourceforge.mxupdate.update.datamodel.Type_mxJPO.class,
                         "Export / Import of types.",
