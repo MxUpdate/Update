@@ -171,10 +171,17 @@ user:
 --person
 */
     }
-/*
- 'j' --jpo
- --program
- */
+
+    static  {
+        defineParameter('j', null,
+                        net.sourceforge.mxupdate.update.program.JPO_mxJPO.class,
+                        "Export / Import of JPOs.",
+                        "jpo");
+        defineParameter(null, null,
+                        net.sourceforge.mxupdate.update.program.Program_mxJPO.class,
+                        "Export / Import of programs.",
+                        "program");
+    }
 
     /**
      * Holds all classes used for the user interface import / export.
@@ -237,7 +244,9 @@ user:
                                         final String... _longParams)
     {
         final List<String> allParamStrings = new ArrayList<String>();
-        _paramsList.add(_clazz);
+        if (_paramsList != null)  {
+            _paramsList.add(_clazz);
+        }
         Set<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>> tmp = null;
         // check for short parameter and test for double definition
         if (_shortParam != null)  {
