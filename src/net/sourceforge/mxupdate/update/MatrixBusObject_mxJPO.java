@@ -77,6 +77,7 @@ public abstract class MatrixBusObject_mxJPO
      * Sorted set of attribute values.
      *
      * @see #prepare(Context)           sorted the attribute values
+     * @see #getAttrValuesSorted()
      */
     private final Set<Attribute> attrValuesSorted = new TreeSet<Attribute>();
 
@@ -108,6 +109,7 @@ public abstract class MatrixBusObject_mxJPO
      * header of the TCL file includes the revision of the business object).
      *
      * @see #parse(String, String)
+     * @see #getBusDescription()
      */
     private String busDescription = null;
 
@@ -349,20 +351,42 @@ public abstract class MatrixBusObject_mxJPO
     }
 
     /**
+     * Getter method for instance variable {@link #busDescription}.
+     *
+     * @return value of instance variable {@link #busDescription}
+     * @see #busDescription
+     */
+    protected String getBusDescription()
+    {
+        return this.busDescription;
+    }
+
+    /**
+     * Getter method for instance variable {@link #attrValuesSorted}.
+     *
+     * @return value of instance variable {@link #attrValuesSorted}
+     * @see #attrValuesSorted
+     */
+    protected Set<Attribute> getAttrValuesSorted()
+    {
+        return this.attrValuesSorted;
+    }
+
+    /**
      * Class used to hold the user access.
      */
-    private class Attribute
+    protected class Attribute
             implements Comparable<Attribute>
     {
         /**
          * Holds the user references of a user access.
          */
-        String name = null;
+        public String name = null;
 
         /**
          * Holds the expression filter of a user access.
          */
-        String value = null;
+        public String value = null;
 
         /**
          * @param _attribute    attribute instance to compare

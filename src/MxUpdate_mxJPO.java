@@ -110,6 +110,14 @@ public class MxUpdate_mxJPO
                         net.sourceforge.mxupdate.update.datamodel.Format_mxJPO.class,
                         "Export / Import of formats.",
                         "format");
+        defineParameter(null, PARAMS_DM,
+                        net.sourceforge.mxupdate.update.datamodel.NumberGenerator_mxJPO.class,
+                        "Export / Import of number generators.",
+                        "numbergenerator");
+        defineParameter(null, PARAMS_DM,
+                        net.sourceforge.mxupdate.update.datamodel.ObjectGenerator_mxJPO.class,
+                        "Export / Import of object generators.",
+                        "objectgenerator");
         defineParameter('r', PARAMS_DM,
                         net.sourceforge.mxupdate.update.datamodel.Relationship_mxJPO.class,
                         "Export / Import of relationships.",
