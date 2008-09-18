@@ -20,10 +20,7 @@
 
 package net.sourceforge.mxupdate.update;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.HashSet;
@@ -32,13 +29,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 import matrix.db.Context;
 import matrix.db.MQLCommand;
@@ -77,13 +67,11 @@ public abstract class MatrixAdminObject_mxJPO
 
     /**
      * Returns the file name for this matrix object. The file name is a
-     * concatenation of the {@link #prefix} in upper case, an underline
-     * (&quot;_&quot;), the {@link #name} of the matrix object and
+     * concatenation of the defined admin type annotation in upper case, an
+     * underline (&quot;_&quot;), the {@link #name} of the matrix object and
      *  &quot;.tcl&quot; as extension.
      *
      * @return file name of this matrix object
-     * @see #name
-     * @see #prefix
      */
     @Override
     public String getFileName()
@@ -131,6 +119,13 @@ public abstract class MatrixAdminObject_mxJPO
         return ret;
     }
 
+    @Override
+    protected String getExportMQL(final String _name)
+    {
+        return "export " + getClass().getAnnotation(net.sourceforge.mxupdate.update.util.AdminType_mxJPO.class).value() + " \"" + _name + "\" xml";
+    }
+
+    @Override
     protected void parse(final String _url,
                          final String _content)
     {
@@ -168,29 +163,39 @@ public abstract class MatrixAdminObject_mxJPO
         } else if ("/adminProperties/propertyList/property/value".equals(_url))  {
             this.propertiesStack.peek().value = _content;
         } else  {
-System.err.println("unkown parsing url: "+_url+"("+_content+")");
+            super.parse(_url, _content);
         }
     }
 
     /**
+     * Sorted the properties and sets the author depending on the properties.
      *
      * @param _context      context for this request
      * @throws MatrixException
+     * @see #propertiesStack    unsorted properties
+     * @see #propertiesMap      sorted map of properties
      */
+    @Override
     protected void prepare(final Context _context)
             throws MatrixException
     {
+        // sort the properties
         for (final Property property : this.propertiesStack)  {
-            final StringBuilder key = new StringBuilder()
-                    .append(property.name);
+            final StringBuilder key = new StringBuilder().append(property.name);
             if ((property.refAdminName != null) && (property.refAdminName != null))  {
                 key.append("::").append(property.refAdminType)
                    .append("::").append(property.refAdminName);
             }
             this.propertiesMap.put(key.toString(), property);
         }
+        // set author depending on the properties
+        final Property author = this.propertiesMap.get("author");
+        if (author != null)   {
+            setAuthor(author.value);
+        }
     }
 
+        @Override
         protected final void write(final Writer _out)
                 throws IOException
         {
@@ -214,54 +219,6 @@ System.err.println("unkown parsing url: "+_url+"("+_content+")");
                 throws IOException
         {
 
-        }
-
-        void writeHeader(final Writer _out)
-                throws IOException
-        {
-            final String type = getClass().getAnnotation(net.sourceforge.mxupdate.update.util.AdminType_mxJPO.class).value();
-            _out.append("################################################################################\n")
-                .append("# ").append(type.toUpperCase()).append(":\n")
-                .append("# ~");
-            for (int i = 0; i < type.length(); i++)  {
-                _out.append("~");
-            }
-            _out.append("\n")
-                .append("# ").append(getName()).append("\n")
-                .append("#\n")
-                .append("# SYMBOLIC NAME:\n")
-                .append("# ~~~~~~~~~~~~~~\n")
-.append("# ").append(type).append("_").append(getName()).append("\n")
-                .append("#\n")
-                .append("# DESCRIPTION:\n")
-                .append("# ~~~~~~~~~~~~\n");
-            if ((getDescription() != null) && !"".equals(getDescription()))  {
-                _out.append('#');
-                int length = 0;
-                for (final String desc : getDescription().split(" "))  {
-                    if (!"".equals(desc))  {
-                        length += desc.length() + 1;
-                        if (length > 79)  {
-                            _out.append("\n#");
-                            length = desc.length() + 1;
-                        }
-                        _out.append(' ').append(desc);
-                    }
-                }
-                _out.append("\n");
-            } else  {
-                _out.append("#\n");
-            }
-            _out.append("#\n")
-                .append("# AUTHOR:\n")
-                .append("# ~~~~~~~\n");
-            final Property author = this.propertiesMap.get("author");
-            if ((author != null) && (author.value != null) && !"".equals(author.value))  {
-                _out.append("# ").append(author.value).append('\n');
-            } else {
-                _out.append("#\n");
-            }
-            _out.append("################################################################################\n\n");
         }
 
     private void writeProperties(final Writer _out)
@@ -369,134 +326,4 @@ System.err.println("unkown parsing url: "+_url+"("+_content+")");
             return "[name="+name+", value="+value+", flags="+flags+"]";
         }
     }
-
-    @Override
-    public void export(final Context _context,
-                       final File _path,
-                       final String _name)
-            throws MatrixException, SAXException, IOException
-    {
-        parse(_context, _name);
-        final File file = new File(_path, getFileName());
-        if (!file.getParentFile().exists())  {
-            file.getParentFile().mkdirs();
-        }
-        final Writer out = new FileWriter(file);
-        write(out);
-        out.flush();
-        out.close();
-    }
-
-    protected void parse(final Context _context,
-                         final String _name)
-            throws MatrixException, SAXException, IOException
-    {
-        final MQLCommand mql = new MQLCommand();
-        mql.executeCommand(_context, "export " + getClass().getAnnotation(net.sourceforge.mxupdate.update.util.AdminType_mxJPO.class).value() + " \"" + _name + "\" xml");
-        final String xml = mql.getResult();
-        // einen XML Reader erzeugen
-        XMLReader reader = XMLReaderFactory.createXMLReader();
-     // den eigenen Sax Content Handler registrieren
-        PadSaxHandler handler = new PadSaxHandler ();
-        reader.setContentHandler(handler);
-        reader.setDTDHandler(handler);
-        reader.setEntityResolver(handler);
-        // parse the XML string of the export
-        InputSource inputSource = new InputSource(new StringReader(xml));
-        inputSource.setEncoding("UTF8");
-        reader.parse(inputSource);
-        // prepare post preparation
-        prepare(_context);
-    }
-
-    public class PadSaxHandler extends DefaultHandler
-    {
-        final Stack<String> stack = new Stack<String>();
-        StringBuilder content = null;
-        private boolean called = false;
-
-        final Stack<Object> objects = new Stack<Object>();
-
-        private String getUrl()
-        {
-            final StringBuilder ret = new StringBuilder();
-            for (final String tag : stack.subList(2, stack.size()))  {
-                ret.append('/').append(tag);
-            }
-            return ret.toString();
-        }
-
-        /**
-         * An input source with a zero length strin is returned, because
-         * the XML parser wants to open file &quot;ematrixml.dtd&quot;.
-         */
-        @Override
-        public InputSource resolveEntity (final String _publicId,
-                                          final String _systemId)
-            throws IOException, SAXException
-        {
-            return new InputSource(new StringReader(""));
-        }
-
-        @Override
-        public void characters(final char[] _ch,
-                               final int _start,
-                               final int _length)
-            throws SAXException
-        {
-
-          if (_length > 0) {
-            final String content = new String (_ch,_start,_length);
-            if (!this.called)  {
-              if (this.content == null)  {
-                this.content = new StringBuilder();
-              }
-              this.content.append(content);
-            }
-          }
-        }
-
-        @Override
-        public void endElement (final String uri,
-                                final String localName,
-                                final String qName)
-                throws SAXException
-        {
-            if (!this.called)
-            {
-                evaluate();
-                this.called = true;
-            }
-            this.stack.pop();
-        }
-
-        @Override
-        public void startElement(final String _uri,
-                                 final String _localName,
-                                 final String _qName,
-                                 final Attributes _attributes)
-                throws SAXException
-        {
-            if (!this.called)
-            {
-                evaluate();
-            }
-            this.called = false;
-            this.content = null;
-
-            this.stack.add(_qName);
-        }
-
-        private void evaluate()
-        {
-            if (this.stack.size() > 2)  {
-                final String tag = this.stack.get(1);
-                if (!"creationProperties".equals(tag))  {
-                    MatrixAdminObject_mxJPO.this.parse(getUrl(),
-                                                       (this.content != null) ? this.content.toString() : null);
-                }
-            }
-        }
-    }
-
 }
