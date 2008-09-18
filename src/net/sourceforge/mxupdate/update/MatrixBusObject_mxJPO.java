@@ -157,14 +157,16 @@ public abstract class MatrixBusObject_mxJPO
         final Set<String> ret = new TreeSet<String>();
         for (final Object mapObj : list)  {
             final BusinessObjectWithSelect map = (BusinessObjectWithSelect) mapObj;
-            final String name = new StringBuilder()
-                    .append(map.getSelectDataList("name").get(0))
-                    .append(SPLIT_NAME)
-                    .append(map.getSelectDataList("revision").get(0))
-                    .toString();
+            final StringBuilder name = new StringBuilder()
+                    .append(map.getSelectDataList("name").get(0));
+            final String revision = (String) map.getSelectDataList("revision").get(0);
+            if ((revision != null) && !"".equals(revision))  {
+                name.append(SPLIT_NAME)
+                    .append(map.getSelectDataList("revision").get(0));
+            }
             for (final String match : _matches)  {
-                if (match(name, match))  {
-                    ret.add(name);
+                if (match(name.toString(), match))  {
+                    ret.add(name.toString());
                 }
             }
         }
@@ -187,7 +189,9 @@ public abstract class MatrixBusObject_mxJPO
         return new StringBuilder()
                 .append("export bus \"")
                 .append(getBusType())
-                .append("\" \"").append(nameRev[0]).append("\" \"").append(nameRev[1]).append("\" !file !icon !history !relationship !state xml")
+                .append("\" \"").append(nameRev[0])
+                .append("\" \"").append((nameRev.length > 2) ? nameRev[1] : "")
+                .append("\" !file !icon !history !relationship !state xml")
                 .toString();
     }
 
@@ -214,18 +218,8 @@ public abstract class MatrixBusObject_mxJPO
             // to be ignored ...
         } else if ("/objectName".equals(_url))  {
             this.busName = _content;
-            if (getName() != null)  {
-                setName(_content + getName());
-            } else  {
-                setName(_content);
-            }
         } else if ("/objectRevision".equals(_url))  {
             this.busRevision = _content;
-            if (getName() != null)  {
-                setName(getName() + SPLIT_NAME + _content);
-            } else  {
-                setName(SPLIT_NAME + _content);
-            }
         } else if ("/description".equals(_url))  {
             this.busDescription = _content;
         } else if ("/vaultRef".equals(_url))  {
@@ -251,8 +245,9 @@ public abstract class MatrixBusObject_mxJPO
     }
 
     /**
-     * Sorts the attribute values and defined the description for the TCL
-     * update script (concatination of the revision and description).
+     * Sorts the attribute values, defines the description for the TCL
+     * update script (concatination of the revision and description) and the
+     * name (concationation of name and revision).
      *
      * @param _context  context for this request
      * @see #attrValues         unsorted attribute values
@@ -283,6 +278,12 @@ public abstract class MatrixBusObject_mxJPO
             desc.append(this.busDescription);
         }
         setDescription(desc.toString());
+        // defines the name
+        final StringBuilder name = new StringBuilder().append(this.busName);
+        if (this.busRevision != null)  {
+            name.append(SPLIT_NAME).append(this.busRevision);
+        }
+        setName(name.toString());
     }
 
     /**
