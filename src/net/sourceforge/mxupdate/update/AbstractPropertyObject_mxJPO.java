@@ -156,27 +156,39 @@ public abstract class AbstractPropertyObject_mxJPO
         out.close();
     }
 
+    /**
+     * Creates a XML representation of the Object to export, parses them and
+     * executes the post preparation {@link #prepare(Context)}.
+     *
+     * @param _context  context for this request
+     * @param _name     name of object to parse
+     * @see #getExportMQL(String)       used to get the MQL command to get a
+     *                                  XML representation
+     * @see PadSaxHandler               SAX handler to parse the XML file
+     * @see #parse(String, String)      parser called within the SAX handler
+     * @see #prepare(Context)           called post preparation method
+     */
     protected void parse(final Context _context,
-            final String _name)
-throws MatrixException, SAXException, IOException
-{
-final MQLCommand mql = new MQLCommand();
-mql.executeCommand(_context, getExportMQL(_name));
-final String xml = mql.getResult();
-// create XML reader
-final XMLReader reader = XMLReaderFactory.createXMLReader();
-// register Sax Content Handler
-PadSaxHandler handler = new PadSaxHandler ();
-reader.setContentHandler(handler);
-reader.setDTDHandler(handler);
-reader.setEntityResolver(handler);
-// parse the XML string of the export
-InputSource inputSource = new InputSource(new StringReader(xml));
-inputSource.setEncoding("UTF8");
-reader.parse(inputSource);
-// prepare post preparation
-prepare(_context);
-}
+                         final String _name)
+            throws MatrixException, SAXException, IOException
+    {
+        final MQLCommand mql = new MQLCommand();
+        mql.executeCommand(_context, getExportMQL(_name));
+        final String xml = mql.getResult();
+        // create XML reader
+        final XMLReader reader = XMLReaderFactory.createXMLReader();
+        // register Sax Content Handler
+        PadSaxHandler handler = new PadSaxHandler ();
+        reader.setContentHandler(handler);
+        reader.setDTDHandler(handler);
+        reader.setEntityResolver(handler);
+        // parse the XML string of the export
+        InputSource inputSource = new InputSource(new StringReader(xml));
+        inputSource.setEncoding("UTF8");
+        reader.parse(inputSource);
+        // prepare post preparation
+        prepare(_context);
+    }
 
     protected abstract String getExportMQL(final String _name);
 
