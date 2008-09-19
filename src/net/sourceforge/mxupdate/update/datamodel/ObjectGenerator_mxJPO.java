@@ -37,7 +37,7 @@ import matrix.util.StringList;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("datamodel/objectgenerator")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("object generator")
 public class ObjectGenerator_mxJPO
-        extends net.sourceforge.mxupdate.update.MatrixBusObject_mxJPO
+        extends net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO
 {
     private final static String RELATIONSHIP_NUMBER_GENERATOR = "eService Number Generator";
 

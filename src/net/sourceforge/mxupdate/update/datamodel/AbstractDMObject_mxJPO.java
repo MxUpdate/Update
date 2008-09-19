@@ -42,7 +42,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 public abstract class AbstractDMObject_mxJPO
-        extends net.sourceforge.mxupdate.update.MatrixAdminObject_mxJPO
+        extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
     /**
      * Stack with all triggers for this type.

@@ -41,8 +41,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
  * @author tmoxter
  * @version $Id$
  */
-public abstract class MatrixBusObject_mxJPO
-        extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
+public abstract class AbstractBusObject_mxJPO
+        extends net.sourceforge.mxupdate.update.AbstractPropertyObject_mxJPO
 {
     /**
      * String used to split the name and revision of administrational business
@@ -122,7 +122,7 @@ public abstract class MatrixBusObject_mxJPO
      * @return file name of this matrix object
      */
     @Override
-    public String getFileName()
+    protected String getFileName()
     {
         return new StringBuilder()
                 .append(getClass().getAnnotation(net.sourceforge.mxupdate.update.util.BusType_mxJPO.class).filePrefix().toUpperCase())

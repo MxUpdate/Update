@@ -40,7 +40,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/channel")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("channel")
 public class Channel_mxJPO
-        extends net.sourceforge.mxupdate.update.MatrixAdminObject_mxJPO
+        extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
     /**
      * Alt (label) of the channel.
@@ -144,7 +144,7 @@ public class Channel_mxJPO
             _out.append(" \\\n    height \"").append(this.height.toString()).append("\"");
         }
         // settings
-        for (final net.sourceforge.mxupdate.update.MatrixAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
+        for (final net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
             if (prop.getName().startsWith("%"))  {
                 _out.append(" \\\n    add setting \"").append(convert(prop.getName().substring(1))).append("\"")
                     .append(" \"").append(convert(prop.getValue())).append("\"");

@@ -81,8 +81,8 @@ public class MxUpdate_mxJPO
      * All paramaeters related to export / import are stored in this map. The
      * key is the parameter (incl. the '-'), the value the related class.
      */
-    private final static Map<String,Set<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>>> PARAMS
-            = new HashMap<String,Set<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>>>();
+    private final static Map<String,Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>> PARAMS
+            = new HashMap<String,Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>>();
 
 // -a --all --admin
 // 'x' --export
@@ -91,8 +91,8 @@ public class MxUpdate_mxJPO
     /**
      * Holds all classes used for the data model import / export.
      */
-    private final static Set<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>> PARAMS_DM
-            = new HashSet<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>>();
+    private final static Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>> PARAMS_DM
+            = new HashSet<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>();
     static  {
         PARAMS.put("-d", PARAMS_DM);
         PARAMS.put("--datamodel", PARAMS_DM);
@@ -148,8 +148,8 @@ process: 's' --process
     /**
      * Holds all classes used for the data model import / export.
      */
-    private final static Set<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>> PARAMS_USER
-            = new HashSet<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>>();
+    private final static Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>> PARAMS_USER
+            = new HashSet<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>();
     static  {
         PARAMS.put("--user", PARAMS_USER);
         appendDescription("Export / Import of user administrational objects.",
@@ -186,8 +186,8 @@ user:
     /**
      * Holds all classes used for the user interface import / export.
      */
-    private final static Set<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>> PARAMS_UI
-            = new HashSet<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>>();
+    private final static Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>> PARAMS_UI
+            = new HashSet<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>();
     static  {
         PARAMS.put("-u", PARAMS_UI);
         PARAMS.put("--ui", PARAMS_UI);
@@ -238,8 +238,8 @@ user:
      * @throws Error if a short parameter is already defined
      */
     private static void defineParameter(final Character _shortParam,
-                                        final Set<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>> _paramsList,
-                                        final Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO> _clazz,
+                                        final Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>> _paramsList,
+                                        final Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO> _clazz,
                                         final String _description,
                                         final String... _longParams)
     {
@@ -247,7 +247,7 @@ user:
         if (_paramsList != null)  {
             _paramsList.add(_clazz);
         }
-        Set<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>> tmp = null;
+        Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>> tmp = null;
         // check for short parameter and test for double definition
         if (_shortParam != null)  {
             final String shortParam = "-" + _shortParam;
@@ -256,11 +256,11 @@ user:
                 throw new Error("double definition of short parameter '" + shortParam
                                 + "'! Found:\n" + tmp + "\nNew Definition:\n" + _clazz);
             }
-            tmp = new HashSet<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>>();
+            tmp = new HashSet<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>();
             PARAMS.put(shortParam, tmp);
             allParamStrings.add(shortParam);
         } else  {
-            tmp = new HashSet<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>>();
+            tmp = new HashSet<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>();
         }
         tmp.add(_clazz);
         // all long parameters
@@ -268,7 +268,7 @@ user:
             final String paramStr = "--" + param;
             tmp = PARAMS.get(paramStr);
             if (tmp == null)  {
-                tmp = new HashSet<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>>();
+                tmp = new HashSet<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>();
                 PARAMS.put(paramStr, tmp);
             }
             tmp.add(_clazz);
@@ -323,8 +323,8 @@ user:
 
             Mode mode = null;
 
-final Map<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>,List<String>> clazz2matches
-        = new HashMap<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>,List<String>>();
+final Map<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,List<String>> clazz2matches
+        = new HashMap<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,List<String>>();
 //System.err.println("PARAM_MODE="  + Mode.IMPORT);
 
 boolean unknown = false;
@@ -333,11 +333,11 @@ String pathStr = null;
 
         for (int idx = 0; idx < _args.length; idx++)  {
 //System.out.println(""+idx+"="+_args[idx]+"="+PARAMS.get(_args[idx]));
-            final Set<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>> clazzes = PARAMS.get(_args[idx]);
+            final Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>> clazzes = PARAMS.get(_args[idx]);
             if (clazzes != null)  {
                 idx++;
                 final String name = _args[idx];
-                for (final Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO> clazz : clazzes)  {
+                for (final Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO> clazz : clazzes)  {
                     List<String> names = clazz2matches.get(clazz);
                     if (names == null)  {
                         names = new ArrayList<String>();
@@ -365,15 +365,15 @@ System.err.println("unknown pararameter "  + _args[idx]);
 if (unknown || (Mode.HELP == mode))  {
     System.out.println("" + DESCRIPTION);
 } else if (Mode.EXPORT == mode)  {
-    final Map<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>,Set<String>> clazz2names
-            = new HashMap<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>,Set<String>>();
-    for (final Map.Entry<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>,List<String>> entry : clazz2matches.entrySet())  {
-        net.sourceforge.mxupdate.update.MatrixObject_mxJPO instance = entry.getKey().newInstance();
+    final Map<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,Set<String>> clazz2names
+            = new HashMap<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,Set<String>>();
+    for (final Map.Entry<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,List<String>> entry : clazz2matches.entrySet())  {
+        net.sourceforge.mxupdate.update.AbstractObject_mxJPO instance = entry.getKey().newInstance();
         clazz2names.put(entry.getKey(), instance.getMatchingNames(_context, entry.getValue()));
     }
-    for (final Map.Entry<Class<? extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO>,Set<String>> entry : clazz2names.entrySet())  {
+    for (final Map.Entry<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,Set<String>> entry : clazz2names.entrySet())  {
         for (final String name : entry.getValue())  {
-            net.sourceforge.mxupdate.update.MatrixObject_mxJPO instance = entry.getKey().newInstance();
+            net.sourceforge.mxupdate.update.AbstractObject_mxJPO instance = entry.getKey().newInstance();
             final File path = new File(pathStr + File.separator + instance.getPath());
 System.out.println("export "+instance.getClass().getAnnotation(net.sourceforge.mxupdate.update.util.TagName_mxJPO.class).value() + " '" + name + "'");
             instance.export(_context, path, name);

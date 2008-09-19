@@ -39,7 +39,7 @@ import matrix.util.StringList;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("datamodel/trigger")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("trigger")
 public class Trigger_mxJPO
-        extends net.sourceforge.mxupdate.update.MatrixBusObject_mxJPO
+        extends net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO
 {
     /**
      * Is the trigger active?

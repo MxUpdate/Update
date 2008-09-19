@@ -42,7 +42,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/portal")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("portal")
 public class Portal_mxJPO
-         extends net.sourceforge.mxupdate.update.MatrixAdminObject_mxJPO
+         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
     /**
      * Alt (label) of the portal.
@@ -149,7 +149,7 @@ public class Portal_mxJPO
             _out.append(" \\\n    alt \"").append(convert(this.alt)).append("\"");
         }
         // settings
-        for (final net.sourceforge.mxupdate.update.MatrixAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
+        for (final net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
             if (prop.getName().startsWith("%"))  {
                 _out.append(" \\\n    add setting \"").append(convert(prop.getName().substring(1))).append("\"")
                     .append(" \"").append(convert(prop.getValue())).append("\"");

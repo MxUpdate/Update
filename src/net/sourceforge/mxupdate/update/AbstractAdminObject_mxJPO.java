@@ -41,8 +41,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
  * @author tmoxter
  * @version $Id$
  */
-public abstract class MatrixAdminObject_mxJPO
-        extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
+public abstract class AbstractAdminObject_mxJPO
+        extends net.sourceforge.mxupdate.update.AbstractPropertyObject_mxJPO
 {
     /**
      * Is the matrix object hidden?
@@ -74,7 +74,7 @@ public abstract class MatrixAdminObject_mxJPO
      * @return file name of this matrix object
      */
     @Override
-    public String getFileName()
+    protected String getFileName()
     {
         return new StringBuilder()
                 .append(getClass().getAnnotation(net.sourceforge.mxupdate.update.util.AdminType_mxJPO.class).value().toUpperCase())
@@ -82,18 +82,6 @@ public abstract class MatrixAdminObject_mxJPO
                 .append(getName())
                 .append(".tcl")
                 .toString();
-    }
-
-    /**
-     * Returns the path where the file is located of this matrix object. The
-     * method used the path annotation.
-     *
-     * @return path.
-     */
-    @Override
-    public String getPath()
-    {
-        return getClass().getAnnotation(net.sourceforge.mxupdate.update.util.Path_mxJPO.class).value();
     }
 
     @Override

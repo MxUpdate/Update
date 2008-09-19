@@ -36,7 +36,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("user/role")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("role")
 public class Role_mxJPO
-        extends net.sourceforge.mxupdate.update.MatrixAdminObject_mxJPO
+        extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
     /**
      * Set to hold all parent roles.

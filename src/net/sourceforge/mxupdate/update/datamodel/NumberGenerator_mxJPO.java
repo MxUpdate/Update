@@ -33,7 +33,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("datamodel/numbergenerator")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("number generator")
 public class NumberGenerator_mxJPO
-        extends net.sourceforge.mxupdate.update.MatrixBusObject_mxJPO
+        extends net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO
 {
     final static String ATTRIBUTE_ESERVICE_NEXT_NUMBER = "eService Next Number";
 

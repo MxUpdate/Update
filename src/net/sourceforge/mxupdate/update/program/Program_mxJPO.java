@@ -43,21 +43,15 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("program")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("program")
 public class Program_mxJPO
-        extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
+        extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO
 {
-
-    @Override
-    protected String getExportMQL(String _name)
-    {
-        return null;
-    }
-
-    @Override
-    public String getFileName()
-    {
-        return null;
-    }
-
+    /**
+     * Evaluates for given collection of string which programs are matching
+     * returns them as set. Only programs which are not JPOs are returned.
+     *
+     * @param _context          context for this request
+     * @param _matches          collection of strings which must match
+     */
     @Override
     public Set<String> getMatchingNames(final Context _context,
                                         final Collection<String> _matches)
@@ -81,6 +75,13 @@ public class Program_mxJPO
         return ret;
     }
 
+    /**
+     * Exports given program to given path for given name.
+     *
+     * @param _context          context for this request
+     * @param _path             export path
+     * @param _name             name of JPO to export
+     */
     @Override
     public void export(final Context _context,
                        final File _path,
@@ -101,17 +102,4 @@ public class Program_mxJPO
         out.flush();
         out.close();
     }
-
-    @Override
-    protected void write(final Writer _out)
-            throws IOException
-    {
-
-    }
-
-    @Override
-    protected void prepare(Context _context) throws MatrixException
-    {
-    }
-
 }

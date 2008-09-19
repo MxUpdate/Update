@@ -35,7 +35,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/form")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("web form")
 public class Form_mxJPO
-        extends net.sourceforge.mxupdate.update.MatrixAdminObject_mxJPO
+        extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
     /**
      * Stores all fields of this form instance.

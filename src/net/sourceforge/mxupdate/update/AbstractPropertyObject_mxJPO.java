@@ -25,8 +25,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.Writer;
-import java.util.Collection;
-import java.util.Set;
 import java.util.Stack;
 
 import org.xml.sax.Attributes;
@@ -44,7 +42,8 @@ import matrix.util.MatrixException;
  * @author tmoxter
  * @version $Id$
  */
-public abstract class MatrixObject_mxJPO
+public abstract class AbstractPropertyObject_mxJPO
+        extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO
 {
     /**
      * Name of the matrix object.
@@ -75,22 +74,7 @@ public abstract class MatrixObject_mxJPO
      *
      * @return file name of this matrix object
      */
-    public abstract String getFileName();
-
-    /**
-     * Returns the path where the file is located of this matrix object. The
-     * method used the path annotation.
-     *
-     * @return path.
-     */
-    public String getPath()
-    {
-        return getClass().getAnnotation(net.sourceforge.mxupdate.update.util.Path_mxJPO.class).value();
-    }
-
-    public abstract Set<String> getMatchingNames(final Context _context,
-                                                 final Collection<String> _matches)
-            throws MatrixException;
+    protected abstract String getFileName();
 
     /**
      * Getter method for instance variable {@link #name}.
@@ -155,6 +139,7 @@ public abstract class MatrixObject_mxJPO
     }
 
 
+    @Override
     public void export(final Context _context,
                        final File _path,
                        final String _name)
@@ -351,11 +336,10 @@ prepare(_context);
             if (this.stack.size() > 2)  {
                 final String tag = this.stack.get(1);
                 if (!"creationProperties".equals(tag))  {
-                    MatrixObject_mxJPO.this.parse(getUrl(),
-                                                  (this.content != null) ? this.content.toString() : null);
+                    AbstractPropertyObject_mxJPO.this.parse(getUrl(),
+                                                            (this.content != null) ? this.content.toString() : null);
                 }
             }
         }
     }
-
 }

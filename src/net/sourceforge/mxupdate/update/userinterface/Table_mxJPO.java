@@ -33,7 +33,7 @@ import java.util.Stack;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/table")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("web table")
 public class Table_mxJPO
-        extends net.sourceforge.mxupdate.update.MatrixAdminObject_mxJPO
+        extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
     /**
      * Stores all table columns of this web table instance.

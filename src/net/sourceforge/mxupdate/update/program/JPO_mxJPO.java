@@ -43,21 +43,23 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
 @net.sourceforge.mxupdate.update.util.Path_mxJPO("jpo")
 @net.sourceforge.mxupdate.update.util.TagName_mxJPO("jpo")
 public class JPO_mxJPO
-        extends net.sourceforge.mxupdate.update.MatrixObject_mxJPO
+        extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO
 {
+    /**
+     * String with name suffix (used also from the extract routine from
+     * Matrix).
+     *
+     * @see #export(Context, File, String)
+     */
+    private final static String NAME_SUFFIX = "_" + "mxJPO";
 
-    @Override
-    protected String getExportMQL(String _name)
-    {
-        return null;
-    }
-
-    @Override
-    public String getFileName()
-    {
-        return null;
-    }
-
+    /**
+     * Evaluates for given collection of string which JPOs are matching
+     * returns them as set.
+     *
+     * @param _context          context for this request
+     * @param _matches          collection of strings which must match
+     */
     @Override
     public Set<String> getMatchingNames(final Context _context,
                                         final Collection<String> _matches)
@@ -81,6 +83,16 @@ public class JPO_mxJPO
         return ret;
     }
 
+    /**
+     * Exports given JPO to given path for given name. The JPO code is first
+     * converted, because Matrix uses keywords which must be replaced to have
+     * real Java code. The conversion works like the original extract method,
+     * but only converts the given JPOs and not depending JPOs.
+     *
+     * @param _context          context for this request
+     * @param _path             export path
+     * @param _name             name of JPO to export
+     */
     @Override
     public void export(final Context _context,
                        final File _path,
@@ -92,13 +104,13 @@ public class JPO_mxJPO
                 .append("print program \"").append(_name).append("\" select code dump");
         mql.executeCommand(_context, cmd.toString().trim());
 
-final String name = _name + "_"+"mxJPO";
-final String code = mql.getResult()
-                       .replaceAll("\\$\\{CLASSNAME\\}", name.replaceAll(".*\\.", ""))
-                       .replaceAll("\\\\\\\\", "\\\\")
-                       .replaceAll("(?<=\\$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", "_" + "mxJPO")
-                       .replaceAll("\\$\\{CLASS\\:", "")
-                       .trim();
+        final String name = _name + NAME_SUFFIX;
+        final String code = mql.getResult()
+                               .replaceAll("\\$\\{CLASSNAME\\}", name.replaceAll(".*\\.", ""))
+                               .replaceAll("\\\\\\\\", "\\\\")
+                               .replaceAll("(?<=\\$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", NAME_SUFFIX)
+                               .replaceAll("\\$\\{CLASS\\:", "")
+                               .trim();
 
         final File file = new File(_path, name.replaceAll("\\.", "/") + ".java");
         if (!file.getParentFile().exists())  {
@@ -109,17 +121,4 @@ final String code = mql.getResult()
         out.flush();
         out.close();
     }
-
-    @Override
-    protected void write(final Writer _out)
-            throws IOException
-    {
-
-    }
-
-    @Override
-    protected void prepare(Context _context) throws MatrixException
-    {
-    }
-
 }
