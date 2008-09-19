@@ -192,7 +192,7 @@ public abstract class AbstractBusObject_mxJPO
                 .append("export bus \"")
                 .append(getBusType())
                 .append("\" \"").append(nameRev[0])
-                .append("\" \"").append((nameRev.length > 2) ? nameRev[1] : "")
+                .append("\" \"").append((nameRev.length > 1) ? nameRev[1] : "")
                 .append("\" !file !icon !history !relationship !state xml")
                 .toString();
     }
