@@ -184,7 +184,7 @@ public abstract class AbstractAdminObject_mxJPO
     }
 
         @Override
-        protected final void write(final Writer _out)
+        protected void write(final Writer _out)
                 throws IOException
         {
             writeHeader(_out);
@@ -203,13 +203,12 @@ public abstract class AbstractAdminObject_mxJPO
 
         protected abstract void writeObject(final Writer _out) throws IOException;
 
-        protected void writeEnd(final Writer _out)
-                throws IOException
-        {
+    protected void writeEnd(final Writer _out)
+            throws IOException
+    {
+    }
 
-        }
-
-    private void writeProperties(final Writer _out)
+    protected void writeProperties(final Writer _out)
             throws IOException
     {
         for (final Property prop : this.propertiesMap.values())  {

@@ -122,7 +122,7 @@ public abstract class AbstractDMObject_mxJPO
          *
          * @see #write(Writer)
          */
-        private static final Pattern PATTERN_EVENTTYPE = Pattern.compile("^.*(?=((Action)|(Check)|(Override))$)");
+        static final Pattern PATTERN_EVENTTYPE = Pattern.compile("^.*(?=((Action)|(Check)|(Override))$)");
 
         /**
          * Used to parse the event kind (&quot;Action&quot;, &quot;Check&quot;
@@ -130,7 +130,7 @@ public abstract class AbstractDMObject_mxJPO
          *
          * @see #write(Writer)
          */
-        private static final Pattern PATTERN_KIND = Pattern.compile("((Action)|(Check)|(Override))$");
+        static final Pattern PATTERN_KIND = Pattern.compile("((Action)|(Check)|(Override))$");
 
 
         /**

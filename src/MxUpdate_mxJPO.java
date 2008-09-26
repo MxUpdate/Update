@@ -130,17 +130,16 @@ public class MxUpdate_mxJPO
                         net.sourceforge.mxupdate.update.datamodel.Type_mxJPO.class,
                         "Export / Import of types.",
                         "type");
+        defineParameter('p', PARAMS_DM,
+                         net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO.class,
+                         "Export / Import of policies.",
+                         "policy");
         defineParameter('g', PARAMS_DM,
                         net.sourceforge.mxupdate.update.datamodel.Trigger_mxJPO.class,
                         "Export / Import of triggers.",
                         "trigger", "trig");
 /*
-// admin:
-policy: --policy
-
 bus:
-numbergenerator: 'n' --numbergenerator
-objectgenerator: 'o' --objectgenerator
 process: 's' --process
 */
     }

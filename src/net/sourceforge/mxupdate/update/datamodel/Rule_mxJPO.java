@@ -181,7 +181,7 @@ public class Rule_mxJPO
                 _out.append(access);
             }
             _out.append("\" filter \"")
-                .append((userAccess.expressionFilter != null) ? convert(userAccess.expressionFilter) : "")
+                .append(convert(userAccess.expressionFilter))
                 .append("\"");
         }
     }
