@@ -66,34 +66,65 @@ public class MxUpdate_mxJPO
      * Holds the mapping between the parameter and mode.
      */
     private final static Map<String,Mode> PARAM_MODE = new HashMap<String,Mode>();
-    static  {
-        PARAM_MODE.put("-e", Mode.EXPORT);
-        PARAM_MODE.put("--export", Mode.EXPORT);
-        appendDescription("Export Mode", "-e", "--export");
-        PARAM_MODE.put("-i", Mode.IMPORT);
-        PARAM_MODE.put("--import", Mode.IMPORT);
-        appendDescription("Import Mode", "-i", "--import");
-        PARAM_MODE.put("-h", Mode.HELP);
-        PARAM_MODE.put("--help", Mode.HELP);
-    }
 
     /**
-     * All paramaeters related to export / import are stored in this map. The
-     * key is the parameter (incl. the '-'), the value the related class.
+     * All parameters related to export / import are stored in this map. The
+     * key is the parameter (including the '-'), the value the related class.
      */
     private final static Map<String,Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>> PARAMS
             = new HashMap<String,Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>>();
 
-// -a --all --admin
-// 'x' --export
-// 'u' --update
+    /**
+     * Holds all classes used for all exports / imports. The set is needed that
+     * the parameter '-a' (--admin) could be defined.
+     */
+    private final static Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>> PARAMS_ADMIN
+            = new HashSet<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>();
 
     /**
      * Holds all classes used for the data model import / export.
      */
     private final static Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>> PARAMS_DM
             = new HashSet<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>();
+
+    /**
+     * Holds all classes used for the data model import / export.
+     */
+    private final static Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>> PARAMS_USER
+            = new HashSet<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>();
+
+    /**
+     * Holds all classes used for the user interface import / export.
+     */
+    private final static Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>> PARAMS_UI
+            = new HashSet<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>();
+
     static  {
+        ////////////////////////////////////////////////////////////////////////
+        // mode (export / import / help)
+
+        PARAM_MODE.put("-e", Mode.EXPORT);
+        PARAM_MODE.put("--export", Mode.EXPORT);
+        appendDescription("Export Mode", "-e", "--export");
+        PARAM_MODE.put("-u", Mode.IMPORT);
+        PARAM_MODE.put("--update", Mode.IMPORT);
+        appendDescription("Update Mode", "-u", "--update");
+        PARAM_MODE.put("-h", Mode.HELP);
+        PARAM_MODE.put("--help", Mode.HELP);
+
+        ////////////////////////////////////////////////////////////////////////
+        // admin
+
+        PARAMS.put("-a", PARAMS_ADMIN);
+        PARAMS.put("--admin", PARAMS_ADMIN);
+        PARAMS.put("--all", PARAMS_ADMIN);
+
+        ////////////////////////////////////////////////////////////////////////
+        // data model
+/*
+process: 's' --process
+*/
+
         PARAMS.put("-d", PARAMS_DM);
         PARAMS.put("--datamodel", PARAMS_DM);
         appendDescription("Export / Import of data model administrational objects.",
@@ -138,18 +169,12 @@ public class MxUpdate_mxJPO
                         net.sourceforge.mxupdate.update.datamodel.Trigger_mxJPO.class,
                         "Export / Import of triggers.",
                         "trigger", "trig");
-/*
-bus:
-process: 's' --process
-*/
-    }
 
-    /**
-     * Holds all classes used for the data model import / export.
-     */
-    private final static Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>> PARAMS_USER
-            = new HashSet<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>();
-    static  {
+        ////////////////////////////////////////////////////////////////////////
+        // user
+/*
+--person
+*/
         PARAMS.put("--user", PARAMS_USER);
         appendDescription("Export / Import of user administrational objects.",
                           "--user");
@@ -165,13 +190,10 @@ process: 's' --process
                         net.sourceforge.mxupdate.update.user.Role_mxJPO.class,
                         "Export / Import of roles.",
                         "role");
-/*
-user:
---person
-*/
-    }
 
-    static  {
+        ////////////////////////////////////////////////////////////////////////
+        // program
+
         defineParameter('j', null,
                         net.sourceforge.mxupdate.update.program.JPO_mxJPO.class,
                         "Export / Import of JPOs.",
@@ -180,14 +202,10 @@ user:
                         net.sourceforge.mxupdate.update.program.Program_mxJPO.class,
                         "Export / Import of programs.",
                         "program");
-    }
 
-    /**
-     * Holds all classes used for the user interface import / export.
-     */
-    private final static Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>> PARAMS_UI
-            = new HashSet<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>();
-    static  {
+        ////////////////////////////////////////////////////////////////////////
+        // user interface
+
         PARAMS.put("-u", PARAMS_UI);
         PARAMS.put("--ui", PARAMS_UI);
         PARAMS.put("--userinterface", PARAMS_UI);
@@ -221,8 +239,6 @@ user:
                         net.sourceforge.mxupdate.update.userinterface.Table_mxJPO.class,
                         "Export / Import of web tables.",
                         "webtable", "table");
-// channel
-// portal
     }
 
     /**
@@ -243,6 +259,9 @@ user:
                                         final String... _longParams)
     {
         final List<String> allParamStrings = new ArrayList<String>();
+        // add to set of all classes parameters set
+        PARAMS_ADMIN.add(_clazz);
+        // add to given set of parameters
         if (_paramsList != null)  {
             _paramsList.add(_clazz);
         }
@@ -317,8 +336,6 @@ user:
             throws Exception
     {
         try {
-//System.out.println("1");
-//System.out.println("MAP2DESCR="+DESCRIPTION);
 
             Mode mode = null;
 
@@ -345,10 +362,16 @@ String pathStr = null;
                     names.add(name);
                 }
             } else if (PARAM_MODE.containsKey(_args[idx])) {
+                final Mode tmpMode = PARAM_MODE.get(_args[idx]);
                 if (mode != null)  {
-                    throw new Error("A mode is already defined and could not be defined twice!");
+                    if ((mode == Mode.HELP) || (tmpMode == Mode.HELP))  {
+                        mode = Mode.HELP;
+                    } else  {
+                        throw new Error("A mode is already defined and could not be defined twice!");
+                    }
+                } else  {
+                    mode = PARAM_MODE.get(_args[idx]);
                 }
-                mode = PARAM_MODE.get(_args[idx]);
             } else if ("--path".equals(_args[idx]))  {
                 idx++;
                 pathStr = _args[idx];
