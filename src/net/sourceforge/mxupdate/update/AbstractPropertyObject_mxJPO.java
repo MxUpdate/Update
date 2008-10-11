@@ -314,6 +314,7 @@ System.out.println("    - update to version '" + modified + "'");
             final StringBuilder cmd = new StringBuilder()
                     .append("mod ").append(this.getInfoAnno().adminType())
                     .append(" \"").append(this.getName()).append("\" ")
+                    .append(this.getInfoAnno().adminTypeSuffix())
                     .append(" add property version value \"").append(modified).append("\";\n");
 
             final Map<String,String> variables = new HashMap<String,String>();
