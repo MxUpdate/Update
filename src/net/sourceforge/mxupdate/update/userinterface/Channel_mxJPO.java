@@ -37,7 +37,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "channel",
-                                                     filePrefix = "CHANNEL",
+                                                     filePrefix = "CHANNEL_",
+                                                     fileSuffix = ".tcl",
                                                      filePath = "userinterface/channel",
                                                      description = "channel")
 public class Channel_mxJPO
@@ -46,22 +47,22 @@ public class Channel_mxJPO
     /**
      * Alt (label) of the channel.
      */
-    String alt = null;
+    private String alt = null;
 
     /**
      * Height of the channel.
      */
-    Integer height = null;
+    private Integer height = null;
 
     /**
      * Href of the channel.
      */
-    String href = null;
+    private String href = null;
 
     /**
      * Label of the channel.
      */
-    String label = null;
+    private String label = null;
 
     /**
      * Stack with all referenced commands (used while parsing the channel).
@@ -69,7 +70,7 @@ public class Channel_mxJPO
      * @see #parse(Context, String)
      * @see #prepare(Context)
      */
-    final Stack<CommandRef> commandRefs = new Stack<CommandRef>();
+    private final Stack<CommandRef> commandRefs = new Stack<CommandRef>();
 
     /**
      * Ordered map of referenced commands.
@@ -119,7 +120,7 @@ public class Channel_mxJPO
     {
         // order referenced commands
         for (final CommandRef cmdRef : this.commandRefs)  {
-            orderCmds.put(cmdRef.order, cmdRef);
+            this.orderCmds.put(cmdRef.order, cmdRef);
         }
         super.prepare(_context);
     }
@@ -155,6 +156,36 @@ public class Channel_mxJPO
         for (final CommandRef cmdRef : this.orderCmds.values())  {
             _out.append(" \\\n    place \"").append(convert(cmdRef.name)).append("\" after \"\"");
         }
+    }
+
+    /**
+     * Appends the MQL statement to reset this channel:
+     * <ul>
+     * <li>reset HRef, description, alt and label</li>
+     * <li>set height to 0</li>
+     * <li>remove all settings, commands and properties</li>
+     * </ul>
+     *
+     * @param _cmd      string builder used to append the MQL statements
+     */
+    @Override
+    protected void appendResetMQL(final StringBuilder _cmd)
+    {
+        _cmd.append("mod ").append(getInfoAnno().adminType())
+            .append(" \"").append(getName()).append('\"')
+           .append(" href \"\" description \"\" alt \"\" label \"\" height 0");
+        // reset settings
+        for (final net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
+            if (prop.getName().startsWith("%"))  {
+                _cmd.append(" remove setting \"").append(prop.getName().substring(1)).append('\"');
+            }
+        }
+        // remove commands
+        for (final CommandRef cmdRef : this.orderCmds.values())  {
+            _cmd.append(" remove command \"").append(cmdRef.name).append('\"');
+        }
+        // reset properties
+        this.appendResetProperties(_cmd);
     }
 
     /**

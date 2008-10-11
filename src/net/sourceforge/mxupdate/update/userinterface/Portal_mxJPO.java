@@ -39,7 +39,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "portal",
-                                                     filePrefix = "PORTAL",
+                                                     filePrefix = "PORTAL_",
+                                                     fileSuffix = ".tcl",
                                                      filePath = "userinterface/portal",
                                                      description = "portal")
 public class Portal_mxJPO
@@ -170,6 +171,35 @@ public class Portal_mxJPO
             }
             firstRow = false;
         }
+    }
+
+    /**
+     * Appends the MQL statement to reset this portal:
+     * <ul>
+     * <li>reset HRef, description, alt and label</li>
+     * <li>remove all settings, channels and properties</li>
+     * </ul>
+     *
+     * @param _cmd      string builder used to append the MQL statements
+     */
+    @Override
+    protected void appendResetMQL(final StringBuilder _cmd)
+    {
+        _cmd.append("mod ").append(getInfoAnno().adminType())
+            .append(" \"").append(getName()).append('\"')
+            .append(" href \"\" description \"\" alt \"\" label \"\"");
+        // reset settings
+        for (final net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
+            if (prop.getName().startsWith("%"))  {
+                _cmd.append(" remove setting \"").append(prop.getName().substring(1)).append('\"');
+            }
+        }
+        // remove channels
+        for (final ChannelRef channelRef : this.channelRefs)  {
+            _cmd.append(" remove channel \"").append(channelRef.name).append('\"');
+        }
+        // reset properties
+        this.appendResetProperties(_cmd);
     }
 
     /**

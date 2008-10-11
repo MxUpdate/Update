@@ -40,7 +40,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "policy",
-                                                     filePrefix = "POLICY",
+                                                     filePrefix = "POLICY_",
+                                                     fileSuffix = ".tcl",
                                                      filePath = "datamodel/policy",
                                                      description = "policy")
 public class Policy_mxJPO
@@ -313,6 +314,20 @@ public class Policy_mxJPO
     @Override
     protected void writeObject(final Writer _out)
             throws IOException
+    {
+    }
+
+    /**
+     * Appends the MQL statement to reset this policy:
+     * <ul>
+     * <li></li>
+     * </ul>
+     *
+     * @param _cmd      string builder used to append the MQL statements
+     * @todo implement
+     */
+    @Override
+    protected void appendResetMQL(final StringBuilder _cmd)
     {
     }
 

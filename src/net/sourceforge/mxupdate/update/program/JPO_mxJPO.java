@@ -31,7 +31,6 @@ import java.util.TreeSet;
 import org.xml.sax.SAXException;
 
 import matrix.db.Context;
-import matrix.db.MQLCommand;
 import matrix.util.MatrixException;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
@@ -41,6 +40,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(filePrefix = "",
+                                                     fileSuffix = "_" + "mxJPO.java",
                                                      filePath = "jpo",
                                                      description = "jpo")
 public class JPO_mxJPO
@@ -66,12 +66,10 @@ public class JPO_mxJPO
                                         final Collection<String> _matches)
             throws MatrixException
     {
-        final MQLCommand mql = new MQLCommand();
         final StringBuilder cmd = new StringBuilder()
                 .append("list program * select name isjavaprogram dump \"\t\"");
-        mql.executeCommand(_context, cmd.toString().trim());
         final Set<String> ret = new TreeSet<String>();
-        for (final String name : mql.getResult().split("\n"))  {
+        for (final String name : execMql(_context, cmd).split("\n"))  {
             final String[] nameArr = name.split("\t");
             if ("TRUE".equals(nameArr[1]))  {
                 for (final String match : _matches)  {
@@ -100,13 +98,11 @@ public class JPO_mxJPO
                        final String _name)
             throws MatrixException, SAXException, IOException
     {
-        final MQLCommand mql = new MQLCommand();
         final StringBuilder cmd = new StringBuilder()
                 .append("print program \"").append(_name).append("\" select code dump");
-        mql.executeCommand(_context, cmd.toString().trim());
 
         final String name = _name + NAME_SUFFIX;
-        final String code = mql.getResult()
+        final String code = execMql(_context, cmd)
                                .replaceAll("\\$\\{CLASSNAME\\}", name.replaceAll(".*\\.", ""))
                                .replaceAll("\\\\\\\\", "\\\\")
                                .replaceAll("(?<=\\$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", NAME_SUFFIX)

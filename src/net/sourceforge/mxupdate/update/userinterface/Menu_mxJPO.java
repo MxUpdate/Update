@@ -27,7 +27,6 @@ import java.util.Stack;
 import java.util.TreeMap;
 
 import matrix.db.Context;
-import matrix.db.MQLCommand;
 import matrix.util.MatrixException;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
@@ -38,7 +37,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "menu",
-                                                     filePrefix = "MENU",
+                                                     filePrefix = "MENU_",
+                                                     fileSuffix = ".tcl",
                                                      filePath = "userinterface/menu",
                                                      description = "menu")
 public class Menu_mxJPO
@@ -88,9 +88,9 @@ public class Menu_mxJPO
     protected void prepare(final Context _context)
             throws MatrixException
     {
-        MQLCommand mql = new MQLCommand();
-        mql.executeCommand(_context, "print menu \"" + this.getName() + "\" select parent[Tree] dump");
-        if ("TRUE".equalsIgnoreCase(mql.getResult().trim()))  {
+        final StringBuilder cmd = new StringBuilder()
+                .append("print menu \"").append(this.getName()).append("\" select parent[Tree] dump");
+        if ("TRUE".equalsIgnoreCase(execMql(_context, cmd)))  {
             this.treeMenu = true;
         }
         super.prepare(_context);
@@ -119,9 +119,37 @@ public class Menu_mxJPO
     }
 
     /**
+     * Appends the MQL statement to reset this menu:
+     * <ul>
+     * <li>all MQL commands done in the Command class</li>
+     * <li>all child commands / menus</li>
+     * <li>definition as tree menu</li>
+     * </ul>
+     *
+     * @param _cmd      string builder used to append the MQL statements
+     */
+    @Override
+    protected void appendResetMQL(final StringBuilder _cmd)
+    {
+        super.appendResetMQL(_cmd);
+
+        // remove information about tree menu...
+        _cmd.append(";\n");
+        if (this.treeMenu)  {
+            _cmd.append("mod menu Tree remove menu \"").append(this.getName()).append("\";\n");
+        }
+
+        // remove child commands / menus
+        _cmd.append("mod menu \"").append(this.getName()).append('\"');
+        for (final MenuChild child : this.childs)  {
+            _cmd.append(" remove ").append(child.type)
+                .append(" \"").append(child.name).append("\"");
+        }
+    }
+
+    /**
      *
      */
-
     class MenuChild
     {
         String type = null;

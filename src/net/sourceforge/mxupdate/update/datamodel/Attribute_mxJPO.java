@@ -37,7 +37,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "attribute",
-                                                     filePrefix = "ATTRIBUTE",
+                                                     filePrefix = "ATTRIBUTE_",
+                                                     fileSuffix = ".tcl",
                                                      filePath = "datamodel/attribute",
                                                      description = "attribute")
 public class Attribute_mxJPO
@@ -175,6 +176,20 @@ public class Attribute_mxJPO
         for (final Range range : this.rangesSorted)  {
             range.write(_out);
         }
+    }
+
+    /**
+     * Appends the MQL statement to reset this attribute:
+     * <ul>
+     * <li></li>
+     * </ul>
+     *
+     * @param _cmd      string builder used to append the MQL statements
+     * @todo implement
+     */
+    @Override
+    protected void appendResetMQL(final StringBuilder _cmd)
+    {
     }
 
     /**

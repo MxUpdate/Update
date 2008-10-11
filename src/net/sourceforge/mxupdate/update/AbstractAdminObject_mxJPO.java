@@ -31,7 +31,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import matrix.db.Context;
-import matrix.db.MQLCommand;
 import matrix.util.MatrixException;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
@@ -70,15 +69,13 @@ public abstract class AbstractAdminObject_mxJPO
                                         final Collection<String> _matches)
             throws MatrixException
     {
-        final MQLCommand mql = new MQLCommand();
         final StringBuilder cmd = new StringBuilder()
                 .append("list ")
                 .append(getInfoAnno().adminType())
                 .append(" ")
                 .append(getInfoAnno().adminTypeSuffix());
-        mql.executeCommand(_context, cmd.toString().trim());
         final Set<String> ret = new TreeSet<String>();
-        for (final String name : mql.getResult().split("\n"))  {
+        for (final String name : execMql(_context, cmd).split("\n"))  {
             for (final String match : _matches)  {
                 if (match(name, match))  {
                     ret.add(name);
@@ -162,6 +159,11 @@ public abstract class AbstractAdminObject_mxJPO
         if (author != null)   {
             setAuthor(author.value);
         }
+        // sets the version depending on the properties
+        final Property version = this.propertiesMap.get("version");
+        if (version != null)   {
+            setVersion(version.value);
+        }
     }
 
         @Override
@@ -206,6 +208,24 @@ public abstract class AbstractAdminObject_mxJPO
                 }
                 if (prop.value != null)  {
                     _out.append("  \\\n    value \"").append(convert(prop.value)).append("\"");
+                }
+            }
+        }
+    }
+
+    /**
+     * Appends the MQL statements to remove all properties within the reset.
+     *
+     * @param _cmd      string builder used to append the MQL statements
+     */
+    protected void appendResetProperties(final StringBuilder _cmd)
+    {
+        for (final Property prop : this.propertiesMap.values())  {
+            if (!IGNORED_PROPERTIES.contains(prop.name) && !prop.name.startsWith("%"))  {
+                _cmd.append(" remove property \"").append(prop.name).append('\"');
+                if ((prop.refAdminName) != null && (prop.refAdminType != null))  {
+                    _cmd.append(" to ").append(prop.refAdminType)
+                        .append(" \"").append(prop.refAdminName).append('\"');
                 }
             }
         }

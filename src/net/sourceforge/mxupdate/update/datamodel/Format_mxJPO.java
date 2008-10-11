@@ -31,7 +31,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "format",
-                                                     filePrefix = "FORMAT",
+                                                     filePrefix = "FORMAT_",
+                                                     fileSuffix = ".tcl",
                                                      filePath = "datamodel/format",
                                                      description = "format")
 public class Format_mxJPO
@@ -116,5 +117,19 @@ public class Format_mxJPO
             .append(" \\\n    view \"").append((this.commandView != null) ? convert(this.commandView) : "").append('\"')
             .append(" \\\n    edit \"").append((this.commandEdit != null) ? convert(this.commandEdit) : "").append('\"')
             .append(" \\\n    print \"").append((this.commandPrint != null) ? convert(this.commandPrint) : "").append('\"');
+    }
+
+    /**
+     * Appends the MQL statement to reset this format:
+     * <ul>
+     * <li></li>
+     * </ul>
+     *
+     * @param _cmd      string builder used to append the MQL statements
+     * @todo implement
+     */
+    @Override
+    protected void appendResetMQL(final StringBuilder _cmd)
+    {
     }
 }

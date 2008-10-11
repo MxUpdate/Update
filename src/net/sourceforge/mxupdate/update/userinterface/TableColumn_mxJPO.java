@@ -126,6 +126,18 @@ class TableColumn_mxJPO
         }
     }
 
+    /**
+     * Returns the name of the form field / table column. The method is the
+     * getter method for instance variable {@see #name}.
+     *
+     * @return name of field / column name
+     * @see #name
+     */
+    public String getName()
+    {
+        return this.name;
+    }
+
     @Override
     public String toString()
     {

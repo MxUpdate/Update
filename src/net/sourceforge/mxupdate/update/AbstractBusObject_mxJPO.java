@@ -288,6 +288,20 @@ public abstract class AbstractBusObject_mxJPO
     }
 
     /**
+     * Appends the MQL statement to reset this business object:
+     * <ul>
+     * <li></li>
+     * </ul>
+     *
+     * @param _cmd      string builder used to append the MQL statements
+     * @todo implement
+     */
+    @Override
+    protected void appendResetMQL(final StringBuilder _cmd)
+    {
+    }
+
+    /**
      * Returns the business type of this business object instance. The business
      * type is evaluated from the business type annotation.
      *

@@ -49,9 +49,14 @@ public @interface InfoAnno_mxJPO
     public String busType() default "";
 
     /**
-     * Prefix for the file name.
+     * Prefix of the file name.
      */
     public String filePrefix();
+
+    /**
+     * Suffix of the file name including the file extension.
+     */
+    public String fileSuffix();
 
     /**
      * Used sub directory for the export.

@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.Writer;
 
 import matrix.db.Context;
-import matrix.db.MQLCommand;
 import matrix.util.MatrixException;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
@@ -35,7 +34,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 * @version $Id$
 */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "expression",
-                                                     filePrefix = "EXPRESSION",
+                                                     filePrefix = "EXPRESSION_",
+                                                     fileSuffix = ".tcl",
                                                      filePath = "datamodel/expression",
                                                      description = "exception")
 public class Expression_mxJPO
@@ -78,9 +78,7 @@ public class Expression_mxJPO
                 .append("print expression \"").append(convert(getName()))
                 .append("\" select value dump")
                 .toString();
-        MQLCommand mql = new MQLCommand();
-        mql.executeCommand(_context, cmd);
-        this.expression = mql.getResult().trim();
+        this.expression = execMql(_context, cmd);
         super.prepare(_context);
     }
 
@@ -105,5 +103,19 @@ public class Expression_mxJPO
             _out.append(expr);
         }
         _out.append('\"');
+    }
+
+    /**
+     * Appends the MQL statement to reset this expression:
+     * <ul>
+     * <li></li>
+     * </ul>
+     *
+     * @param _cmd      string builder used to append the MQL statements
+     * @todo implement
+     */
+    @Override
+    protected void appendResetMQL(final StringBuilder _cmd)
+    {
     }
 }

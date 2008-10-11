@@ -34,7 +34,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "type",
-                                                     filePrefix = "TYPE",
+                                                     filePrefix = "TYPE_",
+                                                     fileSuffix = ".tcl",
                                                      filePath = "datamodel/type",
                                                      description = "type")
 public class Type_mxJPO
@@ -101,5 +102,19 @@ public class Type_mxJPO
             _out.append("    \"").append(convert(attr)).append("\" \\\n");
         }
         _out.append("]");
+    }
+
+    /**
+     * Appends the MQL statement to reset this attribute:
+     * <ul>
+     * <li></li>
+     * </ul>
+     *
+     * @param _cmd      string builder used to append the MQL statements
+     * @todo implement
+     */
+    @Override
+    protected void appendResetMQL(final StringBuilder _cmd)
+    {
     }
 }

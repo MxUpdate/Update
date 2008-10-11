@@ -37,7 +37,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "rule",
-                                                     filePrefix = "RULE",
+                                                     filePrefix = "RULE_",
+                                                     fileSuffix = ".tcl",
                                                      filePath = "datamodel/rule",
                                                      description = "rule")
 public class Rule_mxJPO
@@ -185,6 +186,20 @@ public class Rule_mxJPO
                 .append(convert(userAccess.expressionFilter))
                 .append("\"");
         }
+    }
+
+    /**
+     * Appends the MQL statement to reset this rule:
+     * <ul>
+     * <li></li>
+     * </ul>
+     *
+     * @param _cmd      string builder used to append the MQL statements
+     * @todo implement
+     */
+    @Override
+    protected void appendResetMQL(final StringBuilder _cmd)
+    {
     }
 
     /**

@@ -23,12 +23,17 @@ package net.sourceforge.mxupdate.update;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.xml.sax.SAXException;
 
 import matrix.db.Context;
+import matrix.db.MQLCommand;
 import matrix.util.MatrixException;
+
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
 
 /**
  * Abstract class from which must be derived for exporting and importing all
@@ -39,6 +44,15 @@ import matrix.util.MatrixException;
  */
 public abstract class AbstractObject_mxJPO
 {
+    /**
+     * Stores the version information of this object. If the value is
+     * <code>null</code>, the version information is not defined.
+     *
+     * @see #getVersion()
+     * @see #setVersion(String)
+     */
+    private String version = null;
+
     /**
      * Returns the path where the file is located of this matrix object. The
      * method used the information annotation.
@@ -94,4 +108,97 @@ public abstract class AbstractObject_mxJPO
                                 final File _path,
                                 final String _name)
             throws MatrixException, SAXException, IOException;
+
+    /**
+     * Evaluates for given set of files all matching files and returns them as
+     * map (key is the file name, value is the name of the matrix
+     * administration (business) object).<br/>
+     * If the file name without prefix and suffix matches one of the collection
+     * match strings, the file is added to the map and is returned.
+     *
+     * @param _files            set of files used to found matching files
+     * @param _matches          collection of match strings
+     * @return map of files (as key) with the related matrix name (as value)
+     */
+    public Map<File, String> getMatchingFileNames(final Set<File> _files,
+                                                  final Collection<String> _matches)
+    {
+        final Map<File,String> ret = new TreeMap<File,String>();
+
+        final String prefix = getInfoAnno().filePrefix();
+        final String suffix = getInfoAnno().fileSuffix();
+        final int prefixLength = prefix.length();
+        final int suffixLength = suffix.length();
+
+        for (final File file : _files)  {
+            for (final String match : _matches)  {
+                final String fileName = file.getName();
+                if (fileName.startsWith(prefix) && fileName.endsWith(suffix))  {
+                    final String name = fileName.substring(0, fileName.length() - suffixLength)
+                                                .substring(prefixLength);
+                    if (match(name, match))  {
+                        ret.put(file, name);
+                    }
+                }
+            }
+        }
+        return ret;
+    }
+
+    /**
+     *
+     * @param _context
+     * @param _name
+     * @param _file
+     * @throws Exception
+     * @todo dummy method!!!!
+     */
+    public void update(final Context _context,
+                       final String _name,
+                       final File _file)
+            throws Exception
+    {
+    }
+
+    /**
+     * Executes given MQL command and returns the trimmed result of the MQL
+     * execution.
+     *
+     * @param _context  context for this request
+     * @param _cmd      MQL command to execute
+     * @return trimmed result of the MQL execution
+     * @throws MatrixException if MQL execution fails
+     */
+    protected String execMql(final Context _context,
+                             final CharSequence _cmd)
+            throws MatrixException
+    {
+        final MQLCommand mql = new MQLCommand();
+        mql.executeCommand(_context, _cmd.toString());
+        return mql.getResult().trim();
+    }
+
+    /**
+     * Returns the version string of this administration (business) object. The
+     * method is the getter method for {@see #version).
+     *
+     * @return version string
+     * @see #version
+     */
+    protected String getVersion()
+    {
+        return this.version;
+    }
+
+    /**
+     * Sets the new version string for this administration (business) object.
+     * It is the setter method for {@see #version}.
+     *
+     * @param _version  new version to set
+     * @see #version
+     */
+    protected void setVersion(final String _version)
+    {
+        this.version = _version;
+    }
 }

@@ -32,7 +32,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "form",
-                                                     filePrefix = "FORM",
+                                                     filePrefix = "FORM_",
+                                                     fileSuffix = ".tcl",
                                                      filePath = "userinterface/form",
                                                      description = "web form")
 public class Form_mxJPO
@@ -92,6 +93,28 @@ public class Form_mxJPO
             _out.append("    \"").append(convert(field.name)).append("\" \\\n");
         }
         _out.append("]");
+    }
+
+    /**
+     * Appends the MQL statement to reset this form:
+     * <ul>
+     * <li>remove all fields of the web form</li>
+     * <li>remove all properties</li>
+     * </ul>
+     *
+     * @param _cmd      string builder used to append the MQL statements
+     */
+    @Override
+    protected void appendResetMQL(final StringBuilder _cmd)
+    {
+        _cmd.append("mod form \"").append(this.getName()).append('\"');
+
+        // remove all fields
+        for (final net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO field : this.fields)  {
+            _cmd.append(" field delete name \"").append(field.getName()).append('\"');
+        }
+        // reset properties
+        appendResetProperties(_cmd);
     }
 
 }

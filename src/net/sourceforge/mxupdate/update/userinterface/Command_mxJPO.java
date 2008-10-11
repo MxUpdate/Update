@@ -33,7 +33,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "command",
-                                                     filePrefix = "COMMAND",
+                                                     filePrefix = "COMMAND_",
+                                                     fileSuffix = ".tcl",
                                                      filePath = "userinterface/command",
                                                      description = "command")
 public class Command_mxJPO
@@ -94,5 +95,37 @@ public class Command_mxJPO
                     .append(" \"").append(convert(prop.getValue())).append("\"");
             }
         }
+    }
+
+
+    /**
+     * Appends the MQL statement to reset this command:
+     * <ul>
+     * <li>HRef, description, alt and label is set to empty string</li>
+     * <li>all settings, users and properties are removed</li>
+     * </ul>
+     *
+     * @param _cmd      string builder used to append the MQL statements
+     * @todo implement
+     */
+    @Override
+    protected void appendResetMQL(final StringBuilder _cmd)
+    {
+        // reset command
+        _cmd.append("mod ").append(getInfoAnno().adminType())
+            .append(" \"").append(getName()).append('\"')
+           .append(" href \"\" description \"\" alt \"\" label \"\"");
+        // reset settings
+        for (final net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
+            if (prop.getName().startsWith("%"))  {
+                _cmd.append(" remove setting \"").append(prop.getName().substring(1)).append('\"');
+            }
+        }
+        // reset users
+        for (final String user : this.users)  {
+            _cmd.append(" remove user \"").append(user).append('\"');
+        }
+        // reset properties
+        appendResetProperties(_cmd);
     }
 }

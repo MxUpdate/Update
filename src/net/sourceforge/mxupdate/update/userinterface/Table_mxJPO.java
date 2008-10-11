@@ -31,7 +31,8 @@ import java.util.Stack;
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "table",
                                                       adminTypeSuffix = "system",
-                                                      filePrefix = "TABLE",
+                                                      filePrefix = "TABLE_",
+                                                      fileSuffix = ".tcl",
                                                       filePath = "userinterface/table",
                                                       description = "web table")
 public class Table_mxJPO
@@ -65,5 +66,27 @@ public class Table_mxJPO
             _out.append(" \\\n    column");
             column.write(_out);
         }
+    }
+
+    /**
+     * Appends the MQL statement to reset this web table:
+     * <ul>
+     * <li>remove all columns of the web table</li>
+     * <li>remove all properties</li>
+     * </ul>
+     *
+     * @param _cmd      string builder used to append the MQL statements
+     */
+    @Override
+    protected void appendResetMQL(final StringBuilder _cmd)
+    {
+        _cmd.append("mod table \"").append(this.getName()).append("\" system");
+
+        // remove all columns
+        for (final net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO column : this.columns)  {
+            _cmd.append(" column delete name \"").append(column.getName()).append('\"');
+        }
+        // reset properties
+        appendResetProperties(_cmd);
     }
 }

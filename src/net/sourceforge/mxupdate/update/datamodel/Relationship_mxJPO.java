@@ -34,7 +34,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "relationship",
-                                                     filePrefix = "RELATIONSHIP",
+                                                     filePrefix = "RELATIONSHIP_",
+                                                     fileSuffix = ".tcl",
                                                      filePath = "datamodel/relationship",
                                                      description = "relation")
 public class Relationship_mxJPO
@@ -228,5 +229,19 @@ public class Relationship_mxJPO
             _out.append("    \"").append(convert(attr)).append("\" \\\n");
         }
         _out.append("]");
+    }
+
+    /**
+     * Appends the MQL statement to reset this relationship:
+     * <ul>
+     * <li></li>
+     * </ul>
+     *
+     * @param _cmd      string builder used to append the MQL statements
+     * @todo implement
+     */
+    @Override
+    protected void appendResetMQL(final StringBuilder _cmd)
+    {
     }
 }

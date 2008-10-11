@@ -31,7 +31,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "association",
-                                                     filePrefix = "ASSOCIATION",
+                                                     filePrefix = "ASSOCIATION_",
+                                                     fileSuffix = ".tcl",
                                                      filePath = "user/association",
                                                      description = "association")
 public class Association_mxJPO
@@ -72,5 +73,19 @@ public class Association_mxJPO
     {
         _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden")
             .append(" \\\n    definition \"").append(convert(this.definition)).append("\"");
+    }
+
+    /**
+     * Appends the MQL statement to reset this association:
+     * <ul>
+     * <li></li>
+     * </ul>
+     *
+     * @param _cmd      string builder used to append the MQL statements
+     * @todo implement
+     */
+    @Override
+    protected void appendResetMQL(final StringBuilder _cmd)
+    {
     }
 }

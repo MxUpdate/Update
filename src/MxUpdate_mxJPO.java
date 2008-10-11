@@ -402,12 +402,48 @@ System.out.println("export "+instance.getInfoAnno().description() + " '" + name 
         }
     }
 } else if (Mode.IMPORT == mode) {
-System.out.println("import");
+    final Set<File> allFiles = getAllFiles(new File(pathStr));
+    final Map<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,Map<File,String>> clazz2names
+            = new HashMap<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,Map<File,String>>();
+    for (final Map.Entry<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,List<String>> entry : clazz2matches.entrySet())  {
+        net.sourceforge.mxupdate.update.AbstractObject_mxJPO instance = entry.getKey().newInstance();
+        clazz2names.put(entry.getKey(), instance.getMatchingFileNames(allFiles, entry.getValue()));
+    }
+    for (final Map.Entry<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,Map<File,String>> entry : clazz2names.entrySet())  {
+        for (final Map.Entry<File, String> fileEntry : entry.getValue().entrySet())  {
+            net.sourceforge.mxupdate.update.AbstractObject_mxJPO instance = entry.getKey().newInstance();
+System.out.println("check "+instance.getInfoAnno().description() + " '" + fileEntry.getValue() + "'");
+            instance.update(_context, fileEntry.getValue(), fileEntry.getKey());
+        }
+    }
 }
 
         } catch (Exception e)  {
             e.printStackTrace();
         }
 
+    }
+
+    /**
+     * Evaluates depending on given path all files in the sub directories.
+     *
+     * @param _path     path for which the files are searched
+     * @return set of all found files
+     */
+    protected static Set<File> getAllFiles(final File _path)
+    {
+        final Set<File> ret = new HashSet<File>();
+
+        if (_path.isDirectory())  {
+            for (final File file : _path.listFiles())  {
+                if (file.isDirectory())  {
+                    ret.addAll(getAllFiles(file));
+                } else  {
+                    ret.add(file);
+                }
+            }
+        }
+
+        return ret;
     }
 }

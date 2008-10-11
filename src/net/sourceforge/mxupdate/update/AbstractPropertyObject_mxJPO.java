@@ -20,11 +20,15 @@
 
 package net.sourceforge.mxupdate.update;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import org.xml.sax.Attributes;
@@ -35,8 +39,9 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import matrix.db.Context;
-import matrix.db.MQLCommand;
 import matrix.util.MatrixException;
+
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 /**
  * @author tmoxter
@@ -72,18 +77,17 @@ public abstract class AbstractPropertyObject_mxJPO
     /**
      * Returns the file name for this matrix business object. The file name is
      * a concatenation of the defined file prefix within the information
-     * annotation , an underline (&quot;_&quot;),the name of the
-     * matrix object and &quot;.tcl&quot; as extension.
+     * annotation , the name of the matrix object and the file suffix within
+     * the information annotation.
      *
-     * @return file name of this matrix object
+     * @return file name of this administration (business) object
      */
     protected String getFileName()
     {
         return new StringBuilder()
                 .append(getInfoAnno().filePrefix())
-                .append('_')
                 .append(getName())
-                .append(".tcl")
+                .append(getInfoAnno().fileSuffix())
                 .toString();
     }
 
@@ -183,9 +187,7 @@ public abstract class AbstractPropertyObject_mxJPO
                          final String _name)
             throws MatrixException, SAXException, IOException
     {
-        final MQLCommand mql = new MQLCommand();
-        mql.executeCommand(_context, getExportMQL(_name));
-        final String xml = mql.getResult();
+        final String xml = execMql(_context, getExportMQL(_name));
         // create XML reader
         final XMLReader reader = XMLReaderFactory.createXMLReader();
         // register Sax Content Handler
@@ -215,13 +217,20 @@ public abstract class AbstractPropertyObject_mxJPO
     protected abstract void write(final Writer _out)
             throws IOException;
 
+    /**
+     *
+     * @param _out      writer instance
+     * @throws IOException
+     * @todo evaluate already defined symbolic names if exists
+     */
     protected void writeHeader(final Writer _out)
             throws IOException
     {
+        final String headerText = getInfoAnno().filePrefix().replaceAll("_$", "");
         _out.append("################################################################################\n")
-            .append("# ").append(getInfoAnno().filePrefix()).append(":\n")
+            .append("# ").append(headerText).append(":\n")
             .append("# ~");
-        for (int i = 0; i < getInfoAnno().filePrefix().length(); i++)  {
+        for (int i = 0; i < headerText.length(); i++)  {
             _out.append("~");
         }
         _out.append("\n")
@@ -266,6 +275,126 @@ public abstract class AbstractPropertyObject_mxJPO
         _out.append("################################################################################\n\n");
     }
 
+
+    /**
+     * Updates this administration (business) object if the stored information
+     * about the version is not the same as the file date. If an update is
+     * required, the file is read and the object is updated with
+     * {@link #update(Context, CharSequence, CharSequence, Map)}.
+     *
+     * @param _context          context for this request
+     * @param _name             name of object to update
+     * @param _file             file with TCL update code
+     * @see #update(Context, CharSequence, CharSequence, Map)
+     */
+    @Override
+    public void update(final Context _context,
+                       final String _name,
+                       final File _file)
+            throws Exception
+    {
+        // parse objects
+        this.parse(_context, _name);
+
+        // compare file date as version against version information in Matrix
+        final String modified = Long.toString(_file.lastModified() / 1000);
+        if (!modified.equals(this.getVersion()))  {
+System.out.println("    - update to version '" + modified + "'");
+
+            // read code
+            final StringBuilder code = new StringBuilder();
+            final BufferedReader reader = new BufferedReader(new FileReader(_file));
+            String line = reader.readLine();
+            while (line != null)  {
+                code.append(line).append('\n');
+                line = reader.readLine();
+            }
+            reader.close();
+
+            final StringBuilder cmd = new StringBuilder()
+                    .append("mod ").append(this.getInfoAnno().adminType())
+                    .append(" \"").append(this.getName()).append("\" ")
+                    .append(" add property version value \"").append(modified).append("\";\n");
+
+            final Map<String,String> variables = new HashMap<String,String>();
+            variables.put("NAME", this.getName());
+
+            this.update(_context, cmd, code, variables);
+        }
+    }
+
+    /**
+     * The method updates this administration (business) object. First all MQL
+     * commands are concatenated:
+     * <ul>
+     * <li>pre MQL commands (from parameter <code>_preCode</code>)</li>
+     * <li>reset MQL commands (via {@link #appendResetMQL(StringBuilder)})</li>
+     * <li>change to TCL mode</li>
+     * <li>set all required TCL variables</li>
+     * <li>append TCL update code from file</li>
+     * </ul>
+     * This MQL statement is executed within a transaction to be sure that the
+     * statement is not executed if an error had occurred.
+     *
+     * @param _context          context for this request
+     * @param _preCode          MQL command which must be called before the TCL
+     *                          code is executed
+     * @param _code             TCL code from the file used to update
+     * @param _tclVariables     map of all TCL variables where the key is the
+     *                          name and the value is value of the TCL variable
+     *                          (the value is automatically converted to TCL
+     *                          syntax!)
+     * @throws Exception if update failed
+     * @see #appendResetMQL(StringBuilder)
+     */
+    protected void update(final Context _context,
+                          final CharSequence _preCode,
+                          final CharSequence _code,
+                          final Map<String,String> _tclVariables)
+            throws Exception
+    {
+        final StringBuilder cmd = new StringBuilder().append(_preCode);
+
+        // append reset MQL commands
+        appendResetMQL(cmd);
+
+        // append TCL mode
+        cmd.append(";\n")
+           .append("tcl;\n")
+           .append("eval  {\n");
+
+        // define all TCL variables
+        for (final Map.Entry<String, String> entry : _tclVariables.entrySet())  {
+            cmd.append("set ").append(entry.getKey())
+               .append(" \"").append(convert(entry.getValue())).append("\"\n");
+        }
+        // append file code to MQL commands
+        cmd.append(_code)
+           .append("\n}\n");
+
+        // execute update
+        boolean commit = false;
+        try  {
+            _context.start(true);
+            execMql(_context, cmd);
+            _context.commit();
+            commit = true;
+        } finally  {
+            if (!commit)  {
+                _context.abort();
+            }
+        }
+    }
+
+    /**
+     * Appends the MQL statements to reset the administration (business)
+     * object.
+     *
+     * @param _cmd      string builder used to append the MQL statements
+     */
+    protected abstract void appendResetMQL(final StringBuilder _cmd);
+
+
     /**
      * Sax handler used to parse the XML exports.
      */
@@ -287,7 +416,7 @@ public abstract class AbstractPropertyObject_mxJPO
         }
 
         /**
-         * An input source with a zero length strin is returned, because
+         * An input source with a zero length string is returned, because
          * the XML parser wants to open file &quot;ematrixml.dtd&quot;.
          */
         @Override

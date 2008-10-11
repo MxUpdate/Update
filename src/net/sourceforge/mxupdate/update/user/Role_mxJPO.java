@@ -33,7 +33,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "role",
-                                                     filePrefix = "ROLE",
+                                                     filePrefix = "ROLE_",
+                                                     fileSuffix = ".tcl",
                                                      filePath = "user/role",
                                                      description ="role")
 public class Role_mxJPO
@@ -80,5 +81,19 @@ public class Role_mxJPO
                 .append(convert(role))
                 .append("\" child \"${NAME}\"");
         }
+    }
+
+    /**
+     * Appends the MQL statement to reset this role:
+     * <ul>
+     * <li></li>
+     * </ul>
+     *
+     * @param _cmd      string builder used to append the MQL statements
+     * @todo implement
+     */
+    @Override
+    protected void appendResetMQL(final StringBuilder _cmd)
+    {
     }
 }
