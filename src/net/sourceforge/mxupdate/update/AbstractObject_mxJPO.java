@@ -31,6 +31,9 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 /**
+ * Abstract class from which must be derived for exporting and importing all
+ * administration (business) objects.
+ *
  * @author tmoxter
  * @version $Id$
  */
@@ -38,21 +41,31 @@ public abstract class AbstractObject_mxJPO
 {
     /**
      * Returns the path where the file is located of this matrix object. The
-     * method used the path annotation.
+     * method used the information annotation.
      *
-     * @return path.
+     * @return sub path
+     * @see #getInfoAnno()
      */
     public String getPath()
     {
         return getInfoAnno().filePath();
     }
 
+    /**
+     * Evaluates for this instance of export / import class the related
+     * information annotations and returns that.
+     *
+     * @return instance of the related information annotation
+     */
     public final net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO getInfoAnno()
     {
         return getClass().getAnnotation(net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO.class);
     }
 
     /**
+     * Returns for the list of strings to match (parameter
+     * <code>_matches</code>) the list of matching administration (business)
+     * object names.
      *
      * @param _context  context for this request
      * @param _matches  collection of match strings
@@ -64,9 +77,14 @@ public abstract class AbstractObject_mxJPO
             throws MatrixException;
 
     /**
+     * Export given administration (business) object with given name into given
+     * path. The name of the file where is written through is evaluated within
+     * this export method.
      *
      * @param _context  context for this request
-     * @param _path     path to write through
+     * @param _path     path to write through (if required also including
+     *                  depending file path defined from the information
+     *                  annotation)
      * @param _name     name of object to export
      * @throws MatrixException
      * @throws SAXException
@@ -76,6 +94,4 @@ public abstract class AbstractObject_mxJPO
                                 final File _path,
                                 final String _name)
             throws MatrixException, SAXException, IOException;
-
-
 }
