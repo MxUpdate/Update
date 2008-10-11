@@ -65,25 +65,6 @@ public abstract class AbstractAdminObject_mxJPO
         IGNORED_PROPERTIES.add("author");
     }
 
-    /**
-     * Returns the file name for this matrix object. The file name is a
-     * concatenation of the defined admin type annotation in upper case, an
-     * underline (&quot;_&quot;), the {@link #name} of the matrix object and
-     *  &quot;.tcl&quot; as extension.
-     *
-     * @return file name of this matrix object
-     */
-    @Override
-    protected String getFileName()
-    {
-        return new StringBuilder()
-                .append(getClass().getAnnotation(net.sourceforge.mxupdate.update.util.AdminType_mxJPO.class).value().toUpperCase())
-                .append('_')
-                .append(getName())
-                .append(".tcl")
-                .toString();
-    }
-
     @Override
     public Set<String> getMatchingNames(final Context _context,
                                         final Collection<String> _matches)
@@ -92,9 +73,9 @@ public abstract class AbstractAdminObject_mxJPO
         final MQLCommand mql = new MQLCommand();
         final StringBuilder cmd = new StringBuilder()
                 .append("list ")
-                .append(getClass().getAnnotation(net.sourceforge.mxupdate.update.util.AdminType_mxJPO.class).value())
+                .append(getInfoAnno().adminType())
                 .append(" ")
-                .append(getClass().getAnnotation(net.sourceforge.mxupdate.update.util.AdminType_mxJPO.class).suffix());
+                .append(getInfoAnno().adminTypeSuffix());
         mql.executeCommand(_context, cmd.toString().trim());
         final Set<String> ret = new TreeSet<String>();
         for (final String name : mql.getResult().split("\n"))  {
@@ -110,7 +91,7 @@ public abstract class AbstractAdminObject_mxJPO
     @Override
     protected String getExportMQL(final String _name)
     {
-        return "export " + getClass().getAnnotation(net.sourceforge.mxupdate.update.util.AdminType_mxJPO.class).value() + " \"" + _name + "\" xml";
+        return "export " + getInfoAnno().adminType() + " \"" + _name + "\" xml";
     }
 
     @Override
@@ -189,11 +170,10 @@ public abstract class AbstractAdminObject_mxJPO
         {
             writeHeader(_out);
             _out.append("mql mod ")
-                .append(getClass().getAnnotation(net.sourceforge.mxupdate.update.util.AdminType_mxJPO.class).value())
+                .append(getInfoAnno().adminType())
                 .append(" \"${NAME}\"");
-            final String suffix = getClass().getAnnotation(net.sourceforge.mxupdate.update.util.AdminType_mxJPO.class).suffix();
-            if (!"".equals(suffix))  {
-                _out.append(" ").append(suffix);
+            if (!"".equals(getInfoAnno().adminTypeSuffix()))  {
+                _out.append(" ").append(getInfoAnno().adminTypeSuffix());
             }
             _out.append(" \\\n    description \"").append(convert(getDescription())).append("\"");
             writeObject(_out);
@@ -215,11 +195,10 @@ public abstract class AbstractAdminObject_mxJPO
             if (!IGNORED_PROPERTIES.contains(prop.name) && !prop.name.startsWith("%"))  {
                 _out.append("\nmql add property \"").append(convert(prop.name)).append("\"")
                     .append(" \\\n    on ")
-                    .append(getClass().getAnnotation(net.sourceforge.mxupdate.update.util.AdminType_mxJPO.class).value())
+                    .append(getInfoAnno().adminType())
                     .append(" \"${NAME}\"");
-                final String suffix = getClass().getAnnotation(net.sourceforge.mxupdate.update.util.AdminType_mxJPO.class).suffix();
-                if (!"".equals(suffix))  {
-                    _out.append(' ').append(suffix);
+                if (!"".equals(getInfoAnno().adminTypeSuffix()))  {
+                    _out.append(' ').append(getInfoAnno().adminTypeSuffix());
                 }
                 if ((prop.refAdminName) != null && (prop.refAdminType != null))  {
                     _out.append("  \\\n    to ").append(prop.refAdminType)

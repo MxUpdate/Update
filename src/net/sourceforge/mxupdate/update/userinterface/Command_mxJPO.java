@@ -32,9 +32,10 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.AdminType_mxJPO("command")
-@net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/command")
-@net.sourceforge.mxupdate.update.util.TagName_mxJPO("command")
+@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "command",
+                                                     filePrefix = "COMMAND",
+                                                     filePath = "userinterface/command",
+                                                     description = "command")
 public class Command_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {

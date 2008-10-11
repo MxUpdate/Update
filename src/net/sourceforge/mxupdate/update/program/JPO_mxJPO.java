@@ -40,8 +40,9 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.Path_mxJPO("jpo")
-@net.sourceforge.mxupdate.update.util.TagName_mxJPO("jpo")
+@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(filePrefix = "",
+                                                     filePath = "jpo",
+                                                     description = "jpo")
 public class JPO_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO
 {

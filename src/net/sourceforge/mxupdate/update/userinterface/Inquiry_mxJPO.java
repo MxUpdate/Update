@@ -30,9 +30,10 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.AdminType_mxJPO("inquiry")
-@net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/inquiry")
-@net.sourceforge.mxupdate.update.util.TagName_mxJPO("inquiry")
+@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "inquiry",
+                                                     filePrefix = "INQUIRY",
+                                                     filePath = "userinterface/inquiry",
+                                                     description = "inquiry")
 public class Inquiry_mxJPO
        extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {

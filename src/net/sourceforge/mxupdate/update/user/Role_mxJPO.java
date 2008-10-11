@@ -32,9 +32,10 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.AdminType_mxJPO("role")
-@net.sourceforge.mxupdate.update.util.Path_mxJPO("user/role")
-@net.sourceforge.mxupdate.update.util.TagName_mxJPO("role")
+@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "role",
+                                                     filePrefix = "ROLE",
+                                                     filePath = "user/role",
+                                                     description ="role")
 public class Role_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {

@@ -36,9 +36,10 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.AdminType_mxJPO("channel")
-@net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/channel")
-@net.sourceforge.mxupdate.update.util.TagName_mxJPO("channel")
+@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "channel",
+                                                     filePrefix = "CHANNEL",
+                                                     filePath = "userinterface/channel",
+                                                     description = "channel")
 public class Channel_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {

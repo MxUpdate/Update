@@ -33,9 +33,10 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.AdminType_mxJPO("relationship")
-@net.sourceforge.mxupdate.update.util.Path_mxJPO("datamodel/relationship")
-@net.sourceforge.mxupdate.update.util.TagName_mxJPO("relation")
+@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "relationship",
+                                                     filePrefix = "RELATIONSHIP",
+                                                     filePath = "datamodel/relationship",
+                                                     description = "relation")
 public class Relationship_mxJPO
         extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO
 {

@@ -32,9 +32,10 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.AdminType_mxJPO("group")
-@net.sourceforge.mxupdate.update.util.Path_mxJPO("user/group")
-@net.sourceforge.mxupdate.update.util.TagName_mxJPO("group")
+@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "group",
+                                                     filePrefix = "GROUP",
+                                                     filePath = "user/group",
+                                                     description = "group")
 public class Group_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {

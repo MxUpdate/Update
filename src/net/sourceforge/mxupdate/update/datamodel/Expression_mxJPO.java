@@ -34,9 +34,10 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 * @author tmoxter
 * @version $Id$
 */
-@net.sourceforge.mxupdate.update.util.AdminType_mxJPO("expression")
-@net.sourceforge.mxupdate.update.util.Path_mxJPO("datamodel/expression")
-@net.sourceforge.mxupdate.update.util.TagName_mxJPO("expression")
+@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "expression",
+                                                     filePrefix = "EXPRESSION",
+                                                     filePath = "datamodel/expression",
+                                                     description = "exception")
 public class Expression_mxJPO
         extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO
 {

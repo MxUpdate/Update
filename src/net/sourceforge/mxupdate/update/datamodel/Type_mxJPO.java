@@ -33,9 +33,10 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.AdminType_mxJPO("type")
-@net.sourceforge.mxupdate.update.util.Path_mxJPO("datamodel/type")
-@net.sourceforge.mxupdate.update.util.TagName_mxJPO("type")
+@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "type",
+                                                     filePrefix = "TYPE",
+                                                     filePath = "datamodel/type",
+                                                     description = "type")
 public class Type_mxJPO
         extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO
 {

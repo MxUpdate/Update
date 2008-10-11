@@ -38,9 +38,10 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.AdminType_mxJPO("portal")
-@net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/portal")
-@net.sourceforge.mxupdate.update.util.TagName_mxJPO("portal")
+@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "portal",
+                                                     filePrefix = "PORTAL",
+                                                     filePath = "userinterface/portal",
+                                                     description = "portal")
 public class Portal_mxJPO
          extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {

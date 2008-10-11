@@ -384,7 +384,7 @@ System.err.println("unknown pararameter "  + _args[idx]);
 //System.out.println("mode="+mode);
 //System.out.println("clazz2matches="+clazz2matches);
 
-if (unknown || (Mode.HELP == mode))  {
+if (unknown || (Mode.HELP == mode) || (mode == null))  {
     System.out.println("" + DESCRIPTION);
 } else if (Mode.EXPORT == mode)  {
     final Map<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,Set<String>> clazz2names
@@ -397,12 +397,12 @@ if (unknown || (Mode.HELP == mode))  {
         for (final String name : entry.getValue())  {
             net.sourceforge.mxupdate.update.AbstractObject_mxJPO instance = entry.getKey().newInstance();
             final File path = new File(pathStr + File.separator + instance.getPath());
-System.out.println("export "+instance.getClass().getAnnotation(net.sourceforge.mxupdate.update.util.TagName_mxJPO.class).value() + " '" + name + "'");
+System.out.println("export "+instance.getInfoAnno().description() + " '" + name + "'");
             instance.export(_context, path, name);
         }
     }
-//System.out.println("clazz2names="+clazz2names);
-} else  {
+} else if (Mode.IMPORT == mode) {
+System.out.println("import");
 }
 
         } catch (Exception e)  {

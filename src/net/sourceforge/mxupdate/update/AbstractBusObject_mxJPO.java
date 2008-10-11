@@ -114,25 +114,6 @@ public abstract class AbstractBusObject_mxJPO
     private String busDescription = null;
 
     /**
-     * Returns the file name for this matrix business object. The file name is
-     * a concatenation of the defined file prefix within the business type
-     * annotation in upper case, an underline (&quot;_&quot;),the name of the
-     * matrix object and &quot;.tcl&quot; as extension.
-     *
-     * @return file name of this matrix object
-     */
-    @Override
-    protected String getFileName()
-    {
-        return new StringBuilder()
-                .append(getClass().getAnnotation(net.sourceforge.mxupdate.update.util.BusType_mxJPO.class).filePrefix().toUpperCase())
-                .append('_')
-                .append(getName())
-                .append(".tcl")
-                .toString();
-    }
-
-    /**
      * Evaluates the matching names for this administrational business objects.
      * Matching means, that the name and / or revision of the business object
      * matches the collection of given matches.
@@ -314,7 +295,7 @@ public abstract class AbstractBusObject_mxJPO
      */
     protected String getBusType()
     {
-        return getClass().getAnnotation(net.sourceforge.mxupdate.update.util.BusType_mxJPO.class).type();
+        return getInfoAnno().busType();
     }
 
     /**

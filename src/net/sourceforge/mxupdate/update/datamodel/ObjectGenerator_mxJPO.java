@@ -33,9 +33,10 @@ import matrix.util.StringList;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.BusType_mxJPO(type="eService Object Generator",filePrefix="objectgenerator")
-@net.sourceforge.mxupdate.update.util.Path_mxJPO("datamodel/objectgenerator")
-@net.sourceforge.mxupdate.update.util.TagName_mxJPO("object generator")
+@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(busType = "eService Object Generator",
+                                                     filePrefix = "objectgenerator",
+                                                     filePath = "datamodel/objectgenerator",
+                                                     description = "object generator")
 public class ObjectGenerator_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO
 {

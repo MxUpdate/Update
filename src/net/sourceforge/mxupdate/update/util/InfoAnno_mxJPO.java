@@ -30,16 +30,36 @@ import java.lang.annotation.RetentionPolicy;
  * @version $Id$
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AdminType_mxJPO
+public @interface InfoAnno_mxJPO
 {
     /**
-     * Value of the type.
+     * Name of the administration type.
      */
-    public String value();
+    public String adminType() default "";
 
     /**
      * Suffix of the administration type (if required, e.g. for web tables). If
      * not defined the suffix is a zero length string.
      */
-    public String suffix() default "";
+    public String adminTypeSuffix() default "";
+
+    /**
+     * Name of the business type.
+     */
+    public String busType() default "";
+
+    /**
+     * Prefix for the file name.
+     */
+    public String filePrefix();
+
+    /**
+     * Used sub directory for the export.
+     */
+    public String filePath();
+
+    /**
+     * String used for logging purpose.
+     */
+    public String description();
 }

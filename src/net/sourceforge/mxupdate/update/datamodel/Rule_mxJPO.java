@@ -36,9 +36,10 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.AdminType_mxJPO("rule")
-@net.sourceforge.mxupdate.update.util.Path_mxJPO("datamodel/rule")
-@net.sourceforge.mxupdate.update.util.TagName_mxJPO("rule")
+@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "rule",
+                                                     filePrefix = "RULE",
+                                                     filePath = "datamodel/rule",
+                                                     description = "rule")
 public class Rule_mxJPO
         extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO
 {

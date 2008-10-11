@@ -35,9 +35,10 @@ import matrix.util.StringList;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.BusType_mxJPO(type="eService Trigger Program Parameters",filePrefix="trigger")
-@net.sourceforge.mxupdate.update.util.Path_mxJPO("datamodel/trigger")
-@net.sourceforge.mxupdate.update.util.TagName_mxJPO("trigger")
+@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(busType = "eService Trigger Program Parameters",
+                                                     filePrefix="trigger",
+                                                     filePath = "datamodel/trigger",
+                                                     description = "trigger")
 public class Trigger_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO
 {

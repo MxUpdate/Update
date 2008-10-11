@@ -39,9 +39,10 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.AdminType_mxJPO("policy")
-@net.sourceforge.mxupdate.update.util.Path_mxJPO("datamodel/policy")
-@net.sourceforge.mxupdate.update.util.TagName_mxJPO("policy")
+@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "policy",
+                                                     filePrefix = "POLICY",
+                                                     filePath = "datamodel/policy",
+                                                     description = "policy")
 public class Policy_mxJPO
         extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO
 {
@@ -258,7 +259,7 @@ public class Policy_mxJPO
     {
         writeHeader(_out);
         _out.append("updatePolicy \"${NAME}\" {");
-        final String suffix = getClass().getAnnotation(net.sourceforge.mxupdate.update.util.AdminType_mxJPO.class).suffix();
+        final String suffix = getInfoAnno().adminTypeSuffix();
         if (!"".equals(suffix))  {
             _out.append(" ").append(suffix);
         }

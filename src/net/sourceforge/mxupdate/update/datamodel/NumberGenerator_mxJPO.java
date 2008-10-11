@@ -29,9 +29,10 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.BusType_mxJPO(type="eService Number Generator",filePrefix="numbergenerator")
-@net.sourceforge.mxupdate.update.util.Path_mxJPO("datamodel/numbergenerator")
-@net.sourceforge.mxupdate.update.util.TagName_mxJPO("number generator")
+@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(busType = "eService Number Generator",
+                                                     filePrefix = "numbergenerator",
+                                                     filePath = "datamodel/numbergenerator",
+                                                     description = "number generator")
 public class NumberGenerator_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO
 {

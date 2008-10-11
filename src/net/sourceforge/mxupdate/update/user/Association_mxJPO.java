@@ -30,9 +30,10 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.AdminType_mxJPO("association")
-@net.sourceforge.mxupdate.update.util.Path_mxJPO("user/association")
-@net.sourceforge.mxupdate.update.util.TagName_mxJPO("association")
+@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "association",
+                                                     filePrefix = "ASSOCIATION",
+                                                     filePath = "user/association",
+                                                     description = "association")
 public class Association_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {

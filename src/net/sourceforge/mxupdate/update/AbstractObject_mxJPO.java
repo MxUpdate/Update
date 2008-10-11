@@ -44,7 +44,12 @@ public abstract class AbstractObject_mxJPO
      */
     public String getPath()
     {
-        return getClass().getAnnotation(net.sourceforge.mxupdate.update.util.Path_mxJPO.class).value();
+        return getInfoAnno().filePath();
+    }
+
+    public final net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO getInfoAnno()
+    {
+        return getClass().getAnnotation(net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO.class);
     }
 
     /**
@@ -71,4 +76,6 @@ public abstract class AbstractObject_mxJPO
                                 final File _path,
                                 final String _name)
             throws MatrixException, SAXException, IOException;
+
+
 }

@@ -70,11 +70,22 @@ public abstract class AbstractPropertyObject_mxJPO
     private String description = "";
 
     /**
-     * Returns the file name for this matrix object.
+     * Returns the file name for this matrix business object. The file name is
+     * a concatenation of the defined file prefix within the information
+     * annotation , an underline (&quot;_&quot;),the name of the
+     * matrix object and &quot;.tcl&quot; as extension.
      *
      * @return file name of this matrix object
      */
-    protected abstract String getFileName();
+    protected String getFileName()
+    {
+        return new StringBuilder()
+                .append(getInfoAnno().filePrefix())
+                .append('_')
+                .append(getName())
+                .append(".tcl")
+                .toString();
+    }
 
     /**
      * Getter method for instance variable {@link #name}.
@@ -207,27 +218,20 @@ public abstract class AbstractPropertyObject_mxJPO
     protected void writeHeader(final Writer _out)
             throws IOException
     {
-        final net.sourceforge.mxupdate.update.util.AdminType_mxJPO adminType
-                = getClass().getAnnotation(net.sourceforge.mxupdate.update.util.AdminType_mxJPO.class);
-        final net.sourceforge.mxupdate.update.util.BusType_mxJPO busType
-                = getClass().getAnnotation(net.sourceforge.mxupdate.update.util.BusType_mxJPO.class);
-        final String type = (adminType != null)
-                            ? adminType.value()
-                            : busType.filePrefix();
-
         _out.append("################################################################################\n")
-            .append("# ").append(type.toUpperCase()).append(":\n")
+            .append("# ").append(getInfoAnno().filePrefix()).append(":\n")
             .append("# ~");
-        for (int i = 0; i < type.length(); i++)  {
+        for (int i = 0; i < getInfoAnno().filePrefix().length(); i++)  {
             _out.append("~");
         }
         _out.append("\n")
             .append("# ").append(getName()).append("\n")
             .append("#\n");
-        if (adminType != null)  {
+        // symbolic name only if an administration type is defined
+        if (!"".equals(getInfoAnno().adminType()))  {
             _out.append("# SYMBOLIC NAME:\n")
                 .append("# ~~~~~~~~~~~~~~\n")
-.append("# ").append(type).append("_").append(getName()).append("\n")
+.append("# ").append(getInfoAnno().adminType()).append("_").append(getName()).append("\n")
                 .append("#\n");
         }
         _out.append("# DESCRIPTION:\n")

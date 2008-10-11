@@ -29,9 +29,11 @@ import java.util.Stack;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.AdminType_mxJPO(value="table",suffix="system")
-@net.sourceforge.mxupdate.update.util.Path_mxJPO("userinterface/table")
-@net.sourceforge.mxupdate.update.util.TagName_mxJPO("web table")
+@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "table",
+                                                      adminTypeSuffix = "system",
+                                                      filePrefix = "TABLE",
+                                                      filePath = "userinterface/table",
+                                                      description = "web table")
 public class Table_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
