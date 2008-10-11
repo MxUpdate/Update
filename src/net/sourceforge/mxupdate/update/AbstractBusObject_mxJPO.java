@@ -293,11 +293,13 @@ public abstract class AbstractBusObject_mxJPO
      * <li></li>
      * </ul>
      *
+     * @param _context  context for this request
      * @param _cmd      string builder used to append the MQL statements
      * @todo implement
      */
     @Override
-    protected void appendResetMQL(final StringBuilder _cmd)
+    protected void appendResetMQL(final Context _context,
+                                  final StringBuilder _cmd)
     {
     }
 

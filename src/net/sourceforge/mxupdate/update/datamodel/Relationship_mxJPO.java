@@ -25,6 +25,8 @@ import java.io.Writer;
 import java.util.Set;
 import java.util.TreeSet;
 
+import matrix.db.Context;
+
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 /**
@@ -237,11 +239,13 @@ public class Relationship_mxJPO
      * <li></li>
      * </ul>
      *
+     * @param _context  context for this request
      * @param _cmd      string builder used to append the MQL statements
      * @todo implement
      */
     @Override
-    protected void appendResetMQL(final StringBuilder _cmd)
+    protected void appendResetMQL(final Context _context,
+                                  final StringBuilder _cmd)
     {
     }
 }

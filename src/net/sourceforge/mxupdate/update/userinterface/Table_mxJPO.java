@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Stack;
 
+import matrix.db.Context;
+
 /**
  *
  * @author tmoxter
@@ -75,10 +77,12 @@ public class Table_mxJPO
      * <li>remove all properties</li>
      * </ul>
      *
+     * @param _context  context for this request
      * @param _cmd      string builder used to append the MQL statements
      */
     @Override
-    protected void appendResetMQL(final StringBuilder _cmd)
+    protected void appendResetMQL(final Context _context,
+                                  final StringBuilder _cmd)
     {
         _cmd.append("mod table \"").append(this.getName()).append("\" system");
 

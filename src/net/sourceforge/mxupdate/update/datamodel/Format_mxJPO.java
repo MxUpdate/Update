@@ -23,6 +23,8 @@ package net.sourceforge.mxupdate.update.datamodel;
 import java.io.IOException;
 import java.io.Writer;
 
+import matrix.db.Context;
+
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 /**
@@ -125,11 +127,13 @@ public class Format_mxJPO
      * <li></li>
      * </ul>
      *
+     * @param _context  context for this request
      * @param _cmd      string builder used to append the MQL statements
      * @todo implement
      */
     @Override
-    protected void appendResetMQL(final StringBuilder _cmd)
+    protected void appendResetMQL(final Context _context,
+                                  final StringBuilder _cmd)
     {
     }
 }

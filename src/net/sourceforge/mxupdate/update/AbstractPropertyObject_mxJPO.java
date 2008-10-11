@@ -357,7 +357,7 @@ System.out.println("    - update to version '" + modified + "'");
         final StringBuilder cmd = new StringBuilder().append(_preCode);
 
         // append reset MQL commands
-        appendResetMQL(cmd);
+        appendResetMQL(_context, cmd);
 
         // append TCL mode
         cmd.append(";\n")
@@ -391,9 +391,11 @@ System.out.println("    - update to version '" + modified + "'");
      * Appends the MQL statements to reset the administration (business)
      * object.
      *
+     * @param _context  context for this request
      * @param _cmd      string builder used to append the MQL statements
      */
-    protected abstract void appendResetMQL(final StringBuilder _cmd);
+    protected abstract void appendResetMQL(final Context _context,
+                                           final StringBuilder _cmd);
 
 
     /**

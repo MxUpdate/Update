@@ -154,10 +154,12 @@ public class Form_mxJPO
      * <li>remove all properties</li>
      * </ul>
      *
+     * @param _context  context for this request
      * @param _cmd      string builder used to append the MQL statements
      */
     @Override
-    protected void appendResetMQL(final StringBuilder _cmd)
+    protected void appendResetMQL(final Context _context,
+                                  final StringBuilder _cmd)
     {
         _cmd.append("mod form \"").append(this.getName()).append('\"');
 

@@ -161,10 +161,12 @@ public class Inquiry_mxJPO
      * <li>remove all arguments and arguments</li>
      * </ul>
      *
+     * @param _context  context for this request
      * @param _cmd      string builder used to append the MQL statements
      */
     @Override
-    protected void appendResetMQL(final StringBuilder _cmd)
+    protected void appendResetMQL(final Context _context,
+                                  final StringBuilder _cmd)
     {
         _cmd.append("mod ").append(getInfoAnno().adminType())
             .append(" \"").append(getName()).append('\"')

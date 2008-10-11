@@ -129,9 +129,10 @@ public class Menu_mxJPO
      * @param _cmd      string builder used to append the MQL statements
      */
     @Override
-    protected void appendResetMQL(final StringBuilder _cmd)
+    protected void appendResetMQL(final Context _context,
+                                  final StringBuilder _cmd)
     {
-        super.appendResetMQL(_cmd);
+        super.appendResetMQL(_context, _cmd);
 
         // remove information about tree menu...
         _cmd.append(";\n");
