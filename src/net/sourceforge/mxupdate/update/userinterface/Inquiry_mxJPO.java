@@ -104,7 +104,7 @@ public class Inquiry_mxJPO
     {
         _out.append("\n\n# do not change the next three lines, they are needed as separator information:\n")
             .append(INQUIRY_SEPARATOR)
-            .append('\n').append(this.code);
+            .append("\n\n").append(this.code);
     }
 
     /**
