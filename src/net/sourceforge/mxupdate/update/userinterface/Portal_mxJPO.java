@@ -194,10 +194,15 @@ public class Portal_mxJPO
                 _cmd.append(" remove setting \"").append(prop.getName().substring(1)).append('\"');
             }
         }
-        // remove channels
+        _cmd.append(";\n");
+        // remove channels (each channel must be removed in a single line...)
         for (final ChannelRef channelRef : this.channelRefs)  {
-            _cmd.append(" remove channel \"").append(channelRef.name).append('\"');
+            _cmd.append("mod ").append(getInfoAnno().adminType())
+                .append(" \"").append(getName()).append('\"')
+                .append(" remove channel \"").append(channelRef.name).append("\";\n");
         }
+        _cmd.append("mod ").append(getInfoAnno().adminType())
+            .append(" \"").append(getName()).append('\"');
         // reset properties
         this.appendResetProperties(_cmd);
     }
