@@ -88,12 +88,12 @@ public class Group_mxJPO
     /**
      * Appends the MQL statement to reset this group:
      * <ul>
-     * <li></li>
+     * <li>reset description</li>
+     * <li>remove all parent groups</li>
      * </ul>
      *
      * @param _context  context for this request
      * @param _cmd      string builder used to append the MQL statements
-     * @todo implement
      */
     @Override
     protected void appendResetMQL(final Context _context,

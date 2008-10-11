@@ -80,12 +80,12 @@ public class Association_mxJPO
     /**
      * Appends the MQL statement to reset this association:
      * <ul>
-     * <li></li>
+     * <li>reset description</li>
+     * <li>set definition to current context user</li>
      * </ul>
      *
      * @param _context  context for this request
      * @param _cmd      string builder used to append the MQL statements
-     * @todo implement
      */
     @Override
     protected void appendResetMQL(final Context _context,
@@ -98,6 +98,5 @@ public class Association_mxJPO
             .append(" definition \"").append(_context.getUser()).append("\"");
         // reset properties
         appendResetProperties(_cmd);
-
     }
 }

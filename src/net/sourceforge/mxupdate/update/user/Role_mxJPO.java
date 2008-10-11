@@ -88,7 +88,8 @@ public class Role_mxJPO
     /**
      * Appends the MQL statement to reset this role:
      * <ul>
-     * <li></li>
+     * <li>reset description</li>
+     * <li>remove all parent roles</li>
      * </ul>
      *
      * @param _context  context for this request
