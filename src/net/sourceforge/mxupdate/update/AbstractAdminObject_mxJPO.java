@@ -213,6 +213,19 @@ public abstract class AbstractAdminObject_mxJPO
         }
     }
 
+    @Override
+    public void create(final Context _context,
+                       final String _name)
+            throws Exception
+    {
+        final StringBuilder cmd = new StringBuilder()
+                .append("add ").append(getInfoAnno().adminType())
+                .append(" \"").append(_name).append("\" ")
+                .append(getInfoAnno().adminTypeSuffix());
+        execMql(_context, cmd);
+    }
+
+
     /**
      * Appends the MQL statements to remove all properties within the reset.
      *

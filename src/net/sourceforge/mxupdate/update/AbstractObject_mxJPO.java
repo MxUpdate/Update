@@ -145,6 +145,13 @@ public abstract class AbstractObject_mxJPO
         return ret;
     }
 
+    public void create(final Context _context,
+                       final String _name)
+            throws Exception
+    {
+
+    }
+
     /**
      *
      * @param _context
@@ -175,6 +182,9 @@ public abstract class AbstractObject_mxJPO
     {
         final MQLCommand mql = new MQLCommand();
         mql.executeCommand(_context, _cmd.toString());
+        if ((mql.getError() != null) && !"".equals(mql.getError()))  {
+            throw new MatrixException(mql.getError() + "\nMQL command was:\n" + _cmd);
+        }
         return mql.getResult().trim();
     }
 

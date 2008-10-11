@@ -20,6 +20,7 @@
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -403,12 +404,27 @@ System.out.println("export "+instance.getInfoAnno().description() + " '" + name 
     }
 } else if (Mode.IMPORT == mode) {
     final Set<File> allFiles = getAllFiles(new File(pathStr));
+    // get all matching files depending on the update classes
     final Map<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,Map<File,String>> clazz2names
             = new HashMap<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,Map<File,String>>();
     for (final Map.Entry<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,List<String>> entry : clazz2matches.entrySet())  {
         net.sourceforge.mxupdate.update.AbstractObject_mxJPO instance = entry.getKey().newInstance();
         clazz2names.put(entry.getKey(), instance.getMatchingFileNames(allFiles, entry.getValue()));
     }
+    // create if needed
+    final Collection<String> wildCardMatch = new HashSet<String>();
+    wildCardMatch.add("*");
+    for (final Map.Entry<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,Map<File,String>> entry : clazz2names.entrySet())  {
+        for (final Map.Entry<File, String> fileEntry : entry.getValue().entrySet())  {
+            net.sourceforge.mxupdate.update.AbstractObject_mxJPO instance = entry.getKey().newInstance();
+            final Set<String> existings = instance.getMatchingNames(_context, wildCardMatch);
+            if (!existings.contains(fileEntry.getValue()))  {
+System.out.println("create "+instance.getInfoAnno().description() + " '" + fileEntry.getValue() + "'");
+                instance.create(_context, fileEntry.getValue());
+            }
+        }
+    }
+    // update
     for (final Map.Entry<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,Map<File,String>> entry : clazz2names.entrySet())  {
         for (final Map.Entry<File, String> fileEntry : entry.getValue().entrySet())  {
             net.sourceforge.mxupdate.update.AbstractObject_mxJPO instance = entry.getKey().newInstance();
