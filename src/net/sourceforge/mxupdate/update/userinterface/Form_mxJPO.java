@@ -22,7 +22,10 @@ package net.sourceforge.mxupdate.update.userinterface;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Map;
 import java.util.Stack;
+
+import matrix.db.Context;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
@@ -40,9 +43,29 @@ public class Form_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
     /**
+     * TCL procedure used to order fields of form, because Matrix has a bug
+     * that sometimes the fields of a form are not in the correct order.
+     *
+     * @see #update(Context, CharSequence, CharSequence, Map)
+     */
+    private static final String ORDER_PROC
+            = "proc orderFields {_name _fields}  {\n"
+                + "foreach offset [list 100000 1] {\n"
+                    + "foreach field $_fields {"
+                        + "mql mod form \"${_name}\" "
+                            + "field modify name \"$field\" "
+                            + "order ${offset}\n"
+                        + "incr offset\n"
+                    + "}\n"
+                + "}"
+            + "}";
+
+
+    /**
      * Stores all fields of this form instance.
      */
-    final Stack<net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO> fields = new Stack<net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO>();
+    private final Stack<net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO> fields
+            = new Stack<net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO>();
 
     @Override
     protected void parse(String _url, String _content)
@@ -93,6 +116,35 @@ public class Form_mxJPO
             _out.append("    \"").append(convert(field.name)).append("\" \\\n");
         }
         _out.append("]");
+    }
+
+    /**
+     * The update of web forms works sometimes not correctly for the correct
+     * order of fields. Because of that, the TCL update code is includes a
+     * procedure to order the form fields.
+     *
+     * @param _context          context for this request
+     * @param _preCode          MQL command which must be called before the TCL
+     *                          code is executed
+     * @param _code             TCL code from the file used to update
+     * @param _tclVariables     map of all TCL variables where the key is the
+     *                          name and the value is value of the TCL variable
+     *                          (the value is automatically converted to TCL
+     *                          syntax!)
+     * @see #ORDER_PROC
+     */
+    @Override
+    protected void update(final Context _context,
+                          final CharSequence _preCode,
+                          final CharSequence _code,
+                          final Map<String,String> _tclVariables)
+            throws Exception
+    {
+        final StringBuilder tclCode = new StringBuilder()
+                .append(ORDER_PROC)
+                .append('\n')
+                .append(_code);
+        super.update(_context, _preCode, tclCode, _tclVariables);
     }
 
     /**
