@@ -35,6 +35,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "command",
+                                                     title = "COMMAND",
                                                      filePrefix = "COMMAND_",
                                                      fileSuffix = ".tcl",
                                                      filePath = "userinterface/command",

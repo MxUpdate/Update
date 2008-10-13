@@ -35,6 +35,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "group",
+                                                     title = "GROUP",
                                                      filePrefix = "GROUP_",
                                                      fileSuffix = ".tcl",
                                                      filePath = "user/group",

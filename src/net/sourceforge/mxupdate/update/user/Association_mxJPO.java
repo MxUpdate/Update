@@ -33,6 +33,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "association",
+                                                     title = "ASSOCIATION",
                                                      filePrefix = "ASSOCIATION_",
                                                      fileSuffix = ".tcl",
                                                      filePath = "user/association",

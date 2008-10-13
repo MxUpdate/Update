@@ -34,6 +34,7 @@ import matrix.util.StringList;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(busType = "eService Object Generator",
+                                                     title = "OBJECTGENERATOR",
                                                      filePrefix = "OBJECTGENERATOR_",
                                                      fileSuffix = ".tcl",
                                                      filePath = "datamodel/objectgenerator",

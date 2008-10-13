@@ -125,19 +125,20 @@ public abstract class AbstractObject_mxJPO
     {
         final Map<File,String> ret = new TreeMap<File,String>();
 
-        final String prefix = getInfoAnno().filePrefix();
         final String suffix = getInfoAnno().fileSuffix();
-        final int prefixLength = prefix.length();
         final int suffixLength = suffix.length();
+        for (final String prefix : getInfoAnno().filePrefix())  {
+            final int prefixLength = prefix.length();
 
-        for (final File file : _files)  {
-            for (final String match : _matches)  {
-                final String fileName = file.getName();
-                if (fileName.startsWith(prefix) && fileName.endsWith(suffix))  {
-                    final String name = fileName.substring(0, fileName.length() - suffixLength)
-                                                .substring(prefixLength);
-                    if (match(name, match))  {
-                        ret.put(file, name);
+            for (final File file : _files)  {
+                for (final String match : _matches)  {
+                    final String fileName = file.getName();
+                    if (fileName.startsWith(prefix) && fileName.endsWith(suffix))  {
+                        final String name = fileName.substring(0, fileName.length() - suffixLength)
+                                                    .substring(prefixLength);
+                        if (match(name, match))  {
+                            ret.put(file, name);
+                        }
                     }
                 }
             }
@@ -146,6 +147,7 @@ public abstract class AbstractObject_mxJPO
     }
 
     public void create(final Context _context,
+                       final File _file,
                        final String _name)
             throws Exception
     {

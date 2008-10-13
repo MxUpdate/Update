@@ -20,6 +20,7 @@
 
 package net.sourceforge.mxupdate.update;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
@@ -213,8 +214,17 @@ public abstract class AbstractAdminObject_mxJPO
         }
     }
 
+    /**
+     * Creates given administration object from given type with given name.
+     *
+     * @param _context          context for this request
+     * @param _file             file for which the administration object must
+     *                          be created (not used)
+     * @param _name             name of administration object to create
+     */
     @Override
     public void create(final Context _context,
+                       final File _file,
                        final String _name)
             throws Exception
     {
@@ -224,7 +234,6 @@ public abstract class AbstractAdminObject_mxJPO
                 .append(getInfoAnno().adminTypeSuffix());
         execMql(_context, cmd);
     }
-
 
     /**
      * Appends the MQL statements to remove all properties within the reset.

@@ -37,6 +37,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "menu",
+                                                     title ="MENU",
                                                      filePrefix = "MENU_",
                                                      fileSuffix = ".tcl",
                                                      filePath = "userinterface/menu",

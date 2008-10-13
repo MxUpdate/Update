@@ -39,7 +39,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(filePrefix = "",
+@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(title = "",
+                                                     filePrefix = "",
                                                      fileSuffix = "_" + "mxJPO.java",
                                                      filePath = "jpo",
                                                      description = "jpo")

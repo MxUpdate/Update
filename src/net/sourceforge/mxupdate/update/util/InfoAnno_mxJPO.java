@@ -49,9 +49,9 @@ public @interface InfoAnno_mxJPO
     public String busType() default "";
 
     /**
-     * Prefix of the file name.
+     * Prefixes of the file name.
      */
-    public String filePrefix();
+    public String[] filePrefix();
 
     /**
      * Suffix of the file name including the file extension.
@@ -62,6 +62,11 @@ public @interface InfoAnno_mxJPO
      * Used sub directory for the export.
      */
     public String filePath();
+
+    /**
+     * String used as title within the TCL header of the file.
+     */
+    public String title();
 
     /**
      * String used for logging purpose.

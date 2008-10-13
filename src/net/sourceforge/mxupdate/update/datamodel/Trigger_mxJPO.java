@@ -36,6 +36,7 @@ import matrix.util.StringList;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(busType = "eService Trigger Program Parameters",
+                                                     title = "TRIGGER",
                                                      filePrefix = "TRIGGER_",
                                                      fileSuffix = ".tcl",
                                                      filePath = "datamodel/trigger",

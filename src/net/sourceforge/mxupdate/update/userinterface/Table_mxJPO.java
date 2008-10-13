@@ -32,11 +32,12 @@ import matrix.db.Context;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "table",
-                                                      adminTypeSuffix = "system",
-                                                      filePrefix = "TABLE_",
-                                                      fileSuffix = ".tcl",
-                                                      filePath = "userinterface/table",
-                                                      description = "web table")
+                                                     adminTypeSuffix = "system",
+                                                     title = "TABLE",
+                                                     filePrefix = "TABLE_",
+                                                     fileSuffix = ".tcl",
+                                                     filePath = "userinterface/table",
+                                                     description = "web table")
 public class Table_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {

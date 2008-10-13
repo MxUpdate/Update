@@ -420,7 +420,7 @@ System.out.println("export "+instance.getInfoAnno().description() + " '" + name 
             final Set<String> existings = instance.getMatchingNames(_context, wildCardMatch);
             if (!existings.contains(fileEntry.getValue()))  {
 System.out.println("create "+instance.getInfoAnno().description() + " '" + fileEntry.getValue() + "'");
-                instance.create(_context, fileEntry.getValue());
+                instance.create(_context, fileEntry.getKey(), fileEntry.getValue());
             }
         }
     }

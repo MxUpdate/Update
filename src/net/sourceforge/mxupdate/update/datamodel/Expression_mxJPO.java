@@ -34,6 +34,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 * @version $Id$
 */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "expression",
+                                                     title = "EXPRESSION",
                                                      filePrefix = "EXPRESSION_",
                                                      fileSuffix = ".tcl",
                                                      filePath = "datamodel/expression",

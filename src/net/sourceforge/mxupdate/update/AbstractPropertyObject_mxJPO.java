@@ -84,8 +84,9 @@ public abstract class AbstractPropertyObject_mxJPO
      */
     protected String getFileName()
     {
+// TODO: throw exception if more than one prefix is found!
         return new StringBuilder()
-                .append(getInfoAnno().filePrefix())
+                .append(getInfoAnno().filePrefix()[0])
                 .append(getName())
                 .append(getInfoAnno().fileSuffix())
                 .toString();
@@ -226,7 +227,7 @@ public abstract class AbstractPropertyObject_mxJPO
     protected void writeHeader(final Writer _out)
             throws IOException
     {
-        final String headerText = getInfoAnno().filePrefix().replaceAll("_$", "");
+        final String headerText = getInfoAnno().title();
         _out.append("################################################################################\n")
             .append("# ").append(headerText).append(":\n")
             .append("# ~");

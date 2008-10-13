@@ -20,6 +20,7 @@
 
 package net.sourceforge.mxupdate.update.datamodel;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Set;
@@ -35,9 +36,12 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  *
  * @author tmoxter
  * @version $Id$
+ * @todo description
+ * @todo program ranges
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "attribute",
-                                                     filePrefix = "ATTRIBUTE_",
+                                                     title = "ATTRIBUTE",
+                                                     filePrefix = {"BOOLEAN_", "DATE_", "INTEGER_", "REAL_", "STRING_"},
                                                      fileSuffix = ".tcl",
                                                      filePath = "datamodel/attribute",
                                                      description = "attribute")
@@ -179,19 +183,62 @@ public class Attribute_mxJPO
     }
 
     /**
+     * Creates given attribute from given type with given name. Because the
+     * type of the attribute is defined with the file name (as prefix), the
+     * original create method must be overwritten.
+     *
+     * @param _context          context for this request
+     * @param _file             file for which the attribute must be created
+     *                          (needed to define the attribute
+     *                          type)
+     * @param _name             name of attribute to create
+     */
+    @Override
+    public void create(final Context _context,
+                       final File _file,
+                       final String _name)
+            throws Exception
+    {
+        final StringBuilder cmd = new StringBuilder()
+                .append("add ").append(getInfoAnno().adminType())
+                .append(" \"").append(_name).append("\" ")
+                .append(" type ").append(_file.getName().replaceAll("_.*", "").toLowerCase());
+        execMql(_context, cmd);
+    }
+
+    /**
      * Appends the MQL statement to reset this attribute:
      * <ul>
-     * <li></li>
+     * <li>set to not hidden</li>
+     * <li>reset description and default value</li>
+     * <li>remove all triggers, ranges and properties</li>
      * </ul>
      *
      * @param _context  context for this request
      * @param _cmd      string builder used to append the MQL statements
-     * @todo implement
      */
     @Override
     protected void appendResetMQL(final Context _context,
                                   final StringBuilder _cmd)
     {
+        _cmd.append("mod ").append(getInfoAnno().adminType())
+            .append(" \"").append(getName()).append('\"')
+            .append(" !hidden description \"\" default \"\"")
+            .append(" remove trigger modify check")
+            .append(" remove trigger modify override")
+            .append(" remove trigger modify action");
+        // remove rules
+        for (final String rule : this.rules)  {
+            _cmd.append(" remove rule \"").append(rule).append('\"');
+        }
+        // remove ranges
+// TODO: between? program?
+        for (final Range range : this.rangesSorted)  {
+            _cmd.append(" remove range ").append(range.type)
+                .append(" \"").append(range.value1).append("\"");
+        }
+        // reset properties
+        this.appendResetProperties(_cmd);
     }
 
     /**

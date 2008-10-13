@@ -35,6 +35,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "form",
+                                                     title = "FORM",
                                                      filePrefix = "FORM_",
                                                      fileSuffix = ".tcl",
                                                      filePath = "userinterface/form",
