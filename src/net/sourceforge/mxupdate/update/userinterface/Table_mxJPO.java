@@ -84,7 +84,8 @@ public class Table_mxJPO
     protected void appendResetMQL(final Context _context,
                                   final StringBuilder _cmd)
     {
-        _cmd.append("mod table \"").append(this.getName()).append("\" system");
+        _cmd.append("mod table \"").append(this.getName()).append("\" system")
+            .append(" !hidden");
 
         // remove all columns
         for (final net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO column : this.columns)  {

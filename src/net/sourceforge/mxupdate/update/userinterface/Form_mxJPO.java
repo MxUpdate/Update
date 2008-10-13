@@ -161,7 +161,8 @@ public class Form_mxJPO
     protected void appendResetMQL(final Context _context,
                                   final StringBuilder _cmd)
     {
-        _cmd.append("mod form \"").append(this.getName()).append('\"');
+        _cmd.append("mod form \"").append(this.getName()).append('\"')
+            .append(" !hidden");
 
         // remove all fields
         for (final net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO field : this.fields)  {
