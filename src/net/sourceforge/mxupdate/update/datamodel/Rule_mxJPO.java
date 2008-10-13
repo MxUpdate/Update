@@ -191,17 +191,27 @@ public class Rule_mxJPO
     /**
      * Appends the MQL statement to reset this rule:
      * <ul>
-     * <li></li>
+     * <li>set to not hidden</li>
+     * <li>no owner and public access</li>
+     * <li>remove all users and properties</li>
      * </ul>
      *
      * @param _context  context for this request
      * @param _cmd      string builder used to append the MQL statements
-     * @todo implement
      */
     @Override
     protected void appendResetMQL(final Context _context,
                                   final StringBuilder _cmd)
     {
+        _cmd.append("mod ").append(getInfoAnno().adminType())
+            .append(" \"").append(getName()).append('\"')
+            .append(" !hidden owner none public none");
+        // remove user access
+        for (final UserAccess userAccess : this.userAccessSorted)  {
+            _cmd.append(" remove user \"").append(userAccess.userRef).append("\" all");
+        }
+        // reset properties
+        this.appendResetProperties(_cmd);
     }
 
     /**

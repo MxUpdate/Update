@@ -37,7 +37,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
                                                      filePrefix = "EXPRESSION_",
                                                      fileSuffix = ".tcl",
                                                      filePath = "datamodel/expression",
-                                                     description = "exception")
+                                                     description = "expression")
 public class Expression_mxJPO
         extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO
 {
@@ -108,16 +108,22 @@ public class Expression_mxJPO
     /**
      * Appends the MQL statement to reset this expression:
      * <ul>
-     * <li></li>
+     * <li>set to not hidden</li>
+     * <li>reset description and value (expression itself)</li>
+     * <li>remove all properties</li>
      * </ul>
      *
      * @param _context  context for this request
      * @param _cmd      string builder used to append the MQL statements
-     * @todo implement
      */
     @Override
     protected void appendResetMQL(final Context _context,
                                   final StringBuilder _cmd)
     {
+        _cmd.append("mod ").append(getInfoAnno().adminType())
+            .append(" \"").append(getName()).append('\"')
+            .append(" !hidden description \"\" value \"\"");
+        // reset properties
+        this.appendResetProperties(_cmd);
     }
 }
