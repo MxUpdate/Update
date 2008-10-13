@@ -75,6 +75,7 @@ public class Table_mxJPO
      * <ul>
      * <li>remove all columns of the web table</li>
      * <li>remove all properties</li>
+     * <li>set to not hidden</li>
      * </ul>
      *
      * @param _context  context for this request

@@ -152,6 +152,7 @@ public class Form_mxJPO
      * <ul>
      * <li>remove all fields of the web form</li>
      * <li>remove all properties</li>
+     * <li>set to not hidden</li>
      * </ul>
      *
      * @param _context  context for this request
