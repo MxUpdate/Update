@@ -176,7 +176,9 @@ public class Attribute_mxJPO
         } else  {
             _out.append(" \\\n    default \"\"");
         }
-        writeTriggers(_out);
+        // append triggers
+        this.writeTriggers(_out);
+        // append ranges
         for (final Range range : this.rangesSorted)  {
             range.write(_out);
         }
@@ -203,7 +205,7 @@ public class Attribute_mxJPO
                 .append("add ").append(getInfoAnno().adminType())
                 .append(" \"").append(_name).append("\" ")
                 .append(" type ").append(_file.getName().replaceAll("_.*", "").toLowerCase());
-        execMql(_context, cmd);
+        this.execMql(_context, cmd);
     }
 
     /**
@@ -223,10 +225,9 @@ public class Attribute_mxJPO
     {
         _cmd.append("mod ").append(getInfoAnno().adminType())
             .append(" \"").append(getName()).append('\"')
-            .append(" !hidden description \"\" default \"\"")
-            .append(" remove trigger modify check")
-            .append(" remove trigger modify override")
-            .append(" remove trigger modify action");
+            .append(" !hidden description \"\" default \"\"");
+        // reset triggers
+        this.appendResetTriggerMQLStatements(_cmd);
         // remove rules
         for (final String rule : this.rules)  {
             _cmd.append(" remove rule \"").append(rule).append('\"');

@@ -101,7 +101,7 @@ public abstract class AbstractDMObject_mxJPO
     }
 
     /**
-     * Writes the trigger information to the writter instance.
+     * Writes the trigger information to the writer instance.
      *
      * @param _out      writer instance
      * @throws IOException if write failed
@@ -116,6 +116,22 @@ public abstract class AbstractDMObject_mxJPO
         }
     }
 
+    /**
+     * Appends to the string builder the MQL statements to remove all current
+     * assigned triggers.
+     *
+     * @param _cmd      string builder with current MQL statement
+     */
+    protected void appendResetTriggerMQLStatements(final StringBuilder _cmd)
+    {
+        for (final Trigger trigger : this.triggers.values())  {
+            trigger.appendResetMQLStatement(_cmd);
+        }
+    }
+
+    /**
+     * Class used to store informations about triggers.
+     */
     static class Trigger  {
         /**
          * Used to parse the event type of the trigger from the {@link #name}.
@@ -156,7 +172,7 @@ public abstract class AbstractDMObject_mxJPO
          * @param _out  writer instance
          * @throws IOException if write failed
          */
-        protected void write(Writer _out)
+        protected void write(final Writer _out)
                 throws IOException
         {
             // parse event type
@@ -170,6 +186,24 @@ public abstract class AbstractDMObject_mxJPO
             _out.append(" \\\n    add trigger ").append(eventType.toLowerCase()).append(' ').append(kind.toLowerCase())
                 .append(" \"").append(convert(this.program)).append("\"")
                 .append(" input \"").append(convert(this.arguments)).append("\"");
+        }
+
+        /**
+         * Appends the MQL statement to remove all triggers.
+         *
+         * @param _cmd          string builder with current MQL statement
+         */
+        protected void appendResetMQLStatement(final StringBuilder _cmd)
+        {
+            // parse event type
+            final Matcher matchEventType = PATTERN_EVENTTYPE.matcher(this.name);
+            matchEventType.find();
+            final String eventType = matchEventType.group();
+            // parse kind
+            final Matcher matchKind = PATTERN_KIND.matcher(this.name);
+            matchKind.find();
+            final String kind = matchKind.group();
+            _cmd.append(" remove trigger ").append(eventType.toLowerCase()).append(' ').append(kind.toLowerCase());
         }
     }
 }
