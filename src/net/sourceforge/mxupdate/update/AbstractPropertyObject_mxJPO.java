@@ -339,9 +339,9 @@ System.out.println("    - update to version '" + modified + "'");
      * statement is not executed if an error had occurred.
      *
      * @param _context          context for this request
-     * @param _preCode          MQL command which must be called before the TCL
+     * @param _preMQLCode          MQL command which must be called before the TCL
      *                          code is executed
-     * @param _code             TCL code from the file used to update
+     * @param _tclCode          TCL code from the file used to update
      * @param _tclVariables     map of all TCL variables where the key is the
      *                          name and the value is value of the TCL variable
      *                          (the value is automatically converted to TCL
@@ -350,12 +350,12 @@ System.out.println("    - update to version '" + modified + "'");
      * @see #appendResetMQL(StringBuilder)
      */
     protected void update(final Context _context,
-                          final CharSequence _preCode,
-                          final CharSequence _code,
+                          final CharSequence _preMQLCode,
+                          final CharSequence _tclCode,
                           final Map<String,String> _tclVariables)
             throws Exception
     {
-        final StringBuilder cmd = new StringBuilder().append(_preCode);
+        final StringBuilder cmd = new StringBuilder().append(_preMQLCode);
 
         // append reset MQL commands
         appendResetMQL(_context, cmd);
@@ -371,7 +371,7 @@ System.out.println("    - update to version '" + modified + "'");
                .append(" \"").append(convert(entry.getValue())).append("\"\n");
         }
         // append file code to MQL commands
-        cmd.append(_code)
+        cmd.append(_tclCode)
            .append("\n}\n");
 
         // execute update
