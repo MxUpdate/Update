@@ -48,6 +48,11 @@ public class Portal_mxJPO
          extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
     /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -3337088092343095556L;
+
+    /**
      * Alt (label) of the portal.
      */
     private String alt = null;

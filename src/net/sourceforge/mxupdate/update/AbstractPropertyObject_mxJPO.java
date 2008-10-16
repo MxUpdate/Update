@@ -51,6 +51,11 @@ public abstract class AbstractPropertyObject_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO
 {
     /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -2794355865894159489L;
+
+    /**
      * Name of the matrix object.
      *
      * @see #setName(String)

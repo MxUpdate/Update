@@ -44,6 +44,11 @@ public class Role_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
     /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -1889259829075111308L;
+
+    /**
      * Set to hold all parent roles.
      */
     final Set<String> parentRoles = new TreeSet<String>();

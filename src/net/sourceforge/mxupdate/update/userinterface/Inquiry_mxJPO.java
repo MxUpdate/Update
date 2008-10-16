@@ -46,6 +46,11 @@ public class Inquiry_mxJPO
        extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
     /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -6884861954912987897L;
+
+    /**
      * Separator used between the inquiry update statements and the inquiry
      * code itself.
      */

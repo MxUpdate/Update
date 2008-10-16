@@ -22,6 +22,7 @@ package net.sourceforge.mxupdate.update;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +44,13 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
  * @version $Id$
  */
 public abstract class AbstractObject_mxJPO
+        implements Serializable
 {
+    /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -5505850566853070973L;
+
     /**
      * Stores the version information of this object. If the value is
      * <code>null</code>, the version information is not defined.

@@ -49,6 +49,11 @@ public class Policy_mxJPO
         extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO
 {
     /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = 8645304838663417963L;
+
+    /**
      * Default format of this policy.
      */
     private String defaultFormat = null;

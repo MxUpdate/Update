@@ -45,6 +45,11 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 public class Menu_mxJPO
         extends net.sourceforge.mxupdate.update.userinterface.Command_mxJPO
 {
+    /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = 3617033695673460587L;
+
     boolean treeMenu = false;
 
     final Stack<MenuChild> childs = new Stack<MenuChild>();

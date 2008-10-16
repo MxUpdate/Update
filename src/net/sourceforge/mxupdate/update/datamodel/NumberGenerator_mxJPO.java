@@ -38,6 +38,11 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 public class NumberGenerator_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO
 {
+    /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -3678077121553752020L;
+
     final static String ATTRIBUTE_ESERVICE_NEXT_NUMBER = "eService Next Number";
 
     /**

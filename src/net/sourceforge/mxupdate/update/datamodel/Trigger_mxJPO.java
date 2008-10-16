@@ -45,6 +45,11 @@ public class Trigger_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO
 {
     /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = 8068133769051567270L;
+
+    /**
      * Is the trigger active?
      *
      * @see #prepare(Context)   used to read the information if the trigger is

@@ -48,6 +48,11 @@ public class Program_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO
 {
     /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -3329894042318127257L;
+
+    /**
      * Evaluates for given collection of string which programs are matching
      * returns them as set. Only programs which are not JPOs are returned.
      *

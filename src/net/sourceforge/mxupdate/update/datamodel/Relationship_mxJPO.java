@@ -45,6 +45,11 @@ public class Relationship_mxJPO
         extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO
 {
     /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -5246287940374394548L;
+
+    /**
      * List of all attributes for this type.
      */
     private final Set<String> attributes = new TreeSet<String>();

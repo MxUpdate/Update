@@ -22,6 +22,7 @@ package net.sourceforge.mxupdate.update;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.HashSet;
@@ -44,6 +45,11 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
 public abstract class AbstractAdminObject_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractPropertyObject_mxJPO
 {
+    /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = 6211240989585499402L;
+
     /**
      * Is the matrix object hidden?
      *
@@ -280,7 +286,13 @@ public abstract class AbstractAdminObject_mxJPO
      * of property (with reference, with value, ...) is stored as flag.
      */
     protected class Property
+            implements Serializable
     {
+        /**
+         * Defines the serialize version unique identifier.
+         */
+        private static final long serialVersionUID = 7814222356799301361L;
+
         /**
          * Name of the property.
          */

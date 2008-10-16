@@ -49,6 +49,11 @@ public class Attribute_mxJPO
         extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO
 {
     /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -502565364090887306L;
+
+    /**
      * Set holding all rules referencing this attribute.
      */
     final Set<String> rules = new TreeSet<String>();

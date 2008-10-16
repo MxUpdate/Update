@@ -46,6 +46,11 @@ public class Channel_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
     /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -8663929923260904020L;
+
+    /**
      * Alt (label) of the channel.
      */
     private String alt = null;

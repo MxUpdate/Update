@@ -42,6 +42,11 @@ public class Format_mxJPO
         extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO
 {
     /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -2981049394263810538L;
+
+    /**
      * Reference to the edit program.
      */
     private String commandEdit = null;

@@ -42,6 +42,11 @@ import matrix.util.StringList;
 public class ObjectGenerator_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO
 {
+    /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -8831221903916014033L;
+
     private final static String RELATIONSHIP_NUMBER_GENERATOR = "eService Number Generator";
 
     /**

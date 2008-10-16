@@ -21,6 +21,7 @@
 package net.sourceforge.mxupdate.update.datamodel;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.Writer;
 import java.util.Map;
 import java.util.Stack;
@@ -44,6 +45,11 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 public abstract class AbstractDMObject_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
+    /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -3691181822025363195L;
+
     /**
      * Stack with all triggers for this type.
      */
@@ -132,7 +138,14 @@ public abstract class AbstractDMObject_mxJPO
     /**
      * Class used to store informations about triggers.
      */
-    static class Trigger  {
+    static class Trigger
+            implements Serializable
+    {
+        /**
+         * Defines the serialize version unique identifier.
+         */
+        private static final long serialVersionUID = -241775149089053095L;
+
         /**
          * Used to parse the event type of the trigger from the {@link #name}.
          *

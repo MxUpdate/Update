@@ -44,6 +44,11 @@ public class Form_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
     /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = 8819919834817411562L;
+
+    /**
      * TCL procedure used to order fields of form, because Matrix has a bug
      * that sometimes the fields of a form are not in the correct order.
      *

@@ -43,6 +43,11 @@ public class Expression_mxJPO
         extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO
 {
     /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -2903151847643967098L;
+
+    /**
      * Hold the expression itself.
      */
     private String expression = null;

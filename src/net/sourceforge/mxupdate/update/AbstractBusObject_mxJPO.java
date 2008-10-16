@@ -45,6 +45,11 @@ public abstract class AbstractBusObject_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractPropertyObject_mxJPO
 {
     /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -5381775541507933947L;
+
+    /**
      * String used to split the name and revision of administrational business
      * object.
      */

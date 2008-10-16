@@ -42,6 +42,11 @@ public class Association_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
     /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -3663847015076548873L;
+
+    /**
      * Stores the definition of this association instance.
      */
     private String definition = null;

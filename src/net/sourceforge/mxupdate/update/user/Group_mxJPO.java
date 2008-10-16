@@ -44,6 +44,11 @@ public class Group_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
     /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -4819262751735809709L;
+
+    /**
      * Set to hold all parent groups.
      */
     final Set<String> parentGroups = new TreeSet<String>();

@@ -43,6 +43,11 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 public class Command_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
+    /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -6311434999021971324L;
+
     String alt = null;
 
     /**

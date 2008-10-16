@@ -42,6 +42,11 @@ public class Table_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
     /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -518184934631890227L;
+
+    /**
      * Stores all table columns of this web table instance.
      */
     final Stack<net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO> columns = new Stack<net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO>();
