@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Revision:        $Rev: 14 $
- * Last Changed:    $Date: 2008-09-12 17:19:41 +0200 (Fri, 12. Sep 2008) $
- * Last Changed By: $Author: tmoxter $
+ * Revision:        $Rev$
+ * Last Changed:    $Date$
+ * Last Changed By: $Author$
  */
 
 package net.sourceforge.mxupdate.update.datamodel;
