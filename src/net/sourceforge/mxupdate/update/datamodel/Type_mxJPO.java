@@ -22,8 +22,6 @@ package net.sourceforge.mxupdate.update.datamodel;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Set;
-import java.util.TreeSet;
 
 import matrix.db.Context;
 
@@ -42,8 +40,13 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
                                                      filePath = "datamodel/type",
                                                      description = "type")
 public class Type_mxJPO
-        extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO
+        extends net.sourceforge.mxupdate.update.datamodel.AbstractDMWithAttributes_mxJPO
 {
+    /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = 7501426743362043943L;
+
     /**
      * Is the type abstract?
      */
@@ -53,11 +56,6 @@ public class Type_mxJPO
      * From which type is this type derived?
      */
     private String derived = "ADMINISTRATION";
-
-    /**
-     * List of all attributes for this type.
-     */
-    private final Set<String> attributes = new TreeSet<String>();
 
     /**
      * @param _url      URL to parse
@@ -72,9 +70,6 @@ public class Type_mxJPO
 
         } else if ("/attributeDefRefList".equals(_url))  {
             // to be ignored ...
-        } else if ("/attributeDefRefList/attributeDefRef".equals(_url))  {
-            this.attributes.add(_content);
-
         } else if ("/derivedFrom".equals(_url))  {
             // to be ignored ...
         } else if ("/derivedFrom/typeRefList".equals(_url))  {
@@ -93,33 +88,30 @@ public class Type_mxJPO
         _out.append(" \\\n    derived \"").append(convert(this.derived)).append("\"")
             .append(" \\\n    ").append(isHidden() ? "" : "!").append("hidden")
             .append(" \\\n    abstract ").append(Boolean.toString(this.abstractFlag));
-        writeTriggers(_out);
-    }
-
-    @Override
-    protected void writeEnd(final Writer _out)
-            throws IOException
-    {
-        _out.append("\n\ntestAttributes -type \"${NAME}\" -attributes [list \\\n");
-        for (final String attr : this.attributes)  {
-            _out.append("    \"").append(convert(attr)).append("\" \\\n");
-        }
-        _out.append("]");
+        this.writeTriggers(_out);
     }
 
     /**
      * Appends the MQL statement to reset this attribute:
      * <ul>
-     * <li></li>
+     * <li>set not hidden</li>
+     * <li>reset description</li>
+     * <li>remove all triggers and properties</li>
      * </ul>
      *
      * @param _context  context for this request
      * @param _cmd      string builder used to append the MQL statements
-     * @todo implement
      */
     @Override
     protected void appendResetMQL(final Context _context,
                                   final StringBuilder _cmd)
     {
+        _cmd.append("mod ").append(getInfoAnno().adminType())
+            .append(" \"").append(getName()).append('\"')
+            .append(" !hidden description \"\"");
+        // reset triggers
+        this.appendResetTriggerMQLStatements(_cmd);
+        // reset properties
+        this.appendResetProperties(_cmd);
     }
 }

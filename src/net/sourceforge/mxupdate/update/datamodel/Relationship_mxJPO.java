@@ -42,17 +42,12 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
                                                      filePath = "datamodel/relationship",
                                                      description = "relation")
 public class Relationship_mxJPO
-        extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO
+        extends net.sourceforge.mxupdate.update.datamodel.AbstractDMWithAttributes_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = -5246287940374394548L;
-
-    /**
-     * List of all attributes for this type.
-     */
-    private final Set<String> attributes = new TreeSet<String>();
 
     /**
      * Prevent duplicates for this relationship.
@@ -137,10 +132,9 @@ public class Relationship_mxJPO
     protected void parse(final String _url,
                          final String _content)
     {
+// TODO rules:
         if ("/attributeDefRefList".equals(_url))  {
             // to be ignored ...
-        } else if ("/attributeDefRefList/attributeDefRef".equals(_url))  {
-            this.attributes.add(_content);
 
         } else if ("/fromSide".equals(_url))  {
             // to be ignored ...
@@ -193,11 +187,13 @@ public class Relationship_mxJPO
     }
 
     @Override
-    protected void writeObject(Writer _out) throws IOException
+    protected void writeObject(final Writer _out)
+            throws IOException
     {
+// TODO rules:
         _out.append(" \\\n    ").append(isHidden() ? "" : "!").append("hidden")
             .append(" \\\n    ").append(this.preventDuplicates ? "" : "!").append("preventduplicates");
-        writeTriggers(_out);
+        this.writeTriggers(_out);
         _out.append(" \\\n    from")
             .append(" \\\n        ").append(this.fromPropagateModify ? "" : "!").append("propagatemodify")
             .append(" \\\n        ").append(this.fromPropagateConnection ? "" : "!").append("propagateconnection")
@@ -228,30 +224,45 @@ public class Relationship_mxJPO
         }
     }
 
-    @Override
-    protected void writeEnd(final Writer _out)
-            throws IOException
-    {
-        _out.append("\n\ntestAttributes -relationship \"${NAME}\" -attributes [list \\\n");
-        for (final String attr : this.attributes)  {
-            _out.append("    \"").append(convert(attr)).append("\" \\\n");
-        }
-        _out.append("]");
-    }
-
     /**
      * Appends the MQL statement to reset this relationship:
      * <ul>
-     * <li></li>
+     * <li>reset description</li>
+     * <li>remove hidden and prevent duplicate flag</li>
+     * <li>reset from and to information</li>
+     * <li>remove all from and to types</li>
+     * <li>remove all properties and triggers</li>
      * </ul>
      *
      * @param _context  context for this request
      * @param _cmd      string builder used to append the MQL statements
-     * @todo implement
      */
     @Override
     protected void appendResetMQL(final Context _context,
                                   final StringBuilder _cmd)
     {
+        _cmd.append("mod ").append(getInfoAnno().adminType())
+            .append(" \"").append(getName()).append('\"')
+            // remove hidden, description, prevent duplicate
+            .append(" !hidden description \"\" !preventduplicate")
+            // reset from information
+            .append(" from !propagatemodify !propagateconnection  meaning \"\" cardinality one revision none clone none ")
+            .append(" from remove type all")
+            // reset to information
+            .append(" to !propagatemodify !propagateconnection  meaning \"\" cardinality one revision none clone none ")
+            .append(" to remove type all");
+        // remove all from types
+        for (final String type : this.fromTypes)  {
+            _cmd.append(" from remove type \"").append(type).append('\"');
+        }
+        // remove all to types
+        for (final String type : this.toTypes)  {
+            _cmd.append(" to remove type \"").append(type).append('\"');
+        }
+// TODO: remove rules
+        // reset triggers
+        this.appendResetTriggerMQLStatements(_cmd);
+        // reset properties
+        this.appendResetProperties(_cmd);
     }
 }
