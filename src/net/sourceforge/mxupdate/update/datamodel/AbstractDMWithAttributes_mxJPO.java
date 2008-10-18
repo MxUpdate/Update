@@ -126,8 +126,10 @@ public abstract class AbstractDMWithAttributes_mxJPO
      * <code>JPO_CALLER_INSTANCE</code>.
      *
      * @param _context          context for this request
-     * @param _preMQLCode       MQL command which must be called before the TCL
-     *                          code is executed
+     * @param _preMQLCode       MQL statements which must be called before the
+     *                          TCL code is executed
+     * @param _postMQLCode      MQL statements which must be called after the
+     *                          TCL code is executed
      * @param _tclCode          TCL code from the file used to update which
      *                          gets the TCL procedure in the front
      * @param _tclVariables     map with TCL variables
@@ -136,15 +138,23 @@ public abstract class AbstractDMWithAttributes_mxJPO
     @Override
     protected void update(final Context _context,
                           final CharSequence _preMQLCode,
+                          final CharSequence _postMQLCode,
                           final CharSequence _tclCode,
                           final Map<String,String> _tclVariables)
             throws Exception
     {
+        // define TCL variable for this instance
         final String[] instance = JPO.packArgs(this);
         final Map<String,String> tclVariables = new HashMap<String,String>();
         tclVariables.putAll(_tclVariables);
         tclVariables.put("JPO_CALLER_INSTANCE", instance[1]);
-        super.update(_context, _preMQLCode, TCL_PROCEDURE + _tclCode, tclVariables);
+
+        // add TCL code for the procedure
+        final StringBuilder tclCode = new StringBuilder()
+                .append(TCL_PROCEDURE)
+                .append(_tclCode);
+
+        super.update(_context, _preMQLCode, _postMQLCode, tclCode, tclVariables);
     }
 
     /**

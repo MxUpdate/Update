@@ -311,7 +311,7 @@ System.out.println("    - update to version '" + modified + "'");
             final Map<String,String> variables = new HashMap<String,String>();
             variables.put("VERSION", modified);
 
-            this.update(_context, "", tclCode, variables);
+            this.update(_context, "", "", tclCode, variables);
         }
     }
 
@@ -329,8 +329,10 @@ System.out.println("    - update to version '" + modified + "'");
      * statement is not executed if an error had occurred.
      *
      * @param _context          context for this request
-     * @param _preMQLCode       MQL command which must be called before the TCL
-     *                          code is executed
+     * @param _preMQLCode       MQL statements which must be called before the
+     *                          TCL code is executed
+     * @param _postMQLCode      MQL statements which must be called after the
+     *                          TCL code is executed
      * @param _tclCode          TCL code from the file used to update
      * @param _tclVariables     map of all TCL variables where the key is the
      *                          name and the value is value of the TCL variable
@@ -341,6 +343,7 @@ System.out.println("    - update to version '" + modified + "'");
      */
     protected void update(final Context _context,
                           final CharSequence _preMQLCode,
+                          final CharSequence _postMQLCode,
                           final CharSequence _tclCode,
                           final Map<String,String> _tclVariables)
             throws Exception
@@ -360,9 +363,10 @@ System.out.println("    - update to version '" + modified + "'");
             cmd.append("set ").append(entry.getKey())
                .append(" \"").append(convert(entry.getValue())).append("\"\n");
         }
-        // append file code to MQL commands
+        // append TCL code and post MQL statements
         cmd.append(_tclCode)
-           .append("\n}\n");
+           .append("\n}\nexit;\n")
+           .append(_postMQLCode);
 
         // execute update
         boolean commit = false;

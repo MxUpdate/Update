@@ -237,8 +237,10 @@ public abstract class AbstractAdminObject_mxJPO
      * method of the super class is called.
      *
      * @param _context          context for this request
-     * @param _preMQLCode       MQL command which must be called before the TCL
-     *                          code is executed
+     * @param _preMQLCode       MQL statements which must be called before the
+     *                          TCL code is executed
+     * @param _postMQLCode      MQL statements which must be called after the
+     *                          TCL code is executed
      * @param _tclCode          TCL code from the file used to update
      * @param _tclVariables     map of all TCL variables where the key is the
      *                          name and the value is value of the TCL variable
@@ -248,24 +250,25 @@ public abstract class AbstractAdminObject_mxJPO
     @Override
     protected void update(final Context _context,
                           final CharSequence _preMQLCode,
+                          final CharSequence _postMQLCode,
                           final CharSequence _tclCode,
                           final Map<String,String> _tclVariables)
             throws Exception
     {
         // defined the version property
-        final StringBuilder preMQLCode = new StringBuilder()
+        final StringBuilder postMQLCode = new StringBuilder()
+                .append(_postMQLCode)
                 .append("mod ").append(this.getInfoAnno().adminType())
                 .append(" \"").append(this.getName()).append("\" ")
                 .append(this.getInfoAnno().adminTypeSuffix())
-                .append(" add property version value \"").append(_tclVariables.get("VERSION")).append("\";\n")
-                .append(_preMQLCode);
+                .append(" add property version value \"").append(_tclVariables.get("VERSION")).append("\";\n");
 
         // prepare map of all TCL variables incl. name of admin object
         final Map<String,String> tclVariables = new HashMap<String,String>();
         tclVariables.put("NAME", this.getName());
         tclVariables.putAll(_tclVariables);
 
-        super.update(_context, preMQLCode, _tclCode, tclVariables);
+        super.update(_context, _preMQLCode, postMQLCode, _tclCode, tclVariables);
     }
 
     /**

@@ -310,11 +310,14 @@ public abstract class AbstractBusObject_mxJPO
      * attribute and the version attribute of the business object is updated.
      * <br/>
      * The new generated MQL code is set in the front of the already defined
-     * MQL code in <code>_preMQLCode</code>.
+     * MQL code in <code>_preMQLCode</code> and appended to the MQL statements
+     * in <code>_postMQLCode</code>.
      *
      * @param _context          context for this request
-     * @param _preMQLCode       MQL command which must be called before the TCL
-     *                          code is executed
+     * @param _preMQLCode       MQL statements which must be called before the
+     *                          TCL code is executed
+     * @param _postMQLCode      MQL statements which must be called after the
+     *                          TCL code is executed
      * @param _tclCode          TCL code from the file used to update
      * @param _tclVariables     map of all TCL variables where the key is the
      *                          name and the value is value of the TCL variable
@@ -324,6 +327,7 @@ public abstract class AbstractBusObject_mxJPO
     @Override
     protected void update(final Context _context,
                           final CharSequence _preMQLCode,
+                          final CharSequence _postMQLCode,
                           final CharSequence _tclCode,
                           final Map<String,String> _tclVariables)
             throws Exception
@@ -335,12 +339,9 @@ public abstract class AbstractBusObject_mxJPO
                                                       this.getBusVault());
         final String objectId = bus.getObjectId(_context);
 
-        // resets the description and sets the version and author attribute
-        // value
+        // resets the description
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod bus ").append(objectId).append(" description \"\" \"")
-                .append(ATTR_UPDATE_VERSION).append("\" \"").append(_tclVariables.get("VERSION")).append("\" \"")
-                .append(ATTR_AUTHOR).append("\" \"").append(this.getAuthor()).append('\"');
+                .append("mod bus ").append(objectId).append(" description \"\"");
 
         // reset all attributes (if they must not be ignored...)
         final String[] ignoreAttrs = this.getInfoAnno().busIgnoreAttributes();
@@ -362,6 +363,12 @@ public abstract class AbstractBusObject_mxJPO
         // append other pre MQL code
         preMQLCode.append(_preMQLCode);
 
+        // post update MQL statements to define the version
+        final StringBuilder postMQLCode = new StringBuilder()
+                .append(_postMQLCode)
+                .append("mod bus ").append(objectId).append(" \"")
+                .append(ATTR_UPDATE_VERSION).append("\" \"").append(_tclVariables.get("VERSION")).append("\" \"");
+
         // prepare map of all TCL variables incl. id of business object
         final Map<String,String> tclVariables = new HashMap<String,String>();
         tclVariables.put("OBJECTID", objectId);
@@ -370,7 +377,7 @@ public abstract class AbstractBusObject_mxJPO
         // update must be done with history off (because not required...)
         try  {
             this.execMql(_context, "history off;");
-            super.update(_context, preMQLCode, _tclCode, tclVariables);
+            super.update(_context, preMQLCode, postMQLCode, _tclCode, tclVariables);
         } finally  {
             this.execMql(_context, "history on;");
         }

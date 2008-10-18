@@ -121,24 +121,32 @@ public class Inquiry_mxJPO
      * the update, the temporary file is removed (because not needed anymore).
      *
      * @param _context          context for this request
-     * @param _newVersion       new version string
-     * @param _code             code for the update
+     * @param _preMQLCode       MQL statements which must be called before the
+     *                          TCL code is executed
+     * @param _postMQLCode      MQL statements which must be called after the
+     *                          TCL code is executed
+     * @param _tclCode          TCL code from the file used to update
+     * @param _tclVariables     map of all TCL variables where the key is the
+     *                          name and the value is value of the TCL variable
+     *                          (the value is automatically converted to TCL
+     *                          syntax!)
      * @throws Exception if update failed
      */
     @Override
     protected void update(final Context _context,
                           final CharSequence _preCode,
-                          final CharSequence _code,
+                          final CharSequence _postMQLCode,
+                          final CharSequence _tclCode,
                           final Map<String,String> _tclVariables)
             throws Exception
     {
         // separate the inquiry code and the TCL code
-        final int idx = _code.toString().lastIndexOf(INQUIRY_SEPARATOR);
+        final int idx = _tclCode.toString().lastIndexOf(INQUIRY_SEPARATOR);
         final CharSequence code = (idx >= 0)
-                                  ? _code.subSequence(0, idx)
-                                  : _code;
+                                  ? _tclCode.subSequence(0, idx)
+                                  : _tclCode;
         final CharSequence inqu = (idx >= 0)
-                                  ? _code.subSequence(idx + INQUIRY_SEPARATOR.length() + 1, _code.length())
+                                  ? _tclCode.subSequence(idx + INQUIRY_SEPARATOR.length() + 1, _tclCode.length())
                                   : "";
 
         final File tmpFile = File.createTempFile("TMP_", ".inquiry");
@@ -154,7 +162,7 @@ public class Inquiry_mxJPO
             final Map<String,String> tclVariables = new HashMap<String,String>();
             tclVariables.putAll(_tclVariables);
             tclVariables.put("FILE", tmpFile.getPath());
-            super.update(_context, _preCode, code, tclVariables);
+            super.update(_context, _preCode, _postMQLCode, code, tclVariables);
         } finally  {
             tmpFile.delete();
         }

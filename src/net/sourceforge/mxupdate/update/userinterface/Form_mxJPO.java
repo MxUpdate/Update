@@ -130,9 +130,11 @@ public class Form_mxJPO
      * procedure to order the form fields.
      *
      * @param _context          context for this request
-     * @param _preCode          MQL command which must be called before the TCL
-     *                          code is executed
-     * @param _code             TCL code from the file used to update
+     * @param _preMQLCode       MQL statements which must be called before the
+     *                          TCL code is executed
+     * @param _postMQLCode      MQL statements which must be called after the
+     *                          TCL code is executed
+     * @param _tclCode          TCL code from the file used to update
      * @param _tclVariables     map of all TCL variables where the key is the
      *                          name and the value is value of the TCL variable
      *                          (the value is automatically converted to TCL
@@ -142,15 +144,16 @@ public class Form_mxJPO
     @Override
     protected void update(final Context _context,
                           final CharSequence _preCode,
-                          final CharSequence _code,
+                          final CharSequence _postMQLCode,
+                          final CharSequence _tclCode,
                           final Map<String,String> _tclVariables)
             throws Exception
     {
         final StringBuilder tclCode = new StringBuilder()
                 .append(ORDER_PROC)
                 .append('\n')
-                .append(_code);
-        super.update(_context, _preCode, tclCode, _tclVariables);
+                .append(_tclCode);
+        super.update(_context, _preCode, _postMQLCode, tclCode, _tclVariables);
     }
 
     /**

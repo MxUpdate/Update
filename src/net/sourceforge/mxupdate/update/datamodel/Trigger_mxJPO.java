@@ -102,8 +102,10 @@ public class Trigger_mxJPO
      * the given MQL code in <code>_preMQLCode</code>.
      *
      * @param _context          context for this request
-     * @param _preMQLCode       MQL command which must be called before the TCL
-     *                          code is executed
+     * @param _preMQLCode       MQL statements which must be called before the
+     *                          TCL code is executed
+     * @param _postMQLCode      MQL statements which must be called after the
+     *                          TCL code is executed
      * @param _tclCode          TCL code from the file used to update
      * @param _tclVariables     map of all TCL variables where the key is the
      *                          name and the value is value of the TCL variable
@@ -113,6 +115,7 @@ public class Trigger_mxJPO
     @Override
     protected void update(final Context _context,
                           final CharSequence _preMQLCode,
+                          final CharSequence _postMQLCode,
                           final CharSequence _tclCode,
                           final Map<String,String> _tclVariables)
             throws Exception
@@ -131,6 +134,6 @@ public class Trigger_mxJPO
         // append rest of pre MQL code
         preMQLCode.append(_preMQLCode);
 
-        super.update(_context, preMQLCode, _tclCode, _tclVariables);
+        super.update(_context, preMQLCode, _postMQLCode, _tclCode, _tclVariables);
     }
 }
