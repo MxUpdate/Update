@@ -30,6 +30,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 @net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(busType = "eService Number Generator",
+                                                     busIgnoreAttributes = {"eService Next Number"},
                                                      title = "NUMBERGENERATOR",
                                                      filePrefix = "NUMBERGENERATOR_",
                                                      fileSuffix = ".tcl",

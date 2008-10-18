@@ -317,16 +317,10 @@ System.out.println("    - update to version '" + modified + "'");
             }
             reader.close();
 
-            final StringBuilder cmd = new StringBuilder()
-                    .append("mod ").append(this.getInfoAnno().adminType())
-                    .append(" \"").append(this.getName()).append("\" ")
-                    .append(this.getInfoAnno().adminTypeSuffix())
-                    .append(" add property version value \"").append(modified).append("\";\n");
-
             final Map<String,String> variables = new HashMap<String,String>();
-            variables.put("NAME", this.getName());
+            variables.put("VERSION", modified);
 
-            this.update(_context, cmd, code, variables);
+            this.update(_context, "", code, variables);
         }
     }
 
@@ -399,9 +393,12 @@ System.out.println("    - update to version '" + modified + "'");
      *
      * @param _context  context for this request
      * @param _cmd      string builder used to append the MQL statements
+     * @todo remove usage of this method...
      */
-    protected abstract void appendResetMQL(final Context _context,
-                                           final StringBuilder _cmd);
+    protected void appendResetMQL(final Context _context,
+                                  final StringBuilder _cmd)
+    {
+    }
 
 
     /**

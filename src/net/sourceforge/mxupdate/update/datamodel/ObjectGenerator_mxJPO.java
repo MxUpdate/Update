@@ -22,6 +22,7 @@ package net.sourceforge.mxupdate.update.datamodel;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Map;
 
 import matrix.db.BusinessObject;
 import matrix.db.BusinessObjectWithSelect;
@@ -129,5 +130,45 @@ public class ObjectGenerator_mxJPO
                         .append(this.numGenName).append("\" \"")
                         .append(this.numGenRevi).append("\"");
         }
+    }
+
+    /**
+     * The pre MQL code gets in the front the MQL code to disconnect from the
+     * number generator if already connected.
+     *
+     * @param _context          context for this request
+     * @param _preMQLCode       MQL command which must be called before the TCL
+     *                          code is executed
+     * @param _tclCode          TCL code from the file used to update
+     * @param _tclVariables     map of all TCL variables where the key is the
+     *                          name and the value is value of the TCL variable
+     *                          (the value is automatically converted to TCL
+     *                          syntax!)
+     */
+    @Override
+    protected void update(final Context _context,
+                          final CharSequence _preMQLCode,
+                          final CharSequence _tclCode,
+                          final Map<String,String> _tclVariables)
+            throws Exception
+    {
+        final StringBuilder preMQLCode = new StringBuilder();
+
+        // disconnect from number generator
+        if ((this.numGenName != null) && (this.numGenRevi != null))  {
+            preMQLCode.append("disconnect bus  \"").append(this.getBusType())
+                              .append("\" \"").append(this.getBusName())
+                              .append("\" \"").append(this.getBusRevision())
+                              .append("\" in \"").append(this.getBusVault())
+                      .append("\" relationship \"").append(RELATIONSHIP_NUMBER_GENERATOR)
+                      .append("\" to \"").append(this.numGenType).append("\" \"")
+                              .append(this.numGenName).append("\" \"")
+                              .append(this.numGenRevi).append("\"");
+        }
+
+        // append rest of pre MQL code
+        preMQLCode.append(_preMQLCode);
+
+        super.update(_context, preMQLCode, _tclCode, _tclVariables);
     }
 }

@@ -35,6 +35,7 @@ public @interface InfoAnno_mxJPO
     /**
      * Name of the administration type.
      */
+// TODO: use symbolic names instead of the name of the Matrix type name
     public String adminType() default "";
 
     /**
@@ -47,6 +48,12 @@ public @interface InfoAnno_mxJPO
      * Name of the business type.
      */
     public String busType() default "";
+
+    /**
+     * Defines the attributes which are ignored from the reset algorithm if
+     * the update is make for a business object.
+     */
+    public String[] busIgnoreAttributes() default {};
 
     /**
      * Prefixes of the file name.

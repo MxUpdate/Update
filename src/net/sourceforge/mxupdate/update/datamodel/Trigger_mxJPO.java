@@ -22,6 +22,7 @@ package net.sourceforge.mxupdate.update.datamodel;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Map;
 
 import matrix.db.BusinessObject;
 import matrix.db.BusinessObjectWithSelect;
@@ -74,9 +75,9 @@ public class Trigger_mxJPO
                                                       getBusRevision(),
                                                       getBusVault());
         final StringList selects = new StringList(1);
-       selects.addElement("current");
-       final BusinessObjectWithSelect s = bus.select(_context, selects);
-       active = "Active".equals(s.getSelectData("current"));
+        selects.addElement("current");
+        final BusinessObjectWithSelect s = bus.select(_context, selects);
+        active = "Active".equals(s.getSelectData("current"));
     }
 
     /**
@@ -93,5 +94,43 @@ public class Trigger_mxJPO
         if (this.active)  {
             _out.append("\nmql promote bus \"${OBJECTID}\"");
         }
+    }
+
+    /**
+     * If a trigger object is updated, the trigger must be demoted if the
+     * trigger is active. The MQL code for the demote is set in the front of
+     * the given MQL code in <code>_preMQLCode</code>.
+     *
+     * @param _context          context for this request
+     * @param _preMQLCode       MQL command which must be called before the TCL
+     *                          code is executed
+     * @param _tclCode          TCL code from the file used to update
+     * @param _tclVariables     map of all TCL variables where the key is the
+     *                          name and the value is value of the TCL variable
+     *                          (the value is automatically converted to TCL
+     *                          syntax!)
+     */
+    @Override
+    protected void update(final Context _context,
+                          final CharSequence _preMQLCode,
+                          final CharSequence _tclCode,
+                          final Map<String,String> _tclVariables)
+            throws Exception
+    {
+        final StringBuilder preMQLCode = new StringBuilder();
+
+        // demote if required
+        if (this.active)  {
+            preMQLCode.append("demote bus \"").append(this.getBusType())
+                      .append("\" \"").append(this.getBusName())
+                      .append("\" \"").append(this.getBusRevision())
+                      .append("\" in \"").append(this.getBusVault())
+                      .append("\";\n");
+        }
+
+        // append rest of pre MQL code
+        preMQLCode.append(_preMQLCode);
+
+        super.update(_context, preMQLCode, _tclCode, _tclVariables);
     }
 }

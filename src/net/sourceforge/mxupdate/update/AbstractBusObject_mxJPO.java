@@ -23,10 +23,13 @@ package net.sourceforge.mxupdate.update;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 
+import matrix.db.BusinessObject;
 import matrix.db.BusinessObjectWithSelect;
 import matrix.db.BusinessObjectWithSelectList;
 import matrix.db.Context;
@@ -234,8 +237,8 @@ public abstract class AbstractBusObject_mxJPO
 
     /**
      * Sorts the attribute values, defines the description for the TCL
-     * update script (concatination of the revision and description) and the
-     * name (concationation of name and revision).
+     * update script (concatenation of the revision and description) and the
+     * name (concatenation of name and revision).
      *
      * @param _context  context for this request
      * @see #attrValues         unsorted attribute values
@@ -244,13 +247,14 @@ public abstract class AbstractBusObject_mxJPO
      * @see #busRevision        business revison
      */
     @Override
-    protected void prepare(Context _context) throws MatrixException
+    protected void prepare(final Context _context) throws MatrixException
     {
         for (final Attribute attrValue : this.attrValues)  {
             if (ATTR_AUTHOR.equals(attrValue.name))  {
-                setAuthor(attrValue.value);
-            } else if (!ATTR_INSTALLED_DATE.equals(attrValue.name)
-                    && !ATTR_UPDATE_VERSION.equals(attrValue.name))  {
+                this.setAuthor(attrValue.value);
+            } else if (ATTR_UPDATE_VERSION.equals(attrValue.name))  {
+                this.setVersion(attrValue.value);
+            } else if (!ATTR_INSTALLED_DATE.equals(attrValue.name))  {
                 this.attrValuesSorted.add(attrValue);
             }
         }
@@ -293,19 +297,83 @@ public abstract class AbstractBusObject_mxJPO
     }
 
     /**
-     * Appends the MQL statement to reset this business object:
+     * The method overwrites the original method to
      * <ul>
-     * <li></li>
+     * <li>reset the description</li>
+     * <li>set the version and author attribute</li>
+     * <li>reset all not ignored attributes</li>
+     * <li>define the TCL variable &quot;OBJECTID&quot; with the object id of
+     *     the represented business object</li>
      * </ul>
+     * The original method of the super class if called surrounded with a
+     * history off, because if the update itself is done the modified basic
+     * attribute and the version attribute of the business object is updated.
+     * <br/>
+     * The new generated MQL code is set in the front of the already defined
+     * MQL code in <code>_preMQLCode</code>.
      *
-     * @param _context  context for this request
-     * @param _cmd      string builder used to append the MQL statements
-     * @todo implement
+     * @param _context          context for this request
+     * @param _preMQLCode       MQL command which must be called before the TCL
+     *                          code is executed
+     * @param _tclCode          TCL code from the file used to update
+     * @param _tclVariables     map of all TCL variables where the key is the
+     *                          name and the value is value of the TCL variable
+     *                          (the value is automatically converted to TCL
+     *                          syntax!)
      */
     @Override
-    protected void appendResetMQL(final Context _context,
-                                  final StringBuilder _cmd)
+    protected void update(final Context _context,
+                          final CharSequence _preMQLCode,
+                          final CharSequence _tclCode,
+                          final Map<String,String> _tclVariables)
+            throws Exception
     {
+        // found the business object
+        final BusinessObject bus = new BusinessObject(this.getBusType(),
+                                                      this.getBusName(),
+                                                      this.getBusRevision(),
+                                                      this.getBusVault());
+        final String objectId = bus.getObjectId(_context);
+
+        // resets the description and sets the version and author attribute
+        // value
+        final StringBuilder preMQLCode = new StringBuilder()
+                .append("mod bus ").append(objectId).append(" description \"\" \"")
+                .append(ATTR_UPDATE_VERSION).append("\" \"").append(_tclVariables.get("VERSION")).append("\" \"")
+                .append(ATTR_AUTHOR).append("\" \"").append(this.getAuthor()).append('\"');
+
+        // reset all attributes (if they must not be ignored...)
+        final String[] ignoreAttrs = this.getInfoAnno().busIgnoreAttributes();
+        for (final Attribute attr : this.attrValuesSorted)  {
+// TODO: use default attribute value instead of ""
+            boolean found = false;
+            for (final String ignoreAttr : ignoreAttrs)  {
+                if (ignoreAttr.equals(attr.name))  {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)  {
+                preMQLCode.append(" \"").append(attr.name).append("\" \"\"");
+            }
+        }
+        preMQLCode.append(";\n");
+
+        // append other pre MQL code
+        preMQLCode.append(_preMQLCode);
+
+        // prepare map of all TCL variables incl. id of business object
+        final Map<String,String> tclVariables = new HashMap<String,String>();
+        tclVariables.put("OBJECTID", objectId);
+        tclVariables.putAll(_tclVariables);
+
+        // update must be done with history off (because not required...)
+        try  {
+            this.execMql(_context, "history off;");
+            super.update(_context, preMQLCode, _tclCode, tclVariables);
+        } finally  {
+            this.execMql(_context, "history on;");
+        }
     }
 
     /**
@@ -331,14 +399,17 @@ public abstract class AbstractBusObject_mxJPO
     }
 
     /**
-     * Getter method for instance variable {@link #busRevision}.
+     * Getter method for instance variable {@link #busRevision}. If
+     * {@link #busRevision} is <code>null</code> an empty string "" is returned.
      *
      * @return value of instance variable {@link #busRevision}
      * @see #busRevision
      */
     protected String getBusRevision()
     {
-        return this.busRevision;
+        return (this.busRevision == null)
+               ? ""
+               : this.busRevision;
     }
 
     /**
