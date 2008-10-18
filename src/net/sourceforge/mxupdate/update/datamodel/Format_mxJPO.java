@@ -39,7 +39,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
                                                      filePath = "datamodel/format",
                                                      description = "format")
 public class Format_mxJPO
-        extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO
+        extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.

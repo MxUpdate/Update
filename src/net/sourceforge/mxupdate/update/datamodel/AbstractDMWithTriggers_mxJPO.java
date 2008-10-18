@@ -36,13 +36,12 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 
 /**
- * Abstract class for all data model administration objects (not business
- * objects!).
+ * Abstract class for all data model administration objects with triggers.
  *
  * @author tmoxter
  * @version $Id$
  */
-public abstract class AbstractDMObject_mxJPO
+public abstract class AbstractDMWithTriggers_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
     /**

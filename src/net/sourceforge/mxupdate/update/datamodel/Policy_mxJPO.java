@@ -46,7 +46,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
                                                      filePath = "datamodel/policy",
                                                      description = "policy")
 public class Policy_mxJPO
-        extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO
+        extends net.sourceforge.mxupdate.update.datamodel.AbstractDMWithTriggers_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.

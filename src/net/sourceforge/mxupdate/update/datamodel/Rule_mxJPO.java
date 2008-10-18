@@ -43,7 +43,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
                                                      filePath = "datamodel/rule",
                                                      description = "rule")
 public class Rule_mxJPO
-        extends net.sourceforge.mxupdate.update.datamodel.AbstractDMObject_mxJPO
+        extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
