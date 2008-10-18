@@ -96,7 +96,6 @@ public class Type_mxJPO
      * <ul>
      * <li>set not hidden</li>
      * <li>reset description</li>
-     * <li>remove all triggers</li>
      * </ul>
      *
      * @param _context  context for this request
@@ -109,7 +108,5 @@ public class Type_mxJPO
         _cmd.append("mod ").append(getInfoAnno().adminType())
             .append(" \"").append(getName()).append('\"')
             .append(" !hidden description \"\"");
-        // reset triggers
-        this.appendResetTriggerMQLStatements(_cmd);
     }
 }

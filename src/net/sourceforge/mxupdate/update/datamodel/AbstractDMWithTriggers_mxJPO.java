@@ -122,16 +122,43 @@ public abstract class AbstractDMWithTriggers_mxJPO
     }
 
     /**
-     * Appends to the string builder the MQL statements to remove all current
-     * assigned triggers.
+     * The method overwrites the original method to append the MQL statements
+     * in the <code>_preMQLCode</code> to remove all current assigned triggers.
+     * Then the update method of the super class is called.
      *
-     * @param _cmd      string builder with current MQL statement
+     * @param _context          context for this request
+     * @param _preMQLCode       MQL statements which must be called before the
+     *                          TCL code is executed
+     * @param _postMQLCode      MQL statements which must be called after the
+     *                          TCL code is executed
+     * @param _tclCode          TCL code from the file used to update
+     * @param _tclVariables     map of all TCL variables where the key is the
+     *                          name and the value is value of the TCL variable
+     *                          (the value is automatically converted to TCL
+     *                          syntax!)
      */
-    protected void appendResetTriggerMQLStatements(final StringBuilder _cmd)
+    @Override
+    protected void update(final Context _context,
+                          final CharSequence _preMQLCode,
+                          final CharSequence _postMQLCode,
+                          final CharSequence _tclCode,
+                          final Map<String,String> _tclVariables)
+            throws Exception
     {
+        // remove all properties
+        final StringBuilder preMQLCode = new StringBuilder()
+                .append("mod ").append(this.getInfoAnno().adminType())
+                .append(" \"").append(this.getName()).append("\" ")
+                .append(this.getInfoAnno().adminTypeSuffix());
         for (final Trigger trigger : this.triggers.values())  {
-            trigger.appendResetMQLStatement(_cmd);
+            trigger.appendResetMQLStatement(preMQLCode);
         }
+        preMQLCode.append(";\n");
+
+        // append already existing pre MQL code
+        preMQLCode.append(_preMQLCode);
+
+        super.update(_context, preMQLCode, _postMQLCode, _tclCode, _tclVariables);
     }
 
     /**
