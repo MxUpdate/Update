@@ -172,7 +172,7 @@ public class Inquiry_mxJPO
      * Appends the MQL statement to reset this inquiry:
      * <ul>
      * <li>reset the description pattern and code</li>
-     * <li>remove all arguments and arguments</li>
+     * <li>remove all arguments</li>
      * </ul>
      *
      * @param _context  context for this request
@@ -191,7 +191,5 @@ public class Inquiry_mxJPO
                 _cmd.append(" remove argument \"").append(prop.getName().substring(1)).append('\"');
             }
         }
-        // reset properties
-        this.appendResetProperties(_cmd);
     }
 }

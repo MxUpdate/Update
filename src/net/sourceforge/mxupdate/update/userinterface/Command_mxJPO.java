@@ -110,7 +110,7 @@ public class Command_mxJPO
      * Appends the MQL statement to reset this command:
      * <ul>
      * <li>HRef, description, alt and label is set to empty string</li>
-     * <li>all settings, users and properties are removed</li>
+     * <li>all settings and users are removed</li>
      * </ul>
      *
      * @param _context  context for this request
@@ -134,7 +134,5 @@ public class Command_mxJPO
         for (final String user : this.users)  {
             _cmd.append(" remove user \"").append(user).append('\"');
         }
-        // reset properties
-        appendResetProperties(_cmd);
     }
 }

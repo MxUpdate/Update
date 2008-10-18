@@ -110,7 +110,5 @@ public class Group_mxJPO
             .append(" \"").append(getName()).append('\"')
             .append(" description \"\"")
             .append(" remove parent all");
-        // reset properties
-        appendResetProperties(_cmd);
     }
 }

@@ -218,7 +218,7 @@ public class Attribute_mxJPO
      * <ul>
      * <li>set to not hidden</li>
      * <li>reset description and default value</li>
-     * <li>remove all triggers, ranges and properties</li>
+     * <li>remove all triggers and ranges</li>
      * </ul>
      *
      * @param _context  context for this request
@@ -243,8 +243,6 @@ public class Attribute_mxJPO
             _cmd.append(" remove range ").append(range.type)
                 .append(" \"").append(range.value1).append("\"");
         }
-        // reset properties
-        this.appendResetProperties(_cmd);
     }
 
     /**

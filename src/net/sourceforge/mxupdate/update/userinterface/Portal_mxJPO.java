@@ -183,7 +183,7 @@ public class Portal_mxJPO
      * Appends the MQL statement to reset this portal:
      * <ul>
      * <li>reset HRef, description, alt and label</li>
-     * <li>remove all settings, channels and properties</li>
+     * <li>remove all settings and channels</li>
      * </ul>
      *
      * @param _context  context for this request
@@ -211,8 +211,6 @@ public class Portal_mxJPO
         }
         _cmd.append("mod ").append(getInfoAnno().adminType())
             .append(" \"").append(getName()).append('\"');
-        // reset properties
-        this.appendResetProperties(_cmd);
     }
 
     /**

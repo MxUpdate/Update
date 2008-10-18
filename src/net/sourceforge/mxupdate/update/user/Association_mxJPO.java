@@ -102,7 +102,5 @@ public class Association_mxJPO
             .append(" \"").append(getName()).append('\"')
             .append(" description \"\"")
             .append(" definition \"").append(_context.getUser()).append("\"");
-        // reset properties
-        appendResetProperties(_cmd);
     }
 }

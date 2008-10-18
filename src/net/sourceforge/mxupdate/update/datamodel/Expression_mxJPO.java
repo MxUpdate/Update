@@ -116,7 +116,6 @@ public class Expression_mxJPO
      * <ul>
      * <li>set to not hidden</li>
      * <li>reset description and value (expression itself)</li>
-     * <li>remove all properties</li>
      * </ul>
      *
      * @param _context  context for this request
@@ -129,7 +128,5 @@ public class Expression_mxJPO
         _cmd.append("mod ").append(getInfoAnno().adminType())
             .append(" \"").append(getName()).append('\"')
             .append(" !hidden description \"\" value \"\"");
-        // reset properties
-        this.appendResetProperties(_cmd);
     }
 }

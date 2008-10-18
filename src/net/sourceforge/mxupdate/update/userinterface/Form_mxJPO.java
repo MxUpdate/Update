@@ -160,7 +160,6 @@ public class Form_mxJPO
      * Appends the MQL statement to reset this form:
      * <ul>
      * <li>remove all fields of the web form</li>
-     * <li>remove all properties</li>
      * <li>set to not hidden</li>
      * </ul>
      *
@@ -178,8 +177,6 @@ public class Form_mxJPO
         for (final net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO field : this.fields)  {
             _cmd.append(" field delete name \"").append(field.getName()).append('\"');
         }
-        // reset properties
-        appendResetProperties(_cmd);
     }
 
 }

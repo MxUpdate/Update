@@ -80,7 +80,6 @@ public class Table_mxJPO
      * Appends the MQL statement to reset this web table:
      * <ul>
      * <li>remove all columns of the web table</li>
-     * <li>remove all properties</li>
      * <li>set to not hidden</li>
      * </ul>
      *
@@ -98,7 +97,5 @@ public class Table_mxJPO
         for (final net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO column : this.columns)  {
             _cmd.append(" column delete name \"").append(column.getName()).append('\"');
         }
-        // reset properties
-        appendResetProperties(_cmd);
     }
 }

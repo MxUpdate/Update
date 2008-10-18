@@ -169,7 +169,7 @@ public class Channel_mxJPO
      * <ul>
      * <li>reset HRef, description, alt and label</li>
      * <li>set height to 0</li>
-     * <li>remove all settings, commands and properties</li>
+     * <li>remove all settings and commands</li>
      * </ul>
      *
      * @param _context  context for this request
@@ -192,8 +192,6 @@ public class Channel_mxJPO
         for (final CommandRef cmdRef : this.orderCmds.values())  {
             _cmd.append(" remove command \"").append(cmdRef.name).append('\"');
         }
-        // reset properties
-        this.appendResetProperties(_cmd);
     }
 
     /**

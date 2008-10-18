@@ -231,7 +231,7 @@ public class Relationship_mxJPO
      * <li>remove hidden and prevent duplicate flag</li>
      * <li>reset from and to information</li>
      * <li>remove all from and to types</li>
-     * <li>remove all properties and triggers</li>
+     * <li>remove all triggers</li>
      * </ul>
      *
      * @param _context  context for this request
@@ -262,7 +262,5 @@ public class Relationship_mxJPO
 // TODO: remove rules
         // reset triggers
         this.appendResetTriggerMQLStatements(_cmd);
-        // reset properties
-        this.appendResetProperties(_cmd);
     }
 }

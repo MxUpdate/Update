@@ -232,9 +232,13 @@ public abstract class AbstractAdminObject_mxJPO
     }
 
     /**
-     * The method overwrites the original method to define the property
-     * &quot;version&quot; and the TCL variable for the name. Then the update
-     * method of the super class is called.
+     * The method overwrites the original method to
+     * <ul>
+     * <li>remove all existing properties</li>
+     * <li>define the TCL variable for the name</li>
+     * <li>define the property &quot;version&quot;</li>
+     * </ul>
+     * Then the update method of the super class is called.
      *
      * @param _context          context for this request
      * @param _preMQLCode       MQL statements which must be called before the
@@ -255,6 +259,25 @@ public abstract class AbstractAdminObject_mxJPO
                           final Map<String,String> _tclVariables)
             throws Exception
     {
+        // remove all properties
+        final StringBuilder preMQLCode = new StringBuilder()
+                .append("mod ").append(this.getInfoAnno().adminType())
+                .append(" \"").append(this.getName()).append("\" ")
+                .append(this.getInfoAnno().adminTypeSuffix());
+        for (final Property prop : this.propertiesMap.values())  {
+            if (!IGNORED_PROPERTIES.contains(prop.name) && !prop.name.startsWith("%"))  {
+                preMQLCode.append(" remove property \"").append(prop.name).append('\"');
+                if ((prop.refAdminName) != null && (prop.refAdminType != null))  {
+                    preMQLCode.append(" to ").append(prop.refAdminType)
+                              .append(" \"").append(prop.refAdminName).append('\"');
+                }
+            }
+        }
+        preMQLCode.append(";\n");
+
+        // append already existing pre MQL code
+        preMQLCode.append(_preMQLCode);
+
         // defined the version property
         final StringBuilder postMQLCode = new StringBuilder()
                 .append(_postMQLCode)
@@ -268,25 +291,7 @@ public abstract class AbstractAdminObject_mxJPO
         tclVariables.put("NAME", this.getName());
         tclVariables.putAll(_tclVariables);
 
-        super.update(_context, _preMQLCode, postMQLCode, _tclCode, tclVariables);
-    }
-
-    /**
-     * Appends the MQL statements to remove all properties within the reset.
-     *
-     * @param _cmd      string builder used to append the MQL statements
-     */
-    protected void appendResetProperties(final StringBuilder _cmd)
-    {
-        for (final Property prop : this.propertiesMap.values())  {
-            if (!IGNORED_PROPERTIES.contains(prop.name) && !prop.name.startsWith("%"))  {
-                _cmd.append(" remove property \"").append(prop.name).append('\"');
-                if ((prop.refAdminName) != null && (prop.refAdminType != null))  {
-                    _cmd.append(" to ").append(prop.refAdminType)
-                        .append(" \"").append(prop.refAdminName).append('\"');
-                }
-            }
-        }
+        super.update(_context, preMQLCode, postMQLCode, _tclCode, tclVariables);
     }
 
     /**

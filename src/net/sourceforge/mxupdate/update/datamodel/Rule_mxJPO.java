@@ -199,7 +199,7 @@ public class Rule_mxJPO
      * <ul>
      * <li>set to not hidden</li>
      * <li>no owner and public access</li>
-     * <li>remove all users and properties</li>
+     * <li>remove all users</li>
      * </ul>
      *
      * @param _context  context for this request
@@ -216,8 +216,6 @@ public class Rule_mxJPO
         for (final UserAccess userAccess : this.userAccessSorted)  {
             _cmd.append(" remove user \"").append(userAccess.userRef).append("\" all");
         }
-        // reset properties
-        this.appendResetProperties(_cmd);
     }
 
     /**
