@@ -20,10 +20,13 @@
 
 package net.sourceforge.mxupdate.update;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -50,6 +53,17 @@ public abstract class AbstractObject_mxJPO
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = -5505850566853070973L;
+
+    // TODO: must be defined in the Property Class
+    protected final static Set<String> IGNORED_PROPERTIES = new HashSet<String>();
+    static  {
+        IGNORED_PROPERTIES.add("version");
+        IGNORED_PROPERTIES.add("installed date");
+        IGNORED_PROPERTIES.add("original name");
+        IGNORED_PROPERTIES.add("application");
+        IGNORED_PROPERTIES.add("installer");
+        IGNORED_PROPERTIES.add("author");
+    }
 
     /**
      * Stores the version information of this object. If the value is
@@ -162,19 +176,17 @@ public abstract class AbstractObject_mxJPO
     }
 
     /**
+     * Updated this administration (business) object.
      *
-     * @param _context
-     * @param _name
-     * @param _file
-     * @throws Exception
-     * @todo dummy method!!!!
+     * @param _context          context for this request
+     * @param _name             name of the administration (business) object
+     * @param _file             reference to the file to update
+     * @throws Exception if update failed
      */
-    public void update(final Context _context,
-                       final String _name,
-                       final File _file)
-            throws Exception
-    {
-    }
+    public abstract void update(final Context _context,
+                                final String _name,
+                                final File _file)
+            throws Exception;
 
     /**
      * Executes given MQL command and returns the trimmed result of the MQL
@@ -195,6 +207,29 @@ public abstract class AbstractObject_mxJPO
             throw new MatrixException(mql.getError() + "\nMQL command was:\n" + _cmd);
         }
         return mql.getResult().trim();
+    }
+
+    /**
+     * Reads for given file the code and returns them.
+     *
+     * @param _file     file to read the code
+     * @return read code of the file
+     * @throws IOException if the file could not be opened or read
+     */
+    protected StringBuilder getCode(final File _file)
+            throws IOException
+    {
+        // read code
+        final StringBuilder code = new StringBuilder();
+        final BufferedReader reader = new BufferedReader(new FileReader(_file));
+        String line = reader.readLine();
+        while (line != null)  {
+            code.append(line).append('\n');
+            line = reader.readLine();
+        }
+        reader.close();
+
+        return code;
     }
 
     /**

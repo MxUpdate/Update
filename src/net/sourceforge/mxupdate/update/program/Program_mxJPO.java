@@ -105,4 +105,36 @@ public class Program_mxJPO
         out.flush();
         out.close();
     }
+
+    /**
+     * The program is updated if the modified date of the file is not the same
+     * as the the version property.
+     *
+     * @param _context          context for this request
+     * @param _name             name of the administration (business) object
+     * @param _file             reference to the file to update
+     * @throws Exception if update of the program failed
+     */
+    @Override
+    public void update(final Context _context,
+                       final String _name,
+                       final File _file)
+            throws Exception
+    {
+        final String version = this.execMql(_context,
+                                            new StringBuilder()
+                                               .append("print prog \"").append(_name)
+                                               .append("\" select property[version].value dump"));
+        // compare file date as version against version information in Matrix
+        final String modified = Long.toString(_file.lastModified() / 1000);
+        if (!modified.equals(version))  {
+            // not equal => update JPO code and version
+            final StringBuilder cmd = new StringBuilder()
+                    .append("mod prog \"").append(_name)
+                            .append("\" file \"").append(_file.getPath()).append("\";\n")
+                    .append("mod prog \"").append(_name)
+                            .append("\" add property version value \"").append(modified).append("\";");
+            this.execMql(_context, cmd);
+        }
+    }
 }

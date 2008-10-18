@@ -26,7 +26,6 @@ import java.io.Serializable;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -61,16 +60,6 @@ public abstract class AbstractAdminObject_mxJPO
     final Stack<Property> propertiesStack = new Stack<Property>();
 
     final Map<String,Property> propertiesMap = new TreeMap<String,Property>();
-
-    private final static Set<String> IGNORED_PROPERTIES = new HashSet<String>();
-    static  {
-        IGNORED_PROPERTIES.add("version");
-        IGNORED_PROPERTIES.add("installed date");
-        IGNORED_PROPERTIES.add("original name");
-        IGNORED_PROPERTIES.add("application");
-        IGNORED_PROPERTIES.add("installer");
-        IGNORED_PROPERTIES.add("author");
-    }
 
     @Override
     public Set<String> getMatchingNames(final Context _context,
@@ -323,7 +312,8 @@ public abstract class AbstractAdminObject_mxJPO
      * Property with name, value and referenced administration type. The kind
      * of property (with reference, with value, ...) is stored as flag.
      */
-    protected class Property
+    // TODO define class in own file
+   protected class Property
             implements Serializable
     {
         /**

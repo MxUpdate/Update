@@ -20,9 +20,7 @@
 
 package net.sourceforge.mxupdate.update;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
@@ -307,20 +305,13 @@ public abstract class AbstractPropertyObject_mxJPO
         if (!modified.equals(this.getVersion()))  {
 System.out.println("    - update to version '" + modified + "'");
 
-            // read code
-            final StringBuilder code = new StringBuilder();
-            final BufferedReader reader = new BufferedReader(new FileReader(_file));
-            String line = reader.readLine();
-            while (line != null)  {
-                code.append(line).append('\n');
-                line = reader.readLine();
-            }
-            reader.close();
+            // read TCL code
+            final StringBuilder tclCode = this.getCode(_file);
 
             final Map<String,String> variables = new HashMap<String,String>();
             variables.put("VERSION", modified);
 
-            this.update(_context, "", code, variables);
+            this.update(_context, "", tclCode, variables);
         }
     }
 
