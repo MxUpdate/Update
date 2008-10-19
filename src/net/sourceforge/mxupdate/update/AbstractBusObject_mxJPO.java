@@ -367,7 +367,7 @@ public abstract class AbstractBusObject_mxJPO
         final StringBuilder postMQLCode = new StringBuilder()
                 .append(_postMQLCode)
                 .append("mod bus ").append(objectId).append(" \"")
-                .append(ATTR_UPDATE_VERSION).append("\" \"").append(_tclVariables.get("VERSION")).append("\" \"");
+                .append(ATTR_UPDATE_VERSION).append("\" \"").append(_tclVariables.get("VERSION")).append("\";\n");
 
         // prepare map of all TCL variables incl. id of business object
         final Map<String,String> tclVariables = new HashMap<String,String>();
