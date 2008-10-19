@@ -319,11 +319,15 @@ System.out.println("    - update to version '" + modified + "'");
      * The method updates this administration (business) object. First all MQL
      * commands are concatenated:
      * <ul>
-     * <li>pre MQL commands (from parameter <code>_preCode</code>)</li>
-     * <li>reset MQL commands (via {@link #appendResetMQL(StringBuilder)})</li>
+     * <li>pre MQL commands (from parameter <code>_preMQLCode</code>)</li>
      * <li>change to TCL mode</li>
-     * <li>set all required TCL variables</li>
-     * <li>append TCL update code from file</li>
+     * <li>set all required TCL variables (from parameter <code>_tclVariables
+     *     </code>)</li>
+     * <li>append TCL update code from file (from parameter <code>_tclCode
+     *     </code>)</li>
+     * <li>change back to MQL mode</li>
+     * <li>append post MQL statements (from parameter <code>_postMQLCode
+     *     </code>)</li>
      * </ul>
      * This MQL statement is executed within a transaction to be sure that the
      * statement is not executed if an error had occurred.
@@ -339,7 +343,6 @@ System.out.println("    - update to version '" + modified + "'");
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @throws Exception if update failed
-     * @see #appendResetMQL(StringBuilder)
      */
     protected void update(final Context _context,
                           final CharSequence _preMQLCode,
@@ -350,12 +353,8 @@ System.out.println("    - update to version '" + modified + "'");
     {
         final StringBuilder cmd = new StringBuilder().append(_preMQLCode);
 
-        // append reset MQL commands
-        appendResetMQL(_context, cmd);
-
         // append TCL mode
-        cmd.append(";\n")
-           .append("tcl;\n")
+        cmd.append("tcl;\n")
            .append("eval  {\n");
 
         // define all TCL variables
@@ -363,7 +362,7 @@ System.out.println("    - update to version '" + modified + "'");
             cmd.append("set ").append(entry.getKey())
                .append(" \"").append(convert(entry.getValue())).append("\"\n");
         }
-        // append TCL code and post MQL statements
+        // append TCL code, end of TCL mode and post MQL statements
         cmd.append(_tclCode)
            .append("\n}\nexit;\n")
            .append(_postMQLCode);
@@ -381,20 +380,6 @@ System.out.println("    - update to version '" + modified + "'");
             }
         }
     }
-
-    /**
-     * Appends the MQL statements to reset the administration (business)
-     * object.
-     *
-     * @param _context  context for this request
-     * @param _cmd      string builder used to append the MQL statements
-     * @todo remove usage of this method...
-     */
-    protected void appendResetMQL(final Context _context,
-                                  final StringBuilder _cmd)
-    {
-    }
-
 
     /**
      * Sax handler used to parse the XML exports.

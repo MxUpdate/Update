@@ -180,37 +180,57 @@ public class Portal_mxJPO
     }
 
     /**
-     * Appends the MQL statement to reset this portal:
+     * The method overwrites the original method to append the MQL statements
+     * in the <code>_preMQLCode</code> to reset this portal:
      * <ul>
      * <li>reset HRef, description, alt and label</li>
      * <li>remove all settings and channels</li>
      * </ul>
      *
-     * @param _context  context for this request
-     * @param _cmd      string builder used to append the MQL statements
+     * @param _context          context for this request
+     * @param _preMQLCode       MQL statements which must be called before the
+     *                          TCL code is executed
+     * @param _postMQLCode      MQL statements which must be called after the
+     *                          TCL code is executed
+     * @param _tclCode          TCL code from the file used to update
+     * @param _tclVariables     map of all TCL variables where the key is the
+     *                          name and the value is value of the TCL variable
+     *                          (the value is automatically converted to TCL
+     *                          syntax!)
      */
     @Override
-    protected void appendResetMQL(final Context _context,
-                                  final StringBuilder _cmd)
+    protected void update(final Context _context,
+                          final CharSequence _preMQLCode,
+                          final CharSequence _postMQLCode,
+                          final CharSequence _tclCode,
+                          final Map<String,String> _tclVariables)
+            throws Exception
     {
-        _cmd.append("mod ").append(getInfoAnno().adminType())
-            .append(" \"").append(getName()).append('\"')
-            .append(" href \"\" description \"\" alt \"\" label \"\"");
+        // HRef, description, alt and label
+        final StringBuilder preMQLCode = new StringBuilder()
+                .append("mod ").append(getInfoAnno().adminType())
+                .append(" \"").append(getName()).append('\"')
+                .append(" href \"\" description \"\" alt \"\" label \"\"");
+
         // reset settings
         for (final net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
             if (prop.getName().startsWith("%"))  {
-                _cmd.append(" remove setting \"").append(prop.getName().substring(1)).append('\"');
+                preMQLCode.append(" remove setting \"").append(prop.getName().substring(1)).append('\"');
             }
         }
-        _cmd.append(";\n");
+        preMQLCode.append(";\n");
+
         // remove channels (each channel must be removed in a single line...)
         for (final ChannelRef channelRef : this.channelRefs)  {
-            _cmd.append("mod ").append(getInfoAnno().adminType())
-                .append(" \"").append(getName()).append('\"')
-                .append(" remove channel \"").append(channelRef.name).append("\";\n");
+            preMQLCode.append("mod ").append(getInfoAnno().adminType())
+                      .append(" \"").append(getName()).append('\"')
+                      .append(" remove channel \"").append(channelRef.name).append("\";\n");
         }
-        _cmd.append("mod ").append(getInfoAnno().adminType())
-            .append(" \"").append(getName()).append('\"');
+
+        // append already existing pre MQL code
+        preMQLCode.append(_preMQLCode);
+
+        super.update(_context, preMQLCode, _postMQLCode, _tclCode, _tclVariables);
     }
 
     /**

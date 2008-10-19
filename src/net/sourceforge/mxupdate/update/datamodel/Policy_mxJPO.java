@@ -324,22 +324,6 @@ public class Policy_mxJPO
     }
 
     /**
-     * Appends the MQL statement to reset this policy:
-     * <ul>
-     * <li></li>
-     * </ul>
-     *
-     * @param _context  context for this request
-     * @param _cmd      string builder used to append the MQL statements
-     * @todo implement
-     */
-    @Override
-    protected void appendResetMQL(final Context _context,
-                                  final StringBuilder _cmd)
-    {
-    }
-
-    /**
      * Class defining states of a policy.
      */
     private class State

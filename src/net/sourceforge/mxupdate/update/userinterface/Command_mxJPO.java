@@ -22,6 +22,7 @@ package net.sourceforge.mxupdate.update.userinterface;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -105,34 +106,55 @@ public class Command_mxJPO
         }
     }
 
-
     /**
-     * Appends the MQL statement to reset this command:
+     * The method overwrites the original method to append the MQL statements
+     * in the <code>_preMQLCode</code> to reset this command:
      * <ul>
      * <li>HRef, description, alt and label is set to empty string</li>
      * <li>all settings and users are removed</li>
      * </ul>
      *
-     * @param _context  context for this request
-     * @param _cmd      string builder used to append the MQL statements
+     * @param _context          context for this request
+     * @param _preMQLCode       MQL statements which must be called before the
+     *                          TCL code is executed
+     * @param _postMQLCode      MQL statements which must be called after the
+     *                          TCL code is executed
+     * @param _tclCode          TCL code from the file used to update
+     * @param _tclVariables     map of all TCL variables where the key is the
+     *                          name and the value is value of the TCL variable
+     *                          (the value is automatically converted to TCL
+     *                          syntax!)
      */
     @Override
-    protected void appendResetMQL(final Context _context,
-                                  final StringBuilder _cmd)
+    protected void update(final Context _context,
+                          final CharSequence _preMQLCode,
+                          final CharSequence _postMQLCode,
+                          final CharSequence _tclCode,
+                          final Map<String,String> _tclVariables)
+            throws Exception
     {
-        // reset command
-        _cmd.append("mod ").append(getInfoAnno().adminType())
-            .append(" \"").append(getName()).append('\"')
-           .append(" href \"\" description \"\" alt \"\" label \"\"");
+        // reset HRef, description, alt and label
+        final StringBuilder preMQLCode = new StringBuilder()
+                .append("mod ").append(getInfoAnno().adminType())
+                .append(" \"").append(getName()).append('\"')
+                .append(" href \"\" description \"\" alt \"\" label \"\"");
+
         // reset settings
         for (final net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
             if (prop.getName().startsWith("%"))  {
-                _cmd.append(" remove setting \"").append(prop.getName().substring(1)).append('\"');
+                preMQLCode.append(" remove setting \"").append(prop.getName().substring(1)).append('\"');
             }
         }
+
         // reset users
         for (final String user : this.users)  {
-            _cmd.append(" remove user \"").append(user).append('\"');
+            preMQLCode.append(" remove user \"").append(user).append('\"');
         }
+
+        // append already existing pre MQL code
+        preMQLCode.append(";\n")
+                  .append(_preMQLCode);
+
+        super.update(_context, preMQLCode, _postMQLCode, _tclCode, _tclVariables);
     }
 }

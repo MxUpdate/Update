@@ -125,6 +125,12 @@ public class Form_mxJPO
     }
 
     /**
+     * The method overwrites the original method to append the MQL statements
+     * in the <code>_preMQLCode</code> to reset this form:
+     * <ul>
+     * <li>remove all fields of the web form</li>
+     * <li>set to not hidden</li>
+     * </ul>
      * The update of web forms works sometimes not correctly for the correct
      * order of fields. Because of that, the TCL update code is includes a
      * procedure to order the form fields.
@@ -143,40 +149,34 @@ public class Form_mxJPO
      */
     @Override
     protected void update(final Context _context,
-                          final CharSequence _preCode,
+                          final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _tclCode,
                           final Map<String,String> _tclVariables)
             throws Exception
     {
+        // reset HRef, description, alt and label
+        final StringBuilder preMQLCode = new StringBuilder()
+                .append("mod ").append(getInfoAnno().adminType())
+                .append(" \"").append(getName()).append('\"')
+                .append(" !hidden");
+
+        // remove all fields
+        for (final net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO field : this.fields)  {
+            preMQLCode.append(" field delete name \"").append(field.getName()).append('\"');
+        }
+
+        // append already existing pre MQL code
+        preMQLCode.append(";\n")
+                  .append(_preMQLCode);
+
+        // append procedure to order fields of the form
         final StringBuilder tclCode = new StringBuilder()
                 .append(ORDER_PROC)
                 .append('\n')
                 .append(_tclCode);
-        super.update(_context, _preCode, _postMQLCode, tclCode, _tclVariables);
-    }
 
-    /**
-     * Appends the MQL statement to reset this form:
-     * <ul>
-     * <li>remove all fields of the web form</li>
-     * <li>set to not hidden</li>
-     * </ul>
-     *
-     * @param _context  context for this request
-     * @param _cmd      string builder used to append the MQL statements
-     */
-    @Override
-    protected void appendResetMQL(final Context _context,
-                                  final StringBuilder _cmd)
-    {
-        _cmd.append("mod form \"").append(this.getName()).append('\"')
-            .append(" !hidden");
-
-        // remove all fields
-        for (final net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO field : this.fields)  {
-            _cmd.append(" field delete name \"").append(field.getName()).append('\"');
-        }
+        super.update(_context, preMQLCode, _postMQLCode, tclCode, _tclVariables);
     }
 
 }

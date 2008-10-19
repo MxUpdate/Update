@@ -22,6 +22,7 @@ package net.sourceforge.mxupdate.update.userinterface;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Map;
 import java.util.Stack;
 
 import matrix.db.Context;
@@ -77,25 +78,49 @@ public class Table_mxJPO
     }
 
     /**
-     * Appends the MQL statement to reset this web table:
+     * The method overwrites the original method to append the MQL statements
+     * in the <code>_preMQLCode</code> to reset this web table:
      * <ul>
      * <li>remove all columns of the web table</li>
      * <li>set to not hidden</li>
      * </ul>
      *
-     * @param _context  context for this request
-     * @param _cmd      string builder used to append the MQL statements
+     * @param _context          context for this request
+     * @param _preMQLCode       MQL statements which must be called before the
+     *                          TCL code is executed
+     * @param _postMQLCode      MQL statements which must be called after the
+     *                          TCL code is executed
+     * @param _tclCode          TCL code from the file used to update
+     * @param _tclVariables     map of all TCL variables where the key is the
+     *                          name and the value is value of the TCL variable
+     *                          (the value is automatically converted to TCL
+     *                          syntax!)
      */
     @Override
-    protected void appendResetMQL(final Context _context,
-                                  final StringBuilder _cmd)
+    protected void update(final Context _context,
+                          final CharSequence _preMQLCode,
+                          final CharSequence _postMQLCode,
+                          final CharSequence _tclCode,
+                          final Map<String,String> _tclVariables)
+            throws Exception
     {
-        _cmd.append("mod table \"").append(this.getName()).append("\" system")
-            .append(" !hidden");
+        // set to not hidden
+        final StringBuilder preMQLCode = new StringBuilder()
+                .append("mod ").append(getInfoAnno().adminType())
+                .append(" \"").append(getName()).append('\"')
+                .append(' ').append(getInfoAnno().adminTypeSuffix())
+                .append(" !hidden");
 
         // remove all columns
         for (final net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO column : this.columns)  {
-            _cmd.append(" column delete name \"").append(column.getName()).append('\"');
+            preMQLCode.append(" column delete name \"").append(column.getName()).append('\"');
         }
+
+        // append already existing pre MQL code
+        preMQLCode.append(";\n")
+                  .append(_preMQLCode);
+
+        super.update(_context, preMQLCode, _postMQLCode, _tclCode, _tclVariables);
     }
+
 }

@@ -119,6 +119,12 @@ public class Inquiry_mxJPO
      * written in a temporary file. This temporary file is used while the
      * update is running (defined via TCL variable <code>FILE</code>). After
      * the update, the temporary file is removed (because not needed anymore).
+     * Also the MQL statements to reset this inquiry are appended to the
+     * statements in <code>_preMQLCode</code> to:
+     * <ul>
+     * <li>reset the description, pattern and code</li>
+     * <li>remove all arguments</li>
+     * </ul>
      *
      * @param _context          context for this request
      * @param _preMQLCode       MQL statements which must be called before the
@@ -134,12 +140,29 @@ public class Inquiry_mxJPO
      */
     @Override
     protected void update(final Context _context,
-                          final CharSequence _preCode,
+                          final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _tclCode,
                           final Map<String,String> _tclVariables)
             throws Exception
     {
+        // reset HRef, description, alt, label and height
+        final StringBuilder preMQLCode = new StringBuilder()
+                .append("mod ").append(getInfoAnno().adminType())
+                .append(" \"").append(getName()).append('\"')
+                .append(" description \"\" pattern \"\" code \"\"");
+
+        // reset arguments
+        for (final net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
+            if (prop.getName().startsWith("%"))  {
+                preMQLCode.append(" remove argument \"").append(prop.getName().substring(1)).append('\"');
+            }
+        }
+
+        // append already existing pre MQL code
+        preMQLCode.append(";\n")
+                  .append(_preMQLCode);
+
         // separate the inquiry code and the TCL code
         final int idx = _tclCode.toString().lastIndexOf(INQUIRY_SEPARATOR);
         final CharSequence code = (idx >= 0)
@@ -158,38 +181,15 @@ public class Inquiry_mxJPO
             out.flush();
             out.close();
 
-            // and update
+            // define TCL variable for the file
             final Map<String,String> tclVariables = new HashMap<String,String>();
             tclVariables.putAll(_tclVariables);
             tclVariables.put("FILE", tmpFile.getPath());
-            super.update(_context, _preCode, _postMQLCode, code, tclVariables);
+
+            // and update
+            super.update(_context, preMQLCode, _postMQLCode, code, tclVariables);
         } finally  {
             tmpFile.delete();
-        }
-    }
-
-    /**
-     * Appends the MQL statement to reset this inquiry:
-     * <ul>
-     * <li>reset the description pattern and code</li>
-     * <li>remove all arguments</li>
-     * </ul>
-     *
-     * @param _context  context for this request
-     * @param _cmd      string builder used to append the MQL statements
-     */
-    @Override
-    protected void appendResetMQL(final Context _context,
-                                  final StringBuilder _cmd)
-    {
-        _cmd.append("mod ").append(getInfoAnno().adminType())
-            .append(" \"").append(getName()).append('\"')
-            .append(" description \"\" pattern \"\" code \"\"");
-        // reset arguments
-        for (final net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
-            if (prop.getName().startsWith("%"))  {
-                _cmd.append(" remove argument \"").append(prop.getName().substring(1)).append('\"');
-            }
         }
     }
 }

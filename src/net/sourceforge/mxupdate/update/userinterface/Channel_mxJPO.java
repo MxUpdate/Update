@@ -165,33 +165,56 @@ public class Channel_mxJPO
     }
 
     /**
-     * Appends the MQL statement to reset this channel:
+     * The method overwrites the original method to append the MQL statements
+     * in the <code>_preMQLCode</code> to reset this channel:
      * <ul>
      * <li>reset HRef, description, alt and label</li>
      * <li>set height to 0</li>
      * <li>remove all settings and commands</li>
      * </ul>
      *
-     * @param _context  context for this request
-     * @param _cmd      string builder used to append the MQL statements
+     * @param _context          context for this request
+     * @param _preMQLCode       MQL statements which must be called before the
+     *                          TCL code is executed
+     * @param _postMQLCode      MQL statements which must be called after the
+     *                          TCL code is executed
+     * @param _tclCode          TCL code from the file used to update
+     * @param _tclVariables     map of all TCL variables where the key is the
+     *                          name and the value is value of the TCL variable
+     *                          (the value is automatically converted to TCL
+     *                          syntax!)
      */
     @Override
-    protected void appendResetMQL(final Context _context,
-                                  final StringBuilder _cmd)
+    protected void update(final Context _context,
+                          final CharSequence _preMQLCode,
+                          final CharSequence _postMQLCode,
+                          final CharSequence _tclCode,
+                          final Map<String,String> _tclVariables)
+            throws Exception
     {
-        _cmd.append("mod ").append(getInfoAnno().adminType())
-            .append(" \"").append(getName()).append('\"')
-           .append(" href \"\" description \"\" alt \"\" label \"\" height 0");
+        // reset HRef, description, alt, label and height
+        final StringBuilder preMQLCode = new StringBuilder()
+                .append("mod ").append(getInfoAnno().adminType())
+                .append(" \"").append(getName()).append('\"')
+                .append(" href \"\" description \"\" alt \"\" label \"\" height 0");
+
         // reset settings
         for (final net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
             if (prop.getName().startsWith("%"))  {
-                _cmd.append(" remove setting \"").append(prop.getName().substring(1)).append('\"');
+                preMQLCode.append(" remove setting \"").append(prop.getName().substring(1)).append('\"');
             }
         }
+
         // remove commands
         for (final CommandRef cmdRef : this.orderCmds.values())  {
-            _cmd.append(" remove command \"").append(cmdRef.name).append('\"');
+            preMQLCode.append(" remove command \"").append(cmdRef.name).append('\"');
         }
+
+        // append already existing pre MQL code
+        preMQLCode.append(";\n")
+                  .append(_preMQLCode);
+
+        super.update(_context, preMQLCode, _postMQLCode, _tclCode, _tclVariables);
     }
 
     /**

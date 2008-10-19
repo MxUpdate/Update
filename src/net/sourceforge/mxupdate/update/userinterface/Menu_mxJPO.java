@@ -125,33 +125,51 @@ public class Menu_mxJPO
     }
 
     /**
-     * Appends the MQL statement to reset this menu:
+     * The method overwrites the original method to append the MQL statements
+     * in the <code>_preMQLCode</code> to reset this menu:
      * <ul>
-     * <li>all MQL commands done in the Command class</li>
-     * <li>all child commands / menus</li>
-     * <li>definition as tree menu</li>
+     * <li>remove all child commands / menus</li>
+     * <li>remove definition as tree menu</li>
      * </ul>
+     * The description etc. is reseted in the command super class.
      *
-     * @param _cmd      string builder used to append the MQL statements
+     * @param _context          context for this request
+     * @param _preMQLCode       MQL statements which must be called before the
+     *                          TCL code is executed
+     * @param _postMQLCode      MQL statements which must be called after the
+     *                          TCL code is executed
+     * @param _tclCode          TCL code from the file used to update
+     * @param _tclVariables     map of all TCL variables where the key is the
+     *                          name and the value is value of the TCL variable
+     *                          (the value is automatically converted to TCL
+     *                          syntax!)
      */
     @Override
-    protected void appendResetMQL(final Context _context,
-                                  final StringBuilder _cmd)
+    protected void update(final Context _context,
+                          final CharSequence _preMQLCode,
+                          final CharSequence _postMQLCode,
+                          final CharSequence _tclCode,
+                          final Map<String,String> _tclVariables)
+            throws Exception
     {
-        super.appendResetMQL(_context, _cmd);
+        // remove child commands / menus
+        final StringBuilder preMQLCode = new StringBuilder()
+                .append("mod ").append(getInfoAnno().adminType()).append(" \"").append(this.getName()).append('\"');
+        for (final MenuChild child : this.childs)  {
+            preMQLCode.append(" remove ").append(child.type)
+                      .append(" \"").append(child.name).append("\"");
+        }
+        preMQLCode.append(";\n");
 
         // remove information about tree menu...
-        _cmd.append(";\n");
         if (this.treeMenu)  {
-            _cmd.append("mod menu Tree remove menu \"").append(this.getName()).append("\";\n");
+            preMQLCode.append("mod menu Tree remove menu \"").append(this.getName()).append("\";\n");
         }
 
-        // remove child commands / menus
-        _cmd.append("mod menu \"").append(this.getName()).append('\"');
-        for (final MenuChild child : this.childs)  {
-            _cmd.append(" remove ").append(child.type)
-                .append(" \"").append(child.name).append("\"");
-        }
+        // append already existing pre MQL code
+        preMQLCode.append(_preMQLCode);
+
+        super.update(_context, preMQLCode, _postMQLCode, _tclCode, _tclVariables);
     }
 
     /**
