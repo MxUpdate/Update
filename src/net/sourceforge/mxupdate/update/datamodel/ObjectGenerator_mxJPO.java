@@ -166,7 +166,8 @@ public class ObjectGenerator_mxJPO
                       .append("\" relationship \"").append(RELATIONSHIP_NUMBER_GENERATOR)
                       .append("\" to \"").append(this.numGenType).append("\" \"")
                               .append(this.numGenName).append("\" \"")
-                              .append(this.numGenRevi).append("\"");
+                              .append(this.numGenRevi).append("\"")
+                      .append(";\n");
         }
 
         // append rest of pre MQL code
