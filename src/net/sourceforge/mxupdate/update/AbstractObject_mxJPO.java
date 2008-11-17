@@ -31,11 +31,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.xml.sax.SAXException;
-
 import matrix.db.Context;
 import matrix.db.MQLCommand;
 import matrix.util.MatrixException;
+
+import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+
+import org.xml.sax.SAXException;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
 
@@ -88,13 +90,23 @@ public abstract class AbstractObject_mxJPO
 
     /**
      * Evaluates for this instance of export / import class the related
-     * information annotations and returns that.
+     * information annotations and returns that. If the information annotation
+     * does not exists directly in the class, the information annotation is
+     * searched in the super classes.
      *
      * @return instance of the related information annotation
      */
-    public final net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO getInfoAnno()
+    public final InfoAnno_mxJPO getInfoAnno()
     {
-        return getClass().getAnnotation(net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO.class);
+        InfoAnno_mxJPO ret = this.getClass().getAnnotation(InfoAnno_mxJPO.class);
+        if (ret == null)  {
+            Class<?> clazz = this.getClass().getSuperclass();
+            while ((clazz != null) && (ret == null))  {
+                ret = clazz.getAnnotation(InfoAnno_mxJPO.class);
+                clazz = clazz.getSuperclass();
+            }
+        }
+        return ret;
     }
 
     /**
