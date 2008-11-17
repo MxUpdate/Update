@@ -43,68 +43,20 @@ eval  {
     error "\nRequired enviroment variable '${ENV_NAME}' is not defined!"
   }
 
-  ##############################################################################
-  # Inserts all JPOs depending on the file date into the data base.
-  ##############################################################################
-  proc pUpdate {_sPath _sPackage}  {
-    global VERSION
-    global ALLPRGS
-
-    foreach sOneFile [glob -nocomplain -types {f} [file join "${_sPath}" "*_mxJPO.java"]]  {
-      # extract JPO name
-      set sJPOName "${_sPackage}[lindex [file split $sOneFile] end]"
-      regsub {_mxJPO\.java$} "${sJPOName}" "" sJPOName
-
-      # store JPO name to know which programs must be deleted
-      set ALLPRGS(${sJPOName}) ""
-
-      # test for file date from file against file date in data base
-      set sFileFileDate [file atime "${sOneFile}"]
-      set sMxFileData ""
-      if {[mql list prog "${sJPOName}"] != ""}  {
-        set sMxFileData [mql print prog "${sJPOName}" select property\[file date\].value dump]
-      }
-      # update only needed if mx and file file date differs
-      if {"${sFileFileDate}" != "${sMxFileData}"}  {
-        puts "update '${sJPOName}'"
-        mql insert prog "${sOneFile}"
-        mql mod prog "${sJPOName}" \
-            add property "version" value "${VERSION}" \
-            add property "file date" value "${sFileFileDate}" \
-            add property "installed date" value [clock format [clock seconds] -format "%m-%d-%Y"] \
-            add property "installer" value "The MxUpdate Team" \
-            add property "author" value "The MxUpdate Team" \
-            add property "original name" value "${sJPOName}" \
-            add property "application" value "MxUpdate"
-      }
-    }
-
-    # and now loop through all directories
-    foreach sOneDir [glob -nocomplain -types {d} [file join "${_sPath}" "*"]]  {
-      pUpdate "${sOneDir}" "${_sPackage}[lindex [file split $sOneDir] end]."
-    }
-  }
-
-  ##############################################################################
-  # Delete in the data base existing programs, but not defined in the file
-  # system anymore.
-  ##############################################################################
-  proc pDelete {}  {
-    global ALLPRGS
-
-    foreach sOneProg [mql list prog "net.sourceforge.mxupdate.*"]  {
-      if ![info exists ALLPRGS(${sOneProg})]  {
-        puts "delete '${sOneProg}'"
-        mql delete prog "${sOneProg}"
-      }
-    }
-  }
-
   mql verbose off
 
-  pUpdate "${sPath}" ""
-  pDelete
-#  mql compile prog net.sourceforge.mxupdate.*,MxUpdate;
-  
+  set sFileName [file join "${sPath}" "net" "sourceforge" "mxupdate" "install" "Insert_mxJPO.java"]
+  set sFileDate [clock format [file mtime "${sFileName}"]  -gmt true -format "%Y-%m-%d %H:%M:%S"]
+  set sJPOName  "net.sourceforge.mxupdate.install.Insert";
+  set sJPODate  [mql print prog "${sJPOName}" select property\[file date\].value dump]
+  if {"${sJPODate}" != "${sFileDate}"}  {
+    puts "update insert JPO"
+    mql insert prog "${sFileName}"
+  }
+
+  mql exec prog "${sJPOName}" "${sPath}" "${VERSION}"
+
+  mql verbose on
+  mql compile prog net.sourceforge.mxupdate.*,MxUpdate
   mql verbose off
 }
