@@ -23,6 +23,7 @@ package net.sourceforge.mxupdate.update;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.HashMap;
@@ -43,7 +44,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
  * @version $Id$
  */
 public abstract class AbstractAdminObject_mxJPO
-        extends net.sourceforge.mxupdate.update.AbstractPropertyObject_mxJPO
+        extends AbstractPropertyObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
@@ -312,6 +313,29 @@ public abstract class AbstractAdminObject_mxJPO
     protected Map<String,Property>  getPropertiesMap()
     {
         return this.propertiesMap;
+    }
+
+    /**
+     * The string representation of this administration object is returned.
+     * The string representation is the MQL update script and so method
+     * {@link #write(Writer)} is called.
+     *
+     * @return string representation of this administration object
+     * @see #write(Writer)
+     */
+    @Override
+    public String toString()
+    {
+        final StringWriter writer = new StringWriter();
+        try
+        {
+            this.write(writer);
+        }
+        catch (Exception e)
+        {
+            throw new Error(e);
+        }
+        return writer.toString();
     }
 
     ///////////////////////////////////////////////////////////////////////////
