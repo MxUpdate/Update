@@ -23,6 +23,9 @@ package net.sourceforge.mxupdate.update.datamodel;
 import java.io.IOException;
 import java.io.Writer;
 
+import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
+import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 /**
@@ -30,14 +33,14 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "format",
-                                                     title = "FORMAT",
-                                                     filePrefix = "FORMAT_",
-                                                     fileSuffix = ".tcl",
-                                                     filePath = "datamodel/format",
-                                                     description = "format")
+@InfoAnno_mxJPO(adminType = "format",
+                title = "FORMAT",
+                filePrefix = "FORMAT_",
+                fileSuffix = ".tcl",
+                filePath = "datamodel/format",
+                description = "format")
 public class Format_mxJPO
-        extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
+        extends AbstractAdminObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.

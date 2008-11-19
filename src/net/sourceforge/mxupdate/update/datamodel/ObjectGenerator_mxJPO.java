@@ -30,18 +30,21 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 import matrix.util.StringList;
 
+import net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO;
+import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+
 /**
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(busType = "eService Object Generator",
-                                                     title = "OBJECTGENERATOR",
-                                                     filePrefix = "OBJECTGENERATOR_",
-                                                     fileSuffix = ".tcl",
-                                                     filePath = "datamodel/objectgenerator",
-                                                     description = "object generator")
+@InfoAnno_mxJPO(busType = "eService Object Generator",
+                title = "OBJECTGENERATOR",
+                filePrefix = "OBJECTGENERATOR_",
+                fileSuffix = ".tcl",
+                filePath = "datamodel/objectgenerator",
+                description = "object generator")
 public class ObjectGenerator_mxJPO
-        extends net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO
+        extends AbstractBusObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.

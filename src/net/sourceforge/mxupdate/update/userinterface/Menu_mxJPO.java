@@ -29,6 +29,8 @@ import java.util.TreeMap;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
+import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 /**
@@ -36,14 +38,14 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "menu",
-                                                     title ="MENU",
-                                                     filePrefix = "MENU_",
-                                                     fileSuffix = ".tcl",
-                                                     filePath = "userinterface/menu",
-                                                     description = "menu")
+@InfoAnno_mxJPO(adminType = "menu",
+                title ="MENU",
+                filePrefix = "MENU_",
+                fileSuffix = ".tcl",
+                filePath = "userinterface/menu",
+                description = "menu")
 public class Menu_mxJPO
-        extends net.sourceforge.mxupdate.update.userinterface.Command_mxJPO
+        extends Command_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.

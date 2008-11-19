@@ -23,21 +23,24 @@ package net.sourceforge.mxupdate.update.datamodel;
 import java.io.IOException;
 import java.io.Writer;
 
+import net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO;
+import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 /**
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(busType = "eService Number Generator",
-                                                     busIgnoreAttributes = {"eService Next Number"},
-                                                     title = "NUMBERGENERATOR",
-                                                     filePrefix = "NUMBERGENERATOR_",
-                                                     fileSuffix = ".tcl",
-                                                     filePath = "datamodel/numbergenerator",
-                                                     description = "number generator")
+@InfoAnno_mxJPO(busType = "eService Number Generator",
+                busIgnoreAttributes = {"eService Next Number"},
+                title = "NUMBERGENERATOR",
+                filePrefix = "NUMBERGENERATOR_",
+                fileSuffix = ".tcl",
+                filePath = "datamodel/numbergenerator",
+                description = "number generator")
 public class NumberGenerator_mxJPO
-        extends net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO
+        extends AbstractBusObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.

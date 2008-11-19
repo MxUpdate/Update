@@ -28,10 +28,13 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.xml.sax.SAXException;
-
 import matrix.db.Context;
 import matrix.util.MatrixException;
+
+import net.sourceforge.mxupdate.update.AbstractObject_mxJPO;
+import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+
+import org.xml.sax.SAXException;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
 
@@ -39,13 +42,13 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(title = "",
-                                                     filePrefix = "",
-                                                     fileSuffix = "_" + "mxJPO.java",
-                                                     filePath = "jpo",
-                                                     description = "jpo")
+@InfoAnno_mxJPO(title = "",
+                filePrefix = "",
+                fileSuffix = "_" + "mxJPO.java",
+                filePath = "jpo",
+                description = "jpo")
 public class JPO_mxJPO
-        extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO
+        extends AbstractObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.

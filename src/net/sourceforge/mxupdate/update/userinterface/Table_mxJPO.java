@@ -27,20 +27,23 @@ import java.util.Stack;
 
 import matrix.db.Context;
 
+import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
+import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+
 /**
  *
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "table",
-                                                     adminTypeSuffix = "system",
-                                                     title = "TABLE",
-                                                     filePrefix = "TABLE_",
-                                                     fileSuffix = ".tcl",
-                                                     filePath = "userinterface/table",
-                                                     description = "web table")
+@InfoAnno_mxJPO(adminType = "table",
+                adminTypeSuffix = "system",
+                title = "TABLE",
+                filePrefix = "TABLE_",
+                fileSuffix = ".tcl",
+                filePath = "userinterface/table",
+                description = "web table")
 public class Table_mxJPO
-        extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
+        extends AbstractAdminObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
@@ -50,16 +53,16 @@ public class Table_mxJPO
     /**
      * Stores all table columns of this web table instance.
      */
-    final Stack<net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO> columns = new Stack<net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO>();
+    final Stack<TableColumn_mxJPO> columns = new Stack<TableColumn_mxJPO>();
 
     @Override
     protected void parse(final String _url,
-                      final String _content)
+                         final String _content)
     {
         if ("/columnList".equals(_url))  {
             // to be ignored...
         } else if ("/columnList/column".equals(_url))  {
-            this.columns.add(new net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO());
+            this.columns.add(new TableColumn_mxJPO());
         } else if (_url.startsWith("/columnList/column/"))  {
             this.columns.peek().parse(_url.substring(18), _content);
         } else  {
@@ -71,7 +74,7 @@ public class Table_mxJPO
     protected void writeObject(final Writer _out)
             throws IOException
     {
-        for (final net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO column : this.columns)  {
+        for (final TableColumn_mxJPO column : this.columns)  {
             _out.append(" \\\n    column");
             column.write(_out);
         }
@@ -112,7 +115,7 @@ public class Table_mxJPO
                 .append(" !hidden");
 
         // remove all columns
-        for (final net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO column : this.columns)  {
+        for (final TableColumn_mxJPO column : this.columns)  {
             preMQLCode.append(" column delete name \"").append(column.getName()).append('\"');
         }
 

@@ -27,6 +27,9 @@ import java.util.Stack;
 
 import matrix.db.Context;
 
+import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
+import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 /**
@@ -34,14 +37,14 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "form",
-                                                     title = "FORM",
-                                                     filePrefix = "FORM_",
-                                                     fileSuffix = ".tcl",
-                                                     filePath = "userinterface/form",
-                                                     description = "web form")
+@InfoAnno_mxJPO(adminType = "form",
+                title = "FORM",
+                filePrefix = "FORM_",
+                fileSuffix = ".tcl",
+                filePath = "userinterface/form",
+                description = "web form")
 public class Form_mxJPO
-        extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
+        extends AbstractAdminObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
@@ -70,8 +73,8 @@ public class Form_mxJPO
     /**
      * Stores all fields of this form instance.
      */
-    private final Stack<net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO> fields
-            = new Stack<net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO>();
+    private final Stack<TableColumn_mxJPO> fields
+            = new Stack<TableColumn_mxJPO>();
 
     @Override
     protected void parse(String _url, String _content)
@@ -80,7 +83,7 @@ public class Form_mxJPO
         if ("/fieldList".equals(_url))  {
             // to be ignored ...
         } else if ("/fieldList/field".equals(_url))  {
-            this.fields.add(new net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO());
+            this.fields.add(new TableColumn_mxJPO());
         } else if (_url.startsWith("/fieldList/field/"))  {
             this.fields.peek().parse(_url.substring(16), _content);
 
@@ -107,7 +110,7 @@ public class Form_mxJPO
     protected void writeObject(final Writer _out)
             throws IOException
     {
-        for (final net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO field : this.fields)  {
+        for (final TableColumn_mxJPO field : this.fields)  {
             _out.write(" \\\n    field");
             field.write(_out);
         }
@@ -118,7 +121,7 @@ public class Form_mxJPO
             throws IOException
     {
         _out.append("\n\norderFields \"${NAME}\" [list \\\n");
-        for (final net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO field : this.fields)  {
+        for (final TableColumn_mxJPO field : this.fields)  {
             _out.append("    \"").append(convert(field.name)).append("\" \\\n");
         }
         _out.append("]");
@@ -162,7 +165,7 @@ public class Form_mxJPO
                 .append(" !hidden");
 
         // remove all fields
-        for (final net.sourceforge.mxupdate.update.userinterface.TableColumn_mxJPO field : this.fields)  {
+        for (final TableColumn_mxJPO field : this.fields)  {
             preMQLCode.append(" field delete name \"").append(field.getName()).append('\"');
         }
 

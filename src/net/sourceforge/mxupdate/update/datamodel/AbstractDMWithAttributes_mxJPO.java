@@ -32,6 +32,8 @@ import java.util.regex.Pattern;
 import matrix.db.Context;
 import matrix.db.JPO;
 
+import net.sourceforge.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface;
+
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 /**
@@ -42,8 +44,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 public abstract class AbstractDMWithAttributes_mxJPO
-        extends net.sourceforge.mxupdate.update.datamodel.AbstractDMWithTriggers_mxJPO
-        implements net.sourceforge.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface
+        extends AbstractDMWithTriggers_mxJPO
+        implements JPOCallerInterface
 {
     /**
      * Defines the serialize version unique identifier.

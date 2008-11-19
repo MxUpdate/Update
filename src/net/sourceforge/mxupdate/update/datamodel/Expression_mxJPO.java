@@ -27,6 +27,9 @@ import java.util.Map;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
+import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
+import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 /**
@@ -34,14 +37,14 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 * @author tmoxter
 * @version $Id$
 */
-@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "expression",
-                                                     title = "EXPRESSION",
-                                                     filePrefix = "EXPRESSION_",
-                                                     fileSuffix = ".tcl",
-                                                     filePath = "datamodel/expression",
-                                                     description = "expression")
+@InfoAnno_mxJPO(adminType = "expression",
+                title = "EXPRESSION",
+                filePrefix = "EXPRESSION_",
+                fileSuffix = ".tcl",
+                filePath = "datamodel/expression",
+                description = "expression")
 public class Expression_mxJPO
-        extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
+        extends AbstractAdminObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.

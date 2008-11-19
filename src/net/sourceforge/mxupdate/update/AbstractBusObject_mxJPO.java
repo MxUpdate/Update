@@ -45,7 +45,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
  * @version $Id$
  */
 public abstract class AbstractBusObject_mxJPO
-        extends net.sourceforge.mxupdate.update.AbstractPropertyObject_mxJPO
+        extends AbstractPropertyObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.

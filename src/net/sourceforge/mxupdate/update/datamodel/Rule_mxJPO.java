@@ -30,6 +30,9 @@ import java.util.TreeSet;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
+import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
+import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 /**
@@ -37,14 +40,14 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "rule",
-                                                     title = "RULE",
-                                                     filePrefix = "RULE_",
-                                                     fileSuffix = ".tcl",
-                                                     filePath = "datamodel/rule",
-                                                     description = "rule")
+@InfoAnno_mxJPO(adminType = "rule",
+                title = "RULE",
+                filePrefix = "RULE_",
+                fileSuffix = ".tcl",
+                filePath = "datamodel/rule",
+                description = "rule")
 public class Rule_mxJPO
-        extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
+        extends AbstractAdminObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.

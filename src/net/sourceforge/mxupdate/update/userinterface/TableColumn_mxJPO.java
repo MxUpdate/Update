@@ -51,7 +51,7 @@ class TableColumn_mxJPO
 
     String lastSetting = null;
 
-    final Stack<net.sourceforge.mxupdate.update.userinterface.Setting_mxJPO> settings = new Stack<net.sourceforge.mxupdate.update.userinterface.Setting_mxJPO>();
+    final Stack<Setting_mxJPO> settings = new Stack<Setting_mxJPO>();
 
     final Set<String> users = new TreeSet<String>();
 
@@ -84,7 +84,7 @@ class TableColumn_mxJPO
             this.users.add(_content);
 
         } else if ("/fieldSettingList/fieldSetting".equals(_url))  {
-            this.settings.add(new net.sourceforge.mxupdate.update.userinterface.Setting_mxJPO());
+            this.settings.add(new Setting_mxJPO());
         } else if ("/fieldSettingList/fieldSetting/fieldSettingName".equals(_url))  {
             this.settings.peek().name = _content;
         } else if ("/fieldSettingList/fieldSetting/fieldSettingValue".equals(_url))  {
@@ -115,7 +115,7 @@ class TableColumn_mxJPO
         }
 
         final Map<String,String> tmpSettings  = new TreeMap<String,String>();
-        for (final net.sourceforge.mxupdate.update.userinterface.Setting_mxJPO setting : this.settings)  {
+        for (final Setting_mxJPO setting : this.settings)  {
             tmpSettings.put(setting.name, setting.value);
         }
         for (final Map.Entry<String,String> setting : tmpSettings.entrySet())  {

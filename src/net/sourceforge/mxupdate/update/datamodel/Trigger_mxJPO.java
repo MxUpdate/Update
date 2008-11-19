@@ -30,20 +30,21 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 import matrix.util.StringList;
 
-
+import net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO;
+import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 
 /**
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(busType = "eService Trigger Program Parameters",
-                                                     title = "TRIGGER",
-                                                     filePrefix = "TRIGGER_",
-                                                     fileSuffix = ".tcl",
-                                                     filePath = "datamodel/trigger",
-                                                     description = "trigger")
+@InfoAnno_mxJPO(busType = "eService Trigger Program Parameters",
+                title = "TRIGGER",
+                filePrefix = "TRIGGER_",
+                fileSuffix = ".tcl",
+                filePath = "datamodel/trigger",
+                description = "trigger")
 public class Trigger_mxJPO
-        extends net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO
+        extends AbstractBusObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.

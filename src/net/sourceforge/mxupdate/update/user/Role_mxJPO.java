@@ -28,6 +28,9 @@ import java.util.TreeSet;
 
 import matrix.db.Context;
 
+import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
+import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 /**
@@ -35,14 +38,14 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "role",
-                                                     title = "GROUP",
-                                                     filePrefix = "ROLE_",
-                                                     fileSuffix = ".tcl",
-                                                     filePath = "user/role",
-                                                     description ="role")
+@InfoAnno_mxJPO(adminType = "role",
+                title = "GROUP",
+                filePrefix = "ROLE_",
+                fileSuffix = ".tcl",
+                filePath = "user/role",
+                description ="role")
 public class Role_mxJPO
-        extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
+        extends AbstractAdminObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.

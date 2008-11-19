@@ -26,6 +26,8 @@ import java.util.Map;
 
 import matrix.db.Context;
 
+import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 /**
@@ -34,14 +36,14 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "type",
-                                                     title = "TYPE",
-                                                     filePrefix = "TYPE_",
-                                                     fileSuffix = ".tcl",
-                                                     filePath = "datamodel/type",
-                                                     description = "type")
+@InfoAnno_mxJPO(adminType = "type",
+                title = "TYPE",
+                filePrefix = "TYPE_",
+                fileSuffix = ".tcl",
+                filePath = "datamodel/type",
+                description = "type")
 public class Type_mxJPO
-        extends net.sourceforge.mxupdate.update.datamodel.AbstractDMWithAttributes_mxJPO
+        extends AbstractDMWithAttributes_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.

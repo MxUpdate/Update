@@ -29,6 +29,8 @@ import java.util.TreeMap;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
+import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 /**
@@ -36,12 +38,12 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "channel",
-                                                     title = "CHANNEL",
-                                                     filePrefix = "CHANNEL_",
-                                                     fileSuffix = ".tcl",
-                                                     filePath = "userinterface/channel",
-                                                     description = "channel")
+@InfoAnno_mxJPO(adminType = "channel",
+                title = "CHANNEL",
+                filePrefix = "CHANNEL_",
+                fileSuffix = ".tcl",
+                filePath = "userinterface/channel",
+                description = "channel")
 public class Channel_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {

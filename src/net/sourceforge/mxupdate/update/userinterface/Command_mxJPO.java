@@ -28,6 +28,9 @@ import java.util.TreeSet;
 
 import matrix.db.Context;
 
+import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
+import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 /**
@@ -35,14 +38,14 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "command",
-                                                     title = "COMMAND",
-                                                     filePrefix = "COMMAND_",
-                                                     fileSuffix = ".tcl",
-                                                     filePath = "userinterface/command",
-                                                     description = "command")
+@InfoAnno_mxJPO(adminType = "command",
+                title = "COMMAND",
+                filePrefix = "COMMAND_",
+                fileSuffix = ".tcl",
+                filePath = "userinterface/command",
+                description = "command")
 public class Command_mxJPO
-        extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
+        extends AbstractAdminObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
@@ -98,7 +101,7 @@ public class Command_mxJPO
         for (final String user : this.users)  {
             _out.append(" \\\n    add user \"").append(convert(user)).append("\"");
         }
-        for (final net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
+        for (final AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
             if (prop.getName().startsWith("%"))  {
                 _out.append(" \\\n    add setting \"").append(convert(prop.getName().substring(1))).append("\"")
                     .append(" \"").append(convert(prop.getValue())).append("\"");
@@ -140,7 +143,7 @@ public class Command_mxJPO
                 .append(" href \"\" description \"\" alt \"\" label \"\"");
 
         // reset settings
-        for (final net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
+        for (final AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
             if (prop.getName().startsWith("%"))  {
                 preMQLCode.append(" remove setting \"").append(prop.getName().substring(1)).append('\"');
             }

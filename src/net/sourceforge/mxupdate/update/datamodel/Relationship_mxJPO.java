@@ -28,6 +28,8 @@ import java.util.TreeSet;
 
 import matrix.db.Context;
 
+import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 /**
@@ -36,14 +38,14 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "relationship",
-                                                     title = "RELATIONSHIP",
-                                                     filePrefix = "RELATIONSHIP_",
-                                                     fileSuffix = ".tcl",
-                                                     filePath = "datamodel/relationship",
-                                                     description = "relation")
+@InfoAnno_mxJPO(adminType = "relationship",
+                title = "RELATIONSHIP",
+                filePrefix = "RELATIONSHIP_",
+                fileSuffix = ".tcl",
+                filePath = "datamodel/relationship",
+                description = "relation")
 public class Relationship_mxJPO
-        extends net.sourceforge.mxupdate.update.datamodel.AbstractDMWithAttributes_mxJPO
+        extends AbstractDMWithAttributes_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.

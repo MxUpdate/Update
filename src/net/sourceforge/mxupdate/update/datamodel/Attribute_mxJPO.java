@@ -31,6 +31,8 @@ import java.util.TreeSet;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
+import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 /**
@@ -40,14 +42,14 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @todo description
  * @todo program ranges
  */
-@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "attribute",
-                                                     title = "ATTRIBUTE",
-                                                     filePrefix = {"BOOLEAN_", "DATE_", "INTEGER_", "REAL_", "STRING_"},
-                                                     fileSuffix = ".tcl",
-                                                     filePath = "datamodel/attribute",
-                                                     description = "attribute")
+@InfoAnno_mxJPO(adminType = "attribute",
+                title = "ATTRIBUTE",
+                filePrefix = {"BOOLEAN_", "DATE_", "INTEGER_", "REAL_", "STRING_"},
+                fileSuffix = ".tcl",
+                filePath = "datamodel/attribute",
+                description = "attribute")
 public class Attribute_mxJPO
-        extends net.sourceforge.mxupdate.update.datamodel.AbstractDMWithTriggers_mxJPO
+        extends AbstractDMWithTriggers_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
