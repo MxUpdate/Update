@@ -32,8 +32,9 @@ import java.util.regex.Pattern;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
 /**
  * Abstract class for all data model administration objects with triggers.
@@ -42,7 +43,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 public abstract class AbstractDMWithTriggers_mxJPO
-        extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
+        extends AbstractAdminObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
@@ -164,7 +165,7 @@ public abstract class AbstractDMWithTriggers_mxJPO
     /**
      * Class used to store informations about triggers.
      */
-    static class Trigger
+    public static class Trigger
             implements Serializable
     {
         /**
