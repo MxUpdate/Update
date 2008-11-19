@@ -29,15 +29,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
+import matrix.db.Context;
+import matrix.util.MatrixException;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
-
-import matrix.db.Context;
-import matrix.util.MatrixException;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
 
@@ -46,7 +46,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
  * @version $Id$
  */
 public abstract class AbstractPropertyObject_mxJPO
-        extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO
+        extends AbstractObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
@@ -406,9 +406,8 @@ System.out.println("    - update to version '" + modified + "'");
          * the XML parser wants to open file &quot;ematrixml.dtd&quot;.
          */
         @Override
-        public InputSource resolveEntity (final String _publicId,
-                                          final String _systemId)
-            throws IOException, SAXException
+        public InputSource resolveEntity(final String _publicId,
+                                         final String _systemId)
         {
             return new InputSource(new StringReader(""));
         }
