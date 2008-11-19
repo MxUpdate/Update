@@ -43,18 +43,31 @@ eval  {
     error "\nRequired enviroment variable '${ENV_NAME}' is not defined!"
   }
 
-  mql verbose off
-
-  set sFileName [file join "${sPath}" "net" "sourceforge" "mxupdate" "install" "Insert_mxJPO.java"]
-  set sFileDate [clock format [file mtime "${sFileName}"]  -gmt true -format "%Y-%m-%d %H:%M:%S"]
-  set sJPOName  "net.sourceforge.mxupdate.install.Insert";
-  set sJPODate  [mql print prog "${sJPOName}" select property\[file date\].value dump]
-  if {"${sJPODate}" != "${sFileDate}"}  {
-    puts "update insert JPO"
-    mql insert prog "${sFileName}"
+  ##############################################################################
+  # The procedure installs given JPO within the given root path.
+  ##############################################################################
+  proc pInstall {_sRoot _sJPOName}  {
+    regsub -all {\.} "${_sJPOName}" {/} sFileName
+    set sFileName [file join "${_sRoot}" "${sFileName}_mxJPO.java"]
+    set sFileDate [clock format [file mtime "${sFileName}"]  -gmt true -format "%Y-%m-%d %H:%M:%S"]
+    if {[mql list prog "${_sJPOName}"] == ""}  {
+      set sJPODate ""
+    } else  {
+      set sJPODate [mql print prog "${_sJPOName}" select property\[file date\].value dump]
+    }
+    if {"${sJPODate}" != "${sFileDate}"}  {
+      puts "update jpo '${_sJPOName}'"
+      mql insert prog "${sFileName}"
+      mql mod prog ${_sJPOName} add property "file date" value "${sFileDate}"
+    }
   }
 
-  mql exec prog "${sJPOName}" "${sPath}" "${VERSION}"
+  mql verbose off
+
+  pInstall "${sPath}" "net.sourceforge.mxupdate.install.Insert"
+  pInstall "${sPath}" "net.sourceforge.mxupdate.util.MqlUtil"
+
+  mql exec prog "net.sourceforge.mxupdate.install.Insert" "${sPath}" "${VERSION}"
 
   mql verbose on
   mql compile prog net.sourceforge.mxupdate.*,MxUpdate

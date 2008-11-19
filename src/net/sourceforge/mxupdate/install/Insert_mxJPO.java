@@ -35,10 +35,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import matrix.db.Context;
-import matrix.db.MQLCommand;
 import matrix.util.MatrixException;
 
+import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
+import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.isEscapeOn;
+import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.setEscapeOff;
+import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.setEscapeOn;
+
 /**
+ * The JPO is used to install the Mx Update JPO file package. Because the Mx
+ * update JPO classes are using imports and Matrix could not handle imports of
+ * JPO classes, the complete MQL insert is rewritten.
+ *
  * @author tmoxter
  * @version $Id$
  */
@@ -124,24 +132,36 @@ public class Insert_mxJPO
     private static final String VALUE_APPLICATION = "MxUpdate";
 
     /**
+     * Regular expression for the package line. The package must be removed
+     * from the JPO because Matrix does internally handle all JPOs within the
+     * default package.
      *
+     * @see ClassFile#getCode(Map)
      */
     private static final Pattern PATTERN_PACKAGE = Pattern.compile("^package [A-Za-z0-9\\.]*;$");
 
     /**
      *
+     *
+     * @see ClassFile#getCode(Map)
      */
     private static final Pattern PATTERN_IMPORT = Pattern.compile("(?<=^import[\\ \\t]?)[A-Za-z0-9\\.]*_"+"mxJPO(?=[\\ \\t]?;[\\ \\t]?$)");
 
     /**
+     * Regular expression for a JPO name without a package (but in the front a
+     * package is defined). The expression is used to extract the JPO class
+     * name from the import definition.
      *
+     * @see ClassFile#getCode(Map)
      */
-    private static final Pattern classWithoutPckPat = Pattern.compile("(?<=\\.)[A-Za-z0-9]*_"+"mxJPO");
+    private static final Pattern PATTERN_JPOWITHOUTPCK = Pattern.compile("(?<=\\.)[A-Za-z0-9]*_"+"mxJPO");
 
     /**
      *
+     *
+     * @see ClassFile#getCode(Map)
      */
-    private static final Pattern pattern = Pattern.compile("((?<=[ \\(\\)\\t\\r\\n@\\<])|(^))[A-Za-z0-9\\.]*\\_"+"mxJPO");
+    private static final Pattern PATTERN_JPO = Pattern.compile("((?<=[ \\(\\)\\t\\r\\n@\\<])|(^))[A-Za-z0-9\\.]*\\_"+"mxJPO");
 
     /**
      * MQL command line to list the installed MxUpdate JPOs and the depending
@@ -202,48 +222,39 @@ System.out.println("delete jpo '" + progName + "'");
         }
 
         // create new / update JPOs
-        for (final Map.Entry<String,Map<String,ClassFile>> newPckFilesEntry : mapPckFiles.entrySet())  {
-            // evaluate JPOs from current package
-            final Map<String,String> class2Pck = new HashMap<String,String>();
-            for (final ClassFile classFile : newPckFilesEntry.getValue().values())  {
-                class2Pck.put(classFile.className, classFile.jpoName);
-            }
-            // install all JPOs from current package
-            for (final ClassFile classFile : newPckFilesEntry.getValue().values())  {
-                if (!installedProgs.containsKey(classFile.jpoName))  {
+        final boolean isMqlEscapeOn = isEscapeOn(_context);
+        try  {
+            setEscapeOn(_context);
+
+            for (final Map.Entry<String,Map<String,ClassFile>> newPckFilesEntry : mapPckFiles.entrySet())  {
+                // evaluate JPOs from current package
+                final Map<String,String> class2Pck = new HashMap<String,String>();
+                for (final ClassFile classFile : newPckFilesEntry.getValue().values())  {
+                    class2Pck.put(classFile.className, classFile.jpoName);
+                }
+                // install all JPOs from current package
+                for (final ClassFile classFile : newPckFilesEntry.getValue().values())  {
+                    if (!installedProgs.containsKey(classFile.jpoName))  {
 System.out.println("install jpo '" + classFile.jpoName + "'");
-                    classFile.create(_context, class2Pck, version);
-                } else  {
-                    final Date mxDate = installedProgs.get(classFile.jpoName);
-                    if ((mxDate == null) || !mxDate.equals(classFile.getLastModified()))  {
+                        classFile.create(_context, class2Pck, version);
+                    } else  {
+                        final Date mxDate = installedProgs.get(classFile.jpoName);
+                        if ((mxDate == null) || !mxDate.equals(classFile.getLastModified()))  {
 System.out.println("update jpo '" + classFile.jpoName + "'");
-                        classFile.update(_context, class2Pck, version);
+                            classFile.update(_context, class2Pck, version);
+                        }
                     }
                 }
             }
         }
+        finally
+        {
+            if (!isMqlEscapeOn)  {
+                setEscapeOff(_context);
+            }
+        }
     }
 
-    /**
-     * Executes given MQL command and returns the trimmed result of the MQL
-     * execution.
-     *
-     * @param _context  context for this request
-     * @param _cmd      MQL command to execute
-     * @return trimmed result of the MQL execution
-     * @throws MatrixException if MQL execution fails
-     */
-    protected String execMql(final Context _context,
-                             final CharSequence _cmd)
-            throws MatrixException
-    {
-        final MQLCommand mql = new MQLCommand();
-        mql.executeCommand(_context, _cmd.toString());
-        if ((mql.getError() != null) && !"".equals(mql.getError()))  {
-            throw new MatrixException(mql.getError() + "\nMQL command was:\n" + _cmd);
-        }
-        return mql.getResult().trim();
-    }
 
 
     /**
@@ -417,19 +428,19 @@ System.out.println("update jpo '" + classFile.jpoName + "'");
             try  {
                 String line = reader.readLine();
                 while (line != null)  {
-                    final Matcher pckMatch = PATTERN_PACKAGE.matcher(line);
+                    final Matcher pckMatch = Insert_mxJPO.PATTERN_PACKAGE.matcher(line);
                     if (pckMatch.find())  {
                         code.append('\n');
                     } else  {
-                        final Matcher impMatch = PATTERN_IMPORT.matcher(line);
+                        final Matcher impMatch = Insert_mxJPO.PATTERN_IMPORT.matcher(line);
                         if (impMatch.find())  {
                             final String impClass= impMatch.group();
                             // extract class name from imported name
-                            final Matcher classWithoutPckMatch = classWithoutPckPat.matcher(impClass);
+                            final Matcher classWithoutPckMatch = Insert_mxJPO.PATTERN_JPOWITHOUTPCK.matcher(impClass);
                             classWithoutPckMatch.find();
                             class2Pck.put(classWithoutPckMatch.group(), impClass.substring(0, impClass.length() - 6));
                         } else  {
-                            final Matcher matcher = pattern.matcher(line);
+                            final Matcher matcher = Insert_mxJPO.PATTERN_JPO.matcher(line);
                             int start = 0;
                             final StringBuilder newLine = new StringBuilder();
                             while (matcher.find())  {
