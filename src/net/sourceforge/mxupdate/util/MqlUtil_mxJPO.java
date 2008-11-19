@@ -28,6 +28,7 @@ import matrix.util.MatrixException;
  * The JPO class holds utilities for easy MQL access.
  *
  * @author tmoxter
+ * @version $Id$
  */
 public final class MqlUtil_mxJPO
 {
