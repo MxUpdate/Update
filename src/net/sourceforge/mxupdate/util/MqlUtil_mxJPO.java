@@ -95,6 +95,6 @@ public final class MqlUtil_mxJPO
     public static void setEscapeOff(final Context _context)
             throws MatrixException
     {
-        execMql(_context, "set escape on");
+        execMql(_context, "set escape off");
     }
 }
