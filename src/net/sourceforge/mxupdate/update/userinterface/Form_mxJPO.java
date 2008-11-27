@@ -30,7 +30,7 @@ import matrix.db.Context;
 import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  *
@@ -122,7 +122,7 @@ public class Form_mxJPO
     {
         _out.append("\n\norderFields \"${NAME}\" [list \\\n");
         for (final TableColumn_mxJPO field : this.fields)  {
-            _out.append("    \"").append(convert(field.name)).append("\" \\\n");
+            _out.append("    \"").append(convertTcl(field.name)).append("\" \\\n");
         }
         _out.append("]");
     }

@@ -39,7 +39,7 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  * @author tmoxter
@@ -360,7 +360,7 @@ System.out.println("    - update to version '" + modified + "'");
         // define all TCL variables
         for (final Map.Entry<String, String> entry : _tclVariables.entrySet())  {
             cmd.append("set ").append(entry.getKey())
-               .append(" \"").append(convert(entry.getValue())).append("\"\n");
+               .append(" \"").append(convertTcl(entry.getValue())).append("\"\n");
         }
         // append TCL code, end of TCL mode and post MQL statements
         cmd.append(_tclCode)

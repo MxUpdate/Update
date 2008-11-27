@@ -31,7 +31,7 @@ import matrix.util.MatrixException;
 
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  *
@@ -143,12 +143,12 @@ public class Channel_mxJPO
     protected void writeObject(final Writer _out)
             throws IOException
     {
-        _out.append(" \\\n    label \"").append(convert(this.label)).append("\"");
+        _out.append(" \\\n    label \"").append(convertTcl(this.label)).append("\"");
         if (this.href != null)  {
-            _out.append(" \\\n    href \"").append(convert(this.href)).append("\"");
+            _out.append(" \\\n    href \"").append(convertTcl(this.href)).append("\"");
         }
         if (this.alt != null)  {
-            _out.append(" \\\n    alt \"").append(convert(this.alt)).append("\"");
+            _out.append(" \\\n    alt \"").append(convertTcl(this.alt)).append("\"");
         }
         if (this.height != null)  {
             _out.append(" \\\n    height \"").append(this.height.toString()).append("\"");
@@ -156,13 +156,13 @@ public class Channel_mxJPO
         // settings
         for (final net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
             if (prop.getName().startsWith("%"))  {
-                _out.append(" \\\n    add setting \"").append(convert(prop.getName().substring(1))).append("\"")
-                    .append(" \"").append(convert(prop.getValue())).append("\"");
+                _out.append(" \\\n    add setting \"").append(convertTcl(prop.getName().substring(1))).append("\"")
+                    .append(" \"").append(convertTcl(prop.getValue())).append("\"");
             }
         }
         // referenced commands
         for (final CommandRef cmdRef : this.orderCmds.values())  {
-            _out.append(" \\\n    place \"").append(convert(cmdRef.name)).append("\" after \"\"");
+            _out.append(" \\\n    place \"").append(convertTcl(cmdRef.name)).append("\" after \"\"");
         }
     }
 

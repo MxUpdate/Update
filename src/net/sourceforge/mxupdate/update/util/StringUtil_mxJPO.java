@@ -30,8 +30,13 @@ import java.util.Stack;
  */
 public class StringUtil_mxJPO
 {
-
-    public static String convert(final String _text)
+    /**
+     * Converts given string by escaping all special characters for TCL.
+     *
+     * @param _text string to convert
+     * @return converted string
+     */
+    public static String convertTcl(final String _text)
     {
         return (_text != null)
                ? _text.replaceAll("\\\\", "\\\\\\\\")

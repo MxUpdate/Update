@@ -28,7 +28,7 @@ import matrix.db.Context;
 
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  * Data model type class.
@@ -88,7 +88,7 @@ public class Type_mxJPO
     @Override
     protected void writeObject(Writer _out) throws IOException
     {
-        _out.append(" \\\n    derived \"").append(convert(this.derived)).append("\"")
+        _out.append(" \\\n    derived \"").append(convertTcl(this.derived)).append("\"")
             .append(" \\\n    ").append(isHidden() ? "" : "!").append("hidden")
             .append(" \\\n    abstract ").append(Boolean.toString(this.abstractFlag));
         this.writeTriggers(_out);

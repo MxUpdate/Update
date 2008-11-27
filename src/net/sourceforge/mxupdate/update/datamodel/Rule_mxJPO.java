@@ -33,7 +33,7 @@ import matrix.util.MatrixException;
 import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  *
@@ -182,7 +182,7 @@ public class Rule_mxJPO
 
         // user access
         for (final UserAccess userAccess : this.userAccessSorted)  {
-            _out.append(" \\\n    add user \"").append(convert(userAccess.userRef)).append("\" \"");
+            _out.append(" \\\n    add user \"").append(convertTcl(userAccess.userRef)).append("\" \"");
             first = true;
             for (final String access : userAccess.access)  {
                 if (!first)  {
@@ -193,7 +193,7 @@ public class Rule_mxJPO
                 _out.append(access);
             }
             _out.append("\" filter \"")
-                .append(convert(userAccess.expressionFilter))
+                .append(convertTcl(userAccess.expressionFilter))
                 .append("\"");
         }
     }

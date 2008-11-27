@@ -30,7 +30,7 @@ import matrix.db.Context;
 
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  * Data model relationship class.
@@ -200,29 +200,29 @@ public class Relationship_mxJPO
         _out.append(" \\\n    from")
             .append(" \\\n        ").append(this.fromPropagateModify ? "" : "!").append("propagatemodify")
             .append(" \\\n        ").append(this.fromPropagateConnection ? "" : "!").append("propagateconnection")
-            .append(" \\\n        meaning \"").append(convert(this.fromMeaning)).append("\"")
-            .append(" \\\n        cardinality \"").append(convert(this.fromCardinality)).append("\"")
-            .append(" \\\n        revision \"").append(convert(this.fromRevisionAction)).append("\"")
-            .append(" \\\n        clone \"").append(convert(this.fromCloneAction)).append("\"");
+            .append(" \\\n        meaning \"").append(convertTcl(this.fromMeaning)).append("\"")
+            .append(" \\\n        cardinality \"").append(convertTcl(this.fromCardinality)).append("\"")
+            .append(" \\\n        revision \"").append(convertTcl(this.fromRevisionAction)).append("\"")
+            .append(" \\\n        clone \"").append(convertTcl(this.fromCloneAction)).append("\"");
         if (this.fromTypes.isEmpty())  {
             _out.append(" \\\n        add type \"all\"");
         } else  {
             for (final String type : this.fromTypes)  {
-                _out.append(" \\\n        add type \"").append(convert(type)).append("\"");
+                _out.append(" \\\n        add type \"").append(convertTcl(type)).append("\"");
             }
         }
         _out.append(" \\\n    to")
             .append(" \\\n        ").append(this.toPropagateModify ? "" : "!").append("propagatemodify")
             .append(" \\\n        ").append(this.toPropagateConnection ? "" : "!").append("propagateconnection")
-            .append(" \\\n        meaning \"").append(convert(this.toMeaning)).append("\"")
-            .append(" \\\n        cardinality \"").append(convert(this.toCardinality)).append("\"")
-            .append(" \\\n        revision \"").append(convert(this.toRevisionAction)).append("\"")
-            .append(" \\\n        clone \"").append(convert(this.toCloneAction)).append("\"");
+            .append(" \\\n        meaning \"").append(convertTcl(this.toMeaning)).append("\"")
+            .append(" \\\n        cardinality \"").append(convertTcl(this.toCardinality)).append("\"")
+            .append(" \\\n        revision \"").append(convertTcl(this.toRevisionAction)).append("\"")
+            .append(" \\\n        clone \"").append(convertTcl(this.toCloneAction)).append("\"");
         if (this.toTypes.isEmpty())  {
             _out.append(" \\\n        add type \"all\"");
         } else  {
             for (final String type : this.toTypes)  {
-                _out.append(" \\\n        add type \"").append(convert(type)).append("\"");
+                _out.append(" \\\n        add type \"").append(convertTcl(type)).append("\"");
             }
         }
     }

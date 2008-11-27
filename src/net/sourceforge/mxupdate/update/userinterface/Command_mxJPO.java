@@ -31,7 +31,7 @@ import matrix.db.Context;
 import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  *
@@ -95,16 +95,16 @@ public class Command_mxJPO
     @Override
     protected void writeObject(Writer _out) throws IOException
     {
-        _out.append(" \\\n    label \"").append(convert(this.label)).append("\"")
-            .append(" \\\n    href \"").append(convert(this.href)).append("\"")
-            .append(" \\\n    alt \"").append(convert(this.alt)).append("\"");
+        _out.append(" \\\n    label \"").append(convertTcl(this.label)).append("\"")
+            .append(" \\\n    href \"").append(convertTcl(this.href)).append("\"")
+            .append(" \\\n    alt \"").append(convertTcl(this.alt)).append("\"");
         for (final String user : this.users)  {
-            _out.append(" \\\n    add user \"").append(convert(user)).append("\"");
+            _out.append(" \\\n    add user \"").append(convertTcl(user)).append("\"");
         }
         for (final AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
             if (prop.getName().startsWith("%"))  {
-                _out.append(" \\\n    add setting \"").append(convert(prop.getName().substring(1))).append("\"")
-                    .append(" \"").append(convert(prop.getValue())).append("\"");
+                _out.append(" \\\n    add setting \"").append(convertTcl(prop.getName().substring(1))).append("\"")
+                    .append(" \"").append(convertTcl(prop.getValue())).append("\"");
             }
         }
     }

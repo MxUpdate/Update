@@ -30,7 +30,7 @@ import matrix.util.MatrixException;
 import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
 *
@@ -85,7 +85,7 @@ public class Expression_mxJPO
             throws MatrixException
     {
         final String cmd = new StringBuilder()
-                .append("print expression \"").append(convert(getName()))
+                .append("print expression \"").append(convertTcl(getName()))
                 .append("\" select value dump")
                 .toString();
         this.expression = execMql(_context, cmd);
@@ -104,7 +104,7 @@ public class Expression_mxJPO
     {
         _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden");
         _out.append(" \\\n    value \"");
-        final String expr = convert(this.expression);
+        final String expr = convertTcl(this.expression);
         // bug-fix: expression with starting and ending ' (but without ')
         // must have a " as first and last character
         if (expr.matches("^'[^']*'$"))  {

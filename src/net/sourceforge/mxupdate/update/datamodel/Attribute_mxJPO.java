@@ -33,7 +33,7 @@ import matrix.util.MatrixException;
 
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  *
@@ -177,10 +177,10 @@ public class Attribute_mxJPO
             _out.append(" \\\n    ").append(this.multiline ? "" : "!").append("multiline");
         }
         for (final String rule : this.rules)  {
-            _out.append(" \\\n    add rule \"").append(convert(rule)).append("\"");
+            _out.append(" \\\n    add rule \"").append(convertTcl(rule)).append("\"");
         }
         if (this.defaultValue != null)  {
-            _out.append(" \\\n    default \"").append(convert(this.defaultValue)).append("\"");
+            _out.append(" \\\n    default \"").append(convertTcl(this.defaultValue)).append("\"");
         } else  {
             _out.append(" \\\n    default \"\"");
         }
@@ -351,14 +351,14 @@ public class Attribute_mxJPO
             } else  {
                 _out.append(this.type);
             }
-            _out.append(" \"").append(convert(this.value1)).append("\"");
+            _out.append(" \"").append(convertTcl(this.value1)).append("\"");
             if ("between".equals(this.type))  {
                 if (this.include1)  {
                     _out.append(" inclusive");
                 } else  {
                     _out.append(" exclusive");
                 }
-                _out.append(" \"").append(convert(this.value2)).append("\"");
+                _out.append(" \"").append(convertTcl(this.value2)).append("\"");
                 if (this.include2)  {
                     _out.append(" inclusive");
                 } else  {

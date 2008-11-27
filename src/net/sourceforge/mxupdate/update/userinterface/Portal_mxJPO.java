@@ -32,7 +32,7 @@ import matrix.util.MatrixException;
 import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  * The class parses the information about the portal and writes the script used
@@ -152,18 +152,18 @@ public class Portal_mxJPO
     protected void writeObject(final Writer _out)
             throws IOException
     {
-        _out.append(" \\\n    label \"").append(convert(this.label)).append("\"");
+        _out.append(" \\\n    label \"").append(convertTcl(this.label)).append("\"");
         if (this.href != null)  {
-            _out.append(" \\\n    href \"").append(convert(this.href)).append("\"");
+            _out.append(" \\\n    href \"").append(convertTcl(this.href)).append("\"");
         }
         if (this.alt != null)  {
-            _out.append(" \\\n    alt \"").append(convert(this.alt)).append("\"");
+            _out.append(" \\\n    alt \"").append(convertTcl(this.alt)).append("\"");
         }
         // settings
         for (final AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
             if (prop.getName().startsWith("%"))  {
-                _out.append(" \\\n    add setting \"").append(convert(prop.getName().substring(1))).append("\"")
-                    .append(" \"").append(convert(prop.getValue())).append("\"");
+                _out.append(" \\\n    add setting \"").append(convertTcl(prop.getName().substring(1))).append("\"")
+                    .append(" \"").append(convertTcl(prop.getValue())).append("\"");
             }
         }
         // channel references
@@ -171,7 +171,7 @@ public class Portal_mxJPO
         for (final Map<Integer,ChannelRef> channelRefs : this.orderedChannelRefs.values())  {
             boolean firstCol = true;
             for (final ChannelRef channelRef : channelRefs.values())  {
-                _out.append(" \\\n    place \"").append(convert(channelRef.name)).append("\"");
+                _out.append(" \\\n    place \"").append(convertTcl(channelRef.name)).append("\"");
                 if (!firstRow && firstCol)  {
                     _out.append(" newrow");
                 }

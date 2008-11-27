@@ -32,7 +32,7 @@ import matrix.db.Context;
 import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  *
@@ -96,13 +96,13 @@ public class Inquiry_mxJPO
     @Override
     protected void writeObject(Writer _out) throws IOException
     {
-        _out.append(" \\\n    pattern \"").append(convert(this.pattern)).append("\"")
-            .append(" \\\n    format \"").append(convert(this.format)).append("\"")
+        _out.append(" \\\n    pattern \"").append(convertTcl(this.pattern)).append("\"")
+            .append(" \\\n    format \"").append(convertTcl(this.format)).append("\"")
             .append(" \\\n    file \"${FILE}\"");
         for (final AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
             if (prop.getName().startsWith("%"))  {
-                _out.append(" \\\n    add argument \"").append(convert(prop.getName().substring(1))).append("\"")
-                    .append(" \"").append(convert(prop.getValue())).append("\"");
+                _out.append(" \\\n    add argument \"").append(convertTcl(prop.getName().substring(1))).append("\"")
+                    .append(" \"").append(convertTcl(prop.getValue())).append("\"");
             }
         }
    }

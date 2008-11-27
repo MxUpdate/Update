@@ -26,7 +26,7 @@ import java.io.Writer;
 import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  *
@@ -120,11 +120,11 @@ public class Format_mxJPO
             throws IOException
     {
         _out.append(" \\\n    ").append(isHidden() ? "hidden" : "nothidden")
-            .append(" \\\n    version \"").append((this.version != null) ? convert(this.version) : "").append('\"')
-            .append(" \\\n    suffix \"").append((this.fileSuffix != null) ? convert(this.fileSuffix) : "").append('\"')
-            .append(" \\\n    mime \"").append((this.fileType != null) ? convert(this.fileType) : "").append('\"')
-            .append(" \\\n    view \"").append((this.commandView != null) ? convert(this.commandView) : "").append('\"')
-            .append(" \\\n    edit \"").append((this.commandEdit != null) ? convert(this.commandEdit) : "").append('\"')
-            .append(" \\\n    print \"").append((this.commandPrint != null) ? convert(this.commandPrint) : "").append('\"');
+            .append(" \\\n    version \"").append((this.version != null) ? convertTcl(this.version) : "").append('\"')
+            .append(" \\\n    suffix \"").append((this.fileSuffix != null) ? convertTcl(this.fileSuffix) : "").append('\"')
+            .append(" \\\n    mime \"").append((this.fileType != null) ? convertTcl(this.fileType) : "").append('\"')
+            .append(" \\\n    view \"").append((this.commandView != null) ? convertTcl(this.commandView) : "").append('\"')
+            .append(" \\\n    edit \"").append((this.commandEdit != null) ? convertTcl(this.commandEdit) : "").append('\"')
+            .append(" \\\n    print \"").append((this.commandPrint != null) ? convertTcl(this.commandPrint) : "").append('\"');
     }
 }

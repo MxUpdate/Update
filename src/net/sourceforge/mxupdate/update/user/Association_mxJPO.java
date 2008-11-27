@@ -29,7 +29,7 @@ import matrix.db.Context;
 import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  *
@@ -84,7 +84,7 @@ public class Association_mxJPO
             throws IOException
     {
         _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden")
-            .append(" \\\n    definition \"").append(convert(this.definition)).append("\"");
+            .append(" \\\n    definition \"").append(convertTcl(this.definition)).append("\"");
     }
 
     /**

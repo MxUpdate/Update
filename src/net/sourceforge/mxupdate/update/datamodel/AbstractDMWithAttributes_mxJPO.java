@@ -34,7 +34,7 @@ import matrix.db.JPO;
 
 import net.sourceforge.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  * The class is used to handle the export / import of administration objects
@@ -116,7 +116,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
         _out.append("\n\ntestAttributes -").append(getInfoAnno().adminType())
             .append(" \"${NAME}\" -attributes [list \\\n");
         for (final String attr : this.attributes)  {
-            _out.append("    \"").append(convert(attr)).append("\" \\\n");
+            _out.append("    \"").append(convertTcl(attr)).append("\" \\\n");
         }
         _out.append("]");
     }

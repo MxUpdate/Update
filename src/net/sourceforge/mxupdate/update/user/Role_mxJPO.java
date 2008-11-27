@@ -31,7 +31,7 @@ import matrix.db.Context;
 import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  *
@@ -90,7 +90,7 @@ public class Role_mxJPO
         _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden");
         for (final String role : this.parentRoles)  {
             _out.append("\nmql mod role \"")
-                .append(convert(role))
+                .append(convertTcl(role))
                 .append("\" child \"${NAME}\"");
         }
     }

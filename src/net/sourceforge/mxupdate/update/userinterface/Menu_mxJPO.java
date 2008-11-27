@@ -31,7 +31,7 @@ import matrix.util.MatrixException;
 
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  *
@@ -118,7 +118,7 @@ public class Menu_mxJPO
         // output childs
         for (final MenuChild child : tmpChilds.values())  {
             _out.append(" \\\n    add ").append(child.type).append(" \"")
-                .append(convert(child.name)).append("\"");
+                .append(convertTcl(child.name)).append("\"");
         }
 
         if (this.treeMenu)  {

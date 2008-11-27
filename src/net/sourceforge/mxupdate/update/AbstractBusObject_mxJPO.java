@@ -37,7 +37,7 @@ import matrix.db.Query;
 import matrix.util.MatrixException;
 import matrix.util.StringList;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
 
 /**
@@ -289,10 +289,10 @@ public abstract class AbstractBusObject_mxJPO
     {
         writeHeader(_out);
         _out.append("mql mod bus \"${OBJECTID}\"")
-            .append(" \\\n    description \"").append(convert(this.busDescription)).append("\"");
+            .append(" \\\n    description \"").append(convertTcl(this.busDescription)).append("\"");
         for (final Attribute attr : this.attrValuesSorted)  {
-          _out.append(" \\\n    \"").append(convert(attr.name))
-              .append("\" \"").append(convert(attr.value)).append("\"");
+          _out.append(" \\\n    \"").append(convertTcl(attr.name))
+              .append("\" \"").append(convertTcl(attr.value)).append("\"");
         }
     }
 

@@ -26,7 +26,7 @@ import java.io.Writer;
 import net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  * @author tmoxter
@@ -62,14 +62,14 @@ public class NumberGenerator_mxJPO
     {
         writeHeader(_out);
         _out.append("mql mod bus \"${OBJECTID}\"")
-            .append(" \\\n    description \"").append(convert(getDescription())).append("\"");
+            .append(" \\\n    description \"").append(convertTcl(getDescription())).append("\"");
         String nextNumber = null;
         for (final Attribute attr : getAttrValuesSorted())  {
             if (ATTRIBUTE_ESERVICE_NEXT_NUMBER.equals(attr.name))  {
                 nextNumber = attr.value;
             } else  {
-                _out.append(" \\\n    \"").append(convert(attr.name))
-                    .append("\" \"").append(convert(attr.value)).append("\"");
+                _out.append(" \\\n    \"").append(convertTcl(attr.name))
+                    .append("\" \"").append(convertTcl(attr.value)).append("\"");
             }
         }
         _out.append("\n")

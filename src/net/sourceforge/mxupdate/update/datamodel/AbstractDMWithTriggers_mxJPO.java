@@ -34,7 +34,7 @@ import matrix.util.MatrixException;
 
 import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  * Abstract class for all data model administration objects with triggers.
@@ -252,8 +252,8 @@ public abstract class AbstractDMWithTriggers_mxJPO
             matchKind.find();
             final String kind = matchKind.group();
             _out.append(" \\\n    add trigger ").append(eventType.toLowerCase()).append(' ').append(kind.toLowerCase())
-                .append(" \"").append(convert(this.program)).append("\"")
-                .append(" input \"").append(convert(this.arguments)).append("\"");
+                .append(" \"").append(convertTcl(this.program)).append("\"")
+                .append(" input \"").append(convertTcl(this.arguments)).append("\"");
         }
 
         /**

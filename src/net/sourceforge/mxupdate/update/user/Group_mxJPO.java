@@ -31,7 +31,7 @@ import matrix.db.Context;
 import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  *
@@ -90,7 +90,7 @@ public class Group_mxJPO
         _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden");
         for (final String group : this.parentGroups)  {
             _out.append("\nmql mod group \"")
-                .append(convert(group))
+                .append(convertTcl(group))
                 .append("\" child \"${NAME}\"");
         }
     }

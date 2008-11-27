@@ -36,7 +36,7 @@ import java.util.TreeSet;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
 
 /**
@@ -175,7 +175,7 @@ public abstract class AbstractAdminObject_mxJPO
             if (!"".equals(getInfoAnno().adminTypeSuffix()))  {
                 _out.append(" ").append(getInfoAnno().adminTypeSuffix());
             }
-            _out.append(" \\\n    description \"").append(convert(getDescription())).append("\"");
+            _out.append(" \\\n    description \"").append(convertTcl(getDescription())).append("\"");
             writeObject(_out);
             writeProperties(_out);
             writeEnd(_out);
@@ -193,7 +193,7 @@ public abstract class AbstractAdminObject_mxJPO
     {
         for (final Property prop : this.propertiesMap.values())  {
             if (!IGNORED_PROPERTIES.contains(prop.name) && !prop.name.startsWith("%"))  {
-                _out.append("\nmql add property \"").append(convert(prop.name)).append("\"")
+                _out.append("\nmql add property \"").append(convertTcl(prop.name)).append("\"")
                     .append(" \\\n    on ")
                     .append(getInfoAnno().adminType())
                     .append(" \"${NAME}\"");
@@ -202,10 +202,10 @@ public abstract class AbstractAdminObject_mxJPO
                 }
                 if ((prop.refAdminName) != null && (prop.refAdminType != null))  {
                     _out.append("  \\\n    to ").append(prop.refAdminType)
-                        .append(" \"").append(convert(prop.refAdminName)).append("\"");
+                        .append(" \"").append(convertTcl(prop.refAdminName)).append("\"");
                 }
                 if (prop.value != null)  {
-                    _out.append("  \\\n    value \"").append(convert(prop.value)).append("\"");
+                    _out.append("  \\\n    value \"").append(convertTcl(prop.value)).append("\"");
                 }
             }
         }

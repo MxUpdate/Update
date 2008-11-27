@@ -41,7 +41,7 @@ import net.sourceforge.mxupdate.update.datamodel.policy.PolicyDefParser_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 import net.sourceforge.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertMql;
 import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.isEscapeOn;
 import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.setEscapeOff;
@@ -304,7 +304,7 @@ public class Policy_mxJPO
         if (!"".equals(suffix))  {
             _out.append(" ").append(suffix);
         }
-        _out.append("\n  description \"").append(convert(getDescription())).append("\"");
+        _out.append("\n  description \"").append(convertTcl(getDescription())).append("\"");
         // types
         boolean first = true;
         _out.append("\n  type {");
@@ -314,7 +314,7 @@ public class Policy_mxJPO
             } else  {
                 _out.append(',');
             }
-            _out.append('\"').append(convert(type)).append('\"');
+            _out.append('\"').append(convertTcl(type)).append('\"');
         }
         _out.append("}");
         // formats
@@ -329,13 +329,13 @@ public class Policy_mxJPO
                 } else  {
                     _out.append(' ');
                 }
-                _out.append('\"').append(convert(format)).append('\"');
+                _out.append('\"').append(convertTcl(format)).append('\"');
             }
             _out.append("}");
         }
-        _out.append("\n  defaultformat \"").append(convert(this.defaultFormat)).append('\"')
-            .append("\n  sequence \"").append(convert(this.sequence)).append('\"')
-            .append("\n  store \"").append(convert(this.store)).append('\"')
+        _out.append("\n  defaultformat \"").append(convertTcl(this.defaultFormat)).append('\"')
+            .append("\n  sequence \"").append(convertTcl(this.sequence)).append('\"')
+            .append("\n  store \"").append(convertTcl(this.store)).append('\"')
             .append("\n  hidden \"").append(Boolean.toString(isHidden())).append("\"");
         // all states
         for (final State state : this.states)  {
@@ -694,10 +694,10 @@ throw new Exception("some states are not defined anymore!");
                 throws IOException
         {
             // basics
-            _out.append("\n  state \"").append(convert(this.name)).append("\"  {")
+            _out.append("\n  state \"").append(convertTcl(this.name)).append("\"  {")
                 .append("\n    registeredName \"").append((this.nameSymbolic != null)
-                                                          ? convert(this.nameSymbolic)
-                                                          : "state_" + convert(this.name.replaceAll(" ", "_"))).append('\"')
+                                                          ? convertTcl(this.nameSymbolic)
+                                                          : "state_" + convertTcl(this.name.replaceAll(" ", "_"))).append('\"')
                 .append("\n    revision \"").append(Boolean.toString(this.revisionable)).append('\"')
                 .append("\n    version \"").append(Boolean.toString(this.versionable)).append('\"')
                 .append("\n    promote \"").append(Boolean.toString(this.autoPromotion)).append('\"')
@@ -712,9 +712,9 @@ throw new Exception("some states are not defined anymore!");
                     } else  {
                         _out.append(' ');
                     }
-                    _out.append('\"').append(convert(user)).append('\"');
+                    _out.append('\"').append(convertTcl(user)).append('\"');
                 }
-                _out.append("} \"").append(convert(this.routeMessage)).append('\"');
+                _out.append("} \"").append(convertTcl(this.routeMessage)).append('\"');
             }
             // owner access
             _out.append("\n    owner {");
@@ -726,32 +726,32 @@ throw new Exception("some states are not defined anymore!");
             _out.append("}");
             // user access
             for (final UserAccess userAccess : this.userAccessSorted)  {
-                _out.append("\n    user \"").append(convert(userAccess.userRef)).append("\" {");
+                _out.append("\n    user \"").append(convertTcl(userAccess.userRef)).append("\" {");
                 this.appendAccess(_out, ' ', userAccess.access);
                 _out.append('}');
                 if (userAccess.expressionFilter != null)  {
                     _out.append(" filter \"")
-                        .append(convert(userAccess.expressionFilter))
+                        .append(convertTcl(userAccess.expressionFilter))
                         .append("\"");
                 }
             }
-            _out.append("\n    action \"").append(convert(this.actionProgram)).append("\" input \"").append(convert(this.actionInput)).append('\"')
-                .append("\n    check \"").append(convert(this.checkProgram)).append("\" input \"").append(convert(this.checkInput)).append('\"');
+            _out.append("\n    action \"").append(convertTcl(this.actionProgram)).append("\" input \"").append(convertTcl(this.actionInput)).append('\"')
+                .append("\n    check \"").append(convertTcl(this.checkProgram)).append("\" input \"").append(convertTcl(this.checkInput)).append('\"');
             // output of triggers, but sorted!
             for (final Trigger trigger : this.triggers.values())  {
                 _out.append("\n    trigger ").append(trigger.getEventType()).append(' ').append(trigger.getKind())
-                    .append(" \"").append(convert(trigger.program)).append("\"")
-                    .append(" input \"").append(convert(trigger.arguments)).append("\"");
+                    .append(" \"").append(convertTcl(trigger.program)).append("\"")
+                    .append(" input \"").append(convertTcl(trigger.arguments)).append("\"");
             }
             // signatures
             for (final Signature signature : this.signatures)  {
-                _out.append("\n    signature \"").append(convert(signature.name)).append("\" {")
-                    .append("\n      branch \"").append(convert(signature.branch)).append("\"")
+                _out.append("\n    signature \"").append(convertTcl(signature.name)).append("\" {")
+                    .append("\n      branch \"").append(convertTcl(signature.branch)).append("\"")
 // TODO: approve, ignore, reject users
                     .append("\n      approve {}")
                     .append("\n      ignore {}")
                     .append("\n      reject {}")
-                    .append("\n      filter \"").append(convert(signature.filter)).append("\"")
+                    .append("\n      filter \"").append(convertTcl(signature.filter)).append("\"")
                     .append("\n    }");
 
             }

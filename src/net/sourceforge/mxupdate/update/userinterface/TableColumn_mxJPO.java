@@ -28,7 +28,7 @@ import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  *
@@ -95,20 +95,20 @@ class TableColumn_mxJPO
     void write(final Writer _out)
             throws IOException
     {
-        _out.append(" \\\n        name \"").append(convert(this.name)).append("\"")
-            .append(" \\\n        label \"").append((this.label != null) ? convert(this.label) : "").append("\"");
+        _out.append(" \\\n        name \"").append(convertTcl(this.name)).append("\"")
+            .append(" \\\n        label \"").append((this.label != null) ? convertTcl(this.label) : "").append("\"");
         if (isBusinessObject && (this.expression != null))  {
-            _out.append(" \\\n        businessobject \"").append(convert(this.expression)).append("\"");
+            _out.append(" \\\n        businessobject \"").append(convertTcl(this.expression)).append("\"");
         }
         if (isRelationship && (this.expression != null))  {
-            _out.append(" \\\n        relationship \"").append(convert(this.expression)).append("\"");
+            _out.append(" \\\n        relationship \"").append(convertTcl(this.expression)).append("\"");
         }
 
-        _out.append(" \\\n        range \"").append((this.rangeHref != null) ? convert(this.rangeHref) : "").append("\"")
-            .append(" \\\n        href \"").append((this.href != null) ? convert(this.href) : "").append("\"")
-            .append(" \\\n        alt \"").append((this.alt != null) ? convert(this.alt) : "").append("\"");
+        _out.append(" \\\n        range \"").append((this.rangeHref != null) ? convertTcl(this.rangeHref) : "").append("\"")
+            .append(" \\\n        href \"").append((this.href != null) ? convertTcl(this.href) : "").append("\"")
+            .append(" \\\n        alt \"").append((this.alt != null) ? convertTcl(this.alt) : "").append("\"");
         for (final String user : this.users)  {
-            _out.append(" \\\n        user \"").append(convert(user)).append("\"");
+            _out.append(" \\\n        user \"").append(convertTcl(user)).append("\"");
         }
         if ("3".equals(this.sortType))  {
             _out.append(" \\\n        sorttype other");
@@ -122,7 +122,7 @@ class TableColumn_mxJPO
             final String value = (setting.getValue() == null)
                                  ? ""
                                  : setting.getValue();
-            _out.append(" \\\n        setting \"").append(convert(setting.getKey())).append("\" \"").append(convert(value)).append("\"");
+            _out.append(" \\\n        setting \"").append(convertTcl(setting.getKey())).append("\" \"").append(convertTcl(value)).append("\"");
         }
     }
 
