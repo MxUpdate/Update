@@ -430,7 +430,7 @@ System.out.println("update jpo '" + classFile.jpoName + "'");
                 while (line != null)  {
                     final Matcher pckMatch = Insert_mxJPO.PATTERN_PACKAGE.matcher(line);
                     if (pckMatch.find())  {
-                        code.append('\n');
+                        code.append("\n\n");
                     } else  {
                         final Matcher impMatch = Insert_mxJPO.PATTERN_IMPORT.matcher(line);
                         if (impMatch.find())  {
