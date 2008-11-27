@@ -21,37 +21,71 @@
 package net.sourceforge.mxupdate.update.datamodel;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringReader;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
 
 import matrix.db.Context;
+import matrix.db.JPO;
 import matrix.util.MatrixException;
 
+import net.sourceforge.mxupdate.update.datamodel.policy.PolicyDefParser_mxJPO;
+import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface;
+
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convert;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertMql;
+import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.isEscapeOn;
+import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.setEscapeOff;
+import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.setEscapeOn;
 
 /**
  * @author tmoxter
  * @version $Id$
  */
-@net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO(adminType = "policy",
-                                                     title = "POLICY",
-                                                     filePrefix = "POLICY_",
-                                                     fileSuffix = ".tcl",
-                                                     filePath = "datamodel/policy",
-                                                     description = "policy")
+@InfoAnno_mxJPO(adminType = "policy",
+                title = "POLICY",
+                filePrefix = "POLICY_",
+                fileSuffix = ".tcl",
+                filePath = "datamodel/policy",
+                description = "policy")
 public class Policy_mxJPO
-        extends net.sourceforge.mxupdate.update.datamodel.AbstractDMWithTriggers_mxJPO
+        extends AbstractDMWithTriggers_mxJPO
+        implements JPOCallerInterface
 {
     /**
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = 8645304838663417963L;
+
+    /**
+     * Called TCL procedure within the TCL update to parse the new policy
+     * definition. The TCL procedure calls method
+     * {@link #jpoCallExecute(Context, String...)} with the new policy
+     * definition. All quot's are replaced by <code>@0@0@</code> and all
+     * apostroph's are replaced by <code>@1@1@</code>.
+     *
+     * @see #update(Context, CharSequence, CharSequence, Map)
+     * @see #jpoCallExecute(Context, String...)
+     */
+    private final static String TCL_PROCEDURE
+            = "proc updatePolicy {_sPolicy _lsArgs}  {\n"
+                + "global JPO_CALLER_INSTANCE\n"
+                + "regsub -all {'} $_lsArgs {@0@0@} sArg\n"
+                + "regsub -all {\\\"} $sArg {@1@1@} sArg\n"
+                + "regsub -all {\\\\\\[} $sArg {[} sArg\n"
+                + "regsub -all {\\\\\\]} $sArg {]} sArg\n"
+                + "mql exec prog net.sourceforge.mxupdate.update.util.JPOCaller $JPO_CALLER_INSTANCE $_sPolicy \"${sArg}\"\n"
+            + "}\n";
+
 
     /**
      * Default format of this policy.
@@ -324,10 +358,208 @@ public class Policy_mxJPO
     }
 
     /**
+     * The method overwrites the original method to append the MQL statements
+     * in the <code>_preMQLCode</code> to reset this policy:
+     * <ul>
+     * <li>reset description</li>
+     * <li>remove hidden and prevent duplicate flag</li>
+     * <li>reset from and to information</li>
+     * <li>remove all from and to types</li>
+     * </ul>
+     *      * Adds the TCL procedure {@link #TCL_PROCEDURE} so that attributes could
+     * be assigned to this administration object. The instance itself
+     * is stored as encoded string in the TCL variable
+     * <code>JPO_CALLER_INSTANCE</code>.
+     *
+     * @param _context          context for this request
+     * @param _preMQLCode       MQL statements which must be called before the
+     *                          TCL code is executed
+     * @param _postMQLCode      MQL statements which must be called after the
+     *                          TCL code is executed
+     * @param _tclCode          TCL code from the file used to update
+     * @param _tclVariables     map of all TCL variables where the key is the
+     *                          name and the value is value of the TCL variable
+     *                          (the value is automatically converted to TCL
+     *                          syntax!)
+     */
+    @Override
+    protected void update(final Context _context,
+                          final CharSequence _preMQLCode,
+                          final CharSequence _postMQLCode,
+                          final CharSequence _tclCode,
+                          final Map<String,String> _tclVariables)
+            throws Exception
+    {
+        // define TCL variable for this instance
+        final String[] instance = JPO.packArgs(this);
+        final Map<String,String> tclVariables = new HashMap<String,String>();
+        tclVariables.putAll(_tclVariables);
+        tclVariables.put("JPO_CALLER_INSTANCE", instance[1]);
+
+        // add TCL code for the procedure
+        final StringBuilder tclCode = new StringBuilder()
+                .append(TCL_PROCEDURE)
+                .append(_tclCode);
+
+        super.update(_context, _preMQLCode, _postMQLCode, tclCode, tclVariables);
+    }
+
+    /**
+     * The method is called within the update of an administration object. The
+     * method is called directly within the update.
+     * <ul>
+     * <li>All <code>@0@0@</code> are replaced by quot's and all
+     *     <code>@1@1@</code> are replaced by apostroph's.</li>
+     * <li>The new policy definition is parsed.</li>
+     * <li>A delta MQL script generated to update the policy to the new target
+     *     definition.</li>
+     * <li>The delta MQL script is executed.</li>
+     * </ul>
+     *
+     * @param _contex   context for this request
+     * @param _args     arguments from the TCL procedure
+     * @throws Exception if a state is not defined anymore or the policy could
+     *                   not be updated
+     * @see #TCL_PROCEDURE
+     */
+    public void jpoCallExecute(final Context _context,
+                               final String... _args)
+            throws Exception
+    {
+        final String code = _args[1].replaceAll("@0@0@", "'")
+                                    .replaceAll("@1@1@", "\\\"");
+
+        final PolicyDefParser_mxJPO parser = new PolicyDefParser_mxJPO(new StringReader(code));
+        final Policy_mxJPO policy = parser.policy();
+        policy.prepare(_context);
+
+        final StringBuilder cmd = new StringBuilder()
+                .append("mod policy \"").append(this.getName()).append("\" ");
+
+        // basic information
+        this.calcDelta(cmd, "description", policy.getDescription(), this.getDescription());
+        this.calcDelta(cmd, "type", policy.types, this.types);
+        this.calcDelta(cmd, "format", policy.formats, this.formats);
+        this.calcDelta(cmd, "defaultformat", policy.defaultFormat, this.defaultFormat);
+        this.calcDelta(cmd, "sequence", policy.sequence, this.sequence);
+        // hidden flag, because hidden flag must be set with special syntax
+        if (this.isHidden() != policy.isHidden())  {
+            if (!policy.isHidden())  {
+                cmd.append('!');
+            }
+            cmd.append("hidden ");
+        }
+        // because the store of a policy could not be removed....
+        if ((policy.store != null) && !"".equals(policy.store))  {
+            this.calcDelta(cmd, "store", policy.store, this.store);
+        }
+
+        // states....
+        final Iterator<State> curStateIter = this.states.iterator();
+        final Iterator<State> newStateIter = policy.states.iterator();
+        while (curStateIter.hasNext() && newStateIter.hasNext())  {
+            final State curState = curStateIter.next();
+            State newState = newStateIter.next();
+            while (!curState.name.equals(newState.name) && newStateIter.hasNext())  {
+                cmd.append("add state \"").append(convertMql(newState.name))
+                   .append("\" before \"").append(convertMql(curState.name)).append("\" ");
+System.out.println("    - insert new state '" + newState.name + "' before '" + curState.name + "'");
+                newState.calcDelta(cmd, null);
+                newState = newStateIter.next();
+            }
+            if (curState.name.equals(newState.name))  {
+                cmd.append("state \"").append(convertMql(newState.name)).append("\" ");
+                newState.calcDelta(cmd, curState);
+            }
+        }
+        while (newStateIter.hasNext())  {
+            final State newState = newStateIter.next();
+            cmd.append("add state \"").append(convertMql(newState.name)).append("\" ");
+            newState.calcDelta(cmd, null);
+System.out.println("    - add new state '" + newState.name + "'");
+        }
+        // check for already existing state, but not defined anymore!
+        if (curStateIter.hasNext())  {
+throw new Exception("some states are not defined anymore!");
+        }
+
+        final boolean isMqlEscapeOn = isEscapeOn(_context);
+        try  {
+            setEscapeOn(_context);
+            this.execMql(_context, cmd);
+        } finally  {
+            if (!isMqlEscapeOn)  {
+                setEscapeOff(_context);
+            }
+        }
+    }
+
+    /**
+     *
+     * @param _cmd      string build where the delta must be append
+     * @param _kind     kind of the delta
+     * @param _curVal   current value in the database
+     * @param _newVal   new target value
+     */
+    protected void calcDelta(final StringBuilder _cmd,
+                             final String _kind,
+                             final String _curVal,
+                             final String _newVal)
+    {
+        final String curVal = (_curVal == null) ? "" : _curVal;
+        final String newVal = (_newVal == null) ? "" : _newVal;
+
+        if (!curVal.equals(newVal))  {
+            _cmd.append(_kind).append(" \"").append(newVal).append("\" ");
+        }
+    }
+
+    /**
+     *
+     * @param _cmd      string build where the delta must be append
+     * @param _kind     kind of the delta
+     * @param _curVal   current value in the database
+     * @param _newVal   new target value
+     */
+    protected void calcDelta(final StringBuilder _cmd,
+                             final String _kind,
+                             final Set<String> _new,
+                             final Set<String> _current)
+    {
+        boolean equal = (_current.size() == _new.size());
+        if (equal)  {
+            for (final String format : _current)  {
+                if (!_new.contains(format))  {
+                    equal = false;
+                    break;
+                }
+            }
+        }
+        if (!equal)  {
+            for (final String format : _current)  {
+                if (!_new.contains(format))  {
+                    _cmd.append("remove ").append(_kind).append(" \"").append(format).append("\" ");
+                }
+            }
+            for (final String format : _new)  {
+                if (!_current.contains(format))  {
+                    _cmd.append("add ").append(_kind).append(" \"").append(format).append("\" ");
+                }
+            }
+        }
+    }
+
+    /**
      * Class defining states of a policy.
      */
-    private class State
+    public static class State
+            implements Serializable
     {
+        /**
+         * Defines the serialize version unique identifier.
+         */
+        private static final long serialVersionUID = -5507116248555405867L;
+
         /**
          * Name of the state.
          */
@@ -461,6 +693,7 @@ public class Policy_mxJPO
         protected void writeObject(final Writer _out)
                 throws IOException
         {
+            // basics
             _out.append("\n  state \"").append(convert(this.name)).append("\"  {")
                 .append("\n    registeredName \"").append((this.nameSymbolic != null)
                                                           ? convert(this.nameSymbolic)
@@ -470,7 +703,7 @@ public class Policy_mxJPO
                 .append("\n    promote \"").append(Boolean.toString(this.autoPromotion)).append('\"')
                 .append("\n    checkouthistory \"").append(Boolean.toString(this.checkoutHistory)).append('\"');
             // route
-            if ((this.routeMessage != null) ||!this.routeUsers.isEmpty())  {
+            if ((this.routeMessage != null) || !this.routeUsers.isEmpty())  {
                 _out.append("\n    route {");
                 boolean first = true;
                 for (final String user : this.routeUsers)  {
@@ -484,41 +717,17 @@ public class Policy_mxJPO
                 _out.append("} \"").append(convert(this.routeMessage)).append('\"');
             }
             // owner access
-            boolean first = true;
             _out.append("\n    owner {");
-            for (final String access : this.ownerAccess)  {
-                if (first)  {
-                    first = false;
-                } else  {
-                    _out.append(' ');
-                }
-                _out.append(access);
-            }
+            this.appendAccess(_out, ' ', this.ownerAccess);
+            // public access
             _out.append("}")
                 .append("\n    public {");
-            // public access
-            first = true;
-            for (final String access : this.publicAccess)  {
-                if (first)  {
-                    first = false;
-                } else  {
-                    _out.append(' ');
-                }
-                _out.append(access);
-            }
+            this.appendAccess(_out, ' ', this.publicAccess);
             _out.append("}");
             // user access
             for (final UserAccess userAccess : this.userAccessSorted)  {
                 _out.append("\n    user \"").append(convert(userAccess.userRef)).append("\" {");
-                first = true;
-                for (final String access : userAccess.access)  {
-                    if (!first)  {
-                        _out.append(' ');
-                    } else  {
-                        first = false;
-                    }
-                    _out.append(access);
-                }
+                this.appendAccess(_out, ' ', userAccess.access);
                 _out.append('}');
                 if (userAccess.expressionFilter != null)  {
                     _out.append(" filter \"")
@@ -530,15 +739,7 @@ public class Policy_mxJPO
                 .append("\n    check \"").append(convert(this.checkProgram)).append("\" input \"").append(convert(this.checkInput)).append('\"');
             // output of triggers, but sorted!
             for (final Trigger trigger : this.triggers.values())  {
-                // parse event type
-                final Matcher matchEventType = Trigger.PATTERN_EVENTTYPE.matcher(trigger.name);
-                matchEventType.find();
-                final String eventType = matchEventType.group();
-                // parse kind
-                final Matcher matchKind = Trigger.PATTERN_KIND.matcher(trigger.name);
-                matchKind.find();
-                final String kind = matchKind.group();
-                _out.append("\n    trigger ").append(eventType.toLowerCase()).append(' ').append(kind.toLowerCase())
+                _out.append("\n    trigger ").append(trigger.getEventType()).append(' ').append(trigger.getKind())
                     .append(" \"").append(convert(trigger.program)).append("\"")
                     .append(" input \"").append(convert(trigger.arguments)).append("\"");
             }
@@ -546,6 +747,7 @@ public class Policy_mxJPO
             for (final Signature signature : this.signatures)  {
                 _out.append("\n    signature \"").append(convert(signature.name)).append("\" {")
                     .append("\n      branch \"").append(convert(signature.branch)).append("\"")
+// TODO: approve, ignore, reject users
                     .append("\n      approve {}")
                     .append("\n      ignore {}")
                     .append("\n      reject {}")
@@ -555,14 +757,136 @@ public class Policy_mxJPO
             }
             _out.append("\n  }");
         }
+
+        protected void appendAccess(final Appendable _appendable,
+                                    final char _separator,
+                                    final Stack<String> _access)
+                throws IOException
+        {
+            boolean first = true;
+            for (final String access : _access)  {
+                if (!first)  {
+                    _appendable.append(_separator);
+                } else  {
+                    first = false;
+                }
+                _appendable.append(access);
+            }
+        }
+
+
+    /*
+     * where STATE_ITEM is:
+    | notify USER_NAME {,USER_NAME} message VALUE            |
+    | notify signer                 message VALUE            |
+    | route USER_NAME message VALUE                          |
+    | signature SIGN_NAME [SIGNATURE_ITEM {,SIGNATURE_ITEM}] |
+     */
+        protected void calcDelta(final StringBuilder _cmd,
+                                 final State _oldState)
+                throws IOException
+        {
+            // basics
+            _cmd.append("promote ").append(this.autoPromotion).append(' ')
+                .append("revision ").append(this.revisionable).append(' ')
+                .append("checkouthistory ").append(this.checkoutHistory).append(' ')
+                .append("version ").append(this.versionable).append(' ')
+                .append("action \"").append(convertMql(this.actionProgram)).append("\" ")
+                .append("input \"").append(convertMql(this.actionInput)).append("\" ")
+                .append("check \"").append(convertMql(this.checkProgram)).append("\" ")
+                .append("input \"").append(convertMql(this.checkInput)).append("\" ");
+// TODO: route
+            // owner access
+            _cmd.append("owner ");
+            this.appendAccess(_cmd, ',', this.ownerAccess);
+            _cmd.append(" ");
+            // public access
+            _cmd.append("public ");
+            this.appendAccess(_cmd, ',', this.publicAccess);
+            _cmd.append(" ");
+            // user access
+            final Set<String> newUsers = new HashSet<String>();
+            for (final UserAccess userAccess : this.userAccess)  {
+                newUsers.add(userAccess.userRef);
+            }
+            final Set<String> oldUser = new HashSet<String>();
+            if (_oldState != null)  {
+                for (final UserAccess userAccess : _oldState.userAccess)  {
+                    if (newUsers.contains(userAccess.userRef))  {
+                        oldUser.add(userAccess.userRef);
+                    } else  {
+                        _cmd.append("remove user \"")
+                            .append(convertMql(userAccess.userRef))
+                            .append("\" all ");
+                    }
+                }
+            }
+            for (final UserAccess userAccess : this.userAccess)  {
+                if ((_oldState != null) && !oldUser.contains(userAccess.userRef))  {
+                    _cmd.append("add ");
+                }
+                _cmd.append("user \"").append(userAccess.userRef).append("\" ");
+                this.appendAccess(_cmd, ',', userAccess.access);
+                _cmd.append(" ")
+                    .append("filter \"")
+                    .append(convertMql(userAccess.expressionFilter))
+                    .append("\" ");
+            }
+            // triggers
+            if (_oldState != null)  {
+                for (final Trigger trigger : _oldState.triggers.values())  {
+                    if (!this.triggers.containsKey(trigger.name))  {
+                        _cmd.append("remove trigger ")
+                            .append(trigger.getEventType())
+                            .append(' ')
+                            .append(trigger.getKind())
+                            .append(' ');
+                    }
+                }
+            }
+            for (final Trigger trigger : this.triggers.values())  {
+                _cmd.append("add trigger ").append(trigger.getEventType()).append(' ').append(trigger.getKind())
+                    .append(" \"").append(convertMql(trigger.program)).append("\"")
+                    .append(" input \"").append(convertMql(trigger.arguments)).append("\" ");
+            }
+            // signatures
+            final Set<String> newSigs = new HashSet<String>();
+            for (final Signature signature : this.signatures)  {
+                newSigs.add(signature.name);
+            }
+            final Set<String> oldSigs = new HashSet<String>();
+            if (_oldState != null)  {
+                for (final Signature signature : _oldState.signatures)  {
+                    if (newSigs.contains(signature.name))  {
+                        oldSigs.add(signature.name);
+                    } else  {
+                        _cmd.append("remove signature \"")
+                            .append(convertMql(signature.name))
+                            .append("\" ");
+                    }
+                }
+            }
+            for (final Signature signature : this.signatures)  {
+                if ((_oldState != null) && !oldSigs.contains(signature.name))  {
+                    _cmd.append("add ");
+                }
+                _cmd.append("signature \"").append(convertMql(signature.name)).append("\" ");
+                signature.calcDelta(_cmd);
+            }
+        }
     }
 
     /**
      * Class used to hold the user access for a state.
      */
-    private class UserAccess
-            implements Comparable<UserAccess>
+    public static class UserAccess
+            implements Comparable<UserAccess>, Serializable
     {
+        /**
+         * Defines the serialize version unique identifier.
+         */
+        private static final long serialVersionUID = -8442325362152826050L;
+
         /**
          * Holds the user references of a user access.
          */
@@ -594,8 +918,14 @@ public class Policy_mxJPO
     /**
      * Class defining a signature for a state.
      */
-    private class Signature
+    public static class Signature
+            implements Serializable
     {
+        /**
+         * Defines the serialize version unique identifier.
+         */
+        private static final long serialVersionUID = -8959837947086801473L;
+
         /**
          * Name of the signature.
          */
@@ -625,5 +955,13 @@ public class Policy_mxJPO
          * Set of users which could reject the signature.
          */
         final Set<String> rejectUsers = new TreeSet<String>();
+
+        protected void calcDelta(final StringBuilder _cmd)
+                throws IOException
+        {
+//TODO: approve, ignore, reject users
+            _cmd.append("branch \"").append(convertMql(this.branch)).append("\" ");
+            _cmd.append("filter \"").append(convertMql(this.filter)).append("\" ");
+        }
     }
 }

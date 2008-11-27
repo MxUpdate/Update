@@ -1,0 +1,479 @@
+/*
+ * Copyright 2008 The MxUpdate Team
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Revision:        $Rev$
+ * Last Changed:    $Date$
+ * Last Changed By: $Author$
+ */
+
+options {
+  JDK_VERSION = "1.5";
+  STATIC = false;
+  ERROR_REPORTING = false;
+  USER_TOKEN_MANAGER = false;
+//  USER_CHAR_STREAM = true;
+//  OPTIMIZE_TOKEN_MANAGER = true;
+}
+
+PARSER_BEGIN(PolicyDefParser_mxJPO)
+
+package net.sourceforge.mxupdate.update.datamodel.policy;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import matrix.db.Context;
+
+public class PolicyDefParser_mxJPO {
+  public static void main(String args[]) {
+    System.out.println("Reading from standard input...");
+//    new eg2(System.in);
+PolicyDefParser_mxJPO e = new PolicyDefParser_mxJPO(new java.io.StringReader(
+"  description \"Policy used for all Products\\\" within the Bosch eADM application.\"\n"
++ "  type {\"Products\"}\n"
++ "  format {a b c}\n"
++ "  defaultformat a\n"
++ "  sequence \"1,2,3,...\"\n"
++ "  store \"STORE\"\n"
++ "  hidden \"false\"\n"
++ "  state \"InWork\"  {\n"
++ "    registeredName \"state_InWork\"\n"
++ "    revision \"true\"\n"
++ "    version \"true\"\n"
++ "    promote \"true\"\n"
++ "    checkouthistory \"true\"\n"
++ "    owner {read modify promote fromconnect toconnect fromdisconnect todisconnect show}\n"
++ "    public {none}\n"
++ "    user \"Access Grantor\" {read grant revoke show}\n"
++ "    user \"RBN_ProductManager\" {create}\n"
++ "    user \"RBN_PublicChangeName\" {changename} filter \"(context.user == owner) && (id == first.id)\"\n"
++ "    user \"Shadow Agent\" {all}\n"
++ "    action \"a1\" input \"a3\"\n"
++ "    check \"c1\" input \"c3\"\n"
++ "    route {tmo tma tmoa2} \"route message\""
++ "    signature \"FinalReject\" {\n"
++ "      branch \"Canceled\"\n"
++ "      approve {a1 a2 a3}\n"
++ "      ignore {b1 b2 b3}\n"
++ "      reject {c1 c2 c3}\n"
++ "      filter \"(attribute[RBN_FinalRejectReason] != \\\"\\\")\"\n"
++ "    }\n"
++ "  }\n"
++ "  state \"InReview\"  {"
++ "    registeredName \"state_InReview\""
++ "    revision \"false\""
++ "    version \"false\""
++ "    promote \"false\""
++ "    checkouthistory \"false\""
++ "    owner {read promote demote show}"
++ "    public {none}"
++ "    user \"Access Grantor\" {read grant revoke show}"
++ "    user \"Shadow Agent\" {all}"
++ "    action \"\" input \"\""
++ "    check \"\" input \"\""
++ "    trigger promote check \"emxTriggerManager\" input \"PolicyRBN_ProductsInReviewPromoteCheck\""
++ "  }"));
+    try {
+    net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO n = e.policy();
+//      SimpleNode_mxJPO n = eg2.Start();
+//      n.dump("");
+
+        final Method method = n.getClass().getDeclaredMethod("prepare", Context.class); 
+        final boolean accessible = method.isAccessible();
+        try  {
+            method.setAccessible(true);
+            method.invoke(n, (Context) null);
+        } finally  {
+            method.setAccessible(accessible);
+        }
+      System.out.println("Thank you."+n);
+      
+    } catch (Exception ex) {
+      System.out.println("Oops.");
+      System.out.println(ex.getMessage());
+    }
+  }
+  
+
+    protected static void setValue(final Object _object,
+                                   final String _fieldName,
+                                   final String _value)
+    {
+try  {
+        final Field field = getField(_object, _fieldName);
+        final boolean accessible = field.isAccessible();
+        try  {
+            field.setAccessible(true);
+            final Class<?> type = field.getType();
+            if ("boolean".equals(type.getName()))  {
+                field.setBoolean(_object, Boolean.parseBoolean(_value));
+            } else  {
+                field.set(_object, _value);
+            }
+        } finally  {
+            field.setAccessible(accessible);
+        }
+} catch (Exception e)  {
+    e.printStackTrace();
+}
+    }
+
+    protected static void setValue(final Object _object,
+                                   final String _fieldName,
+                                   final Collection<?> _values)
+    {
+try  {
+        final Field field = getField(_object, _fieldName);
+        final boolean accessible = field.isAccessible();
+        try  {
+            field.setAccessible(true);
+            final Collection<Object> set = (Collection<Object>) field.get(_object);
+            set.addAll(_values);
+        } finally  {
+            field.setAccessible(accessible);
+        }
+} catch (Exception e)  {
+    e.printStackTrace();
+}
+    }
+
+    protected static void appendValue(final Object _object,
+                                      final String _fieldName,
+                                      final Object _value)
+    {
+try  {
+        final Field field = getField(_object, _fieldName);
+        final boolean accessible = field.isAccessible();
+        try  {
+            field.setAccessible(true);
+            final Collection<Object> collection = (Collection<Object>) field.get(_object);
+            collection.add(_value);
+        } finally  {
+            field.setAccessible(accessible);
+        }
+} catch (Exception e)  {
+    e.printStackTrace();
+}
+    }
+
+    /**
+     * Searches for given name the field within the object.
+     *
+     * @param _object       object where the field is searched
+     * @param _fieldName    name of searched field
+     * @return found field
+     */
+    protected static Field getField(final Object _object,
+                                    final String _fieldName)
+    {
+        Class<?> clazz = _object.getClass();
+        Field field = null;
+        try  {
+            field = clazz.getDeclaredField(_fieldName);
+        } catch (NoSuchFieldException e)  {
+        }
+        while ((field == null) && (clazz != null))  {
+            clazz = clazz.getSuperclass();
+            if (clazz != null)  {
+                try  {
+                    field = clazz.getDeclaredField(_fieldName);
+                } catch (NoSuchFieldException e)  {
+                }
+            }
+        }
+        return field;
+    }
+}
+PARSER_END(PolicyDefParser_mxJPO)
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+
+TOKEN : /** first level */
+{
+      <DESCRIPTION:     "description">      : S_EXPECTED
+    | <TYPE:            "type">             : L_EXPECTED
+    | <FORMAT:          "format">           : L_EXPECTED
+    | <STORE:           "store">            : S_EXPECTED
+    | <DEFAULTFORMAT:   "defaultformat">    : S_EXPECTED
+    | <SEQUENCE:        "sequence">         : S_EXPECTED
+    | <HIDDEN:          "hidden">           : S_EXPECTED
+    | <STATE:           "state">            : S_EXPECTED
+}
+
+TOKEN : /** State and depending signature and trigger Tokens */
+{
+      <REGISTEREDNAME:  "registeredName">   : S_EXPECTED
+    | <REVISION:        "revision">         : S_EXPECTED
+    | <VERSION:         "version">          : S_EXPECTED
+    | <PROMOTE:         "promote">          : S_EXPECTED
+    | <CHECKOUTHISTORY: "checkouthistory">  : S_EXPECTED
+    | <OWNER:           "owner">            : L_EXPECTED
+    | <PUBLIC:          "public">           : L_EXPECTED
+    | <USER:            "user">             : SL_EXPECTED
+    | <FILTER:          "filter">           : S_EXPECTED
+    | <ACTION:          "action">           : S_EXPECTED
+    | <CHECK:           "check">            : S_EXPECTED
+    | <OVERRIDE:        "override">         : S_EXPECTED
+    | <INPUT:           "input">            : S_EXPECTED
+    | <TRIGGER:         "trigger">          : S_EXPECTED
+    | <APPROVE:         "approve">          : L_EXPECTED
+    | <IGNORE:          "ignore">           : L_EXPECTED
+    | <REJECT:          "reject">           : L_EXPECTED
+    | <BRANCH:          "branch">           : S_EXPECTED
+    | <SIGNATURE:       "signature">        : S_EXPECTED
+    | <ROUTE:           "route">            : LS_EXPECTED
+}
+
+/************************************************************* List -> String */
+<LS_EXPECTED> SKIP:
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<LS_EXPECTED> TOKEN : /* List of Strings */
+{
+      <LS_CURLY_BRACKET_OPEN : "{">    : LS_EXPECTED
+    | <LS_CURLY_BRACKET_CLOSE : "}">   : S_EXPECTED
+    | <LS_STRING : (<LS_APOSTROPHE>(<LS_CHAR> | "\\\"" | " ")*<LS_APOSTROPHE>)> : LS_EXPECTED
+    | <LS_SINGLE_STRING : (<LS_CHAR>)+> : LS_EXPECTED
+    | <#LS_APOSTROPHE: "\"" >
+    | <#LS_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/************************************************************* String -> List */
+<SL_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r" 
+}
+
+<SL_EXPECTED> TOKEN :
+{
+      <SL_STRING : (<SL_APOSTROPHE>(<SL_CHAR> | "\\\"" | " ")*<SL_APOSTROPHE>)> : L_EXPECTED
+    | <SL_SINGLE_STRING : (<SL_CHAR>)+> : L_EXPECTED
+    | <#SL_APOSTROPHE: "\"" >
+    | <#SL_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/******************************************************************** String  */
+<S_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r" 
+}
+
+<S_EXPECTED> TOKEN :
+{
+      <S_STRING : (<S_APOSTROPHE>(<S_CHAR> | "\\\"" | " ")*<S_APOSTROPHE>)> : DEFAULT
+    | <S_SINGLE_STRING : (<S_CHAR>)+> : DEFAULT
+    | <#S_APOSTROPHE: "\"" >
+    | <#S_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/*********************************************************************** List */
+<L_EXPECTED> SKIP:
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<L_EXPECTED> TOKEN : /* List of Strings */
+{
+      <L_CURLY_BRACKET_OPEN : "{">    : L_EXPECTED
+    | <L_CURLY_BRACKET_CLOSE : "}">   : DEFAULT
+    | <L_STRING : (<L_APOSTROPHE>(<L_CHAR> | "\\\"" | " ")*<L_APOSTROPHE>)> : L_EXPECTED
+    | <L_SINGLE_STRING : (<L_CHAR>)+> : L_EXPECTED
+    | <#L_APOSTROPHE: "\"" >
+    | <#L_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO policy() : {
+    final net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO policy
+            = new net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO();
+    String tmp;
+    Set<String> set;
+} {
+    ( (<DESCRIPTION>    tmp = sString() {setValue(policy, "description", tmp);})
+    | (<TYPE>           set = lList()   {setValue(policy, "types", set);})
+    | (<FORMAT>         set = lList()   {setValue(policy, "formats", set);})
+    | (<DEFAULTFORMAT>  tmp = sString() {setValue(policy, "defaultFormat", tmp);})
+    | (<SEQUENCE>       tmp = sString() {setValue(policy, "sequence", tmp);})
+    | (<STORE>          tmp = sString() {setValue(policy, "store", tmp);})
+    | (<HIDDEN>         tmp = sString() {setValue(policy, "hidden", tmp);})
+    | (state(policy)) )*
+  { return policy; }
+}
+
+void state(final net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO _policy) : {
+    final net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO.State state
+            = new net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO.State();
+    String tmpStr;
+    Set<String> tmpSet;
+} {
+    <STATE> tmpStr = sString() {setValue(state, "name", tmpStr);}
+    "{"
+        ( (<REGISTEREDNAME>     tmpStr = sString() {setValue(state, "nameSymbolic", tmpStr);})
+        | (<REVISION>           tmpStr = sString() {setValue(state, "revisionable", tmpStr);})
+        | (<VERSION>            tmpStr = sString() {setValue(state, "versionable", tmpStr);})
+        | (<PROMOTE>            tmpStr = sString() {setValue(state, "autoPromotion", tmpStr);})
+        | (<CHECKOUTHISTORY>    tmpStr = sString() {setValue(state, "checkoutHistory", tmpStr);})
+        | (<OWNER>              tmpSet = lList()   {setValue(state, "ownerAccess", tmpSet);})
+        | (<PUBLIC>             tmpSet = lList()   {setValue(state, "publicAccess", tmpSet);})
+        | (<ACTION>             tmpStr = sString() {setValue(state, "actionProgram", tmpStr);}
+           <INPUT>              tmpStr = sString() {setValue(state, "actionInput", tmpStr);})
+        | (<CHECK>              tmpStr = sString() {setValue(state, "checkProgram", tmpStr);}
+           <INPUT>              tmpStr = sString() {setValue(state, "checkInput", tmpStr);})
+        | (<ROUTE>              tmpSet = lsList()  {setValue(state, "routeUsers", tmpSet);}
+                                tmpStr = sString() {setValue(state, "routeMessage", tmpStr);})
+        | stateUser(state)
+        | stateTrigger(state)
+        | stateSignature(state)
+        )*
+    "}"
+    {
+        appendValue(_policy, "states", state);
+    }
+}
+
+void stateUser(final net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO.State _state) : {
+    final net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO.UserAccess userAccess
+            = new net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO.UserAccess();
+    String user, filter = null;
+    Set<String> accessSet;
+}  {
+    <USER> user = slString() accessSet = lList()
+    (<FILTER> filter = sString())?
+    {
+        setValue(userAccess, "userRef", user);
+        setValue(userAccess, "access", accessSet);
+        setValue(userAccess, "expressionFilter", filter);
+        appendValue(_state, "userAccess", userAccess);
+    }
+}
+
+void stateTrigger(final net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO.State _state) : {
+    final net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO.Trigger trigger
+            = new net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO.Trigger();
+    String tmp;
+} {
+    <TRIGGER> tmp = sString()
+            (<ACTION> {setValue(trigger, "name", tmp + "Action");}
+                | <CHECK> {setValue(trigger, "name", tmp + "Check");}
+                | <OVERRIDE> {setValue(trigger, "name", tmp + "Override");})
+            tmp = sString() {setValue(trigger, "program", tmp);}
+            <INPUT> tmp = sString() {setValue(trigger, "arguments", tmp);}
+    {
+        appendValue(_state, "triggersStack", trigger);
+    }
+}
+
+void stateSignature(final net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO.State _state) : {
+    final net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO.Signature signature
+            = new net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO.Signature();
+    String tmpStr;
+    Set<String> tmpSet;
+} {
+    <SIGNATURE> tmpStr = sString() {setValue(signature, "name", tmpStr);}
+    "{"
+        ( (<BRANCH> tmpStr = sString()  {setValue(signature, "branch", tmpStr);})
+        | (<APPROVE> tmpSet = lList()   {setValue(signature, "approverUsers", tmpSet);})
+        | (<IGNORE> tmpSet = lList()    {setValue(signature, "ignoreUsers", tmpSet);})
+        | (<REJECT> tmpSet = lList()    {setValue(signature, "rejectUsers", tmpSet);})
+        | (<FILTER> tmpStr = sString()  {setValue(signature, "filter", tmpStr);})) *
+    "}"
+    {
+        appendValue(_state, "signatures", signature);
+    }
+}
+
+Set<String> lsList() :  {
+    Token tmp;
+    Set<String> ret = new HashSet<String>();
+}  {
+    (
+        <LS_CURLY_BRACKET_OPEN>
+            (
+                (tmp = <LS_STRING>) {ret.add(tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\""));}
+                |
+                (tmp = <LS_SINGLE_STRING>) {ret.add(tmp.image.replaceAll("\\\\\\\"", "\""));}
+            )*
+        <LS_CURLY_BRACKET_CLOSE>
+    )
+    {
+        return ret;
+    }
+}
+
+Set<String> lList() :  {
+    Token tmp;
+    Set<String> ret = new HashSet<String>();
+}  {
+    (
+        <L_CURLY_BRACKET_OPEN>
+            (
+                (tmp = <L_STRING>) {ret.add(tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\""));}
+                |
+                (tmp = <L_SINGLE_STRING>) {ret.add(tmp.image.replaceAll("\\\\\\\"", "\""));}
+            )*
+        <L_CURLY_BRACKET_CLOSE>
+    )
+    {
+        return ret;
+    }
+}
+
+/**
+ * Evaluates a simple string where a list must follow.
+ *
+ * @return evaluated simple string
+ */
+String slString() : {
+    Token tmp;
+    String ret;
+} {
+    (
+        (tmp = <SL_STRING>) {ret = tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\"");}
+        |
+        (tmp = <SL_SINGLE_STRING>) {ret = tmp.image.replaceAll("\\\\\\\"", "\"");}
+    )
+    {
+        return ret;
+    }
+}
+
+/**
+ * Evaluates a simple string.
+ *
+ * @return evaluated simple string
+ */
+String sString() : {
+    Token tmp;
+    String ret;
+} {
+    (
+        (tmp = <S_STRING>) {ret = tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\"");}
+        |
+        (tmp = <S_SINGLE_STRING>) {ret = tmp.image.replaceAll("\\\\\\\"", "\"");}
+    )
+    {
+        return ret;
+    }
+}
