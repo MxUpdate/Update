@@ -45,6 +45,21 @@ public class StringUtil_mxJPO
     }
 
     /**
+     * Converts given string by escaping the &quot; so that in escape mode on
+     * string could be handled with &quot; and '.
+     *
+     * @param _text string to convert
+     * @return converted string
+     */
+    public static String convertMql(final String _text)
+    {
+        return (_text != null)
+               ? _text.replaceAll("\\\\", "\\\\\\\\")
+                      .replaceAll("\\\"", "\\\\\"")
+               : "";
+    }
+
+    /**
      * The method is original implemented by the project on
      * <a href="http://commons.apache.org/io">Apache Commons IO</a> and copied
      * from method <code>wildcardMatch</code> within class
