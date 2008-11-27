@@ -178,7 +178,7 @@ public abstract class AbstractDMWithTriggers_mxJPO
          *
          * @see #write(Writer)
          */
-        static final Pattern PATTERN_EVENTTYPE = Pattern.compile("^.*(?=((Action)|(Check)|(Override))$)");
+        private static final Pattern PATTERN_EVENTTYPE = Pattern.compile("^.*(?=((action)|(check)|(override))$)");
 
         /**
          * Used to parse the event kind (&quot;Action&quot;, &quot;Check&quot;
@@ -186,8 +186,7 @@ public abstract class AbstractDMWithTriggers_mxJPO
          *
          * @see #write(Writer)
          */
-        static final Pattern PATTERN_KIND = Pattern.compile("((Action)|(Check)|(Override))$");
-
+        private static final Pattern PATTERN_KIND = Pattern.compile("((action)|(check)|(override))$");
 
         /**
          * Name of the trigger (like ChangeVaultAction etc...).
@@ -203,6 +202,35 @@ public abstract class AbstractDMWithTriggers_mxJPO
          * Arguments of the called program.
          */
         String arguments = "";
+
+        /**
+         * Evaluates from the {@link #name} the related event type of the
+         * trigger.
+         *
+         * @return event type of the trigger
+         * @see #name
+         * @see #PATTERN_EVENTTYPE
+         */
+        protected String getEventType()
+        {
+            final Matcher matchEventType = PATTERN_EVENTTYPE.matcher(this.name.toLowerCase());
+            matchEventType.find();
+            return matchEventType.group();
+        }
+
+        /**
+         * Evaluates from the {@link #name} the related king of the trigger.
+         *
+         * @return kind of the trigger
+         * @see #name
+         * @see #PATTERN_KIND
+         */
+        protected String getKind()
+        {
+            final Matcher matchKind = PATTERN_KIND.matcher(this.name.toLowerCase());
+            matchKind.find();
+            return matchKind.group();
+        }
 
         /**
          * Writes this trigger TCL source code. The trigger event type and kind
