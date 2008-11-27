@@ -26,8 +26,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import matrix.db.Context;
+
+import net.sourceforge.mxupdate.update.AbstractObject_mxJPO;
+import net.sourceforge.mxupdate.update.userinterface.Channel_mxJPO;
+import net.sourceforge.mxupdate.update.userinterface.Command_mxJPO;
+import net.sourceforge.mxupdate.update.userinterface.Form_mxJPO;
+import net.sourceforge.mxupdate.update.userinterface.Inquiry_mxJPO;
+import net.sourceforge.mxupdate.update.userinterface.Menu_mxJPO;
+import net.sourceforge.mxupdate.update.userinterface.Portal_mxJPO;
+import net.sourceforge.mxupdate.update.userinterface.Table_mxJPO;
 
 /**
  * <table>
@@ -43,7 +53,14 @@ public class MxUpdate_mxJPO
     /**
      * Stored the descriptions of all parameters.
      */
-    private final static StringBuilder DESCRIPTION = new StringBuilder();
+    private static final Map<String,String> DESCRIPTION = new TreeMap<String,String>();
+
+    /**
+     * Defines the length of the parameters strings.
+     *
+     * @see #appendDescription(String, List)
+     */
+    private static final int LENGTH_DESC_PARAMS = 42;
 
     private enum Mode
     {
@@ -72,33 +89,15 @@ public class MxUpdate_mxJPO
      * All parameters related to export / import are stored in this map. The
      * key is the parameter (including the '-'), the value the related class.
      */
-    private final static Map<String,Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>> PARAMS
-            = new HashMap<String,Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>>();
+    private final static Map<String,Set<Class<? extends AbstractObject_mxJPO>>> PARAMS
+            = new HashMap<String,Set<Class<? extends AbstractObject_mxJPO>>>();
 
     /**
      * Holds all classes used for all exports / imports. The set is needed that
      * the parameter '-a' (--admin) could be defined.
      */
-    private final static Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>> PARAMS_ADMIN
-            = new HashSet<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>();
-
-    /**
-     * Holds all classes used for the data model import / export.
-     */
-    private final static Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>> PARAMS_DM
-            = new HashSet<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>();
-
-    /**
-     * Holds all classes used for the data model import / export.
-     */
-    private final static Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>> PARAMS_USER
-            = new HashSet<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>();
-
-    /**
-     * Holds all classes used for the user interface import / export.
-     */
-    private final static Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>> PARAMS_UI
-            = new HashSet<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>();
+    private final static Set<Class<? extends AbstractObject_mxJPO>> PARAMS_ADMIN
+            = new HashSet<Class<? extends AbstractObject_mxJPO>>();
 
     static  {
         ////////////////////////////////////////////////////////////////////////
@@ -125,48 +124,48 @@ public class MxUpdate_mxJPO
 /*
 process: 's' --process
 */
-
-        PARAMS.put("-d", PARAMS_DM);
-        PARAMS.put("--datamodel", PARAMS_DM);
-        appendDescription("Export / Import of data model administrational objects.",
-                          "-d","--dm", "--datamodel");
-        defineParameter('b', PARAMS_DM,
+        final Set<Class<? extends AbstractObject_mxJPO>> dm = new HashSet<Class<? extends AbstractObject_mxJPO>>();
+        defineParameter('d', dm,
+                        null,
+                        "Export / Import of data model administrational objects.",
+                        "dm", "datamodel");
+        defineParameter('b', dm,
                         net.sourceforge.mxupdate.update.datamodel.Attribute_mxJPO.class,
                         "Export / Import of attributes.",
                         "attribute", "attrib", "attr", "att");
-        defineParameter(null, PARAMS_DM,
+        defineParameter(null, dm,
                         net.sourceforge.mxupdate.update.datamodel.Expression_mxJPO.class,
                         "Export / Import of expressions.",
                         "expression", "expr", "exp");
-        defineParameter(null, PARAMS_DM,
+        defineParameter(null, dm,
                         net.sourceforge.mxupdate.update.datamodel.Format_mxJPO.class,
                         "Export / Import of formats.",
                         "format");
-        defineParameter(null, PARAMS_DM,
+        defineParameter(null, dm,
                         net.sourceforge.mxupdate.update.datamodel.NumberGenerator_mxJPO.class,
                         "Export / Import of number generators.",
                         "numbergenerator");
-        defineParameter(null, PARAMS_DM,
+        defineParameter(null, dm,
                         net.sourceforge.mxupdate.update.datamodel.ObjectGenerator_mxJPO.class,
                         "Export / Import of object generators.",
                         "objectgenerator");
-        defineParameter('r', PARAMS_DM,
+        defineParameter('r', dm,
                         net.sourceforge.mxupdate.update.datamodel.Relationship_mxJPO.class,
                         "Export / Import of relationships.",
                         "relation", "relationship");
-        defineParameter(null, PARAMS_DM,
+        defineParameter(null, dm,
                         net.sourceforge.mxupdate.update.datamodel.Rule_mxJPO.class,
                         "Export / Import of rules.",
                         "rule");
-        defineParameter('t', PARAMS_DM,
+        defineParameter('t', dm,
                         net.sourceforge.mxupdate.update.datamodel.Type_mxJPO.class,
                         "Export / Import of types.",
                         "type");
-        defineParameter('p', PARAMS_DM,
+        defineParameter('p', dm,
                          net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO.class,
                          "Export / Import of policies.",
                          "policy");
-        defineParameter('g', PARAMS_DM,
+        defineParameter('g', dm,
                         net.sourceforge.mxupdate.update.datamodel.Trigger_mxJPO.class,
                         "Export / Import of triggers.",
                         "trigger", "trig");
@@ -176,18 +175,20 @@ process: 's' --process
 /*
 --person
 */
-        PARAMS.put("--user", PARAMS_USER);
-        appendDescription("Export / Import of user administrational objects.",
-                          "--user");
-        defineParameter(null, PARAMS_USER,
+        final Set<Class<? extends AbstractObject_mxJPO>> user = new HashSet<Class<? extends AbstractObject_mxJPO>>();
+        defineParameter(null, user,
+                        null,
+                        "Export / Import of user administrational objects.",
+                        "user");
+        defineParameter(null, user,
                         net.sourceforge.mxupdate.update.user.Association_mxJPO.class,
                         "Export / Import of associations.",
                         "association", "asso");
-        defineParameter(null, PARAMS_USER,
+        defineParameter(null, user,
                         net.sourceforge.mxupdate.update.user.Group_mxJPO.class,
                         "Export / Import of groups.",
                         "group");
-        defineParameter(null, PARAMS_USER,
+        defineParameter(null, user,
                         net.sourceforge.mxupdate.update.user.Role_mxJPO.class,
                         "Export / Import of roles.",
                         "role");
@@ -202,42 +203,42 @@ process: 's' --process
         defineParameter(null, null,
                         net.sourceforge.mxupdate.update.program.Program_mxJPO.class,
                         "Export / Import of programs.",
-                        "program");
+                        "program", "prog");
 
         ////////////////////////////////////////////////////////////////////////
         // user interface
 
-        PARAMS.put("-u", PARAMS_UI);
-        PARAMS.put("--ui", PARAMS_UI);
-        PARAMS.put("--userinterface", PARAMS_UI);
-        appendDescription("Export / Import of user interface administrational objects.",
-                          "-u","--ui", "--userinterface");
-        defineParameter(null, PARAMS_UI,
-                        net.sourceforge.mxupdate.update.userinterface.Channel_mxJPO.class,
+        final Set<Class<? extends AbstractObject_mxJPO>> ui = new HashSet<Class<? extends AbstractObject_mxJPO>>();
+        defineParameter(null, ui,
+                        null,
+                        "Export / Import of user interface administrational objects.",
+                        "ui", "userinterface");
+        defineParameter(null, ui,
+                        Channel_mxJPO.class,
                         "Export / Import of channels.",
                         "channel");
-        defineParameter('c', PARAMS_UI,
-                        net.sourceforge.mxupdate.update.userinterface.Command_mxJPO.class,
+        defineParameter('c', ui,
+                        Command_mxJPO.class,
                         "Export / Import of commands.",
                         "command");
-        defineParameter('f', PARAMS_UI,
-                        net.sourceforge.mxupdate.update.userinterface.Form_mxJPO.class,
+        defineParameter('f', ui,
+                        Form_mxJPO.class,
                         "Export / Import of web forms.",
                         "webform", "form");
-        defineParameter('i', PARAMS_UI,
-                        net.sourceforge.mxupdate.update.userinterface.Inquiry_mxJPO.class,
+        defineParameter('i', ui,
+                        Inquiry_mxJPO.class,
                         "Export / Import of inquiries.",
                         "inquiry");
-        defineParameter('m', PARAMS_UI,
-                        net.sourceforge.mxupdate.update.userinterface.Menu_mxJPO.class,
+        defineParameter('m', ui,
+                        Menu_mxJPO.class,
                         "Export / Import of menus.",
                         "menu");
-        defineParameter(null, PARAMS_UI,
-                        net.sourceforge.mxupdate.update.userinterface.Portal_mxJPO.class,
+        defineParameter(null, ui,
+                        Portal_mxJPO.class,
                         "Export / Import of portal.",
                         "portal");
-        defineParameter('w', PARAMS_UI,
-                        net.sourceforge.mxupdate.update.userinterface.Table_mxJPO.class,
+        defineParameter('w', ui,
+                        Table_mxJPO.class,
                         "Export / Import of web tables.",
                         "webtable", "table");
     }
@@ -248,54 +249,57 @@ process: 's' --process
      *                          defined)
      * @param _paramsList       to which parameter list must the parameter
      *                          appended
-     * @param _clazz            class implementing the import / export
-     * @param _description      description of the paraemter
+     * @param _clazz            class implementing the import / export (or
+     *                          <code>null</code> if the complete parameter
+     *                          list must be used)
+     * @param _description      description of the parameter
      * @param _longParams       list of long parameters strings
      * @throws Error if a short parameter is already defined
      */
     private static void defineParameter(final Character _shortParam,
-                                        final Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>> _paramsList,
-                                        final Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO> _clazz,
+                                        final Set<Class<? extends AbstractObject_mxJPO>> _paramsList,
+                                        final Class<? extends AbstractObject_mxJPO> _clazz,
                                         final String _description,
                                         final String... _longParams)
     {
         final List<String> allParamStrings = new ArrayList<String>();
-        // add to set of all classes parameters set
-        PARAMS_ADMIN.add(_clazz);
-        // add to given set of parameters
-        if (_paramsList != null)  {
-            _paramsList.add(_clazz);
+        final Set<Class<? extends AbstractObject_mxJPO>> tmp = (_clazz == null)
+                ? _paramsList
+                : new HashSet<Class<? extends AbstractObject_mxJPO>>();
+
+        if (_clazz != null)  {
+            // add to set of all classes parameters set
+            PARAMS_ADMIN.add(_clazz);
+            // add to given set of parameters
+            if (_paramsList != null)  {
+                _paramsList.add(_clazz);
+            }
+            tmp.add(_clazz);
         }
-        Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>> tmp = null;
+
         // check for short parameter and test for double definition
         if (_shortParam != null)  {
             final String shortParam = "-" + _shortParam;
-            tmp = PARAMS.get(shortParam);
-            if (tmp != null)  {
+            if (PARAMS.containsKey(shortParam) || PARAM_MODE.containsKey(shortParam))  {
                 throw new Error("double definition of short parameter '" + shortParam
-                                + "'! Found:\n" + tmp + "\nNew Definition:\n" + _clazz);
+                                + "'! Found:\n" + PARAMS.get(shortParam) + "\nNew Definition:\n" + tmp);
             }
-            tmp = new HashSet<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>();
             PARAMS.put(shortParam, tmp);
             allParamStrings.add(shortParam);
-        } else  {
-            tmp = new HashSet<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>();
         }
-        tmp.add(_clazz);
         // all long parameters
         for (final String param : _longParams)  {
             final String paramStr = "--" + param;
-            tmp = PARAMS.get(paramStr);
-            if (tmp == null)  {
-                tmp = new HashSet<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>>();
-                PARAMS.put(paramStr, tmp);
+            if (PARAMS.containsKey(paramStr) || PARAM_MODE.containsKey(paramStr))  {
+                throw new Error("double definition of short parameter '" + paramStr
+                        + "'! Found:\n" + PARAMS.get(paramStr) + "\nNew Definition:\n" + tmp);
             }
-            tmp.add(_clazz);
+            PARAMS.put(paramStr, tmp);
             allParamStrings.add(paramStr);
         }
 
         // store description
-        appendDescription(_description, allParamStrings);
+        appendDescription(_description, allParamStrings, "MATCH");
     }
 
     /**
@@ -303,14 +307,55 @@ process: 's' --process
      *
      * @param _description      description to append
      * @param _params           related parameters
+     * @param _argument         text of the argument for the list of parameters
+     *                          (or <code>null</code> if not defined)
      */
     private static void appendDescription(final String _description,
-                                          final List<String> _params)
+                                          final List<String> _params,
+                                          final String _argument)
     {
-        for (final String paramString : _params)  {
-            DESCRIPTION.append(paramString);
+        // check if first parameter is not a short parameter
+        final String firstParam = _params.get(0);
+        final char prefix;
+        final StringBuilder line = new StringBuilder().append(' ');
+        if (firstParam.charAt(1) == '-')  {
+            prefix = firstParam.charAt(2);
+            line.append("   ");
+        } else  {
+            prefix = firstParam.charAt(1);
         }
-        DESCRIPTION.append(' ').append(_description).append('\n');
+
+        // append all parameters
+        boolean first = true;
+        for (final String paramString : _params)  {
+            if (first)  {
+                first = false;
+            } else  {
+                line.append(',');
+            }
+            line.append(paramString);
+        }
+
+        // append arguments
+        if (_argument != null)  {
+            line.append(" <").append(_argument).append('>');
+        }
+
+        // append spaces
+        if (line.length() > LENGTH_DESC_PARAMS)  {
+            line.append("\n ");
+            for (int i = 1; i < LENGTH_DESC_PARAMS; i++)  {
+                line.append(' ');
+            }
+        } else  {
+            for (int i = line.length(); i < LENGTH_DESC_PARAMS; i++)  {
+                line.append(' ');
+            }
+        }
+
+        line.append(_description);
+
+        DESCRIPTION.put("" + prefix + line, line.toString());
     }
 
     /**
@@ -329,7 +374,20 @@ process: 's' --process
         for (final String param : _params)  {
             params.add(param);
         }
-        appendDescription(_description, params);
+        appendDescription(_description, params, null);
+    }
+
+    /**
+     * Prints the help for the MxUpdate functionality.
+     *
+     * @see #DESCRIPTION
+     */
+    private void printHelp()
+    {
+        System.out.println("usage: exec prog MxUpdate -e | -u ....\n");
+        for (final String line : DESCRIPTION.values())  {
+            System.out.println(line);
+        }
     }
 
     public void mxMain(final Context _context,
@@ -340,8 +398,8 @@ process: 's' --process
 
             Mode mode = null;
 
-final Map<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,List<String>> clazz2matches
-        = new HashMap<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,List<String>>();
+final Map<Class<? extends AbstractObject_mxJPO>,List<String>> clazz2matches
+        = new HashMap<Class<? extends AbstractObject_mxJPO>,List<String>>();
 //System.err.println("PARAM_MODE="  + Mode.IMPORT);
 
 boolean unknown = false;
@@ -350,11 +408,11 @@ String pathStr = null;
 
         for (int idx = 0; idx < _args.length; idx++)  {
 //System.out.println(""+idx+"="+_args[idx]+"="+PARAMS.get(_args[idx]));
-            final Set<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>> clazzes = PARAMS.get(_args[idx]);
+            final Set<Class<? extends AbstractObject_mxJPO>> clazzes = PARAMS.get(_args[idx]);
             if (clazzes != null)  {
                 idx++;
                 final String name = _args[idx];
-                for (final Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO> clazz : clazzes)  {
+                for (final Class<? extends AbstractObject_mxJPO> clazz : clazzes)  {
                     List<String> names = clazz2matches.get(clazz);
                     if (names == null)  {
                         names = new ArrayList<String>();
@@ -386,17 +444,17 @@ System.err.println("unknown pararameter "  + _args[idx]);
 //System.out.println("clazz2matches="+clazz2matches);
 
 if (unknown || (Mode.HELP == mode) || (mode == null))  {
-    System.out.println("" + DESCRIPTION);
+    printHelp();
 } else if (Mode.EXPORT == mode)  {
-    final Map<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,Set<String>> clazz2names
-            = new HashMap<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,Set<String>>();
-    for (final Map.Entry<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,List<String>> entry : clazz2matches.entrySet())  {
-        net.sourceforge.mxupdate.update.AbstractObject_mxJPO instance = entry.getKey().newInstance();
+    final Map<Class<? extends AbstractObject_mxJPO>,Set<String>> clazz2names
+            = new HashMap<Class<? extends AbstractObject_mxJPO>,Set<String>>();
+    for (final Map.Entry<Class<? extends AbstractObject_mxJPO>,List<String>> entry : clazz2matches.entrySet())  {
+        AbstractObject_mxJPO instance = entry.getKey().newInstance();
         clazz2names.put(entry.getKey(), instance.getMatchingNames(_context, entry.getValue()));
     }
-    for (final Map.Entry<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,Set<String>> entry : clazz2names.entrySet())  {
+    for (final Map.Entry<Class<? extends AbstractObject_mxJPO>,Set<String>> entry : clazz2names.entrySet())  {
         for (final String name : entry.getValue())  {
-            net.sourceforge.mxupdate.update.AbstractObject_mxJPO instance = entry.getKey().newInstance();
+            AbstractObject_mxJPO instance = entry.getKey().newInstance();
             final File path = new File(pathStr + File.separator + instance.getPath());
 System.out.println("export "+instance.getInfoAnno().description() + " '" + name + "'");
             instance.export(_context, path, name);
@@ -405,18 +463,18 @@ System.out.println("export "+instance.getInfoAnno().description() + " '" + name 
 } else if (Mode.IMPORT == mode) {
     final Set<File> allFiles = getAllFiles(new File(pathStr));
     // get all matching files depending on the update classes
-    final Map<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,Map<File,String>> clazz2names
-            = new HashMap<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,Map<File,String>>();
-    for (final Map.Entry<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,List<String>> entry : clazz2matches.entrySet())  {
-        net.sourceforge.mxupdate.update.AbstractObject_mxJPO instance = entry.getKey().newInstance();
+    final Map<Class<? extends AbstractObject_mxJPO>,Map<File,String>> clazz2names
+            = new HashMap<Class<? extends AbstractObject_mxJPO>,Map<File,String>>();
+    for (final Map.Entry<Class<? extends AbstractObject_mxJPO>,List<String>> entry : clazz2matches.entrySet())  {
+        AbstractObject_mxJPO instance = entry.getKey().newInstance();
         clazz2names.put(entry.getKey(), instance.getMatchingFileNames(allFiles, entry.getValue()));
     }
     // create if needed
     final Collection<String> wildCardMatch = new HashSet<String>();
     wildCardMatch.add("*");
-    for (final Map.Entry<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,Map<File,String>> entry : clazz2names.entrySet())  {
+    for (final Map.Entry<Class<? extends AbstractObject_mxJPO>,Map<File,String>> entry : clazz2names.entrySet())  {
         for (final Map.Entry<File, String> fileEntry : entry.getValue().entrySet())  {
-            net.sourceforge.mxupdate.update.AbstractObject_mxJPO instance = entry.getKey().newInstance();
+            AbstractObject_mxJPO instance = entry.getKey().newInstance();
             final Set<String> existings = instance.getMatchingNames(_context, wildCardMatch);
             if (!existings.contains(fileEntry.getValue()))  {
 System.out.println("create "+instance.getInfoAnno().description() + " '" + fileEntry.getValue() + "'");
@@ -425,9 +483,9 @@ System.out.println("create "+instance.getInfoAnno().description() + " '" + fileE
         }
     }
     // update
-    for (final Map.Entry<Class<? extends net.sourceforge.mxupdate.update.AbstractObject_mxJPO>,Map<File,String>> entry : clazz2names.entrySet())  {
+    for (final Map.Entry<Class<? extends AbstractObject_mxJPO>,Map<File,String>> entry : clazz2names.entrySet())  {
         for (final Map.Entry<File, String> fileEntry : entry.getValue().entrySet())  {
-            net.sourceforge.mxupdate.update.AbstractObject_mxJPO instance = entry.getKey().newInstance();
+            AbstractObject_mxJPO instance = entry.getKey().newInstance();
 System.out.println("check "+instance.getInfoAnno().description() + " '" + fileEntry.getValue() + "'");
             instance.update(_context, fileEntry.getValue(), fileEntry.getKey());
         }
