@@ -31,6 +31,19 @@ import java.util.TreeMap;
 import matrix.db.Context;
 
 import net.sourceforge.mxupdate.update.AbstractObject_mxJPO;
+import net.sourceforge.mxupdate.update.datamodel.Attribute_mxJPO;
+import net.sourceforge.mxupdate.update.datamodel.Expression_mxJPO;
+import net.sourceforge.mxupdate.update.datamodel.Format_mxJPO;
+import net.sourceforge.mxupdate.update.datamodel.NumberGenerator_mxJPO;
+import net.sourceforge.mxupdate.update.datamodel.ObjectGenerator_mxJPO;
+import net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO;
+import net.sourceforge.mxupdate.update.datamodel.Relationship_mxJPO;
+import net.sourceforge.mxupdate.update.datamodel.Rule_mxJPO;
+import net.sourceforge.mxupdate.update.datamodel.Trigger_mxJPO;
+import net.sourceforge.mxupdate.update.datamodel.Type_mxJPO;
+import net.sourceforge.mxupdate.update.user.Association_mxJPO;
+import net.sourceforge.mxupdate.update.user.Group_mxJPO;
+import net.sourceforge.mxupdate.update.user.Role_mxJPO;
 import net.sourceforge.mxupdate.update.userinterface.Channel_mxJPO;
 import net.sourceforge.mxupdate.update.userinterface.Command_mxJPO;
 import net.sourceforge.mxupdate.update.userinterface.Form_mxJPO;
@@ -38,6 +51,7 @@ import net.sourceforge.mxupdate.update.userinterface.Inquiry_mxJPO;
 import net.sourceforge.mxupdate.update.userinterface.Menu_mxJPO;
 import net.sourceforge.mxupdate.update.userinterface.Portal_mxJPO;
 import net.sourceforge.mxupdate.update.userinterface.Table_mxJPO;
+import net.sourceforge.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * <table>
@@ -130,43 +144,43 @@ process: 's' --process
                         "Export / Import of data model administrational objects.",
                         "dm", "datamodel");
         defineParameter('b', dm,
-                        net.sourceforge.mxupdate.update.datamodel.Attribute_mxJPO.class,
+                        Attribute_mxJPO.class,
                         "Export / Import of attributes.",
                         "attribute", "attrib", "attr", "att");
         defineParameter(null, dm,
-                        net.sourceforge.mxupdate.update.datamodel.Expression_mxJPO.class,
+                        Expression_mxJPO.class,
                         "Export / Import of expressions.",
                         "expression", "expr", "exp");
         defineParameter(null, dm,
-                        net.sourceforge.mxupdate.update.datamodel.Format_mxJPO.class,
+                        Format_mxJPO.class,
                         "Export / Import of formats.",
                         "format");
         defineParameter(null, dm,
-                        net.sourceforge.mxupdate.update.datamodel.NumberGenerator_mxJPO.class,
+                        NumberGenerator_mxJPO.class,
                         "Export / Import of number generators.",
                         "numbergenerator");
         defineParameter(null, dm,
-                        net.sourceforge.mxupdate.update.datamodel.ObjectGenerator_mxJPO.class,
+                        ObjectGenerator_mxJPO.class,
                         "Export / Import of object generators.",
                         "objectgenerator");
         defineParameter('r', dm,
-                        net.sourceforge.mxupdate.update.datamodel.Relationship_mxJPO.class,
+                        Relationship_mxJPO.class,
                         "Export / Import of relationships.",
                         "relation", "relationship");
         defineParameter(null, dm,
-                        net.sourceforge.mxupdate.update.datamodel.Rule_mxJPO.class,
+                        Rule_mxJPO.class,
                         "Export / Import of rules.",
                         "rule");
         defineParameter('t', dm,
-                        net.sourceforge.mxupdate.update.datamodel.Type_mxJPO.class,
+                        Type_mxJPO.class,
                         "Export / Import of types.",
                         "type");
         defineParameter('p', dm,
-                         net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO.class,
+                         Policy_mxJPO.class,
                          "Export / Import of policies.",
                          "policy");
         defineParameter('g', dm,
-                        net.sourceforge.mxupdate.update.datamodel.Trigger_mxJPO.class,
+                        Trigger_mxJPO.class,
                         "Export / Import of triggers.",
                         "trigger", "trig");
 
@@ -181,15 +195,15 @@ process: 's' --process
                         "Export / Import of user administrational objects.",
                         "user");
         defineParameter(null, user,
-                        net.sourceforge.mxupdate.update.user.Association_mxJPO.class,
+                        Association_mxJPO.class,
                         "Export / Import of associations.",
                         "association", "asso");
         defineParameter(null, user,
-                        net.sourceforge.mxupdate.update.user.Group_mxJPO.class,
+                        Group_mxJPO.class,
                         "Export / Import of groups.",
                         "group");
         defineParameter(null, user,
-                        net.sourceforge.mxupdate.update.user.Role_mxJPO.class,
+                        Role_mxJPO.class,
                         "Export / Import of roles.",
                         "role");
 
@@ -395,6 +409,8 @@ process: 's' --process
             throws Exception
     {
         try {
+            // to be sure....
+            MqlUtil_mxJPO.execMql(_context, "verbose off");
 
             Mode mode = null;
 
@@ -469,15 +485,24 @@ System.out.println("export "+instance.getInfoAnno().description() + " '" + name 
         AbstractObject_mxJPO instance = entry.getKey().newInstance();
         clazz2names.put(entry.getKey(), instance.getMatchingFileNames(allFiles, entry.getValue()));
     }
-    // create if needed
+    // evaluate for existing administration objects
     final Collection<String> wildCardMatch = new HashSet<String>();
     wildCardMatch.add("*");
+    final Map<Class<? extends AbstractObject_mxJPO>,Set<String>> existingNames
+            = new HashMap<Class<? extends AbstractObject_mxJPO>,Set<String>>();
+    for (final Class<? extends AbstractObject_mxJPO> clazz : clazz2names.keySet())  {
+        if (!existingNames.containsKey(clazz))  {
+            final AbstractObject_mxJPO instance = clazz.newInstance();
+            existingNames.put(clazz,
+                              instance.getMatchingNames(_context, wildCardMatch));
+        }
+    }
+    // create if needed (and not in the list of existing objects
     for (final Map.Entry<Class<? extends AbstractObject_mxJPO>,Map<File,String>> entry : clazz2names.entrySet())  {
         for (final Map.Entry<File, String> fileEntry : entry.getValue().entrySet())  {
-            AbstractObject_mxJPO instance = entry.getKey().newInstance();
-            final Set<String> existings = instance.getMatchingNames(_context, wildCardMatch);
+            final Set<String> existings = existingNames.get(entry.getKey());
             if (!existings.contains(fileEntry.getValue()))  {
-System.out.println("create "+instance.getInfoAnno().description() + " '" + fileEntry.getValue() + "'");
+                final AbstractObject_mxJPO instance = entry.getKey().newInstance();
                 instance.create(_context, fileEntry.getKey(), fileEntry.getValue());
             }
         }
