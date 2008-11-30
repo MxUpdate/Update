@@ -22,9 +22,13 @@ package net.sourceforge.mxupdate.update.user;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Date;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import matrix.db.Context;
+import matrix.util.MatrixException;
 
 import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
@@ -49,6 +53,14 @@ public class Association_mxJPO
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = -3663847015076548873L;
+
+    /**
+     * Regular expression used to extract the version information from a &quot;
+     * standard&quot; association print.
+     *
+     * @see #getMxFileDate(Context, String)
+     */
+    private static final Pattern VERSION_PATTERN = Pattern.compile("(?<=  property version value )[0-9]++");
 
     /**
      * Stores the definition of this association instance.
@@ -125,5 +137,29 @@ public class Association_mxJPO
         preMQLCode.append(_preMQLCode);
 
         super.update(_context, preMQLCode, _postMQLCode, _tclCode, _tclVariables);
+    }
+
+    /**
+     * Returns the stored file date within Matrix for administration object
+     * with given name. The original method is overwritten, because a select
+     * statement of a &quot;print&quot; command does not work.
+     *
+     * @param _context      context for this request
+     * @param _name         name of update object
+     * @return modified date of given update object
+     * @throws MatrixException if the MQL print failed
+     * @see #VERSION_PATTERN
+     */
+    @Override
+    public Date getMxFileDate(final Context _context,
+                              final String _name)
+            throws MatrixException
+    {
+        final String curVersion = execMql(_context, new StringBuilder()
+                .append("print asso \"").append(_name).append("\""));
+        final Matcher matcher = VERSION_PATTERN.matcher(curVersion);
+        return (matcher.find())
+               ? new Date(Long.parseLong(matcher.group()) * 1000)
+               : null;
     }
 }

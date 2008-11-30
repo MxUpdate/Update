@@ -20,7 +20,9 @@
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -95,15 +97,26 @@ public class MxUpdate_mxJPO
     }
 
     /**
+     * Enumeration used to define how the version information is evaluated.
+     */
+    private enum VersionInfo
+    {
+        /**
+         * The last modified date of the file is used as version information.
+         */
+        FILEDATE;
+    }
+
+    /**
      * Holds the mapping between the parameter and mode.
      */
-    private final static Map<String,Mode> PARAM_MODE = new HashMap<String,Mode>();
+    private static final Map<String,Mode> PARAM_MODE = new HashMap<String,Mode>();
 
     /**
      * All parameters related to export / import are stored in this map. The
      * key is the parameter (including the '-'), the value the related class.
      */
-    private final static Map<String,Set<Class<? extends AbstractObject_mxJPO>>> PARAMS
+    private static final Map<String,Set<Class<? extends AbstractObject_mxJPO>>> PARAMS
             = new HashMap<String,Set<Class<? extends AbstractObject_mxJPO>>>();
 
     /**
@@ -112,6 +125,11 @@ public class MxUpdate_mxJPO
      */
     private final static Set<Class<? extends AbstractObject_mxJPO>> PARAMS_ADMIN
             = new HashSet<Class<? extends AbstractObject_mxJPO>>();
+
+    /**
+     * Holds all parameters related how the version information is set.
+     */
+    private static final Map<String,VersionInfo> PARAM_VERSION = new HashMap<String,VersionInfo>();
 
     static  {
         ////////////////////////////////////////////////////////////////////////
@@ -122,9 +140,18 @@ public class MxUpdate_mxJPO
         appendDescription("Export Mode", "-e", "--export");
         PARAM_MODE.put("-u", Mode.IMPORT);
         PARAM_MODE.put("--update", Mode.IMPORT);
-        appendDescription("Update Mode", "-u", "--update");
+        appendDescription("Update Mode.", "-u", "--update");
+        PARAM_MODE.put("-?", Mode.HELP);
         PARAM_MODE.put("-h", Mode.HELP);
         PARAM_MODE.put("--help", Mode.HELP);
+        appendDescription("Print this Help.", "-h", "-?", "--help");
+
+        ////////////////////////////////////////////////////////////////////////
+        // version information
+
+        PARAM_VERSION.put("--usefiledateasversion", VersionInfo.FILEDATE);
+        appendDescription("The last modified date of the file is used as version information.",
+                          "--usefiledateasversion");
 
         ////////////////////////////////////////////////////////////////////////
         // admin
@@ -132,6 +159,9 @@ public class MxUpdate_mxJPO
         PARAMS.put("-a", PARAMS_ADMIN);
         PARAMS.put("--admin", PARAMS_ADMIN);
         PARAMS.put("--all", PARAMS_ADMIN);
+        appendDescription("Export / Import of all administrational objects.",
+                          Arrays.asList(new String[]{"-a", "--admin", "--all"}),
+                          "MATCH");
 
         ////////////////////////////////////////////////////////////////////////
         // data model
@@ -294,7 +324,7 @@ process: 's' --process
         // check for short parameter and test for double definition
         if (_shortParam != null)  {
             final String shortParam = "-" + _shortParam;
-            if (PARAMS.containsKey(shortParam) || PARAM_MODE.containsKey(shortParam))  {
+            if (PARAMS.containsKey(shortParam) || PARAM_MODE.containsKey(shortParam) || PARAM_VERSION.containsKey(shortParam))  {
                 throw new Error("double definition of short parameter '" + shortParam
                                 + "'! Found:\n" + PARAMS.get(shortParam) + "\nNew Definition:\n" + tmp);
             }
@@ -304,7 +334,7 @@ process: 's' --process
         // all long parameters
         for (final String param : _longParams)  {
             final String paramStr = "--" + param;
-            if (PARAMS.containsKey(paramStr) || PARAM_MODE.containsKey(paramStr))  {
+            if (PARAMS.containsKey(paramStr) || PARAM_MODE.containsKey(paramStr) || PARAM_VERSION.containsKey(paramStr))  {
                 throw new Error("double definition of short parameter '" + paramStr
                         + "'! Found:\n" + PARAMS.get(paramStr) + "\nNew Definition:\n" + tmp);
             }
@@ -421,6 +451,8 @@ final Map<Class<? extends AbstractObject_mxJPO>,List<String>> clazz2matches
 boolean unknown = false;
 String pathStr = null;
 
+VersionInfo versionInfo = null;
+
 
         for (int idx = 0; idx < _args.length; idx++)  {
 //System.out.println(""+idx+"="+_args[idx]+"="+PARAMS.get(_args[idx]));
@@ -447,6 +479,8 @@ String pathStr = null;
                 } else  {
                     mode = PARAM_MODE.get(_args[idx]);
                 }
+            } else if (PARAM_VERSION.containsKey(_args[idx]))  {
+                versionInfo = PARAM_VERSION.get(_args[idx]);
             } else if ("--path".equals(_args[idx]))  {
                 idx++;
                 pathStr = _args[idx];
@@ -512,13 +546,35 @@ System.out.println("export "+instance.getInfoAnno().description() + " '" + name 
         for (final Map.Entry<File, String> fileEntry : entry.getValue().entrySet())  {
             AbstractObject_mxJPO instance = entry.getKey().newInstance();
 System.out.println("check "+instance.getInfoAnno().description() + " '" + fileEntry.getValue() + "'");
-            instance.update(_context, fileEntry.getValue(), fileEntry.getKey());
+
+final boolean update;
+String version = null;
+if (versionInfo == VersionInfo.FILEDATE)  {
+    final Date fileDate = new Date(fileEntry.getKey().lastModified());
+    if (fileDate.equals(instance.getMxFileDate(_context, fileEntry.getValue())))  {
+        update = false;
+    } else  {
+        update = true;
+        System.out.println("    - update to version from " + fileDate);
+        version = Long.toString(fileDate.getTime() / 1000);
+    }
+} else  {
+    update = true;
+    System.out.println("    - update");
+}
+            if (update)  {
+                instance.update(_context,
+                                fileEntry.getValue(),
+                                fileEntry.getKey(),
+                                version);
+            }
+
         }
     }
 }
 
         } catch (Exception e)  {
-            e.printStackTrace();
+            e.printStackTrace(System.out);
         }
 
     }

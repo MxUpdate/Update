@@ -26,6 +26,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -193,11 +194,15 @@ public abstract class AbstractObject_mxJPO
      * @param _context          context for this request
      * @param _name             name of the administration (business) object
      * @param _file             reference to the file to update
+     * @param _newVersion       new version which must be set within the update
+     *                          (or <code>null</code> if the version must not
+     *                          be set).
      * @throws Exception if update failed
      */
     public abstract void update(final Context _context,
                                 final String _name,
-                                final File _file)
+                                final File _file,
+                                final String _newVersion)
             throws Exception;
 
     /**
@@ -242,6 +247,44 @@ public abstract class AbstractObject_mxJPO
         reader.close();
 
         return code;
+    }
+
+    /**
+     * Returns the stored file date within Matrix for administration object
+     * with given name. For performance reason the method uses
+     * &quot;print&quot; commands, because a complete XML parse including a
+     * complete export takes longer time.
+     *
+     * @param _context      context for this request
+     * @param _name         name of update object
+     * @return modified date of given update object
+     * @throws MatrixException
+     */
+    public Date getMxFileDate(final Context _context,
+                              final String _name)
+            throws MatrixException
+    {
+        final String curVersion;
+        // check for existing administration type...
+        if (!"".equals(this.getInfoAnno().adminType()))  {
+            curVersion = execMql(_context, new StringBuilder()
+                    .append("print ").append(this.getInfoAnno().adminType())
+                    .append(" \"").append(_name).append("\" ")
+                    .append(this.getInfoAnno().adminTypeSuffix())
+                    .append(" select property[version] dump")).substring(14);
+        // otherwise we have a business object....
+        } else  {
+            final String[] nameRev = _name.split("________");
+            curVersion = execMql(_context, new StringBuilder()
+                    .append("print bus \"")
+                    .append(this.getInfoAnno().busType())
+                    .append("\" \"").append(nameRev[0])
+                    .append("\" \"").append((nameRev.length > 1) ? nameRev[1] : "")
+                    .append("\" select attribute[").append("emxGerLibUpdateVersion").append("] dump"));
+        }
+        return (curVersion.matches("^[0-9]++$"))
+               ? new Date(Long.parseLong(curVersion) * 1000)
+               : null;
     }
 
     /**

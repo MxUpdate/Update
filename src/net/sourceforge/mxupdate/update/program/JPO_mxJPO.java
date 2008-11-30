@@ -42,7 +42,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(title = "",
+@InfoAnno_mxJPO(adminType = "program",
+                title = "",
                 filePrefix = "",
                 fileSuffix = "_" + "mxJPO.java",
                 filePath = "jpo",
@@ -158,66 +159,62 @@ public class JPO_mxJPO
      * @param _context          context for this request
      * @param _name             name of the administration (business) object
      * @param _file             reference to the file to update
+     * @param _newVersion       new version which must be set within the update
+     *                          (or <code>null</code> if the version must not
+     *                          be set).
      * @throws Exception if update of the JPO failed
      */
     @Override
     public void update(final Context _context,
                        final String _name,
-                       final File _file)
+                       final File _file,
+                       final String _newVersion)
             throws Exception
     {
-        final String version = this.execMql(_context,
-                                            new StringBuilder()
-                                               .append("print prog \"").append(_name)
-                                               .append("\" select property[version].value dump"));
-        // compare file date as version against version information in Matrix
-        final String modified = Long.toString(_file.lastModified() / 1000);
-        if (!modified.equals(version))  {
-System.out.println("    - update to version '" + modified + "'");
+        // append statement to reset execute user
+        final StringBuilder cmd = new StringBuilder()
+                .append("mod prog \"").append(_name)
+                .append("\" execute user \"\";\n");
 
-            // append statement to reset execute user
-            final StringBuilder cmd = new StringBuilder()
-                    .append("mod prog \"").append(_name)
-                    .append("\" execute user \"\";\n");
-
-            // append MQL statements to reset properties
-            final String prpStr = this.execMql(_context,
-                                               new StringBuilder().append("print program \"").append(_name)
-                                                   .append("\" select property.name property.to dump ' @@@@@@'"));
-            final String[] prpArr = prpStr.toString().split("(@@@@@@)");
-            final int length = (prpArr.length + 1) / 2;
-            for (int idxName = 0, idxTo = length; idxName < length; idxName++, idxTo++)  {
-                final String name = prpArr[idxName].trim();
-                if (!IGNORED_PROPERTIES.contains(name))  {
+        // append MQL statements to reset properties
+        final String prpStr = this.execMql(_context,
+                                           new StringBuilder().append("print program \"").append(_name)
+                                               .append("\" select property.name property.to dump ' @@@@@@'"));
+        final String[] prpArr = prpStr.toString().split("(@@@@@@)");
+        final int length = (prpArr.length + 1) / 2;
+        for (int idxName = 0, idxTo = length; idxName < length; idxName++, idxTo++)  {
+            final String name = prpArr[idxName].trim();
+            if (!IGNORED_PROPERTIES.contains(name))  {
 // TODO: if to is defined, the remove must be specified the to ....
-                    final String to = (idxTo < length) ? prpArr[idxTo].trim() : "";
-                    cmd.append("mod prog \"").append(_name)
-                       .append("\" remove property \"").append(name).append("\";\n");
-                }
+                final String to = (idxTo < length) ? prpArr[idxTo].trim() : "";
+                cmd.append("mod prog \"").append(_name)
+                   .append("\" remove property \"").append(name).append("\";\n");
             }
-
-            // not equal => update JPO code and version
-            cmd.append("insert prog \"").append(_file.getPath()).append("\";\n");
-
-            // append TCL code of JPO
-            final StringBuilder jpoCode = this.getCode(_file);
-            final int start = jpoCode.indexOf(SEPARATOR_START);
-            final int end = jpoCode.indexOf(SEPARATOR_END);
-            if ((start >= 0) && (end > 0))  {
-                final String tclCode = jpoCode.substring(start + SEPARATOR_START.length(), end).trim();
-                if (!"".equals(tclCode))  {
-                    cmd.append("tcl;\neval {\n")
-                       .append(tclCode)
-                       .append("\n}\nexit;\n");
-                }
-            }
-
-            // define new version
-            cmd.append("mod prog \"").append(_name)
-                            .append("\" add property version value \"").append(modified).append("\";");
-
-            // execute MQL statement
-            this.execMql(_context, cmd);
         }
+
+        // not equal => update JPO code and version
+        cmd.append("insert prog \"").append(_file.getPath()).append("\";\n");
+
+        // append TCL code of JPO
+        final StringBuilder jpoCode = this.getCode(_file);
+        final int start = jpoCode.indexOf(SEPARATOR_START);
+        final int end = jpoCode.indexOf(SEPARATOR_END);
+        if ((start >= 0) && (end > 0))  {
+            final String tclCode = jpoCode.substring(start + SEPARATOR_START.length(), end).trim();
+            if (!"".equals(tclCode))  {
+                cmd.append("tcl;\neval {\n")
+                   .append(tclCode)
+                   .append("\n}\nexit;\n");
+            }
+        }
+
+        // define new version
+        if (_newVersion != null)  {
+            cmd.append("mod prog \"").append(_name)
+                            .append("\" add property version value \"").append(_newVersion).append("\";");
+        }
+
+        // execute MQL statement
+        this.execMql(_context, cmd);
     }
 }

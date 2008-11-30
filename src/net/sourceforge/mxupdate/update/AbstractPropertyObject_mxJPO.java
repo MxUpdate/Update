@@ -289,30 +289,32 @@ public abstract class AbstractPropertyObject_mxJPO
      * @param _context          context for this request
      * @param _name             name of object to update
      * @param _file             file with TCL update code
+     * @param _newVersion       new version which must be set within the update
+     *                          (or <code>null</code> if the version must not
+     *                          be set).
      * @see #update(Context, CharSequence, CharSequence, Map)
      */
     @Override
     public void update(final Context _context,
                        final String _name,
-                       final File _file)
+                       final File _file,
+                       final String _newVersion)
             throws Exception
     {
         // parse objects
         this.parse(_context, _name);
 
-        // compare file date as version against version information in Matrix
-        final String modified = Long.toString(_file.lastModified() / 1000);
-        if (!modified.equals(this.getVersion()))  {
-System.out.println("    - update to version '" + modified + "'");
+        // read TCL code
+        final StringBuilder tclCode = this.getCode(_file);
 
-            // read TCL code
-            final StringBuilder tclCode = this.getCode(_file);
-
-            final Map<String,String> variables = new HashMap<String,String>();
-            variables.put("VERSION", modified);
-
-            this.update(_context, "", "", tclCode, variables);
+        final Map<String,String> variables = new HashMap<String,String>();
+        if (_newVersion == null)  {
+            variables.put("VERSION", "");
+        } else  {
+            variables.put("VERSION", _newVersion);
         }
+
+        this.update(_context, "", "", tclCode, variables);
     }
 
     /**
