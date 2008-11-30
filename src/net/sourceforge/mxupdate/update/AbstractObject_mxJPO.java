@@ -153,6 +153,7 @@ public abstract class AbstractObject_mxJPO
      * @param _files            set of files used to found matching files
      * @param _matches          collection of match strings
      * @return map of files (as key) with the related matrix name (as value)
+     * @see #getMatchingFileNames(Set)
      */
     public Map<File, String> getMatchingFileNames(final Set<File> _files,
                                                   final Collection<String> _matches)
@@ -165,8 +166,8 @@ public abstract class AbstractObject_mxJPO
             final int prefixLength = prefix.length();
 
             for (final File file : _files)  {
+                final String fileName = file.getName();
                 for (final String match : _matches)  {
-                    final String fileName = file.getName();
                     if (fileName.startsWith(prefix) && fileName.endsWith(suffix))  {
                         final String name = fileName.substring(0, fileName.length() - suffixLength)
                                                     .substring(prefixLength);
@@ -174,6 +175,35 @@ public abstract class AbstractObject_mxJPO
                             ret.put(file, name);
                         }
                     }
+                }
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Checks for all files if the prefix and file extension are fulfilled. For
+     * this files, the Matrix name is extracted and returned together with
+     * the file in a map.
+     *
+     * @param _files    files to check if they are defining an update
+     * @return map of files (as key) with the related matrix name (as value)
+     * @see #getMatchingFileNames(Set, Collection)
+     */
+    public Map<File, String> getMatchingFileNames(final Set<File> _files)
+    {
+        final Map<File,String> ret = new TreeMap<File,String>();
+
+        final String suffix = getInfoAnno().fileSuffix();
+        final int suffixLength = suffix.length();
+        for (final String prefix : getInfoAnno().filePrefix())  {
+            final int prefixLength = prefix.length();
+            for (final File file : _files)  {
+                final String fileName = file.getName();
+                if (fileName.startsWith(prefix) && fileName.endsWith(suffix))  {
+                    final String name = fileName.substring(0, fileName.length() - suffixLength)
+                                                .substring(prefixLength);
+                    ret.put(file, name);
                 }
             }
         }
