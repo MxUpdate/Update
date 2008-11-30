@@ -580,6 +580,7 @@ if (versionInfo == VersionInfo.FILEDATE)  {
 
         } catch (Exception e)  {
             e.printStackTrace(System.out);
+            throw e;
         }
 
     }
