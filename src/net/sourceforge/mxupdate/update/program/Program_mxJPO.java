@@ -37,6 +37,7 @@ import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 import org.xml.sax.SAXException;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
+import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
  * @author tmoxter
@@ -137,6 +138,6 @@ public class Program_mxJPO
             cmd.append("mod prog \"").append(_name)
                .append("\" add property version value \"").append(_newVersion).append("\";");
         }
-        this.execMql(_context, cmd);
+        execMql(_context, cmd);
     }
 }

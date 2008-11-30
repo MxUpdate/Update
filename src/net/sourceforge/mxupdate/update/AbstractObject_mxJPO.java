@@ -33,7 +33,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import matrix.db.Context;
-import matrix.db.MQLCommand;
 import matrix.util.MatrixException;
 
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
@@ -41,6 +40,7 @@ import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 import org.xml.sax.SAXException;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
+import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
  * Abstract class from which must be derived for exporting and importing all
@@ -204,27 +204,6 @@ public abstract class AbstractObject_mxJPO
                                 final File _file,
                                 final String _newVersion)
             throws Exception;
-
-    /**
-     * Executes given MQL command and returns the trimmed result of the MQL
-     * execution.
-     *
-     * @param _context  context for this request
-     * @param _cmd      MQL command to execute
-     * @return trimmed result of the MQL execution
-     * @throws MatrixException if MQL execution fails
-     */
-    protected String execMql(final Context _context,
-                             final CharSequence _cmd)
-            throws MatrixException
-    {
-        final MQLCommand mql = new MQLCommand();
-        mql.executeCommand(_context, _cmd.toString());
-        if ((mql.getError() != null) && !"".equals(mql.getError()))  {
-            throw new MatrixException(mql.getError() + "\nMQL command was:\n" + _cmd);
-        }
-        return mql.getResult().trim();
-    }
 
     /**
      * Reads for given file the code and returns them.

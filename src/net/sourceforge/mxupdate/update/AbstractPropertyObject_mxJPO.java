@@ -40,6 +40,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
  * @author tmoxter

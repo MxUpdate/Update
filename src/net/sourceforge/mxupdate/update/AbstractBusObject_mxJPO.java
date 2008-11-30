@@ -39,6 +39,8 @@ import matrix.util.StringList;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
+import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.setHistoryOff;
+import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.setHistoryOn;
 
 /**
  * @author tmoxter
@@ -376,10 +378,10 @@ public abstract class AbstractBusObject_mxJPO
 
         // update must be done with history off (because not required...)
         try  {
-            this.execMql(_context, "history off;");
+            setHistoryOff(_context);
             super.update(_context, preMQLCode, postMQLCode, _tclCode, tclVariables);
         } finally  {
-            this.execMql(_context, "history on;");
+            setHistoryOn(_context);
         }
     }
 

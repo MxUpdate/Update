@@ -41,8 +41,9 @@ import net.sourceforge.mxupdate.update.datamodel.policy.PolicyDefParser_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 import net.sourceforge.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertMql;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
 import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.isEscapeOn;
 import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.setEscapeOff;
 import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.setEscapeOn;
@@ -486,7 +487,7 @@ throw new Exception("some states are not defined anymore!");
         final boolean isMqlEscapeOn = isEscapeOn(_context);
         try  {
             setEscapeOn(_context);
-            this.execMql(_context, cmd);
+            execMql(_context, cmd);
         } finally  {
             if (!isMqlEscapeOn)  {
                 setEscapeOff(_context);

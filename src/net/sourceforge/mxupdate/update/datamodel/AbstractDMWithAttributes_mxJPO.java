@@ -35,6 +35,7 @@ import matrix.db.JPO;
 import net.sourceforge.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
  * The class is used to handle the export / import of administration objects
@@ -228,11 +229,11 @@ public abstract class AbstractDMWithAttributes_mxJPO
         for (final String attr : newAttrs)  {
             if (!this.attributes.contains(attr))  {
 System.out.println("    - add attribute '" + attr + "'");
-                this.execMql(_context,
-                             new StringBuilder()
-                                     .append("mod ").append(getInfoAnno().adminType())
-                                     .append(" '").append(this.getName()).append('\'')
-                                     .append("add attribute '").append(attr).append('\''));
+                execMql(_context,
+                        new StringBuilder()
+                            .append("mod ").append(getInfoAnno().adminType())
+                            .append(" '").append(this.getName()).append('\'')
+                            .append("add attribute '").append(attr).append('\''));
             }
         }
     }

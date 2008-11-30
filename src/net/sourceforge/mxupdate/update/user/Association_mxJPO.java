@@ -34,6 +34,7 @@ import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
  *

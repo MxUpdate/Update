@@ -34,6 +34,7 @@ import matrix.util.MatrixException;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
  *
@@ -213,7 +214,7 @@ public class Attribute_mxJPO
                 .append("add ").append(getInfoAnno().adminType())
                 .append(" \"").append(_name).append("\" ")
                 .append(" type ").append(_file.getName().replaceAll("_.*", "").toLowerCase());
-        this.execMql(_context, cmd);
+       execMql(_context, cmd);
     }
 
     /**

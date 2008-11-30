@@ -97,4 +97,28 @@ public final class MqlUtil_mxJPO
     {
         execMql(_context, "set escape off");
     }
+
+    /**
+     * Sets the history on.
+     *
+     * @param _context  context for this request
+     * @throws MatrixException if the history could not be set to on
+     */
+    public static void setHistoryOn(final Context _context)
+            throws MatrixException
+    {
+        execMql(_context, "history on");
+    }
+
+    /**
+     * Sets the history off.
+     *
+     * @param _context  context for this request
+     * @throws MatrixException if the history could not be set to off
+     */
+    public static void setHistoryOff(final Context _context)
+            throws MatrixException
+    {
+        execMql(_context, "history off");
+    }
 }

@@ -37,6 +37,7 @@ import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 import org.xml.sax.SAXException;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
+import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
  * @author tmoxter
@@ -177,9 +178,9 @@ public class JPO_mxJPO
                 .append("\" execute user \"\";\n");
 
         // append MQL statements to reset properties
-        final String prpStr = this.execMql(_context,
-                                           new StringBuilder().append("print program \"").append(_name)
-                                               .append("\" select property.name property.to dump ' @@@@@@'"));
+        final String prpStr = execMql(_context,
+                                      new StringBuilder().append("print program \"").append(_name)
+                                           .append("\" select property.name property.to dump ' @@@@@@'"));
         final String[] prpArr = prpStr.toString().split("(@@@@@@)");
         final int length = (prpArr.length + 1) / 2;
         for (int idxName = 0, idxTo = length; idxName < length; idxName++, idxTo++)  {
@@ -215,6 +216,6 @@ public class JPO_mxJPO
         }
 
         // execute MQL statement
-        this.execMql(_context, cmd);
+        execMql(_context, cmd);
     }
 }
