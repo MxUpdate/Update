@@ -542,6 +542,7 @@ if (unknown || (Mode.HELP == mode) || (mode == null))  {
             final Set<String> existings = existingNames.get(entry.getKey());
             if (!existings.contains(fileEntry.getValue()))  {
                 final AbstractObject_mxJPO instance = entry.getKey().newInstance();
+System.out.println("create "+instance.getInfoAnno().description() + " '" + fileEntry.getValue() + "'");
                 instance.create(_context, fileEntry.getKey(), fileEntry.getValue());
             }
         }
