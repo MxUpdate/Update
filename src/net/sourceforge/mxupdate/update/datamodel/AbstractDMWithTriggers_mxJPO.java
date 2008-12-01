@@ -207,7 +207,7 @@ public abstract class AbstractDMWithTriggers_mxJPO
          * Evaluates from the {@link #name} the related event type of the
          * trigger.
          *
-         * @return event type of the trigger
+         * @return event type of the trigger  (always in lower case)
          * @see #name
          * @see #PATTERN_EVENTTYPE
          */
@@ -221,7 +221,7 @@ public abstract class AbstractDMWithTriggers_mxJPO
         /**
          * Evaluates from the {@link #name} the related king of the trigger.
          *
-         * @return kind of the trigger
+         * @return kind of the trigger (always in lower case)
          * @see #name
          * @see #PATTERN_KIND
          */
@@ -240,18 +240,10 @@ public abstract class AbstractDMWithTriggers_mxJPO
          * @param _out  writer instance
          * @throws IOException if write failed
          */
-        protected void write(final Writer _out)
+        protected void write(final Appendable _out)
                 throws IOException
         {
-            // parse event type
-            final Matcher matchEventType = PATTERN_EVENTTYPE.matcher(this.name);
-            matchEventType.find();
-            final String eventType = matchEventType.group();
-            // parse kind
-            final Matcher matchKind = PATTERN_KIND.matcher(this.name);
-            matchKind.find();
-            final String kind = matchKind.group();
-            _out.append(" \\\n    add trigger ").append(eventType.toLowerCase()).append(' ').append(kind.toLowerCase())
+            _out.append(" \\\n    add trigger ").append(this.getEventType()).append(' ').append(this.getKind())
                 .append(" \"").append(convertTcl(this.program)).append("\"")
                 .append(" input \"").append(convertTcl(this.arguments)).append("\"");
         }
