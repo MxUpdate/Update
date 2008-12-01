@@ -110,7 +110,8 @@ eval  {
   
 
   mql verbose off
-
+  mql set escape off
+  
   pInstallDM "${VERSION}"
   pInstallJPO "${sPath}" "net.sourceforge.mxupdate.install.Insert" "${VERSION}"
   pInstallJPO "${sPath}" "net.sourceforge.mxupdate.util.MqlUtil"   "${VERSION}"
