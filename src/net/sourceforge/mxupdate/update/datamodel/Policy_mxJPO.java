@@ -719,16 +719,16 @@ throw new Exception("some states are not defined anymore!");
             }
             // owner access
             _out.append("\n    owner {");
-            this.appendAccess(_out, ' ', this.ownerAccess);
+            this.appendAccess(_out, ' ', this.ownerAccess, false);
             // public access
             _out.append("}")
                 .append("\n    public {");
-            this.appendAccess(_out, ' ', this.publicAccess);
+            this.appendAccess(_out, ' ', this.publicAccess, false);
             _out.append("}");
             // user access
             for (final UserAccess userAccess : this.userAccessSorted)  {
                 _out.append("\n    user \"").append(convertTcl(userAccess.userRef)).append("\" {");
-                this.appendAccess(_out, ' ', userAccess.access);
+                this.appendAccess(_out, ' ', userAccess.access, false);
                 _out.append('}');
                 if (userAccess.expressionFilter != null)  {
                     _out.append(" filter \"")
@@ -759,19 +759,36 @@ throw new Exception("some states are not defined anymore!");
             _out.append("\n  }");
         }
 
+        /**
+         *
+         * @param _appendable   where the access statement is appended
+         * @param _separator    separator between two access definitions
+         * @param _access       list of access strings
+         * @param _writeNone    if <i>true</i> a <code>none</code> is written
+         *                      if the list of access string is empty,
+         *                      otherwise nothing is written
+         * @throws IOException
+         */
         protected void appendAccess(final Appendable _appendable,
                                     final char _separator,
-                                    final Stack<String> _access)
+                                    final Stack<String> _access,
+                                    final boolean _writeNone)
                 throws IOException
         {
             boolean first = true;
-            for (final String access : _access)  {
-                if (!first)  {
-                    _appendable.append(_separator);
-                } else  {
-                    first = false;
+            if (_access.isEmpty())  {
+                if (_writeNone)  {
+                    _appendable.append("none");
                 }
-                _appendable.append(access);
+            } else  {
+                for (final String access : _access)  {
+                    if (!first)  {
+                        _appendable.append(_separator);
+                    } else  {
+                        first = false;
+                    }
+                    _appendable.append(access);
+                }
             }
         }
 
@@ -799,11 +816,11 @@ throw new Exception("some states are not defined anymore!");
 // TODO: route
             // owner access
             _cmd.append("owner ");
-            this.appendAccess(_cmd, ',', this.ownerAccess);
+            this.appendAccess(_cmd, ',', this.ownerAccess, true);
             _cmd.append(" ");
             // public access
             _cmd.append("public ");
-            this.appendAccess(_cmd, ',', this.publicAccess);
+            this.appendAccess(_cmd, ',', this.publicAccess, true);
             _cmd.append(" ");
             // user access
             final Set<String> newUsers = new HashSet<String>();
@@ -827,7 +844,7 @@ throw new Exception("some states are not defined anymore!");
                     _cmd.append("add ");
                 }
                 _cmd.append("user \"").append(userAccess.userRef).append("\" ");
-                this.appendAccess(_cmd, ',', userAccess.access);
+                this.appendAccess(_cmd, ',', userAccess.access, true);
                 _cmd.append(" ")
                     .append("filter \"")
                     .append(convertMql(userAccess.expressionFilter))
@@ -855,11 +872,11 @@ throw new Exception("some states are not defined anymore!");
             for (final Signature signature : this.signatures)  {
                 newSigs.add(signature.name);
             }
-            final Set<String> oldSigs = new HashSet<String>();
+            final Map<String,Signature> oldSigs = new HashMap<String,Signature>();
             if (_oldState != null)  {
                 for (final Signature signature : _oldState.signatures)  {
                     if (newSigs.contains(signature.name))  {
-                        oldSigs.add(signature.name);
+                        oldSigs.put(signature.name, signature);
                     } else  {
                         _cmd.append("remove signature \"")
                             .append(convertMql(signature.name))
@@ -868,11 +885,15 @@ throw new Exception("some states are not defined anymore!");
                 }
             }
             for (final Signature signature : this.signatures)  {
-                if ((_oldState != null) && !oldSigs.contains(signature.name))  {
+                final Signature oldSig;
+                if ((_oldState != null) && !oldSigs.containsKey(signature.name))  {
                     _cmd.append("add ");
+                    oldSig = null;
+                } else  {
+                    oldSig = oldSigs.get(signature.name);
                 }
                 _cmd.append("signature \"").append(convertMql(signature.name)).append("\" ");
-                signature.calcDelta(_cmd);
+                signature.calcDelta(_cmd, oldSig);
             }
         }
     }
@@ -930,38 +951,52 @@ throw new Exception("some states are not defined anymore!");
         /**
          * Name of the signature.
          */
-        String name = null;
+        private String name;
 
         /**
          * Branch to state?
          */
-        String branch = null;
+        private String branch;
 
         /**
          * Expression filter of the signature.
          */
-        String filter = null;
+        private String filter;
 
         /**
          * Set of users which could approve the signature.
          */
-        final Set<String> approverUsers = new TreeSet<String>();
+        private final Set<String> approverUsers = new TreeSet<String>();
 
         /**
          * Set of users which could ignore the signature.
          */
-        final Set<String> ignoreUsers = new TreeSet<String>();
+        private final Set<String> ignoreUsers = new TreeSet<String>();
 
         /**
          * Set of users which could reject the signature.
          */
-        final Set<String> rejectUsers = new TreeSet<String>();
+        private final Set<String> rejectUsers = new TreeSet<String>();
 
-        protected void calcDelta(final StringBuilder _cmd)
-                throws IOException
+        /**
+         * Calculates the delta between the old signature and this signature.
+         * If for the old signature a branch is defined and for the new
+         * signature no branch, an error is thrown.
+         *
+         * @param _cmd          command
+         * @param _oldSignature old signature to compare
+         */
+        protected void calcDelta(final StringBuilder _cmd,
+                                 final Signature _oldSignature)
         {
 //TODO: approve, ignore, reject users
-            _cmd.append("branch \"").append(convertMql(this.branch)).append("\" ");
+            if ("".equals(this.branch))  {
+                if ((_oldSignature != null) && (_oldSignature.branch != null) && !"".equals(_oldSignature.branch))  {
+throw new Error("branch '" + _oldSignature.branch + "' exists for signature " + this.name + ", but is not defined anymore");
+                }
+            } else  {
+                _cmd.append("branch \"").append(convertMql(this.branch)).append("\" ");
+            }
             _cmd.append("filter \"").append(convertMql(this.filter)).append("\" ");
         }
     }
