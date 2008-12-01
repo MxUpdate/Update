@@ -313,7 +313,7 @@ public class Policy_mxJPO
             if (first)  {
                 first = false;
             } else  {
-                _out.append(',');
+                _out.append(' ');
             }
             _out.append('\"').append(convertTcl(type)).append('\"');
         }
@@ -781,7 +781,7 @@ throw new Exception("some states are not defined anymore!");
                     _appendable.append("none");
                 }
             } else  {
-                for (final String access : _access)  {
+                for (final String access : new TreeSet<String>(_access))  {
                     if (!first)  {
                         _appendable.append(_separator);
                     } else  {
