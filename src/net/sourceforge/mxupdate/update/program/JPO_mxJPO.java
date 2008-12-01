@@ -147,6 +147,26 @@ public class JPO_mxJPO
     }
 
     /**
+     * Creates given JPO object from given type with given name.
+     *
+     * @param _context          context for this request
+     * @param _file             file for which the administration object must
+     *                          be created (not used)
+     * @param _name             name of administration object to create
+     */
+    @Override
+    public void create(final Context _context,
+            final File _file,
+            final String _name)
+    throws Exception
+    {
+        final StringBuilder cmd = new StringBuilder()
+                .append("add ").append(getInfoAnno().adminType())
+                .append(" \"").append(_name).append("\" java");
+        execMql(_context, cmd);
+    }
+
+    /**
      * The JPO is updated by following steps if the modified date of the file
      * is not the same as the the version property:
      * <ul>
