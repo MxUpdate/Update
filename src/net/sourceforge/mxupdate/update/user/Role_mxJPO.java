@@ -39,7 +39,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
  * @version $Id$
  */
 @InfoAnno_mxJPO(adminType = "role",
-                title = "GROUP",
+                title = "ROLE",
                 filePrefix = "ROLE_",
                 fileSuffix = ".tcl",
                 filePath = "user/role",
