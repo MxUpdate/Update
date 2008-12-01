@@ -276,11 +276,14 @@ public abstract class AbstractObject_mxJPO
         final String curVersion;
         // check for existing administration type...
         if (!"".equals(this.getInfoAnno().adminType()))  {
-            curVersion = execMql(_context, new StringBuilder()
+            final String tmp = execMql(_context, new StringBuilder()
                     .append("print ").append(this.getInfoAnno().adminType())
                     .append(" \"").append(_name).append("\" ")
                     .append(this.getInfoAnno().adminTypeSuffix())
-                    .append(" select property[version] dump")).substring(14);
+                    .append(" select property[version] dump"));
+            curVersion = (tmp.length() >= 14)
+                         ? tmp.substring(14)
+                         : "";
         // otherwise we have a business object....
         } else  {
             final String[] nameRev = _name.split("________");
