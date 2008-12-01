@@ -90,8 +90,7 @@ public class Token_mxJPO {
   /**
    * Returns the image.
    */
-  @Override
-public String toString()
+  public String toString()
   {
      return image;
   }

@@ -27,7 +27,7 @@ options {
 //  OPTIMIZE_TOKEN_MANAGER = true;
 }
 
-PARSER_BEGIN(PolicyDefParser_mxJPO)
+PARSER_BEGIN(PolicyDefParser)
 
 package net.sourceforge.mxupdate.update.datamodel.policy;
 
@@ -39,14 +39,14 @@ import java.util.Set;
 
 import matrix.db.Context;
 
-public class PolicyDefParser_mxJPO {
+public class PolicyDefParser {
   public static void main(String args[]) {
     System.out.println("Reading from standard input...");
 //    new eg2(System.in);
-PolicyDefParser_mxJPO e = new PolicyDefParser_mxJPO(new java.io.StringReader(
+PolicyDefParser e = new PolicyDefParser(new java.io.StringReader(
 "  description \"Policy used for all Products\\\" within the Bosch eADM application.\"\n"
 + "  type {\"Products\"}\n"
-+ "  format {a b c}\n"
++ "  format {{a \"{a}} b c}\n"
 + "  defaultformat a\n"
 + "  sequence \"1,2,3,...\"\n"
 + "  store \"STORE\"\n"
@@ -199,7 +199,7 @@ try  {
         return field;
     }
 }
-PARSER_END(PolicyDefParser_mxJPO)
+PARSER_END(PolicyDefParser)
 
 SKIP :
 {
@@ -294,15 +294,34 @@ TOKEN : /** State and depending signature and trigger Tokens */
 {
   " " | "\t" | "\n" | "\r"
 }
-
 <L_EXPECTED> TOKEN : /* List of Strings */
 {
-      <L_CURLY_BRACKET_OPEN : "{">    : L_EXPECTED
-    | <L_CURLY_BRACKET_CLOSE : "}">   : DEFAULT
-    | <L_STRING : (<L_APOSTROPHE>(<L_CHAR> | "\\\"" | " ")*<L_APOSTROPHE>)> : L_EXPECTED
-    | <L_SINGLE_STRING : (<L_CHAR>)+> : L_EXPECTED
+      <L_CURLY_BRACKET_OPEN : "{">    : L2_EXPECTED
+}
+
+<L2_EXPECTED> SKIP:
+{
+  " " | "\t" | "\n" | "\r"
+}
+<L2_EXPECTED> TOKEN : /* List of Strings */
+{
+      <L_CURLY_BRACKET_CLOSE : "}">   : DEFAULT
+    | <L_STRING : (<L_APOSTROPHE>(<L_CHAR> | "\\\"" | " ")*<L_APOSTROPHE>)> : L2_EXPECTED
+    | <L_SINGLE_STRING : (<L_CHAR>)+> : L2_EXPECTED
     | <#L_APOSTROPHE: "\"" >
     | <#L_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+    | <L2_CURLY_BRACKET_OPEN : "{">    : L3_EXPECTED
+}
+
+<L3_EXPECTED> TOKEN : /* List of Strings */
+{
+      <L3_BRACE_STRING  : (<L3_CHAR>)*> : L4_EXPECTED
+    | <#L3_CHAR : ~["\u0000"-"\u001f","{","}","\u0100"-"\uffff"]>
+}
+
+<L4_EXPECTED> TOKEN : /* List of Strings */
+{
+      <L4_CURLY_BRACKET_CLOSE : "}">   : L2_EXPECTED
 }
 
 net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO policy() : {
@@ -432,6 +451,11 @@ Set<String> lList() :  {
                 (tmp = <L_STRING>) {ret.add(tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\""));}
                 |
                 (tmp = <L_SINGLE_STRING>) {ret.add(tmp.image.replaceAll("\\\\\\\"", "\""));}
+                |
+                <L2_CURLY_BRACKET_OPEN>
+                    (tmp = <L3_BRACE_STRING>)
+                    {ret.add(tmp.image);}
+                <L4_CURLY_BRACKET_CLOSE>
             )*
         <L_CURLY_BRACKET_CLOSE>
     )
