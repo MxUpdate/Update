@@ -46,7 +46,7 @@ eval  {
   ##############################################################################
   # The procedure installs given JPO within the given root path.
   ##############################################################################
-  proc pInstall {_sRoot _sJPOName}  {
+  proc pInstallJPO {_sRoot _sJPOName _sVersion}  {
     regsub -all {\.} "${_sJPOName}" {/} sFileName
     set sFileName [file join "${_sRoot}" "${sFileName}_mxJPO.java"]
     set sFileDate [clock format [file mtime "${sFileName}"]  -gmt true -format "%Y-%m-%d %H:%M:%S"]
@@ -58,14 +58,62 @@ eval  {
     if {"${sJPODate}" != "${sFileDate}"}  {
       puts "update jpo '${_sJPOName}'"
       mql insert prog "${sFileName}"
-      mql mod prog ${_sJPOName} add property "file date" value "${sFileDate}"
+      mql mod prog ${_sJPOName} \
+            add property "file date" value "${sFileDate}" \
+            add property "version" value "${_sVersion}"
     }
   }
 
+  ##############################################################################
+  # The procedure installs depending data model needed for the MxUpdate.
+  ##############################################################################
+  proc pInstallDM {_sVersion}  {
+    set lsAttributes [list "emxGerLibUpdateAuthor" \
+                           "emxGerLibUpdateInstalledDate" \
+                           "emxGerLibUpdateVersion"]
+    set lsTypes [list "eService Number Generator" \
+                      "eService Object Generator" \
+                      "eService Trigger Program Parameters"]
+    # create attributes
+    set lsExists [split [mql list attribute [join ${lsAttributes} ","]] "\n"]
+    foreach sOneAttribute ${lsAttributes}  {
+      if {[lsearch ${lsExists} "${sOneAttribute}"] < 0}  {
+        puts "create attribute '${sOneAttribute}'"
+        mql add attribute "${sOneAttribute}" type string
+      } else  {
+        puts "update attribute '${sOneAttribute}'"
+      }
+      mql modify attribute "${sOneAttribute}" \
+          add property "application"    value "MxUpdate" \
+          add property "author"         value "The MxUpdate Team" \
+          add property "installed date" value [clock format [clock clicks]  -gmt true -format "%m-%d-%Y"] \
+          add property "installer"      value "The MxUpdate Team" \
+          add property "original name"  value "${sOneAttribute}" \
+          add property "version"        value "${_sVersion}"
+          
+    }
+    # update types
+    foreach sOneType ${lsTypes}  {
+      foreach sOneAttribute ${lsAttributes}  {
+        if {[mql print type "${sOneType}" select attribute\[${sOneAttribute}\] dump]=="FALSE"}  {
+          puts "add attribute '${sOneAttribute}' to type '${sOneType}'"
+          mql modify type "${sOneType}" add attribute "${sOneAttribute}"
+        }
+      }
+    }
+    # register MxUpdate
+    if {[mql list program "eServiceSystemInformation.tcl"] != ""}  {
+      puts "register MxUpdate ${_sVersion}"
+      mql mod prog "eServiceSystemInformation.tcl" add property "appVersionMxUpdate" value "${_sVersion}"
+    }
+  }
+  
+
   mql verbose off
 
-  pInstall "${sPath}" "net.sourceforge.mxupdate.install.Insert"
-  pInstall "${sPath}" "net.sourceforge.mxupdate.util.MqlUtil"
+  pInstallDM "${VERSION}"
+  pInstallJPO "${sPath}" "net.sourceforge.mxupdate.install.Insert" "${VERSION}"
+  pInstallJPO "${sPath}" "net.sourceforge.mxupdate.util.MqlUtil"   "${VERSION}"
 
   mql exec prog "net.sourceforge.mxupdate.install.Insert" "${sPath}" "${VERSION}"
 
