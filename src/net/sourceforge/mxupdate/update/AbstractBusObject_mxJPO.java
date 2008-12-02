@@ -204,8 +204,14 @@ public abstract class AbstractBusObject_mxJPO
             this.attrValues.add(new Attribute());
         } else if ("/attributeList/attribute/name".equals(_url))  {
             this.attrValues.peek().name = _content;
+        } else if ("/attributeList/attribute/boolean".equals(_url))  {
+            this.attrValues.peek().value = _content;
+        } else if ("/attributeList/attribute/integer".equals(_url))  {
+            this.attrValues.peek().value = _content;
         } else if ("/attributeList/attribute/string".equals(_url))  {
             this.attrValues.peek().value = _content;
+        } else if ("/attributeList/attribute/unknown".equals(_url))  {
+            // to be ignored, because no value defined...
 
         } else if ("/objectType".equals(_url))  {
             // to be ignored ...
