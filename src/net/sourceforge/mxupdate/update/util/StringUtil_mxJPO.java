@@ -21,6 +21,7 @@
 package net.sourceforge.mxupdate.update.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Stack;
 
 /**
@@ -62,6 +63,41 @@ public class StringUtil_mxJPO
                ? _text.replaceAll("\\\\", "\\\\\\\\")
                       .replaceAll("\\\"", "\\\\\"")
                : "";
+    }
+
+    /**
+     * A list of string is joined to one string. Between two string the given
+     * separator is set.
+     *
+     * @param _separator    separator between two list items
+     * @param _list         list of strings
+     * @param _emptyString  string which is written if the list is empty (or
+     *                      <code>null</code> if no string for empty list is
+     *                      written)
+     * @return joined string of the list items
+     */
+    public static String join(final char _separator,
+                              final Collection<String> _list,
+                              final String _emptyString)
+    {
+        final StringBuilder ret = new StringBuilder();
+
+        boolean first = true;
+        if (_list.isEmpty())  {
+            if (_emptyString != null)  {
+                ret.append(_emptyString);
+            }
+        } else  {
+            for (final String access : _list)  {
+                if (!first)  {
+                    ret.append(_separator);
+                } else  {
+                    first = false;
+                }
+                ret.append(access);
+            }
+        }
+        return ret.toString();
     }
 
     /**
