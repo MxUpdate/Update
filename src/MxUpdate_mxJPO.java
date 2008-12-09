@@ -46,6 +46,7 @@ import net.sourceforge.mxupdate.update.datamodel.Trigger_mxJPO;
 import net.sourceforge.mxupdate.update.datamodel.Type_mxJPO;
 import net.sourceforge.mxupdate.update.user.Association_mxJPO;
 import net.sourceforge.mxupdate.update.user.Group_mxJPO;
+import net.sourceforge.mxupdate.update.user.Person_mxJPO;
 import net.sourceforge.mxupdate.update.user.Role_mxJPO;
 import net.sourceforge.mxupdate.update.userinterface.Channel_mxJPO;
 import net.sourceforge.mxupdate.update.userinterface.Command_mxJPO;
@@ -227,6 +228,10 @@ process: 's' --process
                         null,
                         "Export / Import of user administrational objects.",
                         "user");
+        defineParameter(null, user,
+                        Person_mxJPO.class,
+                        "Export / Import of persons.",
+                        "person");
         defineParameter(null, user,
                         Association_mxJPO.class,
                         "Export / Import of associations.",
