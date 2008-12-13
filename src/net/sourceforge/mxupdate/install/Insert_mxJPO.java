@@ -161,7 +161,7 @@ public class Insert_mxJPO
      *
      * @see ClassFile#getCode(Map)
      */
-    private static final Pattern PATTERN_JPO = Pattern.compile("((?<=[ \\(\\)\\t\\r\\n@\\<])|(^))[A-Za-z0-9\\.]*\\_"+"mxJPO");
+    private static final Pattern PATTERN_JPO = Pattern.compile("((?<=[+ \\(\\)\\t\\r\\n@\\<])|(^))[A-Za-z0-9\\.]*\\_"+"mxJPO");
 
     /**
      * MQL command line to list the installed MxUpdate JPOs and the depending
@@ -171,7 +171,7 @@ public class Insert_mxJPO
      */
     private static final String CMD_LISTJPOS
             = "list prog \"MxUpdate,net.sourceforge.mxupdate.*\" "
-                    + "select name property[" + PROP_FILEDATE + "].value "
+                    + "select name property[" + PROP_FILEDATE + "].value isjavaprogram "
                     + "dump \"\t\"";
 
     /**
@@ -259,7 +259,10 @@ System.out.println("update jpo '" + classFile.jpoName + "'");
 
     /**
      * Searches for the installed JPOs and returns them including the
-     * information about the last modified date of the installed file.
+     * information about the last modified date of the installed file. If a
+     * program is found which is not a JPO and does not have the extension
+     * <code>.properties</code>, an information is printed that the program is
+     * ignored.
      *
      * @param _context  context for this request
      * @return map of already installed JPOs and the last modified date of the
@@ -274,19 +277,23 @@ System.out.println("update jpo '" + classFile.jpoName + "'");
         final Map<String,Date> installedProgs = new TreeMap<String,Date>();
         for (final String oneJPO : jpos.split("\n"))  {
             final String[] oneJPOArr = oneJPO.split("\t");
+            final String name = oneJPOArr[0];
             final String modDate = (oneJPOArr.length > 1) ? oneJPOArr[1] : "";
-            Date mxDate;
-            try  {
-                mxDate = DATE_FORMAT.parse(modDate);
-            } catch (final ParseException e)  {
-                mxDate = null;
+            final String isJava = (oneJPOArr.length > 2) ? oneJPOArr[2].trim() : "";
+            if ("TRUE".equalsIgnoreCase(isJava))  {
+                Date mxDate;
+                try  {
+                    mxDate = DATE_FORMAT.parse(modDate);
+                } catch (final ParseException e)  {
+                    mxDate = null;
+                }
+                installedProgs.put(name, mxDate);
+            } else if (!name.endsWith(".properties")) {
+                System.out.println("program '" + name + "' is ignored because not a JPO");
             }
-            installedProgs.put(oneJPOArr[0], mxDate);
         }
-
         return installedProgs;
     }
-
 
     /**
      *
