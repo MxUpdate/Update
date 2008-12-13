@@ -72,6 +72,37 @@ eval  {
   }
 
   ##############################################################################
+  # Register symbolic name for given administration object.
+  ##############################################################################
+  proc pRegisterObject {_sKind _sName}  {
+    global asMapping
+
+    regsub -all { } "${_sName}" {} sSymbName
+    set sSymbName "${_sKind}_${sSymbName}"
+
+    # get existing symbolic name (if exists)
+    set sExists [mql list property \
+                    on program $asMapping(Program.RegisterSymbolicNames) \
+                    to ${_sKind} "${_sName}"]
+    regsub -all { on program .*} "${sExists}" {} sExists
+
+    if {"${sExists}" != "${sSymbName}"}  {
+      # if old symbolic name is not equal new symbolic name => delete
+      if {"${sExists}" != ""}  {
+        puts "remove wrong registered property '${sExists}' for ${_sKind} '${_sName}'"
+        mql delete property "${sExists}" \
+            on program $asMapping(Program.RegisterSymbolicNames) \
+            to ${_sKind} "${_sName}"
+      }
+      # and create new one
+      puts "created registered property '${sSymbName}' for ${_sKind} '${_sName}'"
+      mql add property "${sSymbName}" \
+            on program $asMapping(Program.RegisterSymbolicNames) \
+            to ${_sKind} "${_sName}"
+    }
+  }
+
+  ##############################################################################
   # The procedure installs given JPO within the given root path.
   ##############################################################################
   proc pInstallJPO {_sRoot _sJPOName _sVersion}  {
@@ -92,6 +123,7 @@ eval  {
             add property $asMapping(Property.FileDate) value "${sFileDate}" \
             add property $asMapping(Property.Version) value "${_sVersion}"
     }
+    pRegisterObject program "${_sJPOName}"
   }
 
   ##############################################################################
@@ -119,6 +151,7 @@ eval  {
             add property $asMapping(Property.FileDate) value "${sFileDate}" \
             add property $asMapping(Property.Version) value "${_sVersion}"
     }
+    pRegisterObject program "${_sPropName}"
   }
 
   ##############################################################################
@@ -150,6 +183,7 @@ eval  {
           add property $asMapping(Property.Installer)     value "The MxUpdate Team" \
           add property $asMapping(Property.OriginalName)  value "${sOneAttribute}" \
           add property $asMapping(Property.Version)       value "${_sVersion}"
+      pRegisterObject attribute "${sOneAttribute}"
     }
     # update types
     foreach sOneType ${lsTypes}  {
@@ -161,9 +195,11 @@ eval  {
       }
     }
     # register MxUpdate
-    if {[mql list program "eServiceSystemInformation.tcl"] != ""}  {
+    if {[mql list program $asMapping(Program.RegisterApplication)] != ""}  {
       puts "register MxUpdate ${_sVersion}"
-      mql mod prog "eServiceSystemInformation.tcl" add property "appVersionMxUpdate" value "${_sVersion}"
+      mql mod prog $asMapping(Program.RegisterApplication) \
+          add property "appVersionMxUpdate" \
+          value "${_sVersion}"
     }
   }
   
