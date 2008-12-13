@@ -157,7 +157,7 @@ eval  {
   ##############################################################################
   # The procedure installs depending data model needed for the MxUpdate.
   ##############################################################################
-  proc pInstallDM {_sVersion}  {
+  proc pInstallDM {_sRoot _sVersion}  {
     global asMapping
 
     set lsAttributes [list $asMapping(Attribute.CommonAuthor) \
@@ -166,25 +166,46 @@ eval  {
                            $asMapping(Attribute.CommonVersion)]
     set lsTypes      [list $asMapping(Type.NumberGenerator) \
                            $asMapping(Type.ObjectGenerator) \
-                           $asMapping(Type.Trigger)]
+                           $asMapping(Type.Trigger) \
+                           $asMapping(Type.TriggerGroup)]
+
     # create attributes
     set lsExists [split [mql list attribute [join ${lsAttributes} ","]] "\n"]
     foreach sOneAttribute ${lsAttributes}  {
       if {[lsearch ${lsExists} "${sOneAttribute}"] < 0}  {
         puts "create attribute '${sOneAttribute}'"
-        mql add attribute "${sOneAttribute}" type string
+        mql add attribute "${sOneAttribute}" type string \
+            property $asMapping(Property.InstalledDate) value [clock format [clock clicks]  -gmt true -format "%m-%d-%Y"]
       } else  {
         puts "update attribute '${sOneAttribute}'"
       }
       mql modify attribute "${sOneAttribute}" \
           add property $asMapping(Property.Application)   value "MxUpdate" \
           add property $asMapping(Property.Author)        value "The MxUpdate Team" \
-          add property $asMapping(Property.InstalledDate) value [clock format [clock clicks]  -gmt true -format "%m-%d-%Y"] \
           add property $asMapping(Property.Installer)     value "The MxUpdate Team" \
           add property $asMapping(Property.OriginalName)  value "${sOneAttribute}" \
           add property $asMapping(Property.Version)       value "${_sVersion}"
       pRegisterObject attribute "${sOneAttribute}"
     }
+
+    # create / update trigger group type
+    if {[mql list type $asMapping(Type.TriggerGroup)] == ""}  {
+      puts "create trigger group type '$asMapping(Type.TriggerGroup)'"
+      mql add type $asMapping(Type.TriggerGroup) \
+          property $asMapping(Property.InstalledDate) value [clock format [clock clicks]  -gmt true -format "%m-%d-%Y"]
+    } else  {
+      puts "update trigger group type '$asMapping(Type.TriggerGroup)'"
+    }
+    mql mod type $asMapping(Type.TriggerGroup) \
+        description "Type used to group trigger definitions." \
+        icon [file join "${_sRoot}" "TriggerGroup.gif"] \
+        add property $asMapping(Property.Application)   value "MxUpdate" \
+        add property $asMapping(Property.Author)        value "The MxUpdate Team" \
+        add property $asMapping(Property.Installer)     value "The MxUpdate Team" \
+        add property $asMapping(Property.OriginalName)  value "$asMapping(Type.TriggerGroup)" \
+        add property $asMapping(Property.Version)       value "${_sVersion}"
+    pRegisterObject type "$asMapping(Type.TriggerGroup)"
+
     # update types
     foreach sOneType ${lsTypes}  {
       foreach sOneAttribute ${lsAttributes}  {
@@ -194,6 +215,46 @@ eval  {
         }
       }
     }
+
+    # create / update trigger group policy
+    if {[mql list policy $asMapping(Policy.TriggerGroup)] == ""}  {
+      puts "create trigger group policy '$asMapping(Policy.TriggerGroup)'"
+      mql copy policy $asMapping(Policy.Trigger) $asMapping(Policy.TriggerGroup) \
+          remove state "Inactive" \
+          remove type $asMapping(Type.Trigger) \
+          add property $asMapping(Property.InstalledDate) value [clock format [clock clicks]  -gmt true -format "%m-%d-%Y"]
+    } else  {
+      puts "update trigger group policy '$asMapping(Policy.TriggerGroup)'"
+    }
+    mql mod policy $asMapping(Policy.TriggerGroup) \
+        description "Policy used to group trigger definitions." \
+        add type $asMapping(Type.TriggerGroup) \
+        add property $asMapping(Property.Application)   value "MxUpdate" \
+        add property $asMapping(Property.Author)        value "The MxUpdate Team" \
+        add property $asMapping(Property.Installer)     value "The MxUpdate Team" \
+        add property $asMapping(Property.OriginalName)  value "$asMapping(Policy.TriggerGroup)" \
+        add property $asMapping(Property.Version)       value "${_sVersion}"
+    pRegisterObject policy "$asMapping(Policy.TriggerGroup)"
+
+    # create / update trigger group relationship
+    if {[mql list relationship $asMapping(Relationship.TriggerGroup)] == ""}  {
+      puts "create trigger group relationship '$asMapping(Relationship.TriggerGroup)'"
+      mql add relationship $asMapping(Relationship.TriggerGroup)
+    } else  {
+      puts "update trigger group relationship '$asMapping(Relationship.TriggerGroup)'"
+    }
+    mql mod relationship $asMapping(Relationship.TriggerGroup) \
+        description "Relationship used to group trigger definitions." \
+        from add type $asMapping(Type.TriggerGroup) \
+        to add type $asMapping(Type.Trigger) \
+           add type $asMapping(Type.TriggerGroup) \
+        add property $asMapping(Property.Application)   value "MxUpdate" \
+        add property $asMapping(Property.Author)        value "The MxUpdate Team" \
+        add property $asMapping(Property.Installer)     value "The MxUpdate Team" \
+        add property $asMapping(Property.OriginalName)  value "$asMapping(Relationship.TriggerGroup)" \
+        add property $asMapping(Property.Version)       value "${_sVersion}"
+    pRegisterObject relationship "$asMapping(Relationship.TriggerGroup)"
+
     # register MxUpdate
     if {[mql list program $asMapping(Program.RegisterApplication)] != ""}  {
       puts "register MxUpdate ${_sVersion}"
@@ -210,7 +271,7 @@ eval  {
   pReadMapping "${sPath}"
 
   pInstallProperties "${sPath}" "net.sourceforge.mxupdate.mapping.properties" "${VERSION}"
-  pInstallDM                                                                  "${VERSION}"
+  pInstallDM         "${sPath}"                                               "${VERSION}"
   pInstallJPO        "${sPath}" "net.sourceforge.mxupdate.install.Insert"     "${VERSION}"
   pInstallJPO        "${sPath}" "net.sourceforge.mxupdate.util.MqlUtil"       "${VERSION}"
 

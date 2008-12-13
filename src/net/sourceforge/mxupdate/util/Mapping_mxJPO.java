@@ -172,7 +172,12 @@ public final class Mapping_mxJPO
         /**
          * Trigger business type.
          */
-        Trigger;
+        Trigger,
+
+        /**
+         * Trigger group business type.
+         */
+        TriggerGroup;
 
         /**
          * Returns the related name used within Mx. The method returns only
