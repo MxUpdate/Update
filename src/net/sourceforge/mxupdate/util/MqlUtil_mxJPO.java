@@ -20,6 +20,11 @@
 
 package net.sourceforge.mxupdate.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 import matrix.db.Context;
 import matrix.db.MQLCommand;
 import matrix.util.MatrixException;
@@ -120,5 +125,32 @@ public final class MqlUtil_mxJPO
             throws MatrixException
     {
         execMql(_context, "history off");
+    }
+
+    /**
+     * Reads the program with given name and evaluates the code of the program
+     * as properties.
+     *
+     * @param _context      context for this request
+     * @param _name         name of the property program to read
+     * @throws MatrixException  if the code of the program with given name
+     *                          could not be read
+     * @throws IOException      if the code of the program could not be parsed
+     *                          as properties
+     */
+    public static Properties readPropertyProgram(final Context _context,
+                                                 final String _name)
+            throws MatrixException, IOException
+    {
+        final String code = execMql(_context,
+                                    new StringBuilder()
+                                            .append("print prog \"").append(_name)
+                                            .append("\" select code dump"));
+
+        final InputStream is = new ByteArrayInputStream(code.getBytes());
+        final Properties properties = new Properties();
+        properties.load(is);
+
+        return properties;
     }
 }

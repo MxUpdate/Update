@@ -25,6 +25,8 @@ import java.io.Writer;
 
 import net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AttributeDef;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.TypeDef;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
@@ -32,8 +34,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(busType = "eService Number Generator",
-                busIgnoreAttributes = {"eService Next Number"},
+@InfoAnno_mxJPO(busType = TypeDef.NumberGenerator,
+                busIgnoreAttributes = AttributeDef.NumberGeneratorNextNumber,
                 title = "NUMBERGENERATOR",
                 filePrefix = "NUMBERGENERATOR_",
                 fileSuffix = ".tcl",
@@ -46,8 +48,6 @@ public class NumberGenerator_mxJPO
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = -3678077121553752020L;
-
-    final static String ATTRIBUTE_ESERVICE_NEXT_NUMBER = "eService Next Number";
 
     /**
      * Writes the information to update the business objects. Because for the
@@ -65,7 +65,7 @@ public class NumberGenerator_mxJPO
             .append(" \\\n    description \"").append(convertTcl(getDescription())).append("\"");
         String nextNumber = null;
         for (final Attribute attr : getAttrValuesSorted())  {
-            if (ATTRIBUTE_ESERVICE_NEXT_NUMBER.equals(attr.name))  {
+            if (AttributeDef.NumberGeneratorNextNumber.getMxName().equals(attr.name))  {
                 nextNumber = attr.value;
             } else  {
                 _out.append(" \\\n    \"").append(convertTcl(attr.name))
@@ -74,9 +74,9 @@ public class NumberGenerator_mxJPO
         }
         _out.append("\n")
             .append("\n# update of the next number attribute only if not already set")
-            .append("\nset sTmp [mql print bus \"${OBJECTID}\" select attribute\\[").append(ATTRIBUTE_ESERVICE_NEXT_NUMBER).append("\\] dump]")
+            .append("\nset sTmp [mql print bus \"${OBJECTID}\" select attribute\\[").append(AttributeDef.NumberGeneratorNextNumber.getMxName()).append("\\] dump]")
             .append("\nif {[string length \"${sTmp}\"]==0}  {")
-            .append("\n  mql mod bus \"${OBJECTID}\" \"").append(ATTRIBUTE_ESERVICE_NEXT_NUMBER).append("\" \"").append(nextNumber).append("\"")
+            .append("\n  mql mod bus \"${OBJECTID}\" \"").append(AttributeDef.NumberGeneratorNextNumber.getMxName()).append("\" \"").append(nextNumber).append("\"")
             .append("\n}");
     }
 }

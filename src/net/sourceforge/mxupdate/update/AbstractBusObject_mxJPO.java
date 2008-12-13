@@ -37,6 +37,8 @@ import matrix.db.Query;
 import matrix.util.MatrixException;
 import matrix.util.StringList;
 
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AttributeDef;
+
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
 import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.setHistoryOff;
@@ -59,21 +61,6 @@ public abstract class AbstractBusObject_mxJPO
      * object.
      */
     private static final String SPLIT_NAME = "________";
-
-    /**
-     * Attribute name of the author.
-     */
-    private static final String ATTR_AUTHOR = "emxGerLibUpdateAuthor";
-
-    /**
-     * Attribute name of the installation date.
-     */
-    private static final String ATTR_INSTALLED_DATE = "emxGerLibUpdateInstalledDate";
-
-    /**
-     * Attribute name of the updated version.
-     */
-    private static final String ATTR_UPDATE_VERSION = "emxGerLibUpdateVersion";
 
     /**
      * All attribute values of this business object.
@@ -181,7 +168,7 @@ public abstract class AbstractBusObject_mxJPO
 
         return new StringBuilder()
                 .append("export bus \"")
-                .append(getBusType())
+                .append(this.getBusType())
                 .append("\" \"").append(nameRev[0])
                 .append("\" \"").append((nameRev.length > 1) ? nameRev[1] : "")
                 .append("\" !file !icon !history !relationship !state xml")
@@ -258,11 +245,11 @@ public abstract class AbstractBusObject_mxJPO
     protected void prepare(final Context _context) throws MatrixException
     {
         for (final Attribute attrValue : this.attrValues)  {
-            if (ATTR_AUTHOR.equals(attrValue.name))  {
+            if (AttributeDef.CommonAuthor.getMxName().equals(attrValue.name))  {
                 this.setAuthor(attrValue.value);
-            } else if (ATTR_UPDATE_VERSION.equals(attrValue.name))  {
+            } else if (AttributeDef.CommonVersion.getMxName().equals(attrValue.name))  {
                 this.setVersion(attrValue.value);
-            } else if (!ATTR_INSTALLED_DATE.equals(attrValue.name))  {
+            } else if (!AttributeDef.CommonInstalledDate.getMxName().equals(attrValue.name))  {
                 this.attrValuesSorted.add(attrValue);
             }
         }
@@ -352,12 +339,12 @@ public abstract class AbstractBusObject_mxJPO
                 .append("mod bus ").append(objectId).append(" description \"\"");
 
         // reset all attributes (if they must not be ignored...)
-        final String[] ignoreAttrs = this.getInfoAnno().busIgnoreAttributes();
+        final AttributeDef[] ignoreAttrs = this.getInfoAnno().busIgnoreAttributes();
         for (final Attribute attr : this.attrValuesSorted)  {
 // TODO: use default attribute value instead of ""
             boolean found = false;
-            for (final String ignoreAttr : ignoreAttrs)  {
-                if (ignoreAttr.equals(attr.name))  {
+            for (final AttributeDef ignoreAttr : ignoreAttrs)  {
+                if (ignoreAttr.getMxName().equals(attr.name))  {
                     found = true;
                     break;
                 }
@@ -375,7 +362,7 @@ public abstract class AbstractBusObject_mxJPO
         final StringBuilder postMQLCode = new StringBuilder()
                 .append(_postMQLCode)
                 .append("mod bus ").append(objectId).append(" \"")
-                .append(ATTR_UPDATE_VERSION).append("\" \"").append(_tclVariables.get("VERSION")).append("\";\n");
+                .append(AttributeDef.CommonVersion.getMxName()).append("\" \"").append(_tclVariables.get("VERSION")).append("\";\n");
 
         // prepare map of all TCL variables incl. id of business object
         final Map<String,String> tclVariables = new HashMap<String,String>();
@@ -399,7 +386,7 @@ public abstract class AbstractBusObject_mxJPO
      */
     protected String getBusType()
     {
-        return getInfoAnno().busType();
+        return getInfoAnno().busType().getMxName();
     }
 
     /**

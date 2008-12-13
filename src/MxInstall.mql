@@ -44,23 +44,80 @@ eval  {
   }
 
   ##############################################################################
+  # Read the mapping configuration between MX names and internal used names
+  ##############################################################################
+  proc pReadMapping {_sRoot}  {
+    global asMapping
+
+    # read file
+    set pFile [open [file join "${_sRoot}" "net" "sourceforge" "mxupdate" "mapping.properties"] r]
+    set lsMapping [split [read $pFile] "\n"]
+    close $pFile
+
+    # prepare mapping
+    foreach sOneLine ${lsMapping}  {
+      set sOneLine [string trim "${sOneLine}"]
+      # check for none empty line and none comment line 
+      if {([string length "${sOneLine}"] > 0) && ([string index "${sOneLine}" 0] != "#")}  {
+        # equal index position
+        set iIdx [string first "=" "${sOneLine}"]
+        if {${iIdx} > 0}  {
+          # extract key and value
+          set sKey [string trim [string range "${sOneLine}" 0 [expr ${iIdx} - 1]]]
+          set sVal [string trim [string range "${sOneLine}" [expr ${iIdx} + 1] end]]
+          set asMapping(${sKey}) "${sVal}"
+        }
+      }
+    }
+  }
+
+  ##############################################################################
   # The procedure installs given JPO within the given root path.
   ##############################################################################
   proc pInstallJPO {_sRoot _sJPOName _sVersion}  {
+    global asMapping
+
     regsub -all {\.} "${_sJPOName}" {/} sFileName
     set sFileName [file join "${_sRoot}" "${sFileName}_mxJPO.java"]
     set sFileDate [clock format [file mtime "${sFileName}"]  -gmt true -format "%Y-%m-%d %H:%M:%S"]
     if {[mql list prog "${_sJPOName}"] == ""}  {
       set sJPODate ""
     } else  {
-      set sJPODate [mql print prog "${_sJPOName}" select property\[file date\].value dump]
+      set sJPODate [mql print prog "${_sJPOName}" select property\[$asMapping(Property.FileDate)\].value dump]
     }
     if {"${sJPODate}" != "${sFileDate}"}  {
       puts "update jpo '${_sJPOName}'"
       mql insert prog "${sFileName}"
       mql mod prog ${_sJPOName} \
-            add property "file date" value "${sFileDate}" \
-            add property "version" value "${_sVersion}"
+            add property $asMapping(Property.FileDate) value "${sFileDate}" \
+            add property $asMapping(Property.Version) value "${_sVersion}"
+    }
+  }
+
+  ##############################################################################
+  # The procedure installs given property within the given root path.
+  ##############################################################################
+  proc pInstallProperties {_sRoot _sPropName _sVersion}  {
+    global asMapping
+
+    # extract path and file of property
+    regsub {\.properties} "${_sPropName}" {} sFileName
+    regsub -all {\.} "${sFileName}" {/} sFileName
+    set sFileName [file join "${_sRoot}" "${sFileName}.properties"]
+
+    set sFileDate [clock format [file mtime "${sFileName}"]  -gmt true -format "%Y-%m-%d %H:%M:%S"]
+    if {[mql list prog "${_sPropName}"] == ""}  {
+      set sDate ""
+      mql add prog "${_sPropName}"
+    } else  {
+      set sDate [mql print prog "${_sPropName}" select property\[$asMapping(Property.FileDate)\].value dump]
+    }
+    if {"${sDate}" != "${sFileDate}"}  {
+      puts "update property '${_sPropName}'"
+      mql mod prog ${_sPropName} \
+            file "${sFileName}" \
+            add property $asMapping(Property.FileDate) value "${sFileDate}" \
+            add property $asMapping(Property.Version) value "${_sVersion}"
     }
   }
 
@@ -68,12 +125,15 @@ eval  {
   # The procedure installs depending data model needed for the MxUpdate.
   ##############################################################################
   proc pInstallDM {_sVersion}  {
-    set lsAttributes [list "emxGerLibUpdateAuthor" \
-                           "emxGerLibUpdateInstalledDate" \
-                           "emxGerLibUpdateVersion"]
-    set lsTypes [list "eService Number Generator" \
-                      "eService Object Generator" \
-                      "eService Trigger Program Parameters"]
+    global asMapping
+
+    set lsAttributes [list $asMapping(Attribute.CommonAuthor) \
+                           $asMapping(Attribute.CommonFileDate) \
+                           $asMapping(Attribute.CommonInstalledDate) \
+                           $asMapping(Attribute.CommonVersion)]
+    set lsTypes      [list $asMapping(Type.NumberGenerator) \
+                           $asMapping(Type.ObjectGenerator) \
+                           $asMapping(Type.Trigger)]
     # create attributes
     set lsExists [split [mql list attribute [join ${lsAttributes} ","]] "\n"]
     foreach sOneAttribute ${lsAttributes}  {
@@ -84,13 +144,12 @@ eval  {
         puts "update attribute '${sOneAttribute}'"
       }
       mql modify attribute "${sOneAttribute}" \
-          add property "application"    value "MxUpdate" \
-          add property "author"         value "The MxUpdate Team" \
-          add property "installed date" value [clock format [clock clicks]  -gmt true -format "%m-%d-%Y"] \
-          add property "installer"      value "The MxUpdate Team" \
-          add property "original name"  value "${sOneAttribute}" \
-          add property "version"        value "${_sVersion}"
-          
+          add property $asMapping(Property.Application)   value "MxUpdate" \
+          add property $asMapping(Property.Author)        value "The MxUpdate Team" \
+          add property $asMapping(Property.InstalledDate) value [clock format [clock clicks]  -gmt true -format "%m-%d-%Y"] \
+          add property $asMapping(Property.Installer)     value "The MxUpdate Team" \
+          add property $asMapping(Property.OriginalName)  value "${sOneAttribute}" \
+          add property $asMapping(Property.Version)       value "${_sVersion}"
     }
     # update types
     foreach sOneType ${lsTypes}  {
@@ -111,10 +170,13 @@ eval  {
 
   mql verbose off
   mql set escape off
-  
-  pInstallDM "${VERSION}"
-  pInstallJPO "${sPath}" "net.sourceforge.mxupdate.install.Insert" "${VERSION}"
-  pInstallJPO "${sPath}" "net.sourceforge.mxupdate.util.MqlUtil"   "${VERSION}"
+
+  pReadMapping "${sPath}"
+
+  pInstallProperties "${sPath}" "net.sourceforge.mxupdate.mapping.properties" "${VERSION}"
+  pInstallDM                                                                  "${VERSION}"
+  pInstallJPO        "${sPath}" "net.sourceforge.mxupdate.install.Insert"     "${VERSION}"
+  pInstallJPO        "${sPath}" "net.sourceforge.mxupdate.util.MqlUtil"       "${VERSION}"
 
   mql exec prog "net.sourceforge.mxupdate.install.Insert" "${sPath}" "${VERSION}"
 

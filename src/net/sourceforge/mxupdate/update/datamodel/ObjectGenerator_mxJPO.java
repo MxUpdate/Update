@@ -32,12 +32,13 @@ import matrix.util.StringList;
 
 import net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.TypeDef;
 
 /**
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(busType = "eService Object Generator",
+@InfoAnno_mxJPO(busType = TypeDef.ObjectGenerator,
                 title = "OBJECTGENERATOR",
                 filePrefix = "OBJECTGENERATOR_",
                 fileSuffix = ".tcl",

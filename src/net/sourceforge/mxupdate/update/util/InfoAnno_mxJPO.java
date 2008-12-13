@@ -23,6 +23,9 @@ package net.sourceforge.mxupdate.update.util;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AttributeDef;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.TypeDef;
+
 /**
  * Internal Matrix administration type name and (if required) suffix.
  *
@@ -47,13 +50,13 @@ public @interface InfoAnno_mxJPO
     /**
      * Name of the business type.
      */
-    public String busType() default "";
+    public TypeDef busType() default TypeDef.UnDef;
 
     /**
      * Defines the attributes which are ignored from the reset algorithm if
      * the update is make for a business object.
      */
-    public String[] busIgnoreAttributes() default {};
+    public AttributeDef[] busIgnoreAttributes() default {};
 
     /**
      * Prefixes of the file name.

@@ -55,6 +55,7 @@ import net.sourceforge.mxupdate.update.userinterface.Inquiry_mxJPO;
 import net.sourceforge.mxupdate.update.userinterface.Menu_mxJPO;
 import net.sourceforge.mxupdate.update.userinterface.Portal_mxJPO;
 import net.sourceforge.mxupdate.update.userinterface.Table_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO;
 import net.sourceforge.mxupdate.util.MqlUtil_mxJPO;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
@@ -466,6 +467,10 @@ process: 's' --process
                        final String... _args)
             throws Exception
     {
+
+        // initialize mapping
+        Mapping_mxJPO.init(_context);
+
         try {
             // to be sure....
             MqlUtil_mxJPO.execMql(_context, "verbose off");

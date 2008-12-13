@@ -36,6 +36,7 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AttributeDef;
 
 import org.xml.sax.SAXException;
 
@@ -289,10 +290,10 @@ public abstract class AbstractObject_mxJPO
             final String[] nameRev = _name.split("________");
             curVersion = execMql(_context, new StringBuilder()
                     .append("print bus \"")
-                    .append(this.getInfoAnno().busType())
+                    .append(this.getInfoAnno().busType().getMxName())
                     .append("\" \"").append(nameRev[0])
                     .append("\" \"").append((nameRev.length > 1) ? nameRev[1] : "")
-                    .append("\" select attribute[").append("emxGerLibUpdateVersion").append("] dump"));
+                    .append("\" select attribute[").append(AttributeDef.CommonVersion.getMxName()).append("] dump"));
         }
         return (curVersion.matches("^[0-9]++$"))
                ? new Date(Long.parseLong(curVersion) * 1000)

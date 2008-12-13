@@ -43,6 +43,7 @@ import net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO;
 import net.sourceforge.mxupdate.update.AbstractObject_mxJPO;
 import net.sourceforge.mxupdate.update.AbstractPropertyObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.TypeDef;
 
 import org.xml.sax.SAXException;
 
@@ -57,7 +58,7 @@ import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.setHistoryOn;
  * @version $Id$
  */
 @InfoAnno_mxJPO(adminType = "person",
-                busType = "Person",
+                busType = TypeDef.Person,
                 title = "PERSON",
                 filePrefix = "PERSON_",
                 fileSuffix = ".tcl",
@@ -477,13 +478,13 @@ public class Person_mxJPO
         }
     }
 
-    @InfoAnno_mxJPO(busType = "Person",
-            busIgnoreAttributes = {},
-            title = "",
-            filePrefix = "",
-            fileSuffix = "",
-            filePath = "",
-            description = "person")
+    @InfoAnno_mxJPO(busType = TypeDef.Person,
+                    busIgnoreAttributes = {},
+                    title = "",
+                    filePrefix = "",
+                    fileSuffix = "",
+                    filePath = "",
+                    description = "person")
     private class PersonBus
             extends AbstractBusObject_mxJPO
     {

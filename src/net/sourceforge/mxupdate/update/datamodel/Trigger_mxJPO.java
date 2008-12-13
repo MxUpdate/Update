@@ -32,12 +32,13 @@ import matrix.util.StringList;
 
 import net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.TypeDef;
 
 /**
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(busType = "eService Trigger Program Parameters",
+@InfoAnno_mxJPO(busType = TypeDef.Trigger,
                 title = "TRIGGER",
                 filePrefix = "TRIGGER_",
                 fileSuffix = ".tcl",
