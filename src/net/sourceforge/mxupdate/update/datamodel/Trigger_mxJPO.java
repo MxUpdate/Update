@@ -32,18 +32,14 @@ import matrix.util.StringList;
 
 import net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
-import net.sourceforge.mxupdate.util.Mapping_mxJPO.TypeDef;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.BusTypeDef;
 
 /**
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(busType = TypeDef.Trigger,
-                title = "TRIGGER",
-                filePrefix = "TRIGGER_",
-                fileSuffix = ".tcl",
-                filePath = "datamodel/trigger",
-                description = "trigger")
+@InfoAnno_mxJPO(busType = BusTypeDef.Trigger,
+                fileSuffix = ".tcl")
 public class Trigger_mxJPO
         extends AbstractBusObject_mxJPO
 {

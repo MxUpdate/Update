@@ -23,8 +23,9 @@ package net.sourceforge.mxupdate.update.util;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 import net.sourceforge.mxupdate.util.Mapping_mxJPO.AttributeDef;
-import net.sourceforge.mxupdate.util.Mapping_mxJPO.TypeDef;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.BusTypeDef;
 
 /**
  * Internal Matrix administration type name and (if required) suffix.
@@ -38,19 +39,12 @@ public @interface InfoAnno_mxJPO
     /**
      * Name of the administration type.
      */
-// TODO: use symbolic names instead of the name of the Matrix type name
-    public String adminType() default "";
-
-    /**
-     * Suffix of the administration type (if required, e.g. for web tables). If
-     * not defined the suffix is a zero length string.
-     */
-    public String adminTypeSuffix() default "";
+    public AdminTypeDef adminType() default AdminTypeDef.Undef;
 
     /**
      * Name of the business type.
      */
-    public TypeDef busType() default TypeDef.UnDef;
+    public BusTypeDef busType() default BusTypeDef.UnDef;
 
     /**
      * Defines the attributes which are ignored from the reset algorithm if
@@ -59,27 +53,7 @@ public @interface InfoAnno_mxJPO
     public AttributeDef[] busIgnoreAttributes() default {};
 
     /**
-     * Prefixes of the file name.
-     */
-    public String[] filePrefix();
-
-    /**
      * Suffix of the file name including the file extension.
      */
     public String fileSuffix();
-
-    /**
-     * Used sub directory for the export.
-     */
-    public String filePath();
-
-    /**
-     * String used as title within the TCL header of the file.
-     */
-    public String title();
-
-    /**
-     * String used for logging purpose.
-     */
-    public String description();
 }

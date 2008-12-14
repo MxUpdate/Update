@@ -33,6 +33,7 @@ import matrix.util.MatrixException;
 
 import net.sourceforge.mxupdate.update.AbstractObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import org.xml.sax.SAXException;
 
@@ -43,12 +44,8 @@ import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = "program",
-                title = "",
-                filePrefix = "",
-                fileSuffix = "_" + "mxJPO.java",
-                filePath = "jpo",
-                description = "jpo")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.JPO,
+                fileSuffix = "_" + "mxJPO.java")
 public class JPO_mxJPO
         extends AbstractObject_mxJPO
 {
@@ -161,7 +158,7 @@ public class JPO_mxJPO
     throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
-                .append("add ").append(getInfoAnno().adminType())
+                .append("add ").append(this.getInfoAnno().adminType().getMxName())
                 .append(" \"").append(_name).append("\" java");
         execMql(_context, cmd);
     }

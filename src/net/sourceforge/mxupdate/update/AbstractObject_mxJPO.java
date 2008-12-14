@@ -36,7 +36,9 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 import net.sourceforge.mxupdate.util.Mapping_mxJPO.AttributeDef;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.TypeDef;
 
 import org.xml.sax.SAXException;
 
@@ -87,7 +89,7 @@ public abstract class AbstractObject_mxJPO
      */
     public String getPath()
     {
-        return getInfoAnno().filePath();
+        return this.getTypeDef().getFilePath();
     }
 
     /**
@@ -109,6 +111,20 @@ public abstract class AbstractObject_mxJPO
             }
         }
         return ret;
+    }
+
+    /**
+     * Returns the type definition instance.
+     *
+     * @return type definition instance (if administration type definition
+     *         exists else business type definition)
+     */
+    public final TypeDef getTypeDef()
+    {
+        final InfoAnno_mxJPO infoAnno = this.getInfoAnno();
+        return (infoAnno.adminType() != AdminTypeDef.Undef)
+               ? infoAnno.adminType()
+               : infoAnno.busType();
     }
 
     /**
@@ -161,20 +177,19 @@ public abstract class AbstractObject_mxJPO
     {
         final Map<File,String> ret = new TreeMap<File,String>();
 
-        final String suffix = getInfoAnno().fileSuffix();
+        final String suffix = this.getInfoAnno().fileSuffix();
         final int suffixLength = suffix.length();
-        for (final String prefix : getInfoAnno().filePrefix())  {
-            final int prefixLength = prefix.length();
+        final String prefix = this.getTypeDef().getFilePrefix();
+        final int prefixLength = prefix.length();
 
-            for (final File file : _files)  {
-                final String fileName = file.getName();
-                for (final String match : _matches)  {
-                    if (fileName.startsWith(prefix) && fileName.endsWith(suffix))  {
-                        final String name = fileName.substring(0, fileName.length() - suffixLength)
-                                                    .substring(prefixLength);
-                        if (match(name, match))  {
-                            ret.put(file, name);
-                        }
+        for (final File file : _files)  {
+            final String fileName = file.getName();
+            for (final String match : _matches)  {
+                if (fileName.startsWith(prefix) && fileName.endsWith(suffix))  {
+                    final String name = fileName.substring(0, fileName.length() - suffixLength)
+                                                .substring(prefixLength);
+                    if (match(name, match))  {
+                        ret.put(file, name);
                     }
                 }
             }
@@ -195,17 +210,16 @@ public abstract class AbstractObject_mxJPO
     {
         final Map<File,String> ret = new TreeMap<File,String>();
 
-        final String suffix = getInfoAnno().fileSuffix();
+        final String suffix = this.getInfoAnno().fileSuffix();
         final int suffixLength = suffix.length();
-        for (final String prefix : getInfoAnno().filePrefix())  {
-            final int prefixLength = prefix.length();
-            for (final File file : _files)  {
-                final String fileName = file.getName();
-                if (fileName.startsWith(prefix) && fileName.endsWith(suffix))  {
-                    final String name = fileName.substring(0, fileName.length() - suffixLength)
-                                                .substring(prefixLength);
-                    ret.put(file, name);
-                }
+        final String prefix = this.getTypeDef().getFilePrefix();
+        final int prefixLength = prefix.length();
+        for (final File file : _files)  {
+            final String fileName = file.getName();
+            if (fileName.startsWith(prefix) && fileName.endsWith(suffix))  {
+                final String name = fileName.substring(0, fileName.length() - suffixLength)
+                                            .substring(prefixLength);
+                ret.put(file, name);
             }
         }
         return ret;
@@ -276,11 +290,11 @@ public abstract class AbstractObject_mxJPO
     {
         final String curVersion;
         // check for existing administration type...
-        if (!"".equals(this.getInfoAnno().adminType()))  {
+        if (this.getInfoAnno().adminType() != AdminTypeDef.Undef)  {
             final String tmp = execMql(_context, new StringBuilder()
-                    .append("print ").append(this.getInfoAnno().adminType())
+                    .append("print ").append(this.getInfoAnno().adminType().getMxName())
                     .append(" \"").append(_name).append("\" ")
-                    .append(this.getInfoAnno().adminTypeSuffix())
+                    .append(this.getInfoAnno().adminType().getMxSuffix())
                     .append(" select property[version] dump"));
             curVersion = (tmp.length() >= 14)
                          ? tmp.substring(14)

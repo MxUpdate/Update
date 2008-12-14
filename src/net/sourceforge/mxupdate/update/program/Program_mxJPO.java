@@ -33,6 +33,7 @@ import matrix.util.MatrixException;
 
 import net.sourceforge.mxupdate.update.AbstractObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import org.xml.sax.SAXException;
 
@@ -43,12 +44,8 @@ import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = "program",
-                title = "",
-                filePrefix = "",
-                fileSuffix = "",
-                filePath = "program",
-                description = "program")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Program,
+                fileSuffix = "")
 public class Program_mxJPO
         extends AbstractObject_mxJPO
 {

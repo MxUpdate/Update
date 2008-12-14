@@ -249,7 +249,8 @@ public abstract class AbstractBusObject_mxJPO
                 this.setAuthor(attrValue.value);
             } else if (AttributeDef.CommonVersion.getMxName().equals(attrValue.name))  {
                 this.setVersion(attrValue.value);
-            } else if (!AttributeDef.CommonInstalledDate.getMxName().equals(attrValue.name))  {
+            } else if (!AttributeDef.CommonInstalledDate.getMxName().equals(attrValue.name)
+                        && !AttributeDef.CommonFileDate.getMxName().equals(attrValue.name))  {
                 this.attrValuesSorted.add(attrValue);
             }
         }

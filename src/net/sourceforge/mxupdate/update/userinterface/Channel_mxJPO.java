@@ -29,7 +29,9 @@ import java.util.TreeMap;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
+import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
@@ -38,12 +40,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = "channel",
-                title = "CHANNEL",
-                filePrefix = "CHANNEL_",
-                fileSuffix = ".tcl",
-                filePath = "userinterface/channel",
-                description = "channel")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Channel,
+                fileSuffix = ".tcl")
 public class Channel_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {
@@ -196,12 +194,12 @@ public class Channel_mxJPO
     {
         // reset HRef, description, alt, label and height
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(getInfoAnno().adminType())
-                .append(" \"").append(getName()).append('\"')
+                .append("mod ").append(this.getInfoAnno().adminType().getMxName())
+                .append(" \"").append(this.getName()).append('\"')
                 .append(" href \"\" description \"\" alt \"\" label \"\" height 0");
 
         // reset settings
-        for (final net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
+        for (final AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
             if (prop.getName().startsWith("%"))  {
                 preMQLCode.append(" remove setting \"").append(prop.getName().substring(1)).append('\"');
             }

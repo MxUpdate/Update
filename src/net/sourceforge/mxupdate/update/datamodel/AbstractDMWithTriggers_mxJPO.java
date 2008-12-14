@@ -148,9 +148,9 @@ public abstract class AbstractDMWithTriggers_mxJPO
     {
         // remove all properties
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getInfoAnno().adminType())
+                .append("mod ").append(this.getInfoAnno().adminType().getMxName())
                 .append(" \"").append(this.getName()).append("\" ")
-                .append(this.getInfoAnno().adminTypeSuffix());
+                .append(this.getInfoAnno().adminType().getMxSuffix());
         for (final Trigger trigger : this.triggers.values())  {
             trigger.appendResetMQLStatement(preMQLCode);
         }

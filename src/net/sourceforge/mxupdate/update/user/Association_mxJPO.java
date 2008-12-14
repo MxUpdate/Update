@@ -32,6 +32,7 @@ import matrix.util.MatrixException;
 
 import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
@@ -41,12 +42,8 @@ import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = "association",
-                title = "ASSOCIATION",
-                filePrefix = "ASSOCIATION_",
-                fileSuffix = ".tcl",
-                filePath = "user/association",
-                description = "association")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Association,
+                fileSuffix = ".tcl")
 public class Association_mxJPO
         extends AbstractAdminObject_mxJPO
 {
@@ -129,8 +126,8 @@ public class Association_mxJPO
     {
         // description and definition
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(getInfoAnno().adminType())
-                .append(" \"").append(getName()).append('\"')
+                .append("mod ").append(this.getInfoAnno().adminType().getMxName())
+                .append(" \"").append(this.getName()).append('\"')
                 .append(" description \"\"")
                 .append(" definition \"").append(_context.getUser()).append("\";\n");
 

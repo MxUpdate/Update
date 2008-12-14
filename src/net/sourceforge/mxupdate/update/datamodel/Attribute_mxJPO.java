@@ -23,17 +23,21 @@ package net.sourceforge.mxupdate.update.datamodel;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
 import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
@@ -43,12 +47,8 @@ import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
  * @todo description
  * @todo program ranges
  */
-@InfoAnno_mxJPO(adminType = "attribute",
-                title = "ATTRIBUTE",
-                filePrefix = {"BOOLEAN_", "DATE_", "INTEGER_", "REAL_", "STRING_"},
-                fileSuffix = ".tcl",
-                filePath = "datamodel/attribute",
-                description = "attribute")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Attribute,
+                fileSuffix = ".tcl")
 public class Attribute_mxJPO
         extends AbstractDMWithTriggers_mxJPO
 {
@@ -92,6 +92,77 @@ public class Attribute_mxJPO
      * The attribute is a multi line attribute.
      */
     private boolean multiline = false;
+
+    private final String[] PREFIXES = {"BOOLEAN_", "DATE_", "INTEGER_", "REAL_", "STRING_"};
+
+    /**
+     * Evaluates for given set of files all matching files and returns them as
+     * map (key is the file name, value is the name of the matrix
+     * administration (business) object).<br/>
+     * If the file name without prefix and suffix matches one of the collection
+     * match strings, the file is added to the map and is returned.
+     *
+     * @param _files            set of files used to found matching files
+     * @param _matches          collection of match strings
+     * @return map of files (as key) with the related matrix name (as value)
+     * @see #getMatchingFileNames(Set)
+     */
+    @Override
+    public Map<File, String> getMatchingFileNames(final Set<File> _files,
+                                                  final Collection<String> _matches)
+    {
+        final Map<File,String> ret = new TreeMap<File,String>();
+
+        final String suffix = this.getInfoAnno().fileSuffix();
+        final int suffixLength = suffix.length();
+        for (final String prefix : PREFIXES)  {
+            final int prefixLength = prefix.length();
+
+            for (final File file : _files)  {
+                final String fileName = file.getName();
+                for (final String match : _matches)  {
+                    if (fileName.startsWith(prefix) && fileName.endsWith(suffix))  {
+                        final String name = fileName.substring(0, fileName.length() - suffixLength)
+                                                    .substring(prefixLength);
+                        if (match(name, match))  {
+                            ret.put(file, name);
+                        }
+                    }
+                }
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Checks for all files if the prefix and file extension are fulfilled. For
+     * this files, the Matrix name is extracted and returned together with
+     * the file in a map.
+     *
+     * @param _files    files to check if they are defining an update
+     * @return map of files (as key) with the related matrix name (as value)
+     * @see #getMatchingFileNames(Set, Collection)
+     */
+    @Override
+    public Map<File, String> getMatchingFileNames(final Set<File> _files)
+    {
+        final Map<File,String> ret = new TreeMap<File,String>();
+
+        final String suffix = getInfoAnno().fileSuffix();
+        final int suffixLength = suffix.length();
+        for (final String prefix : PREFIXES)  {
+            final int prefixLength = prefix.length();
+            for (final File file : _files)  {
+                final String fileName = file.getName();
+                if (fileName.startsWith(prefix) && fileName.endsWith(suffix))  {
+                    final String name = fileName.substring(0, fileName.length() - suffixLength)
+                                                .substring(prefixLength);
+                    ret.put(file, name);
+                }
+            }
+        }
+        return ret;
+    }
 
     /**
      * Returns the file name for this matrix object. The file name is a
@@ -211,7 +282,7 @@ public class Attribute_mxJPO
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
-                .append("add ").append(getInfoAnno().adminType())
+                .append("add ").append(this.getInfoAnno().adminType().getMxName())
                 .append(" \"").append(_name).append("\" ")
                 .append(" type ").append(_file.getName().replaceAll("_.*", "").toLowerCase());
        execMql(_context, cmd);

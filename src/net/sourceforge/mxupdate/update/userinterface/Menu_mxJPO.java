@@ -30,6 +30,7 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
@@ -39,12 +40,8 @@ import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = "menu",
-                title ="MENU",
-                filePrefix = "MENU_",
-                fileSuffix = ".tcl",
-                filePath = "userinterface/menu",
-                description = "menu")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Menu,
+                fileSuffix = ".tcl")
 public class Menu_mxJPO
         extends Command_mxJPO
 {
@@ -157,7 +154,7 @@ public class Menu_mxJPO
     {
         // remove child commands / menus
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(getInfoAnno().adminType()).append(" \"").append(this.getName()).append('\"');
+                .append("mod ").append(this.getInfoAnno().adminType().getMxName()).append(" \"").append(this.getName()).append('\"');
         for (final MenuChild child : this.childs)  {
             preMQLCode.append(" remove ").append(child.type)
                       .append(" \"").append(child.name).append("\"");

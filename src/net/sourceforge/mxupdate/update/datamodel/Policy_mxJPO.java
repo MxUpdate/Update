@@ -40,6 +40,7 @@ import matrix.util.MatrixException;
 import net.sourceforge.mxupdate.update.datamodel.policy.PolicyDefParser_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 import net.sourceforge.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertMql;
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
@@ -52,12 +53,8 @@ import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.setEscapeOn;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = "policy",
-                title = "POLICY",
-                filePrefix = "POLICY_",
-                fileSuffix = ".tcl",
-                filePath = "datamodel/policy",
-                description = "policy")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Policy,
+                fileSuffix = ".tcl")
 public class Policy_mxJPO
         extends AbstractDMWithTriggers_mxJPO
         implements JPOCallerInterface
@@ -301,7 +298,7 @@ public class Policy_mxJPO
     {
         writeHeader(_out);
         _out.append("updatePolicy \"${NAME}\" {");
-        final String suffix = getInfoAnno().adminTypeSuffix();
+        final String suffix = getInfoAnno().adminType().getMxSuffix();
         if (!"".equals(suffix))  {
             _out.append(" ").append(suffix);
         }

@@ -114,7 +114,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
     protected void writeEnd(final Writer _out)
             throws IOException
     {
-        _out.append("\n\ntestAttributes -").append(getInfoAnno().adminType())
+        _out.append("\n\ntestAttributes -").append(this.getInfoAnno().adminType().getMxName())
             .append(" \"${NAME}\" -attributes [list \\\n");
         for (final String attr : this.attributes)  {
             _out.append("    \"").append(convertTcl(attr)).append("\" \\\n");
@@ -198,10 +198,10 @@ public abstract class AbstractDMWithAttributes_mxJPO
 
         // check for equal administration name
         if (!this.getName().equals(name))  {
-            throw new Exception(getInfoAnno().description()
+            throw new Exception(this.getTypeDef().getLogging()
                     + " '" + this.getName() + "' was called to"
                     + " update via update script, but "
-                    + getInfoAnno().description() + " '" + name + "' was"
+                    + this.getTypeDef().getLogging() + " '" + name + "' was"
                     + " called in the procedure...");
         }
 
@@ -221,7 +221,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
         for (final String attr : this.attributes)  {
             if (!newAttrs.contains(attr))  {
                 throw new Exception("Attribute '" + attr + "' is defined to be deleted"
-                        + " in " + getInfoAnno().description() + " '"
+                        + " in " + this.getTypeDef().getLogging() + " '"
                         + this.getName() + "', but not allowed!");
             }
         }

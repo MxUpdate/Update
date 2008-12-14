@@ -552,7 +552,7 @@ if (unknown || (Mode.HELP == mode) || (mode == null))  {
             final Set<String> existings = existingNames.get(entry.getKey());
             if (!existings.contains(fileEntry.getValue()))  {
                 final AbstractObject_mxJPO instance = entry.getKey().newInstance();
-System.out.println("create "+instance.getInfoAnno().description() + " '" + fileEntry.getValue() + "'");
+System.out.println("create "+instance.getTypeDef().getLogging() + " '" + fileEntry.getValue() + "'");
                 instance.create(_context, fileEntry.getKey(), fileEntry.getValue());
             }
         }
@@ -561,7 +561,7 @@ System.out.println("create "+instance.getInfoAnno().description() + " '" + fileE
     for (final Map.Entry<Class<? extends AbstractObject_mxJPO>,Map<File,String>> entry : clazz2names.entrySet())  {
         for (final Map.Entry<File, String> fileEntry : entry.getValue().entrySet())  {
             AbstractObject_mxJPO instance = entry.getKey().newInstance();
-System.out.println("check "+instance.getInfoAnno().description() + " '" + fileEntry.getValue() + "'");
+System.out.println("check "+instance.getTypeDef().getLogging() + " '" + fileEntry.getValue() + "'");
 
 final boolean update;
 String version = null;
@@ -633,7 +633,7 @@ if (versionInfo == VersionInfo.FILEDATE)  {
             for (final String name : entry.getValue())  {
                 AbstractObject_mxJPO instance = entry.getKey().newInstance();
                 final File path = new File(pathStr + File.separator + instance.getPath());
-System.out.println("export "+instance.getInfoAnno().description() + " '" + name + "'");
+System.out.println("export "+instance.getTypeDef().getLogging() + " '" + name + "'");
                 instance.export(_context, path, name);
             }
         }

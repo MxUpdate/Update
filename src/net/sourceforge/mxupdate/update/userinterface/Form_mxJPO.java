@@ -29,6 +29,7 @@ import matrix.db.Context;
 
 import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
@@ -37,12 +38,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = "form",
-                title = "FORM",
-                filePrefix = "FORM_",
-                fileSuffix = ".tcl",
-                filePath = "userinterface/form",
-                description = "web form")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Form,
+                fileSuffix = ".tcl")
 public class Form_mxJPO
         extends AbstractAdminObject_mxJPO
 {
@@ -160,8 +157,8 @@ public class Form_mxJPO
     {
         // reset HRef, description, alt and label
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(getInfoAnno().adminType())
-                .append(" \"").append(getName()).append('\"')
+                .append("mod ").append(this.getInfoAnno().adminType().getMxName())
+                .append(" \"").append(this.getName()).append('\"')
                 .append(" !hidden");
 
         // remove all fields

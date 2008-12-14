@@ -25,6 +25,7 @@ import java.io.Writer;
 
 import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
@@ -33,12 +34,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = "format",
-                title = "FORMAT",
-                filePrefix = "FORMAT_",
-                fileSuffix = ".tcl",
-                filePath = "datamodel/format",
-                description = "format")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Format,
+                fileSuffix = ".tcl")
 public class Format_mxJPO
         extends AbstractAdminObject_mxJPO
 {

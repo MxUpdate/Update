@@ -70,9 +70,9 @@ public abstract class AbstractAdminObject_mxJPO
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("list ")
-                .append(getInfoAnno().adminType())
+                .append(this.getInfoAnno().adminType().getMxName())
                 .append(" ")
-                .append(getInfoAnno().adminTypeSuffix());
+                .append(this.getInfoAnno().adminType().getMxSuffix());
         final Set<String> ret = new TreeSet<String>();
         for (final String name : execMql(_context, cmd).split("\n"))  {
             for (final String match : _matches)  {
@@ -87,7 +87,7 @@ public abstract class AbstractAdminObject_mxJPO
     @Override
     protected String getExportMQL(final String _name)
     {
-        return "export " + getInfoAnno().adminType() + " \"" + _name + "\" xml";
+        return "export " + this.getInfoAnno().adminType().getMxName() + " \"" + _name + "\" xml";
     }
 
     @Override
@@ -171,10 +171,10 @@ public abstract class AbstractAdminObject_mxJPO
         {
             writeHeader(_out);
             _out.append("mql mod ")
-                .append(getInfoAnno().adminType())
+                .append(this.getInfoAnno().adminType().getMxName())
                 .append(" \"${NAME}\"");
-            if (!"".equals(getInfoAnno().adminTypeSuffix()))  {
-                _out.append(" ").append(getInfoAnno().adminTypeSuffix());
+            if (!"".equals(this.getInfoAnno().adminType().getMxSuffix()))  {
+                _out.append(" ").append(this.getInfoAnno().adminType().getMxSuffix());
             }
             _out.append(" \\\n    description \"").append(convertTcl(getDescription())).append("\"");
             writeObject(_out);
@@ -196,10 +196,10 @@ public abstract class AbstractAdminObject_mxJPO
             if (!IGNORED_PROPERTIES.contains(prop.name) && !prop.name.startsWith("%"))  {
                 _out.append("\nmql add property \"").append(convertTcl(prop.name)).append("\"")
                     .append(" \\\n    on ")
-                    .append(getInfoAnno().adminType())
+                    .append(this.getInfoAnno().adminType().getMxName())
                     .append(" \"${NAME}\"");
-                if (!"".equals(getInfoAnno().adminTypeSuffix()))  {
-                    _out.append(' ').append(getInfoAnno().adminTypeSuffix());
+                if (!"".equals(this.getInfoAnno().adminType().getMxSuffix()))  {
+                    _out.append(' ').append(this.getInfoAnno().adminType().getMxSuffix());
                 }
                 if ((prop.refAdminName) != null && (prop.refAdminType != null))  {
                     _out.append("  \\\n    to ").append(prop.refAdminType)
@@ -227,9 +227,9 @@ public abstract class AbstractAdminObject_mxJPO
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
-                .append("add ").append(getInfoAnno().adminType())
+                .append("add ").append(this.getInfoAnno().adminType().getMxName())
                 .append(" \"").append(_name).append("\" ")
-                .append(getInfoAnno().adminTypeSuffix());
+                .append(this.getInfoAnno().adminType().getMxSuffix());
         execMql(_context, cmd);
     }
 
@@ -263,9 +263,9 @@ public abstract class AbstractAdminObject_mxJPO
     {
         // remove all properties
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getInfoAnno().adminType())
+                .append("mod ").append(this.getInfoAnno().adminType().getMxName())
                 .append(" \"").append(this.getName()).append("\" ")
-                .append(this.getInfoAnno().adminTypeSuffix());
+                .append(this.getInfoAnno().adminType().getMxSuffix());
         for (final Property prop : this.propertiesMap.values())  {
             if (!IGNORED_PROPERTIES.contains(prop.name) && !prop.name.startsWith("%"))  {
                 preMQLCode.append(" remove property \"").append(prop.name).append('\"');
@@ -283,9 +283,9 @@ public abstract class AbstractAdminObject_mxJPO
         // defined the version property
         final StringBuilder postMQLCode = new StringBuilder()
                 .append(_postMQLCode)
-                .append("mod ").append(this.getInfoAnno().adminType())
+                .append("mod ").append(this.getInfoAnno().adminType().getMxName())
                 .append(" \"").append(this.getName()).append("\" ")
-                .append(this.getInfoAnno().adminTypeSuffix())
+                .append(this.getInfoAnno().adminType().getMxSuffix())
                 .append(" add property version value \"").append(_tclVariables.get("VERSION")).append("\";\n");
 
         // prepare map of all TCL variables incl. name of admin object

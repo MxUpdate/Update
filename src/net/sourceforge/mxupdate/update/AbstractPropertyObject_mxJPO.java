@@ -32,6 +32,8 @@ import java.util.Stack;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -79,20 +81,19 @@ public abstract class AbstractPropertyObject_mxJPO
     private String description = "";
 
     /**
-     * Returns the file name for this matrix business object. The file name is
-     * a concatenation of the defined file prefix within the information
-     * annotation , the name of the matrix object and the file suffix within
-     * the information annotation.
+     * Returns the file name for this MxUpdate administration object. The file
+     * name is a concatenation of the defined file prefix within the
+     * information annotation , the name of the Mx object and the file suffix
+     * within the information annotation.
      *
      * @return file name of this administration (business) object
      */
     protected String getFileName()
     {
-// TODO: throw exception if more than one prefix is found!
         return new StringBuilder()
-                .append(getInfoAnno().filePrefix()[0])
-                .append(getName())
-                .append(getInfoAnno().fileSuffix())
+                .append(this.getTypeDef().getFilePrefix())
+                .append(this.getName())
+                .append(this.getInfoAnno().fileSuffix())
                 .toString();
     }
 
@@ -231,7 +232,7 @@ public abstract class AbstractPropertyObject_mxJPO
     protected void writeHeader(final Writer _out)
             throws IOException
     {
-        final String headerText = getInfoAnno().title();
+        final String headerText = this.getTypeDef().getTitle();
         _out.append("################################################################################\n")
             .append("# ").append(headerText).append(":\n")
             .append("# ~");
@@ -242,16 +243,16 @@ public abstract class AbstractPropertyObject_mxJPO
             .append("# ").append(getName()).append("\n")
             .append("#\n");
         // symbolic name only if an administration type is defined
-        if (!"".equals(getInfoAnno().adminType()))  {
+        if (this.getInfoAnno().adminType() != AdminTypeDef.Undef)  {
             _out.append("# SYMBOLIC NAME:\n")
                 .append("# ~~~~~~~~~~~~~~\n")
-.append("# ").append(getInfoAnno().adminType()).append("_").append(getName()).append("\n")
+.append("# ").append(this.getInfoAnno().adminType().getMxName()).append("_").append(this.getName()).append("\n")
                 .append("#\n");
         }
         _out.append("# DESCRIPTION:\n")
             .append("# ~~~~~~~~~~~~\n");
-        if ((getDescription() != null) && !"".equals(getDescription()))  {
-            for (final String partDesc : getDescription().split("\n"))  {
+        if ((this.getDescription() != null) && !"".equals(this.getDescription()))  {
+            for (final String partDesc : this.getDescription().split("\n"))  {
                 _out.append('#');
                 int length = 0;
                 for (final String desc : partDesc.split(" "))  {

@@ -29,6 +29,7 @@ import java.util.TreeSet;
 import matrix.db.Context;
 
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
@@ -38,12 +39,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = "relationship",
-                title = "RELATIONSHIP",
-                filePrefix = "RELATIONSHIP_",
-                fileSuffix = ".tcl",
-                filePath = "datamodel/relationship",
-                description = "relation")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Relationship,
+                fileSuffix = ".tcl")
 public class Relationship_mxJPO
         extends AbstractDMWithAttributes_mxJPO
 {
@@ -258,8 +255,8 @@ public class Relationship_mxJPO
             throws Exception
     {
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(getInfoAnno().adminType())
-                .append(" \"").append(getName()).append('\"')
+                .append("mod ").append(this.getInfoAnno().adminType().getMxName())
+                .append(" \"").append(this.getName()).append('\"')
                 // remove hidden, description, prevent duplicate
                 .append(" !hidden description \"\" !preventduplicate")
                 // reset from information

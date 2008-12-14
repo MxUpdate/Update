@@ -43,7 +43,8 @@ import net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO;
 import net.sourceforge.mxupdate.update.AbstractObject_mxJPO;
 import net.sourceforge.mxupdate.update.AbstractPropertyObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
-import net.sourceforge.mxupdate.util.Mapping_mxJPO.TypeDef;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.BusTypeDef;
 
 import org.xml.sax.SAXException;
 
@@ -57,13 +58,9 @@ import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.setHistoryOn;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = "person",
-                busType = TypeDef.Person,
-                title = "PERSON",
-                filePrefix = "PERSON_",
-                fileSuffix = ".tcl",
-                filePath = "user/person",
-                description ="person")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Person,
+                busType = BusTypeDef.Person,
+                fileSuffix = ".tcl")
 public class Person_mxJPO
         extends AbstractObject_mxJPO
 {
@@ -145,12 +142,8 @@ public class Person_mxJPO
         this.personAdmin.update(_context, _name, _file, _newVersion);
     }
 
-    @InfoAnno_mxJPO(adminType = "person",
-                    title = "PERSON",
-                    filePrefix = "PERSON_",
-                    fileSuffix = ".tcl",
-                    filePath = "user/person",
-                    description ="person")
+    @InfoAnno_mxJPO(adminType = AdminTypeDef.Person,
+                    fileSuffix = ".tcl")
     private class PersonAdmin
             extends AbstractAdminObject_mxJPO
     {
@@ -478,13 +471,8 @@ public class Person_mxJPO
         }
     }
 
-    @InfoAnno_mxJPO(busType = TypeDef.Person,
-                    busIgnoreAttributes = {},
-                    title = "",
-                    filePrefix = "",
-                    fileSuffix = "",
-                    filePath = "",
-                    description = "person")
+    @InfoAnno_mxJPO(busType = BusTypeDef.Person,
+                    fileSuffix = "")
     private class PersonBus
             extends AbstractBusObject_mxJPO
     {

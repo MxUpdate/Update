@@ -26,7 +26,7 @@ import java.io.Writer;
 import net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 import net.sourceforge.mxupdate.util.Mapping_mxJPO.AttributeDef;
-import net.sourceforge.mxupdate.util.Mapping_mxJPO.TypeDef;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.BusTypeDef;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
@@ -34,13 +34,9 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(busType = TypeDef.NumberGenerator,
+@InfoAnno_mxJPO(busType = BusTypeDef.NumberGenerator,
                 busIgnoreAttributes = AttributeDef.NumberGeneratorNextNumber,
-                title = "NUMBERGENERATOR",
-                filePrefix = "NUMBERGENERATOR_",
-                fileSuffix = ".tcl",
-                filePath = "datamodel/numbergenerator",
-                description = "number generator")
+                fileSuffix = ".tcl")
 public class NumberGenerator_mxJPO
         extends AbstractBusObject_mxJPO
 {

@@ -29,19 +29,15 @@ import matrix.db.Context;
 
 import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 /**
  *
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = "table",
-                adminTypeSuffix = "system",
-                title = "TABLE",
-                filePrefix = "TABLE_",
-                fileSuffix = ".tcl",
-                filePath = "userinterface/table",
-                description = "web table")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Table,
+                fileSuffix = ".tcl")
 public class Table_mxJPO
         extends AbstractAdminObject_mxJPO
 {
@@ -109,9 +105,9 @@ public class Table_mxJPO
     {
         // set to not hidden
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(getInfoAnno().adminType())
-                .append(" \"").append(getName()).append('\"')
-                .append(' ').append(getInfoAnno().adminTypeSuffix())
+                .append("mod ").append(this.getInfoAnno().adminType().getMxName())
+                .append(" \"").append(this.getName()).append('\"')
+                .append(' ').append(this.getInfoAnno().adminType().getMxSuffix())
                 .append(" !hidden");
 
         // remove all columns

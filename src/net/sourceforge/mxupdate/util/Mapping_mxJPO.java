@@ -63,12 +63,83 @@ public final class Mapping_mxJPO
     /**
      * Mapping between internal used type definitions and the Mx type names.
      */
-    private static final Map<TypeDef,String> TYPES = new HashMap<TypeDef,String>();
+    private static final Map<BusTypeDef,String> BUS_TYPES = new HashMap<BusTypeDef,String>();
 
     /**
      * Used prefix of type definitions within the property file.
      */
     private static final String PREFIX_TYPE = "Type.";
+
+    /**
+     * Mapping between internal used type definitions and the file paths.
+     */
+    private static final Map<AdminTypeDef,String> ADMINTYPE_FILE_PATHS = new HashMap<AdminTypeDef,String>();
+
+    /**
+     * Mapping between internal used type definitions and the file paths.
+     *
+     * @see BusTypeDef#getFilePath()
+     */
+    private static final Map<BusTypeDef,String> BUSTYPE_FILE_PATHS = new HashMap<BusTypeDef,String>();
+
+    /**
+     * Used prefix of type definitions within the property file.
+     */
+    private static final String PREFIX_FILE_PATH = "FilePath.";
+
+    /**
+     * Mapping between internal used administration type definitions and the
+     * file prefixes.
+     *
+     * @see AdminTypeDef#getFilePrefix()
+     */
+    private static final Map<AdminTypeDef,String> ADMIN_TYPE_FILE_PREFIXES = new HashMap<AdminTypeDef,String>();
+
+    /**
+     * Mapping between internal used business type definitions and the file
+     * prefixes.
+     *
+     * @see BusTypeDef#getFilePrefix()
+     */
+    private static final Map<BusTypeDef,String> BUS_TYPE_FILE_PREFIXES = new HashMap<BusTypeDef,String>();
+
+    /**
+     * Used prefix of type definitions within the property file.
+     */
+    private static final String PREFIX_FILE_PREFIX = "FilePrefix.";
+
+    /**
+     * Mapping between internal used administration type definitions and the
+     * logging string.
+     */
+    private static final Map<AdminTypeDef,String> ADMIN_TYPE_LOGGINGS = new HashMap<AdminTypeDef,String>();
+
+    /**
+     * Mapping between internal used business type definitions and the logging
+     * string.
+     */
+    private static final Map<BusTypeDef,String> BUS_TYPE_LOGGINGS = new HashMap<BusTypeDef,String>();
+
+    /**
+     * Used logging text of type definitions within the property file.
+     */
+    private static final String PREFIX_LOGGING = "Logging.";
+
+    /**
+     * Mapping between internal used administration type definitions and the
+     * titles.
+     */
+    private static final Map<AdminTypeDef,String> ADMIN_TYPE_TITLES = new HashMap<AdminTypeDef,String>();
+
+    /**
+     * Mapping between internal used business type definitions and the titles.
+     */
+    private static final Map<BusTypeDef,String> BUS_TYPE_TITLES = new HashMap<BusTypeDef,String>();
+
+    /**
+     * Used title of type definitions within the property file.
+     */
+    private static final String PREFIX_TITLE = "Title.";
 
     /**
      * Dummy constructor so that no new instance of this final mapping class
@@ -78,12 +149,19 @@ public final class Mapping_mxJPO
     {
     }
 
+    /**
+     *
+     * @param _context  context for this request
+     * @throws MatrixException if the property program {@see #PROP_NAME} could
+     *                         not be read
+     * @throws IOException     if the properties could not be parsed
+     */
     public static void init(final Context _context)
             throws MatrixException, IOException
     {
         PROPERTIES.clear();
         ATTRIBUTES.clear();
-        TYPES.clear();
+        BUS_TYPES.clear();
 
         PROPERTIES.putAll(MqlUtil_mxJPO.readPropertyProgram(_context, PROP_NAME));
 
@@ -94,8 +172,44 @@ public final class Mapping_mxJPO
             if (key.startsWith(PREFIX_ATTRIBUTE))  {
                 ATTRIBUTES.put(AttributeDef.valueOf(key.substring(PREFIX_ATTRIBUTE.length())),
                                value);
+            } else if (key.startsWith(PREFIX_FILE_PATH))  {
+                final String keyFilePath = key.substring(PREFIX_FILE_PATH.length());
+                try  {
+                    ADMINTYPE_FILE_PATHS.put(AdminTypeDef.valueOf(keyFilePath),
+                                             value);
+                } catch (final IllegalArgumentException e)  {
+                    BUSTYPE_FILE_PATHS.put(BusTypeDef.valueOf(keyFilePath),
+                                           value);
+                }
+            } else if (key.startsWith(PREFIX_FILE_PREFIX))  {
+                final String keyFilePrefix = key.substring(PREFIX_FILE_PREFIX.length());
+                try  {
+                    ADMIN_TYPE_FILE_PREFIXES.put(AdminTypeDef.valueOf(keyFilePrefix),
+                                                 value);
+                } catch (final IllegalArgumentException e)  {
+                    BUS_TYPE_FILE_PREFIXES.put(BusTypeDef.valueOf(keyFilePrefix),
+                                               value);
+                }
+            } else if (key.startsWith(PREFIX_LOGGING))  {
+                final String keyFilePrefix = key.substring(PREFIX_LOGGING.length());
+                try  {
+                    ADMIN_TYPE_LOGGINGS.put(AdminTypeDef.valueOf(keyFilePrefix),
+                                            value);
+                } catch (final IllegalArgumentException e)  {
+                    BUS_TYPE_LOGGINGS.put(BusTypeDef.valueOf(keyFilePrefix),
+                                          value);
+                }
+            } else if (key.startsWith(PREFIX_TITLE))  {
+                final String keyTitle = key.substring(PREFIX_TITLE.length());
+                try  {
+                    ADMIN_TYPE_TITLES.put(AdminTypeDef.valueOf(keyTitle),
+                                          value);
+                } catch (final IllegalArgumentException e)  {
+                    BUS_TYPE_TITLES.put(BusTypeDef.valueOf(keyTitle),
+                                        value);
+                }
             } else if (key.startsWith(PREFIX_TYPE))  {
-                TYPES.put(TypeDef.valueOf(key.substring(PREFIX_TYPE.length())),
+                BUS_TYPES.put(BusTypeDef.valueOf(key.substring(PREFIX_TYPE.length())),
                           value);
             }
         }
@@ -127,7 +241,7 @@ public final class Mapping_mxJPO
         CommonVersion,
 
         /**
-         * Next number attribute of type {@link TypeDef#NumberGenerator}.
+         * Next number attribute of type {@link BusTypeDef#NumberGenerator}.
          */
         NumberGeneratorNextNumber;
 
@@ -144,9 +258,216 @@ public final class Mapping_mxJPO
     }
 
     /**
-     * Enum for type definitions.
+     * Interface which the type enumerations must implement.
+     *
+     * @see AdminTypeDef
+     * @see BusTypeDef
      */
-    public enum TypeDef
+    public interface TypeDef
+    {
+        /**
+         *
+         *
+         * @return file path of the type definition
+         */
+        public String getFilePath();
+
+        /**
+         *
+         * @return file prefix of the type definition
+         */
+        public String getFilePrefix();
+
+        /**
+         *
+         * @return title of the type definition
+         */
+        public String getTitle();
+
+        /**
+         * @return string used for logging purpose.
+         */
+        public String getLogging();
+    }
+
+    /**
+     * Enumeration for administration type definitions.
+     */
+    public enum AdminTypeDef
+            implements TypeDef
+    {
+        /**
+         * Administration type is not defined (or does not exists). The value
+         * is used like <code>null</code>.
+         */
+        Undef(null, null),
+
+        /** Data model attribute. */
+        Attribute("attribute", ""),
+
+        /** Data model expression. */
+        Expression("expression", ""),
+
+        /** Data model format. */
+        Format("format", ""),
+
+        /** Data model policy. */
+        Policy("policy", ""),
+
+        /** Data model relationship. */
+        Relationship("relationship", ""),
+
+        /** Data model rule. */
+        Rule("rule", ""),
+
+        /** Data model type. */
+        Type("type", ""),
+
+        /** Program JPO. */
+        JPO("program", ""),
+
+        /** Program program. */
+        Program("program", ""),
+
+        /** User association. */
+        Association("association", ""),
+
+        /** User group. */
+        Group("group", ""),
+
+        /** User person. */
+        Person("person", ""),
+
+        /** User role. */
+        Role("role", ""),
+
+        /** User interface channel. */
+        Channel("channel", ""),
+
+        /** User interface command. */
+        Command("command", ""),
+
+        /** User interface form. */
+        Form("form", ""),
+
+        /** User interface inquiry. */
+        Inquiry("inquiry", ""),
+
+        /** User interface menu. */
+        Menu("menu", ""),
+
+        /** User interface portal. */
+        Portal("portal", ""),
+
+        /** User interface setting. */
+        Setting("setting", ""),
+
+        /** User interface web table. */
+        Table("table", "system");
+
+        /**
+         * Internal Mx used name of the administration type.
+         */
+        private final String mxName;
+
+        /**
+         * Suffix of the administration type (if required, e.g. for web
+         * tables). If not defined the suffix is a zero length string.
+         */
+        private final String mxSuffix;
+
+        /**
+         *
+         * @param _adminName
+         * @param _adminSuffix
+         */
+        private AdminTypeDef(final String _adminName,
+                             final String _adminSuffix)
+        {
+            this.mxName = _adminName;
+            this.mxSuffix = _adminSuffix;
+        }
+
+        /**
+         * Returns the related administration type name used within Mx. The
+         * method returns only correct values if the initialize method was
+         * called!
+         *
+         * @return Mx name of the administration type definition
+         * @see #mxName
+         */
+        public String getMxName()
+        {
+            return this.mxName;
+        }
+
+        /**
+         * Returns the related administration type fsufix used within Mx. The
+         * method returns only correct values if the initialize method was
+         * called!
+         *
+         * @return Mx suffix of the administration type definition
+         * @see #mxSuffix
+         */
+        public String getMxSuffix()
+        {
+            return this.mxSuffix;
+        }
+
+        /**
+         * Returns the related file path. The method returns only correct
+         * values if the initialize method was called!
+         *
+         * @return file path of the administration type definition
+         * @see Mapping_mxJPO#ADMINTYPE_FILE_PATHS
+         */
+        public String getFilePath()
+        {
+            return Mapping_mxJPO.ADMINTYPE_FILE_PATHS.get(this);
+        }
+
+        /**
+         * Returns the related file name prefix. The method returns only
+         * correct values if the initialize method was called!
+         *
+         * @return file name prefix of the administration type definition
+         * @see Mapping_mxJPO#ADMIN_TYPE_FILE_PREFIXES
+         */
+        public String getFilePrefix()
+        {
+            return Mapping_mxJPO.ADMIN_TYPE_FILE_PREFIXES.get(this);
+        }
+
+        /**
+         * Returns the related logging string. The method returns only correct
+         * values if the initialize method was called!
+         *
+         * @return logging string of the administration type definition
+         * @see Mapping_mxJPO#ADMIN_TYPE_LOGGINGS
+         */
+        public String getLogging()
+        {
+            return Mapping_mxJPO.ADMIN_TYPE_LOGGINGS.get(this);
+        }
+
+        /**
+         * Returns the related title used in the Mx update files. The method
+         * returns only correct values if the initialize method was called!
+         *
+         * @return title of the business type definition
+         * @see Mapping_mxJPO#ADMIN_TYPE_TITLES
+         */
+        public String getTitle()
+        {
+            return Mapping_mxJPO.ADMIN_TYPE_TITLES.get(this);
+        }
+    }
+
+    /**
+     * Enumeration for business type definitions.
+     */
+    public enum BusTypeDef
+            implements TypeDef
     {
         /**
          * Business type is not defined (or does not exists). The value is used
@@ -180,14 +501,63 @@ public final class Mapping_mxJPO
         TriggerGroup;
 
         /**
-         * Returns the related name used within Mx. The method returns only
-         * correct values if the initialize method was called!
+         * Returns the related business type name used within Mx. The method
+         * returns only correct values if the initialize method was called!
          *
-         * @return Mx name of the type definition
+         * @return Mx name of the business type definition
+         * @see Mapping_mxJPO#BUS_TYPES
          */
         public String getMxName()
         {
-            return Mapping_mxJPO.TYPES.get(this);
+            return Mapping_mxJPO.BUS_TYPES.get(this);
+        }
+
+        /**
+         * Returns the related file path. The method returns only correct
+         * values if the initialize method was called!
+         *
+         * @return file path of the business type definition
+         * @see Mapping_mxJPO#BUSTYPE_FILE_PATHS
+         */
+        public String getFilePath()
+        {
+            return Mapping_mxJPO.BUSTYPE_FILE_PATHS.get(this);
+        }
+
+        /**
+         * Returns the related file name prefix. The method returns only
+         * correct values if the initialize method was called!
+         *
+         * @return file name prefix of the business type definition
+         * @see Mapping_mxJPO#BUS_TYPE_FILE_PREFIXES
+         */
+        public String getFilePrefix()
+        {
+            return Mapping_mxJPO.BUS_TYPE_FILE_PREFIXES.get(this);
+        }
+
+        /**
+         * Returns the related logging string. The method returns only correct
+         * values if the initialize method was called!
+         *
+         * @return logging string of the business type definition
+         * @see Mapping_mxJPO#BUS_TYPE_LOGGINGS
+         */
+        public String getLogging()
+        {
+            return Mapping_mxJPO.BUS_TYPE_LOGGINGS.get(this);
+        }
+
+        /**
+         * Returns the related title used in the Mx update files. The method
+         * returns only correct values if the initialize method was called!
+         *
+         * @return title of the business type definition
+         * @see Mapping_mxJPO#BUS_TYPE_TITLES
+         */
+        public String getTitle()
+        {
+            return Mapping_mxJPO.BUS_TYPE_TITLES.get(this);
         }
     }
 }

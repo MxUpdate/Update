@@ -32,18 +32,14 @@ import matrix.util.StringList;
 
 import net.sourceforge.mxupdate.update.AbstractBusObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
-import net.sourceforge.mxupdate.util.Mapping_mxJPO.TypeDef;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.BusTypeDef;
 
 /**
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(busType = TypeDef.ObjectGenerator,
-                title = "OBJECTGENERATOR",
-                filePrefix = "OBJECTGENERATOR_",
-                fileSuffix = ".tcl",
-                filePath = "datamodel/objectgenerator",
-                description = "object generator")
+@InfoAnno_mxJPO(busType = BusTypeDef.ObjectGenerator,
+                fileSuffix = ".tcl")
 public class ObjectGenerator_mxJPO
         extends AbstractBusObject_mxJPO
 {

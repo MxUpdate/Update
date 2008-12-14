@@ -29,6 +29,7 @@ import matrix.util.MatrixException;
 
 import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
@@ -38,12 +39,8 @@ import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
 * @author tmoxter
 * @version $Id$
 */
-@InfoAnno_mxJPO(adminType = "expression",
-                title = "EXPRESSION",
-                filePrefix = "EXPRESSION_",
-                fileSuffix = ".tcl",
-                filePath = "datamodel/expression",
-                description = "expression")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Expression,
+                fileSuffix = ".tcl")
 public class Expression_mxJPO
         extends AbstractAdminObject_mxJPO
 {
@@ -144,8 +141,8 @@ public class Expression_mxJPO
             throws Exception
     {
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(getInfoAnno().adminType())
-                .append(" \"").append(getName()).append('\"')
+                .append("mod ").append(this.getInfoAnno().adminType().getMxName())
+                .append(" \"").append(this.getName()).append('\"')
                 .append(" !hidden description \"\" value \"\";\n");
 
         // append already existing pre MQL code

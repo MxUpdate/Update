@@ -32,6 +32,7 @@ import matrix.util.MatrixException;
 
 import net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
@@ -40,12 +41,8 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = "rule",
-                title = "RULE",
-                filePrefix = "RULE_",
-                fileSuffix = ".tcl",
-                filePath = "datamodel/rule",
-                description = "rule")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Rule,
+                fileSuffix = ".tcl")
 public class Rule_mxJPO
         extends AbstractAdminObject_mxJPO
 {
@@ -227,8 +224,8 @@ public class Rule_mxJPO
             throws Exception
     {
         final StringBuilder preMQLCode = new StringBuilder()
-            .append("mod ").append(getInfoAnno().adminType())
-            .append(" \"").append(getName()).append('\"')
+            .append("mod ").append(this.getInfoAnno().adminType().getMxName())
+            .append(" \"").append(this.getName()).append('\"')
             .append(" !hidden owner none public none");
         // remove user access
         for (final UserAccess userAccess : this.userAccessSorted)  {
