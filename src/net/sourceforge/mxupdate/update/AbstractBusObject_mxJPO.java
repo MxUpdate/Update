@@ -57,7 +57,7 @@ public abstract class AbstractBusObject_mxJPO
     private static final long serialVersionUID = -5381775541507933947L;
 
     /**
-     * String used to split the name and revision of administrational business
+     * String used to split the name and revision of administration business
      * object.
      */
     private static final String SPLIT_NAME = "________";
@@ -84,7 +84,7 @@ public abstract class AbstractBusObject_mxJPO
      * @see #parse(String, String)
      * @see #getBusName()
      */
-    private String busName = null;
+    private String busName;
 
     /**
      * Revision of business object.
@@ -92,14 +92,14 @@ public abstract class AbstractBusObject_mxJPO
      * @see #parse(String, String)
      * @see #getBusRevision()
      */
-    private String busRevision = null;
+    private String busRevision;
 
     /**
      * Vault of the business object.
      *
      * @see #parse(String, String)
      */
-    private String busVault = null;
+    private String busVault;
 
     /**
      * Description of the business object (because the description within the
@@ -108,7 +108,15 @@ public abstract class AbstractBusObject_mxJPO
      * @see #parse(String, String)
      * @see #getBusDescription()
      */
-    private String busDescription = null;
+    private String busDescription;
+
+    /**
+     * Object id of the business object.
+     *
+     * @see #prepare(Context)
+     * @see #getBusOid()
+     */
+    private String busOid;
 
     /**
      * Evaluates the matching names for this administrational business objects.
@@ -176,7 +184,7 @@ public abstract class AbstractBusObject_mxJPO
     }
 
     /**
-     * Parses the XML url for the business object XML export file.
+     * Parses the XML Url for the business object XML export file.
      *
      * @param _url      url
      * @param _content  content
@@ -240,6 +248,7 @@ public abstract class AbstractBusObject_mxJPO
      * @see #attrValuesSorted   sorted attribute values
      * @see #busDescription     business description
      * @see #busRevision        business revison
+     * @see #busOid
      */
     @Override
     protected void prepare(final Context _context) throws MatrixException
@@ -272,6 +281,12 @@ public abstract class AbstractBusObject_mxJPO
             name.append(SPLIT_NAME).append(this.busRevision);
         }
         setName(name.toString());
+        // found the business object
+        final BusinessObject bus = new BusinessObject(this.getBusType(),
+                                                      this.getBusName(),
+                                                      this.getBusRevision(),
+                                                      this.getBusVault());
+        this.busOid = bus.getObjectId(_context);
     }
 
     /**
@@ -328,16 +343,9 @@ public abstract class AbstractBusObject_mxJPO
                           final Map<String,String> _tclVariables)
             throws Exception
     {
-        // found the business object
-        final BusinessObject bus = new BusinessObject(this.getBusType(),
-                                                      this.getBusName(),
-                                                      this.getBusRevision(),
-                                                      this.getBusVault());
-        final String objectId = bus.getObjectId(_context);
-
         // resets the description
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod bus ").append(objectId).append(" description \"\"");
+                .append("mod bus ").append(this.busOid).append(" description \"\"");
 
         // reset all attributes (if they must not be ignored...)
         final AttributeDef[] ignoreAttrs = this.getInfoAnno().busIgnoreAttributes();
@@ -362,12 +370,12 @@ public abstract class AbstractBusObject_mxJPO
         // post update MQL statements to define the version
         final StringBuilder postMQLCode = new StringBuilder()
                 .append(_postMQLCode)
-                .append("mod bus ").append(objectId).append(" \"")
+                .append("mod bus ").append(this.busOid).append(" \"")
                 .append(AttributeDef.CommonVersion.getMxName()).append("\" \"").append(_tclVariables.get("VERSION")).append("\";\n");
 
         // prepare map of all TCL variables incl. id of business object
         final Map<String,String> tclVariables = new HashMap<String,String>();
-        tclVariables.put("OBJECTID", objectId);
+        tclVariables.put("OBJECTID", this.busOid);
         tclVariables.putAll(_tclVariables);
 
         // update must be done with history off (because not required...)
@@ -435,6 +443,17 @@ public abstract class AbstractBusObject_mxJPO
     protected String getBusDescription()
     {
         return this.busDescription;
+    }
+
+    /**
+     * Getter method for instance variable {@link #busOid}.
+     *
+     * @return value of instance variable {@link #busOid}
+     * @see #busOid
+     */
+    protected String getBusOid()
+    {
+        return this.busOid;
     }
 
     /**
