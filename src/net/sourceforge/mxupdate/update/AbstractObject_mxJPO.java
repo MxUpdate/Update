@@ -180,12 +180,12 @@ public abstract class AbstractObject_mxJPO
         final String suffix = this.getInfoAnno().fileSuffix();
         final int suffixLength = suffix.length();
         final String prefix = this.getTypeDef().getFilePrefix();
-        final int prefixLength = prefix.length();
+        final int prefixLength = (prefix != null) ? prefix.length() : 0;
 
         for (final File file : _files)  {
             final String fileName = file.getName();
             for (final String match : _matches)  {
-                if (fileName.startsWith(prefix) && fileName.endsWith(suffix))  {
+                if (((prefix == null) || fileName.startsWith(prefix)) && fileName.endsWith(suffix))  {
                     final String name = fileName.substring(0, fileName.length() - suffixLength)
                                                 .substring(prefixLength);
                     if (match(name, match))  {
