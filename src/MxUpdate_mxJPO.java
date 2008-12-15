@@ -122,15 +122,15 @@ public class MxUpdate_mxJPO
      * All parameters related to export / import are stored in this map. The
      * key is the parameter (including the '-'), the value the related class.
      */
-    private static final Map<String,Set<Class<? extends AbstractObject_mxJPO>>> PARAMS
-            = new HashMap<String,Set<Class<? extends AbstractObject_mxJPO>>>();
+    private static final Map<String,Collection<Class<? extends AbstractObject_mxJPO>>> PARAMS
+            = new HashMap<String,Collection<Class<? extends AbstractObject_mxJPO>>>();
 
     /**
      * Holds all classes used for all exports / imports. The set is needed that
      * the parameter '-a' (--admin) could be defined.
      */
-    private final static Set<Class<? extends AbstractObject_mxJPO>> PARAMS_ADMIN
-            = new HashSet<Class<? extends AbstractObject_mxJPO>>();
+    private final static Collection<Class<? extends AbstractObject_mxJPO>> PARAMS_ADMIN
+            = new ArrayList<Class<? extends AbstractObject_mxJPO>>();
 
     /**
      * Holds all parameters related how the version information is set.
@@ -171,10 +171,8 @@ public class MxUpdate_mxJPO
 
         ////////////////////////////////////////////////////////////////////////
         // data model
-/*
-process: 's' --process
-*/
-        final Set<Class<? extends AbstractObject_mxJPO>> dm = new HashSet<Class<? extends AbstractObject_mxJPO>>();
+
+        final Collection<Class<? extends AbstractObject_mxJPO>> dm = new HashSet<Class<? extends AbstractObject_mxJPO>>();
         defineParameter('d', dm,
                         null,
                         "Export / Import of data model administrational objects.",
@@ -199,6 +197,10 @@ process: 's' --process
                         ObjectGenerator_mxJPO.class,
                         "Export / Import of object generators.",
                         "objectgenerator");
+        defineParameter('p', dm,
+                        Policy_mxJPO.class,
+                        "Export / Import of policies.",
+                        "policy");
         defineParameter('r', dm,
                         Relationship_mxJPO.class,
                         "Export / Import of relationships.",
@@ -207,14 +209,6 @@ process: 's' --process
                         Rule_mxJPO.class,
                         "Export / Import of rules.",
                         "rule");
-        defineParameter('t', dm,
-                        Type_mxJPO.class,
-                        "Export / Import of types.",
-                        "type");
-        defineParameter('p', dm,
-                         Policy_mxJPO.class,
-                         "Export / Import of policies.",
-                         "policy");
         defineParameter('g', dm,
                         Trigger_mxJPO.class,
                         "Export / Import of triggers.",
@@ -223,21 +217,19 @@ process: 's' --process
                         TriggerGroup_mxJPO.class,
                         "Export / Import of triggers groups.",
                         "triggergroup");
+        defineParameter('t', dm,
+                        Type_mxJPO.class,
+                        "Export / Import of types.",
+                        "type");
 
         ////////////////////////////////////////////////////////////////////////
         // user
-/*
---person
-*/
-        final Set<Class<? extends AbstractObject_mxJPO>> user = new HashSet<Class<? extends AbstractObject_mxJPO>>();
+
+        final Collection<Class<? extends AbstractObject_mxJPO>> user = new HashSet<Class<? extends AbstractObject_mxJPO>>();
         defineParameter(null, user,
                         null,
                         "Export / Import of user administrational objects.",
                         "user");
-        defineParameter(null, user,
-                        Person_mxJPO.class,
-                        "Export / Import of persons.",
-                        "person");
         defineParameter(null, user,
                         Association_mxJPO.class,
                         "Export / Import of associations.",
@@ -246,6 +238,10 @@ process: 's' --process
                         Group_mxJPO.class,
                         "Export / Import of groups.",
                         "group");
+        defineParameter(null, user,
+                        Person_mxJPO.class,
+                        "Export / Import of persons.",
+                        "person");
         defineParameter(null, user,
                         Role_mxJPO.class,
                         "Export / Import of roles.",
@@ -266,7 +262,7 @@ process: 's' --process
         ////////////////////////////////////////////////////////////////////////
         // user interface
 
-        final Set<Class<? extends AbstractObject_mxJPO>> ui = new HashSet<Class<? extends AbstractObject_mxJPO>>();
+        final Collection<Class<? extends AbstractObject_mxJPO>> ui = new HashSet<Class<? extends AbstractObject_mxJPO>>();
         defineParameter(null, ui,
                         null,
                         "Export / Import of user interface administrational objects.",
@@ -315,13 +311,13 @@ process: 's' --process
      * @throws Error if a short parameter is already defined
      */
     private static void defineParameter(final Character _shortParam,
-                                        final Set<Class<? extends AbstractObject_mxJPO>> _paramsList,
+                                        final Collection<Class<? extends AbstractObject_mxJPO>> _paramsList,
                                         final Class<? extends AbstractObject_mxJPO> _clazz,
                                         final String _description,
                                         final String... _longParams)
     {
         final List<String> allParamStrings = new ArrayList<String>();
-        final Set<Class<? extends AbstractObject_mxJPO>> tmp = (_clazz == null)
+        final Collection<Class<? extends AbstractObject_mxJPO>> tmp = (_clazz == null)
                 ? _paramsList
                 : new HashSet<Class<? extends AbstractObject_mxJPO>>();
 
@@ -494,7 +490,7 @@ final Set<String> paths = new TreeSet<String>();
 
         for (int idx = 0; idx < _args.length; idx++)  {
 //System.out.println(""+idx+"="+_args[idx]+"="+PARAMS.get(_args[idx]));
-            final Set<Class<? extends AbstractObject_mxJPO>> clazzes = PARAMS.get(_args[idx]);
+            final Collection<Class<? extends AbstractObject_mxJPO>> clazzes = PARAMS.get(_args[idx]);
             if (clazzes != null)  {
                 idx++;
                 final String name = _args[idx];
@@ -552,20 +548,25 @@ if (unknown || (Mode.HELP == mode) || (mode == null))  {
         }
     }
     // create if needed (and not in the list of existing objects
-    for (final Map.Entry<Class<? extends AbstractObject_mxJPO>,Map<File,String>> entry : clazz2names.entrySet())  {
-        for (final Map.Entry<File, String> fileEntry : entry.getValue().entrySet())  {
-            final Set<String> existings = existingNames.get(entry.getKey());
-            if (!existings.contains(fileEntry.getValue()))  {
-                final AbstractObject_mxJPO instance = entry.getKey().newInstance();
+    for (Class<? extends AbstractObject_mxJPO> clazz : PARAMS_ADMIN)  {
+        final Map<File,String> clazzMap = clazz2names.get(clazz);
+        if (clazzMap != null)  {
+            for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
+                final Set<String> existings = existingNames.get(clazz);
+                if (!existings.contains(fileEntry.getValue()))  {
+                    final AbstractObject_mxJPO instance = clazz.newInstance();
 System.out.println("create "+instance.getTypeDef().getLogging() + " '" + fileEntry.getValue() + "'");
-                instance.create(_context, fileEntry.getKey(), fileEntry.getValue());
+                    instance.create(_context, fileEntry.getKey(), fileEntry.getValue());
+                }
             }
         }
     }
     // update
-    for (final Map.Entry<Class<? extends AbstractObject_mxJPO>,Map<File,String>> entry : clazz2names.entrySet())  {
-        for (final Map.Entry<File, String> fileEntry : entry.getValue().entrySet())  {
-            AbstractObject_mxJPO instance = entry.getKey().newInstance();
+    for (Class<? extends AbstractObject_mxJPO> clazz : PARAMS_ADMIN)  {
+        final Map<File,String> clazzMap = clazz2names.get(clazz);
+        if (clazzMap != null)  {
+            for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
+                final AbstractObject_mxJPO instance = clazz.newInstance();
 System.out.println("check "+instance.getTypeDef().getLogging() + " '" + fileEntry.getValue() + "'");
 
 final boolean update;
@@ -583,13 +584,13 @@ if (versionInfo == VersionInfo.FILEDATE)  {
     update = true;
     System.out.println("    - update");
 }
-            if (update)  {
-                instance.update(_context,
-                                fileEntry.getValue(),
-                                fileEntry.getKey(),
-                                version);
+                if (update)  {
+                    instance.update(_context,
+                                    fileEntry.getValue(),
+                                    fileEntry.getKey(),
+                                    version);
+                }
             }
-
         }
     }
 }
