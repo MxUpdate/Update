@@ -59,8 +59,7 @@ import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.setHistoryOn;
  * @version $Id$
  */
 @InfoAnno_mxJPO(adminType = AdminTypeDef.Person,
-                busType = BusTypeDef.Person,
-                fileSuffix = ".tcl")
+                busType = BusTypeDef.Person)
 public class Person_mxJPO
         extends AbstractObject_mxJPO
 {
@@ -142,8 +141,7 @@ public class Person_mxJPO
         this.personAdmin.update(_context, _name, _file, _newVersion);
     }
 
-    @InfoAnno_mxJPO(adminType = AdminTypeDef.Person,
-                    fileSuffix = ".tcl")
+    @InfoAnno_mxJPO(adminType = AdminTypeDef.Person)
     private class PersonAdmin
             extends AbstractAdminObject_mxJPO
     {
@@ -471,8 +469,7 @@ public class Person_mxJPO
         }
     }
 
-    @InfoAnno_mxJPO(busType = BusTypeDef.Person,
-                    fileSuffix = "")
+    @InfoAnno_mxJPO(busType = BusTypeDef.Person)
     private class PersonBus
             extends AbstractBusObject_mxJPO
     {

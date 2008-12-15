@@ -35,8 +35,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
  * @version $Id$
  */
 @InfoAnno_mxJPO(busType = BusTypeDef.NumberGenerator,
-                busIgnoreAttributes = AttributeDef.NumberGeneratorNextNumber,
-                fileSuffix = ".tcl")
+                busIgnoreAttributes = AttributeDef.NumberGeneratorNextNumber)
 public class NumberGenerator_mxJPO
         extends AbstractBusObject_mxJPO
 {

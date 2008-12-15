@@ -53,8 +53,7 @@ import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.setEscapeOn;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.Policy,
-                fileSuffix = ".tcl")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Policy)
 public class Policy_mxJPO
         extends AbstractDMWithTriggers_mxJPO
         implements JPOCallerInterface

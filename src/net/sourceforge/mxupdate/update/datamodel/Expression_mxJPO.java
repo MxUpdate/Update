@@ -39,8 +39,7 @@ import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
 * @author tmoxter
 * @version $Id$
 */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.Expression,
-                fileSuffix = ".tcl")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Expression)
 public class Expression_mxJPO
         extends AbstractAdminObject_mxJPO
 {

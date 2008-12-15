@@ -177,7 +177,7 @@ public abstract class AbstractObject_mxJPO
     {
         final Map<File,String> ret = new TreeMap<File,String>();
 
-        final String suffix = this.getInfoAnno().fileSuffix();
+        final String suffix = this.getTypeDef().getFileSuffix();
         final int suffixLength = suffix.length();
         final String prefix = this.getTypeDef().getFilePrefix();
         final int prefixLength = (prefix != null) ? prefix.length() : 0;
@@ -210,7 +210,7 @@ public abstract class AbstractObject_mxJPO
     {
         final Map<File,String> ret = new TreeMap<File,String>();
 
-        final String suffix = this.getInfoAnno().fileSuffix();
+        final String suffix = this.getTypeDef().getFileSuffix();
         final int suffixLength = suffix.length();
         final String prefix = this.getTypeDef().getFilePrefix();
         final int prefixLength = prefix.length();

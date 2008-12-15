@@ -38,8 +38,7 @@ import net.sourceforge.mxupdate.util.Mapping_mxJPO.BusTypeDef;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(busType = BusTypeDef.Trigger,
-                fileSuffix = ".tcl")
+@InfoAnno_mxJPO(busType = BusTypeDef.Trigger)
 public class Trigger_mxJPO
         extends AbstractBusObject_mxJPO
 {

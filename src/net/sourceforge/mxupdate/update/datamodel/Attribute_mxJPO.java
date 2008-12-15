@@ -47,8 +47,7 @@ import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
  * @todo description
  * @todo program ranges
  */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.Attribute,
-                fileSuffix = ".tcl")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Attribute)
 public class Attribute_mxJPO
         extends AbstractDMWithTriggers_mxJPO
 {
@@ -113,7 +112,7 @@ public class Attribute_mxJPO
     {
         final Map<File,String> ret = new TreeMap<File,String>();
 
-        final String suffix = this.getInfoAnno().fileSuffix();
+        final String suffix = this.getTypeDef().getFileSuffix();
         final int suffixLength = suffix.length();
         for (final String prefix : PREFIXES)  {
             final int prefixLength = prefix.length();
@@ -148,7 +147,7 @@ public class Attribute_mxJPO
     {
         final Map<File,String> ret = new TreeMap<File,String>();
 
-        final String suffix = getInfoAnno().fileSuffix();
+        final String suffix = this.getTypeDef().getFileSuffix();
         final int suffixLength = suffix.length();
         for (final String prefix : PREFIXES)  {
             final int prefixLength = prefix.length();

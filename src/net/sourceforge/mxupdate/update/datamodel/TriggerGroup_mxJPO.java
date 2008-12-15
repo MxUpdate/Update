@@ -44,8 +44,7 @@ import net.sourceforge.mxupdate.util.Mapping_mxJPO.RelationDef;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(busType = BusTypeDef.TriggerGroup,
-                fileSuffix = ".tcl")
+@InfoAnno_mxJPO(busType = BusTypeDef.TriggerGroup)
 public class TriggerGroup_mxJPO
         extends AbstractBusObject_mxJPO
 {

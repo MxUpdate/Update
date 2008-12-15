@@ -40,8 +40,7 @@ import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.Channel,
-                fileSuffix = ".tcl")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Channel)
 public class Channel_mxJPO
         extends net.sourceforge.mxupdate.update.AbstractAdminObject_mxJPO
 {

@@ -36,8 +36,7 @@ import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.Table,
-                fileSuffix = ".tcl")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Table)
 public class Table_mxJPO
         extends AbstractAdminObject_mxJPO
 {

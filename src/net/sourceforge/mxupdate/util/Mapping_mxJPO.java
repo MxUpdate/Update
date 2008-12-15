@@ -112,6 +112,27 @@ public final class Mapping_mxJPO
 
     /**
      * Mapping between internal used administration type definitions and the
+     * file suffixes.
+     *
+     * @see AdminTypeDef#getFileSuffix()
+     */
+    private static final Map<AdminTypeDef,String> ADMIN_TYPE_FILE_SUFFIXES = new HashMap<AdminTypeDef,String>();
+
+    /**
+     * Mapping between internal used business type definitions and the file
+     * suffixes.
+     *
+     * @see BusTypeDef#getFileSuffix()
+     */
+    private static final Map<BusTypeDef,String> BUS_TYPE_FILE_SUFFIXES = new HashMap<BusTypeDef,String>();
+
+    /**
+     * Used file suffix of type definitions within the property file.
+     */
+    private static final String PREFIX_FILE_SUFFIX = "FileSuffix.";
+
+    /**
+     * Mapping between internal used administration type definitions and the
      * logging string.
      *
      * @see AdminTypeDef#getLogging()
@@ -192,50 +213,46 @@ public final class Mapping_mxJPO
             final String key = (String) entry.getKey();
             final String value = (String) entry.getValue();
             if (key.startsWith(PREFIX_ATTRIBUTE))  {
-                ATTRIBUTES.put(AttributeDef.valueOf(key.substring(PREFIX_ATTRIBUTE.length())),
-                               value);
+                ATTRIBUTES.put(AttributeDef.valueOf(key.substring(PREFIX_ATTRIBUTE.length())), value);
             } else if (key.startsWith(PREFIX_FILE_PATH))  {
                 final String keyFilePath = key.substring(PREFIX_FILE_PATH.length());
                 try  {
-                    ADMINTYPE_FILE_PATHS.put(AdminTypeDef.valueOf(keyFilePath),
-                                             value);
+                    ADMINTYPE_FILE_PATHS.put(AdminTypeDef.valueOf(keyFilePath), value);
                 } catch (final IllegalArgumentException e)  {
-                    BUSTYPE_FILE_PATHS.put(BusTypeDef.valueOf(keyFilePath),
-                                           value);
+                    BUSTYPE_FILE_PATHS.put(BusTypeDef.valueOf(keyFilePath), value);
                 }
             } else if (key.startsWith(PREFIX_FILE_PREFIX))  {
                 final String keyFilePrefix = key.substring(PREFIX_FILE_PREFIX.length());
                 try  {
-                    ADMIN_TYPE_FILE_PREFIXES.put(AdminTypeDef.valueOf(keyFilePrefix),
-                                                 value);
+                    ADMIN_TYPE_FILE_PREFIXES.put(AdminTypeDef.valueOf(keyFilePrefix), value);
                 } catch (final IllegalArgumentException e)  {
-                    BUS_TYPE_FILE_PREFIXES.put(BusTypeDef.valueOf(keyFilePrefix),
-                                               value);
+                    BUS_TYPE_FILE_PREFIXES.put(BusTypeDef.valueOf(keyFilePrefix), value);
+                }
+            } else if (key.startsWith(PREFIX_FILE_SUFFIX))  {
+                final String keyFilePrefix = key.substring(PREFIX_FILE_SUFFIX.length());
+                try  {
+                    ADMIN_TYPE_FILE_SUFFIXES.put(AdminTypeDef.valueOf(keyFilePrefix), value);
+                } catch (final IllegalArgumentException e)  {
+                    BUS_TYPE_FILE_SUFFIXES.put(BusTypeDef.valueOf(keyFilePrefix), value);
                 }
             } else if (key.startsWith(PREFIX_LOGGING))  {
                 final String keyFilePrefix = key.substring(PREFIX_LOGGING.length());
                 try  {
-                    ADMIN_TYPE_LOGGINGS.put(AdminTypeDef.valueOf(keyFilePrefix),
-                                            value);
+                    ADMIN_TYPE_LOGGINGS.put(AdminTypeDef.valueOf(keyFilePrefix), value);
                 } catch (final IllegalArgumentException e)  {
-                    BUS_TYPE_LOGGINGS.put(BusTypeDef.valueOf(keyFilePrefix),
-                                          value);
+                    BUS_TYPE_LOGGINGS.put(BusTypeDef.valueOf(keyFilePrefix), value);
                 }
             } else if (key.startsWith(PREFIX_RELATION))  {
-                RELATIONS.put(RelationDef.valueOf(key.substring(PREFIX_RELATION.length())),
-                              value);
+                RELATIONS.put(RelationDef.valueOf(key.substring(PREFIX_RELATION.length())), value);
             } else if (key.startsWith(PREFIX_TITLE))  {
                 final String keyTitle = key.substring(PREFIX_TITLE.length());
                 try  {
-                    ADMIN_TYPE_TITLES.put(AdminTypeDef.valueOf(keyTitle),
-                                          value);
+                    ADMIN_TYPE_TITLES.put(AdminTypeDef.valueOf(keyTitle), value);
                 } catch (final IllegalArgumentException e)  {
-                    BUS_TYPE_TITLES.put(BusTypeDef.valueOf(keyTitle),
-                                        value);
+                    BUS_TYPE_TITLES.put(BusTypeDef.valueOf(keyTitle), value);
                 }
             } else if (key.startsWith(PREFIX_TYPE))  {
-                BUS_TYPES.put(BusTypeDef.valueOf(key.substring(PREFIX_TYPE.length())),
-                          value);
+                BUS_TYPES.put(BusTypeDef.valueOf(key.substring(PREFIX_TYPE.length())), value);
             }
         }
     }
@@ -302,6 +319,12 @@ public final class Mapping_mxJPO
          * @return file prefix of the type definition
          */
         public String getFilePrefix();
+
+        /**
+         *
+         * @return file suffix of the type definition
+         */
+        public String getFileSuffix();
 
         /**
          *
@@ -464,6 +487,18 @@ public final class Mapping_mxJPO
         }
 
         /**
+         * Returns the related file name suffix. The method returns only
+         * correct values if the initialize method was called!
+         *
+         * @return file name prefix of the administration type definition
+         * @see Mapping_mxJPO#ADMIN_TYPE_FILE_SUFFIXES
+         */
+        public String getFileSuffix()
+        {
+            return Mapping_mxJPO.ADMIN_TYPE_FILE_SUFFIXES.get(this);
+        }
+
+        /**
          * Returns the related logging string. The method returns only correct
          * values if the initialize method was called!
          *
@@ -559,6 +594,18 @@ public final class Mapping_mxJPO
         public String getFilePrefix()
         {
             return Mapping_mxJPO.BUS_TYPE_FILE_PREFIXES.get(this);
+        }
+
+        /**
+         * Returns the related file name suffix. The method returns only
+         * correct values if the initialize method was called!
+         *
+         * @return file name prefix of the business type definition
+         * @see Mapping_mxJPO#BUS_TYPE_FILE_SUFFIXES
+         */
+        public String getFileSuffix()
+        {
+            return Mapping_mxJPO.BUS_TYPE_FILE_SUFFIXES.get(this);
         }
 
         /**

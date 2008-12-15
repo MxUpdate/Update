@@ -93,7 +93,7 @@ public abstract class AbstractPropertyObject_mxJPO
         return new StringBuilder()
                 .append(this.getTypeDef().getFilePrefix())
                 .append(this.getName())
-                .append(this.getInfoAnno().fileSuffix())
+                .append(this.getTypeDef().getFileSuffix())
                 .toString();
     }
 

@@ -42,8 +42,7 @@ import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.Association,
-                fileSuffix = ".tcl")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Association)
 public class Association_mxJPO
         extends AbstractAdminObject_mxJPO
 {

@@ -51,9 +51,4 @@ public @interface InfoAnno_mxJPO
      * the update is make for a business object.
      */
     public AttributeDef[] busIgnoreAttributes() default {};
-
-    /**
-     * Suffix of the file name including the file extension.
-     */
-    public String fileSuffix();
 }

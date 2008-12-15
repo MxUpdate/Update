@@ -44,8 +44,7 @@ import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.JPO,
-                fileSuffix = "_" + "mxJPO.java")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.JPO)
 public class JPO_mxJPO
         extends AbstractObject_mxJPO
 {

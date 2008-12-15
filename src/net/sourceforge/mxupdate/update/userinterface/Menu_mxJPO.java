@@ -40,8 +40,7 @@ import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.Menu,
-                fileSuffix = ".tcl")
+@InfoAnno_mxJPO(adminType = AdminTypeDef.Menu)
 public class Menu_mxJPO
         extends Command_mxJPO
 {
