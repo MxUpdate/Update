@@ -245,6 +245,7 @@ eval  {
     }
     mql mod relationship $asMapping(Relationship.TriggerGroup) \
         description "Relationship used to group trigger definitions." \
+        preventduplicates \
         from add type $asMapping(Type.TriggerGroup) \
         to add type $asMapping(Type.Trigger) \
            add type $asMapping(Type.TriggerGroup) \
