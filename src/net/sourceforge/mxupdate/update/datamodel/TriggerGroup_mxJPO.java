@@ -22,6 +22,7 @@ package net.sourceforge.mxupdate.update.datamodel;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -142,21 +143,71 @@ public class TriggerGroup_mxJPO
             throws IOException
     {
         super.write(_out);
+        // write all from objects
         for (final BusObject_mxJPO bus : this.froms)  {
             _out.append("\nmql connect bus \"${OBJECTID}\" \\")
                 .append("\n    relationship \"").append(RelationDef.TriggerGroup.getMxName()).append("\" \\")
                 .append("\n    from \"").append(bus.getType()).append("\" \"")
                         .append(bus.getName()).append("\" \"")
                         .append(bus.getRevision()).append("\"");
-
         }
+        // write all to objects
         for (final BusObject_mxJPO bus: this.tos)  {
             _out.append("\nmql connect bus \"${OBJECTID}\" \\")
                 .append("\n    relationship \"").append(RelationDef.TriggerGroup.getMxName()).append("\" \\")
                 .append("\n    to \"").append(bus.getType()).append("\" \"")
                         .append(bus.getName()).append("\" \"")
                         .append(bus.getRevision()).append("\"");
-
         }
+    }
+
+
+    /**
+     * Appends to the MQL statements which must called before the TCL is
+     * executed the MQL statements to disconnected all {@link #tos} and
+     * {@link #froms} objects.
+     *
+     * @param _context          context for this request
+     * @param _preMQLCode       MQL statements which must be called before the
+     *                          TCL code is executed
+     * @param _postMQLCode      MQL statements which must be called after the
+     *                          TCL code is executed
+     * @param _tclCode          TCL code from the file used to update
+     * @param _tclVariables     map of all TCL variables where the key is the
+     *                          name and the value is value of the TCL variable
+     *                          (the value is automatically converted to TCL
+     *                          syntax!)
+     */
+    @Override
+    protected void update(final Context _context,
+                          final CharSequence _preMQLCode,
+                          final CharSequence _postMQLCode,
+                          final CharSequence _tclCode,
+                          final Map<String,String> _tclVariables)
+            throws Exception
+    {
+        final StringBuilder preMQLCode = new StringBuilder();
+
+        // disconnect all from objects
+        for (final BusObject_mxJPO bus : this.froms)  {
+            preMQLCode.append("disconnect bus ").append(this.getBusOid())
+                      .append(" relationship \"").append(RelationDef.TriggerGroup.getMxName()).append("\"")
+                      .append(" from \"").append(bus.getType()).append("\" \"")
+                              .append(bus.getName()).append("\" \"")
+                              .append(bus.getRevision()).append("\";\n");
+        }
+        // disconnect all to objects
+        for (final BusObject_mxJPO bus: this.tos)  {
+            preMQLCode.append("disconnect bus ").append(this.getBusOid())
+                      .append(" relationship \"").append(RelationDef.TriggerGroup.getMxName()).append("\"")
+                      .append(" to \"").append(bus.getType()).append("\" \"")
+                              .append(bus.getName()).append("\" \"")
+                              .append(bus.getRevision()).append("\";\n");
+        }
+
+        // append rest of pre MQL code
+        preMQLCode.append(_preMQLCode);
+
+        super.update(_context, preMQLCode, _postMQLCode, _tclCode, _tclVariables);
     }
 }
