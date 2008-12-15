@@ -72,6 +72,8 @@ public final class Mapping_mxJPO
 
     /**
      * Mapping between internal used type definitions and the file paths.
+     *
+     * @see AdminTypeDef#getFilePath()
      */
     private static final Map<AdminTypeDef,String> ADMINTYPE_FILE_PATHS = new HashMap<AdminTypeDef,String>();
 
@@ -111,12 +113,16 @@ public final class Mapping_mxJPO
     /**
      * Mapping between internal used administration type definitions and the
      * logging string.
+     *
+     * @see AdminTypeDef#getLogging()
      */
     private static final Map<AdminTypeDef,String> ADMIN_TYPE_LOGGINGS = new HashMap<AdminTypeDef,String>();
 
     /**
      * Mapping between internal used business type definitions and the logging
      * string.
+     *
+     * @see BusTypeDef#getLogging()
      */
     private static final Map<BusTypeDef,String> BUS_TYPE_LOGGINGS = new HashMap<BusTypeDef,String>();
 
@@ -128,11 +134,15 @@ public final class Mapping_mxJPO
     /**
      * Mapping between internal used administration type definitions and the
      * titles.
+     *
+     * @see AdminTypeDef#getTitle()
      */
     private static final Map<AdminTypeDef,String> ADMIN_TYPE_TITLES = new HashMap<AdminTypeDef,String>();
 
     /**
      * Mapping between internal used business type definitions and the titles.
+     *
+     * @see BusTypeDef#getTitle()
      */
     private static final Map<BusTypeDef,String> BUS_TYPE_TITLES = new HashMap<BusTypeDef,String>();
 
@@ -140,6 +150,18 @@ public final class Mapping_mxJPO
      * Used title of type definitions within the property file.
      */
     private static final String PREFIX_TITLE = "Title.";
+
+    /**
+     * Mapping between internal used business type definitions and the titles.
+     *
+     * @see RelationDef#getMxName()
+     */
+    private static final Map<RelationDef,String> RELATIONS = new HashMap<RelationDef,String>();
+
+    /**
+     * Used title of type definitions within the property file.
+     */
+    private static final String PREFIX_RELATION = "Relationship.";
 
     /**
      * Dummy constructor so that no new instance of this final mapping class
@@ -199,6 +221,9 @@ public final class Mapping_mxJPO
                     BUS_TYPE_LOGGINGS.put(BusTypeDef.valueOf(keyFilePrefix),
                                           value);
                 }
+            } else if (key.startsWith(PREFIX_RELATION))  {
+                RELATIONS.put(RelationDef.valueOf(key.substring(PREFIX_RELATION.length())),
+                              value);
             } else if (key.startsWith(PREFIX_TITLE))  {
                 final String keyTitle = key.substring(PREFIX_TITLE.length());
                 try  {
@@ -558,6 +583,30 @@ public final class Mapping_mxJPO
         public String getTitle()
         {
             return Mapping_mxJPO.BUS_TYPE_TITLES.get(this);
+        }
+    }
+
+    /**
+     * Enumeration used to define all relationship used within MxUpdate
+     * application.
+     */
+    public enum RelationDef
+    {
+        /**
+         * Relationship between trigger groups and triggers or trigger groups.
+         */
+        TriggerGroup;
+
+        /**
+         * Returns the related name used within Mx. The method returns only
+         * correct values if the initialize method was called!
+         *
+         * @return Mx name of the relationship definition
+         * @see Mapping_mxJPO#RELATIONS
+         */
+        public String getMxName()
+        {
+            return Mapping_mxJPO.RELATIONS.get(this);
         }
     }
 }

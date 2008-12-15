@@ -42,6 +42,7 @@ import net.sourceforge.mxupdate.update.datamodel.ObjectGenerator_mxJPO;
 import net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO;
 import net.sourceforge.mxupdate.update.datamodel.Relationship_mxJPO;
 import net.sourceforge.mxupdate.update.datamodel.Rule_mxJPO;
+import net.sourceforge.mxupdate.update.datamodel.TriggerGroup_mxJPO;
 import net.sourceforge.mxupdate.update.datamodel.Trigger_mxJPO;
 import net.sourceforge.mxupdate.update.datamodel.Type_mxJPO;
 import net.sourceforge.mxupdate.update.user.Association_mxJPO;
@@ -218,6 +219,10 @@ process: 's' --process
                         Trigger_mxJPO.class,
                         "Export / Import of triggers.",
                         "trigger", "trig");
+        defineParameter(null, dm,
+                        TriggerGroup_mxJPO.class,
+                        "Export / Import of triggers groups.",
+                        "triggergroup");
 
         ////////////////////////////////////////////////////////////////////////
         // user
