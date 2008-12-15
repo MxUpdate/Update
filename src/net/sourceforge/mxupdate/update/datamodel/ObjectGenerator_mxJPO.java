@@ -159,11 +159,8 @@ public class ObjectGenerator_mxJPO
 
         // disconnect from number generator
         if ((this.numGenName != null) && (this.numGenRevi != null))  {
-            preMQLCode.append("disconnect bus  \"").append(this.getBusType())
-                              .append("\" \"").append(this.getBusName())
-                              .append("\" \"").append(this.getBusRevision())
-                              .append("\" in \"").append(this.getBusVault())
-                      .append("\" relationship \"").append(RELATIONSHIP_NUMBER_GENERATOR)
+            preMQLCode.append("disconnect bus ").append(this.getBusOid())
+                      .append(" relationship \"").append(RELATIONSHIP_NUMBER_GENERATOR)
                       .append("\" to \"").append(this.numGenType).append("\" \"")
                               .append(this.numGenName).append("\" \"")
                               .append(this.numGenRevi).append("\"")

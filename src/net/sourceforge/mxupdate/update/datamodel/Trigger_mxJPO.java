@@ -122,11 +122,8 @@ public class Trigger_mxJPO
 
         // demote if required
         if (this.active)  {
-            preMQLCode.append("demote bus \"").append(this.getBusType())
-                      .append("\" \"").append(this.getBusName())
-                      .append("\" \"").append(this.getBusRevision())
-                      .append("\" in \"").append(this.getBusVault())
-                      .append("\";\n");
+            preMQLCode.append("demote bus ").append(this.getBusOid())
+                      .append(";\n");
         }
 
         // append rest of pre MQL code
