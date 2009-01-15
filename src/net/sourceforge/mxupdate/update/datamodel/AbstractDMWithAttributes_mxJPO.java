@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 The MxUpdate Team
+ * Copyright 2008-2009 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -179,7 +179,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
             throws Exception
     {
         final String nameParam = new StringBuilder()
-                .append('-').append(getInfoAnno().adminType()).toString();
+                .append('-').append(getInfoAnno().adminType().getMxName()).toString();
         int idx = 0;
         String name = null;
         String attrStr = null;
