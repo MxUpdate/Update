@@ -255,15 +255,7 @@ public abstract class AbstractDMWithTriggers_mxJPO
          */
         protected void appendResetMQLStatement(final StringBuilder _cmd)
         {
-            // parse event type
-            final Matcher matchEventType = PATTERN_EVENTTYPE.matcher(this.name);
-            matchEventType.find();
-            final String eventType = matchEventType.group();
-            // parse kind
-            final Matcher matchKind = PATTERN_KIND.matcher(this.name);
-            matchKind.find();
-            final String kind = matchKind.group();
-            _cmd.append(" remove trigger ").append(eventType.toLowerCase()).append(' ').append(kind.toLowerCase());
+            _cmd.append(" remove trigger ").append(this.getEventType()).append(' ').append(this.getKind());
         }
     }
 }
