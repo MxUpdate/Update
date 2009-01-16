@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 The MxUpdate Team
+ * Copyright 2008-2009 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 package net.sourceforge.mxupdate.update.userinterface;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
@@ -191,18 +192,21 @@ public class Portal_mxJPO
      *                          TCL code is executed
      * @param _postMQLCode      MQL statements which must be called after the
      *                          TCL code is executed
-     * @param _tclCode          TCL code from the file used to update
+     * @param _preTCLCode       TCL code which is defined before the source
+     *                          file is sourced
      * @param _tclVariables     map of all TCL variables where the key is the
      *                          name and the value is value of the TCL variable
      *                          (the value is automatically converted to TCL
      *                          syntax!)
+     * @param _sourceFile       souce file with the TCL code to update
      */
     @Override
     protected void update(final Context _context,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
-                          final CharSequence _tclCode,
-                          final Map<String,String> _tclVariables)
+                          final CharSequence _preTCLCode,
+                          final Map<String,String> _tclVariables,
+                          final File _sourceFile)
             throws Exception
     {
         // HRef, description, alt and label
@@ -229,7 +233,7 @@ public class Portal_mxJPO
         // append already existing pre MQL code
         preMQLCode.append(_preMQLCode);
 
-        super.update(_context, preMQLCode, _postMQLCode, _tclCode, _tclVariables);
+        super.update(_context, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
     }
 
     /**

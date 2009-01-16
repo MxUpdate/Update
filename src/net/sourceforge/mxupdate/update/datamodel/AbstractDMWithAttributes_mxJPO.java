@@ -20,9 +20,11 @@
 
 package net.sourceforge.mxupdate.update.datamodel;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -35,6 +37,7 @@ import matrix.db.JPO;
 import net.sourceforge.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
 import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
@@ -48,6 +51,11 @@ public abstract class AbstractDMWithAttributes_mxJPO
         extends AbstractDMWithTriggers_mxJPO
         implements JPOCallerInterface
 {
+    /**
+     *
+     */
+    public static final Set<String> IGNORE_TYPE_ATTRIBUTES = new HashSet<String>();
+
     /**
      * Defines the serialize version unique identifier.
      */
@@ -133,17 +141,19 @@ public abstract class AbstractDMWithAttributes_mxJPO
      *                          TCL code is executed
      * @param _postMQLCode      MQL statements which must be called after the
      *                          TCL code is executed
-     * @param _tclCode          TCL code from the file used to update which
-     *                          gets the TCL procedure in the front
+     * @param _preTCLCode       TCL code which is defined before the source
+     *                          file is sourced
      * @param _tclVariables     map with TCL variables
+     * @param _sourceFile       souce file with the TCL code to update
      * @see #TCL_PROCEDURE
      */
     @Override
     protected void update(final Context _context,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
-                          final CharSequence _tclCode,
-                          final Map<String,String> _tclVariables)
+                          final CharSequence _preTCLCode,
+                          final Map<String,String> _tclVariables,
+                          final File _sourceFile)
             throws Exception
     {
         // define TCL variable for this instance
@@ -155,9 +165,9 @@ public abstract class AbstractDMWithAttributes_mxJPO
         // add TCL code for the procedure
         final StringBuilder tclCode = new StringBuilder()
                 .append(TCL_PROCEDURE)
-                .append(_tclCode);
+                .append(_preTCLCode);
 
-        super.update(_context, _preMQLCode, _postMQLCode, tclCode, tclVariables);
+        super.update(_context, _preMQLCode, _postMQLCode, tclCode, tclVariables, _sourceFile);
     }
 
     /**
@@ -184,10 +194,14 @@ public abstract class AbstractDMWithAttributes_mxJPO
         String name = null;
         String attrStr = null;
 // TODO: parameters -ignoreattr and -removeattr
+final Set<String> ignoreAttrs = new HashSet<String>();
         while (idx < _args.length)  {
             final String arg = _args[idx];
             if (nameParam.equals(arg))  {
                 name = _args[++idx];
+                if ("-type".equals(arg))  {
+                    ignoreAttrs.addAll(IGNORE_TYPE_ATTRIBUTES);
+                }
             } else if ("-attributes".equals(arg))  {
                 attrStr = _args[++idx];
             } else  {
@@ -220,9 +234,19 @@ public abstract class AbstractDMWithAttributes_mxJPO
         // now check for not defined but existing attributes
         for (final String attr : this.attributes)  {
             if (!newAttrs.contains(attr))  {
-                throw new Exception("Attribute '" + attr + "' is defined to be deleted"
-                        + " in " + this.getTypeDef().getLogging() + " '"
-                        + this.getName() + "', but not allowed!");
+                boolean ignore = false;
+                for (final String ignoreAttr : ignoreAttrs)  {
+                    if (match(attr, ignoreAttr))  {
+                        ignore = true;
+System.out.println("    - attribute '" + attr + "' is not defined but will be ignored");
+                        break;
+                    }
+                }
+                if (!ignore)  {
+                    throw new Exception("Attribute '" + attr + "' is defined to be deleted"
+                            + " in " + this.getTypeDef().getLogging() + " '"
+                            + this.getName() + "', but not allowed!");
+                }
             }
         }
         // and check for not existing attributes but needed

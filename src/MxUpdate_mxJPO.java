@@ -138,6 +138,15 @@ public class MxUpdate_mxJPO
     private static final Map<String,VersionInfo> PARAM_VERSION = new HashMap<String,VersionInfo>();
 
     static  {
+
+        ////////////////////////////////////////////////////////////////////////
+        //
+
+        appendDescription("Pattern defining the match of attributes which are ignored "
+                                + "within the test attributes of types.",
+                          Arrays.asList(new String[]{"--ignoretypeattributes"}),
+                          "MATCH");
+
         ////////////////////////////////////////////////////////////////////////
         // mode (export / import / help)
 
@@ -449,7 +458,7 @@ public class MxUpdate_mxJPO
         System.out.println("(asterisk '*' could be uses..).");
         System.out.println();
         System.out.println("--------------------------------------------------------------------------------");
-        System.out.println(" Copyright 2008 The MxUpdate Team");
+        System.out.println(" Copyright 2008-2009 The MxUpdate Team");
         System.out.println(" Licensed under the Apache License, Version 2.0 (the \"License\");");
         System.out.println(" you may not use this files except in compliance with the License.");
         System.out.println(" You may obtain a copy of the License at");
@@ -471,6 +480,8 @@ public class MxUpdate_mxJPO
 
         // initialize mapping
         Mapping_mxJPO.init(_context);
+
+        Type_mxJPO.IGNORE_TYPE_ATTRIBUTES.clear();
 
         try {
             // to be sure....
@@ -515,6 +526,9 @@ final Set<String> paths = new TreeSet<String>();
                 }
             } else if (PARAM_VERSION.containsKey(_args[idx]))  {
                 versionInfo = PARAM_VERSION.get(_args[idx]);
+            } else if ("--ignoretypeattributes".equals(_args[idx]))  {
+                idx++;
+                Type_mxJPO.IGNORE_TYPE_ATTRIBUTES.add(_args[idx]);
             } else if ("--path".equals(_args[idx]))  {
                 idx++;
                 paths.add(_args[idx]);
@@ -532,67 +546,7 @@ if (unknown || (Mode.HELP == mode) || (mode == null))  {
 } else if (Mode.EXPORT == mode)  {
     this.export(_context, paths, clazz2matches);
 } else if (Mode.IMPORT == mode) {
-    // get all matching files depending on the update classes
-    final Map<Class<? extends AbstractObject_mxJPO>,Map<File,String>> clazz2names
-            = this.evalMatches(paths, clazz2matches);
-    // evaluate for existing administration objects
-    final Collection<String> wildCardMatch = new HashSet<String>();
-    wildCardMatch.add("*");
-    final Map<Class<? extends AbstractObject_mxJPO>,Set<String>> existingNames
-            = new HashMap<Class<? extends AbstractObject_mxJPO>,Set<String>>();
-    for (final Class<? extends AbstractObject_mxJPO> clazz : clazz2names.keySet())  {
-        if (!existingNames.containsKey(clazz))  {
-            final AbstractObject_mxJPO instance = clazz.newInstance();
-            existingNames.put(clazz,
-                              instance.getMatchingNames(_context, wildCardMatch));
-        }
-    }
-    // create if needed (and not in the list of existing objects
-    for (Class<? extends AbstractObject_mxJPO> clazz : PARAMS_ADMIN)  {
-        final Map<File,String> clazzMap = clazz2names.get(clazz);
-        if (clazzMap != null)  {
-            for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
-                final Set<String> existings = existingNames.get(clazz);
-                if (!existings.contains(fileEntry.getValue()))  {
-                    final AbstractObject_mxJPO instance = clazz.newInstance();
-System.out.println("create "+instance.getTypeDef().getLogging() + " '" + fileEntry.getValue() + "'");
-                    instance.create(_context, fileEntry.getKey(), fileEntry.getValue());
-                }
-            }
-        }
-    }
-    // update
-    for (Class<? extends AbstractObject_mxJPO> clazz : PARAMS_ADMIN)  {
-        final Map<File,String> clazzMap = clazz2names.get(clazz);
-        if (clazzMap != null)  {
-            for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
-                final AbstractObject_mxJPO instance = clazz.newInstance();
-System.out.println("check "+instance.getTypeDef().getLogging() + " '" + fileEntry.getValue() + "'");
-
-final boolean update;
-String version = null;
-if (versionInfo == VersionInfo.FILEDATE)  {
-    final Date fileDate = new Date(fileEntry.getKey().lastModified());
-    if (fileDate.equals(instance.getMxFileDate(_context, fileEntry.getValue())))  {
-        update = false;
-    } else  {
-        update = true;
-        System.out.println("    - update to version from " + fileDate);
-        version = Long.toString(fileDate.getTime() / 1000);
-    }
-} else  {
-    update = true;
-    System.out.println("    - update");
-}
-                if (update)  {
-                    instance.update(_context,
-                                    fileEntry.getValue(),
-                                    fileEntry.getKey(),
-                                    version);
-                }
-            }
-        }
-    }
+    this.update(_context, paths, clazz2matches, versionInfo);
 }
 
         } catch (Exception e)  {
@@ -601,6 +555,82 @@ if (versionInfo == VersionInfo.FILEDATE)  {
         }
 
     }
+
+    /**
+     *
+     * @param _context
+     * @param _paths
+     * @param _clazz2matches
+     */
+    protected void update(final Context _context,
+                          final Set<String> _paths,
+                          final Map<Class<? extends AbstractObject_mxJPO>,List<String>> _clazz2matches,
+                          final VersionInfo _versionInfo)
+            throws Exception
+    {
+        // get all matching files depending on the update classes
+        final Map<Class<? extends AbstractObject_mxJPO>,Map<File,String>> clazz2names
+                = this.evalMatches(_paths, _clazz2matches);
+        // evaluate for existing administration objects
+        final Collection<String> wildCardMatch = new HashSet<String>();
+        wildCardMatch.add("*");
+        final Map<Class<? extends AbstractObject_mxJPO>,Set<String>> existingNames
+                = new HashMap<Class<? extends AbstractObject_mxJPO>,Set<String>>();
+        for (final Class<? extends AbstractObject_mxJPO> clazz : clazz2names.keySet())  {
+            if (!existingNames.containsKey(clazz))  {
+                final AbstractObject_mxJPO instance = clazz.newInstance();
+                existingNames.put(clazz,
+                                  instance.getMatchingNames(_context, wildCardMatch));
+            }
+        }
+        // create if needed (and not in the list of existing objects
+        for (Class<? extends AbstractObject_mxJPO> clazz : PARAMS_ADMIN)  {
+            final Map<File,String> clazzMap = clazz2names.get(clazz);
+            if (clazzMap != null)  {
+                for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
+                    final Set<String> existings = existingNames.get(clazz);
+                    if (!existings.contains(fileEntry.getValue()))  {
+                        final AbstractObject_mxJPO instance = clazz.newInstance();
+System.out.println("create "+instance.getTypeDef().getLogging() + " '" + fileEntry.getValue() + "'");
+                        instance.create(_context, fileEntry.getKey(), fileEntry.getValue());
+                    }
+                }
+            }
+        }
+        // update
+        for (Class<? extends AbstractObject_mxJPO> clazz : PARAMS_ADMIN)  {
+            final Map<File,String> clazzMap = clazz2names.get(clazz);
+            if (clazzMap != null)  {
+                for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
+                    final AbstractObject_mxJPO instance = clazz.newInstance();
+System.out.println("check "+instance.getTypeDef().getLogging() + " '" + fileEntry.getValue() + "'");
+
+                    final boolean update;
+                    String version = null;
+                    if (_versionInfo == VersionInfo.FILEDATE)  {
+                        final Date fileDate = new Date(fileEntry.getKey().lastModified());
+                        if (fileDate.equals(instance.getMxFileDate(_context, fileEntry.getValue())))  {
+                            update = false;
+                        } else  {
+                            update = true;
+System.out.println("    - update to version from " + fileDate);
+                            version = Long.toString(fileDate.getTime() / 1000);
+                        }
+                    } else  {
+                        update = true;
+System.out.println("    - update");
+                    }
+                    if (update)  {
+                        instance.update(_context,
+                                        fileEntry.getValue(),
+                                        fileEntry.getKey(),
+                                        version);
+                    }
+                }
+            }
+        }
+    }
+
 
     /**
      * Exports matching administration objects to given path.

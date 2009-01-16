@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 The MxUpdate Team
+ * Copyright 2008-2009 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -306,9 +306,6 @@ public abstract class AbstractPropertyObject_mxJPO
         // parse objects
         this.parse(_context, _name);
 
-        // read TCL code
-        final StringBuilder tclCode = this.getCode(_file);
-
         final Map<String,String> variables = new HashMap<String,String>();
         if (_newVersion == null)  {
             variables.put("VERSION", "");
@@ -316,7 +313,7 @@ public abstract class AbstractPropertyObject_mxJPO
             variables.put("VERSION", _newVersion);
         }
 
-        this.update(_context, "", "", tclCode, variables);
+        this.update(_context, "", "", "", variables, _file);
     }
 
     /**
@@ -341,18 +338,21 @@ public abstract class AbstractPropertyObject_mxJPO
      *                          TCL code is executed
      * @param _postMQLCode      MQL statements which must be called after the
      *                          TCL code is executed
-     * @param _tclCode          TCL code from the file used to update
+     * @param _preTCLCode       TCL code which is defined before the source
+     *                          file is sourced
      * @param _tclVariables     map of all TCL variables where the key is the
      *                          name and the value is value of the TCL variable
      *                          (the value is automatically converted to TCL
      *                          syntax!)
+     * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if update failed
      */
     protected void update(final Context _context,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
-                          final CharSequence _tclCode,
-                          final Map<String,String> _tclVariables)
+                          final CharSequence _preTCLCode,
+                          final Map<String,String> _tclVariables,
+                          final File _sourceFile)
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder().append(_preMQLCode);
@@ -367,20 +367,21 @@ public abstract class AbstractPropertyObject_mxJPO
                .append(" \"").append(convertTcl(entry.getValue())).append("\"\n");
         }
         // append TCL code, end of TCL mode and post MQL statements
-        cmd.append(_tclCode)
+        cmd.append(_preTCLCode)
+           .append("\nsource \"").append(_sourceFile.toString()).append("\"")
            .append("\n}\nexit;\n")
            .append(_postMQLCode);
 
         // execute update
         boolean commit = false;
         try  {
-            _context.start(true);
+//            _context.start(true);
             execMql(_context, cmd);
-            _context.commit();
+//            _context.commit();
             commit = true;
         } finally  {
             if (!commit)  {
-                _context.abort();
+//                _context.abort();
             }
         }
     }

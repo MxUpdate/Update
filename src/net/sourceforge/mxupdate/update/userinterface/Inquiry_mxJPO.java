@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 The MxUpdate Team
+ * Copyright 2008-2009 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,19 +130,22 @@ public class Inquiry_mxJPO
      *                          TCL code is executed
      * @param _postMQLCode      MQL statements which must be called after the
      *                          TCL code is executed
-     * @param _tclCode          TCL code from the file used to update
+     * @param _preTCLCode       TCL code which is defined before the source
+     *                          file is sourced
      * @param _tclVariables     map of all TCL variables where the key is the
      *                          name and the value is value of the TCL variable
      *                          (the value is automatically converted to TCL
      *                          syntax!)
+     * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if update failed
      */
     @Override
     protected void update(final Context _context,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
-                          final CharSequence _tclCode,
-                          final Map<String,String> _tclVariables)
+                          final CharSequence _preTCLCode,
+                          final Map<String,String> _tclVariables,
+                          final File _sourceFile)
             throws Exception
     {
         // reset HRef, description, alt, label and height
@@ -163,32 +166,40 @@ public class Inquiry_mxJPO
                   .append(_preMQLCode);
 
         // separate the inquiry code and the TCL code
-        final int idx = _tclCode.toString().lastIndexOf(INQUIRY_SEPARATOR);
+        final int idx = this.getCode(_sourceFile).lastIndexOf(INQUIRY_SEPARATOR);
         final CharSequence code = (idx >= 0)
-                                  ? _tclCode.subSequence(0, idx)
-                                  : _tclCode;
+                                  ? _preTCLCode.subSequence(0, idx)
+                                  : _preTCLCode;
         final CharSequence inqu = (idx >= 0)
-                                  ? _tclCode.subSequence(idx + INQUIRY_SEPARATOR.length() + 1, _tclCode.length())
+                                  ? _preTCLCode.subSequence(idx + INQUIRY_SEPARATOR.length() + 1, _preTCLCode.length())
                                   : "";
 
-        final File tmpFile = File.createTempFile("TMP_", ".inquiry");
+        final File tmpInqFile = File.createTempFile("TMP_", ".inquiry");
+        final File tmpTclFile = File.createTempFile("TMP_", ".tcl");
 
         try  {
+            // write TCL code
+            final Writer outTCL = new FileWriter(tmpTclFile);
+            outTCL.append(code.toString().trim());
+            outTCL.flush();
+            outTCL.close();
+
             // write inquiry code
-            final Writer out = new FileWriter(tmpFile);
-            out.append(inqu.toString().trim());
-            out.flush();
-            out.close();
+            final Writer outInq = new FileWriter(tmpInqFile);
+            outInq.append(inqu.toString().trim());
+            outInq.flush();
+            outInq.close();
 
             // define TCL variable for the file
             final Map<String,String> tclVariables = new HashMap<String,String>();
             tclVariables.putAll(_tclVariables);
-            tclVariables.put("FILE", tmpFile.getPath());
+            tclVariables.put("FILE", tmpInqFile.getPath());
 
             // and update
-            super.update(_context, preMQLCode, _postMQLCode, code, tclVariables);
+            super.update(_context, preMQLCode, _postMQLCode, code, tclVariables, tmpTclFile);
         } finally  {
-            tmpFile.delete();
+            tmpInqFile.delete();
+            tmpTclFile.delete();
         }
     }
 }
