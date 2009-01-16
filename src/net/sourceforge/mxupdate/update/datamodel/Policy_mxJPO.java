@@ -496,16 +496,18 @@ throw new Exception("some states are not defined anymore!");
     }
 
     /**
+     * Calculates the delta between the new and the old value. If a delta
+     * exists, the kind with the new delta is added to the string builder.
      *
-     * @param _cmd      string build where the delta must be append
+     * @param _cmd      string builder where the delta must be append
      * @param _kind     kind of the delta
-     * @param _curVal   current value in the database
      * @param _newVal   new target value
+     * @param _curVal   current value in the database
      */
     protected void calcDelta(final StringBuilder _cmd,
                              final String _kind,
-                             final String _curVal,
-                             final String _newVal)
+                             final String _newVal,
+                             final String _curVal)
     {
         final String curVal = (_curVal == null) ? "" : _curVal;
         final String newVal = (_newVal == null) ? "" : _newVal;
