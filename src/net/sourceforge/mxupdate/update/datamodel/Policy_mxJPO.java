@@ -456,8 +456,10 @@ public class Policy_mxJPO
         }
 
         // states....
+        // (first add new states because of references in branches)
         final Iterator<State> curStateIter = this.states.iterator();
         final Iterator<State> newStateIter = policy.states.iterator();
+        final Map<State,State> stateDeltaMap = new HashMap<State,State>();
         while (curStateIter.hasNext() && newStateIter.hasNext())  {
             final State curState = curStateIter.next();
             State newState = newStateIter.next();
@@ -465,23 +467,30 @@ public class Policy_mxJPO
                 cmd.append("add state \"").append(convertMql(newState.name))
                    .append("\" before \"").append(convertMql(curState.name)).append("\" ");
 System.out.println("    - insert new state '" + newState.name + "' before '" + curState.name + "'");
-                newState.calcDelta(cmd, null);
+                stateDeltaMap.put(newState, null);
                 newState = newStateIter.next();
             }
             if (curState.name.equals(newState.name))  {
-                cmd.append("state \"").append(convertMql(newState.name)).append("\" ");
-                newState.calcDelta(cmd, curState);
+                stateDeltaMap.put(newState, curState);
             }
         }
         while (newStateIter.hasNext())  {
             final State newState = newStateIter.next();
             cmd.append("add state \"").append(convertMql(newState.name)).append("\" ");
-            newState.calcDelta(cmd, null);
 System.out.println("    - add new state '" + newState.name + "'");
+            stateDeltaMap.put(newState, null);
         }
         // check for already existing state, but not defined anymore!
         if (curStateIter.hasNext())  {
 throw new Exception("some states are not defined anymore!");
+        }
+
+        // now update state information itself
+        cmd.append(';')
+           .append("mod policy \"").append(this.getName()).append("\" ");
+        for (final Map.Entry<State, State> entry : stateDeltaMap.entrySet())  {
+            cmd.append("state \"").append(convertMql(entry.getKey().name)).append("\" ");
+            entry.getKey().calcDelta(cmd, entry.getValue());
         }
 
         final boolean isMqlEscapeOn = isEscapeOn(_context);
