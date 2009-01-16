@@ -108,6 +108,26 @@ public class Program_mxJPO
     }
 
     /**
+     * Creates given program object from given type with given name.
+     *
+     * @param _context          context for this request
+     * @param _file             file for which the administration object must
+     *                          be created (not used)
+     * @param _name             name of administration object to create
+     */
+    @Override
+    public void create(final Context _context,
+            final File _file,
+            final String _name)
+    throws Exception
+    {
+        final StringBuilder cmd = new StringBuilder()
+                .append("add ").append(this.getInfoAnno().adminType().getMxName())
+                .append(" \"").append(_name).append('\"');
+        execMql(_context, cmd);
+    }
+
+    /**
      * The program is updated if the modified date of the file is not the same
      * as the the version property.
      *
