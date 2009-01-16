@@ -472,7 +472,7 @@ try  {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case LS_STRING:
         tmp = jj_consume_token(LS_STRING);
-                                     ret.add(tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\""));
+                                     ret.add(tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\"").replaceAll("\\\\\\{", "{").replaceAll("\\\\\\}", "}"));
         break;
       case LS_SINGLE_STRING:
         tmp = jj_consume_token(LS_SINGLE_STRING);
@@ -506,7 +506,7 @@ try  {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case L_STRING:
         tmp = jj_consume_token(L_STRING);
-                                    ret.add(tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\""));
+                                    ret.add(tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\"").replaceAll("\\\\\\{", "{").replaceAll("\\\\\\}", "}"));
         break;
       case L_SINGLE_STRING:
         tmp = jj_consume_token(L_SINGLE_STRING);
@@ -539,7 +539,7 @@ try  {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case SL_STRING:
       tmp = jj_consume_token(SL_STRING);
-                             ret = tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\"");
+                             ret = tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\"").replaceAll("\\\\\\{", "{").replaceAll("\\\\\\}", "}");
       break;
     case SL_SINGLE_STRING:
       tmp = jj_consume_token(SL_SINGLE_STRING);
@@ -564,7 +564,7 @@ try  {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case S_STRING:
       tmp = jj_consume_token(S_STRING);
-                            ret = tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\"");
+                            ret = tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\"").replaceAll("\\\\\\{", "{").replaceAll("\\\\\\}", "}");
       break;
     case S_SINGLE_STRING:
       tmp = jj_consume_token(S_SINGLE_STRING);

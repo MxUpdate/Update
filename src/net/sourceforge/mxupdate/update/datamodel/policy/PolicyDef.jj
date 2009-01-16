@@ -255,7 +255,7 @@ TOKEN : /** State and depending signature and trigger Tokens */
 {
       <LS_CURLY_BRACKET_OPEN : "{">    : LS_EXPECTED
     | <LS_CURLY_BRACKET_CLOSE : "}">   : S_EXPECTED
-    | <LS_STRING : (<LS_APOSTROPHE>(<LS_CHAR> | "\\\"" | " ")*<LS_APOSTROPHE>)> : LS_EXPECTED
+    | <LS_STRING : (<LS_APOSTROPHE>(<LS_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<LS_APOSTROPHE>)> : LS_EXPECTED
     | <LS_SINGLE_STRING : (<LS_CHAR>)+> : LS_EXPECTED
     | <#LS_APOSTROPHE: "\"" >
     | <#LS_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
@@ -269,7 +269,7 @@ TOKEN : /** State and depending signature and trigger Tokens */
 
 <SL_EXPECTED> TOKEN :
 {
-      <SL_STRING : (<SL_APOSTROPHE>(<SL_CHAR> | "\\\"" | " ")*<SL_APOSTROPHE>)> : L_EXPECTED
+      <SL_STRING : (<SL_APOSTROPHE>(<SL_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<SL_APOSTROPHE>)> : L_EXPECTED
     | <SL_SINGLE_STRING : (<SL_CHAR>)+> : L_EXPECTED
     | <#SL_APOSTROPHE: "\"" >
     | <#SL_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
@@ -283,7 +283,7 @@ TOKEN : /** State and depending signature and trigger Tokens */
 
 <S_EXPECTED> TOKEN :
 {
-      <S_STRING : (<S_APOSTROPHE>(<S_CHAR> | "\\\"" | " ")*<S_APOSTROPHE>)> : DEFAULT
+      <S_STRING : (<S_APOSTROPHE>(<S_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<S_APOSTROPHE>)> : DEFAULT
     | <S_SINGLE_STRING : (<S_CHAR>)+> : DEFAULT
     | <#S_APOSTROPHE: "\"" >
     | <#S_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
@@ -306,7 +306,7 @@ TOKEN : /** State and depending signature and trigger Tokens */
 <L2_EXPECTED> TOKEN : /* List of Strings */
 {
       <L_CURLY_BRACKET_CLOSE : "}">   : DEFAULT
-    | <L_STRING : (<L_APOSTROPHE>(<L_CHAR> | "\\\"" | " ")*<L_APOSTROPHE>)> : L2_EXPECTED
+    | <L_STRING : (<L_APOSTROPHE>(<L_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<L_APOSTROPHE>)> : L2_EXPECTED
     | <L_SINGLE_STRING : (<L_CHAR>)+> : L2_EXPECTED
     | <#L_APOSTROPHE: "\"" >
     | <#L_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
@@ -430,7 +430,7 @@ Set<String> lsList() :  {
     (
         <LS_CURLY_BRACKET_OPEN>
             (
-                (tmp = <LS_STRING>) {ret.add(tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\""));}
+                (tmp = <LS_STRING>) {ret.add(tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\"").replaceAll("\\\\\\{", "{").replaceAll("\\\\\\}", "}"));}
                 |
                 (tmp = <LS_SINGLE_STRING>) {ret.add(tmp.image.replaceAll("\\\\\\\"", "\""));}
             )*
@@ -448,7 +448,7 @@ Set<String> lList() :  {
     (
         <L_CURLY_BRACKET_OPEN>
             (
-                (tmp = <L_STRING>) {ret.add(tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\""));}
+                (tmp = <L_STRING>) {ret.add(tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\"").replaceAll("\\\\\\{", "{").replaceAll("\\\\\\}", "}"));}
                 |
                 (tmp = <L_SINGLE_STRING>) {ret.add(tmp.image.replaceAll("\\\\\\\"", "\""));}
                 |
@@ -474,7 +474,7 @@ String slString() : {
     String ret;
 } {
     (
-        (tmp = <SL_STRING>) {ret = tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\"");}
+        (tmp = <SL_STRING>) {ret = tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\"").replaceAll("\\\\\\{", "{").replaceAll("\\\\\\}", "}");}
         |
         (tmp = <SL_SINGLE_STRING>) {ret = tmp.image.replaceAll("\\\\\\\"", "\"");}
     )
@@ -493,7 +493,7 @@ String sString() : {
     String ret;
 } {
     (
-        (tmp = <S_STRING>) {ret = tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\"");}
+        (tmp = <S_STRING>) {ret = tmp.image.replaceAll("^\"", "").replaceAll("\"$", "").replaceAll("\\\\\\\"", "\"").replaceAll("\\\\\\{", "{").replaceAll("\\\\\\}", "}");}
         |
         (tmp = <S_SINGLE_STRING>) {ret = tmp.image.replaceAll("\\\\\\\"", "\"");}
     )
