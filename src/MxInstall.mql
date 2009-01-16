@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright 2008 The MxUpdate Team
+# Copyright 2008-2009 The MxUpdate Team
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,21 +26,36 @@ eval  {
 
   set VERSION "0-1"
 
-  set ENV_NAME "MXUPDATE_PATH"
-  
+  set ENV_NAME_MXUPDATE_PATH      "MXUPDATE_PATH"
+  set ENV_NAME_MAPPING_EXTENSION  "MXUPDATE_MAPPING_FILE"
+
   # get the installation directory
   # is the installation directory defined as local MX environment variable?
-  if {[mql exists env "${ENV_NAME}"] > 0} {
-    set sPath [mql get env "${ENV_NAME}"]
+  if {[mql exists env "${ENV_NAME_MXUPDATE_PATH}"] > 0} {
+    set sPath [mql get env "${ENV_NAME_MXUPDATE_PATH}"]
   # maybe as global environment variable?
-  } elseif {[mql exists env global "${ENV_NAME}"] > 0} {
-    set sPath [mql get env global "${ENV_NAME}"]
+  } elseif {[mql exists env global "${ENV_NAME_MXUPDATE_PATH}"] > 0} {
+    set sPath [mql get env global "${ENV_NAME_MXUPDATE_PATH}"]
   # or as shell enviroment variable?
-  } elseif {[info exists env(${ENV_NAME})] > 0}  {
-    set sPath $env(${ENV_NAME})
+  } elseif {[info exists env(${ENV_NAME_MXUPDATE_PATH})] > 0}  {
+    set sPath $env(${ENV_NAME_MXUPDATE_PATH})
   # otherwise error!!!!
   } else  {
-    error "\nRequired enviroment variable '${ENV_NAME}' is not defined!"
+    error "\nRequired enviroment variable '${ENV_NAME_MXUPDATE_PATH}' is not defined!"
+  }
+
+  # get mapping file extension (if defined)
+  # is the mapping file extension defined as local MX environment variable?
+  if {[mql exists env "${ENV_NAME_MAPPING_EXTENSION}"] > 0} {
+    set sMappingFile [mql get env "${ENV_NAME_MAPPING_EXTENSION}"]
+  # maybe as global environment variable?
+  } elseif {[mql exists env global "${ENV_NAME_MAPPING_EXTENSION}"] > 0} {
+    set sMappingFile [mql get env global "${ENV_NAME_MAPPING_EXTENSION}"]
+  # or as shell enviroment variable?
+  } elseif {[info exists env(${ENV_NAME_MAPPING_EXTENSION})] > 0}  {
+    set sMappingFile $env(${ENV_NAME_MAPPING_EXTENSION})
+  } else  {
+    set sMappingFile ""
   }
 
   ##############################################################################
@@ -48,11 +63,19 @@ eval  {
   ##############################################################################
   proc pReadMapping {_sRoot}  {
     global asMapping
+    global sMappingFile
 
-    # read file
+    # read original file
     set pFile [open [file join "${_sRoot}" "net" "sourceforge" "mxupdate" "mapping.properties"] r]
     set lsMapping [split [read $pFile] "\n"]
     close $pFile
+
+    # read extension file (if defined)
+    if {"${sMappingFile}" != ""}  {
+      set pFile [open [file join "${sMappingFile}"] r]
+      set lsMapping [concat $lsMapping [split [read $pFile] "\n"]]
+      close $pFile
+    }
 
     # prepare mapping
     foreach sOneLine ${lsMapping}  {
@@ -129,7 +152,7 @@ eval  {
   ##############################################################################
   # The procedure installs given property within the given root path.
   ##############################################################################
-  proc pInstallProperties {_sRoot _sPropName _sVersion}  {
+  proc pInstallProperties {_sRoot _sPropName _sVersion _sExtensionFile}  {
     global asMapping
 
     # extract path and file of property
@@ -137,7 +160,12 @@ eval  {
     regsub -all {\.} "${sFileName}" {/} sFileName
     set sFileName [file join "${_sRoot}" "${sFileName}.properties"]
 
+    # if a file extension exists, both file dates must be checked!
     set sFileDate [clock format [file mtime "${sFileName}"]  -gmt true -format "%Y-%m-%d %H:%M:%S"]
+    if {"${_sExtensionFile}" != ""}  {
+      set sFileDate "${sFileDate}, [clock format [file mtime "${_sExtensionFile}"]  -gmt true -format "%Y-%m-%d %H:%M:%S"]"
+    }
+
     if {[mql list prog "${_sPropName}"] == ""}  {
       set sDate ""
       mql add prog "${_sPropName}"
@@ -146,10 +174,26 @@ eval  {
     }
     if {"${sDate}" != "${sFileDate}"}  {
       puts "update property '${_sPropName}'"
+
+      # read original properties
+      set pFile [open [file join "${sFileName}"] r]
+      set sCode [read $pFile]
+      close $pFile
+
+      # read extension file
+      if {"${_sExtensionFile}" != ""}  {
+        set pFile [open [file join "${_sExtensionFile}"] r]
+        set sCode "${sCode}\n[read $pFile]"
+        close $pFile
+      }
+
+      # update property program (with escape on because of special characters)
+      mql set escape on
       mql mod prog ${_sPropName} \
-            file "${sFileName}" \
+            code "${sCode}" \
             add property $asMapping(Property.FileDate) value "${sFileDate}" \
             add property $asMapping(Property.Version) value "${_sVersion}"
+      mql set escape off
     }
     pRegisterObject program "${_sPropName}"
   }
@@ -271,7 +315,7 @@ eval  {
 
   pReadMapping "${sPath}"
 
-  pInstallProperties "${sPath}" "net.sourceforge.mxupdate.mapping.properties" "${VERSION}"
+  pInstallProperties "${sPath}" "net.sourceforge.mxupdate.mapping.properties" "${VERSION}" "${sMappingFile}"
   pInstallDM         "${sPath}"                                               "${VERSION}"
   pInstallJPO        "${sPath}" "net.sourceforge.mxupdate.install.Insert"     "${VERSION}"
   pInstallJPO        "${sPath}" "net.sourceforge.mxupdate.util.MqlUtil"       "${VERSION}"
