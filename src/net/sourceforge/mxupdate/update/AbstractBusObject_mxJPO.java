@@ -39,6 +39,7 @@ import matrix.util.MatrixException;
 import matrix.util.StringList;
 
 import net.sourceforge.mxupdate.util.Mapping_mxJPO.AttributeDef;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.BusTypeDef;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
@@ -306,6 +307,29 @@ public abstract class AbstractBusObject_mxJPO
           _out.append(" \\\n    \"").append(convertTcl(attr.name))
               .append("\" \"").append(convertTcl(attr.value)).append("\"");
         }
+    }
+
+    /**
+     * Creates for given name the business object.
+     *
+     * @param _context  context for this request
+     * @param _file     defines the file for which the business object is
+     *                  created
+     * @param _name     name and revision of the business object
+     */
+    @Override
+    public void create(final Context _context,
+                       final File _file,
+                       final String _name)
+            throws Exception
+    {
+        final BusTypeDef busType = this.getInfoAnno().busType();
+        final String[] nameRev = _name.split(SPLIT_NAME);
+        final BusinessObject bus = new BusinessObject(busType.getMxName(),
+                                                      nameRev[0],
+                                                      (nameRev.length > 1) ? nameRev[1] : "",
+                                                      busType.getMxVault());
+        bus.create(_context, busType.getMxPolicy());
     }
 
     /**

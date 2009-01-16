@@ -71,6 +71,26 @@ public final class Mapping_mxJPO
     private static final String PREFIX_TYPE = "Type.";
 
     /**
+     * Mapping between internal used type definitions and the Mx policy names.
+     */
+    private static final Map<BusTypeDef,String> BUS_POLICIES = new HashMap<BusTypeDef,String>();
+
+    /**
+     * Used prefix of policy definitions within the property file.
+     */
+    private static final String PREFIX_POLICY = "Policy.";
+
+    /**
+     * Mapping between internal used type definitions and the Mx vault names.
+     */
+    private static final Map<BusTypeDef,String> BUS_VAULTS = new HashMap<BusTypeDef,String>();
+
+    /**
+     * Used prefix of vault definitions within the property file.
+     */
+    private static final String PREFIX_VAULT = "Vault.";
+
+    /**
      * Mapping between internal used type definitions and the file paths.
      *
      * @see AdminTypeDef#getFilePath()
@@ -205,6 +225,7 @@ public final class Mapping_mxJPO
         PROPERTIES.clear();
         ATTRIBUTES.clear();
         BUS_TYPES.clear();
+        BUS_POLICIES.clear();
 
         PROPERTIES.putAll(MqlUtil_mxJPO.readPropertyProgram(_context, PROP_NAME));
 
@@ -251,8 +272,12 @@ public final class Mapping_mxJPO
                 } catch (final IllegalArgumentException e)  {
                     BUS_TYPE_TITLES.put(BusTypeDef.valueOf(keyTitle), value);
                 }
+            } else if (key.startsWith(PREFIX_POLICY))  {
+                BUS_POLICIES.put(BusTypeDef.valueOf(key.substring(PREFIX_POLICY.length())), value);
             } else if (key.startsWith(PREFIX_TYPE))  {
                 BUS_TYPES.put(BusTypeDef.valueOf(key.substring(PREFIX_TYPE.length())), value);
+            } else if (key.startsWith(PREFIX_VAULT))  {
+                BUS_VAULTS.put(BusTypeDef.valueOf(key.substring(PREFIX_VAULT.length())), value);
             }
         }
     }
@@ -570,6 +595,30 @@ public final class Mapping_mxJPO
         public String getMxName()
         {
             return Mapping_mxJPO.BUS_TYPES.get(this);
+        }
+
+        /**
+         * Returns the related business policy name used within Mx. The method
+         * returns only correct values if the initialize method was called!
+         *
+         * @return Mx name of the business type definition
+         * @see Mapping_mxJPO#BUS_POLICIES
+         */
+        public String getMxPolicy()
+        {
+            return Mapping_mxJPO.BUS_POLICIES.get(this);
+        }
+
+        /**
+         * Returns the related business vault name used within Mx. The method
+         * returns only correct values if the initialize method was called!
+         *
+         * @return Mx name of the business vault definition
+         * @see Mapping_mxJPO#BUS_VAULTS
+         */
+        public String getMxVault()
+        {
+            return Mapping_mxJPO.BUS_VAULTS.get(this);
         }
 
         /**

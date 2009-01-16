@@ -129,6 +129,14 @@ public class Person_mxJPO
         out.close();
     }
 
+    @Override
+    public void create(final Context _context,
+                       final File _file,
+                       final String _name)
+            throws Exception
+    {
+
+    }
 
     @Override
     public void update(final Context _context,

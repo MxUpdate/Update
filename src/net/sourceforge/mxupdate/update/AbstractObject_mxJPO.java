@@ -225,13 +225,10 @@ public abstract class AbstractObject_mxJPO
         return ret;
     }
 
-    public void create(final Context _context,
-                       final File _file,
-                       final String _name)
-            throws Exception
-    {
-
-    }
+    public abstract void create(final Context _context,
+                                final File _file,
+                                final String _name)
+            throws Exception;
 
     /**
      * Updated this administration (business) object.
