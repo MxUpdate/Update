@@ -161,7 +161,9 @@ public class ObjectGenerator_mxJPO
         final StringBuilder preMQLCode = new StringBuilder();
 
         // disconnect from number generator
-        if ((this.numGenName != null) && (this.numGenRevi != null))  {
+        if ((this.numGenType != null) && !"".equals(this.numGenType)
+                && (this.numGenName != null) && !"".equals(this.numGenName)
+                && (this.numGenRevi != null) && !"".equals(this.numGenRevi))  {
             preMQLCode.append("disconnect bus ").append(this.getBusOid())
                       .append(" relationship \"").append(RELATIONSHIP_NUMBER_GENERATOR)
                       .append("\" to \"").append(this.numGenType).append("\" \"")
