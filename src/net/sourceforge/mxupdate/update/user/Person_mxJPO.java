@@ -129,6 +129,24 @@ public class Person_mxJPO
         out.close();
     }
 
+    /**
+     * Deletes administration object from given type with given name.
+     *
+     * @param _context      context for this request
+     * @param _name         name of object to delete
+     * @throws Exception if delete failed
+     * @todo dummy method must be replaced
+     */
+    @Override
+    public void delete(final Context _context,
+                       final String _name)
+            throws Exception
+    {
+    }
+
+    /**
+     * @todo dummy method mus be replaced
+     */
     @Override
     public void create(final Context _context,
                        final File _file,

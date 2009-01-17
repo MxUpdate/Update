@@ -143,6 +143,25 @@ public class JPO_mxJPO
     }
 
     /**
+     * Deletes administration object from given type with given name.
+     *
+     * @param _context      context for this request
+     * @param _name         name of object to delete
+     * @throws Exception if delete failed
+     */
+    @Override
+    public void delete(final Context _context,
+                       final String _name)
+            throws Exception
+    {
+        final StringBuilder cmd = new StringBuilder()
+                .append("delete ").append(this.getInfoAnno().adminType().getMxName())
+                .append(" \"").append(_name).append("\" ")
+                .append(this.getInfoAnno().adminType().getMxSuffix());
+        execMql(_context, cmd);
+    }
+
+    /**
      * Creates given JPO object from given type with given name.
      *
      * @param _context          context for this request
@@ -152,9 +171,9 @@ public class JPO_mxJPO
      */
     @Override
     public void create(final Context _context,
-            final File _file,
-            final String _name)
-    throws Exception
+                       final File _file,
+                       final String _name)
+            throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("add ").append(this.getInfoAnno().adminType().getMxName())

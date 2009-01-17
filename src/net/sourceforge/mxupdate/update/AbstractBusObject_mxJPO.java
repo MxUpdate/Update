@@ -44,6 +44,7 @@ import net.sourceforge.mxupdate.util.Mapping_mxJPO.BusTypeDef;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
+import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
 import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.setHistoryOff;
 import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.setHistoryOn;
 
@@ -350,6 +351,28 @@ public abstract class AbstractBusObject_mxJPO
           _out.append(" \\\n    \"").append(convertTcl(attr.name))
               .append("\" \"").append(convertTcl(attr.value)).append("\"");
         }
+    }
+
+
+    /**
+     * Deletes administration business object from given type with given name.
+     *
+     * @param _context      context for this request
+     * @param _name         name of object to delete
+     * @throws Exception if delete failed
+     */
+    @Override
+    public void delete(final Context _context,
+                       final String _name)
+            throws Exception
+    {
+        final BusTypeDef busType = this.getInfoAnno().busType();
+        final String[] nameRev = _name.split(SPLIT_NAME);
+        final StringBuilder cmd = new StringBuilder()
+                .append("delete bus \"").append(busType.getMxName()).append('\"')
+                .append(" \"").append(nameRev[0]).append("\" ")
+                .append(" \"").append((nameRev.length > 1) ? nameRev[1] : "").append("\";");
+        execMql(_context, cmd);
     }
 
     /**

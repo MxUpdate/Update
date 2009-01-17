@@ -87,7 +87,7 @@ public class MxUpdate_mxJPO
     private enum Mode
     {
         /**
-         * Mode 'import' used to import defined administrational objects from
+         * Mode 'import' used to import defined administration objects from
          * file system into Matrix.
          */
         IMPORT,
@@ -96,6 +96,11 @@ public class MxUpdate_mxJPO
          * Matrix into a file system.
          */
         EXPORT,
+        /**
+         * Mode 'delete' used to delete in Mx objects which are not defined
+         * in the repository (file system).
+         */
+        DELETE,
         /**
          * Prints out the help description.
          */
@@ -153,9 +158,14 @@ public class MxUpdate_mxJPO
         PARAM_MODE.put("-e", Mode.EXPORT);
         PARAM_MODE.put("--export", Mode.EXPORT);
         appendDescription("Export Mode", "-e", "--export");
+
         PARAM_MODE.put("-u", Mode.IMPORT);
         PARAM_MODE.put("--update", Mode.IMPORT);
         appendDescription("Update Mode.", "-u", "--update");
+
+        PARAM_MODE.put("--delete", Mode.DELETE);
+        appendDescription("Delete Mode.", "--delete");
+
         PARAM_MODE.put("-?", Mode.HELP);
         PARAM_MODE.put("-h", Mode.HELP);
         PARAM_MODE.put("--help", Mode.HELP);
@@ -545,8 +555,10 @@ if (unknown || (Mode.HELP == mode) || (mode == null))  {
     this.printHelp();
 } else if (Mode.EXPORT == mode)  {
     this.export(_context, paths, clazz2matches);
-} else if (Mode.IMPORT == mode) {
+} else if (Mode.IMPORT == mode)  {
     this.update(_context, paths, clazz2matches, versionInfo);
+} else if (Mode.DELETE == mode)  {
+    this.delete(_context, paths, clazz2matches);
 }
 
         } catch (Exception e)  {
@@ -554,6 +566,45 @@ if (unknown || (Mode.HELP == mode) || (mode == null))  {
             throw e;
         }
 
+    }
+
+    /**
+     * Exports matching administration objects to given path.
+     *
+     * @param _context          context for this request
+     * @param _paths            path where the administration objects are
+     *                          exported
+     * @param _clazz2matches    classes and their matched to export
+     * @throws Exception if none path or more than one path is defined or if
+     *                   the export failed
+     */
+    protected void export(final Context _context,
+                          final Set<String> _paths,
+                          final Map<Class<? extends AbstractObject_mxJPO>,List<String>> _clazz2matches)
+            throws Exception
+    {
+        // check for definition of min. / max. one path
+        if (_paths.isEmpty())  {
+            throw new Exception("no path is defined, but required for the export!");
+        }
+        if (_paths.size() > 1)  {
+            throw new Exception("more than one path is defined, but maximum is allowed for the export!");
+        }
+        final String pathStr = _paths.iterator().next();
+
+        // evaluate all matching administration objects
+        final Map<Class<? extends AbstractObject_mxJPO>,Set<String>> clazz2names
+                = this.getMatching(_context, _clazz2matches);
+
+        // export
+        for (final Map.Entry<Class<? extends AbstractObject_mxJPO>,Set<String>> entry : clazz2names.entrySet())  {
+            for (final String name : entry.getValue())  {
+                AbstractObject_mxJPO instance = entry.getKey().newInstance();
+                final File path = new File(pathStr + File.separator + instance.getPath());
+System.out.println("export "+instance.getTypeDef().getLogging() + " '" + name + "'");
+                instance.export(_context, path, name);
+            }
+        }
     }
 
     /**
@@ -590,7 +641,7 @@ if (unknown || (Mode.HELP == mode) || (mode == null))  {
                 for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
                     final Set<String> existings = existingNames.get(clazz);
                     if (!existings.contains(fileEntry.getValue()))  {
-                        final AbstractObject_mxJPO instance = clazz.newInstance();
+                         final AbstractObject_mxJPO instance = clazz.newInstance();
 System.out.println("create "+instance.getTypeDef().getLogging() + " '" + fileEntry.getValue() + "'");
                         instance.create(_context, fileEntry.getKey(), fileEntry.getValue());
                     }
@@ -631,46 +682,33 @@ System.out.println("    - update");
         }
     }
 
-
-    /**
-     * Exports matching administration objects to given path.
-     *
-     * @param _context          context for this request
-     * @param _paths            path where the administration objects are
-     *                          exported
-     * @param _clazz2matches    classes and their matched to export
-     * @throws Exception if none path or more than one path is defined or if
-     *                   the export failed
-     */
-    protected void export(final Context _context,
+    protected void delete(final Context _context,
                           final Set<String> _paths,
                           final Map<Class<? extends AbstractObject_mxJPO>,List<String>> _clazz2matches)
-            throws Exception
+    throws Exception
     {
         // check for definition of min. / max. one path
         if (_paths.isEmpty())  {
-            throw new Exception("no path is defined, but required for the export!");
+            throw new Exception("no path is defined, but required for the delete!");
         }
-        if (_paths.size() > 1)  {
-            throw new Exception("more than one path is defined, but maximum is allowed for the export!");
-        }
-        final String pathStr = _paths.iterator().next();
 
         // evaluate all matching administration objects
-        final Map<Class<? extends AbstractObject_mxJPO>,Set<String>> clazz2names
-                = new HashMap<Class<? extends AbstractObject_mxJPO>,Set<String>>();
-        for (final Map.Entry<Class<? extends AbstractObject_mxJPO>,List<String>> entry : _clazz2matches.entrySet())  {
-            AbstractObject_mxJPO instance = entry.getKey().newInstance();
-            clazz2names.put(entry.getKey(), instance.getMatchingNames(_context, entry.getValue()));
-        }
+        final Map<Class<? extends AbstractObject_mxJPO>,Set<String>> clazz2MxNames
+                = this.getMatching(_context, _clazz2matches);
 
-        // export
-        for (final Map.Entry<Class<? extends AbstractObject_mxJPO>,Set<String>> entry : clazz2names.entrySet())  {
+        // get all matching files depending on the update classes
+        final Map<Class<? extends AbstractObject_mxJPO>,Map<File,String>> clazz2FileNames
+                = this.evalMatches(_paths, _clazz2matches);
+
+        // and now loop throw the list of file names and compare to existing
+        for (final Map.Entry<Class<? extends AbstractObject_mxJPO>,Set<String>> entry : clazz2MxNames.entrySet())  {
+            final AbstractObject_mxJPO instance = entry.getKey().newInstance();
+            final Collection<String> fileNames = clazz2FileNames.get(entry.getKey()).values();
             for (final String name : entry.getValue())  {
-                AbstractObject_mxJPO instance = entry.getKey().newInstance();
-                final File path = new File(pathStr + File.separator + instance.getPath());
-System.out.println("export "+instance.getTypeDef().getLogging() + " '" + name + "'");
-                instance.export(_context, path, name);
+                if (!fileNames.contains(name))  {
+System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name + "'");
+                    instance.delete(_context, name);
+                }
             }
         }
     }
@@ -753,5 +791,30 @@ System.out.println("export "+instance.getTypeDef().getLogging() + " '" + name + 
         }
 
         return ret;
+    }
+
+    /**
+     * Evaluate all matching administration objects.
+     *
+     * @param _context          context for this request
+     * @param _clazz2matches    map of classes and the depending list of string
+     *                          which must match
+     * @return map of classes and a set of matching names for this classes
+     * @throws Exception if the match fails
+     * @see #export(Context, Set, Map)
+     * @see #delete(Context, Set, Map)
+     */
+    protected Map<Class<? extends AbstractObject_mxJPO>,Set<String>> getMatching(final Context _context,
+                                                                                 final Map<Class<? extends AbstractObject_mxJPO>,List<String>> _clazz2matches)
+            throws Exception
+    {
+        final Map<Class<? extends AbstractObject_mxJPO>,Set<String>> clazz2names
+                = new HashMap<Class<? extends AbstractObject_mxJPO>,Set<String>>();
+        for (final Map.Entry<Class<? extends AbstractObject_mxJPO>,List<String>> entry : _clazz2matches.entrySet())  {
+            AbstractObject_mxJPO instance = entry.getKey().newInstance();
+            clazz2names.put(entry.getKey(), instance.getMatchingNames(_context, entry.getValue()));
+        }
+
+        return clazz2names;
     }
 }

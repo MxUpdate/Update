@@ -225,6 +225,25 @@ public abstract class AbstractObject_mxJPO
         return ret;
     }
 
+    /**
+     * Deletes administration object with given name.
+     *
+     * @param _context      context for this request
+     * @param _name         name of object to delete
+     * @throws Exception if delete failed
+     */
+    public abstract void delete(final Context _context,
+                                final String _name)
+            throws Exception;
+
+    /**
+     * Creates a new administration object with given name.
+     *
+     * @param _context      context for this request
+     * @param _file         file with code to create
+     * @param _name         name of object to create
+     * @throws Exception if create failed
+     */
     public abstract void create(final Context _context,
                                 final File _file,
                                 final String _name)
