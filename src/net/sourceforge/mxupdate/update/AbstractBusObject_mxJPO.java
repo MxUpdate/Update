@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import matrix.db.BusinessObject;
@@ -158,6 +159,47 @@ public abstract class AbstractBusObject_mxJPO
             for (final String match : _matches)  {
                 if (match(busName, match) || match(busRevision, match))  {
                     ret.add(name.toString());
+                }
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Evaluates for given set of files all matching files and returns them as
+     * map (key is the file name, value is the name of the matrix
+     * administration (business) object).<br/>
+     * For the file name without prefix and suffix the name is splitted to get
+     * the name and revision of the business object. If the business object
+     * name or revision matches one of the collection match strings, the file
+     * is added to the map and is returned.
+     *
+     * @param _files            set of files used to found matching files
+     * @param _matches          collection of match strings
+     * @return map of files (as key) with the related matrix name (as value)
+     * @see #getMatchingFileNames(Set)
+     */
+    @Override
+    public Map<File, String> getMatchingFileNames(final Set<File> _files,
+                                                  final Collection<String> _matches)
+    {
+        final Map<File,String> ret = new TreeMap<File,String>();
+
+        final String suffix = this.getTypeDef().getFileSuffix();
+        final int suffixLength = suffix.length();
+        final String prefix = this.getTypeDef().getFilePrefix();
+        final int prefixLength = (prefix != null) ? prefix.length() : 0;
+
+        for (final File file : _files)  {
+            final String fileName = file.getName();
+            for (final String match : _matches)  {
+                if (((prefix == null) || fileName.startsWith(prefix)) && fileName.endsWith(suffix))  {
+                    final String name = fileName.substring(0, fileName.length() - suffixLength)
+                                                .substring(prefixLength);
+                    final String[] nameRev = name.split(SPLIT_NAME);
+                    if (match(nameRev[0], match) || ((nameRev.length > 1) && match(nameRev[1], match)))  {
+                        ret.put(file, name);
+                    }
                 }
             }
         }
