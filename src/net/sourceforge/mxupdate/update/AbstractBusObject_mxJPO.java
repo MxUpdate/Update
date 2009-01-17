@@ -147,15 +147,16 @@ public abstract class AbstractBusObject_mxJPO
         final Set<String> ret = new TreeSet<String>();
         for (final Object mapObj : list)  {
             final BusinessObjectWithSelect map = (BusinessObjectWithSelect) mapObj;
+            final String busName = (String) map.getSelectDataList("name").get(0);
+            final String busRevision = (String) map.getSelectDataList("revision").get(0);
             final StringBuilder name = new StringBuilder()
                     .append(map.getSelectDataList("name").get(0));
-            final String revision = (String) map.getSelectDataList("revision").get(0);
-            if ((revision != null) && !"".equals(revision))  {
+            if ((busRevision != null) && !"".equals(busRevision))  {
                 name.append(SPLIT_NAME)
                     .append(map.getSelectDataList("revision").get(0));
             }
             for (final String match : _matches)  {
-                if (match(name.toString(), match))  {
+                if (match(busName, match) || match(busRevision, match))  {
                     ret.add(name.toString());
                 }
             }
