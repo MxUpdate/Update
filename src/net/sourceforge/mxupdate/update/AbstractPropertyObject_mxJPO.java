@@ -25,6 +25,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.Writer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -32,6 +35,7 @@ import java.util.Stack;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminPropertyDef;
 import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import org.xml.sax.Attributes;
@@ -57,7 +61,37 @@ public abstract class AbstractPropertyObject_mxJPO
     private static final long serialVersionUID = -2794355865894159489L;
 
     /**
-     * Name of the matrix object.
+     * Header string of the author.
+     *
+     * @see #writeHeader(Writer)
+     * @see #defineAuthor(Map, StringBuilder)
+     */
+    private static final String HEADER_AUTHOR = "\n# AUTHOR:\n# ~~~~~~~\n#";
+
+    /**
+     * Header string of the symbolic name.
+     *
+     * @see #writeHeader(Writer)
+     * @see #defineSymbolicName(Map, StringBuilder)
+     */
+    private static final String HEADER_SYMBOLIC_NAME = "\n# SYMBOLIC NAME:\n# ~~~~~~~~~~~~~~\n#";
+
+    /**
+     * Length of the header string of the author.
+     *
+     * @see #defineAuthor(Map, StringBuilder)
+     */
+    private static final int LENGTH_HEADER_AUTHOR = HEADER_AUTHOR.length();
+
+    /**
+     * Length of the header string of the symbolic name.
+     *
+     * @see #defineSymbolicName(Map, StringBuilder)
+     */
+    private static final int LENGTH_HEADER_SYMBOLIC_NAME = HEADER_SYMBOLIC_NAME.length();
+
+    /**
+     * Name of the matrix administration object.
      *
      * @see #setName(String)
      * @see #getName()
@@ -65,7 +99,7 @@ public abstract class AbstractPropertyObject_mxJPO
     private String name = null;
 
     /**
-     * Author of the matrix object.
+     * Author of the matrix administration object.
      *
      * @see #setAuthor(String)
      * @see #getAuthor()
@@ -73,7 +107,15 @@ public abstract class AbstractPropertyObject_mxJPO
     private String author = null;
 
     /**
-     * Description of the matrix object.
+     * Installation date of the matrix administration object.
+     *
+     * @see #setInstallationDate(String)
+     * @see #getInstallationDate()
+     */
+    private String installationDate;
+
+    /**
+     * Description of the matrix administration object.
      *
      * @see #setDescription(String)
      * @see #getDescription()
@@ -137,6 +179,28 @@ public abstract class AbstractPropertyObject_mxJPO
     protected void setAuthor(final String _author)
     {
         this.author = _author;
+    }
+
+    /**
+     * Getter method for instance variable {@link #installationDate}.
+     *
+     * @return value of instance variable {@link #installationDate}.
+     * @see #installationDate
+     */
+    protected String getInstallationDate()
+    {
+        return this.installationDate;
+    }
+
+    /**
+     * Setter method for instance variable {@link #installationDate}.
+     *
+     * @param _author new value for instance variable {@link #installationDate}
+     * @see #installationDate
+     */
+    protected void setInstallationDate(final String _installationDate)
+    {
+        this.installationDate = _installationDate;
     }
 
     /**
@@ -228,6 +292,8 @@ public abstract class AbstractPropertyObject_mxJPO
      * @param _out      writer instance
      * @throws IOException
      * @todo evaluate already defined symbolic names if exists
+     * @see #HEADER_AUTHOR
+     * @see #HEADER_SYMBOLIC_NAME
      */
     protected void writeHeader(final Writer _out)
             throws IOException
@@ -244,9 +310,8 @@ public abstract class AbstractPropertyObject_mxJPO
             .append("#\n");
         // symbolic name only if an administration type is defined
         if (this.getInfoAnno().adminType() != AdminTypeDef.Undef)  {
-            _out.append("# SYMBOLIC NAME:\n")
-                .append("# ~~~~~~~~~~~~~~\n")
-.append("# ").append(this.getInfoAnno().adminType().getMxName()).append("_").append(this.getName()).append("\n")
+            _out.append(HEADER_SYMBOLIC_NAME)
+.append(' ').append(this.getInfoAnno().adminType().getMxName()).append("_").append(this.getName()).append("\n")
                 .append("#\n");
         }
         _out.append("# DESCRIPTION:\n")
@@ -270,13 +335,11 @@ public abstract class AbstractPropertyObject_mxJPO
         } else  {
             _out.append("#\n");
         }
-        _out.append("#\n")
-            .append("# AUTHOR:\n")
-            .append("# ~~~~~~~\n");
+        _out.append(HEADER_AUTHOR);
         if ((this.author != null) && !"".equals(this.author))  {
-            _out.append("# ").append(this.author).append('\n');
+            _out.append(" ").append(this.author).append('\n');
         } else {
-            _out.append("#\n");
+            _out.append("\n");
         }
         _out.append("################################################################################\n\n");
     }
@@ -295,6 +358,8 @@ public abstract class AbstractPropertyObject_mxJPO
      *                          (or <code>null</code> if the version must not
      *                          be set).
      * @see #update(Context, CharSequence, CharSequence, Map)
+     * @see #defineAuthor(Map, StringBuilder)
+     * @see #defineSymbolicName(Map, StringBuilder)
      */
     @Override
     public void update(final Context _context,
@@ -306,14 +371,92 @@ public abstract class AbstractPropertyObject_mxJPO
         // parse objects
         this.parse(_context, _name);
 
-        final Map<String,String> variables = new HashMap<String,String>();
+        // defines the version in the TCL variables
+        final Map<String,String> tclVariables = new HashMap<String,String>();
         if (_newVersion == null)  {
-            variables.put("VERSION", "");
+            tclVariables.put(AdminPropertyDef.VERSION.name(), "");
         } else  {
-            variables.put("VERSION", _newVersion);
+            tclVariables.put(AdminPropertyDef.VERSION.name(), _newVersion);
         }
 
-        this.update(_context, "", "", "", variables, _file);
+        // read code
+        final StringBuilder code = this.getCode(_file);
+
+        // define author
+        this.defineAuthor(tclVariables, code);
+
+        // define symbolic name
+        this.defineSymbolicName(tclVariables, code);
+
+        // define file date
+        final DateFormat format = new SimpleDateFormat(AdminPropertyDef.FILEDATE.getValue());
+        tclVariables.put(AdminPropertyDef.FILEDATE.name(),
+                         format.format(new Date(_file.lastModified())));
+
+        this.update(_context, "", "", "", tclVariables, _file);
+    }
+
+    /**
+     * Extracts the author from the source code. If no author in the TCL update
+     * file is defined, the default value from the mapping is used. This author
+     * is stored in the map of TCL variables.
+     *
+     * @param _tclVariables     map with TCL variables
+     * @param _code             TCL update source code
+     * @see #HEADER_AUTHOR
+     * @see AdminPropertyDef.AUTHOR
+     */
+    protected void defineAuthor(final Map<String,String> _tclVariables,
+                                final StringBuilder _code)
+    {
+        final int start = _code.indexOf(HEADER_AUTHOR) + LENGTH_HEADER_AUTHOR;
+        final String author;
+        if ((start > LENGTH_HEADER_AUTHOR) && (_code.charAt(start) == ' '))  {
+            final int end = _code.indexOf("\n", start);
+            if (end > 0)  {
+                final String tmp = _code.substring(start, end).trim();
+                if ("".equals(tmp))  {
+                    author = AdminPropertyDef.AUTHOR.getValue();
+                } else  {
+                    author = tmp;
+                }
+            } else  {
+                author = AdminPropertyDef.AUTHOR.getValue();
+            }
+        } else  {
+            author = AdminPropertyDef.AUTHOR.getValue();
+        }
+        _tclVariables.put(AdminPropertyDef.AUTHOR.name(), author);
+    }
+
+    /**
+     *
+     * @param _tclVariables     map with TCL variables
+     * @param _code             TCL update source code
+     */
+    protected void defineSymbolicName(final Map<String,String> _tclVariables,
+                                      final StringBuilder _code)
+    {
+        if (this.getInfoAnno().adminType() != AdminTypeDef.Undef)  {
+            final int start = _code.indexOf(HEADER_SYMBOLIC_NAME) + LENGTH_HEADER_SYMBOLIC_NAME;
+            String symbName = new StringBuilder().append(this.getInfoAnno().adminType().getMxName())
+                                                 .append("_").append(this.getName().replaceAll(" ", ""))
+                                                 .toString();
+            if ((start > LENGTH_HEADER_SYMBOLIC_NAME) && (_code.charAt(start) == ' '))  {
+                final int end = _code.indexOf("\n", start);
+                if (end > 0)  {
+                    final String tmp = _code.substring(start, end).trim();
+                    if (!"".equals(tmp))  {
+                        if (tmp.startsWith(this.getInfoAnno().adminType().getMxName()))  {
+                            symbName = tmp;
+                        } else  {
+System.out.println("ERROR! Symbolic name does not start correctly! So '" + symbName + "' will be used (instead of '" + tmp + "')");
+                        }
+                    }
+                }
+            }
+            _tclVariables.put("SYMBOLICNAME", symbName);
+        }
     }
 
     /**

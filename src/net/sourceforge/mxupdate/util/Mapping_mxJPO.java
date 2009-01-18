@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 The MxUpdate Team
+ * Copyright 2008-2009 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,40 @@ public final class Mapping_mxJPO
     private static final String PROP_NAME = "net.sourceforge.mxupdate.mapping.properties";
 
     /**
+     * Mapping between internal used admin property definitions and the Mx
+     * attribute names.
+     */
+    private static final Map<AdminPropertyDef,String> ADMINPROPERTY_ATTRIBUTES = new HashMap<AdminPropertyDef,String>();
+
+    /**
+     * Used prefix of attribute definitions within the property file.
+     */
+    private static final String PREFIX_ADMINPROPERTYATTRIBUTE = "PropertyAttribute.";
+
+    /**
+     * Mapping between internal used admin property definitions and the Mx
+     * admin property names.
+     */
+    private static final Map<AdminPropertyDef,String> ADMINPROPERTY_NAMES = new HashMap<AdminPropertyDef,String>();
+
+    /**
+     * Used prefix of admin property definitions within the property file.
+     */
+    private static final String PREFIX_ADMINPROPERTYNAME = "PropertyName.";
+
+    /**
+     * Mapping between internal used admin property definitions and the default
+     * value of the property.
+     */
+    private static final Map<AdminPropertyDef,String> ADMINPROPERTY_VALUES = new HashMap<AdminPropertyDef,String>();
+
+    /**
+     * Used prefix of admin property value definitions within the property
+     * file.
+     */
+    private static final String PREFIX_ADMINPROPERTYVALUE = "PropertyValue.";
+
+    /**
      * Mapping between internal used attribute definitions and the Mx attribute
      * names.
      */
@@ -73,7 +107,7 @@ public final class Mapping_mxJPO
     /**
      * Mapping between internal used type definitions and the Mx policy names.
      */
-    private static final Map<BusTypeDef,String> BUS_POLICIES = new HashMap<BusTypeDef,String>();
+    private static final Map<BusTypeDef,String> BUS_TYPE_POLICIES = new HashMap<BusTypeDef,String>();
 
     /**
      * Used prefix of policy definitions within the property file.
@@ -83,7 +117,7 @@ public final class Mapping_mxJPO
     /**
      * Mapping between internal used type definitions and the Mx vault names.
      */
-    private static final Map<BusTypeDef,String> BUS_VAULTS = new HashMap<BusTypeDef,String>();
+    private static final Map<BusTypeDef,String> BUS_TYPE_VAULTS = new HashMap<BusTypeDef,String>();
 
     /**
      * Used prefix of vault definitions within the property file.
@@ -223,9 +257,16 @@ public final class Mapping_mxJPO
             throws MatrixException, IOException
     {
         PROPERTIES.clear();
+        ADMINPROPERTY_NAMES.clear();
+        ADMINPROPERTY_VALUES.clear();
         ATTRIBUTES.clear();
+        BUS_TYPE_FILE_PREFIXES.clear();
+        BUS_TYPE_FILE_SUFFIXES.clear();
+        BUS_TYPE_LOGGINGS.clear();
+        BUS_TYPE_POLICIES.clear();
+        BUS_TYPE_TITLES.clear();
+        BUS_TYPE_VAULTS.clear();
         BUS_TYPES.clear();
-        BUS_POLICIES.clear();
 
         PROPERTIES.putAll(MqlUtil_mxJPO.readPropertyProgram(_context, PROP_NAME));
 
@@ -233,7 +274,13 @@ public final class Mapping_mxJPO
         for (final Entry<Object, Object> entry : PROPERTIES.entrySet())  {
             final String key = (String) entry.getKey();
             final String value = (String) entry.getValue();
-            if (key.startsWith(PREFIX_ATTRIBUTE))  {
+            if (key.startsWith(PREFIX_ADMINPROPERTYATTRIBUTE))  {
+                ADMINPROPERTY_ATTRIBUTES.put(AdminPropertyDef.valueOf(key.substring(PREFIX_ADMINPROPERTYATTRIBUTE.length()).toUpperCase()), value);
+            } else if (key.startsWith(PREFIX_ADMINPROPERTYNAME))  {
+                ADMINPROPERTY_NAMES.put(AdminPropertyDef.valueOf(key.substring(PREFIX_ADMINPROPERTYNAME.length()).toUpperCase()), value);
+            } else if (key.startsWith(PREFIX_ADMINPROPERTYVALUE))  {
+                ADMINPROPERTY_VALUES.put(AdminPropertyDef.valueOf(key.substring(PREFIX_ADMINPROPERTYVALUE.length()).toUpperCase()), value);
+            } else if (key.startsWith(PREFIX_ATTRIBUTE))  {
                 ATTRIBUTES.put(AttributeDef.valueOf(key.substring(PREFIX_ATTRIBUTE.length())), value);
             } else if (key.startsWith(PREFIX_FILE_PATH))  {
                 final String keyFilePath = key.substring(PREFIX_FILE_PATH.length());
@@ -273,12 +320,69 @@ public final class Mapping_mxJPO
                     BUS_TYPE_TITLES.put(BusTypeDef.valueOf(keyTitle), value);
                 }
             } else if (key.startsWith(PREFIX_POLICY))  {
-                BUS_POLICIES.put(BusTypeDef.valueOf(key.substring(PREFIX_POLICY.length())), value);
+                BUS_TYPE_POLICIES.put(BusTypeDef.valueOf(key.substring(PREFIX_POLICY.length())), value);
             } else if (key.startsWith(PREFIX_TYPE))  {
                 BUS_TYPES.put(BusTypeDef.valueOf(key.substring(PREFIX_TYPE.length())), value);
             } else if (key.startsWith(PREFIX_VAULT))  {
-                BUS_VAULTS.put(BusTypeDef.valueOf(key.substring(PREFIX_VAULT.length())), value);
+                BUS_TYPE_VAULTS.put(BusTypeDef.valueOf(key.substring(PREFIX_VAULT.length())), value);
             }
+        }
+    }
+
+    /**
+     * Enumerator for admin properties.
+     */
+    public enum AdminPropertyDef
+    {
+        /** Admin property to store the name of the application. */
+        APPLICATION,
+        /** Admin property to store the author. */
+        AUTHOR,
+        /** Admin property to store the last modified date of the file. */
+        FILEDATE,
+        /** Admin property to store the installation date. */
+        INSTALLEDDATE,
+        /** Admin property to store the installer. */
+        INSTALLER,
+        /** Admin property to store the original name. */
+        ORIGINALNAME,
+        /** Admin property to store the version. */
+        VERSION;
+
+        /**
+         * Returns the related admin property name used within Mx. The method
+         * returns only correct values if the initialize method was called!
+         *
+         * @return Mx name of the property definition
+         * @see Mapping_mxJPO#ADMINPROPERTY_NAMES
+         */
+        public String getPropName()
+        {
+            return Mapping_mxJPO.ADMINPROPERTY_NAMES.get(this);
+        }
+
+        /**
+         * Returns the related attribute name used within Mx. The method
+         * returns only correct values if the initialize method was called!
+         *
+         * @return Mx name of the property definition
+         * @see Mapping_mxJPO#ADMINPROPERTY_ATTRIBUTES
+         */
+        public String getAttrName()
+        {
+            return Mapping_mxJPO.ADMINPROPERTY_ATTRIBUTES.get(this);
+        }
+
+       /**
+         * Returns the related admin property value. The method returns only
+         * correct values if the initialize method was called!
+         *
+         * @return value of the property definition
+         * @see Mapping_mxJPO#ADMINPROPERTY_VALUES
+         */
+        public String getValue()
+        {
+            return Mapping_mxJPO.ADMINPROPERTY_VALUES.get(this);
         }
     }
 
@@ -287,26 +391,6 @@ public final class Mapping_mxJPO
      */
     public enum AttributeDef
     {
-        /**
-         * Author attribute.
-         */
-        CommonAuthor,
-
-        /**
-         * File date attribute.
-         */
-        CommonFileDate,
-
-        /**
-         * Installed date attribute.
-         */
-        CommonInstalledDate,
-
-        /**
-         * Version attribute.
-         */
-        CommonVersion,
-
         /**
          * Next number attribute of type {@link BusTypeDef#NumberGenerator}.
          */
@@ -602,11 +686,11 @@ public final class Mapping_mxJPO
          * returns only correct values if the initialize method was called!
          *
          * @return Mx name of the business type definition
-         * @see Mapping_mxJPO#BUS_POLICIES
+         * @see Mapping_mxJPO#BUS_TYPE_POLICIES
          */
         public String getMxPolicy()
         {
-            return Mapping_mxJPO.BUS_POLICIES.get(this);
+            return Mapping_mxJPO.BUS_TYPE_POLICIES.get(this);
         }
 
         /**
@@ -614,11 +698,11 @@ public final class Mapping_mxJPO
          * returns only correct values if the initialize method was called!
          *
          * @return Mx name of the business vault definition
-         * @see Mapping_mxJPO#BUS_VAULTS
+         * @see Mapping_mxJPO#BUS_TYPE_VAULTS
          */
         public String getMxVault()
         {
-            return Mapping_mxJPO.BUS_VAULTS.get(this);
+            return Mapping_mxJPO.BUS_TYPE_VAULTS.get(this);
         }
 
         /**

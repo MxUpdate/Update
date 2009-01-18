@@ -23,7 +23,10 @@ package net.sourceforge.mxupdate.update;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -39,6 +42,7 @@ import matrix.db.Query;
 import matrix.util.MatrixException;
 import matrix.util.StringList;
 
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminPropertyDef;
 import net.sourceforge.mxupdate.util.Mapping_mxJPO.AttributeDef;
 import net.sourceforge.mxupdate.util.Mapping_mxJPO.BusTypeDef;
 
@@ -300,12 +304,13 @@ public abstract class AbstractBusObject_mxJPO
     protected void prepare(final Context _context) throws MatrixException
     {
         for (final Attribute attrValue : this.attrValues)  {
-            if (AttributeDef.CommonAuthor.getMxName().equals(attrValue.name))  {
+            if (AdminPropertyDef.AUTHOR.getAttrName().equals(attrValue.name))  {
                 this.setAuthor(attrValue.value);
-            } else if (AttributeDef.CommonVersion.getMxName().equals(attrValue.name))  {
+            } else if (AdminPropertyDef.VERSION.getAttrName().equals(attrValue.name))  {
                 this.setVersion(attrValue.value);
-            } else if (!AttributeDef.CommonInstalledDate.getMxName().equals(attrValue.name)
-                        && !AttributeDef.CommonFileDate.getMxName().equals(attrValue.name))  {
+            } else if (AdminPropertyDef.INSTALLEDDATE.getAttrName().equals(attrValue.name))  {
+                this.setInstallationDate(attrValue.value);
+            } else if (!AdminPropertyDef.FILEDATE.getAttrName().equals(attrValue.name))  {
                 this.attrValuesSorted.add(attrValue);
             }
         }
@@ -461,11 +466,30 @@ public abstract class AbstractBusObject_mxJPO
         // append other pre MQL code
         preMQLCode.append(_preMQLCode);
 
-        // post update MQL statements to define the version
+        // post update MQL statements
         final StringBuilder postMQLCode = new StringBuilder()
                 .append(_postMQLCode)
-                .append("mod bus ").append(this.busOid).append(" \"")
-                .append(AttributeDef.CommonVersion.getMxName()).append("\" \"").append(_tclVariables.get("VERSION")).append("\";\n");
+                .append("mod bus ").append(this.busOid)
+        // define version
+                .append(" \"").append(AdminPropertyDef.VERSION.getAttrName())
+                        .append("\" \"").append(AdminPropertyDef.VERSION.name()).append('\"')
+        // define file date
+                .append(" \"").append(AdminPropertyDef.FILEDATE.getAttrName())
+                        .append("\" \"").append(AdminPropertyDef.FILEDATE.name()).append('\"');
+
+        // is installed date property defined?
+        if ((this.getInstallationDate() == null) || "".equals(this.getInstallationDate()))  {
+            final DateFormat format = new SimpleDateFormat(AdminPropertyDef.INSTALLEDDATE.getValue());
+            postMQLCode.append(" \"").append(AdminPropertyDef.INSTALLEDDATE.getAttrName())
+                    .append("\" \"").append(format.format(new Date())).append('\"');
+        }
+        // exists no author property or author property not equal?
+        final String authVal = _tclVariables.get(AdminPropertyDef.AUTHOR.name());
+        if ((this.getAuthor() == null) || !this.getAuthor().equals(authVal))  {
+            postMQLCode.append(" \"").append(AdminPropertyDef.AUTHOR.getAttrName())
+                    .append("\" \"").append(AdminPropertyDef.AUTHOR.name()).append('\"');
+        }
+        postMQLCode.append(";\n");
 
         // prepare map of all TCL variables incl. id of business object
         final Map<String,String> tclVariables = new HashMap<String,String>();

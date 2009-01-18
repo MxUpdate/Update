@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 The MxUpdate Team
+ * Copyright 2008-2009 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,8 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminPropertyDef;
 import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
-import net.sourceforge.mxupdate.util.Mapping_mxJPO.AttributeDef;
 import net.sourceforge.mxupdate.util.Mapping_mxJPO.TypeDef;
 
 import org.xml.sax.SAXException;
@@ -323,7 +323,7 @@ public abstract class AbstractObject_mxJPO
                     .append(this.getInfoAnno().busType().getMxName())
                     .append("\" \"").append(nameRev[0])
                     .append("\" \"").append((nameRev.length > 1) ? nameRev[1] : "")
-                    .append("\" select attribute[").append(AttributeDef.CommonVersion.getMxName()).append("] dump"));
+                    .append("\" select attribute[").append(AdminPropertyDef.VERSION.getAttrName()).append("] dump"));
         }
         return (curVersion.matches("^[0-9]++$"))
                ? new Date(Long.parseLong(curVersion) * 1000)

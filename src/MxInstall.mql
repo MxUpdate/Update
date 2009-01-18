@@ -137,14 +137,14 @@ eval  {
     if {[mql list prog "${_sJPOName}"] == ""}  {
       set sJPODate ""
     } else  {
-      set sJPODate [mql print prog "${_sJPOName}" select property\[$asMapping(Property.FileDate)\].value dump]
+      set sJPODate [mql print prog "${_sJPOName}" select property\[$asMapping(PropertyName.FileDate)\].value dump]
     }
     if {"${sJPODate}" != "${sFileDate}"}  {
       puts "update jpo '${_sJPOName}'"
       mql insert prog "${sFileName}"
       mql mod prog ${_sJPOName} \
-            add property $asMapping(Property.FileDate) value "${sFileDate}" \
-            add property $asMapping(Property.Version) value "${_sVersion}"
+            add property $asMapping(PropertyName.FileDate) value "${sFileDate}" \
+            add property $asMapping(PropertyName.Version) value "${_sVersion}"
     }
     pRegisterObject program "${_sJPOName}"
   }
@@ -170,7 +170,7 @@ eval  {
       set sDate ""
       mql add prog "${_sPropName}"
     } else  {
-      set sDate [mql print prog "${_sPropName}" select property\[$asMapping(Property.FileDate)\].value dump]
+      set sDate [mql print prog "${_sPropName}" select property\[$asMapping(PropertyName.FileDate)\].value dump]
     }
     if {"${sDate}" != "${sFileDate}"}  {
       puts "update property '${_sPropName}'"
@@ -191,8 +191,8 @@ eval  {
       mql set escape on
       mql mod prog ${_sPropName} \
             code "${sCode}" \
-            add property $asMapping(Property.FileDate) value "${sFileDate}" \
-            add property $asMapping(Property.Version) value "${_sVersion}"
+            add property $asMapping(PropertyName.FileDate) value "${sFileDate}" \
+            add property $asMapping(PropertyName.Version) value "${_sVersion}"
       mql set escape off
     }
     pRegisterObject program "${_sPropName}"
@@ -204,10 +204,10 @@ eval  {
   proc pInstallDM {_sRoot _sVersion}  {
     global asMapping
 
-    set lsAttributes [list $asMapping(Attribute.CommonAuthor) \
-                           $asMapping(Attribute.CommonFileDate) \
-                           $asMapping(Attribute.CommonInstalledDate) \
-                           $asMapping(Attribute.CommonVersion)]
+    set lsAttributes [list $asMapping(PropertyAttribute.Author) \
+                           $asMapping(PropertyAttribute.FileDate) \
+                           $asMapping(PropertyAttribute.InstalledDate) \
+                           $asMapping(PropertyAttribute.Version)]
     set lsTypes      [list $asMapping(Type.NumberGenerator) \
                            $asMapping(Type.ObjectGenerator) \
                            $asMapping(Type.Trigger) \
@@ -219,16 +219,16 @@ eval  {
       if {[lsearch ${lsExists} "${sOneAttribute}"] < 0}  {
         puts "create attribute '${sOneAttribute}'"
         mql add attribute "${sOneAttribute}" type string \
-            property $asMapping(Property.InstalledDate) value [clock format [clock clicks]  -gmt true -format "%m-%d-%Y"]
+            property $asMapping(PropertyName.InstalledDate) value [clock format [clock clicks]  -gmt true -format "%m-%d-%Y"]
       } else  {
         puts "update attribute '${sOneAttribute}'"
       }
       mql modify attribute "${sOneAttribute}" \
-          add property $asMapping(Property.Application)   value "MxUpdate" \
-          add property $asMapping(Property.Author)        value "The MxUpdate Team" \
-          add property $asMapping(Property.Installer)     value "The MxUpdate Team" \
-          add property $asMapping(Property.OriginalName)  value "${sOneAttribute}" \
-          add property $asMapping(Property.Version)       value "${_sVersion}"
+          add property $asMapping(PropertyName.Application)   value "MxUpdate" \
+          add property $asMapping(PropertyName.Author)        value "The MxUpdate Team" \
+          add property $asMapping(PropertyName.Installer)     value "The MxUpdate Team" \
+          add property $asMapping(PropertyName.OriginalName)  value "${sOneAttribute}" \
+          add property $asMapping(PropertyName.Version)       value "${_sVersion}"
       pRegisterObject attribute "${sOneAttribute}"
     }
 
@@ -236,18 +236,18 @@ eval  {
     if {[mql list type $asMapping(Type.TriggerGroup)] == ""}  {
       puts "create trigger group type '$asMapping(Type.TriggerGroup)'"
       mql add type $asMapping(Type.TriggerGroup) \
-          property $asMapping(Property.InstalledDate) value [clock format [clock clicks]  -gmt true -format "%m-%d-%Y"]
+          property $asMapping(PropertyName.InstalledDate) value [clock format [clock clicks]  -gmt true -format "%m-%d-%Y"]
     } else  {
       puts "update trigger group type '$asMapping(Type.TriggerGroup)'"
     }
     mql mod type $asMapping(Type.TriggerGroup) \
         description "Type used to group trigger definitions." \
         icon [file join "${_sRoot}" "TriggerGroup.gif"] \
-        add property $asMapping(Property.Application)   value "MxUpdate" \
-        add property $asMapping(Property.Author)        value "The MxUpdate Team" \
-        add property $asMapping(Property.Installer)     value "The MxUpdate Team" \
-        add property $asMapping(Property.OriginalName)  value "$asMapping(Type.TriggerGroup)" \
-        add property $asMapping(Property.Version)       value "${_sVersion}"
+        add property $asMapping(PropertyName.Application)   value "MxUpdate" \
+        add property $asMapping(PropertyName.Author)        value "The MxUpdate Team" \
+        add property $asMapping(PropertyName.Installer)     value "The MxUpdate Team" \
+        add property $asMapping(PropertyName.OriginalName)  value "$asMapping(Type.TriggerGroup)" \
+        add property $asMapping(PropertyName.Version)       value "${_sVersion}"
     pRegisterObject type "$asMapping(Type.TriggerGroup)"
 
     # update types
@@ -266,18 +266,18 @@ eval  {
       mql copy policy $asMapping(Policy.Trigger) $asMapping(Policy.TriggerGroup) \
           remove state "Inactive" \
           remove type $asMapping(Type.Trigger) \
-          add property $asMapping(Property.InstalledDate) value [clock format [clock clicks]  -gmt true -format "%m-%d-%Y"]
+          add property $asMapping(PropertyName.InstalledDate) value [clock format [clock clicks]  -gmt true -format "%m-%d-%Y"]
     } else  {
       puts "update trigger group policy '$asMapping(Policy.TriggerGroup)'"
     }
     mql mod policy $asMapping(Policy.TriggerGroup) \
         description "Policy used to group trigger definitions." \
         add type $asMapping(Type.TriggerGroup) \
-        add property $asMapping(Property.Application)   value "MxUpdate" \
-        add property $asMapping(Property.Author)        value "The MxUpdate Team" \
-        add property $asMapping(Property.Installer)     value "The MxUpdate Team" \
-        add property $asMapping(Property.OriginalName)  value "$asMapping(Policy.TriggerGroup)" \
-        add property $asMapping(Property.Version)       value "${_sVersion}"
+        add property $asMapping(PropertyName.Application)   value "MxUpdate" \
+        add property $asMapping(PropertyName.Author)        value "The MxUpdate Team" \
+        add property $asMapping(PropertyName.Installer)     value "The MxUpdate Team" \
+        add property $asMapping(PropertyName.OriginalName)  value "$asMapping(Policy.TriggerGroup)" \
+        add property $asMapping(PropertyName.Version)       value "${_sVersion}"
     pRegisterObject policy "$asMapping(Policy.TriggerGroup)"
 
     # create / update trigger group relationship
@@ -293,11 +293,11 @@ eval  {
         from add type $asMapping(Type.TriggerGroup) \
         to add type $asMapping(Type.Trigger) \
            add type $asMapping(Type.TriggerGroup) \
-        add property $asMapping(Property.Application)   value "MxUpdate" \
-        add property $asMapping(Property.Author)        value "The MxUpdate Team" \
-        add property $asMapping(Property.Installer)     value "The MxUpdate Team" \
-        add property $asMapping(Property.OriginalName)  value "$asMapping(Relationship.TriggerGroup)" \
-        add property $asMapping(Property.Version)       value "${_sVersion}"
+        add property $asMapping(PropertyName.Application)   value "MxUpdate" \
+        add property $asMapping(PropertyName.Author)        value "The MxUpdate Team" \
+        add property $asMapping(PropertyName.Installer)     value "The MxUpdate Team" \
+        add property $asMapping(PropertyName.OriginalName)  value "$asMapping(Relationship.TriggerGroup)" \
+        add property $asMapping(PropertyName.Version)       value "${_sVersion}"
     pRegisterObject relationship "$asMapping(Relationship.TriggerGroup)"
 
     # register MxUpdate
