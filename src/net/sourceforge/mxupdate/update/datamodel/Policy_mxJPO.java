@@ -432,6 +432,7 @@ public class Policy_mxJPO
 
         final PolicyDefParser_mxJPO parser = new PolicyDefParser_mxJPO(new StringReader(code));
         final Policy_mxJPO policy = parser.policy();
+        policy.setName(this.getName());
         policy.prepare(_context);
 
         final StringBuilder cmd = new StringBuilder()
