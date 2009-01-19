@@ -166,12 +166,13 @@ public class Inquiry_mxJPO
                   .append(_preMQLCode);
 
         // separate the inquiry code and the TCL code
-        final int idx = this.getCode(_sourceFile).lastIndexOf(INQUIRY_SEPARATOR);
+        final StringBuilder orgCode = this.getCode(_sourceFile);
+        final int idx = orgCode.lastIndexOf(INQUIRY_SEPARATOR);
         final CharSequence code = (idx >= 0)
-                                  ? _preTCLCode.subSequence(0, idx)
-                                  : _preTCLCode;
+                                  ? orgCode.subSequence(0, idx)
+                                  : orgCode;
         final CharSequence inqu = (idx >= 0)
-                                  ? _preTCLCode.subSequence(idx + INQUIRY_SEPARATOR.length() + 1, _preTCLCode.length())
+                                  ? orgCode.subSequence(idx + INQUIRY_SEPARATOR.length() + 1, orgCode.length())
                                   : "";
 
         final File tmpInqFile = File.createTempFile("TMP_", ".inquiry");
