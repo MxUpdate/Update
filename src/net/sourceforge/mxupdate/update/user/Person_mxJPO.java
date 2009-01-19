@@ -360,10 +360,10 @@ public class Person_mxJPO
         }
 
         @Override
-        protected String getExportMQL(final String _name)
+        protected String getExportMQL()
         {
             return new StringBuilder()
-                    .append("export person \"").append(_name).append("\" !mail !set xml")
+                    .append("export person \"").append(this.getName()).append("\" !mail !set xml")
                     .toString();
         }
 

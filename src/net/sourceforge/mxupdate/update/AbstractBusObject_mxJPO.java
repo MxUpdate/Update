@@ -220,9 +220,9 @@ public abstract class AbstractBusObject_mxJPO
      * @see #SPLIT_NAME used splitter between name and revision
      */
     @Override
-    protected String getExportMQL(final String _name)
+    protected String getExportMQL()
     {
-        final String[] nameRev = _name.split(SPLIT_NAME);
+        final String[] nameRev = this.getName().split(SPLIT_NAME);
 
         return new StringBuilder()
                 .append("export bus \"")

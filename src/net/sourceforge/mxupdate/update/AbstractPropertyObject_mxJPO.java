@@ -257,11 +257,12 @@ public abstract class AbstractPropertyObject_mxJPO
                          final String _name)
             throws MatrixException, SAXException, IOException
     {
-        final String xml = execMql(_context, getExportMQL(_name));
+        this.setName(_name);
+        final String xml = execMql(_context, this.getExportMQL());
         // create XML reader
         final XMLReader reader = XMLReaderFactory.createXMLReader();
         // register Sax Content Handler
-        PadSaxHandler handler = new PadSaxHandler ();
+        final PadSaxHandler handler = new PadSaxHandler();
         reader.setContentHandler(handler);
         reader.setDTDHandler(handler);
         reader.setEntityResolver(handler);
@@ -270,10 +271,10 @@ public abstract class AbstractPropertyObject_mxJPO
         inputSource.setEncoding("UTF8");
         reader.parse(inputSource);
         // prepare post preparation
-        prepare(_context);
+        this.prepare(_context);
     }
 
-    protected abstract String getExportMQL(final String _name);
+    protected abstract String getExportMQL();
 
     protected void parse(final String _url,
                          final String _content)
@@ -510,8 +511,9 @@ System.out.println("ERROR! Symbolic name does not start correctly! So '" + symbN
                .append(" \"").append(convertTcl(entry.getValue())).append("\"\n");
         }
         // append TCL code, end of TCL mode and post MQL statements
+        // (source with the file must be replace for windows ...)
         cmd.append(_preTCLCode)
-           .append("\nsource \"").append(_sourceFile.toString()).append("\"")
+           .append("\nsource \"").append(_sourceFile.toString().replaceAll("\\\\", "/")).append("\"")
            .append("\n}\nexit;\n")
            .append(_postMQLCode);
 

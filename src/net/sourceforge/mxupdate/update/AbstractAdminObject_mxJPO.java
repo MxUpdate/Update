@@ -95,9 +95,9 @@ public abstract class AbstractAdminObject_mxJPO
     }
 
     @Override
-    protected String getExportMQL(final String _name)
+    protected String getExportMQL()
     {
-        return "export " + this.getInfoAnno().adminType().getMxName() + " \"" + _name + "\" xml";
+        return "export " + this.getInfoAnno().adminType().getMxName() + " \"" + this.getName() + "\" xml";
     }
 
     @Override
