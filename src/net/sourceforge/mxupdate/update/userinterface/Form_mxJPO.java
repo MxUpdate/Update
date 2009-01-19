@@ -33,6 +33,7 @@ import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
 import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import static net.sourceforge.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
  *
@@ -122,6 +123,28 @@ public class Form_mxJPO
             _out.append("    \"").append(convertTcl(field.name)).append("\" \\\n");
         }
         _out.append("]");
+    }
+
+    /**
+     * Creates given web form object with given name. Because the MQL add
+     * command for a web form must include the string &quot;web&quot; a
+     * specific create method must be written.
+     *
+     * @param _context          context for this request
+     * @param _file             file for which the administration object must
+     *                          be created (not used)
+     * @param _name             name of administration object to create
+     */
+    @Override
+    public void create(final Context _context,
+                       final File _file,
+                       final String _name)
+            throws Exception
+    {
+        final StringBuilder cmd = new StringBuilder()
+                .append("add ").append(this.getInfoAnno().adminType().getMxName())
+                        .append(" \"").append(_name).append("\" web;");
+        execMql(_context, cmd);
     }
 
     /**
