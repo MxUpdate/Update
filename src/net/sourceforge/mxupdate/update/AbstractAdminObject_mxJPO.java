@@ -222,7 +222,7 @@ public abstract class AbstractAdminObject_mxJPO
             throws IOException
     {
         for (final Property prop : this.propertiesMap.values())  {
-            if (!IGNORED_PROPERTIES.contains(prop.name) && !prop.name.startsWith("%"))  {
+            if ((AdminPropertyDef.getEnumByPropName(prop.name) == null) && !prop.name.startsWith("%"))  {
                 _out.append("\nmql add property \"").append(convertTcl(prop.name)).append("\"")
                     .append(" \\\n    on ")
                     .append(this.getInfoAnno().adminType().getMxName())
@@ -330,7 +330,7 @@ public abstract class AbstractAdminObject_mxJPO
                 .append(this.getInfoAnno().adminType().getMxSuffix());
         for (final Property prop : this.propertiesMap.values())  {
             // % must be ignored because this means settings
-            if (!IGNORED_PROPERTIES.contains(prop.name) && !prop.name.startsWith("%"))  {
+            if ((AdminPropertyDef.getEnumByPropName(prop.name) == null) && !prop.name.startsWith("%"))  {
                 preMQLCode.append(" remove property \"").append(prop.name).append('\"');
                 if ((prop.refAdminName) != null && (prop.refAdminType != null))  {
                     preMQLCode.append(" to ").append(prop.refAdminType)

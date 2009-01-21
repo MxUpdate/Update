@@ -63,8 +63,18 @@ public final class Mapping_mxJPO
     /**
      * Mapping between internal used admin property definitions and the Mx
      * admin property names.
+     *
+     * @see AdminPropertyDef#getPropName()
      */
-    private static final Map<AdminPropertyDef,String> ADMINPROPERTY_NAMES = new HashMap<AdminPropertyDef,String>();
+    private static final Map<AdminPropertyDef,String> ADMINPROPERTY_ENUM2NAMES = new HashMap<AdminPropertyDef,String>();
+
+    /**
+     * Mapping between MX admin property name and the inernal used admin
+     * property definition.
+     *
+     * @see AdminPropertyDef#getEnumByPropName(String)
+     */
+    private static final Map<String,AdminPropertyDef> ADMINPROPERTY_NAMES2ENUM = new HashMap<String,AdminPropertyDef>();
 
     /**
      * Used prefix of admin property definitions within the property file.
@@ -257,7 +267,8 @@ public final class Mapping_mxJPO
             throws MatrixException, IOException
     {
         PROPERTIES.clear();
-        ADMINPROPERTY_NAMES.clear();
+        ADMINPROPERTY_ENUM2NAMES.clear();
+        ADMINPROPERTY_NAMES2ENUM.clear();
         ADMINPROPERTY_VALUES.clear();
         ATTRIBUTES.clear();
         BUS_TYPE_FILE_PREFIXES.clear();
@@ -277,7 +288,9 @@ public final class Mapping_mxJPO
             if (key.startsWith(PREFIX_ADMINPROPERTYATTRIBUTE))  {
                 ADMINPROPERTY_ATTRIBUTES.put(AdminPropertyDef.valueOf(key.substring(PREFIX_ADMINPROPERTYATTRIBUTE.length()).toUpperCase()), value);
             } else if (key.startsWith(PREFIX_ADMINPROPERTYNAME))  {
-                ADMINPROPERTY_NAMES.put(AdminPropertyDef.valueOf(key.substring(PREFIX_ADMINPROPERTYNAME.length()).toUpperCase()), value);
+                AdminPropertyDef en = AdminPropertyDef.valueOf(key.substring(PREFIX_ADMINPROPERTYNAME.length()).toUpperCase());
+                ADMINPROPERTY_ENUM2NAMES.put(en, value);
+                ADMINPROPERTY_NAMES2ENUM.put(value, en);
             } else if (key.startsWith(PREFIX_ADMINPROPERTYVALUE))  {
                 ADMINPROPERTY_VALUES.put(AdminPropertyDef.valueOf(key.substring(PREFIX_ADMINPROPERTYVALUE.length()).toUpperCase()), value);
             } else if (key.startsWith(PREFIX_ATTRIBUTE))  {
@@ -354,11 +367,26 @@ public final class Mapping_mxJPO
          * returns only correct values if the initialize method was called!
          *
          * @return Mx name of the property definition
-         * @see Mapping_mxJPO#ADMINPROPERTY_NAMES
+         * @see Mapping_mxJPO#ADMINPROPERTY_ENUM2NAMES
          */
         public String getPropName()
         {
-            return Mapping_mxJPO.ADMINPROPERTY_NAMES.get(this);
+            return Mapping_mxJPO.ADMINPROPERTY_ENUM2NAMES.get(this);
+        }
+
+        /**
+         * Returns the related admin property enum element for given property
+         * name.
+         *
+         * @param _propName name of property for which the admin property enum
+         *                  is searched
+         * @return related admin property enum element or <code>null</code> if
+         *         not found
+         * @see Mapping_mxJPO#ADMINPROPERTY_NAMES2ENUM
+         */
+        static public AdminPropertyDef getEnumByPropName(final String _propName)
+        {
+            return Mapping_mxJPO.ADMINPROPERTY_NAMES2ENUM.get(_propName);
         }
 
         /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 The MxUpdate Team
+ * Copyright 2008-2009 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import matrix.util.MatrixException;
 
 import net.sourceforge.mxupdate.update.AbstractObject_mxJPO;
 import net.sourceforge.mxupdate.update.util.InfoAnno_mxJPO;
+import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminPropertyDef;
 import net.sourceforge.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import org.xml.sax.SAXException;
@@ -220,7 +221,7 @@ public class JPO_mxJPO
         final int length = (prpArr.length + 1) / 2;
         for (int idxName = 0, idxTo = length; idxName < length; idxName++, idxTo++)  {
             final String name = prpArr[idxName].trim();
-            if (!IGNORED_PROPERTIES.contains(name))  {
+            if (AdminPropertyDef.getEnumByPropName(name) == null)  {
 // TODO: if to is defined, the remove must be specified the to ....
                 final String to = (idxTo < length) ? prpArr[idxTo].trim() : "";
                 cmd.append("mod prog \"").append(_name)

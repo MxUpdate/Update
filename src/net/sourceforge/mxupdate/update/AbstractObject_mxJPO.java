@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -59,17 +58,6 @@ public abstract class AbstractObject_mxJPO
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = -5505850566853070973L;
-
-    // TODO: must be defined in the Property Class
-    protected final static Set<String> IGNORED_PROPERTIES = new HashSet<String>();
-    static  {
-        IGNORED_PROPERTIES.add("version");
-        IGNORED_PROPERTIES.add("installed date");
-        IGNORED_PROPERTIES.add("original name");
-        IGNORED_PROPERTIES.add("application");
-        IGNORED_PROPERTIES.add("installer");
-        IGNORED_PROPERTIES.add("author");
-    }
 
     /**
      * Stores the version information of this object. If the value is
