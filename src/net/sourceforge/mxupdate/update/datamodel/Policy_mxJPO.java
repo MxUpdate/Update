@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -304,31 +305,15 @@ public class Policy_mxJPO
         }
         _out.append("\n  description \"").append(convertTcl(getDescription())).append("\"");
         // types
-        boolean first = true;
         _out.append("\n  type {");
-        for (final String type : this.types)  {
-            if (first)  {
-                first = false;
-            } else  {
-                _out.append(' ');
-            }
-            _out.append('\"').append(convertTcl(type)).append('\"');
-        }
+        Policy_mxJPO.writeList(_out, this.types);
         _out.append("}");
         // formats
         if (this.allFormats)  {
             _out.append("\n  format all");
         } else  {
-            first = true;
             _out.append("\n  format {");
-            for (final String format : this.formats)  {
-                if (first)  {
-                    first = false;
-                } else  {
-                    _out.append(' ');
-                }
-                _out.append('\"').append(convertTcl(format)).append('\"');
-            }
+            Policy_mxJPO.writeList(_out, this.formats);
             _out.append("}");
         }
         _out.append("\n  defaultformat \"").append(convertTcl(this.defaultFormat)).append('\"')
@@ -341,6 +326,28 @@ public class Policy_mxJPO
         }
         _out.append("\n}");
         writeProperties(_out);
+    }
+
+    /**
+     * Appends the list  of elements to the appendable instance.
+     *
+     * @param _out      appendable instance
+     * @param _list     list of string to write
+     * @throws IOException if the elements of list could not appended
+     */
+    static protected void writeList(final Appendable _out,
+                                    final Collection<String> _list)
+            throws IOException
+    {
+        boolean first = true;
+        for (final String element : _list)  {
+            if (first)  {
+                first = false;
+            } else  {
+                _out.append(' ');
+            }
+            _out.append('\"').append(convertTcl(element)).append('\"');
+        }
     }
 
     /**
@@ -626,7 +633,7 @@ throw new Exception("some states are not defined anymore!");
         /**
          * Route message of this state.
          */
-        String routeMessage = null;
+        String routeMessage;
 
         /**
          * Route users of this state.
@@ -718,15 +725,7 @@ throw new Exception("some states are not defined anymore!");
             // route
             if ((this.routeMessage != null) || !this.routeUsers.isEmpty())  {
                 _out.append("\n    route {");
-                boolean first = true;
-                for (final String user : this.routeUsers)  {
-                    if (first)  {
-                        first = false;
-                    } else  {
-                        _out.append(' ');
-                    }
-                    _out.append('\"').append(convertTcl(user)).append('\"');
-                }
+                Policy_mxJPO.writeList(_out, this.routeUsers);
                 _out.append("} \"").append(convertTcl(this.routeMessage)).append('\"');
             }
             // owner access
@@ -758,15 +757,7 @@ throw new Exception("some states are not defined anymore!");
             }
             // signatures
             for (final Signature signature : this.signatures)  {
-                _out.append("\n    signature \"").append(convertTcl(signature.name)).append("\" {")
-                    .append("\n      branch \"").append(convertTcl(signature.branch)).append("\"")
-// TODO: approve, ignore, reject users
-                    .append("\n      approve {}")
-                    .append("\n      ignore {}")
-                    .append("\n      reject {}")
-                    .append("\n      filter \"").append(convertTcl(signature.filter)).append("\"")
-                    .append("\n    }");
-
+                signature.writeObject(_out);
             }
             _out.append("\n  }");
         }
@@ -804,14 +795,12 @@ throw new Exception("some states are not defined anymore!");
             }
         }
 
-
-    /*
-     * where STATE_ITEM is:
-    | notify USER_NAME {,USER_NAME} message VALUE            |
-    | notify signer                 message VALUE            |
-    | route USER_NAME message VALUE                          |
-    | signature SIGN_NAME [SIGNATURE_ITEM {,SIGNATURE_ITEM}] |
-     */
+        /**
+         *
+         * @param _cmd
+         * @param _oldState
+         * @throws IOException
+         */
         protected void calcDelta(final StringBuilder _cmd,
                                  final State _oldState)
                 throws IOException
@@ -825,7 +814,13 @@ throw new Exception("some states are not defined anymore!");
                 .append("input \"").append(convertMql(this.actionInput)).append("\" ")
                 .append("check \"").append(convertMql(this.checkProgram)).append("\" ")
                 .append("input \"").append(convertMql(this.checkInput)).append("\" ");
-// TODO: route
+            // route message
+            _cmd.append("route message \"").append(convertMql(this.routeMessage)).append("\" ");
+            for (final String routeUser : this.routeUsers)  {
+                if (!_oldState.routeUsers.contains(routeUser))  {
+                    _cmd.append("add route \"").append(convertMql(routeUser)).append("\" ");
+                }
+            }
             // owner access
             _cmd.append("owner ");
             this.appendAccess(_cmd, ',', this.ownerAccess, true);
@@ -991,6 +986,35 @@ throw new Exception("some states are not defined anymore!");
         private final Set<String> rejectUsers = new TreeSet<String>();
 
         /**
+         * Appends the signature information including the branch, filter and
+         * the approve, ignore and reject users.
+         *
+         * @param _out  appendable instance
+         * @throws IOException
+         */
+        protected void writeObject(final Appendable _out)
+                throws IOException
+        {
+            _out.append("\n    signature \"").append(convertTcl(this.name)).append("\" {")
+                .append("\n      branch \"").append(convertTcl(this.branch)).append("\"")
+                .append("\n      approve {");
+            // append approver users
+            Policy_mxJPO.writeList(_out, this.approverUsers);
+            _out.append("}")
+                .append("\n      ignore {");
+            // append ignore users
+            Policy_mxJPO.writeList(_out, this.ignoreUsers);
+            _out.append("}")
+                .append("\n      reject {");
+            // append reject users
+            Policy_mxJPO.writeList(_out, this.rejectUsers);
+            _out.append("}")
+                .append("\n      filter \"").append(convertTcl(this.filter)).append("\"")
+                .append("\n    }");
+        }
+
+
+        /**
          * Calculates the delta between the old signature and this signature.
          * If for the old signature a branch is defined and for the new
          * signature no branch, an error is thrown.
@@ -1001,7 +1025,6 @@ throw new Exception("some states are not defined anymore!");
         protected void calcDelta(final StringBuilder _cmd,
                                  final Signature _oldSignature)
         {
-//TODO: approve, ignore, reject users
             if ("".equals(this.branch))  {
                 if ((_oldSignature != null) && (_oldSignature.branch != null) && !"".equals(_oldSignature.branch))  {
 throw new Error("branch '" + _oldSignature.branch + "' exists for signature " + this.name + ", but is not defined anymore");
@@ -1010,6 +1033,39 @@ throw new Error("branch '" + _oldSignature.branch + "' exists for signature " + 
                 _cmd.append("branch \"").append(convertMql(this.branch)).append("\" ");
             }
             _cmd.append("filter \"").append(convertMql(this.filter)).append("\" ");
+            // update approve users
+            for (final String approver : this.approverUsers)  {
+                if (!_oldSignature.approverUsers.contains(approver))  {
+                    _cmd.append("add approve \"").append(convertMql(approver)).append("\" ");
+                }
+            }
+            for (final String approver : _oldSignature.approverUsers)  {
+                if (!this.approverUsers.contains(approver))  {
+                    _cmd.append("remove approve \"").append(convertMql(approver)).append("\" ");
+                }
+            }
+            // update ignore user
+            for (final String ignore : this.ignoreUsers)  {
+                if (!_oldSignature.ignoreUsers.contains(ignore))  {
+                    _cmd.append("add ignore \"").append(convertMql(ignore)).append("\" ");
+                }
+            }
+            for (final String ignore : _oldSignature.ignoreUsers)  {
+                if (!this.ignoreUsers.contains(ignore))  {
+                    _cmd.append("remove ignore \"").append(convertMql(ignore)).append("\" ");
+                }
+            }
+            // update reject users
+            for (final String reject : this.rejectUsers)  {
+                if (!_oldSignature.rejectUsers.contains(reject))  {
+                    _cmd.append("add reject \"").append(convertMql(reject)).append("\" ");
+                }
+            }
+            for (final String reject : _oldSignature.rejectUsers)  {
+                if (!this.rejectUsers.contains(reject))  {
+                    _cmd.append("remove reject \"").append(convertMql(reject)).append("\" ");
+                }
+            }
         }
     }
 }
