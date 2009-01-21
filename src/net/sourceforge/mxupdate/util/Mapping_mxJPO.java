@@ -343,6 +343,45 @@ public final class Mapping_mxJPO
     }
 
     /**
+     * Defines the new value of the application property
+     * {@link AdminPropertyDef#APPLICATION}.
+     *
+     * @param _application  new application definition
+     * @see #ADMINPROPERTY_VALUES
+     * @see AdminPropertyDef#APPLICATION
+     */
+    public static void defineApplication(final String _application)
+    {
+        ADMINPROPERTY_VALUES.put(AdminPropertyDef.APPLICATION, _application);
+    }
+
+    /**
+     * Defines the new value of the author property
+     * {@link AdminPropertyDef#AUTHOR}.
+     *
+     * @param _author   new author definition
+     * @see #ADMINPROPERTY_VALUES
+     * @see AdminPropertyDef#AUTHOR
+     */
+    public static void defineAuthor(final String _author)
+    {
+        ADMINPROPERTY_VALUES.put(AdminPropertyDef.AUTHOR, _author);
+    }
+
+    /**
+     * Defines the new value of the installer property
+     * {@link AdminPropertyDef#INSTALLER}.
+     *
+     * @param _installer    new installer definition
+     * @see #ADMINPROPERTY_VALUES
+     * @see AdminPropertyDef#INSTALLER
+     */
+    public static void defineInstaller(final String _installer)
+    {
+        ADMINPROPERTY_VALUES.put(AdminPropertyDef.INSTALLER, _installer);
+    }
+
+    /**
      * Enumerator for admin properties.
      */
     public enum AdminPropertyDef

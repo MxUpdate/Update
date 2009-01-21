@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 The MxUpdate Team
+ * Copyright 2008-2009 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,9 +80,16 @@ public class MxUpdate_mxJPO
     /**
      * Defines the length of the parameters strings.
      *
-     * @see #appendDescription(String, List)
+     * @see #appendDescription(String, List, String)
      */
     private static final int LENGTH_DESC_PARAMS = 42;
+
+    /**
+     * Defines the length of one description line.
+     *
+     * @see #appendDescription(String, List, String)
+     */
+    private static final int LENGTH_DESC_LINE = 100;
 
     private enum Mode
     {
@@ -151,6 +158,27 @@ public class MxUpdate_mxJPO
                                 + "within the test attributes of types.",
                           Arrays.asList(new String[]{"--ignoretypeattributes"}),
                           "MATCH");
+
+        appendDescription("Defines the name of application which is defined as property"
+                                + " / attribute on administration objects. The value of"
+                                + " mapping property 'PropertyValue.Application' will be"
+                                + " overwritten.",
+                          Arrays.asList(new String[]{"--application"}),
+                          "APPLICATIONAME");
+
+        appendDescription("Defines the name of author which is defined as property"
+                                + " / attribute on administration objects. The value of"
+                                + " mapping property 'PropertyValue.Author' will be"
+                                + " overwritten.",
+                          Arrays.asList(new String[]{"--author"}),
+                          "AUTHORNAME");
+
+        appendDescription("Defines the name of installer which is defined as property"
+                                + " / attribute on administration objects. The value of"
+                                + " mapping property 'PropertyValue.Installer' will be"
+                                + " overwritten.",
+                          Arrays.asList(new String[]{"--installer"}),
+                          "INSTALLERNAME");
 
         ////////////////////////////////////////////////////////////////////////
         // mode (export / import / help)
@@ -426,7 +454,32 @@ public class MxUpdate_mxJPO
             }
         }
 
-        line.append(_description);
+        // append description
+        first = true;
+        for (final String partDesc : _description.split("\n"))  {
+            int length = LENGTH_DESC_PARAMS;
+            if (first == true)  {
+                first = false;
+            } else  {
+                line.append("\n");
+                for (int i = 0; i < LENGTH_DESC_PARAMS; i++)  {
+                    line.append(' ');
+                }
+            }
+            for (final String desc : partDesc.split(" "))  {
+                if (!"".equals(desc))  {
+                    length += desc.length() + 1;
+                    if (length > LENGTH_DESC_LINE)  {
+                        line.append("\n");
+                        for (int i = 0; i < LENGTH_DESC_PARAMS; i++)  {
+                            line.append(' ');
+                        }
+                        length = LENGTH_DESC_PARAMS + desc.length() + 1;
+                    }
+                    line.append(' ').append(desc);
+                }
+            }
+        }
 
         DESCRIPTION.put("" + prefix + line, line.toString());
     }
@@ -536,9 +589,18 @@ final Set<String> paths = new TreeSet<String>();
                 }
             } else if (PARAM_VERSION.containsKey(_args[idx]))  {
                 versionInfo = PARAM_VERSION.get(_args[idx]);
+            } else if ("--application".equals(_args[idx]))  {
+                idx++;
+                Mapping_mxJPO.defineApplication(_args[idx]);
+            } else if ("--author".equals(_args[idx]))  {
+                idx++;
+                Mapping_mxJPO.defineAuthor(_args[idx]);
             } else if ("--ignoretypeattributes".equals(_args[idx]))  {
                 idx++;
                 Type_mxJPO.IGNORE_TYPE_ATTRIBUTES.add(_args[idx]);
+            } else if ("--installer".equals(_args[idx]))  {
+                idx++;
+                Mapping_mxJPO.defineInstaller(_args[idx]);
             } else if ("--path".equals(_args[idx]))  {
                 idx++;
                 paths.add(_args[idx]);
@@ -685,7 +747,7 @@ System.out.println("    - update");
     protected void delete(final Context _context,
                           final Set<String> _paths,
                           final Map<Class<? extends AbstractObject_mxJPO>,List<String>> _clazz2matches)
-    throws Exception
+            throws Exception
     {
         // check for definition of min. / max. one path
         if (_paths.isEmpty())  {
