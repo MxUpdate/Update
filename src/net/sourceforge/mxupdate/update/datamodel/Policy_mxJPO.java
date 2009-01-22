@@ -817,7 +817,7 @@ throw new Exception("some states are not defined anymore!");
             // route message
             _cmd.append("route message \"").append(convertMql(this.routeMessage)).append("\" ");
             for (final String routeUser : this.routeUsers)  {
-                if (!_oldState.routeUsers.contains(routeUser))  {
+                if ((_oldState == null) || !_oldState.routeUsers.contains(routeUser))  {
                     _cmd.append("add route \"").append(convertMql(routeUser)).append("\" ");
                 }
             }
@@ -1035,35 +1035,41 @@ throw new Error("branch '" + _oldSignature.branch + "' exists for signature " + 
             _cmd.append("filter \"").append(convertMql(this.filter)).append("\" ");
             // update approve users
             for (final String approver : this.approverUsers)  {
-                if (!_oldSignature.approverUsers.contains(approver))  {
+                if ((_oldSignature == null) || !_oldSignature.approverUsers.contains(approver))  {
                     _cmd.append("add approve \"").append(convertMql(approver)).append("\" ");
                 }
             }
-            for (final String approver : _oldSignature.approverUsers)  {
-                if (!this.approverUsers.contains(approver))  {
-                    _cmd.append("remove approve \"").append(convertMql(approver)).append("\" ");
+            if (_oldSignature != null)  {
+                for (final String approver : _oldSignature.approverUsers)  {
+                    if (!this.approverUsers.contains(approver))  {
+                        _cmd.append("remove approve \"").append(convertMql(approver)).append("\" ");
+                    }
                 }
             }
             // update ignore user
             for (final String ignore : this.ignoreUsers)  {
-                if (!_oldSignature.ignoreUsers.contains(ignore))  {
+                if ((_oldSignature == null) || !_oldSignature.ignoreUsers.contains(ignore))  {
                     _cmd.append("add ignore \"").append(convertMql(ignore)).append("\" ");
                 }
             }
-            for (final String ignore : _oldSignature.ignoreUsers)  {
-                if (!this.ignoreUsers.contains(ignore))  {
-                    _cmd.append("remove ignore \"").append(convertMql(ignore)).append("\" ");
+            if (_oldSignature != null)  {
+                for (final String ignore : _oldSignature.ignoreUsers)  {
+                    if (!this.ignoreUsers.contains(ignore))  {
+                        _cmd.append("remove ignore \"").append(convertMql(ignore)).append("\" ");
+                    }
                 }
             }
             // update reject users
             for (final String reject : this.rejectUsers)  {
-                if (!_oldSignature.rejectUsers.contains(reject))  {
+                if ((_oldSignature == null) || !_oldSignature.rejectUsers.contains(reject))  {
                     _cmd.append("add reject \"").append(convertMql(reject)).append("\" ");
                 }
             }
-            for (final String reject : _oldSignature.rejectUsers)  {
-                if (!this.rejectUsers.contains(reject))  {
-                    _cmd.append("remove reject \"").append(convertMql(reject)).append("\" ");
+            if (_oldSignature != null)  {
+                for (final String reject : _oldSignature.rejectUsers)  {
+                    if (!this.rejectUsers.contains(reject))  {
+                        _cmd.append("remove reject \"").append(convertMql(reject)).append("\" ");
+                    }
                 }
             }
         }
