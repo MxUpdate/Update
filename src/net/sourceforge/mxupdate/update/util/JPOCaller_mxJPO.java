@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 The MxUpdate Team
+ * Copyright 2008-2009 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,16 +46,21 @@ public class JPOCaller_mxJPO
                        final String[] _args)
             throws Exception
     {
-        final ByteArrayInputStream bis = new ByteArrayInputStream(Mime64.decode(_args[0]));
-        final ObjectInputStream ois = new ObjectInputStream(bis);
+        try  {
+            final ByteArrayInputStream bis = new ByteArrayInputStream(Mime64.decode(_args[0]));
+            final ObjectInputStream ois = new ObjectInputStream(bis);
 
-        // prepare arguments
-        final String[] args = new String[_args.length - 1];
-        System.arraycopy(_args, 1, args, 0, _args.length - 1);
+            // prepare arguments
+            final String[] args = new String[_args.length - 1];
+            System.arraycopy(_args, 1, args, 0, _args.length - 1);
 
-        // execute JPO instance
-        final JPOCallerInterface jpo = (JPOCallerInterface) ois.readObject();
-        jpo.jpoCallExecute(_context, args);
+            // execute JPO instance
+            final JPOCallerInterface jpo = (JPOCallerInterface) ois.readObject();
+            jpo.jpoCallExecute(_context, args);
+        } catch (Exception e)  {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     /**
