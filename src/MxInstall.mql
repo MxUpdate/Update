@@ -66,7 +66,7 @@ eval  {
     global sMappingFile
 
     # read original file
-    set pFile [open [file join "${_sRoot}" "net" "sourceforge" "mxupdate" "mapping.properties"] r]
+    set pFile [open [file join "${_sRoot}" "org" "mxupdate" "mapping.properties"] r]
     set lsMapping [split [read $pFile] "\n"]
     close $pFile
 
@@ -315,14 +315,14 @@ eval  {
 
   pReadMapping "${sPath}"
 
-  pInstallProperties "${sPath}" "net.sourceforge.mxupdate.mapping.properties" "${VERSION}" "${sMappingFile}"
-  pInstallDM         "${sPath}"                                               "${VERSION}"
-  pInstallJPO        "${sPath}" "net.sourceforge.mxupdate.install.Insert"     "${VERSION}"
-  pInstallJPO        "${sPath}" "net.sourceforge.mxupdate.util.MqlUtil"       "${VERSION}"
+  pInstallProperties "${sPath}" "org.mxupdate.mapping.properties" "${VERSION}" "${sMappingFile}"
+  pInstallDM         "${sPath}"                                                "${VERSION}"
+  pInstallJPO        "${sPath}" "org.mxupdate.install.Insert"     "${VERSION}"
+  pInstallJPO        "${sPath}" "org.mxupdate.util.MqlUtil"       "${VERSION}"
 
-  mql exec prog "net.sourceforge.mxupdate.install.Insert" "${sPath}" "${VERSION}"
+  mql exec prog "org.mxupdate.install.Insert" "${sPath}" "${VERSION}"
 
   mql verbose on
-  mql compile prog net.sourceforge.mxupdate.*,MxUpdate
+  mql compile prog org.mxupdate.*,MxUpdate
   mql verbose off
 }

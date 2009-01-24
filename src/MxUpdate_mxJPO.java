@@ -33,33 +33,35 @@ import java.util.TreeSet;
 
 import matrix.db.Context;
 
-import net.sourceforge.mxupdate.update.AbstractObject_mxJPO;
-import net.sourceforge.mxupdate.update.datamodel.Attribute_mxJPO;
-import net.sourceforge.mxupdate.update.datamodel.Expression_mxJPO;
-import net.sourceforge.mxupdate.update.datamodel.Format_mxJPO;
-import net.sourceforge.mxupdate.update.datamodel.NumberGenerator_mxJPO;
-import net.sourceforge.mxupdate.update.datamodel.ObjectGenerator_mxJPO;
-import net.sourceforge.mxupdate.update.datamodel.Policy_mxJPO;
-import net.sourceforge.mxupdate.update.datamodel.Relationship_mxJPO;
-import net.sourceforge.mxupdate.update.datamodel.Rule_mxJPO;
-import net.sourceforge.mxupdate.update.datamodel.TriggerGroup_mxJPO;
-import net.sourceforge.mxupdate.update.datamodel.Trigger_mxJPO;
-import net.sourceforge.mxupdate.update.datamodel.Type_mxJPO;
-import net.sourceforge.mxupdate.update.user.Association_mxJPO;
-import net.sourceforge.mxupdate.update.user.Group_mxJPO;
-import net.sourceforge.mxupdate.update.user.Person_mxJPO;
-import net.sourceforge.mxupdate.update.user.Role_mxJPO;
-import net.sourceforge.mxupdate.update.userinterface.Channel_mxJPO;
-import net.sourceforge.mxupdate.update.userinterface.Command_mxJPO;
-import net.sourceforge.mxupdate.update.userinterface.Form_mxJPO;
-import net.sourceforge.mxupdate.update.userinterface.Inquiry_mxJPO;
-import net.sourceforge.mxupdate.update.userinterface.Menu_mxJPO;
-import net.sourceforge.mxupdate.update.userinterface.Portal_mxJPO;
-import net.sourceforge.mxupdate.update.userinterface.Table_mxJPO;
-import net.sourceforge.mxupdate.util.Mapping_mxJPO;
-import net.sourceforge.mxupdate.util.MqlUtil_mxJPO;
+import org.mxupdate.update.AbstractObject_mxJPO;
+import org.mxupdate.update.datamodel.Attribute_mxJPO;
+import org.mxupdate.update.datamodel.Expression_mxJPO;
+import org.mxupdate.update.datamodel.Format_mxJPO;
+import org.mxupdate.update.datamodel.NumberGenerator_mxJPO;
+import org.mxupdate.update.datamodel.ObjectGenerator_mxJPO;
+import org.mxupdate.update.datamodel.Policy_mxJPO;
+import org.mxupdate.update.datamodel.Relationship_mxJPO;
+import org.mxupdate.update.datamodel.Rule_mxJPO;
+import org.mxupdate.update.datamodel.TriggerGroup_mxJPO;
+import org.mxupdate.update.datamodel.Trigger_mxJPO;
+import org.mxupdate.update.datamodel.Type_mxJPO;
+import org.mxupdate.update.program.JPO_mxJPO;
+import org.mxupdate.update.program.Program_mxJPO;
+import org.mxupdate.update.user.Association_mxJPO;
+import org.mxupdate.update.user.Group_mxJPO;
+import org.mxupdate.update.user.Person_mxJPO;
+import org.mxupdate.update.user.Role_mxJPO;
+import org.mxupdate.update.userinterface.Channel_mxJPO;
+import org.mxupdate.update.userinterface.Command_mxJPO;
+import org.mxupdate.update.userinterface.Form_mxJPO;
+import org.mxupdate.update.userinterface.Inquiry_mxJPO;
+import org.mxupdate.update.userinterface.Menu_mxJPO;
+import org.mxupdate.update.userinterface.Portal_mxJPO;
+import org.mxupdate.update.userinterface.Table_mxJPO;
+import org.mxupdate.util.Mapping_mxJPO;
+import org.mxupdate.util.MqlUtil_mxJPO;
 
-import static net.sourceforge.mxupdate.update.util.StringUtil_mxJPO.match;
+import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 
 /**
  * <table>
@@ -298,11 +300,11 @@ public class MxUpdate_mxJPO
         // program
 
         defineParameter('j', null,
-                        net.sourceforge.mxupdate.update.program.JPO_mxJPO.class,
+                        JPO_mxJPO.class,
                         "Export / Import of JPOs.",
                         "jpo");
         defineParameter(null, null,
-                        net.sourceforge.mxupdate.update.program.Program_mxJPO.class,
+                        Program_mxJPO.class,
                         "Export / Import of programs.",
                         "program", "prog");
 
