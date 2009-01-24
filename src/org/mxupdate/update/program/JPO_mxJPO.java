@@ -124,6 +124,7 @@ public class JPO_mxJPO
         final StringBuilder cmd = new StringBuilder()
                 .append("print program \"").append(_name).append("\" select code dump");
 
+        // replace class names and references to other JPOs
         final String name = _name + NAME_SUFFIX;
         final String code = execMql(_context, cmd)
                                .replaceAll("\\$\\{CLASSNAME\\}", name.replaceAll(".*\\.", ""))
@@ -132,12 +133,22 @@ public class JPO_mxJPO
                                .replaceAll("\\$\\{CLASS\\:", "")
                                .trim();
 
+        // extract package name
+        final int idx = _name.lastIndexOf('.');
+        final String pck;
+        if (idx > 0)  {
+            pck = "package " + _name.substring(0, idx) + ";\n";
+        } else  {
+            pck = "";
+        }
+
         final File file = new File(_path, name.replaceAll("\\.", "/") + ".java");
         if (!file.getParentFile().exists())  {
             file.getParentFile().mkdirs();
         }
         final Writer out = new FileWriter(file);
-        out.append(code);
+        out.append(pck)
+           .append(code);
         out.flush();
         out.close();
     }
