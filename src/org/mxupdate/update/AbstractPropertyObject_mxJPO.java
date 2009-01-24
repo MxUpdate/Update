@@ -318,6 +318,7 @@ public abstract class AbstractPropertyObject_mxJPO
     {
         this.setName(_name);
         final String xml = execMql(_context, this.getExportMQL());
+
         // create XML reader
         final XMLReader reader = XMLReaderFactory.createXMLReader();
         // register Sax Content Handler
@@ -616,14 +617,15 @@ System.out.println("ERROR! Symbolic name does not start correctly! So '" + symbN
         }
 
         /**
-         * An input source with a zero length string is returned, because
-         * the XML parser wants to open file &quot;ematrixml.dtd&quot;.
+         * An input source defining the entity &quot;ematrixProductDtd&quot; to
+         * replace the original DTD file &quot;ematrixml.dtd&quot; which the
+         * XML parser wants to open.
          */
         @Override
         public InputSource resolveEntity(final String _publicId,
                                          final String _systemId)
         {
-            return new InputSource(new StringReader(""));
+            return new InputSource(new StringReader("<!ENTITY ematrixProductDtd \"\">"));
         }
 
         @Override
