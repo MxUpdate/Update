@@ -306,10 +306,14 @@ public abstract class AbstractBusObject_mxJPO
         for (final Attribute attrValue : this.attrValues)  {
             if (AdminPropertyDef.AUTHOR.getAttrName().equals(attrValue.name))  {
                 this.setAuthor(attrValue.value);
-            } else if (AdminPropertyDef.VERSION.getAttrName().equals(attrValue.name))  {
-                this.setVersion(attrValue.value);
+            } else if (AdminPropertyDef.APPLICATION.getAttrName().equals(attrValue.name))  {
+                this.setApplication(attrValue.value);
             } else if (AdminPropertyDef.INSTALLEDDATE.getAttrName().equals(attrValue.name))  {
                 this.setInstallationDate(attrValue.value);
+            } else if (AdminPropertyDef.INSTALLER.getAttrName().equals(attrValue.name))  {
+                this.setInstaller(attrValue.value);
+            } else if (AdminPropertyDef.VERSION.getAttrName().equals(attrValue.name))  {
+                this.setVersion(attrValue.value);
             } else if (!AdminPropertyDef.FILEDATE.getAttrName().equals(attrValue.name))  {
                 this.attrValuesSorted.add(attrValue);
             }
@@ -472,16 +476,25 @@ public abstract class AbstractBusObject_mxJPO
                 .append("mod bus ").append(this.busOid)
         // define version
                 .append(" \"").append(AdminPropertyDef.VERSION.getAttrName())
-                        .append("\" \"").append(AdminPropertyDef.VERSION.name()).append('\"')
+                        .append("\" \"").append(_tclVariables.get(AdminPropertyDef.VERSION.name())).append('\"')
         // define file date
                 .append(" \"").append(AdminPropertyDef.FILEDATE.getAttrName())
-                        .append("\" \"").append(AdminPropertyDef.FILEDATE.name()).append('\"');
-
+                        .append("\" \"").append(_tclVariables.get(AdminPropertyDef.FILEDATE.name())).append('\"');
+        // exists no application property or application property not equal?
+        if ((this.getApplication() == null) || !AdminPropertyDef.APPLICATION.getValue().equals(this.getApplication()))  {
+            postMQLCode.append(" \"").append(AdminPropertyDef.APPLICATION.getAttrName())
+                    .append("\" \"").append(AdminPropertyDef.APPLICATION.getValue()).append('\"');
+        }
         // is installed date property defined?
         if ((this.getInstallationDate() == null) || "".equals(this.getInstallationDate()))  {
             final DateFormat format = new SimpleDateFormat(AdminPropertyDef.INSTALLEDDATE.getValue());
             postMQLCode.append(" \"").append(AdminPropertyDef.INSTALLEDDATE.getAttrName())
                     .append("\" \"").append(format.format(new Date())).append('\"');
+        }
+        // is installer property defined?
+        if ((this.getInstaller() == null) || "".equals(this.getInstaller()))  {
+            postMQLCode.append(" \"").append(AdminPropertyDef.INSTALLER.getAttrName())
+                    .append("\" \"").append(AdminPropertyDef.INSTALLER.getValue()).append('\"');
         }
         // exists no author property or author property not equal?
         final String authVal = _tclVariables.get(AdminPropertyDef.AUTHOR.name());

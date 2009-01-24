@@ -205,8 +205,10 @@ eval  {
     global asMapping
 
     set lsAttributes [list $asMapping(PropertyAttribute.Author) \
+                           $asMapping(PropertyAttribute.Application) \
                            $asMapping(PropertyAttribute.FileDate) \
                            $asMapping(PropertyAttribute.InstalledDate) \
+                           $asMapping(PropertyAttribute.Installer) \
                            $asMapping(PropertyAttribute.Version)]
     set lsTypes      [list $asMapping(Type.NumberGenerator) \
                            $asMapping(Type.ObjectGenerator) \

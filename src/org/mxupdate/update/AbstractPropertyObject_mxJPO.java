@@ -103,7 +103,15 @@ public abstract class AbstractPropertyObject_mxJPO
      * @see #setAuthor(String)
      * @see #getAuthor()
      */
-    private String author = null;
+    private String author;
+
+    /**
+     * Application of the matrix administration object.
+     *
+     * @see #setApplication(String)
+     * @see #getApplication()
+     */
+    private String application;
 
     /**
      * Installation date of the matrix administration object.
@@ -112,6 +120,14 @@ public abstract class AbstractPropertyObject_mxJPO
      * @see #getInstallationDate()
      */
     private String installationDate;
+
+    /**
+     * Installer of the matrix administration object.
+     *
+     * @see #setInstaller(String)
+     * @see #getInstaller()
+     */
+    private String installer;
 
     /**
      * Description of the matrix administration object.
@@ -181,6 +197,28 @@ public abstract class AbstractPropertyObject_mxJPO
     }
 
     /**
+     * Getter method for instance variable {@link #application}.
+     *
+     * @return value of instance variable {@link #application}.
+     * @see #application
+     */
+    protected String getApplication()
+    {
+        return this.application;
+    }
+
+    /**
+     * Setter method for instance variable {@link #application}.
+     *
+     * @param _author new value for instance variable {@link #application}
+     * @see #application
+     */
+    protected void setApplication(final String _application)
+    {
+        this.application = _application;
+    }
+
+    /**
      * Getter method for instance variable {@link #installationDate}.
      *
      * @return value of instance variable {@link #installationDate}.
@@ -200,6 +238,28 @@ public abstract class AbstractPropertyObject_mxJPO
     protected void setInstallationDate(final String _installationDate)
     {
         this.installationDate = _installationDate;
+    }
+
+    /**
+     * Getter method for instance variable {@link #installer}.
+     *
+     * @return value of instance variable {@link #installer}.
+     * @see #installer
+     */
+    protected String getInstaller()
+    {
+        return this.installer;
+    }
+
+    /**
+     * Setter method for instance variable {@link #installer}.
+     *
+     * @param _author new value for instance variable {@link #installer}
+     * @see #installer
+     */
+    protected void setInstaller(final String _installer)
+    {
+        this.installer = _installer;
     }
 
     /**

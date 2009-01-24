@@ -170,10 +170,20 @@ public abstract class AbstractAdminObject_mxJPO
         if (author != null)   {
             this.setAuthor(author.value);
         }
+        // set application depending on the properties
+        final Property appl = this.propertiesMap.get(AdminPropertyDef.APPLICATION.getPropName());
+        if (appl != null)   {
+            this.setApplication(appl.value);
+        }
         // sets the installation date depending on the properties
         final Property installationDate = this.propertiesMap.get(AdminPropertyDef.INSTALLEDDATE.getPropName());
         if (installationDate != null)   {
             this.setInstallationDate(installationDate.value);
+        }
+        // sets the installer depending on the properties
+        final Property installer = this.propertiesMap.get(AdminPropertyDef.INSTALLER.getPropName());
+        if (installer != null)   {
+            this.setInstaller(installer.value);
         }
         // sets the version depending on the properties
         final Property version = this.propertiesMap.get(AdminPropertyDef.VERSION.getPropName());
@@ -349,7 +359,8 @@ public abstract class AbstractAdminObject_mxJPO
                 .append("mod ").append(this.getInfoAnno().adminType().getMxName())
                 .append(" \"").append(this.getName()).append("\" ")
                 .append(this.getInfoAnno().adminType().getMxSuffix())
-                .append(" add property version value \"").append(_tclVariables.get("VERSION")).append('\"');
+                .append(" add property \"").append(AdminPropertyDef.VERSION.getPropName()).append("\" ")
+                .append("value \"").append(_tclVariables.get(AdminPropertyDef.VERSION.name())).append('\"');
         // define file date property
         postMQLCode.append(" add property \"").append(AdminPropertyDef.FILEDATE.getPropName()).append("\" ")
                 .append("value \"").append(_tclVariables.get(AdminPropertyDef.FILEDATE.name())).append('\"');
@@ -360,7 +371,7 @@ public abstract class AbstractAdminObject_mxJPO
                     .append("value \"").append(format.format(new Date())).append('\"');
         }
         // is installer property defined?
-        if (!this.propertiesMap.containsKey(AdminPropertyDef.INSTALLER.getPropName()))  {
+        if ((this.getInstaller() == null) || "".equals(this.getInstaller()))  {
             postMQLCode.append(" add property \"").append(AdminPropertyDef.INSTALLER.getPropName()).append("\" ")
                     .append("value \"").append(AdminPropertyDef.INSTALLER.getValue()).append('\"');
         }
@@ -370,8 +381,7 @@ public abstract class AbstractAdminObject_mxJPO
                     .append("value \"").append(this.getName()).append('\"');
         }
         // exists no application property or application property not equal?
-        final Property applProp = this.propertiesMap.get(AdminPropertyDef.APPLICATION.getPropName());
-        if ((applProp == null) || (applProp.value == null) || !applProp.value.equals(AdminPropertyDef.APPLICATION.getValue()))  {
+        if ((this.getApplication() == null) || !AdminPropertyDef.APPLICATION.getValue().equals(this.getApplication()))  {
             postMQLCode.append(" add property \"").append(AdminPropertyDef.APPLICATION.getPropName()).append("\" ")
                     .append("value \"").append(AdminPropertyDef.APPLICATION.getValue()).append('\"');
         }
