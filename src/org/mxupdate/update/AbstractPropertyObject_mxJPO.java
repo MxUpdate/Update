@@ -518,14 +518,19 @@ System.out.println("ERROR! Symbolic name does not start correctly! So '" + symbN
 
         // execute update
         boolean commit = false;
+        boolean transActive = _context.isTransactionActive();
         try  {
-//            _context.start(true);
+            if (!transActive)  {
+                _context.start(true);
+            }
             execMql(_context, cmd);
-//            _context.commit();
+            if (!transActive)  {
+                _context.commit();
+            }
             commit = true;
         } finally  {
-            if (!commit)  {
-//                _context.abort();
+            if (!commit && !transActive)  {
+                _context.abort();
             }
         }
     }
