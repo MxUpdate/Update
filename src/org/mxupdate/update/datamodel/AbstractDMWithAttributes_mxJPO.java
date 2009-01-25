@@ -55,6 +55,10 @@ public abstract class AbstractDMWithAttributes_mxJPO
      *
      */
     public static final Set<String> IGNORE_TYPE_ATTRIBUTES = new HashSet<String>();
+    /**
+    *
+    */
+   public static final Set<String> IGNORE_RELATIONSHIP_ATTRIBUTES = new HashSet<String>();
 
     /**
      * Defines the serialize version unique identifier.
@@ -201,6 +205,8 @@ final Set<String> ignoreAttrs = new HashSet<String>();
                 name = _args[++idx];
                 if ("-type".equals(arg))  {
                     ignoreAttrs.addAll(IGNORE_TYPE_ATTRIBUTES);
+                } else if ("-relationship".equals(arg))  {
+                    ignoreAttrs.addAll(IGNORE_RELATIONSHIP_ATTRIBUTES);
                 }
             } else if ("-attributes".equals(arg))  {
                 attrStr = _args[++idx];

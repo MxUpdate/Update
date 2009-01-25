@@ -160,6 +160,10 @@ public class MxUpdate_mxJPO
                                 + "within the test attributes of types.",
                           Arrays.asList(new String[]{"--ignoretypeattributes"}),
                           "MATCH");
+        appendDescription("Pattern defining the match of attributes which are ignored "
+                                + "within the test attributes of relationships.",
+                          Arrays.asList(new String[]{"--ignorerelationshipattributes"}),
+                          "MATCH");
 
         appendDescription("Defines the name of application which is defined as property"
                                 + " / attribute on administration objects. The value of"
@@ -547,6 +551,7 @@ public class MxUpdate_mxJPO
         Mapping_mxJPO.init(_context);
 
         Type_mxJPO.IGNORE_TYPE_ATTRIBUTES.clear();
+        Relationship_mxJPO.IGNORE_RELATIONSHIP_ATTRIBUTES.clear();
 
         try {
             // to be sure....
@@ -597,6 +602,9 @@ final Set<String> paths = new TreeSet<String>();
             } else if ("--author".equals(_args[idx]))  {
                 idx++;
                 Mapping_mxJPO.defineAuthor(_args[idx]);
+            } else if ("--ignorerelationshipattributes".equals(_args[idx]))  {
+                idx++;
+                Relationship_mxJPO.IGNORE_RELATIONSHIP_ATTRIBUTES.add(_args[idx]);
             } else if ("--ignoretypeattributes".equals(_args[idx]))  {
                 idx++;
                 Type_mxJPO.IGNORE_TYPE_ATTRIBUTES.add(_args[idx]);
