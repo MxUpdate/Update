@@ -345,7 +345,7 @@ public enum TypeDef_mxJPO
         }
 
         if (key.equals(TypeDefValues.PREFIX_BUS_IGNOREATTRIBUTES))  {
-            value.paramList = Arrays.asList(_value.split(","));
+            value.busIgnoredAttributes = Arrays.asList(_value.split(","));
         } else if (key.equals(TypeDefValues.PREFIX_BUS_POLICY))  {
             value.busPolicy = _value;
         } else if (key.equals(TypeDefValues.PREFIX_BUS_TYPE))  {
