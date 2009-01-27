@@ -37,6 +37,7 @@ import org.mxupdate.update.datamodel.Rule_mxJPO;
 import org.mxupdate.update.datamodel.TriggerGroup_mxJPO;
 import org.mxupdate.update.datamodel.Trigger_mxJPO;
 import org.mxupdate.update.datamodel.Type_mxJPO;
+import org.mxupdate.update.integration.IEFGlobalConfig_mxJPO;
 import org.mxupdate.update.program.JPO_mxJPO;
 import org.mxupdate.update.program.Program_mxJPO;
 import org.mxupdate.update.user.Association_mxJPO;
@@ -97,6 +98,9 @@ public enum TypeDef_mxJPO
 
     /** Data model type. */
     Type("type", "", Type_mxJPO.class),
+
+    /** Integration IEF global configuration object */
+    IEFGlobalConfig(null, null, IEFGlobalConfig_mxJPO.class),
 
     /** Program JPO. */
     JPO("program", "", JPO_mxJPO.class),
@@ -166,25 +170,32 @@ public enum TypeDef_mxJPO
         private static final String PREFIX_BUS_IGNOREATTRIBUTES = "BusIgnoreAttributes";
 
         /**
+         * Used prefix of check exists definitions within the property file.
+         *
+         * @see TypeDef_mxJPO#defineTypeDefValue(String, String)
+         */
+        private static final String PREFIX_BUS_CHECKEXISTS = "BusCheckExists";
+
+        /**
          * Used prefix of policy definitions within the property file.
          *
          * @see TypeDef_mxJPO#defineTypeDefValue(String, String)
          */
-        private static final String PREFIX_BUS_POLICY = "Policy";
+        private static final String PREFIX_BUS_POLICY = "BusPolicy";
 
         /**
          * Used prefix of type definitions within the property file.
          *
          * @see TypeDef_mxJPO#defineTypeDefValue(String, String)
          */
-        private static final String PREFIX_BUS_TYPE = "Type";
+        private static final String PREFIX_BUS_TYPE = "BusType";
 
         /**
          * Used prefix of vault definitions within the property file.
          *
          * @see TypeDef_mxJPO#defineTypeDefValue(String, String)
          */
-        private static final String PREFIX_BUS_VAULT = "Vault";
+        private static final String PREFIX_BUS_VAULT = "BusVault";
 
         /**
          * Used prefix of type definitions within the property file.
@@ -237,10 +248,19 @@ public enum TypeDef_mxJPO
         private static final String PREFIX_PARAM_LIST = "ParameterList";
 
         /**
+         * Must be checked if the business type exists?
+         *
+         * @see TypeDef_mxJPO#isBusCheckExists
+         * @see TypeDef_mxJPO#defineTypeDefValue(String, String)
+         */
+        private boolean busCheckExists = false;
+
+        /**
          * Defines the list of attributes which are automatically ignored
          * within the update.
          *
          * @see TypeDef_mxJPO#getMxBusIgnoredAttributes()
+         * @see TypeDef_mxJPO#defineTypeDefValue(String, String)
          */
         private Collection<String> busIgnoredAttributes;
 
@@ -249,6 +269,7 @@ public enum TypeDef_mxJPO
          * names.
          *
          * @see TypeDef_mxJPO#getMxBusPolicy()
+         * @see TypeDef_mxJPO#defineTypeDefValue(String, String)
          */
         private String busPolicy;
 
@@ -257,6 +278,7 @@ public enum TypeDef_mxJPO
          * names.
          *
          * @see TypeDef_mxJPO#getMxBusType()
+         * @see TypeDef_mxJPO#defineTypeDefValue(String, String)
          */
         private String busType;
 
@@ -265,6 +287,7 @@ public enum TypeDef_mxJPO
          * names.
          *
          * @see TypeDef_mxJPO#getMxBusVault()
+         * @see TypeDef_mxJPO#defineTypeDefValue(String, String)
          */
         private String busVault;
 
@@ -272,6 +295,7 @@ public enum TypeDef_mxJPO
          * Mapping between internal used type definitions and the file paths.
          *
          * @see TypeDef_mxJPO#getFilePath()
+         * @see TypeDef_mxJPO#defineTypeDefValue(String, String)
          */
         private String filePath;
 
@@ -280,6 +304,7 @@ public enum TypeDef_mxJPO
          * file prefixes.
          *
          * @see TypeDef_mxJPO#getFilePrefix()
+         * @see TypeDef_mxJPO#defineTypeDefValue(String, String)
          */
         private String filePrefix;
 
@@ -288,6 +313,7 @@ public enum TypeDef_mxJPO
          * file suffixes.
          *
          * @see TypeDef_mxJPO#getFileSuffix()
+         * @see TypeDef_mxJPO#defineTypeDefValue(String, String)
          */
         private String fileSuffix;
 
@@ -296,6 +322,7 @@ public enum TypeDef_mxJPO
          * logging string.
          *
          * @see TypeDef_mxJPO#getLogging()
+         * @see TypeDef_mxJPO#defineTypeDefValue(String, String)
          */
         private String textLogging;
 
@@ -304,6 +331,7 @@ public enum TypeDef_mxJPO
          * titles.
          *
          * @see TypeDef_mxJPO#getTitle()
+         * @see TypeDef_mxJPO#defineTypeDefValue(String, String)
          */
         private String textTitle;
 
@@ -311,6 +339,7 @@ public enum TypeDef_mxJPO
          * Defines the parameter description.
          *
          * @see TypeDef_mxJPO#getParameterDesc()
+         * @see TypeDef_mxJPO#defineTypeDefValue(String, String)
          */
         private String paramDesc;
 
@@ -318,6 +347,7 @@ public enum TypeDef_mxJPO
          * Defines the list of parameters.
          *
          * @see TypeDef_mxJPO#getParameters()
+         * @see TypeDef_mxJPO#defineTypeDefValue(String, String)
          */
         private Collection<String> paramList;
     }
@@ -345,7 +375,9 @@ public enum TypeDef_mxJPO
             TypeDefValues.VALUES.put(typeDef, value);
         }
 
-        if (key.equals(TypeDefValues.PREFIX_BUS_IGNOREATTRIBUTES))  {
+        if (key.equals(TypeDefValues.PREFIX_BUS_CHECKEXISTS))  {
+            value.busCheckExists = _value.equalsIgnoreCase("true");
+        } else if (key.equals(TypeDefValues.PREFIX_BUS_IGNOREATTRIBUTES))  {
             value.busIgnoredAttributes = Arrays.asList(_value.split(","));
         } else if (key.equals(TypeDefValues.PREFIX_BUS_POLICY))  {
             value.busPolicy = _value;
@@ -443,6 +475,19 @@ public enum TypeDef_mxJPO
     public String getMxAdminSuffix()
     {
         return this.mxSuffix;
+    }
+
+    /**
+     * Must be checked if the business type exists? The method returns only
+     * correct values if the initialize method was called!
+     *
+     * @return <i>true</i> if a check must be done if the type exists;
+     *         otherwise <i>false</i>
+     * @see TypeDefValues#busCheckExists
+     */
+    public boolean isBusCheckExists()
+    {
+        return TypeDefValues.VALUES.get(this).busCheckExists;
     }
 
     /**

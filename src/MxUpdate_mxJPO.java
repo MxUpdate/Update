@@ -32,6 +32,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import matrix.db.Context;
+import matrix.util.MatrixException;
 
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.datamodel.Relationship_mxJPO;
@@ -42,6 +43,7 @@ import org.mxupdate.util.TypeDef_mxJPO;
 import org.mxupdate.util.Mapping_mxJPO.AdminPropertyDef;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
+import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
  * <table>
@@ -136,7 +138,8 @@ public class MxUpdate_mxJPO
      */
     private final Map<String,UpdateCheck> PARAM_VERSION = new HashMap<String,UpdateCheck>();
 
-    private void prepareParams()
+    private void prepareParams(final Context _context)
+            throws MatrixException
     {
         this.DESCRIPTION.clear();
         this.PARAM_MODE.clear();
@@ -232,17 +235,22 @@ public class MxUpdate_mxJPO
                         null,
                         "Export / Import of data model administrational objects.",
                         Arrays.asList(new String[]{"d", "dm", "datamodel"}));
-        defineParameter(dm, TypeDef_mxJPO.Attribute);
-        defineParameter(dm, TypeDef_mxJPO.Expression);
-        defineParameter(dm, TypeDef_mxJPO.Format);
-        defineParameter(dm, TypeDef_mxJPO.NumberGenerator);
-        defineParameter(dm, TypeDef_mxJPO.ObjectGenerator);
-        defineParameter(dm, TypeDef_mxJPO.Policy);
-        defineParameter(dm, TypeDef_mxJPO.Relationship);
-        defineParameter(dm, TypeDef_mxJPO.Rule);
-        defineParameter(dm, TypeDef_mxJPO.Trigger);
-        defineParameter(dm, TypeDef_mxJPO.TriggerGroup);
-        defineParameter(dm, TypeDef_mxJPO.Type);
+        defineParameter(_context, dm, TypeDef_mxJPO.Attribute);
+        defineParameter(_context, dm, TypeDef_mxJPO.Expression);
+        defineParameter(_context, dm, TypeDef_mxJPO.Format);
+        defineParameter(_context, dm, TypeDef_mxJPO.NumberGenerator);
+        defineParameter(_context, dm, TypeDef_mxJPO.ObjectGenerator);
+        defineParameter(_context, dm, TypeDef_mxJPO.Policy);
+        defineParameter(_context, dm, TypeDef_mxJPO.Relationship);
+        defineParameter(_context, dm, TypeDef_mxJPO.Rule);
+        defineParameter(_context, dm, TypeDef_mxJPO.Trigger);
+        defineParameter(_context, dm, TypeDef_mxJPO.TriggerGroup);
+        defineParameter(_context, dm, TypeDef_mxJPO.Type);
+
+        ////////////////////////////////////////////////////////////////////////
+        // integration
+
+        defineParameter(_context, null, TypeDef_mxJPO.IEFGlobalConfig);
 
         ////////////////////////////////////////////////////////////////////////
         // user
@@ -252,16 +260,16 @@ public class MxUpdate_mxJPO
                         null,
                         "Export / Import of user administrational objects.",
                         Arrays.asList(new String[]{"user"}));
-        defineParameter(user, TypeDef_mxJPO.Association);
-        defineParameter(user, TypeDef_mxJPO.Group);
-        defineParameter(user, TypeDef_mxJPO.Person);
-        defineParameter(user, TypeDef_mxJPO.Role);
+        defineParameter(_context, user, TypeDef_mxJPO.Association);
+        defineParameter(_context, user, TypeDef_mxJPO.Group);
+        defineParameter(_context, user, TypeDef_mxJPO.Person);
+        defineParameter(_context, user, TypeDef_mxJPO.Role);
 
         ////////////////////////////////////////////////////////////////////////
         // program
 
-        defineParameter(null, TypeDef_mxJPO.JPO);
-        defineParameter(null, TypeDef_mxJPO.Program);
+        defineParameter(_context, null, TypeDef_mxJPO.JPO);
+        defineParameter(_context, null, TypeDef_mxJPO.Program);
 
         ////////////////////////////////////////////////////////////////////////
         // user interface
@@ -271,13 +279,13 @@ public class MxUpdate_mxJPO
                         null,
                         "Export / Import of user interface administrational objects.",
                         Arrays.asList(new String[]{"ui", "userinterface"}));
-        defineParameter(ui, TypeDef_mxJPO.Channel);
-        defineParameter(ui, TypeDef_mxJPO.Command);
-        defineParameter(ui, TypeDef_mxJPO.Form);
-        defineParameter(ui, TypeDef_mxJPO.Inquiry);
-        defineParameter(ui, TypeDef_mxJPO.Menu);
-        defineParameter(ui, TypeDef_mxJPO.Portal);
-        defineParameter(ui, TypeDef_mxJPO.Table);
+        defineParameter(_context, ui, TypeDef_mxJPO.Channel);
+        defineParameter(_context, ui, TypeDef_mxJPO.Command);
+        defineParameter(_context, ui, TypeDef_mxJPO.Form);
+        defineParameter(_context, ui, TypeDef_mxJPO.Inquiry);
+        defineParameter(_context, ui, TypeDef_mxJPO.Menu);
+        defineParameter(_context, ui, TypeDef_mxJPO.Portal);
+        defineParameter(_context, ui, TypeDef_mxJPO.Table);
     }
 
     /**
@@ -330,13 +338,23 @@ public class MxUpdate_mxJPO
         appendDescription(_description, allParamStrings, "MATCH");
     }
 
-    private void defineParameter(final Collection<TypeDef_mxJPO> _paramsList,
-                                 final TypeDef_mxJPO _clazz)
+    private void defineParameter(final Context _context,
+                                 final Collection<TypeDef_mxJPO> _paramsList,
+                                 final TypeDef_mxJPO _typeDef)
+            throws MatrixException
     {
-        this.defineParameter(_paramsList,
-                             _clazz,
-                             _clazz.getParameterDesc(),
-                             _clazz.getParameters());
+        boolean exists = true;
+        if (_typeDef.isBusCheckExists())  {
+            final String tmp = execMql(_context,
+                                       new StringBuilder().append("list type '").append(_typeDef.getMxBusType()).append("'"));
+            exists = (tmp.length() > 0);
+        }
+        if (exists)  {
+            this.defineParameter(_paramsList,
+                                 _typeDef,
+                                 _typeDef.getParameterDesc(),
+                                 _typeDef.getParameters());
+        }
     }
 
     /**
@@ -479,7 +497,7 @@ public class MxUpdate_mxJPO
         // initialize mapping
         Mapping_mxJPO.init(_context);
 
-        this.prepareParams();
+        this.prepareParams(_context);
 
         Type_mxJPO.IGNORE_TYPE_ATTRIBUTES.clear();
         Relationship_mxJPO.IGNORE_RELATIONSHIP_ATTRIBUTES.clear();
