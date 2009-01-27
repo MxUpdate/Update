@@ -39,6 +39,7 @@ import org.mxupdate.update.datamodel.Trigger_mxJPO;
 import org.mxupdate.update.datamodel.Type_mxJPO;
 import org.mxupdate.update.program.JPO_mxJPO;
 import org.mxupdate.update.program.Program_mxJPO;
+import org.mxupdate.update.user.Association_mxJPO;
 import org.mxupdate.update.user.Group_mxJPO;
 import org.mxupdate.update.user.Person_mxJPO;
 import org.mxupdate.update.user.Role_mxJPO;
@@ -104,7 +105,7 @@ public enum TypeDef_mxJPO
     Program("program", "", Program_mxJPO.class),
 
     /** User association. */
-    Association("association", "", null),
+    Association("association", "", Association_mxJPO.class),
 
     /** User group. */
     Group("group", "", Group_mxJPO.class),
