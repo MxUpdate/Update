@@ -34,10 +34,8 @@ import java.util.TreeMap;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
-import org.mxupdate.update.util.InfoAnno_mxJPO;
+import org.mxupdate.util.TypeDef_mxJPO;
 import org.mxupdate.util.Mapping_mxJPO.AdminPropertyDef;
-import org.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
-import org.mxupdate.util.Mapping_mxJPO.TypeDef;
 import org.xml.sax.SAXException;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
@@ -80,38 +78,14 @@ public abstract class AbstractObject_mxJPO
     }
 
     /**
-     * Evaluates for this instance of export / import class the related
-     * information annotations and returns that. If the information annotation
-     * does not exists directly in the class, the information annotation is
-     * searched in the super classes.
-     *
-     * @return instance of the related information annotation
-     */
-    public final InfoAnno_mxJPO getInfoAnno()
-    {
-        InfoAnno_mxJPO ret = this.getClass().getAnnotation(InfoAnno_mxJPO.class);
-        if (ret == null)  {
-            Class<?> clazz = this.getClass().getSuperclass();
-            while ((clazz != null) && (ret == null))  {
-                ret = clazz.getAnnotation(InfoAnno_mxJPO.class);
-                clazz = clazz.getSuperclass();
-            }
-        }
-        return ret;
-    }
-
-    /**
      * Returns the type definition instance.
      *
      * @return type definition instance (if administration type definition
      *         exists else business type definition)
      */
-    public final TypeDef getTypeDef()
+    public final TypeDef_mxJPO getTypeDef()
     {
-        final InfoAnno_mxJPO infoAnno = this.getInfoAnno();
-        return (infoAnno.adminType() != AdminTypeDef.Undef)
-               ? infoAnno.adminType()
-               : infoAnno.busType();
+        return TypeDef_mxJPO.valueOf(this);
     }
 
     /**
@@ -165,14 +139,14 @@ public abstract class AbstractObject_mxJPO
         final Map<File,String> ret = new TreeMap<File,String>();
 
         final String suffix = this.getTypeDef().getFileSuffix();
-        final int suffixLength = suffix.length();
+        final int suffixLength = (suffix != null) ? suffix.length() : 0;
         final String prefix = this.getTypeDef().getFilePrefix();
         final int prefixLength = (prefix != null) ? prefix.length() : 0;
 
         for (final File file : _files)  {
             final String fileName = file.getName();
             for (final String match : _matches)  {
-                if (((prefix == null) || fileName.startsWith(prefix)) && fileName.endsWith(suffix))  {
+                if (((prefix == null) || fileName.startsWith(prefix)) && ((suffix == null) || fileName.endsWith(suffix)))  {
                     final String name = fileName.substring(0, fileName.length() - suffixLength)
                                                 .substring(prefixLength);
                     if (match(name, match))  {
@@ -293,11 +267,11 @@ public abstract class AbstractObject_mxJPO
     {
         final String curVersion;
         // check for existing administration type...
-        if (this.getInfoAnno().adminType() != AdminTypeDef.Undef)  {
+        if (this.getTypeDef().getMxAdminName() != null)  {
             final String tmp = execMql(_context, new StringBuilder()
-                    .append("print ").append(this.getInfoAnno().adminType().getMxName())
+                    .append("print ").append(this.getTypeDef().getMxAdminName())
                     .append(" \"").append(_name).append("\" ")
-                    .append(this.getInfoAnno().adminType().getMxSuffix())
+                    .append(this.getTypeDef().getMxAdminSuffix())
                     .append(" select property[version] dump"));
             curVersion = (tmp.length() >= 14)
                          ? tmp.substring(14)
@@ -307,7 +281,7 @@ public abstract class AbstractObject_mxJPO
             final String[] nameRev = _name.split("________");
             curVersion = execMql(_context, new StringBuilder()
                     .append("print bus \"")
-                    .append(this.getInfoAnno().busType().getMxName())
+                    .append(this.getTypeDef().getMxBusType())
                     .append("\" \"").append(nameRev[0])
                     .append("\" \"").append((nameRev.length > 1) ? nameRev[1] : "")
                     .append("\" select attribute[").append(AdminPropertyDef.VERSION.getAttrName()).append("] dump"));

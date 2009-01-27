@@ -80,9 +80,9 @@ public abstract class AbstractAdminObject_mxJPO
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("list ")
-                .append(this.getInfoAnno().adminType().getMxName())
+                .append(this.getTypeDef().getMxAdminName())
                 .append(" ")
-                .append(this.getInfoAnno().adminType().getMxSuffix());
+                .append(this.getTypeDef().getMxAdminSuffix());
         final Set<String> ret = new TreeSet<String>();
         for (final String name : execMql(_context, cmd).split("\n"))  {
             for (final String match : _matches)  {
@@ -97,7 +97,7 @@ public abstract class AbstractAdminObject_mxJPO
     @Override
     protected String getExportMQL()
     {
-        return "export " + this.getInfoAnno().adminType().getMxName() + " \"" + this.getName() + "\" xml";
+        return "export " + this.getTypeDef().getMxAdminName() + " \"" + this.getName() + "\" xml";
     }
 
     @Override
@@ -194,9 +194,9 @@ public abstract class AbstractAdminObject_mxJPO
         // reads symbolic names of the administration objects
         final StringBuilder cmd = new StringBuilder()
                 .append("list property on program eServiceSchemaVariableMapping.tcl to ")
-                    .append(this.getInfoAnno().adminType().getMxName())
+                    .append(this.getTypeDef().getMxAdminName())
                     .append(" \"").append(this.getName()).append("\" ")
-                    .append(this.getInfoAnno().adminType().getMxSuffix());
+                    .append(this.getTypeDef().getMxAdminSuffix());
         for (final String symbName : execMql(_context, cmd).split("\n"))  {
             if (!"".equals(symbName))  {
                 this.symbolicNames.add(symbName.substring(0, symbName.indexOf(' ')));
@@ -210,10 +210,10 @@ public abstract class AbstractAdminObject_mxJPO
         {
             writeHeader(_out);
             _out.append("mql mod ")
-                .append(this.getInfoAnno().adminType().getMxName())
+                .append(this.getTypeDef().getMxAdminName())
                 .append(" \"${NAME}\"");
-            if (!"".equals(this.getInfoAnno().adminType().getMxSuffix()))  {
-                _out.append(" ").append(this.getInfoAnno().adminType().getMxSuffix());
+            if (!"".equals(this.getTypeDef().getMxAdminSuffix()))  {
+                _out.append(" ").append(this.getTypeDef().getMxAdminSuffix());
             }
             _out.append(" \\\n    description \"").append(convertTcl(getDescription())).append("\"");
             writeObject(_out);
@@ -235,10 +235,10 @@ public abstract class AbstractAdminObject_mxJPO
             if ((AdminPropertyDef.getEnumByPropName(prop.name) == null) && !prop.name.startsWith("%"))  {
                 _out.append("\nmql add property \"").append(convertTcl(prop.name)).append("\"")
                     .append(" \\\n    on ")
-                    .append(this.getInfoAnno().adminType().getMxName())
+                    .append(this.getTypeDef().getMxAdminName())
                     .append(" \"${NAME}\"");
-                if (!"".equals(this.getInfoAnno().adminType().getMxSuffix()))  {
-                    _out.append(' ').append(this.getInfoAnno().adminType().getMxSuffix());
+                if (!"".equals(this.getTypeDef().getMxAdminSuffix()))  {
+                    _out.append(' ').append(this.getTypeDef().getMxAdminSuffix());
                 }
                 if ((prop.refAdminName) != null && (prop.refAdminType != null))  {
                     _out.append("  \\\n    to ").append(prop.refAdminType)
@@ -264,9 +264,9 @@ public abstract class AbstractAdminObject_mxJPO
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
-                .append("delete ").append(this.getInfoAnno().adminType().getMxName())
+                .append("delete ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(_name).append("\" ")
-                .append(this.getInfoAnno().adminType().getMxSuffix());
+                .append(this.getTypeDef().getMxAdminSuffix());
         execMql(_context, cmd);
     }
 
@@ -285,9 +285,9 @@ public abstract class AbstractAdminObject_mxJPO
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
-                .append("add ").append(this.getInfoAnno().adminType().getMxName())
+                .append("add ").append(this.getTypeDef().getMxAdminName())
                         .append(" \"").append(_name).append("\" ")
-                        .append(this.getInfoAnno().adminType().getMxSuffix()).append(";");
+                        .append(this.getTypeDef().getMxAdminSuffix()).append(";");
         execMql(_context, cmd);
     }
 
@@ -335,9 +335,9 @@ public abstract class AbstractAdminObject_mxJPO
     {
         // remove all properties
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getInfoAnno().adminType().getMxName())
+                .append("mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append("\" ")
-                .append(this.getInfoAnno().adminType().getMxSuffix());
+                .append(this.getTypeDef().getMxAdminSuffix());
         for (final Property prop : this.propertiesMap.values())  {
             // % must be ignored because this means settings
             if ((AdminPropertyDef.getEnumByPropName(prop.name) == null) && !prop.name.startsWith("%"))  {
@@ -356,9 +356,9 @@ public abstract class AbstractAdminObject_mxJPO
         // define version property
         final StringBuilder postMQLCode = new StringBuilder()
                 .append(_postMQLCode)
-                .append("mod ").append(this.getInfoAnno().adminType().getMxName())
+                .append("mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append("\" ")
-                .append(this.getInfoAnno().adminType().getMxSuffix())
+                .append(this.getTypeDef().getMxAdminSuffix())
                 .append(" add property \"").append(AdminPropertyDef.VERSION.getPropName()).append("\" ")
                 .append("value \"").append(_tclVariables.get(AdminPropertyDef.VERSION.name())).append('\"');
         // define file date property
@@ -399,9 +399,9 @@ public abstract class AbstractAdminObject_mxJPO
 System.out.println("    - register symbolic name '" + symbName + "'");
             postMQLCode.append("add property \"").append(symbName).append("\" ")
                     .append(" on program eServiceSchemaVariableMapping.tcl to ")
-                    .append(this.getInfoAnno().adminType().getMxName())
+                    .append(this.getTypeDef().getMxAdminName())
                     .append(" \"").append(this.getName()).append("\" ")
-                    .append(this.getInfoAnno().adminType().getMxSuffix())
+                    .append(this.getTypeDef().getMxAdminSuffix())
                     .append(";\n");
         }
         for (final String exSymbName : this.symbolicNames)  {
@@ -409,9 +409,9 @@ System.out.println("    - register symbolic name '" + symbName + "'");
 System.out.println("    - remove symbolic name '" + exSymbName + "'");
                 postMQLCode.append("delete property \"").append(symbName).append("\" ")
                         .append(" on program eServiceSchemaVariableMapping.tcl to ")
-                        .append(this.getInfoAnno().adminType().getMxName())
+                        .append(this.getTypeDef().getMxAdminName())
                         .append(" \"").append(this.getName()).append("\" ")
-                        .append(this.getInfoAnno().adminType().getMxSuffix())
+                        .append(this.getTypeDef().getMxAdminSuffix())
                         .append(";\n");
             }
         }

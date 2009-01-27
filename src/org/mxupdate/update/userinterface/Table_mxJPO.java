@@ -29,15 +29,12 @@ import java.util.Stack;
 import matrix.db.Context;
 
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.util.InfoAnno_mxJPO;
-import org.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 /**
  *
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.Table)
 public class Table_mxJPO
         extends AbstractAdminObject_mxJPO
 {
@@ -108,9 +105,9 @@ public class Table_mxJPO
     {
         // set to not hidden
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getInfoAnno().adminType().getMxName())
+                .append("mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append('\"')
-                .append(' ').append(this.getInfoAnno().adminType().getMxSuffix())
+                .append(' ').append(this.getTypeDef().getMxAdminSuffix())
                 .append(" !hidden");
 
         // remove all columns

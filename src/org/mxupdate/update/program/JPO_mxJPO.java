@@ -32,9 +32,7 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.update.AbstractObject_mxJPO;
-import org.mxupdate.update.util.InfoAnno_mxJPO;
 import org.mxupdate.util.Mapping_mxJPO.AdminPropertyDef;
-import org.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 import org.xml.sax.SAXException;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
@@ -44,7 +42,6 @@ import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.JPO)
 public class JPO_mxJPO
         extends AbstractObject_mxJPO
 {
@@ -166,9 +163,9 @@ public class JPO_mxJPO
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
-                .append("delete ").append(this.getInfoAnno().adminType().getMxName())
+                .append("delete ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(_name).append("\" ")
-                .append(this.getInfoAnno().adminType().getMxSuffix());
+                .append(this.getTypeDef().getMxAdminSuffix());
         execMql(_context, cmd);
     }
 
@@ -187,7 +184,7 @@ public class JPO_mxJPO
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
-                .append("add ").append(this.getInfoAnno().adminType().getMxName())
+                .append("add ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(_name).append("\" java");
         execMql(_context, cmd);
     }

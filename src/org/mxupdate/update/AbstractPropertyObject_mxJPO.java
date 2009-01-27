@@ -36,7 +36,6 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.util.Mapping_mxJPO.AdminPropertyDef;
-import org.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -370,9 +369,9 @@ public abstract class AbstractPropertyObject_mxJPO
             .append("# ").append(getName()).append("\n")
             .append("#\n");
         // symbolic name only if an administration type is defined
-        if (this.getInfoAnno().adminType() != AdminTypeDef.Undef)  {
+        if (this.getTypeDef().getMxAdminName() != null)  {
             _out.append(HEADER_SYMBOLIC_NAME)
-.append(' ').append(this.getInfoAnno().adminType().getMxName()).append("_").append(this.getName()).append("\n")
+.append(' ').append(this.getTypeDef().getMxAdminName()).append("_").append(this.getName()).append("\n")
                 .append("#\n");
         }
         _out.append("# DESCRIPTION:\n")
@@ -498,9 +497,9 @@ public abstract class AbstractPropertyObject_mxJPO
     protected void defineSymbolicName(final Map<String,String> _tclVariables,
                                       final StringBuilder _code)
     {
-        if (this.getInfoAnno().adminType() != AdminTypeDef.Undef)  {
+        if (this.getTypeDef().getMxAdminName() != null)  {
             final int start = _code.indexOf(HEADER_SYMBOLIC_NAME) + LENGTH_HEADER_SYMBOLIC_NAME;
-            String symbName = new StringBuilder().append(this.getInfoAnno().adminType().getMxName())
+            String symbName = new StringBuilder().append(this.getTypeDef().getMxAdminName())
                                                  .append("_").append(this.getName().replaceAll(" ", ""))
                                                  .toString();
             if ((start > LENGTH_HEADER_SYMBOLIC_NAME) && (_code.charAt(start) == ' '))  {
@@ -508,7 +507,7 @@ public abstract class AbstractPropertyObject_mxJPO
                 if (end > 0)  {
                     final String tmp = _code.substring(start, end).trim();
                     if (!"".equals(tmp))  {
-                        if (tmp.startsWith(this.getInfoAnno().adminType().getMxName()))  {
+                        if (tmp.startsWith(this.getTypeDef().getMxAdminName()))  {
                             symbName = tmp;
                         } else  {
 System.out.println("ERROR! Symbolic name does not start correctly! So '" + symbName + "' will be used (instead of '" + tmp + "')");

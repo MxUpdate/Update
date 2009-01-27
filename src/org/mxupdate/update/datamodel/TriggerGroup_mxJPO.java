@@ -37,15 +37,12 @@ import matrix.util.StringList;
 
 import org.mxupdate.update.AbstractBusObject_mxJPO;
 import org.mxupdate.update.util.BusObject_mxJPO;
-import org.mxupdate.update.util.InfoAnno_mxJPO;
-import org.mxupdate.util.Mapping_mxJPO.BusTypeDef;
 import org.mxupdate.util.Mapping_mxJPO.RelationDef;
 
 /**
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(busType = BusTypeDef.TriggerGroup)
 public class TriggerGroup_mxJPO
         extends AbstractBusObject_mxJPO
 {

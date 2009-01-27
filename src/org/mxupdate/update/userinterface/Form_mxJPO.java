@@ -29,8 +29,6 @@ import java.util.Stack;
 import matrix.db.Context;
 
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.util.InfoAnno_mxJPO;
-import org.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
@@ -40,7 +38,6 @@ import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.Form)
 public class Form_mxJPO
         extends AbstractAdminObject_mxJPO
 {
@@ -142,7 +139,7 @@ public class Form_mxJPO
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
-                .append("add ").append(this.getInfoAnno().adminType().getMxName())
+                .append("add ").append(this.getTypeDef().getMxAdminName())
                         .append(" \"").append(_name).append("\" web;");
         execMql(_context, cmd);
     }
@@ -183,7 +180,7 @@ public class Form_mxJPO
     {
         // reset HRef, description, alt and label
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getInfoAnno().adminType().getMxName())
+                .append("mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append('\"')
                 .append(" !hidden");
 

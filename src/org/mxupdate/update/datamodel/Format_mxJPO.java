@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.util.InfoAnno_mxJPO;
-import org.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
@@ -34,7 +32,6 @@ import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.Format)
 public class Format_mxJPO
         extends AbstractAdminObject_mxJPO
 {

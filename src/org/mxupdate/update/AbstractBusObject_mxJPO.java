@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -42,9 +43,8 @@ import matrix.db.Query;
 import matrix.util.MatrixException;
 import matrix.util.StringList;
 
+import org.mxupdate.util.TypeDef_mxJPO;
 import org.mxupdate.util.Mapping_mxJPO.AdminPropertyDef;
-import org.mxupdate.util.Mapping_mxJPO.AttributeDef;
-import org.mxupdate.util.Mapping_mxJPO.BusTypeDef;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
@@ -375,10 +375,10 @@ public abstract class AbstractBusObject_mxJPO
                        final String _name)
             throws Exception
     {
-        final BusTypeDef busType = this.getInfoAnno().busType();
+        final TypeDef_mxJPO typeDef = this.getTypeDef();
         final String[] nameRev = _name.split(SPLIT_NAME);
         final StringBuilder cmd = new StringBuilder()
-                .append("delete bus \"").append(busType.getMxName()).append('\"')
+                .append("delete bus \"").append(typeDef.getMxBusType()).append('\"')
                 .append(" \"").append(nameRev[0]).append("\" ")
                 .append(" \"").append((nameRev.length > 1) ? nameRev[1] : "").append("\";");
         execMql(_context, cmd);
@@ -398,13 +398,13 @@ public abstract class AbstractBusObject_mxJPO
                        final String _name)
             throws Exception
     {
-        final BusTypeDef busType = this.getInfoAnno().busType();
+        final TypeDef_mxJPO busType = this.getTypeDef();
         final String[] nameRev = _name.split(SPLIT_NAME);
-        final BusinessObject bus = new BusinessObject(busType.getMxName(),
+        final BusinessObject bus = new BusinessObject(busType.getMxBusType(),
                                                       nameRev[0],
                                                       (nameRev.length > 1) ? nameRev[1] : "",
-                                                      busType.getMxVault());
-        bus.create(_context, busType.getMxPolicy());
+                                                      busType.getMxBusVault());
+        bus.create(_context, busType.getMxBusPolicy());
     }
 
     /**
@@ -451,17 +451,12 @@ public abstract class AbstractBusObject_mxJPO
                 .append("mod bus ").append(this.busOid).append(" description \"\"");
 
         // reset all attributes (if they must not be ignored...)
-        final AttributeDef[] ignoreAttrs = this.getInfoAnno().busIgnoreAttributes();
+        final Set<String> ignoreAttrs = (this.getTypeDef().getMxBusIgnoredAttributes() == null)
+                                        ? new HashSet<String>(0)
+                                        : new HashSet<String>(this.getTypeDef().getMxBusIgnoredAttributes());
         for (final Attribute attr : this.attrValuesSorted)  {
 // TODO: use default attribute value instead of ""
-            boolean found = false;
-            for (final AttributeDef ignoreAttr : ignoreAttrs)  {
-                if (ignoreAttr.getMxName().equals(attr.name))  {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)  {
+            if (!ignoreAttrs.contains(attr.name))  {
                 preMQLCode.append(" \"").append(attr.name).append("\" \"\"");
             }
         }
@@ -526,7 +521,7 @@ public abstract class AbstractBusObject_mxJPO
      */
     protected String getBusType()
     {
-        return getInfoAnno().busType().getMxName();
+        return this.getTypeDef().getMxBusType();
     }
 
     /**

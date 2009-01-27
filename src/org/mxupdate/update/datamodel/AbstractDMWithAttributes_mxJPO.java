@@ -126,7 +126,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
     protected void writeEnd(final Writer _out)
             throws IOException
     {
-        _out.append("\n\ntestAttributes -").append(this.getInfoAnno().adminType().getMxName())
+        _out.append("\n\ntestAttributes -").append(this.getTypeDef().getMxAdminName())
             .append(" \"${NAME}\" -attributes [list \\\n");
         for (final String attr : this.attributes)  {
             _out.append("    \"").append(convertTcl(attr)).append("\" \\\n");
@@ -193,7 +193,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
             throws Exception
     {
         final String nameParam = new StringBuilder()
-                .append('-').append(getInfoAnno().adminType().getMxName()).toString();
+                .append('-').append(this.getTypeDef().getMxAdminName()).toString();
         int idx = 0;
         String name = null;
         String attrStr = null;
@@ -261,7 +261,7 @@ System.out.println("    - attribute '" + attr + "' is not defined but will be ig
 System.out.println("    - add attribute '" + attr + "'");
                 execMql(_context,
                         new StringBuilder()
-                            .append("mod ").append(getInfoAnno().adminType())
+                            .append("mod ").append(this.getTypeDef().getMxAdminName())
                             .append(" '").append(this.getName()).append('\'')
                             .append("add attribute '").append(attr).append('\''));
             }

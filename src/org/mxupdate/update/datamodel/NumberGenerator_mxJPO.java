@@ -24,9 +24,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.mxupdate.update.AbstractBusObject_mxJPO;
-import org.mxupdate.update.util.InfoAnno_mxJPO;
 import org.mxupdate.util.Mapping_mxJPO.AttributeDef;
-import org.mxupdate.util.Mapping_mxJPO.BusTypeDef;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
@@ -34,8 +32,6 @@ import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(busType = BusTypeDef.NumberGenerator,
-                busIgnoreAttributes = AttributeDef.NumberGeneratorNextNumber)
 public class NumberGenerator_mxJPO
         extends AbstractBusObject_mxJPO
 {

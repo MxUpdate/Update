@@ -210,10 +210,10 @@ eval  {
                            $asMapping(PropertyAttribute.InstalledDate) \
                            $asMapping(PropertyAttribute.Installer) \
                            $asMapping(PropertyAttribute.Version)]
-    set lsTypes      [list $asMapping(Type.NumberGenerator) \
-                           $asMapping(Type.ObjectGenerator) \
-                           $asMapping(Type.Trigger) \
-                           $asMapping(Type.TriggerGroup)]
+    set lsTypes      [list $asMapping(TypeDef.BusType.NumberGenerator) \
+                           $asMapping(TypeDef.BusType.ObjectGenerator) \
+                           $asMapping(TypeDef.BusType.Trigger) \
+                           $asMapping(TypeDef.BusType.TriggerGroup)]
 
     # create attributes
     set lsExists [split [mql list attribute [join ${lsAttributes} ","]] "\n"]
@@ -235,22 +235,22 @@ eval  {
     }
 
     # create / update trigger group type
-    if {[mql list type $asMapping(Type.TriggerGroup)] == ""}  {
-      puts "create trigger group type '$asMapping(Type.TriggerGroup)'"
-      mql add type $asMapping(Type.TriggerGroup) \
+    if {[mql list type $asMapping(TypeDef.BusType.TriggerGroup)] == ""}  {
+      puts "create trigger group type '$asMapping(TypeDef.BusType.TriggerGroup)'"
+      mql add type $asMapping(TypeDef.BusType.TriggerGroup) \
           property $asMapping(PropertyName.InstalledDate) value [clock format [clock clicks]  -gmt true -format "%m-%d-%Y"]
     } else  {
-      puts "update trigger group type '$asMapping(Type.TriggerGroup)'"
+      puts "update trigger group type '$asMapping(TypeDef.BusType.TriggerGroup)'"
     }
-    mql mod type $asMapping(Type.TriggerGroup) \
+    mql mod type $asMapping(TypeDef.BusType.TriggerGroup) \
         description "Type used to group trigger definitions." \
         icon [file join "${_sRoot}" "TriggerGroup.gif"] \
         add property $asMapping(PropertyName.Application)   value "MxUpdate" \
         add property $asMapping(PropertyName.Author)        value "The MxUpdate Team" \
         add property $asMapping(PropertyName.Installer)     value "The MxUpdate Team" \
-        add property $asMapping(PropertyName.OriginalName)  value "$asMapping(Type.TriggerGroup)" \
+        add property $asMapping(PropertyName.OriginalName)  value "$asMapping(TypeDef.BusType.TriggerGroup)" \
         add property $asMapping(PropertyName.Version)       value "${_sVersion}"
-    pRegisterObject type "$asMapping(Type.TriggerGroup)"
+    pRegisterObject type "$asMapping(TypeDef.BusType.TriggerGroup)"
 
     # update types
     foreach sOneType ${lsTypes}  {
@@ -263,24 +263,24 @@ eval  {
     }
 
     # create / update trigger group policy
-    if {[mql list policy $asMapping(Policy.TriggerGroup)] == ""}  {
-      puts "create trigger group policy '$asMapping(Policy.TriggerGroup)'"
-      mql copy policy $asMapping(Policy.Trigger) $asMapping(Policy.TriggerGroup) \
+    if {[mql list policy $asMapping(TypeDef.BusPolicy.TriggerGroup)] == ""}  {
+      puts "create trigger group policy '$asMapping(TypeDef.BusPolicy.TriggerGroup)'"
+      mql copy policy $asMapping(TypeDef.BusPolicy.Trigger) $asMapping(TypeDef.BusPolicy.TriggerGroup) \
           remove state "Inactive" \
-          remove type $asMapping(Type.Trigger) \
+          remove type $asMapping(TypeDef.BusType.Trigger) \
           add property $asMapping(PropertyName.InstalledDate) value [clock format [clock clicks]  -gmt true -format "%m-%d-%Y"]
     } else  {
-      puts "update trigger group policy '$asMapping(Policy.TriggerGroup)'"
+      puts "update trigger group policy '$asMapping(TypeDef.BusPolicy.TriggerGroup)'"
     }
-    mql mod policy $asMapping(Policy.TriggerGroup) \
+    mql mod policy $asMapping(TypeDef.BusPolicy.TriggerGroup) \
         description "Policy used to group trigger definitions." \
-        add type $asMapping(Type.TriggerGroup) \
+        add type $asMapping(TypeDef.BusType.TriggerGroup) \
         add property $asMapping(PropertyName.Application)   value "MxUpdate" \
         add property $asMapping(PropertyName.Author)        value "The MxUpdate Team" \
         add property $asMapping(PropertyName.Installer)     value "The MxUpdate Team" \
-        add property $asMapping(PropertyName.OriginalName)  value "$asMapping(Policy.TriggerGroup)" \
+        add property $asMapping(PropertyName.OriginalName)  value "$asMapping(TypeDef.BusPolicy.TriggerGroup)" \
         add property $asMapping(PropertyName.Version)       value "${_sVersion}"
-    pRegisterObject policy "$asMapping(Policy.TriggerGroup)"
+    pRegisterObject policy "$asMapping(TypeDef.BusPolicy.TriggerGroup)"
 
     # create / update trigger group relationship
     if {[mql list relationship $asMapping(Relationship.TriggerGroup)] == ""}  {
@@ -292,9 +292,9 @@ eval  {
     mql mod relationship $asMapping(Relationship.TriggerGroup) \
         description "Relationship used to group trigger definitions." \
         preventduplicates \
-        from add type $asMapping(Type.TriggerGroup) \
-        to add type $asMapping(Type.Trigger) \
-           add type $asMapping(Type.TriggerGroup) \
+        from add type $asMapping(TypeDef.BusType.TriggerGroup) \
+        to add type $asMapping(TypeDef.BusType.Trigger) \
+           add type $asMapping(TypeDef.BusType.TriggerGroup) \
         add property $asMapping(PropertyName.Application)   value "MxUpdate" \
         add property $asMapping(PropertyName.Author)        value "The MxUpdate Team" \
         add property $asMapping(PropertyName.Installer)     value "The MxUpdate Team" \

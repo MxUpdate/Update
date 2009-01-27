@@ -30,9 +30,6 @@ import java.util.TreeMap;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
-import org.mxupdate.update.util.InfoAnno_mxJPO;
-import org.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
-
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
@@ -41,7 +38,6 @@ import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.Menu)
 public class Menu_mxJPO
         extends Command_mxJPO
 {
@@ -157,7 +153,7 @@ public class Menu_mxJPO
     {
         // remove child commands / menus
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getInfoAnno().adminType().getMxName()).append(" \"").append(this.getName()).append('\"');
+                .append("mod ").append(this.getTypeDef().getMxAdminName()).append(" \"").append(this.getName()).append('\"');
         for (final MenuChild child : this.childs)  {
             preMQLCode.append(" remove ").append(child.type)
                       .append(" \"").append(child.name).append("\"");

@@ -31,8 +31,6 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.util.InfoAnno_mxJPO;
-import org.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
@@ -43,7 +41,6 @@ import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.Portal)
 public class Portal_mxJPO
          extends AbstractAdminObject_mxJPO
 {
@@ -211,7 +208,7 @@ public class Portal_mxJPO
     {
         // HRef, description, alt and label
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getInfoAnno().adminType().getMxName())
+                .append("mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append('\"')
                 .append(" href \"\" description \"\" alt \"\" label \"\"");
 
@@ -225,8 +222,8 @@ public class Portal_mxJPO
 
         // remove channels (each channel must be removed in a single line...)
         for (final ChannelRef channelRef : this.channelRefs)  {
-            preMQLCode.append("mod ").append(getInfoAnno().adminType())
-                      .append(" \"").append(getName()).append('\"')
+            preMQLCode.append("mod ").append(this.getTypeDef().getMxAdminName())
+                      .append(" \"").append(this.getName()).append('\"')
                       .append(" remove channel \"").append(channelRef.name).append("\";\n");
         }
 

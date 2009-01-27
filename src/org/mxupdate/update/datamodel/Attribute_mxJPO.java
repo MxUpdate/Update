@@ -33,9 +33,6 @@ import java.util.TreeSet;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
-import org.mxupdate.update.util.InfoAnno_mxJPO;
-import org.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
-
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
@@ -47,7 +44,6 @@ import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
  * @todo description
  * @todo program ranges
  */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.Attribute)
 public class Attribute_mxJPO
         extends AbstractDMWithTriggers_mxJPO
 {
@@ -281,7 +277,7 @@ public class Attribute_mxJPO
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
-                .append("add ").append(this.getInfoAnno().adminType().getMxName())
+                .append("add ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(_name).append("\" ")
                 .append(" type ").append(_file.getName().replaceAll("_.*", "").toLowerCase());
        execMql(_context, cmd);
@@ -320,7 +316,7 @@ public class Attribute_mxJPO
     {
         // remove all properties
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(getInfoAnno().adminType())
+                .append("mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(getName()).append('\"')
                 .append(" !hidden description \"\" default \"\"");
         // remove rules

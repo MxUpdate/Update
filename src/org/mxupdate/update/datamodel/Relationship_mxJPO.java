@@ -29,9 +29,6 @@ import java.util.TreeSet;
 
 import matrix.db.Context;
 
-import org.mxupdate.update.util.InfoAnno_mxJPO;
-import org.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
-
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
@@ -40,7 +37,6 @@ import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.Relationship)
 public class Relationship_mxJPO
         extends AbstractDMWithAttributes_mxJPO
 {
@@ -258,7 +254,7 @@ public class Relationship_mxJPO
             throws Exception
     {
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getInfoAnno().adminType().getMxName())
+                .append("mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append('\"')
                 // remove hidden, description, prevent duplicate
                 .append(" !hidden description \"\" !preventduplicate")

@@ -30,8 +30,6 @@ import java.util.TreeSet;
 import matrix.db.Context;
 
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.util.InfoAnno_mxJPO;
-import org.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
@@ -40,7 +38,6 @@ import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.Command)
 public class Command_mxJPO
         extends AbstractAdminObject_mxJPO
 {
@@ -138,7 +135,7 @@ public class Command_mxJPO
     {
         // reset HRef, description, alt and label
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getInfoAnno().adminType().getMxName())
+                .append("mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append('\"')
                 .append(" href \"\" description \"\" alt \"\" label \"\"");
 

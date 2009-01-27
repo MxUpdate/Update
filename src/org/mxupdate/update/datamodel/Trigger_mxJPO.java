@@ -32,14 +32,11 @@ import matrix.util.MatrixException;
 import matrix.util.StringList;
 
 import org.mxupdate.update.AbstractBusObject_mxJPO;
-import org.mxupdate.update.util.InfoAnno_mxJPO;
-import org.mxupdate.util.Mapping_mxJPO.BusTypeDef;
 
 /**
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(busType = BusTypeDef.Trigger)
 public class Trigger_mxJPO
         extends AbstractBusObject_mxJPO
 {

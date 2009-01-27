@@ -30,8 +30,6 @@ import java.util.TreeSet;
 import matrix.db.Context;
 
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.util.InfoAnno_mxJPO;
-import org.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
@@ -40,7 +38,6 @@ import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.Group)
 public class Group_mxJPO
         extends AbstractAdminObject_mxJPO
 {
@@ -124,7 +121,7 @@ public class Group_mxJPO
     {
         // description and all parents
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getInfoAnno().adminType().getMxName())
+                .append("mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append('\"')
                 .append(" description \"\"")
                 .append(" remove parent all;\n");

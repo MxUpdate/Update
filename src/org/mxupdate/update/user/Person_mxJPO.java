@@ -42,9 +42,6 @@ import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.AbstractBusObject_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.AbstractPropertyObject_mxJPO;
-import org.mxupdate.update.util.InfoAnno_mxJPO;
-import org.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
-import org.mxupdate.util.Mapping_mxJPO.BusTypeDef;
 import org.xml.sax.SAXException;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
@@ -57,8 +54,6 @@ import static org.mxupdate.util.MqlUtil_mxJPO.setHistoryOn;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.Person,
-                busType = BusTypeDef.Person)
 public class Person_mxJPO
         extends AbstractObject_mxJPO
 {
@@ -166,7 +161,6 @@ public class Person_mxJPO
         this.personAdmin.update(_context, _name, _file, _newVersion);
     }
 
-    @InfoAnno_mxJPO(adminType = AdminTypeDef.Person)
     private class PersonAdmin
             extends AbstractAdminObject_mxJPO
     {
@@ -497,7 +491,6 @@ public class Person_mxJPO
         }
     }
 
-    @InfoAnno_mxJPO(busType = BusTypeDef.Person)
     private class PersonBus
             extends AbstractBusObject_mxJPO
     {

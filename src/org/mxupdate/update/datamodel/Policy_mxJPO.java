@@ -40,9 +40,7 @@ import matrix.db.JPO;
 import matrix.util.MatrixException;
 
 import org.mxupdate.update.datamodel.policy.PolicyDefParser_mxJPO;
-import org.mxupdate.update.util.InfoAnno_mxJPO;
 import org.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface;
-import org.mxupdate.util.Mapping_mxJPO.AdminTypeDef;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertMql;
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
@@ -55,7 +53,6 @@ import static org.mxupdate.util.MqlUtil_mxJPO.setEscapeOn;
  * @author tmoxter
  * @version $Id$
  */
-@InfoAnno_mxJPO(adminType = AdminTypeDef.Policy)
 public class Policy_mxJPO
         extends AbstractDMWithTriggers_mxJPO
         implements JPOCallerInterface
@@ -299,7 +296,7 @@ public class Policy_mxJPO
     {
         writeHeader(_out);
         _out.append("updatePolicy \"${NAME}\" {");
-        final String suffix = getInfoAnno().adminType().getMxSuffix();
+        final String suffix = this.getTypeDef().getMxAdminSuffix();
         if (!"".equals(suffix))  {
             _out.append(" ").append(suffix);
         }

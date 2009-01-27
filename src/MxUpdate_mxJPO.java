@@ -34,32 +34,11 @@ import java.util.TreeSet;
 import matrix.db.Context;
 
 import org.mxupdate.update.AbstractObject_mxJPO;
-import org.mxupdate.update.datamodel.Attribute_mxJPO;
-import org.mxupdate.update.datamodel.Expression_mxJPO;
-import org.mxupdate.update.datamodel.Format_mxJPO;
-import org.mxupdate.update.datamodel.NumberGenerator_mxJPO;
-import org.mxupdate.update.datamodel.ObjectGenerator_mxJPO;
-import org.mxupdate.update.datamodel.Policy_mxJPO;
 import org.mxupdate.update.datamodel.Relationship_mxJPO;
-import org.mxupdate.update.datamodel.Rule_mxJPO;
-import org.mxupdate.update.datamodel.TriggerGroup_mxJPO;
-import org.mxupdate.update.datamodel.Trigger_mxJPO;
 import org.mxupdate.update.datamodel.Type_mxJPO;
-import org.mxupdate.update.program.JPO_mxJPO;
-import org.mxupdate.update.program.Program_mxJPO;
-import org.mxupdate.update.user.Association_mxJPO;
-import org.mxupdate.update.user.Group_mxJPO;
-import org.mxupdate.update.user.Person_mxJPO;
-import org.mxupdate.update.user.Role_mxJPO;
-import org.mxupdate.update.userinterface.Channel_mxJPO;
-import org.mxupdate.update.userinterface.Command_mxJPO;
-import org.mxupdate.update.userinterface.Form_mxJPO;
-import org.mxupdate.update.userinterface.Inquiry_mxJPO;
-import org.mxupdate.update.userinterface.Menu_mxJPO;
-import org.mxupdate.update.userinterface.Portal_mxJPO;
-import org.mxupdate.update.userinterface.Table_mxJPO;
 import org.mxupdate.util.Mapping_mxJPO;
 import org.mxupdate.util.MqlUtil_mxJPO;
+import org.mxupdate.util.TypeDef_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 
@@ -74,11 +53,6 @@ import static org.mxupdate.update.util.StringUtil_mxJPO.match;
  */
 public class MxUpdate_mxJPO
 {
-    /**
-     * Stored the descriptions of all parameters.
-     */
-    private static final Map<String,String> DESCRIPTION = new TreeMap<String,String>();
-
     /**
      * Defines the length of the parameters strings.
      *
@@ -128,30 +102,39 @@ public class MxUpdate_mxJPO
     }
 
     /**
+     * Stored the descriptions of all parameters.
+     */
+    private final Map<String,String> DESCRIPTION = new TreeMap<String,String>();
+
+    /**
      * Holds the mapping between the parameter and mode.
      */
-    private static final Map<String,Mode> PARAM_MODE = new HashMap<String,Mode>();
+    private final Map<String,Mode> PARAM_MODE = new HashMap<String,Mode>();
 
     /**
      * All parameters related to export / import are stored in this map. The
      * key is the parameter (including the '-'), the value the related class.
      */
-    private static final Map<String,Collection<Class<? extends AbstractObject_mxJPO>>> PARAMS
-            = new HashMap<String,Collection<Class<? extends AbstractObject_mxJPO>>>();
+    private final Map<String,Collection<TypeDef_mxJPO>> PARAMS = new HashMap<String,Collection<TypeDef_mxJPO>>();
 
     /**
      * Holds all classes used for all exports / imports. The set is needed that
      * the parameter '-a' (--admin) could be defined.
      */
-    private final static Collection<Class<? extends AbstractObject_mxJPO>> PARAMS_ADMIN
-            = new ArrayList<Class<? extends AbstractObject_mxJPO>>();
+    private final Collection<TypeDef_mxJPO> PARAMS_ADMIN = new ArrayList<TypeDef_mxJPO>();
 
     /**
      * Holds all parameters related how the version information is set.
      */
-    private static final Map<String,VersionInfo> PARAM_VERSION = new HashMap<String,VersionInfo>();
+    private final Map<String,VersionInfo> PARAM_VERSION = new HashMap<String,VersionInfo>();
 
-    static  {
+    private void prepareParams()
+    {
+        this.DESCRIPTION.clear();
+        this.PARAM_MODE.clear();
+        this.PARAMS.clear();
+        this.PARAMS_ADMIN.clear();
+        this.PARAM_VERSION.clear();
 
         ////////////////////////////////////////////////////////////////////////
         //
@@ -189,35 +172,35 @@ public class MxUpdate_mxJPO
         ////////////////////////////////////////////////////////////////////////
         // mode (export / import / help)
 
-        PARAM_MODE.put("-e", Mode.EXPORT);
-        PARAM_MODE.put("--export", Mode.EXPORT);
+        this.PARAM_MODE.put("-e", Mode.EXPORT);
+        this.PARAM_MODE.put("--export", Mode.EXPORT);
         appendDescription("Export Mode", "-e", "--export");
 
-        PARAM_MODE.put("-u", Mode.IMPORT);
-        PARAM_MODE.put("--update", Mode.IMPORT);
+        this.PARAM_MODE.put("-u", Mode.IMPORT);
+        this.PARAM_MODE.put("--update", Mode.IMPORT);
         appendDescription("Update Mode.", "-u", "--update");
 
-        PARAM_MODE.put("--delete", Mode.DELETE);
+        this.PARAM_MODE.put("--delete", Mode.DELETE);
         appendDescription("Delete Mode.", "--delete");
 
-        PARAM_MODE.put("-?", Mode.HELP);
-        PARAM_MODE.put("-h", Mode.HELP);
-        PARAM_MODE.put("--help", Mode.HELP);
+        this.PARAM_MODE.put("-?", Mode.HELP);
+        this.PARAM_MODE.put("-h", Mode.HELP);
+        this.PARAM_MODE.put("--help", Mode.HELP);
         appendDescription("Print this Help.", "-h", "-?", "--help");
 
         ////////////////////////////////////////////////////////////////////////
         // version information
 
-        PARAM_VERSION.put("--usefiledateasversion", VersionInfo.FILEDATE);
+        this.PARAM_VERSION.put("--usefiledateasversion", VersionInfo.FILEDATE);
         appendDescription("The last modified date of the file is used as version information.",
                           "--usefiledateasversion");
 
         ////////////////////////////////////////////////////////////////////////
         // admin
 
-        PARAMS.put("-a", PARAMS_ADMIN);
-        PARAMS.put("--admin", PARAMS_ADMIN);
-        PARAMS.put("--all", PARAMS_ADMIN);
+        this.PARAMS.put("-a", this.PARAMS_ADMIN);
+        this.PARAMS.put("--admin", this.PARAMS_ADMIN);
+        this.PARAMS.put("--all", this.PARAMS_ADMIN);
         appendDescription("Export / Import of all administrational objects.",
                           Arrays.asList(new String[]{"-a", "--admin", "--all"}),
                           "MATCH");
@@ -225,129 +208,57 @@ public class MxUpdate_mxJPO
         ////////////////////////////////////////////////////////////////////////
         // data model
 
-        final Collection<Class<? extends AbstractObject_mxJPO>> dm = new HashSet<Class<? extends AbstractObject_mxJPO>>();
-        defineParameter('d', dm,
+        final Collection<TypeDef_mxJPO> dm = new HashSet<TypeDef_mxJPO>();
+        defineParameter(dm,
                         null,
                         "Export / Import of data model administrational objects.",
-                        "dm", "datamodel");
-        defineParameter('b', dm,
-                        Attribute_mxJPO.class,
-                        "Export / Import of attributes.",
-                        "attribute", "attrib", "attr", "att");
-        defineParameter(null, dm,
-                        Expression_mxJPO.class,
-                        "Export / Import of expressions.",
-                        "expression", "expr", "exp");
-        defineParameter(null, dm,
-                        Format_mxJPO.class,
-                        "Export / Import of formats.",
-                        "format");
-        defineParameter(null, dm,
-                        NumberGenerator_mxJPO.class,
-                        "Export / Import of number generators.",
-                        "numbergenerator");
-        defineParameter(null, dm,
-                        ObjectGenerator_mxJPO.class,
-                        "Export / Import of object generators.",
-                        "objectgenerator");
-        defineParameter('p', dm,
-                        Policy_mxJPO.class,
-                        "Export / Import of policies.",
-                        "policy");
-        defineParameter('r', dm,
-                        Relationship_mxJPO.class,
-                        "Export / Import of relationships.",
-                        "relation", "relationship");
-        defineParameter(null, dm,
-                        Rule_mxJPO.class,
-                        "Export / Import of rules.",
-                        "rule");
-        defineParameter('g', dm,
-                        Trigger_mxJPO.class,
-                        "Export / Import of triggers.",
-                        "trigger", "trig");
-        defineParameter(null, dm,
-                        TriggerGroup_mxJPO.class,
-                        "Export / Import of triggers groups.",
-                        "triggergroup");
-        defineParameter('t', dm,
-                        Type_mxJPO.class,
-                        "Export / Import of types.",
-                        "type");
+                        Arrays.asList(new String[]{"d", "dm", "datamodel"}));
+        defineParameter(dm, TypeDef_mxJPO.Attribute);
+        defineParameter(dm, TypeDef_mxJPO.Expression);
+        defineParameter(dm, TypeDef_mxJPO.Format);
+        defineParameter(dm, TypeDef_mxJPO.NumberGenerator);
+        defineParameter(dm, TypeDef_mxJPO.ObjectGenerator);
+        defineParameter(dm, TypeDef_mxJPO.Policy);
+        defineParameter(dm, TypeDef_mxJPO.Relationship);
+        defineParameter(dm, TypeDef_mxJPO.Rule);
+        defineParameter(dm, TypeDef_mxJPO.Trigger);
+        defineParameter(dm, TypeDef_mxJPO.TriggerGroup);
+        defineParameter(dm, TypeDef_mxJPO.Type);
 
         ////////////////////////////////////////////////////////////////////////
         // user
 
-        final Collection<Class<? extends AbstractObject_mxJPO>> user = new HashSet<Class<? extends AbstractObject_mxJPO>>();
-        defineParameter(null, user,
+        final Collection<TypeDef_mxJPO> user = new HashSet<TypeDef_mxJPO>();
+        defineParameter(user,
                         null,
                         "Export / Import of user administrational objects.",
-                        "user");
-        defineParameter(null, user,
-                        Association_mxJPO.class,
-                        "Export / Import of associations.",
-                        "association", "asso");
-        defineParameter(null, user,
-                        Group_mxJPO.class,
-                        "Export / Import of groups.",
-                        "group");
-        defineParameter(null, user,
-                        Person_mxJPO.class,
-                        "Export / Import of persons.",
-                        "person");
-        defineParameter(null, user,
-                        Role_mxJPO.class,
-                        "Export / Import of roles.",
-                        "role");
+                        Arrays.asList(new String[]{"user"}));
+        defineParameter(user, TypeDef_mxJPO.Association);
+        defineParameter(user, TypeDef_mxJPO.Group);
+        defineParameter(user, TypeDef_mxJPO.Person);
+        defineParameter(user, TypeDef_mxJPO.Role);
 
         ////////////////////////////////////////////////////////////////////////
         // program
 
-        defineParameter('j', null,
-                        JPO_mxJPO.class,
-                        "Export / Import of JPOs.",
-                        "jpo");
-        defineParameter(null, null,
-                        Program_mxJPO.class,
-                        "Export / Import of programs.",
-                        "program", "prog");
+        defineParameter(null, TypeDef_mxJPO.JPO);
+        defineParameter(null, TypeDef_mxJPO.Program);
 
         ////////////////////////////////////////////////////////////////////////
         // user interface
 
-        final Collection<Class<? extends AbstractObject_mxJPO>> ui = new HashSet<Class<? extends AbstractObject_mxJPO>>();
-        defineParameter(null, ui,
+        final Collection<TypeDef_mxJPO> ui = new HashSet<TypeDef_mxJPO>();
+        defineParameter(ui,
                         null,
                         "Export / Import of user interface administrational objects.",
-                        "ui", "userinterface");
-        defineParameter(null, ui,
-                        Channel_mxJPO.class,
-                        "Export / Import of channels.",
-                        "channel");
-        defineParameter('c', ui,
-                        Command_mxJPO.class,
-                        "Export / Import of commands.",
-                        "command");
-        defineParameter('f', ui,
-                        Form_mxJPO.class,
-                        "Export / Import of web forms.",
-                        "webform", "form");
-        defineParameter('i', ui,
-                        Inquiry_mxJPO.class,
-                        "Export / Import of inquiries.",
-                        "inquiry");
-        defineParameter('m', ui,
-                        Menu_mxJPO.class,
-                        "Export / Import of menus.",
-                        "menu");
-        defineParameter(null, ui,
-                        Portal_mxJPO.class,
-                        "Export / Import of portal.",
-                        "portal");
-        defineParameter('w', ui,
-                        Table_mxJPO.class,
-                        "Export / Import of web tables.",
-                        "webtable", "table");
+                        Arrays.asList(new String[]{"ui", "userinterface"}));
+        defineParameter(ui, TypeDef_mxJPO.Channel);
+        defineParameter(ui, TypeDef_mxJPO.Command);
+        defineParameter(ui, TypeDef_mxJPO.Form);
+        defineParameter(ui, TypeDef_mxJPO.Inquiry);
+        defineParameter(ui, TypeDef_mxJPO.Menu);
+        defineParameter(ui, TypeDef_mxJPO.Portal);
+        defineParameter(ui, TypeDef_mxJPO.Table);
     }
 
     /**
@@ -363,20 +274,19 @@ public class MxUpdate_mxJPO
      * @param _longParams       list of long parameters strings
      * @throws Error if a short parameter is already defined
      */
-    private static void defineParameter(final Character _shortParam,
-                                        final Collection<Class<? extends AbstractObject_mxJPO>> _paramsList,
-                                        final Class<? extends AbstractObject_mxJPO> _clazz,
-                                        final String _description,
-                                        final String... _longParams)
+    private void defineParameter(final Collection<TypeDef_mxJPO> _paramsList,
+                                 final TypeDef_mxJPO _clazz,
+                                 final String _description,
+                                 final Collection<String> _longParams)
     {
         final List<String> allParamStrings = new ArrayList<String>();
-        final Collection<Class<? extends AbstractObject_mxJPO>> tmp = (_clazz == null)
+        final Collection<TypeDef_mxJPO> tmp = (_clazz == null)
                 ? _paramsList
-                : new HashSet<Class<? extends AbstractObject_mxJPO>>();
+                : new HashSet<TypeDef_mxJPO>();
 
         if (_clazz != null)  {
             // add to set of all classes parameters set
-            PARAMS_ADMIN.add(_clazz);
+            this.PARAMS_ADMIN.add(_clazz);
             // add to given set of parameters
             if (_paramsList != null)  {
                 _paramsList.add(_clazz);
@@ -384,29 +294,30 @@ public class MxUpdate_mxJPO
             tmp.add(_clazz);
         }
 
-        // check for short parameter and test for double definition
-        if (_shortParam != null)  {
-            final String shortParam = "-" + _shortParam;
-            if (PARAMS.containsKey(shortParam) || PARAM_MODE.containsKey(shortParam) || PARAM_VERSION.containsKey(shortParam))  {
-                throw new Error("double definition of short parameter '" + shortParam
-                                + "'! Found:\n" + PARAMS.get(shortParam) + "\nNew Definition:\n" + tmp);
-            }
-            PARAMS.put(shortParam, tmp);
-            allParamStrings.add(shortParam);
-        }
-        // all long parameters
+        // check for long parameters and test for double definition
         for (final String param : _longParams)  {
-            final String paramStr = "--" + param;
-            if (PARAMS.containsKey(paramStr) || PARAM_MODE.containsKey(paramStr) || PARAM_VERSION.containsKey(paramStr))  {
-                throw new Error("double definition of short parameter '" + paramStr
-                        + "'! Found:\n" + PARAMS.get(paramStr) + "\nNew Definition:\n" + tmp);
+            final String paramStr = (param.length() == 1)
+                                    ? "-" + param
+                                    : "--" + param;
+            if (this.PARAMS.containsKey(paramStr) || this.PARAM_MODE.containsKey(paramStr) || this.PARAM_VERSION.containsKey(paramStr))  {
+                throw new Error("double definition of parameter '" + paramStr
+                        + "'! Found:\n" + this.PARAMS.get(paramStr) + "\nNew Definition:\n" + tmp);
             }
-            PARAMS.put(paramStr, tmp);
+            this.PARAMS.put(paramStr, tmp);
             allParamStrings.add(paramStr);
         }
 
         // store description
         appendDescription(_description, allParamStrings, "MATCH");
+    }
+
+    private void defineParameter(final Collection<TypeDef_mxJPO> _paramsList,
+                                 final TypeDef_mxJPO _clazz)
+    {
+        this.defineParameter(_paramsList,
+                             _clazz,
+                             _clazz.getParameterDesc(),
+                             _clazz.getParameters());
     }
 
     /**
@@ -417,9 +328,9 @@ public class MxUpdate_mxJPO
      * @param _argument         text of the argument for the list of parameters
      *                          (or <code>null</code> if not defined)
      */
-    private static void appendDescription(final String _description,
-                                          final List<String> _params,
-                                          final String _argument)
+    private void appendDescription(final String _description,
+                                   final List<String> _params,
+                                   final String _argument)
     {
         // check if first parameter is not a short parameter
         final String firstParam = _params.get(0);
@@ -487,7 +398,7 @@ public class MxUpdate_mxJPO
             }
         }
 
-        DESCRIPTION.put("" + prefix + line, line.toString());
+        this.DESCRIPTION.put("" + prefix + line, line.toString());
     }
 
     /**
@@ -499,14 +410,14 @@ public class MxUpdate_mxJPO
      * @see #appendDescription(String, List) used method to append parameter
      *                                       description
      */
-    private static void appendDescription(final String _description,
-                                          final String... _params)
+    private void appendDescription(final String _description,
+                                   final String... _params)
     {
         final List<String> params = new ArrayList<String>(_params.length);
         for (final String param : _params)  {
             params.add(param);
         }
-        appendDescription(_description, params, null);
+        this.appendDescription(_description, params, null);
     }
 
     /**
@@ -517,7 +428,7 @@ public class MxUpdate_mxJPO
     private void printHelp()
     {
         System.out.println("usage: exec prog MxUpdate -e | -u ....\n");
-        for (final String line : DESCRIPTION.values())  {
+        for (final String line : this.DESCRIPTION.values())  {
             System.out.println(line);
         }
         System.out.println();
@@ -546,9 +457,10 @@ public class MxUpdate_mxJPO
                        final String... _args)
             throws Exception
     {
-
         // initialize mapping
         Mapping_mxJPO.init(_context);
+
+        this.prepareParams();
 
         Type_mxJPO.IGNORE_TYPE_ATTRIBUTES.clear();
         Relationship_mxJPO.IGNORE_RELATIONSHIP_ATTRIBUTES.clear();
@@ -559,8 +471,7 @@ public class MxUpdate_mxJPO
 
             Mode mode = null;
 
-final Map<Class<? extends AbstractObject_mxJPO>,List<String>> clazz2matches
-        = new HashMap<Class<? extends AbstractObject_mxJPO>,List<String>>();
+            final Map<TypeDef_mxJPO,List<String>> clazz2matches = new HashMap<TypeDef_mxJPO,List<String>>();
 //System.err.println("PARAM_MODE="  + Mode.IMPORT);
 
 boolean unknown = false;
@@ -571,11 +482,11 @@ final Set<String> paths = new TreeSet<String>();
 
         for (int idx = 0; idx < _args.length; idx++)  {
 //System.out.println(""+idx+"="+_args[idx]+"="+PARAMS.get(_args[idx]));
-            final Collection<Class<? extends AbstractObject_mxJPO>> clazzes = PARAMS.get(_args[idx]);
+            final Collection<TypeDef_mxJPO> clazzes = PARAMS.get(_args[idx]);
             if (clazzes != null)  {
                 idx++;
                 final String name = _args[idx];
-                for (final Class<? extends AbstractObject_mxJPO> clazz : clazzes)  {
+                for (final TypeDef_mxJPO clazz : clazzes)  {
                     List<String> names = clazz2matches.get(clazz);
                     if (names == null)  {
                         names = new ArrayList<String>();
@@ -583,8 +494,8 @@ final Set<String> paths = new TreeSet<String>();
                     }
                     names.add(name);
                 }
-            } else if (PARAM_MODE.containsKey(_args[idx])) {
-                final Mode tmpMode = PARAM_MODE.get(_args[idx]);
+            } else if (this.PARAM_MODE.containsKey(_args[idx])) {
+                final Mode tmpMode = this.PARAM_MODE.get(_args[idx]);
                 if (mode != null)  {
                     if ((mode == Mode.HELP) || (tmpMode == Mode.HELP))  {
                         mode = Mode.HELP;
@@ -592,10 +503,10 @@ final Set<String> paths = new TreeSet<String>();
                         throw new Error("A mode is already defined and could not be defined twice!");
                     }
                 } else  {
-                    mode = PARAM_MODE.get(_args[idx]);
+                    mode = this.PARAM_MODE.get(_args[idx]);
                 }
-            } else if (PARAM_VERSION.containsKey(_args[idx]))  {
-                versionInfo = PARAM_VERSION.get(_args[idx]);
+            } else if (this.PARAM_VERSION.containsKey(_args[idx]))  {
+                versionInfo = this.PARAM_VERSION.get(_args[idx]);
             } else if ("--application".equals(_args[idx]))  {
                 idx++;
                 Mapping_mxJPO.defineApplication(_args[idx]);
@@ -652,7 +563,7 @@ if (unknown || (Mode.HELP == mode) || (mode == null))  {
      */
     protected void export(final Context _context,
                           final Set<String> _paths,
-                          final Map<Class<? extends AbstractObject_mxJPO>,List<String>> _clazz2matches)
+                          final Map<TypeDef_mxJPO,List<String>> _clazz2matches)
             throws Exception
     {
         // check for definition of min. / max. one path
@@ -665,13 +576,12 @@ if (unknown || (Mode.HELP == mode) || (mode == null))  {
         final String pathStr = _paths.iterator().next();
 
         // evaluate all matching administration objects
-        final Map<Class<? extends AbstractObject_mxJPO>,Set<String>> clazz2names
-                = this.getMatching(_context, _clazz2matches);
+        final Map<TypeDef_mxJPO,Set<String>> clazz2names = this.getMatching(_context, _clazz2matches);
 
         // export
-        for (final Map.Entry<Class<? extends AbstractObject_mxJPO>,Set<String>> entry : clazz2names.entrySet())  {
+        for (final Map.Entry<TypeDef_mxJPO,Set<String>> entry : clazz2names.entrySet())  {
             for (final String name : entry.getValue())  {
-                AbstractObject_mxJPO instance = entry.getKey().newInstance();
+                AbstractObject_mxJPO instance = entry.getKey().newTypeInstance();
                 final File path = new File(pathStr + File.separator + instance.getPath());
 System.out.println("export "+instance.getTypeDef().getLogging() + " '" + name + "'");
                 instance.export(_context, path, name);
@@ -687,33 +597,31 @@ System.out.println("export "+instance.getTypeDef().getLogging() + " '" + name + 
      */
     protected void update(final Context _context,
                           final Set<String> _paths,
-                          final Map<Class<? extends AbstractObject_mxJPO>,List<String>> _clazz2matches,
+                          final Map<TypeDef_mxJPO,List<String>> _clazz2matches,
                           final VersionInfo _versionInfo)
             throws Exception
     {
         // get all matching files depending on the update classes
-        final Map<Class<? extends AbstractObject_mxJPO>,Map<File,String>> clazz2names
-                = this.evalMatches(_paths, _clazz2matches);
+        final Map<TypeDef_mxJPO,Map<File,String>> clazz2names = this.evalMatches(_paths, _clazz2matches);
         // evaluate for existing administration objects
         final Collection<String> wildCardMatch = new HashSet<String>();
         wildCardMatch.add("*");
-        final Map<Class<? extends AbstractObject_mxJPO>,Set<String>> existingNames
-                = new HashMap<Class<? extends AbstractObject_mxJPO>,Set<String>>();
-        for (final Class<? extends AbstractObject_mxJPO> clazz : clazz2names.keySet())  {
+        final Map<TypeDef_mxJPO,Set<String>> existingNames = new HashMap<TypeDef_mxJPO,Set<String>>();
+        for (final TypeDef_mxJPO clazz : clazz2names.keySet())  {
             if (!existingNames.containsKey(clazz))  {
-                final AbstractObject_mxJPO instance = clazz.newInstance();
+                final AbstractObject_mxJPO instance = clazz.newTypeInstance();
                 existingNames.put(clazz,
                                   instance.getMatchingNames(_context, wildCardMatch));
             }
         }
         // create if needed (and not in the list of existing objects
-        for (Class<? extends AbstractObject_mxJPO> clazz : PARAMS_ADMIN)  {
+        for (final TypeDef_mxJPO clazz : PARAMS_ADMIN)  {
             final Map<File,String> clazzMap = clazz2names.get(clazz);
             if (clazzMap != null)  {
                 for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
                     final Set<String> existings = existingNames.get(clazz);
                     if (!existings.contains(fileEntry.getValue()))  {
-                         final AbstractObject_mxJPO instance = clazz.newInstance();
+                         final AbstractObject_mxJPO instance = clazz.newTypeInstance();
 System.out.println("create "+instance.getTypeDef().getLogging() + " '" + fileEntry.getValue() + "'");
                         instance.create(_context, fileEntry.getKey(), fileEntry.getValue());
                     }
@@ -721,11 +629,11 @@ System.out.println("create "+instance.getTypeDef().getLogging() + " '" + fileEnt
             }
         }
         // update
-        for (Class<? extends AbstractObject_mxJPO> clazz : PARAMS_ADMIN)  {
+        for (final TypeDef_mxJPO clazz : PARAMS_ADMIN)  {
             final Map<File,String> clazzMap = clazz2names.get(clazz);
             if (clazzMap != null)  {
                 for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
-                    final AbstractObject_mxJPO instance = clazz.newInstance();
+                    final AbstractObject_mxJPO instance = clazz.newTypeInstance();
 System.out.println("check "+instance.getTypeDef().getLogging() + " '" + fileEntry.getValue() + "'");
 
                     final boolean update;
@@ -756,7 +664,7 @@ System.out.println("    - update");
 
     protected void delete(final Context _context,
                           final Set<String> _paths,
-                          final Map<Class<? extends AbstractObject_mxJPO>,List<String>> _clazz2matches)
+                          final Map<TypeDef_mxJPO,List<String>> _clazz2matches)
             throws Exception
     {
         // check for definition of min. / max. one path
@@ -765,16 +673,16 @@ System.out.println("    - update");
         }
 
         // evaluate all matching administration objects
-        final Map<Class<? extends AbstractObject_mxJPO>,Set<String>> clazz2MxNames
+        final Map<TypeDef_mxJPO,Set<String>> clazz2MxNames
                 = this.getMatching(_context, _clazz2matches);
 
         // get all matching files depending on the update classes
-        final Map<Class<? extends AbstractObject_mxJPO>,Map<File,String>> clazz2FileNames
+        final Map<TypeDef_mxJPO,Map<File,String>> clazz2FileNames
                 = this.evalMatches(_paths, _clazz2matches);
 
         // and now loop throw the list of file names and compare to existing
-        for (final Map.Entry<Class<? extends AbstractObject_mxJPO>,Set<String>> entry : clazz2MxNames.entrySet())  {
-            final AbstractObject_mxJPO instance = entry.getKey().newInstance();
+        for (final Map.Entry<TypeDef_mxJPO,Set<String>> entry : clazz2MxNames.entrySet())  {
+            final AbstractObject_mxJPO instance = entry.getKey().newTypeInstance();
             final Collection<String> fileNames = clazz2FileNames.get(entry.getKey()).values();
             for (final String name : entry.getValue())  {
                 if (!fileNames.contains(name))  {
@@ -799,17 +707,16 @@ System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name 
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
-    protected Map<Class<? extends AbstractObject_mxJPO>,Map<File,String>> evalMatches(final Set<String> _paths,
-                                                                                      final Map<Class<? extends AbstractObject_mxJPO>,List<String>> _clazz2matches)
+    protected Map<TypeDef_mxJPO,Map<File,String>> evalMatches(final Set<String> _paths,
+                                                        final Map<TypeDef_mxJPO,List<String>> _clazz2matches)
             throws InstantiationException, IllegalAccessException
     {
-        final Map<Class<? extends AbstractObject_mxJPO>,Map<File,String>> clazz2names
-                = new HashMap<Class<? extends AbstractObject_mxJPO>,Map<File,String>>();
+        final Map<TypeDef_mxJPO,Map<File,String>> clazz2names = new HashMap<TypeDef_mxJPO,Map<File,String>>();
 
         // if no path is defined, the paths are directly defined at the objects
         // to import
         if (_paths.isEmpty())  {
-            for (final Map.Entry<Class<? extends AbstractObject_mxJPO>,List<String>> entry : _clazz2matches.entrySet())  {
+            for (final Map.Entry<TypeDef_mxJPO,List<String>> entry : _clazz2matches.entrySet())  {
                 final Set<File> allFiles = new HashSet<File>();
 
                 for (final String pathStr : entry.getValue())  {
@@ -823,7 +730,7 @@ System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name 
                     }
                 }
                 clazz2names.put(entry.getKey(),
-                        entry.getKey().newInstance().getMatchingFileNames(allFiles));
+                                entry.getKey().newTypeInstance().getMatchingFileNames(allFiles));
             }
         // path parameter is defined
         } else  {
@@ -832,9 +739,9 @@ System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name 
                 allFiles.addAll(getAllFiles(new File(path)));
             }
             // get all matching files depending on the update classes
-            for (final Map.Entry<Class<? extends AbstractObject_mxJPO>,List<String>> entry : _clazz2matches.entrySet())  {
+            for (final Map.Entry<TypeDef_mxJPO,List<String>> entry : _clazz2matches.entrySet())  {
                 clazz2names.put(entry.getKey(),
-                                entry.getKey().newInstance().getMatchingFileNames(allFiles, entry.getValue()));
+                                entry.getKey().newTypeInstance().getMatchingFileNames(allFiles, entry.getValue()));
             }
         }
         return clazz2names;
@@ -876,14 +783,13 @@ System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name 
      * @see #export(Context, Set, Map)
      * @see #delete(Context, Set, Map)
      */
-    protected Map<Class<? extends AbstractObject_mxJPO>,Set<String>> getMatching(final Context _context,
-                                                                                 final Map<Class<? extends AbstractObject_mxJPO>,List<String>> _clazz2matches)
+    protected Map<TypeDef_mxJPO,Set<String>> getMatching(final Context _context,
+                                                   final Map<TypeDef_mxJPO,List<String>> _clazz2matches)
             throws Exception
     {
-        final Map<Class<? extends AbstractObject_mxJPO>,Set<String>> clazz2names
-                = new HashMap<Class<? extends AbstractObject_mxJPO>,Set<String>>();
-        for (final Map.Entry<Class<? extends AbstractObject_mxJPO>,List<String>> entry : _clazz2matches.entrySet())  {
-            AbstractObject_mxJPO instance = entry.getKey().newInstance();
+        final Map<TypeDef_mxJPO,Set<String>> clazz2names = new HashMap<TypeDef_mxJPO,Set<String>>();
+        for (final Map.Entry<TypeDef_mxJPO,List<String>> entry : _clazz2matches.entrySet())  {
+            AbstractObject_mxJPO instance = entry.getKey().newTypeInstance();
             clazz2names.put(entry.getKey(), instance.getMatchingNames(_context, entry.getValue()));
         }
 
