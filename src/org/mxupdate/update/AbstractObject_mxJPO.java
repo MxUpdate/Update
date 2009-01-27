@@ -25,6 +25,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
@@ -258,11 +261,13 @@ public abstract class AbstractObject_mxJPO
      *
      * @param _context      context for this request
      * @param _name         name of update object
+     * @param _prop         property for which the date value is searched
      * @return modified date of given update object
      * @throws MatrixException
      */
     public Date getMxFileDate(final Context _context,
-                              final String _name)
+                              final String _name,
+                              final AdminPropertyDef _prop)
             throws MatrixException
     {
         final String curVersion;
@@ -272,9 +277,10 @@ public abstract class AbstractObject_mxJPO
                     .append("print ").append(this.getTypeDef().getMxAdminName())
                     .append(" \"").append(_name).append("\" ")
                     .append(this.getTypeDef().getMxAdminSuffix())
-                    .append(" select property[version] dump"));
-            curVersion = (tmp.length() >= 14)
-                         ? tmp.substring(14)
+                    .append(" select property[").append(_prop.getPropName()).append("] dump"));
+            final int length = 7 + _prop.getPropName().length();
+            curVersion = (tmp.length() >= length)
+                         ? tmp.substring(length)
                          : "";
         // otherwise we have a business object....
         } else  {
@@ -284,11 +290,24 @@ public abstract class AbstractObject_mxJPO
                     .append(this.getTypeDef().getMxBusType())
                     .append("\" \"").append(nameRev[0])
                     .append("\" \"").append((nameRev.length > 1) ? nameRev[1] : "")
-                    .append("\" select attribute[").append(AdminPropertyDef.VERSION.getAttrName()).append("] dump"));
+                    .append("\" select attribute[").append(_prop.getAttrName()).append("] dump"));
         }
-        return (curVersion.matches("^[0-9]++$"))
-               ? new Date(Long.parseLong(curVersion) * 1000)
-               : null;
+
+        Date ret;
+        if (_prop == AdminPropertyDef.FILEDATE)  {
+            final DateFormat format = new SimpleDateFormat(_prop.getValue());
+            try {
+                ret = format.parse(curVersion);
+            } catch (final ParseException e) {
+                ret = null;
+            }
+        } else  {
+            ret = (curVersion.matches("^[0-9]++$"))
+                  ? new Date(Long.parseLong(curVersion) * 1000)
+                  : null;
+        }
+
+        return ret;
     }
 
     /**

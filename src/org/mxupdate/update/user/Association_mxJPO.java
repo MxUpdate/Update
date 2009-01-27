@@ -23,15 +23,17 @@ package org.mxupdate.update.user;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.util.Mapping_mxJPO.AdminPropertyDef;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
@@ -48,14 +50,6 @@ public class Association_mxJPO
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = -3663847015076548873L;
-
-    /**
-     * Regular expression used to extract the version information from a &quot;
-     * standard&quot; association print.
-     *
-     * @see #getMxFileDate(Context, String)
-     */
-    private static final Pattern VERSION_PATTERN = Pattern.compile("(?<=  property version value )[0-9]++");
 
     /**
      * Stores the definition of this association instance.
@@ -144,20 +138,48 @@ public class Association_mxJPO
      *
      * @param _context      context for this request
      * @param _name         name of update object
+     * @param _prop         property for which the date value is searched
      * @return modified date of given update object
      * @throws MatrixException if the MQL print failed
      * @see #VERSION_PATTERN
      */
     @Override
     public Date getMxFileDate(final Context _context,
-                              final String _name)
+                              final String _name,
+                              final AdminPropertyDef _prop)
             throws MatrixException
     {
+        final String text = _prop.getPropName() + " on association " + _name + " value ";
         final String curVersion = execMql(_context, new StringBuilder()
-                .append("print asso \"").append(_name).append("\""));
-        final Matcher matcher = VERSION_PATTERN.matcher(curVersion);
-        return (matcher.find())
-               ? new Date(Long.parseLong(matcher.group()) * 1000)
-               : null;
+                .append("list property on asso \"").append(_name).append("\""));
+
+        final int idx = curVersion.indexOf(text);
+        final String version;
+        if (idx >= 0)  {
+            final int last = curVersion.indexOf('\n', idx);
+            if (last > 0)  {
+                version = curVersion.substring(idx + text.length(), last);
+            } else  {
+                version = curVersion.substring(idx + text.length());
+            }
+        } else  {
+            version = null;
+        }
+
+        Date ret;
+        if (_prop == AdminPropertyDef.FILEDATE)  {
+            final DateFormat format = new SimpleDateFormat(_prop.getValue());
+            try {
+                ret = format.parse(version);
+            } catch (final ParseException e) {
+                ret = null;
+            }
+        } else  {
+            ret = (version.matches("^[0-9]++$"))
+                  ? new Date(Long.parseLong(curVersion) * 1000)
+                  : null;
+        }
+
+        return ret;
     }
 }
