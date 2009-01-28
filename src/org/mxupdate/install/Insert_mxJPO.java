@@ -23,7 +23,9 @@ package org.mxupdate.install;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -230,7 +232,7 @@ System.out.println("delete jpo '" + progName + "'");
                 // evaluate JPOs from current package
                 final Map<String,String> class2Pck = new HashMap<String,String>();
                 for (final ClassFile classFile : newPckFilesEntry.getValue().values())  {
-                    class2Pck.put(classFile.className, classFile.jpoName);
+                    class2Pck.put(classFile.className, classFile.completeName);
                 }
                 // install all JPOs from current package
                 for (final ClassFile classFile : newPckFilesEntry.getValue().values())  {
@@ -327,13 +329,32 @@ System.out.println("update jpo '" + classFile.jpoName + "'");
 
     private class ClassFile
     {
+        /**
+         * Link to the JPO file.
+         */
         final File jpoFile;
 
+        /**
+         * Name of the package in which the class is defined.
+         */
         final String pckName;
 
+        /**
+         * Name of the class without package but with &quot;mxJPO&quot;
+         * extension).
+         */
         final String className;
 
+        /**
+         * Internal MX used name of the JPO (excl. the &quot;mxJPO&quot;
+         * extension).
+         */
         final String jpoName;
+
+        /**
+         * Holds the complete name of the class (package name and class name).
+         */
+        final String completeName;
 
         ClassFile(final File _packagePath,
                   final File _jpoFile)
@@ -343,9 +364,10 @@ System.out.println("update jpo '" + classFile.jpoName + "'");
                                        .replace(File.separatorChar, '.')
                                        .replaceAll("^\\.", "");
             this.className = _jpoFile.getName().replaceAll(JAVA_FILE_EXTENSION + "$", "");
-            this.jpoName = "".equals(pckName)
-                             ? this.className.replaceAll(JPO_EXTENSION + "$", "")
-                             : pckName + "." + this.className.replaceAll(JPO_EXTENSION + "$", "");
+            this.completeName = "".equals(this.pckName)
+                                ? this.className
+                                : this.pckName + "." + this.className;
+            this.jpoName = this.completeName.replaceAll(JPO_EXTENSION + "$", "");
         }
 
         /**
@@ -360,6 +382,8 @@ System.out.println("update jpo '" + classFile.jpoName + "'");
         }
 
         /**
+         * Creates the JPO new and appends the properties for the author,
+         * installer, installed date, application and original name.
          *
          * @param _context      context for this request
          * @param _class2Pck    used JPO name within the code and the related
@@ -367,6 +391,7 @@ System.out.println("update jpo '" + classFile.jpoName + "'");
          * @param _version      application version
          * @throws IOException if the JPO file could not be read
          * @throws MatrixException if the JPO could not created
+         * @see #update(Context, Map, String)
          */
         public void create(final Context _context,
                            final Map<String,String> _class2Pck,
@@ -375,12 +400,7 @@ System.out.println("update jpo '" + classFile.jpoName + "'");
         {
             execMql(_context,
                     new StringBuilder()
-                    .append("add program '").append(this.jpoName).append("' java code \"")
-                            .append(this.getCode(_class2Pck)).append("\" ")
-                    .append("property \"").append(Insert_mxJPO.PROP_FILEDATE).append("\" value \"")
-                            .append(Insert_mxJPO.DATE_FORMAT.format(getLastModified())).append("\" ")
-                    .append("property \"").append(Insert_mxJPO.PROP_VERSION).append("\" value \"")
-                            .append(_version).append("\" ")
+                    .append("add program '").append(this.jpoName).append("' java ")
                     .append("property \"").append(Insert_mxJPO.PROP_AUTHOR).append("\" value \"")
                             .append(Insert_mxJPO.VALUE_AUTHOR).append("\" ")
                     .append("property \"").append(Insert_mxJPO.PROP_INSTALLER).append("\" value \"")
@@ -391,9 +411,14 @@ System.out.println("update jpo '" + classFile.jpoName + "'");
                             .append(Insert_mxJPO.VALUE_APPLICATION).append("\" ")
                     .append("property \"").append(Insert_mxJPO.PROP_ORIGINAL_NAME).append("\" value \"")
                             .append(this.jpoName).append("\" "));
+            this.update(_context, _class2Pck, _version);
         }
 
         /**
+         * Because there is a different behavior for backslashes between MX
+         * versions, the JPO program must be included. So the source code is
+         * only updated so that the source code includes for all used classes
+         * the depending package names.
          *
          * @param _context      context for this request
          * @param _class2Pck    used JPO name within the code and the related
@@ -401,20 +426,42 @@ System.out.println("update jpo '" + classFile.jpoName + "'");
          * @param _version      application version
          * @throws IOException if the JPO file could not be read
          * @throws MatrixException if the JPO could not updated
+         * @see #getCode(Map)
          */
         public void update(final Context _context,
                            final Map<String,String> _class2Pck,
                            final String _version)
                 throws IOException, MatrixException
         {
-            execMql(_context,
-                    new StringBuilder()
-                    .append("mod program '").append(this.jpoName).append("' code \"")
-                    .append(this.getCode(_class2Pck))
-                    .append("\" add property \"").append(Insert_mxJPO.PROP_FILEDATE).append("\" value \"")
-                            .append(Insert_mxJPO.DATE_FORMAT.format(getLastModified())).append('\"')
-                    .append(" add property \"").append(Insert_mxJPO.PROP_VERSION).append("\" value \"")
-                            .append(_version).append("\""));
+            final CharSequence code = this.getCode(_class2Pck);
+
+            final File tmpInqFile = File.createTempFile(this.jpoFile.getName(), "");
+            try  {
+                tmpInqFile.delete();
+                tmpInqFile.mkdir();
+
+                final File file = new File(tmpInqFile, this.jpoFile.getName());
+
+                try  {
+                    final Writer outTCL = new FileWriter(file);
+                    outTCL.append(code.toString().trim());
+                    outTCL.flush();
+                    outTCL.close();
+
+                    execMql(_context,
+                            new StringBuilder()
+                                .append("insert program '").append(file.toString()).append("';")
+                                .append("mod program '").append(this.jpoName).append("'")
+                                        .append(" add property \"").append(Insert_mxJPO.PROP_FILEDATE).append("\" value \"")
+                                                .append(Insert_mxJPO.DATE_FORMAT.format(getLastModified())).append('\"')
+                                        .append(" add property \"").append(Insert_mxJPO.PROP_VERSION).append("\" value \"")
+                                                .append(_version).append("\";"));
+                } finally  {
+                    file.delete();
+                }
+            } finally  {
+                tmpInqFile.delete();
+            }
         }
 
         /**
@@ -437,7 +484,7 @@ System.out.println("update jpo '" + classFile.jpoName + "'");
                 while (line != null)  {
                     final Matcher pckMatch = Insert_mxJPO.PATTERN_PACKAGE.matcher(line);
                     if (pckMatch.find())  {
-                        code.append('\n');
+                        code.append(pckMatch.group()).append('\n');
                     } else  {
                         final Matcher impMatch = Insert_mxJPO.PATTERN_IMPORT.matcher(line);
                         if (impMatch.find())  {
@@ -445,7 +492,7 @@ System.out.println("update jpo '" + classFile.jpoName + "'");
                             // extract class name from imported name
                             final Matcher classWithoutPckMatch = Insert_mxJPO.PATTERN_JPOWITHOUTPCK.matcher(impClass);
                             classWithoutPckMatch.find();
-                            class2Pck.put(classWithoutPckMatch.group(), impClass.substring(0, impClass.length() - 6));
+                            class2Pck.put(classWithoutPckMatch.group(), impClass);
                         } else  {
                             final Matcher matcher = Insert_mxJPO.PATTERN_JPO.matcher(line);
                             int start = 0;
@@ -453,22 +500,20 @@ System.out.println("update jpo '" + classFile.jpoName + "'");
                             while (matcher.find())  {
                                 if (className.equals(matcher.group()))  {
                                     newLine.append(line.substring(start, matcher.start()))
-                                            .append("${"+"CLASSNAME"+"}");
+                                           .append(className);
                                     start = matcher.start() + matcher.group().length();
                                 } else  {
                                     final String clazzName = class2Pck.containsKey(matcher.group())
                                                              ? class2Pck.get(matcher.group())
-                                                             : matcher.group().substring(0, matcher.group().length() - 6);
+                                                             : matcher.group();
                                     newLine.append(line.substring(start, matcher.start()))
-                                           .append("${"+"CLASS:")
-                                           .append(clazzName)
-                                           .append("}");
+                                           .append(clazzName);
                                     start = matcher.start() + matcher.group().length();
                                 }
                             }
                             newLine.append(line.substring(start, line.length()));
 
-                            code.append(newLine.toString().replaceAll("\\\\", "\\\\\\\\\\\\\\\\").replaceAll("\"", "\\\\\"")).append('\n');
+                            code.append(newLine.toString()/*.replaceAll("\\\\", "\\\\\\\\\\\\\\\\").replaceAll("\"", "\\\\\"")*/).append('\n');
                         }
                     }
                     line = reader.readLine();
