@@ -19,6 +19,7 @@
  */
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -754,12 +755,17 @@ System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name 
      *                          the Matrix name; otherwise the found files must
      *                          match)
      * @return map of update classes and the depending files with their names
-     * @throws InstantiationException
+     * @throws InvocationTargetException
      * @throws IllegalAccessException
+     * @throws InstantiationException
+     * @throws NoSuchMethodException
+     * @throws IllegalArgumentException
+     * @throws SecurityException
      */
     protected Map<TypeDef_mxJPO,Map<File,String>> evalMatches(final Set<String> _paths,
                                                         final Map<TypeDef_mxJPO,List<String>> _clazz2matches)
-            throws InstantiationException, IllegalAccessException
+            throws SecurityException, IllegalArgumentException, NoSuchMethodException,
+                   InstantiationException, IllegalAccessException, InvocationTargetException
     {
         final Map<TypeDef_mxJPO,Map<File,String>> clazz2names = new HashMap<TypeDef_mxJPO,Map<File,String>>();
 

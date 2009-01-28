@@ -32,6 +32,7 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.update.AbstractObject_mxJPO;
+import org.mxupdate.util.TypeDef_mxJPO;
 import org.xml.sax.SAXException;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
@@ -48,6 +49,16 @@ public class Program_mxJPO
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = -3329894042318127257L;
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public Program_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     /**
      * Evaluates for given collection of string which programs are matching

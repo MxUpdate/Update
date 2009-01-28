@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.mxupdate.update.datamodel.Policy_mxJPO;
+import org.mxupdate.util.TypeDef_mxJPO;
 
 import matrix.db.Context;
 
@@ -327,7 +328,7 @@ TOKEN : /** State and depending signature and trigger Tokens */
 }
 
 Policy_mxJPO policy() : {
-    final Policy_mxJPO policy = new Policy_mxJPO();
+    final Policy_mxJPO policy = new Policy_mxJPO(TypeDef_mxJPO.Policy);
     String tmp;
     Set<String> set;
 } {

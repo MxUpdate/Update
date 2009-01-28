@@ -31,6 +31,7 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.util.TypeDef_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
@@ -82,6 +83,16 @@ public class Channel_mxJPO
      * @see #writeObject(Writer)
      */
     final Map<Integer,CommandRef> orderCmds = new TreeMap<Integer,CommandRef>();
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public Channel_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     @Override
     protected void parse(final String _url,

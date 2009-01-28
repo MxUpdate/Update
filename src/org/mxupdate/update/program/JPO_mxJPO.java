@@ -32,6 +32,7 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.update.AbstractObject_mxJPO;
+import org.mxupdate.util.TypeDef_mxJPO;
 import org.mxupdate.util.Mapping_mxJPO.AdminPropertyDef;
 import org.xml.sax.SAXException;
 
@@ -73,6 +74,16 @@ public class JPO_mxJPO
             = "################################################################################\n"
             + "# END NEEDED MQL UPDATE FOR THIS JPO PROGRAM                                   #\n"
             + "################################################################################";
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public JPO_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     /**
      * Evaluates for given collection of string which JPOs are matching

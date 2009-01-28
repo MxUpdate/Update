@@ -27,6 +27,8 @@ import java.util.Map;
 
 import matrix.db.Context;
 
+import org.mxupdate.util.TypeDef_mxJPO;
+
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
@@ -52,6 +54,16 @@ public class Type_mxJPO
      * From which type is this type derived?
      */
     private String derived = "ADMINISTRATION";
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public Type_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     /**
      * @param _url      URL to parse

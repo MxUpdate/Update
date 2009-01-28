@@ -32,6 +32,7 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.util.TypeDef_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
@@ -71,6 +72,16 @@ public class Rule_mxJPO
      * @see #prepare(Context)   method used to sort the user access instances
      */
     private final Set<UserAccess> userAccessSorted = new TreeSet<UserAccess>();
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public Rule_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     /**
      * Parses all rule specific URLs.

@@ -21,6 +21,7 @@
 package org.mxupdate.update.integration;
 
 import org.mxupdate.update.AbstractBusObject_mxJPO;
+import org.mxupdate.util.TypeDef_mxJPO;
 
 /**
  * @author tmoxter
@@ -33,4 +34,14 @@ public class IEFGlobalConfig_mxJPO
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = -4568440571515470965L;
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public IEFGlobalConfig_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 }

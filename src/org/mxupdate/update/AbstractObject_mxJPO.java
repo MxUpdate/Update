@@ -69,6 +69,24 @@ public abstract class AbstractObject_mxJPO
     private String version = null;
 
     /**
+     * Defines the related type definition enumeration.
+     *
+     * @see #getTypeDef()
+     * @see #AbstractObject_mxJPO(TypeDef_mxJPO)
+     */
+    private final TypeDef_mxJPO typeDef;
+
+    /**
+     * Initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    protected AbstractObject_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        this.typeDef = _typeDef;
+    }
+
+    /**
      * Returns the path where the file is located of this matrix object. The
      * method used the information annotation.
      *
@@ -83,12 +101,12 @@ public abstract class AbstractObject_mxJPO
     /**
      * Returns the type definition instance.
      *
-     * @return type definition instance (if administration type definition
-     *         exists else business type definition)
+     * @return type definition enumeration
+     * @see #typeDef
      */
     public final TypeDef_mxJPO getTypeDef()
     {
-        return TypeDef_mxJPO.valueOf(this);
+        return this.typeDef;
     }
 
     /**

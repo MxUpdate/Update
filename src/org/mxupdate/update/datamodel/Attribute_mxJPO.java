@@ -33,6 +33,8 @@ import java.util.TreeSet;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
+import org.mxupdate.util.TypeDef_mxJPO;
+
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
@@ -89,6 +91,16 @@ public class Attribute_mxJPO
     private boolean multiline = false;
 
     private final String[] PREFIXES = {"BOOLEAN_", "DATE_", "INTEGER_", "REAL_", "STRING_"};
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public Attribute_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     /**
      * Evaluates for given set of files all matching files and returns them as

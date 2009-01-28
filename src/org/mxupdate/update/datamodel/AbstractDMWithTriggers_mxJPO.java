@@ -34,6 +34,7 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.util.TypeDef_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
@@ -64,6 +65,16 @@ public abstract class AbstractDMWithTriggers_mxJPO
      * @see #writeTriggers(Writer)      write the trigger information
      */
     private final Map<String,Trigger> triggers = new TreeMap<String,Trigger>();
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public AbstractDMWithTriggers_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     /**
      * @param _url      URL to parse

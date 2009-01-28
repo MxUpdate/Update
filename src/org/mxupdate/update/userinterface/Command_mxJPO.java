@@ -30,6 +30,7 @@ import java.util.TreeSet;
 import matrix.db.Context;
 
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.util.TypeDef_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
@@ -62,6 +63,16 @@ public class Command_mxJPO
      * Sorted list of assigned users of the command.
      */
     final Set<String> users = new TreeSet<String>();
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public Command_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     @Override
     protected void parse(final String _url,

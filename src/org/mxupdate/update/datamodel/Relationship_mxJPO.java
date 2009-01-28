@@ -29,6 +29,8 @@ import java.util.TreeSet;
 
 import matrix.db.Context;
 
+import org.mxupdate.util.TypeDef_mxJPO;
+
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
@@ -119,6 +121,16 @@ public class Relationship_mxJPO
      * To side type list.
      */
     private final Set<String> toTypes = new TreeSet<String>();
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public Relationship_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     /**
      * @param _url      URL to parse

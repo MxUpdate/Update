@@ -37,6 +37,7 @@ import matrix.util.StringList;
 
 import org.mxupdate.update.AbstractBusObject_mxJPO;
 import org.mxupdate.update.util.BusObject_mxJPO;
+import org.mxupdate.util.TypeDef_mxJPO;
 import org.mxupdate.util.Mapping_mxJPO.RelationDef;
 
 /**
@@ -66,6 +67,16 @@ public class TriggerGroup_mxJPO
      * @see #write(Writer)
      */
     private final Set<BusObject_mxJPO> froms = new TreeSet<BusObject_mxJPO>();
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public TriggerGroup_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     /**
      * Evaluated all from and to objects of this trigger group.

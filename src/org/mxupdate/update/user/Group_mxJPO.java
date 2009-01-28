@@ -30,6 +30,7 @@ import java.util.TreeSet;
 import matrix.db.Context;
 
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.util.TypeDef_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
@@ -50,6 +51,16 @@ public class Group_mxJPO
      * Set to hold all parent groups.
      */
     final Set<String> parentGroups = new TreeSet<String>();
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public Group_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     /**
      * Parses all group specific URLs.

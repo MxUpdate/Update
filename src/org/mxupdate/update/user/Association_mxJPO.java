@@ -33,6 +33,7 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.util.TypeDef_mxJPO;
 import org.mxupdate.util.Mapping_mxJPO.AdminPropertyDef;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
@@ -55,6 +56,16 @@ public class Association_mxJPO
      * Stores the definition of this association instance.
      */
     private String definition = null;
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public Association_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     /**
      * Parses all association specific URLs.

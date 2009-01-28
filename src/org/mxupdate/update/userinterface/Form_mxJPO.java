@@ -29,6 +29,7 @@ import java.util.Stack;
 import matrix.db.Context;
 
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.util.TypeDef_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
@@ -70,6 +71,16 @@ public class Form_mxJPO
      */
     private final Stack<TableColumn_mxJPO> fields
             = new Stack<TableColumn_mxJPO>();
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public Form_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     @Override
     protected void parse(String _url, String _content)

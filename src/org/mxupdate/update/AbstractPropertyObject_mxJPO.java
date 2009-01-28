@@ -35,6 +35,7 @@ import java.util.Stack;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
+import org.mxupdate.util.TypeDef_mxJPO;
 import org.mxupdate.util.Mapping_mxJPO.AdminPropertyDef;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -135,6 +136,16 @@ public abstract class AbstractPropertyObject_mxJPO
      * @see #getDescription()
      */
     private String description = "";
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    protected AbstractPropertyObject_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     /**
      * Returns the file name for this MxUpdate administration object. The file

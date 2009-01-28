@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.mxupdate.update.AbstractBusObject_mxJPO;
+import org.mxupdate.util.TypeDef_mxJPO;
 import org.mxupdate.util.Mapping_mxJPO.AttributeDef;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
@@ -39,6 +40,16 @@ public class NumberGenerator_mxJPO
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = -3678077121553752020L;
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public NumberGenerator_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     /**
      * Writes the information to update the business objects. Because for the

@@ -30,6 +30,8 @@ import java.util.TreeMap;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
+import org.mxupdate.util.TypeDef_mxJPO;
+
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
@@ -50,9 +52,14 @@ public class Menu_mxJPO
 
     final Stack<MenuChild> childs = new Stack<MenuChild>();
 
-    public Menu_mxJPO()
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public Menu_mxJPO(final TypeDef_mxJPO _typeDef)
     {
-        super();
+        super(_typeDef);
     }
 
     @Override

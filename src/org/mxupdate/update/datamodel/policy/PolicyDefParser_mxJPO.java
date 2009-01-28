@@ -9,6 +9,9 @@ import java.util.Set;
 
 import matrix.db.Context;
 
+import org.mxupdate.update.datamodel.Policy_mxJPO;
+import org.mxupdate.util.TypeDef_mxJPO;
+
 public class PolicyDefParser_mxJPO implements PolicyDefParserConstants_mxJPO {
   public static void main(String args[]) {
     System.out.println("Reading from standard input...");
@@ -59,7 +62,7 @@ PolicyDefParser_mxJPO e = new PolicyDefParser_mxJPO(new java.io.StringReader(
 + "    trigger promote check \"emxTriggerManager\" input \"PolicyRBN_ProductsInReviewPromoteCheck\""
 + "  }"));
     try {
-    org.mxupdate.update.datamodel.Policy_mxJPO n = e.policy();
+    Policy_mxJPO n = e.policy();
 //      SimpleNode_mxJPO n = eg2.Start();
 //      n.dump("");
 
@@ -169,9 +172,8 @@ try  {
         return field;
     }
 
-  final public org.mxupdate.update.datamodel.Policy_mxJPO policy() throws ParseException_mxJPO {
-    final org.mxupdate.update.datamodel.Policy_mxJPO policy
-            = new org.mxupdate.update.datamodel.Policy_mxJPO();
+  final public Policy_mxJPO policy() throws ParseException_mxJPO {
+    final Policy_mxJPO policy = new Policy_mxJPO(TypeDef_mxJPO.Policy);
     String tmp;
     Set<String> set;
     label_1:
@@ -238,9 +240,8 @@ try  {
     throw new Error("Missing return statement in function");
   }
 
-  final public void state(final org.mxupdate.update.datamodel.Policy_mxJPO _policy) throws ParseException_mxJPO {
-    final org.mxupdate.update.datamodel.Policy_mxJPO.State state
-            = new org.mxupdate.update.datamodel.Policy_mxJPO.State();
+  final public void state(final Policy_mxJPO _policy) throws ParseException_mxJPO {
+    final Policy_mxJPO.State state = new Policy_mxJPO.State();
     String tmpStr;
     Set<String> tmpSet;
     jj_consume_token(STATE);
@@ -345,9 +346,8 @@ try  {
         appendValue(_policy, "states", state);
   }
 
-  final public void stateUser(final org.mxupdate.update.datamodel.Policy_mxJPO.State _state) throws ParseException_mxJPO {
-    final org.mxupdate.update.datamodel.Policy_mxJPO.UserAccess userAccess
-            = new org.mxupdate.update.datamodel.Policy_mxJPO.UserAccess();
+  final public void stateUser(final Policy_mxJPO.State _state) throws ParseException_mxJPO {
+    final Policy_mxJPO.UserAccess userAccess = new Policy_mxJPO.UserAccess();
     String user, filter = null;
     Set<String> accessSet;
     jj_consume_token(USER);
@@ -367,9 +367,8 @@ try  {
         appendValue(_state, "userAccess", userAccess);
   }
 
-  final public void stateTrigger(final org.mxupdate.update.datamodel.Policy_mxJPO.State _state) throws ParseException_mxJPO {
-    final org.mxupdate.update.datamodel.Policy_mxJPO.Trigger trigger
-            = new org.mxupdate.update.datamodel.Policy_mxJPO.Trigger();
+  final public void stateTrigger(final Policy_mxJPO.State _state) throws ParseException_mxJPO {
+    final Policy_mxJPO.Trigger trigger = new Policy_mxJPO.Trigger();
     String tmp;
     jj_consume_token(TRIGGER);
     tmp = sString();
@@ -398,9 +397,8 @@ try  {
         appendValue(_state, "triggersStack", trigger);
   }
 
-  final public void stateSignature(final org.mxupdate.update.datamodel.Policy_mxJPO.State _state) throws ParseException_mxJPO {
-    final org.mxupdate.update.datamodel.Policy_mxJPO.Signature signature
-            = new org.mxupdate.update.datamodel.Policy_mxJPO.Signature();
+  final public void stateSignature(final Policy_mxJPO.State _state) throws ParseException_mxJPO {
+    final Policy_mxJPO.Signature signature = new Policy_mxJPO.Signature();
     String tmpStr;
     Set<String> tmpSet;
     jj_consume_token(SIGNATURE);

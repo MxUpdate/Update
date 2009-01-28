@@ -39,6 +39,7 @@ import java.util.TreeSet;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
+import org.mxupdate.util.TypeDef_mxJPO;
 import org.mxupdate.util.Mapping_mxJPO.AdminPropertyDef;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
@@ -72,6 +73,16 @@ public abstract class AbstractAdminObject_mxJPO
      *
      */
     private final Set<String> symbolicNames = new TreeSet<String>();
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    protected AbstractAdminObject_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     @Override
     public Set<String> getMatchingNames(final Context _context,

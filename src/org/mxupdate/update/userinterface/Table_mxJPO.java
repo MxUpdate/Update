@@ -29,6 +29,7 @@ import java.util.Stack;
 import matrix.db.Context;
 
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.util.TypeDef_mxJPO;
 
 /**
  *
@@ -47,6 +48,16 @@ public class Table_mxJPO
      * Stores all table columns of this web table instance.
      */
     final Stack<TableColumn_mxJPO> columns = new Stack<TableColumn_mxJPO>();
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public Table_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     @Override
     protected void parse(final String _url,

@@ -20,6 +20,7 @@
 
 package org.mxupdate.util;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -448,7 +449,19 @@ public enum TypeDef_mxJPO
      */
     public static TypeDef_mxJPO valueOf(final AbstractObject_mxJPO _obj)
     {
-        return TypeDefValues.MAP_CLASS2TYPEDEF.get(_obj.getClass());
+        System.out.println("valueof._obj.getClass()="+_obj.getClass());
+        System.out.println("valueof._obj.getClass()="+_obj.getClass().getSuperclass());
+/*InfoAnno_mxJPO ret = this.getClass().getAnnotation(InfoAnno_mxJPO.class);
+if (ret == null)  {
+    Class<?> clazz = this.getClass().getSuperclass();
+    while ((clazz != null) && (ret == null))  {
+        ret = clazz.getAnnotation(InfoAnno_mxJPO.class);
+        clazz = clazz.getSuperclass();
+    }
+}
+return ret;
+*/
+return TypeDefValues.MAP_CLASS2TYPEDEF.get(_obj.getClass());
     }
 
     /**
@@ -624,8 +637,9 @@ public enum TypeDef_mxJPO
     }
 
     public AbstractObject_mxJPO newTypeInstance()
-            throws InstantiationException, IllegalAccessException
+            throws SecurityException, NoSuchMethodException, IllegalArgumentException,
+                   InstantiationException, IllegalAccessException, InvocationTargetException
     {
-        return this.typeClazz.newInstance();
+        return this.typeClazz.getConstructor(TypeDef_mxJPO.class).newInstance(this);
     }
 }

@@ -32,6 +32,7 @@ import matrix.util.MatrixException;
 import matrix.util.StringList;
 
 import org.mxupdate.update.AbstractBusObject_mxJPO;
+import org.mxupdate.util.TypeDef_mxJPO;
 
 /**
  * @author tmoxter
@@ -82,6 +83,16 @@ public class ObjectGenerator_mxJPO
      * @see #prepare(Context)
      */
     private String numGenRevi = null;
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public ObjectGenerator_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     /**
      * Related number generator revision.

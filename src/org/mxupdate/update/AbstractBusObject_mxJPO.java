@@ -127,6 +127,16 @@ public abstract class AbstractBusObject_mxJPO
     private String busOid;
 
     /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    protected AbstractBusObject_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
+
+    /**
      * Evaluates the matching names for this administrational business objects.
      * Matching means, that the name and / or revision of the business object
      * matches the collection of given matches.

@@ -42,6 +42,7 @@ import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.AbstractBusObject_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.AbstractPropertyObject_mxJPO;
+import org.mxupdate.util.TypeDef_mxJPO;
 import org.xml.sax.SAXException;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
@@ -83,6 +84,16 @@ public class Person_mxJPO
      * Holds all role assignments of this person.
      */
     private final Set<String> roles = new TreeSet<String>();
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public Person_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     /**
      * The matching names are evaluated with the help of the business
@@ -248,6 +259,14 @@ public class Person_mxJPO
          * Set of administration access for this person.
          */
         private final Set<String> adminAccess = new TreeSet<String>();
+
+        /**
+         * Constructor used to initialize the type definition enumeration.
+         */
+        private PersonAdmin()
+        {
+            super(Person_mxJPO.this.getTypeDef());
+        }
 
         /**
          * Because the original method
@@ -528,6 +547,14 @@ public class Person_mxJPO
          * Set of all companies for which the person is company representative.
          */
         private final Set<String> representativeOf = new TreeSet<String>();
+
+        /**
+         * Constructor used to initialize the type definition enumeration.
+         */
+        private PersonBus()
+        {
+            super(Person_mxJPO.this.getTypeDef());
+        }
 
         /**
          * Parsed the business object of the person.

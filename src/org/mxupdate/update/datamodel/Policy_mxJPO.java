@@ -41,6 +41,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.update.datamodel.policy.PolicyDefParser_mxJPO;
 import org.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface;
+import org.mxupdate.util.TypeDef_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertMql;
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
@@ -119,6 +120,16 @@ public class Policy_mxJPO
      * Stack with all states of this policy.
      */
     private final Stack<State> states = new Stack<State>();
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public Policy_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     /**
      * Parses all format specific URLs.

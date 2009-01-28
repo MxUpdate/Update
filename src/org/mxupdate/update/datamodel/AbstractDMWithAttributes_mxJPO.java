@@ -35,6 +35,7 @@ import matrix.db.Context;
 import matrix.db.JPO;
 
 import org.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface;
+import org.mxupdate.util.TypeDef_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
@@ -94,6 +95,16 @@ public abstract class AbstractDMWithAttributes_mxJPO
                 + "}\n"
                 + "eval $lsCmd\n"
             + "}\n";
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     */
+    public AbstractDMWithAttributes_mxJPO(final TypeDef_mxJPO _typeDef)
+    {
+        super(_typeDef);
+    }
 
     /**
      * Checks if the URL to parse defined an attribute and appends this
