@@ -450,7 +450,7 @@ System.out.println("update jpo '" + classFile.jpoName + "'");
 
                     execMql(_context,
                             new StringBuilder()
-                                .append("insert program '").append(file.toString()).append("';")
+                                .append("insert program '").append(file.toString().replaceAll("\\\\", "/")).append("';")
                                 .append("mod program '").append(this.jpoName).append("'")
                                         .append(" add property \"").append(Insert_mxJPO.PROP_FILEDATE).append("\" value \"")
                                                 .append(Insert_mxJPO.DATE_FORMAT.format(getLastModified())).append('\"')
