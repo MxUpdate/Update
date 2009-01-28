@@ -187,7 +187,7 @@ public class Association_mxJPO
             }
         } else  {
             ret = (version.matches("^[0-9]++$"))
-                  ? new Date(Long.parseLong(curVersion) * 1000)
+                  ? new Date(Long.parseLong(version) * 1000)
                   : null;
         }
 
