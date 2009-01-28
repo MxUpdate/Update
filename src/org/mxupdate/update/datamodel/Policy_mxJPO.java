@@ -379,7 +379,7 @@ public class Policy_mxJPO
      * <li>reset from and to information</li>
      * <li>remove all from and to types</li>
      * </ul>
-     *      * Adds the TCL procedure {@link #TCL_PROCEDURE} so that attributes could
+     * Adds the TCL procedure {@link #TCL_PROCEDURE} so that attributes could
      * be assigned to this administration object. The instance itself
      * is stored as encoded string in the TCL variable
      * <code>JPO_CALLER_INSTANCE</code>.
