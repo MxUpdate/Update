@@ -20,11 +20,7 @@
 
 package org.mxupdate.update.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.ObjectInputStream;
-
 import matrix.db.Context;
-import matrix.util.Mime64;
 
 /**
  *
@@ -34,6 +30,21 @@ import matrix.util.Mime64;
  */
 public class JPOCaller_mxJPO
 {
+    /**
+     * Stores the current caller instance.
+     */
+    private static JPOCallerInterface CALLER_INSTANCE;
+
+    /**
+     * Defines new instance which will be called within a TCL program.
+     *
+     * @param _instance new instance
+     */
+    public static void defineInstance(final JPOCallerInterface _instance)
+    {
+        CALLER_INSTANCE = _instance;
+    }
+
     /**
      *
      * @param _context          context for this request
@@ -47,16 +58,7 @@ public class JPOCaller_mxJPO
             throws Exception
     {
         try  {
-            final ByteArrayInputStream bis = new ByteArrayInputStream(Mime64.decode(_args[0]));
-            final ObjectInputStream ois = new ObjectInputStream(bis);
-
-            // prepare arguments
-            final String[] args = new String[_args.length - 1];
-            System.arraycopy(_args, 1, args, 0, _args.length - 1);
-
-            // execute JPO instance
-            final JPOCallerInterface jpo = (JPOCallerInterface) ois.readObject();
-            jpo.jpoCallExecute(_context, args);
+            CALLER_INSTANCE.jpoCallExecute(_context, _args);
         } catch (Exception e)  {
             e.printStackTrace();
             throw e;

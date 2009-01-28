@@ -23,7 +23,6 @@ package org.mxupdate.update.datamodel;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -32,8 +31,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import matrix.db.Context;
-import matrix.db.JPO;
 
+import org.mxupdate.update.util.JPOCaller_mxJPO;
 import org.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface;
 import org.mxupdate.util.TypeDef_mxJPO;
 
@@ -53,6 +52,11 @@ public abstract class AbstractDMWithAttributes_mxJPO
         implements JPOCallerInterface
 {
     /**
+     * Defines the serialize version unique identifier.
+     */
+    private static final long serialVersionUID = -2194896309854537398L;
+
+    /**
      *
      */
     public static final Set<String> IGNORE_TYPE_ATTRIBUTES = new HashSet<String>();
@@ -60,11 +64,6 @@ public abstract class AbstractDMWithAttributes_mxJPO
     *
     */
    public static final Set<String> IGNORE_RELATIONSHIP_ATTRIBUTES = new HashSet<String>();
-
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -2194896309854537398L;
 
     /**
      * List of all attributes for this data model administration object.
@@ -88,7 +87,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
             = "proc testAttributes {args}  {\n"
                 + "global JPO_CALLER_INSTANCE\n"
                 + "set iIdx 0\n"
-                + "set lsCmd [list mql exec prog org.mxupdate.update.util.JPOCaller $JPO_CALLER_INSTANCE]\n"
+                + "set lsCmd [list mql exec prog org.mxupdate.update.util.JPOCaller]\n"
                 + "while {$iIdx < [llength $args]}  {\n"
                 +   "lappend lsCmd [lindex $args $iIdx]\n"
                 +   "incr iIdx\n"
@@ -171,18 +170,14 @@ public abstract class AbstractDMWithAttributes_mxJPO
                           final File _sourceFile)
             throws Exception
     {
-        // define TCL variable for this instance
-        final String[] instance = JPO.packArgs(this);
-        final Map<String,String> tclVariables = new HashMap<String,String>();
-        tclVariables.putAll(_tclVariables);
-        tclVariables.put("JPO_CALLER_INSTANCE", instance[1]);
+        JPOCaller_mxJPO.defineInstance(this);
 
         // add TCL code for the procedure
         final StringBuilder tclCode = new StringBuilder()
                 .append(TCL_PROCEDURE)
                 .append(_preTCLCode);
 
-        super.update(_context, _preMQLCode, _postMQLCode, tclCode, tclVariables, _sourceFile);
+        super.update(_context, _preMQLCode, _postMQLCode, tclCode, _tclVariables, _sourceFile);
     }
 
     /**

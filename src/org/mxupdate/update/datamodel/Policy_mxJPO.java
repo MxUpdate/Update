@@ -36,10 +36,10 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import matrix.db.Context;
-import matrix.db.JPO;
 import matrix.util.MatrixException;
 
 import org.mxupdate.update.datamodel.policy.PolicyDefParser_mxJPO;
+import org.mxupdate.update.util.JPOCaller_mxJPO;
 import org.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface;
 import org.mxupdate.util.TypeDef_mxJPO;
 
@@ -80,7 +80,7 @@ public class Policy_mxJPO
                 + "regsub -all {\\\"} $sArg {@1@1@} sArg\n"
                 + "regsub -all {\\\\\\[} $sArg {[} sArg\n"
                 + "regsub -all {\\\\\\]} $sArg {]} sArg\n"
-                + "mql exec prog org.mxupdate.update.util.JPOCaller $JPO_CALLER_INSTANCE $_sPolicy \"${sArg}\"\n"
+                + "mql exec prog org.mxupdate.update.util.JPOCaller $_sPolicy \"${sArg}\"\n"
             + "}\n";
 
 
@@ -406,18 +406,14 @@ public class Policy_mxJPO
                           final File _sourceFile)
             throws Exception
     {
-        // define TCL variable for this instance
-        final String[] instance = JPO.packArgs(this);
-        final Map<String,String> tclVariables = new HashMap<String,String>();
-        tclVariables.putAll(_tclVariables);
-        tclVariables.put("JPO_CALLER_INSTANCE", instance[1]);
+        JPOCaller_mxJPO.defineInstance(this);
 
         // add TCL code for the procedure
         final StringBuilder tclCode = new StringBuilder()
                 .append(TCL_PROCEDURE)
                 .append(_preTCLCode);
 
-        super.update(_context, _preMQLCode, _postMQLCode, tclCode, tclVariables, _sourceFile);
+        super.update(_context, _preMQLCode, _postMQLCode, tclCode, _tclVariables, _sourceFile);
     }
 
     /**
