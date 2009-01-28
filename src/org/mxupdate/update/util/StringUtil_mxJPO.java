@@ -42,7 +42,7 @@ public class StringUtil_mxJPO
         return (_text != null)
                ? _text.replaceAll("\\\\", "\\\\\\\\")
                       .replaceAll("\\\"", "\\\\\"")
-                      .replaceAll("\\$", "\\\\\\$")
+                      .replaceAll("\\" + "$", "\\\\\\" + "$")
                       .replaceAll("\\{", "\\\\{")
                       .replaceAll("\\}", "\\\\}")
                       .replaceAll("\\[", "\\\\[")

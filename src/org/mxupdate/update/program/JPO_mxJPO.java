@@ -135,10 +135,10 @@ public class JPO_mxJPO
         // replace class names and references to other JPOs
         final String name = _name + NAME_SUFFIX;
         final String code = execMql(_context, cmd)
-                               .replaceAll("\\$\\{CLASSNAME\\}", name.replaceAll(".*\\.", ""))
+                               .replaceAll("\\" + "$\\{CLASSNAME\\}", name.replaceAll(".*\\.", ""))
                                .replaceAll("\\\\\\\\", "\\\\")
-                               .replaceAll("(?<=\\$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", NAME_SUFFIX)
-                               .replaceAll("\\$\\{CLASS\\:", "")
+                               .replaceAll("(?<=\\"+ "$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", NAME_SUFFIX)
+                               .replaceAll("\\" + "$\\{CLASS\\:", "")
                                .trim();
 
         // extract package name
