@@ -39,8 +39,8 @@ import java.util.TreeSet;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
-import org.mxupdate.util.TypeDef_mxJPO;
-import org.mxupdate.util.Mapping_mxJPO.AdminPropertyDef;
+import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;

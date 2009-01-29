@@ -38,10 +38,10 @@ import java.util.TreeSet;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
+import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.policy.PolicyDefParser_mxJPO;
 import org.mxupdate.update.util.JPOCaller_mxJPO;
 import org.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface;
-import org.mxupdate.util.TypeDef_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertMql;
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;

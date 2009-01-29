@@ -31,8 +31,8 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 import matrix.util.StringList;
 
+import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractBusObject_mxJPO;
-import org.mxupdate.util.TypeDef_mxJPO;
 
 /**
  * @author tmoxter

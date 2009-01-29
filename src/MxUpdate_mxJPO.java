@@ -35,13 +35,13 @@ import java.util.TreeSet;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
+import org.mxupdate.mapping.Mapping_mxJPO;
+import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.datamodel.Relationship_mxJPO;
 import org.mxupdate.update.datamodel.Type_mxJPO;
-import org.mxupdate.util.Mapping_mxJPO;
 import org.mxupdate.util.MqlUtil_mxJPO;
-import org.mxupdate.util.TypeDef_mxJPO;
-import org.mxupdate.util.Mapping_mxJPO.AdminPropertyDef;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;

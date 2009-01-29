@@ -28,8 +28,8 @@ import java.util.Map;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
+import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.util.TypeDef_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;

@@ -27,7 +27,7 @@ import java.util.Map;
 
 import matrix.db.Context;
 
-import org.mxupdate.util.TypeDef_mxJPO;
+import org.mxupdate.mapping.TypeDef_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 

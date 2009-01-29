@@ -9,8 +9,8 @@ import java.util.Set;
 
 import matrix.db.Context;
 
+import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
-import org.mxupdate.util.TypeDef_mxJPO;
 
 public class PolicyDefParser_mxJPO implements PolicyDefParserConstants_mxJPO {
   public static void main(String args[]) {

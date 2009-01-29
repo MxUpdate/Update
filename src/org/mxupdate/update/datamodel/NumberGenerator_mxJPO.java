@@ -23,9 +23,9 @@ package org.mxupdate.update.datamodel;
 import java.io.IOException;
 import java.io.Writer;
 
+import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.mapping.Mapping_mxJPO.AttributeDef;
 import org.mxupdate.update.AbstractBusObject_mxJPO;
-import org.mxupdate.util.TypeDef_mxJPO;
-import org.mxupdate.util.Mapping_mxJPO.AttributeDef;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 

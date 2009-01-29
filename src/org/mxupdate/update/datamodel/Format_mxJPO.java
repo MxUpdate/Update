@@ -23,8 +23,8 @@ package org.mxupdate.update.datamodel;
 import java.io.IOException;
 import java.io.Writer;
 
+import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.util.TypeDef_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 

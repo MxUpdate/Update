@@ -18,7 +18,7 @@
  * Last Changed By: $Author$
  */
 
-package org.mxupdate.util;
+package org.mxupdate.mapping;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;

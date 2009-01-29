@@ -18,7 +18,7 @@
  * Last Changed By: $Author$
  */
 
-package org.mxupdate.util;
+package org.mxupdate.mapping;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -28,6 +28,8 @@ import java.util.Map.Entry;
 
 import matrix.db.Context;
 import matrix.util.MatrixException;
+
+import org.mxupdate.util.MqlUtil_mxJPO;
 
 
 /**

@@ -38,11 +38,11 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 import matrix.util.StringList;
 
+import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.AbstractBusObject_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.AbstractPropertyObject_mxJPO;
-import org.mxupdate.util.TypeDef_mxJPO;
 import org.xml.sax.SAXException;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;

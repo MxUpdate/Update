@@ -35,8 +35,8 @@ import java.util.Stack;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
-import org.mxupdate.util.TypeDef_mxJPO;
-import org.mxupdate.util.Mapping_mxJPO.AdminPropertyDef;
+import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;

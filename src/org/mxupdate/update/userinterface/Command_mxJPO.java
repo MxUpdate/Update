@@ -29,8 +29,8 @@ import java.util.TreeSet;
 
 import matrix.db.Context;
 
+import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.util.TypeDef_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 

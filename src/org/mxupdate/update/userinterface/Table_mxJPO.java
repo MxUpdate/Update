@@ -28,8 +28,8 @@ import java.util.Stack;
 
 import matrix.db.Context;
 
+import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.util.TypeDef_mxJPO;
 
 /**
  *

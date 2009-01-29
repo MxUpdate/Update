@@ -20,8 +20,8 @@
 
 package org.mxupdate.update.integration;
 
+import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractBusObject_mxJPO;
-import org.mxupdate.util.TypeDef_mxJPO;
 
 /**
  * @author tmoxter
