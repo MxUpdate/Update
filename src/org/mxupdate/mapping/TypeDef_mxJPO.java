@@ -366,8 +366,8 @@ public enum TypeDef_mxJPO
     protected static void defineTypeDefValue(final String _key,
                                              final String _value)
     {
-        final String key = _key.replaceAll("\\..*", "");
-        final String enumName = _key.substring(key.length() + 1);
+        final String enumName = _key.replaceAll("\\..*", "");
+        final String key = _key.substring(enumName.length() + 1);
 
         final TypeDef_mxJPO typeDef = TypeDef_mxJPO.valueOf(enumName);
         TypeDefValues value = TypeDefValues.VALUES.get(typeDef);
