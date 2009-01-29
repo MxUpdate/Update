@@ -158,7 +158,7 @@ public abstract class AbstractBusObject_mxJPO
         query.open(_context);
         query.setBusinessObjectType(this.getTypeDef().getMxBusType());
         final BusinessObjectWithSelectList list = query.select(_context, selects);
-       query.close(_context);
+        query.close(_context);
 
         final Set<String> ret = new TreeSet<String>();
         for (final Object mapObj : list)  {

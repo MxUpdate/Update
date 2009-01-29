@@ -96,9 +96,11 @@ public abstract class AbstractAdminObject_mxJPO
                 .append(this.getTypeDef().getMxAdminSuffix());
         final Set<String> ret = new TreeSet<String>();
         for (final String name : execMql(_context, cmd).split("\n"))  {
-            for (final String match : _matches)  {
-                if (match(name, match))  {
-                    ret.add(name);
+            if (!"".equals(name))  {
+                for (final String match : _matches)  {
+                    if (match(name, match))  {
+                        ret.add(name);
+                    }
                 }
             }
         }

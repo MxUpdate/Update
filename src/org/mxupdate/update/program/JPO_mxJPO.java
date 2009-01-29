@@ -101,11 +101,13 @@ public class JPO_mxJPO
                 .append("list program * select name isjavaprogram dump \"\t\"");
         final Set<String> ret = new TreeSet<String>();
         for (final String name : execMql(_context, cmd).split("\n"))  {
-            final String[] nameArr = name.split("\t");
-            if ("TRUE".equals(nameArr[1]))  {
-                for (final String match : _matches)  {
-                    if (match(nameArr[0], match))  {
-                        ret.add(nameArr[0]);
+            if (!"".equals(name))  {
+                final String[] nameArr = name.split("\t");
+                if ("TRUE".equals(nameArr[1]))  {
+                    for (final String match : _matches)  {
+                        if (match(nameArr[0], match))  {
+                            ret.add(nameArr[0]);
+                        }
                     }
                 }
             }
