@@ -170,8 +170,8 @@ public class ObjectGenerator_mxJPO
 
         // disconnect from number generator
         if ((this.numGenType != null) && !"".equals(this.numGenType)
-                && (this.numGenName != null) && !"".equals(this.numGenName)
-                && (this.numGenRevi != null) && !"".equals(this.numGenRevi))  {
+                && (this.numGenName != null)
+                && (this.numGenRevi != null))  {
             preMQLCode.append("disconnect bus ").append(this.getBusOid())
                       .append(" relationship \"").append(RELATIONSHIP_NUMBER_GENERATOR)
                       .append("\" to \"").append(this.numGenType).append("\" \"")
