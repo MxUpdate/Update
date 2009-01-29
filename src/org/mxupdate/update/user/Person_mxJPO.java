@@ -110,7 +110,7 @@ public class Person_mxJPO
                                         final Collection<String> _matches)
             throws MatrixException
     {
-        return this.personAdmin.getMatchingNames(_context, _matches);
+        return this.personBus.getMatchingNames(_context, _matches);
     }
 
     @Override
@@ -119,8 +119,8 @@ public class Person_mxJPO
                        final String _name)
             throws MatrixException, SAXException, IOException
     {
-        this.personAdmin.parse(_context, _name);
         this.personBus.parse(_context, _name);
+        this.personAdmin.parse(_context, this.personBus.getBusName());
         final File file = new File(_path, this.personAdmin.getFileName());
         if (!file.getParentFile().exists())  {
             file.getParentFile().mkdirs();
@@ -261,6 +261,11 @@ public class Person_mxJPO
         private final Set<String> adminAccess = new TreeSet<String>();
 
         /**
+         * Defines the site of the person.
+         */
+        private String site;
+
+        /**
          * Constructor used to initialize the type definition enumeration.
          */
         private PersonAdmin()
@@ -357,6 +362,14 @@ public class Person_mxJPO
             } else if ("/phone".equals(_url))  {
                 this.phone = _content;
 
+            } else if ("/homeSite".equals(_url))  {
+            // to be ignored
+            } else if ("/homeSite/siteRef".equals(_url))  {
+                this.site = _content;
+
+            // password must be ignored...
+            } else if (_url.startsWith("/password"))  {
+
             // to be ignored ...
             } else if (_url.startsWith("/cueList"))  {
             } else if (_url.startsWith("/filterList"))  {
@@ -391,6 +404,9 @@ public class Person_mxJPO
                 .append(" \\\n    fullname \"").append(convertTcl(this.fullName)).append("\"")
                 .append(" \\\n    phone \"").append(convertTcl(this.phone)).append("\"")
                 .append(" \\\n    vault \"").append(convertTcl(this.vault)).append("\"");
+            if (this.site != null)  {
+                _out.append(" \\\n    site \"").append(convertTcl(this.site)).append("\"");
+            }
             for (final String group : Person_mxJPO.this.groups)  {
                 _out.append(" \\\n    assign group \"")
                     .append(convertTcl(group))
@@ -567,7 +583,7 @@ public class Person_mxJPO
                              final String _name)
                 throws MatrixException, SAXException, IOException
         {
-            super.parse(_context, _name + "________" + "-");
+            super.parse(_context, _name);
             this.prepare(_context);
 
             // exists a business object?
@@ -721,6 +737,17 @@ public class Person_mxJPO
 
             // prepare map of all TCL variables incl. id of business object
             _tclVariables.put("OBJECTID", objectId);
+        }
+
+        /**
+         * Returns the name of the person.
+         *
+         * @return name of the business object (means the name of person)
+         */
+        @Override
+        protected String getBusName()
+        {
+            return super.getBusName();
         }
     }
 }
