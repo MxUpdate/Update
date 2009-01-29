@@ -600,7 +600,7 @@ System.out.println("ERROR! Symbolic name does not start correctly! So '" + symbN
             }
             commit = true;
         } finally  {
-            if (!commit && !transActive)  {
+            if (!commit && !transActive && _context.isTransactionActive())  {
                 _context.abort();
             }
         }
