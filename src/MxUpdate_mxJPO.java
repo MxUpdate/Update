@@ -36,6 +36,7 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.Mapping_mxJPO;
+import org.mxupdate.mapping.TypeDefGroup_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.AbstractObject_mxJPO;
@@ -153,32 +154,32 @@ public class MxUpdate_mxJPO
 
         appendDescription("Pattern defining the match of attributes which are ignored "
                                 + "within the test attributes of types.",
-                          Arrays.asList(new String[]{"--ignoretypeattributes"}),
+                          Arrays.asList(new String[]{"ignoretypeattributes"}),
                           "MATCH");
         appendDescription("Pattern defining the match of attributes which are ignored "
                                 + "within the test attributes of relationships.",
-                          Arrays.asList(new String[]{"--ignorerelationshipattributes"}),
+                          Arrays.asList(new String[]{"ignorerelationshipattributes"}),
                           "MATCH");
 
         appendDescription("Defines the name of application which is defined as property"
                                 + " / attribute on administration objects. The value of"
                                 + " mapping property 'PropertyValue.Application' will be"
                                 + " overwritten.",
-                          Arrays.asList(new String[]{"--application"}),
+                          Arrays.asList(new String[]{"application"}),
                           "APPLICATIONAME");
 
         appendDescription("Defines the name of author which is defined as property"
                                 + " / attribute on administration objects. The value of"
                                 + " mapping property 'PropertyValue.Author' will be"
                                 + " overwritten.",
-                          Arrays.asList(new String[]{"--author"}),
+                          Arrays.asList(new String[]{"author"}),
                           "AUTHORNAME");
 
         appendDescription("Defines the name of installer which is defined as property"
                                 + " / attribute on administration objects. The value of"
                                 + " mapping property 'PropertyValue.Installer' will be"
                                 + " overwritten.",
-                          Arrays.asList(new String[]{"--installer"}),
+                          Arrays.asList(new String[]{"installer"}),
                           "INSTALLERNAME");
 
         ////////////////////////////////////////////////////////////////////////
@@ -186,19 +187,19 @@ public class MxUpdate_mxJPO
 
         this.PARAM_MODE.put("-e", Mode.EXPORT);
         this.PARAM_MODE.put("--export", Mode.EXPORT);
-        appendDescription("Export Mode", "-e", "--export");
+        appendDescription("Export Mode", "e", "export");
 
         this.PARAM_MODE.put("-u", Mode.IMPORT);
         this.PARAM_MODE.put("--update", Mode.IMPORT);
-        appendDescription("Update Mode.", "-u", "--update");
+        appendDescription("Update Mode.", "u", "update");
 
         this.PARAM_MODE.put("--delete", Mode.DELETE);
-        appendDescription("Delete Mode.", "--delete");
+        appendDescription("Delete Mode.", "delete");
 
         this.PARAM_MODE.put("-?", Mode.HELP);
         this.PARAM_MODE.put("-h", Mode.HELP);
         this.PARAM_MODE.put("--help", Mode.HELP);
-        appendDescription("Print this Help.", "-h", "-?", "--help");
+        appendDescription("Print this Help.", "h", "?", "help");
 
         ////////////////////////////////////////////////////////////////////////
         // version information
@@ -207,87 +208,51 @@ public class MxUpdate_mxJPO
         appendDescription("The last modified date in seconds of the file is used as version information. "
                                 + "An update of an administration object is needed if the last modified "
                                 + "date of the file is not equal to the value stored on the version property.",
-                          "--usefiledateasversion");
+                          "usefiledateasversion");
 
         this.PARAM_VERSION.put("--checkfiledate", UpdateCheck.FILEDATE);
         appendDescription("Check if an update is required by comparing the last modified date against "
                                 + "the value of the file date property.",
-                          "--checkfiledate");
+                          "checkfiledate");
 
         appendDescription("Defines the version of administration objects (e.g. 1-0).",
-                          Arrays.asList(new String[]{"--version"}),
+                          Arrays.asList(new String[]{"version"}),
                           "VERSIONNUMBER");
 
         ////////////////////////////////////////////////////////////////////////
         // admin
 
-        this.PARAMS.put("-a", this.PARAMS_ADMIN);
-        this.PARAMS.put("--admin", this.PARAMS_ADMIN);
-        this.PARAMS.put("--all", this.PARAMS_ADMIN);
-        appendDescription("Export / Import of all administrational objects.",
-                          Arrays.asList(new String[]{"-a", "--admin", "--all"}),
-                          "MATCH");
+        // define type definition group parameters
+        final Set<TypeDef_mxJPO> all = new HashSet<TypeDef_mxJPO>();
+        for (final TypeDefGroup_mxJPO group : TypeDefGroup_mxJPO.getGroups())  {
+            final Set<TypeDef_mxJPO> curTypeDefs = new HashSet<TypeDef_mxJPO>();
+            for (final String typeDefName : group.getTypeDefList())  {
+                final TypeDef_mxJPO typeDef = TypeDef_mxJPO.valueOf(typeDefName);
+                curTypeDefs.add(typeDef);
+                all.add(typeDef);
+            }
+            this.defineParameter(curTypeDefs,
+                                 null,
+                                 group.getParameterDesc(),
+                                 group.getParameterList());
+        }
 
-        ////////////////////////////////////////////////////////////////////////
-        // data model
-
-        final Collection<TypeDef_mxJPO> dm = new HashSet<TypeDef_mxJPO>();
-        defineParameter(dm,
-                        null,
-                        "Export / Import of data model administrational objects.",
-                        Arrays.asList(new String[]{"d", "dm", "datamodel"}));
-        defineParameter(_context, dm, TypeDef_mxJPO.Attribute);
-        defineParameter(_context, dm, TypeDef_mxJPO.Expression);
-        defineParameter(_context, dm, TypeDef_mxJPO.Format);
-        defineParameter(_context, dm, TypeDef_mxJPO.NumberGenerator);
-        defineParameter(_context, dm, TypeDef_mxJPO.ObjectGenerator);
-        defineParameter(_context, dm, TypeDef_mxJPO.Policy);
-        defineParameter(_context, dm, TypeDef_mxJPO.Relationship);
-        defineParameter(_context, dm, TypeDef_mxJPO.Rule);
-        defineParameter(_context, dm, TypeDef_mxJPO.Trigger);
-        defineParameter(_context, dm, TypeDef_mxJPO.TriggerGroup);
-        defineParameter(_context, dm, TypeDef_mxJPO.Type);
-
-        ////////////////////////////////////////////////////////////////////////
-        // integration
-
-        defineParameter(_context, null, TypeDef_mxJPO.IEFGlobalConfig);
-
-        ////////////////////////////////////////////////////////////////////////
-        // user
-
-        final Collection<TypeDef_mxJPO> user = new HashSet<TypeDef_mxJPO>();
-        defineParameter(user,
-                        null,
-                        "Export / Import of user administrational objects.",
-                        Arrays.asList(new String[]{"user"}));
-        defineParameter(_context, user, TypeDef_mxJPO.Association);
-        defineParameter(_context, user, TypeDef_mxJPO.Group);
-        defineParameter(_context, user, TypeDef_mxJPO.Person);
-        defineParameter(_context, user, TypeDef_mxJPO.Role);
-
-        ////////////////////////////////////////////////////////////////////////
-        // program
-
-        defineParameter(_context, null, TypeDef_mxJPO.JPO);
-        defineParameter(_context, null, TypeDef_mxJPO.Program);
-
-        ////////////////////////////////////////////////////////////////////////
-        // user interface
-
-        final Collection<TypeDef_mxJPO> ui = new HashSet<TypeDef_mxJPO>();
-        defineParameter(ui,
-                        null,
-                        "Export / Import of user interface administrational objects.",
-                        Arrays.asList(new String[]{"ui", "userinterface"}));
-        defineParameter(_context, ui, TypeDef_mxJPO.Channel);
-        defineParameter(_context, ui, TypeDef_mxJPO.Command);
-        defineParameter(_context, ui, TypeDef_mxJPO.Form);
-        defineParameter(_context, ui, TypeDef_mxJPO.Inquiry);
-        defineParameter(_context, ui, TypeDef_mxJPO.Menu);
-        defineParameter(_context, ui, TypeDef_mxJPO.Portal);
-        defineParameter(_context, ui, TypeDef_mxJPO.Table);
-    }
+        // define type definition parameters
+        for (final TypeDef_mxJPO typeDef : all)  {
+            boolean exists = true;
+            if (typeDef.isBusCheckExists())  {
+                final String tmp = execMql(_context,
+                                           new StringBuilder().append("list type '").append(typeDef.getMxBusType()).append("'"));
+                exists = (tmp.length() > 0);
+            }
+            if (exists)  {
+                this.defineParameter(null,
+                                     typeDef,
+                                     typeDef.getParameterDesc(),
+                                     typeDef.getParameters());
+            }
+        }
+   }
 
     /**
      *
@@ -307,10 +272,9 @@ public class MxUpdate_mxJPO
                                  final String _description,
                                  final Collection<String> _longParams)
     {
-        final List<String> allParamStrings = new ArrayList<String>();
         final Collection<TypeDef_mxJPO> tmp = (_clazz == null)
-                ? _paramsList
-                : new HashSet<TypeDef_mxJPO>();
+                                              ? _paramsList
+                                              : new HashSet<TypeDef_mxJPO>();
 
         if (_clazz != null)  {
             // add to set of all classes parameters set
@@ -332,30 +296,10 @@ public class MxUpdate_mxJPO
                         + "'! Found:\n" + this.PARAMS.get(paramStr) + "\nNew Definition:\n" + tmp);
             }
             this.PARAMS.put(paramStr, tmp);
-            allParamStrings.add(paramStr);
         }
 
         // store description
-        appendDescription(_description, allParamStrings, "MATCH");
-    }
-
-    private void defineParameter(final Context _context,
-                                 final Collection<TypeDef_mxJPO> _paramsList,
-                                 final TypeDef_mxJPO _typeDef)
-            throws MatrixException
-    {
-        boolean exists = true;
-        if (_typeDef.isBusCheckExists())  {
-            final String tmp = execMql(_context,
-                                       new StringBuilder().append("list type '").append(_typeDef.getMxBusType()).append("'"));
-            exists = (tmp.length() > 0);
-        }
-        if (exists)  {
-            this.defineParameter(_paramsList,
-                                 _typeDef,
-                                 _typeDef.getParameterDesc(),
-                                 _typeDef.getParameters());
-        }
+        this.appendDescription(_description, _longParams, "MATCH");
     }
 
     /**
@@ -367,18 +311,15 @@ public class MxUpdate_mxJPO
      *                          (or <code>null</code> if not defined)
      */
     private void appendDescription(final String _description,
-                                   final List<String> _params,
+                                   final Collection<String> _params,
                                    final String _argument)
     {
         // check if first parameter is not a short parameter
-        final String firstParam = _params.get(0);
-        final char prefix;
+        final String firstParam = _params.iterator().next();
+        final char prefix = firstParam.charAt(0);
         final StringBuilder line = new StringBuilder().append(' ');
-        if (firstParam.charAt(1) == '-')  {
-            prefix = firstParam.charAt(2);
+        if (firstParam.length() > 1)  {
             line.append("   ");
-        } else  {
-            prefix = firstParam.charAt(1);
         }
 
         // append all parameters
@@ -389,7 +330,10 @@ public class MxUpdate_mxJPO
             } else  {
                 line.append(',');
             }
-            line.append(paramString);
+            if (paramString.length() > 1)  {
+                line.append('-');
+            }
+            line.append('-').append(paramString);
         }
 
         // append arguments
@@ -495,10 +439,15 @@ public class MxUpdate_mxJPO
                        final String... _args)
             throws Exception
     {
+try {
         // initialize mapping
         Mapping_mxJPO.init(_context);
 
         this.prepareParams(_context);
+} catch (Exception e)  {
+    e.printStackTrace();
+    throw e;
+}
 
         Type_mxJPO.IGNORE_TYPE_ATTRIBUTES.clear();
         Relationship_mxJPO.IGNORE_RELATIONSHIP_ATTRIBUTES.clear();

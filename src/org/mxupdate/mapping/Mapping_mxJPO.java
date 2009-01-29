@@ -164,6 +164,8 @@ public final class Mapping_mxJPO
                 RELATIONS.put(RelationDef.valueOf(key.substring(PREFIX_RELATION.length())), value);
             } else if (key.startsWith("TypeDef."))  {
                 TypeDef_mxJPO.defineTypeDefValue(key.substring(8), value);
+            } else if (key.startsWith("TypeDefGroup."))  {
+                TypeDefGroup_mxJPO.defineValue(key.substring(13), value);
             }
         }
     }
