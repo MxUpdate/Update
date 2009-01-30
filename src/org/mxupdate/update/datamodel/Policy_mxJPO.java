@@ -442,7 +442,7 @@ public class Policy_mxJPO
                                     .replaceAll("@1@1@", "\\\"");
 
         final PolicyDefParser_mxJPO parser = new PolicyDefParser_mxJPO(new StringReader(code));
-        final Policy_mxJPO policy = parser.policy();
+        final Policy_mxJPO policy = parser.policy(this.getTypeDef());
         policy.setName(this.getName());
         policy.prepare(_context);
 

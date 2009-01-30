@@ -32,86 +32,18 @@ PARSER_BEGIN(PolicyDefParser)
 package org.mxupdate.update.datamodel.policy;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
-import org.mxupdate.util.TypeDef_mxJPO;
 
 import matrix.db.Context;
 
 public class PolicyDefParser {
-  public static void main(String args[]) {
-    System.out.println("Reading from standard input...");
-//    new eg2(System.in);
-PolicyDefParser e = new PolicyDefParser(new java.io.StringReader(
-"  description \"Policy used for all Products\\\" within the Bosch eADM application.\"\n"
-+ "  type {\"Products\"}\n"
-+ "  format {{a \"{a}} b c}\n"
-+ "  defaultformat a\n"
-+ "  sequence \"1,2,3,...\"\n"
-+ "  store \"STORE\"\n"
-+ "  hidden \"false\"\n"
-+ "  state \"InWork\"  {\n"
-+ "    registeredName \"state_InWork\"\n"
-+ "    revision \"true\"\n"
-+ "    version \"true\"\n"
-+ "    promote \"true\"\n"
-+ "    checkouthistory \"true\"\n"
-+ "    owner {read modify promote fromconnect toconnect fromdisconnect todisconnect show}\n"
-+ "    public {none}\n"
-+ "    user \"Access Grantor\" {read grant revoke show}\n"
-+ "    user \"RBN_ProductManager\" {create}\n"
-+ "    user \"RBN_PublicChangeName\" {changename} filter \"(context.user == owner) && (id == first.id)\"\n"
-+ "    user \"Shadow Agent\" {all}\n"
-+ "    action \"a1\" input \"a3\"\n"
-+ "    check \"c1\" input \"c3\"\n"
-+ "    route {tmo tma tmoa2} \"route message\""
-+ "    signature \"FinalReject\" {\n"
-+ "      branch \"Canceled\"\n"
-+ "      approve {a1 a2 a3}\n"
-+ "      ignore {b1 b2 b3}\n"
-+ "      reject {c1 c2 c3}\n"
-+ "      filter \"(attribute[RBN_FinalRejectReason] != \\\"\\\")\"\n"
-+ "    }\n"
-+ "  }\n"
-+ "  state \"InReview\"  {"
-+ "    registeredName \"state_InReview\""
-+ "    revision \"false\""
-+ "    version \"false\""
-+ "    promote \"false\""
-+ "    checkouthistory \"false\""
-+ "    owner {read promote demote show}"
-+ "    public {none}"
-+ "    user \"Access Grantor\" {read grant revoke show}"
-+ "    user \"Shadow Agent\" {all}"
-+ "    action \"\" input \"\""
-+ "    check \"\" input \"\""
-+ "    trigger promote check \"emxTriggerManager\" input \"PolicyRBN_ProductsInReviewPromoteCheck\""
-+ "  }"));
-    try {
-    Policy_mxJPO n = e.policy();
-//      SimpleNode_mxJPO n = eg2.Start();
-//      n.dump("");
-
-        final Method method = n.getClass().getDeclaredMethod("prepare", Context.class); 
-        final boolean accessible = method.isAccessible();
-        try  {
-            method.setAccessible(true);
-            method.invoke(n, (Context) null);
-        } finally  {
-            method.setAccessible(accessible);
-        }
-      System.out.println("Thank you."+n);
-      
-    } catch (Exception ex) {
-      System.out.println("Oops.");
-      System.out.println(ex.getMessage());
-    }
-  }
-  
 
     protected static void setValue(final Object _object,
                                    final String _fieldName,
@@ -327,8 +259,8 @@ TOKEN : /** State and depending signature and trigger Tokens */
       <L4_CURLY_BRACKET_CLOSE : "}">   : L2_EXPECTED
 }
 
-Policy_mxJPO policy() : {
-    final Policy_mxJPO policy = new Policy_mxJPO(TypeDef_mxJPO.Policy);
+Policy_mxJPO policy(final TypeDef_mxJPO _typeDef) throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException : {
+    final Policy_mxJPO policy = (Policy_mxJPO) _typeDef.newTypeInstance();
     String tmp;
     Set<String> set;
 } {
