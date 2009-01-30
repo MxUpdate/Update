@@ -378,14 +378,14 @@ public abstract class AbstractPropertyObject_mxJPO
         }
         _out.append("\n")
             .append("# ").append(getName()).append("\n")
-            .append("#\n");
+            .append("#");
         // symbolic name only if an administration type is defined
         if (this.getTypeDef().getMxAdminName() != null)  {
             _out.append(HEADER_SYMBOLIC_NAME)
 .append(' ').append(this.getTypeDef().getMxAdminName()).append("_").append(this.getName()).append("\n")
-                .append("#\n");
+                .append("#");
         }
-        _out.append("# DESCRIPTION:\n")
+        _out.append("\n# DESCRIPTION:\n")
             .append("# ~~~~~~~~~~~~\n");
         if ((this.getDescription() != null) && !"".equals(this.getDescription()))  {
             for (final String partDesc : this.getDescription().split("\n"))  {
@@ -406,7 +406,7 @@ public abstract class AbstractPropertyObject_mxJPO
         } else  {
             _out.append("#\n");
         }
-        _out.append(HEADER_AUTHOR);
+        _out.append('#').append(HEADER_AUTHOR);
         if ((this.author != null) && !"".equals(this.author))  {
             _out.append(" ").append(this.author).append('\n');
         } else {
