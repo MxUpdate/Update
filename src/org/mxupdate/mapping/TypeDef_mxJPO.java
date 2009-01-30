@@ -61,12 +61,6 @@ import org.mxupdate.update.userinterface.Table_mxJPO;
  */
 public enum TypeDef_mxJPO
 {
-    /**
-     * Administration type is not defined (or does not exists). The value
-     * is used like <code>null</code>.
-     */
-    Undef(null, null, null),
-
     /** Data model attribute. */
     Attribute("attribute", "", Attribute_mxJPO.class),
 

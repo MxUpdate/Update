@@ -222,34 +222,41 @@ public class MxUpdate_mxJPO
         ////////////////////////////////////////////////////////////////////////
         // admin
 
-        // define type definition group parameters
+        // first create list all type definitions which could be used...
         final Set<TypeDef_mxJPO> all = new HashSet<TypeDef_mxJPO>();
-        for (final TypeDefGroup_mxJPO group : TypeDefGroup_mxJPO.getGroups())  {
-            final Set<TypeDef_mxJPO> curTypeDefs = new HashSet<TypeDef_mxJPO>();
-            for (final String typeDefName : group.getTypeDefList())  {
-                final TypeDef_mxJPO typeDef = TypeDef_mxJPO.valueOf(typeDefName);
-                curTypeDefs.add(typeDef);
-                all.add(typeDef);
-            }
-            this.defineParameter(curTypeDefs,
-                                 null,
-                                 group.getParameterDesc(),
-                                 group.getParameterList());
-        }
-
-        // define type definition parameters
-        for (final TypeDef_mxJPO typeDef : all)  {
+        for (final TypeDef_mxJPO typeDef : TypeDef_mxJPO.values())  {
             boolean exists = true;
             if (typeDef.isBusCheckExists())  {
                 final String tmp = execMql(_context,
                                            new StringBuilder().append("list type '").append(typeDef.getMxBusType()).append("'"));
                 exists = (tmp.length() > 0);
             }
+
             if (exists)  {
+                all.add(typeDef);
                 this.defineParameter(null,
-                                     typeDef,
-                                     typeDef.getParameterDesc(),
-                                     typeDef.getParameters());
+                        typeDef,
+                        typeDef.getParameterDesc(),
+                        typeDef.getParameters());
+            }
+        }
+
+        // define type definition group parameters depending on existing type
+        // definitions (and only if at minimum one type definition of the
+        // groups exists...)
+        for (final TypeDefGroup_mxJPO group : TypeDefGroup_mxJPO.getGroups())  {
+            final Set<TypeDef_mxJPO> curTypeDefs = new HashSet<TypeDef_mxJPO>();
+            for (final String typeDefName : group.getTypeDefList())  {
+                final TypeDef_mxJPO typeDef = TypeDef_mxJPO.valueOf(typeDefName);
+                if (all.contains(typeDef))  {
+                    curTypeDefs.add(typeDef);
+                }
+            }
+            if (!curTypeDefs.isEmpty())  {
+                this.defineParameter(curTypeDefs,
+                                     null,
+                                     group.getParameterDesc(),
+                                     group.getParameterList());
             }
         }
    }
