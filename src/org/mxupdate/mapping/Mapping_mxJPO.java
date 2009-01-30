@@ -135,7 +135,7 @@ public final class Mapping_mxJPO
      * @throws IOException     if the properties could not be parsed
      */
     public static void init(final Context _context)
-            throws MatrixException, IOException
+            throws MatrixException, IOException, Exception
     {
         TypeDef_mxJPO.resetTypeDefValues();
         PROPERTIES.clear();
@@ -163,7 +163,7 @@ public final class Mapping_mxJPO
             } else if (key.startsWith(PREFIX_RELATION))  {
                 RELATIONS.put(RelationDef.valueOf(key.substring(PREFIX_RELATION.length())), value);
             } else if (key.startsWith("TypeDef."))  {
-                TypeDef_mxJPO.defineTypeDefValue(key.substring(8), value);
+                TypeDef_mxJPO.defineValue(_context, key.substring(8), value);
             } else if (key.startsWith("TypeDefGroup."))  {
                 TypeDefGroup_mxJPO.defineValue(key.substring(13), value);
             }
