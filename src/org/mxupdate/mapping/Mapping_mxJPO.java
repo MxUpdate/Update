@@ -137,6 +137,7 @@ public final class Mapping_mxJPO
     public static void init(final Context _context)
             throws MatrixException, IOException, Exception
     {
+        Mode_mxJPO.resetValues();
         TypeDef_mxJPO.resetValues();
         TypeDefGroup_mxJPO.resetValues();
         PROPERTIES.clear();
@@ -163,6 +164,8 @@ public final class Mapping_mxJPO
                 ATTRIBUTES.put(AttributeDef.valueOf(key.substring(PREFIX_ATTRIBUTE.length())), value);
             } else if (key.startsWith(PREFIX_RELATION))  {
                 RELATIONS.put(RelationDef.valueOf(key.substring(PREFIX_RELATION.length())), value);
+            } else if (key.startsWith("Mode."))  {
+                Mode_mxJPO.defineValue(key.substring(5), value);
             } else if (key.startsWith("TypeDef."))  {
                 TypeDef_mxJPO.defineValue(_context, key.substring(8), value);
             } else if (key.startsWith("TypeDefGroup."))  {

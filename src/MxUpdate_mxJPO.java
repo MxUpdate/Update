@@ -36,6 +36,7 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.Mapping_mxJPO;
+import org.mxupdate.mapping.Mode_mxJPO;
 import org.mxupdate.mapping.TypeDefGroup_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
@@ -72,29 +73,6 @@ public class MxUpdate_mxJPO
      */
     private static final int LENGTH_DESC_LINE = 100;
 
-    private enum Mode
-    {
-        /**
-         * Mode 'import' used to import defined administration objects from
-         * file system into Matrix.
-         */
-        IMPORT,
-        /**
-         * Mode 'export' used to export defined administration objects from
-         * Matrix into a file system.
-         */
-        EXPORT,
-        /**
-         * Mode 'delete' used to delete in Mx objects which are not defined
-         * in the repository (file system).
-         */
-        DELETE,
-        /**
-         * Prints out the help description.
-         */
-        HELP;
-    }
-
     /**
      * Enumeration used to define how the version information is evaluated.
      */
@@ -116,24 +94,18 @@ public class MxUpdate_mxJPO
     /**
      * Stored the descriptions of all parameters.
      */
-    private final Map<String,String> DESCRIPTION = new TreeMap<String,String>();
+    private final Map<String,String> description = new TreeMap<String,String>();
 
     /**
      * Holds the mapping between the parameter and mode.
      */
-    private final Map<String,Mode> PARAM_MODE = new HashMap<String,Mode>();
+    private final Map<String,Mode_mxJPO> paramsModes = new HashMap<String,Mode_mxJPO>();
 
     /**
      * All parameters related to export / import are stored in this map. The
      * key is the parameter (including the '-'), the value the related class.
      */
-    private final Map<String,Collection<TypeDef_mxJPO>> PARAMS = new HashMap<String,Collection<TypeDef_mxJPO>>();
-
-    /**
-     * Holds all classes used for all exports / imports. The set is needed that
-     * the parameter '-a' (--admin) could be defined.
-     */
-    private final Collection<TypeDef_mxJPO> PARAMS_ADMIN = new ArrayList<TypeDef_mxJPO>();
+    private final Map<String,Collection<TypeDef_mxJPO>> paramsTypeDefs = new HashMap<String,Collection<TypeDef_mxJPO>>();
 
     /**
      * Holds all parameters related how the version information is set.
@@ -143,10 +115,9 @@ public class MxUpdate_mxJPO
     private void prepareParams(final Context _context)
             throws MatrixException
     {
-        this.DESCRIPTION.clear();
-        this.PARAM_MODE.clear();
-        this.PARAMS.clear();
-        this.PARAMS_ADMIN.clear();
+        this.description.clear();
+        this.paramsModes.clear();
+        this.paramsTypeDefs.clear();
         this.PARAM_VERSION.clear();
 
         ////////////////////////////////////////////////////////////////////////
@@ -183,23 +154,19 @@ public class MxUpdate_mxJPO
                           "INSTALLERNAME");
 
         ////////////////////////////////////////////////////////////////////////
-        // mode (export / import / help)
+        // modes
 
-        this.PARAM_MODE.put("-e", Mode.EXPORT);
-        this.PARAM_MODE.put("--export", Mode.EXPORT);
-        appendDescription("Export Mode", "e", "export");
-
-        this.PARAM_MODE.put("-u", Mode.IMPORT);
-        this.PARAM_MODE.put("--update", Mode.IMPORT);
-        appendDescription("Update Mode.", "u", "update");
-
-        this.PARAM_MODE.put("--delete", Mode.DELETE);
-        appendDescription("Delete Mode.", "delete");
-
-        this.PARAM_MODE.put("-?", Mode.HELP);
-        this.PARAM_MODE.put("-h", Mode.HELP);
-        this.PARAM_MODE.put("--help", Mode.HELP);
-        appendDescription("Print this Help.", "h", "?", "help");
+        for (final Mode_mxJPO mode : Mode_mxJPO.values())  {
+            for (final String param : mode.getParameterList())  {
+                final String paramStr = (param.length() > 1)
+                                        ? "--" + param
+                                        : "-" + param;
+                this.paramsModes.put(paramStr, mode);
+            }
+            this.appendDescription(mode.getParameterDesc(),
+                                   mode.getParameterList(),
+                                   null);
+        }
 
         ////////////////////////////////////////////////////////////////////////
         // version information
@@ -220,7 +187,7 @@ public class MxUpdate_mxJPO
                           "VERSIONNUMBER");
 
         ////////////////////////////////////////////////////////////////////////
-        // admin
+        // type definitions
 
         // first create list all type definitions which could be used...
         final Set<TypeDef_mxJPO> all = new HashSet<TypeDef_mxJPO>();
@@ -279,13 +246,11 @@ public class MxUpdate_mxJPO
                                  final String _description,
                                  final Collection<String> _longParams)
     {
-        final Collection<TypeDef_mxJPO> tmp = (_clazz == null)
-                                              ? _paramsList
-                                              : new HashSet<TypeDef_mxJPO>();
-
-        if (_clazz != null)  {
-            // add to set of all classes parameters set
-            this.PARAMS_ADMIN.add(_clazz);
+        final Collection<TypeDef_mxJPO> tmp;
+        if (_clazz == null)  {
+            tmp = _paramsList;
+        } else  {
+            tmp = new HashSet<TypeDef_mxJPO>();
             // add to given set of parameters
             if (_paramsList != null)  {
                 _paramsList.add(_clazz);
@@ -298,11 +263,11 @@ public class MxUpdate_mxJPO
             final String paramStr = (param.length() == 1)
                                     ? "-" + param
                                     : "--" + param;
-            if (this.PARAMS.containsKey(paramStr) || this.PARAM_MODE.containsKey(paramStr) || this.PARAM_VERSION.containsKey(paramStr))  {
+            if (this.paramsTypeDefs.containsKey(paramStr) || this.paramsModes.containsKey(paramStr) || this.PARAM_VERSION.containsKey(paramStr))  {
                 throw new Error("double definition of parameter '" + paramStr
-                        + "'! Found:\n" + this.PARAMS.get(paramStr) + "\nNew Definition:\n" + tmp);
+                        + "'! Found:\n" + this.paramsTypeDefs.get(paramStr) + "\nNew Definition:\n" + tmp);
             }
-            this.PARAMS.put(paramStr, tmp);
+            this.paramsTypeDefs.put(paramStr, tmp);
         }
 
         // store description
@@ -387,7 +352,7 @@ public class MxUpdate_mxJPO
             }
         }
 
-        this.DESCRIPTION.put("" + prefix + line, line.toString());
+        this.description.put("" + prefix + line, line.toString());
     }
 
     /**
@@ -412,19 +377,30 @@ public class MxUpdate_mxJPO
     /**
      * Prints the help for the MxUpdate functionality.
      *
-     * @see #DESCRIPTION
+     * @see #description
      */
     private void printHelp()
     {
-        System.out.println("usage: exec prog MxUpdate -e | -u ....\n");
-        for (final String line : this.DESCRIPTION.values())  {
+        System.out.print("usage: exec prog MxUpdate ");
+        boolean first = true;
+        for (final Mode_mxJPO mode : Mode_mxJPO.values())  {
+            final String param = mode.getParameterList().iterator().next();
+            if (first)  {
+                first = false;
+            } else  {
+                System.out.print(" | ");
+            }
+            if (param.length() > 1)  {
+                System.out.print('-');
+            }
+            System.out.print('-');
+            System.out.print(param);
+        }
+        System.out.println(" | ... \n");
+
+        for (final String line : this.description.values())  {
             System.out.println(line);
         }
-        System.out.println();
-        System.out.println("If parameter '--path' exists for the update mode, the <MATCH> arguments are");
-        System.out.println("patterns used to evaluate matching names without prefix and suffix. If parameter");
-        System.out.println("'--path' is not defined, the <MATCH> arguments are defined as file names");
-        System.out.println("(asterisk '*' could be uses..).");
         System.out.println();
         System.out.println("--------------------------------------------------------------------------------");
         System.out.println(" Copyright 2008-2009 The MxUpdate Team");
@@ -446,15 +422,10 @@ public class MxUpdate_mxJPO
                        final String... _args)
             throws Exception
     {
-try {
         // initialize mapping
         Mapping_mxJPO.init(_context);
 
         this.prepareParams(_context);
-} catch (Exception e)  {
-    e.printStackTrace();
-    throw e;
-}
 
         Type_mxJPO.IGNORE_TYPE_ATTRIBUTES.clear();
         Relationship_mxJPO.IGNORE_RELATIONSHIP_ATTRIBUTES.clear();
@@ -465,83 +436,78 @@ try {
             // to be sure....
             MqlUtil_mxJPO.execMql(_context, "verbose off");
 
-            Mode mode = null;
+            Mode_mxJPO mode = null;
 
             final Map<TypeDef_mxJPO,List<String>> clazz2matches = new HashMap<TypeDef_mxJPO,List<String>>();
-//System.err.println("PARAM_MODE="  + Mode.IMPORT);
 
-boolean unknown = false;
+            boolean unknown = false;
 
-UpdateCheck versionInfo = null;
+            UpdateCheck versionInfo = null;
 
-final Set<String> paths = new TreeSet<String>();
+            final Set<String> paths = new TreeSet<String>();
 
-        for (int idx = 0; idx < _args.length; idx++)  {
-//System.out.println(""+idx+"="+_args[idx]+"="+PARAMS.get(_args[idx]));
-            final Collection<TypeDef_mxJPO> clazzes = PARAMS.get(_args[idx]);
-            if (clazzes != null)  {
-                idx++;
-                final String name = _args[idx];
-                for (final TypeDef_mxJPO clazz : clazzes)  {
-                    List<String> names = clazz2matches.get(clazz);
-                    if (names == null)  {
-                        names = new ArrayList<String>();
-                        clazz2matches.put(clazz, names);
+            for (int idx = 0; idx < _args.length; idx++)  {
+                final Collection<TypeDef_mxJPO> clazzes = paramsTypeDefs.get(_args[idx]);
+                if (clazzes != null)  {
+                    idx++;
+                    final String name = _args[idx];
+                    for (final TypeDef_mxJPO clazz : clazzes)  {
+                        List<String> names = clazz2matches.get(clazz);
+                        if (names == null)  {
+                            names = new ArrayList<String>();
+                            clazz2matches.put(clazz, names);
+                        }
+                        names.add(name);
                     }
-                    names.add(name);
-                }
-            } else if (this.PARAM_MODE.containsKey(_args[idx])) {
-                final Mode tmpMode = this.PARAM_MODE.get(_args[idx]);
-                if (mode != null)  {
-                    if ((mode == Mode.HELP) || (tmpMode == Mode.HELP))  {
-                        mode = Mode.HELP;
+                } else if (this.paramsModes.containsKey(_args[idx])) {
+                    final Mode_mxJPO tmpMode = this.paramsModes.get(_args[idx]);
+                    if (mode != null)  {
+                        if ((mode == Mode_mxJPO.HELP) || (tmpMode == Mode_mxJPO.HELP))  {
+                            mode = Mode_mxJPO.HELP;
+                        } else  {
+                            throw new Error("A mode is already defined and could not be defined twice!");
+                        }
                     } else  {
-                        throw new Error("A mode is already defined and could not be defined twice!");
+                        mode = this.paramsModes.get(_args[idx]);
                     }
+                } else if (this.PARAM_VERSION.containsKey(_args[idx]))  {
+                    versionInfo = this.PARAM_VERSION.get(_args[idx]);
+                } else if ("--application".equals(_args[idx]))  {
+                    idx++;
+                    Mapping_mxJPO.defineApplication(_args[idx]);
+                } else if ("--author".equals(_args[idx]))  {
+                    idx++;
+                    Mapping_mxJPO.defineAuthor(_args[idx]);
+                } else if ("--ignorerelationshipattributes".equals(_args[idx]))  {
+                    idx++;
+                    Relationship_mxJPO.IGNORE_RELATIONSHIP_ATTRIBUTES.add(_args[idx]);
+                } else if ("--ignoretypeattributes".equals(_args[idx]))  {
+                    idx++;
+                    Type_mxJPO.IGNORE_TYPE_ATTRIBUTES.add(_args[idx]);
+                } else if ("--installer".equals(_args[idx]))  {
+                    idx++;
+                    Mapping_mxJPO.defineInstaller(_args[idx]);
+                } else if ("--path".equals(_args[idx]))  {
+                    idx++;
+                    paths.add(_args[idx]);
+                } else if ("--version".equals(_args[idx]))  {
+                    idx++;
+                    version = _args[idx];
                 } else  {
-                    mode = this.PARAM_MODE.get(_args[idx]);
-                }
-            } else if (this.PARAM_VERSION.containsKey(_args[idx]))  {
-                versionInfo = this.PARAM_VERSION.get(_args[idx]);
-            } else if ("--application".equals(_args[idx]))  {
-                idx++;
-                Mapping_mxJPO.defineApplication(_args[idx]);
-            } else if ("--author".equals(_args[idx]))  {
-                idx++;
-                Mapping_mxJPO.defineAuthor(_args[idx]);
-            } else if ("--ignorerelationshipattributes".equals(_args[idx]))  {
-                idx++;
-                Relationship_mxJPO.IGNORE_RELATIONSHIP_ATTRIBUTES.add(_args[idx]);
-            } else if ("--ignoretypeattributes".equals(_args[idx]))  {
-                idx++;
-                Type_mxJPO.IGNORE_TYPE_ATTRIBUTES.add(_args[idx]);
-            } else if ("--installer".equals(_args[idx]))  {
-                idx++;
-                Mapping_mxJPO.defineInstaller(_args[idx]);
-            } else if ("--path".equals(_args[idx]))  {
-                idx++;
-                paths.add(_args[idx]);
-            } else if ("--version".equals(_args[idx]))  {
-                idx++;
-                version = _args[idx];
-            } else  {
-                unknown = true;
+                    unknown = true;
 System.err.println("unknown pararameter "  + _args[idx]);
+                }
             }
-        }
 
-//System.out.println("mode="+mode);
-//System.out.println("clazz2matches="+clazz2matches);
-
-if (unknown || (Mode.HELP == mode) || (mode == null))  {
-    this.printHelp();
-} else if (Mode.EXPORT == mode)  {
-    this.export(_context, paths, clazz2matches);
-} else if (Mode.IMPORT == mode)  {
-    this.update(_context, paths, clazz2matches, versionInfo, version);
-} else if (Mode.DELETE == mode)  {
-    this.delete(_context, paths, clazz2matches);
-}
+            if (unknown || (Mode_mxJPO.HELP == mode) || (mode == null))  {
+                this.printHelp();
+            } else if (Mode_mxJPO.EXPORT == mode)  {
+                this.export(_context, paths, clazz2matches);
+            } else if (Mode_mxJPO.IMPORT == mode)  {
+                this.update(_context, paths, clazz2matches, versionInfo, version);
+            } else if (Mode_mxJPO.DELETE == mode)  {
+                this.delete(_context, paths, clazz2matches);
+            }
 
         } catch (Exception e)  {
             e.printStackTrace(System.out);
@@ -617,7 +583,7 @@ System.out.println("export "+instance.getTypeDef().getLogging() + " '" + name + 
             }
         }
         // create if needed (and not in the list of existing objects
-        for (final TypeDef_mxJPO clazz : PARAMS_ADMIN)  {
+        for (final TypeDef_mxJPO clazz : TypeDef_mxJPO.values())  {
             final Map<File,String> clazzMap = clazz2names.get(clazz);
             if (clazzMap != null)  {
                 for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
@@ -631,7 +597,7 @@ System.out.println("create "+instance.getTypeDef().getLogging() + " '" + fileEnt
             }
         }
         // update
-        for (final TypeDef_mxJPO clazz : PARAMS_ADMIN)  {
+        for (final TypeDef_mxJPO clazz : TypeDef_mxJPO.values())  {
             final Map<File,String> clazzMap = clazz2names.get(clazz);
             if (clazzMap != null)  {
                 for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
