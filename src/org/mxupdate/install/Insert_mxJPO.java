@@ -163,7 +163,7 @@ public class Insert_mxJPO
      *
      * @see ClassFile#getCode(Map)
      */
-    private static final Pattern PATTERN_JPO = Pattern.compile("((?<=[+ \\(\\)\\t\\r\\n@\\<])|(^))[A-Za-z0-9\\.]*\\_"+"mxJPO");
+    private static final Pattern PATTERN_JPO = Pattern.compile("((?<=[+ \\(\\)\\t\\r\\n@\\<,])|(^))[A-Za-z0-9\\.]*\\_"+"mxJPO");
 
     /**
      * MQL command line to list the installed MxUpdate JPOs and the depending
