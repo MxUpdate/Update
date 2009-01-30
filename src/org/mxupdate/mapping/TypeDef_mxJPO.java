@@ -51,7 +51,7 @@ public final class TypeDef_mxJPO
     /**
      * Map between the JPO name and the class name used within MX.
      *
-     * @see #resetTypeDefValues()
+     * @see #resetValues()
      * @see #defineValue(Context, String, String)
      */
     private final static Map<String,String> MAP2CLASS = new HashMap<String,String>();
@@ -293,9 +293,10 @@ public final class TypeDef_mxJPO
      *
      * @see #MAP
      */
-    protected static void resetTypeDefValues()
+    protected static void resetValues()
     {
         MAP.clear();
+        MAP2CLASS.clear();
     }
 
     /**

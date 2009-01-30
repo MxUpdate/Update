@@ -137,7 +137,8 @@ public final class Mapping_mxJPO
     public static void init(final Context _context)
             throws MatrixException, IOException, Exception
     {
-        TypeDef_mxJPO.resetTypeDefValues();
+        TypeDef_mxJPO.resetValues();
+        TypeDefGroup_mxJPO.resetValues();
         PROPERTIES.clear();
         ADMINPROPERTY_ENUM2NAMES.clear();
         ADMINPROPERTY_NAMES2ENUM.clear();

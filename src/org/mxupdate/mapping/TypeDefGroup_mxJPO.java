@@ -102,6 +102,16 @@ public class TypeDefGroup_mxJPO
         }
     }
 
+    /**
+     * Resets type definition group map.
+     *
+     * @see #MAP
+     */
+    protected static void resetValues()
+    {
+        MAP.clear();
+    }
+
     public static Collection<TypeDefGroup_mxJPO> getGroups()
     {
         return MAP.values();
