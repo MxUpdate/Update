@@ -110,7 +110,12 @@ public class Person_mxJPO
                                         final Collection<String> _matches)
             throws MatrixException
     {
-        return this.personBus.getMatchingNames(_context, _matches);
+        final Set<String> persons = this.personBus.getMatchingNames(_context, _matches);
+        final Set<String> ret = new TreeSet<String>();
+        for (final String busName : persons)  {
+            ret.add(busName.split(AbstractBusObject_mxJPO.SPLIT_NAME)[0]);
+        }
+        return ret;
     }
 
     @Override
@@ -119,8 +124,8 @@ public class Person_mxJPO
                        final String _name)
             throws MatrixException, SAXException, IOException
     {
+        this.personAdmin.parse(_context, _name);
         this.personBus.parse(_context, _name);
-        this.personAdmin.parse(_context, this.personBus.getBusName());
         final File file = new File(_path, this.personAdmin.getFileName());
         if (!file.getParentFile().exists())  {
             file.getParentFile().mkdirs();
@@ -583,7 +588,8 @@ public class Person_mxJPO
                              final String _name)
                 throws MatrixException, SAXException, IOException
         {
-            super.parse(_context, _name);
+            super.parse(_context,
+                        new StringBuilder().append(_name).append(AbstractBusObject_mxJPO.SPLIT_NAME).append('-').toString());
             this.prepare(_context);
 
             // exists a business object?
@@ -737,17 +743,6 @@ public class Person_mxJPO
 
             // prepare map of all TCL variables incl. id of business object
             _tclVariables.put("OBJECTID", objectId);
-        }
-
-        /**
-         * Returns the name of the person.
-         *
-         * @return name of the business object (means the name of person)
-         */
-        @Override
-        protected String getBusName()
-        {
-            return super.getBusName();
         }
     }
 }
