@@ -68,7 +68,7 @@ public abstract class AbstractBusObject_mxJPO
      * String used to split the name and revision of administration business
      * object.
      */
-    private static final String SPLIT_NAME = "________";
+    public static final String SPLIT_NAME = "________";
 
     /**
      * All attribute values of this business object.
