@@ -234,9 +234,18 @@ public abstract class AbstractAdminObject_mxJPO
             writeEnd(_out);
         }
 
-        protected abstract void writeObject(final Writer _out) throws IOException;
+    protected abstract void writeObject(final Writer _out) throws IOException;
 
-    protected void writeEnd(final Writer _out)
+    /**
+     * At the end of the write to the TCL update file in some cases some
+     * extensions must be defined. This &quot;extensions&quot; depends on the
+     * use cases. E.g. for an inquiry, the inquiry code must be written at the
+     * end of a TCL update file.
+     *
+     * @param _out      appendable instance to the TCL update file
+     * @throws IOException if the extension could not be written
+     */
+    protected void writeEnd(final Appendable _out)
             throws IOException
     {
     }

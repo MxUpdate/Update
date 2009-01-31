@@ -122,8 +122,15 @@ public class Form_mxJPO
         }
     }
 
+    /**
+     * At the end of the TCL update file a call to a procedure must be included
+     * to order all web form fields correctly.
+     *
+     * @param _out      appendable instance to the TCL update file
+     * @throws IOException if the extension could not be written
+     */
     @Override
-    protected void writeEnd(final Writer _out)
+    protected void writeEnd(final Appendable _out)
             throws IOException
     {
         _out.append("\n\norderFields \"${NAME}\" [list \\\n");

@@ -129,11 +129,12 @@ public abstract class AbstractDMWithAttributes_mxJPO
      * {@link #TCL_PROCEDURE} to append missing attributes to the
      * administration object.
      *
-     * @param _out      writer instance to the TCL update file
+     * @param _out      appendable instance to the TCL update file
+     * @throws IOException if the extension could not be written
      * @see #attributes
      */
     @Override
-    protected void writeEnd(final Writer _out)
+    protected void writeEnd(final Appendable _out)
             throws IOException
     {
         _out.append("\n\ntestAttributes -").append(this.getTypeDef().getMxAdminName())

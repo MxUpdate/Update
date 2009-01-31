@@ -111,8 +111,15 @@ public class Inquiry_mxJPO
         }
    }
 
+    /**
+     * At the end of the TCL update file the inquiry code must be appended.
+     *
+     * @param _out      appendable instance to the TCL update file
+     * @throws IOException if the extension could not be written
+     * @see #code
+     */
     @Override
-    protected void writeEnd(final Writer _out)
+    protected void writeEnd(final Appendable _out)
             throws IOException
     {
         _out.append("\n\n# do not change the next three lines, they are needed as separator information:\n")

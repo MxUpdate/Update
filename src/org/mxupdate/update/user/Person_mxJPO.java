@@ -76,16 +76,6 @@ public class Person_mxJPO
     private final PersonBus personBus = new PersonBus();
 
     /**
-     * Holds all group assignments of this person.
-     */
-    private final Set<String> groups = new TreeSet<String>();
-
-    /**
-     * Holds all role assignments of this person.
-     */
-    private final Set<String> roles = new TreeSet<String>();
-
-    /**
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
@@ -97,13 +87,16 @@ public class Person_mxJPO
 
     /**
      * The matching names are evaluated with the help of the business
-     * administration person objects.
+     * person objects. From the return values of the query for all business
+     * person objects, only the business object name is returned in the set
+     * (because the revision of the person business object is always a
+     * &quot;-&quot;).
      *
      * @param _contex       context for this request
      * @param _matched      collection of match strings for which the persons
      *                      are searched
      * @return set of matching person names
-     * @see #personAdmin
+     * @see #personBus
      */
     @Override
     public Set<String> getMatchingNames(final Context _context,
@@ -177,102 +170,14 @@ public class Person_mxJPO
         this.personAdmin.update(_context, _name, _file, _newVersion);
     }
 
-    private class PersonAdmin
-            extends AbstractAdminObject_mxJPO
+    class PersonAdmin
+            extends PersonAdmin_mxJPO
     {
         /**
          * Defines the serialize version unique identifier.
          */
-        private static final long serialVersionUID = -8458972437612839433L;
+        private static final long serialVersionUID = -3816908902276144444L;
 
-        /**
-         * Full name of the person.
-         */
-        private String fullName;
-
-        /**
-         * Email address of the person.
-         */
-        private String email;
-
-        /**
-         * Address of the person.
-         */
-        private String address;
-
-        /**
-         * Fax of the person.
-         */
-        private String fax;
-
-        /**
-         * Phone of the person.
-         */
-        private String phone;
-
-        /**
-         * Default vault of the person.
-         */
-        private String vault;
-
-        /**
-         * Is the person not active?
-         */
-        private boolean isInactive = false;
-
-        /**
-         * Is the person an application user?
-         */
-        private boolean isApplicationUser = false;
-
-        /**
-         * Is the person a full user?
-         */
-        private boolean isFullUser = false;
-
-        /**
-         * Is the person a business administrator?
-         */
-        private boolean isBusinessAdministrator = false;
-
-        /**
-         * Is the person a system administrator?
-         */
-        private boolean isSystemAdministrator = false;
-
-        /**
-         * Is the person a trusted user?
-         */
-        private boolean isTrusted = false;
-
-        /**
-         * Person wants email?
-         */
-        private boolean wantsEmail = false;
-
-        /**
-         * Person wants (internal) icon mail.
-         */
-        private boolean wantsIconMail = false;
-
-        /**
-         * Set of access for this person.
-         */
-        private final Set<String> access = new TreeSet<String>();
-
-        /**
-         * Set of administration access for this person.
-         */
-        private final Set<String> adminAccess = new TreeSet<String>();
-
-        /**
-         * Defines the site of the person.
-         */
-        private String site;
-
-        /**
-         * Constructor used to initialize the type definition enumeration.
-         */
         private PersonAdmin()
         {
             super(Person_mxJPO.this.getTypeDef());
@@ -298,167 +203,35 @@ public class Person_mxJPO
             super.parse(_context, _name);
         }
 
+        /**
+         * Because the original method
+         * {@link AbstractPropertyObject_mxJPO#getFileName()} is
+         * protected, but called from
+         * {@link Person_mxJPO#export(Context, File, String)}, the original
+         * method must be overwritten and only called.
+         *
+         * @return file name
+         */
         @Override
         protected String getFileName()
         {
             return super.getFileName();
         }
 
+        /**
+         * Because the original method
+         * {@link AbstractAdminObject_mxJPO#write(Writer)} is protected, but
+         * called from {@link Person_mxJPO#export(Context, File, String)}, the
+         * original method must be overwritten and only called.
+         *
+         * @param _out  writer instance
+         */
         @Override
         protected void write(final Writer _out)
                 throws IOException
         {
             super.write(_out);
         }
-
-        @Override
-        protected void parse(final String _url,
-                             final String _content)
-        {
-            if ("/assignmentList".equals(_url))  {
-                // to be ignored ...
-            } else if ("/assignmentList/assignment".equals(_url))  {
-                // to be ignored ...
-            } else if ("/assignmentList/assignment/groupRef".equals(_url))  {
-                Person_mxJPO.this.groups.add(_content);
-            } else if ("/assignmentList/assignment/roleRef".equals(_url))  {
-                Person_mxJPO.this.roles.add(_content);
-
-            } else if ("/access".equals(_url))  {
-                // to be ignored ...
-            } else if (_url.startsWith("/access"))  {
-                this.access.add(_url.substring(8).replaceAll("Access$", ""));
-
-            } else if ("/adminAccess".equals(_url))  {
-                // to be ignored ...
-            } else if (_url.startsWith("/adminAccess"))  {
-                this.adminAccess.add(_url.substring(13).replaceAll("Access$", ""));
-
-            } else if ("/inactive".equals(_url))  {
-                this.isInactive = true;
-            } else if ("/applicationsOnly".equals(_url))  {
-                this.isApplicationUser = true;
-            } else if ("/fullUser".equals(_url))  {
-                this.isFullUser = true;
-            } else if ("/businessAdministrator".equals(_url))  {
-                this.isBusinessAdministrator = true;
-            } else if ("/systemAdministrator".equals(_url))  {
-                this.isSystemAdministrator = true;
-            } else if ("/trusted".equals(_url))  {
-                this.isTrusted = true;
-
-            } else if ("/wantsEmail".equals(_url))  {
-                this.wantsEmail = true;
-            } else if ("/wantsIconMail".equals(_url))  {
-                this.wantsIconMail = true;
-
-            } else if ("/address".equals(_url))  {
-                this.address = _content;
-            } else if ("/email".equals(_url))  {
-                this.email = _content;
-            } else if ("/fax".equals(_url))  {
-                this.fax = _content;
-            } else if ("/fullName".equals(_url))  {
-                this.fullName = _content;
-            } else if ("/homeVault".equals(_url))  {
-                // to be ignored ...
-            } else if ("/homeVault/vaultRef".equals(_url))  {
-                this.vault = _content;
-            } else if ("/phone".equals(_url))  {
-                this.phone = _content;
-
-            } else if ("/homeSite".equals(_url))  {
-            // to be ignored
-            } else if ("/homeSite/siteRef".equals(_url))  {
-                this.site = _content;
-
-            // password must be ignored...
-            } else if (_url.startsWith("/password"))  {
-
-            // to be ignored ...
-            } else if (_url.startsWith("/cueList"))  {
-            } else if (_url.startsWith("/filterList"))  {
-            } else if (_url.startsWith("/queryList"))  {
-            } else if (_url.startsWith("/tableList"))  {
-            } else if (_url.startsWith("/tipList"))  {
-            } else if (_url.startsWith("/toolsetList"))  {
-            } else if (_url.startsWith("/viewList"))  {
-
-            } else  {
-                super.parse(_url, _content);
-            }
-        }
-
-        @Override
-        protected String getExportMQL()
-        {
-            return new StringBuilder()
-                    .append("export person \"").append(this.getName()).append("\" !mail !set xml")
-                    .toString();
-        }
-
-        @Override
-        protected void writeObject(Writer _out)
-                throws IOException
-        {
-            _out.append(" \\\n    access \"").append(join(',', this.access, "none")).append("\"")
-                .append(" \\\n    admin \"").append(join(',', this.adminAccess, "none")).append("\"")
-                .append(" \\\n    address \"").append(convertTcl(this.address)).append("\"")
-                .append(" \\\n    email \"").append(convertTcl(this.email)).append("\"")
-                .append(" \\\n    fax \"").append(convertTcl(this.fax)).append("\"")
-                .append(" \\\n    fullname \"").append(convertTcl(this.fullName)).append("\"")
-                .append(" \\\n    phone \"").append(convertTcl(this.phone)).append("\"")
-                .append(" \\\n    vault \"").append(convertTcl(this.vault)).append("\"");
-            if (this.site != null)  {
-                _out.append(" \\\n    site \"").append(convertTcl(this.site)).append("\"");
-            }
-            for (final String group : Person_mxJPO.this.groups)  {
-                _out.append(" \\\n    assign group \"")
-                    .append(convertTcl(group))
-                    .append("\"");
-            }
-            for (final String role : Person_mxJPO.this.roles)  {
-                _out.append(" \\\n    assign role \"")
-                    .append(convertTcl(role))
-                    .append("\"");
-            }
-        }
-
-        /**
-         *
-         * @param _out
-         * @throws IOException
-         */
-        protected void writeEnd(final Appendable _out)
-                throws IOException
-        {
-            _out.append("\nmql mod person \"${NAME}\" type ");
-            if (!this.isApplicationUser)  {
-                _out.append("not");
-            }
-            _out.append("application,");
-            if (!this.isFullUser)  {
-                _out.append("not");
-            }
-            _out.append("full,");
-            if (!this.isBusinessAdministrator)  {
-                _out.append("not");
-            }
-            _out.append("business,");
-            if (!this.isInactive)  {
-                _out.append("not");
-            }
-            _out.append("inactive,");
-            if (!this.isTrusted)  {
-                _out.append("not");
-            }
-            _out.append("trusted,");
-            if (!this.isSystemAdministrator)  {
-                _out.append("not");
-            }
-            _out.append("system");
-        }
-
 
         /**
          * The method overwrites the original method to
@@ -509,18 +282,6 @@ public class Person_mxJPO
             Person_mxJPO.this.personBus.prepareUpdate(_context, preMQLCode, postMQLCode, tclVariables);
             tclVariables.putAll(_tclVariables);
 
-            // append other pre MQL code
-            preMQLCode.append(_preMQLCode)
-                      .append("mod person \"").append(this.getName()).append("\" ")
-                          .append("access none ")
-                          .append("admin none ")
-                          .append("address '' ")
-                          .append("email '' ")
-                          .append("fax '' ")
-                          .append("fullname '' ")
-                          .append("phone '' ")
-                          .append("remove assign all;\n");
-
             // update must be done with history off (because not required...)
             try  {
                 setHistoryOff(_context);
@@ -531,7 +292,7 @@ public class Person_mxJPO
         }
     }
 
-    private class PersonBus
+    class PersonBus
             extends AbstractBusObject_mxJPO
     {
         /**
