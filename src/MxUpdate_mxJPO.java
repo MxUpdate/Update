@@ -20,6 +20,9 @@
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,6 +42,7 @@ import org.mxupdate.mapping.Mapping_mxJPO;
 import org.mxupdate.mapping.Mode_mxJPO;
 import org.mxupdate.mapping.TypeDefGroup_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.mapping.UpdateCheck_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.datamodel.Relationship_mxJPO;
@@ -74,24 +78,6 @@ public class MxUpdate_mxJPO
     private static final int LENGTH_DESC_LINE = 100;
 
     /**
-     * Enumeration used to define how the version information is evaluated.
-     */
-    private enum UpdateCheck
-    {
-        /**
-         * The last modified date of the file is check against the version
-         * information.
-         */
-        FILEDATE_AS_VERSION,
-
-        /**
-         * Check for the last modified date of the file against the file date
-         * property.
-         */
-        FILEDATE;
-    }
-
-    /**
      * Stored the descriptions of all parameters.
      */
     private final Map<String,String> description = new TreeMap<String,String>();
@@ -110,7 +96,7 @@ public class MxUpdate_mxJPO
     /**
      * Holds all parameters related how the version information is set.
      */
-    private final Map<String,UpdateCheck> PARAM_VERSION = new HashMap<String,UpdateCheck>();
+    private final Map<String,UpdateCheck_mxJPO> PARAM_VERSION = new HashMap<String,UpdateCheck_mxJPO>();
 
     private void prepareParams(final Context _context)
             throws MatrixException
@@ -169,18 +155,24 @@ public class MxUpdate_mxJPO
         }
 
         ////////////////////////////////////////////////////////////////////////
-        // version information
+        // update checks
 
-        this.PARAM_VERSION.put("--usefiledateasversion", UpdateCheck.FILEDATE_AS_VERSION);
-        appendDescription("The last modified date in seconds of the file is used as version information. "
-                                + "An update of an administration object is needed if the last modified "
-                                + "date of the file is not equal to the value stored on the version property.",
-                          "usefiledateasversion");
+        for (final UpdateCheck_mxJPO updateCheck : UpdateCheck_mxJPO.values())  {
+            for (final String param : updateCheck.getParameterList())  {
+                if (param.length() == 1)  {
+                    this.PARAM_VERSION.put("-" + param, updateCheck);
+                } else  {
+                    this.PARAM_VERSION.put("--" + param, updateCheck);
+                }
+            }
+            this.appendDescription(updateCheck.getParameterDesc(),
+                                   updateCheck.getParameterList(),
+                                   null);
+        }
 
-        this.PARAM_VERSION.put("--checkfiledate", UpdateCheck.FILEDATE);
-        appendDescription("Check if an update is required by comparing the last modified date against "
-                                + "the value of the file date property.",
-                          "checkfiledate");
+        appendDescription("The last modified date in seconds of the file is used as version information.",
+                          Arrays.asList(new String[]{"usefiledateasversion"}),
+                          null);
 
         appendDescription("Defines the version of administration objects (e.g. 1-0).",
                           Arrays.asList(new String[]{"version"}),
@@ -204,7 +196,7 @@ public class MxUpdate_mxJPO
                 this.defineParameter(null,
                         typeDef,
                         typeDef.getParameterDesc(),
-                        typeDef.getParameters());
+                        typeDef.getParameterList());
             }
         }
 
@@ -431,6 +423,7 @@ public class MxUpdate_mxJPO
         Relationship_mxJPO.IGNORE_RELATIONSHIP_ATTRIBUTES.clear();
 
         String version = null;
+        boolean useFileDateAsVersion = false;
 
         try {
             // to be sure....
@@ -442,7 +435,7 @@ public class MxUpdate_mxJPO
 
             boolean unknown = false;
 
-            UpdateCheck versionInfo = null;
+            UpdateCheck_mxJPO versionInfo = null;
 
             final Set<String> paths = new TreeSet<String>();
 
@@ -490,6 +483,8 @@ public class MxUpdate_mxJPO
                 } else if ("--path".equals(_args[idx]))  {
                     idx++;
                     paths.add(_args[idx]);
+                } else if ("--usefiledateasversion".equals(_args[idx]))  {
+                    useFileDateAsVersion = true;
                 } else if ("--version".equals(_args[idx]))  {
                     idx++;
                     version = _args[idx];
@@ -504,7 +499,7 @@ System.err.println("unknown pararameter "  + _args[idx]);
             } else if (Mode_mxJPO.EXPORT == mode)  {
                 this.export(_context, paths, clazz2matches);
             } else if (Mode_mxJPO.IMPORT == mode)  {
-                this.update(_context, paths, clazz2matches, versionInfo, version);
+                this.update(_context, paths, clazz2matches, versionInfo, version, useFileDateAsVersion);
             } else if (Mode_mxJPO.DELETE == mode)  {
                 this.delete(_context, paths, clazz2matches);
             }
@@ -565,8 +560,9 @@ System.out.println("export "+instance.getTypeDef().getLogging() + " '" + name + 
     protected void update(final Context _context,
                           final Set<String> _paths,
                           final Map<TypeDef_mxJPO,List<String>> _clazz2matches,
-                          final UpdateCheck _versionInfo,
-                          final String _version)
+                          final UpdateCheck_mxJPO _versionInfo,
+                          final String _version,
+                          final boolean _useFileDateAsVersion)
             throws Exception
     {
         // get all matching files depending on the update classes
@@ -605,19 +601,39 @@ System.out.println("create "+instance.getTypeDef().getLogging() + " '" + fileEnt
 System.out.println("check "+instance.getTypeDef().getLogging() + " '" + fileEntry.getValue() + "'");
 
                     final boolean update;
-                    String version = _version;
-                    if ((_versionInfo == UpdateCheck.FILEDATE_AS_VERSION) || (_versionInfo == UpdateCheck.FILEDATE))  {
+                    String version = _useFileDateAsVersion
+                                     ? Long.toString(fileEntry.getKey().lastModified() / 1000)
+                                     : _version;
+                    if (_versionInfo == UpdateCheck_mxJPO.FILEDATE)  {
                         final Date fileDate = new Date(fileEntry.getKey().lastModified());
-                        final Date instDate = (_versionInfo == UpdateCheck.FILEDATE)
-                                              ? instance.getMxFileDate(_context, fileEntry.getValue(), AdminPropertyDef.FILEDATE)
-                                              : instance.getMxFileDate(_context, fileEntry.getValue(), AdminPropertyDef.VERSION);
+                        final String instDateString = instance.getPropValue(_context,
+                                                                            fileEntry.getValue(),
+                                                                            AdminPropertyDef.FILEDATE);
+                        final DateFormat format = new SimpleDateFormat(AdminPropertyDef.FILEDATE.getValue());
+                        Date instDate;
+                        try {
+                            instDate = format.parse(instDateString);
+                        } catch (final ParseException e) {
+                            instDate = null;
+                        }
                         if (fileDate.equals(instDate))  {
                             update = false;
                         } else  {
                             update = true;
 System.out.println("    - update to version from " + fileDate);
-                            if (_versionInfo == UpdateCheck.FILEDATE_AS_VERSION)  {
-                                version = Long.toString(fileDate.getTime() / 1000);
+                        }
+                    } else if (_versionInfo == UpdateCheck_mxJPO.VERSION)  {
+                        final String instVersion = instance.getPropValue(_context,
+                                                                         fileEntry.getValue(),
+                                                                         AdminPropertyDef.VERSION);
+                        if (instVersion.equals(version))  {
+                            update = false;
+                        } else  {
+                            update = true;
+                            if (_useFileDateAsVersion)  {
+                                System.out.println("    - update to version from " + new Date(fileEntry.getKey().lastModified()));
+                            } else  {
+                                System.out.println("    - update to version " + version);
                             }
                         }
                     } else  {

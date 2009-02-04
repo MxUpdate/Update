@@ -26,32 +26,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Enumeration of all modes which are supported by the MxUpdate.
+ * Enumeration used to define was is checked if an update is done.
  *
  * @author tmoxter
  * @version $Id$
  */
-public enum Mode_mxJPO
+public enum UpdateCheck_mxJPO
 {
     /**
-     * Mode 'import' used to import defined administration objects from
-     * file system into Matrix.
+     * Check for the defined version against the version property.
      */
-    IMPORT,
+    VERSION,
+
     /**
-     * Mode 'export' used to export defined administration objects from
-     * Matrix into a file system.
+     * Check for the last modified date of the file against the file date
+     * property.
      */
-    EXPORT,
-    /**
-     * Mode 'delete' used to delete in Mx objects which are not defined
-     * in the repository (file system).
-     */
-    DELETE,
-    /**
-     * Prints out the help description.
-     */
-    HELP;
+    FILEDATE;
 
     /**
      * Maps from the name of the type definition group to the related type
@@ -59,8 +50,8 @@ public enum Mode_mxJPO
      *
      * @see Mode_mxJPO#defineValue(String, String)
      */
-    private final static Map<Mode_mxJPO,ParameterValues_mxJPO> MAP
-            = new HashMap<Mode_mxJPO,ParameterValues_mxJPO>();
+    private final static Map<UpdateCheck_mxJPO,ParameterValues_mxJPO> MAP
+            = new HashMap<UpdateCheck_mxJPO,ParameterValues_mxJPO>();
 
     /**
      * Resets type definition map.
@@ -86,7 +77,7 @@ public enum Mode_mxJPO
         final String enumName = _key.replaceAll("\\..*", "");
         final String key = _key.substring(enumName.length() + 1);
 
-        final Mode_mxJPO modeEnum = valueOf(enumName);
+        final UpdateCheck_mxJPO modeEnum = valueOf(enumName);
         ParameterValues_mxJPO mode = MAP.get(modeEnum);
         if (mode == null)  {
             mode = new ParameterValues_mxJPO();

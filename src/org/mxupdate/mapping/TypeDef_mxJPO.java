@@ -38,6 +38,7 @@ import org.mxupdate.util.MqlUtil_mxJPO;
  * @version $Id$
  */
 public final class TypeDef_mxJPO
+        extends ParameterValues_mxJPO
 {
     /**
      * Maps from the name of the type definition group to the related type
@@ -271,22 +272,6 @@ public final class TypeDef_mxJPO
      * @see #defineValue(String, String)
      */
     private String textTitle;
-
-    /**
-     * Defines the parameter description.
-     *
-     * @see #getParameterDesc()
-     * @see #defineValue(String, String)
-     */
-    private String paramDesc;
-
-    /**
-     * Defines the list of parameters.
-     *
-     * @see #getParameters()
-     * @see #defineValue(String, String)
-     */
-    private Collection<String> paramList;
 
     /**
      * Resets type definition map.
@@ -536,30 +521,6 @@ public final class TypeDef_mxJPO
     public String getFileSuffix()
     {
         return this.fileSuffix;
-    }
-
-    /**
-     * Returns the description of parameters which defines the administration
-     * object used to export / import / delete.
-     *
-     * @return description of parameter
-     * @see #paramDesc
-     */
-    public String getParameterDesc()
-    {
-        return this.paramDesc;
-    }
-
-    /**
-     * Returns the list of parameters which defines the administration object
-     * class used to export / import / delete.
-     *
-     * @return list of parameter strings
-     * @see #paramList
-     */
-    public Collection<String> getParameters()
-    {
-        return this.paramList;
     }
 
     /**

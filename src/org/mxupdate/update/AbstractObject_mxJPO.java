@@ -288,6 +288,30 @@ public abstract class AbstractObject_mxJPO
                               final AdminPropertyDef _prop)
             throws MatrixException
     {
+        final String curVersion = this.getPropValue(_context, _name, _prop);
+
+        Date ret;
+        if (_prop == AdminPropertyDef.FILEDATE)  {
+            final DateFormat format = new SimpleDateFormat(_prop.getValue());
+            try {
+                ret = format.parse(curVersion);
+            } catch (final ParseException e) {
+                ret = null;
+            }
+        } else  {
+            ret = (curVersion.matches("^[0-9]++$"))
+                  ? new Date(Long.parseLong(curVersion) * 1000)
+                  : null;
+        }
+
+        return ret;
+    }
+
+    public String getPropValue(final Context _context,
+                               final String _name,
+                               final AdminPropertyDef _prop)
+            throws MatrixException
+    {
         final String curVersion;
         // check for existing administration type...
         if (this.getTypeDef().getMxAdminName() != null)  {
@@ -311,21 +335,7 @@ public abstract class AbstractObject_mxJPO
                     .append("\" select attribute[").append(_prop.getAttrName()).append("] dump"));
         }
 
-        Date ret;
-        if (_prop == AdminPropertyDef.FILEDATE)  {
-            final DateFormat format = new SimpleDateFormat(_prop.getValue());
-            try {
-                ret = format.parse(curVersion);
-            } catch (final ParseException e) {
-                ret = null;
-            }
-        } else  {
-            ret = (curVersion.matches("^[0-9]++$"))
-                  ? new Date(Long.parseLong(curVersion) * 1000)
-                  : null;
-        }
-
-        return ret;
+        return curVersion;
     }
 
     /**

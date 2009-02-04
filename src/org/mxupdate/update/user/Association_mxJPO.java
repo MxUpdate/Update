@@ -23,10 +23,6 @@ package org.mxupdate.update.user;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Map;
 
 import matrix.db.Context;
@@ -155,42 +151,28 @@ public class Association_mxJPO
      * @see #VERSION_PATTERN
      */
     @Override
-    public Date getMxFileDate(final Context _context,
-                              final String _name,
-                              final AdminPropertyDef _prop)
+    public String getPropValue(final Context _context,
+                               final String _name,
+                               final AdminPropertyDef _prop)
             throws MatrixException
     {
         final String text = _prop.getPropName() + " on association " + _name + " value ";
-        final String curVersion = execMql(_context, new StringBuilder()
+        final String curValue = execMql(_context, new StringBuilder()
                 .append("list property on asso \"").append(_name).append("\""));
 
-        final int idx = curVersion.indexOf(text);
-        final String version;
+        final int idx = curValue.indexOf(text);
+        final String value;
         if (idx >= 0)  {
-            final int last = curVersion.indexOf('\n', idx);
+            final int last = curValue.indexOf('\n', idx);
             if (last > 0)  {
-                version = curVersion.substring(idx + text.length(), last);
+                value = curValue.substring(idx + text.length(), last);
             } else  {
-                version = curVersion.substring(idx + text.length());
+                value = curValue.substring(idx + text.length());
             }
         } else  {
-            version = null;
+            value = null;
         }
 
-        Date ret;
-        if (_prop == AdminPropertyDef.FILEDATE)  {
-            final DateFormat format = new SimpleDateFormat(_prop.getValue());
-            try {
-                ret = format.parse(version);
-            } catch (final ParseException e) {
-                ret = null;
-            }
-        } else  {
-            ret = (version.matches("^[0-9]++$"))
-                  ? new Date(Long.parseLong(version) * 1000)
-                  : null;
-        }
-
-        return ret;
+        return value;
     }
 }

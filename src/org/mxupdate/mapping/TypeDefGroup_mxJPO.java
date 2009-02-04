@@ -32,6 +32,7 @@ import java.util.Map;
  * @version $Id$
  */
 public class TypeDefGroup_mxJPO
+        extends ParameterValues_mxJPO
 {
     /**
      * Maps from the name of the type definition group to the related type
@@ -41,22 +42,6 @@ public class TypeDefGroup_mxJPO
      */
     private final static Map<String,TypeDefGroup_mxJPO> MAP
             = new HashMap<String,TypeDefGroup_mxJPO>();
-
-    /**
-     * Defines the parameter description.
-     *
-     * @see #getParameterDesc()
-     * @see #defineValue(String, String)
-     */
-    private String paramDesc;
-
-    /**
-     * Defines the list of parameters.
-     *
-     * @see #getParameterList()
-     * @see #defineValue(String, String)
-     */
-    private Collection<String> paramList;
 
     /**
      * Name list of type definition instances for which this type definition
@@ -115,29 +100,6 @@ public class TypeDefGroup_mxJPO
     public static Collection<TypeDefGroup_mxJPO> getGroups()
     {
         return MAP.values();
-    }
-
-    /**
-     * Returns the description of parameters which defines this type definition
-     * group.
-     *
-     * @return description of parameter
-     * @see #paramDesc
-     */
-    public String getParameterDesc()
-    {
-        return this.paramDesc;
-    }
-
-    /**
-     * Returns the list of parameters which defines this type definiton group.
-     *
-     * @return list of parameter strings
-     * @see #paramList
-     */
-    public Collection<String> getParameterList()
-    {
-        return this.paramList;
     }
 
     /**

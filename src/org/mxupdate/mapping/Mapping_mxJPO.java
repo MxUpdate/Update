@@ -140,6 +140,7 @@ public final class Mapping_mxJPO
         Mode_mxJPO.resetValues();
         TypeDef_mxJPO.resetValues();
         TypeDefGroup_mxJPO.resetValues();
+        UpdateCheck_mxJPO.resetValues();
         PROPERTIES.clear();
         ADMINPROPERTY_ENUM2NAMES.clear();
         ADMINPROPERTY_NAMES2ENUM.clear();
@@ -170,6 +171,8 @@ public final class Mapping_mxJPO
                 TypeDef_mxJPO.defineValue(_context, key.substring(8), value);
             } else if (key.startsWith("TypeDefGroup."))  {
                 TypeDefGroup_mxJPO.defineValue(key.substring(13), value);
+            } else if (key.startsWith("UpdateCheck."))  {
+                UpdateCheck_mxJPO.defineValue(key.substring(12), value);
             }
         }
     }
