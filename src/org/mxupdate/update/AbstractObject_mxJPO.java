@@ -25,11 +25,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -272,41 +268,17 @@ public abstract class AbstractObject_mxJPO
     }
 
     /**
-     * Returns the stored file date within Matrix for administration object
-     * with given name. For performance reason the method uses
+     * Returns the stored value within Matrix for administration object
+     * with given property name. For performance reason the method uses
      * &quot;print&quot; commands, because a complete XML parse including a
      * complete export takes longer time.
      *
      * @param _context      context for this request
-     * @param _name         name of update object
-     * @param _prop         property for which the date value is searched
-     * @return modified date of given update object
+     * @param _name         name of administration object
+     * @param _prop         property for which the value is searched
+     * @return value for given property
      * @throws MatrixException
      */
-    public Date getMxFileDate(final Context _context,
-                              final String _name,
-                              final AdminPropertyDef _prop)
-            throws MatrixException
-    {
-        final String curVersion = this.getPropValue(_context, _name, _prop);
-
-        Date ret;
-        if (_prop == AdminPropertyDef.FILEDATE)  {
-            final DateFormat format = new SimpleDateFormat(_prop.getValue());
-            try {
-                ret = format.parse(curVersion);
-            } catch (final ParseException e) {
-                ret = null;
-            }
-        } else  {
-            ret = (curVersion.matches("^[0-9]++$"))
-                  ? new Date(Long.parseLong(curVersion) * 1000)
-                  : null;
-        }
-
-        return ret;
-    }
-
     public String getPropValue(final Context _context,
                                final String _name,
                                final AdminPropertyDef _prop)
