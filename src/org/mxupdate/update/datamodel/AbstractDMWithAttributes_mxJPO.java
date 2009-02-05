@@ -110,7 +110,9 @@ public abstract class AbstractDMWithAttributes_mxJPO
     protected void parse(final String _url,
                          final String _content)
     {
-        if ("/attributeDefRefList/attributeDefRef".equals(_url))  {
+        if ("/attributeDefRefList".equals(_url))  {
+            // to be ignored ...
+        } else if ("/attributeDefRefList/attributeDefRef".equals(_url))  {
             this.attributes.add(_content);
         } else  {
             super.parse(_url, _content);
@@ -223,7 +225,6 @@ final Set<String> ignoreAttrs = new HashSet<String>();
             }
             idx++;
         }
-System.out.println("ignoreAttrs="+ignoreAttrs);
 
         // check for equal administration name
         if (!this.getName().equals(name))  {

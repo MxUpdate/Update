@@ -140,10 +140,7 @@ public class Relationship_mxJPO
                          final String _content)
     {
 // TODO rules:
-        if ("/attributeDefRefList".equals(_url))  {
-            // to be ignored ...
-
-        } else if ("/fromSide".equals(_url))  {
+        if ("/fromSide".equals(_url))  {
             // to be ignored ...
         } else if ("/fromSide/cardinality".equals(_url))  {
             this.fromCardinality = _content.equalsIgnoreCase("1")

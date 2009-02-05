@@ -75,8 +75,6 @@ public class Type_mxJPO
         if ("/abstract".equals(_url))  {
             this.abstractFlag = true;
 
-        } else if ("/attributeDefRefList".equals(_url))  {
-            // to be ignored ...
         } else if ("/derivedFrom".equals(_url))  {
             // to be ignored ...
         } else if ("/derivedFrom/typeRefList".equals(_url))  {
