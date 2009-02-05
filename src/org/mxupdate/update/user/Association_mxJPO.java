@@ -31,13 +31,14 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
  *
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public class Association_mxJPO
@@ -103,7 +104,7 @@ public class Association_mxJPO
      * <li>set definition to current context user</li>
      * </ul>
      *
-     * @param _context          context for this request
+     * @param _paramCache       parameter cache
      * @param _preMQLCode       MQL statements which must be called before the
      *                          TCL code is executed
      * @param _postMQLCode      MQL statements which must be called after the
@@ -117,7 +118,7 @@ public class Association_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      */
     @Override
-    protected void update(final Context _context,
+    protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
@@ -130,12 +131,12 @@ public class Association_mxJPO
                 .append("mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append('\"')
                 .append(" description \"\"")
-                .append(" definition \"").append(_context.getUser()).append("\";\n");
+                .append(" definition \"").append(_paramCache.getContext().getUser()).append("\";\n");
 
         // append already existing pre MQL code
         preMQLCode.append(_preMQLCode);
 
-        super.update(_context, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
     }
 
     /**

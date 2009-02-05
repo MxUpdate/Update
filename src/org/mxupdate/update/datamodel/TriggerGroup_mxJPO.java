@@ -39,9 +39,10 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.RelationDef;
 import org.mxupdate.update.AbstractBusObject_mxJPO;
 import org.mxupdate.update.util.BusObject_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public class TriggerGroup_mxJPO
@@ -175,7 +176,7 @@ public class TriggerGroup_mxJPO
      * executed the MQL statements to disconnected all {@link #tos} and
      * {@link #froms} objects.
      *
-     * @param _context          context for this request
+     * @param _paramCache       parameter cache
      * @param _preMQLCode       MQL statements which must be called before the
      *                          TCL code is executed
      * @param _postMQLCode      MQL statements which must be called after the
@@ -189,7 +190,7 @@ public class TriggerGroup_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      */
     @Override
-    protected void update(final Context _context,
+    protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
@@ -219,6 +220,6 @@ public class TriggerGroup_mxJPO
         // append rest of pre MQL code
         preMQLCode.append(_preMQLCode);
 
-        super.update(_context, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
     }
 }

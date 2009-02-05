@@ -26,14 +26,13 @@ import java.io.Writer;
 import java.util.Map;
 import java.util.Stack;
 
-import matrix.db.Context;
-
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
  *
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public class Table_mxJPO
@@ -92,7 +91,7 @@ public class Table_mxJPO
      * <li>set to not hidden</li>
      * </ul>
      *
-     * @param _context          context for this request
+     * @param _paramCache       parameter cache
      * @param _preMQLCode       MQL statements which must be called before the
      *                          TCL code is executed
      * @param _postMQLCode      MQL statements which must be called after the
@@ -106,7 +105,7 @@ public class Table_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      */
     @Override
-    protected void update(final Context _context,
+    protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
@@ -130,7 +129,7 @@ public class Table_mxJPO
         preMQLCode.append(";\n")
                   .append(_preMQLCode);
 
-        super.update(_context, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
     }
 
 }

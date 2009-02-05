@@ -36,7 +36,7 @@ import org.mxupdate.util.MqlUtil_mxJPO;
  * The class is used to map from used names within the MxUpdate JPOs and the
  * internal used names within Mx.
  *
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public final class Mapping_mxJPO
@@ -85,18 +85,6 @@ public final class Mapping_mxJPO
     private static final String PREFIX_ADMINPROPERTYNAME = "PropertyName.";
 
     /**
-     * Mapping between internal used admin property definitions and the default
-     * value of the property.
-     */
-    private static final Map<AdminPropertyDef,String> ADMINPROPERTY_VALUES = new HashMap<AdminPropertyDef,String>();
-
-    /**
-     * Used prefix of admin property value definitions within the property
-     * file.
-     */
-    private static final String PREFIX_ADMINPROPERTYVALUE = "PropertyValue.";
-
-    /**
      * Mapping between internal used attribute definitions and the Mx attribute
      * names.
      */
@@ -138,13 +126,13 @@ public final class Mapping_mxJPO
             throws MatrixException, IOException, Exception
     {
         Mode_mxJPO.resetValues();
+        ParameterDef_mxJPO.resetValues();
         TypeDef_mxJPO.resetValues();
         TypeDefGroup_mxJPO.resetValues();
         UpdateCheck_mxJPO.resetValues();
         PROPERTIES.clear();
         ADMINPROPERTY_ENUM2NAMES.clear();
         ADMINPROPERTY_NAMES2ENUM.clear();
-        ADMINPROPERTY_VALUES.clear();
         ATTRIBUTES.clear();
 
         PROPERTIES.putAll(MqlUtil_mxJPO.readPropertyProgram(_context, PROP_NAME));
@@ -159,14 +147,14 @@ public final class Mapping_mxJPO
                 AdminPropertyDef en = AdminPropertyDef.valueOf(key.substring(PREFIX_ADMINPROPERTYNAME.length()).toUpperCase());
                 ADMINPROPERTY_ENUM2NAMES.put(en, value);
                 ADMINPROPERTY_NAMES2ENUM.put(value, en);
-            } else if (key.startsWith(PREFIX_ADMINPROPERTYVALUE))  {
-                ADMINPROPERTY_VALUES.put(AdminPropertyDef.valueOf(key.substring(PREFIX_ADMINPROPERTYVALUE.length()).toUpperCase()), value);
             } else if (key.startsWith(PREFIX_ATTRIBUTE))  {
                 ATTRIBUTES.put(AttributeDef.valueOf(key.substring(PREFIX_ATTRIBUTE.length())), value);
             } else if (key.startsWith(PREFIX_RELATION))  {
                 RELATIONS.put(RelationDef.valueOf(key.substring(PREFIX_RELATION.length())), value);
             } else if (key.startsWith("Mode."))  {
                 Mode_mxJPO.defineValue(key.substring(5), value);
+            } else if (key.startsWith("ParameterDef."))  {
+                ParameterDef_mxJPO.defineValue(key.substring(13), value);
             } else if (key.startsWith("TypeDef."))  {
                 TypeDef_mxJPO.defineValue(_context, key.substring(8), value);
             } else if (key.startsWith("TypeDefGroup."))  {
@@ -175,45 +163,6 @@ public final class Mapping_mxJPO
                 UpdateCheck_mxJPO.defineValue(key.substring(12), value);
             }
         }
-    }
-
-    /**
-     * Defines the new value of the application property
-     * {@link AdminPropertyDef#APPLICATION}.
-     *
-     * @param _application  new application definition
-     * @see #ADMINPROPERTY_VALUES
-     * @see AdminPropertyDef#APPLICATION
-     */
-    public static void defineApplication(final String _application)
-    {
-        ADMINPROPERTY_VALUES.put(AdminPropertyDef.APPLICATION, _application);
-    }
-
-    /**
-     * Defines the new value of the author property
-     * {@link AdminPropertyDef#AUTHOR}.
-     *
-     * @param _author   new author definition
-     * @see #ADMINPROPERTY_VALUES
-     * @see AdminPropertyDef#AUTHOR
-     */
-    public static void defineAuthor(final String _author)
-    {
-        ADMINPROPERTY_VALUES.put(AdminPropertyDef.AUTHOR, _author);
-    }
-
-    /**
-     * Defines the new value of the installer property
-     * {@link AdminPropertyDef#INSTALLER}.
-     *
-     * @param _installer    new installer definition
-     * @see #ADMINPROPERTY_VALUES
-     * @see AdminPropertyDef#INSTALLER
-     */
-    public static void defineInstaller(final String _installer)
-    {
-        ADMINPROPERTY_VALUES.put(AdminPropertyDef.INSTALLER, _installer);
     }
 
     /**
@@ -273,18 +222,6 @@ public final class Mapping_mxJPO
         public String getAttrName()
         {
             return Mapping_mxJPO.ADMINPROPERTY_ATTRIBUTES.get(this);
-        }
-
-       /**
-         * Returns the related admin property value. The method returns only
-         * correct values if the initialize method was called!
-         *
-         * @return value of the property definition
-         * @see Mapping_mxJPO#ADMINPROPERTY_VALUES
-         */
-        public String getValue()
-        {
-            return Mapping_mxJPO.ADMINPROPERTY_VALUES.get(this);
         }
     }
 

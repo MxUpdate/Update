@@ -28,11 +28,11 @@ import java.util.Map;
 /**
  * Groups the type definition enumeration used for the parameter definitions.
  *
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public class TypeDefGroup_mxJPO
-        extends ParameterValues_mxJPO
+        extends AbstractValue_mxJPO
 {
     /**
      * Maps from the name of the type definition group to the related type
@@ -55,9 +55,12 @@ public class TypeDefGroup_mxJPO
     /**
      * The constructor is defined private so that a new instance could only
      * created within this class.
+     *
+     * @param _name     name of the type definition group
      */
-    private TypeDefGroup_mxJPO()
+    private TypeDefGroup_mxJPO(final String _name)
     {
+        super(_name);
     }
 
     /**
@@ -65,25 +68,25 @@ public class TypeDefGroup_mxJPO
      *
      * @param _key
      * @param _value
+     * @throws Exception if key is not found
      */
     protected static void defineValue(final String _key,
                                       final String _value)
+            throws Exception
     {
         final String enumName = _key.replaceAll("\\..*", "");
         final String key = _key.substring(enumName.length() + 1);
 
         TypeDefGroup_mxJPO group = MAP.get(enumName);
         if (group == null)  {
-            group = new TypeDefGroup_mxJPO();
+            group = new TypeDefGroup_mxJPO(enumName);
             MAP.put(enumName, group);
         }
 
-        if ("ParameterDesc".equals(key))  {
-            group.paramDesc = _value;
-        } else if ("ParameterList".equals(key))  {
-            group.paramList = Arrays.asList(_value.split(","));
-        } else if ("TypeDefList".endsWith(key))  {
+        if ("TypeDefList".endsWith(key))  {
             group.typeDefList = Arrays.asList(_value.split(","));
+        } else  {
+            group.defineValues(key, _value);
         }
     }
 

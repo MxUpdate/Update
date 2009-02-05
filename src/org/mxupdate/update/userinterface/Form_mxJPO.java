@@ -30,13 +30,14 @@ import matrix.db.Context;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
  *
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public class Form_mxJPO
@@ -173,7 +174,7 @@ public class Form_mxJPO
      * order of fields. Because of that, the TCL update code is includes a
      * procedure to order the form fields.
      *
-     * @param _context          context for this request
+     * @param _paramCache       parameter cache
      * @param _preMQLCode       MQL statements which must be called before the
      *                          TCL code is executed
      * @param _postMQLCode      MQL statements which must be called after the
@@ -188,7 +189,7 @@ public class Form_mxJPO
      * @see #ORDER_PROC
      */
     @Override
-    protected void update(final Context _context,
+    protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
@@ -217,7 +218,7 @@ public class Form_mxJPO
                 .append('\n')
                 .append(_preTCLCode);
 
-        super.update(_context, preMQLCode, _postMQLCode, tclCode, _tclVariables, _sourceFile);
+        super.update(_paramCache, preMQLCode, _postMQLCode, tclCode, _tclVariables, _sourceFile);
     }
 
 }

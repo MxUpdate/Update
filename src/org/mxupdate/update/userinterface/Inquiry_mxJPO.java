@@ -27,16 +27,15 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
-import matrix.db.Context;
-
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  *
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public class Inquiry_mxJPO
@@ -140,7 +139,7 @@ public class Inquiry_mxJPO
      * <li>remove all arguments</li>
      * </ul>
      *
-     * @param _context          context for this request
+     * @param _paramCache       parameter cache
      * @param _preMQLCode       MQL statements which must be called before the
      *                          TCL code is executed
      * @param _postMQLCode      MQL statements which must be called after the
@@ -155,7 +154,7 @@ public class Inquiry_mxJPO
      * @throws Exception if update failed
      */
     @Override
-    protected void update(final Context _context,
+    protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
@@ -212,7 +211,7 @@ public class Inquiry_mxJPO
             tclVariables.put("FILE", tmpInqFile.getPath());
 
             // and update
-            super.update(_context, preMQLCode, _postMQLCode, code, tclVariables, tmpTclFile);
+            super.update(_paramCache, preMQLCode, _postMQLCode, code, tclVariables, tmpTclFile);
         } finally  {
             tmpInqFile.delete();
             tmpTclFile.delete();

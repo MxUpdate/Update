@@ -35,6 +35,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.xml.sax.SAXException;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
@@ -44,7 +45,7 @@ import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
  * Abstract class from which must be derived for exporting and importing all
  * administration (business) objects.
  *
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public abstract class AbstractObject_mxJPO
@@ -230,7 +231,7 @@ public abstract class AbstractObject_mxJPO
     /**
      * Updated this administration (business) object.
      *
-     * @param _context          context for this request
+     * @param _paramCache       parameter cache
      * @param _name             name of the administration (business) object
      * @param _file             reference to the file to update
      * @param _newVersion       new version which must be set within the update
@@ -238,7 +239,7 @@ public abstract class AbstractObject_mxJPO
      *                          be set).
      * @throws Exception if update failed
      */
-    public abstract void update(final Context _context,
+    public abstract void update(final ParameterCache_mxJPO _paramCache,
                                 final String _name,
                                 final File _file,
                                 final String _newVersion)

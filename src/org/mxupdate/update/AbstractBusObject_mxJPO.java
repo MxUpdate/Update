@@ -45,6 +45,7 @@ import matrix.util.StringList;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
@@ -53,7 +54,7 @@ import static org.mxupdate.util.MqlUtil_mxJPO.setHistoryOff;
 import static org.mxupdate.util.MqlUtil_mxJPO.setHistoryOn;
 
 /**
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public abstract class AbstractBusObject_mxJPO
@@ -438,7 +439,7 @@ public abstract class AbstractBusObject_mxJPO
      * MQL code in <code>_preMQLCode</code> and appended to the MQL statements
      * in <code>_postMQLCode</code>.
      *
-     * @param _context          context for this request
+     * @param _paramCache       parameter cache
      * @param _preMQLCode       MQL statements which must be called before the
      *                          TCL code is executed
      * @param _postMQLCode      MQL statements which must be called after the
@@ -452,7 +453,7 @@ public abstract class AbstractBusObject_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      */
     @Override
-    protected void update(final Context _context,
+    protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
@@ -490,20 +491,21 @@ public abstract class AbstractBusObject_mxJPO
                 .append(" \"").append(AdminPropertyDef.FILEDATE.getAttrName())
                         .append("\" \"").append(_tclVariables.get(AdminPropertyDef.FILEDATE.name())).append('\"');
         // exists no application property or application property not equal?
-        if ((this.getApplication() == null) || !AdminPropertyDef.APPLICATION.getValue().equals(this.getApplication()))  {
+        final String applVal = _paramCache.getValueString(ParameterCache_mxJPO.KEY_APPLICATION);
+        if ((this.getApplication() == null) || !applVal.equals(this.getApplication()))  {
             postMQLCode.append(" \"").append(AdminPropertyDef.APPLICATION.getAttrName())
-                    .append("\" \"").append(AdminPropertyDef.APPLICATION.getValue()).append('\"');
+                    .append("\" \"").append(applVal).append('\"');
         }
         // is installed date property defined?
         if ((this.getInstallationDate() == null) || "".equals(this.getInstallationDate()))  {
-            final DateFormat format = new SimpleDateFormat(AdminPropertyDef.INSTALLEDDATE.getValue());
+            final DateFormat format = new SimpleDateFormat(_paramCache.getValueString(ParameterCache_mxJPO.KEY_INSTALLEDDATEFORMAT));
             postMQLCode.append(" \"").append(AdminPropertyDef.INSTALLEDDATE.getAttrName())
                     .append("\" \"").append(format.format(new Date())).append('\"');
         }
         // is installer property defined?
         if ((this.getInstaller() == null) || "".equals(this.getInstaller()))  {
             postMQLCode.append(" \"").append(AdminPropertyDef.INSTALLER.getAttrName())
-                    .append("\" \"").append(AdminPropertyDef.INSTALLER.getValue()).append('\"');
+                    .append("\" \"").append(_paramCache.getValueString(ParameterCache_mxJPO.KEY_INSTALLER)).append('\"');
         }
         // exists no author property or author property not equal?
         final String authVal = _tclVariables.get(AdminPropertyDef.AUTHOR.name());
@@ -520,10 +522,10 @@ public abstract class AbstractBusObject_mxJPO
 
         // update must be done with history off (because not required...)
         try  {
-            setHistoryOff(_context);
-            super.update(_context, preMQLCode, postMQLCode, _preTCLCode, tclVariables, _sourceFile);
+            setHistoryOff(_paramCache.getContext());
+            super.update(_paramCache, preMQLCode, postMQLCode, _preTCLCode, tclVariables, _sourceFile);
         } finally  {
-            setHistoryOn(_context);
+            setHistoryOn(_paramCache.getContext());
         }
     }
 

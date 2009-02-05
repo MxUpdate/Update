@@ -37,6 +37,7 @@ import matrix.util.StringList;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.update.util.StringUtil_mxJPO.join;
@@ -44,10 +45,10 @@ import static org.mxupdate.util.MqlUtil_mxJPO.setHistoryOff;
 import static org.mxupdate.util.MqlUtil_mxJPO.setHistoryOn;
 
 /**
-*
-* @author tmoxter
-* @version $Id$
-*/
+ *
+ * @author Tim Moxter
+ * @version $Id$
+ */
 public class PersonAdmin_mxJPO
         extends AbstractAdminObject_mxJPO
 {
@@ -374,7 +375,7 @@ public class PersonAdmin_mxJPO
      * MQL code in <code>_preMQLCode</code> and appended to the MQL statements
      * in <code>_postMQLCode</code>.
      *
-     * @param _context          context for this request
+     * @param _paramCache       parameter cache
      * @param _preMQLCode       MQL statements which must be called before the
      *                          TCL code is executed
      * @param _postMQLCode      MQL statements which must be called after the
@@ -388,7 +389,7 @@ public class PersonAdmin_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      */
     @Override
-    protected void update(final Context _context,
+    protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
@@ -411,10 +412,10 @@ public class PersonAdmin_mxJPO
 
         // update must be done with history off (because not required...)
         try  {
-            setHistoryOff(_context);
-            super.update(_context, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+            setHistoryOff(_paramCache.getContext());
+            super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
         } finally  {
-            setHistoryOn(_context);
+            setHistoryOn(_paramCache.getContext());
         }
     }
 }

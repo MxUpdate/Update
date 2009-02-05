@@ -33,13 +33,14 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.xml.sax.SAXException;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public class Program_mxJPO
@@ -159,7 +160,7 @@ public class Program_mxJPO
      * The program is updated if the modified date of the file is not the same
      * as the the version property.
      *
-     * @param _context          context for this request
+     * @param _paramCache       parameter cache
      * @param _name             name of the administration (business) object
      * @param _file             reference to the file to update
      * @param _newVersion       new version which must be set within the update
@@ -168,7 +169,7 @@ public class Program_mxJPO
      * @throws Exception if update of the program failed
      */
     @Override
-    public void update(final Context _context,
+    public void update(final ParameterCache_mxJPO _paramCache,
                        final String _name,
                        final File _file,
                        final String _newVersion)
@@ -182,6 +183,6 @@ public class Program_mxJPO
             cmd.append("mod prog \"").append(_name)
                .append("\" add property version value \"").append(_newVersion).append("\";");
         }
-        execMql(_context, cmd);
+        execMql(_paramCache.getContext(), cmd);
     }
 }

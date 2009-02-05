@@ -1,0 +1,161 @@
+/*
+ * Copyright 2008-2009 The MxUpdate Team
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Revision:        $Rev$
+ * Last Changed:    $Date$
+ * Last Changed By: $Author$
+ */
+
+package org.mxupdate.mapping;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+/**
+ *
+ * @author Tim Moxter
+ * @version $Id$
+ */
+class AbstractValue_mxJPO
+{
+    /**
+     * Used parameter description within the property file.
+     *
+     * @see #defineValues(String, String)
+     */
+    private static final String PREFIX_PARAM_DESC = "ParameterDesc";
+
+    /**
+     * Used parameter argument list within the property file.
+     *
+     * @see #defineValues(String, String)
+     */
+    private static final String PREFIX_PARAM_ARGS = "ParameterArgs";
+
+    /**
+     * Used parameter list within the property file.
+     *
+     * @see #defineValues(String, String)
+     */
+    private static final String PREFIX_PARAM_LIST = "ParameterList";
+
+    /**
+     * Holds the name of the value.
+     *
+     * @see #getName()
+     * @see #AbstractValues_mxJPO(String)
+     */
+    private final String name;
+
+    /**
+     * Defines the parameter description.
+     *
+     * @see #getParameterDesc()
+     * @see #defineValue(String, String)
+     */
+    private String paramDesc;
+
+    /**
+     * Defines the list of arguments.
+     *
+     * @see #getParameterList()
+     * @see #defineValue(String, String)
+     */
+    private Collection<String> paramArgs;
+
+    /**
+     * Defines the list of parameters.
+     *
+     * @see #getParameterList()
+     * @see #defineValue(String, String)
+     */
+    private Collection<String> paramList;
+
+    /**
+     * Constructor used to initialize the name of the abstract values.
+     *
+     * @param _name name of the abstract value
+     * @see #name
+     */
+    protected AbstractValue_mxJPO(final String _name)
+    {
+        this.name = _name;
+    }
+
+    /**
+     *
+     * @param _key      name of the key
+     * @param _value    related value
+     * @throws Exception if the key is not known
+     */
+    protected void defineValues(final String _key,
+                                final String _value)
+            throws Exception
+    {
+        if (_key.equals(PREFIX_PARAM_DESC))  {
+            this.paramDesc = _value;
+        } else if (_key.equals(PREFIX_PARAM_ARGS))  {
+            this.paramArgs = Arrays.asList(_value.split(","));
+        } else if (_key.equals(PREFIX_PARAM_LIST))  {
+            this.paramList = Arrays.asList(_value.split(","));
+        } else  {
+            throw new Exception("unkown key " + _key + " with value '" + _value + "' defined!");
+        }
+    }
+
+    /**
+     * Returns the name of the abstract value.
+     *
+     * @return name
+     * @see #name
+     */
+    public String getName()
+    {
+        return this.name;
+    }
+
+    /**
+     * Returns the description of parameters which defines mode.
+     *
+     * @return description of parameter
+     * @see #paramDesc
+     */
+    public String getParameterDesc()
+    {
+        return this.paramDesc;
+    }
+
+    /**
+     * Returns the list of parameter arguments which defines this mode.
+     *
+     * @return list of parameter argument strings
+     * @see #paramArgs
+     */
+    public Collection<String> getParameterArgs()
+    {
+        return this.paramArgs;
+    }
+
+    /**
+     * Returns the list of parameters which defines this mode.
+     *
+     * @return list of parameter strings
+     * @see #paramList
+     */
+    public Collection<String> getParameterList()
+    {
+        return this.paramList;
+    }
+}

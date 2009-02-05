@@ -27,16 +27,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import matrix.db.Context;
-
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  *
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public class Role_mxJPO
@@ -108,7 +107,7 @@ public class Role_mxJPO
      * <li>remove all parent groups</li>
      * </ul>
      *
-     * @param _context          context for this request
+     * @param _paramCache       parameter cache
      * @param _preMQLCode       MQL statements which must be called before the
      *                          TCL code is executed
      * @param _postMQLCode      MQL statements which must be called after the
@@ -122,7 +121,7 @@ public class Role_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      */
     @Override
-    protected void update(final Context _context,
+    protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
@@ -140,6 +139,6 @@ public class Role_mxJPO
         // append already existing pre MQL code
         preMQLCode.append(_preMQLCode);
 
-        super.update(_context, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
     }
 }

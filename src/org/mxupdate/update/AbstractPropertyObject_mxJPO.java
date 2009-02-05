@@ -37,6 +37,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -48,7 +49,7 @@ import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public abstract class AbstractPropertyObject_mxJPO
@@ -422,7 +423,7 @@ public abstract class AbstractPropertyObject_mxJPO
      * required, the file is read and the object is updated with
      * {@link #update(Context, CharSequence, CharSequence, Map)}.
      *
-     * @param _context          context for this request
+     * @param _paramCache       parameter cache
      * @param _name             name of object to update
      * @param _file             file with TCL update code
      * @param _newVersion       new version which must be set within the update
@@ -433,14 +434,14 @@ public abstract class AbstractPropertyObject_mxJPO
      * @see #defineSymbolicName(Map, StringBuilder)
      */
     @Override
-    public void update(final Context _context,
+    public void update(final ParameterCache_mxJPO _paramCache,
                        final String _name,
                        final File _file,
                        final String _newVersion)
             throws Exception
     {
         // parse objects
-        this.parse(_context, _name);
+        this.parse(_paramCache.getContext(), _name);
 
         // defines the version in the TCL variables
         final Map<String,String> tclVariables = new HashMap<String,String>();
@@ -454,17 +455,17 @@ public abstract class AbstractPropertyObject_mxJPO
         final StringBuilder code = this.getCode(_file);
 
         // define author
-        this.defineAuthor(tclVariables, code);
+        this.defineAuthor(_paramCache, tclVariables, code);
 
         // define symbolic name
         this.defineSymbolicName(tclVariables, code);
 
         // define file date
-        final DateFormat format = new SimpleDateFormat(AdminPropertyDef.FILEDATE.getValue());
+        final DateFormat format = new SimpleDateFormat(_paramCache.getValueString(ParameterCache_mxJPO.KEY_FILEDATEFORMAT));
         tclVariables.put(AdminPropertyDef.FILEDATE.name(),
                          format.format(new Date(_file.lastModified())));
 
-        this.update(_context, "", "", "", tclVariables, _file);
+        this.update(_paramCache, "", "", "", tclVariables, _file);
     }
 
     /**
@@ -472,12 +473,14 @@ public abstract class AbstractPropertyObject_mxJPO
      * file is defined, the default value from the mapping is used. This author
      * is stored in the map of TCL variables.
      *
+     * @param _paramCache       parameter cache
      * @param _tclVariables     map with TCL variables
      * @param _code             TCL update source code
      * @see #HEADER_AUTHOR
      * @see AdminPropertyDef.AUTHOR
      */
-    protected void defineAuthor(final Map<String,String> _tclVariables,
+    protected void defineAuthor(final ParameterCache_mxJPO _paramCache,
+                                final Map<String,String> _tclVariables,
                                 final StringBuilder _code)
     {
         final int start = _code.indexOf(HEADER_AUTHOR) + LENGTH_HEADER_AUTHOR;
@@ -487,15 +490,15 @@ public abstract class AbstractPropertyObject_mxJPO
             if (end > 0)  {
                 final String tmp = _code.substring(start, end).trim();
                 if ("".equals(tmp))  {
-                    author = AdminPropertyDef.AUTHOR.getValue();
+                    author = _paramCache.getValueString(ParameterCache_mxJPO.KEY_AUTHOR);
                 } else  {
                     author = tmp;
                 }
             } else  {
-                author = AdminPropertyDef.AUTHOR.getValue();
+                author = _paramCache.getValueString(ParameterCache_mxJPO.KEY_AUTHOR);
             }
         } else  {
-            author = AdminPropertyDef.AUTHOR.getValue();
+            author = _paramCache.getValueString(ParameterCache_mxJPO.KEY_AUTHOR);
         }
         _tclVariables.put(AdminPropertyDef.AUTHOR.name(), author);
     }
@@ -547,7 +550,7 @@ System.out.println("ERROR! Symbolic name does not start correctly! So '" + symbN
      * This MQL statement is executed within a transaction to be sure that the
      * statement is not executed if an error had occurred.
      *
-     * @param _context          context for this request
+     * @param _paramCache       parameter cache
      * @param _preMQLCode       MQL statements which must be called before the
      *                          TCL code is executed
      * @param _postMQLCode      MQL statements which must be called after the
@@ -561,7 +564,7 @@ System.out.println("ERROR! Symbolic name does not start correctly! So '" + symbN
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if update failed
      */
-    protected void update(final Context _context,
+    protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
@@ -589,19 +592,19 @@ System.out.println("ERROR! Symbolic name does not start correctly! So '" + symbN
 
         // execute update
         boolean commit = false;
-        boolean transActive = _context.isTransactionActive();
+        boolean transActive = _paramCache.getContext().isTransactionActive();
         try  {
             if (!transActive)  {
-                _context.start(true);
+                _paramCache.getContext().start(true);
             }
-            execMql(_context, cmd);
+            execMql(_paramCache.getContext(), cmd);
             if (!transActive)  {
-                _context.commit();
+                _paramCache.getContext().commit();
             }
             commit = true;
         } finally  {
-            if (!commit && !transActive && _context.isTransactionActive())  {
-                _context.abort();
+            if (!commit && !transActive && _paramCache.getContext().isTransactionActive())  {
+                _paramCache.getContext().abort();
             }
         }
     }

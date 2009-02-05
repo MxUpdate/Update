@@ -41,13 +41,14 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public abstract class AbstractAdminObject_mxJPO
@@ -333,7 +334,7 @@ public abstract class AbstractAdminObject_mxJPO
      * </ul>
      * Then the update method of the super class is called.
      *
-     * @param _context          context for this request
+     * @param _paramCache       parameter cache
      * @param _preMQLCode       MQL statements which must be called before the
      *                          TCL code is executed
      * @param _postMQLCode      MQL statements which must be called after the
@@ -347,7 +348,7 @@ public abstract class AbstractAdminObject_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      */
     @Override
-    protected void update(final Context _context,
+    protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
@@ -388,14 +389,14 @@ public abstract class AbstractAdminObject_mxJPO
                 .append("value \"").append(_tclVariables.get(AdminPropertyDef.FILEDATE.name())).append('\"');
         // is installed date property defined?
         if ((this.getInstallationDate() == null) || "".equals(this.getInstallationDate()))  {
-            final DateFormat format = new SimpleDateFormat(AdminPropertyDef.INSTALLEDDATE.getValue());
+            final DateFormat format = new SimpleDateFormat(_paramCache.getValueString(ParameterCache_mxJPO.KEY_INSTALLEDDATEFORMAT));
             postMQLCode.append(" add property \"").append(AdminPropertyDef.INSTALLEDDATE.getPropName()).append("\" ")
                     .append("value \"").append(format.format(new Date())).append('\"');
         }
         // is installer property defined?
         if ((this.getInstaller() == null) || "".equals(this.getInstaller()))  {
             postMQLCode.append(" add property \"").append(AdminPropertyDef.INSTALLER.getPropName()).append("\" ")
-                    .append("value \"").append(AdminPropertyDef.INSTALLER.getValue()).append('\"');
+                    .append("value \"").append(_paramCache.getValueString(ParameterCache_mxJPO.KEY_INSTALLER)).append('\"');
         }
         // is original name property defined?
         if (!this.propertiesMap.containsKey(AdminPropertyDef.ORIGINALNAME.getPropName()))  {
@@ -403,9 +404,10 @@ public abstract class AbstractAdminObject_mxJPO
                     .append("value \"").append(this.getName()).append('\"');
         }
         // exists no application property or application property not equal?
-        if ((this.getApplication() == null) || !AdminPropertyDef.APPLICATION.getValue().equals(this.getApplication()))  {
+        final String applVal = _paramCache.getValueString(ParameterCache_mxJPO.KEY_APPLICATION);
+        if ((this.getApplication() == null) || !applVal.equals(this.getApplication()))  {
             postMQLCode.append(" add property \"").append(AdminPropertyDef.APPLICATION.getPropName()).append("\" ")
-                    .append("value \"").append(AdminPropertyDef.APPLICATION.getValue()).append('\"');
+                    .append("value \"").append(applVal).append('\"');
         }
         // exists no author property or author property not equal?
         final String authVal = _tclVariables.get(AdminPropertyDef.AUTHOR.name());
@@ -443,7 +445,7 @@ System.out.println("    - remove symbolic name '" + exSymbName + "'");
         tclVariables.put("NAME", this.getName());
         tclVariables.putAll(_tclVariables);
 
-        super.update(_context, preMQLCode, postMQLCode, _preTCLCode, tclVariables, _sourceFile);
+        super.update(_paramCache, preMQLCode, postMQLCode, _preTCLCode, tclVariables, _sourceFile);
     }
 
     /**

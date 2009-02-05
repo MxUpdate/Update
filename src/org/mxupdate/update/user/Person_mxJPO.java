@@ -43,6 +43,7 @@ import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.AbstractBusObject_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.AbstractPropertyObject_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.xml.sax.SAXException;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
@@ -52,7 +53,7 @@ import static org.mxupdate.util.MqlUtil_mxJPO.setHistoryOn;
 
 /**
  *
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public class Person_mxJPO
@@ -160,14 +161,14 @@ public class Person_mxJPO
     }
 
     @Override
-    public void update(final Context _context,
+    public void update(final ParameterCache_mxJPO _paramCache,
                        final String _name,
                        final File _file,
                        final String _newVersion)
             throws Exception
     {
-        this.personBus.parse(_context, _name);
-        this.personAdmin.update(_context, _name, _file, _newVersion);
+        this.personBus.parse(_paramCache.getContext(), _name);
+        this.personAdmin.update(_paramCache, _name, _file, _newVersion);
     }
 
     class PersonAdmin
@@ -250,7 +251,7 @@ public class Person_mxJPO
          * MQL code in <code>_preMQLCode</code> and appended to the MQL statements
          * in <code>_postMQLCode</code>.
          *
-         * @param _context          context for this request
+         * @param _paramCache       parameter cache
          * @param _preMQLCode       MQL statements which must be called before the
          *                          TCL code is executed
          * @param _postMQLCode      MQL statements which must be called after the
@@ -264,7 +265,7 @@ public class Person_mxJPO
          * @param _sourceFile       souce file with the TCL code to update
          */
         @Override
-        protected void update(final Context _context,
+        protected void update(final ParameterCache_mxJPO _paramCache,
                               final CharSequence _preMQLCode,
                               final CharSequence _postMQLCode,
                               final CharSequence _preTCLCode,
@@ -279,15 +280,15 @@ public class Person_mxJPO
                     .append(_postMQLCode);
 
             final Map<String,String> tclVariables = new HashMap<String,String>();
-            Person_mxJPO.this.personBus.prepareUpdate(_context, preMQLCode, postMQLCode, tclVariables);
+            Person_mxJPO.this.personBus.prepareUpdate(_paramCache.getContext(), preMQLCode, postMQLCode, tclVariables);
             tclVariables.putAll(_tclVariables);
 
             // update must be done with history off (because not required...)
             try  {
-                setHistoryOff(_context);
-                super.update(_context, preMQLCode, postMQLCode, _preTCLCode, tclVariables, _sourceFile);
+                setHistoryOff(_paramCache.getContext());
+                super.update(_paramCache, preMQLCode, postMQLCode, _preTCLCode, tclVariables, _sourceFile);
             } finally  {
-                setHistoryOn(_context);
+                setHistoryOn(_paramCache.getContext());
             }
         }
     }

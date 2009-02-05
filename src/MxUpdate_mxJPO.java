@@ -40,13 +40,13 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.Mapping_mxJPO;
 import org.mxupdate.mapping.Mode_mxJPO;
+import org.mxupdate.mapping.ParameterDef_mxJPO;
 import org.mxupdate.mapping.TypeDefGroup_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.UpdateCheck_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.AbstractObject_mxJPO;
-import org.mxupdate.update.datamodel.Relationship_mxJPO;
-import org.mxupdate.update.datamodel.Type_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.util.MqlUtil_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
@@ -83,9 +83,21 @@ public class MxUpdate_mxJPO
     private final Map<String,String> description = new TreeMap<String,String>();
 
     /**
+     * Stores all parameters to be sure that a parameter is defined only once.
+     *
+     * @see #appendDescription(String, Collection, Collection)
+     */
+    private final Set<String> allParams = new HashSet<String>();
+
+    /**
      * Holds the mapping between the parameter and mode.
      */
     private final Map<String,Mode_mxJPO> paramsModes = new HashMap<String,Mode_mxJPO>();
+
+    /**
+     * Holds the mapping between the parameters and the related parameters.
+     */
+    private final Map<String,ParameterDef_mxJPO> paramsParameters = new HashMap<String,ParameterDef_mxJPO>();
 
     /**
      * All parameters related to export / import are stored in this map. The
@@ -96,48 +108,36 @@ public class MxUpdate_mxJPO
     /**
      * Holds all parameters related how the version information is set.
      */
-    private final Map<String,UpdateCheck_mxJPO> PARAM_VERSION = new HashMap<String,UpdateCheck_mxJPO>();
+    private final Map<String,UpdateCheck_mxJPO> paramsUpdateChecks = new HashMap<String,UpdateCheck_mxJPO>();
 
     private void prepareParams(final Context _context)
             throws MatrixException
     {
         this.description.clear();
+        this.allParams.clear();
         this.paramsModes.clear();
+        this.paramsParameters.clear();
         this.paramsTypeDefs.clear();
-        this.PARAM_VERSION.clear();
+        this.paramsUpdateChecks.clear();
 
         ////////////////////////////////////////////////////////////////////////
-        //
+        // parameters
 
-        appendDescription("Pattern defining the match of attributes which are ignored "
-                                + "within the test attributes of types.",
-                          Arrays.asList(new String[]{"ignoretypeattributes"}),
-                          "MATCH");
-        appendDescription("Pattern defining the match of attributes which are ignored "
-                                + "within the test attributes of relationships.",
-                          Arrays.asList(new String[]{"ignorerelationshipattributes"}),
-                          "MATCH");
-
-        appendDescription("Defines the name of application which is defined as property"
-                                + " / attribute on administration objects. The value of"
-                                + " mapping property 'PropertyValue.Application' will be"
-                                + " overwritten.",
-                          Arrays.asList(new String[]{"application"}),
-                          "APPLICATIONAME");
-
-        appendDescription("Defines the name of author which is defined as property"
-                                + " / attribute on administration objects. The value of"
-                                + " mapping property 'PropertyValue.Author' will be"
-                                + " overwritten.",
-                          Arrays.asList(new String[]{"author"}),
-                          "AUTHORNAME");
-
-        appendDescription("Defines the name of installer which is defined as property"
-                                + " / attribute on administration objects. The value of"
-                                + " mapping property 'PropertyValue.Installer' will be"
-                                + " overwritten.",
-                          Arrays.asList(new String[]{"installer"}),
-                          "INSTALLERNAME");
+        for (final ParameterDef_mxJPO parameter : ParameterDef_mxJPO.values())  {
+            for (final String param : parameter.getParameterList())  {
+                final String paramStr = (param.length() > 1)
+                                        ? "--" + param
+                                        : "-" + param;
+                this.paramsParameters.put(paramStr, parameter);
+            }
+            final StringBuilder desc = new StringBuilder().append(parameter.getParameterDesc());
+            if (parameter.getDefaultValue() != null)  {
+                desc.append('\n').append("(Default '").append(parameter.getDefaultValue()).append("')");
+            }
+            this.appendDescription(desc,
+                                   parameter.getParameterList(),
+                                   parameter.getParameterArgs());
+        }
 
         ////////////////////////////////////////////////////////////////////////
         // modes
@@ -160,23 +160,15 @@ public class MxUpdate_mxJPO
         for (final UpdateCheck_mxJPO updateCheck : UpdateCheck_mxJPO.values())  {
             for (final String param : updateCheck.getParameterList())  {
                 if (param.length() == 1)  {
-                    this.PARAM_VERSION.put("-" + param, updateCheck);
+                    this.paramsUpdateChecks.put("-" + param, updateCheck);
                 } else  {
-                    this.PARAM_VERSION.put("--" + param, updateCheck);
+                    this.paramsUpdateChecks.put("--" + param, updateCheck);
                 }
             }
             this.appendDescription(updateCheck.getParameterDesc(),
                                    updateCheck.getParameterList(),
                                    null);
         }
-
-        appendDescription("The last modified date in seconds of the file is used as version information.",
-                          Arrays.asList(new String[]{"usefiledateasversion"}),
-                          null);
-
-        appendDescription("Defines the version of administration objects (e.g. 1-0).",
-                          Arrays.asList(new String[]{"version"}),
-                          "VERSIONNUMBER");
 
         ////////////////////////////////////////////////////////////////////////
         // type definitions
@@ -231,7 +223,6 @@ public class MxUpdate_mxJPO
      *                          list must be used)
      * @param _description      description of the parameter
      * @param _longParams       list of long parameters strings
-     * @throws Error if a short parameter is already defined
      */
     private void defineParameter(final Collection<TypeDef_mxJPO> _paramsList,
                                  final TypeDef_mxJPO _clazz,
@@ -255,29 +246,38 @@ public class MxUpdate_mxJPO
             final String paramStr = (param.length() == 1)
                                     ? "-" + param
                                     : "--" + param;
-            if (this.paramsTypeDefs.containsKey(paramStr) || this.paramsModes.containsKey(paramStr) || this.PARAM_VERSION.containsKey(paramStr))  {
-                throw new Error("double definition of parameter '" + paramStr
-                        + "'! Found:\n" + this.paramsTypeDefs.get(paramStr) + "\nNew Definition:\n" + tmp);
-            }
             this.paramsTypeDefs.put(paramStr, tmp);
         }
 
         // store description
-        this.appendDescription(_description, _longParams, "MATCH");
+        this.appendDescription(_description,
+                               _longParams,
+                               Arrays.asList(new String[]{"MATCH"}));
     }
 
     /**
      * Appends a description for a defined list of parameters.
      *
-     * @param _description      description to append
-     * @param _params           related parameters
-     * @param _argument         text of the argument for the list of parameters
-     *                          (or <code>null</code> if not defined)
+     * @param _description  description to append
+     * @param _params       related parameters
+     * @param _args         text of the arguments for the list of parameters
+     *                      (or <code>null</code> if not defined)
+     * @throws Error if a parameter is defined twice)
+     * @see #allParams
      */
-    private void appendDescription(final String _description,
+    private void appendDescription(final CharSequence _description,
                                    final Collection<String> _params,
-                                   final String _argument)
+                                   final Collection<String> _args)
     {
+        // check for double parameter definitions
+        for (final String param : _params)  {
+            if (this.allParams.contains(param))  {
+                throw new Error("double definition of parameter '" + param
+                        + "' with description '" + _description + "'");
+            }
+            this.allParams.add(param);
+        }
+
         // check if first parameter is not a short parameter
         final String firstParam = _params.iterator().next();
         final char prefix = firstParam.charAt(0);
@@ -286,7 +286,7 @@ public class MxUpdate_mxJPO
             line.append("   ");
         }
 
-        // append all parameters
+        // append all parameters to the description text
         boolean first = true;
         for (final String paramString : _params)  {
             if (first)  {
@@ -301,8 +301,10 @@ public class MxUpdate_mxJPO
         }
 
         // append arguments
-        if (_argument != null)  {
-            line.append(" <").append(_argument).append('>');
+        if (_args != null)  {
+            for (final String arg : _args)  {
+                line.append(" <").append(arg).append('>');
+            }
         }
 
         // append spaces
@@ -319,7 +321,7 @@ public class MxUpdate_mxJPO
 
         // append description
         first = true;
-        for (final String partDesc : _description.split("\n"))  {
+        for (final String partDesc : _description.toString().split("\n"))  {
             int length = LENGTH_DESC_PARAMS;
             if (first == true)  {
                 first = false;
@@ -345,25 +347,6 @@ public class MxUpdate_mxJPO
         }
 
         this.description.put("" + prefix + line, line.toString());
-    }
-
-    /**
-     * Appends a description for given parameters. The method is a wrapper
-     * method for {@link #appendDescription(String, List)}.
-     *
-     * @param _description      description to append
-     * @param _params           array of parameters to append
-     * @see #appendDescription(String, List) used method to append parameter
-     *                                       description
-     */
-    private void appendDescription(final String _description,
-                                   final String... _params)
-    {
-        final List<String> params = new ArrayList<String>(_params.length);
-        for (final String param : _params)  {
-            params.add(param);
-        }
-        this.appendDescription(_description, params, null);
     }
 
     /**
@@ -419,12 +402,6 @@ public class MxUpdate_mxJPO
 
         this.prepareParams(_context);
 
-        Type_mxJPO.IGNORE_TYPE_ATTRIBUTES.clear();
-        Relationship_mxJPO.IGNORE_RELATIONSHIP_ATTRIBUTES.clear();
-
-        String version = null;
-        boolean useFileDateAsVersion = false;
-
         try {
             // to be sure....
             MqlUtil_mxJPO.execMql(_context, "verbose off");
@@ -437,7 +414,7 @@ public class MxUpdate_mxJPO
 
             UpdateCheck_mxJPO versionInfo = null;
 
-            final Set<String> paths = new TreeSet<String>();
+            final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, ParameterDef_mxJPO.values());
 
             for (int idx = 0; idx < _args.length; idx++)  {
                 final Collection<TypeDef_mxJPO> clazzes = paramsTypeDefs.get(_args[idx]);
@@ -463,35 +440,22 @@ public class MxUpdate_mxJPO
                     } else  {
                         mode = this.paramsModes.get(_args[idx]);
                     }
-                } else if (this.PARAM_VERSION.containsKey(_args[idx]))  {
-                    versionInfo = this.PARAM_VERSION.get(_args[idx]);
-                } else if ("--application".equals(_args[idx]))  {
-                    idx++;
-                    Mapping_mxJPO.defineApplication(_args[idx]);
-                } else if ("--author".equals(_args[idx]))  {
-                    idx++;
-                    Mapping_mxJPO.defineAuthor(_args[idx]);
-                } else if ("--ignorerelationshipattributes".equals(_args[idx]))  {
-                    idx++;
-                    Relationship_mxJPO.IGNORE_RELATIONSHIP_ATTRIBUTES.add(_args[idx]);
-                } else if ("--ignoretypeattributes".equals(_args[idx]))  {
-                    idx++;
-                    Type_mxJPO.IGNORE_TYPE_ATTRIBUTES.add(_args[idx]);
-                } else if ("--installer".equals(_args[idx]))  {
-                    idx++;
-                    Mapping_mxJPO.defineInstaller(_args[idx]);
-                } else if ("--path".equals(_args[idx]))  {
-                    idx++;
-                    paths.add(_args[idx]);
-                } else if ("--usefiledateasversion".equals(_args[idx]))  {
-                    useFileDateAsVersion = true;
-                } else if ("--version".equals(_args[idx]))  {
-                    idx++;
-                    version = _args[idx];
+                } else if (this.paramsParameters.containsKey(_args[idx]))  {
+                    idx = paramCache.evalParameter(this.paramsParameters.get(_args[idx]),
+                                                   _args,
+                                                   idx);
+                } else if (this.paramsUpdateChecks.containsKey(_args[idx]))  {
+                    versionInfo = this.paramsUpdateChecks.get(_args[idx]);
                 } else  {
                     unknown = true;
 System.err.println("unknown pararameter "  + _args[idx]);
                 }
+            }
+
+            // get path parameters
+            final Set<String> paths = new TreeSet<String>();
+            if (paramCache.contains(ParameterCache_mxJPO.KEY_PATH))  {
+                paths.addAll(paramCache.getValueList(ParameterCache_mxJPO.KEY_PATH));
             }
 
             if (unknown || (Mode_mxJPO.HELP == mode) || (mode == null))  {
@@ -499,7 +463,7 @@ System.err.println("unknown pararameter "  + _args[idx]);
             } else if (Mode_mxJPO.EXPORT == mode)  {
                 this.export(_context, paths, clazz2matches);
             } else if (Mode_mxJPO.IMPORT == mode)  {
-                this.update(_context, paths, clazz2matches, versionInfo, version, useFileDateAsVersion);
+                this.update(paramCache, paths, clazz2matches, versionInfo);
             } else if (Mode_mxJPO.DELETE == mode)  {
                 this.delete(_context, paths, clazz2matches);
             }
@@ -551,18 +515,14 @@ System.out.println("export "+instance.getTypeDef().getLogging() + " '" + name + 
 
     /**
      *
-     * @param _context
+     * @param _paramCache       parameter cache
      * @param _paths
      * @param _clazz2matches
-     * @param _versionInfo
-     * @param _version
      */
-    protected void update(final Context _context,
+    protected void update(final ParameterCache_mxJPO _paramCache,
                           final Set<String> _paths,
                           final Map<TypeDef_mxJPO,List<String>> _clazz2matches,
-                          final UpdateCheck_mxJPO _versionInfo,
-                          final String _version,
-                          final boolean _useFileDateAsVersion)
+                          final UpdateCheck_mxJPO _versionInfo)
             throws Exception
     {
         // get all matching files depending on the update classes
@@ -575,7 +535,7 @@ System.out.println("export "+instance.getTypeDef().getLogging() + " '" + name + 
             if (!existingNames.containsKey(clazz))  {
                 final AbstractObject_mxJPO instance = clazz.newTypeInstance();
                 existingNames.put(clazz,
-                                  instance.getMatchingNames(_context, wildCardMatch));
+                                  instance.getMatchingNames(_paramCache.getContext(), wildCardMatch));
             }
         }
         // create if needed (and not in the list of existing objects
@@ -587,7 +547,7 @@ System.out.println("export "+instance.getTypeDef().getLogging() + " '" + name + 
                     if (!existings.contains(fileEntry.getValue()))  {
                          final AbstractObject_mxJPO instance = clazz.newTypeInstance();
 System.out.println("create "+instance.getTypeDef().getLogging() + " '" + fileEntry.getValue() + "'");
-                        instance.create(_context, fileEntry.getKey(), fileEntry.getValue());
+                        instance.create(_paramCache.getContext(), fileEntry.getKey(), fileEntry.getValue());
                     }
                 }
             }
@@ -601,15 +561,15 @@ System.out.println("create "+instance.getTypeDef().getLogging() + " '" + fileEnt
 System.out.println("check "+instance.getTypeDef().getLogging() + " '" + fileEntry.getValue() + "'");
 
                     final boolean update;
-                    String version = _useFileDateAsVersion
+                    String version = _paramCache.getValueBoolean(ParameterCache_mxJPO.KEY_FILEDATE2VERSION)
                                      ? Long.toString(fileEntry.getKey().lastModified() / 1000)
-                                     : _version;
+                                     : _paramCache.getValueString(ParameterCache_mxJPO.KEY_VERSION);
                     if (_versionInfo == UpdateCheck_mxJPO.FILEDATE)  {
                         final Date fileDate = new Date(fileEntry.getKey().lastModified());
-                        final String instDateString = instance.getPropValue(_context,
+                        final String instDateString = instance.getPropValue(_paramCache.getContext(),
                                                                             fileEntry.getValue(),
                                                                             AdminPropertyDef.FILEDATE);
-                        final DateFormat format = new SimpleDateFormat(AdminPropertyDef.FILEDATE.getValue());
+                        final DateFormat format = new SimpleDateFormat(_paramCache.getValueString(ParameterCache_mxJPO.KEY_FILEDATEFORMAT));
                         Date instDate;
                         try {
                             instDate = format.parse(instDateString);
@@ -623,14 +583,14 @@ System.out.println("check "+instance.getTypeDef().getLogging() + " '" + fileEntr
 System.out.println("    - update to version from " + fileDate);
                         }
                     } else if (_versionInfo == UpdateCheck_mxJPO.VERSION)  {
-                        final String instVersion = instance.getPropValue(_context,
+                        final String instVersion = instance.getPropValue(_paramCache.getContext(),
                                                                          fileEntry.getValue(),
                                                                          AdminPropertyDef.VERSION);
                         if (instVersion.equals(version))  {
                             update = false;
                         } else  {
                             update = true;
-                            if (_useFileDateAsVersion)  {
+                            if (_paramCache.getValueBoolean(ParameterCache_mxJPO.KEY_FILEDATE2VERSION))  {
                                 System.out.println("    - update to version from " + new Date(fileEntry.getKey().lastModified()));
                             } else  {
                                 System.out.println("    - update to version " + version);
@@ -641,7 +601,7 @@ System.out.println("    - update to version from " + fileDate);
 System.out.println("    - update");
                     }
                     if (update)  {
-                        instance.update(_context,
+                        instance.update(_paramCache,
                                         fileEntry.getValue(),
                                         fileEntry.getKey(),
                                         version);

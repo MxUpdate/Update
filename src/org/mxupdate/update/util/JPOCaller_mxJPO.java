@@ -24,7 +24,7 @@ import matrix.db.Context;
 
 /**
  *
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  * @todo description
  */
@@ -36,13 +36,33 @@ public class JPOCaller_mxJPO
     private static JPOCallerInterface CALLER_INSTANCE;
 
     /**
+     * Stores the current caller instance.
+     */
+    private static ParameterCache_mxJPO PARAM_CACHE;
+
+    /**
      * Defines new instance which will be called within a TCL program.
+     *
+     * @param _paramCache       parameter cache
+     * @param _instance         new instance
+     */
+    public static void defineInstance(final ParameterCache_mxJPO _paramCache,
+                                      final JPOCallerInterface _instance)
+    {
+        PARAM_CACHE = _paramCache;
+        CALLER_INSTANCE = _instance;
+    }
+
+    /**
+     * Undefines new instance which will be called within a TCL program.
      *
      * @param _instance new instance
      */
-    public static void defineInstance(final JPOCallerInterface _instance)
+    public static void undefineInstance(final ParameterCache_mxJPO _paramCache,
+                                        final JPOCallerInterface _instance)
     {
-        CALLER_INSTANCE = _instance;
+        PARAM_CACHE = null;
+        CALLER_INSTANCE = null;
     }
 
     /**
@@ -58,7 +78,7 @@ public class JPOCaller_mxJPO
             throws Exception
     {
         try  {
-            CALLER_INSTANCE.jpoCallExecute(_context, _args);
+            CALLER_INSTANCE.jpoCallExecute(PARAM_CACHE.clone(_context), _args);
         } catch (Exception e)  {
             e.printStackTrace();
             throw e;
@@ -72,11 +92,11 @@ public class JPOCaller_mxJPO
     {
         /**
          *
-         * @param _context      context for this request
+         * @param _paramCache   parameter cache
          * @param _args         list of arguments
          * @throws Exception
          */
-        public void jpoCallExecute(final Context _context,
+        public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
                                    final String... _args)
                 throws Exception;
     }

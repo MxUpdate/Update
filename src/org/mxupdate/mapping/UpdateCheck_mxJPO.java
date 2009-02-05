@@ -20,7 +20,6 @@
 
 package org.mxupdate.mapping;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +27,7 @@ import java.util.Map;
 /**
  * Enumeration used to define was is checked if an update is done.
  *
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public enum UpdateCheck_mxJPO
@@ -50,8 +49,8 @@ public enum UpdateCheck_mxJPO
      *
      * @see Mode_mxJPO#defineValue(String, String)
      */
-    private final static Map<UpdateCheck_mxJPO,ParameterValues_mxJPO> MAP
-            = new HashMap<UpdateCheck_mxJPO,ParameterValues_mxJPO>();
+    private final static Map<UpdateCheck_mxJPO,AbstractValue_mxJPO> MAP
+            = new HashMap<UpdateCheck_mxJPO,AbstractValue_mxJPO>();
 
     /**
      * Resets type definition map.
@@ -69,33 +68,31 @@ public enum UpdateCheck_mxJPO
      * @param _key      key with name of enumeration and (separated by a point)
      *                  the key
      * @param _value    value which must be set
-     * @see ParameterValues_mxJPO
+     * @throws Exception if the key is not known
+     * @see AbstractValue_mxJPO
      */
     protected static void defineValue(final String _key,
                                       final String _value)
+            throws Exception
     {
         final String enumName = _key.replaceAll("\\..*", "");
         final String key = _key.substring(enumName.length() + 1);
 
-        final UpdateCheck_mxJPO modeEnum = valueOf(enumName);
-        ParameterValues_mxJPO mode = MAP.get(modeEnum);
-        if (mode == null)  {
-            mode = new ParameterValues_mxJPO();
-            MAP.put(modeEnum, mode);
+        final UpdateCheck_mxJPO updateCheckEnum = valueOf(enumName);
+        AbstractValue_mxJPO updateCheckValue = MAP.get(updateCheckEnum);
+        if (updateCheckValue == null)  {
+            updateCheckValue = new AbstractValue_mxJPO(enumName);
+            MAP.put(updateCheckEnum, updateCheckValue);
         }
 
-        if ("ParameterDesc".equals(key))  {
-            mode.paramDesc = _value;
-        } else if ("ParameterList".equals(key))  {
-            mode.paramList = Arrays.asList(_value.split(","));
-        }
+        updateCheckValue.defineValues(key, _value);
     }
 
     /**
      * Returns the description of parameters which defines mode.
      *
      * @return description of parameter
-     * @see ParameterValues_mxJPO#paramDesc
+     * @see AbstractValue_mxJPO#paramDesc
      */
     public String getParameterDesc()
     {
@@ -106,7 +103,7 @@ public enum UpdateCheck_mxJPO
      * Returns the list of parameters which defines this mode.
      *
      * @return list of parameter strings
-     * @see ParameterValues_mxJPO#paramList
+     * @see AbstractValue_mxJPO#paramList
      */
     public Collection<String> getParameterList()
     {

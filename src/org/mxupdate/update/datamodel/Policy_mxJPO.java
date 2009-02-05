@@ -41,6 +41,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.policy.PolicyDefParser_mxJPO;
 import org.mxupdate.update.util.JPOCaller_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertMql;
@@ -51,7 +52,7 @@ import static org.mxupdate.util.MqlUtil_mxJPO.setEscapeOff;
 import static org.mxupdate.util.MqlUtil_mxJPO.setEscapeOn;
 
 /**
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public class Policy_mxJPO
@@ -380,11 +381,9 @@ public class Policy_mxJPO
      * <li>remove all from and to types</li>
      * </ul>
      * Adds the TCL procedure {@link #TCL_PROCEDURE} so that attributes could
-     * be assigned to this administration object. The instance itself
-     * is stored as encoded string in the TCL variable
-     * <code>JPO_CALLER_INSTANCE</code>.
+     * be assigned to this administration object.
      *
-     * @param _context          context for this request
+     * @param _paramCache       parameter cache
      * @param _preMQLCode       MQL statements which must be called before the
      *                          TCL code is executed
      * @param _postMQLCode      MQL statements which must be called after the
@@ -398,7 +397,7 @@ public class Policy_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      */
     @Override
-    protected void update(final Context _context,
+    protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
@@ -406,14 +405,16 @@ public class Policy_mxJPO
                           final File _sourceFile)
             throws Exception
     {
-        JPOCaller_mxJPO.defineInstance(this);
+        JPOCaller_mxJPO.defineInstance(_paramCache, this);
 
         // add TCL code for the procedure
         final StringBuilder tclCode = new StringBuilder()
                 .append(TCL_PROCEDURE)
                 .append(_preTCLCode);
 
-        super.update(_context, _preMQLCode, _postMQLCode, tclCode, _tclVariables, _sourceFile);
+        super.update(_paramCache, _preMQLCode, _postMQLCode, tclCode, _tclVariables, _sourceFile);
+
+        JPOCaller_mxJPO.undefineInstance(_paramCache, this);
     }
 
     /**
@@ -428,13 +429,13 @@ public class Policy_mxJPO
      * <li>The delta MQL script is executed.</li>
      * </ul>
      *
-     * @param _contex   context for this request
-     * @param _args     arguments from the TCL procedure
+     * @param _paramCache   parameter cache
+     * @param _args         arguments from the TCL procedure
      * @throws Exception if a state is not defined anymore or the policy could
      *                   not be updated
      * @see #TCL_PROCEDURE
      */
-    public void jpoCallExecute(final Context _context,
+    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
                                final String... _args)
             throws Exception
     {
@@ -444,7 +445,7 @@ public class Policy_mxJPO
         final PolicyDefParser_mxJPO parser = new PolicyDefParser_mxJPO(new StringReader(code));
         final Policy_mxJPO policy = parser.policy(this.getTypeDef());
         policy.setName(this.getName());
-        policy.prepare(_context);
+        policy.prepare(_paramCache.getContext());
 
         final StringBuilder cmd = new StringBuilder()
                 .append("mod policy \"").append(this.getName()).append("\" ");
@@ -505,13 +506,13 @@ throw new Exception("some states are not defined anymore!");
             entry.getKey().calcDelta(cmd, entry.getValue());
         }
 
-        final boolean isMqlEscapeOn = isEscapeOn(_context);
+        final boolean isMqlEscapeOn = isEscapeOn(_paramCache.getContext());
         try  {
-            setEscapeOn(_context);
-            execMql(_context, cmd);
+            setEscapeOn(_paramCache.getContext());
+            execMql(_paramCache.getContext(), cmd);
         } finally  {
             if (!isMqlEscapeOn)  {
-                setEscapeOff(_context);
+                setEscapeOff(_paramCache.getContext());
             }
         }
     }

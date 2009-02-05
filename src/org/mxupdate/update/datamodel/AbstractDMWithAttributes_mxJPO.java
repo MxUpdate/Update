@@ -23,6 +23,7 @@ package org.mxupdate.update.datamodel;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +35,7 @@ import matrix.db.Context;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.JPOCaller_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
@@ -44,7 +46,7 @@ import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
  * The class is used to handle the export / import of administration objects
  * depending on attributes.
  *
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public abstract class AbstractDMWithAttributes_mxJPO
@@ -55,15 +57,6 @@ public abstract class AbstractDMWithAttributes_mxJPO
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = -2194896309854537398L;
-
-    /**
-     *
-     */
-    public static final Set<String> IGNORE_TYPE_ATTRIBUTES = new HashSet<String>();
-    /**
-    *
-    */
-   public static final Set<String> IGNORE_RELATIONSHIP_ATTRIBUTES = new HashSet<String>();
 
     /**
      * List of all attributes for this data model administration object.
@@ -151,7 +144,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
      * is stored as encoded string in the TCL variable
      * <code>JPO_CALLER_INSTANCE</code>.
      *
-     * @param _context          context for this request
+     * @param _paramCache       parameter cache
      * @param _preMQLCode       MQL statements which must be called before the
      *                          TCL code is executed
      * @param _postMQLCode      MQL statements which must be called after the
@@ -163,7 +156,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
      * @see #TCL_PROCEDURE
      */
     @Override
-    protected void update(final Context _context,
+    protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
@@ -171,14 +164,16 @@ public abstract class AbstractDMWithAttributes_mxJPO
                           final File _sourceFile)
             throws Exception
     {
-        JPOCaller_mxJPO.defineInstance(this);
+        JPOCaller_mxJPO.defineInstance(_paramCache, this);
 
         // add TCL code for the procedure
         final StringBuilder tclCode = new StringBuilder()
                 .append(TCL_PROCEDURE)
                 .append(_preTCLCode);
 
-        super.update(_context, _preMQLCode, _postMQLCode, tclCode, _tclVariables, _sourceFile);
+        super.update(_paramCache, _preMQLCode, _postMQLCode, tclCode, _tclVariables, _sourceFile);
+
+        JPOCaller_mxJPO.undefineInstance(_paramCache, this);
     }
 
     /**
@@ -188,14 +183,14 @@ public abstract class AbstractDMWithAttributes_mxJPO
      * administration object. If an attribute is not defined anymore but
      * assigned in Matrix, an exception is thrown.
      *
-     * @param _contex   context for this request
-     * @param _args     arguments from the TCL procedure
+     * @param _paramCache   parameter cache
+     * @param _args         arguments from the TCL procedure
      * @throws Exception if an unknown parameter is defined, the given name of
      *                   the administration object is not the same or an
      *                   attribute is assigned to an administration object
      *                   within Matrix but not defined anymore
      */
-    public void jpoCallExecute(final Context _context,
+    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
                                final String... _args)
             throws Exception
     {
@@ -211,9 +206,15 @@ final Set<String> ignoreAttrs = new HashSet<String>();
             if (nameParam.equals(arg))  {
                 name = _args[++idx];
                 if ("-type".equals(arg))  {
-                    ignoreAttrs.addAll(IGNORE_TYPE_ATTRIBUTES);
+                    final Collection<String> tmp = _paramCache.getValueList("IgnoreTypeAttr");
+                    if (tmp != null)  {
+                        ignoreAttrs.addAll(tmp);
+                    }
                 } else if ("-relationship".equals(arg))  {
-                    ignoreAttrs.addAll(IGNORE_RELATIONSHIP_ATTRIBUTES);
+                    final Collection<String> tmp = _paramCache.getValueList("IgnoreRelAttr");
+                    if (tmp != null)  {
+                        ignoreAttrs.addAll(tmp);
+                    }
                 }
             } else if ("-attributes".equals(arg))  {
                 attrStr = _args[++idx];
@@ -222,6 +223,7 @@ final Set<String> ignoreAttrs = new HashSet<String>();
             }
             idx++;
         }
+System.out.println("ignoreAttrs="+ignoreAttrs);
 
         // check for equal administration name
         if (!this.getName().equals(name))  {
@@ -266,7 +268,7 @@ System.out.println("    - attribute '" + attr + "' is not defined but will be ig
         for (final String attr : newAttrs)  {
             if (!this.attributes.contains(attr))  {
 System.out.println("    - add attribute '" + attr + "'");
-                execMql(_context,
+                execMql(_paramCache.getContext(),
                         new StringBuilder()
                             .append("mod ").append(this.getTypeDef().getMxAdminName())
                             .append(" '").append(this.getName()).append('\'')

@@ -34,11 +34,11 @@ import org.mxupdate.util.MqlUtil_mxJPO;
 /**
  * Enumeration for administration type definitions.
  *
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public final class TypeDef_mxJPO
-        extends ParameterValues_mxJPO
+        extends AbstractValue_mxJPO
 {
     /**
      * Maps from the name of the type definition group to the related type
@@ -148,21 +148,6 @@ public final class TypeDef_mxJPO
      * @see #defineValue(String, String)
      */
     private static final String PREFIX_TEXT_TITLE = "TextTitle";
-
-    /**
-     * Used parameter description of type definitions within the property
-     * file.
-     *
-     * @see #defineValue(String, String)
-     */
-    private static final String PREFIX_PARAM_DESC = "ParameterDesc";
-
-    /**
-     * Used parameter list of type definitions within the property file.
-     *
-     * @see #defineValue(String, String)
-     */
-    private static final String PREFIX_PARAM_LIST = "ParameterList";
 
     /**
      * Defines the name of the admin type.
@@ -303,7 +288,7 @@ public final class TypeDef_mxJPO
 
         TypeDef_mxJPO typeDef = MAP.get(enumName);
         if (typeDef == null)  {
-            typeDef = new TypeDef_mxJPO();
+            typeDef = new TypeDef_mxJPO(enumName);
             MAP.put(enumName, typeDef);
         }
 
@@ -329,16 +314,12 @@ public final class TypeDef_mxJPO
             typeDef.fileSuffix = _value;
         } else if (key.equals(PREFIX_JPO))  {
             typeDef.defineJPOClass(_context, _value);
-        } else if (key.equals(PREFIX_PARAM_DESC))  {
-            typeDef.paramDesc = _value;
-        } else if (key.equals(PREFIX_PARAM_LIST))  {
-            typeDef.paramList = Arrays.asList(_value.split(","));
         } else if (key.equals(PREFIX_TEXT_LOGGING))  {
             typeDef.textLogging = _value;
         } else if (key.equals(PREFIX_TEXT_TITLE))  {
             typeDef.textTitle = _value;
         } else  {
-            throw new Exception("unkown key " + _key + " with value '" + _value + "' defined!");
+            typeDef.defineValues(key, _value);
         }
     }
 
@@ -369,9 +350,12 @@ public final class TypeDef_mxJPO
     /**
      * The constructor is defined private so that a new instance could only
      * created within this class.
+     *
+     * @param _name     name of the type definition group
      */
-    private TypeDef_mxJPO()
+    private TypeDef_mxJPO(final String _name)
     {
+        super(_name);
     }
 
     /**

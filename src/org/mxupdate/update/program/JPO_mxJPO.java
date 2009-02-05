@@ -34,13 +34,14 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.AbstractObject_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.xml.sax.SAXException;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public class JPO_mxJPO
@@ -213,7 +214,7 @@ public class JPO_mxJPO
      * <li>insert JPO code</li>
      * </ul>
      *
-     * @param _context          context for this request
+     * @param _paramCache       parameter cache
      * @param _name             name of the administration (business) object
      * @param _file             reference to the file to update
      * @param _newVersion       new version which must be set within the update
@@ -222,7 +223,7 @@ public class JPO_mxJPO
      * @throws Exception if update of the JPO failed
      */
     @Override
-    public void update(final Context _context,
+    public void update(final ParameterCache_mxJPO _paramCache,
                        final String _name,
                        final File _file,
                        final String _newVersion)
@@ -234,7 +235,7 @@ public class JPO_mxJPO
                 .append("\" execute user \"\";\n");
 
         // append MQL statements to reset properties
-        final String prpStr = execMql(_context,
+        final String prpStr = execMql(_paramCache.getContext(),
                                       new StringBuilder().append("print program \"").append(_name)
                                            .append("\" select property.name property.to dump ' @@@@@@'"));
         final String[] prpArr = prpStr.toString().split("(@@@@@@)");
@@ -272,6 +273,6 @@ public class JPO_mxJPO
         }
 
         // execute MQL statement
-        execMql(_context, cmd);
+        execMql(_paramCache.getContext(), cmd);
     }
 }

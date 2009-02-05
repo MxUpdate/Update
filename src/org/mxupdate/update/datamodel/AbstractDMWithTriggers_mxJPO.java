@@ -35,13 +35,14 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  * Abstract class for all data model administration objects with triggers.
  *
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public abstract class AbstractDMWithTriggers_mxJPO
@@ -139,7 +140,7 @@ public abstract class AbstractDMWithTriggers_mxJPO
      * in the <code>_preMQLCode</code> to remove all current assigned triggers.
      * Then the update method of the super class is called.
      *
-     * @param _context          context for this request
+     * @param _paramCache       parameter cache
      * @param _preMQLCode       MQL statements which must be called before the
      *                          TCL code is executed
      * @param _postMQLCode      MQL statements which must be called after the
@@ -153,7 +154,7 @@ public abstract class AbstractDMWithTriggers_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      */
     @Override
-    protected void update(final Context _context,
+    protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
@@ -174,7 +175,7 @@ public abstract class AbstractDMWithTriggers_mxJPO
         // append already existing pre MQL code
         preMQLCode.append(_preMQLCode);
 
-        super.update(_context, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
     }
 
     /**
