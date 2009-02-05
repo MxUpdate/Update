@@ -86,7 +86,7 @@ public class ParameterCache_mxJPO
     /**
      * Mapping between parameter definition and the related boolean value.
      *
-     * @see #ParameterCache_mxJPO(Collection)
+     * @see #ParameterCache_mxJPO(Context,Collection)
      * @see #evalParameter(ParameterDef_mxJPO, String[], int)
      */
     final Map<String,Boolean> mapBoolean;
@@ -95,16 +95,25 @@ public class ParameterCache_mxJPO
      * Mapping between parameter definition and the related list of string
      * values.
      *
-     * @see #ParameterCache_mxJPO(Collection)
+     * @see #ParameterCache_mxJPO(Context,Collection)
      * @see #evalParameter(ParameterDef_mxJPO, String[], int)
      */
     final Map<String,Collection<String>> mapList;
 
     /**
+     * Mapping between parameter definition and the related map of string
+     * values.
+     *
+     * @see #ParameterCache_mxJPO(Context,Collection)
+     * @see #evalParameter(ParameterDef_mxJPO, String[], int)
+     */
+    final Map<String,Map<String,String>> mapMap;
+
+    /**
      * Mapping between the enumeration name of the parameter and the string
      * value.
      *
-     * @see #ParameterCache_mxJPO(Collection)
+     * @see #ParameterCache_mxJPO(Context,Collection)
      * @see #evalParameter(ParameterDef_mxJPO, String[], int)
      */
     final Map<String,String> mapString;
@@ -125,6 +134,7 @@ public class ParameterCache_mxJPO
      * @see #context
      * @see #mapBoolean
      * @see #mapList
+     * @see #mapMap
      * @see #mapString
      */
     public ParameterCache_mxJPO(final Context _context,
@@ -133,6 +143,7 @@ public class ParameterCache_mxJPO
         this.context = _context;
         this.mapBoolean = new HashMap<String,Boolean>();
         this.mapList = new HashMap<String,Collection<String>>();
+        this.mapMap = new HashMap<String,Map<String,String>>();
         this.mapString = new HashMap<String,String>();
 
         for (final ParameterDef_mxJPO paramDef : _paramDefs)  {
@@ -163,6 +174,7 @@ public class ParameterCache_mxJPO
      * @see #context
      * @see #mapBoolean
      * @see #mapList
+     * @see #mapMap
      * @see #mapString
      */
     private ParameterCache_mxJPO(final Context _context,
@@ -171,6 +183,7 @@ public class ParameterCache_mxJPO
         this.context = _context;
         this.mapBoolean = _original.mapBoolean;
         this.mapList = _original.mapList;
+        this.mapMap = _original.mapMap;
         this.mapString = _original.mapString;
     }
 
@@ -239,12 +252,14 @@ public class ParameterCache_mxJPO
      *         is returned
      * @see #mapBoolean
      * @see #mapList
+     * @see #mapMap
      * @see #mapString
      */
     public boolean contains(final String _key)
     {
         return this.mapBoolean.containsKey(_key)
                || this.mapList.containsKey(_key)
+               || this.mapMap.containsKey(_key)
                || this.mapString.containsKey(_key);
     }
 
@@ -286,6 +301,33 @@ public class ParameterCache_mxJPO
     }
 
     /**
+     * Returns for given key the related map value.
+     *
+     * @param _key  key of searched map value
+     * @return map for related key (or <code>null</code> if map is not defined)
+     * @see #mapMap
+     */
+    public Map<String,String> getValueMap(final String _key)
+    {
+        return this.mapMap.get(_key);
+    }
+
+    /**
+     * Creates for given key a new map if not exists and returns this map.
+     *
+     * @param _key  key of searched / new created map value
+     * @return map for related key
+     * @see #mapMap
+     */
+    public Map<String,String> defineValueMap(final String _key)
+    {
+        if (!this.mapMap.containsKey(_key))  {
+            this.mapMap.put(_key, new HashMap<String,String>());
+        }
+        return this.mapMap.get(_key);
+    }
+
+    /**
      * Returns for given key the related string value.
      *
      * @param _key  key of searched string value
@@ -306,6 +348,7 @@ public class ParameterCache_mxJPO
      * @return string representation of the parameter cache
      * @see #mapBoolean
      * @see #mapList
+     * @see #mapMap
      * @see #mapString
      */
     @Override
@@ -315,6 +358,7 @@ public class ParameterCache_mxJPO
                 .append("[Parameter Cache ")
                     .append("boolean = ").append(this.mapBoolean).append(", ")
                     .append("list = ").append(this.mapList).append(", ")
+                    .append("map = ").append(this.mapMap).append(", ")
                     .append("string = ").append(this.mapString)
                 .append("]")
                 .toString();

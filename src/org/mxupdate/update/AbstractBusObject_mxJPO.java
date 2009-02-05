@@ -63,7 +63,14 @@ public abstract class AbstractBusObject_mxJPO
     /**
      * Defines the serialize version unique identifier.
      */
-    private static final long serialVersionUID = -5381775541507933947L;
+    private final static long serialVersionUID = -5381775541507933947L;
+
+    /**
+     * Key used to store default attribute values within the parameter cache.
+     *
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private final static String PARAMCACHE_KEY_ATTRS = "DefaultAttributeValues";
 
     /**
      * String used to split the name and revision of administration business
@@ -469,10 +476,17 @@ public abstract class AbstractBusObject_mxJPO
         final Set<String> ignoreAttrs = (this.getTypeDef().getMxBusIgnoredAttributes() == null)
                                         ? new HashSet<String>(0)
                                         : new HashSet<String>(this.getTypeDef().getMxBusIgnoredAttributes());
+        final Map<String,String> defaultAttrValues = _paramCache.defineValueMap(PARAMCACHE_KEY_ATTRS);
         for (final Attribute attr : this.attrValuesSorted)  {
-// TODO: use default attribute value instead of ""
             if (!ignoreAttrs.contains(attr.name))  {
-                preMQLCode.append(" \"").append(attr.name).append("\" \"\"");
+                if (!defaultAttrValues.containsKey(attr.name))  {
+                    final String def = execMql(_paramCache.getContext(),
+                                               new StringBuilder().append("print attr '")
+                                                       .append(attr.name).append("' select default dump"));
+                    defaultAttrValues.put(attr.name, def);
+                }
+                preMQLCode.append(" \"").append(attr.name).append("\" \"")
+                        .append(defaultAttrValues.get(attr.name)).append('\"');
             }
         }
         preMQLCode.append(";\n");
