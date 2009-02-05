@@ -465,7 +465,7 @@ System.err.println("unknown pararameter "  + _args[idx]);
             } else if (Mode_mxJPO.IMPORT == mode)  {
                 this.update(paramCache, paths, clazz2matches, versionInfo);
             } else if (Mode_mxJPO.DELETE == mode)  {
-                this.delete(_context, paths, clazz2matches);
+                this.delete(paramCache, paths, clazz2matches);
             }
 
         } catch (Exception e)  {
@@ -600,18 +600,35 @@ System.out.println("    - update to version from " + fileDate);
                         update = true;
 System.out.println("    - update");
                     }
+                    // execute update
                     if (update)  {
-                        instance.update(_paramCache,
-                                        fileEntry.getValue(),
-                                        fileEntry.getKey(),
-                                        version);
+                        boolean commit = false;
+                        boolean transActive = _paramCache.getContext().isTransactionActive();
+                        try  {
+                            if (!transActive)  {
+                                _paramCache.getContext().start(true);
+                            }
+                            instance.update(_paramCache,
+                                            fileEntry.getValue(),
+                                            fileEntry.getKey(),
+                                            version);
+                            if (!transActive)  {
+                                _paramCache.getContext().commit();
+                            }
+                            commit = true;
+                        } finally  {
+                            if (!commit && !transActive && _paramCache.getContext().isTransactionActive())  {
+                                _paramCache.getContext().abort();
+                            }
+                        }
                     }
                 }
             }
         }
     }
 
-    protected void delete(final Context _context,
+
+    protected void delete(final ParameterCache_mxJPO _paramCache,
                           final Set<String> _paths,
                           final Map<TypeDef_mxJPO,List<String>> _clazz2matches)
             throws Exception
@@ -623,7 +640,7 @@ System.out.println("    - update");
 
         // evaluate all matching administration objects
         final Map<TypeDef_mxJPO,Set<String>> clazz2MxNames
-                = this.getMatching(_context, _clazz2matches);
+                = this.getMatching(_paramCache.getContext(), _clazz2matches);
 
         // get all matching files depending on the update classes
         final Map<TypeDef_mxJPO,Map<File,String>> clazz2FileNames
@@ -636,7 +653,22 @@ System.out.println("    - update");
             for (final String name : entry.getValue())  {
                 if (!fileNames.contains(name))  {
 System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name + "'");
-                    instance.delete(_context, name);
+                    boolean commit = false;
+                    boolean transActive = _paramCache.getContext().isTransactionActive();
+                    try  {
+                        if (!transActive)  {
+                            _paramCache.getContext().start(true);
+                        }
+                        instance.delete(_paramCache.getContext(), name);
+                        if (!transActive)  {
+                            _paramCache.getContext().commit();
+                        }
+                        commit = true;
+                    } finally  {
+                        if (!commit && !transActive && _paramCache.getContext().isTransactionActive())  {
+                            _paramCache.getContext().abort();
+                        }
+                    }
                 }
             }
         }

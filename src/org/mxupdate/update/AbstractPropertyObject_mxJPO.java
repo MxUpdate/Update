@@ -591,22 +591,7 @@ System.out.println("ERROR! Symbolic name does not start correctly! So '" + symbN
            .append(_postMQLCode);
 
         // execute update
-        boolean commit = false;
-        boolean transActive = _paramCache.getContext().isTransactionActive();
-        try  {
-            if (!transActive)  {
-                _paramCache.getContext().start(true);
-            }
-            execMql(_paramCache.getContext(), cmd);
-            if (!transActive)  {
-                _paramCache.getContext().commit();
-            }
-            commit = true;
-        } finally  {
-            if (!commit && !transActive && _paramCache.getContext().isTransactionActive())  {
-                _paramCache.getContext().abort();
-            }
-        }
+        execMql(_paramCache.getContext(), cmd);
     }
 
     /**
