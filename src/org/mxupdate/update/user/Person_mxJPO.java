@@ -134,22 +134,30 @@ public class Person_mxJPO
     }
 
     /**
-     * Deletes administration object from given type with given name.
+     * Deletes the person business object and person administration object.
      *
      * @param _context      context for this request
-     * @param _name         name of object to delete
-     * @throws Exception if delete failed
-     * @todo dummy method must be replaced
+     * @param _name         name of person to delete
+     * @throws Exception if delete of person failed
      */
     @Override
     public void delete(final Context _context,
                        final String _name)
             throws Exception
     {
+        this.personBus.delete(_context,
+                              new StringBuilder().append(_name).append(AbstractBusObject_mxJPO.SPLIT_NAME)
+                                      .append('-').toString());
+        this.personAdmin.delete(_context, _name);
     }
 
     /**
-     * @todo dummy method mus be replaced
+     * Creates the person administration object and person business object.
+     *
+     * @param _context      context for this request
+     * @param _file         TCL update file
+     * @param _name         name of person to create
+     * @throws Exception if create of person failed
      */
     @Override
     public void create(final Context _context,
@@ -157,7 +165,11 @@ public class Person_mxJPO
                        final String _name)
             throws Exception
     {
-
+        this.personAdmin.create(_context, _file, _name);
+        this.personBus.create(_context,
+                              _file,
+                              new StringBuilder().append(_name).append(AbstractBusObject_mxJPO.SPLIT_NAME)
+                                      .append('-').toString());
     }
 
     @Override
