@@ -59,6 +59,23 @@ public abstract class AbstractDMWithAttributes_mxJPO
     private static final long serialVersionUID = -2194896309854537398L;
 
     /**
+     * Called TCL procedure within the TCL update to assign attributes to this
+     * administration object.
+     *
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private final static String TCL_PROCEDURE
+            = "proc testAttributes {args}  {\n"
+                + "set iIdx 0\n"
+                + "set lsCmd [list mql exec prog org.mxupdate.update.util.JPOCaller attributes]\n"
+                + "while {$iIdx < [llength $args]}  {\n"
+                +   "lappend lsCmd [lindex $args $iIdx]\n"
+                +   "incr iIdx\n"
+                + "}\n"
+                + "eval $lsCmd\n"
+            + "}\n";
+
+    /**
      * List of all attributes for this data model administration object.
      *
      * @see #parse(String, String)              method used to parse attributes
@@ -69,24 +86,6 @@ public abstract class AbstractDMWithAttributes_mxJPO
      *                                          object
      */
     private final Set<String> attributes = new TreeSet<String>();
-
-    /**
-     * Called TCL procedure within the TCL update to assign attributes to this
-     * administration object.
-     *
-     * @see #update(Context, CharSequence, CharSequence, Map)
-     */
-    private final static String TCL_PROCEDURE
-            = "proc testAttributes {args}  {\n"
-                + "global JPO_CALLER_INSTANCE\n"
-                + "set iIdx 0\n"
-                + "set lsCmd [list mql exec prog org.mxupdate.update.util.JPOCaller]\n"
-                + "while {$iIdx < [llength $args]}  {\n"
-                +   "lappend lsCmd [lindex $args $iIdx]\n"
-                +   "incr iIdx\n"
-                + "}\n"
-                + "eval $lsCmd\n"
-            + "}\n";
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -183,14 +182,14 @@ public abstract class AbstractDMWithAttributes_mxJPO
      * method is called directly within the update and checks which attributes
      * are missed in the new definition and adds missing attributes to the
      * administration object. If an attribute is not defined anymore but
-     * assigned in Matrix, an exception is thrown.
+     * assigned in MX, an exception is thrown.
      *
      * @param _paramCache   parameter cache
      * @param _args         arguments from the TCL procedure
      * @throws Exception if an unknown parameter is defined, the given name of
      *                   the administration object is not the same or an
      *                   attribute is assigned to an administration object
-     *                   within Matrix but not defined anymore
+     *                   within MX but not defined anymore
      */
     public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
                                final String... _args)
@@ -198,7 +197,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
     {
         final String nameParam = new StringBuilder()
                 .append('-').append(this.getTypeDef().getMxAdminName()).toString();
-        int idx = 0;
+        int idx = 1;
         String name = null;
         String attrStr = null;
 // TODO: parameters -ignoreattr and -removeattr
