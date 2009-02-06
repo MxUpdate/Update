@@ -143,15 +143,17 @@ public class TriggerGroup_mxJPO
     /**
      * Appends the information about all from and to connected objects.
      *
-     * @param _out      writer instance
+     * @param _paramCache   parameter cache
+     * @param _out          writer instance
      * @see #tos
      * @see #froms
      */
     @Override
-    protected final void write(final Writer _out)
+    protected final void write(final ParameterCache_mxJPO _paramCache,
+                               final Writer _out)
             throws IOException
     {
-        super.write(_out);
+        super.write(_paramCache, _out);
         // write all from objects
         for (final BusObject_mxJPO bus : this.froms)  {
             _out.append("\nmql connect bus \"${OBJECTID}\" \\")

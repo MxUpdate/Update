@@ -369,13 +369,15 @@ public abstract class AbstractBusObject_mxJPO
     /**
      * Writes the information to update the business objects.
      *
-     * @param _out      writer instance
+     * @param _paramCache   parameter cache
+     * @param _out          writer instance
      */
     @Override
-    protected void write(final Writer _out)
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Writer _out)
             throws IOException
     {
-        writeHeader(_out);
+        this.writeHeader(_paramCache, _out);
         _out.append("mql mod bus \"${OBJECTID}\"")
             .append(" \\\n    description \"").append(convertTcl(this.busDescription)).append("\"");
         for (final Attribute attr : this.attrValuesSorted)  {
@@ -505,7 +507,7 @@ public abstract class AbstractBusObject_mxJPO
                 .append(" \"").append(AdminPropertyDef.FILEDATE.getAttrName())
                         .append("\" \"").append(_tclVariables.get(AdminPropertyDef.FILEDATE.name())).append('\"');
         // exists no application property or application property not equal?
-        final String applVal = _paramCache.getValueString(ParameterCache_mxJPO.KEY_APPLICATION);
+        final String applVal = _paramCache.getValueString(ParameterCache_mxJPO.KEY_DEFAULTAPPLICATION);
         if ((this.getApplication() == null) || !applVal.equals(this.getApplication()))  {
             postMQLCode.append(" \"").append(AdminPropertyDef.APPLICATION.getAttrName())
                     .append("\" \"").append(applVal).append('\"');

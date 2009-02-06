@@ -61,6 +61,13 @@ public abstract class AbstractPropertyObject_mxJPO
     private static final long serialVersionUID = -2794355865894159489L;
 
     /**
+     * Header string of the application.
+     *
+     * @see #writeHeader(Writer)
+     */
+    private static final String HEADER_APPLICATION = "\n# APPLICATION:\n# ~~~~~~~~~~~~\n#";
+
+    /**
      * Header string of the author.
      *
      * @see #writeHeader(Writer)
@@ -77,11 +84,33 @@ public abstract class AbstractPropertyObject_mxJPO
     private static final String HEADER_SYMBOLIC_NAME = "\n# SYMBOLIC NAME:\n# ~~~~~~~~~~~~~~\n#";
 
     /**
+     * Header string of the version.
+     *
+     * @see #writeHeader(Writer)
+     */
+    private static final String HEADER_VERSION = "\n# VERSION:\n# ~~~~~~~~\n#";
+
+    /**
+     * Length of the header string of the application.
+     *
+     * @see #HEADER_APPLICATION
+     */
+    private static final int LENGTH_HEADER_APPLICATION = HEADER_APPLICATION.length();
+
+    /**
      * Length of the header string of the author.
      *
+     * @see #HEADER_AUTHOR
      * @see #defineAuthor(Map, StringBuilder)
      */
     private static final int LENGTH_HEADER_AUTHOR = HEADER_AUTHOR.length();
+    /**
+     * Length of the header string of the version.
+     *
+     * @see #HEADER_VERSION
+     */
+    private static final int LENGTH_HEADER_VERSION = HEADER_VERSION.length();
+
 
     /**
      * Length of the header string of the symbolic name.
@@ -294,19 +323,22 @@ public abstract class AbstractPropertyObject_mxJPO
     }
 
 
+    /**
+     *
+     */
     @Override
-    public void export(final Context _context,
+    public void export(final ParameterCache_mxJPO _paramCache,
                        final File _path,
                        final String _name)
             throws MatrixException, SAXException, IOException
     {
-        parse(_context, _name);
+        this.parse(_paramCache.getContext(), _name);
         final File file = new File(_path, getFileName());
         if (!file.getParentFile().exists())  {
             file.getParentFile().mkdirs();
         }
         final Writer out = new FileWriter(file);
-        write(out);
+        this.write(_paramCache, out);
         out.flush();
         out.close();
     }
@@ -356,18 +388,21 @@ public abstract class AbstractPropertyObject_mxJPO
     protected abstract void prepare(final Context _context)
             throws MatrixException;
 
-    protected abstract void write(final Writer _out)
+    protected abstract void write(final ParameterCache_mxJPO _paramCache,
+                                  final Writer _out)
             throws IOException;
 
     /**
      *
-     * @param _out      writer instance
+     * @param _paramCache   parameter cache
+     * @param _out          writer instance
      * @throws IOException
      * @todo evaluate already defined symbolic names if exists
      * @see #HEADER_AUTHOR
      * @see #HEADER_SYMBOLIC_NAME
      */
-    protected void writeHeader(final Writer _out)
+    protected void writeHeader(final ParameterCache_mxJPO _paramCache,
+                               final Writer _out)
             throws IOException
     {
         final String headerText = this.getTypeDef().getTitle();
@@ -383,6 +418,7 @@ public abstract class AbstractPropertyObject_mxJPO
         // symbolic name only if an administration type is defined
         if (this.getTypeDef().getMxAdminName() != null)  {
             _out.append(HEADER_SYMBOLIC_NAME)
+// TODO: use stored symbolic name!
 .append(' ').append(this.getTypeDef().getMxAdminName()).append("_").append(this.getName()).append("\n")
                 .append("#");
         }
@@ -412,6 +448,24 @@ public abstract class AbstractPropertyObject_mxJPO
             _out.append(" ").append(this.author).append('\n');
         } else {
             _out.append("\n");
+        }
+        // write application
+        if (_paramCache.getValueBoolean(ParameterCache_mxJPO.KEY_EXPORTAPPLICATION))  {
+            _out.append('#').append(HEADER_APPLICATION);
+            if ((this.application != null) && !"".equals(this.application))  {
+                _out.append(" ").append(this.application).append('\n');
+            } else {
+                _out.append("\n");
+            }
+        }
+        // write version
+        if (_paramCache.getValueBoolean(ParameterCache_mxJPO.KEY_EXPORTVERSION))  {
+            _out.append('#').append(HEADER_VERSION);
+            if ((this.getVersion() != null) && !"".equals(this.getVersion()))  {
+                _out.append(" ").append(this.getVersion()).append('\n');
+            } else {
+                _out.append("\n");
+            }
         }
         _out.append("################################################################################\n\n");
     }
@@ -443,19 +497,41 @@ public abstract class AbstractPropertyObject_mxJPO
         // parse objects
         this.parse(_paramCache.getContext(), _name);
 
+        // read code
+        final StringBuilder code = this.getCode(_file);
+
         // defines the version in the TCL variables
         final Map<String,String> tclVariables = new HashMap<String,String>();
         if (_newVersion == null)  {
-            tclVariables.put(AdminPropertyDef.VERSION.name(), "");
+            tclVariables.put(AdminPropertyDef.VERSION.name(),
+                              this.extractFromCode(code,
+                                                   HEADER_VERSION,
+                                                   ""));
         } else  {
             tclVariables.put(AdminPropertyDef.VERSION.name(), _newVersion);
         }
 
-        // read code
-        final StringBuilder code = this.getCode(_file);
-
         // define author
-        this.defineAuthor(_paramCache, tclVariables, code);
+        final String author;
+        if (_paramCache.contains(ParameterCache_mxJPO.KEY_AUTHOR))  {
+            author = _paramCache.getValueString(ParameterCache_mxJPO.KEY_AUTHOR);
+        } else  {
+            author = this.extractFromCode(code,
+                                          HEADER_AUTHOR,
+                                          _paramCache.getValueString(ParameterCache_mxJPO.KEY_DEFAULTAUTHOR));
+        }
+        tclVariables.put(AdminPropertyDef.AUTHOR.name(), author);
+
+        // define application
+        final String appl;
+        if (_paramCache.contains(ParameterCache_mxJPO.KEY_APPLICATION))  {
+            appl = _paramCache.getValueString(ParameterCache_mxJPO.KEY_APPLICATION);
+        } else  {
+            appl = this.extractFromCode(code,
+                                        HEADER_APPLICATION,
+                                        _paramCache.getValueString(ParameterCache_mxJPO.KEY_DEFAULTAPPLICATION));
+        }
+        tclVariables.put(AdminPropertyDef.APPLICATION.name(), appl);
 
         // define symbolic name
         this.defineSymbolicName(tclVariables, code);
@@ -479,28 +555,29 @@ public abstract class AbstractPropertyObject_mxJPO
      * @see #HEADER_AUTHOR
      * @see AdminPropertyDef.AUTHOR
      */
-    protected void defineAuthor(final ParameterCache_mxJPO _paramCache,
-                                final Map<String,String> _tclVariables,
-                                final StringBuilder _code)
+    protected String extractFromCode(final StringBuilder _code,
+                                     final String _headerText,
+                                     final String _default)
     {
-        final int start = _code.indexOf(HEADER_AUTHOR) + LENGTH_HEADER_AUTHOR;
-        final String author;
-        if ((start > LENGTH_HEADER_AUTHOR) && (_code.charAt(start) == ' '))  {
+        final int length = _headerText.length();
+        final int start = _code.indexOf(_headerText) + length;
+        final String value;
+        if ((start > length) && (_code.charAt(start) == ' '))  {
             final int end = _code.indexOf("\n", start);
             if (end > 0)  {
                 final String tmp = _code.substring(start, end).trim();
                 if ("".equals(tmp))  {
-                    author = _paramCache.getValueString(ParameterCache_mxJPO.KEY_AUTHOR);
+                    value = _default;
                 } else  {
-                    author = tmp;
+                    value = tmp;
                 }
             } else  {
-                author = _paramCache.getValueString(ParameterCache_mxJPO.KEY_AUTHOR);
+                value = _default;
             }
         } else  {
-            author = _paramCache.getValueString(ParameterCache_mxJPO.KEY_AUTHOR);
+            value = _default;
         }
-        _tclVariables.put(AdminPropertyDef.AUTHOR.name(), author);
+        return value;
     }
 
     /**

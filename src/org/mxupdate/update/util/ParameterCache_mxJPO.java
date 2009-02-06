@@ -50,6 +50,30 @@ public class ParameterCache_mxJPO
     public static final String KEY_AUTHOR = "Author";
 
     /**
+     * String of the key within the parameter cache for the default application
+     * parameter.
+     */
+    public static final String KEY_DEFAULTAPPLICATION = "DefaultApplication";
+
+    /**
+     * String of the key within the parameter cache for the default author
+     * parameter.
+     */
+    public static final String KEY_DEFAULTAUTHOR = "DefaultAuthor";
+
+    /**
+     * String of the key within the parameter cache for the export application
+     * parameter.
+     */
+    public static final String KEY_EXPORTAPPLICATION = "ExportApplication";
+
+    /**
+     * String of the key within the parameter cache for the export version
+     * parameter.
+     */
+    public static final String KEY_EXPORTVERSION = "ExportVersion";
+
+    /**
      * String of the key within the parameter cache for the use file date as
      * version parameter.
      */

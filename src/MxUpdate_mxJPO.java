@@ -461,7 +461,7 @@ System.err.println("unknown pararameter "  + _args[idx]);
             if (unknown || (Mode_mxJPO.HELP == mode) || (mode == null))  {
                 this.printHelp();
             } else if (Mode_mxJPO.EXPORT == mode)  {
-                this.export(_context, paths, clazz2matches);
+                this.export(paramCache, paths, clazz2matches);
             } else if (Mode_mxJPO.IMPORT == mode)  {
                 this.update(paramCache, paths, clazz2matches, versionInfo);
             } else if (Mode_mxJPO.DELETE == mode)  {
@@ -478,14 +478,14 @@ System.err.println("unknown pararameter "  + _args[idx]);
     /**
      * Exports matching administration objects to given path.
      *
-     * @param _context          context for this request
+     * @param _paramCache       parameter cache
      * @param _paths            path where the administration objects are
      *                          exported
      * @param _clazz2matches    classes and their matched to export
      * @throws Exception if none path or more than one path is defined or if
      *                   the export failed
      */
-    protected void export(final Context _context,
+    protected void export(final ParameterCache_mxJPO _paramCache,
                           final Set<String> _paths,
                           final Map<TypeDef_mxJPO,List<String>> _clazz2matches)
             throws Exception
@@ -500,7 +500,7 @@ System.err.println("unknown pararameter "  + _args[idx]);
         final String pathStr = _paths.iterator().next();
 
         // evaluate all matching administration objects
-        final Map<TypeDef_mxJPO,Set<String>> clazz2names = this.getMatching(_context, _clazz2matches);
+        final Map<TypeDef_mxJPO,Set<String>> clazz2names = this.getMatching(_paramCache.getContext(), _clazz2matches);
 
         // export
         for (final Map.Entry<TypeDef_mxJPO,Set<String>> entry : clazz2names.entrySet())  {
@@ -508,7 +508,7 @@ System.err.println("unknown pararameter "  + _args[idx]);
                 AbstractObject_mxJPO instance = entry.getKey().newTypeInstance();
                 final File path = new File(pathStr + File.separator + instance.getPath());
 System.out.println("export "+instance.getTypeDef().getLogging() + " '" + name + "'");
-                instance.export(_context, path, name);
+                instance.export(_paramCache, path, name);
             }
         }
     }

@@ -113,21 +113,21 @@ public class Person_mxJPO
     }
 
     @Override
-    public void export(final Context _context,
+    public void export(final ParameterCache_mxJPO _paramCache,
                        final File _path,
                        final String _name)
             throws MatrixException, SAXException, IOException
     {
-        this.personAdmin.parse(_context, _name);
-        this.personBus.parse(_context, _name);
+        this.personAdmin.parse(_paramCache.getContext(), _name);
+        this.personBus.parse(_paramCache.getContext(), _name);
         final File file = new File(_path, this.personAdmin.getFileName());
         if (!file.getParentFile().exists())  {
             file.getParentFile().mkdirs();
         }
         final Writer out = new FileWriter(file);
-        this.personAdmin.write(out);
+        this.personAdmin.write(_paramCache, out);
         out.append('\n');
-        this.personBus.write(out);
+        this.personBus.write(_paramCache, out);
         this.personAdmin.writeEnd(out);
         out.flush();
         out.close();
@@ -233,17 +233,20 @@ public class Person_mxJPO
 
         /**
          * Because the original method
-         * {@link AbstractAdminObject_mxJPO#write(Writer)} is protected, but
-         * called from {@link Person_mxJPO#export(Context, File, String)}, the
+         * {@link AbstractAdminObject_mxJPO#write(ParameterCache_mxJPO,Writer)}
+         * is protected, but called from
+         * {@link Person_mxJPO#export(Context, File, String)}, the
          * original method must be overwritten and only called.
          *
-         * @param _out  writer instance
+         * @param _paramCache   parameter cache
+         * @param _out          writer instance
          */
         @Override
-        protected void write(final Writer _out)
+        protected void write(final ParameterCache_mxJPO _paramCache,
+                             final Writer _out)
                 throws IOException
         {
-            super.write(_out);
+            super.write(_paramCache, _out);
         }
 
         /**
@@ -413,11 +416,13 @@ public class Person_mxJPO
         /**
          * Appends the part for the business object to the TCL update code.
          *
-         * @param _out      appendable instance where the TCL update code for
-         *                  the business object part must be written
+         * @param _paramCache   parameter cache
+         * @param _out          appendable instance where the TCL update code
+         *                      for the business object part must be written
          */
         @Override
-        protected void write(final Writer _out)
+        protected void write(final ParameterCache_mxJPO _paramCache,
+                             final Writer _out)
                 throws IOException
         {
             _out.append("mql mod bus \"${OBJECTID}\"")

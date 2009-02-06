@@ -122,12 +122,12 @@ public class JPO_mxJPO
      * real Java code. The conversion works like the original extract method,
      * but only converts the given JPOs and not depending JPOs.
      *
-     * @param _context          context for this request
-     * @param _path             export path
-     * @param _name             name of JPO to export
+     * @param _paramCache   parameter cache
+     * @param _path         export path
+     * @param _name         name of JPO to export
      */
     @Override
-    public void export(final Context _context,
+    public void export(final ParameterCache_mxJPO _paramCache,
                        final File _path,
                        final String _name)
             throws MatrixException, SAXException, IOException
@@ -137,7 +137,7 @@ public class JPO_mxJPO
 
         // replace class names and references to other JPOs
         final String name = _name + NAME_SUFFIX;
-        final String code = execMql(_context, cmd)
+        final String code = execMql(_paramCache.getContext(), cmd)
                                .replaceAll("\\" + "$\\{CLASSNAME\\}", name.replaceAll(".*\\.", ""))
                                .replaceAll("\\\\\\\\", "\\\\")
                                .replaceAll("(?<=\\"+ "$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", NAME_SUFFIX)

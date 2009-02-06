@@ -125,13 +125,15 @@ public class ObjectGenerator_mxJPO
      * Appends the information if the trigger is active or not. If the trigger
      * is active, a promote must be done within the TCL update script.
      *
-     * @param _out      writer instance
+     * @param _paramCache   parameter cache
+     * @param _out          writer instance
      */
     @Override
-    protected final void write(final Writer _out)
+    protected final void write(final ParameterCache_mxJPO _paramCache,
+                               final Writer _out)
             throws IOException
     {
-        super.write(_out);
+        super.write(_paramCache, _out);
         if ((this.numGenName != null) && (this.numGenRevi != null))  {
             _out.append("\nmql connect bus  \"${OBJECTID}\" \\\n")
                 .append("    relationship \"").append(RELATIONSHIP_NUMBER_GENERATOR).append("\" \\\n")

@@ -300,13 +300,15 @@ public class Policy_mxJPO
     /**
      * Writes the update script for this policy.
      *
-     * @param _out      writer instance
+     * @param _paramCache   parameter cache
+     * @param _out          writer instance
      */
     @Override
-    protected void write(final Writer _out)
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Writer _out)
             throws IOException
     {
-        writeHeader(_out);
+        this.writeHeader(_paramCache, _out);
         _out.append("updatePolicy \"${NAME}\" {");
         final String suffix = this.getTypeDef().getMxAdminSuffix();
         if (!"".equals(suffix))  {
@@ -334,7 +336,7 @@ public class Policy_mxJPO
             state.writeObject(_out);
         }
         _out.append("\n}");
-        writeProperties(_out);
+        this.writeProperties(_out);
     }
 
     /**
@@ -1017,7 +1019,6 @@ throw new Exception("some states are not defined anymore!");
                 .append("\n      filter \"").append(convertTcl(this.filter)).append("\"")
                 .append("\n    }");
         }
-
 
         /**
          * Calculates the delta between the old signature and this signature.

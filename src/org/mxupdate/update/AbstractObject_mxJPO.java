@@ -125,16 +125,16 @@ public abstract class AbstractObject_mxJPO
      * path. The name of the file where is written through is evaluated within
      * this export method.
      *
-     * @param _context  context for this request
-     * @param _path     path to write through (if required also including
-     *                  depending file path defined from the information
-     *                  annotation)
-     * @param _name     name of object to export
+     * @param _paramCache   parameter cache
+     * @param _path         path to write through (if required also including
+     *                      depending file path defined from the information
+     *                      annotation)
+     * @param _name         name of object to export
      * @throws MatrixException
      * @throws SAXException
      * @throws IOException
      */
-    public abstract void export(final Context _context,
+    public abstract void export(final ParameterCache_mxJPO _paramCache,
                                 final File _path,
                                 final String _name)
             throws MatrixException, SAXException, IOException;

@@ -94,12 +94,12 @@ public class Program_mxJPO
     /**
      * Exports given program to given path for given name.
      *
-     * @param _context          context for this request
-     * @param _path             export path
-     * @param _name             name of JPO to export
+     * @param _paramCache   parameter cache
+     * @param _path         export path
+     * @param _name         name of JPO to export
      */
     @Override
-    public void export(final Context _context,
+    public void export(final ParameterCache_mxJPO _paramCache,
                        final File _path,
                        final String _name)
             throws MatrixException, SAXException, IOException
@@ -112,7 +112,7 @@ public class Program_mxJPO
             file.getParentFile().mkdirs();
         }
         final Writer out = new FileWriter(file);
-        out.append(execMql(_context, cmd));
+        out.append(execMql(_paramCache.getContext(), cmd));
         out.flush();
         out.close();
     }

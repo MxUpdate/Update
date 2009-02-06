@@ -26,6 +26,7 @@ import java.io.Writer;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AttributeDef;
 import org.mxupdate.update.AbstractBusObject_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
@@ -56,13 +57,15 @@ public class NumberGenerator_mxJPO
      * next number attribute must be enclosing within an if clause, the
      * original method is overwritten.
      *
-     * @param _out      writer instance
+     * @param _paramCache   parameter cache
+     * @param _out          writer instance
      */
     @Override
-    protected void write(final Writer _out)
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Writer _out)
             throws IOException
     {
-        writeHeader(_out);
+        this.writeHeader(_paramCache, _out);
         _out.append("mql mod bus \"${OBJECTID}\"")
             .append(" \\\n    description \"").append(convertTcl(getDescription())).append("\"");
         String nextNumber = null;

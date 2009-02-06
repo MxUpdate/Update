@@ -218,22 +218,29 @@ public abstract class AbstractAdminObject_mxJPO
         }
     }
 
-        @Override
-        protected void write(final Writer _out)
-                throws IOException
-        {
-            writeHeader(_out);
-            _out.append("mql mod ")
-                .append(this.getTypeDef().getMxAdminName())
-                .append(" \"${NAME}\"");
-            if (!"".equals(this.getTypeDef().getMxAdminSuffix()))  {
-                _out.append(" ").append(this.getTypeDef().getMxAdminSuffix());
-            }
-            _out.append(" \\\n    description \"").append(convertTcl(getDescription())).append("\"");
-            writeObject(_out);
-            writeProperties(_out);
-            writeEnd(_out);
+    /**
+     *
+     * @param _paramCache   parameter cache
+     * @param _out          writer instance
+     * @throws IOException
+     */
+    @Override
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Writer _out)
+            throws IOException
+    {
+        this.writeHeader(_paramCache, _out);
+        _out.append("mql mod ")
+            .append(this.getTypeDef().getMxAdminName())
+            .append(" \"${NAME}\"");
+        if (!"".equals(this.getTypeDef().getMxAdminSuffix()))  {
+            _out.append(" ").append(this.getTypeDef().getMxAdminSuffix());
         }
+        _out.append(" \\\n    description \"").append(convertTcl(getDescription())).append("\"");
+        this.writeObject(_out);
+        this.writeProperties(_out);
+        this.writeEnd(_out);
+    }
 
     protected abstract void writeObject(final Writer _out) throws IOException;
 
@@ -404,7 +411,7 @@ public abstract class AbstractAdminObject_mxJPO
                     .append("value \"").append(this.getName()).append('\"');
         }
         // exists no application property or application property not equal?
-        final String applVal = _paramCache.getValueString(ParameterCache_mxJPO.KEY_APPLICATION);
+        final String applVal = _tclVariables.get(AdminPropertyDef.APPLICATION.name());
         if ((this.getApplication() == null) || !applVal.equals(this.getApplication()))  {
             postMQLCode.append(" add property \"").append(AdminPropertyDef.APPLICATION.getPropName()).append("\" ")
                     .append("value \"").append(applVal).append('\"');
@@ -482,7 +489,7 @@ System.out.println("    - remove symbolic name '" + exSymbName + "'");
         final StringWriter writer = new StringWriter();
         try
         {
-            this.write(writer);
+            this.write(null, writer);
         }
         catch (Exception e)
         {
