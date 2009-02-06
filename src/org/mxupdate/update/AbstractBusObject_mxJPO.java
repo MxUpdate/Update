@@ -506,26 +506,30 @@ public abstract class AbstractBusObject_mxJPO
         // define file date
                 .append(" \"").append(AdminPropertyDef.FILEDATE.getAttrName())
                         .append("\" \"").append(_tclVariables.get(AdminPropertyDef.FILEDATE.name())).append('\"');
-        // exists no application property or application property not equal?
-        final String applVal = _paramCache.getValueString(ParameterCache_mxJPO.KEY_DEFAULTAPPLICATION);
-        if ((this.getApplication() == null) || !applVal.equals(this.getApplication()))  {
-            postMQLCode.append(" \"").append(AdminPropertyDef.APPLICATION.getAttrName())
-                    .append("\" \"").append(applVal).append('\"');
-        }
         // is installed date property defined?
         if ((this.getInstallationDate() == null) || "".equals(this.getInstallationDate()))  {
             final DateFormat format = new SimpleDateFormat(_paramCache.getValueString(ParameterCache_mxJPO.KEY_INSTALLEDDATEFORMAT));
             postMQLCode.append(" \"").append(AdminPropertyDef.INSTALLEDDATE.getAttrName())
                     .append("\" \"").append(format.format(new Date())).append('\"');
         }
-        // is installer property defined?
-        if ((this.getInstaller() == null) || "".equals(this.getInstaller()))  {
+        // exists no installer property or installer property not equal?
+        final String instVal = _tclVariables.get(AdminPropertyDef.INSTALLER.name());
+       if ((this.getInstaller() == null) || !this.getInstaller().equals(instVal))  {
+System.out.println("    - define installer '" + instVal + "'");
             postMQLCode.append(" \"").append(AdminPropertyDef.INSTALLER.getAttrName())
-                    .append("\" \"").append(_paramCache.getValueString(ParameterCache_mxJPO.KEY_INSTALLER)).append('\"');
+                    .append("\" \"").append(instVal).append('\"');
+        }
+        // exists no application property or application property not equal?
+        final String applVal = _tclVariables.get(AdminPropertyDef.APPLICATION.name());
+        if ((this.getApplication() == null) || !this.getApplication().equals(applVal))  {
+System.out.println("    - define application '" + applVal + "'");
+            postMQLCode.append(" \"").append(AdminPropertyDef.APPLICATION.getAttrName())
+                    .append("\" \"").append(applVal).append('\"');
         }
         // exists no author property or author property not equal?
         final String authVal = _tclVariables.get(AdminPropertyDef.AUTHOR.name());
         if ((this.getAuthor() == null) || !this.getAuthor().equals(authVal))  {
+System.out.println("    - define author '" + authVal + "'");
             postMQLCode.append(" \"").append(AdminPropertyDef.AUTHOR.getAttrName())
                     .append("\" \"").append(AdminPropertyDef.AUTHOR.name()).append('\"');
         }

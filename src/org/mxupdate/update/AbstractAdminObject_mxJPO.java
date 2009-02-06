@@ -181,27 +181,32 @@ public abstract class AbstractAdminObject_mxJPO
         }
         // set author depending on the properties
         final Property author = this.propertiesMap.get(AdminPropertyDef.AUTHOR.getPropName());
-        if (author != null)   {
+        if (author != null)  {
             this.setAuthor(author.value);
         }
         // set application depending on the properties
         final Property appl = this.propertiesMap.get(AdminPropertyDef.APPLICATION.getPropName());
-        if (appl != null)   {
+        if (appl != null)  {
             this.setApplication(appl.value);
         }
         // sets the installation date depending on the properties
         final Property installationDate = this.propertiesMap.get(AdminPropertyDef.INSTALLEDDATE.getPropName());
-        if (installationDate != null)   {
+        if (installationDate != null)  {
             this.setInstallationDate(installationDate.value);
         }
         // sets the installer depending on the properties
         final Property installer = this.propertiesMap.get(AdminPropertyDef.INSTALLER.getPropName());
-        if (installer != null)   {
+        if (installer != null)  {
             this.setInstaller(installer.value);
+        }
+        // sets the original name depending on the properties
+        final Property origName = this.propertiesMap.get(AdminPropertyDef.ORIGINALNAME.getPropName());
+        if (origName != null)  {
+            this.setOriginalName(origName.value);
         }
         // sets the version depending on the properties
         final Property version = this.propertiesMap.get(AdminPropertyDef.VERSION.getPropName());
-        if (version != null)   {
+        if (version != null)  {
             this.setVersion(version.value);
         }
 
@@ -397,28 +402,36 @@ public abstract class AbstractAdminObject_mxJPO
         // is installed date property defined?
         if ((this.getInstallationDate() == null) || "".equals(this.getInstallationDate()))  {
             final DateFormat format = new SimpleDateFormat(_paramCache.getValueString(ParameterCache_mxJPO.KEY_INSTALLEDDATEFORMAT));
+            final String date = format.format(new Date());
+System.out.println("    - define installed date '" + date + "'");
             postMQLCode.append(" add property \"").append(AdminPropertyDef.INSTALLEDDATE.getPropName()).append("\" ")
-                    .append("value \"").append(format.format(new Date())).append('\"');
+                    .append("value \"").append(date).append('\"');
         }
-        // is installer property defined?
-        if ((this.getInstaller() == null) || "".equals(this.getInstaller()))  {
+        // exists no installer property or installer property not equal?
+        final String instVal = _tclVariables.get(AdminPropertyDef.INSTALLER.name());
+        if ((this.getInstaller() == null) || !this.getInstaller().equals(instVal))  {
+System.out.println("    - define installer '" + instVal + "'");
             postMQLCode.append(" add property \"").append(AdminPropertyDef.INSTALLER.getPropName()).append("\" ")
-                    .append("value \"").append(_paramCache.getValueString(ParameterCache_mxJPO.KEY_INSTALLER)).append('\"');
+                    .append("value \"").append(instVal).append('\"');
         }
         // is original name property defined?
-        if (!this.propertiesMap.containsKey(AdminPropertyDef.ORIGINALNAME.getPropName()))  {
+        final String origNameVal = _tclVariables.get(AdminPropertyDef.ORIGINALNAME.name());
+        if ((this.getOriginalName() == null) || !this.getOriginalName().equals(origNameVal))  {
+System.out.println("    - define original name '" + origNameVal + "'");
             postMQLCode.append(" add property \"").append(AdminPropertyDef.ORIGINALNAME.getPropName()).append("\" ")
-                    .append("value \"").append(this.getName()).append('\"');
+                    .append("value \"").append(origNameVal).append('\"');
         }
         // exists no application property or application property not equal?
         final String applVal = _tclVariables.get(AdminPropertyDef.APPLICATION.name());
-        if ((this.getApplication() == null) || !applVal.equals(this.getApplication()))  {
+        if ((this.getApplication() == null) || !this.getApplication().equals(applVal))  {
+System.out.println("    - define application '" + applVal + "'");
             postMQLCode.append(" add property \"").append(AdminPropertyDef.APPLICATION.getPropName()).append("\" ")
                     .append("value \"").append(applVal).append('\"');
         }
         // exists no author property or author property not equal?
         final String authVal = _tclVariables.get(AdminPropertyDef.AUTHOR.name());
         if ((this.getAuthor() == null) || !this.getAuthor().equals(authVal))  {
+System.out.println("    - define author '" + authVal + "'");
             postMQLCode.append(" add property \"").append(AdminPropertyDef.AUTHOR.getPropName()).append("\" ")
                     .append("value \"").append(authVal).append('\"');
         }

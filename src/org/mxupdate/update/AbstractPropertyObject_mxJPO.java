@@ -61,9 +61,50 @@ public abstract class AbstractPropertyObject_mxJPO
     private static final long serialVersionUID = -2794355865894159489L;
 
     /**
+     * String of the key within the parameter cache for the export application
+     * parameter.
+     *
+     * @see #writeHeader(ParameterCache_mxJPO, Writer)
+     */
+    private static final String PARAM_EXPORTAPPLICATION = "ExportApplication";
+
+    /**
+     * String of the key within the parameter cache for the export author
+     * parameter.
+     *
+     * @see #writeHeader(ParameterCache_mxJPO, Writer)
+     */
+    private static final String PARAM_EXPORTAUTHOR = "ExportAuthor";
+
+    /**
+     * String of the key within the parameter cache for the export installer
+     * parameter.
+     *
+     * @see #writeHeader(ParameterCache_mxJPO, Writer)
+     */
+    private static final String PARAM_EXPORTINSTALLER = "ExportInstaller";
+
+    /**
+     * String of the key within the parameter cache for the export original
+     * name parameter.
+     *
+     * @see #writeHeader(ParameterCache_mxJPO, Writer)
+     */
+    private static final String PARAM_EXPORTORIGINALNAME = "ExportOriginalName";
+
+    /**
+     * String of the key within the parameter cache for the export version
+     * parameter.
+     *
+     * @see #writeHeader(ParameterCache_mxJPO, Writer)
+     */
+    private static final String PARAM_EXPORTVERSION = "ExportVersion";
+
+    /**
      * Header string of the application.
      *
      * @see #writeHeader(Writer)
+     * @see #update(ParameterCache_mxJPO, String, File, String)
      */
     private static final String HEADER_APPLICATION = "\n# APPLICATION:\n# ~~~~~~~~~~~~\n#";
 
@@ -71,9 +112,25 @@ public abstract class AbstractPropertyObject_mxJPO
      * Header string of the author.
      *
      * @see #writeHeader(Writer)
-     * @see #defineAuthor(Map, StringBuilder)
+     * @see #update(ParameterCache_mxJPO, String, File, String)
      */
     private static final String HEADER_AUTHOR = "\n# AUTHOR:\n# ~~~~~~~\n#";
+
+    /**
+     * Header string of the installer name.
+     *
+     * @see #writeHeader(Writer)
+     * @see #update(ParameterCache_mxJPO, String, File, String)
+     */
+    private static final String HEADER_INSTALLER = "\n# INSTALLER:\n# ~~~~~~~~~~\n#";
+
+    /**
+     * Header string of the original name.
+     *
+     * @see #writeHeader(Writer)
+     * @see #update(ParameterCache_mxJPO, String, File, String)
+     */
+    private static final String HEADER_ORIGINALNAME = "\n# ORIGINAL NAME:\n# ~~~~~~~~~~~~~~\n#";
 
     /**
      * Header string of the symbolic name.
@@ -87,30 +144,9 @@ public abstract class AbstractPropertyObject_mxJPO
      * Header string of the version.
      *
      * @see #writeHeader(Writer)
+     * @see #update(ParameterCache_mxJPO, String, File, String)
      */
     private static final String HEADER_VERSION = "\n# VERSION:\n# ~~~~~~~~\n#";
-
-    /**
-     * Length of the header string of the application.
-     *
-     * @see #HEADER_APPLICATION
-     */
-    private static final int LENGTH_HEADER_APPLICATION = HEADER_APPLICATION.length();
-
-    /**
-     * Length of the header string of the author.
-     *
-     * @see #HEADER_AUTHOR
-     * @see #defineAuthor(Map, StringBuilder)
-     */
-    private static final int LENGTH_HEADER_AUTHOR = HEADER_AUTHOR.length();
-    /**
-     * Length of the header string of the version.
-     *
-     * @see #HEADER_VERSION
-     */
-    private static final int LENGTH_HEADER_VERSION = HEADER_VERSION.length();
-
 
     /**
      * Length of the header string of the symbolic name.
@@ -144,6 +180,14 @@ public abstract class AbstractPropertyObject_mxJPO
     private String application;
 
     /**
+     * Description of the matrix administration object.
+     *
+     * @see #setDescription(String)
+     * @see #getDescription()
+     */
+    private String description = "";
+
+    /**
      * Installation date of the matrix administration object.
      *
      * @see #setInstallationDate(String)
@@ -160,12 +204,12 @@ public abstract class AbstractPropertyObject_mxJPO
     private String installer;
 
     /**
-     * Description of the matrix administration object.
+     * Original name of the matrix administration object.
      *
-     * @see #setDescription(String)
-     * @see #getDescription()
+     * @see #setOriginalName(String)
+     * @see #getOriginalName()
      */
-    private String description = "";
+    private String originalName;
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -259,6 +303,27 @@ public abstract class AbstractPropertyObject_mxJPO
     }
 
     /**
+     * Getter method for instance variable {@link #description}.
+     *
+     * @return value of instance variable {@link #description}.
+     */
+    protected String getDescription()
+    {
+        return this.description;
+    }
+
+    /**
+     * Setter method for instance variable {@link #description}.
+     *
+     * @param _description new value for instance variable {@link #description}.
+     */
+    protected void setDescription(final String _description)
+    {
+        this.description = _description;
+    }
+
+
+    /**
      * Getter method for instance variable {@link #installationDate}.
      *
      * @return value of instance variable {@link #installationDate}.
@@ -303,25 +368,25 @@ public abstract class AbstractPropertyObject_mxJPO
     }
 
     /**
-     * Getter method for instance variable {@link #description}.
+     * Getter method for instance variable {@link #originalName}.
      *
-     * @return value of instance variable {@link #description}.
+     * @return value of instance variable {@link #originalName}.
      */
-    protected String getDescription()
+    protected String getOriginalName()
     {
-        return this.description;
+        return this.originalName;
     }
 
     /**
-     * Setter method for instance variable {@link #description}.
+     * Setter method for instance variable {@link #originalName}.
      *
-     * @param _description new value for instance variable {@link #description}.
+     * @param _originalName     new value for instance variable
+     *                          {@link #originalName}.
      */
-    protected void setDescription(final String _description)
+    protected void setOriginalName(final String _originalName)
     {
-        this.description = _description;
+        this.originalName = _originalName;
     }
-
 
     /**
      *
@@ -398,8 +463,17 @@ public abstract class AbstractPropertyObject_mxJPO
      * @param _out          writer instance
      * @throws IOException
      * @todo evaluate already defined symbolic names if exists
+     * @see #HEADER_APPLICATION
      * @see #HEADER_AUTHOR
+     * @see #HEADER_INSTALLER
+     * @see #HEADER_ORIGINALNAME
      * @see #HEADER_SYMBOLIC_NAME
+     * @see #HEADER_VERSION
+     * @see #PARAM_EXPORTAPPLICATION
+     * @see #PARAM_EXPORTAUTHOR
+     * @see #PARAM_EXPORTINSTALLER
+     * @see #PARAM_EXPORTORIGINALNAME
+     * @see #PARAM_EXPORTVERSION
      */
     protected void writeHeader(final ParameterCache_mxJPO _paramCache,
                                final Writer _out)
@@ -419,10 +493,20 @@ public abstract class AbstractPropertyObject_mxJPO
         if (this.getTypeDef().getMxAdminName() != null)  {
             _out.append(HEADER_SYMBOLIC_NAME)
 // TODO: use stored symbolic name!
-.append(' ').append(this.getTypeDef().getMxAdminName()).append("_").append(this.getName()).append("\n")
-                .append("#");
+.append(' ').append(this.getTypeDef().getMxAdminName()).append("_").append(this.getName()).append("\n");
         }
-        _out.append("\n# DESCRIPTION:\n")
+        // original name
+        // (only if an administration type and related parameter is defined)
+        if ((this.getTypeDef().getMxAdminName() != null) && _paramCache.getValueBoolean(PARAM_EXPORTORIGINALNAME))  {
+            _out.append('#').append(HEADER_ORIGINALNAME);
+            if ((this.getOriginalName() != null) && !"".equals(this.getOriginalName()))  {
+                _out.append(" ").append(this.getOriginalName()).append('\n');
+            } else {
+                _out.append("\n");
+            }
+        }
+        // description
+        _out.append("#\n# DESCRIPTION:\n")
             .append("# ~~~~~~~~~~~~\n");
         if ((this.getDescription() != null) && !"".equals(this.getDescription()))  {
             for (final String partDesc : this.getDescription().split("\n"))  {
@@ -443,23 +527,35 @@ public abstract class AbstractPropertyObject_mxJPO
         } else  {
             _out.append("#\n");
         }
-        _out.append('#').append(HEADER_AUTHOR);
-        if ((this.author != null) && !"".equals(this.author))  {
-            _out.append(" ").append(this.author).append('\n');
-        } else {
-            _out.append("\n");
+        // write header
+        if (_paramCache.getValueBoolean(PARAM_EXPORTAUTHOR))  {
+            _out.append('#').append(HEADER_AUTHOR);
+            if ((this.getAuthor() != null) && !"".equals(this.getAuthor()))  {
+                _out.append(" ").append(this.getAuthor()).append('\n');
+            } else {
+                _out.append("\n");
+            }
+        }
+        // write installer
+        if (_paramCache.getValueBoolean(PARAM_EXPORTINSTALLER))  {
+            _out.append('#').append(HEADER_INSTALLER);
+            if ((this.getInstaller() != null) && !"".equals(this.getInstaller()))  {
+                _out.append(" ").append(this.getInstaller()).append('\n');
+            } else {
+                _out.append("\n");
+            }
         }
         // write application
-        if (_paramCache.getValueBoolean(ParameterCache_mxJPO.KEY_EXPORTAPPLICATION))  {
+        if (_paramCache.getValueBoolean(PARAM_EXPORTAPPLICATION))  {
             _out.append('#').append(HEADER_APPLICATION);
-            if ((this.application != null) && !"".equals(this.application))  {
-                _out.append(" ").append(this.application).append('\n');
+            if ((this.getApplication() != null) && !"".equals(this.getApplication()))  {
+                _out.append(" ").append(this.getApplication()).append('\n');
             } else {
                 _out.append("\n");
             }
         }
         // write version
-        if (_paramCache.getValueBoolean(ParameterCache_mxJPO.KEY_EXPORTVERSION))  {
+        if (_paramCache.getValueBoolean(PARAM_EXPORTVERSION))  {
             _out.append('#').append(HEADER_VERSION);
             if ((this.getVersion() != null) && !"".equals(this.getVersion()))  {
                 _out.append(" ").append(this.getVersion()).append('\n');
@@ -484,8 +580,13 @@ public abstract class AbstractPropertyObject_mxJPO
      *                          (or <code>null</code> if the version must not
      *                          be set).
      * @see #update(Context, CharSequence, CharSequence, Map)
-     * @see #defineAuthor(Map, StringBuilder)
+     * @see #extractFromCode(StringBuilder, String, String)
      * @see #defineSymbolicName(Map, StringBuilder)
+     * @see #HEADER_APPLICATION
+     * @see #HEADER_AUTHOR
+     * @see #HEADER_INSTALLER
+     * @see #HEADER_ORIGINALNAME
+     * @see #HEADER_VERSION
      */
     @Override
     public void update(final ParameterCache_mxJPO _paramCache,
@@ -533,8 +634,30 @@ public abstract class AbstractPropertyObject_mxJPO
         }
         tclVariables.put(AdminPropertyDef.APPLICATION.name(), appl);
 
-        // define symbolic name
-        this.defineSymbolicName(tclVariables, code);
+        // define installer
+        final String installer;
+        if (_paramCache.contains(ParameterCache_mxJPO.KEY_INSTALLER))  {
+            installer = _paramCache.getValueString(ParameterCache_mxJPO.KEY_INSTALLER);
+        } else  {
+            installer = this.extractFromCode(code,
+                                             HEADER_INSTALLER,
+                                             _paramCache.getValueString(ParameterCache_mxJPO.KEY_DEFAULTINSTALLER));
+        }
+        tclVariables.put(AdminPropertyDef.INSTALLER.name(), installer);
+
+        if (this.getTypeDef().getMxAdminName() != null)  {
+            // define symbolic name
+            this.defineSymbolicName(tclVariables, code);
+
+            // define original name
+            final String origName;
+            if ((this.getOriginalName() != null) && !"".equals(this.getOriginalName()))  {
+                origName = this.getOriginalName();
+            } else  {
+                origName = _name;
+            }
+            tclVariables.put(AdminPropertyDef.ORIGINALNAME.name(), origName);
+        }
 
         // define file date
         final DateFormat format = new SimpleDateFormat(_paramCache.getValueString(ParameterCache_mxJPO.KEY_FILEDATEFORMAT));

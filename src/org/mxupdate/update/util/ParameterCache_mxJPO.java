@@ -62,16 +62,10 @@ public class ParameterCache_mxJPO
     public static final String KEY_DEFAULTAUTHOR = "DefaultAuthor";
 
     /**
-     * String of the key within the parameter cache for the export application
+     * String of the key within the parameter cache for the default installer
      * parameter.
      */
-    public static final String KEY_EXPORTAPPLICATION = "ExportApplication";
-
-    /**
-     * String of the key within the parameter cache for the export version
-     * parameter.
-     */
-    public static final String KEY_EXPORTVERSION = "ExportVersion";
+    public static final String KEY_DEFAULTINSTALLER = "DefaultInstaller";
 
     /**
      * String of the key within the parameter cache for the use file date as
@@ -231,7 +225,7 @@ public class ParameterCache_mxJPO
      * depending on the list of arguments.
      * <ul>
      * <li><b>boolean parameter</b>: the boolean map defines for the parameter
-     *     a <i>true</i> value</li>
+     *     the converted value from the default value</li>
      * <li><b>list parameter</b>: the next argument is added to the value list
      *     </li>
      * <li><b>string parameter</b>: the next argument is defined as string
@@ -253,7 +247,8 @@ public class ParameterCache_mxJPO
         int index = _index;
 
         if (_paramDef.getType() == ParameterDef_mxJPO.Type.BOOLEAN)  {
-            this.mapBoolean.put(_paramDef.getName(), true);
+            this.mapBoolean.put(_paramDef.getName(),
+                                !Boolean.parseBoolean(_paramDef.getDefaultValue()));
         } else if (_paramDef.getType() == ParameterDef_mxJPO.Type.LIST)  {
             index++;
             if (!this.mapList.containsKey(_paramDef.getName()))  {
