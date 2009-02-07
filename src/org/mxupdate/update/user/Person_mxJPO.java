@@ -40,9 +40,9 @@ import matrix.util.StringList;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.AbstractBusObject_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.AbstractPropertyObject_mxJPO;
+import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.xml.sax.SAXException;
 
@@ -107,7 +107,7 @@ public class Person_mxJPO
         final Set<String> persons = this.personBus.getMatchingNames(_context, _matches);
         final Set<String> ret = new TreeSet<String>();
         for (final String busName : persons)  {
-            ret.add(busName.split(AbstractBusObject_mxJPO.SPLIT_NAME)[0]);
+            ret.add(busName.split(BusObject_mxJPO.SPLIT_NAME)[0]);
         }
         return ret;
     }
@@ -118,8 +118,8 @@ public class Person_mxJPO
                        final String _name)
             throws MatrixException, SAXException, IOException
     {
-        this.personAdmin.parse(_paramCache.getContext(), _name);
-        this.personBus.parse(_paramCache.getContext(), _name);
+        this.personAdmin.parse(_paramCache, _name);
+        this.personBus.parse(_paramCache, _name);
         final File file = new File(_path, this.personAdmin.getFileName());
         if (!file.getParentFile().exists())  {
             file.getParentFile().mkdirs();
@@ -131,6 +131,15 @@ public class Person_mxJPO
         this.personAdmin.writeEnd(out);
         out.flush();
         out.close();
+    }
+
+    @Override
+    protected void parse(final ParameterCache_mxJPO _paramCache,
+                         final String _name)
+            throws MatrixException, SAXException, IOException
+    {
+        // TODO Auto-generated method stub
+
     }
 
     /**
@@ -146,7 +155,7 @@ public class Person_mxJPO
             throws Exception
     {
         this.personBus.delete(_context,
-                              new StringBuilder().append(_name).append(AbstractBusObject_mxJPO.SPLIT_NAME)
+                              new StringBuilder().append(_name).append(BusObject_mxJPO.SPLIT_NAME)
                                       .append('-').toString());
         this.personAdmin.delete(_context, _name);
     }
@@ -168,7 +177,7 @@ public class Person_mxJPO
         this.personAdmin.create(_context, _file, _name);
         this.personBus.create(_context,
                               _file,
-                              new StringBuilder().append(_name).append(AbstractBusObject_mxJPO.SPLIT_NAME)
+                              new StringBuilder().append(_name).append(BusObject_mxJPO.SPLIT_NAME)
                                       .append('-').toString());
     }
 
@@ -179,8 +188,12 @@ public class Person_mxJPO
                        final String _newVersion)
             throws Exception
     {
-        this.personBus.parse(_paramCache.getContext(), _name);
+        this.personBus.parse(_paramCache, _name);
         this.personAdmin.update(_paramCache, _name, _file, _newVersion);
+    }
+
+    protected void write(final ParameterCache_mxJPO _paramCache, final Writer _out) throws IOException,
+            MatrixException {
     }
 
     class PersonAdmin
@@ -205,15 +218,15 @@ public class Person_mxJPO
          * could be used to parse the business administration part of the
          * person.
          *
-         * @param _context  context for this request
-         * @param _name     name of the person to parse
+         * @param _paramCache   parameter cache
+         * @param _name         name of the person to parse
          */
         @Override
-        protected void parse(final Context _context,
+        protected void parse(final ParameterCache_mxJPO _paramCache,
                              final String _name)
                 throws MatrixException, SAXException, IOException
         {
-            super.parse(_context, _name);
+            super.parse(_paramCache, _name);
         }
 
         /**
@@ -309,7 +322,7 @@ public class Person_mxJPO
     }
 
     class PersonBus
-            extends AbstractBusObject_mxJPO
+            extends BusObject_mxJPO
     {
         /**
          * Defines the serialize version unique identifier.
@@ -357,17 +370,16 @@ public class Person_mxJPO
         /**
          * Parsed the business object of the person.
          *
-         * @param _context  context for this request
-         * @param _name     name of the person which must be parsed
+         * @param _paramCache   parameter cache
+         * @param _name         name of the person which must be parsed
          */
         @Override
-        protected void parse(final Context _context,
+        protected void parse(final ParameterCache_mxJPO _paramCache,
                              final String _name)
-                throws MatrixException, SAXException, IOException
+                throws MatrixException
         {
-            super.parse(_context,
-                        new StringBuilder().append(_name).append(AbstractBusObject_mxJPO.SPLIT_NAME).append('-').toString());
-            this.prepare(_context);
+            super.parse(_paramCache,
+                        new StringBuilder().append(_name).append(BusObject_mxJPO.SPLIT_NAME).append('-').toString());
 
             // exists a business object?
             if (this.getBusName() != null)  {
@@ -386,7 +398,7 @@ public class Person_mxJPO
                 selects.addElement("to[Member|from.type==Company].attribute[Project Role]");
                 selects.addElement("to[Organization Representative|from.type==Company].from.name");
 
-                final BusinessObjectWithSelect s = bus.select(_context, selects);
+                final BusinessObjectWithSelect s = bus.select(_paramCache.getContext(), selects);
 
                 // current state
                 this.status = s.getSelectData("current");
@@ -427,7 +439,7 @@ public class Person_mxJPO
         {
             _out.append("mql mod bus \"${OBJECTID}\"")
                 .append(" \\\n    description \"").append(convertTcl(this.getBusDescription())).append("\"");
-            for (final Attribute attr : this.getAttrValuesSorted())  {
+            for (final AttributeValue attr : this.getAttrValuesSorted())  {
                 _out.append(" \\\n    \"").append(convertTcl(attr.name))
                     .append("\" \"").append(convertTcl(attr.value)).append("\"");
               }

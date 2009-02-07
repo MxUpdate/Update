@@ -25,17 +25,17 @@ import java.io.Writer;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AttributeDef;
-import org.mxupdate.update.AbstractBusObject_mxJPO;
+import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public class NumberGenerator_mxJPO
-        extends AbstractBusObject_mxJPO
+        extends BusObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
@@ -69,7 +69,7 @@ public class NumberGenerator_mxJPO
         _out.append("mql mod bus \"${OBJECTID}\"")
             .append(" \\\n    description \"").append(convertTcl(getDescription())).append("\"");
         String nextNumber = null;
-        for (final Attribute attr : getAttrValuesSorted())  {
+        for (final AttributeValue attr : getAttrValuesSorted())  {
             if (AttributeDef.NumberGeneratorNextNumber.getMxName().equals(attr.name))  {
                 nextNumber = attr.value;
             } else  {

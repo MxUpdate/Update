@@ -21,7 +21,6 @@
 package org.mxupdate.update.program;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
@@ -32,10 +31,7 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
-import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.xml.sax.SAXException;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
@@ -45,7 +41,7 @@ import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
  * @version $Id$
  */
 public class JPO_mxJPO
-        extends AbstractObject_mxJPO
+        extends AbstractProgram_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
@@ -117,70 +113,51 @@ public class JPO_mxJPO
     }
 
     /**
-     * Exports given JPO to given path for given name. The JPO code is first
+     * Returns the file name for this JPO.
+     *
+     * @return file name of this administration (business) object
+     */
+    @Override
+    protected String getFileName()
+    {
+        return new StringBuilder()
+                .append(this.getName().replaceAll("\\.", "/"))
+                .append(this.getTypeDef().getFileSuffix())
+                .toString();
+    }
+
+    /**
+     * Writes given JPO to given path for given name. The JPO code is first
      * converted, because Matrix uses keywords which must be replaced to have
      * real Java code. The conversion works like the original extract method,
      * but only converts the given JPOs and not depending JPOs.
      *
      * @param _paramCache   parameter cache
-     * @param _path         export path
-     * @param _name         name of JPO to export
+     *
      */
     @Override
-    public void export(final ParameterCache_mxJPO _paramCache,
-                       final File _path,
-                       final String _name)
-            throws MatrixException, SAXException, IOException
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Writer _out)
+            throws IOException, MatrixException
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("print program \"").append(_name).append("\" select code dump");
+        // define package name (if points within JPO name)
+        final int idx = this.getName().lastIndexOf('.');
+        if (idx > 0)  {
+            _out.append("package ")
+                .append(this.getName().substring(0, idx))
+                .append(";\n");
+        }
 
         // replace class names and references to other JPOs
-        final String name = _name + NAME_SUFFIX;
-        final String code = execMql(_paramCache.getContext(), cmd)
+        final String name = this.getName() + NAME_SUFFIX;
+        final StringBuilder cmd = new StringBuilder()
+                .append("print program \"").append(this.getName()).append("\" select code dump");
+        _out.append(execMql(_paramCache.getContext(), cmd)
                                .replaceAll("\\" + "$\\{CLASSNAME\\}", name.replaceAll(".*\\.", ""))
                                .replaceAll("\\\\\\\\", "\\\\")
                                .replaceAll("(?<=\\"+ "$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", NAME_SUFFIX)
                                .replaceAll("\\" + "$\\{CLASS\\:", "")
-                               .trim();
-
-        // extract package name
-        final int idx = _name.lastIndexOf('.');
-        final String pck;
-        if (idx > 0)  {
-            pck = "package " + _name.substring(0, idx) + ";\n";
-        } else  {
-            pck = "";
-        }
-
-        final File file = new File(_path, name.replaceAll("\\.", "/") + ".java");
-        if (!file.getParentFile().exists())  {
-            file.getParentFile().mkdirs();
-        }
-        final Writer out = new FileWriter(file);
-        out.append(pck)
-           .append(code);
-        out.flush();
-        out.close();
-    }
-
-    /**
-     * Deletes administration object from given type with given name.
-     *
-     * @param _context      context for this request
-     * @param _name         name of object to delete
-     * @throws Exception if delete failed
-     */
-    @Override
-    public void delete(final Context _context,
-                       final String _name)
-            throws Exception
-    {
-        final StringBuilder cmd = new StringBuilder()
-                .append("delete ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(_name).append("\" ")
-                .append(this.getTypeDef().getMxAdminSuffix());
-        execMql(_context, cmd);
+                               .trim());
     }
 
     /**
@@ -229,28 +206,11 @@ public class JPO_mxJPO
                        final String _newVersion)
             throws Exception
     {
-        // append statement to reset execute user
-        final StringBuilder cmd = new StringBuilder()
-                .append("mod prog \"").append(_name)
-                .append("\" execute user \"\";\n");
+        this.parse(_paramCache, _name);
 
-        // append MQL statements to reset properties
-        final String prpStr = execMql(_paramCache.getContext(),
-                                      new StringBuilder().append("print program \"").append(_name)
-                                           .append("\" select property.name property.to dump ' @@@@@@'"));
-        final String[] prpArr = prpStr.toString().split("(@@@@@@)");
-        final int length = (prpArr.length + 1) / 2;
-        for (int idxName = 0, idxTo = length; idxName < length; idxName++, idxTo++)  {
-            final String name = prpArr[idxName].trim();
-            if (AdminPropertyDef.getEnumByPropName(name) == null)  {
-// TODO: if to is defined, the remove must be specified the to ....
-                final String to = (idxTo < length) ? prpArr[idxTo].trim() : "";
-                cmd.append("mod prog \"").append(_name)
-                   .append("\" remove property \"").append(name).append("\";\n");
-            }
-        }
+        final StringBuilder cmd = new StringBuilder();
 
-        // not equal => update JPO code and version
+        // update JPO code
         cmd.append("insert prog \"").append(_file.getPath()).append("\";\n");
 
         // append TCL code of JPO
@@ -266,13 +226,7 @@ public class JPO_mxJPO
             }
         }
 
-        // define new version
-        if (_newVersion != null)  {
-            cmd.append("mod prog \"").append(_name)
-                            .append("\" add property version value \"").append(_newVersion).append("\";");
-        }
-
-        // execute MQL statement
-        execMql(_paramCache.getContext(), cmd);
+        // and update
+        this.update(_paramCache, cmd, _newVersion, _file);
     }
 }

@@ -21,7 +21,6 @@
 package org.mxupdate.update.program;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
@@ -32,9 +31,7 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.xml.sax.SAXException;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
@@ -44,7 +41,7 @@ import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
  * @version $Id$
  */
 public class Program_mxJPO
-        extends AbstractObject_mxJPO
+        extends AbstractProgram_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
@@ -92,48 +89,19 @@ public class Program_mxJPO
     }
 
     /**
-     * Exports given program to given path for given name.
+     * Writes the code from the program to given writer instance.
      *
      * @param _paramCache   parameter cache
-     * @param _path         export path
-     * @param _name         name of JPO to export
+     * @param _out          writer instance
      */
     @Override
-    public void export(final ParameterCache_mxJPO _paramCache,
-                       final File _path,
-                       final String _name)
-            throws MatrixException, SAXException, IOException
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Writer _out)
+            throws IOException, MatrixException
     {
         final StringBuilder cmd = new StringBuilder()
-                .append("print program \"").append(_name).append("\" select code dump");
-
-        final File file = new File(_path, _name);
-        if (!file.getParentFile().exists())  {
-            file.getParentFile().mkdirs();
-        }
-        final Writer out = new FileWriter(file);
-        out.append(execMql(_paramCache.getContext(), cmd));
-        out.flush();
-        out.close();
-    }
-
-    /**
-     * Deletes administration object from given type with given name.
-     *
-     * @param _context      context for this request
-     * @param _name         name of object to delete
-     * @throws Exception if delete failed
-     */
-    @Override
-    public void delete(final Context _context,
-                       final String _name)
-            throws Exception
-    {
-        final StringBuilder cmd = new StringBuilder()
-                .append("delete ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(_name).append("\" ")
-                .append(this.getTypeDef().getMxAdminSuffix());
-        execMql(_context, cmd);
+                .append("print program \"").append(this.getName()).append("\" select code dump");
+        _out.append(execMql(_paramCache.getContext(), cmd));
     }
 
     /**
@@ -146,9 +114,9 @@ public class Program_mxJPO
      */
     @Override
     public void create(final Context _context,
-            final File _file,
-            final String _name)
-    throws Exception
+                       final File _file,
+                       final String _name)
+            throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("add ").append(this.getTypeDef().getMxAdminName())
@@ -175,14 +143,14 @@ public class Program_mxJPO
                        final String _newVersion)
             throws Exception
     {
-        // not equal => update JPO code and version
+        this.parse(_paramCache, _name);
+
+        // update code
         final StringBuilder cmd = new StringBuilder()
                 .append("mod prog \"").append(_name)
                         .append("\" file \"").append(_file.getPath()).append("\";\n");
-        if (_newVersion != null)  {
-            cmd.append("mod prog \"").append(_name)
-               .append("\" add property version value \"").append(_newVersion).append("\";");
-        }
-        execMql(_paramCache.getContext(), cmd);
+
+        // and update
+        this.update(_paramCache, cmd, _newVersion, _file);
     }
 }

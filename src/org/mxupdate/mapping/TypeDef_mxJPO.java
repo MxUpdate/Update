@@ -58,24 +58,27 @@ public final class TypeDef_mxJPO
     private final static Map<String,String> MAP2CLASS = new HashMap<String,String>();
 
     /**
-     * Used prefix of the admin type name.
-     *
-     * @see #defineValue(String, String)
-     */
-    private static final String PREFIX_ADMIN_TYPE = "AdminType";
-
-    /**
      * Used prefix of admin type suffix.
      *
      * @see #defineValue(String, String)
+     * @see #adminSuffix
      */
     private static final String PREFIX_ADMIN_SUFFIX = "AdminSuffix";
+
+    /**
+     * Used prefix of the admin type name.
+     *
+     * @see #defineValue(String, String)
+     * @see #adminType
+     */
+    private static final String PREFIX_ADMIN_TYPE = "AdminType";
 
     /**
      * Used prefix of ignored attributes for business objects within the
      * property file.
      *
      * @see #defineValue(String, String)
+     * @see #busIgnoredAttributes
      */
     private static final String PREFIX_BUS_IGNOREATTRIBUTES = "BusIgnoreAttributes";
 
@@ -83,6 +86,7 @@ public final class TypeDef_mxJPO
      * Used prefix of check exists definitions within the property file.
      *
      * @see #defineValue(String, String)
+     * @see #busCheckExists
      */
     private static final String PREFIX_BUS_CHECKEXISTS = "BusCheckExists";
 
@@ -90,13 +94,31 @@ public final class TypeDef_mxJPO
      * Used prefix of policy definitions within the property file.
      *
      * @see #defineValue(String, String)
+     * @see #busPolicy
      */
     private static final String PREFIX_BUS_POLICY = "BusPolicy";
 
     /**
-     * Used prefix of type definitions within the property file.
+     * Used prefix of from relationship definitions within the property file.
      *
      * @see TypeDef_mxJPO#defineValue(String, String)
+     * @see #busRelsFrom
+     */
+    private static final String PREFIX_BUS_RELSFROM = "BusRelsFrom";
+
+    /**
+     * Used prefix of to relationship definitions within the property file.
+     *
+     * @see TypeDef_mxJPO#defineValue(String, String)
+     * @see #busRelsTo
+     */
+    private static final String PREFIX_BUS_RELSTO = "BusRelsTo";
+
+    /**
+     * Used prefix of business type definitions within the property file.
+     *
+     * @see TypeDef_mxJPO#defineValue(String, String)
+     * @see #busType
      */
     private static final String PREFIX_BUS_TYPE = "BusType";
 
@@ -104,6 +126,7 @@ public final class TypeDef_mxJPO
      * Used prefix of vault definitions within the property file.
      *
      * @see #defineValue(String, String)
+     * @see #busVault
      */
     private static final String PREFIX_BUS_VAULT = "BusVault";
 
@@ -111,6 +134,7 @@ public final class TypeDef_mxJPO
      * Used prefix of type definitions within the property file.
      *
      * @see #defineValue(String, String)
+     * @see #filePath
      */
     private static final String PREFIX_FILE_PATH = "FilePath";
 
@@ -118,6 +142,7 @@ public final class TypeDef_mxJPO
      * Used prefix of type definitions within the property file.
      *
      * @see #defineValue(String, String)
+     * @see #filePrefix
      */
     private static final String PREFIX_FILE_PREFIX = "FilePrefix";
 
@@ -125,6 +150,7 @@ public final class TypeDef_mxJPO
      * Used file suffix of type definitions within the property file.
      *
      * @see #defineValue(String, String)
+     * @see #fileSuffix
      */
     private static final String PREFIX_FILE_SUFFIX = "FileSuffix";
 
@@ -132,6 +158,7 @@ public final class TypeDef_mxJPO
      * Used prefix of the JPO name.
      *
      * @see #defineValue(String, String)
+     * @see #jpoClass
      */
     private static final String PREFIX_JPO = "JPO";
 
@@ -139,6 +166,7 @@ public final class TypeDef_mxJPO
      * Used logging text of type definitions within the property file.
      *
      * @see #defineValue(String, String)
+     * @see #textLogging
      */
     private static final String PREFIX_TEXT_LOGGING = "TextLogging";
 
@@ -146,6 +174,7 @@ public final class TypeDef_mxJPO
      * Used title of type definitions within the property file.
      *
      * @see #defineValue(String, String)
+     * @see #textTitle
      */
     private static final String PREFIX_TEXT_TITLE = "TextTitle";
 
@@ -183,7 +212,7 @@ public final class TypeDef_mxJPO
     private Collection<String> busIgnoredAttributes;
 
     /**
-     * Mapping between internal used type definitions and the Mx policy
+     * Mapping between internal used type definitions and the MX policy
      * names.
      *
      * @see #getMxBusPolicy()
@@ -192,7 +221,25 @@ public final class TypeDef_mxJPO
     private String busPolicy;
 
     /**
-     * Mapping between internal used type definitions and the Mx type
+     * Defines the list of from relationships which must be evaluated to write
+     * and run of update script.
+     *
+     * @see #getMxBusRelsFrom()
+     * @see #defineValue(String, String)
+     */
+    private Collection<String> busRelsFrom;
+
+    /**
+     * Defines the list of to relationships which must be evaluated to write
+     * and run of update script.
+     *
+     * @see #getMxBusRelsTo()
+     * @see #defineValue(String, String)
+     */
+    private Collection<String> busRelsTo;
+
+    /**
+     * Mapping between internal used type definitions and the MX type
      * names.
      *
      * @see #getMxBusType()
@@ -201,7 +248,7 @@ public final class TypeDef_mxJPO
     private String busType;
 
     /**
-     * Mapping between internal used type definitions and the Mx vault
+     * Mapping between internal used type definitions and the MX vault
      * names.
      *
      * @see #getMxBusVault()
@@ -300,6 +347,10 @@ public final class TypeDef_mxJPO
             typeDef.busCheckExists = _value.equalsIgnoreCase("true");
         } else if (key.equals(PREFIX_BUS_IGNOREATTRIBUTES))  {
             typeDef.busIgnoredAttributes = Arrays.asList(_value.split(","));
+        } else if (key.equals(PREFIX_BUS_RELSFROM))  {
+            typeDef.busRelsFrom = Arrays.asList(_value.split(","));
+        } else if (key.equals(PREFIX_BUS_RELSTO))  {
+            typeDef.busRelsTo = Arrays.asList(_value.split(","));
         } else if (key.equals(PREFIX_BUS_POLICY))  {
             typeDef.busPolicy = _value;
         } else if (key.equals(PREFIX_BUS_TYPE))  {
@@ -384,11 +435,11 @@ public final class TypeDef_mxJPO
     }
 
     /**
-     * Returns the related administration type fsufix used within Mx. The
+     * Returns the related administration type fsufix used within MX. The
      * method returns only correct values if the initialize method was
      * called!
      *
-     * @return Mx suffix of the administration type definition
+     * @return MX suffix of the administration type definition
      * @see #adminSuffix
      */
     public String getMxAdminSuffix()
@@ -397,11 +448,11 @@ public final class TypeDef_mxJPO
     }
 
     /**
-     * Returns the related administration type name used within Mx. The
+     * Returns the related administration type name used within MX. The
      * method returns only correct values if the initialize method was
      * called!
      *
-     * @return Mx name of the administration type definition
+     * @return MX name of the administration type definition
      * @see #adminType
      */
     public String getMxAdminName()
@@ -427,7 +478,7 @@ public final class TypeDef_mxJPO
      * the update (means this attributes are not reseted). The method returns
      * only correct values if the initialize method was called!
      *
-     * @return Mx name of the business type definition
+     * @return MX name of the business type definition
      * @see #busIgnoredAttributes
      */
     public Collection<String> getMxBusIgnoredAttributes()
@@ -436,10 +487,10 @@ public final class TypeDef_mxJPO
     }
 
     /**
-     * Returns the related business policy name used within Mx. The method
+     * Returns the related business policy name used within MX. The method
      * returns only correct values if the initialize method was called!
      *
-     * @return Mx name of the business type definition
+     * @return MX name of the business type definition
      * @see #busPolicy
      */
     public String getMxBusPolicy()
@@ -448,10 +499,34 @@ public final class TypeDef_mxJPO
     }
 
     /**
-     * Returns the related business type name used within Mx. The method
+     * Returns the related from relationship used within MX. The method
      * returns only correct values if the initialize method was called!
      *
-     * @return Mx name of the business type definition
+     * @return list of from relationships
+     * @see #busRelsFrom
+     */
+    public Collection<String> getMxBusRelsFrom()
+    {
+        return this.busRelsFrom;
+    }
+
+    /**
+     * Returns the related from relationship used within MX. The method
+     * returns only correct values if the initialize method was called!
+     *
+     * @return list of from relationships
+     * @see #busRelsTo
+     */
+    public Collection<String> getMxBusRelsTo()
+    {
+        return this.busRelsTo;
+    }
+
+    /**
+     * Returns the related business type name used within MX. The method
+     * returns only correct values if the initialize method was called!
+     *
+     * @return MX name of the business type definition
      * @see #busType
      */
     public String getMxBusType()
@@ -460,10 +535,10 @@ public final class TypeDef_mxJPO
     }
 
     /**
-     * Returns the related business vault name used within Mx. The method
+     * Returns the related business vault name used within MX. The method
      * returns only correct values if the initialize method was called!
      *
-     * @return Mx name of the business vault definition
+     * @return MX name of the business vault definition
      * @see #busVault
      */
     public String getMxBusVault()
@@ -520,7 +595,7 @@ public final class TypeDef_mxJPO
     }
 
     /**
-     * Returns the related title used in the Mx update files. The method
+     * Returns the related title used in the MX update files. The method
      * returns only correct values if the initialize method was called!
      *
      * @return title of the business type definition

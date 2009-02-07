@@ -23,6 +23,7 @@ package org.mxupdate.update;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.text.DateFormat;
@@ -42,6 +43,12 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
@@ -108,13 +115,46 @@ public abstract class AbstractAdminObject_mxJPO
         return ret;
     }
 
+    /**
+     * Creates a XML representation of the Object to export, parses them and
+     * executes the post preparation {@link #prepare(Context)}.
+     *
+     * @param _paramCache   parameter cache
+     * @param _name         name of object to parse
+     * @see #getExportMQL(String)       used to get the MQL command to get a
+     *                                  XML representation
+     * @see PadSaxHandler               SAX handler to parse the XML file
+     * @see #parse(String, String)      parser called within the SAX handler
+     * @see #prepare(Context)           called post preparation method
+     */
     @Override
+    protected void parse(final ParameterCache_mxJPO _paramCache,
+                         final String _name)
+            throws MatrixException, SAXException, IOException
+    {
+        this.setName(_name);
+        final String xml = execMql(_paramCache.getContext(), this.getExportMQL());
+
+        // create XML reader
+        final XMLReader reader = XMLReaderFactory.createXMLReader();
+        // register Sax Content Handler
+        final PadSaxHandler handler = new PadSaxHandler();
+        reader.setContentHandler(handler);
+        reader.setDTDHandler(handler);
+        reader.setEntityResolver(handler);
+        // parse the XML string of the export
+        InputSource inputSource = new InputSource(new StringReader(xml));
+        inputSource.setEncoding("UTF8");
+        reader.parse(inputSource);
+        // prepare post preparation
+        this.prepare(_paramCache.getContext());
+    }
+
     protected String getExportMQL()
     {
         return "export " + this.getTypeDef().getMxAdminName() + " \"" + this.getName() + "\" xml";
     }
 
-    @Override
     protected void parse(final String _url,
                          final String _content)
     {
@@ -152,7 +192,7 @@ public abstract class AbstractAdminObject_mxJPO
         } else if ("/adminProperties/propertyList/property/value".equals(_url))  {
             this.propertiesStack.peek().value = _content;
         } else  {
-            super.parse(_url, _content);
+            System.err.println("unkown parsing url: "+_url+"("+_content+")");
         }
     }
 
@@ -166,7 +206,6 @@ public abstract class AbstractAdminObject_mxJPO
      * @see #propertiesMap
      * @see #symbolicNames
      */
-    @Override
     protected void prepare(final Context _context)
             throws MatrixException
     {
@@ -577,6 +616,99 @@ System.out.println("    - remove symbolic name '" + exSymbName + "'");
         public String toString()
         {
             return "[name="+name+", value="+value+", flags="+flags+"]";
+        }
+    }
+
+    /**
+     * Sax handler used to parse the XML exports.
+     */
+    public class PadSaxHandler extends DefaultHandler
+    {
+        final Stack<String> stack = new Stack<String>();
+        StringBuilder content = null;
+        private boolean called = false;
+
+        final Stack<Object> objects = new Stack<Object>();
+
+        private String getUrl()
+        {
+            final StringBuilder ret = new StringBuilder();
+            for (final String tag : stack.subList(2, stack.size()))  {
+                ret.append('/').append(tag);
+            }
+            return ret.toString();
+        }
+
+        /**
+         * An input source defining the entity &quot;ematrixProductDtd&quot; to
+         * replace the original DTD file &quot;ematrixml.dtd&quot; which the
+         * XML parser wants to open.
+         */
+        @Override
+        public InputSource resolveEntity(final String _publicId,
+                                         final String _systemId)
+        {
+            return new InputSource(new StringReader("<!ENTITY ematrixProductDtd \"\">"));
+        }
+
+        @Override
+        public void characters(final char[] _ch,
+                               final int _start,
+                               final int _length)
+            throws SAXException
+        {
+
+          if (_length > 0) {
+            final String content = new String (_ch,_start,_length);
+            if (!this.called)  {
+              if (this.content == null)  {
+                this.content = new StringBuilder();
+              }
+              this.content.append(content);
+            }
+          }
+        }
+
+        @Override
+        public void endElement (final String uri,
+                                final String localName,
+                                final String qName)
+                throws SAXException
+        {
+            if (!this.called)
+            {
+                evaluate();
+                this.called = true;
+            }
+            this.stack.pop();
+        }
+
+        @Override
+        public void startElement(final String _uri,
+                                 final String _localName,
+                                 final String _qName,
+                                 final Attributes _attributes)
+                throws SAXException
+        {
+            if (!this.called)
+            {
+                evaluate();
+            }
+            this.called = false;
+            this.content = null;
+
+            this.stack.add(_qName);
+        }
+
+        private void evaluate()
+        {
+            if (this.stack.size() > 2)  {
+                final String tag = this.stack.get(1);
+                if (!"creationProperties".equals(tag))  {
+                    AbstractAdminObject_mxJPO.this.parse(getUrl(),
+                                                         (this.content != null) ? this.content.toString() : null);
+                }
+            }
         }
     }
 }

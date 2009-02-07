@@ -31,21 +31,25 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import matrix.db.Attribute;
+import matrix.db.AttributeList;
 import matrix.db.BusinessObject;
 import matrix.db.BusinessObjectWithSelect;
 import matrix.db.BusinessObjectWithSelectList;
 import matrix.db.Context;
+import matrix.db.ExpansionWithSelect;
 import matrix.db.Query;
+import matrix.db.RelationshipWithSelect;
 import matrix.util.MatrixException;
 import matrix.util.StringList;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.xml.sax.SAXException;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
@@ -57,7 +61,7 @@ import static org.mxupdate.util.MqlUtil_mxJPO.setHistoryOn;
  * @author Tim Moxter
  * @version $Id$
  */
-public abstract class AbstractBusObject_mxJPO
+public class BusObject_mxJPO
         extends AbstractPropertyObject_mxJPO
 {
     /**
@@ -79,25 +83,17 @@ public abstract class AbstractBusObject_mxJPO
     public static final String SPLIT_NAME = "________";
 
     /**
-     * All attribute values of this business object.
-     *
-     * @see #parse(String, String)      reads the attribute values
-     * @see #prepare(Context)           sortes the attribute values
-     */
-    private final Stack<Attribute> attrValues = new Stack<Attribute>();
-
-    /**
      * Sorted set of attribute values.
      *
-     * @see #prepare(Context)           sorted the attribute values
+     * @see #parse(ParameterCache_mxJPO, String)
      * @see #getAttrValuesSorted()
      */
-    private final Set<Attribute> attrValuesSorted = new TreeSet<Attribute>();
+    private final Set<AttributeValue> attrValuesSorted = new TreeSet<AttributeValue>();
 
     /**
      * Name of business object.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String)
      * @see #getBusName()
      */
     private String busName;
@@ -105,7 +101,7 @@ public abstract class AbstractBusObject_mxJPO
     /**
      * Revision of business object.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String)
      * @see #getBusRevision()
      */
     private String busRevision;
@@ -113,7 +109,7 @@ public abstract class AbstractBusObject_mxJPO
     /**
      * Vault of the business object.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String)
      */
     private String busVault;
 
@@ -121,25 +117,56 @@ public abstract class AbstractBusObject_mxJPO
      * Description of the business object (because the description within the
      * header of the TCL file includes the revision of the business object).
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String)
      * @see #getBusDescription()
      */
     private String busDescription;
 
     /**
+     * Current state of the related business object.
+     *
+     * @see #parse(ParameterCache_mxJPO, String)
+     * @see #getBusCurrent()
+     */
+    private String busCurrent;
+
+    /**
+     * All possible states of the related business object.
+     *
+     * @see #parse(ParameterCache_mxJPO, String)
+     */
+    private StringList busStates;
+
+    /**
      * Object id of the business object.
      *
-     * @see #prepare(Context)
+     * @see #parse(ParameterCache_mxJPO, String)
      * @see #getBusOid()
      */
     private String busOid;
+
+    /**
+     * Holds all to connected objects.
+     *
+     * @see #parse(ParameterCache_mxJPO, String)
+     * @see #write(ParameterCache_mxJPO, Writer)
+     */
+    private final Map<String,Set<Connection>> tos = new TreeMap<String,Set<Connection>>();
+
+    /**
+     * Holds all from connected objects.
+     *
+     * @see #parse(ParameterCache_mxJPO, String)
+     * @see #write(ParameterCache_mxJPO, Writer)
+     */
+    private final Map<String,Set<Connection>> froms = new TreeMap<String,Set<Connection>>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
      */
-    protected AbstractBusObject_mxJPO(final TypeDef_mxJPO _typeDef)
+    public BusObject_mxJPO(final TypeDef_mxJPO _typeDef)
     {
         super(_typeDef);
     }
@@ -230,119 +257,76 @@ public abstract class AbstractBusObject_mxJPO
     }
 
     /**
-     * Prepares the MQL statement to export the business object as XML string.
-     *
-     * @param _name     name of business object to export (name and revision,
-     *                  separated by the splitter string)
-     * @return prepared MQL statement
-     * @see #SPLIT_NAME used splitter between name and revision
-     */
-    @Override
-    protected String getExportMQL()
-    {
-        final String[] nameRev = this.getName().split(SPLIT_NAME);
-
-        return new StringBuilder()
-                .append("export bus \"")
-                .append(this.getBusType())
-                .append("\" \"").append(nameRev[0])
-                .append("\" \"").append((nameRev.length > 1) ? nameRev[1] : "")
-                .append("\" !file !icon !history !relationship !state xml")
-                .toString();
-    }
-
-    /**
-     * Parses the XML Url for the business object XML export file.
-     *
-     * @param _url      url
-     * @param _content  content
-     */
-    @Override
-    protected void parse(final String _url,
-                         final String _content)
-    {
-        if ("/attributeList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/attributeList/attribute".equals(_url))  {
-            this.attrValues.add(new Attribute());
-        } else if ("/attributeList/attribute/name".equals(_url))  {
-            this.attrValues.peek().name = _content;
-        } else if ("/attributeList/attribute/boolean".equals(_url))  {
-            this.attrValues.peek().value = _content;
-        } else if ("/attributeList/attribute/integer".equals(_url))  {
-            this.attrValues.peek().value = _content;
-        } else if ("/attributeList/attribute/string".equals(_url))  {
-            this.attrValues.peek().value = _content;
-        } else if ("/attributeList/attribute/unknown".equals(_url))  {
-            // to be ignored, because no value defined...
-
-        } else if ("/objectType".equals(_url))  {
-            // to be ignored ...
-        } else if ("/objectName".equals(_url))  {
-            this.busName = _content;
-        } else if ("/objectRevision".equals(_url))  {
-            this.busRevision = _content;
-        } else if ("/description".equals(_url))  {
-            this.busDescription = _content;
-        } else if ("/vaultRef".equals(_url))  {
-            this.busVault = _content;
-        } else if ("/policyRef".equals(_url))  {
-            // to be ignored ...
-        } else if ("/owner".equals(_url))  {
-            // to be ignored ...
-        } else if ("/owner/userRef".equals(_url))  {
-            // to be ignored ...
-        } else if ("/creationInfo".equals(_url))  {
-            // to be ignored ...
-        } else if ("/creationInfo/datetime".equals(_url))  {
-            // to be ignored ...
-        } else if ("/modificationInfo".equals(_url))  {
-            // to be ignored ...
-        } else if ("/modificationInfo/datetime".equals(_url))  {
-            // to be ignored ...
-        } else if ("/locker".equals(_url))  {
-            // to be ignored ...
-        } else if ("/locker/userRef".equals(_url))  {
-            // to be ignored ...
-
-        } else  {
-            super.parse(_url, _content);
-        }
-    }
-
-    /**
+     * Parses all information for given administration object.
      * Sorts the attribute values, defines the description for the TCL
      * update script (concatenation of the revision and description) and the
      * name (concatenation of name and revision).
      *
-     * @param _context  context for this request
-     * @see #attrValues         unsorted attribute values
-     * @see #attrValuesSorted   sorted attribute values
-     * @see #busDescription     business description
-     * @see #busRevision        business revison
+     * @param _paramCache   parameter cache
+     * @param _name         name of administration object which must be parsed
+     * @throws MatrixException
+     * @throws SAXException
+     * @throws IOException
+     * @see #attrValuesSorted
+     * @see #busCurrent
+     * @see #busDescription
+     * @see #busName
      * @see #busOid
+     * @see #busRevision
+     * @see #busStates
+     * @see #busVault
      */
     @Override
-    protected void prepare(final Context _context) throws MatrixException
+    protected void parse(final ParameterCache_mxJPO _paramCache,
+                         final String _name)
+            throws MatrixException
     {
-        for (final Attribute attrValue : this.attrValues)  {
-            if (AdminPropertyDef.AUTHOR.getAttrName().equals(attrValue.name))  {
-                this.setAuthor(attrValue.value);
-            } else if (AdminPropertyDef.APPLICATION.getAttrName().equals(attrValue.name))  {
-                this.setApplication(attrValue.value);
-            } else if (AdminPropertyDef.INSTALLEDDATE.getAttrName().equals(attrValue.name))  {
-                this.setInstallationDate(attrValue.value);
-            } else if (AdminPropertyDef.INSTALLER.getAttrName().equals(attrValue.name))  {
-                this.setInstaller(attrValue.value);
-            } else if (AdminPropertyDef.VERSION.getAttrName().equals(attrValue.name))  {
-                this.setVersion(attrValue.value);
-            } else if (!AdminPropertyDef.FILEDATE.getAttrName().equals(attrValue.name))  {
-                this.attrValuesSorted.add(attrValue);
+        final String[] nameRev = _name.split(SPLIT_NAME);
+
+        this.busName = nameRev[0];
+        this.busRevision = (nameRev.length > 1) ? nameRev[1] : "";
+
+        final BusinessObject bus = new BusinessObject(this.getBusType(),
+                                                      this.getBusName(),
+                                                      this.getBusRevision(),
+                                                      null);
+
+        // id, vault, description and current MX state
+        final StringList select = new StringList(4);
+        select.addElement("id");
+        select.addElement("vault");
+        select.addElement("description");
+        select.addElement("current");
+        select.addElement("policy.state");
+        final BusinessObjectWithSelect sel = bus.select(_paramCache.getContext(), select);
+        this.busOid = sel.getSelectData("id");
+        this.busVault = sel.getSelectData("vault");
+        this.busDescription = sel.getSelectData("description");
+        this.busCurrent = sel.getSelectData("current");
+        this.busStates = sel.getSelectDataList("policy.state");
+
+        // define properties (attribute values)
+        final AttributeList attrs = bus.getAttributeValues(_paramCache.getContext(), true);
+        for (final Object attrObj : attrs)  {
+            final Attribute attr = (Attribute) attrObj;
+            if (AdminPropertyDef.AUTHOR.getAttrName().equals(attr.getName()))  {
+                this.setAuthor(attr.getValue());
+            } else if (AdminPropertyDef.APPLICATION.getAttrName().equals(attr.getName()))  {
+                this.setApplication(attr.getValue());
+            } else if (AdminPropertyDef.INSTALLEDDATE.getAttrName().equals(attr.getName()))  {
+                this.setInstallationDate(attr.getValue());
+            } else if (AdminPropertyDef.INSTALLER.getAttrName().equals(attr.getName()))  {
+                this.setInstaller(attr.getValue());
+            } else if (AdminPropertyDef.VERSION.getAttrName().equals(attr.getName()))  {
+                this.setVersion(attr.getValue());
+            } else if (!AdminPropertyDef.FILEDATE.getAttrName().equals(attr.getName()))  {
+                this.attrValuesSorted.add(new AttributeValue(attr));
             }
         }
-        // defines the description
+
+        // define description
         final StringBuilder desc = new StringBuilder();
-        if (this.busRevision != null)  {
+        if ((this.busRevision != null) && !"".equals(this.busRevision))  {
             desc.append(this.busRevision);
             if (this.busDescription != null)  {
                 desc.append('\n');
@@ -352,18 +336,85 @@ public abstract class AbstractBusObject_mxJPO
             desc.append(this.busDescription);
         }
         setDescription(desc.toString());
-        // defines the name
+
+        // define name
         final StringBuilder name = new StringBuilder().append(this.busName);
-        if (this.busRevision != null)  {
+        if ((this.busRevision != null) && !"".equals(this.busRevision))  {
             name.append(SPLIT_NAME).append(this.busRevision);
         }
         setName(name.toString());
-        // found the business object
-        final BusinessObject bus = new BusinessObject(this.getBusType(),
-                                                      this.getBusName(),
-                                                      this.getBusRevision(),
-                                                      this.getBusVault());
-        this.busOid = bus.getObjectId(_context);
+
+        // evaluate from connections
+        if (this.getTypeDef().getMxBusRelsFrom() != null)  {
+            for (final String relation : this.getTypeDef().getMxBusRelsFrom())  {
+                final Set<Connection> cons = new TreeSet<Connection>();
+                this.froms.put(relation, cons);
+
+                final StringList busSelect = new StringList(3);
+                busSelect.addElement("type");
+                busSelect.addElement("name");
+                busSelect.addElement("revision");
+                final StringList relSelect = new StringList(1);
+                relSelect.addElement("id");
+                // get from objects
+                final ExpansionWithSelect expandTo = bus.expandSelect(_paramCache.getContext(),
+                                                                      relation,
+                                                                      "*",
+                                                                      busSelect,
+                                                                      relSelect,
+                                                                      true,
+                                                                      false,
+                                                                      (short) 1,
+                                                                      null,
+                                                                      null,
+                                                                      (short) 0,
+                                                                      true);
+                for (final Object obj : expandTo.getRelationships())  {
+                    final RelationshipWithSelect rel = (RelationshipWithSelect) obj;
+                    final BusinessObjectWithSelect map = rel.getTarget();
+                    cons.add(new Connection(map.getSelectData("type"),
+                                            map.getSelectData("name"),
+                                            map.getSelectData("revision"),
+                                            rel.getSelectData("id")));
+                }
+            }
+        }
+
+        // evaluate to connections
+        if (this.getTypeDef().getMxBusRelsTo() != null)  {
+            for (final String relation : this.getTypeDef().getMxBusRelsTo())  {
+                final Set<Connection> cons = new TreeSet<Connection>();
+                this.tos.put(relation, cons);
+
+                final StringList busSelect = new StringList(3);
+                busSelect.addElement("type");
+                busSelect.addElement("name");
+                busSelect.addElement("revision");
+                final StringList relSelect = new StringList(1);
+                relSelect.addElement("id");
+                // get from objects
+                final ExpansionWithSelect expandTo = bus.expandSelect(_paramCache.getContext(),
+                                                                      relation,
+                                                                      "*",
+                                                                      busSelect,
+                                                                      relSelect,
+                                                                      false,
+                                                                      true,
+                                                                      (short) 1,
+                                                                      null,
+                                                                      null,
+                                                                      (short) 0,
+                                                                      true);
+                for (final Object obj : expandTo.getRelationships())  {
+                    final RelationshipWithSelect rel = (RelationshipWithSelect) obj;
+                    final BusinessObjectWithSelect map = rel.getTarget();
+                    cons.add(new Connection(map.getSelectData("type"),
+                                            map.getSelectData("name"),
+                                            map.getSelectData("revision"),
+                                            rel.getSelectData("id")));
+                }
+            }
+        }
     }
 
     /**
@@ -380,9 +431,34 @@ public abstract class AbstractBusObject_mxJPO
         this.writeHeader(_paramCache, _out);
         _out.append("mql mod bus \"${OBJECTID}\"")
             .append(" \\\n    description \"").append(convertTcl(this.busDescription)).append("\"");
-        for (final Attribute attr : this.attrValuesSorted)  {
+        for (final AttributeValue attr : this.attrValuesSorted)  {
           _out.append(" \\\n    \"").append(convertTcl(attr.name))
               .append("\" \"").append(convertTcl(attr.value)).append("\"");
+        }
+        // write all from objects
+        for (final Map.Entry<String, Set<Connection>> fromEntry : this.froms.entrySet())  {
+            for (final Connection con : fromEntry.getValue())  {
+                _out.append("\nmql connect bus \"${OBJECTID}\" \\")
+                    .append("\n    relationship \"").append(fromEntry.getKey()).append("\" \\")
+                    .append("\n    from \"").append(con.type).append("\" \"")
+                            .append(con.name).append("\" \"")
+                            .append(con.revision).append("\"");
+            }
+        }
+        // write all to objects
+        for (final Map.Entry<String, Set<Connection>> toEntry : this.tos.entrySet())  {
+            for (final Connection con: toEntry.getValue())  {
+                _out.append("\nmql connect bus \"${OBJECTID}\" \\")
+                    .append("\n    relationship \"").append(toEntry.getKey()).append("\" \\")
+                    .append("\n    to \"").append(con.type).append("\" \"")
+                            .append(con.name).append("\" \"")
+                            .append(con.revision).append("\"");
+            }
+        }
+        // write promotes to target states if required
+        final int target = this.busStates.indexOf(this.busCurrent);
+        for (int idx = 0; idx < target; idx++)  {
+            _out.append("\nmql promote bus \"${OBJECTID}\"");
         }
     }
 
@@ -479,7 +555,7 @@ public abstract class AbstractBusObject_mxJPO
                                         ? new HashSet<String>(0)
                                         : new HashSet<String>(this.getTypeDef().getMxBusIgnoredAttributes());
         final Map<String,String> defaultAttrValues = _paramCache.defineValueMap(PARAMCACHE_KEY_ATTRS);
-        for (final Attribute attr : this.attrValuesSorted)  {
+        for (final AttributeValue attr : this.attrValuesSorted)  {
             if (!ignoreAttrs.contains(attr.name))  {
                 if (!defaultAttrValues.containsKey(attr.name))  {
                     final String def = execMql(_paramCache.getContext(),
@@ -492,6 +568,26 @@ public abstract class AbstractBusObject_mxJPO
             }
         }
         preMQLCode.append(";\n");
+
+        // disconnect all from objects
+        for (final Map.Entry<String, Set<Connection>> fromEntry : this.froms.entrySet())  {
+            for (final Connection con : fromEntry.getValue())  {
+                preMQLCode.append("disconnect connection ").append(con.conId).append(";\n");
+            }
+        }
+
+        // disconnect all to objects
+        for (final Map.Entry<String, Set<Connection>> toEntry : this.tos.entrySet())  {
+            for (final Connection con: toEntry.getValue())  {
+                preMQLCode.append("disconnect connection ").append(con.conId).append(";\n");
+            }
+        }
+
+        // append demotes if required
+        final int target = this.busStates.indexOf(this.busCurrent);
+        for (int idx = 0; idx < target; idx++)  {
+            preMQLCode.append("\ndemote bus ").append(this.busOid).append(";\n");
+        }
 
         // append other pre MQL code
         preMQLCode.append(_preMQLCode);
@@ -531,7 +627,7 @@ System.out.println("    - define application '" + applVal + "'");
         if ((this.getAuthor() == null) || !this.getAuthor().equals(authVal))  {
 System.out.println("    - define author '" + authVal + "'");
             postMQLCode.append(" \"").append(AdminPropertyDef.AUTHOR.getAttrName())
-                    .append("\" \"").append(AdminPropertyDef.AUTHOR.name()).append('\"');
+                    .append("\" \"").append(authVal).append('\"');
         }
         postMQLCode.append(";\n");
 
@@ -608,6 +704,17 @@ System.out.println("    - define author '" + authVal + "'");
     }
 
     /**
+     * Getter method for instance variable {@link #busCurrent}.
+     *
+     * @return value of instance variable {@link #busCurrent}
+     * @see #busCurrent
+     */
+    protected String getBusCurrent()
+    {
+        return this.busCurrent;
+    }
+
+    /**
      * Getter method for instance variable {@link #busOid}.
      *
      * @return value of instance variable {@link #busOid}
@@ -624,7 +731,7 @@ System.out.println("    - define author '" + authVal + "'");
      * @return value of instance variable {@link #attrValuesSorted}
      * @see #attrValuesSorted
      */
-    protected Set<Attribute> getAttrValuesSorted()
+    protected Set<AttributeValue> getAttrValuesSorted()
     {
         return this.attrValuesSorted;
     }
@@ -632,8 +739,8 @@ System.out.println("    - define author '" + authVal + "'");
     /**
      * Class used to hold the user access.
      */
-    protected class Attribute
-            implements Comparable<Attribute>
+    protected class AttributeValue
+            implements Comparable<AttributeValue>
     {
         /**
          * Holds the user references of a user access.
@@ -645,10 +752,16 @@ System.out.println("    - define author '" + authVal + "'");
          */
         public String value = null;
 
+        AttributeValue(final Attribute _attr)
+        {
+            this.name = _attr.getName();
+            this.value = _attr.getValue();
+        }
+
         /**
          * @param _attribute    attribute instance to compare
          */
-        public int compareTo(final Attribute _attribute)
+        public int compareTo(final AttributeValue _attribute)
         {
             final String name1 = this.name.replaceAll(" [0-9]*$", "");
             final String name2 = _attribute.name.replaceAll(" [0-9]*$", "");
@@ -664,4 +777,75 @@ System.out.println("    - define author '" + authVal + "'");
             return ret;
         }
    }
+
+    private class Connection
+            implements Comparable<Connection>
+    {
+        /**
+         * Type of the business object.
+         */
+        final String type;
+
+        /**
+         * Name of the business object.
+         */
+        final String name;
+
+        /**
+         * Revision of the business object.
+         */
+        final String revision;
+
+        /**
+         * Id of the connection.
+         */
+        final String conId;
+
+        public Connection(final String _type,
+                          final String _name,
+                          final String _revision,
+                          final String _conId)
+        {
+            this.type = _type;
+            this.name = _name;
+            this.revision = _revision;
+            this.conId = _conId;
+        }
+
+        /**
+         * Returns the string representation of the business object. The string
+         * representation is a concatenation of {@link #type}, {@link #name} and
+         * {@link #revision}.
+         *
+         * @return string representation of the business object
+         * @see #type
+         * @see #name
+         * @see #revision
+         */
+        @Override
+        public String toString()
+        {
+            return "[type = " + this.type + ","
+                   + " name = " + this.name + ","
+                   + " revision = " + this.revision + "]";
+        }
+
+        /**
+         * Compares given business object with this business object. First the type
+         * is compared. If the types are equal, the names are compared. If the
+         * names are equal, the revisions are compared.
+         *
+         * @param _compare      business object to compare
+         */
+        public int compareTo(final Connection _compare)
+        {
+            return this.type.equals(_compare.type)
+                   ? this.name.equals(_compare.name)
+                           ? this.revision.equals(_compare.revision)
+                                   ? 0
+                                   : this.revision.compareTo(_compare.revision)
+                           : this.name.compareTo(_compare.name)
+                   : this.type.compareTo(_compare.type);
+        }
+    }
 }

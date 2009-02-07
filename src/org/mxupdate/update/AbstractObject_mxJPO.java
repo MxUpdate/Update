@@ -23,8 +23,10 @@ package org.mxupdate.update;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.Writer;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -72,6 +74,62 @@ public abstract class AbstractObject_mxJPO
      * @see #AbstractObject_mxJPO(TypeDef_mxJPO)
      */
     private final TypeDef_mxJPO typeDef;
+
+    /**
+     * Name of the matrix administration object.
+     *
+     * @see #setName(String)
+     * @see #getName()
+     */
+    private String name = null;
+
+    /**
+     * Author of the matrix administration object.
+     *
+     * @see #setAuthor(String)
+     * @see #getAuthor()
+     */
+    private String author;
+
+    /**
+     * Application of the matrix administration object.
+     *
+     * @see #setApplication(String)
+     * @see #getApplication()
+     */
+    private String application;
+
+    /**
+     * Description of the matrix administration object.
+     *
+     * @see #setDescription(String)
+     * @see #getDescription()
+     */
+    private String description = "";
+
+    /**
+     * Installation date of the matrix administration object.
+     *
+     * @see #setInstallationDate(String)
+     * @see #getInstallationDate()
+     */
+    private String installationDate;
+
+    /**
+     * Installer of the matrix administration object.
+     *
+     * @see #setInstaller(String)
+     * @see #getInstaller()
+     */
+    private String installer;
+
+    /**
+     * Original name of the matrix administration object.
+     *
+     * @see #setOriginalName(String)
+     * @see #getOriginalName()
+     */
+    private String originalName;
 
     /**
      * Initialize the type definition enumeration.
@@ -134,9 +192,37 @@ public abstract class AbstractObject_mxJPO
      * @throws SAXException
      * @throws IOException
      */
-    public abstract void export(final ParameterCache_mxJPO _paramCache,
-                                final File _path,
-                                final String _name)
+    public void export(final ParameterCache_mxJPO _paramCache,
+                       final File _path,
+                       final String _name)
+            throws MatrixException, SAXException, IOException
+    {
+        this.parse(_paramCache, _name);
+        final File file = new File(_path, this.getFileName());
+        if (!file.getParentFile().exists())  {
+            file.getParentFile().mkdirs();
+        }
+        final Writer out = new FileWriter(file);
+        this.write(_paramCache, out);
+        out.flush();
+        out.close();
+    }
+
+    protected abstract void write(final ParameterCache_mxJPO _paramCache,
+                                  final Writer _out)
+            throws IOException, MatrixException;
+
+    /**
+     * Parses all information for given administration object.
+     *
+     * @param _paramCache   parameter cache
+     * @param _name         name of administration object which must be parsed
+     * @throws MatrixException
+     * @throws SAXException
+     * @throws IOException
+     */
+    protected abstract void parse(final ParameterCache_mxJPO _paramCache,
+                                  final String _name)
             throws MatrixException, SAXException, IOException;
 
     /**
@@ -190,12 +276,13 @@ public abstract class AbstractObject_mxJPO
         final Map<File,String> ret = new TreeMap<File,String>();
 
         final String suffix = this.getTypeDef().getFileSuffix();
-        final int suffixLength = suffix.length();
+        final int suffixLength = (suffix != null) ? suffix.length() : 0;
         final String prefix = this.getTypeDef().getFilePrefix();
-        final int prefixLength = prefix.length();
+        final int prefixLength = (prefix != null) ? prefix.length() : 0;
         for (final File file : _files)  {
             final String fileName = file.getName();
-            if (fileName.startsWith(prefix) && fileName.endsWith(suffix))  {
+            if (((prefix == null) || fileName.startsWith(prefix))
+                    && ((prefix == null) || fileName.endsWith(suffix)))  {
                 final String name = fileName.substring(0, fileName.length() - suffixLength)
                                             .substring(prefixLength);
                 ret.put(file, name);
@@ -312,6 +399,155 @@ public abstract class AbstractObject_mxJPO
     }
 
     /**
+     * Getter method for instance variable {@link #name}.
+     *
+     * @return value of instance variable {@link #name}.
+     */
+    protected String getName()
+    {
+        return this.name;
+    }
+
+    /**
+     * Setter method for instance variable {@link #name}.
+     *
+     * @param _name new value for instance variable {@link #name}.
+     */
+    protected void setName(final String _name)
+    {
+        this.name = _name;
+    }
+
+    /**
+     * Getter method for instance variable {@link #author}.
+     *
+     * @return value of instance variable {@link #author}.
+     * @see #author
+     */
+    protected String getAuthor()
+    {
+        return this.author;
+    }
+
+    /**
+     * Setter method for instance variable {@link #author}.
+     *
+     * @param _author new value for instance variable {@link #author}
+     * @see #author
+     */
+    protected void setAuthor(final String _author)
+    {
+        this.author = _author;
+    }
+
+    /**
+     * Getter method for instance variable {@link #application}.
+     *
+     * @return value of instance variable {@link #application}.
+     * @see #application
+     */
+    protected String getApplication()
+    {
+        return this.application;
+    }
+
+    /**
+     * Setter method for instance variable {@link #application}.
+     *
+     * @param _author new value for instance variable {@link #application}
+     * @see #application
+     */
+    protected void setApplication(final String _application)
+    {
+        this.application = _application;
+    }
+
+    /**
+     * Getter method for instance variable {@link #description}.
+     *
+     * @return value of instance variable {@link #description}.
+     */
+    protected String getDescription()
+    {
+        return this.description;
+    }
+
+    /**
+     * Setter method for instance variable {@link #description}.
+     *
+     * @param _description new value for instance variable {@link #description}.
+     */
+    protected void setDescription(final String _description)
+    {
+        this.description = _description;
+    }
+
+    /**
+     * Getter method for instance variable {@link #installationDate}.
+     *
+     * @return value of instance variable {@link #installationDate}.
+     * @see #installationDate
+     */
+    protected String getInstallationDate()
+    {
+        return this.installationDate;
+    }
+
+    /**
+     * Setter method for instance variable {@link #installationDate}.
+     *
+     * @param _author new value for instance variable {@link #installationDate}
+     * @see #installationDate
+     */
+    protected void setInstallationDate(final String _installationDate)
+    {
+        this.installationDate = _installationDate;
+    }
+
+    /**
+     * Getter method for instance variable {@link #installer}.
+     *
+     * @return value of instance variable {@link #installer}.
+     * @see #installer
+     */
+    protected String getInstaller()
+    {
+        return this.installer;
+    }
+
+    /**
+     * Setter method for instance variable {@link #installer}.
+     *
+     * @param _author new value for instance variable {@link #installer}
+     * @see #installer
+     */
+    protected void setInstaller(final String _installer)
+    {
+        this.installer = _installer;
+    }
+
+    /**
+     * Getter method for instance variable {@link #originalName}.
+     *
+     * @return value of instance variable {@link #originalName}.
+     */
+    protected String getOriginalName()
+    {
+        return this.originalName;
+    }
+
+    /**
+     * Setter method for instance variable {@link #originalName}.
+     *
+     * @param _originalName     new value for instance variable
+     *                          {@link #originalName}.
+     */
+    protected void setOriginalName(final String _originalName)
+    {
+        this.originalName = _originalName;
+    }
+
+    /**
      * Returns the version string of this administration (business) object. The
      * method is the getter method for {@see #version).
      *
@@ -333,5 +569,25 @@ public abstract class AbstractObject_mxJPO
     protected void setVersion(final String _version)
     {
         this.version = _version;
+    }
+
+    /**
+     * Returns the file name for this MxUpdate administration object. The file
+     * name is a concatenation of the defined file prefix within the
+     * information annotation , the name of the Mx object and the file suffix
+     * within the information annotation.
+     *
+     * @return file name of this administration (business) object
+     */
+    protected String getFileName() {
+        final StringBuilder ret = new StringBuilder();
+        if (this.getTypeDef().getFilePrefix() != null)  {
+            ret.append(this.getTypeDef().getFilePrefix());
+        }
+        ret.append(this.getName());
+        if (this.getTypeDef().getFileSuffix() != null)  {
+            ret.append(this.getTypeDef().getFileSuffix());
+        }
+        return ret.toString();
     }
 }

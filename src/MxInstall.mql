@@ -283,13 +283,13 @@ eval  {
     pRegisterObject policy "$asMapping(TypeDef.TriggerGroup.BusPolicy)"
 
     # create / update trigger group relationship
-    if {[mql list relationship $asMapping(Relationship.TriggerGroup)] == ""}  {
-      puts "create trigger group relationship '$asMapping(Relationship.TriggerGroup)'"
-      mql add relationship $asMapping(Relationship.TriggerGroup)
+    if {[mql list relationship $asMapping(TypeDef.TriggerGroup.BusRelsFrom)] == ""}  {
+      puts "create trigger group relationship '$asMapping(TypeDef.TriggerGroup.BusRelsFrom)'"
+      mql add relationship $asMapping(TypeDef.TriggerGroup.BusRelsFrom)
     } else  {
-      puts "update trigger group relationship '$asMapping(Relationship.TriggerGroup)'"
+      puts "update trigger group relationship '$asMapping(TypeDef.TriggerGroup.BusRelsFrom)'"
     }
-    mql mod relationship $asMapping(Relationship.TriggerGroup) \
+    mql mod relationship $asMapping(TypeDef.TriggerGroup.BusRelsFrom) \
         description "Relationship used to group trigger definitions." \
         preventduplicates \
         from add type $asMapping(TypeDef.TriggerGroup.BusType) \
@@ -298,9 +298,9 @@ eval  {
         add property $asMapping(PropertyName.Application)   value "MxUpdate" \
         add property $asMapping(PropertyName.Author)        value "The MxUpdate Team" \
         add property $asMapping(PropertyName.Installer)     value "The MxUpdate Team" \
-        add property $asMapping(PropertyName.OriginalName)  value "$asMapping(Relationship.TriggerGroup)" \
+        add property $asMapping(PropertyName.OriginalName)  value "$asMapping(TypeDef.TriggerGroup.BusRelsFrom)" \
         add property $asMapping(PropertyName.Version)       value "${_sVersion}"
-    pRegisterObject relationship "$asMapping(Relationship.TriggerGroup)"
+    pRegisterObject relationship "$asMapping(TypeDef.TriggerGroup.BusRelsFrom)"
 
     # register MxUpdate
     if {[mql list program $asMapping(Program.RegisterApplication)] != ""}  {
