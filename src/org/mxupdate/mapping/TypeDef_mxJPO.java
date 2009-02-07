@@ -44,7 +44,7 @@ public final class TypeDef_mxJPO
      * Maps from the name of the type definition group to the related type
      * definition group instance.
      *
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      */
     private final static Map<String,TypeDef_mxJPO> MAP
             = new HashMap<String,TypeDef_mxJPO>();
@@ -60,7 +60,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of admin type suffix.
      *
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      * @see #adminSuffix
      */
     private static final String PREFIX_ADMIN_SUFFIX = "AdminSuffix";
@@ -68,7 +68,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of the admin type name.
      *
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      * @see #adminType
      */
     private static final String PREFIX_ADMIN_TYPE = "AdminType";
@@ -77,7 +77,7 @@ public final class TypeDef_mxJPO
      * Used prefix of ignored attributes for business objects within the
      * property file.
      *
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      * @see #busIgnoredAttributes
      */
     private static final String PREFIX_BUS_IGNOREATTRIBUTES = "BusIgnoreAttributes";
@@ -85,7 +85,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of check exists definitions within the property file.
      *
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      * @see #busCheckExists
      */
     private static final String PREFIX_BUS_CHECKEXISTS = "BusCheckExists";
@@ -93,7 +93,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of policy definitions within the property file.
      *
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      * @see #busPolicy
      */
     private static final String PREFIX_BUS_POLICY = "BusPolicy";
@@ -101,7 +101,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of both relationship definitions within the property file.
      *
-     * @see TypeDef_mxJPO#defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      * @see #busRelsBoth
      */
     private static final String PREFIX_BUS_RELSBOTH = "BusRelsBoth";
@@ -109,7 +109,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of from relationship definitions within the property file.
      *
-     * @see TypeDef_mxJPO#defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      * @see #busRelsFrom
      */
     private static final String PREFIX_BUS_RELSFROM = "BusRelsFrom";
@@ -117,7 +117,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of to relationship definitions within the property file.
      *
-     * @see TypeDef_mxJPO#defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      * @see #busRelsTo
      */
     private static final String PREFIX_BUS_RELSTO = "BusRelsTo";
@@ -125,7 +125,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of business type definitions within the property file.
      *
-     * @see TypeDef_mxJPO#defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      * @see #busType
      */
     private static final String PREFIX_BUS_TYPE = "BusType";
@@ -133,7 +133,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of vault definitions within the property file.
      *
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      * @see #busVault
      */
     private static final String PREFIX_BUS_VAULT = "BusVault";
@@ -141,23 +141,31 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of type definitions within the property file.
      *
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      * @see #filePath
      */
     private static final String PREFIX_FILE_PATH = "FilePath";
 
     /**
-     * Used prefix of type definitions within the property file.
+     * Used prefix of file last matching definitions within the property file.
      *
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
+     * @see #fileMatchLast
+     */
+    private static final String PREFIX_FILE_MATCHLAST = "FileMatchLast";
+
+    /**
+     * Used prefix of file prefix definitions within the property file.
+     *
+     * @see #defineValue(Context, String, String)
      * @see #filePrefix
      */
     private static final String PREFIX_FILE_PREFIX = "FilePrefix";
 
     /**
-     * Used file suffix of type definitions within the property file.
+     * Used file suffix of file suffix definitions within the property file.
      *
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      * @see #fileSuffix
      */
     private static final String PREFIX_FILE_SUFFIX = "FileSuffix";
@@ -165,7 +173,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of the JPO name.
      *
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      * @see #jpoClass
      */
     private static final String PREFIX_JPO = "JPO";
@@ -173,7 +181,7 @@ public final class TypeDef_mxJPO
     /**
      * Used logging text of type definitions within the property file.
      *
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      * @see #textLogging
      */
     private static final String PREFIX_TEXT_LOGGING = "TextLogging";
@@ -181,7 +189,7 @@ public final class TypeDef_mxJPO
     /**
      * Used title of type definitions within the property file.
      *
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      * @see #textTitle
      */
     private static final String PREFIX_TEXT_TITLE = "TextTitle";
@@ -190,7 +198,7 @@ public final class TypeDef_mxJPO
      * Defines the name of the admin type.
      *
      * @see #getMxAdminName()
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      */
     private String adminType;
 
@@ -198,7 +206,7 @@ public final class TypeDef_mxJPO
      * Defines the suffix of the admin type.
      *
      * @see #getMxAdminSuffix()
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      */
     private String adminSuffix;
 
@@ -206,7 +214,7 @@ public final class TypeDef_mxJPO
      * Must be checked if the business type exists?
      *
      * @see #isBusCheckExists
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      */
     private boolean busCheckExists = false;
 
@@ -215,7 +223,7 @@ public final class TypeDef_mxJPO
      * within the update.
      *
      * @see #getMxBusIgnoredAttributes()
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      */
     private Collection<String> busIgnoredAttributes;
 
@@ -224,7 +232,7 @@ public final class TypeDef_mxJPO
      * names.
      *
      * @see #getMxBusPolicy()
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      */
     private String busPolicy;
 
@@ -233,7 +241,7 @@ public final class TypeDef_mxJPO
      * and run of update script.
      *
      * @see #getMxBusRelsBoth()
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      */
     private Collection<String> busRelsBoth;
 
@@ -242,7 +250,7 @@ public final class TypeDef_mxJPO
      * and run of update script.
      *
      * @see #getMxBusRelsFrom()
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      */
     private Collection<String> busRelsFrom;
 
@@ -251,7 +259,7 @@ public final class TypeDef_mxJPO
      * and run of update script.
      *
      * @see #getMxBusRelsTo()
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      */
     private Collection<String> busRelsTo;
 
@@ -260,7 +268,7 @@ public final class TypeDef_mxJPO
      * names.
      *
      * @see #getMxBusType()
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      */
     private String busType;
 
@@ -269,15 +277,23 @@ public final class TypeDef_mxJPO
      * names.
      *
      * @see #getMxBusVault()
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, Context, String, String)
      */
     private String busVault;
+
+    /**
+     * Must the matching files matched on last positions? E.g. required if no
+     * {@see #filePrefix} and no {@see #fileSuffix} are defined.
+     *
+     * @see #defineValue(Context, String, String)
+     */
+    private boolean fileMatchLast = false;
 
     /**
      * Mapping between internal used type definitions and the file paths.
      *
      * @see #getFilePath()
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      */
     private String filePath;
 
@@ -286,7 +302,7 @@ public final class TypeDef_mxJPO
      * file prefixes.
      *
      * @see #getFilePrefix()
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      */
     private String filePrefix;
 
@@ -295,12 +311,15 @@ public final class TypeDef_mxJPO
      * file suffixes.
      *
      * @see #getFileSuffix()
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      */
     private String fileSuffix;
 
     /**
      * Stores the class implementing the MxUpdate functionality.
+     *
+     * @see #newTypeInstance()
+     * @see #defineJPOClass(Context, String)
      */
     private Class<? extends AbstractObject_mxJPO> jpoClass;
 
@@ -309,7 +328,7 @@ public final class TypeDef_mxJPO
      * logging string.
      *
      * @see #getLogging()
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      */
     private String textLogging;
 
@@ -318,7 +337,7 @@ public final class TypeDef_mxJPO
      * titles.
      *
      * @see #getTitle()
-     * @see #defineValue(String, String)
+     * @see #defineValue(Context, String, String)
      */
     private String textTitle;
 
@@ -376,6 +395,8 @@ public final class TypeDef_mxJPO
             typeDef.busType = _value;
         } else if (key.equals(PREFIX_BUS_VAULT))  {
             typeDef.busVault = _value;
+        } else if (key.equals(PREFIX_FILE_MATCHLAST))  {
+            typeDef.fileMatchLast = _value.equalsIgnoreCase("true");
         } else if (key.equals(PREFIX_FILE_PATH))  {
             typeDef.filePath = _value;
         } else if (key.equals(PREFIX_FILE_PREFIX))  {
@@ -575,6 +596,22 @@ public final class TypeDef_mxJPO
     public String getMxBusVault()
     {
         return this.busVault;
+    }
+
+    /**
+     * Return <i>true</i> if matching files must be checked on last position
+     * after file name checks for all other types. Only if a file before does
+     * not match, this files could be checked against this type. If this
+     * behavior for matching files is not required, a <i>false</i> is returned.
+     * The parameter is only evaluated it the path parameter is defined!
+     *
+     * @return <i>true</i> if matching files must be checked at last (after all
+     *         other types are checked); otherwise <i>false</i>
+     * @see #fileMatchLast
+     */
+    public boolean isFileMatchLast()
+    {
+        return this.fileMatchLast;
     }
 
     /**

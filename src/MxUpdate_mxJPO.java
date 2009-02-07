@@ -693,7 +693,7 @@ System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name 
      * @throws SecurityException
      */
     protected Map<TypeDef_mxJPO,Map<File,String>> evalMatches(final Set<String> _paths,
-                                                        final Map<TypeDef_mxJPO,List<String>> _clazz2matches)
+                                                              final Map<TypeDef_mxJPO,List<String>> _clazz2matches)
             throws SecurityException, IllegalArgumentException, NoSuchMethodException,
                    InstantiationException, IllegalAccessException, InvocationTargetException
     {
@@ -724,10 +724,34 @@ System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name 
             for (final String path : _paths)  {
                 allFiles.addAll(getAllFiles(new File(path)));
             }
+            final Set<File> matchedFiles = new HashSet<File>();
             // get all matching files depending on the update classes
+            // (and NOT last file match)
+            boolean lastFileMatchNeeded = false;
             for (final Map.Entry<TypeDef_mxJPO,List<String>> entry : _clazz2matches.entrySet())  {
-                clazz2names.put(entry.getKey(),
-                                entry.getKey().newTypeInstance().getMatchingFileNames(allFiles, entry.getValue()));
+                if (!entry.getKey().isFileMatchLast())  {
+                    final Map<File,String> matching = entry.getKey().newTypeInstance().getMatchingFileNames(allFiles, entry.getValue());
+                    clazz2names.put(entry.getKey(), matching);
+                    matchedFiles.addAll(matching.keySet());
+                } else  {
+                    lastFileMatchNeeded = true;
+                }
+            }
+            // get all matching files depending on the update classes
+            // (and LAST file match)
+            if (lastFileMatchNeeded)  {
+                final Set<File> notMatchedFiles = new HashSet<File>();
+                for (final File file : allFiles)  {
+                    if (!matchedFiles.contains(file))  {
+                        notMatchedFiles.add(file);
+                    }
+                }
+                for (final Map.Entry<TypeDef_mxJPO,List<String>> entry : _clazz2matches.entrySet())  {
+                    if (entry.getKey().isFileMatchLast())  {
+                        clazz2names.put(entry.getKey(),
+                                        entry.getKey().newTypeInstance().getMatchingFileNames(notMatchedFiles, entry.getValue()));
+                    }
+                }
             }
         }
         return clazz2names;
@@ -770,7 +794,7 @@ System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name 
      * @see #delete(Context, Set, Map)
      */
     protected Map<TypeDef_mxJPO,Set<String>> getMatching(final Context _context,
-                                                   final Map<TypeDef_mxJPO,List<String>> _clazz2matches)
+                                                         final Map<TypeDef_mxJPO,List<String>> _clazz2matches)
             throws Exception
     {
         final Map<TypeDef_mxJPO,Set<String>> clazz2names = new HashMap<TypeDef_mxJPO,Set<String>>();
