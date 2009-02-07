@@ -96,18 +96,6 @@ public final class Mapping_mxJPO
     private static final String PREFIX_ATTRIBUTE = "Attribute.";
 
     /**
-     * Mapping between internal used business type definitions and the titles.
-     *
-     * @see RelationDef#getMxName()
-     */
-    private static final Map<RelationDef,String> RELATIONS = new HashMap<RelationDef,String>();
-
-    /**
-     * Used title of type definitions within the property file.
-     */
-    private static final String PREFIX_RELATION = "Relationship.";
-
-    /**
      * Dummy constructor so that no new instance of this final mapping class
      * could be created.
      */
@@ -149,8 +137,6 @@ public final class Mapping_mxJPO
                 ADMINPROPERTY_NAMES2ENUM.put(value, en);
             } else if (key.startsWith(PREFIX_ATTRIBUTE))  {
                 ATTRIBUTES.put(AttributeDef.valueOf(key.substring(PREFIX_ATTRIBUTE.length())), value);
-            } else if (key.startsWith(PREFIX_RELATION))  {
-                RELATIONS.put(RelationDef.valueOf(key.substring(PREFIX_RELATION.length())), value);
             } else if (key.startsWith("Mode."))  {
                 Mode_mxJPO.defineValue(key.substring(5), value);
             } else if (key.startsWith("ParameterDef."))  {
@@ -244,30 +230,6 @@ public final class Mapping_mxJPO
         public String getMxName()
         {
             return Mapping_mxJPO.ATTRIBUTES.get(this);
-        }
-    }
-
-    /**
-     * Enumeration used to define all relationship used within MxUpdate
-     * application.
-     */
-    public enum RelationDef
-    {
-        /**
-         * Relationship between trigger groups and triggers or trigger groups.
-         */
-        TriggerGroup;
-
-        /**
-         * Returns the related name used within Mx. The method returns only
-         * correct values if the initialize method was called!
-         *
-         * @return Mx name of the relationship definition
-         * @see Mapping_mxJPO#RELATIONS
-         */
-        public String getMxName()
-        {
-            return Mapping_mxJPO.RELATIONS.get(this);
         }
     }
 }
