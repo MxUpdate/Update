@@ -99,6 +99,14 @@ public final class TypeDef_mxJPO
     private static final String PREFIX_BUS_POLICY = "BusPolicy";
 
     /**
+     * Used prefix of both relationship definitions within the property file.
+     *
+     * @see TypeDef_mxJPO#defineValue(String, String)
+     * @see #busRelsBoth
+     */
+    private static final String PREFIX_BUS_RELSBOTH = "BusRelsBoth";
+
+    /**
      * Used prefix of from relationship definitions within the property file.
      *
      * @see TypeDef_mxJPO#defineValue(String, String)
@@ -219,6 +227,15 @@ public final class TypeDef_mxJPO
      * @see #defineValue(String, String)
      */
     private String busPolicy;
+
+    /**
+     * Defines the list of both relationships which must be evaluated to write
+     * and run of update script.
+     *
+     * @see #getMxBusRelsBoth()
+     * @see #defineValue(String, String)
+     */
+    private Collection<String> busRelsBoth;
 
     /**
      * Defines the list of from relationships which must be evaluated to write
@@ -347,6 +364,8 @@ public final class TypeDef_mxJPO
             typeDef.busCheckExists = _value.equalsIgnoreCase("true");
         } else if (key.equals(PREFIX_BUS_IGNOREATTRIBUTES))  {
             typeDef.busIgnoredAttributes = Arrays.asList(_value.split(","));
+        } else if (key.equals(PREFIX_BUS_RELSBOTH))  {
+            typeDef.busRelsBoth = Arrays.asList(_value.split(","));
         } else if (key.equals(PREFIX_BUS_RELSFROM))  {
             typeDef.busRelsFrom = Arrays.asList(_value.split(","));
         } else if (key.equals(PREFIX_BUS_RELSTO))  {
@@ -496,6 +515,18 @@ public final class TypeDef_mxJPO
     public String getMxBusPolicy()
     {
         return this.busPolicy;
+    }
+
+    /**
+     * Returns the related both relationship used within MX. The method
+     * returns only correct values if the initialize method was called!
+     *
+     * @return list of both relationships
+     * @see #busRelsBoth
+     */
+    public Collection<String> getMxBusRelsBoth()
+    {
+        return this.busRelsBoth;
     }
 
     /**

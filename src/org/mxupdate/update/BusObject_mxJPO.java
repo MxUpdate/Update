@@ -349,34 +349,7 @@ public class BusObject_mxJPO
             for (final String relation : this.getTypeDef().getMxBusRelsFrom())  {
                 final Set<Connection> cons = new TreeSet<Connection>();
                 this.froms.put(relation, cons);
-
-                final StringList busSelect = new StringList(3);
-                busSelect.addElement("type");
-                busSelect.addElement("name");
-                busSelect.addElement("revision");
-                final StringList relSelect = new StringList(1);
-                relSelect.addElement("id");
-                // get from objects
-                final ExpansionWithSelect expandTo = bus.expandSelect(_paramCache.getContext(),
-                                                                      relation,
-                                                                      "*",
-                                                                      busSelect,
-                                                                      relSelect,
-                                                                      true,
-                                                                      false,
-                                                                      (short) 1,
-                                                                      null,
-                                                                      null,
-                                                                      (short) 0,
-                                                                      true);
-                for (final Object obj : expandTo.getRelationships())  {
-                    final RelationshipWithSelect rel = (RelationshipWithSelect) obj;
-                    final BusinessObjectWithSelect map = rel.getTarget();
-                    cons.add(new Connection(map.getSelectData("type"),
-                                            map.getSelectData("name"),
-                                            map.getSelectData("revision"),
-                                            rel.getSelectData("id")));
-                }
+                this.expand4Parse(_paramCache, bus, relation, cons, true, false);
             }
         }
 
@@ -385,36 +358,67 @@ public class BusObject_mxJPO
             for (final String relation : this.getTypeDef().getMxBusRelsTo())  {
                 final Set<Connection> cons = new TreeSet<Connection>();
                 this.tos.put(relation, cons);
-
-                final StringList busSelect = new StringList(3);
-                busSelect.addElement("type");
-                busSelect.addElement("name");
-                busSelect.addElement("revision");
-                final StringList relSelect = new StringList(1);
-                relSelect.addElement("id");
-                // get from objects
-                final ExpansionWithSelect expandTo = bus.expandSelect(_paramCache.getContext(),
-                                                                      relation,
-                                                                      "*",
-                                                                      busSelect,
-                                                                      relSelect,
-                                                                      false,
-                                                                      true,
-                                                                      (short) 1,
-                                                                      null,
-                                                                      null,
-                                                                      (short) 0,
-                                                                      true);
-                for (final Object obj : expandTo.getRelationships())  {
-                    final RelationshipWithSelect rel = (RelationshipWithSelect) obj;
-                    final BusinessObjectWithSelect map = rel.getTarget();
-                    cons.add(new Connection(map.getSelectData("type"),
-                                            map.getSelectData("name"),
-                                            map.getSelectData("revision"),
-                                            rel.getSelectData("id")));
-                }
+                this.expand4Parse(_paramCache, bus, relation, cons, false, true);
             }
         }
+
+        // evaluate both connections
+        if (this.getTypeDef().getMxBusRelsBoth() != null)  {
+            for (final String relation : this.getTypeDef().getMxBusRelsBoth())  {
+                // from
+                Set<Connection> cons = this.froms.get(relation);
+                if (cons == null)  {
+                    cons = new TreeSet<Connection>();
+                    this.froms.put(relation, cons);
+                }
+                this.expand4Parse(_paramCache, bus, relation, cons, true, false);
+                // to
+                cons = this.tos.get(relation);
+                if (cons == null)  {
+                    cons = new TreeSet<Connection>();
+                    this.tos.put(relation, cons);
+                }
+                this.expand4Parse(_paramCache, bus, relation, cons, false, true);
+            }
+        }
+    }
+
+    private void expand4Parse(final ParameterCache_mxJPO _paramCache,
+                              final BusinessObject _bus,
+                              final String _relation,
+                              final Set<Connection> _cons,
+                              final boolean _getFrom,
+                              final boolean _getTo)
+            throws MatrixException
+    {
+        final StringList busSelect = new StringList(3);
+        busSelect.addElement("type");
+        busSelect.addElement("name");
+        busSelect.addElement("revision");
+        final StringList relSelect = new StringList(1);
+        relSelect.addElement("id");
+        // get from objects
+        final ExpansionWithSelect expandTo = _bus.expandSelect(_paramCache.getContext(),
+                                                              _relation,
+                                                              "*",
+                                                              busSelect,
+                                                              relSelect,
+                                                              _getFrom,
+                                                              _getTo,
+                                                              (short) 1,
+                                                              null,
+                                                              null,
+                                                              (short) 0,
+                                                              true);
+        for (final Object obj : expandTo.getRelationships())  {
+            final RelationshipWithSelect rel = (RelationshipWithSelect) obj;
+            final BusinessObjectWithSelect map = rel.getTarget();
+            _cons.add(new Connection(map.getSelectData("type"),
+                                     map.getSelectData("name"),
+                                     map.getSelectData("revision"),
+                                     rel.getSelectData("id")));
+        }
+
     }
 
     /**
