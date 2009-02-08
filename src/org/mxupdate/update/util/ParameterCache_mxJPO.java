@@ -92,11 +92,6 @@ public class ParameterCache_mxJPO
     public static final String KEY_INSTALLER = "Installer";
 
     /**
-     * String of the key within the parameter cache for the path parameter.
-     */
-    public static final String KEY_PATH = "Path";
-
-    /**
      * String of the key within the parameter cache for the version parameter.
      */
     public static final String KEY_VERSION = "Version";
@@ -171,7 +166,7 @@ public class ParameterCache_mxJPO
                                         Boolean.parseBoolean(paramDef.getDefaultValue()));
                 } else if (paramDef.getType() == ParameterDef_mxJPO.Type.LIST)  {
                     this.mapList.put(paramDef.getName(),
-                                     Arrays.asList(paramDef.getDefaultValue().split(",")));
+                                     new ArrayList<String>(Arrays.asList(paramDef.getDefaultValue().split(","))));
                 } else if (paramDef.getType() == ParameterDef_mxJPO.Type.STRING)  {
                     this.mapString.put(paramDef.getName(),
                                        paramDef.getDefaultValue());

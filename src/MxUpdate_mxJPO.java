@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import matrix.db.Context;
 import matrix.util.MatrixException;
@@ -76,6 +75,31 @@ public class MxUpdate_mxJPO
      * @see #appendDescription(String, List, String)
      */
     private static final int LENGTH_DESC_LINE = 100;
+
+    /**
+     * String of the key within the parameter cache for the ignore file
+     * parameter.
+     *
+     * @see #evalMatches(ParameterCache_mxJPO, Map)
+     */
+    private static final String PARAM_IGNOREFILE = "PathIgnoreFile";
+
+    /**
+     * String of the key within the parameter cache for the ignore path
+     * parameter.
+     *
+     * @see #evalMatches(ParameterCache_mxJPO, Map)
+     */
+    private static final String PARAM_IGNOREPATH = "PathIgnorePath";
+
+    /**
+     * String of the key within the parameter cache for the path parameter.
+     *
+     * @see #delete(ParameterCache_mxJPO, Map)
+     * @see #evalMatches(ParameterCache_mxJPO, Map)
+     * @see #export(ParameterCache_mxJPO, Map)
+     */
+    private static final String PARAM_PATH = "Path";
 
     /**
      * Stored the descriptions of all parameters.
@@ -131,8 +155,14 @@ public class MxUpdate_mxJPO
                 this.paramsParameters.put(paramStr, parameter);
             }
             final StringBuilder desc = new StringBuilder().append(parameter.getParameterDesc());
-            if (parameter.getDefaultValue() != null)  {
-                desc.append('\n').append("(Default '").append(parameter.getDefaultValue()).append("')");
+            if ((parameter.getDefaultValue() != null) && (parameter.getType() != ParameterDef_mxJPO.Type.BOOLEAN))  {
+                desc.append('\n').append("(Default '");
+                if (parameter.getType() == ParameterDef_mxJPO.Type.LIST)  {
+                    desc.append(parameter.getDefaultValue().replaceAll(",", ", "));
+                } else  {
+                    desc.append(parameter.getDefaultValue());
+                }
+                desc.append("')");
             }
             this.appendDescription(desc,
                                    parameter.getParameterList(),
@@ -452,20 +482,14 @@ System.err.println("unknown pararameter "  + _args[idx]);
                 }
             }
 
-            // get path parameters
-            final Set<String> paths = new TreeSet<String>();
-            if (paramCache.contains(ParameterCache_mxJPO.KEY_PATH))  {
-                paths.addAll(paramCache.getValueList(ParameterCache_mxJPO.KEY_PATH));
-            }
-
             if (unknown || (Mode_mxJPO.HELP == mode) || (mode == null))  {
                 this.printHelp();
             } else if (Mode_mxJPO.EXPORT == mode)  {
-                this.export(paramCache, paths, clazz2matches);
+                this.export(paramCache, clazz2matches);
             } else if (Mode_mxJPO.IMPORT == mode)  {
-                this.update(paramCache, paths, clazz2matches, versionInfo);
+                this.update(paramCache, clazz2matches, versionInfo);
             } else if (Mode_mxJPO.DELETE == mode)  {
-                this.delete(paramCache, paths, clazz2matches);
+                this.delete(paramCache, clazz2matches);
             }
 
         } catch (Exception e)  {
@@ -479,25 +503,24 @@ System.err.println("unknown pararameter "  + _args[idx]);
      * Exports matching administration objects to given path.
      *
      * @param _paramCache       parameter cache
-     * @param _paths            path where the administration objects are
-     *                          exported
      * @param _clazz2matches    classes and their matched to export
      * @throws Exception if none path or more than one path is defined or if
      *                   the export failed
      */
     protected void export(final ParameterCache_mxJPO _paramCache,
-                          final Set<String> _paths,
                           final Map<TypeDef_mxJPO,List<String>> _clazz2matches)
             throws Exception
     {
+        final Collection<String> paths = _paramCache.getValueList(PARAM_PATH);
+
         // check for definition of min. / max. one path
-        if (_paths.isEmpty())  {
+        if (paths.isEmpty())  {
             throw new Exception("no path is defined, but required for the export!");
         }
-        if (_paths.size() > 1)  {
+        if (paths.size() > 1)  {
             throw new Exception("more than one path is defined, but maximum is allowed for the export!");
         }
-        final String pathStr = _paths.iterator().next();
+        final String pathStr = paths.iterator().next();
 
         // evaluate all matching administration objects
         final Map<TypeDef_mxJPO,Set<String>> clazz2names = this.getMatching(_paramCache.getContext(), _clazz2matches);
@@ -520,13 +543,13 @@ System.out.println("export "+instance.getTypeDef().getLogging() + " '" + name + 
      * @param _clazz2matches
      */
     protected void update(final ParameterCache_mxJPO _paramCache,
-                          final Set<String> _paths,
                           final Map<TypeDef_mxJPO,List<String>> _clazz2matches,
                           final UpdateCheck_mxJPO _versionInfo)
             throws Exception
     {
         // get all matching files depending on the update classes
-        final Map<TypeDef_mxJPO,Map<File,String>> clazz2names = this.evalMatches(_paths, _clazz2matches);
+        final Map<TypeDef_mxJPO,Map<File,String>> clazz2names = this.evalMatches(_paramCache, _clazz2matches);
+
         // evaluate for existing administration objects
         final Collection<String> wildCardMatch = new HashSet<String>();
         wildCardMatch.add("*");
@@ -629,12 +652,11 @@ System.out.println("    - update");
 
 
     protected void delete(final ParameterCache_mxJPO _paramCache,
-                          final Set<String> _paths,
                           final Map<TypeDef_mxJPO,List<String>> _clazz2matches)
             throws Exception
     {
         // check for definition of min. / max. one path
-        if (_paths.isEmpty())  {
+        if (_paramCache.getValueList(PARAM_PATH).isEmpty())  {
             throw new Exception("no path is defined, but required for the delete!");
         }
 
@@ -644,7 +666,7 @@ System.out.println("    - update");
 
         // get all matching files depending on the update classes
         final Map<TypeDef_mxJPO,Map<File,String>> clazz2FileNames
-                = this.evalMatches(_paths, _clazz2matches);
+                = this.evalMatches(_paramCache, _clazz2matches);
 
         // and now loop throw the list of file names and compare to existing
         for (final Map.Entry<TypeDef_mxJPO,Set<String>> entry : clazz2MxNames.entrySet())  {
@@ -678,8 +700,8 @@ System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name 
      * Evaluates for matching files with the names depending on the update
      * classes.
      *
-     * @param _paths            paths to check (or empty if no path parameter
-     *                          is defined)
+     * @param _paramCache       parameter cache with paths to check (or no path
+     *                          parameter)
      * @param _clazz2matches    all classes with the depending matches (if
      *                          paths are defined, the names must match against
      *                          the Matrix name; otherwise the found files must
@@ -691,24 +713,32 @@ System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name 
      * @throws NoSuchMethodException
      * @throws IllegalArgumentException
      * @throws SecurityException
+     * @see #PARAM_IGNOREFILE
+     * @see #PARAM_IGNOREPATH
+     * @see #PARAM_PATH
      */
-    protected Map<TypeDef_mxJPO,Map<File,String>> evalMatches(final Set<String> _paths,
+    protected Map<TypeDef_mxJPO,Map<File,String>> evalMatches(final ParameterCache_mxJPO _paramCache,
                                                               final Map<TypeDef_mxJPO,List<String>> _clazz2matches)
             throws SecurityException, IllegalArgumentException, NoSuchMethodException,
                    InstantiationException, IllegalAccessException, InvocationTargetException
     {
         final Map<TypeDef_mxJPO,Map<File,String>> clazz2names = new HashMap<TypeDef_mxJPO,Map<File,String>>();
 
+        // get path parameters
+        final Collection<String> ignoreFiles = _paramCache.getValueList(PARAM_IGNOREFILE);
+        final Collection<String> ignorePaths = _paramCache.getValueList(PARAM_IGNOREPATH);
+        final Collection<String> paths = _paramCache.getValueList(PARAM_PATH);
+
         // if no path is defined, the paths are directly defined at the objects
         // to import
-        if (_paths.isEmpty())  {
+        if (paths.isEmpty())  {
             for (final Map.Entry<TypeDef_mxJPO,List<String>> entry : _clazz2matches.entrySet())  {
                 final Set<File> allFiles = new HashSet<File>();
 
                 for (final String pathStr : entry.getValue())  {
                     final File pathFile = new File(pathStr);
                     final String match = pathFile.getName();
-                    final Set<File> subPathFiles = getAllFiles(pathFile.getParentFile());
+                    final Set<File> subPathFiles = this.getAllFiles(pathFile.getParentFile(), ignorePaths, ignoreFiles);
                     for (final File file : subPathFiles)  {
                         if (match(file.getName(), match))  {
                             allFiles.add(file);
@@ -721,8 +751,8 @@ System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name 
         // path parameter is defined
         } else  {
             final Set<File> allFiles = new HashSet<File>();
-            for (final String path : _paths)  {
-                allFiles.addAll(getAllFiles(new File(path)));
+            for (final String path : paths)  {
+                allFiles.addAll(this.getAllFiles(new File(path), ignorePaths, ignoreFiles));
             }
             final Set<File> matchedFiles = new HashSet<File>();
             // get all matching files depending on the update classes
@@ -760,21 +790,44 @@ System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name 
     /**
      * Evaluates depending on given path all files in the sub directories.
      *
-     * @param _path     path for which the files are searched
+     * @param _path         path for which the files are searched
+     * @param _ignorePaths  match for ignored paths for which files are not
+     *                      returned
+     * @param _ignoreFiles  match for ignored files which are not returned
      * @return set of all found files
      * TODO performance improvement needed if for given path already all files
      *       are evaluated
      */
-    protected Set<File> getAllFiles(final File _path)
+    protected Set<File> getAllFiles(final File _path,
+                                    final Collection<String> _ignorePaths,
+                                    final Collection<String> _ignoreFiles)
     {
         final Set<File> ret = new HashSet<File>();
 
         if (_path.isDirectory())  {
             for (final File file : _path.listFiles())  {
                 if (file.isDirectory())  {
-                    ret.addAll(getAllFiles(file));
+                    boolean allowed = true;
+                    for (final String match : _ignorePaths)  {
+                        if (match(file.getName(), match))  {
+                            allowed = false;
+                            break;
+                        }
+                    }
+                    if (allowed)  {
+                        ret.addAll(getAllFiles(file, _ignorePaths, _ignoreFiles));
+                    }
                 } else  {
-                    ret.add(file);
+                    boolean allowed = true;
+                    for (final String match : _ignoreFiles)  {
+                        if (match(file.getName(), match))  {
+                            allowed = false;
+                            break;
+                        }
+                    }
+                    if (allowed)  {
+                        ret.add(file);
+                    }
                 }
             }
         }
@@ -783,7 +836,7 @@ System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name 
     }
 
     /**
-     * Evaluate all matching administration objects.
+     * Evaluate all matching administration objects within MX.
      *
      * @param _context          context for this request
      * @param _clazz2matches    map of classes and the depending list of string
