@@ -244,7 +244,7 @@ eval  {
     }
     mql mod type $asMapping(TypeDef.TriggerGroup.BusType) \
         description "Type used to group trigger definitions." \
-        icon [file join "${_sRoot}" "TriggerGroup.gif"] \
+        icon [file join "${_sRoot}" "icons" "datamodel" "TriggerGroup.gif"] \
         add property $asMapping(PropertyName.Application)   value "MxUpdate" \
         add property $asMapping(PropertyName.Author)        value "The MxUpdate Team" \
         add property $asMapping(PropertyName.Installer)     value "The MxUpdate Team" \
