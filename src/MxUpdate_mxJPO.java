@@ -731,7 +731,7 @@ System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name 
 
         // if no path is defined, the paths are directly defined at the objects
         // to import
-        if (paths.isEmpty())  {
+        if ((paths == null) || paths.isEmpty())  {
             for (final Map.Entry<TypeDef_mxJPO,List<String>> entry : _clazz2matches.entrySet())  {
                 final Set<File> allFiles = new HashSet<File>();
 
