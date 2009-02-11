@@ -245,8 +245,6 @@ public class MxUpdate_mxJPO
 
     /**
      *
-     * @param _shortParam       short parameter (or <code>null</code> if not
-     *                          defined)
      * @param _paramsList       to which parameter list must the parameter
      *                          appended
      * @param _clazz            class implementing the import / export (or
@@ -479,7 +477,7 @@ public class MxUpdate_mxJPO
                     versionInfo = this.paramsUpdateChecks.get(_args[idx]);
                 } else  {
                     unknown = true;
-System.err.println("unknown pararameter "  + _args[idx]);
+                    paramCache.logError("unknown pararameter "  + _args[idx]);
                 }
             }
 
@@ -531,7 +529,7 @@ System.err.println("unknown pararameter "  + _args[idx]);
             for (final String name : entry.getValue())  {
                 final AbstractObject_mxJPO instance = entry.getKey().newTypeInstance();
                 final File path = new File(pathStr + File.separator + instance.getPath());
-System.out.println("export "+instance.getTypeDef().getLogging() + " '" + name + "'");
+                _paramCache.logInfo("export "+instance.getTypeDef().getLogging() + " '" + name + "'");
                 instance.export(_paramCache, path, name);
             }
         }
@@ -787,7 +785,6 @@ System.out.println("export "+instance.getTypeDef().getLogging() + " '" + name + 
                 }
             }
         }
-System.out.println(""+clazz2names);
         return clazz2names;
     }
 
@@ -835,7 +832,6 @@ System.out.println(""+clazz2names);
                 }
             }
         }
-
         return ret;
     }
 
