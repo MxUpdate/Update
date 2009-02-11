@@ -29,8 +29,16 @@ import java.util.Stack;
  * @author tmoxter
  * @version $Id$
  */
-public class StringUtil_mxJPO
+public final class StringUtil_mxJPO
 {
+    /**
+     * The constructor is defined so that no instance of the string utility
+     * could be created.
+     */
+    private StringUtil_mxJPO()
+    {
+    }
+
     /**
      * Converts given string by escaping all special characters for TCL.
      *
@@ -63,6 +71,50 @@ public class StringUtil_mxJPO
                ? _text.replaceAll("\\\\", "\\\\\\\\")
                       .replaceAll("\\\"", "\\\\\"")
                : "";
+    }
+
+    /**
+     * Converts given MX name to a name which could be used within a file
+     * system. This must be done because some characters could not handled
+     * correctly from the file system.
+     * <ul>
+     * <li>a backslash is converted to &quot;@5C&quot;</li>
+     * <li>a slash is converted to &quot;@2F&quot;</li>
+     * <li>% is converted to &quot;@25&quot;</li>
+     * <li>@ is converted to &quot;@@&quot;</li>
+     * </ul>
+     *
+     * @param _name     MX name to convert
+     * @return converted file name
+     */
+    public static String convertToFileName(final String _name)
+    {
+        return _name.replaceAll("@", "@@")
+                    .replaceAll("%", "@25")
+                    .replaceAll("/", "@2F")
+                    .replaceAll("\\\\", "@5C");
+    }
+
+    /**
+     * Converts the given file name back to internal used names. This must be
+     * done because some characters could not handled correctly from the file
+     * system.
+     * <ul>
+     * <li>&quot;@5C&quot; is converted to a backslash</li>
+     * <li>&quot;@2F&quot; is converted to a slash</li>
+     * <li>&quot;@25&quot; is converted to %</li>
+     * <li>&quot;@@&quot; is converted to @</li>
+     * </ul>
+     *
+     * @param _fileName     name from file to convert
+     * @return converted name extracted from a file name
+     */
+    public static String convertFromFileName(final String _fileName)
+    {
+        return _fileName.replaceAll("@5C", "\\\\")
+                        .replaceAll("@2F", "/")
+                        .replaceAll("@25", "%")
+                        .replaceAll("@@", "@");
     }
 
     /**
@@ -107,16 +159,18 @@ public class StringUtil_mxJPO
      * <a href="http://commons.apache.org/io/xref/org/apache/commons/io/FilenameUtils.html">
      * org.apache.commons.io.FilenameUtils</a>.
      *
-     * @param filename
-     * @param wildcardMatcher
+     * @param _filename
+     * @param _wildcardMatcher
      * @return
      */
-    public static boolean match(String filename, String wildcardMatcher) {
+    public static boolean match(final String _filename,
+                                final String _wildcardMatcher)
+    {
 
-                     if (filename == null && wildcardMatcher == null) {
+                     if (_filename == null && _wildcardMatcher == null) {
                          return true;
                      }
-                     if (filename == null || wildcardMatcher == null) {
+                     if (_filename == null || _wildcardMatcher == null) {
                          return false;
                      }
     //                 if (caseSensitivity == null) {
@@ -124,7 +178,7 @@ public class StringUtil_mxJPO
     //                 }
     //                 filename = caseSensitivity.convertCase(filename);
     //                 wildcardMatcher = caseSensitivity.convertCase(wildcardMatcher);
-                     String[] wcs = splitOnTokens(wildcardMatcher);
+                     String[] wcs = splitOnTokens(_wildcardMatcher);
                      boolean anyChars = false;
                      int textIdx = 0;
                      int wcsIdx = 0;
@@ -151,25 +205,25 @@ public class StringUtil_mxJPO
                                  // set any chars status
                                  anyChars = true;
                                  if (wcsIdx == wcs.length - 1) {
-                                     textIdx = filename.length();
+                                     textIdx = _filename.length();
                                  }
 
                              } else {
                                  // matching text token
                                  if (anyChars) {
                                      // any chars then try to locate text token
-                                     textIdx = filename.indexOf(wcs[wcsIdx], textIdx);
+                                     textIdx = _filename.indexOf(wcs[wcsIdx], textIdx);
                                      if (textIdx == -1) {
                                          // token not found
                                          break;
                                      }
-                                     int repeat = filename.indexOf(wcs[wcsIdx], textIdx + 1);
+                                     int repeat = _filename.indexOf(wcs[wcsIdx], textIdx + 1);
                                      if (repeat >= 0) {
                                          backtrack.push(new int[] {wcsIdx, repeat});
                                      }
                                  } else {
                                      // matching from current position
-                                     if (!filename.startsWith(wcs[wcsIdx], textIdx)) {
+                                     if (!_filename.startsWith(wcs[wcsIdx], textIdx)) {
                                          // couldnt match token
                                          break;
                                      }
@@ -184,7 +238,7 @@ public class StringUtil_mxJPO
                          }
 
                          // full match
-                         if (wcsIdx == wcs.length && textIdx == filename.length()) {
+                         if (wcsIdx == wcs.length && textIdx == _filename.length()) {
                              return true;
                          }
 
@@ -201,40 +255,40 @@ public class StringUtil_mxJPO
      * org.apache.commons.io.FilenameUtils</a>.
      * Splits a string into a number of tokens.
      *
-     * @param text  the text to split
+     * @param _text  the text to split
      * @return the tokens, never null
      */
-    public static String[] splitOnTokens(String text) {
-         // used by wildcardMatch
-         // package level so a unit test may run on this
+    public static String[] splitOnTokens(final String _text)
+    {
+        final String[] ret;
 
-         if (text.indexOf("?") == -1 && text.indexOf("*") == -1) {
-             return new String[] { text };
-         }
-
-         char[] array = text.toCharArray();
-         ArrayList<String> list = new ArrayList<String>();
-         StringBuilder buffer = new StringBuilder();
-         for (int i = 0; i < array.length; i++) {
-             if (array[i] == '?' || array[i] == '*') {
-                 if (buffer.length() != 0) {
-                     list.add(buffer.toString());
-                     buffer.setLength(0);
+         if ((_text.indexOf("?") == -1) && (_text.indexOf("*") == -1))  {
+             ret = new String[] { _text };
+         } else  {
+             final char[] array = _text.toCharArray();
+             final ArrayList<String> list = new ArrayList<String>();
+             final StringBuilder buffer = new StringBuilder();
+             for (int i = 0; i < array.length; i++) {
+                 if ((array[i] == '?') || (array[i] == '*')) {
+                     if (!"".equals(buffer)) {
+                         list.add(buffer.toString());
+                         buffer.setLength(0);
+                     }
+                     if (array[i] == '?') {
+                         list.add("?");
+                     } else if (list.isEmpty() || ((i > 0) && !list.get(list.size() - 1).equals("*"))) {
+                         list.add("*");
+                     }
+                 } else  {
+                     buffer.append(array[i]);
                  }
-                 if (array[i] == '?') {
-                     list.add("?");
-                 } else if (list.size() == 0 ||
-                         (i > 0 && list.get(list.size() - 1).equals("*") == false)) {
-                     list.add("*");
-                 }
-             } else {
-                 buffer.append(array[i]);
              }
+             if (!"".equals(buffer))  {
+                 list.add(buffer.toString());
+             }
+             ret = list.toArray(new String[list.size()]);
          }
-         if (buffer.length() != 0) {
-             list.add(buffer.toString());
-         }
-         return list.toArray( new String[ list.size() ] );
+         return ret;
      }
 
 }

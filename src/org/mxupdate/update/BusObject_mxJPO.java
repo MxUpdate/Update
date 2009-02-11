@@ -51,6 +51,7 @@ import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.xml.sax.SAXException;
 
+import static org.mxupdate.update.util.StringUtil_mxJPO.convertFromFileName;
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
@@ -67,14 +68,14 @@ public class BusObject_mxJPO
     /**
      * Defines the serialize version unique identifier.
      */
-    private final static long serialVersionUID = -5381775541507933947L;
+    private static final long serialVersionUID = -5381775541507933947L;
 
     /**
      * Key used to store default attribute values within the parameter cache.
      *
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
-    private final static String PARAMCACHE_KEY_ATTRS = "DefaultAttributeValues";
+    private static final String PARAMCACHE_KEY_ATTRS = "DefaultAttributeValues";
 
     /**
      * String used to split the name and revision of administration business
@@ -244,8 +245,8 @@ public class BusObject_mxJPO
             final String fileName = file.getName();
             for (final String match : _matches)  {
                 if (((prefix == null) || fileName.startsWith(prefix)) && fileName.endsWith(suffix))  {
-                    final String name = fileName.substring(0, fileName.length() - suffixLength)
-                                                .substring(prefixLength);
+                    final String name = convertFromFileName(fileName.substring(0, fileName.length() - suffixLength)
+                                                                    .substring(prefixLength));
                     final String[] nameRev = name.split(SPLIT_NAME);
                     if (match(nameRev[0], match) || ((nameRev.length > 1) && match(nameRev[1], match)))  {
                         ret.put(file, name);
@@ -540,6 +541,7 @@ public class BusObject_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update executed within derived class failed
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,
@@ -615,21 +617,21 @@ public class BusObject_mxJPO
         // exists no installer property or installer property not equal?
         final String instVal = _tclVariables.get(AdminPropertyDef.INSTALLER.name());
        if ((this.getInstaller() == null) || !this.getInstaller().equals(instVal))  {
-System.out.println("    - define installer '" + instVal + "'");
+           _paramCache.logTrace("    - define installer '" + instVal + "'");
             postMQLCode.append(" \"").append(AdminPropertyDef.INSTALLER.getAttrName())
                     .append("\" \"").append(instVal).append('\"');
         }
         // exists no application property or application property not equal?
         final String applVal = _tclVariables.get(AdminPropertyDef.APPLICATION.name());
         if ((this.getApplication() == null) || !this.getApplication().equals(applVal))  {
-System.out.println("    - define application '" + applVal + "'");
+            _paramCache.logTrace("    - define application '" + applVal + "'");
             postMQLCode.append(" \"").append(AdminPropertyDef.APPLICATION.getAttrName())
                     .append("\" \"").append(applVal).append('\"');
         }
         // exists no author property or author property not equal?
         final String authVal = _tclVariables.get(AdminPropertyDef.AUTHOR.name());
         if ((this.getAuthor() == null) || !this.getAuthor().equals(authVal))  {
-System.out.println("    - define author '" + authVal + "'");
+            _paramCache.logTrace("    - define author '" + authVal + "'");
             postMQLCode.append(" \"").append(AdminPropertyDef.AUTHOR.getAttrName())
                     .append("\" \"").append(authVal).append('\"');
         }

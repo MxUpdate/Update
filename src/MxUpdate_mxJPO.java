@@ -570,7 +570,8 @@ System.out.println("export "+instance.getTypeDef().getLogging() + " '" + name + 
                     final Set<String> existings = existingNames.get(clazz);
                     if (!existings.contains(fileEntry.getValue()))  {
                          final AbstractObject_mxJPO instance = clazz.newTypeInstance();
-System.out.println("create "+instance.getTypeDef().getLogging() + " '" + fileEntry.getValue() + "'");
+                         _paramCache.logInfo("create "+instance.getTypeDef().getLogging()
+                                 + " '" + fileEntry.getValue() + "'");
                         instance.create(_paramCache.getContext(), fileEntry.getKey(), fileEntry.getValue());
                     }
                 }
@@ -582,7 +583,8 @@ System.out.println("create "+instance.getTypeDef().getLogging() + " '" + fileEnt
             if (clazzMap != null)  {
                 for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
                     final AbstractObject_mxJPO instance = clazz.newTypeInstance();
-System.out.println("check "+instance.getTypeDef().getLogging() + " '" + fileEntry.getValue() + "'");
+                    _paramCache.logInfo("check "+instance.getTypeDef().getLogging()
+                            + " '" + fileEntry.getValue() + "'");
 
                     final boolean update;
                     final String version = _paramCache.getValueBoolean(ParameterCache_mxJPO.KEY_FILEDATE2VERSION)
@@ -604,7 +606,7 @@ System.out.println("check "+instance.getTypeDef().getLogging() + " '" + fileEntr
                             update = false;
                         } else  {
                             update = true;
-System.out.println("    - update to version from " + fileDate);
+                            _paramCache.logDebug("    - update to version from " + fileDate);
                         }
                     } else if (_versionInfo == UpdateCheck_mxJPO.VERSION)  {
                         final String instVersion = instance.getPropValue(_paramCache.getContext(),
@@ -615,14 +617,14 @@ System.out.println("    - update to version from " + fileDate);
                         } else  {
                             update = true;
                             if (_paramCache.getValueBoolean(ParameterCache_mxJPO.KEY_FILEDATE2VERSION))  {
-                                System.out.println("    - update to version from " + new Date(fileEntry.getKey().lastModified()));
+                                _paramCache.logDebug("    - update to version from " + new Date(fileEntry.getKey().lastModified()));
                             } else  {
-                                System.out.println("    - update to version " + version);
+                                _paramCache.logDebug("    - update to version " + version);
                             }
                         }
                     } else  {
                         update = true;
-System.out.println("    - update");
+                        _paramCache.logDebug("    - update");
                     }
                     // execute update
                     if (update)  {
@@ -675,7 +677,7 @@ System.out.println("    - update");
             final Collection<String> fileNames = clazz2FileNames.get(entry.getKey()).values();
             for (final String name : entry.getValue())  {
                 if (!fileNames.contains(name))  {
-System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name + "'");
+                    _paramCache.logDebug("delete " + instance.getTypeDef().getLogging() + " '" + name + "'");
                     boolean commit = false;
                     final boolean transActive = _paramCache.getContext().isTransactionActive();
                     try  {
@@ -785,6 +787,7 @@ System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name 
                 }
             }
         }
+System.out.println(""+clazz2names);
         return clazz2names;
     }
 
@@ -816,7 +819,7 @@ System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name 
                         }
                     }
                     if (allowed)  {
-                        ret.addAll(getAllFiles(file, _ignorePaths, _ignoreFiles));
+                        ret.addAll(this.getAllFiles(file, _ignorePaths, _ignoreFiles));
                     }
                 } else  {
                     boolean allowed = true;

@@ -36,6 +36,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
+import static org.mxupdate.update.util.StringUtil_mxJPO.convertFromFileName;
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
@@ -155,8 +156,8 @@ public class Attribute_mxJPO
                 final String fileName = file.getName();
                 for (final String match : _matches)  {
                     if (fileName.startsWith(prefix) && fileName.endsWith(suffix))  {
-                        final String name = fileName.substring(0, fileName.length() - suffixLength)
-                                                    .substring(prefixLength);
+                        final String name = convertFromFileName(fileName.substring(0, fileName.length() - suffixLength)
+                                                                        .substring(prefixLength));
                         if (match(name, match))  {
                             ret.put(file, name);
                         }
@@ -190,7 +191,7 @@ public class Attribute_mxJPO
                 if (fileName.startsWith(prefix) && fileName.endsWith(suffix))  {
                     final String name = fileName.substring(0, fileName.length() - suffixLength)
                                                 .substring(prefixLength);
-                    ret.put(file, name);
+                    ret.put(file, convertFromFileName(name));
                 }
             }
         }

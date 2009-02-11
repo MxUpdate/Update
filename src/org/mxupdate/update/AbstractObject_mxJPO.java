@@ -41,6 +41,8 @@ import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.xml.sax.SAXException;
 
+import static org.mxupdate.update.util.StringUtil_mxJPO.convertFromFileName;
+import static org.mxupdate.update.util.StringUtil_mxJPO.convertToFileName;
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
@@ -205,7 +207,7 @@ public abstract class AbstractObject_mxJPO
             throws MatrixException, SAXException, IOException
     {
         this.parse(_paramCache, _name);
-        final File file = new File(_path, this.getFileName());
+        final File file = new File(_path, convertToFileName(this.getFileName()));
         if (!file.getParentFile().exists())  {
             file.getParentFile().mkdirs();
         }
@@ -258,8 +260,8 @@ public abstract class AbstractObject_mxJPO
             final String fileName = file.getName();
             for (final String match : _matches)  {
                 if (((prefix == null) || fileName.startsWith(prefix)) && ((suffix == null) || fileName.endsWith(suffix)))  {
-                    final String name = fileName.substring(0, fileName.length() - suffixLength)
-                                                .substring(prefixLength);
+                    final String name = convertFromFileName(fileName.substring(0, fileName.length() - suffixLength)
+                                                                    .substring(prefixLength));
                     if (match(name, match))  {
                         ret.put(file, name);
                     }
@@ -292,7 +294,7 @@ public abstract class AbstractObject_mxJPO
                     && ((prefix == null) || fileName.endsWith(suffix)))  {
                 final String name = fileName.substring(0, fileName.length() - suffixLength)
                                             .substring(prefixLength);
-                ret.put(file, name);
+                ret.put(file, convertFromFileName(name));
             }
         }
         return ret;
@@ -372,7 +374,7 @@ public abstract class AbstractObject_mxJPO
      * @param _name         name of administration object
      * @param _prop         property for which the value is searched
      * @return value for given property
-     * @throws MatrixException
+     * @throws MatrixException if the property value could not be extracted
      */
     public String getPropValue(final Context _context,
                                final String _name,
@@ -461,7 +463,8 @@ public abstract class AbstractObject_mxJPO
     /**
      * Setter method for instance variable {@link #application}.
      *
-     * @param _author new value for instance variable {@link #application}
+     * @param _application      new value for instance variable
+     *                          {@link #application}
      * @see #application
      */
     protected void setApplication(final String _application)
@@ -503,7 +506,8 @@ public abstract class AbstractObject_mxJPO
     /**
      * Setter method for instance variable {@link #installationDate}.
      *
-     * @param _author new value for instance variable {@link #installationDate}
+     * @param _installationDate     new value for instance variable
+     *                              {@link #installationDate}
      * @see #installationDate
      */
     protected void setInstallationDate(final String _installationDate)
