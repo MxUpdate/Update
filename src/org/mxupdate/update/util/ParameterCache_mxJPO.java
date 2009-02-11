@@ -101,6 +101,8 @@ public class ParameterCache_mxJPO
      *
      * @see #ParameterCache_mxJPO(Context,Collection)
      * @see #evalParameter(ParameterDef_mxJPO, String[], int)
+     * @see #getValueBoolean(String)
+     * @see #defineValueBoolean(String, Boolean)
      */
     final Map<String,Boolean> mapBoolean;
 
@@ -299,6 +301,19 @@ public class ParameterCache_mxJPO
     public Boolean getValueBoolean(final String _key)
     {
         return this.mapBoolean.get(_key);
+    }
+
+    /**
+     * Defines for given key a related value.
+     *
+     * @param _key      key of the boolean value to define
+     * @param _value    related value
+     * @see #mapBoolean
+     */
+    public void defineValueBoolean(final String _key,
+                                   final Boolean _value)
+    {
+        this.mapBoolean.put(_key, _value);
     }
 
     /**

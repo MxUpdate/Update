@@ -51,12 +51,31 @@ public class JPO_mxJPO
     private static final long serialVersionUID = -4933461290880123088L;
 
     /**
+     * The variable is used to evaluate if MX doubles backslashes (done from
+     * old MX versions). The name of the variable and the variable definition
+     * must not be changed or formatted in another way. Otherwise the test for
+     * doubled backslashes fails....
+     *
+     * @see #write(ParameterCache_mxJPO, Writer)
+     */
+    @SuppressWarnings("unused")
+    private static final String JPO_REPLACE_TEST = "\\";
+
+    /**
      * String with name suffix (used also from the extract routine from
      * Matrix).
      *
      * @see #export(Context, File, String)
      */
     private static final String NAME_SUFFIX = "_" + "mxJPO";
+
+    /**
+     * Defines the parameter to cache the information if the backslashes within
+     * MX are doubled (old MX versions) or not (new MX versions).
+     *
+     * @see #write(ParameterCache_mxJPO, Writer)
+     */
+    private static final String PARAM_BACKSLASHDOUBLED = "JPOBackslashDoubled";
 
     /**
      * Defines the parameter to define the string where the TCL update code
@@ -165,16 +184,36 @@ public class JPO_mxJPO
                 .append(";\n");
         }
 
+        // old MX style or new? (means backslashes are doubled...)
+        final Boolean backslashDoubledVal = _paramCache.getValueBoolean(PARAM_BACKSLASHDOUBLED);
+        final boolean backslashDoubled;
+        if (backslashDoubledVal == null)  {
+            final String code = execMql(_paramCache.getContext(),
+                                        "print prog org.mxupdate.update.program.JPO select code dump");
+            final int start = code.indexOf("JPO_REPLACE_TEST");
+            final int end = code.indexOf('\n', start);
+            backslashDoubled = code.substring(start + 20, end - 2).length() == 4;
+            _paramCache.defineValueBoolean(PARAM_BACKSLASHDOUBLED, backslashDoubled);
+        } else  {
+            backslashDoubled = backslashDoubledVal;
+        }
+
         // replace class names and references to other JPOs
         final String name = this.getName() + NAME_SUFFIX;
         final StringBuilder cmd = new StringBuilder()
                 .append("print program \"").append(this.getName()).append("\" select code dump");
-        _out.append(execMql(_paramCache.getContext(), cmd)
-                               .replaceAll("\\" + "$\\{CLASSNAME\\}", name.replaceAll(".*\\.", ""))
-                               .replaceAll("\\\\\\\\", "\\\\")
-                               .replaceAll("(?<=\\"+ "$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", NAME_SUFFIX)
-                               .replaceAll("\\" + "$\\{CLASS\\:", "")
-                               .trim());
+        final String code = execMql(_paramCache.getContext(), cmd)
+                                .replaceAll("\\" + "$\\{CLASSNAME\\}", name.replaceAll(".*\\.", ""))
+                                .replaceAll("(?<=\\"+ "$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", NAME_SUFFIX)
+                                .replaceAll("\\" + "$\\{CLASS\\:", "")
+                                .trim();
+
+        // for old MX all backslashes are doubled...
+        if (backslashDoubled)  {
+            _out.append(code.replaceAll("\\\\\\\\", "\\\\"));
+        } else  {
+            _out.append(code);
+        }
     }
 
     /**
