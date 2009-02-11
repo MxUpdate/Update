@@ -152,8 +152,8 @@ public abstract class AbstractPropertyObject_mxJPO
      *
      * @param _paramCache   parameter cache
      * @param _out          writer instance
-     * @throws IOException
-     * @todo evaluate already defined symbolic names if exists
+     * @throws IOException if the header could not be written to the TCL update
+     *                     file
      * @see #HEADER_APPLICATION
      * @see #HEADER_AUTHOR
      * @see #HEADER_INSTALLER
@@ -181,9 +181,28 @@ public abstract class AbstractPropertyObject_mxJPO
             .append("# ").append(getName()).append("\n");
         // symbolic name only if an administration type is defined
         if (this.getTypeDef().getMxAdminName() != null)  {
-            _out.append('#').append(HEADER_SYMBOLIC_NAME)
-// TODO: use stored symbolic name!
-.append(' ').append(this.getTypeDef().getMxAdminName()).append("_").append(this.getName()).append("\n");
+            _out.append('#').append(HEADER_SYMBOLIC_NAME).append(' ');
+            if (this.getSymblicNames().isEmpty())  {
+                final StringBuilder symbName = new StringBuilder()
+                        .append(this.getTypeDef().getMxAdminName())
+                        .append("_").append(this.getName().replaceAll(" ", ""));
+                _paramCache.logWarning("    - No symbolic name defined for '" + this.getName()
+                        + "'! Symbolic name '" + symbName + "' will be used!");
+                _out.append(symbName);
+            } else if (this.getSymblicNames().size() > 1)  {
+                final String symbName = this.getSymblicNames().iterator().next();
+                _paramCache.logError("    - Found " + this.getSymblicNames().size()
+                        + " symbolic names! Only one is allowed! '"
+                        + symbName + "' will be used!");
+                _paramCache.logTrace("    - Following symbolic names found:");
+                for (final String origSymb : this.getSymblicNames())  {
+                    _paramCache.logTrace("      * '" + origSymb + "'");
+                }
+                _out.append(symbName);
+            } else  {
+                _out.append(this.getSymblicNames().iterator().next());
+            }
+            _out.append('\n');
         }
         // original name
         // (only if an administration type and related parameter is defined)
@@ -269,9 +288,10 @@ public abstract class AbstractPropertyObject_mxJPO
      * @param _newVersion       new version which must be set within the update
      *                          (or <code>null</code> if the version must not
      *                          be set).
+     * @throws Exception if the update from the derived class failed
      * @see #update(Context, CharSequence, CharSequence, Map)
      * @see #extractFromCode(StringBuilder, String, String)
-     * @see #defineSymbolicName(Map, StringBuilder)
+     * @see #extractSymbolicNameFromCode(ParameterCache_mxJPO,StringBuilder)
      * @see #HEADER_APPLICATION
      * @see #HEADER_AUTHOR
      * @see #HEADER_INSTALLER
@@ -295,9 +315,7 @@ public abstract class AbstractPropertyObject_mxJPO
         final Map<String,String> tclVariables = new HashMap<String,String>();
         if (_newVersion == null)  {
             tclVariables.put(AdminPropertyDef.VERSION.name(),
-                              this.extractFromCode(code,
-                                                   HEADER_VERSION,
-                                                   ""));
+                              this.extractFromCode(code, HEADER_VERSION, ""));
         } else  {
             tclVariables.put(AdminPropertyDef.VERSION.name(), _newVersion);
         }
@@ -337,7 +355,7 @@ public abstract class AbstractPropertyObject_mxJPO
 
         if (this.getTypeDef().getMxAdminName() != null)  {
             // define symbolic name
-            tclVariables.put("SYMBOLICNAME", this.extractSymbolicNameFromCode(code));
+            tclVariables.put("SYMBOLICNAME", this.extractSymbolicNameFromCode(_paramCache, code));
 
             // define original name
             final String origName;
@@ -365,6 +383,7 @@ public abstract class AbstractPropertyObject_mxJPO
      * @param _code             TCL update source code
      * @param _headerText       text used to identify the value
      * @param _default          default value if not defined within header
+     * @return extracted string from source code
      */
     protected String extractFromCode(final StringBuilder _code,
                                      final String _headerText,
@@ -393,26 +412,30 @@ public abstract class AbstractPropertyObject_mxJPO
 
     /**
      *
-     * @param _tclVariables     map with TCL variables
-     * @param _code             TCL update source code
+     * @param _paramCache   parameter cache
+     * @param _code         TCL update source code
+     * @return extracted symbolic name from the source code header
      */
-    protected String extractSymbolicNameFromCode(final StringBuilder _code)
+    protected String extractSymbolicNameFromCode(final ParameterCache_mxJPO _paramCache,
+                                                 final StringBuilder _code)
     {
         String codeSymbName = null;
 
         if (this.getTypeDef().getMxAdminName() != null)  {
-            String symbName = new StringBuilder().append(this.getTypeDef().getMxAdminName())
+            final String symbName = new StringBuilder().append(this.getTypeDef().getMxAdminName())
                                     .append("_").append(this.getName().replaceAll(" ", ""))
                                     .toString();
             codeSymbName = this.extractFromCode(_code, HEADER_SYMBOLIC_NAME, null);
             if (codeSymbName == null)  {
-System.out.println("ERROR! No symbolic name defined! So '" + symbName + "' will be used.");
+                _paramCache.logError("No symbolic name defined! So '" + symbName + "' will be used.");
                 codeSymbName = symbName;
             } else if (!codeSymbName.startsWith(this.getTypeDef().getMxAdminName()))  {
-System.out.println("ERROR! Symbolic name does not start correctly! So '" + symbName + "' will be used (instead of '" + codeSymbName + "').");
+                _paramCache.logError("Symbolic name does not start correctly! So '"
+                        + symbName + "' will be used (instead of '" + codeSymbName + "').");
                 codeSymbName = symbName;
             } else if (!codeSymbName.equals(symbName))  {
-System.out.println("WARNING! Symbolic name '" + symbName + "' should be used! But defined is '" + codeSymbName + "'.");
+                _paramCache.logWarning("Symbolic name '" + symbName
+                        + "' should be used! But defined is '" + codeSymbName + "'.");
             }
         }
 

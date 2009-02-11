@@ -78,11 +78,6 @@ public abstract class AbstractAdminObject_mxJPO
     final Map<String,Property> propertiesMap = new TreeMap<String,Property>();
 
     /**
-     *
-     */
-    private final Set<String> symbolicNames = new TreeSet<String>();
-
-    /**
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
@@ -257,7 +252,7 @@ public abstract class AbstractAdminObject_mxJPO
                     .append(this.getTypeDef().getMxAdminSuffix());
         for (final String symbName : execMql(_context, cmd).split("\n"))  {
             if (!"".equals(symbName))  {
-                this.symbolicNames.add(symbName.substring(0, symbName.indexOf(" on program eServiceSchemaVariableMapping.tcl ")));
+                this.getSymblicNames().add(symbName.substring(0, symbName.indexOf(" on program eServiceSchemaVariableMapping.tcl ")));
             }
         }
     }
@@ -351,6 +346,7 @@ public abstract class AbstractAdminObject_mxJPO
      * @param _file             file for which the administration object must
      *                          be created (not used)
      * @param _name             name of administration object to create
+     * @throws Exception if the new administration object could not be created
      */
     @Override
     public void create(final Context _context,
@@ -397,6 +393,7 @@ public abstract class AbstractAdminObject_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update from the derived class failed
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,
@@ -478,7 +475,7 @@ public abstract class AbstractAdminObject_mxJPO
 
         // check symbolic names
         final String symbName = _tclVariables.get("SYMBOLICNAME");
-        if (!this.symbolicNames.contains(symbName))  {
+        if (!this.getSymblicNames().contains(symbName))  {
             _paramCache.logTrace("    - register symbolic name '" + symbName + "'");
             postMQLCode.append("add property \"").append(symbName).append("\" ")
                     .append(" on program eServiceSchemaVariableMapping.tcl to ")
@@ -487,7 +484,7 @@ public abstract class AbstractAdminObject_mxJPO
                     .append(this.getTypeDef().getMxAdminSuffix())
                     .append(";\n");
         }
-        for (final String exSymbName : this.symbolicNames)  {
+        for (final String exSymbName : this.getSymblicNames())  {
             if (!symbName.equals(exSymbName))  {
                 _paramCache.logTrace("    - remove symbolic name '" + exSymbName + "'");
                 postMQLCode.append("delete property \"").append(exSymbName).append("\" ")

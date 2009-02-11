@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import matrix.db.Context;
 import matrix.util.MatrixException;
@@ -76,7 +77,7 @@ public abstract class AbstractObject_mxJPO
     private final TypeDef_mxJPO typeDef;
 
     /**
-     * Name of the matrix administration object.
+     * Name of the MX administration object.
      *
      * @see #setName(String)
      * @see #getName()
@@ -84,7 +85,7 @@ public abstract class AbstractObject_mxJPO
     private String name = null;
 
     /**
-     * Author of the matrix administration object.
+     * Author of the MX administration object.
      *
      * @see #setAuthor(String)
      * @see #getAuthor()
@@ -92,7 +93,7 @@ public abstract class AbstractObject_mxJPO
     private String author;
 
     /**
-     * Application of the matrix administration object.
+     * Application of the MX administration object.
      *
      * @see #setApplication(String)
      * @see #getApplication()
@@ -100,7 +101,7 @@ public abstract class AbstractObject_mxJPO
     private String application;
 
     /**
-     * Description of the matrix administration object.
+     * Description of the MX administration object.
      *
      * @see #setDescription(String)
      * @see #getDescription()
@@ -108,7 +109,7 @@ public abstract class AbstractObject_mxJPO
     private String description = "";
 
     /**
-     * Installation date of the matrix administration object.
+     * Installation date of the MX administration object.
      *
      * @see #setInstallationDate(String)
      * @see #getInstallationDate()
@@ -116,7 +117,7 @@ public abstract class AbstractObject_mxJPO
     private String installationDate;
 
     /**
-     * Installer of the matrix administration object.
+     * Installer of the MX administration object.
      *
      * @see #setInstaller(String)
      * @see #getInstaller()
@@ -124,12 +125,18 @@ public abstract class AbstractObject_mxJPO
     private String installer;
 
     /**
-     * Original name of the matrix administration object.
+     * Original name of the MX administration object.
      *
      * @see #setOriginalName(String)
      * @see #getOriginalName()
      */
     private String originalName;
+
+    /**
+     * All current defined symbolic names for MX administration objects (not
+     * for business administration objects!) are stored.
+     */
+    private final Set<String> symbolicNames = new TreeSet<String>();
 
     /**
      * Initialize the type definition enumeration.
@@ -518,7 +525,7 @@ public abstract class AbstractObject_mxJPO
     /**
      * Setter method for instance variable {@link #installer}.
      *
-     * @param _author new value for instance variable {@link #installer}
+     * @param _installer new value for instance variable {@link #installer}
      * @see #installer
      */
     protected void setInstaller(final String _installer)
@@ -549,7 +556,7 @@ public abstract class AbstractObject_mxJPO
 
     /**
      * Returns the version string of this administration (business) object. The
-     * method is the getter method for {@see #version).
+     * method is the getter method for {@link #version).
      *
      * @return version string
      * @see #version
@@ -557,6 +564,19 @@ public abstract class AbstractObject_mxJPO
     protected String getVersion()
     {
         return this.version;
+    }
+
+    /**
+     * Returns the set of all defined symbolic names of this administration
+     * (not business!) object. The method is the getter method for
+     * {@link #symbolicNames}.
+     *
+     * @return all defined symbolic names
+     * @see #symbolicNames
+     */
+    protected Set<String> getSymblicNames()
+    {
+        return this.symbolicNames;
     }
 
     /**
