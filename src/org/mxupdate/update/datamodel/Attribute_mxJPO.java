@@ -41,11 +41,11 @@ import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
+ * The class is used to evaluate information from attributes within MX used to
+ * export, delete and update an attribute.
  *
  * @author Tim Moxter
  * @version $Id$
- * @todo description
- * @todo program ranges
  */
 public class Attribute_mxJPO
         extends AbstractDMWithTriggers_mxJPO
@@ -56,9 +56,16 @@ public class Attribute_mxJPO
     private static final long serialVersionUID = -502565364090887306L;
 
     /**
+     * List of all possible prefixes.
+     *
+     * @todo not hardcoded, must be defined within mapping.properties
+     */
+    private static final String[] PREFIXES = {"BOOLEAN_", "DATE_", "INTEGER_", "REAL_", "STRING_"};
+
+    /**
      * Set holding all rules referencing this attribute.
      */
-    final Set<String> rules = new TreeSet<String>();
+    private final  Set<String> rules = new TreeSet<String>();
 
     /**
      * Stores the ranges of the attribute (used while parsing the XML
@@ -66,7 +73,27 @@ public class Attribute_mxJPO
      *
      * @see #parse(String, String)
      */
-    final Stack<Range> ranges = new Stack<Range>();
+    private final Stack<Range> ranges = new Stack<Range>();
+
+    /**
+     * If the range is a program the value references a program. Only one range
+     * program could be defined at maximum! So the range program is defined as
+     * variable directly on the attribute and not as range.
+     *
+     * @see #parse(String, String)
+     * @see #rangeProgramInputArguments
+     * @see Range#write(Appendable)
+     */
+    private String rangeProgramRef;
+
+    /**
+     * If the range is a program the value are the input arguments.
+     *
+     * @see #parse(String, String)
+     * @see #rangeProgramRef
+     * @see Range#write(Appendable)
+     */
+    private String rangeProgramInputArguments;
 
     /**
      * All ranges but sorted after they are prepared.
@@ -74,7 +101,7 @@ public class Attribute_mxJPO
      * @see #ranges
      * @see #prepare(Context)   sort the ranges
      */
-    final Set<Range> rangesSorted = new TreeSet<Range>();
+    private final Set<Range> rangesSorted = new TreeSet<Range>();
 
     /**
      * Stores the attribute type of this attribute.
@@ -90,8 +117,6 @@ public class Attribute_mxJPO
      * The attribute is a multi line attribute.
      */
     private boolean multiline = false;
-
-    private final String[] PREFIXES = {"BOOLEAN_", "DATE_", "INTEGER_", "REAL_", "STRING_"};
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -187,10 +212,21 @@ public class Attribute_mxJPO
     @Override
     public String getFileName()
     {
-        return this.type.toUpperCase().replaceAll("TIME$", "") + "_" + getName() + ".tcl";
+        return this.type.toUpperCase().replaceAll("TIME$", "") + "_" + this.getName() + ".tcl";
     }
 
     /**
+     * The method parses the attribute specific XML urls. This includes
+     * information about:
+     * <ul>
+     * <li>assigned rules (see {@link #rules})</li>
+     * <li>default value (see {@link #defaultValue})</li>
+     * <li>is the attribute multiline (see {@link #multiline})</li>
+     * <li>attribute type (see {@link #type})</li>
+     * <li>defined ranges (see {@link #ranges}, {@link #rangeProgramRef} and
+     *     {@link #rangeProgramInputArguments}</li>
+     * </ul>
+     *
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
      */
@@ -198,6 +234,7 @@ public class Attribute_mxJPO
     protected void parse(final String _url,
                          final String _content)
     {
+
         if ("/accessRuleRef".equals(_url))  {
             this.rules.add(_content);
         } else if ("/defaultValue".equals(_url))  {
@@ -222,15 +259,23 @@ public class Attribute_mxJPO
         } else if ("/rangeList/range/includingSecondValue".equals(_url))  {
             this.ranges.peek().include2 = true;
 
+        } else if ("/rangeProgram".equals(_url))  {
+            // to be ignored ...
+        } else if ("/rangeProgram/programRef".equals(_url))  {
+            this.rangeProgramRef = _content;
+        } else if ("/rangeProgram/inputArguments".equals(_url))  {
+            this.rangeProgramInputArguments = _content;
+
         } else  {
             super.parse(_url, _content);
         }
     }
 
     /**
-     * The ranges are sorted.
+     * The ranges in {@link #ranges} are sorted into {@link #rangesSorted}.
      *
      * @param _context   context for this request
+     * @throws MatrixException if the prepare from the derived class failed
      */
     @Override
     protected void prepare(final Context _context)
@@ -247,12 +292,14 @@ public class Attribute_mxJPO
      * writer instance.
      *
      * @param _out      writer instance
+     * @throws IOException if the TCL update code could not be written to the
+     *                     writer instance
      */
     @Override
     protected void writeObject(final Writer _out)
             throws IOException
     {
-        _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden");
+        _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden");
         if ("string".equalsIgnoreCase(this.type))  {
             _out.append(" \\\n    ").append(this.multiline ? "" : "!").append("multiline");
         }
@@ -282,6 +329,8 @@ public class Attribute_mxJPO
      *                          (needed to define the attribute
      *                          type)
      * @param _name             name of attribute to create
+     * @throws Exception if the new attribute for given type could not be
+     *                   created
      */
     @Override
     public void create(final Context _context,
@@ -298,7 +347,7 @@ public class Attribute_mxJPO
 
     /**
      * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this attribute:
+     * in the <code>_preMQLCode</code> to reset this attribute. This includes:
      * <ul>
      * <li>set to not hidden</li>
      * <li>reset description and default value</li>
@@ -317,6 +366,8 @@ public class Attribute_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update of the derived class failed
+     * @see Range#remove4Update(Appendable)
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,
@@ -330,17 +381,15 @@ public class Attribute_mxJPO
         // remove all properties
         final StringBuilder preMQLCode = new StringBuilder()
                 .append("mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(getName()).append('\"')
+                .append(" \"").append(this.getName()).append('\"')
                 .append(" !hidden description \"\" default \"\"");
         // remove rules
         for (final String rule : this.rules)  {
             preMQLCode.append(" remove rule \"").append(rule).append('\"');
         }
         // remove ranges
-//TODO: between? program?
         for (final Range range : this.rangesSorted)  {
-            preMQLCode.append(" remove range ").append(range.type)
-                      .append(" \"").append(range.value1).append("\"");
+            range.remove4Update(preMQLCode);
         }
 
         // append already existing pre MQL code
@@ -407,45 +456,97 @@ public class Attribute_mxJPO
          * <li>&quot;notmatch&quot; to &quot;!match&quot;</li>
          * <li>&quot;notsmatch&quot; to &quot;!smatch&quot;</li>
          * </ul>
+         * If the range type is a program, the name of the program and the
+         * input arguments are defined directly on the attribute in
+         * {@link Attribute_mxJPO#rangeProgramRef} and
+         * {@link Attribute_mxJPO#rangeProgramInputArguments}.
          *
          * @param _out  writer instance
          * @throws IOException if write to the writer instance is not possible
          */
-        private void write(final Writer _out)
+        private void write(final Appendable _out)
                 throws IOException
         {
             _out.append(" \\\n    add range ");
-            if ("equal".equals(this.type))  {
-                _out.append('=');
-            } else if ("greaterthan".equals(this.type))  {
-                _out.append(">");
-            } else if ("greaterthanequal".equals(this.type))  {
-                _out.append(">=");
-            } else if ("lessthan".equals(this.type))  {
-                _out.append("<");
-            } else if ("lessthanequal".equals(this.type))  {
-                _out.append("<=");
-            } else if ("notequal".equals(this.type))  {
-                _out.append("!=");
-            } else if ("notmatch".equals(this.type))  {
-                _out.append("!match");
-            } else if ("notsmatch".equals(this.type))  {
-                _out.append("!smatch");
-            } else  {
-                _out.append(this.type);
-            }
-            _out.append(" \"").append(convertTcl(this.value1)).append("\"");
-            if ("between".equals(this.type))  {
-                if (this.include1)  {
-                    _out.append(" inclusive");
-                } else  {
-                    _out.append(" exclusive");
+            // if the range is a program it is a 'global' attribute info
+            if ("programRange".equals(this.type))  {
+                _out.append("program \"")
+                    .append(convertTcl(Attribute_mxJPO.this.rangeProgramRef))
+                    .append('\"');
+                if (Attribute_mxJPO.this.rangeProgramInputArguments != null)  {
+                    _out.append(" input \"")
+                        .append(convertTcl(Attribute_mxJPO.this.rangeProgramInputArguments))
+                        .append('\"');
                 }
-                _out.append(" \"").append(convertTcl(this.value2)).append("\"");
-                if (this.include2)  {
-                    _out.append(" inclusive");
+            } else  {
+                if ("equal".equals(this.type))  {
+                    _out.append('=');
+                } else if ("greaterthan".equals(this.type))  {
+                    _out.append(">");
+                } else if ("greaterthanequal".equals(this.type))  {
+                    _out.append(">=");
+                } else if ("lessthan".equals(this.type))  {
+                    _out.append("<");
+                } else if ("lessthanequal".equals(this.type))  {
+                    _out.append("<=");
+                } else if ("notequal".equals(this.type))  {
+                    _out.append("!=");
+                } else if ("notmatch".equals(this.type))  {
+                    _out.append("!match");
+                } else if ("notsmatch".equals(this.type))  {
+                    _out.append("!smatch");
                 } else  {
-                    _out.append(" exclusive");
+                    _out.append(this.type);
+                }
+                _out.append(" \"").append(convertTcl(this.value1)).append("\"");
+                if ("between".equals(this.type))  {
+                    if (this.include1)  {
+                        _out.append(" inclusive");
+                    } else  {
+                        _out.append(" exclusive");
+                    }
+                    _out.append(" \"").append(convertTcl(this.value2)).append("\"");
+                    if (this.include2)  {
+                        _out.append(" inclusive");
+                    } else  {
+                        _out.append(" exclusive");
+                    }
+                }
+            }
+        }
+
+        /**
+         * Appends the MQL code to remove this range depending on the type of
+         * range in {@link #type}. If it is a program the related name of
+         * program is defined as attribute variable in
+         * {@link Attribute_mxJPO#rangeProgramRef}.
+         *
+         * @param _out      appendable instance where the MQL code is appended
+         *                  to remove this range
+         * @throws IOException if the MQL code could not appended
+         */
+        private void remove4Update(final Appendable _out)
+                throws IOException
+        {
+            _out.append(" remove range ");
+
+            if ("programRange".equals(this.type))  {
+                _out.append("program \"").append(Attribute_mxJPO.this.rangeProgramRef).append('\"');
+            } else  {
+                _out.append(this.type)
+                    .append(" \"").append(this.value1).append('\"');
+                if ("between".equals(this.type))  {
+                    if (this.include1)  {
+                        _out.append(" inclusive");
+                    } else  {
+                        _out.append(" exclusive");
+                    }
+                    _out.append(" \"").append(this.value2).append("\"");
+                    if (this.include2)  {
+                        _out.append(" inclusive");
+                    } else  {
+                        _out.append(" exclusive");
+                    }
                 }
             }
         }
@@ -466,6 +567,8 @@ public class Attribute_mxJPO
          *
          * @param _range        range instance to which this instance must be
          *                      compared to
+         * @return &quot;0&quot; if both ranges are equal; &quot;1&quot; if
+         *         greater; otherwise &quot;-1&quot;
          */
         public int compareTo(final Range _range)
         {
