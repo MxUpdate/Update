@@ -355,6 +355,56 @@ public class ParameterCache_mxJPO
     }
 
     /**
+     * Logging in error level.
+     *
+     * @param _text     error text
+     */
+    public void logError(final String _text)
+    {
+        System.out.println(_text);
+    }
+
+    /**
+     * Logging in warning level.
+     *
+     * @param _text     warning text
+     */
+    public void logWarning(final String _text)
+    {
+        System.out.println(_text);
+    }
+
+    /**
+     * Logging in level information.
+     *
+     * @param _text     info text
+     */
+    public void logInfo(final String _text)
+    {
+        System.out.println(_text);
+    }
+
+    /**
+     * Logging in debug level.
+     *
+     * @param _text     trace text
+     */
+    public void logDebug(final String _text)
+    {
+        System.out.println(_text);
+    }
+
+    /**
+     * Logging in trace level.
+     *
+     * @param _text     trace text
+     */
+    public void logTrace(final String _text)
+    {
+        System.out.println(_text);
+    }
+
+    /**
      * Returns the string representation of the parameter cache. The string
      * representation includes all boolean values, list values and string
      * values.
