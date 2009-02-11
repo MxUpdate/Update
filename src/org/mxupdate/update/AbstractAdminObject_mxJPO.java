@@ -169,9 +169,9 @@ public abstract class AbstractAdminObject_mxJPO
         } else if ("/adminProperties/modificationInfo/datetime".equals(_url))  {
             // to be ignored ...
         } else if ("/adminProperties/name".equals(_url))  {
-            setName(_content);
+            this.setName(_content);
         } else if ("/adminProperties/description".equals(_url))  {
-            setDescription(_content);
+            this.setDescription(_content);
         } else if ("/adminProperties/hidden".equals(_url))  {
             this.hidden = true;
 
@@ -257,7 +257,7 @@ public abstract class AbstractAdminObject_mxJPO
                     .append(this.getTypeDef().getMxAdminSuffix());
         for (final String symbName : execMql(_context, cmd).split("\n"))  {
             if (!"".equals(symbName))  {
-                this.symbolicNames.add(symbName.substring(0, symbName.indexOf(' ')));
+                this.symbolicNames.add(symbName.substring(0, symbName.indexOf(" on program eServiceSchemaVariableMapping.tcl ")));
             }
         }
     }
@@ -442,35 +442,35 @@ public abstract class AbstractAdminObject_mxJPO
         if ((this.getInstallationDate() == null) || "".equals(this.getInstallationDate()))  {
             final DateFormat format = new SimpleDateFormat(_paramCache.getValueString(ParameterCache_mxJPO.KEY_INSTALLEDDATEFORMAT));
             final String date = format.format(new Date());
-System.out.println("    - define installed date '" + date + "'");
+            _paramCache.logTrace("    - define installed date '" + date + "'");
             postMQLCode.append(" add property \"").append(AdminPropertyDef.INSTALLEDDATE.getPropName()).append("\" ")
                     .append("value \"").append(date).append('\"');
         }
         // exists no installer property or installer property not equal?
         final String instVal = _tclVariables.get(AdminPropertyDef.INSTALLER.name());
         if ((this.getInstaller() == null) || !this.getInstaller().equals(instVal))  {
-System.out.println("    - define installer '" + instVal + "'");
+            _paramCache.logTrace("    - define installer '" + instVal + "'");
             postMQLCode.append(" add property \"").append(AdminPropertyDef.INSTALLER.getPropName()).append("\" ")
                     .append("value \"").append(instVal).append('\"');
         }
         // is original name property defined?
         final String origNameVal = _tclVariables.get(AdminPropertyDef.ORIGINALNAME.name());
         if ((this.getOriginalName() == null) || !this.getOriginalName().equals(origNameVal))  {
-System.out.println("    - define original name '" + origNameVal + "'");
+            _paramCache.logTrace("    - define original name '" + origNameVal + "'");
             postMQLCode.append(" add property \"").append(AdminPropertyDef.ORIGINALNAME.getPropName()).append("\" ")
                     .append("value \"").append(origNameVal).append('\"');
         }
         // exists no application property or application property not equal?
         final String applVal = _tclVariables.get(AdminPropertyDef.APPLICATION.name());
         if ((this.getApplication() == null) || !this.getApplication().equals(applVal))  {
-System.out.println("    - define application '" + applVal + "'");
+            _paramCache.logTrace("    - define application '" + applVal + "'");
             postMQLCode.append(" add property \"").append(AdminPropertyDef.APPLICATION.getPropName()).append("\" ")
                     .append("value \"").append(applVal).append('\"');
         }
         // exists no author property or author property not equal?
         final String authVal = _tclVariables.get(AdminPropertyDef.AUTHOR.name());
         if ((this.getAuthor() == null) || !this.getAuthor().equals(authVal))  {
-System.out.println("    - define author '" + authVal + "'");
+            _paramCache.logTrace("    - define author '" + authVal + "'");
             postMQLCode.append(" add property \"").append(AdminPropertyDef.AUTHOR.getPropName()).append("\" ")
                     .append("value \"").append(authVal).append('\"');
         }
@@ -479,7 +479,7 @@ System.out.println("    - define author '" + authVal + "'");
         // check symbolic names
         final String symbName = _tclVariables.get("SYMBOLICNAME");
         if (!this.symbolicNames.contains(symbName))  {
-System.out.println("    - register symbolic name '" + symbName + "'");
+            _paramCache.logTrace("    - register symbolic name '" + symbName + "'");
             postMQLCode.append("add property \"").append(symbName).append("\" ")
                     .append(" on program eServiceSchemaVariableMapping.tcl to ")
                     .append(this.getTypeDef().getMxAdminName())
@@ -489,8 +489,8 @@ System.out.println("    - register symbolic name '" + symbName + "'");
         }
         for (final String exSymbName : this.symbolicNames)  {
             if (!symbName.equals(exSymbName))  {
-System.out.println("    - remove symbolic name '" + exSymbName + "'");
-                postMQLCode.append("delete property \"").append(symbName).append("\" ")
+                _paramCache.logTrace("    - remove symbolic name '" + exSymbName + "'");
+                postMQLCode.append("delete property \"").append(exSymbName).append("\" ")
                         .append(" on program eServiceSchemaVariableMapping.tcl to ")
                         .append(this.getTypeDef().getMxAdminName())
                         .append(" \"").append(this.getName()).append("\" ")
@@ -543,7 +543,7 @@ System.out.println("    - remove symbolic name '" + exSymbName + "'");
         {
             this.write(null, writer);
         }
-        catch (Exception e)
+        catch (final Exception e)
         {
             throw new Error(e);
         }
