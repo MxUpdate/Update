@@ -38,6 +38,7 @@ import org.mxupdate.update.util.JPOCaller_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface;
 
+import static org.mxupdate.update.util.StringUtil_mxJPO.convertMql;
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
@@ -59,12 +60,60 @@ public abstract class AbstractDMWithAttributes_mxJPO
     private static final long serialVersionUID = -2194896309854537398L;
 
     /**
+     * Name of parameter to define ignored attributes within the test
+     * attributes procedure for interfaces.
+     *
+     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
+     */
+    private static final String PARAM_IGNORE_INTERFACE = "DMWithAttrIgnoreIntAttr";
+
+    /**
+     * Name of parameter to define ignored attributes within the test
+     * attributes procedure for relationship.
+     *
+     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
+     */
+    private static final String PARAM_IGNORE_RELATIONSHIP = "DMWithAttrIgnoreRelAttr";
+
+    /**
+     * Name of parameter to define ignored attributes within the test
+     * attributes procedure for types.
+     *
+     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
+     */
+    private static final String PARAM_IGNORE_TYPE = "DMWithAttrIgnoreTypeAttr";
+
+    /**
+     * Name of parameter to define removed attributes within the test
+     * attributes procedure for interfaces.
+     *
+     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
+     */
+    private static final String PARAM_REMOVE_INTERFACE = "DMWithAttrRemoveIntAttr";
+
+    /**
+     * Name of parameter to define removed attributes within the test
+     * attributes procedure for relationship.
+     *
+     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
+     */
+    private static final String PARAM_REMOVE_RELATIONSHIP = "DMWithAttrRemoveRelAttr";
+
+    /**
+     * Name of parameter to define removed attributes within the test
+     * attributes procedure for types.
+     *
+     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
+     */
+    private static final String PARAM_REMOVE_TYPE = "DMWithAttrRemoveTypeAttr";
+
+    /**
      * Called TCL procedure within the TCL update to assign attributes to this
      * administration object.
      *
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
-    private final static String TCL_PROCEDURE
+    private static final String TCL_PROCEDURE
             = "proc testAttributes {args}  {\n"
                 + "set iIdx 0\n"
                 + "set lsCmd [list mql exec prog org.mxupdate.update.util.JPOCaller attributes]\n"
@@ -154,6 +203,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
      *                          file is sourced
      * @param _tclVariables     map with TCL variables
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update itself within derived class failed
      * @see #TCL_PROCEDURE
      */
     @Override
@@ -195,30 +245,50 @@ public abstract class AbstractDMWithAttributes_mxJPO
                                final String... _args)
             throws Exception
     {
-        final String nameParam = new StringBuilder()
-                .append('-').append(this.getTypeDef().getMxAdminName()).toString();
         int idx = 1;
         String name = null;
         String attrStr = null;
-// TODO: parameters -ignoreattr and -removeattr
-final Set<String> ignoreAttrs = new HashSet<String>();
+
+        final Set<String> ignoreAttrs = new HashSet<String>();
+        final Set<String> removeAttrs = new HashSet<String>();
         while (idx < _args.length)  {
             final String arg = _args[idx];
-            if (nameParam.equals(arg))  {
-                name = _args[++idx];
-                if ("-type".equals(arg))  {
-                    final Collection<String> tmp = _paramCache.getValueList("IgnoreTypeAttr");
-                    if (tmp != null)  {
-                        ignoreAttrs.addAll(tmp);
-                    }
-                } else if ("-relationship".equals(arg))  {
-                    final Collection<String> tmp = _paramCache.getValueList("IgnoreRelAttr");
-                    if (tmp != null)  {
-                        ignoreAttrs.addAll(tmp);
-                    }
-                }
-            } else if ("-attributes".equals(arg))  {
+            if ("-attributes".equals(arg))  {
                 attrStr = _args[++idx];
+            } else if ("-ignoreattr".equals(arg))  {
+                ignoreAttrs.add(_args[++idx]);
+            } else if ("-interface".equals(arg))  {
+                name = _args[++idx];
+                final Collection<String> tmp1 = _paramCache.getValueList(PARAM_IGNORE_INTERFACE);
+                if (tmp1 != null)  {
+                    ignoreAttrs.addAll(tmp1);
+                }
+                final Collection<String> tmp2 = _paramCache.getValueList(PARAM_REMOVE_INTERFACE);
+                if (tmp2 != null)  {
+                    removeAttrs.addAll(tmp2);
+                }
+            } else if ("-relationship".equals(arg))  {
+                name = _args[++idx];
+                final Collection<String> tmp1 = _paramCache.getValueList(PARAM_IGNORE_RELATIONSHIP);
+                if (tmp1 != null)  {
+                    ignoreAttrs.addAll(tmp1);
+                }
+                final Collection<String> tmp2 = _paramCache.getValueList(PARAM_REMOVE_RELATIONSHIP);
+                if (tmp2 != null)  {
+                    removeAttrs.addAll(tmp2);
+                }
+            } else if ("-removeattr".equals(arg))  {
+                removeAttrs.add(_args[++idx]);
+            } else if ("-type".equals(arg))  {
+                name = _args[++idx];
+                final Collection<String> tmp1 = _paramCache.getValueList(PARAM_IGNORE_TYPE);
+                if (tmp1 != null)  {
+                    ignoreAttrs.addAll(tmp1);
+                }
+                final Collection<String> tmp2 = _paramCache.getValueList(PARAM_REMOVE_TYPE);
+                if (tmp2 != null)  {
+                    removeAttrs.addAll(tmp2);
+                }
             } else  {
                 throw new Exception("unknown parameter \"" + arg + "\"");
             }
@@ -253,26 +323,42 @@ final Set<String> ignoreAttrs = new HashSet<String>();
                 for (final String ignoreAttr : ignoreAttrs)  {
                     if (match(attr, ignoreAttr))  {
                         ignore = true;
-System.out.println("    - attribute '" + attr + "' is not defined but will be ignored");
+                        _paramCache.logDebug("    - attribute '" + attr + "' is not defined but will be ignored");
                         break;
                     }
                 }
                 if (!ignore)  {
-                    throw new Exception("Attribute '" + attr + "' is defined to be deleted"
-                            + " in " + this.getTypeDef().getLogging() + " '"
-                            + this.getName() + "', but not allowed!");
+                    boolean remove = false;
+                    for (final String removeAttr : removeAttrs)  {
+                        if (match(attr, removeAttr))  {
+                            remove = true;
+                            _paramCache.logDebug("    - attribute '" + attr + "' is not defined and will be removed");
+                            execMql(_paramCache.getContext(),
+                                    new StringBuilder()
+                                        .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                                        .append(" \"").append(convertMql(this.getName())).append("\"")
+                                        .append(" remove attribute \"").append(convertMql(attr)).append("\""));
+                            break;
+                        }
+                    }
+                    if (!remove)  {
+                        throw new Exception("Attribute '" + attr + "' is defined to be deleted"
+                                + " in " + this.getTypeDef().getLogging() + " '"
+                                + this.getName() + "', but not allowed!");
+                    }
                 }
             }
         }
+
         // and check for not existing attributes but needed
         for (final String attr : newAttrs)  {
             if (!this.attributes.contains(attr))  {
-System.out.println("    - add attribute '" + attr + "'");
+                _paramCache.logDebug("    - add attribute '" + attr + "'");
                 execMql(_paramCache.getContext(),
                         new StringBuilder()
-                            .append("mod ").append(this.getTypeDef().getMxAdminName())
-                            .append(" '").append(this.getName()).append('\'')
-                            .append("add attribute '").append(attr).append('\''));
+                            .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                            .append(" \"").append(convertMql(this.getName())).append("\"")
+                            .append(" add attribute \"").append(convertMql(attr)).append("\""));
             }
         }
     }
