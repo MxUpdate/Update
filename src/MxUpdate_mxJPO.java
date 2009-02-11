@@ -52,7 +52,6 @@ import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
- * <table>
  * <tr>
  * <th></th><th></th><th></th>
  * <tr>
@@ -148,25 +147,27 @@ public class MxUpdate_mxJPO
         // parameters
 
         for (final ParameterDef_mxJPO parameter : ParameterDef_mxJPO.values())  {
-            for (final String param : parameter.getParameterList())  {
-                final String paramStr = (param.length() > 1)
-                                        ? "--" + param
-                                        : "-" + param;
-                this.paramsParameters.put(paramStr, parameter);
-            }
-            final StringBuilder desc = new StringBuilder().append(parameter.getParameterDesc());
-            if ((parameter.getDefaultValue() != null) && (parameter.getType() != ParameterDef_mxJPO.Type.BOOLEAN))  {
-                desc.append('\n').append("(Default '");
-                if (parameter.getType() == ParameterDef_mxJPO.Type.LIST)  {
-                    desc.append(parameter.getDefaultValue().replaceAll(",", ", "));
-                } else  {
-                    desc.append(parameter.getDefaultValue());
+            if (parameter.getParameterList() != null)  {
+                for (final String param : parameter.getParameterList())  {
+                    final String paramStr = (param.length() > 1)
+                                            ? "--" + param
+                                            : "-" + param;
+                    this.paramsParameters.put(paramStr, parameter);
                 }
-                desc.append("')");
+                final StringBuilder desc = new StringBuilder().append(parameter.getParameterDesc());
+                if ((parameter.getDefaultValue() != null) && (parameter.getType() != ParameterDef_mxJPO.Type.BOOLEAN))  {
+                    desc.append('\n').append("(Default '");
+                    if (parameter.getType() == ParameterDef_mxJPO.Type.LIST)  {
+                        desc.append(parameter.getDefaultValue().replaceAll(",", ", "));
+                    } else  {
+                        desc.append(parameter.getDefaultValue());
+                    }
+                    desc.append("')");
+                }
+                this.appendDescription(desc,
+                                       parameter.getParameterList(),
+                                       parameter.getParameterArgs());
             }
-            this.appendDescription(desc,
-                                   parameter.getParameterList(),
-                                   parameter.getParameterArgs());
         }
 
         ////////////////////////////////////////////////////////////////////////
@@ -492,7 +493,7 @@ System.err.println("unknown pararameter "  + _args[idx]);
                 this.delete(paramCache, clazz2matches);
             }
 
-        } catch (Exception e)  {
+        } catch (final Exception e)  {
             e.printStackTrace(System.out);
             throw e;
         }
@@ -528,7 +529,7 @@ System.err.println("unknown pararameter "  + _args[idx]);
         // export
         for (final Map.Entry<TypeDef_mxJPO,Set<String>> entry : clazz2names.entrySet())  {
             for (final String name : entry.getValue())  {
-                AbstractObject_mxJPO instance = entry.getKey().newTypeInstance();
+                final AbstractObject_mxJPO instance = entry.getKey().newTypeInstance();
                 final File path = new File(pathStr + File.separator + instance.getPath());
 System.out.println("export "+instance.getTypeDef().getLogging() + " '" + name + "'");
                 instance.export(_paramCache, path, name);
@@ -584,7 +585,7 @@ System.out.println("create "+instance.getTypeDef().getLogging() + " '" + fileEnt
 System.out.println("check "+instance.getTypeDef().getLogging() + " '" + fileEntry.getValue() + "'");
 
                     final boolean update;
-                    String version = _paramCache.getValueBoolean(ParameterCache_mxJPO.KEY_FILEDATE2VERSION)
+                    final String version = _paramCache.getValueBoolean(ParameterCache_mxJPO.KEY_FILEDATE2VERSION)
                                      ? Long.toString(fileEntry.getKey().lastModified() / 1000)
                                      : _paramCache.getValueString(ParameterCache_mxJPO.KEY_VERSION);
                     if (_versionInfo == UpdateCheck_mxJPO.FILEDATE)  {
@@ -626,7 +627,7 @@ System.out.println("    - update");
                     // execute update
                     if (update)  {
                         boolean commit = false;
-                        boolean transActive = _paramCache.getContext().isTransactionActive();
+                        final boolean transActive = _paramCache.getContext().isTransactionActive();
                         try  {
                             if (!transActive)  {
                                 _paramCache.getContext().start(true);
@@ -676,7 +677,7 @@ System.out.println("    - update");
                 if (!fileNames.contains(name))  {
 System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name + "'");
                     boolean commit = false;
-                    boolean transActive = _paramCache.getContext().isTransactionActive();
+                    final boolean transActive = _paramCache.getContext().isTransactionActive();
                     try  {
                         if (!transActive)  {
                             _paramCache.getContext().start(true);
@@ -852,7 +853,7 @@ System.out.println("delete " + instance.getTypeDef().getLogging() + " '" + name 
     {
         final Map<TypeDef_mxJPO,Set<String>> clazz2names = new HashMap<TypeDef_mxJPO,Set<String>>();
         for (final Map.Entry<TypeDef_mxJPO,List<String>> entry : _clazz2matches.entrySet())  {
-            AbstractObject_mxJPO instance = entry.getKey().newTypeInstance();
+            final AbstractObject_mxJPO instance = entry.getKey().newTypeInstance();
             clazz2names.put(entry.getKey(), instance.getMatchingNames(_context, entry.getValue()));
         }
 
