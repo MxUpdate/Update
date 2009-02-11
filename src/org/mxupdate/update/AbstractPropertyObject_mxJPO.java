@@ -185,7 +185,7 @@ public abstract class AbstractPropertyObject_mxJPO
             if (this.getSymblicNames().isEmpty())  {
                 final StringBuilder symbName = new StringBuilder()
                         .append(this.getTypeDef().getMxAdminName())
-                        .append("_").append(this.getName().replaceAll(" ", ""));
+                        .append("_").append(this.getName().replaceAll(" ", "").replaceAll("/", ""));
                 _paramCache.logWarning("    - No symbolic name defined for '" + this.getName()
                         + "'! Symbolic name '" + symbName + "' will be used!");
                 _out.append(symbName);
@@ -423,7 +423,8 @@ public abstract class AbstractPropertyObject_mxJPO
 
         if (this.getTypeDef().getMxAdminName() != null)  {
             final String symbName = new StringBuilder().append(this.getTypeDef().getMxAdminName())
-                                    .append("_").append(this.getName().replaceAll(" ", ""))
+                                    .append("_")
+                                    .append(this.getName().replaceAll(" ", "").replaceAll("/", ""))
                                     .toString();
             codeSymbName = this.extractFromCode(_code, HEADER_SYMBOLIC_NAME, null);
             if (codeSymbName == null)  {
