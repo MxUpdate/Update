@@ -27,13 +27,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import matrix.db.Context;
+import matrix.util.MatrixException;
+
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
- * Data model relationship class.
+ * Data model relationship class used to export and update relationships.
  *
  * @author Tim Moxter
  * @version $Id$
@@ -83,8 +87,19 @@ public class Relationship_mxJPO
 
     /**
      * From side type list.
+     *
+     * @see #prepare(Context)
+     * @see #fromTypeAll
      */
     private final Set<String> fromTypes = new TreeSet<String>();
+
+    /**
+     * Are all types on the from side allowed?
+     *
+     * @see #prepare(Context)
+     * @see #fromTypes
+     */
+    private boolean fromTypeAll = false;
 
     /**
      * To side cardinality action.
@@ -118,8 +133,19 @@ public class Relationship_mxJPO
 
     /**
      * To side type list.
+     *
+     * @see #prepare(Context)
+     * @see #toTypeAll
      */
     private final Set<String> toTypes = new TreeSet<String>();
+
+    /**
+     * Are all types on the to side allowed?
+     *
+     * @see #prepare(Context)
+     * @see #toTypes
+     */
+    private boolean toTypeAll = false;
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -142,6 +168,8 @@ public class Relationship_mxJPO
 // TODO rules:
         if ("/fromSide".equals(_url))  {
             // to be ignored ...
+        } else if ("/fromSide/allowAllTypes".equals(_url))  {
+            // to be ignored, because read within prepare method
         } else if ("/fromSide/cardinality".equals(_url))  {
             this.fromCardinality = _content.equalsIgnoreCase("1")
                                    ? "One"
@@ -157,7 +185,7 @@ public class Relationship_mxJPO
         } else if ("/fromSide/typeRefList".equals(_url))  {
             // to be ignored ...
         } else if ("/fromSide/typeRefList/typeRef".equals(_url))  {
-            this.fromTypes.add(_content);
+            // to be ignored, because read within prepare method
         } else if ("/fromSide/propagateConnection".equals(_url))  {
             this.fromPropagateConnection = true;
 
@@ -166,6 +194,8 @@ public class Relationship_mxJPO
 
         } else if ("/toSide".equals(_url))  {
             // to be ignored ...
+        } else if ("/toSide/allowAllTypes".equals(_url))  {
+            // to be ignored, because read within prepare method
         } else if ("/toSide/cardinality".equals(_url))  {
             this.toCardinality = _content.equalsIgnoreCase("1")
                                  ? "One"
@@ -181,7 +211,7 @@ public class Relationship_mxJPO
         } else if ("/toSide/typeRefList".equals(_url))  {
             // to be ignored ...
         } else if ("/toSide/typeRefList/typeRef".equals(_url))  {
-            this.toTypes.add(_content);
+            // to be ignored, because read within prepare method
         } else if ("/toSide/propagateConnection".equals(_url))  {
             this.toPropagateConnection = true;
 
@@ -190,12 +220,75 @@ public class Relationship_mxJPO
         }
     }
 
+    /**
+     * Evaluates the from and to type information. Because MX does not handle
+     * the to or from side types correctly within XML exports, the from and to
+     * side types must be evaluated via a &quot;<code>print relationship ...
+     * select fromtype / totype</code>&quot; MQL statement. If this is not done
+     * in this way, there is no other possibility to evaluate the information
+     * {@link #fromTypeAll} or {@link #toTypeAll}.
+     *
+     * @param _context  MX context
+     * @throws MatrixException if the from / to side types could not be
+     *                         evaluated or the prepare from the derived class
+     *                         failed
+     * @todo support for from / to relationships
+     */
+    @Override
+    protected void prepare(final Context _context)
+            throws MatrixException
+    {
+        // evaluate all from types
+        final String[] fromTypesArr = execMql(_context,
+                                              new StringBuilder("escape print rel \"")
+                                                   .append(this.getName())
+                                                   .append("\" select fromtype dump '\n'"))
+                                     .split("\n");
+        for (final String fromType : fromTypesArr)  {
+            if ("all".equals(fromType))  {
+                this.fromTypeAll = true;
+                this.fromTypes.clear();
+            } else if (!"".equals(fromType)) {
+                this.fromTypes.add(fromType);
+            }
+        }
+        // evaluate all to types
+        final String[] toTypesArr = execMql(_context,
+                                            new StringBuilder("escape print rel \"")
+                                                 .append(this.getName())
+                                                 .append("\" select totype dump '\n'"))
+                                    .split("\n");
+        for (final String toType : toTypesArr)  {
+            if ("all".equals(toType))  {
+                this.toTypeAll = true;
+                this.toTypes.clear();
+            } else if (!"".equals(toType)) {
+                this.toTypes.add(toType);
+            }
+        }
+
+        super.prepare(_context);
+    }
+
+    /**
+     * Writes all relationship specific information in the TCL update file.
+     * The relationship specific information are:
+     * <ul>
+     * <li>hidden flag</li>
+     * <li>prevent dupplicates flag (see {@link #preventDuplicates})</li>
+     * <li>from and to side informations</li>
+     * </ul>
+     *
+     * @param _out      writer instance
+     * @throws IOException if the TCL code to the TCL update file could not be
+     *                     written
+     */
     @Override
     protected void writeObject(final Writer _out)
             throws IOException
     {
 // TODO rules:
-        _out.append(" \\\n    ").append(isHidden() ? "" : "!").append("hidden")
+        _out.append(" \\\n    ").append(this.isHidden() ? "" : "!").append("hidden")
             .append(" \\\n    ").append(this.preventDuplicates ? "" : "!").append("preventduplicates");
         this.writeTriggers(_out);
         _out.append(" \\\n    from")
@@ -205,7 +298,7 @@ public class Relationship_mxJPO
             .append(" \\\n        cardinality \"").append(convertTcl(this.fromCardinality)).append("\"")
             .append(" \\\n        revision \"").append(convertTcl(this.fromRevisionAction)).append("\"")
             .append(" \\\n        clone \"").append(convertTcl(this.fromCloneAction)).append("\"");
-        if (this.fromTypes.isEmpty())  {
+        if (this.fromTypeAll)  {
             _out.append(" \\\n        add type \"all\"");
         } else  {
             for (final String type : this.fromTypes)  {
@@ -219,7 +312,7 @@ public class Relationship_mxJPO
             .append(" \\\n        cardinality \"").append(convertTcl(this.toCardinality)).append("\"")
             .append(" \\\n        revision \"").append(convertTcl(this.toRevisionAction)).append("\"")
             .append(" \\\n        clone \"").append(convertTcl(this.toCloneAction)).append("\"");
-        if (this.toTypes.isEmpty())  {
+        if (this.toTypeAll)  {
             _out.append(" \\\n        add type \"all\"");
         } else  {
             for (final String type : this.toTypes)  {
@@ -231,7 +324,8 @@ public class Relationship_mxJPO
 
     /**
      * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this relationship:
+     * in the <code>_preMQLCode</code> to reset this relationship. This
+     * includes:
      * <ul>
      * <li>reset description</li>
      * <li>remove hidden and prevent duplicate flag</li>
@@ -251,6 +345,7 @@ public class Relationship_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update itself failed
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,
