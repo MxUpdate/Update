@@ -178,16 +178,16 @@ public final class StringUtil_mxJPO
     //                 }
     //                 filename = caseSensitivity.convertCase(filename);
     //                 wildcardMatcher = caseSensitivity.convertCase(wildcardMatcher);
-                     String[] wcs = splitOnTokens(_wildcardMatcher);
+                     final String[] wcs = splitOnTokens(_wildcardMatcher);
                      boolean anyChars = false;
                      int textIdx = 0;
                      int wcsIdx = 0;
-                     Stack<int[]> backtrack = new Stack<int[]>();
+                     final Stack<int[]> backtrack = new Stack<int[]>();
 
                      // loop around a backtrack stack, to handle complex * matching
                      do {
                          if (backtrack.size() > 0) {
-                             int[] array = backtrack.pop();
+                             final int[] array = backtrack.pop();
                              wcsIdx = array[0];
                              textIdx = array[1];
                              anyChars = true;
@@ -217,7 +217,7 @@ public final class StringUtil_mxJPO
                                          // token not found
                                          break;
                                      }
-                                     int repeat = _filename.indexOf(wcs[wcsIdx], textIdx + 1);
+                                     final int repeat = _filename.indexOf(wcs[wcsIdx], textIdx + 1);
                                      if (repeat >= 0) {
                                          backtrack.push(new int[] {wcsIdx, repeat});
                                      }
@@ -245,7 +245,7 @@ public final class StringUtil_mxJPO
                      } while (backtrack.size() > 0);
 
                      return false;
-                 }
+    }
 
     /**
      * The method is original implemented by the project on
@@ -270,7 +270,7 @@ public final class StringUtil_mxJPO
              final StringBuilder buffer = new StringBuilder();
              for (int i = 0; i < array.length; i++) {
                  if ((array[i] == '?') || (array[i] == '*')) {
-                     if (!"".equals(buffer)) {
+                     if (buffer.length() != 0) {
                          list.add(buffer.toString());
                          buffer.setLength(0);
                      }
@@ -283,7 +283,7 @@ public final class StringUtil_mxJPO
                      buffer.append(array[i]);
                  }
              }
-             if (!"".equals(buffer))  {
+             if (buffer.length() != 0)  {
                  list.add(buffer.toString());
              }
              ret = list.toArray(new String[list.size()]);
