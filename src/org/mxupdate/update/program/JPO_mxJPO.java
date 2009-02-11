@@ -37,6 +37,8 @@ import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
+ * The class is used to export, create, delete and update JPOs within MX.
+ *
  * @author Tim Moxter
  * @version $Id$
  */
@@ -54,23 +56,31 @@ public class JPO_mxJPO
      *
      * @see #export(Context, File, String)
      */
-    private final static String NAME_SUFFIX = "_" + "mxJPO";
+    private static final String NAME_SUFFIX = "_" + "mxJPO";
 
     /**
-     * Defines the separator where the TCL update code starts.
+     * Defines the parameter to define the string where the TCL update code
+     * starts.
+     *
+     * @see #update(ParameterCache_mxJPO, String, File, String)
      */
-    private final static String SEPARATOR_START
-            = "################################################################################\n"
-            + "# START NEEDED MQL UPDATE FOR THIS JPO PROGRAM                                 #\n"
-            + "################################################################################";
+    private static final String PARAM_MARKSTART = "JPOTclUpdateMarkStart";
 
     /**
-     * Defines the separator where the TCL update code ends.
+     * Defines the parameter to define the string where the TCL update code
+     * ends.
+     *
+     * @see #update(ParameterCache_mxJPO, String, File, String)
      */
-    private final static String SEPARATOR_END
-            = "################################################################################\n"
-            + "# END NEEDED MQL UPDATE FOR THIS JPO PROGRAM                                   #\n"
-            + "################################################################################";
+    private static final String PARAM_MARKEND = "JPOTclUpdateMarkEnd";
+
+    /**
+     * Defines the parameter to define if embedded TCL update code within JPOs
+     * must be executed.
+     *
+     * @see #update(ParameterCache_mxJPO, String, File, String)
+     */
+    private static final String PARAM_NEEDED = "JPOTclUpdateNeeded";
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -88,6 +98,9 @@ public class JPO_mxJPO
      *
      * @param _context          context for this request
      * @param _matches          collection of strings which must match
+     * @return set of all matching JPO program names
+     * @throws MatrixException if the &quot;<code>list program</code>&quot;
+     *                         failed which is used to evluate the JPO names
      */
     @Override
     public Set<String> getMatchingNames(final Context _context,
@@ -133,7 +146,11 @@ public class JPO_mxJPO
      * but only converts the given JPOs and not depending JPOs.
      *
      * @param _paramCache   parameter cache
-     *
+     * @param _out          writer instance to the file where the JPO code must
+     *                      be written
+     * @throws IOException if the source code could not be written
+     * @throws MatrixException if the source code of the JPO could not be
+     *                         extracted from MX
      */
     @Override
     protected void write(final ParameterCache_mxJPO _paramCache,
@@ -167,6 +184,7 @@ public class JPO_mxJPO
      * @param _file             file for which the administration object must
      *                          be created (not used)
      * @param _name             name of administration object to create
+     * @throws Exception if create of JPO failed
      */
     @Override
     public void create(final Context _context,
@@ -182,7 +200,7 @@ public class JPO_mxJPO
 
     /**
      * The JPO is updated by following steps if the modified date of the file
-     * is not the same as the the version property:
+     * is not the same as the the version property. Following steps are done:
      * <ul>
      * <li>reset the execute user</li>
      * <li>remove all properties</li>
@@ -208,6 +226,11 @@ public class JPO_mxJPO
     {
         this.parse(_paramCache, _name);
 
+        // get parameters
+        final String markStart = _paramCache.getValueString(PARAM_MARKSTART).trim();
+        final String markEnd = _paramCache.getValueString(PARAM_MARKEND).trim();
+        final boolean exec = _paramCache.getValueBoolean(PARAM_NEEDED);
+
         final StringBuilder cmd = new StringBuilder();
 
         // update JPO code
@@ -215,14 +238,19 @@ public class JPO_mxJPO
 
         // append TCL code of JPO
         final StringBuilder jpoCode = this.getCode(_file);
-        final int start = jpoCode.indexOf(SEPARATOR_START);
-        final int end = jpoCode.indexOf(SEPARATOR_END);
+        final int start = jpoCode.indexOf(markStart);
+        final int end = jpoCode.indexOf(markEnd);
         if ((start >= 0) && (end > 0))  {
-            final String tclCode = jpoCode.substring(start + SEPARATOR_START.length(), end).trim();
+            final String tclCode = jpoCode.substring(start + markStart.length(), end).trim();
             if (!"".equals(tclCode))  {
-                cmd.append("tcl;\neval {\n")
-                   .append(tclCode)
-                   .append("\n}\nexit;\n");
+                if (exec)  {
+                    _paramCache.logTrace("    - TCL update code is executed");
+                    cmd.append("tcl;\neval {\n")
+                       .append(tclCode)
+                       .append("\n}\nexit;\n");
+                } else  {
+                    _paramCache.logError("    - Warning! Existing TCL update code is not executed!");
+                }
             }
         }
 
