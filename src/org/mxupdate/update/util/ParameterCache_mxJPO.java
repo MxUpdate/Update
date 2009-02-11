@@ -361,7 +361,7 @@ public class ParameterCache_mxJPO
      */
     public void logError(final String _text)
     {
-        System.out.println(_text);
+        System.out.println("ERROR!" + _text);
     }
 
     /**
@@ -371,7 +371,7 @@ public class ParameterCache_mxJPO
      */
     public void logWarning(final String _text)
     {
-        System.out.println(_text);
+        System.out.println("WARNING!" + _text);
     }
 
     /**
