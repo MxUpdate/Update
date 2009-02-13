@@ -595,10 +595,14 @@ public class MxUpdate_mxJPO
                                                                             AdminPropertyDef.FILEDATE);
                         final DateFormat format = new SimpleDateFormat(_paramCache.getValueString(ParameterCache_mxJPO.KEY_FILEDATEFORMAT));
                         Date instDate;
-                        try {
-                            instDate = format.parse(instDateString);
-                        } catch (final ParseException e) {
+                        if ((instDateString == null) || "".equals(instDateString))  {
                             instDate = null;
+                        } else  {
+                            try {
+                                instDate = format.parse(instDateString);
+                            } catch (final ParseException e) {
+                                instDate = null;
+                            }
                         }
                         if (fileDate.equals(instDate))  {
                             update = false;
