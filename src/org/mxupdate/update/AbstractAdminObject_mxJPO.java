@@ -28,7 +28,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +50,6 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
-import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
@@ -87,9 +85,17 @@ public abstract class AbstractAdminObject_mxJPO
         super(_typeDef);
     }
 
+    /**
+     * Searches for all administration object of current type definition and
+     * returns all found names as set.
+     *
+     * @param _paramCache   parameter cache
+     * @return set of all administration object of current type definition
+     * @throws MatrixException if the query for current administration object
+     *                         failed
+     */
     @Override
-    public Set<String> getMatchingNames(final Context _context,
-                                        final Collection<String> _matches)
+    public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
         final StringBuilder cmd = new StringBuilder()
@@ -98,13 +104,9 @@ public abstract class AbstractAdminObject_mxJPO
                 .append(" ")
                 .append(this.getTypeDef().getMxAdminSuffix());
         final Set<String> ret = new TreeSet<String>();
-        for (final String name : execMql(_context, cmd).split("\n"))  {
+        for (final String name : execMql(_paramCache.getContext(), cmd).split("\n"))  {
             if (!"".equals(name))  {
-                for (final String match : _matches)  {
-                    if (match(name, match))  {
-                        ret.add(name);
-                    }
-                }
+                ret.add(name);
             }
         }
         return ret;
@@ -138,7 +140,7 @@ public abstract class AbstractAdminObject_mxJPO
         reader.setDTDHandler(handler);
         reader.setEntityResolver(handler);
         // parse the XML string of the export
-        InputSource inputSource = new InputSource(new StringReader(xml));
+        final InputSource inputSource = new InputSource(new StringReader(xml));
         inputSource.setEncoding("UTF8");
         reader.parse(inputSource);
         // prepare post preparation

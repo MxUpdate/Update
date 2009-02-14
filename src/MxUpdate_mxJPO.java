@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import matrix.db.Context;
 import matrix.util.MatrixException;
@@ -437,7 +438,8 @@ public class MxUpdate_mxJPO
 
             Mode_mxJPO mode = null;
 
-            final Map<TypeDef_mxJPO,List<String>> clazz2matches = new HashMap<TypeDef_mxJPO,List<String>>();
+            final Map<Collection<TypeDef_mxJPO>,List<String>> clazz2matches
+                    = new HashMap<Collection<TypeDef_mxJPO>,List<String>>();
 
             boolean unknown = false;
 
@@ -446,18 +448,15 @@ public class MxUpdate_mxJPO
             final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, ParameterDef_mxJPO.values());
 
             for (int idx = 0; idx < _args.length; idx++)  {
-                final Collection<TypeDef_mxJPO> clazzes = paramsTypeDefs.get(_args[idx]);
-                if (clazzes != null)  {
-                    idx++;
-                    final String name = _args[idx];
-                    for (final TypeDef_mxJPO clazz : clazzes)  {
-                        List<String> names = clazz2matches.get(clazz);
-                        if (names == null)  {
-                            names = new ArrayList<String>();
-                            clazz2matches.put(clazz, names);
-                        }
-                        names.add(name);
+                if (this.paramsTypeDefs.containsKey(_args[idx]))  {
+                    final Collection<TypeDef_mxJPO> clazzes = this.paramsTypeDefs.get(_args[idx]);
+                    final String name = _args[++idx];
+                    List<String> names = clazz2matches.get(clazzes);
+                    if (names == null)  {
+                        names = new ArrayList<String>();
+                        clazz2matches.put(clazzes, names);
                     }
+                    names.add(name);
                 } else if (this.paramsModes.containsKey(_args[idx])) {
                     final Mode_mxJPO tmpMode = this.paramsModes.get(_args[idx]);
                     if (mode != null)  {
@@ -507,7 +506,7 @@ public class MxUpdate_mxJPO
      *                   the export failed
      */
     protected void export(final ParameterCache_mxJPO _paramCache,
-                          final Map<TypeDef_mxJPO,List<String>> _clazz2matches)
+                          final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches)
             throws Exception
     {
         final Collection<String> paths = _paramCache.getValueList(PARAM_PATH);
@@ -522,7 +521,7 @@ public class MxUpdate_mxJPO
         final String pathStr = paths.iterator().next();
 
         // evaluate all matching administration objects
-        final Map<TypeDef_mxJPO,Set<String>> clazz2names = this.getMatching(_paramCache.getContext(), _clazz2matches);
+        final Map<TypeDef_mxJPO,Set<String>> clazz2names = this.getMatching(_paramCache, _clazz2matches);
 
         // export
         for (final Map.Entry<TypeDef_mxJPO,Set<String>> entry : clazz2names.entrySet())  {
@@ -542,7 +541,7 @@ public class MxUpdate_mxJPO
      * @param _clazz2matches
      */
     protected void update(final ParameterCache_mxJPO _paramCache,
-                          final Map<TypeDef_mxJPO,List<String>> _clazz2matches,
+                          final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches,
                           final UpdateCheck_mxJPO _versionInfo)
             throws Exception
     {
@@ -556,8 +555,7 @@ public class MxUpdate_mxJPO
         for (final TypeDef_mxJPO clazz : clazz2names.keySet())  {
             if (!existingNames.containsKey(clazz))  {
                 final AbstractObject_mxJPO instance = clazz.newTypeInstance();
-                existingNames.put(clazz,
-                                  instance.getMatchingNames(_paramCache.getContext(), wildCardMatch));
+                existingNames.put(clazz, instance.getMxNames(_paramCache));
             }
         }
         // create if needed (and not in the list of existing objects
@@ -657,7 +655,7 @@ public class MxUpdate_mxJPO
 
 
     protected void delete(final ParameterCache_mxJPO _paramCache,
-                          final Map<TypeDef_mxJPO,List<String>> _clazz2matches)
+                          final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches)
             throws Exception
     {
         // check for definition of min. / max. one path
@@ -667,7 +665,7 @@ public class MxUpdate_mxJPO
 
         // evaluate all matching administration objects
         final Map<TypeDef_mxJPO,Set<String>> clazz2MxNames
-                = this.getMatching(_paramCache.getContext(), _clazz2matches);
+                = this.getMatching(_paramCache, _clazz2matches);
 
         // get all matching files depending on the update classes
         final Map<TypeDef_mxJPO,Map<File,String>> clazz2FileNames
@@ -723,9 +721,8 @@ public class MxUpdate_mxJPO
      * @see #PARAM_PATH
      */
     protected Map<TypeDef_mxJPO,Map<File,String>> evalMatches(final ParameterCache_mxJPO _paramCache,
-                                                              final Map<TypeDef_mxJPO,List<String>> _clazz2matches)
-            throws SecurityException, IllegalArgumentException, NoSuchMethodException,
-                   InstantiationException, IllegalAccessException, InvocationTargetException
+                                                              final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches)
+            throws Exception
     {
         final Map<TypeDef_mxJPO,Map<File,String>> clazz2names = new HashMap<TypeDef_mxJPO,Map<File,String>>();
 
@@ -737,9 +734,9 @@ public class MxUpdate_mxJPO
         // if no path is defined, the paths are directly defined at the objects
         // to import
         if ((paths == null) || paths.isEmpty())  {
-            for (final Map.Entry<TypeDef_mxJPO,List<String>> entry : _clazz2matches.entrySet())  {
+            for (final Map.Entry<Collection<TypeDef_mxJPO>,List<String>> entry : _clazz2matches.entrySet())  {
+                // first get all matching files
                 final Set<File> allFiles = new HashSet<File>();
-
                 for (final String pathStr : entry.getValue())  {
                     final File pathFile = new File(pathStr);
                     final String match = pathFile.getName();
@@ -750,11 +747,37 @@ public class MxUpdate_mxJPO
                         }
                     }
                 }
-                clazz2names.put(entry.getKey(),
-                                entry.getKey().newTypeInstance().getMatchingFileNames(allFiles));
+                // get all matching files depending on the update classes
+                // (and NOT last file match)
+                final Set<File> matchedFiles = new HashSet<File>();
+                final boolean lastFileMatchNeeded = this.evalMatches(_paramCache,
+                                                                     entry.getKey(),
+                                                                     false,
+                                                                     clazz2names,
+                                                                     allFiles,
+                                                                     matchedFiles,
+                                                                     null);
+                // get all matching files depending on the update classes
+                // (and LAST file match)
+                if (lastFileMatchNeeded)  {
+                    final Set<File> notMatchedFiles = new HashSet<File>();
+                    for (final File file : allFiles)  {
+                        if (!matchedFiles.contains(file))  {
+                            notMatchedFiles.add(file);
+                        }
+                    }
+                    this.evalMatches(_paramCache,
+                                     entry.getKey(),
+                                     true,
+                                     clazz2names,
+                                     notMatchedFiles,
+                                     null,
+                                     null);
+                }
             }
         // path parameter is defined
         } else  {
+            /// get all files
             final Set<File> allFiles = new HashSet<File>();
             for (final String path : paths)  {
                 allFiles.addAll(this.getAllFiles(new File(path), ignorePaths, ignoreFiles));
@@ -763,14 +786,14 @@ public class MxUpdate_mxJPO
             // get all matching files depending on the update classes
             // (and NOT last file match)
             boolean lastFileMatchNeeded = false;
-            for (final Map.Entry<TypeDef_mxJPO,List<String>> entry : _clazz2matches.entrySet())  {
-                if (!entry.getKey().isFileMatchLast())  {
-                    final Map<File,String> matching = entry.getKey().newTypeInstance().getMatchingFileNames(allFiles, entry.getValue());
-                    clazz2names.put(entry.getKey(), matching);
-                    matchedFiles.addAll(matching.keySet());
-                } else  {
-                    lastFileMatchNeeded = true;
-                }
+            for (final Map.Entry<Collection<TypeDef_mxJPO>,List<String>> entry : _clazz2matches.entrySet())  {
+                lastFileMatchNeeded |= this.evalMatches(_paramCache,
+                                                        entry.getKey(),
+                                                        false,
+                                                        clazz2names,
+                                                        allFiles,
+                                                        matchedFiles,
+                                                        entry.getValue());
             }
             // get all matching files depending on the update classes
             // (and LAST file match)
@@ -781,15 +804,78 @@ public class MxUpdate_mxJPO
                         notMatchedFiles.add(file);
                     }
                 }
-                for (final Map.Entry<TypeDef_mxJPO,List<String>> entry : _clazz2matches.entrySet())  {
-                    if (entry.getKey().isFileMatchLast())  {
-                        clazz2names.put(entry.getKey(),
-                                        entry.getKey().newTypeInstance().getMatchingFileNames(notMatchedFiles, entry.getValue()));
-                    }
+                for (final Map.Entry<Collection<TypeDef_mxJPO>,List<String>> entry : _clazz2matches.entrySet())  {
+                    this.evalMatches(_paramCache,
+                                     entry.getKey(),
+                                     true,
+                                     clazz2names,
+                                     notMatchedFiles,
+                                     null,
+                                     entry.getValue());
                 }
             }
         }
         return clazz2names;
+    }
+
+    /**
+     *
+     * @param _paramCache       parameter cache
+     * @param _typeDefs
+     * @param _fileMatchLast
+     * @param _clazz2names
+     * @param _allFiles
+     * @param _matchedFiles
+     * @param _matches
+     * @return ??
+     * @throws Exception if the evaluate for the match fails
+     */
+    private boolean evalMatches(final ParameterCache_mxJPO _paramCache,
+                                final Collection<TypeDef_mxJPO> _typeDefs,
+                                final boolean _fileMatchLast,
+                                final Map<TypeDef_mxJPO,Map<File,String>> _clazz2names,
+                                final Set<File> _allFiles,
+                                final Set<File> _matchedFiles,
+                                final Collection<String> _matches)
+            throws Exception
+    {
+        boolean foundOther = false;
+        for (final TypeDef_mxJPO typeDef : _typeDefs)  {
+            if (typeDef.isFileMatchLast() != _fileMatchLast)  {
+                foundOther = true;
+            } else  {
+                final AbstractObject_mxJPO instance = typeDef.newTypeInstance();
+                for (final File file : _allFiles)  {
+                    final String mxName = instance.extractMxName(_paramCache, file);
+                    if (mxName != null)  {
+                        Map<File,String> tmp = _clazz2names.get(typeDef);
+                        if (tmp == null)  {
+                            tmp = new TreeMap<File,String>();
+                            _clazz2names.put(typeDef, tmp);
+                        }
+                        if (_matches == null)
+                        {
+                            tmp.put(file, mxName);
+                            if (_matchedFiles != null)  {
+                                _matchedFiles.add(file);
+                            }
+                        }
+                        else
+                        {
+                            for (final String match : _matches)  {
+                                if (instance.matchMxName(_paramCache, mxName, match))  {
+                                    tmp.put(file, mxName);
+                                    if (_matchedFiles != null)  {
+                                        _matchedFiles.add(file);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return foundOther;
     }
 
     /**
@@ -842,22 +928,44 @@ public class MxUpdate_mxJPO
     /**
      * Evaluate all matching administration objects within MX.
      *
-     * @param _context          context for this request
-     * @param _clazz2matches    map of classes and the depending list of string
-     *                          which must match
+     * @param _paramCache       parameter cache
+     * @param _clazz2matches    map of collection classes and the depending
+     *                          list of string which must match
      * @return map of classes and a set of matching names for this classes
      * @throws Exception if the match fails
-     * @see #export(Context, Set, Map)
-     * @see #delete(Context, Set, Map)
+     * @see #export(ParameterCache_mxJPO, Map)
+     * @see #delete(ParameterCache_mxJPO, Map)
      */
-    protected Map<TypeDef_mxJPO,Set<String>> getMatching(final Context _context,
-                                                         final Map<TypeDef_mxJPO,List<String>> _clazz2matches)
+    protected Map<TypeDef_mxJPO,Set<String>> getMatching(final ParameterCache_mxJPO _paramCache,
+                                                         final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches)
             throws Exception
     {
+        // first sort the matches depending on the type definition
+        final Map<TypeDef_mxJPO,Set<String>> typeDef2Matches = new HashMap<TypeDef_mxJPO,Set<String>>();
+        for (final Map.Entry<Collection<TypeDef_mxJPO>,List<String>> entry : _clazz2matches.entrySet())  {
+            for (final TypeDef_mxJPO typeDef : entry.getKey())  {
+                Set<String> matches = typeDef2Matches.get(typeDef);
+                if (matches == null)  {
+                    matches = new HashSet<String>();
+                    typeDef2Matches.put(typeDef, matches);
+                }
+                matches.addAll(entry.getValue());
+            }
+        }
+        // and now depending on the type definition prepare return list
         final Map<TypeDef_mxJPO,Set<String>> clazz2names = new HashMap<TypeDef_mxJPO,Set<String>>();
-        for (final Map.Entry<TypeDef_mxJPO,List<String>> entry : _clazz2matches.entrySet())  {
+        for (final Map.Entry<TypeDef_mxJPO,Set<String>> entry : typeDef2Matches.entrySet())  {
             final AbstractObject_mxJPO instance = entry.getKey().newTypeInstance();
-            clazz2names.put(entry.getKey(), instance.getMatchingNames(_context, entry.getValue()));
+            final Set<String> matchingMxNames = new TreeSet<String>();
+            clazz2names.put(entry.getKey(), matchingMxNames);
+            for (final String mxName : instance.getMxNames(_paramCache))  {
+                for (final String match : entry.getValue())  {
+                    if (instance.matchMxName(_paramCache, mxName, match))  {
+                        matchingMxNames.add(mxName);
+                        break;
+                    }
+                }
+            }
         }
 
         return clazz2names;

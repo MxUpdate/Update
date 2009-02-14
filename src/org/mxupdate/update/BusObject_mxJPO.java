@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,7 +50,6 @@ import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.xml.sax.SAXException;
 
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertFromFileName;
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
@@ -173,17 +171,17 @@ public class BusObject_mxJPO
     }
 
     /**
-     * Evaluates the matching names for this administrational business objects.
-     * Matching means, that the name and / or revision of the business object
-     * matches the collection of given matches.
+     * Searches for all business object of current type definition and returns
+     * all MX names. The revision of the business object is appended to the
+     * name of the business object split by {@link #SPLIT_NAME}.
      *
-     * @param _context          context for this request
-     * @param _matches          collection of matches
-     * @return set of found matching business object names
+     * @param _paramCache   parameter cache
+     * @return set of found business object names (and revision)
+     * @throws MatrixException if the query for all business objects for given
+     *                         type failed
      */
     @Override
-    public Set<String> getMatchingNames(final Context _context,
-                                        final Collection<String> _matches)
+    public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
         final StringList selects = new StringList();
@@ -191,70 +189,44 @@ public class BusObject_mxJPO
         selects.addElement("revision");
 
         final Query query = new Query();
-        query.open(_context);
+        query.open(_paramCache.getContext());
         query.setBusinessObjectType(this.getTypeDef().getMxBusType());
-        final BusinessObjectWithSelectList list = query.select(_context, selects);
-        query.close(_context);
+        final BusinessObjectWithSelectList list = query.select(_paramCache.getContext(), selects);
+        query.close(_paramCache.getContext());
 
         final Set<String> ret = new TreeSet<String>();
         for (final Object mapObj : list)  {
             final BusinessObjectWithSelect map = (BusinessObjectWithSelect) mapObj;
             final String busName = (String) map.getSelectDataList("name").get(0);
             final String busRevision = (String) map.getSelectDataList("revision").get(0);
-            final StringBuilder name = new StringBuilder()
-                    .append(map.getSelectDataList("name").get(0));
+            final StringBuilder name = new StringBuilder().append(busName);
             if ((busRevision != null) && !"".equals(busRevision))  {
-                name.append(SPLIT_NAME)
-                    .append(map.getSelectDataList("revision").get(0));
+                name.append(SPLIT_NAME).append(busRevision);
             }
-            for (final String match : _matches)  {
-                if (match(busName, match) || match(busRevision, match))  {
-                    ret.add(name.toString());
-                }
-            }
+            ret.add(name.toString());
         }
         return ret;
     }
 
     /**
-     * Evaluates for given set of files all matching files and returns them as
-     * map (key is the file name, value is the name of the matrix
-     * administration (business) object).<br/>
-     * For the file name without prefix and suffix the name is splitted to get
-     * the name and revision of the business object. If the business object
-     * name or revision matches one of the collection match strings, the file
-     * is added to the map and is returned.
+     * Checks if given MX name without prefix and suffix matches given match
+     * string. The MX name is split with {@link #SPLIT_NAME} to get
+     * the name and revision of the business object. A MX name matches if the
+     * business object name or revision matches.
      *
-     * @param _files            set of files used to found matching files
-     * @param _matches          collection of match strings
-     * @return map of files (as key) with the related matrix name (as value)
-     * @see #getMatchingFileNames(Set)
+     * @param _paramCache   parameter cache
+     * @param _mxName       name (and revision) of the administration business
+     *                      object
+     * @param _match        string which must be matched
+     * @return <i>true</i> if the given MX name matches; otherwise <i>false</i>
      */
     @Override
-    public Map<File, String> getMatchingFileNames(final Set<File> _files,
-                                                  final Collection<String> _matches)
+    public boolean matchMxName(final ParameterCache_mxJPO _paramCache,
+                               final String _mxName,
+                               final String _match)
     {
-        final Map<File,String> ret = new TreeMap<File,String>();
-
-        final String suffix = this.getTypeDef().getFileSuffix();
-        final int suffixLength = suffix.length();
-        final String prefix = this.getTypeDef().getFilePrefix();
-        final int prefixLength = (prefix != null) ? prefix.length() : 0;
-
-        for (final File file : _files)  {
-            final String fileName = file.getName();
-            for (final String match : _matches)  {
-                if (((prefix == null) || fileName.startsWith(prefix)) && fileName.endsWith(suffix))  {
-                    final String name = convertFromFileName(fileName.substring(0, fileName.length() - suffixLength)
-                                                                    .substring(prefixLength));
-                    final String[] nameRev = name.split(SPLIT_NAME);
-                    if (match(nameRev[0], match) || ((nameRev.length > 1) && match(nameRev[1], match)))  {
-                        ret.put(file, name);
-                    }
-                }
-            }
-        }
-        return ret;
+        final String[] nameRev = _mxName.split(SPLIT_NAME);
+        return (match(nameRev[0], _match) || ((nameRev.length > 1) && match(nameRev[1], _match)));
     }
 
     /**
@@ -336,14 +308,14 @@ public class BusObject_mxJPO
         if (this.busDescription != null)  {
             desc.append(this.busDescription);
         }
-        setDescription(desc.toString());
+        this.setDescription(desc.toString());
 
         // define name
         final StringBuilder name = new StringBuilder().append(this.busName);
         if ((this.busRevision != null) && !"".equals(this.busRevision))  {
             name.append(SPLIT_NAME).append(this.busRevision);
         }
-        setName(name.toString());
+        this.setName(name.toString());
 
         // evaluate from connections
         if (this.getTypeDef().getMxBusRelsFrom() != null)  {

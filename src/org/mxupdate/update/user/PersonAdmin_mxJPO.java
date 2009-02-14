@@ -23,14 +23,12 @@ package org.mxupdate.update.user;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import matrix.db.BusinessObjectWithSelect;
 import matrix.db.BusinessObjectWithSelectList;
-import matrix.db.Context;
 import matrix.db.Query;
 import matrix.util.MatrixException;
 import matrix.util.StringList;
@@ -155,7 +153,7 @@ public class PersonAdmin_mxJPO
     /**
      * Constructor used to initialize the type definition enumeration.
      *
-     * @param person_mxJPO TODO
+     * @param _typeDef      person type definition
      */
     public PersonAdmin_mxJPO(final TypeDef_mxJPO _typeDef)
     {
@@ -163,31 +161,29 @@ public class PersonAdmin_mxJPO
     }
 
     /**
-     * Returns a set of found person names. First for all matching
-     * administration persons is searched. Then, all persons are removed from
-     * the matching set, for whom a related business person object exists. This
-     * new set is returned.
+     * Returns a set of found person names. First for all administration
+     * persons are searched. Then, all persons are removed from the matching
+     * set, for whom a related business person object exists. This new set is
+     * returned.
      *
-     * @param _contex       context for this request
-     * @param _matched      collection of match strings for which the persons
-     *                      are searched
-     * @return set of matching person names
+     * @param _paramCache   parameter cache
+     * @return set of person names for which no person business object exists
+     * @throws MatrixException if the query for person objects failed
      */
     @Override
-    public Set<String> getMatchingNames(final Context _context,
-                                        final Collection<String> _matches)
+    public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
-        final Set<String> persons = super.getMatchingNames(_context, _matches);
+        final Set<String> persons = super.getMxNames(_paramCache);
 
         // evaluate for all business person object names
         final StringList selects = new StringList();
         selects.addElement("name");
         final Query query = new Query();
-        query.open(_context);
+        query.open(_paramCache.getContext());
         query.setBusinessObjectType(this.getTypeDef().getMxBusType());
-        final BusinessObjectWithSelectList list = query.select(_context, selects);
-        query.close(_context);
+        final BusinessObjectWithSelectList list = query.select(_paramCache.getContext(), selects);
+        query.close(_paramCache.getContext());
 
         // remove the found persons which related business object
         for (final Object mapObj : list)  {
@@ -293,7 +289,7 @@ public class PersonAdmin_mxJPO
     }
 
     @Override
-    protected void writeObject(Writer _out)
+    protected void writeObject(final Writer _out)
             throws IOException
     {
         _out.append(" \\\n    access \"").append(join(',', this.access, "none")).append("\"")

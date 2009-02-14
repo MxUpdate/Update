@@ -27,10 +27,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
-import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import matrix.db.Context;
@@ -174,20 +171,6 @@ public abstract class AbstractObject_mxJPO
     }
 
     /**
-     * Returns for the list of strings to match (parameter
-     * <code>_matches</code>) the list of matching administration (business)
-     * object names.
-     *
-     * @param _context  context for this request
-     * @param _matches  collection of match strings
-     * @return set of names of this type matching the collection of strings
-     * @throws MatrixException
-     */
-    public abstract Set<String> getMatchingNames(final Context _context,
-                                                 final Collection<String> _matches)
-            throws MatrixException;
-
-    /**
      * Export given administration (business) object with given name into given
      * path. The name of the file where is written through is evaluated within
      * this export method.
@@ -235,70 +218,60 @@ public abstract class AbstractObject_mxJPO
             throws MatrixException, SAXException, IOException;
 
     /**
-     * Evaluates for given set of files all matching files and returns them as
-     * map (key is the file name, value is the name of the matrix
-     * administration (business) object).<br/>
-     * If the file name without prefix and suffix matches one of the collection
-     * match strings, the file is added to the map and is returned.
+     * Returns a list of names exists within MX.
      *
-     * @param _files            set of files used to found matching files
-     * @param _matches          collection of match strings
-     * @return map of files (as key) with the related matrix name (as value)
-     * @see #getMatchingFileNames(Set)
+     * @param _paramCache   parameter cache
+     * @return set of names of this administration type
+     * @throws MatrixException if the search within MX failed
      */
-    public Map<File, String> getMatchingFileNames(final Set<File> _files,
-                                                  final Collection<String> _matches)
+    public abstract Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
+            throws MatrixException;
+
+    /**
+     * Checks if given MX name without prefix and suffix matches given match
+     * string.
+     *
+     * @param _paramCache   parameter cache
+     * @param _mxName       name of the administration object to check
+     * @param _match        string which must be matched
+     * @return <i>true</i> if the given MX name matches; otherwise <i>false</i>
+     */
+    public boolean matchMxName(final ParameterCache_mxJPO _paramCache,
+                               final String _mxName,
+                               final String _match)
     {
-        final Map<File,String> ret = new TreeMap<File,String>();
-
-        final String suffix = this.getTypeDef().getFileSuffix();
-        final int suffixLength = (suffix != null) ? suffix.length() : 0;
-        final String prefix = this.getTypeDef().getFilePrefix();
-        final int prefixLength = (prefix != null) ? prefix.length() : 0;
-
-        for (final File file : _files)  {
-            final String fileName = file.getName();
-            for (final String match : _matches)  {
-                if (((prefix == null) || fileName.startsWith(prefix)) && ((suffix == null) || fileName.endsWith(suffix)))  {
-                    final String name = convertFromFileName(fileName.substring(0, fileName.length() - suffixLength)
-                                                                    .substring(prefixLength));
-                    if (match(name, match))  {
-                        ret.put(file, name);
-                    }
-                }
-            }
-        }
-        return ret;
+        return match(_mxName, _match);
     }
 
     /**
-     * Checks for all files if the prefix and file extension are fulfilled. For
-     * this files, the Matrix name is extracted and returned together with
-     * the file in a map.
+     * Extracts the MX name from given file name if the file prefix and suffix
+     * matches. If the file prefix and suffix not matches a <code>null</code>
+     * is returned.
      *
-     * @param _files    files to check if they are defining an update
-     * @return map of files (as key) with the related matrix name (as value)
-     * @see #getMatchingFileNames(Set, Collection)
+     * @param _paramCache   parameter cache
+     * @param _file         file for which the MX name is searched
+     * @return MX name or <code>null</code> if the file is not an update file
+     *         for current type definition
      */
-    public Map<File, String> getMatchingFileNames(final Set<File> _files)
+    public String extractMxName(final ParameterCache_mxJPO _paramCache,
+                                final File _file)
     {
-        final Map<File,String> ret = new TreeMap<File,String>();
-
         final String suffix = this.getTypeDef().getFileSuffix();
         final int suffixLength = (suffix != null) ? suffix.length() : 0;
         final String prefix = this.getTypeDef().getFilePrefix();
         final int prefixLength = (prefix != null) ? prefix.length() : 0;
-        for (final File file : _files)  {
-            final String fileName = file.getName();
-            if (((prefix == null) || fileName.startsWith(prefix))
-                    && ((prefix == null) || fileName.endsWith(suffix)))  {
-                final String name = fileName.substring(0, fileName.length() - suffixLength)
-                                            .substring(prefixLength);
-                ret.put(file, convertFromFileName(name));
-            }
+
+        final String fileName = _file.getName();
+        final String mxName;
+        if (((prefix == null) || fileName.startsWith(prefix)) && ((suffix == null) || fileName.endsWith(suffix)))  {
+            mxName = convertFromFileName(fileName.substring(0, fileName.length() - suffixLength)
+                                                 .substring(prefixLength));
+        } else  {
+            mxName = null;
         }
-        return ret;
+        return mxName;
     }
+
 
     /**
      * Deletes administration object with given name.

@@ -87,24 +87,22 @@ public class Person_mxJPO
     }
 
     /**
-     * The matching names are evaluated with the help of the business
+     * The list of all person names are evaluated with the help of the business
      * person objects. From the return values of the query for all business
      * person objects, only the business object name is returned in the set
      * (because the revision of the person business object is always a
      * &quot;-&quot;).
      *
-     * @param _contex       context for this request
-     * @param _matched      collection of match strings for which the persons
-     *                      are searched
-     * @return set of matching person names
+     * @param _paramCache   parameter cache
+     * @return set of person names
+     * @throws MatrixException if the query for persons failed
      * @see #personBus
      */
     @Override
-    public Set<String> getMatchingNames(final Context _context,
-                                        final Collection<String> _matches)
+    public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
-        final Set<String> persons = this.personBus.getMatchingNames(_context, _matches);
+        final Set<String> persons = this.personBus.getMxNames(_paramCache);
         final Set<String> ret = new TreeSet<String>();
         for (final String busName : persons)  {
             ret.add(busName.split(BusObject_mxJPO.SPLIT_NAME)[0]);
@@ -192,6 +190,7 @@ public class Person_mxJPO
         this.personAdmin.update(_paramCache, _name, _file, _newVersion);
     }
 
+    @Override
     protected void write(final ParameterCache_mxJPO _paramCache, final Writer _out) throws IOException,
             MatrixException {
     }

@@ -23,11 +23,9 @@ package org.mxupdate.update.datamodel;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import matrix.db.Context;
@@ -38,7 +36,6 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertFromFileName;
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
-import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
@@ -130,72 +127,32 @@ public class Attribute_mxJPO
     }
 
     /**
-     * Evaluates for given set of files all matching files and returns them as
-     * map (key is the file name, value is the name of the matrix
-     * administration (business) object).<br/>
-     * If the file name without prefix and suffix matches one of the collection
-     * match strings, the file is added to the map and is returned.
+     * Extracts the attribute MX name from given file name if the file prefix
+     * and suffix matches. If the file prefix and suffix not matches a
+     * <code>null</code> is returned.
      *
-     * @param _files            set of files used to found matching files
-     * @param _matches          collection of match strings
-     * @return map of files (as key) with the related matrix name (as value)
-     * @see #getMatchingFileNames(Set)
+     * @param _paramCache   parameter cache
+     * @param _file         file for which the attribute MX name is searched
+     * @return MX name or <code>null</code> if the file is not an update file
+     *         for an attribute
      */
     @Override
-    public Map<File, String> getMatchingFileNames(final Set<File> _files,
-                                                  final Collection<String> _matches)
+    public String extractMxName(final ParameterCache_mxJPO _paramCache,
+                                final File _file)
     {
-        final Map<File,String> ret = new TreeMap<File,String>();
-
         final String suffix = this.getTypeDef().getFileSuffix();
-        final int suffixLength = suffix.length();
-        for (final String prefix : PREFIXES)  {
-            final int prefixLength = prefix.length();
+        final int suffixLength = (suffix != null) ? suffix.length() : 0;
 
-            for (final File file : _files)  {
-                final String fileName = file.getName();
-                for (final String match : _matches)  {
-                    if (fileName.startsWith(prefix) && fileName.endsWith(suffix))  {
-                        final String name = convertFromFileName(fileName.substring(0, fileName.length() - suffixLength)
-                                                                        .substring(prefixLength));
-                        if (match(name, match))  {
-                            ret.put(file, name);
-                        }
-                    }
-                }
+        final String fileName = _file.getName();
+        String mxName = null;
+        for (final String prefix : PREFIXES)  {
+            if (fileName.startsWith(prefix) && ((suffix == null) || fileName.endsWith(suffix)))  {
+                mxName = convertFromFileName(fileName.substring(0, fileName.length() - suffixLength)
+                                                     .substring(prefix.length()));
+                break;
             }
         }
-        return ret;
-    }
-
-    /**
-     * Checks for all files if the prefix and file extension are fulfilled. For
-     * this files, the Matrix name is extracted and returned together with
-     * the file in a map.
-     *
-     * @param _files    files to check if they are defining an update
-     * @return map of files (as key) with the related matrix name (as value)
-     * @see #getMatchingFileNames(Set, Collection)
-     */
-    @Override
-    public Map<File, String> getMatchingFileNames(final Set<File> _files)
-    {
-        final Map<File,String> ret = new TreeMap<File,String>();
-
-        final String suffix = this.getTypeDef().getFileSuffix();
-        final int suffixLength = suffix.length();
-        for (final String prefix : PREFIXES)  {
-            final int prefixLength = prefix.length();
-            for (final File file : _files)  {
-                final String fileName = file.getName();
-                if (fileName.startsWith(prefix) && fileName.endsWith(suffix))  {
-                    final String name = fileName.substring(0, fileName.length() - suffixLength)
-                                                .substring(prefixLength);
-                    ret.put(file, convertFromFileName(name));
-                }
-            }
-        }
-        return ret;
+        return mxName;
     }
 
     /**

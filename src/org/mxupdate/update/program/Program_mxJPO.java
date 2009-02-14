@@ -23,7 +23,6 @@ package org.mxupdate.update.program;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -33,7 +32,6 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
-import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
@@ -59,29 +57,25 @@ public class Program_mxJPO
     }
 
     /**
-     * Evaluates for given collection of string which programs are matching
-     * returns them as set. Only programs which are not JPOs are returned.
+     * Searches for all programs which are not JPOs and returns this list.
      *
-     * @param _context          context for this request
-     * @param _matches          collection of strings which must match
+     * @param _paramCache   parameter cache
+     * @return set of all program names (which are not JPOs)
+     * @throws MatrixException if the &quot;<code>list program</code>&quot;
+     *                         failed which is used to evaluate the JPO names
      */
     @Override
-    public Set<String> getMatchingNames(final Context _context,
-                                        final Collection<String> _matches)
+    public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("list program * select name isjavaprogram dump \"\t\"");
         final Set<String> ret = new TreeSet<String>();
-        for (final String name : execMql(_context, cmd).split("\n"))  {
+        for (final String name : execMql(_paramCache.getContext(), cmd).split("\n"))  {
             if (!"".equals(name))  {
                 final String[] nameArr = name.split("\t");
                 if (!"TRUE".equals(nameArr[1]))  {
-                    for (final String match : _matches)  {
-                        if (match(nameArr[0], match))  {
-                            ret.add(nameArr[0]);
-                        }
-                    }
+                    ret.add(nameArr[0]);
                 }
             }
         }
