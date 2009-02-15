@@ -19,6 +19,7 @@
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -47,7 +48,6 @@ import org.mxupdate.mapping.UpdateCheck_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
@@ -62,20 +62,6 @@ import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
  */
 public class MxUpdate_mxJPO
 {
-    /**
-     * Defines the length of the parameters strings.
-     *
-     * @see #appendDescription(String, List, String)
-     */
-    private static final int LENGTH_DESC_PARAMS = 42;
-
-    /**
-     * Defines the length of one description line.
-     *
-     * @see #appendDescription(String, List, String)
-     */
-    private static final int LENGTH_DESC_LINE = 100;
-
     /**
      * String of the key within the parameter cache for the ignore file
      * parameter.
@@ -102,7 +88,56 @@ public class MxUpdate_mxJPO
     private static final String PARAM_PATH = "Path";
 
     /**
-     * Stored the descriptions of all parameters.
+     * String of the key within the parameter cache for the copyright used for
+     * the help description.
+     *
+     * @see #printHelp(ParameterCache_mxJPO)
+     */
+    private static final String PARAM_HELP_COPYRIGHT = "HelpCopyright";
+
+    /**
+     * String of the key within the parameter cache for the length of a
+     * description line used for the help description.
+     *
+     * @see #printHelp(ParameterCache_mxJPO)
+     */
+    private static final String PARAM_HELP_LENGTHLINE = "HelpLengthLine";
+
+    /**
+     * String of the key within the parameter cache for the length of the
+     * parameter line used for the help description.
+     *
+     * @see #printHelp(ParameterCache_mxJPO)
+     */
+    private static final String PARAM_HELP_LENGTHPARAMS = "HelpLengthParams";
+
+    /**
+     * String of the key within the parameter cache for the prefix used for
+     * the help description.
+     *
+     * @see #printHelp(ParameterCache_mxJPO)
+     */
+    private static final String PARAM_HELP_PREFIX = "HelpPrefix";
+
+    /**
+     * String of the key within the parameter cache for the help usage used for
+     * the help description.
+     *
+     * @see #printHelp(ParameterCache_mxJPO)
+     */
+    private static final String PARAM_HELP_USAGE = "HelpUsage";
+
+    /**
+     * Stored the descriptions of all parameters sorted by the parameters.
+     * The key are the parameters. For the alpha numerical sort, each parameter
+     * line must start with a '-' and a character. If the third character of
+     * the parameter line is an underscore ('_'), this is parameter list is
+     * does not contains a short parameter and will be removed within the help
+     * print. Otherwise the list of parameters contains a short parameter and
+     * must be printed completely.
+     *
+     * @see #appendDescription(CharSequence, Collection, Collection)
+     * @see #printHelp(ParameterCache_mxJPO)
      */
     private final Map<String,String> description = new TreeMap<String,String>();
 
@@ -294,6 +329,7 @@ public class MxUpdate_mxJPO
      *                      (or <code>null</code> if not defined)
      * @throws Error if a parameter is defined twice)
      * @see #allParams
+     * @see #description
      */
     private void appendDescription(final CharSequence _description,
                                    final Collection<String> _params,
@@ -310,11 +346,11 @@ public class MxUpdate_mxJPO
 
         // check if first parameter is not a short parameter
         final String firstParam = _params.iterator().next();
-        final char prefix = firstParam.charAt(0);
-        final StringBuilder line = new StringBuilder().append(' ');
+        final StringBuilder param = new StringBuilder();
         if (firstParam.length() > 1)  {
-            line.append("   ");
+            param.append('-').append(firstParam.charAt(0)).append('_');
         }
+
 
         // append all parameters to the description text
         boolean first = true;
@@ -322,105 +358,22 @@ public class MxUpdate_mxJPO
             if (first)  {
                 first = false;
             } else  {
-                line.append(',');
+                param.append(',');
             }
             if (paramString.length() > 1)  {
-                line.append('-');
+                param.append('-');
             }
-            line.append('-').append(paramString);
+            param.append('-').append(paramString);
         }
 
         // append arguments
         if (_args != null)  {
             for (final String arg : _args)  {
-                line.append(" <").append(arg).append('>');
+                param.append(" <").append(arg).append('>');
             }
         }
 
-        // append spaces
-        if (line.length() > LENGTH_DESC_PARAMS)  {
-            line.append("\n ");
-            for (int i = 1; i < LENGTH_DESC_PARAMS; i++)  {
-                line.append(' ');
-            }
-        } else  {
-            for (int i = line.length(); i < LENGTH_DESC_PARAMS; i++)  {
-                line.append(' ');
-            }
-        }
-
-        // append description
-        first = true;
-        for (final String partDesc : _description.toString().split("\n"))  {
-            int length = LENGTH_DESC_PARAMS;
-            if (first == true)  {
-                first = false;
-            } else  {
-                line.append("\n");
-                for (int i = 0; i < LENGTH_DESC_PARAMS; i++)  {
-                    line.append(' ');
-                }
-            }
-            for (final String desc : partDesc.split(" "))  {
-                if (!"".equals(desc))  {
-                    length += desc.length() + 1;
-                    if (length > LENGTH_DESC_LINE)  {
-                        line.append("\n");
-                        for (int i = 0; i < LENGTH_DESC_PARAMS; i++)  {
-                            line.append(' ');
-                        }
-                        length = LENGTH_DESC_PARAMS + desc.length() + 1;
-                    }
-                    line.append(' ').append(desc);
-                }
-            }
-        }
-
-        this.description.put("" + prefix + line, line.toString());
-    }
-
-    /**
-     * Prints the help for the MxUpdate functionality.
-     *
-     * @see #description
-     */
-    private void printHelp()
-    {
-        System.out.print("usage: exec prog MxUpdate ");
-        boolean first = true;
-        for (final Mode_mxJPO mode : Mode_mxJPO.values())  {
-            final String param = mode.getParameterList().iterator().next();
-            if (first)  {
-                first = false;
-            } else  {
-                System.out.print(" | ");
-            }
-            if (param.length() > 1)  {
-                System.out.print('-');
-            }
-            System.out.print('-');
-            System.out.print(param);
-        }
-        System.out.println(" | ... \n");
-
-        for (final String line : this.description.values())  {
-            System.out.println(line);
-        }
-        System.out.println();
-        System.out.println("--------------------------------------------------------------------------------");
-        System.out.println(" Copyright 2008-2009 The MxUpdate Team");
-        System.out.println(" Licensed under the Apache License, Version 2.0 (the \"License\");");
-        System.out.println(" you may not use this files except in compliance with the License.");
-        System.out.println(" You may obtain a copy of the License at");
-        System.out.println("");
-        System.out.println("      http://www.apache.org/licenses/LICENSE-2.0");
-        System.out.println("");
-        System.out.println(" Unless required by applicable law or agreed to in writing, software");
-        System.out.println(" distributed under the License is distributed on an \"AS IS\" BASIS,");
-        System.out.println(" WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.");
-        System.out.println(" See the License for the specific language governing permissions and");
-        System.out.println(" limitations under the License.");
-        System.out.println("--------------------------------------------------------------------------------");
+        this.description.put(param.toString(), _description.toString());
     }
 
     public void mxMain(final Context _context,
@@ -434,7 +387,7 @@ public class MxUpdate_mxJPO
 
         try {
             // to be sure....
-            MqlUtil_mxJPO.execMql(_context, "verbose off");
+            execMql(_context, "verbose off");
 
             Mode_mxJPO mode = null;
 
@@ -481,7 +434,7 @@ public class MxUpdate_mxJPO
             }
 
             if (unknown || (Mode_mxJPO.HELP == mode) || (mode == null))  {
-                this.printHelp();
+                this.printHelp(paramCache);
             } else if (Mode_mxJPO.EXPORT == mode)  {
                 this.export(paramCache, clazz2matches);
             } else if (Mode_mxJPO.IMPORT == mode)  {
@@ -495,6 +448,98 @@ public class MxUpdate_mxJPO
             throw e;
         }
 
+    }
+
+    /**
+     * Prints the help for the MxUpdate functionality.
+     *
+     * @param _paramCache   parameter cache
+     * @throws IOException
+     * @see #description
+     */
+    private void printHelp(final ParameterCache_mxJPO _paramCache)
+            throws IOException
+    {
+        final String prefix = _paramCache.getValueString(PARAM_HELP_PREFIX);
+        final int lengthLine = _paramCache.getValueInteger(PARAM_HELP_LENGTHLINE);
+        final int lengthParam = _paramCache.getValueInteger(PARAM_HELP_LENGTHPARAMS);
+        final Appendable out = System.out;
+
+        // first print the usage text with the mode parameters
+        out.append('\n')
+           .append(prefix)
+           .append(_paramCache.getValueString(PARAM_HELP_USAGE).trim())
+           .append(' ');
+        boolean first = true;
+        for (final Mode_mxJPO mode : Mode_mxJPO.values())  {
+            final String param = mode.getParameterList().iterator().next();
+            if (first)  {
+                first = false;
+            } else  {
+                out.append(" | ");
+            }
+            if (param.length() > 1)  {
+                out.append('-');
+            }
+            out.append('-');
+            out.append(param);
+        }
+        out.append(" | ... \n\n");
+
+        // print all parameters with description
+        for (final Map.Entry<String,String> descLine : this.description.entrySet())  {
+
+            StringBuilder line = new StringBuilder().append(prefix);
+
+            // append list of parameters
+            if ((descLine.getKey().length() > 3) && (descLine.getKey().charAt(2) == '_'))  {
+                line.append("   ").append(descLine.getKey().substring(3));
+            } else  {
+                line.append(descLine.getKey());
+            }
+
+            // append spaces behind parameter list
+            if (line.length() > lengthParam)  {
+                out.append(line).append('\n');
+                line = new StringBuilder().append(prefix);
+            }
+            for (int i = line.length(); i < lengthParam; i++)  {
+                line.append(' ');
+            }
+
+            // append parameter description
+            first = true;
+            for (final String partDesc : descLine.getValue().toString().split("\n"))  {
+                if (first == true)  {
+                    first = false;
+                } else  {
+                    out.append(line).append('\n');
+                    line = new StringBuilder().append(prefix);
+                    for (int i = 1; i < lengthParam; i++)  {
+                        line.append(' ');
+                    }
+                }
+                for (final String desc : partDesc.split(" "))  {
+                    if (!"".equals(desc))  {
+                        if (line.length() > lengthLine)  {
+                            out.append(line).append('\n');
+                            line = new StringBuilder().append(prefix);
+                            for (int i = 1; i < lengthParam; i++)  {
+                                line.append(' ');
+                            }
+                        }
+                        line.append(' ').append(desc);
+                    }
+                }
+            }
+            out.append(line).append('\n');
+        }
+
+        // print copyright
+        for (final String copyright : _paramCache.getValueString(PARAM_HELP_COPYRIGHT).split("\n"))  {
+            out.append(prefix).append(copyright).append('\n');
+        }
+        out.append('\n');
     }
 
     /**
