@@ -23,12 +23,10 @@ package org.mxupdate.update.userinterface;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Stack;
 
 import matrix.db.Context;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
@@ -40,7 +38,7 @@ import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
  * @version $Id$
  */
 public class Form_mxJPO
-        extends AbstractAdminObject_mxJPO
+        extends AbstractUIWithFields_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
@@ -66,15 +64,6 @@ public class Form_mxJPO
             + "}";
 
     /**
-     * Stores all fields of this form instance.
-     *
-     * @see #parse(String, String)
-     * @see #writeObject(Appendable)
-     */
-    private final Stack<TableColumn_mxJPO> fields
-            = new Stack<TableColumn_mxJPO>();
-
-    /**
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
@@ -97,15 +86,7 @@ public class Form_mxJPO
     protected void parse(final String _url,
                          final String _content)
     {
-
-        if ("/fieldList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/fieldList/field".equals(_url))  {
-            this.fields.add(new TableColumn_mxJPO());
-        } else if (_url.startsWith("/fieldList/field/"))  {
-            this.fields.peek().parse(_url.substring(16), _content);
-
-        } else if (_url.startsWith("/footer"))  {
+        if (_url.startsWith("/footer"))  {
             // to be ignored ...
         } else if (_url.startsWith("/header"))  {
             // to be ignored ...
@@ -131,13 +112,14 @@ public class Form_mxJPO
      * @param _out          appendable instance to the TCL update file
      * @throws IOException if the TCL update code for the fields could not be
      *                     written
+     * @see Field#write(Appendable)
      */
     @Override
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
             throws IOException
     {
-        for (final TableColumn_mxJPO field : this.fields)  {
+        for (final Field field : this.getFields())  {
             _out.append(" \\\n    field");
             field.write(_out);
         }
@@ -157,8 +139,8 @@ public class Form_mxJPO
             throws IOException
     {
         _out.append("\n\norderFields \"${NAME}\" [list \\\n");
-        for (final TableColumn_mxJPO field : this.fields)  {
-            _out.append("    \"").append(convertTcl(field.name)).append("\" \\\n");
+        for (final Field field : this.getFields())  {
+            _out.append("    \"").append(convertTcl(field.getName())).append("\" \\\n");
         }
         _out.append("]");
     }
@@ -227,7 +209,7 @@ public class Form_mxJPO
                 .append(" !hidden");
 
         // remove all fields
-        for (final TableColumn_mxJPO field : this.fields)  {
+        for (final Field field : this.getFields())  {
             preMQLCode.append(" field delete name \"").append(field.getName()).append('\"');
         }
 

@@ -22,12 +22,9 @@ package org.mxupdate.update.userinterface;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
-import java.util.Stack;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
@@ -36,20 +33,12 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  * @version $Id$
  */
 public class Table_mxJPO
-        extends AbstractAdminObject_mxJPO
+        extends AbstractUIWithFields_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = -518184934631890227L;
-
-    /**
-     * Stores all table columns of this web table instance.
-     *
-     * @see #parse(String, String)
-     * @see #writeObject(Appendable)
-     */
-    final Stack<TableColumn_mxJPO> columns = new Stack<TableColumn_mxJPO>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -64,42 +53,19 @@ public class Table_mxJPO
     }
 
     /**
-     * Parses all column information from the web table.
-     *
-     * @param _url      URL to parse
-     * @param _content  related content of the URL to parse
-     * @see #columns
-     */
-    @Override
-    protected void parse(final String _url,
-                         final String _content)
-    {
-        if ("/columnList".equals(_url))  {
-            // to be ignored...
-        } else if ("/columnList/column".equals(_url))  {
-            this.columns.add(new TableColumn_mxJPO());
-        } else if (_url.startsWith("/columnList/column/"))  {
-            this.columns.peek().parse(_url.substring(18), _content);
-        } else  {
-            super.parse(_url, _content);
-        }
-    }
-
-    /**
      * Writes each column to the appendable instance.
      *
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
      * @throws IOException if the TCL update code could not be written
-     * @see #columns
-     * @see TableColumn_mxJPO#write(Writer)
+     * @see Field#write(Appendable)
      */
     @Override
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
             throws IOException
     {
-        for (final TableColumn_mxJPO column : this.columns)  {
+        for (final Field column : this.getFields())  {
             _out.append(" \\\n    column");
             column.write(_out);
         }
@@ -145,7 +111,7 @@ public class Table_mxJPO
                 .append(" !hidden");
 
         // remove all columns
-        for (final TableColumn_mxJPO column : this.columns)  {
+        for (final Field column : this.getFields())  {
             preMQLCode.append(" column delete name \"").append(column.getName()).append('\"');
         }
 
@@ -155,5 +121,4 @@ public class Table_mxJPO
 
         super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
     }
-
 }
