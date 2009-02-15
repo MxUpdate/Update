@@ -574,72 +574,72 @@ throw new Exception("some states are not defined anymore!");
         /**
          * Name of the state.
          */
-        String name = null;
+        private String name;
 
         /**
          * Symbolic Name of the state.
          */
-        String nameSymbolic = null;
+        private String nameSymbolic;
 
         /**
          * Called action program for this state.
          */
-        String actionProgram = null;
+        private String actionProgram;
 
         /**
          * Input arguments for the action program for this state.
          */
-        String actionInput = null;
+        private String actionInput;
 
         /**
          * Called check program for this state.
          */
-        String checkProgram = null;
+        private String checkProgram;
 
         /**
          * Input arguments for the check program for this state.
          */
-        String checkInput = null;
+        private String checkInput;
 
         /**
          * Does the state have an auto promotion?
          */
-        boolean autoPromotion = false;
+        private boolean autoPromotion = false;
 
         /**
          * Must a checkout written in the history?
          */
-        boolean checkoutHistory = false;
+        private boolean checkoutHistory = false;
 
         /**
          * Is the business object in this state revisionable?
          */
-        boolean revisionable = false;
+        private boolean revisionable = false;
 
         /**
          * Is the business object in this state versionable?
          */
-        boolean versionable = false;
+        private boolean versionable = false;
 
         /**
          * Route message of this state.
          */
-        String routeMessage;
+        private String routeMessage;
 
         /**
          * Route users of this state.
          */
-        final Set<String> routeUsers = new TreeSet<String>();
+        private final Set<String> routeUsers = new TreeSet<String>();
 
         /**
          * Set holding the complete owner access.
          */
-        private final Stack<String> ownerAccess = new Stack<String>();
+        private final Set<String> ownerAccess = new TreeSet<String>();
 
         /**
          * Set holding the complete public access.
          */
-        private final Stack<String> publicAccess = new Stack<String>();
+        private final Set<String> publicAccess = new TreeSet<String>();
 
         /**
          * Stack used to hold the user access while parsing.
@@ -878,17 +878,17 @@ throw new Exception("some states are not defined anymore!");
         /**
          * Holds the user references of a user access.
          */
-        String userRef = null;
+        private String userRef;
 
         /**
          * Holds the access of the user.
          */
-        final Stack<String> access = new Stack<String>();
+        private final Set<String> access = new TreeSet<String>();
 
         /**
          * Holds the expression filter of a user access.
          */
-        String expressionFilter = null;
+        private String expressionFilter;
 
         /**
          * Compares this user access instance to another user access instance.
