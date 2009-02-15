@@ -208,8 +208,7 @@ public class SimpleCharStream_mxJPO
    * @see #getEndColumn
    */
 
-  @Deprecated
-public int getColumn() {
+  public int getColumn() {
      return bufcolumn[bufpos];
   }
 
@@ -218,8 +217,7 @@ public int getColumn() {
    * @see #getEndLine
    */
 
-  @Deprecated
-public int getLine() {
+  public int getLine() {
      return bufline[bufpos];
   }
 
@@ -471,4 +469,4 @@ public int getLine() {
   }
 
 }
-/* JavaCC - OriginalChecksum=5efb8580c94f5d58ce51e8256081f96a (do not edit this line) */
+/* JavaCC - OriginalChecksum=2e73e3583585e9b6ced1e6cf3f0248af (do not edit this line) */

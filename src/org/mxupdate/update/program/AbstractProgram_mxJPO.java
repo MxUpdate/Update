@@ -25,7 +25,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
@@ -47,9 +46,15 @@ public abstract class AbstractProgram_mxJPO
      */
     private static final long serialVersionUID = -6353366924945315894L;
 
-    protected AbstractProgram_mxJPO(final TypeDef_mxJPO def)
+    /**
+     *
+     * @param _typeDef  type definition of the program
+     * @param _mxName   MX name of the program object
+     */
+    protected AbstractProgram_mxJPO(final TypeDef_mxJPO _typeDef,
+                                    final String _mxName)
     {
-        super(def);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -65,48 +70,42 @@ public abstract class AbstractProgram_mxJPO
      * </ul>
      *
      * @param _paramCache   parameter cache
-     * @param _name         name of the program object
      * @throws MatrixException if the &quot;basic&quot; properties could not be
      *                         read from the program object
      */
     @Override
-    protected void parse(final ParameterCache_mxJPO _paramCache,
-                         final String _name)
+    protected void parse(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
-        // name is defined as parameter
-        this.setName(_name);
         // set author depending on the properties
-        this.setAuthor(this.getPropValue(_paramCache.getContext(), _name, AdminPropertyDef.AUTHOR));
+        this.setAuthor(this.getPropValue(_paramCache.getContext(), AdminPropertyDef.AUTHOR));
         // set application depending on the properties
-        this.setApplication(this.getPropValue(_paramCache.getContext(), _name, AdminPropertyDef.APPLICATION));
+        this.setApplication(this.getPropValue(_paramCache.getContext(), AdminPropertyDef.APPLICATION));
         // sets the installation date depending on the properties
-        this.setInstallationDate(this.getPropValue(_paramCache.getContext(), _name, AdminPropertyDef.INSTALLEDDATE));
+        this.setInstallationDate(this.getPropValue(_paramCache.getContext(), AdminPropertyDef.INSTALLEDDATE));
         // sets the installer depending on the properties
-        this.setInstaller(this.getPropValue(_paramCache.getContext(), _name, AdminPropertyDef.INSTALLER));
+        this.setInstaller(this.getPropValue(_paramCache.getContext(), AdminPropertyDef.INSTALLER));
         // sets the original name depending on the properties
-        this.setOriginalName(this.getPropValue(_paramCache.getContext(), _name, AdminPropertyDef.ORIGINALNAME));
+        this.setOriginalName(this.getPropValue(_paramCache.getContext(), AdminPropertyDef.ORIGINALNAME));
         // sets the version depending on the properties
-        this.setVersion(this.getPropValue(_paramCache.getContext(), _name, AdminPropertyDef.VERSION));
+        this.setVersion(this.getPropValue(_paramCache.getContext(), AdminPropertyDef.VERSION));
     }
 
     /**
      * Deletes administration object from given type with given name.
      *
-     * @param _context      context for this request
-     * @param _name         name of object to delete
+     * @param _paramCache   parameter cache
      * @throws Exception if delete failed
      */
     @Override
-    public void delete(final Context _context,
-                       final String _name)
+    public void delete(final ParameterCache_mxJPO _paramCache)
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("delete ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(_name).append("\" ")
+                .append(" \"").append(this.getName()).append("\" ")
                 .append(this.getTypeDef().getMxAdminSuffix());
-        execMql(_context, cmd);
+        execMql(_paramCache.getContext(), cmd);
     }
 
     protected void update(final ParameterCache_mxJPO _paramCache,

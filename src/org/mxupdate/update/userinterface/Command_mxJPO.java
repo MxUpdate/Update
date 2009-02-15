@@ -22,7 +22,6 @@ package org.mxupdate.update.userinterface;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -46,33 +45,61 @@ public class Command_mxJPO
      */
     private static final long serialVersionUID = -6311434999021971324L;
 
-    String alt = null;
+    /**
+     * Alt label of the command.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
+     */
+    private String alt;
 
     /**
      * Label of the command.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
-    String label = null;
+    private String label;
 
     /**
      * HRef of the command.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
-    String href = null;
+    private String href;
 
     /**
      * Sorted list of assigned users of the command.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
-    final Set<String> users = new TreeSet<String>();
+    private final Set<String> users = new TreeSet<String>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the administration object
      */
-    public Command_mxJPO(final TypeDef_mxJPO _typeDef)
+    public Command_mxJPO(final TypeDef_mxJPO _typeDef,
+                         final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
+    /**
+     * Parses all command specific values. This includes:
+     * <ul>
+     * <li>{@link #alt}</li>
+     * <li>{@link #href}</li>
+     * <li>user references in {@link #userRef}</li>
+     * </ul>
+     *
+     * @param _url      URL to parse
+     * @param _content  related content of the URL to parse
+     */
     @Override
     protected void parse(final String _url,
                          final String _content)
@@ -96,8 +123,16 @@ public class Command_mxJPO
         }
     }
 
+    /**
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the TCL update code for the command could not be
+     *                     written
+     */
     @Override
-    protected void writeObject(Writer _out) throws IOException
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
+            throws IOException
     {
         _out.append(" \\\n    label \"").append(convertTcl(this.label)).append("\"")
             .append(" \\\n    href \"").append(convertTcl(this.href)).append("\"")
@@ -115,7 +150,8 @@ public class Command_mxJPO
 
     /**
      * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this command:
+     * in the <code>_preMQLCode</code> to reset this command. Following steps
+     * are done:
      * <ul>
      * <li>HRef, description, alt and label is set to empty string</li>
      * <li>all settings and users are removed</li>
@@ -133,6 +169,7 @@ public class Command_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update from derived class failed
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,

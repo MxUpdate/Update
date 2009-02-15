@@ -22,7 +22,6 @@ package org.mxupdate.update.userinterface;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -51,23 +50,35 @@ public class Channel_mxJPO
 
     /**
      * Alt (label) of the channel.
+     *
+     * @see #parse(Context, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
-    private String alt = null;
+    private String alt;
 
     /**
      * Height of the channel.
+     *
+     * @see #parse(Context, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
-    private Integer height = null;
+    private Integer height;
 
     /**
      * Href of the channel.
+     *
+     * @see #parse(Context, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
-    private String href = null;
+    private String href;
 
     /**
      * Label of the channel.
+     *
+     * @see #parse(Context, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
-    private String label = null;
+    private String label;
 
     /**
      * Stack with all referenced commands (used while parsing the channel).
@@ -81,7 +92,7 @@ public class Channel_mxJPO
      * Ordered map of referenced commands.
      *
      * @see #prepare(Context)
-     * @see #writeObject(Writer)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     final Map<Integer,CommandRef> orderCmds = new TreeMap<Integer,CommandRef>();
 
@@ -89,12 +100,26 @@ public class Channel_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the administration object
      */
-    public Channel_mxJPO(final TypeDef_mxJPO _typeDef)
+    public Channel_mxJPO(final TypeDef_mxJPO _typeDef,
+                         final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
+    /**
+     * Parses all channel specific values. This includes:
+     * <ul>
+     * <li>command references in {@link #commandRefs}</li>
+     * <li>{@link #height}</li>
+     * <li>{@link #href}</li>
+     * <li>{@link #label}</li>
+     * </ul>
+     *
+     * @param _url      URL to parse
+     * @param _content  related content of the URL to parse
+     */
     @Override
     protected void parse(final String _url,
                          final String _content)
@@ -125,29 +150,34 @@ public class Channel_mxJPO
     /**
      * Order the command references.
      *
-     * @param _context  context for this request
+     * @param _paramCache   parameter cache
+     * @throws MatrixException if the preparation from derived class failed
      * @see #commandRefs        stack of not ordered commands references
      * @see #orderCmds          instance of ordered commands references
      */
     @Override
-    protected void prepare(final Context _context)
+    protected void prepare(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
         // order referenced commands
         for (final CommandRef cmdRef : this.commandRefs)  {
             this.orderCmds.put(cmdRef.order, cmdRef);
         }
-        super.prepare(_context);
+        super.prepare(_paramCache);
     }
 
     /**
      * Writes the label, href, alt, height, settings and the referenced
      * commands as MQL code to the writer instance.
      *
-     * @param _out      writer instance
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the TCL update code for the channel could not be
+     *                     written
      */
     @Override
-    protected void writeObject(final Writer _out)
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
             throws IOException
     {
         _out.append(" \\\n    label \"").append(convertTcl(this.label)).append("\"");
@@ -175,7 +205,8 @@ public class Channel_mxJPO
 
     /**
      * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this channel:
+     * in the <code>_preMQLCode</code> to reset this channel. Following steps
+     * are done:
      * <ul>
      * <li>reset HRef, description, alt and label</li>
      * <li>set height to 0</li>
@@ -194,6 +225,7 @@ public class Channel_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update from derived class failed
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,
@@ -230,18 +262,18 @@ public class Channel_mxJPO
     }
 
     /**
-     * Stores information about the command reference of channels
+     * Stores information about the command reference of channels.
      */
     private class CommandRef
     {
         /**
          * Order of the command reference within a channel.
          */
-        Integer order = null;
+        Integer order;
 
         /**
          * Name of the referenced command.
          */
-        String name = null;
+        String name;
     }
 }

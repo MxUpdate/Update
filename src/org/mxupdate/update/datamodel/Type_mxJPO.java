@@ -22,7 +22,6 @@ package org.mxupdate.update.datamodel;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
@@ -58,10 +57,12 @@ public class Type_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the type object
      */
-    public Type_mxJPO(final TypeDef_mxJPO _typeDef)
+    public Type_mxJPO(final TypeDef_mxJPO _typeDef,
+                      final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -87,8 +88,17 @@ public class Type_mxJPO
         }
     }
 
+    /**
+     *
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the TCL update code for the type could not be
+     *                     written
+     */
     @Override
-    protected void writeObject(Writer _out) throws IOException
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
+            throws IOException
     {
         _out.append(" \\\n    derived \"").append(convertTcl(this.derived)).append("\"")
             .append(" \\\n    ").append(isHidden() ? "" : "!").append("hidden")
@@ -98,7 +108,8 @@ public class Type_mxJPO
 
     /**
      * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this type:
+     * in the <code>_preMQLCode</code> to reset this type. Following steps are
+     * done:
      * <ul>
      * <li>set not hidden</li>
      * <li>reset description</li>
@@ -116,6 +127,7 @@ public class Type_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update from derived class failed
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,

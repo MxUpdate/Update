@@ -21,10 +21,10 @@
 package org.mxupdate.update.datamodel;
 
 import java.io.IOException;
-import java.io.Writer;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
@@ -75,10 +75,12 @@ public class Format_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the format object
      */
-    public Format_mxJPO(final TypeDef_mxJPO _typeDef)
+    public Format_mxJPO(final TypeDef_mxJPO _typeDef,
+                        final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -117,10 +119,14 @@ public class Format_mxJPO
      * Writes specific information about the cached format to the given
      * writer instance.
      *
-     * @param _out      writer instance
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the TCL update code for the format could not be
+     *                     written
      */
     @Override
-    protected void writeObject(final Writer _out)
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
             throws IOException
     {
         _out.append(" \\\n    ").append(isHidden() ? "hidden" : "nothidden")

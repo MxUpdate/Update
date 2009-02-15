@@ -22,7 +22,6 @@ package org.mxupdate.update.user;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
 
 import matrix.db.Context;
@@ -58,10 +57,12 @@ public class Association_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the association object
      */
-    public Association_mxJPO(final TypeDef_mxJPO _typeDef)
+    public Association_mxJPO(final TypeDef_mxJPO _typeDef,
+                             final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -86,10 +87,14 @@ public class Association_mxJPO
      * Writes specific information about the cached associations to the given
      * writer instance.
      *
-     * @param _out      writer instance
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the TCL update code for the association could not
+     *                     be written
      */
     @Override
-    protected void writeObject(final Writer _out)
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
             throws IOException
     {
         _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden")
@@ -98,7 +103,8 @@ public class Association_mxJPO
 
     /**
      * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this association:
+     * in the <code>_preMQLCode</code> to reset this association. Following
+     * steps are done:
      * <ul>
      * <li>reset description</li>
      * <li>set definition to current context user</li>
@@ -116,6 +122,7 @@ public class Association_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update from derived class failed
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,
@@ -145,7 +152,6 @@ public class Association_mxJPO
      * statement of a &quot;print&quot; command does not work.
      *
      * @param _context      context for this request
-     * @param _name         name of update object
      * @param _prop         property for which the date value is searched
      * @return modified date of given update object
      * @throws MatrixException if the MQL print failed
@@ -153,13 +159,12 @@ public class Association_mxJPO
      */
     @Override
     public String getPropValue(final Context _context,
-                               final String _name,
                                final AdminPropertyDef _prop)
             throws MatrixException
     {
-        final String text = _prop.getPropName() + " on association " + _name + " value ";
+        final String text = _prop.getPropName() + " on association " + this.getName() + " value ";
         final String curValue = execMql(_context, new StringBuilder()
-                .append("list property on asso \"").append(_name).append("\""));
+                .append("list property on asso \"").append(this.getName()).append("\""));
 
         final int idx = curValue.indexOf(text);
         final String value;

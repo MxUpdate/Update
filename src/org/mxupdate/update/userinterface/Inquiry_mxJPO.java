@@ -50,7 +50,7 @@ public class Inquiry_mxJPO
      * Separator used between the inquiry update statements and the inquiry
      * code itself.
      */
-    private final static String INQUIRY_SEPARATOR
+    private static final String INQUIRY_SEPARATOR
         = "################################################################################\n"
         + "# INQUIRY CODE                                                                 #\n"
         + "################################################################################";
@@ -58,29 +58,49 @@ public class Inquiry_mxJPO
 
     /**
      * Code for the inquiry.
+     *
+     * @see #parse(String, String)
+     * @see #writeEnd(Appendable)
      */
     private String code = null;
 
     /**
      * Format for the inquiry.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(Appendable)
      */
     private String format = null;
 
     /**
      * Pattern for the inquiry.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(Appendable)
      */
     private String pattern = null;
 
     /**
-     * Constructor used to initialize the type definition enumeration.
+     * Constructor used to initialize the inquiry instance.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the administration object
      */
-    public Inquiry_mxJPO(final TypeDef_mxJPO _typeDef)
+    public Inquiry_mxJPO(final TypeDef_mxJPO _typeDef,
+                         final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
+    /**
+     * Parses the code, format and pattern of an inquiry.
+     *
+     * @param _url      URL to parse
+     * @param _content  related content of the URL to parse
+     * @see #code
+     * @see #format
+     * @see #pattern
+     */
     @Override
     protected void parse(final String _url,
                          final String _content)
@@ -96,8 +116,23 @@ public class Inquiry_mxJPO
         }
     }
 
+    /**
+     * Writes the inquiry specific information to the TCL update write. The
+     * properties are identified as settings if they starts with a
+     * &quot;%&quot;. This settings are also written.
+     *
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the TCL update code for the menu could not be
+     *                     written
+     * @see #pattern
+     * @see #format
+     * @see #getPropertiesMap()
+     */
     @Override
-    protected void writeObject(Writer _out) throws IOException
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
+            throws IOException
     {
         _out.append(" \\\n    pattern \"").append(convertTcl(this.pattern)).append("\"")
             .append(" \\\n    format \"").append(convertTcl(this.format)).append("\"")
@@ -113,12 +148,14 @@ public class Inquiry_mxJPO
     /**
      * At the end of the TCL update file the inquiry code must be appended.
      *
-     * @param _out      appendable instance to the TCL update file
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
      * @throws IOException if the extension could not be written
      * @see #code
      */
     @Override
-    protected void writeEnd(final Appendable _out)
+    protected void writeEnd(final ParameterCache_mxJPO _paramCache,
+                            final Appendable _out)
             throws IOException
     {
         _out.append("\n\n# do not change the next three lines, they are needed as separator information:\n")
@@ -151,7 +188,7 @@ public class Inquiry_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if update failed
+     * @throws Exception if the update from derived class failed
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,

@@ -22,7 +22,6 @@ package org.mxupdate.update.user;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -55,10 +54,12 @@ public class Role_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the administration object
      */
-    public Role_mxJPO(final TypeDef_mxJPO _typeDef)
+    public Role_mxJPO(final TypeDef_mxJPO _typeDef,
+                      final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -85,10 +86,13 @@ public class Role_mxJPO
      * Writes specific information about the cached role to the given
      * writer instance.
      *
-     * @param _out      writer instance
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the TCL update code could not written
      */
     @Override
-    protected void writeObject(final Writer _out)
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
             throws IOException
     {
         _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden");
@@ -101,7 +105,8 @@ public class Role_mxJPO
 
     /**
      * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this role:
+     * in the <code>_preMQLCode</code> to reset this role. Following steps are
+     * done:
      * <ul>
      * <li>reset description</li>
      * <li>remove all parent groups</li>
@@ -119,6 +124,7 @@ public class Role_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update from derived class failed
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,

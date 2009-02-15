@@ -71,10 +71,12 @@ public abstract class AbstractDMWithTriggers_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the administration object
      */
-    public AbstractDMWithTriggers_mxJPO(final TypeDef_mxJPO _typeDef)
+    public AbstractDMWithTriggers_mxJPO(final TypeDef_mxJPO _typeDef,
+                                        final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -104,11 +106,12 @@ public abstract class AbstractDMWithTriggers_mxJPO
     /**
      * After the type XML file is parsed, the triggers must be sorted.
      *
-     * @param _context      context for this request
+     * @param _paramCache   parameter cache
+     * @throws MatrixException if the preparation from derived class failed
      * @see #triggersStack
      */
     @Override
-    protected void prepare(final Context _context)
+    protected void prepare(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
         // sort all triggers
@@ -116,7 +119,7 @@ public abstract class AbstractDMWithTriggers_mxJPO
             this.triggers.put(trigger.name, trigger);
         }
 
-        super.prepare(_context);
+        super.prepare(_paramCache);
     }
 
     /**
@@ -126,7 +129,7 @@ public abstract class AbstractDMWithTriggers_mxJPO
      * @throws IOException if write failed
      * @see #triggers
      */
-    protected void writeTriggers(final Writer _out)
+    protected void writeTriggers(final Appendable _out)
             throws IOException
     {
         // output of triggers, but sorted!
@@ -152,6 +155,7 @@ public abstract class AbstractDMWithTriggers_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update from derived class failed
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,

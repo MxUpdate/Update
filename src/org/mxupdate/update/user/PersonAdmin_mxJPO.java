@@ -22,7 +22,6 @@ package org.mxupdate.update.user;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -38,9 +37,7 @@ import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
-import static org.mxupdate.update.util.StringUtil_mxJPO.join;
-import static org.mxupdate.util.MqlUtil_mxJPO.setHistoryOff;
-import static org.mxupdate.util.MqlUtil_mxJPO.setHistoryOn;
+import static org.mxupdate.update.util.StringUtil_mxJPO.joinTcl;
 
 /**
  *
@@ -153,11 +150,13 @@ public class PersonAdmin_mxJPO
     /**
      * Constructor used to initialize the type definition enumeration.
      *
-     * @param _typeDef      person type definition
+     * @param _typeDef  person type definition
+     * @param _mxName   MX name of the administration object
      */
-    public PersonAdmin_mxJPO(final TypeDef_mxJPO _typeDef)
+    public PersonAdmin_mxJPO(final TypeDef_mxJPO _typeDef,
+                             final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -195,6 +194,10 @@ public class PersonAdmin_mxJPO
         return persons;
     }
 
+    /**
+     * @param _url      URL to parse
+     * @param _content  content depending on the URL
+     */
     @Override
     protected void parse(final String _url,
                          final String _content)
@@ -288,12 +291,18 @@ public class PersonAdmin_mxJPO
                 .toString();
     }
 
+    /**
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the TCL update code could not written
+     */
     @Override
-    protected void writeObject(final Writer _out)
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
             throws IOException
     {
-        _out.append(" \\\n    access \"").append(join(',', this.access, "none")).append("\"")
-            .append(" \\\n    admin \"").append(join(',', this.adminAccess, "none")).append("\"")
+        _out.append(" \\\n    access \"").append(joinTcl(',', false, this.access, "none")).append("\"")
+            .append(" \\\n    admin \"").append(joinTcl(',', false, this.adminAccess, "none")).append("\"")
             .append(" \\\n    address \"").append(convertTcl(this.address)).append("\"")
             .append(" \\\n    email \"").append(convertTcl(this.email)).append("\"")
             .append(" \\\n    fax \"").append(convertTcl(this.fax)).append("\"")
@@ -320,11 +329,13 @@ public class PersonAdmin_mxJPO
      * &quot;type&quot;. The person &quot;type&quot; defines, if the person is
      * e.g. active, or trusted etc..
      *
-     * @param _out      appendable instance to the TCL update file
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
      * @throws IOException if the extension could not be written
      */
     @Override
-    protected void writeEnd(final Appendable _out)
+    protected void writeEnd(final ParameterCache_mxJPO _paramCache,
+                            final Appendable _out)
             throws IOException
     {
         _out.append("\nmql mod person \"${NAME}\" type ");
@@ -383,6 +394,7 @@ public class PersonAdmin_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update from derived class failed
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,
@@ -406,12 +418,6 @@ public class PersonAdmin_mxJPO
                         .append("phone '' ")
                         .append("remove assign all;\n");
 
-        // update must be done with history off (because not required...)
-        try  {
-            setHistoryOff(_paramCache.getContext());
-            super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
-        } finally  {
-            setHistoryOn(_paramCache.getContext());
-        }
+        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
     }
 }

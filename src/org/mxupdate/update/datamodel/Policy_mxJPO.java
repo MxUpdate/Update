@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.Writer;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -40,12 +39,12 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.policy.PolicyDefParser_mxJPO;
-import org.mxupdate.update.util.JPOCaller_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertMql;
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import static org.mxupdate.update.util.StringUtil_mxJPO.joinMql;
+import static org.mxupdate.update.util.StringUtil_mxJPO.joinTcl;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 import static org.mxupdate.util.MqlUtil_mxJPO.isEscapeOn;
 import static org.mxupdate.util.MqlUtil_mxJPO.setEscapeOff;
@@ -57,7 +56,6 @@ import static org.mxupdate.util.MqlUtil_mxJPO.setEscapeOn;
  */
 public class Policy_mxJPO
         extends AbstractDMWithTriggers_mxJPO
-        implements JPOCallerInterface
 {
     /**
      * Defines the serialize version unique identifier.
@@ -74,14 +72,14 @@ public class Policy_mxJPO
      * @see #update(Context, CharSequence, CharSequence, Map)
      * @see #jpoCallExecute(Context, String...)
      */
-    private final static String TCL_PROCEDURE
+    private static final String TCL_PROCEDURE
             = "proc updatePolicy {_sPolicy _lsArgs}  {\n"
                 + "global JPO_CALLER_INSTANCE\n"
                 + "regsub -all {'} $_lsArgs {@0@0@} sArg\n"
                 + "regsub -all {\\\"} $sArg {@1@1@} sArg\n"
                 + "regsub -all {\\\\\\[} $sArg {[} sArg\n"
                 + "regsub -all {\\\\\\]} $sArg {]} sArg\n"
-                + "mql exec prog org.mxupdate.update.util.JPOCaller $_sPolicy \"${sArg}\"\n"
+                + "mql exec prog org.mxupdate.update.util.JPOCaller policy $_sPolicy \"${sArg}\"\n"
             + "}\n";
 
 
@@ -126,10 +124,12 @@ public class Policy_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the policy object
      */
-    public Policy_mxJPO(final TypeDef_mxJPO _typeDef)
+    public Policy_mxJPO(final TypeDef_mxJPO _typeDef,
+                        final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -275,16 +275,17 @@ public class Policy_mxJPO
     /**
      * Calls the state prepare method.
      *
-     * @param _context   context for this request
+     * @param _paramCache   parameter cache
+     * @throws MatrixException if the prepare within super class failed
      */
     @Override
-    protected void prepare(final Context _context)
+    protected void prepare(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
         for (final State state : this.states)  {
-            state.prepare(_context);
+            state.prepare();
         }
-        super.prepare(_context);
+        super.prepare(_paramCache);
         for (final Property property : new HashSet<Property>(this.getPropertiesMap().values()))  {
             if (property.getName().startsWith("state_"))  {
                 for (final State state : this.states)  {
@@ -302,6 +303,7 @@ public class Policy_mxJPO
      *
      * @param _paramCache   parameter cache
      * @param _out          writer instance
+     * @throws IOException if the TCL update code could not be written
      */
     @Override
     protected void write(final ParameterCache_mxJPO _paramCache,
@@ -316,16 +318,16 @@ public class Policy_mxJPO
         }
         _out.append("\n  description \"").append(convertTcl(getDescription())).append("\"");
         // types
-        _out.append("\n  type {");
-        Policy_mxJPO.writeList(_out, this.types);
-        _out.append("}");
+        _out.append("\n  type {")
+            .append(joinTcl(' ', true, this.types, null))
+            .append("}");
         // formats
         if (this.allFormats)  {
             _out.append("\n  format all");
         } else  {
-            _out.append("\n  format {");
-            Policy_mxJPO.writeList(_out, this.formats);
-            _out.append("}");
+            _out.append("\n  format {")
+                .append(joinTcl(' ', true, this.formats, null))
+                .append("}");
         }
         _out.append("\n  defaultformat \"").append(convertTcl(this.defaultFormat)).append('\"')
             .append("\n  sequence \"").append(convertTcl(this.sequence)).append('\"')
@@ -340,42 +342,23 @@ public class Policy_mxJPO
     }
 
     /**
-     * Appends the list  of elements to the appendable instance.
-     *
-     * @param _out      appendable instance
-     * @param _list     list of string to write
-     * @throws IOException if the elements of list could not appended
-     */
-    static protected void writeList(final Appendable _out,
-                                    final Collection<String> _list)
-            throws IOException
-    {
-        boolean first = true;
-        for (final String element : _list)  {
-            if (first)  {
-                first = false;
-            } else  {
-                _out.append(' ');
-            }
-            _out.append('\"').append(convertTcl(element)).append('\"');
-        }
-    }
-
-    /**
      * Only implemented as stub because {@link #write(Writer)} is new
      * implemented.
      *
-     * @param _out      writer instance (not used)
+     * @param _paramCache   parameter cache (not used)
+     * @param _out          appendable instance to the TCL update file (not
+     *                      used)
      */
     @Override
-    protected void writeObject(final Writer _out)
-            throws IOException
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
     {
     }
 
     /**
      * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this policy:
+     * in the <code>_preMQLCode</code> to reset this policy. Following steps
+     * are done:
      * <ul>
      * <li>reset description</li>
      * <li>remove hidden and prevent duplicate flag</li>
@@ -397,6 +380,7 @@ public class Policy_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update from derived class failed
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,
@@ -407,16 +391,12 @@ public class Policy_mxJPO
                           final File _sourceFile)
             throws Exception
     {
-        JPOCaller_mxJPO.defineInstance(_paramCache, this);
-
         // add TCL code for the procedure
         final StringBuilder tclCode = new StringBuilder()
                 .append(TCL_PROCEDURE)
                 .append(_preTCLCode);
 
         super.update(_paramCache, _preMQLCode, _postMQLCode, tclCode, _tclVariables, _sourceFile);
-
-        JPOCaller_mxJPO.undefineInstance(_paramCache, this);
     }
 
     /**
@@ -437,17 +417,17 @@ public class Policy_mxJPO
      *                   not be updated
      * @see #TCL_PROCEDURE
      */
+    @Override
     public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
                                final String... _args)
             throws Exception
     {
-        final String code = _args[1].replaceAll("@0@0@", "'")
+        final String code = _args[2].replaceAll("@0@0@", "'")
                                     .replaceAll("@1@1@", "\\\"");
 
         final PolicyDefParser_mxJPO parser = new PolicyDefParser_mxJPO(new StringReader(code));
-        final Policy_mxJPO policy = parser.policy(this.getTypeDef());
-        policy.setName(this.getName());
-        policy.prepare(_paramCache.getContext());
+        final Policy_mxJPO policy = parser.policy(this.getTypeDef(), _args[1]);
+        policy.prepare(_paramCache);
 
         final StringBuilder cmd = new StringBuilder()
                 .append("mod policy \"").append(this.getName()).append("\" ");
@@ -523,35 +503,39 @@ throw new Exception("some states are not defined anymore!");
      * Calculates the delta between the new and the old value. If a delta
      * exists, the kind with the new delta is added to the string builder.
      *
-     * @param _cmd      string builder where the delta must be append
+     * @param _out      appendable instance where the delta must be append
      * @param _kind     kind of the delta
      * @param _newVal   new target value
      * @param _curVal   current value in the database
+     * @throws IOException if the delta could not appended
      */
-    protected void calcDelta(final StringBuilder _cmd,
+    protected void calcDelta(final Appendable _out,
                              final String _kind,
                              final String _newVal,
                              final String _curVal)
+            throws IOException
     {
         final String curVal = (_curVal == null) ? "" : _curVal;
         final String newVal = (_newVal == null) ? "" : _newVal;
 
         if (!curVal.equals(newVal))  {
-            _cmd.append(_kind).append(" \"").append(newVal).append("\" ");
+            _out.append(_kind).append(" \"").append(newVal).append("\" ");
         }
     }
 
     /**
      *
-     * @param _cmd      string build where the delta must be append
+     * @param _out      appendable instance where the delta must be append
      * @param _kind     kind of the delta
-     * @param _curVal   current value in the database
-     * @param _newVal   new target value
+     * @param _new      new target values
+     * @param _current  current values in MX
+     * @throws IOException if the delta could not appended
      */
-    protected void calcDelta(final StringBuilder _cmd,
+    protected void calcDelta(final Appendable _out,
                              final String _kind,
                              final Set<String> _new,
                              final Set<String> _current)
+            throws IOException
     {
         boolean equal = (_current.size() == _new.size());
         if (equal)  {
@@ -565,12 +549,12 @@ throw new Exception("some states are not defined anymore!");
         if (!equal)  {
             for (final String format : _current)  {
                 if (!_new.contains(format))  {
-                    _cmd.append("remove ").append(_kind).append(" \"").append(format).append("\" ");
+                    _out.append("remove ").append(_kind).append(" \"").append(format).append("\" ");
                 }
             }
             for (final String format : _new)  {
                 if (!_current.contains(format))  {
-                    _cmd.append("add ").append(_kind).append(" \"").append(format).append("\" ");
+                    _out.append("add ").append(_kind).append(" \"").append(format).append("\" ");
                 }
             }
         }
@@ -693,13 +677,11 @@ throw new Exception("some states are not defined anymore!");
         /**
          * The user access and trigger instances are sorted.
          *
-         * @param _context   context for this request
          * @see #userAccess         unsorted list of user access
          * @see #userAccessSorted   sorted list user access (after this method is
          *                          called)
          */
-        protected void prepare(final Context _context)
-                throws MatrixException
+        protected void prepare()
         {
             // sort user access
             for (final UserAccess range : this.userAccess)  {
@@ -716,6 +698,7 @@ throw new Exception("some states are not defined anymore!");
          * instance.
          *
          * @param _out      writer instance
+         * @throws IOException if the TCL update code could not be written
          */
         protected void writeObject(final Writer _out)
                 throws IOException
@@ -731,23 +714,24 @@ throw new Exception("some states are not defined anymore!");
                 .append("\n    checkouthistory \"").append(Boolean.toString(this.checkoutHistory)).append('\"');
             // route
             if ((this.routeMessage != null) || !this.routeUsers.isEmpty())  {
-                _out.append("\n    route {");
-                Policy_mxJPO.writeList(_out, this.routeUsers);
-                _out.append("} \"").append(convertTcl(this.routeMessage)).append('\"');
+                _out.append("\n    route {")
+                    .append(joinTcl(' ', true, this.routeUsers, null))
+                    .append("} \"")
+                    .append(convertTcl(this.routeMessage)).append('\"');
             }
             // owner access
-            _out.append("\n    owner {");
-            this.appendAccess(_out, ' ', this.ownerAccess, false);
+            _out.append("\n    owner {")
+                .append(joinTcl(' ', false, this.ownerAccess, null))
+                .append("}")
             // public access
-            _out.append("}")
-                .append("\n    public {");
-            this.appendAccess(_out, ' ', this.publicAccess, false);
-            _out.append("}");
+                .append("\n    public {")
+                .append(joinTcl(' ', false, this.publicAccess, null))
+                .append("}");
             // user access
             for (final UserAccess userAccess : this.userAccessSorted)  {
-                _out.append("\n    user \"").append(convertTcl(userAccess.userRef)).append("\" {");
-                this.appendAccess(_out, ' ', userAccess.access, false);
-                _out.append('}');
+                _out.append("\n    user \"").append(convertTcl(userAccess.userRef)).append("\" {")
+                    .append(joinTcl(' ', false, userAccess.access, null))
+                    .append('}');
                 if (userAccess.expressionFilter != null)  {
                     _out.append(" filter \"")
                         .append(convertTcl(userAccess.expressionFilter))
@@ -771,71 +755,39 @@ throw new Exception("some states are not defined anymore!");
 
         /**
          *
-         * @param _appendable   where the access statement is appended
-         * @param _separator    separator between two access definitions
-         * @param _access       list of access strings
-         * @param _writeNone    if <i>true</i> a <code>none</code> is written
-         *                      if the list of access string is empty,
-         *                      otherwise nothing is written
-         * @throws IOException
+         * @param _out      appendable instance where the delta must be append
+         * @param _oldState old state to compare to (or <code>null</code> if
+         *                  this state is new)
+         * @throws IOException if the delta could not appended
          */
-        protected void appendAccess(final Appendable _appendable,
-                                    final char _separator,
-                                    final Stack<String> _access,
-                                    final boolean _writeNone)
-                throws IOException
-        {
-            boolean first = true;
-            if (_access.isEmpty())  {
-                if (_writeNone)  {
-                    _appendable.append("none");
-                }
-            } else  {
-                for (final String access : new TreeSet<String>(_access))  {
-                    if (!first)  {
-                        _appendable.append(_separator);
-                    } else  {
-                        first = false;
-                    }
-                    _appendable.append(access);
-                }
-            }
-        }
-
-        /**
-         *
-         * @param _cmd
-         * @param _oldState
-         * @throws IOException
-         */
-        protected void calcDelta(final StringBuilder _cmd,
+        protected void calcDelta(final Appendable _out,
                                  final State _oldState)
                 throws IOException
         {
             // basics
-            _cmd.append("promote ").append(this.autoPromotion).append(' ')
-                .append("revision ").append(this.revisionable).append(' ')
-                .append("checkouthistory ").append(this.checkoutHistory).append(' ')
-                .append("version ").append(this.versionable).append(' ')
+            _out.append("promote ").append(String.valueOf(this.autoPromotion)).append(' ')
+                .append("revision ").append(String.valueOf(this.revisionable)).append(' ')
+                .append("checkouthistory ").append(String.valueOf(this.checkoutHistory)).append(' ')
+                .append("version ").append(String.valueOf(this.versionable)).append(' ')
                 .append("action \"").append(convertMql(this.actionProgram)).append("\" ")
                 .append("input \"").append(convertMql(this.actionInput)).append("\" ")
                 .append("check \"").append(convertMql(this.checkProgram)).append("\" ")
                 .append("input \"").append(convertMql(this.checkInput)).append("\" ");
             // route message
-            _cmd.append("route message \"").append(convertMql(this.routeMessage)).append("\" ");
+            _out.append("route message \"").append(convertMql(this.routeMessage)).append("\" ");
             for (final String routeUser : this.routeUsers)  {
                 if ((_oldState == null) || !_oldState.routeUsers.contains(routeUser))  {
-                    _cmd.append("add route \"").append(convertMql(routeUser)).append("\" ");
+                    _out.append("add route \"").append(convertMql(routeUser)).append("\" ");
                 }
             }
             // owner access
-            _cmd.append("owner ");
-            this.appendAccess(_cmd, ',', this.ownerAccess, true);
-            _cmd.append(" ");
+            _out.append("owner ")
+                .append(joinMql(',', false, this.ownerAccess, "none"))
+                .append(' ')
             // public access
-            _cmd.append("public ");
-            this.appendAccess(_cmd, ',', this.publicAccess, true);
-            _cmd.append(" ");
+                .append("public ")
+                .append(joinMql(',', false, this.publicAccess, "none"))
+                .append(' ');
             // user access
             final Set<String> newUsers = new HashSet<String>();
             for (final UserAccess userAccess : this.userAccess)  {
@@ -847,7 +799,7 @@ throw new Exception("some states are not defined anymore!");
                     if (newUsers.contains(userAccess.userRef))  {
                         oldUser.add(userAccess.userRef);
                     } else  {
-                        _cmd.append("remove user \"")
+                        _out.append("remove user \"")
                             .append(convertMql(userAccess.userRef))
                             .append("\" all ");
                     }
@@ -855,11 +807,11 @@ throw new Exception("some states are not defined anymore!");
             }
             for (final UserAccess userAccess : this.userAccess)  {
                 if ((_oldState != null) && !oldUser.contains(userAccess.userRef))  {
-                    _cmd.append("add ");
+                    _out.append("add ");
                 }
-                _cmd.append("user \"").append(userAccess.userRef).append("\" ");
-                this.appendAccess(_cmd, ',', userAccess.access, true);
-                _cmd.append(" ")
+                _out.append("user \"").append(userAccess.userRef).append("\" ")
+                    .append(joinMql(',', false, userAccess.access, "none"))
+                    .append(" ")
                     .append("filter \"")
                     .append(convertMql(userAccess.expressionFilter))
                     .append("\" ");
@@ -868,7 +820,7 @@ throw new Exception("some states are not defined anymore!");
             if (_oldState != null)  {
                 for (final Trigger trigger : _oldState.triggers.values())  {
                     if (!this.triggers.containsKey(trigger.name))  {
-                        _cmd.append("remove trigger ")
+                        _out.append("remove trigger ")
                             .append(trigger.getEventType())
                             .append(' ')
                             .append(trigger.getKind())
@@ -877,7 +829,7 @@ throw new Exception("some states are not defined anymore!");
                 }
             }
             for (final Trigger trigger : this.triggers.values())  {
-                _cmd.append("add trigger ").append(trigger.getEventType()).append(' ').append(trigger.getKind())
+                _out.append("add trigger ").append(trigger.getEventType()).append(' ').append(trigger.getKind())
                     .append(" \"").append(convertMql(trigger.program)).append("\"")
                     .append(" input \"").append(convertMql(trigger.arguments)).append("\" ");
             }
@@ -892,7 +844,7 @@ throw new Exception("some states are not defined anymore!");
                     if (newSigs.contains(signature.name))  {
                         oldSigs.put(signature.name, signature);
                     } else  {
-                        _cmd.append("remove signature \"")
+                        _out.append("remove signature \"")
                             .append(convertMql(signature.name))
                             .append("\" ");
                     }
@@ -901,13 +853,13 @@ throw new Exception("some states are not defined anymore!");
             for (final Signature signature : this.signatures)  {
                 final Signature oldSig;
                 if ((_oldState != null) && !oldSigs.containsKey(signature.name))  {
-                    _cmd.append("add ");
+                    _out.append("add ");
                     oldSig = null;
                 } else  {
                     oldSig = oldSigs.get(signature.name);
                 }
-                _cmd.append("signature \"").append(convertMql(signature.name)).append("\" ");
-                signature.calcDelta(_cmd, oldSig);
+                _out.append("signature \"").append(convertMql(signature.name)).append("\" ");
+                signature.calcDelta(_out, oldSig);
             }
         }
     }
@@ -997,26 +949,28 @@ throw new Exception("some states are not defined anymore!");
          * the approve, ignore and reject users.
          *
          * @param _out  appendable instance
-         * @throws IOException
+         * @throws IOException if the TCL update code could not appended
          */
         protected void writeObject(final Appendable _out)
                 throws IOException
         {
             _out.append("\n    signature \"").append(convertTcl(this.name)).append("\" {")
                 .append("\n      branch \"").append(convertTcl(this.branch)).append("\"")
-                .append("\n      approve {");
-            // append approver users
-            Policy_mxJPO.writeList(_out, this.approverUsers);
-            _out.append("}")
-                .append("\n      ignore {");
-            // append ignore users
-            Policy_mxJPO.writeList(_out, this.ignoreUsers);
-            _out.append("}")
-                .append("\n      reject {");
-            // append reject users
-            Policy_mxJPO.writeList(_out, this.rejectUsers);
-            _out.append("}")
-                .append("\n      filter \"").append(convertTcl(this.filter)).append("\"")
+                // append approver users
+                .append("\n      approve {")
+                .append(joinTcl(' ', true, this.approverUsers, null))
+                .append("}")
+                // append ignore users
+                .append("\n      ignore {")
+                .append(joinTcl(' ', true, this.ignoreUsers, null))
+                .append("}")
+                // append reject users
+                .append("\n      reject {")
+                .append(joinTcl(' ', true, this.rejectUsers, null))
+                .append("}")
+                // append filters
+                .append("\n      filter \"")
+                .append(convertTcl(this.filter)).append("\"")
                 .append("\n    }");
         }
 
@@ -1025,56 +979,59 @@ throw new Exception("some states are not defined anymore!");
          * If for the old signature a branch is defined and for the new
          * signature no branch, an error is thrown.
          *
-         * @param _cmd          command
+         * @param _out          appendable instance where the delta must be
+         *                      append
          * @param _oldSignature old signature to compare
+         * @throws IOException if the delta could not appended
          */
-        protected void calcDelta(final StringBuilder _cmd,
+        protected void calcDelta(final Appendable _out,
                                  final Signature _oldSignature)
+                throws IOException
         {
             if ("".equals(this.branch))  {
                 if ((_oldSignature != null) && (_oldSignature.branch != null) && !"".equals(_oldSignature.branch))  {
 throw new Error("branch '" + _oldSignature.branch + "' exists for signature " + this.name + ", but is not defined anymore");
                 }
             } else  {
-                _cmd.append("branch \"").append(convertMql(this.branch)).append("\" ");
+                _out.append("branch \"").append(convertMql(this.branch)).append("\" ");
             }
-            _cmd.append("filter \"").append(convertMql(this.filter)).append("\" ");
+            _out.append("filter \"").append(convertMql(this.filter)).append("\" ");
             // update approve users
             for (final String approver : this.approverUsers)  {
                 if ((_oldSignature == null) || !_oldSignature.approverUsers.contains(approver))  {
-                    _cmd.append("add approve \"").append(convertMql(approver)).append("\" ");
+                    _out.append("add approve \"").append(convertMql(approver)).append("\" ");
                 }
             }
             if (_oldSignature != null)  {
                 for (final String approver : _oldSignature.approverUsers)  {
                     if (!this.approverUsers.contains(approver))  {
-                        _cmd.append("remove approve \"").append(convertMql(approver)).append("\" ");
+                        _out.append("remove approve \"").append(convertMql(approver)).append("\" ");
                     }
                 }
             }
             // update ignore user
             for (final String ignore : this.ignoreUsers)  {
                 if ((_oldSignature == null) || !_oldSignature.ignoreUsers.contains(ignore))  {
-                    _cmd.append("add ignore \"").append(convertMql(ignore)).append("\" ");
+                    _out.append("add ignore \"").append(convertMql(ignore)).append("\" ");
                 }
             }
             if (_oldSignature != null)  {
                 for (final String ignore : _oldSignature.ignoreUsers)  {
                     if (!this.ignoreUsers.contains(ignore))  {
-                        _cmd.append("remove ignore \"").append(convertMql(ignore)).append("\" ");
+                        _out.append("remove ignore \"").append(convertMql(ignore)).append("\" ");
                     }
                 }
             }
             // update reject users
             for (final String reject : this.rejectUsers)  {
                 if ((_oldSignature == null) || !_oldSignature.rejectUsers.contains(reject))  {
-                    _cmd.append("add reject \"").append(convertMql(reject)).append("\" ");
+                    _out.append("add reject \"").append(convertMql(reject)).append("\" ");
                 }
             }
             if (_oldSignature != null)  {
                 for (final String reject : _oldSignature.rejectUsers)  {
                     if (!this.rejectUsers.contains(reject))  {
-                        _cmd.append("remove reject \"").append(convertMql(reject)).append("\" ");
+                        _out.append("remove reject \"").append(convertMql(reject)).append("\" ");
                     }
                 }
             }

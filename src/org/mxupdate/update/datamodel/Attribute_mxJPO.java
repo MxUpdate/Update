@@ -22,7 +22,6 @@ package org.mxupdate.update.datamodel;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -120,10 +119,12 @@ public class Attribute_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the attribute object
      */
-    public Attribute_mxJPO(final TypeDef_mxJPO _typeDef)
+    public Attribute_mxJPO(final TypeDef_mxJPO _typeDef,
+                           final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -232,29 +233,31 @@ public class Attribute_mxJPO
     /**
      * The ranges in {@link #ranges} are sorted into {@link #rangesSorted}.
      *
-     * @param _context   context for this request
+     * @param _paramCache   parameter cache
      * @throws MatrixException if the prepare from the derived class failed
      */
     @Override
-    protected void prepare(final Context _context)
+    protected void prepare(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
         for (final Range range : this.ranges)  {
             this.rangesSorted.add(range);
         }
-        super.prepare(_context);
+        super.prepare(_paramCache);
     }
 
     /**
      * Writes specific information about the cached attribute to the given
      * writer instance.
      *
-     * @param _out      writer instance
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
      * @throws IOException if the TCL update code could not be written to the
      *                     writer instance
      */
     @Override
-    protected void writeObject(final Writer _out)
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
             throws IOException
     {
         _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden");
@@ -282,25 +285,22 @@ public class Attribute_mxJPO
      * type of the attribute is defined with the file name (as prefix), the
      * original create method must be overwritten.
      *
-     * @param _context          context for this request
-     * @param _file             file for which the attribute must be created
-     *                          (needed to define the attribute
-     *                          type)
-     * @param _name             name of attribute to create
+     * @param _paramCache   parameter cache
+     * @param _file         file for which the attribute must be created
+     *                      (needed to define the attribute type)
      * @throws Exception if the new attribute for given type could not be
      *                   created
      */
     @Override
-    public void create(final Context _context,
-                       final File _file,
-                       final String _name)
+    public void create(final ParameterCache_mxJPO _paramCache,
+                       final File _file)
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("add ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(_name).append("\" ")
+                .append(" \"").append(this.getName()).append("\" ")
                 .append(" type ").append(_file.getName().replaceAll("_.*", "").toLowerCase());
-       execMql(_context, cmd);
+       execMql(_paramCache.getContext(), cmd);
     }
 
     /**
@@ -324,7 +324,7 @@ public class Attribute_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update of the derived class failed
+     * @throws Exception if the update from derived class failed
      * @see Range#remove4Update(Appendable)
      */
     @Override

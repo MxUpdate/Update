@@ -76,12 +76,11 @@ public abstract class AbstractObject_mxJPO
     private final TypeDef_mxJPO typeDef;
 
     /**
-     * Name of the MX administration object.
+     * MX Name of the administration object.
      *
-     * @see #setName(String)
      * @see #getName()
      */
-    private String name = null;
+    private final String mxName;
 
     /**
      * Author of the MX administration object.
@@ -141,10 +140,13 @@ public abstract class AbstractObject_mxJPO
      * Initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the administration object
      */
-    protected AbstractObject_mxJPO(final TypeDef_mxJPO _typeDef)
+    protected AbstractObject_mxJPO(final TypeDef_mxJPO _typeDef,
+                                   final String _mxName)
     {
         this.typeDef = _typeDef;
+        this.mxName = _mxName;
     }
 
     /**
@@ -179,17 +181,15 @@ public abstract class AbstractObject_mxJPO
      * @param _path         path to write through (if required also including
      *                      depending file path defined from the information
      *                      annotation)
-     * @param _name         name of object to export
      * @throws MatrixException
      * @throws SAXException
      * @throws IOException
      */
     public void export(final ParameterCache_mxJPO _paramCache,
-                       final File _path,
-                       final String _name)
+                       final File _path)
             throws MatrixException, SAXException, IOException
     {
-        this.parse(_paramCache, _name);
+        this.parse(_paramCache);
         final File file = new File(_path, convertToFileName(this.getFileName()));
         if (!file.getParentFile().exists())  {
             file.getParentFile().mkdirs();
@@ -208,13 +208,11 @@ public abstract class AbstractObject_mxJPO
      * Parses all information for given administration object.
      *
      * @param _paramCache   parameter cache
-     * @param _name         name of administration object which must be parsed
      * @throws MatrixException
      * @throws SAXException
      * @throws IOException
      */
-    protected abstract void parse(final ParameterCache_mxJPO _paramCache,
-                                  final String _name)
+    protected abstract void parse(final ParameterCache_mxJPO _paramCache)
             throws MatrixException, SAXException, IOException;
 
     /**
@@ -276,32 +274,27 @@ public abstract class AbstractObject_mxJPO
     /**
      * Deletes administration object with given name.
      *
-     * @param _context      context for this request
-     * @param _name         name of object to delete
+     * @param _paramCache       parameter cache
      * @throws Exception if delete failed
      */
-    public abstract void delete(final Context _context,
-                                final String _name)
+    public abstract void delete(final ParameterCache_mxJPO _paramCache)
             throws Exception;
 
     /**
      * Creates a new administration object with given name.
      *
-     * @param _context      context for this request
+     * @param _paramCache   parameter cache
      * @param _file         file with code to create
-     * @param _name         name of object to create
      * @throws Exception if create failed
      */
-    public abstract void create(final Context _context,
-                                final File _file,
-                                final String _name)
+    public abstract void create(final ParameterCache_mxJPO _paramCache,
+                                final File _file)
             throws Exception;
 
     /**
      * Updated this administration (business) object.
      *
      * @param _paramCache       parameter cache
-     * @param _name             name of the administration (business) object
      * @param _file             reference to the file to update
      * @param _newVersion       new version which must be set within the update
      *                          (or <code>null</code> if the version must not
@@ -309,7 +302,6 @@ public abstract class AbstractObject_mxJPO
      * @throws Exception if update failed
      */
     public abstract void update(final ParameterCache_mxJPO _paramCache,
-                                final String _name,
                                 final File _file,
                                 final String _newVersion)
             throws Exception;
@@ -344,13 +336,11 @@ public abstract class AbstractObject_mxJPO
      * complete export takes longer time.
      *
      * @param _context      context for this request
-     * @param _name         name of administration object
      * @param _prop         property for which the value is searched
      * @return value for given property
      * @throws MatrixException if the property value could not be extracted
      */
     public String getPropValue(final Context _context,
-                               final String _name,
                                final AdminPropertyDef _prop)
             throws MatrixException
     {
@@ -359,7 +349,7 @@ public abstract class AbstractObject_mxJPO
         if (this.getTypeDef().getMxAdminName() != null)  {
             final String tmp = execMql(_context, new StringBuilder()
                     .append("print ").append(this.getTypeDef().getMxAdminName())
-                    .append(" \"").append(_name).append("\" ")
+                    .append(" \"").append(this.getName()).append("\" ")
                     .append(this.getTypeDef().getMxAdminSuffix())
                     .append(" select property[").append(_prop.getPropName()).append("] dump"));
             final int length = 7 + _prop.getPropName().length();
@@ -368,7 +358,7 @@ public abstract class AbstractObject_mxJPO
                          : "";
         // otherwise we have a business object....
         } else  {
-            final String[] nameRev = _name.split("________");
+            final String[] nameRev = this.getName().split("________");
             curVersion = execMql(_context, new StringBuilder()
                     .append("print bus \"")
                     .append(this.getTypeDef().getMxBusType())
@@ -381,23 +371,14 @@ public abstract class AbstractObject_mxJPO
     }
 
     /**
-     * Getter method for instance variable {@link #name}.
+     * Getter method for instance variable {@link #mxName}.
      *
-     * @return value of instance variable {@link #name}.
+     * @return value of instance variable {@link #mxName}.
+     * @see #mxName
      */
     protected String getName()
     {
-        return this.name;
-    }
-
-    /**
-     * Setter method for instance variable {@link #name}.
-     *
-     * @param _name new value for instance variable {@link #name}.
-     */
-    protected void setName(final String _name)
-    {
-        this.name = _name;
+        return this.mxName;
     }
 
     /**

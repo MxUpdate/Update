@@ -22,7 +22,6 @@ package org.mxupdate.update.userinterface;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -53,16 +52,22 @@ public class Portal_mxJPO
 
     /**
      * Alt (label) of the portal.
+     *
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String alt = null;
 
     /**
      * Href of the portal.
+     *
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String href = null;
 
     /**
      * Label of the portal.
+     *
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String label = null;
 
@@ -70,13 +75,15 @@ public class Portal_mxJPO
      * Stack used to parse the channel references.
      *
      * @see #parse(String, String)
+     * @see #prepare(ParameterCache_mxJPO)
      */
-    final private Stack<ChannelRef> channelRefs = new Stack<ChannelRef>();
+    private final Stack<ChannelRef> channelRefs = new Stack<ChannelRef>();
 
     /**
      * Ordered channel references by row and column.
      *
      * @see #prepare(Context)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     final Map<Integer,Map<Integer,ChannelRef>> orderedChannelRefs = new TreeMap<Integer,Map<Integer,ChannelRef>>();
 
@@ -84,10 +91,12 @@ public class Portal_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the administration object
      */
-    public Portal_mxJPO(final TypeDef_mxJPO _typeDef)
+    public Portal_mxJPO(final TypeDef_mxJPO _typeDef,
+                        final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -127,12 +136,13 @@ public class Portal_mxJPO
     /**
      * Order the channel references.
      *
-     * @param _context  context for this request
+     * @param _paramCache   parameter cache
+     * @throws MatrixException if the preparation from derived class failed
      * @see #channelRefs        stack of not ordered channel references
      * @see #orderedChannelRefs ordered channel references
      */
     @Override
-    protected void prepare(final Context _context)
+    protected void prepare(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
         // sort the channels by row and column
@@ -145,17 +155,28 @@ public class Portal_mxJPO
             sub.put(channelRef.column, channelRef);
         }
 
-        super.prepare(_context);
+        super.prepare(_paramCache);
     }
 
     /**
      * Writes specific information about the cached portal to the given writer
-     * instance.
+     * instance. This includes
+     * <ul>
+     * <li>{@link #label}</li>
+     * <li>{@link #href}</li>
+     * <li>{@link #alt}</li>
+     * <li>settings defined as properties starting with &quot;%&quot; in
+     *     {@link #getPropertiesMap()}</li>
+     * <li>channel references {@link #orderedChannelRefs}</li>
+     * </ul>
      *
-     * @param _out      writer instance
+     * @param _paramCache   parameter cache
+     * @param _out          writer instance to the TCL update file
+     * @throws IOException if the TCL update code could not be written
      */
     @Override
-    protected void writeObject(final Writer _out)
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
             throws IOException
     {
         _out.append(" \\\n    label \"").append(convertTcl(this.label)).append("\"");
@@ -190,7 +211,8 @@ public class Portal_mxJPO
 
     /**
      * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this portal:
+     * in the <code>_preMQLCode</code> to reset this portal. Following steps
+     * are done:
      * <ul>
      * <li>reset HRef, description, alt and label</li>
      * <li>remove all settings and channels</li>
@@ -208,6 +230,7 @@ public class Portal_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update from derived class failed
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,

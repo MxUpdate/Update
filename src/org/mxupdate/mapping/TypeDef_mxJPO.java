@@ -46,7 +46,7 @@ public final class TypeDef_mxJPO
      *
      * @see #defineValue(Context, String, String)
      */
-    private final static Map<String,TypeDef_mxJPO> MAP
+    private static final Map<String,TypeDef_mxJPO> MAP
             = new HashMap<String,TypeDef_mxJPO>();
 
     /**
@@ -55,7 +55,7 @@ public final class TypeDef_mxJPO
      * @see #resetValues()
      * @see #defineValue(Context, String, String)
      */
-    private final static Map<String,String> MAP2CLASS = new HashMap<String,String>();
+    private static final Map<String,String> MAP2CLASS = new HashMap<String,String>();
 
     /**
      * Used prefix of admin type suffix.
@@ -431,7 +431,7 @@ public final class TypeDef_mxJPO
      * Returns the list of all type definition instances.
      *
      * @return list of all type definition instances
-     * @return #MAP
+     * @see #MAP
      */
     public static Collection<TypeDef_mxJPO> values()
     {
@@ -674,10 +674,22 @@ public final class TypeDef_mxJPO
         return this.textTitle;
     }
 
-    public AbstractObject_mxJPO newTypeInstance()
+    /**
+     *
+     * @param _mxName   MX name of the new instance
+     * @return
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws IllegalArgumentException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    public AbstractObject_mxJPO newTypeInstance(final String _mxName)
             throws SecurityException, NoSuchMethodException, IllegalArgumentException,
                    InstantiationException, IllegalAccessException, InvocationTargetException
     {
-        return this.jpoClass.getConstructor(TypeDef_mxJPO.class).newInstance(this);
+        return this.jpoClass.getConstructor(TypeDef_mxJPO.class, String.class)
+                            .newInstance(this, _mxName);
     }
 }

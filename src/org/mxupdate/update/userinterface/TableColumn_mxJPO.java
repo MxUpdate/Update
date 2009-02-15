@@ -21,7 +21,6 @@
 package org.mxupdate.update.userinterface;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -92,15 +91,15 @@ class TableColumn_mxJPO
         }
     }
 
-    void write(final Writer _out)
+    void write(final Appendable _out)
             throws IOException
     {
         _out.append(" \\\n        name \"").append(convertTcl(this.name)).append("\"")
             .append(" \\\n        label \"").append((this.label != null) ? convertTcl(this.label) : "").append("\"");
-        if (isBusinessObject && (this.expression != null))  {
+        if (this.isBusinessObject && (this.expression != null))  {
             _out.append(" \\\n        businessobject \"").append(convertTcl(this.expression)).append("\"");
         }
-        if (isRelationship && (this.expression != null))  {
+        if (this.isRelationship && (this.expression != null))  {
             _out.append(" \\\n        relationship \"").append(convertTcl(this.expression)).append("\"");
         }
 
@@ -122,7 +121,9 @@ class TableColumn_mxJPO
             final String value = (setting.getValue() == null)
                                  ? ""
                                  : setting.getValue();
-            _out.append(" \\\n        setting \"").append(convertTcl(setting.getKey())).append("\" \"").append(convertTcl(value)).append("\"");
+            _out.append(" \\\n        setting \"")
+                .append(convertTcl(setting.getKey())).append("\" \"")
+                .append(convertTcl(value)).append("\"");
         }
     }
 
@@ -136,11 +137,5 @@ class TableColumn_mxJPO
     public String getName()
     {
         return this.name;
-    }
-
-    @Override
-    public String toString()
-    {
-        return "[name="+name+", label="+label+", expression="+expression+", sortType="+sortType+", settings="+this.settings+"]";
     }
 }

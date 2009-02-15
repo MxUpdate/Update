@@ -115,8 +115,7 @@ public class TokenMgrError_mxJPO extends Error
     *
     * from this method for such cases in the release version of your parser.
     */
-   @Override
-public String getMessage() {
+   public String getMessage() {
       return super.getMessage();
    }
 
@@ -139,4 +138,4 @@ public String getMessage() {
       this(LexicalError(EOFSeen, lexState, errorLine, errorColumn, errorAfter, curChar), reason);
    }
 }
-/* JavaCC - OriginalChecksum=f9374dd27028f112170477573981cb98 (do not edit this line) */
+/* JavaCC - OriginalChecksum=66156c0ed742249a1d05502d5c37e218 (do not edit this line) */

@@ -22,10 +22,8 @@ package org.mxupdate.update.datamodel;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
 
-import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
@@ -50,6 +48,9 @@ public class Expression_mxJPO
 
     /**
      * Hold the expression itself.
+     *
+     * @see #prepare(ParameterCache_mxJPO)
+     * @see #writeObject(Appendable)
      */
     private String expression = null;
 
@@ -57,10 +58,12 @@ public class Expression_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the expression object
      */
-    public Expression_mxJPO(final TypeDef_mxJPO _typeDef)
+    public Expression_mxJPO(final TypeDef_mxJPO _typeDef,
+                            final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -83,30 +86,38 @@ public class Expression_mxJPO
     }
 
     /**
-     * The ranges are sorted.
+     * Extract the value of the expression from MX.
      *
-     * @param _context   context for this request
+     * @param _paramCache   parameter cache
+     * @throws MatrixException if the preparation from derived class failed or
+     *                         the expression value could not be extraced from
+     *                         MX
+     * @see #expression
      */
     @Override
-    protected void prepare(final Context _context)
+    protected void prepare(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
         final String cmd = new StringBuilder()
                 .append("print expression \"").append(convertTcl(getName()))
                 .append("\" select value dump")
                 .toString();
-        this.expression = execMql(_context, cmd);
-        super.prepare(_context);
+        this.expression = execMql(_paramCache.getContext(), cmd);
+        super.prepare(_paramCache);
     }
 
     /**
      * Writes specific information about the cached expression to the given
      * writer instance.
      *
-     * @param _out      writer instance
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the TCL update code for the expression could not
+     *                     be written
      */
     @Override
-    protected void writeObject(final Writer _out)
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
             throws IOException
     {
         _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden");
@@ -124,7 +135,8 @@ public class Expression_mxJPO
 
     /**
      * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this expression:
+     * in the <code>_preMQLCode</code> to reset this expression. Following
+     * steps are done:
      * <ul>
      * <li>set to not hidden</li>
      * <li>reset description and value (expression itself)</li>
@@ -142,6 +154,7 @@ public class Expression_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update from derived class failed
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,

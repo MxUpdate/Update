@@ -571,10 +571,10 @@ public class MxUpdate_mxJPO
         // export
         for (final Map.Entry<TypeDef_mxJPO,Set<String>> entry : clazz2names.entrySet())  {
             for (final String name : entry.getValue())  {
-                final AbstractObject_mxJPO instance = entry.getKey().newTypeInstance();
+                final AbstractObject_mxJPO instance = entry.getKey().newTypeInstance(name);
                 final File path = new File(pathStr + File.separator + instance.getPath());
                 _paramCache.logInfo("export "+instance.getTypeDef().getLogging() + " '" + name + "'");
-                instance.export(_paramCache, path, name);
+                instance.export(_paramCache, path);
             }
         }
     }
@@ -599,7 +599,7 @@ public class MxUpdate_mxJPO
         final Map<TypeDef_mxJPO,Set<String>> existingNames = new HashMap<TypeDef_mxJPO,Set<String>>();
         for (final TypeDef_mxJPO clazz : clazz2names.keySet())  {
             if (!existingNames.containsKey(clazz))  {
-                final AbstractObject_mxJPO instance = clazz.newTypeInstance();
+                final AbstractObject_mxJPO instance = clazz.newTypeInstance(null);
                 existingNames.put(clazz, instance.getMxNames(_paramCache));
             }
         }
@@ -610,10 +610,10 @@ public class MxUpdate_mxJPO
                 for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
                     final Set<String> existings = existingNames.get(clazz);
                     if (!existings.contains(fileEntry.getValue()))  {
-                         final AbstractObject_mxJPO instance = clazz.newTypeInstance();
+                         final AbstractObject_mxJPO instance = clazz.newTypeInstance(fileEntry.getValue());
                          _paramCache.logInfo("create "+instance.getTypeDef().getLogging()
                                  + " '" + fileEntry.getValue() + "'");
-                        instance.create(_paramCache.getContext(), fileEntry.getKey(), fileEntry.getValue());
+                        instance.create(_paramCache, fileEntry.getKey());
                     }
                 }
             }
@@ -623,7 +623,7 @@ public class MxUpdate_mxJPO
             final Map<File,String> clazzMap = clazz2names.get(clazz);
             if (clazzMap != null)  {
                 for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
-                    final AbstractObject_mxJPO instance = clazz.newTypeInstance();
+                    final AbstractObject_mxJPO instance = clazz.newTypeInstance(fileEntry.getValue());
                     _paramCache.logInfo("check "+instance.getTypeDef().getLogging()
                             + " '" + fileEntry.getValue() + "'");
 
@@ -634,7 +634,6 @@ public class MxUpdate_mxJPO
                     if (_versionInfo == UpdateCheck_mxJPO.FILEDATE)  {
                         final Date fileDate = new Date(fileEntry.getKey().lastModified());
                         final String instDateString = instance.getPropValue(_paramCache.getContext(),
-                                                                            fileEntry.getValue(),
                                                                             AdminPropertyDef.FILEDATE);
                         final DateFormat format = new SimpleDateFormat(_paramCache.getValueString(ParameterCache_mxJPO.KEY_FILEDATEFORMAT));
                         Date instDate;
@@ -655,7 +654,6 @@ public class MxUpdate_mxJPO
                         }
                     } else if (_versionInfo == UpdateCheck_mxJPO.VERSION)  {
                         final String instVersion = instance.getPropValue(_paramCache.getContext(),
-                                                                         fileEntry.getValue(),
                                                                          AdminPropertyDef.VERSION);
                         if (instVersion.equals(version))  {
                             update = false;
@@ -680,7 +678,6 @@ public class MxUpdate_mxJPO
                                 _paramCache.getContext().start(true);
                             }
                             instance.update(_paramCache,
-                                            fileEntry.getValue(),
                                             fileEntry.getKey(),
                                             version);
                             if (!transActive)  {
@@ -718,18 +715,17 @@ public class MxUpdate_mxJPO
 
         // and now loop throw the list of file names and compare to existing
         for (final Map.Entry<TypeDef_mxJPO,Set<String>> entry : clazz2MxNames.entrySet())  {
-            final AbstractObject_mxJPO instance = entry.getKey().newTypeInstance();
             final Collection<String> fileNames = clazz2FileNames.get(entry.getKey()).values();
             for (final String name : entry.getValue())  {
                 if (!fileNames.contains(name))  {
-                    _paramCache.logInfo("delete " + instance.getTypeDef().getLogging() + " '" + name + "'");
+                    _paramCache.logInfo("delete " + entry.getKey().getLogging() + " '" + name + "'");
                     boolean commit = false;
                     final boolean transActive = _paramCache.getContext().isTransactionActive();
                     try  {
                         if (!transActive)  {
                             _paramCache.getContext().start(true);
                         }
-                        instance.delete(_paramCache.getContext(), name);
+                        entry.getKey().newTypeInstance(name).delete(_paramCache);
                         if (!transActive)  {
                             _paramCache.getContext().commit();
                         }
@@ -889,7 +885,7 @@ public class MxUpdate_mxJPO
             if (typeDef.isFileMatchLast() != _fileMatchLast)  {
                 foundOther = true;
             } else  {
-                final AbstractObject_mxJPO instance = typeDef.newTypeInstance();
+                final AbstractObject_mxJPO instance = typeDef.newTypeInstance(null);
                 for (final File file : _allFiles)  {
                     final String mxName = instance.extractMxName(_paramCache, file);
                     if (mxName != null)  {
@@ -1000,7 +996,7 @@ public class MxUpdate_mxJPO
         // and now depending on the type definition prepare return list
         final Map<TypeDef_mxJPO,Set<String>> clazz2names = new HashMap<TypeDef_mxJPO,Set<String>>();
         for (final Map.Entry<TypeDef_mxJPO,Set<String>> entry : typeDef2Matches.entrySet())  {
-            final AbstractObject_mxJPO instance = entry.getKey().newTypeInstance();
+            final AbstractObject_mxJPO instance = entry.getKey().newTypeInstance(null);
             final Set<String> matchingMxNames = new TreeSet<String>();
             clazz2names.put(entry.getKey(), matchingMxNames);
             for (final String mxName : instance.getMxNames(_paramCache))  {

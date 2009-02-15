@@ -3,12 +3,15 @@ package org.mxupdate.update.datamodel.policy;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
+
+import matrix.db.Context;
 
 public class PolicyDefParser_mxJPO implements PolicyDefParserConstants_mxJPO {
 
@@ -30,8 +33,9 @@ try  {
         } finally  {
             field.setAccessible(accessible);
         }
-} catch (Exception e)  {
-    e.printStackTrace();
+} catch (final Exception e)  {
+    e.printStackTrace(System.out);
+    throw new Error(e);
 }
     }
 
@@ -49,8 +53,9 @@ try  {
         } finally  {
             field.setAccessible(accessible);
         }
-} catch (Exception e)  {
-    e.printStackTrace();
+} catch (final Exception e)  {
+    e.printStackTrace(System.out);
+    throw new Error(e);
 }
     }
 
@@ -68,8 +73,9 @@ try  {
         } finally  {
             field.setAccessible(accessible);
         }
-} catch (Exception e)  {
-    e.printStackTrace();
+} catch (final Exception e)  {
+    e.printStackTrace(System.out);
+    throw new Error(e);
 }
     }
 
@@ -87,22 +93,23 @@ try  {
         Field field = null;
         try  {
             field = clazz.getDeclaredField(_fieldName);
-        } catch (NoSuchFieldException e)  {
+        } catch (final NoSuchFieldException e)  {
         }
         while ((field == null) && (clazz != null))  {
             clazz = clazz.getSuperclass();
             if (clazz != null)  {
                 try  {
                     field = clazz.getDeclaredField(_fieldName);
-                } catch (NoSuchFieldException e)  {
+                } catch (final NoSuchFieldException e)  {
                 }
             }
         }
         return field;
     }
 
-  final public Policy_mxJPO policy(final TypeDef_mxJPO _typeDef) throws ParseException_mxJPO, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
-    final Policy_mxJPO policy = (Policy_mxJPO) _typeDef.newTypeInstance();
+  final public Policy_mxJPO policy(final TypeDef_mxJPO _typeDef,
+                    final String _mxName) throws ParseException_mxJPO, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
+    final Policy_mxJPO policy = (Policy_mxJPO) _typeDef.newTypeInstance(_mxName);
     String tmp;
     Set<String> set;
     label_1:

@@ -33,6 +33,7 @@ import matrix.db.Context;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
+import org.mxupdate.update.util.JPOCaller_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
@@ -139,13 +140,24 @@ public abstract class AbstractPropertyObject_mxJPO
     private static final String HEADER_VERSION = "\n# VERSION:\n# ~~~~~~~~\n#";
 
     /**
+     * Test string used as output to test that the update runs correctly
+     * (because it could be that no exception was thrown while an error happens
+     * and the result is a rolled back transaction).
+     *
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private static final String TEST_EXECUTED = "MxUpdate Executed";
+
+    /**
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the administration object
      */
-    protected AbstractPropertyObject_mxJPO(final TypeDef_mxJPO _typeDef)
+    protected AbstractPropertyObject_mxJPO(final TypeDef_mxJPO _typeDef,
+                                           final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -283,7 +295,6 @@ public abstract class AbstractPropertyObject_mxJPO
      * {@link #update(Context, CharSequence, CharSequence, Map)}.
      *
      * @param _paramCache       parameter cache
-     * @param _name             name of object to update
      * @param _file             file with TCL update code
      * @param _newVersion       new version which must be set within the update
      *                          (or <code>null</code> if the version must not
@@ -300,13 +311,12 @@ public abstract class AbstractPropertyObject_mxJPO
      */
     @Override
     public void update(final ParameterCache_mxJPO _paramCache,
-                       final String _name,
                        final File _file,
                        final String _newVersion)
             throws Exception
     {
         // parse objects
-        this.parse(_paramCache, _name);
+        this.parse(_paramCache);
 
         // read code
         final StringBuilder code = this.getCode(_file);
@@ -362,7 +372,7 @@ public abstract class AbstractPropertyObject_mxJPO
             if ((this.getOriginalName() != null) && !"".equals(this.getOriginalName()))  {
                 origName = this.getOriginalName();
             } else  {
-                origName = _name;
+                origName = this.getName();
             }
             tclVariables.put(AdminPropertyDef.ORIGINALNAME.name(), origName);
         }
@@ -373,6 +383,21 @@ public abstract class AbstractPropertyObject_mxJPO
                          format.format(new Date(_file.lastModified())));
 
         this.update(_paramCache, "", "", "", tclVariables, _file);
+    }
+
+    /**
+     * The method is called from the JPO caller interface. In this abstract
+     * class, the definition is only a stub and not used, because otherwise
+     * the method must be defined everywhere.
+     *
+     * @param _paramCache   parameter cache
+     * @param _args         arguments, not used
+     * @throws Exception never, only dummy
+     */
+    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
+                               final String... _args)
+            throws Exception
+    {
     }
 
     /**
@@ -449,16 +474,19 @@ public abstract class AbstractPropertyObject_mxJPO
      * <ul>
      * <li>pre MQL commands (from parameter <code>_preMQLCode</code>)</li>
      * <li>change to TCL mode</li>
-     * <li>set all required TCL variables (from parameter <code>_tclVariables
-     *     </code>)</li>
-     * <li>append TCL update code from file (from parameter <code>_tclCode
-     *     </code>)</li>
+     * <li>set all required TCL variables (from parameter
+     *     <code>_tclVariables</code>)</li>
+     * <li>append TCL update code from file (from parameter
+     *     <code>_tclCode</code>)</li>
      * <li>change back to MQL mode</li>
-     * <li>append post MQL statements (from parameter <code>_postMQLCode
-     *     </code>)</li>
+     * <li>append post MQL statements (from parameter
+     *     <code>_postMQLCode</code>)</li>
      * </ul>
-     * This MQL statement is executed within a transaction to be sure that the
-     * statement is not executed if an error had occurred.
+     * At the end of the MQL statements, {@link #TEST_EXECUTED} is printed via
+     * MQL command &quot;<code>output</code> so that this output is returned
+     * from the MQL execution. The return of the MQL execution is tested if
+     * this output is returned. If not an exception is thrown because the
+     * update failed.
      *
      * @param _paramCache       parameter cache
      * @param _preMQLCode       MQL statements which must be called before the
@@ -498,9 +526,18 @@ public abstract class AbstractPropertyObject_mxJPO
         cmd.append(_preTCLCode)
            .append("\nsource \"").append(_sourceFile.toString().replaceAll("\\\\", "/")).append("\"")
            .append("\n}\nexit;\n")
-           .append(_postMQLCode);
+           .append(_postMQLCode)
+           .append("output '';output '").append(TEST_EXECUTED).append("';");
 
         // execute update
-        execMql(_paramCache.getContext(), cmd);
+        JPOCaller_mxJPO.defineInstance(_paramCache, this);
+        try  {
+            final String[] ret = execMql(_paramCache.getContext(), cmd).split("\n");
+            if (!TEST_EXECUTED.equals(ret[ret.length - 1]))  {
+                throw new Exception("Execution of the update was not complete! Update Failed!");
+            }
+        } finally  {
+            JPOCaller_mxJPO.undefineInstance(_paramCache);
+        }
     }
 }

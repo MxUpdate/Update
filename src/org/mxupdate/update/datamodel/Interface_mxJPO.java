@@ -30,7 +30,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.util.JPOCaller_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
@@ -59,7 +58,7 @@ public class Interface_mxJPO
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
      */
-    private final static String TCL_PROCEDURE
+    private static final String TCL_PROCEDURE
             = "proc testParents {args}  {\n"
                 + "set iIdx 0\n"
                 + "set lsCmd [list mql exec prog org.mxupdate.update.util.JPOCaller parents]\n"
@@ -106,10 +105,12 @@ public class Interface_mxJPO
      * Constructor used to initialize the interface class instance.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the interface object
      */
-    public Interface_mxJPO(final TypeDef_mxJPO _typeDef)
+    public Interface_mxJPO(final TypeDef_mxJPO _typeDef,
+                           final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -157,7 +158,8 @@ public class Interface_mxJPO
      *     types {@link #types})</li>
      * </ul>
      *
-     * @param _out      writter instance to the TCL update file
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
      * @throws IOException if the interface specific information could not be
      *                     written
      * @see #abstractFlag
@@ -165,7 +167,8 @@ public class Interface_mxJPO
      * @see #types
      */
     @Override
-    protected void writeObject(final Writer _out)
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
             throws IOException
     {
         // write abstract information
@@ -187,12 +190,14 @@ public class Interface_mxJPO
      * {@link #TCL_PROCEDURE} to define the parent interfaces for this
      * interface.
      *
-     * @param _out      appendable instance to the TCL update file
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
      * @throws IOException if the extension could not be written
      * @see #derived
      */
     @Override
-    protected void writeEnd(final Appendable _out)
+    protected void writeEnd(final ParameterCache_mxJPO _paramCache,
+                            final Appendable _out)
             throws IOException
     {
         _out.append("\n\ntestParents -").append(this.getTypeDef().getMxAdminName())
@@ -202,7 +207,7 @@ public class Interface_mxJPO
         }
         _out.append("]");
 
-        super.writeEnd(_out);
+        super.writeEnd(_paramCache, _out);
     }
 
     /**
@@ -227,6 +232,7 @@ public class Interface_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update from derived class failed
      * @see #TCL_PROCEDURE
      */
     @Override
@@ -238,8 +244,6 @@ public class Interface_mxJPO
                           final File _sourceFile)
             throws Exception
     {
-        JPOCaller_mxJPO.defineInstance(_paramCache, this);
-
         final StringBuilder preMQLCode = new StringBuilder()
                 .append("mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append('\"')
@@ -264,8 +268,6 @@ public class Interface_mxJPO
                 .append(_preTCLCode);
 
         super.update(_paramCache, preMQLCode, _postMQLCode, preTclCode, _tclVariables, _sourceFile);
-
-        JPOCaller_mxJPO.undefineInstance(_paramCache, this);
     }
 
     /**

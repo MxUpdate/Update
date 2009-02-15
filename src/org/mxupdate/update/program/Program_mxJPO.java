@@ -26,7 +26,6 @@ import java.io.Writer;
 import java.util.Set;
 import java.util.TreeSet;
 
-import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
@@ -50,10 +49,12 @@ public class Program_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the program object
      */
-    public Program_mxJPO(final TypeDef_mxJPO _typeDef)
+    public Program_mxJPO(final TypeDef_mxJPO _typeDef,
+                         final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -101,21 +102,20 @@ public class Program_mxJPO
     /**
      * Creates given program object from given type with given name.
      *
-     * @param _context          context for this request
-     * @param _file             file for which the administration object must
-     *                          be created (not used)
-     * @param _name             name of administration object to create
+     * @param _paramCache   parameter cache
+     * @param _file         file for which the administration object must be
+     *                      be created (not used)
+     * @throws Exception if the program could not be created
      */
     @Override
-    public void create(final Context _context,
-                       final File _file,
-                       final String _name)
+    public void create(final ParameterCache_mxJPO _paramCache,
+                       final File _file)
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("add ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(_name).append('\"');
-        execMql(_context, cmd);
+                .append(" \"").append(this.getName()).append('\"');
+        execMql(_paramCache.getContext(), cmd);
     }
 
     /**
@@ -123,7 +123,6 @@ public class Program_mxJPO
      * as the the version property.
      *
      * @param _paramCache       parameter cache
-     * @param _name             name of the administration (business) object
      * @param _file             reference to the file to update
      * @param _newVersion       new version which must be set within the update
      *                          (or <code>null</code> if the version must not
@@ -132,16 +131,15 @@ public class Program_mxJPO
      */
     @Override
     public void update(final ParameterCache_mxJPO _paramCache,
-                       final String _name,
                        final File _file,
                        final String _newVersion)
             throws Exception
     {
-        this.parse(_paramCache, _name);
+        this.parse(_paramCache);
 
         // update code
         final StringBuilder cmd = new StringBuilder()
-                .append("mod prog \"").append(_name)
+                .append("mod prog \"").append(this.getName())
                         .append("\" file \"").append(_file.getPath()).append("\";\n");
 
         // and update

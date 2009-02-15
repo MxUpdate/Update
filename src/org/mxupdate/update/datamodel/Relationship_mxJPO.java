@@ -22,7 +22,6 @@ package org.mxupdate.update.datamodel;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -54,7 +53,7 @@ public class Relationship_mxJPO
      * Set holding all rules referencing this attribute.
      *
      * @see #parse(String, String)
-     * @see #writeObject(Writer)
+     * @see #writeObject(Appendable)
      */
     private final  Set<String> rules = new TreeSet<String>();
 
@@ -159,10 +158,12 @@ public class Relationship_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the administration object
      */
-    public Relationship_mxJPO(final TypeDef_mxJPO _typeDef)
+    public Relationship_mxJPO(final TypeDef_mxJPO _typeDef,
+                              final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -238,18 +239,18 @@ public class Relationship_mxJPO
      * in this way, there is no other possibility to evaluate the information
      * {@link #fromTypeAll} or {@link #toTypeAll}.
      *
-     * @param _context  MX context
+     * @param _paramCache   parameter cache
      * @throws MatrixException if the from / to side types could not be
      *                         evaluated or the prepare from the derived class
      *                         failed
      * @todo support for from / to relationships
      */
     @Override
-    protected void prepare(final Context _context)
+    protected void prepare(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
         // evaluate all from types
-        final String[] fromTypesArr = execMql(_context,
+        final String[] fromTypesArr = execMql(_paramCache.getContext(),
                                               new StringBuilder("escape print rel \"")
                                                    .append(this.getName())
                                                    .append("\" select fromtype dump '\n'"))
@@ -263,7 +264,7 @@ public class Relationship_mxJPO
             }
         }
         // evaluate all to types
-        final String[] toTypesArr = execMql(_context,
+        final String[] toTypesArr = execMql(_paramCache.getContext(),
                                             new StringBuilder("escape print rel \"")
                                                  .append(this.getName())
                                                  .append("\" select totype dump '\n'"))
@@ -277,7 +278,7 @@ public class Relationship_mxJPO
             }
         }
 
-        super.prepare(_context);
+        super.prepare(_paramCache);
     }
 
     /**
@@ -289,12 +290,14 @@ public class Relationship_mxJPO
      * <li>from and to side informations</li>
      * </ul>
      *
-     * @param _out      writer instance
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
      * @throws IOException if the TCL code to the TCL update file could not be
      *                     written
      */
     @Override
-    protected void writeObject(final Writer _out)
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
             throws IOException
     {
         _out.append(" \\\n    ").append(this.isHidden() ? "" : "!").append("hidden")
@@ -360,7 +363,7 @@ public class Relationship_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update itself failed
+     * @throws Exception if the update from derived class failed
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,

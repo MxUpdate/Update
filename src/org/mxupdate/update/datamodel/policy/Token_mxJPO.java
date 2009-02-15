@@ -90,8 +90,7 @@ public class Token_mxJPO {
   /**
    * Returns the image.
    */
-  @Override
-public String toString()
+  public String toString()
   {
      return image;
   }
@@ -122,4 +121,4 @@ public String toString()
   }
 
 }
-/* JavaCC - OriginalChecksum=1b25a888977de86ebbf925f8908601d2 (do not edit this line) */
+/* JavaCC - OriginalChecksum=e835d2eb0f804555f21ed156a715f54f (do not edit this line) */

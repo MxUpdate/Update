@@ -63,8 +63,9 @@ try  {
         } finally  {
             field.setAccessible(accessible);
         }
-} catch (Exception e)  {
-    e.printStackTrace();
+} catch (final Exception e)  {
+    e.printStackTrace(System.out);
+    throw new Error(e);
 }
     }
 
@@ -82,8 +83,9 @@ try  {
         } finally  {
             field.setAccessible(accessible);
         }
-} catch (Exception e)  {
-    e.printStackTrace();
+} catch (final Exception e)  {
+    e.printStackTrace(System.out);
+    throw new Error(e);
 }
     }
 
@@ -101,8 +103,9 @@ try  {
         } finally  {
             field.setAccessible(accessible);
         }
-} catch (Exception e)  {
-    e.printStackTrace();
+} catch (final Exception e)  {
+    e.printStackTrace(System.out);
+    throw new Error(e);
 }
     }
 
@@ -120,14 +123,14 @@ try  {
         Field field = null;
         try  {
             field = clazz.getDeclaredField(_fieldName);
-        } catch (NoSuchFieldException e)  {
+        } catch (final NoSuchFieldException e)  {
         }
         while ((field == null) && (clazz != null))  {
             clazz = clazz.getSuperclass();
             if (clazz != null)  {
                 try  {
                     field = clazz.getDeclaredField(_fieldName);
-                } catch (NoSuchFieldException e)  {
+                } catch (final NoSuchFieldException e)  {
                 }
             }
         }
@@ -259,8 +262,11 @@ TOKEN : /** State and depending signature and trigger Tokens */
       <L4_CURLY_BRACKET_CLOSE : "}">   : L2_EXPECTED
 }
 
-Policy_mxJPO policy(final TypeDef_mxJPO _typeDef) throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException : {
-    final Policy_mxJPO policy = (Policy_mxJPO) _typeDef.newTypeInstance();
+Policy_mxJPO policy(final TypeDef_mxJPO _typeDef,
+                    final String _mxName) 
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+: {
+    final Policy_mxJPO policy = (Policy_mxJPO) _typeDef.newTypeInstance(_mxName);
     String tmp;
     Set<String> set;
 } {

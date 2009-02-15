@@ -46,10 +46,12 @@ public class NumberGenerator_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the number generator object
      */
-    public NumberGenerator_mxJPO(final TypeDef_mxJPO _typeDef)
+    public NumberGenerator_mxJPO(final TypeDef_mxJPO _typeDef,
+                                 final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -59,6 +61,8 @@ public class NumberGenerator_mxJPO
      *
      * @param _paramCache   parameter cache
      * @param _out          writer instance
+     * @throws IOException if the TCL update code for the number generator
+     *                     could not be written
      */
     @Override
     protected void write(final ParameterCache_mxJPO _paramCache,

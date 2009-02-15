@@ -96,8 +96,7 @@ public class ParseException_mxJPO extends Exception {
    * of the final stack trace, and hence the correct error message
    * gets displayed.
    */
-  @Override
-public String getMessage() {
+  public String getMessage() {
     if (!specialConstructor) {
       return super.getMessage();
     }
@@ -196,4 +195,4 @@ public String getMessage() {
    }
 
 }
-/* JavaCC - OriginalChecksum=76ff032ea831738c4a4ea1ce354682a0 (do not edit this line) */
+/* JavaCC - OriginalChecksum=c2b4f370182f3b3378b75d6ac7eb20e0 (do not edit this line) */

@@ -38,7 +38,6 @@ import matrix.db.AttributeList;
 import matrix.db.BusinessObject;
 import matrix.db.BusinessObjectWithSelect;
 import matrix.db.BusinessObjectWithSelectList;
-import matrix.db.Context;
 import matrix.db.ExpansionWithSelect;
 import matrix.db.Query;
 import matrix.db.RelationshipWithSelect;
@@ -95,7 +94,7 @@ public class BusObject_mxJPO
      * @see #parse(ParameterCache_mxJPO, String)
      * @see #getBusName()
      */
-    private String busName;
+    private final String busName;
 
     /**
      * Revision of business object.
@@ -103,7 +102,7 @@ public class BusObject_mxJPO
      * @see #parse(ParameterCache_mxJPO, String)
      * @see #getBusRevision()
      */
-    private String busRevision;
+    private final String busRevision;
 
     /**
      * Vault of the business object.
@@ -164,10 +163,21 @@ public class BusObject_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the administration object
      */
-    public BusObject_mxJPO(final TypeDef_mxJPO _typeDef)
+    public BusObject_mxJPO(final TypeDef_mxJPO _typeDef,
+                           final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
+
+        if (_mxName != null)  {
+            final String[] nameRev = this.getName().split(SPLIT_NAME);
+            this.busName = nameRev[0];
+            this.busRevision = (nameRev.length > 1) ? nameRev[1] : "";
+        } else  {
+            this.busName = null;
+            this.busRevision = null;
+        }
     }
 
     /**
@@ -236,7 +246,6 @@ public class BusObject_mxJPO
      * name (concatenation of name and revision).
      *
      * @param _paramCache   parameter cache
-     * @param _name         name of administration object which must be parsed
      * @throws MatrixException
      * @throws SAXException
      * @throws IOException
@@ -250,15 +259,9 @@ public class BusObject_mxJPO
      * @see #busVault
      */
     @Override
-    protected void parse(final ParameterCache_mxJPO _paramCache,
-                         final String _name)
+    protected void parse(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
-        final String[] nameRev = _name.split(SPLIT_NAME);
-
-        this.busName = nameRev[0];
-        this.busRevision = (nameRev.length > 1) ? nameRev[1] : "";
-
         final BusinessObject bus = new BusinessObject(this.getBusType(),
                                                       this.getBusName(),
                                                       this.getBusRevision(),
@@ -315,7 +318,6 @@ public class BusObject_mxJPO
         if ((this.busRevision != null) && !"".equals(this.busRevision))  {
             name.append(SPLIT_NAME).append(this.busRevision);
         }
-        this.setName(name.toString());
 
         // evaluate from connections
         if (this.getTypeDef().getMxBusRelsFrom() != null)  {
@@ -399,6 +401,8 @@ public class BusObject_mxJPO
      *
      * @param _paramCache   parameter cache
      * @param _out          writer instance
+     * @throws IOException if the TCL update code for the business object could
+     *                     not be written
      */
     @Override
     protected void write(final ParameterCache_mxJPO _paramCache,
@@ -443,45 +447,40 @@ public class BusObject_mxJPO
     /**
      * Deletes administration business object from given type with given name.
      *
-     * @param _context      context for this request
-     * @param _name         name of object to delete
-     * @throws Exception if delete failed
+     * @param _paramCache   parameter cache
+     * @throws Exception if delete of the business object failed
      */
     @Override
-    public void delete(final Context _context,
-                       final String _name)
+    public void delete(final ParameterCache_mxJPO _paramCache)
             throws Exception
     {
         final TypeDef_mxJPO typeDef = this.getTypeDef();
-        final String[] nameRev = _name.split(SPLIT_NAME);
-        final StringBuilder cmd = new StringBuilder()
-                .append("delete bus \"").append(typeDef.getMxBusType()).append('\"')
-                .append(" \"").append(nameRev[0]).append("\" ")
-                .append(" \"").append((nameRev.length > 1) ? nameRev[1] : "").append("\";");
-        execMql(_context, cmd);
+        final BusinessObject bus = new BusinessObject(typeDef.getMxBusType(),
+                                                      this.busName,
+                                                      this.busRevision,
+                                                      null);
+        bus.remove(_paramCache.getContext());
     }
 
     /**
      * Creates for given name the business object.
      *
-     * @param _context  context for this request
-     * @param _file     defines the file for which the business object is
-     *                  created
-     * @param _name     name and revision of the business object
+     * @param _paramCache   parameter cache
+     * @param _file         defines the file for which the business object is
+     *                      created
+     * @throws Exception if the business object could not be created
      */
     @Override
-    public void create(final Context _context,
-                       final File _file,
-                       final String _name)
+    public void create(final ParameterCache_mxJPO _paramCache,
+                       final File _file)
             throws Exception
     {
         final TypeDef_mxJPO busType = this.getTypeDef();
-        final String[] nameRev = _name.split(SPLIT_NAME);
         final BusinessObject bus = new BusinessObject(busType.getMxBusType(),
-                                                      nameRev[0],
-                                                      (nameRev.length > 1) ? nameRev[1] : "",
+                                                      this.getBusName(),
+                                                      this.getBusRevision(),
                                                       busType.getMxBusVault());
-        bus.create(_context, busType.getMxBusPolicy());
+        bus.create(_paramCache.getContext(), busType.getMxBusPolicy());
     }
 
     /**
@@ -715,7 +714,9 @@ public class BusObject_mxJPO
     }
 
     /**
-     * Class used to hold the user access.
+     * Class used to hold the attributes values. They are comparable by the
+     * attribute name. If numbers within attribute are used, the order is
+     * done depending on the numbers.
      */
     protected class AttributeValue
             implements Comparable<AttributeValue>
@@ -723,13 +724,19 @@ public class BusObject_mxJPO
         /**
          * Holds the user references of a user access.
          */
-        public String name = null;
+        public final String name;
 
         /**
          * Holds the expression filter of a user access.
          */
-        public String value = null;
+        public final String value;
 
+        /**
+         * Defines the name and value of the attribute depending on the
+         * attribute.
+         *
+         * @param _attr attribute
+         */
         AttributeValue(final Attribute _attr)
         {
             this.name = _attr.getName();

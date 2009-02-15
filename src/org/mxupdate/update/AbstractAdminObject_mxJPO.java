@@ -79,10 +79,12 @@ public abstract class AbstractAdminObject_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the administration object
      */
-    protected AbstractAdminObject_mxJPO(final TypeDef_mxJPO _typeDef)
+    protected AbstractAdminObject_mxJPO(final TypeDef_mxJPO _typeDef,
+                                        final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -117,7 +119,6 @@ public abstract class AbstractAdminObject_mxJPO
      * executes the post preparation {@link #prepare(Context)}.
      *
      * @param _paramCache   parameter cache
-     * @param _name         name of object to parse
      * @see #getExportMQL(String)       used to get the MQL command to get a
      *                                  XML representation
      * @see PadSaxHandler               SAX handler to parse the XML file
@@ -125,11 +126,9 @@ public abstract class AbstractAdminObject_mxJPO
      * @see #prepare(Context)           called post preparation method
      */
     @Override
-    protected void parse(final ParameterCache_mxJPO _paramCache,
-                         final String _name)
+    protected void parse(final ParameterCache_mxJPO _paramCache)
             throws MatrixException, SAXException, IOException
     {
-        this.setName(_name);
         final String xml = execMql(_paramCache.getContext(), this.getExportMQL());
 
         // create XML reader
@@ -144,7 +143,7 @@ public abstract class AbstractAdminObject_mxJPO
         inputSource.setEncoding("UTF8");
         reader.parse(inputSource);
         // prepare post preparation
-        this.prepare(_paramCache.getContext());
+        this.prepare(_paramCache);
     }
 
     protected String getExportMQL()
@@ -166,7 +165,7 @@ public abstract class AbstractAdminObject_mxJPO
         } else if ("/adminProperties/modificationInfo/datetime".equals(_url))  {
             // to be ignored ...
         } else if ("/adminProperties/name".equals(_url))  {
-            this.setName(_content);
+            // to be ignored ... (because name is defined within constructor)
         } else if ("/adminProperties/description".equals(_url))  {
             this.setDescription(_content);
         } else if ("/adminProperties/hidden".equals(_url))  {
@@ -197,13 +196,13 @@ public abstract class AbstractAdminObject_mxJPO
      * Sorted the properties, sets the author and version depending on the
      * properties and reads the symbolic names.
      *
-     * @param _context      context for this request
-     * @throws MatrixException
+     * @param _paramCache   parameter cache
+     * @throws MatrixException if the symbolic names could not be extracted
      * @see #propertiesStack
      * @see #propertiesMap
      * @see #symbolicNames
      */
-    protected void prepare(final Context _context)
+    protected void prepare(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
         // sort the properties
@@ -252,7 +251,7 @@ public abstract class AbstractAdminObject_mxJPO
                     .append(this.getTypeDef().getMxAdminName())
                     .append(" \"").append(this.getName()).append("\" ")
                     .append(this.getTypeDef().getMxAdminSuffix());
-        for (final String symbName : execMql(_context, cmd).split("\n"))  {
+        for (final String symbName : execMql(_paramCache.getContext(), cmd).split("\n"))  {
             if (!"".equals(symbName))  {
                 this.getSymblicNames().add(symbName.substring(0, symbName.indexOf(" on program eServiceSchemaVariableMapping.tcl ")));
             }
@@ -277,13 +276,21 @@ public abstract class AbstractAdminObject_mxJPO
         if (!"".equals(this.getTypeDef().getMxAdminSuffix()))  {
             _out.append(" ").append(this.getTypeDef().getMxAdminSuffix());
         }
-        _out.append(" \\\n    description \"").append(convertTcl(getDescription())).append("\"");
-        this.writeObject(_out);
+        _out.append(" \\\n    description \"").append(convertTcl(this.getDescription())).append("\"");
+        this.writeObject(_paramCache, _out);
         this.writeProperties(_out);
-        this.writeEnd(_out);
+        this.writeEnd(_paramCache, _out);
     }
 
-    protected abstract void writeObject(final Writer _out) throws IOException;
+    /**
+     *
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the TCL update code could not be written
+     */
+    protected abstract void writeObject(final ParameterCache_mxJPO _paramCache,
+                                        final Appendable _out)
+            throws IOException;
 
     /**
      * At the end of the write to the TCL update file in some cases some
@@ -291,10 +298,12 @@ public abstract class AbstractAdminObject_mxJPO
      * use cases. E.g. for an inquiry, the inquiry code must be written at the
      * end of a TCL update file.
      *
-     * @param _out      appendable instance to the TCL update file
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
      * @throws IOException if the extension could not be written
      */
-    protected void writeEnd(final Appendable _out)
+    protected void writeEnd(final ParameterCache_mxJPO _paramCache,
+                            final Appendable _out)
             throws IOException
     {
     }
@@ -325,42 +334,38 @@ public abstract class AbstractAdminObject_mxJPO
     /**
      * Deletes administration object from given type with given name.
      *
-     * @param _context      context for this request
-     * @param _name         name of object to delete
+     * @param _paramCache   parameter cache
      * @throws Exception if delete failed
      */
     @Override
-    public void delete(final Context _context,
-                       final String _name)
+    public void delete(final ParameterCache_mxJPO _paramCache)
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("delete ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(_name).append("\" ")
+                .append(" \"").append(this.getName()).append("\" ")
                 .append(this.getTypeDef().getMxAdminSuffix());
-        execMql(_context, cmd);
+        execMql(_paramCache.getContext(), cmd);
     }
 
     /**
      * Creates given administration object from given type with given name.
      *
-     * @param _context          context for this request
-     * @param _file             file for which the administration object must
-     *                          be created (not used)
-     * @param _name             name of administration object to create
+     * @param _paramCache   parameter cache
+     * @param _file         file for which the administration object must be
+     *                      created (not used)
      * @throws Exception if the new administration object could not be created
      */
     @Override
-    public void create(final Context _context,
-                       final File _file,
-                       final String _name)
+    public void create(final ParameterCache_mxJPO _paramCache,
+                       final File _file)
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("add ").append(this.getTypeDef().getMxAdminName())
-                        .append(" \"").append(_name).append("\" ")
+                        .append(" \"").append(this.getName()).append("\" ")
                         .append(this.getTypeDef().getMxAdminSuffix()).append(";");
-        execMql(_context, cmd);
+        execMql(_paramCache.getContext(), cmd);
     }
 
     /**

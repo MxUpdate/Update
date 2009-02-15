@@ -21,7 +21,6 @@
 package org.mxupdate.update.user;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -47,7 +46,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.xml.sax.SAXException;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
-import static org.mxupdate.update.util.StringUtil_mxJPO.join;
+import static org.mxupdate.update.util.StringUtil_mxJPO.joinTcl;
 import static org.mxupdate.util.MqlUtil_mxJPO.setHistoryOff;
 import static org.mxupdate.util.MqlUtil_mxJPO.setHistoryOn;
 
@@ -68,22 +67,26 @@ public class Person_mxJPO
      * Administration person instance (used to parse the admin part of a
      * person).
      */
-    private final PersonAdmin personAdmin = new PersonAdmin();
+    private final PersonAdmin personAdmin;
 
     /**
      * Business object person instance (used to parse the business object part
      * of a person).
      */
-    private final PersonBus personBus = new PersonBus();
+    private final PersonBus personBus;
 
     /**
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the person object
      */
-    public Person_mxJPO(final TypeDef_mxJPO _typeDef)
+    public Person_mxJPO(final TypeDef_mxJPO _typeDef,
+                        final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
+        this.personAdmin = new PersonAdmin(_typeDef, _mxName);
+        this.personBus = new PersonBus(_typeDef, _mxName);
     }
 
     /**
@@ -110,89 +113,71 @@ public class Person_mxJPO
         return ret;
     }
 
+    /**
+     * If the person must be parsed, first the admin object of the person is
+     * parsed and then the related person business object.
+     *
+     * @param _paramCache   parameter cache
+     * @see #personAdmin
+     * @see #personBus
+     */
     @Override
-    public void export(final ParameterCache_mxJPO _paramCache,
-                       final File _path,
-                       final String _name)
+    protected void parse(final ParameterCache_mxJPO _paramCache)
             throws MatrixException, SAXException, IOException
     {
-        this.personAdmin.parse(_paramCache, _name);
-        this.personBus.parse(_paramCache, _name);
-        final File file = new File(_path, this.personAdmin.getFileName());
-        if (!file.getParentFile().exists())  {
-            file.getParentFile().mkdirs();
-        }
-        final Writer out = new FileWriter(file);
-        this.personAdmin.write(_paramCache, out);
-        out.append('\n');
-        this.personBus.write(_paramCache, out);
-        this.personAdmin.writeEnd(out);
-        out.flush();
-        out.close();
-    }
-
-    @Override
-    protected void parse(final ParameterCache_mxJPO _paramCache,
-                         final String _name)
-            throws MatrixException, SAXException, IOException
-    {
-        // TODO Auto-generated method stub
-
+        this.personAdmin.parse(_paramCache);
+        this.personBus.parse(_paramCache);
     }
 
     /**
      * Deletes the person business object and person administration object.
      *
-     * @param _context      context for this request
-     * @param _name         name of person to delete
+     * @param _paramCache   parameter cache
      * @throws Exception if delete of person failed
      */
     @Override
-    public void delete(final Context _context,
-                       final String _name)
+    public void delete(final ParameterCache_mxJPO _paramCache)
             throws Exception
     {
-        this.personBus.delete(_context,
-                              new StringBuilder().append(_name).append(BusObject_mxJPO.SPLIT_NAME)
-                                      .append('-').toString());
-        this.personAdmin.delete(_context, _name);
+        this.personBus.delete(_paramCache);
+        this.personAdmin.delete(_paramCache);
     }
 
     /**
      * Creates the person administration object and person business object.
      *
-     * @param _context      context for this request
+     * @param _paramCache   parameter cache
      * @param _file         TCL update file
-     * @param _name         name of person to create
      * @throws Exception if create of person failed
      */
     @Override
-    public void create(final Context _context,
-                       final File _file,
-                       final String _name)
+    public void create(final ParameterCache_mxJPO _paramCache,
+                       final File _file)
             throws Exception
     {
-        this.personAdmin.create(_context, _file, _name);
-        this.personBus.create(_context,
-                              _file,
-                              new StringBuilder().append(_name).append(BusObject_mxJPO.SPLIT_NAME)
-                                      .append('-').toString());
+        this.personAdmin.create(_paramCache, _file);
+        this.personBus.create(_paramCache, _file);
     }
 
     @Override
     public void update(final ParameterCache_mxJPO _paramCache,
-                       final String _name,
                        final File _file,
                        final String _newVersion)
             throws Exception
     {
-        this.personBus.parse(_paramCache, _name);
-        this.personAdmin.update(_paramCache, _name, _file, _newVersion);
+        this.personBus.parse(_paramCache);
+        this.personAdmin.update(_paramCache, _file, _newVersion);
     }
 
     @Override
-    protected void write(final ParameterCache_mxJPO _paramCache, final Writer _out) throws IOException,
-            MatrixException {
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Writer _out)
+            throws IOException
+    {
+        this.personAdmin.write(_paramCache, _out);
+        _out.append('\n');
+        this.personBus.write(_paramCache, _out);
+        this.personAdmin.writeEnd(_paramCache, _out);
     }
 
     class PersonAdmin
@@ -203,9 +188,17 @@ public class Person_mxJPO
          */
         private static final long serialVersionUID = -3816908902276144444L;
 
-        private PersonAdmin()
+        /**
+         * Constructor used to initialize the administration object instance
+         * for persons.
+         *
+         * @param _typeDef  related type definition for the person
+         * @param _mxName   MX name of the person object
+         */
+        private PersonAdmin(final TypeDef_mxJPO _typeDef,
+                            final String _mxName)
         {
-            super(Person_mxJPO.this.getTypeDef());
+            super(_typeDef, _mxName);
         }
 
         /**
@@ -218,14 +211,12 @@ public class Person_mxJPO
          * person.
          *
          * @param _paramCache   parameter cache
-         * @param _name         name of the person to parse
          */
         @Override
-        protected void parse(final ParameterCache_mxJPO _paramCache,
-                             final String _name)
+        protected void parse(final ParameterCache_mxJPO _paramCache)
                 throws MatrixException, SAXException, IOException
         {
-            super.parse(_paramCache, _name);
+            super.parse(_paramCache);
         }
 
         /**
@@ -252,13 +243,24 @@ public class Person_mxJPO
          *
          * @param _paramCache   parameter cache
          * @param _out          writer instance
+         * @throws IOException if the TCL update code for the person could not
+         *                     be written
          */
         @Override
         protected void write(final ParameterCache_mxJPO _paramCache,
                              final Writer _out)
                 throws IOException
         {
-            super.write(_paramCache, _out);
+            this.writeHeader(_paramCache, _out);
+            _out.append("mql mod ")
+                .append(this.getTypeDef().getMxAdminName())
+                .append(" \"${NAME}\"");
+            if (!"".equals(this.getTypeDef().getMxAdminSuffix()))  {
+                _out.append(" ").append(this.getTypeDef().getMxAdminSuffix());
+            }
+            _out.append(" \\\n    description \"").append(convertTcl(this.getDescription())).append("\"");
+            this.writeObject(_paramCache, _out);
+            this.writeProperties(_out);
         }
 
         /**
@@ -290,6 +292,7 @@ public class Person_mxJPO
          *                          (the value is automatically converted to TCL
          *                          syntax!)
          * @param _sourceFile       souce file with the TCL code to update
+         * @throws Exception if the update from derived class failed
          */
         @Override
         protected void update(final ParameterCache_mxJPO _paramCache,
@@ -359,26 +362,31 @@ public class Person_mxJPO
         private final Set<String> representativeOf = new TreeSet<String>();
 
         /**
-         * Constructor used to initialize the type definition enumeration.
+         * Constructor used to initialize the business object instance for
+         * persons.
+         *
+         * @param _typeDef  related type definition for the person
+         * @param _mxName   MX name of the person object
          */
-        private PersonBus()
+        private PersonBus(final TypeDef_mxJPO _typeDef,
+                          final String _mxName)
         {
-            super(Person_mxJPO.this.getTypeDef());
+            super(_typeDef,
+                 new StringBuilder().append(_mxName)
+                                    .append(BusObject_mxJPO.SPLIT_NAME)
+                                    .append('-').toString());
         }
 
         /**
          * Parsed the business object of the person.
          *
          * @param _paramCache   parameter cache
-         * @param _name         name of the person which must be parsed
          */
         @Override
-        protected void parse(final ParameterCache_mxJPO _paramCache,
-                             final String _name)
+        protected void parse(final ParameterCache_mxJPO _paramCache)
                 throws MatrixException
         {
-            super.parse(_paramCache,
-                        new StringBuilder().append(_name).append(BusObject_mxJPO.SPLIT_NAME).append('-').toString());
+            super.parse(_paramCache);
 
             // exists a business object?
             if (this.getBusName() != null)  {
@@ -430,6 +438,7 @@ public class Person_mxJPO
          * @param _paramCache   parameter cache
          * @param _out          appendable instance where the TCL update code
          *                      for the business object part must be written
+         * @throws IOException if the TCL update code could not written
          */
         @Override
         protected void write(final ParameterCache_mxJPO _paramCache,
@@ -457,7 +466,7 @@ public class Person_mxJPO
                     .append("\n    relationship \"Member\" \\")
                     .append("\n    from Company \"").append(convertTcl(this.memberOf)).append("\" - \\")
                     .append("\n    \"Project Access\" \"").append(convertTcl(this.memberAccess)).append("\" \\")
-                    .append("\n    \"Project Role\" \"").append(convertTcl(join('~', this.memberRoles, null))).append("\"");
+                    .append("\n    \"Project Role\" \"").append(convertTcl(joinTcl('~', false, this.memberRoles, null))).append("\"");
             }
             // employees
             final List<String> employees = new ArrayList<String>();

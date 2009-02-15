@@ -22,7 +22,6 @@ package org.mxupdate.update.userinterface;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
 import java.util.Stack;
 
@@ -66,9 +65,11 @@ public class Form_mxJPO
                 + "}"
             + "}";
 
-
     /**
      * Stores all fields of this form instance.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(Appendable)
      */
     private final Stack<TableColumn_mxJPO> fields
             = new Stack<TableColumn_mxJPO>();
@@ -77,14 +78,24 @@ public class Form_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the administration object
      */
-    public Form_mxJPO(final TypeDef_mxJPO _typeDef)
+    public Form_mxJPO(final TypeDef_mxJPO _typeDef,
+                      final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
+    /**
+     * The fields of the web form are parsed.
+     *
+     * @param _url      URL to parse
+     * @param _content  related content of the URL to parse
+     * @see #fields
+     */
     @Override
-    protected void parse(String _url, String _content)
+    protected void parse(final String _url,
+                         final String _content)
     {
 
         if ("/fieldList".equals(_url))  {
@@ -113,12 +124,21 @@ public class Form_mxJPO
         }
     }
 
+    /**
+     * Writes all field of the web form to the TCL update file.
+     *
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the TCL update code for the fields could not be
+     *                     written
+     */
     @Override
-    protected void writeObject(final Writer _out)
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
             throws IOException
     {
         for (final TableColumn_mxJPO field : this.fields)  {
-            _out.write(" \\\n    field");
+            _out.append(" \\\n    field");
             field.write(_out);
         }
     }
@@ -127,11 +147,13 @@ public class Form_mxJPO
      * At the end of the TCL update file a call to a procedure must be included
      * to order all web form fields correctly.
      *
-     * @param _out      appendable instance to the TCL update file
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
      * @throws IOException if the extension could not be written
      */
     @Override
-    protected void writeEnd(final Appendable _out)
+    protected void writeEnd(final ParameterCache_mxJPO _paramCache,
+                            final Appendable _out)
             throws IOException
     {
         _out.append("\n\norderFields \"${NAME}\" [list \\\n");
@@ -146,26 +168,26 @@ public class Form_mxJPO
      * command for a web form must include the string &quot;web&quot; a
      * specific create method must be written.
      *
-     * @param _context          context for this request
-     * @param _file             file for which the administration object must
-     *                          be created (not used)
-     * @param _name             name of administration object to create
+     * @param _paramCache   parameter cache
+     * @param _file         file for which the administration object must be
+     *                      created (not used)
+     * @throws Exception if the web form could not be created within MX
      */
     @Override
-    public void create(final Context _context,
-                       final File _file,
-                       final String _name)
+    public void create(final ParameterCache_mxJPO _paramCache,
+                       final File _file)
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("add ").append(this.getTypeDef().getMxAdminName())
-                        .append(" \"").append(_name).append("\" web;");
-        execMql(_context, cmd);
+                        .append(" \"").append(this.getName()).append("\" web;");
+        execMql(_paramCache.getContext(), cmd);
     }
 
     /**
      * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this form:
+     * in the <code>_preMQLCode</code> to reset this form. Following steps are
+     * done:
      * <ul>
      * <li>remove all fields of the web form</li>
      * <li>set to not hidden</li>
@@ -186,6 +208,7 @@ public class Form_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update from derived class failed
      * @see #ORDER_PROC
      */
     @Override

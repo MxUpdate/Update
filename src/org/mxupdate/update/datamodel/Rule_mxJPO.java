@@ -22,7 +22,6 @@ package org.mxupdate.update.datamodel;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -35,7 +34,9 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
+import static org.mxupdate.update.util.StringUtil_mxJPO.convertMql;
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import static org.mxupdate.update.util.StringUtil_mxJPO.joinTcl;
 
 /**
  *
@@ -78,10 +79,12 @@ public class Rule_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the rule object
      */
-    public Rule_mxJPO(final TypeDef_mxJPO _typeDef)
+    public Rule_mxJPO(final TypeDef_mxJPO _typeDef,
+                      final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -132,73 +135,53 @@ public class Rule_mxJPO
     /**
      * The user access instances are sorted.
      *
-     * @param _context   context for this request
+     * @param _paramCache   parameter cache
      * @see #userAccess         unsorted list of user access
      * @see #userAccessSorted   sorted list user access (after this method is
      *                          called)
+     * @throws MatrixException if the prepare from derived class failed
      */
     @Override
-    protected void prepare(final Context _context)
+    protected void prepare(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
         for (final UserAccess range : this.userAccess)  {
             this.userAccessSorted.add(range);
         }
-        super.prepare(_context);
+        super.prepare(_paramCache);
     }
 
     /**
      * Writes specific information about the cached rule to the given
      * writer instance.
      *
-     * @param _out      writer instance
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the TCL update code for the rule could not be
+     *                     written
      */
     @Override
-    protected void writeObject(final Writer _out)
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
             throws IOException
     {
         // hidden?
         _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden");
 
         // owner access
-        _out.append(" \\\n    add owner \"");
-        boolean first = true;
-        for (final String access : this.ownerAccess)  {
-            if (!first)  {
-                _out.append(',');
-            } else  {
-                first = false;
-            }
-            _out.append(access);
-        }
-        _out.append('\"');
-
+        _out.append(" \\\n    add owner \"")
+            .append(joinTcl(',', false, this.ownerAccess, null))
+            .append('\"')
         // public access
-        _out.append(" \\\n    add public \"");
-        first = true;
-        for (final String access : this.publicAccess)  {
-            if (!first)  {
-                _out.append(',');
-            } else  {
-                first = false;
-            }
-            _out.append(access);
-        }
-        _out.append('\"');
+            .append(" \\\n    add public \"")
+            .append(joinTcl(',', false, this.publicAccess, null))
+            .append('\"');
 
         // user access
         for (final UserAccess userAccess : this.userAccessSorted)  {
-            _out.append(" \\\n    add user \"").append(convertTcl(userAccess.userRef)).append("\" \"");
-            first = true;
-            for (final String access : userAccess.access)  {
-                if (!first)  {
-                    _out.append(',');
-                } else  {
-                    first = false;
-                }
-                _out.append(access);
-            }
-            _out.append("\" filter \"")
+            _out.append(" \\\n    add user \"").append(convertTcl(userAccess.userRef)).append("\" \"")
+                .append(joinTcl(',', false, userAccess.access, null))
+                .append("\" filter \"")
                 .append(convertTcl(userAccess.expressionFilter))
                 .append("\"");
         }
@@ -206,7 +189,8 @@ public class Rule_mxJPO
 
     /**
      * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this rule:
+     * in the <code>_preMQLCode</code> to reset this rule. Following steps are
+     * done:
      * <ul>
      * <li>set to not hidden</li>
      * <li>no owner and public access</li>
@@ -225,6 +209,7 @@ public class Rule_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the called update from derived class failed
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,
@@ -236,12 +221,14 @@ public class Rule_mxJPO
             throws Exception
     {
         final StringBuilder preMQLCode = new StringBuilder()
-            .append("mod ").append(this.getTypeDef().getMxAdminName())
-            .append(" \"").append(this.getName()).append('\"')
+            .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+            .append(" \"").append(convertMql(this.getName())).append('\"')
             .append(" !hidden owner none public none");
         // remove user access
         for (final UserAccess userAccess : this.userAccessSorted)  {
-            preMQLCode.append(" remove user \"").append(userAccess.userRef).append("\" all");
+            preMQLCode.append(" remove user \"")
+                        .append(convertMql(userAccess.userRef))
+                        .append("\" all");
         }
 
         // append already existing pre MQL code

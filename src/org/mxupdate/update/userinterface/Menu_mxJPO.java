@@ -22,12 +22,10 @@ package org.mxupdate.update.userinterface;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
-import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
@@ -49,20 +47,40 @@ public class Menu_mxJPO
      */
     private static final long serialVersionUID = 3617033695673460587L;
 
-    boolean treeMenu = false;
+    /**
+     * Flag to store the information that the menu is a tree menu.
+     *
+     * @see #prepare(ParamCache)
+     * @see #writeEnd(Appendable)
+     */
+    private boolean treeMenu = false;
 
-    final Stack<MenuChild> childs = new Stack<MenuChild>();
+    /**
+     * Holds all children of this menu instance.
+     *
+     * @see MenuChild
+     */
+    private final Stack<MenuChild> childs = new Stack<MenuChild>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the administration object
      */
-    public Menu_mxJPO(final TypeDef_mxJPO _typeDef)
+    public Menu_mxJPO(final TypeDef_mxJPO _typeDef,
+                      final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
+    /**
+     * Parses all menu related URL's. This means the names of all referenced
+     * children menus and commands are parsed and stored in {@link #childs}.
+     *
+     * @param _url      URL to parse
+     * @param _content  related content of the URL
+     */
     @Override
     protected void parse(final String _url,
                          final String _content)
@@ -94,22 +112,36 @@ public class Menu_mxJPO
         }
     }
 
+    /**
+     * @param _paramCache   parameter cache
+     * @throws MatrixException if the preparation from derived class failed or
+     *                         the check for tree menu used in
+     *                         {@link #treeMenu} failed
+     * @see #treeMenu
+     */
     @Override
-    protected void prepare(final Context _context)
+    protected void prepare(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("print menu \"").append(this.getName()).append("\" select parent[Tree] dump");
-        if ("TRUE".equalsIgnoreCase(execMql(_context, cmd)))  {
+        if ("TRUE".equalsIgnoreCase(execMql(_paramCache.getContext(), cmd)))  {
             this.treeMenu = true;
         }
-        super.prepare(_context);
+        super.prepare(_paramCache);
     }
 
+    /**
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the TCL update code could not be written
+     */
     @Override
-    protected void writeObject(Writer _out) throws IOException
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
+            throws IOException
     {
-        super.writeObject(_out);
+        super.writeObject(_paramCache, _out);
 
         // order childs
         final Map<Integer,MenuChild> tmpChilds = new TreeMap<Integer,MenuChild>();
@@ -123,6 +155,18 @@ public class Menu_mxJPO
                 .append(convertTcl(child.name)).append("\"");
         }
 
+    }
+
+    /**
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the TCL update code could not be written
+     */
+    @Override
+    protected void writeEnd(final ParameterCache_mxJPO _paramCache,
+                            final Appendable _out)
+            throws IOException
+    {
         if (this.treeMenu)  {
             _out.append("\n\nmql mod menu \"Tree\" \\\n    add menu \"${NAME}\"");
         }
@@ -130,7 +174,8 @@ public class Menu_mxJPO
 
     /**
      * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this menu:
+     * in the <code>_preMQLCode</code> to reset this menu. Following steps are
+     * done:
      * <ul>
      * <li>remove all child commands / menus</li>
      * <li>remove definition as tree menu</li>
@@ -149,6 +194,7 @@ public class Menu_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update from derived class failed
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,
@@ -180,12 +226,33 @@ public class Menu_mxJPO
     }
 
     /**
+     * Stores a reference to a child of a menu.
      *
+     * @see Menu_mxJPO#childs
      */
-    class MenuChild
+    private final class MenuChild
     {
-        String type = null;
-        String name = null;
-        Integer order = null;
+        /**
+         * Type of the menu child.
+         */
+        private String type;
+
+        /**
+         * Name of the menu child.
+         */
+        private String name;
+
+        /**
+         * Order index of the menu child.
+         */
+        private Integer order;
+
+        /**
+         * Private constructor so that an instance could only be created within
+         * the Menu_mxJPO class.
+         */
+        private MenuChild()
+        {
+        }
     }
 }

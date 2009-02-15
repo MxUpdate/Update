@@ -45,6 +45,9 @@ public class Table_mxJPO
 
     /**
      * Stores all table columns of this web table instance.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(Appendable)
      */
     final Stack<TableColumn_mxJPO> columns = new Stack<TableColumn_mxJPO>();
 
@@ -52,12 +55,21 @@ public class Table_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the administration object
      */
-    public Table_mxJPO(final TypeDef_mxJPO _typeDef)
+    public Table_mxJPO(final TypeDef_mxJPO _typeDef,
+                       final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
+    /**
+     * Parses all column information from the web table.
+     *
+     * @param _url      URL to parse
+     * @param _content  related content of the URL to parse
+     * @see #columns
+     */
     @Override
     protected void parse(final String _url,
                          final String _content)
@@ -73,8 +85,18 @@ public class Table_mxJPO
         }
     }
 
+    /**
+     * Writes each column to the appendable instance.
+     *
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the TCL update code could not be written
+     * @see #columns
+     * @see TableColumn_mxJPO#write(Writer)
+     */
     @Override
-    protected void writeObject(final Writer _out)
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
             throws IOException
     {
         for (final TableColumn_mxJPO column : this.columns)  {
@@ -85,7 +107,8 @@ public class Table_mxJPO
 
     /**
      * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this web table:
+     * in the <code>_preMQLCode</code> to reset this web table. Following steps
+     * are done:
      * <ul>
      * <li>remove all columns of the web table</li>
      * <li>set to not hidden</li>
@@ -103,6 +126,7 @@ public class Table_mxJPO
      *                          (the value is automatically converted to TCL
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update from derived class failed
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,

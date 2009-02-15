@@ -34,9 +34,7 @@ import java.util.regex.Pattern;
 import matrix.db.Context;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.util.JPOCaller_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.JPOCaller_mxJPO.JPOCallerInterface;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertMql;
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
@@ -52,7 +50,6 @@ import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
  */
 public abstract class AbstractDMWithAttributes_mxJPO
         extends AbstractDMWithTriggers_mxJPO
-        implements JPOCallerInterface
 {
     /**
      * Defines the serialize version unique identifier.
@@ -140,10 +137,12 @@ public abstract class AbstractDMWithAttributes_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the administration object
      */
-    public AbstractDMWithAttributes_mxJPO(final TypeDef_mxJPO _typeDef)
+    public AbstractDMWithAttributes_mxJPO(final TypeDef_mxJPO _typeDef,
+                                          final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -172,12 +171,14 @@ public abstract class AbstractDMWithAttributes_mxJPO
      * {@link #TCL_PROCEDURE} to append missing attributes to the
      * administration object.
      *
-     * @param _out      appendable instance to the TCL update file
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
      * @throws IOException if the extension could not be written
      * @see #attributes
      */
     @Override
-    protected void writeEnd(final Appendable _out)
+    protected void writeEnd(final ParameterCache_mxJPO _paramCache,
+                            final Appendable _out)
             throws IOException
     {
         _out.append("\n\ntestAttributes -").append(this.getTypeDef().getMxAdminName())
@@ -203,7 +204,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
      *                          file is sourced
      * @param _tclVariables     map with TCL variables
      * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update itself within derived class failed
+     * @throws Exception if the update from derived class failed
      * @see #TCL_PROCEDURE
      */
     @Override
@@ -215,16 +216,12 @@ public abstract class AbstractDMWithAttributes_mxJPO
                           final File _sourceFile)
             throws Exception
     {
-        JPOCaller_mxJPO.defineInstance(_paramCache, this);
-
         // add TCL code for the procedure
         final StringBuilder tclCode = new StringBuilder()
                 .append(TCL_PROCEDURE)
                 .append(_preTCLCode);
 
         super.update(_paramCache, _preMQLCode, _postMQLCode, tclCode, _tclVariables, _sourceFile);
-
-        JPOCaller_mxJPO.undefineInstance(_paramCache, this);
     }
 
     /**
@@ -241,6 +238,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
      *                   attribute is assigned to an administration object
      *                   within MX but not defined anymore
      */
+    @Override
     public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
                                final String... _args)
             throws Exception

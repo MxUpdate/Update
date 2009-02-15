@@ -103,10 +103,12 @@ public class JPO_mxJPO
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the JPO object
      */
-    public JPO_mxJPO(final TypeDef_mxJPO _typeDef)
+    public JPO_mxJPO(final TypeDef_mxJPO _typeDef,
+                     final String _mxName)
     {
-        super(_typeDef);
+        super(_typeDef, _mxName);
     }
 
     /**
@@ -210,22 +212,20 @@ public class JPO_mxJPO
     /**
      * Creates given JPO object from given type with given name.
      *
-     * @param _context          context for this request
-     * @param _file             file for which the administration object must
-     *                          be created (not used)
-     * @param _name             name of administration object to create
+     * @param _paramCache   parameter cache
+     * @param _file         file for which the administration object must be
+     *                      created (not used)
      * @throws Exception if create of JPO failed
      */
     @Override
-    public void create(final Context _context,
-                       final File _file,
-                       final String _name)
+    public void create(final ParameterCache_mxJPO _paramCache,
+                       final File _file)
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("add ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(_name).append("\" java");
-        execMql(_context, cmd);
+                .append(" \"").append(this.getName()).append("\" java");
+        execMql(_paramCache.getContext(), cmd);
     }
 
     /**
@@ -240,7 +240,6 @@ public class JPO_mxJPO
      * </ul>
      *
      * @param _paramCache       parameter cache
-     * @param _name             name of the administration (business) object
      * @param _file             reference to the file to update
      * @param _newVersion       new version which must be set within the update
      *                          (or <code>null</code> if the version must not
@@ -249,12 +248,11 @@ public class JPO_mxJPO
      */
     @Override
     public void update(final ParameterCache_mxJPO _paramCache,
-                       final String _name,
                        final File _file,
                        final String _newVersion)
             throws Exception
     {
-        this.parse(_paramCache, _name);
+        this.parse(_paramCache);
 
         // get parameters
         final String markStart = _paramCache.getValueString(PARAM_MARKSTART).trim();
