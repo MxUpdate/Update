@@ -195,7 +195,9 @@ public class Insert_mxJPO
     /**
      *
      * @param _context  context for this request
-     * @param _args
+     * @param _args     arguements from the MX console including as first
+     *                  parameter the root path and as second parameter the
+     *                  MxUpdate version
      * @throws Exception
      */
     public void mxMain(final Context _context,
@@ -207,11 +209,11 @@ public class Insert_mxJPO
 
 
         // get installed JPOs
-        final Map<String,Date> installedProgs = evaluteInstalledJPOs(_context);
+        final Map<String,Date> installedProgs = this.evaluteInstalledJPOs(_context);
 
         final Map<String,Map<String,ClassFile>> mapPckFiles = new TreeMap<String,Map<String,ClassFile>>();
         final Map<String,ClassFile> jpoMap = new TreeMap<String,ClassFile>();
-        evaluateFiles(mapPckFiles, jpoMap, rootPath, new File(""));
+        this.evaluateFiles(mapPckFiles, jpoMap, rootPath, new File(""));
 
         // delete obsolete JPOs
         for (final String progName : installedProgs.keySet())  {
@@ -300,7 +302,7 @@ System.out.println("update jpo '" + classFile.jpoName + "'");
     /**
      *
      * @param _mapPckFiles  map of packages and their JPOs
-     * @param _jpoSet       map of all JPO programs
+     * @param _jpoMap       map of all JPO programs
      * @param _rootPath     path of the root (where the JPO code is located)
      * @param _packagePath  path of the package depending on the root path
      */
@@ -312,7 +314,7 @@ System.out.println("update jpo '" + classFile.jpoName + "'");
         final File path = new File(_rootPath, _packagePath.toString());
         for (final File file : path.listFiles())  {
             if (file.isDirectory())  {
-                evaluateFiles(_mapPckFiles, _jpoMap, _rootPath, new File(_packagePath, file.getName()));
+                this.evaluateFiles(_mapPckFiles, _jpoMap, _rootPath, new File(_packagePath, file.getName()));
             } else if (file.getName().endsWith(JPO_FILE_EXTENSION))  {
                 final ClassFile classFile = new ClassFile(_packagePath, file);
                 Map<String,ClassFile> pckFiles = _mapPckFiles.get(classFile.pckName);
@@ -493,14 +495,15 @@ System.out.println("update jpo '" + classFile.jpoName + "'");
                             final Matcher classWithoutPckMatch = Insert_mxJPO.PATTERN_JPOWITHOUTPCK.matcher(impClass);
                             classWithoutPckMatch.find();
                             class2Pck.put(classWithoutPckMatch.group(), impClass);
+                            code.append('\n');
                         } else  {
                             final Matcher matcher = Insert_mxJPO.PATTERN_JPO.matcher(line);
                             int start = 0;
                             final StringBuilder newLine = new StringBuilder();
                             while (matcher.find())  {
-                                if (className.equals(matcher.group()))  {
+                                if (this.className.equals(matcher.group()))  {
                                     newLine.append(line.substring(start, matcher.start()))
-                                           .append(className);
+                                           .append(this.className);
                                     start = matcher.start() + matcher.group().length();
                                 } else  {
                                     final String clazzName = class2Pck.containsKey(matcher.group())
