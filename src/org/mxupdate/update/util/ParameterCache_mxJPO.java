@@ -107,6 +107,16 @@ public class ParameterCache_mxJPO
     final Map<String,Boolean> mapBoolean;
 
     /**
+     * Mapping between parameter definition and the related integer value.
+     *
+     * @see #ParameterCache_mxJPO(Context,Collection)
+     * @see #evalParameter(ParameterDef_mxJPO, String[], int)
+     * @see #getValueInteger(String)
+     * @see #defineValueInteger(String, Integer)
+     */
+    final Map<String,Integer> mapInteger;
+
+    /**
      * Mapping between parameter definition and the related list of string
      * values.
      *
@@ -157,6 +167,7 @@ public class ParameterCache_mxJPO
     {
         this.context = _context;
         this.mapBoolean = new HashMap<String,Boolean>();
+        this.mapInteger = new HashMap<String,Integer>();
         this.mapList = new HashMap<String,Collection<String>>();
         this.mapMap = new HashMap<String,Map<String,String>>();
         this.mapString = new HashMap<String,String>();
@@ -166,6 +177,9 @@ public class ParameterCache_mxJPO
                 if (paramDef.getType() == ParameterDef_mxJPO.Type.BOOLEAN)  {
                     this.mapBoolean.put(paramDef.getName(),
                                         Boolean.parseBoolean(paramDef.getDefaultValue()));
+                } else if (paramDef.getType() == ParameterDef_mxJPO.Type.INTEGER)  {
+                    this.mapInteger.put(paramDef.getName(),
+                                        Integer.parseInt(paramDef.getDefaultValue()));
                 } else if (paramDef.getType() == ParameterDef_mxJPO.Type.LIST)  {
                     this.mapList.put(paramDef.getName(),
                                      new ArrayList<String>(Arrays.asList(paramDef.getDefaultValue().split(","))));
@@ -197,6 +211,7 @@ public class ParameterCache_mxJPO
     {
         this.context = _context;
         this.mapBoolean = _original.mapBoolean;
+        this.mapInteger = _original.mapInteger;
         this.mapList = _original.mapList;
         this.mapMap = _original.mapMap;
         this.mapString = _original.mapString;
@@ -246,15 +261,16 @@ public class ParameterCache_mxJPO
         if (_paramDef.getType() == ParameterDef_mxJPO.Type.BOOLEAN)  {
             this.mapBoolean.put(_paramDef.getName(),
                                 !Boolean.parseBoolean(_paramDef.getDefaultValue()));
+        } else if (_paramDef.getType() == ParameterDef_mxJPO.Type.INTEGER)  {
+            this.mapInteger.put(_paramDef.getName(),
+                                Integer.parseInt(_args[++index]));
         } else if (_paramDef.getType() == ParameterDef_mxJPO.Type.LIST)  {
-            index++;
             if (!this.mapList.containsKey(_paramDef.getName()))  {
                 this.mapList.put(_paramDef.getName(), new ArrayList<String>());
             }
-            this.mapList.get(_paramDef.getName()).add(_args[index]);
+            this.mapList.get(_paramDef.getName()).add(_args[++index]);
         } else if (_paramDef.getType() == ParameterDef_mxJPO.Type.STRING)  {
-            index++;
-            this.mapString.put(_paramDef.getName(), _args[index]);
+            this.mapString.put(_paramDef.getName(), _args[++index]);
         }
 
         return index;
@@ -304,7 +320,7 @@ public class ParameterCache_mxJPO
     }
 
     /**
-     * Defines for given key a related value.
+     * Defines for given key a related boolean value.
      *
      * @param _key      key of the boolean value to define
      * @param _value    related value
@@ -314,6 +330,32 @@ public class ParameterCache_mxJPO
                                    final Boolean _value)
     {
         this.mapBoolean.put(_key, _value);
+    }
+
+    /**
+     * Returns for given key the related integer value.
+     *
+     * @param _key  key of searched integer value
+     * @return value of the integer (or <code>null</code> if for the key no
+     *         integer value is defined)
+     * @see #mapInteger
+     */
+    public Integer getValueInteger(final String _key)
+    {
+        return this.mapInteger.get(_key);
+    }
+
+    /**
+     * Defines for given key a related integer value.
+     *
+     * @param _key      key of the integer value to define
+     * @param _value    related value
+     * @see #mapInteger
+     */
+    public void defineValueInteger(final String _key,
+                                   final Integer _value)
+    {
+        this.mapInteger.put(_key, _value);
     }
 
     /**

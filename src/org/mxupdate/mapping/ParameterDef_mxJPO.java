@@ -30,9 +30,12 @@ import java.util.Map;
  * @author Tim Moxter
  * @version $Id$
  */
-public class ParameterDef_mxJPO
+public final class ParameterDef_mxJPO
         extends AbstractValue_mxJPO
 {
+    /**
+     * Enumeration to define the value type.
+     */
     public enum Type
     {
         /**
@@ -40,11 +43,23 @@ public class ParameterDef_mxJPO
          * (true) or not (false).
          */
         BOOLEAN,
+
         /**
-         * A list of strings is used this type. That means that every argument
-         * of a parameter is append as string to the list.
+         * If the parameter is defined the value type is integer.
+         */
+        INTEGER,
+
+        /**
+         * A list of strings is used for this type. That means that every
+         * argument of a parameter is append as string to the list.
          */
         LIST,
+
+        /**
+         * A map of strings is used.
+         */
+        MAP,
+
         /**
          * If the parameter is defined, the value is set to a string. If e.g.
          * the parameter is defined twice, the second definition of the
@@ -58,7 +73,7 @@ public class ParameterDef_mxJPO
      *
      * @see #defineValue(String, String)
      */
-    private final static Map<String,ParameterDef_mxJPO> MAP
+    private static final Map<String,ParameterDef_mxJPO> MAP
             = new HashMap<String,ParameterDef_mxJPO>();
 
     /**
@@ -100,8 +115,8 @@ public class ParameterDef_mxJPO
     /**
      * Defines the values of the type definition group.
      *
-     * @param _key
-     * @param _value
+     * @param _key      key to define
+     * @param _value    related value to define
      * @throws Exception if key is not found
      */
     protected static void defineValue(final String _key,
@@ -142,7 +157,7 @@ public class ParameterDef_mxJPO
      * Returns the list of all parameter instances.
      *
      * @return list of all parameter instances
-     * @return #MAP
+     * see #MAP
      */
     public static Collection<ParameterDef_mxJPO> values()
     {
