@@ -151,7 +151,7 @@ public abstract class AbstractProgram_mxJPO
         if ((this.getInstallationDate() == null) || "".equals(this.getInstallationDate()))  {
             final DateFormat format = new SimpleDateFormat(_paramCache.getValueString(ParameterCache_mxJPO.KEY_INSTALLEDDATEFORMAT));
             final String date = format.format(new Date());
-System.out.println("    - define installed date '" + date + "'");
+            _paramCache.logTrace("    - define installed date '" + date + "'");
             cmd.append(" add property \"").append(AdminPropertyDef.INSTALLEDDATE.getPropName()).append("\" ")
                .append("value \"").append(date).append('\"');
         }
@@ -165,13 +165,13 @@ System.out.println("    - define installed date '" + date + "'");
             installer = null;
         }
         if (installer != null)  {
-System.out.println("    - define installer '" + installer + "'");
+            _paramCache.logTrace("    - define installer '" + installer + "'");
             cmd.append(" add property \"").append(AdminPropertyDef.INSTALLER.getPropName()).append("\" ")
                .append("value \"").append(installer).append('\"');
         }
         // is original name property defined?
         if ((this.getOriginalName() == null) && "".equals(this.getOriginalName()))  {
-System.out.println("    - define original name '" + this.getName() + "'");
+            _paramCache.logTrace("    - define original name '" + this.getName() + "'");
             cmd.append(" add property \"").append(AdminPropertyDef.ORIGINALNAME.getPropName()).append("\" ")
                .append("value \"").append(this.getName()).append('\"');
         }
@@ -185,7 +185,7 @@ System.out.println("    - define original name '" + this.getName() + "'");
             appl = null;
         }
         if (appl != null)  {
-System.out.println("    - define application '" + appl + "'");
+            _paramCache.logTrace("    - define application '" + appl + "'");
             cmd.append(" add property \"").append(AdminPropertyDef.APPLICATION.getPropName()).append("\" ")
                .append("value \"").append(appl).append('\"');
         }
@@ -199,7 +199,7 @@ System.out.println("    - define application '" + appl + "'");
             author = null;
         }
         if (author != null)  {
-System.out.println("    - define author '" + author + "'");
+            _paramCache.logTrace("    - define author '" + author + "'");
             cmd.append(" add property \"").append(AdminPropertyDef.AUTHOR.getPropName()).append("\" ")
                .append("value \"").append(author).append('\"');
         }

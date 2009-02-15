@@ -722,7 +722,7 @@ public class MxUpdate_mxJPO
             final Collection<String> fileNames = clazz2FileNames.get(entry.getKey()).values();
             for (final String name : entry.getValue())  {
                 if (!fileNames.contains(name))  {
-                    _paramCache.logDebug("delete " + instance.getTypeDef().getLogging() + " '" + name + "'");
+                    _paramCache.logInfo("delete " + instance.getTypeDef().getLogging() + " '" + name + "'");
                     boolean commit = false;
                     final boolean transActive = _paramCache.getContext().isTransactionActive();
                     try  {

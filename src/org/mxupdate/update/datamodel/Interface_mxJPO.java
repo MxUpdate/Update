@@ -348,7 +348,7 @@ public class Interface_mxJPO
                 boolean first = true;
                 for (final String newParent : newParents)  {
                     if (!this.derived.contains(newParent))  {
-                        System.out.println("    - add to parent '" + newParent + "'");
+                        _paramCache.logDebug("    - add to parent '" + newParent + "'");
                     }
                     if (first)  {
                         first = false;

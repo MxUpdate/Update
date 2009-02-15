@@ -481,7 +481,7 @@ public class Policy_mxJPO
             while (!curState.name.equals(newState.name) && newStateIter.hasNext())  {
                 cmd.append("add state \"").append(convertMql(newState.name))
                    .append("\" before \"").append(convertMql(curState.name)).append("\" ");
-System.out.println("    - insert new state '" + newState.name + "' before '" + curState.name + "'");
+                _paramCache.logDebug("    - insert new state '" + newState.name + "' before '" + curState.name + "'");
                 stateDeltaMap.put(newState, null);
                 newState = newStateIter.next();
             }
@@ -492,7 +492,7 @@ System.out.println("    - insert new state '" + newState.name + "' before '" + c
         while (newStateIter.hasNext())  {
             final State newState = newStateIter.next();
             cmd.append("add state \"").append(convertMql(newState.name)).append("\" ");
-System.out.println("    - add new state '" + newState.name + "'");
+            _paramCache.logDebug("    - add new state '" + newState.name + "'");
             stateDeltaMap.put(newState, null);
         }
         // check for already existing state, but not defined anymore!
