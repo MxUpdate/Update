@@ -162,7 +162,16 @@ public class MxUpdate_mxJPO
      * All parameters related to export / import are stored in this map. The
      * key is the parameter (including the '-'), the value the related class.
      */
-    private final Map<String,Collection<TypeDef_mxJPO>> paramsTypeDefs = new HashMap<String,Collection<TypeDef_mxJPO>>();
+    private final Map<String,Collection<TypeDef_mxJPO>> paramsTypeDefs
+            = new HashMap<String,Collection<TypeDef_mxJPO>>();
+
+    /**
+     * All opposite parameters related to export / import are stored in this
+     * map. The key is the opposite parameter (including the '-'), the value
+     * the related class.
+     */
+    private final Map<String,TypeDef_mxJPO> paramsTypeDefsOpp
+            = new HashMap<String,TypeDef_mxJPO>();
 
     /**
      * Holds all parameters related how the version information is set.
@@ -256,6 +265,18 @@ public class MxUpdate_mxJPO
                         typeDef,
                         typeDef.getParameterDesc(),
                         typeDef.getParameterList());
+                if (typeDef.getParameterListOpp() != null)  {
+                    for (final String param : typeDef.getParameterListOpp())  {
+                        final String paramStr = (param.length() == 1)
+                                                ? "-" + param
+                                                : "--" + param;
+                        this.paramsTypeDefsOpp.put(paramStr, typeDef);
+                    }
+                    // store description
+                    this.appendDescription(typeDef.getParameterDescOpp(),
+                            typeDef.getParameterListOpp(),
+                            Arrays.asList(new String[]{"MATCH"}));
+                }
             }
         }
 
@@ -373,6 +394,10 @@ public class MxUpdate_mxJPO
             }
         }
 
+        if (_description == null)  {
+            throw new Error("descriptions for parameter " + param + " not defined!");
+        }
+
         this.description.put(param.toString(), _description.toString());
     }
 
@@ -380,12 +405,12 @@ public class MxUpdate_mxJPO
                        final String... _args)
             throws Exception
     {
-        // initialize mapping
-        Mapping_mxJPO.init(_context);
-
-        this.prepareParams(_context);
-
         try {
+            // initialize mapping
+            Mapping_mxJPO.init(_context);
+
+            this.prepareParams(_context);
+
             // to be sure....
             execMql(_context, "verbose off");
 
@@ -393,6 +418,8 @@ public class MxUpdate_mxJPO
 
             final Map<Collection<TypeDef_mxJPO>,List<String>> clazz2matches
                     = new HashMap<Collection<TypeDef_mxJPO>,List<String>>();
+            final Map<TypeDef_mxJPO,List<String>> clazz2matchesOpp
+                    = new HashMap<TypeDef_mxJPO,List<String>>();
 
             boolean unknown = false;
 
@@ -401,8 +428,9 @@ public class MxUpdate_mxJPO
             final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, ParameterDef_mxJPO.values());
 
             for (int idx = 0; idx < _args.length; idx++)  {
-                if (this.paramsTypeDefs.containsKey(_args[idx]))  {
-                    final Collection<TypeDef_mxJPO> clazzes = this.paramsTypeDefs.get(_args[idx]);
+                final String arg = _args[idx];
+                if (this.paramsTypeDefs.containsKey(arg))  {
+                    final Collection<TypeDef_mxJPO> clazzes = this.paramsTypeDefs.get(arg);
                     final String name = _args[++idx];
                     List<String> names = clazz2matches.get(clazzes);
                     if (names == null)  {
@@ -410,8 +438,17 @@ public class MxUpdate_mxJPO
                         clazz2matches.put(clazzes, names);
                     }
                     names.add(name);
-                } else if (this.paramsModes.containsKey(_args[idx])) {
-                    final Mode_mxJPO tmpMode = this.paramsModes.get(_args[idx]);
+                } else if (this.paramsTypeDefsOpp.containsKey(arg))  {
+                    final TypeDef_mxJPO typeDef = this.paramsTypeDefsOpp.get(arg);
+                    final String name = _args[++idx];
+                    List<String> names = clazz2matchesOpp.get(typeDef);
+                    if (names == null)  {
+                        names = new ArrayList<String>();
+                        clazz2matchesOpp.put(typeDef, names);
+                    }
+                    names.add(name);
+                } else if (this.paramsModes.containsKey(arg)) {
+                    final Mode_mxJPO tmpMode = this.paramsModes.get(arg);
                     if (mode != null)  {
                         if ((mode == Mode_mxJPO.HELP) || (tmpMode == Mode_mxJPO.HELP))  {
                             mode = Mode_mxJPO.HELP;
@@ -419,28 +456,28 @@ public class MxUpdate_mxJPO
                             throw new Error("A mode is already defined and could not be defined twice!");
                         }
                     } else  {
-                        mode = this.paramsModes.get(_args[idx]);
+                        mode = tmpMode;
                     }
-                } else if (this.paramsParameters.containsKey(_args[idx]))  {
-                    idx = paramCache.evalParameter(this.paramsParameters.get(_args[idx]),
+                } else if (this.paramsParameters.containsKey(arg))  {
+                    idx = paramCache.evalParameter(this.paramsParameters.get(arg),
                                                    _args,
                                                    idx);
-                } else if (this.paramsUpdateChecks.containsKey(_args[idx]))  {
-                    versionInfo = this.paramsUpdateChecks.get(_args[idx]);
+                } else if (this.paramsUpdateChecks.containsKey(arg))  {
+                    versionInfo = this.paramsUpdateChecks.get(arg);
                 } else  {
                     unknown = true;
-                    paramCache.logError("unknown pararameter "  + _args[idx]);
+                    paramCache.logError("unknown pararameter "  + arg);
                 }
             }
 
             if (unknown || (Mode_mxJPO.HELP == mode) || (mode == null))  {
                 this.printHelp(paramCache);
             } else if (Mode_mxJPO.EXPORT == mode)  {
-                this.export(paramCache, clazz2matches);
+                this.export(paramCache, clazz2matches, clazz2matchesOpp);
             } else if (Mode_mxJPO.IMPORT == mode)  {
-                this.update(paramCache, clazz2matches, versionInfo);
+                this.update(paramCache, clazz2matches, clazz2matchesOpp, versionInfo);
             } else if (Mode_mxJPO.DELETE == mode)  {
-                this.delete(paramCache, clazz2matches);
+                this.delete(paramCache, clazz2matches, clazz2matchesOpp);
             }
 
         } catch (final Exception e)  {
@@ -551,7 +588,8 @@ public class MxUpdate_mxJPO
      *                   the export failed
      */
     protected void export(final ParameterCache_mxJPO _paramCache,
-                          final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches)
+                          final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches,
+                          final Map<TypeDef_mxJPO,List<String>> _clazz2matchesOpp)
             throws Exception
     {
         final Collection<String> paths = _paramCache.getValueList(PARAM_PATH);
@@ -566,7 +604,8 @@ public class MxUpdate_mxJPO
         final String pathStr = paths.iterator().next();
 
         // evaluate all matching administration objects
-        final Map<TypeDef_mxJPO,Set<String>> clazz2names = this.getMatching(_paramCache, _clazz2matches);
+        final Map<TypeDef_mxJPO,Set<String>> clazz2names
+                = this.getMatching(_paramCache, _clazz2matches, _clazz2matchesOpp);
 
         // export
         for (final Map.Entry<TypeDef_mxJPO,Set<String>> entry : clazz2names.entrySet())  {
@@ -587,11 +626,13 @@ public class MxUpdate_mxJPO
      */
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches,
+                          final Map<TypeDef_mxJPO,List<String>> _clazz2matchesOpp,
                           final UpdateCheck_mxJPO _versionInfo)
             throws Exception
     {
         // get all matching files depending on the update classes
-        final Map<TypeDef_mxJPO,Map<File,String>> clazz2names = this.evalMatches(_paramCache, _clazz2matches);
+        final Map<TypeDef_mxJPO,Map<File,String>> clazz2names
+                = this.evalMatches(_paramCache, _clazz2matches, _clazz2matchesOpp);
 
         // evaluate for existing administration objects
         final Collection<String> wildCardMatch = new HashSet<String>();
@@ -660,7 +701,8 @@ public class MxUpdate_mxJPO
                         } else  {
                             update = true;
                             if (_paramCache.getValueBoolean(ParameterCache_mxJPO.KEY_FILEDATE2VERSION))  {
-                                _paramCache.logDebug("    - update to version from " + new Date(fileEntry.getKey().lastModified()));
+                                _paramCache.logDebug("    - update to version from "
+                                        + new Date(fileEntry.getKey().lastModified()));
                             } else  {
                                 _paramCache.logDebug("    - update to version " + version);
                             }
@@ -697,7 +739,8 @@ public class MxUpdate_mxJPO
 
 
     protected void delete(final ParameterCache_mxJPO _paramCache,
-                          final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches)
+                          final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches,
+                          final Map<TypeDef_mxJPO,List<String>> _clazz2matchesOpp)
             throws Exception
     {
         // check for definition of min. / max. one path
@@ -707,11 +750,11 @@ public class MxUpdate_mxJPO
 
         // evaluate all matching administration objects
         final Map<TypeDef_mxJPO,Set<String>> clazz2MxNames
-                = this.getMatching(_paramCache, _clazz2matches);
+                = this.getMatching(_paramCache, _clazz2matches, _clazz2matchesOpp);
 
         // get all matching files depending on the update classes
         final Map<TypeDef_mxJPO,Map<File,String>> clazz2FileNames
-                = this.evalMatches(_paramCache, _clazz2matches);
+                = this.evalMatches(_paramCache, _clazz2matches, _clazz2matchesOpp);
 
         // and now loop throw the list of file names and compare to existing
         for (final Map.Entry<TypeDef_mxJPO,Set<String>> entry : clazz2MxNames.entrySet())  {
@@ -762,7 +805,8 @@ public class MxUpdate_mxJPO
      * @see #PARAM_PATH
      */
     protected Map<TypeDef_mxJPO,Map<File,String>> evalMatches(final ParameterCache_mxJPO _paramCache,
-                                                              final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches)
+                                                              final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches,
+                                                              final Map<TypeDef_mxJPO,List<String>> _clazz2matchesOpp)
             throws Exception
     {
         final Map<TypeDef_mxJPO,Map<File,String>> clazz2names = new HashMap<TypeDef_mxJPO,Map<File,String>>();
@@ -856,7 +900,32 @@ public class MxUpdate_mxJPO
                 }
             }
         }
-        return clazz2names;
+
+        // and now remove ignored matches
+        final Map<TypeDef_mxJPO,Map<File,String>> ret = new HashMap<TypeDef_mxJPO,Map<File,String>>();
+        for (final Map.Entry<TypeDef_mxJPO,Map<File,String>> entry : clazz2names.entrySet())  {
+            final Collection<String> matchOpps = _clazz2matchesOpp.get(entry.getKey());
+            if ((matchOpps != null) && !matchOpps.isEmpty())  {
+                final Map<File,String> files = new TreeMap<File,String>();
+                for (final Map.Entry<File,String> fileEntry : entry.getValue().entrySet())  {
+                    boolean allowed = true;
+                    for (final String matchOpp : matchOpps)  {
+                        if (match(fileEntry.getValue(), matchOpp))  {
+                            allowed = false;
+                            break;
+                        }
+                    }
+                    if (allowed)  {
+                        files.put(fileEntry.getKey(), fileEntry.getValue());
+                    }
+                }
+                ret.put(entry.getKey(), files);
+            } else  {
+                ret.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        return ret;
     }
 
     /**
@@ -978,7 +1047,8 @@ public class MxUpdate_mxJPO
      * @see #delete(ParameterCache_mxJPO, Map)
      */
     protected Map<TypeDef_mxJPO,Set<String>> getMatching(final ParameterCache_mxJPO _paramCache,
-                                                         final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches)
+                                                         final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches,
+                                                         final Map<TypeDef_mxJPO,List<String>> _clazz2matchesOpp)
             throws Exception
     {
         // first sort the matches depending on the type definition
@@ -1009,6 +1079,30 @@ public class MxUpdate_mxJPO
             }
         }
 
-        return clazz2names;
+        // and now remove ignored matches
+        final Map<TypeDef_mxJPO,Set<String>> ret = new HashMap<TypeDef_mxJPO,Set<String>>();
+        for (final Map.Entry<TypeDef_mxJPO,Set<String>> entry : clazz2names.entrySet())  {
+            final Collection<String> matchOpps = _clazz2matchesOpp.get(entry.getKey());
+            if ((matchOpps != null) && !matchOpps.isEmpty())  {
+                final Set<String> files = new TreeSet<String>();
+                for (final String fileEntry : entry.getValue())  {
+                    boolean allowed = true;
+                    for (final String matchOpp : matchOpps)  {
+                        if (match(fileEntry, matchOpp))  {
+                            allowed = false;
+                            break;
+                        }
+                    }
+                    if (allowed)  {
+                        files.add(fileEntry);
+                    }
+                }
+                ret.put(entry.getKey(), files);
+            } else  {
+                ret.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        return ret;
     }
 }

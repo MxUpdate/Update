@@ -38,6 +38,13 @@ class AbstractValue_mxJPO
     private static final String PREFIX_PARAM_DESC = "ParameterDesc";
 
     /**
+     * Used opposite parameter description within the property file.
+     *
+     * @see #defineValues(String, String)
+     */
+    private static final String PREFIX_PARAM_DESCOPP = "ParameterDescOpposite";
+
+    /**
      * Used parameter argument list within the property file.
      *
      * @see #defineValues(String, String)
@@ -50,6 +57,13 @@ class AbstractValue_mxJPO
      * @see #defineValues(String, String)
      */
     private static final String PREFIX_PARAM_LIST = "ParameterList";
+
+    /**
+     * Used opposite parameter list within the property file.
+     *
+     * @see #defineValues(String, String)
+     */
+    private static final String PREFIX_PARAM_LISTOPP = "ParameterListOpposite";
 
     /**
      * Holds the name of the value.
@@ -68,6 +82,14 @@ class AbstractValue_mxJPO
     private String paramDesc;
 
     /**
+     * Defines the opposite parameter description.
+     *
+     * @see #getParameterDescOpp()
+     * @see #defineValue(String, String)
+     */
+    private String paramDescOpp;
+
+    /**
      * Defines the list of arguments.
      *
      * @see #getParameterList()
@@ -82,6 +104,14 @@ class AbstractValue_mxJPO
      * @see #defineValue(String, String)
      */
     private Collection<String> paramList;
+
+    /**
+     * Defines the list of opposite parameters.
+     *
+     * @see #getParameterListOpp()
+     * @see #defineValue(String, String)
+     */
+    private Collection<String> paramListOpp;
 
     /**
      * Constructor used to initialize the name of the abstract values.
@@ -106,10 +136,14 @@ class AbstractValue_mxJPO
     {
         if (_key.equals(PREFIX_PARAM_DESC))  {
             this.paramDesc = _value;
+        } else if (_key.equals(PREFIX_PARAM_DESCOPP))  {
+            this.paramDescOpp = _value;
         } else if (_key.equals(PREFIX_PARAM_ARGS))  {
             this.paramArgs = Arrays.asList(_value.split(","));
         } else if (_key.equals(PREFIX_PARAM_LIST))  {
             this.paramList = Arrays.asList(_value.split(","));
+        } else if (_key.equals(PREFIX_PARAM_LISTOPP))  {
+            this.paramListOpp = Arrays.asList(_value.split(","));
         } else  {
             throw new Exception("unkown key " + _key + " with value '" + _value + "' defined!");
         }
@@ -127,7 +161,7 @@ class AbstractValue_mxJPO
     }
 
     /**
-     * Returns the description of parameters which defines mode.
+     * Returns the description of parameters.
      *
      * @return description of parameter
      * @see #paramDesc
@@ -138,7 +172,18 @@ class AbstractValue_mxJPO
     }
 
     /**
-     * Returns the list of parameter arguments which defines this mode.
+     * Returns the opposite description of parameters.
+     *
+     * @return description of parameter
+     * @see #paramDescOpp
+     */
+    public String getParameterDescOpp()
+    {
+        return this.paramDescOpp;
+    }
+
+    /**
+     * Returns the list of parameter arguments.
      *
      * @return list of parameter argument strings
      * @see #paramArgs
@@ -149,7 +194,7 @@ class AbstractValue_mxJPO
     }
 
     /**
-     * Returns the list of parameters which defines this mode.
+     * Returns the list of parameters.
      *
      * @return list of parameter strings
      * @see #paramList
@@ -157,5 +202,16 @@ class AbstractValue_mxJPO
     public Collection<String> getParameterList()
     {
         return this.paramList;
+    }
+
+    /**
+     * Returns the list of opposite parameters.
+     *
+     * @return list of opposite parameter strings
+     * @see #paramListOpp
+     */
+    public Collection<String> getParameterListOpp()
+    {
+        return this.paramListOpp;
     }
 }
