@@ -26,9 +26,9 @@ import java.io.Writer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import matrix.db.Attribute;
@@ -45,7 +45,6 @@ import matrix.util.StringList;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.xml.sax.SAXException;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.update.util.StringUtil_mxJPO.formatInstalledDate;
@@ -71,7 +70,14 @@ public class BusObject_mxJPO
      *
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
-    private static final String PARAMCACHE_KEY_ATTRS = "DefaultAttributeValues";
+    private static final String PARAM_DEFAULT_ATTRS = "BusDefaultAttrValues";
+
+    /**
+     * Parameter key to cache allowed attributes for relationships.
+     *
+     * @see #expand4Parse(ParameterCache_mxJPO, BusinessObject, String, boolean, boolean)
+     */
+    private static final String PARAM_RELATION_ATTRS = "BusRelationAttributes";
 
     /**
      * String used to split the name and revision of administration business
@@ -143,20 +149,12 @@ public class BusObject_mxJPO
     private String busOid;
 
     /**
-     * Holds all to connected objects.
+     * Holds all connected objects.
      *
      * @see #parse(ParameterCache_mxJPO, String)
      * @see #write(ParameterCache_mxJPO, Writer)
      */
-    private final Map<String,Set<Connection>> tos = new TreeMap<String,Set<Connection>>();
-
-    /**
-     * Holds all from connected objects.
-     *
-     * @see #parse(ParameterCache_mxJPO, String)
-     * @see #write(ParameterCache_mxJPO, Writer)
-     */
-    private final Map<String,Set<Connection>> froms = new TreeMap<String,Set<Connection>>();
+    private final Set<Connection> connections = new TreeSet<Connection>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -241,13 +239,10 @@ public class BusObject_mxJPO
     /**
      * Parses all information for given administration object.
      * Sorts the attribute values, defines the description for the TCL
-     * update script (concatenation of the revision and description) and the
-     * name (concatenation of name and revision).
+     * update script (concatenation of the revision and description).
      *
      * @param _paramCache   parameter cache
-     * @throws MatrixException
-     * @throws SAXException
-     * @throws IOException
+     * @throws MatrixException if the parse failed
      * @see #attrValuesSorted
      * @see #busCurrent
      * @see #busDescription
@@ -312,27 +307,17 @@ public class BusObject_mxJPO
         }
         this.setDescription(desc.toString());
 
-        // define name
-        final StringBuilder name = new StringBuilder().append(this.busName);
-        if ((this.busRevision != null) && !"".equals(this.busRevision))  {
-            name.append(SPLIT_NAME).append(this.busRevision);
-        }
-
         // evaluate from connections
         if (this.getTypeDef().getMxBusRelsFrom() != null)  {
             for (final String relation : this.getTypeDef().getMxBusRelsFrom())  {
-                final Set<Connection> cons = new TreeSet<Connection>();
-                this.froms.put(relation, cons);
-                this.expand4Parse(_paramCache, bus, relation, cons, true, false);
+                this.expand4Parse(_paramCache, bus, relation, true, false);
             }
         }
 
         // evaluate to connections
         if (this.getTypeDef().getMxBusRelsTo() != null)  {
             for (final String relation : this.getTypeDef().getMxBusRelsTo())  {
-                final Set<Connection> cons = new TreeSet<Connection>();
-                this.tos.put(relation, cons);
-                this.expand4Parse(_paramCache, bus, relation, cons, false, true);
+                this.expand4Parse(_paramCache, bus, relation, false, true);
             }
         }
 
@@ -340,37 +325,62 @@ public class BusObject_mxJPO
         if (this.getTypeDef().getMxBusRelsBoth() != null)  {
             for (final String relation : this.getTypeDef().getMxBusRelsBoth())  {
                 // from
-                Set<Connection> cons = this.froms.get(relation);
-                if (cons == null)  {
-                    cons = new TreeSet<Connection>();
-                    this.froms.put(relation, cons);
-                }
-                this.expand4Parse(_paramCache, bus, relation, cons, true, false);
+                this.expand4Parse(_paramCache, bus, relation, true, false);
                 // to
-                cons = this.tos.get(relation);
-                if (cons == null)  {
-                    cons = new TreeSet<Connection>();
-                    this.tos.put(relation, cons);
-                }
-                this.expand4Parse(_paramCache, bus, relation, cons, false, true);
+                this.expand4Parse(_paramCache, bus, relation, false, true);
             }
         }
     }
 
+    /**
+     * Expands from the business object depending on the relationship and
+     * stores the connection information. If the relationship has attributes,
+     * the related values are also evaluated.
+     *
+     * @param _paramCache   parameter cache
+     * @param _bus          the business object to expand
+     * @param _relation     name of relationship to expand
+     * @param _getFrom      must be set to <i>true</i> to expand from
+     *                      connections; otherwise <i>false</i>
+     * @param _getTo        must be set to <i>true</i> to expand to
+     *                      connections; otherwise <i>false</i>
+     * @throws MatrixException if the expand failed
+     * @see #connections
+     */
+    @SuppressWarnings("unchecked")
     private void expand4Parse(final ParameterCache_mxJPO _paramCache,
                               final BusinessObject _bus,
                               final String _relation,
-                              final Set<Connection> _cons,
                               final boolean _getFrom,
                               final boolean _getTo)
             throws MatrixException
     {
+        // get attributes from relationship
+        final Map<String,Map> cache = _paramCache.defineValueMap(PARAM_RELATION_ATTRS, Map.class);
+        Map<String,String> attrs = cache.get(_relation);
+        if (attrs == null)
+        {
+            attrs = new HashMap<String,String>();
+            cache.put(_relation, attrs);
+
+            final String attrStr = execMql(_paramCache.getContext(),
+                    new StringBuilder("escape print rel \"").append(_relation)
+                            .append("\" select attribute dump '\n'"));
+            if (!"".equals(attrStr))  {
+                for (final String attr : attrStr.split("\n"))  {
+                    attrs.put("attribute[" + attr + "]", attr);
+                }
+            };
+        }
+
+
         final StringList busSelect = new StringList(3);
         busSelect.addElement("type");
         busSelect.addElement("name");
         busSelect.addElement("revision");
-        final StringList relSelect = new StringList(1);
+        final StringList relSelect = new StringList(1 + attrs.size());
         relSelect.addElement("id");
+        relSelect.addAll(attrs.keySet());
         // get from objects
         final ExpansionWithSelect expandTo = _bus.expandSelect(_paramCache.getContext(),
                                                               _relation,
@@ -384,13 +394,12 @@ public class BusObject_mxJPO
                                                               null,
                                                               (short) 0,
                                                               true);
+
         for (final Object obj : expandTo.getRelationships())  {
-            final RelationshipWithSelect rel = (RelationshipWithSelect) obj;
-            final BusinessObjectWithSelect map = rel.getTarget();
-            _cons.add(new Connection(map.getSelectData("type"),
-                                     map.getSelectData("name"),
-                                     map.getSelectData("revision"),
-                                     rel.getSelectData("id")));
+            this.connections.add(new Connection(_relation,
+                                                _getFrom ? "from" : "to",
+                                                (RelationshipWithSelect) obj,
+                                                attrs));
         }
 
     }
@@ -412,28 +421,11 @@ public class BusObject_mxJPO
         _out.append("mql mod bus \"${OBJECTID}\"")
             .append(" \\\n    description \"").append(convertTcl(this.busDescription)).append("\"");
         for (final AttributeValue attr : this.attrValuesSorted)  {
-          _out.append(" \\\n    \"").append(convertTcl(attr.name))
-              .append("\" \"").append(convertTcl(attr.value)).append("\"");
+            attr.write(_out);
         }
-        // write all from objects
-        for (final Map.Entry<String, Set<Connection>> fromEntry : this.froms.entrySet())  {
-            for (final Connection con : fromEntry.getValue())  {
-                _out.append("\nmql connect bus \"${OBJECTID}\" \\")
-                    .append("\n    relationship \"").append(fromEntry.getKey()).append("\" \\")
-                    .append("\n    from \"").append(con.type).append("\" \"")
-                            .append(con.name).append("\" \"")
-                            .append(con.revision).append("\"");
-            }
-        }
-        // write all to objects
-        for (final Map.Entry<String, Set<Connection>> toEntry : this.tos.entrySet())  {
-            for (final Connection con: toEntry.getValue())  {
-                _out.append("\nmql connect bus \"${OBJECTID}\" \\")
-                    .append("\n    relationship \"").append(toEntry.getKey()).append("\" \\")
-                    .append("\n    to \"").append(con.type).append("\" \"")
-                            .append(con.name).append("\" \"")
-                            .append(con.revision).append("\"");
-            }
+        // write all connected objects
+        for (final Connection con : this.connections)  {
+            con.write(_out);
         }
         // write promotes to target states if required
         final int target = this.busStates.indexOf(this.busCurrent);
@@ -530,7 +522,7 @@ public class BusObject_mxJPO
         final Set<String> ignoreAttrs = (this.getTypeDef().getMxBusIgnoredAttributes() == null)
                                         ? new HashSet<String>(0)
                                         : new HashSet<String>(this.getTypeDef().getMxBusIgnoredAttributes());
-        final Map<String,String> defaultAttrValues = _paramCache.defineValueMap(PARAMCACHE_KEY_ATTRS);
+        final Map<String,String> defaultAttrValues = _paramCache.defineValueMap(PARAM_DEFAULT_ATTRS, String.class);
         for (final AttributeValue attr : this.attrValuesSorted)  {
             if (!ignoreAttrs.contains(attr.name))  {
                 if (!defaultAttrValues.containsKey(attr.name))  {
@@ -545,18 +537,9 @@ public class BusObject_mxJPO
         }
         preMQLCode.append(";\n");
 
-        // disconnect all from objects
-        for (final Map.Entry<String, Set<Connection>> fromEntry : this.froms.entrySet())  {
-            for (final Connection con : fromEntry.getValue())  {
-                preMQLCode.append("disconnect connection ").append(con.conId).append(";\n");
-            }
-        }
-
-        // disconnect all to objects
-        for (final Map.Entry<String, Set<Connection>> toEntry : this.tos.entrySet())  {
-            for (final Connection con: toEntry.getValue())  {
-                preMQLCode.append("disconnect connection ").append(con.conId).append(";\n");
-            }
+        // disconnect all objects
+        for (final Connection con : this.connections)  {
+            preMQLCode.append("disconnect connection ").append(con.conId).append(";\n");
         }
 
         // append demotes if required
@@ -744,7 +727,35 @@ public class BusObject_mxJPO
         }
 
         /**
+         * Defines the name and value of the attribute.
+         *
+         * @param _name     name of the attribute
+         * @param _value    value of the attribute
+         */
+        AttributeValue(final String _name,
+                       final String _value)
+        {
+            this.name = _name;
+            this.value = _value;
+        }
+
+        /**
+         * Compares this attribute name with given attribute name. The related
+         * attribute values are not used to compare. If the attribute names
+         * includes numbers and the attribute names has the same prefix (before
+         * the numbers), the numbers are compared as integer.<br/>
+         * <b/>Examples:</b><br/>
+         * Temp &gt; Name<br/>
+         * Temp = Temp<br/>
+         * Temp 5 &lt Temp 10
+         *
          * @param _attribute    attribute instance to compare
+         * @return <code>0</code> if the attribute names are equal (should not
+         *         possible...); a value less than <code>0</code> if this
+         *         attribute name is lexicographically less than the compared
+         *         attribute name; a value greater than <code>0</code> if this
+         *         attribute name is lexicographically greater than the
+         *         compared attribute name
          */
         public int compareTo(final AttributeValue _attribute)
         {
@@ -761,8 +772,28 @@ public class BusObject_mxJPO
             }
             return ret;
         }
+
+        /**
+         * Writes the attribute name and value to the TCL update file.
+         *
+         * @param _out  appendable instance to the TCL update file
+         * @throws IOException if attribute information could not be written
+         * @see #name
+         * @see #value
+         */
+        public void write(final Appendable _out)
+                throws IOException
+        {
+            _out.append(" \\\n    \"").append(convertTcl(this.name))
+                .append("\" \"").append(convertTcl(this.value)).append("\"");
+        }
    }
 
+    /**
+     * The class is used to store information about one connection including
+     * all attributes values and the type, name with revision of the connected
+     * business object.
+     */
     private class Connection
             implements Comparable<Connection>
     {
@@ -786,15 +817,45 @@ public class BusObject_mxJPO
          */
         final String conId;
 
-        public Connection(final String _type,
-                          final String _name,
-                          final String _revision,
-                          final String _conId)
+        /**
+         * Direction of the connection.
+         */
+        final String direction;
+
+        /**
+         * Name of the relationship.
+         */
+        final String relName;
+
+        /**
+         * Set of all attribute values of this connection.
+         */
+        final Set<AttributeValue> values = new TreeSet<AttributeValue>();
+
+        /**
+         * Constructor to create a new connection instance.
+         *
+         * @param _relName      name of the relationship
+         * @param _direction    direction of the connection
+         * @param _relSelect    relationship selection
+         * @param _attrs        selected attributes within the relationship
+         *                      selection
+         */
+        public Connection(final String _relName,
+                          final String _direction,
+                          final RelationshipWithSelect _relSelect,
+                          final Map<String,String> _attrs)
         {
-            this.type = _type;
-            this.name = _name;
-            this.revision = _revision;
-            this.conId = _conId;
+            this.relName = _relName;
+            this.direction = _direction;
+            final BusinessObjectWithSelect busSelect = _relSelect.getTarget();
+            this.type = busSelect.getSelectData("type");
+            this.name = busSelect.getSelectData("name");
+            this.revision = busSelect.getSelectData("revision");
+            this.conId = _relSelect.getSelectData("id");
+            for (final Map.Entry<String,String> attr : _attrs.entrySet())  {
+                this.values.add(new AttributeValue(attr.getValue(), _relSelect.getSelectData(attr.getKey())));
+            }
         }
 
         /**
@@ -816,21 +877,88 @@ public class BusObject_mxJPO
         }
 
         /**
-         * Compares given business object with this business object. First the type
-         * is compared. If the types are equal, the names are compared. If the
-         * names are equal, the revisions are compared.
+         * Compares given connection with this connection. The compare is done
+         * in this order:
+         * <ul>
+         * <li>compare connection direction</li>
+         * <li>if equal compare relationship name</li>
+         * <li>if equal compare business object type</li>
+         * <li>if equal compare business object name</li>
+         * <li>if equal compare business object revision</li>
+         * <li>if equal compare attributes with
+         *     {@link #compareToAttr(Connection)}</li>
+         * </ul>
          *
-         * @param _compare      business object to compare
+         * @param _compare      connection instance to compare
+         * @return <code>0</code> if the connections are equal (should not
+         *         possible...); a value less than <code>0</code> if this
+         *         connection is lexicographically less than the compared
+         *         connection; a value greater than <code>0</code> if this
+         *         connection is lexicographically greater than the compared
+         *         connection
          */
         public int compareTo(final Connection _compare)
         {
-            return this.type.equals(_compare.type)
-                   ? this.name.equals(_compare.name)
-                           ? this.revision.equals(_compare.revision)
-                                   ? 0
+            return this.direction.equals(_compare.direction)
+                   ? this.relName.equals(_compare.relName)
+                       ? this.type.equals(_compare.type)
+                           ? this.name.equals(_compare.name)
+                               ? this.revision.equals(_compare.revision)
+                                   ? this.compareToAttr(_compare)
                                    : this.revision.compareTo(_compare.revision)
-                           : this.name.compareTo(_compare.name)
-                   : this.type.compareTo(_compare.type);
+                               : this.name.compareTo(_compare.name)
+                           : this.type.compareTo(_compare.type)
+                       : this.relName.compareTo(_compare.relName)
+                   : this.direction.compareTo(_compare.direction);
+        }
+
+        /**
+         * Compares all attributes values from this connection with the values
+         * from the compared connection. If all values of both connections are
+         * equal, the connection id's are compared. The attribute values are
+         * compare in the order of the attributes (by attribute names).
+         *
+         * @param _compare  connection to compare
+         * @return <code>0</code> if all attributes values and both connection
+         *         id's are equal (should not possible...); a value less than
+         *         <code>0</code> if one attribute value is lexicographically
+         *         less than the compared attribute value; a value greater than
+         *         <code>0</code> if one attribute value is lexicographically
+         *         greater than the other attribute value
+         */
+        private int compareToAttr(final Connection _compare)
+        {
+            final Iterator<AttributeValue> thisIter = this.values.iterator();
+            final Iterator<AttributeValue> compIter = _compare.values.iterator();
+            int ret = 0;
+            while (thisIter.hasNext() && (ret == 0))  {
+                ret = thisIter.next().value.compareTo(compIter.next().value);
+            }
+            return (ret == 0)
+                   ? this.conId.compareTo(_compare.conId)
+                   : ret;
+        }
+
+        /**
+         * Writes the attribute name and value to the TCL update file.
+         *
+         * @param _out          appendable instance to the TCL update file
+         * @throws IOException if attribute information could not be written
+         * @see #name
+         * @see #value
+         */
+        public void write(final Appendable _out)
+                throws IOException
+        {
+            _out.append("\nmql connect bus \"${OBJECTID}\" \\")
+                .append("\n    relationship \"").append(this.relName).append("\" \\")
+                .append("\n    ").append(this.direction).append(" \"")
+                    .append(convertTcl(this.type)).append("\" \"")
+                    .append(convertTcl(this.name)).append("\" \"")
+                    .append(convertTcl(this.revision)).append("\"");
+            for (final AttributeValue attr : this.values)  {
+                attr.write(_out);
+            }
         }
     }
 }

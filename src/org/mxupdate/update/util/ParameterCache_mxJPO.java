@@ -120,7 +120,7 @@ public class ParameterCache_mxJPO
      * @see #ParameterCache_mxJPO(Context,Collection)
      * @see #evalParameter(ParameterDef_mxJPO, String[], int)
      */
-    final Map<String,Map<String,String>> mapMap;
+    final Map<String,Map<String,?>> mapMap;
 
     /**
      * Mapping between the enumeration name of the parameter and the string
@@ -157,7 +157,7 @@ public class ParameterCache_mxJPO
         this.mapBoolean = new HashMap<String,Boolean>();
         this.mapInteger = new HashMap<String,Integer>();
         this.mapList = new HashMap<String,Collection<String>>();
-        this.mapMap = new HashMap<String,Map<String,String>>();
+        this.mapMap = new HashMap<String,Map<String,?>>();
         this.mapString = new HashMap<String,String>();
 
         for (final ParameterDef_mxJPO paramDef : _paramDefs)  {
@@ -362,28 +362,36 @@ public class ParameterCache_mxJPO
     /**
      * Returns for given key the related map value.
      *
-     * @param _key  key of searched map value
+     * @param <T>       class of the value of the map
+     * @param _key      key of searched map value
+     * @param _clazz    clazz of the value of the map
      * @return map for related key (or <code>null</code> if map is not defined)
      * @see #mapMap
      */
-    public Map<String,String> getValueMap(final String _key)
+    @SuppressWarnings("unchecked")
+    public <T> Map<String,T> getValueMap(final String _key,
+                                         final Class<T> _clazz)
     {
-        return this.mapMap.get(_key);
+        return (Map<String,T>) this.mapMap.get(_key);
     }
 
     /**
      * Creates for given key a new map if not exists and returns this map.
      *
-     * @param _key  key of searched / new created map value
+     * @param <T>       class of the value of the map
+     * @param _key      key of searched / new created map value
+     * @param _clazz    clazz of the value of the map
      * @return map for related key
      * @see #mapMap
      */
-    public Map<String,String> defineValueMap(final String _key)
+    @SuppressWarnings("unchecked")
+    public <T> Map<String,T> defineValueMap(final String _key,
+                                            final Class<T> _clazz)
     {
         if (!this.mapMap.containsKey(_key))  {
-            this.mapMap.put(_key, new HashMap<String,String>());
+            this.mapMap.put(_key, new HashMap<String,T>());
         }
-        return this.mapMap.get(_key);
+        return (Map<String,T>) this.mapMap.get(_key);
     }
 
     /**
