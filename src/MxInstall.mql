@@ -24,7 +24,7 @@ tcl;
 
 eval  {
 
-  set VERSION "0-1"
+  set VERSION "0-2"
 
   set ENV_NAME_MXUPDATE_PATH      "MXUPDATE_PATH"
   set ENV_NAME_MAPPING_EXTENSION  "MXUPDATE_MAPPING_FILE"
@@ -252,16 +252,6 @@ eval  {
         add property $asMapping(PropertyName.Version)       value "${_sVersion}"
     pRegisterObject type "$asMapping(TypeDef.TriggerGroup.BusType)"
 
-    # update types
-    foreach sOneType ${lsTypes}  {
-      foreach sOneAttribute ${lsAttributes}  {
-        if {[mql print type "${sOneType}" select attribute\[${sOneAttribute}\] dump]=="FALSE"}  {
-          puts "add attribute '${sOneAttribute}' to type '${sOneType}'"
-          mql modify type "${sOneType}" add attribute "${sOneAttribute}"
-        }
-      }
-    }
-
     # create / update trigger group policy
     if {[mql list policy $asMapping(TypeDef.TriggerGroup.BusPolicy)] == ""}  {
       puts "create trigger group policy '$asMapping(TypeDef.TriggerGroup.BusPolicy)'"
@@ -301,14 +291,6 @@ eval  {
         add property $asMapping(PropertyName.OriginalName)  value "$asMapping(TypeDef.TriggerGroup.BusRelsBoth)" \
         add property $asMapping(PropertyName.Version)       value "${_sVersion}"
     pRegisterObject relationship "$asMapping(TypeDef.TriggerGroup.BusRelsBoth)"
-
-    # register MxUpdate
-    if {[mql list program $asMapping(Program.RegisterApplication)] != ""}  {
-      puts "register MxUpdate ${_sVersion}"
-      mql mod prog $asMapping(Program.RegisterApplication) \
-          add property "appVersionMxUpdate" \
-          value "${_sVersion}"
-    }
   }
   
 
@@ -327,4 +309,6 @@ eval  {
   mql verbose on
   mql compile prog org.mxupdate.*,MxUpdate
   mql verbose off
+  
+  mql exec prog "org.mxupdate.install.InstallDataModel" "${VERSION}"
 }

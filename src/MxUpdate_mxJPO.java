@@ -252,14 +252,7 @@ public class MxUpdate_mxJPO
         // first create list all type definitions which could be used...
         final Set<TypeDef_mxJPO> all = new HashSet<TypeDef_mxJPO>();
         for (final TypeDef_mxJPO typeDef : TypeDef_mxJPO.values())  {
-            boolean exists = true;
-            if (typeDef.isBusCheckExists())  {
-                final String tmp = execMql(_context,
-                                           new StringBuilder().append("list type '").append(typeDef.getMxBusType()).append("'"));
-                exists = (tmp.length() > 0);
-            }
-
-            if (exists)  {
+            if (!typeDef.isBusCheckExists() || typeDef.existsBusType(_context))  {
                 all.add(typeDef);
                 this.defineParameter(null,
                         typeDef,

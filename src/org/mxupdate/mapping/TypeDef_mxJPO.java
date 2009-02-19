@@ -27,9 +27,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import matrix.db.Context;
+import matrix.util.MatrixException;
 
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.util.MqlUtil_mxJPO;
+
+import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
  * Enumeration for administration type definitions.
@@ -511,6 +514,21 @@ public final class TypeDef_mxJPO
     public boolean isBusCheckExists()
     {
         return this.busCheckExists;
+    }
+
+    /**
+     * Checks if the business type defining this type definition exists.
+     *
+     * @param _context      MX context for this request
+     * @return <i>true</i> if the business type exists; otherwise <i>false</i>
+     * @throws MatrixException if the check failed
+     */
+    public boolean existsBusType(final Context _context)
+            throws MatrixException
+    {
+        final String tmp = execMql(_context,
+                new StringBuilder().append("list type '").append(this.busType).append("'"));
+        return (tmp.length() > 0);
     }
 
     /**

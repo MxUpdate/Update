@@ -139,11 +139,17 @@ class AbstractValue_mxJPO
         } else if (_key.equals(PREFIX_PARAM_DESCOPP))  {
             this.paramDescOpp = _value;
         } else if (_key.equals(PREFIX_PARAM_ARGS))  {
-            this.paramArgs = Arrays.asList(_value.split(","));
+            if (!"".equals(_value.trim()))  {
+                this.paramArgs = Arrays.asList(_value.split(","));
+            }
         } else if (_key.equals(PREFIX_PARAM_LIST))  {
-            this.paramList = Arrays.asList(_value.split(","));
+            if (!"".equals(_value.trim()))  {
+                this.paramList = Arrays.asList(_value.split(","));
+            }
         } else if (_key.equals(PREFIX_PARAM_LISTOPP))  {
-            this.paramListOpp = Arrays.asList(_value.split(","));
+            if (!"".equals(_value.trim()))  {
+                this.paramListOpp = Arrays.asList(_value.split(","));
+            }
         } else  {
             throw new Exception("unkown key " + _key + " with value '" + _value + "' defined!");
         }
