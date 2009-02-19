@@ -204,36 +204,6 @@ eval  {
   proc pInstallDM {_sRoot _sVersion}  {
     global asMapping
 
-    set lsAttributes [list $asMapping(PropertyAttribute.Author) \
-                           $asMapping(PropertyAttribute.Application) \
-                           $asMapping(PropertyAttribute.FileDate) \
-                           $asMapping(PropertyAttribute.InstalledDate) \
-                           $asMapping(PropertyAttribute.Installer) \
-                           $asMapping(PropertyAttribute.Version)]
-    set lsTypes      [list $asMapping(TypeDef.NumberGenerator.BusType) \
-                           $asMapping(TypeDef.ObjectGenerator.BusType) \
-                           $asMapping(TypeDef.Trigger.BusType) \
-                           $asMapping(TypeDef.TriggerGroup.BusType)]
-
-    # create attributes
-    set lsExists [split [mql list attribute [join ${lsAttributes} ","]] "\n"]
-    foreach sOneAttribute ${lsAttributes}  {
-      if {[lsearch ${lsExists} "${sOneAttribute}"] < 0}  {
-        puts "create attribute '${sOneAttribute}'"
-        mql add attribute "${sOneAttribute}" type string \
-            property $asMapping(PropertyName.InstalledDate) value [clock format [clock clicks]  -gmt true -format "%m-%d-%Y"]
-      } else  {
-        puts "update attribute '${sOneAttribute}'"
-      }
-      mql modify attribute "${sOneAttribute}" \
-          add property $asMapping(PropertyName.Application)   value "MxUpdate" \
-          add property $asMapping(PropertyName.Author)        value "The MxUpdate Team" \
-          add property $asMapping(PropertyName.Installer)     value "The MxUpdate Team" \
-          add property $asMapping(PropertyName.OriginalName)  value "${sOneAttribute}" \
-          add property $asMapping(PropertyName.Version)       value "${_sVersion}"
-      pRegisterObject attribute "${sOneAttribute}"
-    }
-
     # create / update trigger group type
     if {[mql list type $asMapping(TypeDef.TriggerGroup.BusType)] == ""}  {
       puts "create trigger group type '$asMapping(TypeDef.TriggerGroup.BusType)'"

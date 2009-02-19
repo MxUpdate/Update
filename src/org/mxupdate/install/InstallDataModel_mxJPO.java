@@ -20,14 +20,21 @@
 
 package org.mxupdate.install;
 
+import java.util.Date;
+
 import matrix.db.Context;
+import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.Mapping_mxJPO;
 import org.mxupdate.mapping.ParameterDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
+import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
+import static org.mxupdate.update.util.StringUtil_mxJPO.convertMql;
+import static org.mxupdate.update.util.StringUtil_mxJPO.formatFileDate;
+import static org.mxupdate.update.util.StringUtil_mxJPO.formatInstalledDate;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
@@ -45,6 +52,27 @@ public class InstallDataModel_mxJPO
      * @see #registerMxUpdate(ParameterCache_mxJPO, String)
      */
     private static final String PARAM_PROGAPPL = "RegisterApplicationProg";
+
+    /**
+     * Name of the parameter defining the application name.
+     *
+     * @see #updateAttributes(ParameterCache_mxJPO)
+     */
+    private static final String PARAM_APPLNAME = "RegisterApplicationName";
+
+    /**
+     * Name of the parameter defining the author name.
+     *
+     * @see #updateAttributes(ParameterCache_mxJPO)
+     */
+    private static final String PARAM_AUTHOR = "RegisterAuthorName";
+
+    /**
+     * Name of the parameter defining the installer name.
+     *
+     * @see #updateAttributes(ParameterCache_mxJPO)
+     */
+    private static final String PARAM_INSTALLER = "RegisterInstallerName";
 
     /**
      * Method used as entry from the MQL interface to install / update the data
@@ -67,6 +95,7 @@ public class InstallDataModel_mxJPO
         Mapping_mxJPO.init(_context);
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, ParameterDef_mxJPO.values());
 
+        this.updateAttributes(paramCache, version);
         this.updateBusTypes(paramCache);
         this.registerMxUpdate(paramCache, version);
 
@@ -91,6 +120,66 @@ public class InstallDataModel_mxJPO
                 .append("mod prog \"").append(progName).append("\" ")
                 .append("add property \"appVersionMxUpdate\" ")
                 .append("value \"").append(_version).append("\""));
+    }
+
+    /**
+     * Creates / updates all needed attributes used as MxUpdate properties.
+     *
+     * @param _paramCache   parameter cache
+     * @param _version      new MxUpdate version
+     * @throws Exception if update of attribute failed
+     */
+    protected void updateAttributes(final ParameterCache_mxJPO _paramCache,
+                                    final String _version)
+            throws Exception
+    {
+        final String applName = _paramCache.getValueString(PARAM_APPLNAME);
+        final String authorName = _paramCache.getValueString(PARAM_AUTHOR);
+        final String installerName = _paramCache.getValueString(PARAM_INSTALLER);
+
+        final String fileDate = formatFileDate(_paramCache, new Date());
+        final String installedDate = formatInstalledDate(_paramCache, new Date());
+
+        for (final AdminPropertyDef propDef : AdminPropertyDef.values())  {
+            if ((propDef.getAttrName() != null) && !"".equals(propDef.getAttrName()))  {
+                _paramCache.logInfo("check attribute '" + propDef.getAttrName() + "'");
+
+                final StringBuilder cmd = new StringBuilder();
+
+                final String exists = execMql(_paramCache.getContext(),
+                        new StringBuilder().append("list attribute '")
+                                           .append(propDef.getAttrName())
+                                           .append('\''));
+                if ("".equals(exists))  {
+                    _paramCache.logDebug("    - create");
+                    cmd.append("escape add attribute \"").append(convertMql(propDef.getAttrName()))
+                       .append("\" type string;");
+                }
+
+                cmd.append("escape mod attribute \"").append(convertMql(propDef.getAttrName())).append("\" ");
+
+                final AbstractObject_mxJPO instance = TypeDef_mxJPO.valueOf("Attribute")
+                                                                   .newTypeInstance(propDef.getAttrName());
+
+                // check for correct application name
+                this.checkProperty(_paramCache, instance, AdminPropertyDef.APPLICATION, applName, cmd, false);
+                // check for correct author name
+                this.checkProperty(_paramCache, instance, AdminPropertyDef.AUTHOR, authorName, cmd, false);
+                // check for correct installer name
+                this.checkProperty(_paramCache, instance, AdminPropertyDef.INSTALLER, installerName, cmd, false);
+                // check for correct version
+                this.checkProperty(_paramCache, instance, AdminPropertyDef.VERSION, _version, cmd, false);
+                // check for original name
+                this.checkProperty(_paramCache, instance, AdminPropertyDef.ORIGINALNAME,
+                        propDef.getAttrName(), cmd, false);
+                // check for file date
+                this.checkProperty(_paramCache, instance, AdminPropertyDef.FILEDATE, fileDate, cmd, true);
+                // check for installed date
+                this.checkProperty(_paramCache, instance, AdminPropertyDef.INSTALLEDDATE, installedDate, cmd, true);
+
+                execMql(_paramCache.getContext(), cmd);
+            }
+        }
     }
 
     /**
@@ -128,6 +217,39 @@ public class InstallDataModel_mxJPO
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Checks a property value and updates the property if not defined (if
+     * parameter <code>_onlyIfNotDefined</code> is <i>true</i>) or not equal to
+     * new value (if parameter <code>_onlyIfNotDefined</code> is <i>false</i>).
+     *
+     * @param _paramCache       parameter cache
+     * @param _instance         instance used to extract current property value
+     * @param _propDef          property definition
+     * @param _newValue         new property value
+     * @param _cmd              string builder used to append MQL code
+     * @param _onlyIfNotDefined new property value is only defined if currently
+     *                          no value is defined
+     * @throws MatrixException if current value from the instance object could
+     *                         not be evaluated
+     */
+    protected void checkProperty(final ParameterCache_mxJPO _paramCache,
+                                 final AbstractObject_mxJPO _instance,
+                                 final AdminPropertyDef _propDef,
+                                 final String _newValue,
+                                 final StringBuilder _cmd,
+                                 final boolean _onlyIfNotDefined)
+            throws MatrixException
+    {
+        final String current = _instance.getPropValue(_paramCache.getContext(), _propDef);
+        if ((!_newValue.equals(current) && !_onlyIfNotDefined)
+            || (((current == null) || "".equals(current)) && _onlyIfNotDefined))  {
+            _paramCache.logDebug("    - define " + _propDef + " '" + _newValue + "'");
+            _cmd.append("add property \"")
+                .append(convertMql(_propDef.getPropName()))
+                .append("\" value \"").append(convertMql(_newValue)).append("\" ");
         }
     }
 }

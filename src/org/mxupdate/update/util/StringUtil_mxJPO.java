@@ -20,17 +20,50 @@
 
 package org.mxupdate.update.util;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
+import java.util.SimpleTimeZone;
 import java.util.Stack;
 
 /**
  *
- * @author tmoxter
+ * @author Tim Moxter
  * @version $Id$
  */
 public final class StringUtil_mxJPO
 {
+    /**
+     * String of the key within the parameter cache for the file date format
+     * parameter.
+     *
+     * @see #formatFileDate(ParameterCache_mxJPO, Date)
+     * @see #parseFileDate(ParameterCache_mxJPO, String)
+     */
+    private static final String PARAM_FILEDATEFORMAT = "FileDateFormat";
+
+    /**
+     * String of the key within the parameter cache for the installed date
+     * format parameter.
+     *
+     * @see #formatInstalledDate(ParameterCache_mxJPO, Date)
+     * @see #parseInstalledDate(ParameterCache_mxJPO, String)
+     */
+    private static final String PARAM_INSTALLEDDATEFORMAT = "InstalledDateFormat";
+
+    /**
+     * Holding the GMT0 time zone used to convert file and installed dates.
+     *
+     * @see #formatFileDate(ParameterCache_mxJPO, Date)
+     * @see #formatInstalledDate(ParameterCache_mxJPO, Date)
+     * @see #parseFileDate(ParameterCache_mxJPO, String)
+     * @see #parseInstalledDate(ParameterCache_mxJPO, String)
+     */
+    private static final SimpleTimeZone TIMEZONE = new SimpleTimeZone(0, "GMT");
+
     /**
      * The constructor is defined so that no instance of the string utility
      * could be created.
@@ -160,6 +193,84 @@ public final class StringUtil_mxJPO
             }
         }
         return ret.toString();
+    }
+
+    /**
+     * Formats given date with time (normally from the last modification time
+     * of a file) to the related string representation in MX. The convert is
+     * done in time zone {@link #TIMEZONE} so that always the same time zone
+     * is used (e.g. summer and winter time...).
+     *
+     * @param _paramCache   parameter cache
+     * @param _date         last modification date of a file to convert to a
+     *                      string
+     * @return string representation of the date in time zone {@link #TIMEZONE}
+     * @see #PARAM_FILEDATEFORMAT
+     */
+    public static String formatFileDate(final ParameterCache_mxJPO _paramCache,
+                                             final Date _date)
+    {
+        final DateFormat fileFormat = new SimpleDateFormat(_paramCache.getValueString(PARAM_FILEDATEFORMAT));
+        fileFormat.setTimeZone(TIMEZONE);
+        return fileFormat.format(_date);
+    }
+
+    /**
+     * Parses given string with date and time in time zone {@link #TIMEZONE}
+     * and returns related date.
+     *
+     * @param _paramCache   parameter cache
+     * @param _date         string with the last modified date in time zone
+     *                      {@link #TIMEZONE}
+     * @return parsed date instance
+     * @throws ParseException if date string could not be parsed
+     * @see #PARAM_FILEDATEFORMAT
+     */
+    public static Date parseFileDate(final ParameterCache_mxJPO _paramCache,
+                                     final String _date)
+            throws ParseException
+    {
+        final DateFormat fileFormat = new SimpleDateFormat(_paramCache.getValueString(PARAM_FILEDATEFORMAT));
+        fileFormat.setTimeZone(TIMEZONE);
+        return fileFormat.parse(_date);
+    }
+
+    /**
+     * Formats given installation date to the related string representation in
+     * MX. The convert is done in time zone {@link #TIMEZONE} so that always
+     * the same time zone is used (e.g. summer and winter time...).
+      *
+     * @param _paramCache   parameter cache
+     * @param _date         installed date to convert to a string
+     * @return string representation of the date in time zone {@link #TIMEZONE}
+     * @see #PARAM_INSTALLEDDATEFORMAT
+     */
+    public static String formatInstalledDate(final ParameterCache_mxJPO _paramCache,
+                                             final Date _date)
+    {
+        final DateFormat fileFormat = new SimpleDateFormat(_paramCache.getValueString(PARAM_INSTALLEDDATEFORMAT));
+        fileFormat.setTimeZone(TIMEZONE);
+        return fileFormat.format(_date);
+    }
+
+    /**
+     * Parses given string with date in time zone {@link #TIMEZONE} and returns
+     * related date.
+     *
+     * @param _paramCache   parameter cache
+     * @param _date         string with the installed date in time zone
+     *                      {@link #TIMEZONE}
+     * @return parsed date instance
+     * @throws ParseException if date string could not be parsed
+     * @see #PARAM_INSTALLEDDATEFORMAT
+     */
+    public static Date parseInstalledDate(final ParameterCache_mxJPO _paramCache,
+                                          final String _date)
+            throws ParseException
+    {
+        final DateFormat fileFormat = new SimpleDateFormat(_paramCache.getValueString(PARAM_INSTALLEDDATEFORMAT));
+        fileFormat.setTimeZone(TIMEZONE);
+        return fileFormat.parse(_date);
     }
 
     /**
