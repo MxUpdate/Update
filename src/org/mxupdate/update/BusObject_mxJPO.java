@@ -23,8 +23,6 @@ package org.mxupdate.update;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,6 +48,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.xml.sax.SAXException;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import static org.mxupdate.update.util.StringUtil_mxJPO.formatInstalledDate;
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 import static org.mxupdate.util.MqlUtil_mxJPO.setHistoryOff;
@@ -581,14 +580,15 @@ public class BusObject_mxJPO
                         .append("\" \"").append(_tclVariables.get(AdminPropertyDef.FILEDATE.name())).append('\"');
         // is installed date property defined?
         if ((this.getInstallationDate() == null) || "".equals(this.getInstallationDate()))  {
-            final DateFormat format = new SimpleDateFormat(_paramCache.getValueString(ParameterCache_mxJPO.KEY_INSTALLEDDATEFORMAT));
+            final String date = formatInstalledDate(_paramCache, new Date());
+            _paramCache.logTrace("    - define installed date '" + date + "'");
             postMQLCode.append(" \"").append(AdminPropertyDef.INSTALLEDDATE.getAttrName())
-                    .append("\" \"").append(format.format(new Date())).append('\"');
+                    .append("\" \"").append(date).append('\"');
         }
         // exists no installer property or installer property not equal?
         final String instVal = _tclVariables.get(AdminPropertyDef.INSTALLER.name());
-       if ((this.getInstaller() == null) || !this.getInstaller().equals(instVal))  {
-           _paramCache.logTrace("    - define installer '" + instVal + "'");
+        if ((this.getInstaller() == null) || !this.getInstaller().equals(instVal))  {
+            _paramCache.logTrace("    - define installer '" + instVal + "'");
             postMQLCode.append(" \"").append(AdminPropertyDef.INSTALLER.getAttrName())
                     .append("\" \"").append(instVal).append('\"');
         }

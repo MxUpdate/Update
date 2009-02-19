@@ -21,8 +21,6 @@
 package org.mxupdate.update.program;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import matrix.util.MatrixException;
@@ -32,6 +30,8 @@ import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
+import static org.mxupdate.update.util.StringUtil_mxJPO.formatFileDate;
+import static org.mxupdate.update.util.StringUtil_mxJPO.formatInstalledDate;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
@@ -143,13 +143,11 @@ public abstract class AbstractProgram_mxJPO
         cmd.append(" add property \"").append(AdminPropertyDef.VERSION.getPropName()).append("\" ")
            .append("value \"").append(_newVersion != null ? _newVersion : "").append('\"');
         // define file date property
-        final DateFormat fileFormat = new SimpleDateFormat(_paramCache.getValueString(ParameterCache_mxJPO.KEY_FILEDATEFORMAT));
         cmd.append(" add property \"").append(AdminPropertyDef.FILEDATE.getPropName()).append("\" ")
-           .append("value \"").append(fileFormat.format(new Date(_file.lastModified()))).append('\"');
+           .append("value \"").append(formatFileDate(_paramCache, new Date(_file.lastModified()))).append('\"');
         // is installed date property defined?
         if ((this.getInstallationDate() == null) || "".equals(this.getInstallationDate()))  {
-            final DateFormat format = new SimpleDateFormat(_paramCache.getValueString(ParameterCache_mxJPO.KEY_INSTALLEDDATEFORMAT));
-            final String date = format.format(new Date());
+            final String date = formatInstalledDate(_paramCache, new Date());
             _paramCache.logTrace("    - define installed date '" + date + "'");
             cmd.append(" add property \"").append(AdminPropertyDef.INSTALLEDDATE.getPropName()).append("\" ")
                .append("value \"").append(date).append('\"');

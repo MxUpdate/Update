@@ -21,9 +21,7 @@
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -50,8 +48,8 @@ import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
+import static org.mxupdate.update.util.StringUtil_mxJPO.parseFileDate;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
-
 /**
  * <tr>
  * <th></th><th></th><th></th>
@@ -669,13 +667,12 @@ public class MxUpdate_mxJPO
                         final Date fileDate = new Date(fileEntry.getKey().lastModified());
                         final String instDateString = instance.getPropValue(_paramCache.getContext(),
                                                                             AdminPropertyDef.FILEDATE);
-                        final DateFormat format = new SimpleDateFormat(_paramCache.getValueString(ParameterCache_mxJPO.KEY_FILEDATEFORMAT));
                         Date instDate;
                         if ((instDateString == null) || "".equals(instDateString))  {
                             instDate = null;
                         } else  {
                             try {
-                                instDate = format.parse(instDateString);
+                                instDate = parseFileDate(_paramCache, instDateString);
                             } catch (final ParseException e) {
                                 instDate = null;
                             }

@@ -23,8 +23,6 @@ package org.mxupdate.update;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,6 +35,7 @@ import org.mxupdate.update.util.JPOCaller_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import static org.mxupdate.update.util.StringUtil_mxJPO.formatFileDate;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
@@ -378,9 +377,8 @@ public abstract class AbstractPropertyObject_mxJPO
         }
 
         // define file date
-        final DateFormat format = new SimpleDateFormat(_paramCache.getValueString(ParameterCache_mxJPO.KEY_FILEDATEFORMAT));
         tclVariables.put(AdminPropertyDef.FILEDATE.name(),
-                         format.format(new Date(_file.lastModified())));
+                         formatFileDate(_paramCache, new Date(_file.lastModified())));
 
         this.update(_paramCache, "", "", "", tclVariables, _file);
     }

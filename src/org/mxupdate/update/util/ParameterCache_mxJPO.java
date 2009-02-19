@@ -74,18 +74,6 @@ public class ParameterCache_mxJPO
     public static final String KEY_FILEDATE2VERSION = "FileDate2Version";
 
     /**
-     * String of the key within the parameter cache for the file date format
-     * parameter.
-     */
-    public static final String KEY_FILEDATEFORMAT = "FileDateFormat";
-
-    /**
-     * String of the key within the parameter cache for the installed date
-     * format parameter.
-     */
-    public static final String KEY_INSTALLEDDATEFORMAT = "InstalledDateFormat";
-
-    /**
      * String of the key within the parameter cache for the installer
      * parameter.
      */

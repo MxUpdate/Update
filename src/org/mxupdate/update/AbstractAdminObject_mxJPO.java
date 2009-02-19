@@ -26,8 +26,6 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,6 +48,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import static org.mxupdate.update.util.StringUtil_mxJPO.formatInstalledDate;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
@@ -444,8 +443,7 @@ public abstract class AbstractAdminObject_mxJPO
                 .append("value \"").append(_tclVariables.get(AdminPropertyDef.FILEDATE.name())).append('\"');
         // is installed date property defined?
         if ((this.getInstallationDate() == null) || "".equals(this.getInstallationDate()))  {
-            final DateFormat format = new SimpleDateFormat(_paramCache.getValueString(ParameterCache_mxJPO.KEY_INSTALLEDDATEFORMAT));
-            final String date = format.format(new Date());
+            final String date = formatInstalledDate(_paramCache, new Date());
             _paramCache.logTrace("    - define installed date '" + date + "'");
             postMQLCode.append(" add property \"").append(AdminPropertyDef.INSTALLEDDATE.getPropName()).append("\" ")
                     .append("value \"").append(date).append('\"');
