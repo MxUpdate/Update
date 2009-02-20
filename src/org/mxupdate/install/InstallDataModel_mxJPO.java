@@ -144,7 +144,6 @@ public class InstallDataModel_mxJPO
             if ((propDef.getAttrName() != null) && !"".equals(propDef.getAttrName()))  {
                 _paramCache.logInfo("check attribute '" + propDef.getAttrName() + "'");
 
-                final StringBuilder cmd = new StringBuilder();
 
                 final String exists = execMql(_paramCache.getContext(),
                         new StringBuilder().append("list attribute '")
@@ -152,11 +151,14 @@ public class InstallDataModel_mxJPO
                                            .append('\''));
                 if ("".equals(exists))  {
                     _paramCache.logDebug("    - create");
-                    cmd.append("escape add attribute \"").append(convertMql(propDef.getAttrName()))
-                       .append("\" type string;");
+                    execMql(_paramCache.getContext(),
+                            new StringBuilder()
+                                .append("escape add attribute \"").append(convertMql(propDef.getAttrName()))
+                                .append("\" type string;"));
                 }
 
-                cmd.append("escape mod attribute \"").append(convertMql(propDef.getAttrName())).append("\" ");
+                final StringBuilder cmd = new StringBuilder()
+                    .append("escape mod attribute \"").append(convertMql(propDef.getAttrName())).append("\" ");
 
                 final AbstractObject_mxJPO instance = TypeDef_mxJPO.valueOf("Attribute")
                                                                    .newTypeInstance(propDef.getAttrName());
