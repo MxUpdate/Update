@@ -50,6 +50,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import static org.mxupdate.update.util.StringUtil_mxJPO.match;
 import static org.mxupdate.update.util.StringUtil_mxJPO.parseFileDate;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
+
 /**
  * <tr>
  * <th></th><th></th><th></th>
@@ -252,10 +253,12 @@ public class MxUpdate_mxJPO
         for (final TypeDef_mxJPO typeDef : TypeDef_mxJPO.values())  {
             if (!typeDef.isBusCheckExists() || typeDef.existsBusType(_context))  {
                 all.add(typeDef);
-                this.defineParameter(null,
-                        typeDef,
-                        typeDef.getParameterDesc(),
-                        typeDef.getParameterList());
+                if (typeDef.getParameterList() != null)  {
+                    this.defineParameter(null,
+                            typeDef,
+                            typeDef.getParameterDesc(),
+                            typeDef.getParameterList());
+                }
                 if (typeDef.getParameterListOpp() != null)  {
                     for (final String param : typeDef.getParameterListOpp())  {
                         final String paramStr = (param.length() == 1)
@@ -333,13 +336,13 @@ public class MxUpdate_mxJPO
     }
 
     /**
-     * Appends a description for a defined list of parameters.
+     * Appends a description for a defined list of parameters. If a parameter
+     * is defined twice, an error is thrown.
      *
      * @param _description  description to append
      * @param _params       related parameters
      * @param _args         text of the arguments for the list of parameters
      *                      (or <code>null</code> if not defined)
-     * @throws Error if a parameter is defined twice)
      * @see #allParams
      * @see #description
      */
@@ -645,7 +648,7 @@ public class MxUpdate_mxJPO
                          final AbstractObject_mxJPO instance = clazz.newTypeInstance(fileEntry.getValue());
                          _paramCache.logInfo("create "+instance.getTypeDef().getLogging()
                                  + " '" + fileEntry.getValue() + "'");
-                        instance.create(_paramCache, fileEntry.getKey());
+                        instance.create(_paramCache);
                     }
                 }
             }

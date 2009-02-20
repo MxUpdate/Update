@@ -33,7 +33,6 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertFromFileName;
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
@@ -44,7 +43,7 @@ import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
  * @author Tim Moxter
  * @version $Id$
  */
-public class Attribute_mxJPO
+abstract class AbstractAttribute_mxJPO
         extends AbstractDMWithTriggers_mxJPO
 {
     /**
@@ -53,11 +52,13 @@ public class Attribute_mxJPO
     private static final long serialVersionUID = -502565364090887306L;
 
     /**
-     * List of all possible prefixes.
+     * MQL list statement with select for the attribute type and name used
+     * to get the list of all attribute MX names depending on the attribute
+     * type.
      *
-     * @todo not hardcoded, must be defined within mapping.properties
+     * @see #getMxNames(ParameterCache_mxJPO)
      */
-    private static final String[] PREFIXES = {"BOOLEAN_", "DATE_", "INTEGER_", "REAL_", "STRING_"};
+    private static final String SELECT_ATTRS = "list attribute * select type name dump";
 
     /**
      * Set holding all rules referencing this attribute.
@@ -116,62 +117,64 @@ public class Attribute_mxJPO
     private boolean multiline = false;
 
     /**
+     * Holds the attribute type used to create a new attribute.
+     *
+     * @see #create(ParameterCache_mxJPO, File)
+     */
+    private final String attrTypeCreate;
+
+    /**
+     * Holds the attribute including the &quot;,&quot; returned from the
+     * <code>list attribute</code> statement {@link #SELECT_ATTRS}.
+     *
+     * @see #getMxNames(ParameterCache_mxJPO)
+     * @see #SELECT_ATTRS
+     */
+    private final String attrTypeList;
+
+    /**
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the attribute object
+     * @param _attrTypeCreate   attribute type used to create new attribute
+     * @param _attrTypeList     attribute type incl. &quot;,&quot; returned
+     *                          from the select list statement
      */
-    public Attribute_mxJPO(final TypeDef_mxJPO _typeDef,
-                           final String _mxName)
+    public AbstractAttribute_mxJPO(final TypeDef_mxJPO _typeDef,
+                                   final String _mxName,
+                                   final String _attrTypeCreate,
+                                   final String _attrTypeList)
     {
         super(_typeDef, _mxName);
+        this.attrTypeCreate = _attrTypeCreate;
+        this.attrTypeList = _attrTypeList;
     }
 
     /**
-     * Extracts the attribute MX name from given file name if the file prefix
-     * and suffix matches. If the file prefix and suffix not matches a
-     * <code>null</code> is returned.
+     * Searches for all attribute objects depending on the attribute type.
      *
      * @param _paramCache   parameter cache
-     * @param _file         file for which the attribute MX name is searched
-     * @return MX name or <code>null</code> if the file is not an update file
-     *         for an attribute
+     * @return set of MX names of all attributes of attribute type
+     *         {@link #attrTypeList}
+     * @throws MatrixException if the query for attribute objects failed
+     * @see #SELECT_ATTRS
+     * @see #attrTypeList
      */
     @Override
-    public String extractMxName(final ParameterCache_mxJPO _paramCache,
-                                final File _file)
+    public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
+            throws MatrixException
     {
-        final String suffix = this.getTypeDef().getFileSuffix();
-        final int suffixLength = (suffix != null) ? suffix.length() : 0;
-
-        final String fileName = _file.getName();
-        String mxName = null;
-        for (final String prefix : PREFIXES)  {
-            if (fileName.startsWith(prefix) && ((suffix == null) || fileName.endsWith(suffix)))  {
-                mxName = convertFromFileName(fileName.substring(0, fileName.length() - suffixLength)
-                                                     .substring(prefix.length()));
-                break;
+        final Set<String> ret = new TreeSet<String>();
+        final int length = this.attrTypeList.length();
+        for (final String name : execMql(_paramCache.getContext(), SELECT_ATTRS).split("\n"))  {
+            if (!"".equals(name))  {
+                if (name.startsWith(this.attrTypeList))  {
+                    ret.add(name.substring(length));
+                }
             }
         }
-        return mxName;
-    }
-
-    /**
-     * Returns the file name for this matrix object. The file name is a
-     * concatenation of the {@link #type} in upper case (for date time
-     * attribute type only &quot;DATE&quot;), an underline
-     * (&quot;_&quot;), the {@link #name} of the matrix object and
-     *  &quot;.tcl&quot; as extension.<br/>
-     * The method overwrites the original method, because the attribute file
-     * name is not the same than all other update file names.
-     *
-     * @return file name of this matrix object
-     * @see #type
-     */
-    @Override
-    public String getFileName()
-    {
-        return this.type.toUpperCase().replaceAll("TIME$", "") + "_" + this.getName() + ".tcl";
+        return ret;
     }
 
     /**
@@ -282,24 +285,22 @@ public class Attribute_mxJPO
 
     /**
      * Creates given attribute from given type with given name. Because the
-     * type of the attribute is defined with the file name (as prefix), the
-     * original create method must be overwritten.
+     * type of the attribute must defined, the original create method must be
+     * overwritten.
      *
      * @param _paramCache   parameter cache
-     * @param _file         file for which the attribute must be created
-     *                      (needed to define the attribute type)
      * @throws Exception if the new attribute for given type could not be
      *                   created
+     * @see #attrTypeCreate
      */
     @Override
-    public void create(final ParameterCache_mxJPO _paramCache,
-                       final File _file)
+    public void create(final ParameterCache_mxJPO _paramCache)
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("add ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append("\" ")
-                .append(" type ").append(_file.getName().replaceAll("_.*", "").toLowerCase());
+                .append(" type ").append(this.attrTypeCreate);
        execMql(_paramCache.getContext(), cmd);
     }
 
@@ -416,8 +417,8 @@ public class Attribute_mxJPO
          * </ul>
          * If the range type is a program, the name of the program and the
          * input arguments are defined directly on the attribute in
-         * {@link Attribute_mxJPO#rangeProgramRef} and
-         * {@link Attribute_mxJPO#rangeProgramInputArguments}.
+         * {@link AbstractAttribute_mxJPO#rangeProgramRef} and
+         * {@link AbstractAttribute_mxJPO#rangeProgramInputArguments}.
          *
          * @param _out  writer instance
          * @throws IOException if write to the writer instance is not possible
@@ -429,11 +430,11 @@ public class Attribute_mxJPO
             // if the range is a program it is a 'global' attribute info
             if ("programRange".equals(this.type))  {
                 _out.append("program \"")
-                    .append(convertTcl(Attribute_mxJPO.this.rangeProgramRef))
+                    .append(convertTcl(AbstractAttribute_mxJPO.this.rangeProgramRef))
                     .append('\"');
-                if (Attribute_mxJPO.this.rangeProgramInputArguments != null)  {
+                if (AbstractAttribute_mxJPO.this.rangeProgramInputArguments != null)  {
                     _out.append(" input \"")
-                        .append(convertTcl(Attribute_mxJPO.this.rangeProgramInputArguments))
+                        .append(convertTcl(AbstractAttribute_mxJPO.this.rangeProgramInputArguments))
                         .append('\"');
                 }
             } else  {
@@ -477,7 +478,7 @@ public class Attribute_mxJPO
          * Appends the MQL code to remove this range depending on the type of
          * range in {@link #type}. If it is a program the related name of
          * program is defined as attribute variable in
-         * {@link Attribute_mxJPO#rangeProgramRef}.
+         * {@link AbstractAttribute_mxJPO#rangeProgramRef}.
          *
          * @param _out      appendable instance where the MQL code is appended
          *                  to remove this range
@@ -489,7 +490,7 @@ public class Attribute_mxJPO
             _out.append(" remove range ");
 
             if ("programRange".equals(this.type))  {
-                _out.append("program \"").append(Attribute_mxJPO.this.rangeProgramRef).append('\"');
+                _out.append("program \"").append(AbstractAttribute_mxJPO.this.rangeProgramRef).append('\"');
             } else  {
                 _out.append(this.type)
                     .append(" \"").append(this.value1).append('\"');

@@ -91,7 +91,7 @@ public class Update_mxJPO
         final Set<String> allMxNames = instance.getMxNames(paramCache);
         if (!allMxNames.contains(instance.getName()))  {
             paramCache.logInfo("    - create");
-            instance.create(paramCache, file);
+            instance.create(paramCache);
         }
 
         // and update

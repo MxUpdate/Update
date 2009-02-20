@@ -151,13 +151,10 @@ public class Form_mxJPO
      * specific create method must be written.
      *
      * @param _paramCache   parameter cache
-     * @param _file         file for which the administration object must be
-     *                      created (not used)
      * @throws Exception if the web form could not be created within MX
      */
     @Override
-    public void create(final ParameterCache_mxJPO _paramCache,
-                       final File _file)
+    public void create(final ParameterCache_mxJPO _paramCache)
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()

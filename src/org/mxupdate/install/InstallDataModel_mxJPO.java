@@ -97,7 +97,6 @@ public class InstallDataModel_mxJPO
         this.updateAttributes(paramCache, version);
         this.updateBusTypes(paramCache);
         this.registerMxUpdate(paramCache, version);
-
     }
 
     /**
@@ -159,7 +158,7 @@ public class InstallDataModel_mxJPO
                 final StringBuilder cmd = new StringBuilder()
                     .append("escape mod attribute \"").append(convertMql(propDef.getAttrName())).append("\" ");
 
-                final AbstractObject_mxJPO instance = TypeDef_mxJPO.valueOf("Attribute")
+                final AbstractObject_mxJPO instance = TypeDef_mxJPO.valueOf("AttributeString")
                                                                    .newTypeInstance(propDef.getAttrName());
 
                 // check for correct application name

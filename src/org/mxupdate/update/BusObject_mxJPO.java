@@ -457,13 +457,10 @@ public class BusObject_mxJPO
      * Creates for given name the business object.
      *
      * @param _paramCache   parameter cache
-     * @param _file         defines the file for which the business object is
-     *                      created
      * @throws Exception if the business object could not be created
      */
     @Override
-    public void create(final ParameterCache_mxJPO _paramCache,
-                       final File _file)
+    public void create(final ParameterCache_mxJPO _paramCache)
             throws Exception
     {
         final TypeDef_mxJPO busType = this.getTypeDef();

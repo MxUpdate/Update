@@ -284,11 +284,9 @@ public abstract class AbstractObject_mxJPO
      * Creates a new administration object with given name.
      *
      * @param _paramCache   parameter cache
-     * @param _file         file with code to create
      * @throws Exception if create failed
      */
-    public abstract void create(final ParameterCache_mxJPO _paramCache,
-                                final File _file)
+    public abstract void create(final ParameterCache_mxJPO _paramCache)
             throws Exception;
 
     /**

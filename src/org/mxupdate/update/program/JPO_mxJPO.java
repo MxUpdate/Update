@@ -213,13 +213,10 @@ public class JPO_mxJPO
      * Creates given JPO object from given type with given name.
      *
      * @param _paramCache   parameter cache
-     * @param _file         file for which the administration object must be
-     *                      created (not used)
      * @throws Exception if create of JPO failed
      */
     @Override
-    public void create(final ParameterCache_mxJPO _paramCache,
-                       final File _file)
+    public void create(final ParameterCache_mxJPO _paramCache)
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()

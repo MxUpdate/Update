@@ -103,13 +103,10 @@ public class Program_mxJPO
      * Creates given program object from given type with given name.
      *
      * @param _paramCache   parameter cache
-     * @param _file         file for which the administration object must be
-     *                      be created (not used)
      * @throws Exception if the program could not be created
      */
     @Override
-    public void create(final ParameterCache_mxJPO _paramCache,
-                       final File _file)
+    public void create(final ParameterCache_mxJPO _paramCache)
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
