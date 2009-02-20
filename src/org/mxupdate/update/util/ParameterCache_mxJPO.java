@@ -20,6 +20,7 @@
 
 package org.mxupdate.update.util;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import matrix.db.Context;
+import matrix.db.MatrixWriter;
 
 import org.mxupdate.mapping.ParameterDef_mxJPO;
 
@@ -92,7 +94,7 @@ public class ParameterCache_mxJPO
      * @see #getValueBoolean(String)
      * @see #defineValueBoolean(String, Boolean)
      */
-    final Map<String,Boolean> mapBoolean;
+    private final Map<String,Boolean> mapBoolean;
 
     /**
      * Mapping between parameter definition and the related integer value.
@@ -102,7 +104,7 @@ public class ParameterCache_mxJPO
      * @see #getValueInteger(String)
      * @see #defineValueInteger(String, Integer)
      */
-    final Map<String,Integer> mapInteger;
+    private final Map<String,Integer> mapInteger;
 
     /**
      * Mapping between parameter definition and the related list of string
@@ -111,7 +113,7 @@ public class ParameterCache_mxJPO
      * @see #ParameterCache_mxJPO(Context,Collection)
      * @see #evalParameter(ParameterDef_mxJPO, String[], int)
      */
-    final Map<String,Collection<String>> mapList;
+    private final Map<String,Collection<String>> mapList;
 
     /**
      * Mapping between parameter definition and the related map of string
@@ -120,7 +122,7 @@ public class ParameterCache_mxJPO
      * @see #ParameterCache_mxJPO(Context,Collection)
      * @see #evalParameter(ParameterDef_mxJPO, String[], int)
      */
-    final Map<String,Map<String,?>> mapMap;
+    private final Map<String,Map<String,?>> mapMap;
 
     /**
      * Mapping between the enumeration name of the parameter and the string
@@ -129,29 +131,55 @@ public class ParameterCache_mxJPO
      * @see #ParameterCache_mxJPO(Context,Collection)
      * @see #evalParameter(ParameterDef_mxJPO, String[], int)
      */
-    final Map<String,String> mapString;
+    private final Map<String,String> mapString;
 
     /**
      * Stores as parameter the related MX context.
      *
      * @see #getContext()
      */
-    final Context context;
+    private final Context context;
+
+    /**
+     * If set to <i>true</i> the logging is done through the matrix writer,
+     * otherwise the logging is done via {@link System#out}.
+     *
+     * @see #writer
+     * @see #logDebug(String)
+     * @see #logError(String)
+     * @see #logInfo(String)
+     * @see #logTrace(String)
+     * @see #logWarning(String)
+     */
+    private final boolean matrixLog;
+
+    /**
+     * Stores the used writer instance for the logging instances.
+     *
+     * @see #logDebug(String)
+     * @see #logError(String)
+     * @see #logInfo(String)
+     * @see #logTrace(String)
+     * @see #logWarning(String)
+     */
+    private final PrintWriter writer;
 
     /**
      * Creates a new instance of the parameter cache. All default values from
      * the parameter definitions are predefined in the parameter cache.
      *
      * @param _context      MX context
-     * @param _paramDefs    all parameter definitions
+     * @param _matrixLog    if set to <i>true</i> log via matrix writer,
+     *                      <i>false</i> log via <code>System.out</code>
      * @see #context
      * @see #mapBoolean
      * @see #mapList
      * @see #mapMap
      * @see #mapString
+     * @see #writer
      */
     public ParameterCache_mxJPO(final Context _context,
-                                final Collection<ParameterDef_mxJPO> _paramDefs)
+                                final boolean _matrixLog)
     {
         this.context = _context;
         this.mapBoolean = new HashMap<String,Boolean>();
@@ -160,7 +188,7 @@ public class ParameterCache_mxJPO
         this.mapMap = new HashMap<String,Map<String,?>>();
         this.mapString = new HashMap<String,String>();
 
-        for (final ParameterDef_mxJPO paramDef : _paramDefs)  {
+        for (final ParameterDef_mxJPO paramDef : ParameterDef_mxJPO.values())  {
             if (paramDef.getDefaultValue() != null)  {
                 if (paramDef.getType() == ParameterDef_mxJPO.Type.BOOLEAN)  {
                     this.mapBoolean.put(paramDef.getName(),
@@ -177,13 +205,20 @@ public class ParameterCache_mxJPO
                 }
             }
         }
+        this.matrixLog = _matrixLog;
+        if (this.matrixLog)  {
+            this.writer = new PrintWriter(new MatrixWriter(this.context));
+        } else  {
+            this.writer = new PrintWriter(System.out);
+        }
     }
 
     /**
      * Creates a new parameter caches class used for the clone. The new
      * parameter cache instance holds the new defined cache but all already
      * defined value maps {@link #mapBoolean}, {@link #mapList} and
-     * {@link #mapString}.
+     * {@link #mapString}. For the writer in {@link #writer}Êa new instance is
+     * created depending on {@link #matrixLog}.
      *
      * @param _context      new matrix context
      * @param _original     original parameter cache class
@@ -203,6 +238,12 @@ public class ParameterCache_mxJPO
         this.mapList = _original.mapList;
         this.mapMap = _original.mapMap;
         this.mapString = _original.mapString;
+        this.matrixLog = _original.matrixLog;
+        if (this.matrixLog)  {
+            this.writer = new PrintWriter(new MatrixWriter(this.context));
+        } else  {
+            this.writer = new PrintWriter(System.out);
+        }
     }
 
     /**
@@ -411,50 +452,55 @@ public class ParameterCache_mxJPO
      * Logging in error level.
      *
      * @param _text     error text
+     * @see #writer
      */
     public void logError(final String _text)
     {
-        System.out.println("ERROR!" + _text);
+        this.writer.append("ERROR! ").append(_text).append('\n').flush();
     }
 
     /**
      * Logging in warning level.
      *
      * @param _text     warning text
+     * @see #writer
      */
     public void logWarning(final String _text)
     {
-        System.out.println("WARNING!" + _text);
+        this.writer.append("WARNING! ").append(_text).append('\n').flush();
     }
 
     /**
      * Logging in level information.
      *
      * @param _text     info text
+     * @see #writer
      */
     public void logInfo(final String _text)
     {
-        System.out.println(_text);
+        this.writer.append(_text).append('\n').flush();
     }
 
     /**
      * Logging in debug level.
      *
      * @param _text     trace text
+     * @see #writer
      */
     public void logDebug(final String _text)
     {
-        System.out.println(_text);
+        this.writer.append(_text).append('\n').flush();
     }
 
     /**
      * Logging in trace level.
      *
      * @param _text     trace text
+     * @see #writer
      */
     public void logTrace(final String _text)
     {
-        System.out.println(_text);
+        this.writer.append(_text).append('\n').flush();
     }
 
     /**

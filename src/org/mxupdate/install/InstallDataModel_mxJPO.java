@@ -26,7 +26,6 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.Mapping_mxJPO;
-import org.mxupdate.mapping.ParameterDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.AbstractObject_mxJPO;
@@ -93,7 +92,7 @@ public class InstallDataModel_mxJPO
 
         // initialize mapping
         Mapping_mxJPO.init(_context);
-        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, ParameterDef_mxJPO.values());
+        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, false);
 
         this.updateAttributes(paramCache, version);
         this.updateBusTypes(paramCache);

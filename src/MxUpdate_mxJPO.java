@@ -416,7 +416,7 @@ public class MxUpdate_mxJPO
 
             UpdateCheck_mxJPO versionInfo = null;
 
-            final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, ParameterDef_mxJPO.values());
+            final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, false);
 
             for (int idx = 0; idx < _args.length; idx++)  {
                 final String arg = _args[idx];

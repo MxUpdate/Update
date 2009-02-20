@@ -376,7 +376,7 @@ public abstract class AbstractObject_mxJPO
      * @return value of instance variable {@link #mxName}.
      * @see #mxName
      */
-    protected String getName()
+    public String getName()
     {
         return this.mxName;
     }
