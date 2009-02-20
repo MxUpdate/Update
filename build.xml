@@ -34,4 +34,30 @@
         <tar destfile="${filename}.tar.bz2" basedir="src" compression="bzip2"/>
     </target>
 
+    <target name="javadocs" description="Builds javadocs for source code.">
+        <property name="doc.javadocs" value="doc/javadocs"/>
+        <property name="src.dir" value="src"/>
+        <javadoc destdir="${doc.javadocs}"
+                 sourcepath="${src.dir}"
+                 classpath="eMatrixServletRMI.jar"
+                 Author="true" Private="true" Version="true" Use="true" noindex="true"
+                 Windowtitle="DataServerClient API "
+                 Doctitle="DataServerClient API">
+            <bottom>
+                Copyright 2008-2009 The MxUpdate Team&lt;br/&gt;
+                &lt;br/&gt;
+                Licensed under the Apache License, Version 2.0 (the "License")
+                you may not use this file except in compliance with the License.
+                You may obtain a copy of the License at&lt;br/&gt;
+                &lt;br/&gt;
+                  &lt;a href="http://www.apache.org/licenses/LICENSE-2.0"&gt;http://www.apache.org/licenses/LICENSE-2.0&lt;/a&gt;&lt;br/&gt;
+                &lt;br/&gt;
+                Unless required by applicable law or agreed to in writing, software
+                distributed under the License is distributed on an "AS IS" BASIS,
+                WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                See the License for the specific language governing permissions and
+                limitations under the License.
+            </bottom>
+        </javadoc>
+    </target>
 </project>
