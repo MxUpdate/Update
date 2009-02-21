@@ -44,6 +44,13 @@ public final class TypeDef_mxJPO
         extends AbstractValue_mxJPO
 {
     /**
+     * MQL command to list all MxUpdate JPOs.
+     *
+     * @see #defineJPOClass(Context, String)
+     */
+    private static final String MQL_LISTPROG = "list prog org.mxupdate.* select name classname dump '\t'";
+
+    /**
      * Maps from the name of the type definition group to the related type
      * definition group instance.
      *
@@ -174,6 +181,14 @@ public final class TypeDef_mxJPO
     private static final String PREFIX_FILE_SUFFIX = "FileSuffix";
 
     /**
+     * Used file suffix of icon path definitions within the property file.
+     *
+     * @see #defineValue(Context, String, String)
+     * @see #iconPath
+     */
+    private static final String PREFIX_ICONPATH = "Icon";
+
+    /**
      * Used prefix of the JPO name.
      *
      * @see #defineValue(Context, String, String)
@@ -280,13 +295,13 @@ public final class TypeDef_mxJPO
      * names.
      *
      * @see #getMxBusVault()
-     * @see #defineValue(Context, Context, String, String)
+     * @see #defineValue(Context,  String, String)
      */
     private String busVault;
 
     /**
      * Must the matching files matched on last positions? E.g. required if no
-     * {@see #filePrefix} and no {@see #fileSuffix} are defined.
+     * {@link #filePrefix} and no {@link #fileSuffix} are defined.
      *
      * @see #defineValue(Context, String, String)
      */
@@ -319,9 +334,18 @@ public final class TypeDef_mxJPO
     private String fileSuffix;
 
     /**
+     * Stores the path to the icon for the type definition.
+     *
+     * @see #getIconPath()
+     * @see #defineValue(Context, String, String)
+     * @see #PREFIX_ICONPATH
+     */
+    private String iconPath;
+
+    /**
      * Stores the class implementing the MxUpdate functionality.
      *
-     * @see #newTypeInstance()
+     * @see #newTypeInstance(String)
      * @see #defineJPOClass(Context, String)
      */
     private Class<? extends AbstractObject_mxJPO> jpoClass;
@@ -357,10 +381,13 @@ public final class TypeDef_mxJPO
 
     /**
      *
-     * @param _context
-     * @param _key
-     * @param _value
-     * @throws Exception
+     * @param _context  MX context for this request
+     * @param _key      key of the type definition (including the name of type
+     *                  definition and the kind of the type definition
+     *                  separated by a point)
+     * @param _value    value of the related value
+     * @throws Exception if the values could not be defined or the JPO names
+     *                   could not be extracted
      * @see #MAP
      * @see #defineJPOClass(Context, String)
      */
@@ -406,6 +433,8 @@ public final class TypeDef_mxJPO
             typeDef.filePrefix = _value;
         } else if (key.equals(PREFIX_FILE_SUFFIX))  {
             typeDef.fileSuffix = _value;
+        } else if (key.equals(PREFIX_ICONPATH))  {
+            typeDef.iconPath = _value;
         } else if (key.equals(PREFIX_JPO))  {
             typeDef.defineJPOClass(_context, _value);
         } else if (key.equals(PREFIX_TEXT_LOGGING))  {
@@ -459,6 +488,7 @@ public final class TypeDef_mxJPO
      * @param _jpoName  name of searched JPO
      * @throws Exception if the list of MxUdpate JPOs could not evaluated or
      *                   if the related class could not be found
+     * @see #MQL_LISTPROG
      */
     @SuppressWarnings("unchecked")
     private void defineJPOClass(final Context _context,
@@ -466,7 +496,7 @@ public final class TypeDef_mxJPO
             throws Exception
     {
         if (MAP2CLASS.isEmpty())  {
-            final String tmp = MqlUtil_mxJPO.execMql(_context, "list prog org.mxupdate.* select name classname dump '\t'");
+            final String tmp = MqlUtil_mxJPO.execMql(_context, MQL_LISTPROG);
             for (final String line : tmp.split("\n"))  {
                 final String[] arr = line.split("\t");
                 if (arr.length > 1)  {
@@ -649,7 +679,7 @@ public final class TypeDef_mxJPO
      * correct values if the initialize method was called!
      *
      * @return file name prefix of the administration type definition
-     * @see TypeDefValues#filePrefix
+     * @see #filePrefix
      */
     public String getFilePrefix()
     {
@@ -666,6 +696,18 @@ public final class TypeDef_mxJPO
     public String getFileSuffix()
     {
         return this.fileSuffix;
+    }
+
+    /**
+     * Returns the related icon path. The method returns only correct values if
+     * the initialize method was called!
+     *
+     * @return icon path for this type definition
+     * @see #iconPath
+     */
+    public String getIconPath()
+    {
+        return this.iconPath;
     }
 
     /**
@@ -695,7 +737,8 @@ public final class TypeDef_mxJPO
     /**
      *
      * @param _mxName   MX name of the new instance
-     * @return
+     * @return instance of the administration object used for create, update or
+     *                  delete
      * @throws SecurityException
      * @throws NoSuchMethodException
      * @throws IllegalArgumentException

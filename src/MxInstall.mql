@@ -280,5 +280,5 @@ eval  {
   mql compile prog org.mxupdate.*,MxUpdate
   mql verbose off
   
-  mql exec prog "org.mxupdate.install.InstallDataModel" "${VERSION}"
+  mql exec prog "org.mxupdate.install.InstallDataModel" "${sPath}" "${VERSION}"
 }
