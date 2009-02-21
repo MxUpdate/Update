@@ -75,19 +75,19 @@ public final class StringUtil_mxJPO
     /**
      * Converts given string by escaping all special characters for TCL.
      *
-     * @param _text string to convert
+     * @param _text     character stream to convert
      * @return converted string
      */
-    public static String convertTcl(final String _text)
+    public static String convertTcl(final CharSequence _text)
     {
         return (_text != null)
-               ? _text.replaceAll("\\\\", "\\\\\\\\")
-                      .replaceAll("\\\"", "\\\\\"")
-                      .replaceAll("\\" + "$", "\\\\\\" + "$")
-                      .replaceAll("\\{", "\\\\{")
-                      .replaceAll("\\}", "\\\\}")
-                      .replaceAll("\\[", "\\\\[")
-                      .replaceAll("\\]", "\\\\]")
+               ? _text.toString().replaceAll("\\\\", "\\\\\\\\")
+                                 .replaceAll("\\\"", "\\\\\"")
+                                 .replaceAll("\\" + "$", "\\\\\\" + "$")
+                                 .replaceAll("\\{", "\\\\{")
+                                 .replaceAll("\\}", "\\\\}")
+                                 .replaceAll("\\[", "\\\\[")
+                                 .replaceAll("\\]", "\\\\]")
                : "";
     }
 
@@ -95,14 +95,14 @@ public final class StringUtil_mxJPO
      * Converts given string by escaping the &quot; so that in escape mode on
      * string could be handled with &quot; and '.
      *
-     * @param _text string to convert
+     * @param _text     character stream to convert
      * @return converted string
      */
-    public static String convertMql(final String _text)
+    public static String convertMql(final CharSequence _text)
     {
         return (_text != null)
-               ? _text.replaceAll("\\\\", "\\\\\\\\")
-                      .replaceAll("\\\"", "\\\\\"")
+               ? _text.toString().replaceAll("\\\\", "\\\\\\\\")
+                                 .replaceAll("\\\"", "\\\\\"")
                : "";
     }
 
@@ -208,7 +208,7 @@ public final class StringUtil_mxJPO
      * @see #PARAM_FILEDATEFORMAT
      */
     public static String formatFileDate(final ParameterCache_mxJPO _paramCache,
-                                             final Date _date)
+                                        final Date _date)
     {
         final DateFormat fileFormat = new SimpleDateFormat(_paramCache.getValueString(PARAM_FILEDATEFORMAT));
         fileFormat.setTimeZone(TIMEZONE);
