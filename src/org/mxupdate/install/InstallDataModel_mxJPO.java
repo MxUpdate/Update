@@ -136,7 +136,7 @@ public class InstallDataModel_mxJPO
                                     final String _version)
             throws Exception
     {
-        final String progName = _paramCache.getValueString(PARAM_PROGAPPL);
+        final String progName = _paramCache.getValueString(InstallDataModel_mxJPO.PARAM_PROGAPPL);
 
         _paramCache.logInfo("register MxUpdate " + _version);
         execMql(_paramCache.getContext(), new StringBuilder()
@@ -156,9 +156,9 @@ public class InstallDataModel_mxJPO
                                     final String _version)
             throws Exception
     {
-        final String applName = _paramCache.getValueString(PARAM_APPLNAME);
-        final String authorName = _paramCache.getValueString(PARAM_AUTHOR);
-        final String installerName = _paramCache.getValueString(PARAM_INSTALLER);
+        final String applName = _paramCache.getValueString(InstallDataModel_mxJPO.PARAM_APPLNAME);
+        final String authorName = _paramCache.getValueString(InstallDataModel_mxJPO.PARAM_AUTHOR);
+        final String installerName = _paramCache.getValueString(InstallDataModel_mxJPO.PARAM_INSTALLER);
 
         final String fileDate = formatFileDate(_paramCache, new Date());
         final String installedDate = formatInstalledDate(_paramCache, new Date());
@@ -281,10 +281,12 @@ public class InstallDataModel_mxJPO
                 props.add(new StringBuilder()
                             .append(typeDef.getName())
                             .append(".FilePrefix = ")
-                            .append(typeDef.getFilePrefix()).append('\n')
+                            .append(typeDef.getFilePrefix() == null ? "" : typeDef.getFilePrefix())
+                            .append('\n')
                             .append(typeDef.getName())
                             .append(".FileSuffix = ")
-                            .append(typeDef.getFileSuffix()).append('\n')
+                            .append(typeDef.getFileSuffix() == null ? "" : typeDef.getFileSuffix())
+                            .append('\n')
                             .append(typeDef.getName())
                             .append(".Icon = ")
                             .append(icon).toString());
