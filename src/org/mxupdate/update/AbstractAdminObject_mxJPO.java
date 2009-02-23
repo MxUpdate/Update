@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.Writer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +33,6 @@ import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
@@ -115,14 +113,15 @@ public abstract class AbstractAdminObject_mxJPO
 
     /**
      * Creates a XML representation of the Object to export, parses them and
-     * executes the post preparation {@link #prepare(Context)}.
+     * executes the post preparation {@link #prepare(ParameterCache_mxJPO)}.
      *
      * @param _paramCache   parameter cache
-     * @see #getExportMQL(String)       used to get the MQL command to get a
-     *                                  XML representation
-     * @see PadSaxHandler               SAX handler to parse the XML file
-     * @see #parse(String, String)      parser called within the SAX handler
-     * @see #prepare(Context)           called post preparation method
+     * @see #getExportMQL()                 used to get the MQL command to get
+     *                                      a XML representation
+     * @see PadSaxHandler                   SAX handler to parse the XML file
+     * @see #parse(String, String)          parser called within the SAX
+     *                                      handler
+     * @see #prepare(ParameterCache_mxJPO)  called post preparation method
      */
     @Override
     protected void parse(final ParameterCache_mxJPO _paramCache)
@@ -261,11 +260,12 @@ public abstract class AbstractAdminObject_mxJPO
      *
      * @param _paramCache   parameter cache
      * @param _out          writer instance
-     * @throws IOException
+     * @throws IOException  if the write of the TCL update to the writer
+     *                      instance failed
      */
     @Override
     protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Writer _out)
+                         final Appendable _out)
             throws IOException
     {
         this.writeHeader(_paramCache, _out);
@@ -307,7 +307,7 @@ public abstract class AbstractAdminObject_mxJPO
     {
     }
 
-    protected void writeProperties(final Writer _out)
+    protected void writeProperties(final Appendable _out)
             throws IOException
     {
         for (final Property prop : this.propertiesMap.values())  {
@@ -529,10 +529,10 @@ public abstract class AbstractAdminObject_mxJPO
     /**
      * The string representation of this administration object is returned.
      * The string representation is the MQL update script and so method
-     * {@link #write(Writer)} is called.
+     * {@link #write(ParameterCache_mxJPO, Appendable)} is called.
      *
      * @return string representation of this administration object
-     * @see #write(Writer)
+     * @see #write(ParameterCache_mxJPO, Appendable)
      */
     @Override
     public String toString()

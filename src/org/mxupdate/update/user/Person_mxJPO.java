@@ -22,7 +22,6 @@ package org.mxupdate.update.user;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,7 +37,6 @@ import matrix.util.MatrixException;
 import matrix.util.StringList;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.AbstractPropertyObject_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
@@ -169,7 +167,7 @@ public class Person_mxJPO
 
     @Override
     protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Writer _out)
+                         final Appendable _out)
             throws IOException
     {
         this.personAdmin.write(_paramCache, _out);
@@ -201,9 +199,9 @@ public class Person_mxJPO
 
         /**
          * Because the original method
-         * {@link AbstractPropertyObject_mxJPO#parse(Context,String)} is
+         * {@link AbstractPropertyObject_mxJPO#parse(ParameterCache_mxJPO)} is
          * protected, but called from
-         * {@link Person_mxJPO#export(Context, File, String)}, the original
+         * {@link Person_mxJPO#parse(ParameterCache_mxJPO)}, the original
          * method must be overwritten and only called. So the original method
          * could be used to parse the business administration part of the
          * person.
@@ -218,26 +216,6 @@ public class Person_mxJPO
         }
 
         /**
-         * Because the original method
-         * {@link AbstractPropertyObject_mxJPO#getFileName()} is
-         * protected, but called from
-         * {@link Person_mxJPO#export(Context, File, String)}, the original
-         * method must be overwritten and only called.
-         *
-         * @return file name
-         */
-        @Override
-        protected String getFileName()
-        {
-            return super.getFileName();
-        }
-
-        /**
-         * Because the original method
-         * {@link AbstractAdminObject_mxJPO#write(ParameterCache_mxJPO,Writer)}
-         * is protected, but called from
-         * {@link Person_mxJPO#export(Context, File, String)}, the
-         * original method must be overwritten and only called.
          *
          * @param _paramCache   parameter cache
          * @param _out          writer instance
@@ -245,8 +223,8 @@ public class Person_mxJPO
          *                     be written
          */
         @Override
-        protected void write(final ParameterCache_mxJPO _paramCache,
-                             final Writer _out)
+        public void write(final ParameterCache_mxJPO _paramCache,
+                          final Appendable _out)
                 throws IOException
         {
             this.writeHeader(_paramCache, _out);
@@ -439,8 +417,8 @@ public class Person_mxJPO
          * @throws IOException if the TCL update code could not written
          */
         @Override
-        protected void write(final ParameterCache_mxJPO _paramCache,
-                             final Writer _out)
+        public void write(final ParameterCache_mxJPO _paramCache,
+                          final Appendable _out)
                 throws IOException
         {
             _out.append("mql mod bus \"${OBJECTID}\"")

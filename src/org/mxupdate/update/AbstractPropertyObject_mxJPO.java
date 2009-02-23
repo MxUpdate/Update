@@ -22,21 +22,16 @@ package org.mxupdate.update;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import matrix.db.Context;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.util.JPOCaller_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
-import static org.mxupdate.update.util.StringUtil_mxJPO.formatFileDate;
-import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
+import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * @author Tim Moxter
@@ -54,7 +49,7 @@ public abstract class AbstractPropertyObject_mxJPO
      * String of the key within the parameter cache for the export application
      * parameter.
      *
-     * @see #writeHeader(ParameterCache_mxJPO, Writer)
+     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
      */
     private static final String PARAM_EXPORTAPPLICATION = "ExportApplication";
 
@@ -62,7 +57,7 @@ public abstract class AbstractPropertyObject_mxJPO
      * String of the key within the parameter cache for the export author
      * parameter.
      *
-     * @see #writeHeader(ParameterCache_mxJPO, Writer)
+     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
      */
     private static final String PARAM_EXPORTAUTHOR = "ExportAuthor";
 
@@ -70,7 +65,7 @@ public abstract class AbstractPropertyObject_mxJPO
      * String of the key within the parameter cache for the export installer
      * parameter.
      *
-     * @see #writeHeader(ParameterCache_mxJPO, Writer)
+     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
      */
     private static final String PARAM_EXPORTINSTALLER = "ExportInstaller";
 
@@ -78,7 +73,7 @@ public abstract class AbstractPropertyObject_mxJPO
      * String of the key within the parameter cache for the export original
      * name parameter.
      *
-     * @see #writeHeader(ParameterCache_mxJPO, Writer)
+     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
      */
     private static final String PARAM_EXPORTORIGINALNAME = "ExportOriginalName";
 
@@ -86,55 +81,55 @@ public abstract class AbstractPropertyObject_mxJPO
      * String of the key within the parameter cache for the export version
      * parameter.
      *
-     * @see #writeHeader(ParameterCache_mxJPO, Writer)
+     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
      */
     private static final String PARAM_EXPORTVERSION = "ExportVersion";
 
     /**
      * Header string of the application.
      *
-     * @see #writeHeader(Writer)
-     * @see #update(ParameterCache_mxJPO, String, File, String)
+     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, File, String)
      */
     private static final String HEADER_APPLICATION = "\n# APPLICATION:\n# ~~~~~~~~~~~~\n#";
 
     /**
      * Header string of the author.
      *
-     * @see #writeHeader(Writer)
-     * @see #update(ParameterCache_mxJPO, String, File, String)
+     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, File, String)
      */
     private static final String HEADER_AUTHOR = "\n# AUTHOR:\n# ~~~~~~~\n#";
 
     /**
      * Header string of the installer name.
      *
-     * @see #writeHeader(Writer)
-     * @see #update(ParameterCache_mxJPO, String, File, String)
+     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, File, String)
      */
     private static final String HEADER_INSTALLER = "\n# INSTALLER:\n# ~~~~~~~~~~\n#";
 
     /**
      * Header string of the original name.
      *
-     * @see #writeHeader(Writer)
-     * @see #update(ParameterCache_mxJPO, String, File, String)
+     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, File, String)
      */
     private static final String HEADER_ORIGINALNAME = "\n# ORIGINAL NAME:\n# ~~~~~~~~~~~~~~\n#";
 
     /**
      * Header string of the symbolic name.
      *
-     * @see #writeHeader(Writer)
-     * @see #defineSymbolicName(Map, StringBuilder)
+     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
+     * @see #extractSymbolicNameFromCode(ParameterCache_mxJPO, StringBuilder)
      */
     private static final String HEADER_SYMBOLIC_NAME = "\n# SYMBOLIC NAME:\n# ~~~~~~~~~~~~~~\n#";
 
     /**
      * Header string of the version.
      *
-     * @see #writeHeader(Writer)
-     * @see #update(ParameterCache_mxJPO, String, File, String)
+     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, File, String)
      */
     private static final String HEADER_VERSION = "\n# VERSION:\n# ~~~~~~~~\n#";
 
@@ -178,7 +173,7 @@ public abstract class AbstractPropertyObject_mxJPO
      * @see #PARAM_EXPORTVERSION
      */
     protected void writeHeader(final ParameterCache_mxJPO _paramCache,
-                               final Writer _out)
+                               final Appendable _out)
             throws IOException
     {
         final String headerText = this.getTypeDef().getTitle();
@@ -189,10 +184,10 @@ public abstract class AbstractPropertyObject_mxJPO
             _out.append("~");
         }
         _out.append("\n")
-            .append("# ").append(getName()).append("\n");
+            .append("# ").append(this.getName()).append("\n");
         // symbolic name only if an administration type is defined
         if (this.getTypeDef().getMxAdminName() != null)  {
-            _out.append('#').append(HEADER_SYMBOLIC_NAME).append(' ');
+            _out.append('#').append(AbstractPropertyObject_mxJPO.HEADER_SYMBOLIC_NAME).append(' ');
             if (this.getSymblicNames().isEmpty())  {
                 final StringBuilder symbName = new StringBuilder()
                         .append(this.getTypeDef().getMxAdminName())
@@ -217,8 +212,9 @@ public abstract class AbstractPropertyObject_mxJPO
         }
         // original name
         // (only if an administration type and related parameter is defined)
-        if ((this.getTypeDef().getMxAdminName() != null) && _paramCache.getValueBoolean(PARAM_EXPORTORIGINALNAME))  {
-            _out.append('#').append(HEADER_ORIGINALNAME);
+        if ((this.getTypeDef().getMxAdminName() != null)
+                && _paramCache.getValueBoolean(AbstractPropertyObject_mxJPO.PARAM_EXPORTORIGINALNAME))  {
+            _out.append('#').append(AbstractPropertyObject_mxJPO.HEADER_ORIGINALNAME);
             if ((this.getOriginalName() != null) && !"".equals(this.getOriginalName()))  {
                 _out.append(" ").append(this.getOriginalName()).append('\n');
             } else {
@@ -248,8 +244,8 @@ public abstract class AbstractPropertyObject_mxJPO
             _out.append("#\n");
         }
         // write header
-        if (_paramCache.getValueBoolean(PARAM_EXPORTAUTHOR))  {
-            _out.append('#').append(HEADER_AUTHOR);
+        if (_paramCache.getValueBoolean(AbstractPropertyObject_mxJPO.PARAM_EXPORTAUTHOR))  {
+            _out.append('#').append(AbstractPropertyObject_mxJPO.HEADER_AUTHOR);
             if ((this.getAuthor() != null) && !"".equals(this.getAuthor()))  {
                 _out.append(" ").append(this.getAuthor()).append('\n');
             } else {
@@ -257,8 +253,8 @@ public abstract class AbstractPropertyObject_mxJPO
             }
         }
         // write installer
-        if (_paramCache.getValueBoolean(PARAM_EXPORTINSTALLER))  {
-            _out.append('#').append(HEADER_INSTALLER);
+        if (_paramCache.getValueBoolean(AbstractPropertyObject_mxJPO.PARAM_EXPORTINSTALLER))  {
+            _out.append('#').append(AbstractPropertyObject_mxJPO.HEADER_INSTALLER);
             if ((this.getInstaller() != null) && !"".equals(this.getInstaller()))  {
                 _out.append(" ").append(this.getInstaller()).append('\n');
             } else {
@@ -266,8 +262,8 @@ public abstract class AbstractPropertyObject_mxJPO
             }
         }
         // write application
-        if (_paramCache.getValueBoolean(PARAM_EXPORTAPPLICATION))  {
-            _out.append('#').append(HEADER_APPLICATION);
+        if (_paramCache.getValueBoolean(AbstractPropertyObject_mxJPO.PARAM_EXPORTAPPLICATION))  {
+            _out.append('#').append(AbstractPropertyObject_mxJPO.HEADER_APPLICATION);
             if ((this.getApplication() != null) && !"".equals(this.getApplication()))  {
                 _out.append(" ").append(this.getApplication()).append('\n');
             } else {
@@ -275,8 +271,8 @@ public abstract class AbstractPropertyObject_mxJPO
             }
         }
         // write version
-        if (_paramCache.getValueBoolean(PARAM_EXPORTVERSION))  {
-            _out.append('#').append(HEADER_VERSION);
+        if (_paramCache.getValueBoolean(AbstractPropertyObject_mxJPO.PARAM_EXPORTVERSION))  {
+            _out.append('#').append(AbstractPropertyObject_mxJPO.HEADER_VERSION);
             if ((this.getVersion() != null) && !"".equals(this.getVersion()))  {
                 _out.append(" ").append(this.getVersion()).append('\n');
             } else {
@@ -291,7 +287,7 @@ public abstract class AbstractPropertyObject_mxJPO
      * Updates this administration (business) object if the stored information
      * about the version is not the same as the file date. If an update is
      * required, the file is read and the object is updated with
-     * {@link #update(Context, CharSequence, CharSequence, Map)}.
+     * {@link #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)}.
      *
      * @param _paramCache       parameter cache
      * @param _file             file with TCL update code
@@ -299,7 +295,7 @@ public abstract class AbstractPropertyObject_mxJPO
      *                          (or <code>null</code> if the version must not
      *                          be set).
      * @throws Exception if the update from the derived class failed
-     * @see #update(Context, CharSequence, CharSequence, Map)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      * @see #extractFromCode(StringBuilder, String, String)
      * @see #extractSymbolicNameFromCode(ParameterCache_mxJPO,StringBuilder)
      * @see #HEADER_APPLICATION
@@ -324,7 +320,7 @@ public abstract class AbstractPropertyObject_mxJPO
         final Map<String,String> tclVariables = new HashMap<String,String>();
         if (_newVersion == null)  {
             tclVariables.put(AdminPropertyDef.VERSION.name(),
-                              this.extractFromCode(code, HEADER_VERSION, ""));
+                              this.extractFromCode(code, AbstractPropertyObject_mxJPO.HEADER_VERSION, ""));
         } else  {
             tclVariables.put(AdminPropertyDef.VERSION.name(), _newVersion);
         }
@@ -335,7 +331,7 @@ public abstract class AbstractPropertyObject_mxJPO
             author = _paramCache.getValueString(ParameterCache_mxJPO.KEY_AUTHOR);
         } else  {
             author = this.extractFromCode(code,
-                                          HEADER_AUTHOR,
+                                          AbstractPropertyObject_mxJPO.HEADER_AUTHOR,
                                           _paramCache.getValueString(ParameterCache_mxJPO.KEY_DEFAULTAUTHOR));
         }
         tclVariables.put(AdminPropertyDef.AUTHOR.name(), author);
@@ -346,7 +342,7 @@ public abstract class AbstractPropertyObject_mxJPO
             appl = _paramCache.getValueString(ParameterCache_mxJPO.KEY_APPLICATION);
         } else  {
             appl = this.extractFromCode(code,
-                                        HEADER_APPLICATION,
+                                        AbstractPropertyObject_mxJPO.HEADER_APPLICATION,
                                         _paramCache.getValueString(ParameterCache_mxJPO.KEY_DEFAULTAPPLICATION));
         }
         tclVariables.put(AdminPropertyDef.APPLICATION.name(), appl);
@@ -357,7 +353,7 @@ public abstract class AbstractPropertyObject_mxJPO
             installer = _paramCache.getValueString(ParameterCache_mxJPO.KEY_INSTALLER);
         } else  {
             installer = this.extractFromCode(code,
-                                             HEADER_INSTALLER,
+                                             AbstractPropertyObject_mxJPO.HEADER_INSTALLER,
                                              _paramCache.getValueString(ParameterCache_mxJPO.KEY_DEFAULTINSTALLER));
         }
         tclVariables.put(AdminPropertyDef.INSTALLER.name(), installer);
@@ -378,7 +374,7 @@ public abstract class AbstractPropertyObject_mxJPO
 
         // define file date
         tclVariables.put(AdminPropertyDef.FILEDATE.name(),
-                         formatFileDate(_paramCache, new Date(_file.lastModified())));
+                         StringUtil_mxJPO.formatFileDate(_paramCache, new Date(_file.lastModified())));
 
         this.update(_paramCache, "", "", "", tclVariables, _file);
     }
@@ -449,7 +445,7 @@ public abstract class AbstractPropertyObject_mxJPO
                                     .append("_")
                                     .append(this.getName().replaceAll(" ", "").replaceAll("/", ""))
                                     .toString();
-            codeSymbName = this.extractFromCode(_code, HEADER_SYMBOLIC_NAME, null);
+            codeSymbName = this.extractFromCode(_code, AbstractPropertyObject_mxJPO.HEADER_SYMBOLIC_NAME, null);
             if (codeSymbName == null)  {
                 _paramCache.logError("No symbolic name defined! So '" + symbName + "' will be used.");
                 codeSymbName = symbName;
@@ -517,7 +513,7 @@ public abstract class AbstractPropertyObject_mxJPO
         // define all TCL variables
         for (final Map.Entry<String, String> entry : _tclVariables.entrySet())  {
             cmd.append("set ").append(entry.getKey())
-               .append(" \"").append(convertTcl(entry.getValue())).append("\"\n");
+               .append(" \"").append(StringUtil_mxJPO.convertTcl(entry.getValue())).append("\"\n");
         }
         // append TCL code, end of TCL mode and post MQL statements
         // (source with the file must be replace for windows ...)
@@ -525,13 +521,13 @@ public abstract class AbstractPropertyObject_mxJPO
            .append("\nsource \"").append(_sourceFile.toString().replaceAll("\\\\", "/")).append("\"")
            .append("\n}\nexit;\n")
            .append(_postMQLCode)
-           .append("output '';output '").append(TEST_EXECUTED).append("';");
+           .append("output '';output '").append(AbstractPropertyObject_mxJPO.TEST_EXECUTED).append("';");
 
         // execute update
         JPOCaller_mxJPO.defineInstance(_paramCache, this);
         try  {
-            final String[] ret = execMql(_paramCache.getContext(), cmd).split("\n");
-            if (!TEST_EXECUTED.equals(ret[ret.length - 1]))  {
+            final String[] ret = MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd).split("\n");
+            if (!AbstractPropertyObject_mxJPO.TEST_EXECUTED.equals(ret[ret.length - 1]))  {
                 throw new Exception("Execution of the update was not complete! Update Failed!");
             }
         } finally  {

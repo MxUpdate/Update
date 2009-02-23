@@ -22,7 +22,6 @@ package org.mxupdate.update;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,13 +44,8 @@ import matrix.util.StringList;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
-import static org.mxupdate.update.util.StringUtil_mxJPO.formatInstalledDate;
-import static org.mxupdate.update.util.StringUtil_mxJPO.match;
-import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
-import static org.mxupdate.util.MqlUtil_mxJPO.setHistoryOff;
-import static org.mxupdate.util.MqlUtil_mxJPO.setHistoryOn;
+import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * @author Tim Moxter
@@ -88,7 +82,7 @@ public class BusObject_mxJPO
     /**
      * Sorted set of attribute values.
      *
-     * @see #parse(ParameterCache_mxJPO, String)
+     * @see #parse(ParameterCache_mxJPO)
      * @see #getAttrValuesSorted()
      */
     private final Set<AttributeValue> attrValuesSorted = new TreeSet<AttributeValue>();
@@ -96,7 +90,7 @@ public class BusObject_mxJPO
     /**
      * Name of business object.
      *
-     * @see #parse(ParameterCache_mxJPO, String)
+     * @see #parse(ParameterCache_mxJPO)
      * @see #getBusName()
      */
     private final String busName;
@@ -104,7 +98,7 @@ public class BusObject_mxJPO
     /**
      * Revision of business object.
      *
-     * @see #parse(ParameterCache_mxJPO, String)
+     * @see #parse(ParameterCache_mxJPO)
      * @see #getBusRevision()
      */
     private final String busRevision;
@@ -112,7 +106,7 @@ public class BusObject_mxJPO
     /**
      * Vault of the business object.
      *
-     * @see #parse(ParameterCache_mxJPO, String)
+     * @see #parse(ParameterCache_mxJPO)
      */
     private String busVault;
 
@@ -120,7 +114,7 @@ public class BusObject_mxJPO
      * Description of the business object (because the description within the
      * header of the TCL file includes the revision of the business object).
      *
-     * @see #parse(ParameterCache_mxJPO, String)
+     * @see #parse(ParameterCache_mxJPO)
      * @see #getBusDescription()
      */
     private String busDescription;
@@ -128,7 +122,7 @@ public class BusObject_mxJPO
     /**
      * Current state of the related business object.
      *
-     * @see #parse(ParameterCache_mxJPO, String)
+     * @see #parse(ParameterCache_mxJPO)
      * @see #getBusCurrent()
      */
     private String busCurrent;
@@ -136,14 +130,14 @@ public class BusObject_mxJPO
     /**
      * All possible states of the related business object.
      *
-     * @see #parse(ParameterCache_mxJPO, String)
+     * @see #parse(ParameterCache_mxJPO)
      */
     private StringList busStates;
 
     /**
      * Object id of the business object.
      *
-     * @see #parse(ParameterCache_mxJPO, String)
+     * @see #parse(ParameterCache_mxJPO)
      * @see #getBusOid()
      */
     private String busOid;
@@ -151,8 +145,8 @@ public class BusObject_mxJPO
     /**
      * Holds all connected objects.
      *
-     * @see #parse(ParameterCache_mxJPO, String)
-     * @see #write(ParameterCache_mxJPO, Writer)
+     * @see #parse(ParameterCache_mxJPO)
+     * @see #write(ParameterCache_mxJPO, Appendable)
      */
     private final Set<Connection> connections = new TreeSet<Connection>();
 
@@ -168,7 +162,7 @@ public class BusObject_mxJPO
         super(_typeDef, _mxName);
 
         if (_mxName != null)  {
-            final String[] nameRev = this.getName().split(SPLIT_NAME);
+            final String[] nameRev = this.getName().split(BusObject_mxJPO.SPLIT_NAME);
             this.busName = nameRev[0];
             this.busRevision = (nameRev.length > 1) ? nameRev[1] : "";
         } else  {
@@ -208,7 +202,7 @@ public class BusObject_mxJPO
             final String busRevision = (String) map.getSelectDataList("revision").get(0);
             final StringBuilder name = new StringBuilder().append(busName);
             if ((busRevision != null) && !"".equals(busRevision))  {
-                name.append(SPLIT_NAME).append(busRevision);
+                name.append(BusObject_mxJPO.SPLIT_NAME).append(busRevision);
             }
             ret.add(name.toString());
         }
@@ -232,8 +226,9 @@ public class BusObject_mxJPO
                                final String _mxName,
                                final String _match)
     {
-        final String[] nameRev = _mxName.split(SPLIT_NAME);
-        return (match(nameRev[0], _match) || ((nameRev.length > 1) && match(nameRev[1], _match)));
+        final String[] nameRev = _mxName.split(BusObject_mxJPO.SPLIT_NAME);
+        return (StringUtil_mxJPO.match(nameRev[0], _match)
+                || ((nameRev.length > 1) && StringUtil_mxJPO.match(nameRev[1], _match)));
     }
 
     /**
@@ -356,14 +351,14 @@ public class BusObject_mxJPO
             throws MatrixException
     {
         // get attributes from relationship
-        final Map<String,Map> cache = _paramCache.defineValueMap(PARAM_RELATION_ATTRS, Map.class);
+        final Map<String,Map> cache = _paramCache.defineValueMap(BusObject_mxJPO.PARAM_RELATION_ATTRS, Map.class);
         Map<String,String> attrs = cache.get(_relation);
         if (attrs == null)
         {
             attrs = new HashMap<String,String>();
             cache.put(_relation, attrs);
 
-            final String attrStr = execMql(_paramCache.getContext(),
+            final String attrStr = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
                     new StringBuilder("escape print rel \"").append(_relation)
                             .append("\" select attribute dump '\n'"));
             if (!"".equals(attrStr))  {
@@ -414,12 +409,14 @@ public class BusObject_mxJPO
      */
     @Override
     protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Writer _out)
+                         final Appendable _out)
             throws IOException
     {
         this.writeHeader(_paramCache, _out);
         _out.append("mql mod bus \"${OBJECTID}\"")
-            .append(" \\\n    description \"").append(convertTcl(this.busDescription)).append("\"");
+            .append(" \\\n    description \"")
+            .append(StringUtil_mxJPO.convertTcl(this.busDescription))
+            .append("\"");
         for (final AttributeValue attr : this.attrValuesSorted)  {
             attr.write(_out);
         }
@@ -519,11 +516,12 @@ public class BusObject_mxJPO
         final Set<String> ignoreAttrs = (this.getTypeDef().getMxBusIgnoredAttributes() == null)
                                         ? new HashSet<String>(0)
                                         : new HashSet<String>(this.getTypeDef().getMxBusIgnoredAttributes());
-        final Map<String,String> defaultAttrValues = _paramCache.defineValueMap(PARAM_DEFAULT_ATTRS, String.class);
+        final Map<String,String> defaultAttrValues
+                = _paramCache.defineValueMap(BusObject_mxJPO.PARAM_DEFAULT_ATTRS, String.class);
         for (final AttributeValue attr : this.attrValuesSorted)  {
             if (!ignoreAttrs.contains(attr.name))  {
                 if (!defaultAttrValues.containsKey(attr.name))  {
-                    final String def = execMql(_paramCache.getContext(),
+                    final String def = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
                                                new StringBuilder().append("print attr '")
                                                        .append(attr.name).append("' select default dump"));
                     defaultAttrValues.put(attr.name, def);
@@ -560,7 +558,7 @@ public class BusObject_mxJPO
                         .append("\" \"").append(_tclVariables.get(AdminPropertyDef.FILEDATE.name())).append('\"');
         // is installed date property defined?
         if ((this.getInstallationDate() == null) || "".equals(this.getInstallationDate()))  {
-            final String date = formatInstalledDate(_paramCache, new Date());
+            final String date = StringUtil_mxJPO.formatInstalledDate(_paramCache, new Date());
             _paramCache.logTrace("    - define installed date '" + date + "'");
             postMQLCode.append(" \"").append(AdminPropertyDef.INSTALLEDDATE.getAttrName())
                     .append("\" \"").append(date).append('\"');
@@ -595,10 +593,10 @@ public class BusObject_mxJPO
 
         // update must be done with history off (because not required...)
         try  {
-            setHistoryOff(_paramCache.getContext());
+            MqlUtil_mxJPO.setHistoryOff(_paramCache.getContext());
             super.update(_paramCache, preMQLCode, postMQLCode, _preTCLCode, tclVariables, _sourceFile);
         } finally  {
-            setHistoryOn(_paramCache.getContext());
+            MqlUtil_mxJPO.setHistoryOn(_paramCache.getContext());
         }
     }
 
@@ -699,7 +697,7 @@ public class BusObject_mxJPO
      * done depending on the numbers.
      */
     protected class AttributeValue
-            implements Comparable<AttributeValue>
+            implements Comparable<BusObject_mxJPO.AttributeValue>
     {
         /**
          * Holds the user references of a user access.
@@ -741,7 +739,7 @@ public class BusObject_mxJPO
          * attribute values are not used to compare. If the attribute names
          * includes numbers and the attribute names has the same prefix (before
          * the numbers), the numbers are compared as integer.<br/>
-         * <b/>Examples:</b><br/>
+         * <b>Examples:</b><br/>
          * Temp &gt; Name<br/>
          * Temp = Temp<br/>
          * Temp 5 &lt Temp 10
@@ -781,8 +779,8 @@ public class BusObject_mxJPO
         public void write(final Appendable _out)
                 throws IOException
         {
-            _out.append(" \\\n    \"").append(convertTcl(this.name))
-                .append("\" \"").append(convertTcl(this.value)).append("\"");
+            _out.append(" \\\n    \"").append(StringUtil_mxJPO.convertTcl(this.name))
+                .append("\" \"").append(StringUtil_mxJPO.convertTcl(this.value)).append("\"");
         }
    }
 
@@ -792,7 +790,7 @@ public class BusObject_mxJPO
      * business object.
      */
     private class Connection
-            implements Comparable<Connection>
+            implements Comparable<BusObject_mxJPO.Connection>
     {
         /**
          * Type of the business object.
@@ -827,7 +825,7 @@ public class BusObject_mxJPO
         /**
          * Set of all attribute values of this connection.
          */
-        final Set<AttributeValue> values = new TreeSet<AttributeValue>();
+        final Set<BusObject_mxJPO.AttributeValue> values = new TreeSet<BusObject_mxJPO.AttributeValue>();
 
         /**
          * Constructor to create a new connection instance.
@@ -882,8 +880,7 @@ public class BusObject_mxJPO
          * <li>if equal compare business object type</li>
          * <li>if equal compare business object name</li>
          * <li>if equal compare business object revision</li>
-         * <li>if equal compare attributes with
-         *     {@link #compareToAttr(Connection)}</li>
+         * <li>if equal compare attributes with {@link #compareToAttr}</li>
          * </ul>
          *
          * @param _compare      connection instance to compare
@@ -893,6 +890,7 @@ public class BusObject_mxJPO
          *         connection; a value greater than <code>0</code> if this
          *         connection is lexicographically greater than the compared
          *         connection
+         * @see #compareToAttr
          */
         public int compareTo(final Connection _compare)
         {
@@ -923,10 +921,10 @@ public class BusObject_mxJPO
          *         <code>0</code> if one attribute value is lexicographically
          *         greater than the other attribute value
          */
-        private int compareToAttr(final Connection _compare)
+        protected int compareToAttr(final Connection _compare)
         {
-            final Iterator<AttributeValue> thisIter = this.values.iterator();
-            final Iterator<AttributeValue> compIter = _compare.values.iterator();
+            final Iterator<BusObject_mxJPO.AttributeValue> thisIter = this.values.iterator();
+            final Iterator<BusObject_mxJPO.AttributeValue> compIter = _compare.values.iterator();
             int ret = 0;
             while (thisIter.hasNext() && (ret == 0))  {
                 ret = thisIter.next().value.compareTo(compIter.next().value);
@@ -937,12 +935,17 @@ public class BusObject_mxJPO
         }
 
         /**
-         * Writes the attribute name and value to the TCL update file.
+         * Writes the TCL update to connect this connection to given business
+         * object and given attribute values.
          *
          * @param _out          appendable instance to the TCL update file
          * @throws IOException if attribute information could not be written
+         * @see #relName
+         * @see #direction
+         * @see #type
          * @see #name
-         * @see #value
+         * @see #revision
+         * @see #values
          */
         public void write(final Appendable _out)
                 throws IOException
@@ -950,9 +953,9 @@ public class BusObject_mxJPO
             _out.append("\nmql connect bus \"${OBJECTID}\" \\")
                 .append("\n    relationship \"").append(this.relName).append("\" \\")
                 .append("\n    ").append(this.direction).append(" \"")
-                    .append(convertTcl(this.type)).append("\" \"")
-                    .append(convertTcl(this.name)).append("\" \"")
-                    .append(convertTcl(this.revision)).append("\"");
+                    .append(StringUtil_mxJPO.convertTcl(this.type)).append("\" \"")
+                    .append(StringUtil_mxJPO.convertTcl(this.name)).append("\" \"")
+                    .append(StringUtil_mxJPO.convertTcl(this.revision)).append("\"");
             for (final AttributeValue attr : this.values)  {
                 attr.write(_out);
             }

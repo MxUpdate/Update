@@ -21,7 +21,6 @@
 package org.mxupdate.update.datamodel;
 
 import java.io.IOException;
-import java.io.Writer;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AttributeDef;
@@ -66,7 +65,7 @@ public class NumberGenerator_mxJPO
      */
     @Override
     protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Writer _out)
+                         final Appendable _out)
             throws IOException
     {
         this.writeHeader(_paramCache, _out);

@@ -22,17 +22,14 @@ package org.mxupdate.update.program;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Set;
 import java.util.TreeSet;
 
-import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
+import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * The class is used to export, create, delete and update JPOs within MX.
@@ -54,7 +51,7 @@ public class JPO_mxJPO
      * must not be changed or formatted in another way. Otherwise the test for
      * doubled backslashes fails....
      *
-     * @see #write(ParameterCache_mxJPO, Writer)
+     * @see #write(ParameterCache_mxJPO, Appendable)
      */
     @SuppressWarnings("unused")
     private static final String JPO_REPLACE_TEST = "\\";
@@ -63,7 +60,7 @@ public class JPO_mxJPO
      * String with name suffix (used also from the extract routine from
      * Matrix).
      *
-     * @see #export(Context, File, String)
+     * @see #export(ParameterCache_mxJPO, File)
      */
     private static final String NAME_SUFFIX = "_" + "mxJPO";
 
@@ -71,7 +68,7 @@ public class JPO_mxJPO
      * Defines the parameter to cache the information if the backslashes within
      * MX are doubled (old MX versions) or not (new MX versions).
      *
-     * @see #write(ParameterCache_mxJPO, Writer)
+     * @see #write(ParameterCache_mxJPO, Appendable)
      */
     private static final String PARAM_BACKSLASHDOUBLED = "JPOBackslashDoubled";
 
@@ -79,7 +76,7 @@ public class JPO_mxJPO
      * Defines the parameter to define the string where the TCL update code
      * starts.
      *
-     * @see #update(ParameterCache_mxJPO, String, File, String)
+     * @see #update(ParameterCache_mxJPO, File, String)
      */
     private static final String PARAM_MARKSTART = "JPOTclUpdateMarkStart";
 
@@ -87,7 +84,7 @@ public class JPO_mxJPO
      * Defines the parameter to define the string where the TCL update code
      * ends.
      *
-     * @see #update(ParameterCache_mxJPO, String, File, String)
+     * @see #update(ParameterCache_mxJPO, File, String)
      */
     private static final String PARAM_MARKEND = "JPOTclUpdateMarkEnd";
 
@@ -95,7 +92,7 @@ public class JPO_mxJPO
      * Defines the parameter to define if embedded TCL update code within JPOs
      * must be executed.
      *
-     * @see #update(ParameterCache_mxJPO, String, File, String)
+     * @see #update(ParameterCache_mxJPO, File, String)
      */
     private static final String PARAM_NEEDED = "JPOTclUpdateNeeded";
 
@@ -126,7 +123,7 @@ public class JPO_mxJPO
         final StringBuilder cmd = new StringBuilder()
                 .append("list program * select name isjavaprogram dump \"\t\"");
         final Set<String> ret = new TreeSet<String>();
-        for (final String name : execMql(_paramCache.getContext(), cmd).split("\n"))  {
+        for (final String name : MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd).split("\n"))  {
             if (!"".equals(name))  {
                 final String[] nameArr = name.split("\t");
                 if ("TRUE".equals(nameArr[1]))  {
@@ -166,7 +163,7 @@ public class JPO_mxJPO
      */
     @Override
     protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Writer _out)
+                         final Appendable _out)
             throws IOException, MatrixException
     {
         // define package name (if points within JPO name)
@@ -178,26 +175,26 @@ public class JPO_mxJPO
         }
 
         // old MX style or new? (means backslashes are doubled...)
-        final Boolean backslashDoubledVal = _paramCache.getValueBoolean(PARAM_BACKSLASHDOUBLED);
+        final Boolean backslashDoubledVal = _paramCache.getValueBoolean(JPO_mxJPO.PARAM_BACKSLASHDOUBLED);
         final boolean backslashDoubled;
         if (backslashDoubledVal == null)  {
-            final String code = execMql(_paramCache.getContext(),
+            final String code = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
                                         "print prog org.mxupdate.update.program.JPO select code dump");
             final int start = code.indexOf("JPO_REPLACE_TEST");
             final int end = code.indexOf('\n', start);
             backslashDoubled = code.substring(start + 20, end - 2).length() == 4;
-            _paramCache.defineValueBoolean(PARAM_BACKSLASHDOUBLED, backslashDoubled);
+            _paramCache.defineValueBoolean(JPO_mxJPO.PARAM_BACKSLASHDOUBLED, backslashDoubled);
         } else  {
             backslashDoubled = backslashDoubledVal;
         }
 
         // replace class names and references to other JPOs
-        final String name = this.getName() + NAME_SUFFIX;
+        final String name = this.getName() + JPO_mxJPO.NAME_SUFFIX;
         final StringBuilder cmd = new StringBuilder()
                 .append("print program \"").append(this.getName()).append("\" select code dump");
-        final String code = execMql(_paramCache.getContext(), cmd)
+        final String code = MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd)
                                 .replaceAll("\\" + "$\\{CLASSNAME\\}", name.replaceAll(".*\\.", ""))
-                                .replaceAll("(?<=\\"+ "$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", NAME_SUFFIX)
+                                .replaceAll("(?<=\\"+ "$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", JPO_mxJPO.NAME_SUFFIX)
                                 .replaceAll("\\" + "$\\{CLASS\\:", "")
                                 .trim();
 
@@ -222,7 +219,7 @@ public class JPO_mxJPO
         final StringBuilder cmd = new StringBuilder()
                 .append("add ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append("\" java");
-        execMql(_paramCache.getContext(), cmd);
+        MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
     }
 
     /**
@@ -252,9 +249,9 @@ public class JPO_mxJPO
         this.parse(_paramCache);
 
         // get parameters
-        final String markStart = _paramCache.getValueString(PARAM_MARKSTART).trim();
-        final String markEnd = _paramCache.getValueString(PARAM_MARKEND).trim();
-        final boolean exec = _paramCache.getValueBoolean(PARAM_NEEDED);
+        final String markStart = _paramCache.getValueString(JPO_mxJPO.PARAM_MARKSTART).trim();
+        final String markEnd = _paramCache.getValueString(JPO_mxJPO.PARAM_MARKEND).trim();
+        final boolean exec = _paramCache.getValueBoolean(JPO_mxJPO.PARAM_NEEDED);
 
         final StringBuilder cmd = new StringBuilder();
 

@@ -22,7 +22,6 @@ package org.mxupdate.update.program;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -30,8 +29,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
+import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * @author Tim Moxter
@@ -72,7 +70,7 @@ public class Program_mxJPO
         final StringBuilder cmd = new StringBuilder()
                 .append("list program * select name isjavaprogram dump \"\t\"");
         final Set<String> ret = new TreeSet<String>();
-        for (final String name : execMql(_paramCache.getContext(), cmd).split("\n"))  {
+        for (final String name : MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd).split("\n"))  {
             if (!"".equals(name))  {
                 final String[] nameArr = name.split("\t");
                 if (!"TRUE".equals(nameArr[1]))  {
@@ -88,15 +86,18 @@ public class Program_mxJPO
      *
      * @param _paramCache   parameter cache
      * @param _out          writer instance
+     * @throws MatrixException  if the print of the code of the program failed
+     * @throws IOException      if the source code could not be written to the
+     *                          writer instance
      */
     @Override
     protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Writer _out)
+                         final Appendable _out)
             throws IOException, MatrixException
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("print program \"").append(this.getName()).append("\" select code dump");
-        _out.append(execMql(_paramCache.getContext(), cmd));
+        _out.append(MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd));
     }
 
     /**
@@ -112,7 +113,7 @@ public class Program_mxJPO
         final StringBuilder cmd = new StringBuilder()
                 .append("add ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append('\"');
-        execMql(_paramCache.getContext(), cmd);
+        MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
     }
 
     /**

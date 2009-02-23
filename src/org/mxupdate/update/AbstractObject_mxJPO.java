@@ -36,12 +36,9 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.util.MqlUtil_mxJPO;
 import org.xml.sax.SAXException;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertFromFileName;
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertToFileName;
-import static org.mxupdate.update.util.StringUtil_mxJPO.match;
-import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
  * Abstract class from which must be derived for exporting and importing all
@@ -71,7 +68,7 @@ public abstract class AbstractObject_mxJPO
      * Defines the related type definition enumeration.
      *
      * @see #getTypeDef()
-     * @see #AbstractObject_mxJPO(TypeDef_mxJPO)
+     * @see #AbstractObject_mxJPO(TypeDef_mxJPO, String)
      */
     private final TypeDef_mxJPO typeDef;
 
@@ -154,7 +151,7 @@ public abstract class AbstractObject_mxJPO
      * method used the information annotation.
      *
      * @return sub path
-     * @see #getInfoAnno()
+     * @see #getTypeDef()
      */
     public String getPath()
     {
@@ -190,7 +187,7 @@ public abstract class AbstractObject_mxJPO
             throws MatrixException, SAXException, IOException
     {
         this.parse(_paramCache);
-        final File file = new File(_path, convertToFileName(this.getFileName()));
+        final File file = new File(_path, StringUtil_mxJPO.convertToFileName(this.getFileName()));
         if (!file.getParentFile().exists())  {
             file.getParentFile().mkdirs();
         }
@@ -200,8 +197,33 @@ public abstract class AbstractObject_mxJPO
         out.close();
     }
 
+    /**
+     *
+     * @param _paramCache
+     * @param _out
+     * @throws MatrixException
+     * @throws SAXException
+     * @throws IOException
+     * @see #parse(ParameterCache_mxJPO)
+     * @see #write(ParameterCache_mxJPO, Appendable)
+     */
+    public void export(final ParameterCache_mxJPO _paramCache,
+                       final Appendable _out)
+            throws MatrixException, SAXException, IOException
+    {
+        this.parse(_paramCache);
+        this.write(_paramCache, _out);
+    }
+    /**
+     *
+     * @param _paramCache       parameter cache
+     * @param _out              appendable instance to write the TCL update
+     *                          code
+     * @throws IOException      if write of the TCL update failed
+     * @throws MatrixException  if MQL commands failed
+     */
     protected abstract void write(final ParameterCache_mxJPO _paramCache,
-                                  final Writer _out)
+                                  final Appendable _out)
             throws IOException, MatrixException;
 
     /**
@@ -238,7 +260,7 @@ public abstract class AbstractObject_mxJPO
                                final String _mxName,
                                final String _match)
     {
-        return match(_mxName, _match);
+        return StringUtil_mxJPO.match(_mxName, _match);
     }
 
     /**
@@ -262,7 +284,7 @@ public abstract class AbstractObject_mxJPO
         final String fileName = _file.getName();
         final String mxName;
         if (((prefix == null) || fileName.startsWith(prefix)) && ((suffix == null) || fileName.endsWith(suffix)))  {
-            mxName = convertFromFileName(fileName.substring(0, fileName.length() - suffixLength)
+            mxName = StringUtil_mxJPO.convertFromFileName(fileName.substring(0, fileName.length() - suffixLength)
                                                  .substring(prefixLength));
         } else  {
             mxName = null;
@@ -345,7 +367,7 @@ public abstract class AbstractObject_mxJPO
         final String curVersion;
         // check for existing administration type...
         if (this.getTypeDef().getMxAdminName() != null)  {
-            final String tmp = execMql(_context, new StringBuilder()
+            final String tmp = MqlUtil_mxJPO.execMql(_context, new StringBuilder()
                     .append("print ").append(this.getTypeDef().getMxAdminName())
                     .append(" \"").append(this.getName()).append("\" ")
                     .append(this.getTypeDef().getMxAdminSuffix())
@@ -357,7 +379,7 @@ public abstract class AbstractObject_mxJPO
         // otherwise we have a business object....
         } else  {
             final String[] nameRev = this.getName().split("________");
-            curVersion = execMql(_context, new StringBuilder()
+            curVersion = MqlUtil_mxJPO.execMql(_context, new StringBuilder()
                     .append("print bus \"")
                     .append(this.getTypeDef().getMxBusType())
                     .append("\" \"").append(nameRev[0])
@@ -512,7 +534,7 @@ public abstract class AbstractObject_mxJPO
 
     /**
      * Returns the version string of this administration (business) object. The
-     * method is the getter method for {@link #version).
+     * method is the getter method for {@link #version}.
      *
      * @return version string
      * @see #version
@@ -537,7 +559,7 @@ public abstract class AbstractObject_mxJPO
 
     /**
      * Sets the new version string for this administration (business) object.
-     * It is the setter method for {@see #version}.
+     * It is the setter method for {@link #version}.
      *
      * @param _version  new version to set
      * @see #version
