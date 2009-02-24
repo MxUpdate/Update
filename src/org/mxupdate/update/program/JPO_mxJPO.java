@@ -24,6 +24,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import matrix.util.MatrixException;
 
@@ -97,6 +99,14 @@ public class JPO_mxJPO
     private static final String PARAM_NEEDED = "JPOTclUpdateNeeded";
 
     /**
+     * Regular expression for the package line. The package name must be
+     * extracted to get the real name of the JPO used within MX.
+     *
+     * @see #extractMxName(ParameterCache_mxJPO, File)
+     */
+    private static final Pattern PATTERN_PACKAGE = Pattern.compile("(?<=package)[ \\t]+[A-Za-z0-9\\._]*[ \\t]*;");
+
+    /**
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
@@ -146,6 +156,43 @@ public class JPO_mxJPO
                 .append(this.getName().replaceAll("\\.", "/"))
                 .append(this.getTypeDef().getFileSuffix())
                 .toString();
+    }
+
+    /**
+     * If a file is a JPO (checked by calling the extraxtMxName method from
+     * super class), the package is extracted from file and returned together
+     * with the extracted MxName from the file.
+     *
+     * @param _paramCache   parameter cache
+     * @param _file         file for which the MX name is searched
+     * @return MX name or <code>null</code> if the file is not an update file
+     *         for current type definition
+     * @see #PATTERN_PACKAGE
+     * @todo idea: maybe performance improvement by opening file itself and
+     *       read only till class, interface or enum is defined....
+     */
+    @Override
+    public String extractMxName(final ParameterCache_mxJPO _paramCache,
+                                final File _file)
+    {
+        String mxName = super.extractMxName(_paramCache, _file);
+
+        if (mxName != null)  {
+            final String code;
+            try {
+                code = this.getCode(_file).toString();
+            } catch (final IOException e)  {
+                throw new Error("could not open file " + _file, e);
+            }
+            for (final String line : code.split("\n"))  {
+                final Matcher pckMatch = JPO_mxJPO.PATTERN_PACKAGE.matcher(line);
+                if (pckMatch.find())  {
+                    mxName = pckMatch.group().replace(';', ' ').trim() + "." + mxName;
+                    break;
+                }
+            }
+        }
+        return mxName;
     }
 
     /**
