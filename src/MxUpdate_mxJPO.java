@@ -751,9 +751,11 @@ public class MxUpdate_mxJPO
 
         // and now loop throw the list of file names and compare to existing
         for (final Map.Entry<TypeDef_mxJPO,Set<String>> entry : clazz2MxNames.entrySet())  {
-            final Collection<String> fileNames = clazz2FileNames.get(entry.getKey()).values();
+            final Collection<String> fileNames = clazz2FileNames.containsKey(entry.getKey())
+                                                 ? clazz2FileNames.get(entry.getKey()).values()
+                                                 : null;
             for (final String name : entry.getValue())  {
-                if (!fileNames.contains(name))  {
+                if ((fileNames == null) || !fileNames.contains(name))  {
                     _paramCache.logInfo("delete " + entry.getKey().getLogging() + " '" + name + "'");
                     boolean commit = false;
                     final boolean transActive = _paramCache.getContext().isTransactionActive();
