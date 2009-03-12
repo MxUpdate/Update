@@ -173,19 +173,19 @@ public abstract class AbstractProgram_mxJPO
                .append("value \"").append(this.getName()).append('\"');
         }
         // exists no application property or application property not equal?
-        final String appl;
+        String appl = null;
         if (_paramCache.contains(ParameterCache_mxJPO.KEY_APPLICATION))  {
             appl = _paramCache.getValueString(ParameterCache_mxJPO.KEY_APPLICATION);
-        } else if ((this.getApplication() == null) || "".equals(this.getApplication()))  {
+        }
+        if ((appl == null) || "".equals(appl))  {
             appl = _paramCache.getValueString(ParameterCache_mxJPO.KEY_DEFAULTAPPLICATION);
-        } else  {
-            appl = null;
         }
-        if (appl != null)  {
-            _paramCache.logTrace("    - define application '" + appl + "'");
-            cmd.append(" add property \"").append(AdminPropertyDef.APPLICATION.getPropName()).append("\" ")
-               .append("value \"").append(appl).append('\"');
+        if (appl == null)  {
+            appl = "";
         }
+        _paramCache.logTrace("    - define application '" + appl + "'");
+        cmd.append(" add property \"").append(AdminPropertyDef.APPLICATION.getPropName()).append("\" ")
+           .append("value \"").append(appl).append('\"');
         // exists no author property or author property not equal?
         final String author;
         if (_paramCache.contains(ParameterCache_mxJPO.KEY_AUTHOR))  {

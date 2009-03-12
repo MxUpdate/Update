@@ -46,6 +46,14 @@ public abstract class AbstractPropertyObject_mxJPO
     private static final long serialVersionUID = -2794355865894159489L;
 
     /**
+     * String of the key within the parmater cache to define that symbolic
+     * names must be always calculated.
+     *
+     * @see #extractSymbolicNameFromCode(ParameterCache_mxJPO, StringBuilder)
+     */
+    private static final String PARAM_CALCSYMBOLICNAMES = "CalcSymbolicNames";
+
+    /**
      * String of the key within the parameter cache for the export application
      * parameter.
      *
@@ -337,13 +345,17 @@ public abstract class AbstractPropertyObject_mxJPO
         tclVariables.put(AdminPropertyDef.AUTHOR.name(), author);
 
         // define application
-        final String appl;
+        String appl = null;
         if (_paramCache.contains(ParameterCache_mxJPO.KEY_APPLICATION))  {
             appl = _paramCache.getValueString(ParameterCache_mxJPO.KEY_APPLICATION);
-        } else  {
+        }
+        if ((appl == null) || "".equals(appl))  {
             appl = this.extractFromCode(code,
                                         AbstractPropertyObject_mxJPO.HEADER_APPLICATION,
                                         _paramCache.getValueString(ParameterCache_mxJPO.KEY_DEFAULTAPPLICATION));
+        }
+        if (appl == null)  {
+            appl = "";
         }
         tclVariables.put(AdminPropertyDef.APPLICATION.name(), appl);
 
@@ -430,13 +442,25 @@ public abstract class AbstractPropertyObject_mxJPO
     }
 
     /**
+     * <p>Returns the symbolic name for current property object. If parameter
+     * {@link #PARAM_CALCSYMBOLICNAMES} is defined, the symbolic name is only
+     * calculated. Otherwise the header is checked if there is a defined
+     * symbolic name (and by used if exists). A check is done if the symbolic
+     * name starts correctly with the administration type name (in lower
+     * case!). If not, the calculated symbolic name is used. A warning is shown
+     * if the symbolic name defined in the header is not equal to the
+     * calculated symbolic name.</p>
+     * <p>The symbolic name is calculated by removing all spaces and slashes
+     * within the name of the object and add as prefix the administration type
+     * name.</p>
      *
      * @param _paramCache   parameter cache
      * @param _code         TCL update source code
      * @return extracted symbolic name from the source code header
+     * @see #PARAM_CALCSYMBOLICNAMES
      */
-    protected String extractSymbolicNameFromCode(final ParameterCache_mxJPO _paramCache,
-                                                 final StringBuilder _code)
+    private String extractSymbolicNameFromCode(final ParameterCache_mxJPO _paramCache,
+                                               final StringBuilder _code)
     {
         String codeSymbName = null;
 
@@ -445,17 +469,22 @@ public abstract class AbstractPropertyObject_mxJPO
                                     .append("_")
                                     .append(this.getName().replaceAll(" ", "").replaceAll("/", ""))
                                     .toString();
-            codeSymbName = this.extractFromCode(_code, AbstractPropertyObject_mxJPO.HEADER_SYMBOLIC_NAME, null);
-            if (codeSymbName == null)  {
-                _paramCache.logError("No symbolic name defined! So '" + symbName + "' will be used.");
+            if (_paramCache.getValueBoolean(AbstractPropertyObject_mxJPO.PARAM_CALCSYMBOLICNAMES))  {
                 codeSymbName = symbName;
-            } else if (!codeSymbName.startsWith(this.getTypeDef().getMxAdminName()))  {
-                _paramCache.logError("Symbolic name does not start correctly! So '"
-                        + symbName + "' will be used (instead of '" + codeSymbName + "').");
-                codeSymbName = symbName;
-            } else if (!codeSymbName.equals(symbName))  {
-                _paramCache.logWarning("Symbolic name '" + symbName
-                        + "' should be used! But defined is '" + codeSymbName + "'.");
+                _paramCache.logDebug("    - using calculated symbolic name '" + symbName + "'");
+            } else  {
+                codeSymbName = this.extractFromCode(_code, AbstractPropertyObject_mxJPO.HEADER_SYMBOLIC_NAME, null);
+                if (codeSymbName == null)  {
+                    _paramCache.logError("No symbolic name defined! So '" + symbName + "' will be used.");
+                    codeSymbName = symbName;
+                } else if (!codeSymbName.startsWith(this.getTypeDef().getMxAdminName()))  {
+                    _paramCache.logError("Symbolic name does not start correctly! So '"
+                            + symbName + "' will be used (instead of '" + codeSymbName + "').");
+                    codeSymbName = symbName;
+                } else if (!codeSymbName.equals(symbName))  {
+                    _paramCache.logWarning("Symbolic name '" + symbName
+                            + "' should be used! But defined is '" + codeSymbName + "'.");
+                }
             }
         }
 
