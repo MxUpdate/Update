@@ -63,9 +63,8 @@ public class JPOCaller_mxJPO
                                       final AbstractPropertyObject_mxJPO _instance)
     {
         final String sessionId = _paramCache.getContext().getSession().getSessionId();
-
-        PARAM_CACHE.put(sessionId, _paramCache);
-        CALLER_INSTANCE.put(sessionId, _instance);
+        JPOCaller_mxJPO.PARAM_CACHE.put(sessionId, _paramCache);
+        JPOCaller_mxJPO.CALLER_INSTANCE.put(sessionId, _instance);
     }
 
     /**
@@ -77,8 +76,8 @@ public class JPOCaller_mxJPO
     public static void undefineInstance(final ParameterCache_mxJPO _paramCache)
     {
         final String sessionId = _paramCache.getContext().getSession().getSessionId();
-        PARAM_CACHE.remove(sessionId);
-        CALLER_INSTANCE.remove(sessionId);
+        JPOCaller_mxJPO.PARAM_CACHE.remove(sessionId);
+        JPOCaller_mxJPO.CALLER_INSTANCE.remove(sessionId);
     }
 
     /**
@@ -96,8 +95,8 @@ public class JPOCaller_mxJPO
     {
         try  {
             final String sessionId = _context.getSession().getSessionId();
-            final AbstractPropertyObject_mxJPO instance = CALLER_INSTANCE.get(sessionId);
-            final ParameterCache_mxJPO paramCache = PARAM_CACHE.get(sessionId);
+            final AbstractPropertyObject_mxJPO instance = JPOCaller_mxJPO.CALLER_INSTANCE.get(sessionId);
+            final ParameterCache_mxJPO paramCache = JPOCaller_mxJPO.PARAM_CACHE.get(sessionId);
             if (instance == null)  {
                 throw new Error("JPO Caller instance is not defined for session "
                         + sessionId + "!");
