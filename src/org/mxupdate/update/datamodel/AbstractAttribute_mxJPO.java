@@ -32,9 +32,8 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
-import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
+import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * The class is used to evaluate information from attributes within MX used to
@@ -59,6 +58,21 @@ abstract class AbstractAttribute_mxJPO
      * @see #getMxNames(ParameterCache_mxJPO)
      */
     private static final String SELECT_ATTRS = "list attribute * select type name dump";
+
+    /**
+     * Called TCL procedure within the TCL update to parse the new policy
+     * definition. The TCL procedure calls method
+     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)} with the new
+     * policy definition. All quot's are replaced by <code>@0@0@</code> and all
+     * apostroph's are replaced by <code>@1@1@</code>.
+     *
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
+     */
+    private static final String TCL_PROCEDURE
+            = "proc defineAttrDimension {_sName _sDimension}  {\n"
+                + "mql exec prog org.mxupdate.update.util.JPOCaller defineAttrDimension $_sName $_sDimension\n"
+            + "}\n";
 
     /**
      * Set holding all rules referencing this attribute.
@@ -133,6 +147,25 @@ abstract class AbstractAttribute_mxJPO
     private final String attrTypeList;
 
     /**
+     * Stores the reference to the dimension of an attribute.
+     *
+     * @see #parse(String, String)
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
+     */
+    private String dimension;
+
+    /**
+     * The value is needed to hold the information if the update of the
+     * dimension is run (because the TCL procedure {@link #TCL_PROCEDURE} must
+     * not be called everytime...).
+     *
+     * @see #update(ParameterCache_mxJPO, File, String)
+     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
+     * @see #updateDimension(ParameterCache_mxJPO, String)
+     */
+    private boolean dimensionUpdated = false;
+
+    /**
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
@@ -167,7 +200,8 @@ abstract class AbstractAttribute_mxJPO
     {
         final Set<String> ret = new TreeSet<String>();
         final int length = this.attrTypeList.length();
-        for (final String name : execMql(_paramCache.getContext(), SELECT_ATTRS).split("\n"))  {
+        for (final String name : MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+                                                       AbstractAttribute_mxJPO.SELECT_ATTRS).split("\n"))  {
             if (!"".equals(name))  {
                 if (name.startsWith(this.attrTypeList))  {
                     ret.add(name.substring(length));
@@ -201,6 +235,8 @@ abstract class AbstractAttribute_mxJPO
             this.rules.add(_content);
         } else if ("/defaultValue".equals(_url))  {
             this.defaultValue = _content;
+        } else if ("/dimensionRef".equals(_url))  {
+            this.dimension = _content;
         } else if ("/multiline".equals(_url))  {
             this.multiline = true;
         } else if ("/primitiveType".equals(_url))  {
@@ -268,10 +304,10 @@ abstract class AbstractAttribute_mxJPO
             _out.append(" \\\n    ").append(this.multiline ? "" : "!").append("multiline");
         }
         for (final String rule : this.rules)  {
-            _out.append(" \\\n    add rule \"").append(convertTcl(rule)).append("\"");
+            _out.append(" \\\n    add rule \"").append(StringUtil_mxJPO.convertTcl(rule)).append("\"");
         }
         if (this.defaultValue != null)  {
-            _out.append(" \\\n    default \"").append(convertTcl(this.defaultValue)).append("\"");
+            _out.append(" \\\n    default \"").append(StringUtil_mxJPO.convertTcl(this.defaultValue)).append("\"");
         } else  {
             _out.append(" \\\n    default \"\"");
         }
@@ -280,6 +316,28 @@ abstract class AbstractAttribute_mxJPO
         // append ranges
         for (final Range range : this.rangesSorted)  {
             range.write(_out);
+        }
+    }
+
+    /**
+     * Writes the TCL update code for the dimension of an attribute (if
+     * exists).
+     *
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the TCL update code could not be written to the
+     *                     writer instance
+     */
+    @Override
+    protected void writeEnd(final ParameterCache_mxJPO _paramCache,
+                            final Appendable _out)
+            throws IOException
+    {
+        super.writeEnd(_paramCache, _out);
+        if (this.dimension != null)  {
+            _out.append("\ndefineAttrDimension \"${NAME}\" \"")
+                .append(StringUtil_mxJPO.convertTcl(this.dimension))
+                .append('\"');
         }
     }
 
@@ -301,7 +359,7 @@ abstract class AbstractAttribute_mxJPO
                 .append("add ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append("\" ")
                 .append(" type ").append(this.attrTypeCreate);
-       execMql(_paramCache.getContext(), cmd);
+        MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
     }
 
     /**
@@ -311,6 +369,12 @@ abstract class AbstractAttribute_mxJPO
      * <li>set to not hidden</li>
      * <li>reset description and default value</li>
      * <li>remove all ranges</li>
+     * <li>define the TCL procedure {@link #TCL_PROCEDURE} to set the
+     *     dimension</li>
+     * <li>if the dimension is not updated within the TCL update file (tested
+     *     with {@link #dimensionUpdated}) method
+     *     {@link #updateDimension(ParameterCache_mxJPO, String)} is called
+     *     </li>
      * </ul>
      *
      * @param _paramCache       parameter cache
@@ -327,6 +391,9 @@ abstract class AbstractAttribute_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update from derived class failed
      * @see Range#remove4Update(Appendable)
+     * @see #updateDimension(ParameterCache_mxJPO, String)
+     * @see #dimensionUpdated
+     * @see #TCL_PROCEDURE
      */
     @Override
     protected void update(final ParameterCache_mxJPO _paramCache,
@@ -350,19 +417,97 @@ abstract class AbstractAttribute_mxJPO
         for (final Range range : this.rangesSorted)  {
             range.remove4Update(preMQLCode);
         }
-
         // append already existing pre MQL code
         preMQLCode.append(";\n")
                   .append(_preMQLCode);
+        // add TCL code for the procedure
+        final StringBuilder preTCLCode = new StringBuilder()
+                .append(AbstractAttribute_mxJPO.TCL_PROCEDURE)
+                .append(_preTCLCode);
 
-        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+        super.update(_paramCache, preMQLCode, _postMQLCode, preTCLCode, _tclVariables, _sourceFile);
+
+        // is the dimension already updated?
+        if (!this.dimensionUpdated)  {
+            this.updateDimension(_paramCache, "");
+        }
+    }
+
+    /**
+     * The method is called from the TCL update code to define the dimension
+     * for this attribute. If the correct use case is defined method
+     * {@link #updateDimension(ParameterCache_mxJPO, String)} is called.
+     *
+     * @param _paramCache   parameter cache
+     * @param _args         first index defines the use case (must be
+     *                      &quot;defineAttrDimension&quot; that the dimension
+     *                      of the attribute is updated); second index the name
+     *                      of the attribute to update; third index the new
+     *                      dimension to set
+     * @throws Exception if the update of the dimension failed or for all other
+     *                   use cases from super JPO call
+     * @see #updateDimension(ParameterCache_mxJPO, String)
+     * @see #dimensionUpdated
+     */
+    @Override
+    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
+                               final String... _args)
+            throws Exception
+    {
+        // check if dimension is defined
+        if ("defineAttrDimension".equals(_args[0]))  {
+            // check that attribute names are equal
+            if (!this.getName().equals(_args[1]))  {
+                throw new Exception("dimension for wrong attribute '"
+                        + _args[1] + "' is set (attribute '" + this.getName()
+                        + "' is updated!)");
+            }
+
+            this.updateDimension(_paramCache, _args[2]);
+            this.dimensionUpdated = true;
+        } else  {
+            super.jpoCallExecute(_paramCache, _args);
+        }
+    }
+
+    /**
+     * Updates the dimension of this attribute. If a dimension is already
+     * defined for this attribute and it is not the same attribute, an
+     * exception is thrown (because information could be lost).
+     *
+     * @param _paramCache   parameter cache
+     * @param _dimension    new dimension to set
+     * @throws Exception if update failed or the dimension of an update should
+     *                   be changed (and some information could be lost)
+     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    protected void updateDimension(final ParameterCache_mxJPO _paramCache,
+                                   final String _dimension)
+            throws Exception
+    {
+        if ((this.dimension == null) || "".equals(this.dimension))  {
+            if (!"".equals(_dimension))  {
+                _paramCache.logDebug("    - set dimension '" + _dimension + "'");
+                MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+                        new StringBuilder().append("escape mod attribute \"")
+                        .append(StringUtil_mxJPO.convertMql(this.getName()))
+                        .append("\" add dimension \"")
+                        .append(StringUtil_mxJPO.convertMql(_dimension))
+                        .append('\"'));
+            }
+        } else if (!this.dimension.equals(_dimension))  {
+            throw new Exception("If dimension '" + this.dimension
+                    + "' is changed to new dimension '" + _dimension
+                    + "' some information could be lost!");
+        }
     }
 
     /**
      * Class holding range values of this attribute.
      */
     private class Range
-            implements Comparable<Range>
+            implements Comparable<AbstractAttribute_mxJPO.Range>
     {
         /**
          * Holds the range type. Typically following range types are known:
@@ -430,11 +575,11 @@ abstract class AbstractAttribute_mxJPO
             // if the range is a program it is a 'global' attribute info
             if ("programRange".equals(this.type))  {
                 _out.append("program \"")
-                    .append(convertTcl(AbstractAttribute_mxJPO.this.rangeProgramRef))
+                    .append(StringUtil_mxJPO.convertTcl(AbstractAttribute_mxJPO.this.rangeProgramRef))
                     .append('\"');
                 if (AbstractAttribute_mxJPO.this.rangeProgramInputArguments != null)  {
                     _out.append(" input \"")
-                        .append(convertTcl(AbstractAttribute_mxJPO.this.rangeProgramInputArguments))
+                        .append(StringUtil_mxJPO.convertTcl(AbstractAttribute_mxJPO.this.rangeProgramInputArguments))
                         .append('\"');
                 }
             } else  {
@@ -457,14 +602,14 @@ abstract class AbstractAttribute_mxJPO
                 } else  {
                     _out.append(this.type);
                 }
-                _out.append(" \"").append(convertTcl(this.value1)).append("\"");
+                _out.append(" \"").append(StringUtil_mxJPO.convertTcl(this.value1)).append("\"");
                 if ("between".equals(this.type))  {
                     if (this.include1)  {
                         _out.append(" inclusive");
                     } else  {
                         _out.append(" exclusive");
                     }
-                    _out.append(" \"").append(convertTcl(this.value2)).append("\"");
+                    _out.append(" \"").append(StringUtil_mxJPO.convertTcl(this.value2)).append("\"");
                     if (this.include2)  {
                         _out.append(" inclusive");
                     } else  {
