@@ -65,7 +65,6 @@ public class Policy_mxJPO
      */
     private static final String TCL_PROCEDURE
             = "proc updatePolicy {_sPolicy _lsArgs}  {\n"
-                + "global JPO_CALLER_INSTANCE\n"
                 + "regsub -all {'} $_lsArgs {@0@0@} sArg\n"
                 + "regsub -all {\\\"} $sArg {@1@1@} sArg\n"
                 + "regsub -all {\\\\\\[} $sArg {[} sArg\n"
@@ -698,7 +697,8 @@ throw new Exception("some states are not defined anymore!");
             _out.append("\n  state \"").append(StringUtil_mxJPO.convertTcl(this.name)).append("\"  {")
                 .append("\n    registeredName \"").append((this.nameSymbolic != null)
                                                           ? StringUtil_mxJPO.convertTcl(this.nameSymbolic)
-                                                          : "state_" + StringUtil_mxJPO.convertTcl(this.name.replaceAll(" ", "_"))).append('\"')
+                                                          : "state_" + StringUtil_mxJPO.convertTcl(this.name.replaceAll(" ", "_")))
+                                                  .append('\"')
                 .append("\n    revision \"").append(Boolean.toString(this.revisionable)).append('\"')
                 .append("\n    version \"").append(Boolean.toString(this.versionable)).append('\"')
                 .append("\n    promote \"").append(Boolean.toString(this.autoPromotion)).append('\"')
