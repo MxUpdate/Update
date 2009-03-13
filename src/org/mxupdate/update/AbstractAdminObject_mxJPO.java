@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -534,7 +533,7 @@ public abstract class AbstractAdminObject_mxJPO
      * @return string representation of this administration object
      * @see #write(ParameterCache_mxJPO, Appendable)
      */
-    @Override
+/*    @Override
     public String toString()
     {
         final StringWriter writer = new StringWriter();
@@ -547,7 +546,7 @@ public abstract class AbstractAdminObject_mxJPO
             throw new Error(e);
         }
         return writer.toString();
-    }
+    }*/
 
     ///////////////////////////////////////////////////////////////////////////
 
