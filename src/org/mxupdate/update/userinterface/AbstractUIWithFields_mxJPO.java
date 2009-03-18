@@ -295,7 +295,8 @@ abstract class AbstractUIWithFields_mxJPO
 
             final Map<String,String> tmpSettings  = new TreeMap<String,String>();
             for (final Setting_mxJPO setting : this.settings)  {
-                tmpSettings.put(setting.name, setting.value);
+                tmpSettings.put((setting.name == null) ? "" : setting.name,
+                                (setting.value == null) ? "" : setting.value);
             }
             for (final Map.Entry<String,String> setting : tmpSettings.entrySet())  {
                 final String value = (setting.getValue() == null)
