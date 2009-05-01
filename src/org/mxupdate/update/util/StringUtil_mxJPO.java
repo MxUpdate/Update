@@ -162,7 +162,7 @@ public final class StringUtil_mxJPO
      *                      <code>null</code> if no string for empty list is
      *                      written)
      * @return joined string of the list items
-     * @see #convertMql(String)
+     * @see #convertMql(CharSequence)
      */
     public static String joinTcl(final char _separator,
                                  final boolean _quotes,
@@ -186,7 +186,7 @@ public final class StringUtil_mxJPO
                 if (_quotes)  {
                     ret.append('\"');
                 }
-                ret.append(convertTcl(elem));
+                ret.append(StringUtil_mxJPO.convertTcl(elem));
                 if (_quotes)  {
                     ret.append('\"');
                 }
@@ -210,8 +210,9 @@ public final class StringUtil_mxJPO
     public static String formatFileDate(final ParameterCache_mxJPO _paramCache,
                                         final Date _date)
     {
-        final DateFormat fileFormat = new SimpleDateFormat(_paramCache.getValueString(PARAM_FILEDATEFORMAT));
-        fileFormat.setTimeZone(TIMEZONE);
+        final DateFormat fileFormat
+                = new SimpleDateFormat(_paramCache.getValueString(StringUtil_mxJPO.PARAM_FILEDATEFORMAT));
+        fileFormat.setTimeZone(StringUtil_mxJPO.TIMEZONE);
         return fileFormat.format(_date);
     }
 
@@ -230,8 +231,9 @@ public final class StringUtil_mxJPO
                                      final String _date)
             throws ParseException
     {
-        final DateFormat fileFormat = new SimpleDateFormat(_paramCache.getValueString(PARAM_FILEDATEFORMAT));
-        fileFormat.setTimeZone(TIMEZONE);
+        final DateFormat fileFormat
+                = new SimpleDateFormat(_paramCache.getValueString(StringUtil_mxJPO.PARAM_FILEDATEFORMAT));
+        fileFormat.setTimeZone(StringUtil_mxJPO.TIMEZONE);
         return fileFormat.parse(_date);
     }
 
@@ -248,8 +250,9 @@ public final class StringUtil_mxJPO
     public static String formatInstalledDate(final ParameterCache_mxJPO _paramCache,
                                              final Date _date)
     {
-        final DateFormat fileFormat = new SimpleDateFormat(_paramCache.getValueString(PARAM_INSTALLEDDATEFORMAT));
-        fileFormat.setTimeZone(TIMEZONE);
+        final DateFormat fileFormat
+                = new SimpleDateFormat(_paramCache.getValueString(StringUtil_mxJPO.PARAM_INSTALLEDDATEFORMAT));
+        fileFormat.setTimeZone(StringUtil_mxJPO.TIMEZONE);
         return fileFormat.format(_date);
     }
 
@@ -268,8 +271,9 @@ public final class StringUtil_mxJPO
                                           final String _date)
             throws ParseException
     {
-        final DateFormat fileFormat = new SimpleDateFormat(_paramCache.getValueString(PARAM_INSTALLEDDATEFORMAT));
-        fileFormat.setTimeZone(TIMEZONE);
+        final DateFormat fileFormat
+                = new SimpleDateFormat(_paramCache.getValueString(StringUtil_mxJPO.PARAM_INSTALLEDDATEFORMAT));
+        fileFormat.setTimeZone(StringUtil_mxJPO.TIMEZONE);
         return fileFormat.parse(_date);
     }
 
@@ -285,7 +289,7 @@ public final class StringUtil_mxJPO
      *                      <code>null</code> if no string for empty list is
      *                      written)
      * @return joined string of the list items
-     * @see #convertMql(String)
+     * @see #convertMql(CharSequence)
      */
     public static String joinMql(final char _separator,
                                  final boolean _quotes,
@@ -309,7 +313,7 @@ public final class StringUtil_mxJPO
                 if (_quotes)  {
                     ret.append('\"');
                 }
-                ret.append(convertMql(elem));
+                ret.append(StringUtil_mxJPO.convertMql(elem));
                 if (_quotes)  {
                     ret.append('\"');
                 }
@@ -325,92 +329,98 @@ public final class StringUtil_mxJPO
      * <a href="http://commons.apache.org/io/xref/org/apache/commons/io/FilenameUtils.html">
      * org.apache.commons.io.FilenameUtils</a>.
      *
-     * @param _filename
-     * @param _wildcardMatcher
-     * @return
+     * @param _filename         file name to check
+     * @param _wildcardMatcher  wildcard matcher string
+     * @return <i>true</i> if <code>_filename</code> matches
+     *         <code>_wildcardMatcher</code>
      */
     public static boolean match(final String _filename,
                                 final String _wildcardMatcher)
     {
+        final boolean ret;
 
-                     if (_filename == null && _wildcardMatcher == null) {
-                         return true;
-                     }
-                     if (_filename == null || _wildcardMatcher == null) {
-                         return false;
-                     }
+        if ((_filename == null) && (_wildcardMatcher == null))  {
+            ret = true;
+        } else if (_filename == null || _wildcardMatcher == null) {
+            ret = false;
+        } else  {
+            boolean tmpRet = false;
+
     //                 if (caseSensitivity == null) {
     //                     caseSensitivity = IOCase.SENSITIVE;
     //                 }
     //                 filename = caseSensitivity.convertCase(filename);
     //                 wildcardMatcher = caseSensitivity.convertCase(wildcardMatcher);
-                     final String[] wcs = splitOnTokens(_wildcardMatcher);
-                     boolean anyChars = false;
-                     int textIdx = 0;
-                     int wcsIdx = 0;
-                     final Stack<int[]> backtrack = new Stack<int[]>();
+            final String[] wcs = splitOnTokens(_wildcardMatcher);
+            boolean anyChars = false;
+            int textIdx = 0;
+            int wcsIdx = 0;
+            final Stack<int[]> backtrack = new Stack<int[]>();
 
-                     // loop around a backtrack stack, to handle complex * matching
-                     do {
-                         if (backtrack.size() > 0) {
-                             final int[] array = backtrack.pop();
-                             wcsIdx = array[0];
-                             textIdx = array[1];
-                             anyChars = true;
-                         }
+            // loop around a backtrack stack, to handle complex * matching
+            do {
+                if (backtrack.size() > 0) {
+                    final int[] array = backtrack.pop();
+                    wcsIdx = array[0];
+                    textIdx = array[1];
+                    anyChars = true;
+                }
 
-                         // loop whilst tokens and text left to process
-                         while (wcsIdx < wcs.length) {
+                // loop whilst tokens and text left to process
+                while (wcsIdx < wcs.length) {
 
-                             if (wcs[wcsIdx].equals("?")) {
-                                 // ? so move to next text char
-                                 textIdx++;
-                                 anyChars = false;
+                    if (wcs[wcsIdx].equals("?")) {
+                        // ? so move to next text char
+                        textIdx++;
+                        anyChars = false;
 
-                             } else if (wcs[wcsIdx].equals("*")) {
-                                 // set any chars status
-                                 anyChars = true;
-                                 if (wcsIdx == wcs.length - 1) {
-                                     textIdx = _filename.length();
-                                 }
+                    } else if (wcs[wcsIdx].equals("*")) {
+                        // set any chars status
+                        anyChars = true;
+                        if (wcsIdx == wcs.length - 1) {
+                            textIdx = _filename.length();
+                        }
 
-                             } else {
-                                 // matching text token
-                                 if (anyChars) {
-                                     // any chars then try to locate text token
-                                     textIdx = _filename.indexOf(wcs[wcsIdx], textIdx);
-                                     if (textIdx == -1) {
-                                         // token not found
-                                         break;
-                                     }
-                                     final int repeat = _filename.indexOf(wcs[wcsIdx], textIdx + 1);
-                                     if (repeat >= 0) {
-                                         backtrack.push(new int[] {wcsIdx, repeat});
-                                     }
-                                 } else {
-                                     // matching from current position
-                                     if (!_filename.startsWith(wcs[wcsIdx], textIdx)) {
-                                         // couldnt match token
-                                         break;
-                                     }
-                                 }
+                    } else {
+                        // matching text token
+                        if (anyChars) {
+                            // any chars then try to locate text token
+                            textIdx = _filename.indexOf(wcs[wcsIdx], textIdx);
+                            if (textIdx == -1) {
+                                // token not found
+                                break;
+                            }
+                            final int repeat = _filename.indexOf(wcs[wcsIdx], textIdx + 1);
+                            if (repeat >= 0) {
+                                backtrack.push(new int[] {wcsIdx, repeat});
+                            }
+                        } else {
+                            // matching from current position
+                            if (!_filename.startsWith(wcs[wcsIdx], textIdx)) {
+                                // couldnt match token
+                                break;
+                            }
+                        }
 
-                                 // matched text token, move text index to end of matched token
-                                 textIdx += wcs[wcsIdx].length();
-                                 anyChars = false;
-                             }
+                        // matched text token, move text index to end of matched token
+                        textIdx += wcs[wcsIdx].length();
+                        anyChars = false;
+                    }
 
-                             wcsIdx++;
-                         }
+                    wcsIdx++;
+                }
 
-                         // full match
-                         if (wcsIdx == wcs.length && textIdx == _filename.length()) {
-                             return true;
-                         }
+                // full match
+                if ((wcsIdx == wcs.length) && (textIdx == _filename.length()))  {
+                    tmpRet = true;
+                    break;
+                }
 
-                     } while (backtrack.size() > 0);
+            } while (backtrack.size() > 0);
 
-                     return false;
+            ret = tmpRet;
+        }
+        return ret;
     }
 
     /**
