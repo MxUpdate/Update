@@ -21,22 +21,50 @@
  */
 -->
 
-<project default="compress">
+<project default="makeall">
 
-    <property name="filename" location="mxupdate"/>
+    <property name="version" value="0.2.1"/>
 
-    <target name="compress" description="description">
-        <delete file="${filename}.zip"/>
-        <delete file="${filename}.tar.gz"/>
-        <delete file="${filename}.tar.bz2"/>
-        <zip destfile="${filename}.zip" basedir="src"/>
-        <tar destfile="${filename}.tar.gz" basedir="src" compression="gzip"/>
-        <tar destfile="${filename}.tar.bz2" basedir="src" compression="bzip2"/>
+    <!-- defines the path where all the upload staff and the upload jar library 
+         is located -->
+    <property name="upload.path" location="upload"/>
+
+    <!-- names of the the mxupdate install compressed files -->
+    <property name="filename.zip" value="mxupdate.V${version}.install.zip"/>
+    <property name="filename.targz" value="mxupdate.V${version}.install.tar.gz"/>
+    <property name="filename.tarbz2" value="mxupdate.V${version}.install.tar.bz2"/>
+    <property name="file.filename.zip" location="${upload.path}/${filename.zip}"/>
+    <property name="file.filename.targz" location="${upload.path}/${filename.targz}"/>
+    <property name="file.filename.tarbz2" location="${upload.path}/${filename.tarbz2}"/>
+
+
+    <property name="javadoc.zip" value="mxupdate.V${version}.javadoc.zip"/>
+    <property name="file.javadoc.zip" location="${upload.path}/${javadoc.zip}"/>
+
+    <property name="upload.jar.file" location="${upload.path}/ant-googlecode.jar"/>
+    <property name="upload.jar.url" value="http://ant-googlecode.googlecode.com/files/ant-googlecode-0.0.2.jar"/>
+
+    <target name="makeall"
+            depends="compress,javadocs"
+            description="Prepare all compressed containers.">
+        <echo>Finished</echo>
+    </target>
+
+    <target name="compress"
+            description="description">
+        <mkdir dir="${upload.path}"/>
+        <delete file="${file.filename.zip}"/>
+        <delete file="${file.filename.targz}"/>
+        <delete file="${file.filename.tarbz2}"/>
+        <zip destfile="${file.filename.zip}" basedir="src"/>
+        <tar destfile="${file.filename.targz}" basedir="src" compression="gzip"/>
+        <tar destfile="${file.filename.tarbz2}" basedir="src" compression="bzip2"/>
     </target>
 
     <target name="javadocs" description="Builds javadocs for source code.">
-        <property name="doc.javadocs" value="doc/javadocs"/>
+        <property name="doc.javadocs" value="${upload.path}/javadocs"/>
         <property name="src.dir" value="src"/>
+        <delete dir="${doc.javadocs}"/>
         <javadoc destdir="${doc.javadocs}"
                  sourcepath="${src.dir}"
                  sourcefiles="${src.dir}/MxUpdate_mxJPO.java"
@@ -65,5 +93,49 @@
             <tag name="todo" scope="all" description="To do:"/>
             <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
         </javadoc>
+        <delete file="${file.javadoc.zip}"/>
+        <zip destfile="${file.javadoc.zip}" basedir="${upload.path}/javadocs"/>
     </target>
+
+    <target name="upload"
+            depends="makeall,init-upload">
+        <echo>Upload to Google Code</echo>
+        <gcupload projectname="mxupdate"
+                  username="${gc.username}"
+                  password="${gc.password}"
+                  filename="${file.filename.zip}"
+                  targetfilename="${filename.zip}"
+                  summary="MxUpdate Update Deployment Tool V${version} Installation Files as Zip-Container"
+                  labels="Featured, OpSys-All, Type-Installer"/>
+        <gcupload projectname="mxupdate"
+                  username="${gc.username}"
+                  password="${gc.password}"
+                  filename="${file.filename.targz}"
+                  targetfilename="${filename.targz}"
+                  summary="MxUpdate Update Deployment Tool V${version} Installation Files as TarGz-Container"
+                  labels="Featured, OpSys-All, Type-Installer"/>
+        <gcupload projectname="mxupdate"
+                  username="${gc.username}"
+                  password="${gc.password}"
+                  filename="${file.filename.tarbz2}"
+                  targetfilename="${filename.tarbz2}"
+                  summary="MxUpdate Update Deployment Tool V${version} Installation Files as TarBZ2-Container"
+                  labels="Featured, OpSys-All, Type-Installer"/>
+        <gcupload projectname="mxupdate"
+                  username="${gc.username}"
+                  password="${gc.password}"
+                  filename="${file.javadoc.zip}"
+                  targetfilename="${javadoc.zip}"
+                  summary="MxUpdate Update Deployment Tool V${version} JavaDoc"
+                  labels="Featured, OpSys-All, Type-Docs"/>
+    </target>
+
+    <target description="Downloads and defines the gcupload ant task."
+            name="init-upload">
+        <get src="${upload.jar.url}" dest="${upload.jar.file}" usetimestamp="true"/>
+        <taskdef classname="net.bluecow.googlecode.ant.GoogleCodeUploadTask"
+                 name="gcupload"
+                 classpath="${upload.jar.file}"/>
+    </target>
+
 </project>
