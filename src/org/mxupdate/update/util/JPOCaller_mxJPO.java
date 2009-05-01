@@ -34,7 +34,7 @@ import org.mxupdate.util.MqlUtil_mxJPO;
  * The class could be executed within the TCL update to call the original JPO
  * update instance. To use this feature, the JPO update class must be defined
  * from {@link AbstractPropertyObject_mxJPO}. In the derived class method
- * {@link AbstractPropertyObject_mxJPO#jpoCallExecute(ParameterCache_mxJPO, String...)
+ * {@link AbstractPropertyObject_mxJPO#jpoCallExecute(ParameterCache_mxJPO, String...)}
  * must be overwritten.
  *
  * @author Tim Moxter

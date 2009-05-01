@@ -89,7 +89,8 @@ public class ParameterCache_mxJPO
     /**
      * Mapping between parameter definition and the related boolean value.
      *
-     * @see #ParameterCache_mxJPO(Context,Collection)
+     * @see #ParameterCache_mxJPO(Context,boolean)
+     * @see #ParameterCache_mxJPO(Context,ParameterCache_mxJPO)
      * @see #evalParameter(ParameterDef_mxJPO, String[], int)
      * @see #getValueBoolean(String)
      * @see #defineValueBoolean(String, Boolean)
@@ -99,7 +100,8 @@ public class ParameterCache_mxJPO
     /**
      * Mapping between parameter definition and the related integer value.
      *
-     * @see #ParameterCache_mxJPO(Context,Collection)
+     * @see #ParameterCache_mxJPO(Context,boolean)
+     * @see #ParameterCache_mxJPO(Context,ParameterCache_mxJPO)
      * @see #evalParameter(ParameterDef_mxJPO, String[], int)
      * @see #getValueInteger(String)
      * @see #defineValueInteger(String, Integer)
@@ -110,7 +112,8 @@ public class ParameterCache_mxJPO
      * Mapping between parameter definition and the related list of string
      * values.
      *
-     * @see #ParameterCache_mxJPO(Context,Collection)
+     * @see #ParameterCache_mxJPO(Context,boolean)
+     * @see #ParameterCache_mxJPO(Context,ParameterCache_mxJPO)
      * @see #evalParameter(ParameterDef_mxJPO, String[], int)
      */
     private final Map<String,Collection<String>> mapList;
@@ -119,7 +122,8 @@ public class ParameterCache_mxJPO
      * Mapping between parameter definition and the related map of string
      * values.
      *
-     * @see #ParameterCache_mxJPO(Context,Collection)
+     * @see #ParameterCache_mxJPO(Context,boolean)
+     * @see #ParameterCache_mxJPO(Context,ParameterCache_mxJPO)
      * @see #evalParameter(ParameterDef_mxJPO, String[], int)
      */
     private final Map<String,Map<String,?>> mapMap;
@@ -128,7 +132,8 @@ public class ParameterCache_mxJPO
      * Mapping between the enumeration name of the parameter and the string
      * value.
      *
-     * @see #ParameterCache_mxJPO(Context,Collection)
+     * @see #ParameterCache_mxJPO(Context,boolean)
+     * @see #ParameterCache_mxJPO(Context,ParameterCache_mxJPO)
      * @see #evalParameter(ParameterDef_mxJPO, String[], int)
      */
     private final Map<String,String> mapString;
