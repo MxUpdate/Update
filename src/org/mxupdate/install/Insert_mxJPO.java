@@ -49,7 +49,7 @@ import static org.mxupdate.util.MqlUtil_mxJPO.setEscapeOn;
  * update JPO classes are using imports and Matrix could not handle imports of
  * JPO classes, the complete MQL insert is rewritten.
  *
- * @author tmoxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class Insert_mxJPO
@@ -163,7 +163,7 @@ public class Insert_mxJPO
      *
      * @see ClassFile#getCode(Map)
      */
-    private static final Pattern PATTERN_JPO = Pattern.compile("((?<=[+ \\(\\)\\t\\r\\n@\\<,])|(^))[A-Za-z0-9\\.]*\\_"+"mxJPO");
+    private static final Pattern PATTERN_JPO = Pattern.compile("((?<=[+ \\(\\)\\t\\r\\n@\\<,!])|(^))[A-Za-z0-9\\.]*\\_"+"mxJPO");
 
     /**
      * MQL command line to list the installed MxUpdate JPOs and the depending
