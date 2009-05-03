@@ -23,13 +23,12 @@ package org.mxupdate.update.datamodel;
 import java.io.IOException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.mapping.Mapping_mxJPO.AttributeDef;
 import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class NumberGenerator_mxJPO
@@ -39,6 +38,14 @@ public class NumberGenerator_mxJPO
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = -3678077121553752020L;
+
+    /**
+     * String of the key within the parameter cache to define the name of the
+     * attribute which holds the next number of the number generator.
+     *
+     * @see #extractSymbolicNameFromCode(ParameterCache_mxJPO, StringBuilder)
+     */
+    private static final String PARAM_ATTR_NUMBERGENERATOR_NEXTNUMBER = "AttrNumberGenNextNumber";
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -71,8 +78,9 @@ public class NumberGenerator_mxJPO
         _out.append("mql mod bus \"${OBJECTID}\"")
             .append(" \\\n    description \"").append(StringUtil_mxJPO.convertTcl(this.getDescription())).append("\"");
         String nextNumber = null;
+        final String attrNextNumber = _paramCache.getValueString(PARAM_ATTR_NUMBERGENERATOR_NEXTNUMBER);
         for (final AttributeValue attr : this.getAttrValuesSorted())  {
-            if (AttributeDef.NUMBERGENERATORNEXTNUMBER.getMxName(_paramCache).equals(attr.name))  {
+            if (attrNextNumber.equals(attr.name))  {
                 nextNumber = attr.value;
             } else  {
                 _out.append(" \\\n    \"").append(StringUtil_mxJPO.convertTcl(attr.name))
@@ -82,10 +90,10 @@ public class NumberGenerator_mxJPO
         _out.append("\n")
             .append("\n# update of the next number attribute only if not already set")
             .append("\nset sTmp [mql print bus \"${OBJECTID}\" select attribute\\[")
-                    .append(AttributeDef.NUMBERGENERATORNEXTNUMBER.getMxName(_paramCache)).append("\\] dump]")
+                    .append(attrNextNumber).append("\\] dump]")
             .append("\nif {[string length \"${sTmp}\"]==0}  {")
             .append("\n  mql mod bus \"${OBJECTID}\" \"")
-                    .append(AttributeDef.NUMBERGENERATORNEXTNUMBER.getMxName(_paramCache))
+                    .append(attrNextNumber)
                     .append("\" \"").append(nextNumber).append("\"")
             .append("\n}");
     }

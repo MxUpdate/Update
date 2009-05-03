@@ -42,7 +42,7 @@ import org.mxupdate.util.MqlUtil_mxJPO;
 public class Mapping_mxJPO
 {
     /**
-     * Name of the Mx program where the mapping definition is stored as
+     * Name of the MX program where the mapping definition is stored as
      * properties.
      */
     private static final String PROP_NAME = "org.mxupdate.mapping.properties";
@@ -62,20 +62,9 @@ public class Mapping_mxJPO
     private static final int LENGTH_PROPERTYDEF = Mapping_mxJPO.PREFIX_PROPERTYDEF.length();
 
     /**
-     * Used prefix of attribute definitions within the property file.
-     */
-    private static final String PREFIX_ATTRIBUTE = "Attribute.";
-
-    /**
      * Properties holding all mapping definitions.
      */
     private final Properties properties = new Properties();
-
-    /**
-     * Mapping between internal used attribute definitions and the MX attribute
-     * names.
-     */
-    private final Map<AttributeDef,String> attributeMap = new HashMap<AttributeDef,String>();
 
     /**
      * Maps from the mode enumeration {@link Mode_mxJPO} to the related
@@ -182,11 +171,7 @@ public class Mapping_mxJPO
         for (final Map.Entry<Object, Object> entry : this.properties.entrySet())  {
             final String key = (String) entry.getKey();
             final String value = (String) entry.getValue();
-            if (key.startsWith(Mapping_mxJPO.PREFIX_ATTRIBUTE))  {
-                final AttributeDef attr = AttributeDef.valueOf(key.substring(Mapping_mxJPO.PREFIX_ATTRIBUTE.length())
-                                                                  .toUpperCase());
-                this.attributeMap.put(attr, value);
-            } else if (key.startsWith("Mode."))  {
+            if (key.startsWith("Mode."))  {
                 Mode_mxJPO.defineValue(this, key.substring(5), value);
             } else if (key.startsWith("ParameterDef."))  {
                 ParameterDef_mxJPO.defineValue(this, key.substring(13), value);
@@ -384,31 +369,5 @@ public class Mapping_mxJPO
     protected Map<String,TypeDefGroup_mxJPO> getTypeDefGroupMap()
     {
         return this.typeDefGroupMap;
-    }
-
-    /**
-     * Enumeration used for attribute definitions.
-     */
-    public enum AttributeDef
-    {
-        /**
-         * Next number attribute of type {@link BusTypeDef#NumberGenerator}.
-         * <b>Attention!</b> The name of the enumeration should not be changed!
-         * The name is used within the mapping property file.
-         */
-        NUMBERGENERATORNEXTNUMBER;
-
-        /**
-         * Returns the related name used within MX. The method returns only
-         * correct values if the initialize method was called!
-         *
-         * @param _paramCache   for which parameter cache must the property
-         *                      MX name returned
-         * @return MX name of the attribute definition
-         */
-        public String getMxName(final ParameterCache_mxJPO _paramCache)
-        {
-            return _paramCache.getMapping().attributeMap.get(this);
-        }
     }
 }
