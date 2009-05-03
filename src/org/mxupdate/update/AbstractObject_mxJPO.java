@@ -32,8 +32,8 @@ import java.util.TreeSet;
 
 import matrix.util.MatrixException;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.util.MqlUtil_mxJPO;
@@ -43,7 +43,7 @@ import org.xml.sax.SAXException;
  * Abstract class from which must be derived for exporting and importing all
  * administration (business) objects.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public abstract class AbstractObject_mxJPO
@@ -360,7 +360,7 @@ public abstract class AbstractObject_mxJPO
      * @throws MatrixException if the property value could not be extracted
      */
     public String getPropValue(final ParameterCache_mxJPO _paramCache,
-                               final AdminPropertyDef _prop)
+                               final PropertyDef_mxJPO _prop)
             throws MatrixException
     {
         final String curVersion;

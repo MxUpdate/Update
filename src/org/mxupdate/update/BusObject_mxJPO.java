@@ -41,14 +41,14 @@ import matrix.db.RelationshipWithSelect;
 import matrix.util.MatrixException;
 import matrix.util.StringList;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class BusObject_mxJPO
@@ -274,17 +274,17 @@ public class BusObject_mxJPO
         final AttributeList attrs = bus.getAttributeValues(_paramCache.getContext(), true);
         for (final Object attrObj : attrs)  {
             final Attribute attr = (Attribute) attrObj;
-            if (AdminPropertyDef.AUTHOR.getAttrName(_paramCache).equals(attr.getName()))  {
+            if (PropertyDef_mxJPO.AUTHOR.getAttrName(_paramCache).equals(attr.getName()))  {
                 this.setAuthor(attr.getValue());
-            } else if (AdminPropertyDef.APPLICATION.getAttrName(_paramCache).equals(attr.getName()))  {
+            } else if (PropertyDef_mxJPO.APPLICATION.getAttrName(_paramCache).equals(attr.getName()))  {
                 this.setApplication(attr.getValue());
-            } else if (AdminPropertyDef.INSTALLEDDATE.getAttrName(_paramCache).equals(attr.getName()))  {
+            } else if (PropertyDef_mxJPO.INSTALLEDDATE.getAttrName(_paramCache).equals(attr.getName()))  {
                 this.setInstallationDate(attr.getValue());
-            } else if (AdminPropertyDef.INSTALLER.getAttrName(_paramCache).equals(attr.getName()))  {
+            } else if (PropertyDef_mxJPO.INSTALLER.getAttrName(_paramCache).equals(attr.getName()))  {
                 this.setInstaller(attr.getValue());
-            } else if (AdminPropertyDef.VERSION.getAttrName(_paramCache).equals(attr.getName()))  {
+            } else if (PropertyDef_mxJPO.VERSION.getAttrName(_paramCache).equals(attr.getName()))  {
                 this.setVersion(attr.getValue());
-            } else if (!AdminPropertyDef.FILEDATE.getAttrName(_paramCache).equals(attr.getName()))  {
+            } else if (!PropertyDef_mxJPO.FILEDATE.getAttrName(_paramCache).equals(attr.getName()))  {
                 this.attrValuesSorted.add(new AttributeValue(attr));
             }
         }
@@ -551,37 +551,37 @@ public class BusObject_mxJPO
                 .append(_postMQLCode)
                 .append("mod bus ").append(this.busOid)
         // define version
-                .append(" \"").append(AdminPropertyDef.VERSION.getAttrName(_paramCache))
-                        .append("\" \"").append(_tclVariables.get(AdminPropertyDef.VERSION.name())).append('\"')
+                .append(" \"").append(PropertyDef_mxJPO.VERSION.getAttrName(_paramCache))
+                        .append("\" \"").append(_tclVariables.get(PropertyDef_mxJPO.VERSION.name())).append('\"')
         // define file date
-                .append(" \"").append(AdminPropertyDef.FILEDATE.getAttrName(_paramCache))
-                        .append("\" \"").append(_tclVariables.get(AdminPropertyDef.FILEDATE.name())).append('\"');
+                .append(" \"").append(PropertyDef_mxJPO.FILEDATE.getAttrName(_paramCache))
+                        .append("\" \"").append(_tclVariables.get(PropertyDef_mxJPO.FILEDATE.name())).append('\"');
         // is installed date property defined?
         if ((this.getInstallationDate() == null) || "".equals(this.getInstallationDate()))  {
             final String date = StringUtil_mxJPO.formatInstalledDate(_paramCache, new Date());
             _paramCache.logTrace("    - define installed date '" + date + "'");
-            postMQLCode.append(" \"").append(AdminPropertyDef.INSTALLEDDATE.getAttrName(_paramCache))
+            postMQLCode.append(" \"").append(PropertyDef_mxJPO.INSTALLEDDATE.getAttrName(_paramCache))
                     .append("\" \"").append(date).append('\"');
         }
         // exists no installer property or installer property not equal?
-        final String instVal = _tclVariables.get(AdminPropertyDef.INSTALLER.name());
+        final String instVal = _tclVariables.get(PropertyDef_mxJPO.INSTALLER.name());
         if ((this.getInstaller() == null) || !this.getInstaller().equals(instVal))  {
             _paramCache.logTrace("    - define installer '" + instVal + "'");
-            postMQLCode.append(" \"").append(AdminPropertyDef.INSTALLER.getAttrName(_paramCache))
+            postMQLCode.append(" \"").append(PropertyDef_mxJPO.INSTALLER.getAttrName(_paramCache))
                     .append("\" \"").append(instVal).append('\"');
         }
         // exists no application property or application property not equal?
-        final String applVal = _tclVariables.get(AdminPropertyDef.APPLICATION.name());
+        final String applVal = _tclVariables.get(PropertyDef_mxJPO.APPLICATION.name());
         if ((this.getApplication() == null) || !this.getApplication().equals(applVal))  {
             _paramCache.logTrace("    - define application '" + applVal + "'");
-            postMQLCode.append(" \"").append(AdminPropertyDef.APPLICATION.getAttrName(_paramCache))
+            postMQLCode.append(" \"").append(PropertyDef_mxJPO.APPLICATION.getAttrName(_paramCache))
                     .append("\" \"").append(applVal).append('\"');
         }
         // exists no author property or author property not equal?
-        final String authVal = _tclVariables.get(AdminPropertyDef.AUTHOR.name());
+        final String authVal = _tclVariables.get(PropertyDef_mxJPO.AUTHOR.name());
         if ((this.getAuthor() == null) || !this.getAuthor().equals(authVal))  {
             _paramCache.logTrace("    - define author '" + authVal + "'");
-            postMQLCode.append(" \"").append(AdminPropertyDef.AUTHOR.getAttrName(_paramCache))
+            postMQLCode.append(" \"").append(PropertyDef_mxJPO.AUTHOR.getAttrName(_paramCache))
                     .append("\" \"").append(authVal).append('\"');
         }
         postMQLCode.append(";\n");

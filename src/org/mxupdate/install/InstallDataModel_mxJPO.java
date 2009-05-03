@@ -32,8 +32,8 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 import matrix.util.Mime64;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.plugin.GetProperties_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -45,7 +45,7 @@ import org.mxupdate.util.MqlUtil_mxJPO;
  * automatically called from the &quot;MxInstall.mql&quot; MQL installation
  * script.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class InstallDataModel_mxJPO
@@ -158,7 +158,7 @@ public class InstallDataModel_mxJPO
         final String fileDate = StringUtil_mxJPO.formatFileDate(_paramCache, new Date());
         final String installedDate = StringUtil_mxJPO.formatInstalledDate(_paramCache, new Date());
 
-        for (final AdminPropertyDef propDef : AdminPropertyDef.values())  {
+        for (final PropertyDef_mxJPO propDef : PropertyDef_mxJPO.values())  {
             if ((propDef.getAttrName(_paramCache) != null) && !"".equals(propDef.getAttrName(_paramCache)))  {
                 _paramCache.logInfo("check attribute '" + propDef.getAttrName(_paramCache) + "'");
 
@@ -185,20 +185,20 @@ public class InstallDataModel_mxJPO
                                                                  .newTypeInstance(propDef.getAttrName(_paramCache));
 
                 // check for correct application name
-                this.checkProperty(_paramCache, instance, AdminPropertyDef.APPLICATION, applName, cmd, false);
+                this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.APPLICATION, applName, cmd, false);
                 // check for correct author name
-                this.checkProperty(_paramCache, instance, AdminPropertyDef.AUTHOR, authorName, cmd, false);
+                this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.AUTHOR, authorName, cmd, false);
                 // check for correct installer name
-                this.checkProperty(_paramCache, instance, AdminPropertyDef.INSTALLER, installerName, cmd, false);
+                this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.INSTALLER, installerName, cmd, false);
                 // check for correct version
-                this.checkProperty(_paramCache, instance, AdminPropertyDef.VERSION, _version, cmd, false);
+                this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.VERSION, _version, cmd, false);
                 // check for original name
-                this.checkProperty(_paramCache, instance, AdminPropertyDef.ORIGINALNAME,
+                this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.ORIGINALNAME,
                                    propDef.getAttrName(_paramCache), cmd, false);
                 // check for file date
-                this.checkProperty(_paramCache, instance, AdminPropertyDef.FILEDATE, fileDate, cmd, true);
+                this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.FILEDATE, fileDate, cmd, true);
                 // check for installed date
-                this.checkProperty(_paramCache, instance, AdminPropertyDef.INSTALLEDDATE, installedDate, cmd, true);
+                this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.INSTALLEDDATE, installedDate, cmd, true);
 
                 MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
             }
@@ -224,7 +224,7 @@ public class InstallDataModel_mxJPO
                     && (typeDef.getMxAdminName() == null)
                     && (!typeDef.isBusCheckExists() || typeDef.existsBusType(_paramCache.getContext())))  {
                 _paramCache.logInfo("check type "+typeDef.getMxBusType());
-                for (final AdminPropertyDef propDef : AdminPropertyDef.values())  {
+                for (final PropertyDef_mxJPO propDef : PropertyDef_mxJPO.values())  {
                     if ((propDef.getAttrName(_paramCache) != null) && !"".equals(propDef.getAttrName(_paramCache)))  {
                         final StringBuilder cmd = new StringBuilder()
                                 .append("print type \"").append(typeDef.getMxBusType())
@@ -324,7 +324,7 @@ public class InstallDataModel_mxJPO
      */
     protected void checkProperty(final ParameterCache_mxJPO _paramCache,
                                  final AbstractObject_mxJPO _instance,
-                                 final AdminPropertyDef _propDef,
+                                 final PropertyDef_mxJPO _propDef,
                                  final String _newValue,
                                  final StringBuilder _cmd,
                                  final boolean _onlyIfNotDefined)

@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Map.Entry;
 
 import matrix.db.Context;
 import matrix.util.MatrixException;
@@ -37,7 +36,7 @@ import org.mxupdate.util.MqlUtil_mxJPO;
  * The class is used to map from used names within the MxUpdate JPOs and the
  * internal used names within MX.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class Mapping_mxJPO
@@ -49,14 +48,18 @@ public class Mapping_mxJPO
     private static final String PROP_NAME = "org.mxupdate.mapping.properties";
 
     /**
-     * Used prefix of attribute definitions within the property file.
+     * Used prefix of property definition within the property file.
+     *
+     * @see #Mapping_mxJPO(Context)
      */
-    private static final String PREFIX_ADMINPROPERTYATTRIBUTE = "PropertyAttribute.";
+    private static final String PREFIX_PROPERTYDEF = "PropertyDef.";
 
     /**
-     * Used prefix of admin property definitions within the property file.
+     * Length of the prefix of property definition within the property file.
+     *
+     * @see #Mapping_mxJPO(Context)
      */
-    private static final String PREFIX_ADMINPROPERTYNAME = "PropertyName.";
+    private static final int LENGTH_PROPERTYDEF = Mapping_mxJPO.PREFIX_PROPERTYDEF.length();
 
     /**
      * Used prefix of attribute definitions within the property file.
@@ -67,28 +70,6 @@ public class Mapping_mxJPO
      * Properties holding all mapping definitions.
      */
     private final Properties properties = new Properties();
-
-    /**
-     * Mapping between internal used admin property definitions and the MX
-     * attribute names.
-     */
-    private final Map<AdminPropertyDef,String> adminPropertyAttributes = new HashMap<AdminPropertyDef,String>();
-
-    /**
-     * Mapping between internal used admin property definitions and the MX
-     * admin property names.
-     *
-     * @see AdminPropertyDef#getPropName()
-     */
-    private final Map<AdminPropertyDef,String> adminPropertyEnum2Names = new HashMap<AdminPropertyDef,String>();
-
-    /**
-     * Mapping between MX admin property name and the internal used admin
-     * property definition.
-     *
-     * @see AdminPropertyDef#getEnumByPropName(String)
-     */
-    private final Map<String,AdminPropertyDef> adminPropertyNames2Enum = new HashMap<String,AdminPropertyDef>();
 
     /**
      * Mapping between internal used attribute definitions and the MX attribute
@@ -115,6 +96,33 @@ public class Mapping_mxJPO
      * @see #getParameterDefMap()
      */
     private final Map<String,ParameterDef_mxJPO> parameterDefMap = new HashMap<String,ParameterDef_mxJPO>();
+
+    /**
+     * Mapping between internal used admin property definitions and the MX
+     * attribute names.
+     *
+     * @see PropertyDef_mxJPO#getAttrName(ParameterCache_mxJPO)
+     * @see #getPropertyAttributes()
+     */
+    private final Map<PropertyDef_mxJPO,String> propertyAttributes = new HashMap<PropertyDef_mxJPO,String>();
+
+    /**
+     * Mapping between internal used admin property definitions and the MX
+     * admin property names.
+     *
+     * @see PropertyDef_mxJPO#getPropName(ParameterCache_mxJPO)
+     * @see #getPropertyEnum2Names()
+     */
+    private final Map<PropertyDef_mxJPO,String> propertyEnum2Names = new HashMap<PropertyDef_mxJPO,String>();
+
+    /**
+     * Mapping between MX admin property name and the internal used admin
+     * property definition.
+     *
+     * @see PropertyDef_mxJPO#getEnumByPropName(ParameterCache_mxJPO, String)
+     * @see #getPropertyNames2Enum()
+     */
+    private final Map<String,PropertyDef_mxJPO> propertyNames2Enum = new HashMap<String,PropertyDef_mxJPO>();
 
     /**
      * Maps from the name of the type definition group to the related type
@@ -171,21 +179,10 @@ public class Mapping_mxJPO
         this.properties.putAll(MqlUtil_mxJPO.readPropertyProgram(_context, Mapping_mxJPO.PROP_NAME));
 
         // map attributes and types
-        for (final Entry<Object, Object> entry : this.properties.entrySet())  {
+        for (final Map.Entry<Object, Object> entry : this.properties.entrySet())  {
             final String key = (String) entry.getKey();
             final String value = (String) entry.getValue();
-            if (key.startsWith(Mapping_mxJPO.PREFIX_ADMINPROPERTYATTRIBUTE))  {
-                this.adminPropertyAttributes.put(AdminPropertyDef.valueOf(key
-                                                       .substring(Mapping_mxJPO.PREFIX_ADMINPROPERTYATTRIBUTE.length())
-                                                       .toUpperCase()),
-                                                 value);
-            } else if (key.startsWith(Mapping_mxJPO.PREFIX_ADMINPROPERTYNAME))  {
-                final AdminPropertyDef en
-                        = AdminPropertyDef.valueOf(key.substring(Mapping_mxJPO.PREFIX_ADMINPROPERTYNAME.length())
-                                                      .toUpperCase());
-                this.adminPropertyEnum2Names.put(en, value);
-                this.adminPropertyNames2Enum.put(value, en);
-            } else if (key.startsWith(Mapping_mxJPO.PREFIX_ATTRIBUTE))  {
+            if (key.startsWith(Mapping_mxJPO.PREFIX_ATTRIBUTE))  {
                 final AttributeDef attr = AttributeDef.valueOf(key.substring(Mapping_mxJPO.PREFIX_ATTRIBUTE.length())
                                                                   .toUpperCase());
                 this.attributeMap.put(attr, value);
@@ -193,6 +190,8 @@ public class Mapping_mxJPO
                 Mode_mxJPO.defineValue(this, key.substring(5), value);
             } else if (key.startsWith("ParameterDef."))  {
                 ParameterDef_mxJPO.defineValue(this, key.substring(13), value);
+            } else if (key.startsWith(Mapping_mxJPO.PREFIX_PROPERTYDEF))  {
+                PropertyDef_mxJPO.defineValue(this, key.substring(Mapping_mxJPO.LENGTH_PROPERTYDEF), value);
             } else if (key.startsWith("TypeDef."))  {
                 TypeDef_mxJPO.defineValue(_context, this, key.substring(8), value);
             } else if (key.startsWith("TypeDefGroup."))  {
@@ -249,6 +248,42 @@ public class Mapping_mxJPO
     protected Map<String,ParameterDef_mxJPO> getParameterDefJPOsMap()
     {
         return this.parameterDefMap;
+    }
+
+    /**
+     * Returns the mapping between internal used admin property definitions and
+     * the MX attribute names.
+     *
+     * @return mapping
+     * @see #propertyAttributes
+     */
+    protected Map<PropertyDef_mxJPO,String> getPropertyAttributes()
+    {
+        return this.propertyAttributes;
+    }
+
+    /**
+     * Returns the mapping between internal used admin property definitions and
+     * the MX admin property names.
+     *
+     * @return mapping
+     * @see #propertyEnum2Names
+     */
+    protected Map<PropertyDef_mxJPO,String> getPropertyEnum2Names()
+    {
+        return this.propertyEnum2Names;
+    }
+
+    /**
+     * Returns the mapping between MX admin property name and the internal
+     * used admin property definition.
+     *
+     * @return mapping
+     * @see #propertyNames2Enum
+     */
+    protected Map<String,PropertyDef_mxJPO> getPropertyNames2Enum()
+    {
+        return this.propertyNames2Enum;
     }
 
     /**
@@ -349,74 +384,6 @@ public class Mapping_mxJPO
     protected Map<String,TypeDefGroup_mxJPO> getTypeDefGroupMap()
     {
         return this.typeDefGroupMap;
-    }
-
-    /**
-     * Enumerator for admin properties.
-     */
-    public enum AdminPropertyDef
-    {
-        /** Admin property to store the name of the application. */
-        APPLICATION,
-        /** Admin property to store the author. */
-        AUTHOR,
-        /** Admin property to store the last modified date of the file. */
-        FILEDATE,
-        /** Admin property to store the installation date. */
-        INSTALLEDDATE,
-        /** Admin property to store the installer. */
-        INSTALLER,
-        /** Admin property to store the original name. */
-        ORIGINALNAME,
-        /** Admin property to store the version. */
-        VERSION;
-
-        /**
-         * Returns the related admin property name used within Mx. The method
-         * returns only correct values if the initialize method was called!
-         *
-         * @param _paramCache   for which parameter cache must the property
-         *                      name returned
-         * @return MX name of the property definition
-         * @see Mapping_mxJPO#adminPropertyEnum2Names
-         */
-        public String getPropName(final ParameterCache_mxJPO _paramCache)
-        {
-            return _paramCache.getMapping().adminPropertyEnum2Names.get(this);
-        }
-
-        /**
-         * Returns the related admin property enumeration element for given
-         * property name.
-         *
-         * @param _paramCache   for which parameter cache must the property
-         *                      definition enumeration <code>_propName</code>
-         *                      returned
-         * @param _propName     name of property for which the admin property
-         *                      enumeration is searched
-         * @return related admin property enumeration element or
-         *         <code>null</code> if not found
-         * @see Mapping_mxJPO#adminPropertyNames2Enum
-         */
-        public static AdminPropertyDef getEnumByPropName(final ParameterCache_mxJPO _paramCache,
-                                                         final String _propName)
-        {
-            return _paramCache.getMapping().adminPropertyNames2Enum.get(_propName);
-        }
-
-        /**
-         * Returns the related attribute name used within Mx. The method
-         * returns only correct values if the initialize method was called!
-         *
-         * @param _paramCache   for which parameter cache must the attribute
-         *                      returned
-         * @return MX name of the property definition
-         * @see Mapping_mxJPO#adminPropertyAttributes
-         */
-        public String getAttrName(final ParameterCache_mxJPO _paramCache)
-        {
-            return _paramCache.getMapping().adminPropertyAttributes.get(this);
-        }
     }
 
     /**

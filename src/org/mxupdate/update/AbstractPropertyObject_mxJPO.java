@@ -26,15 +26,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.util.JPOCaller_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public abstract class AbstractPropertyObject_mxJPO
@@ -327,10 +327,10 @@ public abstract class AbstractPropertyObject_mxJPO
         // defines the version in the TCL variables
         final Map<String,String> tclVariables = new HashMap<String,String>();
         if (_newVersion == null)  {
-            tclVariables.put(AdminPropertyDef.VERSION.name(),
+            tclVariables.put(PropertyDef_mxJPO.VERSION.name(),
                               this.extractFromCode(code, AbstractPropertyObject_mxJPO.HEADER_VERSION, ""));
         } else  {
-            tclVariables.put(AdminPropertyDef.VERSION.name(), _newVersion);
+            tclVariables.put(PropertyDef_mxJPO.VERSION.name(), _newVersion);
         }
 
         // define author
@@ -342,7 +342,7 @@ public abstract class AbstractPropertyObject_mxJPO
                                           AbstractPropertyObject_mxJPO.HEADER_AUTHOR,
                                           _paramCache.getValueString(ParameterCache_mxJPO.KEY_DEFAULTAUTHOR));
         }
-        tclVariables.put(AdminPropertyDef.AUTHOR.name(), author);
+        tclVariables.put(PropertyDef_mxJPO.AUTHOR.name(), author);
 
         // define application
         String appl = null;
@@ -357,7 +357,7 @@ public abstract class AbstractPropertyObject_mxJPO
         if (appl == null)  {
             appl = "";
         }
-        tclVariables.put(AdminPropertyDef.APPLICATION.name(), appl);
+        tclVariables.put(PropertyDef_mxJPO.APPLICATION.name(), appl);
 
         // define installer
         final String installer;
@@ -368,7 +368,7 @@ public abstract class AbstractPropertyObject_mxJPO
                                              AbstractPropertyObject_mxJPO.HEADER_INSTALLER,
                                              _paramCache.getValueString(ParameterCache_mxJPO.KEY_DEFAULTINSTALLER));
         }
-        tclVariables.put(AdminPropertyDef.INSTALLER.name(), installer);
+        tclVariables.put(PropertyDef_mxJPO.INSTALLER.name(), installer);
 
         if (this.getTypeDef().getMxAdminName() != null)  {
             // define symbolic name
@@ -381,11 +381,11 @@ public abstract class AbstractPropertyObject_mxJPO
             } else  {
                 origName = this.getName();
             }
-            tclVariables.put(AdminPropertyDef.ORIGINALNAME.name(), origName);
+            tclVariables.put(PropertyDef_mxJPO.ORIGINALNAME.name(), origName);
         }
 
         // define file date
-        tclVariables.put(AdminPropertyDef.FILEDATE.name(),
+        tclVariables.put(PropertyDef_mxJPO.FILEDATE.name(),
                          StringUtil_mxJPO.formatFileDate(_paramCache, new Date(_file.lastModified())));
 
         this.update(_paramCache, "", "", "", tclVariables, _file);

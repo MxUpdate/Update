@@ -25,15 +25,15 @@ import java.util.Date;
 
 import matrix.util.MatrixException;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public abstract class AbstractProgram_mxJPO
@@ -76,17 +76,17 @@ public abstract class AbstractProgram_mxJPO
             throws MatrixException
     {
         // set author depending on the properties
-        this.setAuthor(this.getPropValue(_paramCache, AdminPropertyDef.AUTHOR));
+        this.setAuthor(this.getPropValue(_paramCache, PropertyDef_mxJPO.AUTHOR));
         // set application depending on the properties
-        this.setApplication(this.getPropValue(_paramCache, AdminPropertyDef.APPLICATION));
+        this.setApplication(this.getPropValue(_paramCache, PropertyDef_mxJPO.APPLICATION));
         // sets the installation date depending on the properties
-        this.setInstallationDate(this.getPropValue(_paramCache, AdminPropertyDef.INSTALLEDDATE));
+        this.setInstallationDate(this.getPropValue(_paramCache, PropertyDef_mxJPO.INSTALLEDDATE));
         // sets the installer depending on the properties
-        this.setInstaller(this.getPropValue(_paramCache, AdminPropertyDef.INSTALLER));
+        this.setInstaller(this.getPropValue(_paramCache, PropertyDef_mxJPO.INSTALLER));
         // sets the original name depending on the properties
-        this.setOriginalName(this.getPropValue(_paramCache, AdminPropertyDef.ORIGINALNAME));
+        this.setOriginalName(this.getPropValue(_paramCache, PropertyDef_mxJPO.ORIGINALNAME));
         // sets the version depending on the properties
-        this.setVersion(this.getPropValue(_paramCache, AdminPropertyDef.VERSION));
+        this.setVersion(this.getPropValue(_paramCache, PropertyDef_mxJPO.VERSION));
     }
 
     /**
@@ -125,7 +125,7 @@ public abstract class AbstractProgram_mxJPO
         final int length = (prpArr.length + 1) / 2;
         for (int idxName = 0, idxTo = length; idxName < length; idxName++, idxTo++)  {
             final String name = prpArr[idxName].trim();
-            if (AdminPropertyDef.getEnumByPropName(_paramCache, name) == null)  {
+            if (PropertyDef_mxJPO.getEnumByPropName(_paramCache, name) == null)  {
 // TODO: if to is defined, the remove must be specified the to ....
                 final String to = (idxTo < length) ? prpArr[idxTo].trim() : "";
                 cmd.append("mod prog \"").append(this.getName())
@@ -138,17 +138,17 @@ public abstract class AbstractProgram_mxJPO
            .append("mod prog \"").append(this.getName()).append('\"');
 
         // define version property
-        cmd.append(" add property \"").append(AdminPropertyDef.VERSION.getPropName(_paramCache)).append("\" ")
+        cmd.append(" add property \"").append(PropertyDef_mxJPO.VERSION.getPropName(_paramCache)).append("\" ")
            .append("value \"").append(_newVersion != null ? _newVersion : "").append('\"');
         // define file date property
-        cmd.append(" add property \"").append(AdminPropertyDef.FILEDATE.getPropName(_paramCache)).append("\" ")
+        cmd.append(" add property \"").append(PropertyDef_mxJPO.FILEDATE.getPropName(_paramCache)).append("\" ")
            .append("value \"")
            .append(StringUtil_mxJPO.formatFileDate(_paramCache, new Date(_file.lastModified()))).append('\"');
         // is installed date property defined?
         if ((this.getInstallationDate() == null) || "".equals(this.getInstallationDate()))  {
             final String date = StringUtil_mxJPO.formatInstalledDate(_paramCache, new Date());
             _paramCache.logTrace("    - define installed date '" + date + "'");
-            cmd.append(" add property \"").append(AdminPropertyDef.INSTALLEDDATE.getPropName(_paramCache)).append("\" ")
+            cmd.append(" add property \"").append(PropertyDef_mxJPO.INSTALLEDDATE.getPropName(_paramCache)).append("\" ")
                .append("value \"").append(date).append('\"');
         }
         // exists no installer property or installer property not equal?
@@ -162,13 +162,13 @@ public abstract class AbstractProgram_mxJPO
         }
         if (installer != null)  {
             _paramCache.logTrace("    - define installer '" + installer + "'");
-            cmd.append(" add property \"").append(AdminPropertyDef.INSTALLER.getPropName(_paramCache)).append("\" ")
+            cmd.append(" add property \"").append(PropertyDef_mxJPO.INSTALLER.getPropName(_paramCache)).append("\" ")
                .append("value \"").append(installer).append('\"');
         }
         // is original name property defined?
         if ((this.getOriginalName() == null) && "".equals(this.getOriginalName()))  {
             _paramCache.logTrace("    - define original name '" + this.getName() + "'");
-            cmd.append(" add property \"").append(AdminPropertyDef.ORIGINALNAME.getPropName(_paramCache)).append("\" ")
+            cmd.append(" add property \"").append(PropertyDef_mxJPO.ORIGINALNAME.getPropName(_paramCache)).append("\" ")
                .append("value \"").append(this.getName()).append('\"');
         }
         // exists no application property or application property not equal?
@@ -183,7 +183,7 @@ public abstract class AbstractProgram_mxJPO
             appl = "";
         }
         _paramCache.logTrace("    - define application '" + appl + "'");
-        cmd.append(" add property \"").append(AdminPropertyDef.APPLICATION.getPropName(_paramCache)).append("\" ")
+        cmd.append(" add property \"").append(PropertyDef_mxJPO.APPLICATION.getPropName(_paramCache)).append("\" ")
            .append("value \"").append(appl).append('\"');
         // exists no author property or author property not equal?
         final String author;
@@ -196,7 +196,7 @@ public abstract class AbstractProgram_mxJPO
         }
         if (author != null)  {
             _paramCache.logTrace("    - define author '" + author + "'");
-            cmd.append(" add property \"").append(AdminPropertyDef.AUTHOR.getPropName(_paramCache)).append("\" ")
+            cmd.append(" add property \"").append(PropertyDef_mxJPO.AUTHOR.getPropName(_paramCache)).append("\" ")
                .append("value \"").append(author).append('\"');
         }
         cmd.append(";\n");

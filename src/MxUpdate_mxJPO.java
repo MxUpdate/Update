@@ -39,10 +39,10 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.Mode_mxJPO;
 import org.mxupdate.mapping.ParameterDef_mxJPO;
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDefGroup_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.UpdateCheck_mxJPO;
-import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -53,7 +53,7 @@ import org.mxupdate.util.MqlUtil_mxJPO;
  * <th></th><th></th><th></th>
  * <tr>
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class MxUpdate_mxJPO
@@ -670,7 +670,7 @@ public class MxUpdate_mxJPO
                     if (_versionInfo == UpdateCheck_mxJPO.FILEDATE)  {
                         final Date fileDate = new Date(fileEntry.getKey().lastModified());
                         final String instDateString = instance.getPropValue(_paramCache,
-                                                                            AdminPropertyDef.FILEDATE);
+                                                                            PropertyDef_mxJPO.FILEDATE);
                         Date instDate;
                         if ((instDateString == null) || "".equals(instDateString))  {
                             instDate = null;
@@ -689,7 +689,7 @@ public class MxUpdate_mxJPO
                         }
                     } else if (_versionInfo == UpdateCheck_mxJPO.VERSION)  {
                         final String instVersion = instance.getPropValue(_paramCache,
-                                                                         AdminPropertyDef.VERSION);
+                                                                         PropertyDef_mxJPO.VERSION);
                         if (instVersion.equals(version))  {
                             update = false;
                         } else  {

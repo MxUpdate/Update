@@ -26,8 +26,8 @@ import java.util.Map;
 
 import matrix.util.MatrixException;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -35,7 +35,7 @@ import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class Association_mxJPO
@@ -157,7 +157,7 @@ public class Association_mxJPO
      */
     @Override
     public String getPropValue(final ParameterCache_mxJPO _paramCache,
-                               final AdminPropertyDef _prop)
+                               final PropertyDef_mxJPO _prop)
             throws MatrixException
     {
         final String text = _prop.getPropName(_paramCache) + " on association " + this.getName() + " value ";
