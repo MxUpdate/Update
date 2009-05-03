@@ -20,9 +20,6 @@
 
 package org.mxupdate.mapping;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Holds the definition of all parameters.
@@ -69,14 +66,6 @@ public final class ParameterDef_mxJPO
     }
 
     /**
-     * Maps from the name of the parameter to the parameter instance.
-     *
-     * @see #defineValue(String, String)
-     */
-    private static final Map<String,ParameterDef_mxJPO> MAP
-            = new HashMap<String,ParameterDef_mxJPO>();
-
-    /**
      * Default value of the parameter.
      *
      * @see #getDefaultValue()
@@ -103,65 +92,34 @@ public final class ParameterDef_mxJPO
     }
 
     /**
-     * Resets parameter map.
+     * Defines the values of the parameter definition.
      *
-     * @see #MAP
-     */
-    protected static void resetValues()
-    {
-        MAP.clear();
-    }
-
-    /**
-     * Defines the values of the type definition group.
-     *
+     * @param _mapping  cache for all mapping
      * @param _key      key to define
      * @param _value    related value to define
      * @throws Exception if key is not found
      */
-    protected static void defineValue(final String _key,
+    protected static void defineValue(final Mapping_mxJPO _mapping,
+                                      final String _key,
                                       final String _value)
             throws Exception
     {
         final String enumName = _key.replaceAll("\\..*", "");
         final String key = _key.substring(enumName.length() + 1);
 
-        ParameterDef_mxJPO param = MAP.get(enumName);
+        ParameterDef_mxJPO param = _mapping.getParameterDefJPOsMap().get(enumName);
         if (param == null)  {
             param = new ParameterDef_mxJPO(enumName);
-            MAP.put(enumName, param);
+            _mapping.getParameterDefJPOsMap().put(enumName, param);
         }
 
         if ("Default".equals(key))  {
             param.defaultValue = _value;
         } else if ("Type".equals(key))  {
-            param.type = Type.valueOf(_value.toUpperCase());
+            param.type = ParameterDef_mxJPO.Type.valueOf(_value.toUpperCase());
         } else  {
             param.defineValues(key, _value);
         }
-    }
-
-    /**
-     * Returns for given name the related parameter instance.
-     *
-     * @param _name name of the searched parameter instance
-     * @return found parameter instance (or <code>null</code> if not found)
-     * @see #MAP
-     */
-    public static ParameterDef_mxJPO valueOf(final String _name)
-    {
-        return MAP.get(_name);
-    }
-
-    /**
-     * Returns the list of all parameter instances.
-     *
-     * @return list of all parameter instances
-     * see #MAP
-     */
-    public static Collection<ParameterDef_mxJPO> values()
-    {
-        return MAP.values();
     }
 
     /**

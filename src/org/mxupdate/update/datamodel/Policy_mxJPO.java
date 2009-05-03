@@ -328,7 +328,7 @@ public class Policy_mxJPO
             state.writeObject(_out);
         }
         _out.append("\n}");
-        this.writeProperties(_out);
+        this.writeProperties(_paramCache, _out);
     }
 
     /**

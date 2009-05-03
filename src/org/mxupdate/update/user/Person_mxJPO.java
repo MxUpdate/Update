@@ -236,7 +236,7 @@ public class Person_mxJPO
             }
             _out.append(" \\\n    description \"").append(convertTcl(this.getDescription())).append("\"");
             this.writeObject(_paramCache, _out);
-            this.writeProperties(_out);
+            this.writeProperties(_paramCache, _out);
         }
 
         /**

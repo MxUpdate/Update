@@ -37,7 +37,6 @@ import java.util.TreeSet;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
-import org.mxupdate.mapping.Mapping_mxJPO;
 import org.mxupdate.mapping.Mode_mxJPO;
 import org.mxupdate.mapping.ParameterDef_mxJPO;
 import org.mxupdate.mapping.TypeDefGroup_mxJPO;
@@ -46,10 +45,8 @@ import org.mxupdate.mapping.UpdateCheck_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.match;
-import static org.mxupdate.update.util.StringUtil_mxJPO.parseFileDate;
-import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
+import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * <tr>
@@ -177,7 +174,7 @@ public class MxUpdate_mxJPO
      */
     private final Map<String,UpdateCheck_mxJPO> paramsUpdateChecks = new HashMap<String,UpdateCheck_mxJPO>();
 
-    private void prepareParams(final Context _context)
+    private void prepareParams(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
         this.description.clear();
@@ -190,7 +187,7 @@ public class MxUpdate_mxJPO
         ////////////////////////////////////////////////////////////////////////
         // parameters
 
-        for (final ParameterDef_mxJPO parameter : ParameterDef_mxJPO.values())  {
+        for (final ParameterDef_mxJPO parameter : _paramCache.getMapping().getAllParameterDefs())  {
             if (parameter.getParameterList() != null)  {
                 for (final String param : parameter.getParameterList())  {
                     final String paramStr = (param.length() > 1)
@@ -199,7 +196,8 @@ public class MxUpdate_mxJPO
                     this.paramsParameters.put(paramStr, parameter);
                 }
                 final StringBuilder desc = new StringBuilder().append(parameter.getParameterDesc());
-                if ((parameter.getDefaultValue() != null) && (parameter.getType() != ParameterDef_mxJPO.Type.BOOLEAN))  {
+                if ((parameter.getDefaultValue() != null)
+                        && (parameter.getType() != ParameterDef_mxJPO.Type.BOOLEAN))  {
                     desc.append('\n').append("(Default '");
                     if (parameter.getType() == ParameterDef_mxJPO.Type.LIST)  {
                         desc.append(parameter.getDefaultValue().replaceAll(",", ", "));
@@ -250,8 +248,8 @@ public class MxUpdate_mxJPO
 
         // first create list all type definitions which could be used...
         final Set<TypeDef_mxJPO> all = new HashSet<TypeDef_mxJPO>();
-        for (final TypeDef_mxJPO typeDef : TypeDef_mxJPO.values())  {
-            if (!typeDef.isBusCheckExists() || typeDef.existsBusType(_context))  {
+        for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefs())  {
+            if (!typeDef.isBusCheckExists() || typeDef.existsBusType(_paramCache.getContext()))  {
                 all.add(typeDef);
                 if (typeDef.getParameterList() != null)  {
                     this.defineParameter(null,
@@ -277,10 +275,10 @@ public class MxUpdate_mxJPO
         // define type definition group parameters depending on existing type
         // definitions (and only if at minimum one type definition of the
         // groups exists...)
-        for (final TypeDefGroup_mxJPO group : TypeDefGroup_mxJPO.getGroups())  {
+        for (final TypeDefGroup_mxJPO group : _paramCache.getMapping().getAllTypeDefGroups())  {
             final Set<TypeDef_mxJPO> curTypeDefs = new HashSet<TypeDef_mxJPO>();
             for (final String typeDefName : group.getTypeDefList())  {
-                final TypeDef_mxJPO typeDef = TypeDef_mxJPO.valueOf(typeDefName);
+                final TypeDef_mxJPO typeDef = _paramCache.getMapping().getTypeDef(typeDefName);
                 if (all.contains(typeDef))  {
                     curTypeDefs.add(typeDef);
                 }
@@ -400,13 +398,12 @@ public class MxUpdate_mxJPO
             throws Exception
     {
         try {
-            // initialize mapping
-            Mapping_mxJPO.init(_context);
+            final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, false);
 
-            this.prepareParams(_context);
+            this.prepareParams(paramCache);
 
             // to be sure....
-            execMql(_context, "verbose off");
+            MqlUtil_mxJPO.execMql(_context, "verbose off");
 
             Mode_mxJPO mode = null;
 
@@ -419,7 +416,6 @@ public class MxUpdate_mxJPO
 
             UpdateCheck_mxJPO versionInfo = null;
 
-            final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, false);
 
             for (int idx = 0; idx < _args.length; idx++)  {
                 final String arg = _args[idx];
@@ -491,15 +487,15 @@ public class MxUpdate_mxJPO
     private void printHelp(final ParameterCache_mxJPO _paramCache)
             throws IOException
     {
-        final String prefix = _paramCache.getValueString(PARAM_HELP_PREFIX);
-        final int lengthLine = _paramCache.getValueInteger(PARAM_HELP_LENGTHLINE);
-        final int lengthParam = _paramCache.getValueInteger(PARAM_HELP_LENGTHPARAMS);
+        final String prefix = _paramCache.getValueString(MxUpdate_mxJPO.PARAM_HELP_PREFIX);
+        final int lengthLine = _paramCache.getValueInteger(MxUpdate_mxJPO.PARAM_HELP_LENGTHLINE);
+        final int lengthParam = _paramCache.getValueInteger(MxUpdate_mxJPO.PARAM_HELP_LENGTHPARAMS);
         final Appendable out = System.out;
 
         // first print the usage text with the mode parameters
         out.append('\n')
            .append(prefix)
-           .append(_paramCache.getValueString(PARAM_HELP_USAGE).trim())
+           .append(_paramCache.getValueString(MxUpdate_mxJPO.PARAM_HELP_USAGE).trim())
            .append(' ');
         boolean first = true;
         for (final Mode_mxJPO mode : Mode_mxJPO.values())  {
@@ -586,7 +582,7 @@ public class MxUpdate_mxJPO
                           final Map<TypeDef_mxJPO,List<String>> _clazz2matchesOpp)
             throws Exception
     {
-        final Collection<String> paths = _paramCache.getValueList(PARAM_PATH);
+        final Collection<String> paths = _paramCache.getValueList(MxUpdate_mxJPO.PARAM_PATH);
 
         // check for definition of min. / max. one path
         if (paths.isEmpty())  {
@@ -639,7 +635,7 @@ public class MxUpdate_mxJPO
             }
         }
         // create if needed (and not in the list of existing objects
-        for (final TypeDef_mxJPO clazz : TypeDef_mxJPO.values())  {
+        for (final TypeDef_mxJPO clazz : _paramCache.getMapping().getAllTypeDefs())  {
             final Map<File,String> clazzMap = clazz2names.get(clazz);
             if (clazzMap != null)  {
                 for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
@@ -654,7 +650,7 @@ public class MxUpdate_mxJPO
             }
         }
         // update
-        for (final TypeDef_mxJPO clazz : TypeDef_mxJPO.values())  {
+        for (final TypeDef_mxJPO clazz : _paramCache.getMapping().getAllTypeDefs())  {
             final Map<File,String> clazzMap = clazz2names.get(clazz);
             if (clazzMap != null)  {
                 for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
@@ -668,14 +664,14 @@ public class MxUpdate_mxJPO
                                      : _paramCache.getValueString(ParameterCache_mxJPO.KEY_VERSION);
                     if (_versionInfo == UpdateCheck_mxJPO.FILEDATE)  {
                         final Date fileDate = new Date(fileEntry.getKey().lastModified());
-                        final String instDateString = instance.getPropValue(_paramCache.getContext(),
+                        final String instDateString = instance.getPropValue(_paramCache,
                                                                             AdminPropertyDef.FILEDATE);
                         Date instDate;
                         if ((instDateString == null) || "".equals(instDateString))  {
                             instDate = null;
                         } else  {
                             try {
-                                instDate = parseFileDate(_paramCache, instDateString);
+                                instDate = StringUtil_mxJPO.parseFileDate(_paramCache, instDateString);
                             } catch (final ParseException e) {
                                 instDate = null;
                             }
@@ -687,7 +683,7 @@ public class MxUpdate_mxJPO
                             _paramCache.logDebug("    - update to version from " + fileDate);
                         }
                     } else if (_versionInfo == UpdateCheck_mxJPO.VERSION)  {
-                        final String instVersion = instance.getPropValue(_paramCache.getContext(),
+                        final String instVersion = instance.getPropValue(_paramCache,
                                                                          AdminPropertyDef.VERSION);
                         if (instVersion.equals(version))  {
                             update = false;
@@ -737,7 +733,7 @@ public class MxUpdate_mxJPO
             throws Exception
     {
         // check for definition of min. / max. one path
-        if (_paramCache.getValueList(PARAM_PATH).isEmpty())  {
+        if (_paramCache.getValueList(MxUpdate_mxJPO.PARAM_PATH).isEmpty())  {
             throw new Exception("no path is defined, but required for the delete!");
         }
 
@@ -807,9 +803,9 @@ public class MxUpdate_mxJPO
         final Map<TypeDef_mxJPO,Map<File,String>> clazz2names = new HashMap<TypeDef_mxJPO,Map<File,String>>();
 
         // get path parameters
-        final Collection<String> ignoreFiles = _paramCache.getValueList(PARAM_IGNOREFILE);
-        final Collection<String> ignorePaths = _paramCache.getValueList(PARAM_IGNOREPATH);
-        final Collection<String> paths = _paramCache.getValueList(PARAM_PATH);
+        final Collection<String> ignoreFiles = _paramCache.getValueList(MxUpdate_mxJPO.PARAM_IGNOREFILE);
+        final Collection<String> ignorePaths = _paramCache.getValueList(MxUpdate_mxJPO.PARAM_IGNOREPATH);
+        final Collection<String> paths = _paramCache.getValueList(MxUpdate_mxJPO.PARAM_PATH);
 
         // if no path is defined, the paths are directly defined at the objects
         // to import
@@ -822,7 +818,7 @@ public class MxUpdate_mxJPO
                     final String match = pathFile.getName();
                     final Set<File> subPathFiles = this.getAllFiles(pathFile.getParentFile(), ignorePaths, ignoreFiles);
                     for (final File file : subPathFiles)  {
-                        if (match(file.getName(), match))  {
+                        if (StringUtil_mxJPO.match(file.getName(), match))  {
                             allFiles.add(file);
                         }
                     }
@@ -905,7 +901,7 @@ public class MxUpdate_mxJPO
                 for (final Map.Entry<File,String> fileEntry : entry.getValue().entrySet())  {
                     boolean allowed = true;
                     for (final String matchOpp : matchOpps)  {
-                        if (match(fileEntry.getValue(), matchOpp))  {
+                        if (StringUtil_mxJPO.match(fileEntry.getValue(), matchOpp))  {
                             allowed = false;
                             break;
                         }
@@ -1005,7 +1001,7 @@ public class MxUpdate_mxJPO
                 if (file.isDirectory())  {
                     boolean allowed = true;
                     for (final String match : _ignorePaths)  {
-                        if (match(file.getName(), match))  {
+                        if (StringUtil_mxJPO.match(file.getName(), match))  {
                             allowed = false;
                             break;
                         }
@@ -1016,7 +1012,7 @@ public class MxUpdate_mxJPO
                 } else  {
                     boolean allowed = true;
                     for (final String match : _ignoreFiles)  {
-                        if (match(file.getName(), match))  {
+                        if (StringUtil_mxJPO.match(file.getName(), match))  {
                             allowed = false;
                             break;
                         }
@@ -1083,7 +1079,7 @@ public class MxUpdate_mxJPO
                 for (final String fileEntry : entry.getValue())  {
                     boolean allowed = true;
                     for (final String matchOpp : matchOpps)  {
-                        if (match(fileEntry, matchOpp))  {
+                        if (StringUtil_mxJPO.match(fileEntry, matchOpp))  {
                             allowed = false;
                             break;
                         }

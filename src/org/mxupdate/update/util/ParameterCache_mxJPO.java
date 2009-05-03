@@ -30,6 +30,7 @@ import java.util.Map;
 import matrix.db.Context;
 import matrix.db.MatrixWriter;
 
+import org.mxupdate.mapping.Mapping_mxJPO;
 import org.mxupdate.mapping.ParameterDef_mxJPO;
 
 /**
@@ -170,12 +171,21 @@ public class ParameterCache_mxJPO
     private final PrintWriter writer;
 
     /**
+     * Stores the used mapping from this parameter cache instance.
+     *
+     * @see #ParameterCache_mxJPO(Context, boolean)
+     * @see #getMapping()
+     */
+    private final Mapping_mxJPO mapping;
+
+    /**
      * Creates a new instance of the parameter cache. All default values from
      * the parameter definitions are predefined in the parameter cache.
      *
      * @param _context      MX context
      * @param _matrixLog    if set to <i>true</i> log via matrix writer,
      *                      <i>false</i> log via <code>System.out</code>
+     * @throws Exception if the mapping could not be initialized
      * @see #context
      * @see #mapBoolean
      * @see #mapList
@@ -185,7 +195,10 @@ public class ParameterCache_mxJPO
      */
     public ParameterCache_mxJPO(final Context _context,
                                 final boolean _matrixLog)
+            throws Exception
     {
+        this.mapping = new Mapping_mxJPO(_context);
+
         this.context = _context;
         this.mapBoolean = new HashMap<String,Boolean>();
         this.mapInteger = new HashMap<String,Integer>();
@@ -193,7 +206,7 @@ public class ParameterCache_mxJPO
         this.mapMap = new HashMap<String,Map<String,?>>();
         this.mapString = new HashMap<String,String>();
 
-        for (final ParameterDef_mxJPO paramDef : ParameterDef_mxJPO.values())  {
+        for (final ParameterDef_mxJPO paramDef : this.mapping.getAllParameterDefs())  {
             if (paramDef.getDefaultValue() != null)  {
                 if (paramDef.getType() == ParameterDef_mxJPO.Type.BOOLEAN)  {
                     this.mapBoolean.put(paramDef.getName(),
@@ -238,6 +251,7 @@ public class ParameterCache_mxJPO
                                  final ParameterCache_mxJPO _original)
     {
         this.context = _context;
+        this.mapping = _original.mapping;
         this.mapBoolean = _original.mapBoolean;
         this.mapInteger = _original.mapInteger;
         this.mapList = _original.mapList;
@@ -338,6 +352,17 @@ public class ParameterCache_mxJPO
     public Context getContext()
     {
         return this.context;
+    }
+
+    /**
+     * Returns the cache with all mappings.
+     *
+     * @return mapping instance
+     * @see #mapping
+     */
+    public Mapping_mxJPO getMapping()
+    {
+        return this.mapping;
     }
 
     /**

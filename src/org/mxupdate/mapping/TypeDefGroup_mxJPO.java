@@ -22,8 +22,6 @@ package org.mxupdate.mapping;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Groups the type definition enumeration used for the parameter definitions.
@@ -31,18 +29,9 @@ import java.util.Map;
  * @author Tim Moxter
  * @version $Id$
  */
-public class TypeDefGroup_mxJPO
+public final class TypeDefGroup_mxJPO
         extends AbstractValue_mxJPO
 {
-    /**
-     * Maps from the name of the type definition group to the related type
-     * definition group instance.
-     *
-     * @see #defineValue(String, String)
-     */
-    private final static Map<String,TypeDefGroup_mxJPO> MAP
-            = new HashMap<String,TypeDefGroup_mxJPO>();
-
     /**
      * Name list of type definition instances for which this type definition
      * group is defined.
@@ -66,21 +55,25 @@ public class TypeDefGroup_mxJPO
     /**
      * Defines the values of the type definition group.
      *
-     * @param _key
-     * @param _value
+     * @param _mapping  cache for all mapping
+     * @param _key      key of the type definition group (including the name of
+     *                  type definition group and the kind of the type
+     *                  definition separated by a point)
+     * @param _value    value of the related value
      * @throws Exception if key is not found
      */
-    protected static void defineValue(final String _key,
+    protected static void defineValue(final Mapping_mxJPO _mapping,
+                                      final String _key,
                                       final String _value)
             throws Exception
     {
         final String enumName = _key.replaceAll("\\..*", "");
         final String key = _key.substring(enumName.length() + 1);
 
-        TypeDefGroup_mxJPO group = MAP.get(enumName);
+        TypeDefGroup_mxJPO group = _mapping.getTypeDefGroupMap().get(enumName);
         if (group == null)  {
             group = new TypeDefGroup_mxJPO(enumName);
-            MAP.put(enumName, group);
+            _mapping.getTypeDefGroupMap().put(enumName, group);
         }
 
         if ("TypeDefList".endsWith(key))  {
@@ -88,21 +81,6 @@ public class TypeDefGroup_mxJPO
         } else  {
             group.defineValues(key, _value);
         }
-    }
-
-    /**
-     * Resets type definition group map.
-     *
-     * @see #MAP
-     */
-    protected static void resetValues()
-    {
-        MAP.clear();
-    }
-
-    public static Collection<TypeDefGroup_mxJPO> getGroups()
-    {
-        return MAP.values();
     }
 
     /**

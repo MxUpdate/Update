@@ -25,7 +25,6 @@ import java.util.Set;
 
 import matrix.db.Context;
 
-import org.mxupdate.mapping.Mapping_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -50,7 +49,6 @@ public class Update_mxJPO
             throws Exception
     {
         // initialize mapping
-        Mapping_mxJPO.init(_context);
 
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, true);
 
@@ -58,7 +56,7 @@ public class Update_mxJPO
 
         // first found related type definition
         AbstractObject_mxJPO instance = null;
-        for (final TypeDef_mxJPO typeDef : TypeDef_mxJPO.values())  {
+        for (final TypeDef_mxJPO typeDef : paramCache.getMapping().getAllTypeDefs())  {
             if (!typeDef.isFileMatchLast())  {
                 instance = typeDef.newTypeInstance(null);
                 final String mxName = instance.extractMxName(paramCache, file);
@@ -71,7 +69,7 @@ public class Update_mxJPO
             }
         }
         if (instance == null)  {
-            for (final TypeDef_mxJPO typeDef : TypeDef_mxJPO.values())  {
+            for (final TypeDef_mxJPO typeDef : paramCache.getMapping().getAllTypeDefs())  {
                 if (typeDef.isFileMatchLast())  {
                     instance = typeDef.newTypeInstance(null);
                     final String mxName = instance.extractMxName(paramCache, file);

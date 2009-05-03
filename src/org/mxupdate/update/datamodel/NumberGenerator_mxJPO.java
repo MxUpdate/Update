@@ -26,8 +26,7 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AttributeDef;
 import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * @author Tim Moxter
@@ -70,21 +69,24 @@ public class NumberGenerator_mxJPO
     {
         this.writeHeader(_paramCache, _out);
         _out.append("mql mod bus \"${OBJECTID}\"")
-            .append(" \\\n    description \"").append(convertTcl(getDescription())).append("\"");
+            .append(" \\\n    description \"").append(StringUtil_mxJPO.convertTcl(this.getDescription())).append("\"");
         String nextNumber = null;
-        for (final AttributeValue attr : getAttrValuesSorted())  {
-            if (AttributeDef.NumberGeneratorNextNumber.getMxName().equals(attr.name))  {
+        for (final AttributeValue attr : this.getAttrValuesSorted())  {
+            if (AttributeDef.NUMBERGENERATORNEXTNUMBER.getMxName(_paramCache).equals(attr.name))  {
                 nextNumber = attr.value;
             } else  {
-                _out.append(" \\\n    \"").append(convertTcl(attr.name))
-                    .append("\" \"").append(convertTcl(attr.value)).append("\"");
+                _out.append(" \\\n    \"").append(StringUtil_mxJPO.convertTcl(attr.name))
+                    .append("\" \"").append(StringUtil_mxJPO.convertTcl(attr.value)).append("\"");
             }
         }
         _out.append("\n")
             .append("\n# update of the next number attribute only if not already set")
-            .append("\nset sTmp [mql print bus \"${OBJECTID}\" select attribute\\[").append(AttributeDef.NumberGeneratorNextNumber.getMxName()).append("\\] dump]")
+            .append("\nset sTmp [mql print bus \"${OBJECTID}\" select attribute\\[")
+                    .append(AttributeDef.NUMBERGENERATORNEXTNUMBER.getMxName(_paramCache)).append("\\] dump]")
             .append("\nif {[string length \"${sTmp}\"]==0}  {")
-            .append("\n  mql mod bus \"${OBJECTID}\" \"").append(AttributeDef.NumberGeneratorNextNumber.getMxName()).append("\" \"").append(nextNumber).append("\"")
+            .append("\n  mql mod bus \"${OBJECTID}\" \"")
+                    .append(AttributeDef.NUMBERGENERATORNEXTNUMBER.getMxName(_paramCache))
+                    .append("\" \"").append(nextNumber).append("\"")
             .append("\n}");
     }
 }

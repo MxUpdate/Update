@@ -24,16 +24,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
-import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
+import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  *
@@ -97,8 +95,8 @@ public class Association_mxJPO
                                final Appendable _out)
             throws IOException
     {
-        _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden")
-            .append(" \\\n    definition \"").append(convertTcl(this.definition)).append("\"");
+        _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden")
+            .append(" \\\n    definition \"").append(StringUtil_mxJPO.convertTcl(this.definition)).append("\"");
     }
 
     /**
@@ -151,19 +149,19 @@ public class Association_mxJPO
      * with given name. The original method is overwritten, because a select
      * statement of a &quot;print&quot; command does not work.
      *
-     * @param _context      context for this request
+     * @param _paramCache   parameter cache
      * @param _prop         property for which the date value is searched
      * @return modified date of given update object
      * @throws MatrixException if the MQL print failed
      * @see #VERSION_PATTERN
      */
     @Override
-    public String getPropValue(final Context _context,
+    public String getPropValue(final ParameterCache_mxJPO _paramCache,
                                final AdminPropertyDef _prop)
             throws MatrixException
     {
-        final String text = _prop.getPropName() + " on association " + this.getName() + " value ";
-        final String curValue = execMql(_context, new StringBuilder()
+        final String text = _prop.getPropName(_paramCache) + " on association " + this.getName() + " value ";
+        final String curValue = MqlUtil_mxJPO.execMql(_paramCache.getContext(), new StringBuilder()
                 .append("list property on asso \"").append(this.getName()).append("\""));
 
         final int idx = curValue.indexOf(text);

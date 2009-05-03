@@ -37,16 +37,14 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO.AdminPropertyDef;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.util.MqlUtil_mxJPO;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
-import static org.mxupdate.update.util.StringUtil_mxJPO.formatInstalledDate;
-import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
  * @author Tim Moxter
@@ -102,7 +100,7 @@ public abstract class AbstractAdminObject_mxJPO
                 .append(" ")
                 .append(this.getTypeDef().getMxAdminSuffix());
         final Set<String> ret = new TreeSet<String>();
-        for (final String name : execMql(_paramCache.getContext(), cmd).split("\n"))  {
+        for (final String name : MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd).split("\n"))  {
             if (!"".equals(name))  {
                 ret.add(name);
             }
@@ -126,7 +124,7 @@ public abstract class AbstractAdminObject_mxJPO
     protected void parse(final ParameterCache_mxJPO _paramCache)
             throws MatrixException, SAXException, IOException
     {
-        final String xml = execMql(_paramCache.getContext(), this.getExportMQL());
+        final String xml = MqlUtil_mxJPO.execMql(_paramCache.getContext(), this.getExportMQL());
 
         // create XML reader
         final XMLReader reader = XMLReaderFactory.createXMLReader();
@@ -212,32 +210,32 @@ public abstract class AbstractAdminObject_mxJPO
             this.propertiesMap.put(key.toString(), property);
         }
         // set author depending on the properties
-        final Property author = this.propertiesMap.get(AdminPropertyDef.AUTHOR.getPropName());
+        final Property author = this.propertiesMap.get(AdminPropertyDef.AUTHOR.getPropName(_paramCache));
         if (author != null)  {
             this.setAuthor(author.value);
         }
         // set application depending on the properties
-        final Property appl = this.propertiesMap.get(AdminPropertyDef.APPLICATION.getPropName());
+        final Property appl = this.propertiesMap.get(AdminPropertyDef.APPLICATION.getPropName(_paramCache));
         if (appl != null)  {
             this.setApplication(appl.value);
         }
         // sets the installation date depending on the properties
-        final Property installationDate = this.propertiesMap.get(AdminPropertyDef.INSTALLEDDATE.getPropName());
+        final Property installationDate = this.propertiesMap.get(AdminPropertyDef.INSTALLEDDATE.getPropName(_paramCache));
         if (installationDate != null)  {
             this.setInstallationDate(installationDate.value);
         }
         // sets the installer depending on the properties
-        final Property installer = this.propertiesMap.get(AdminPropertyDef.INSTALLER.getPropName());
+        final Property installer = this.propertiesMap.get(AdminPropertyDef.INSTALLER.getPropName(_paramCache));
         if (installer != null)  {
             this.setInstaller(installer.value);
         }
         // sets the original name depending on the properties
-        final Property origName = this.propertiesMap.get(AdminPropertyDef.ORIGINALNAME.getPropName());
+        final Property origName = this.propertiesMap.get(AdminPropertyDef.ORIGINALNAME.getPropName(_paramCache));
         if (origName != null)  {
             this.setOriginalName(origName.value);
         }
         // sets the version depending on the properties
-        final Property version = this.propertiesMap.get(AdminPropertyDef.VERSION.getPropName());
+        final Property version = this.propertiesMap.get(AdminPropertyDef.VERSION.getPropName(_paramCache));
         if (version != null)  {
             this.setVersion(version.value);
         }
@@ -248,7 +246,7 @@ public abstract class AbstractAdminObject_mxJPO
                     .append(this.getTypeDef().getMxAdminName())
                     .append(" \"").append(this.getName()).append("\" ")
                     .append(this.getTypeDef().getMxAdminSuffix());
-        for (final String symbName : execMql(_paramCache.getContext(), cmd).split("\n"))  {
+        for (final String symbName : MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd).split("\n"))  {
             if (!"".equals(symbName))  {
                 this.getSymblicNames().add(symbName.substring(0, symbName.indexOf(" on program eServiceSchemaVariableMapping.tcl ")));
             }
@@ -274,9 +272,9 @@ public abstract class AbstractAdminObject_mxJPO
         if (!"".equals(this.getTypeDef().getMxAdminSuffix()))  {
             _out.append(" ").append(this.getTypeDef().getMxAdminSuffix());
         }
-        _out.append(" \\\n    description \"").append(convertTcl(this.getDescription())).append("\"");
+        _out.append(" \\\n    description \"").append(StringUtil_mxJPO.convertTcl(this.getDescription())).append("\"");
         this.writeObject(_paramCache, _out);
-        this.writeProperties(_out);
+        this.writeProperties(_paramCache, _out);
         this.writeEnd(_paramCache, _out);
     }
 
@@ -306,12 +304,21 @@ public abstract class AbstractAdminObject_mxJPO
     {
     }
 
-    protected void writeProperties(final Appendable _out)
+    /**
+     * Writes the MQL code to add all none standard properties to the TCL
+     * update file.
+     *
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the write to the TCL update file failed
+     */
+    protected void writeProperties(final ParameterCache_mxJPO _paramCache,
+                                   final Appendable _out)
             throws IOException
     {
         for (final Property prop : this.propertiesMap.values())  {
-            if ((AdminPropertyDef.getEnumByPropName(prop.name) == null) && !prop.name.startsWith("%"))  {
-                _out.append("\nmql add property \"").append(convertTcl(prop.name)).append("\"")
+            if ((AdminPropertyDef.getEnumByPropName(_paramCache, prop.name) == null) && !prop.name.startsWith("%"))  {
+                _out.append("\nmql add property \"").append(StringUtil_mxJPO.convertTcl(prop.name)).append("\"")
                     .append(" \\\n    on ")
                     .append(this.getTypeDef().getMxAdminName())
                     .append(" \"${NAME}\"");
@@ -320,10 +327,10 @@ public abstract class AbstractAdminObject_mxJPO
                 }
                 if ((prop.refAdminName) != null && (prop.refAdminType != null))  {
                     _out.append("  \\\n    to ").append(prop.refAdminType)
-                        .append(" \"").append(convertTcl(prop.refAdminName)).append("\"");
+                        .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.refAdminName)).append("\"");
                 }
                 if (prop.value != null)  {
-                    _out.append("  \\\n    value \"").append(convertTcl(prop.value)).append("\"");
+                    _out.append("  \\\n    value \"").append(StringUtil_mxJPO.convertTcl(prop.value)).append("\"");
                 }
             }
         }
@@ -343,7 +350,7 @@ public abstract class AbstractAdminObject_mxJPO
                 .append("delete ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append("\" ")
                 .append(this.getTypeDef().getMxAdminSuffix());
-        execMql(_paramCache.getContext(), cmd);
+        MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
     }
 
     /**
@@ -360,7 +367,7 @@ public abstract class AbstractAdminObject_mxJPO
                 .append("add ").append(this.getTypeDef().getMxAdminName())
                         .append(" \"").append(this.getName()).append("\" ")
                         .append(this.getTypeDef().getMxAdminSuffix()).append(";");
-        execMql(_paramCache.getContext(), cmd);
+        MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
     }
 
     /**
@@ -413,7 +420,7 @@ public abstract class AbstractAdminObject_mxJPO
                 .append(this.getTypeDef().getMxAdminSuffix());
         for (final Property prop : this.propertiesMap.values())  {
             // % must be ignored because this means settings
-            if ((AdminPropertyDef.getEnumByPropName(prop.name) == null) && !prop.name.startsWith("%"))  {
+            if ((AdminPropertyDef.getEnumByPropName(_paramCache, prop.name) == null) && !prop.name.startsWith("%"))  {
                 preMQLCode.append(" remove property \"").append(prop.name).append('\"');
                 if ((prop.refAdminName) != null && (prop.refAdminType != null))  {
                     preMQLCode.append(" to ").append(prop.refAdminType)
@@ -432,44 +439,49 @@ public abstract class AbstractAdminObject_mxJPO
                 .append("mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append("\" ")
                 .append(this.getTypeDef().getMxAdminSuffix())
-                .append(" add property \"").append(AdminPropertyDef.VERSION.getPropName()).append("\" ")
+                .append(" add property \"").append(AdminPropertyDef.VERSION.getPropName(_paramCache)).append("\" ")
                 .append("value \"").append(_tclVariables.get(AdminPropertyDef.VERSION.name())).append('\"');
         // define file date property
-        postMQLCode.append(" add property \"").append(AdminPropertyDef.FILEDATE.getPropName()).append("\" ")
+        postMQLCode.append(" add property \"").append(AdminPropertyDef.FILEDATE.getPropName(_paramCache)).append("\" ")
                 .append("value \"").append(_tclVariables.get(AdminPropertyDef.FILEDATE.name())).append('\"');
         // is installed date property defined?
         if ((this.getInstallationDate() == null) || "".equals(this.getInstallationDate()))  {
-            final String date = formatInstalledDate(_paramCache, new Date());
+            final String date = StringUtil_mxJPO.formatInstalledDate(_paramCache, new Date());
             _paramCache.logTrace("    - define installed date '" + date + "'");
-            postMQLCode.append(" add property \"").append(AdminPropertyDef.INSTALLEDDATE.getPropName()).append("\" ")
+            postMQLCode.append(" add property \"")
+                    .append(AdminPropertyDef.INSTALLEDDATE.getPropName(_paramCache)).append("\" ")
                     .append("value \"").append(date).append('\"');
         }
         // exists no installer property or installer property not equal?
         final String instVal = _tclVariables.get(AdminPropertyDef.INSTALLER.name());
         if ((this.getInstaller() == null) || !this.getInstaller().equals(instVal))  {
             _paramCache.logTrace("    - define installer '" + instVal + "'");
-            postMQLCode.append(" add property \"").append(AdminPropertyDef.INSTALLER.getPropName()).append("\" ")
+            postMQLCode.append(" add property \"")
+                    .append(AdminPropertyDef.INSTALLER.getPropName(_paramCache)).append("\" ")
                     .append("value \"").append(instVal).append('\"');
         }
         // is original name property defined?
         final String origNameVal = _tclVariables.get(AdminPropertyDef.ORIGINALNAME.name());
         if ((this.getOriginalName() == null) || !this.getOriginalName().equals(origNameVal))  {
             _paramCache.logTrace("    - define original name '" + origNameVal + "'");
-            postMQLCode.append(" add property \"").append(AdminPropertyDef.ORIGINALNAME.getPropName()).append("\" ")
+            postMQLCode.append(" add property \"")
+                    .append(AdminPropertyDef.ORIGINALNAME.getPropName(_paramCache)).append("\" ")
                     .append("value \"").append(origNameVal).append('\"');
         }
         // exists no application property or application property not equal?
         final String applVal = _tclVariables.get(AdminPropertyDef.APPLICATION.name());
         if ((this.getApplication() == null) || !this.getApplication().equals(applVal))  {
             _paramCache.logTrace("    - define application '" + applVal + "'");
-            postMQLCode.append(" add property \"").append(AdminPropertyDef.APPLICATION.getPropName()).append("\" ")
+            postMQLCode.append(" add property \"")
+                    .append(AdminPropertyDef.APPLICATION.getPropName(_paramCache)).append("\" ")
                     .append("value \"").append(applVal).append('\"');
         }
         // exists no author property or author property not equal?
         final String authVal = _tclVariables.get(AdminPropertyDef.AUTHOR.name());
         if ((this.getAuthor() == null) || !this.getAuthor().equals(authVal))  {
             _paramCache.logTrace("    - define author '" + authVal + "'");
-            postMQLCode.append(" add property \"").append(AdminPropertyDef.AUTHOR.getPropName()).append("\" ")
+            postMQLCode.append(" add property \"")
+                    .append(AdminPropertyDef.AUTHOR.getPropName(_paramCache)).append("\" ")
                     .append("value \"").append(authVal).append('\"');
         }
         postMQLCode.append(";\n");

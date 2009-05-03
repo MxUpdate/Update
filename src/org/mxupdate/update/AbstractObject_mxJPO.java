@@ -30,7 +30,6 @@ import java.io.Writer;
 import java.util.Set;
 import java.util.TreeSet;
 
-import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
@@ -355,36 +354,36 @@ public abstract class AbstractObject_mxJPO
      * &quot;print&quot; commands, because a complete XML parse including a
      * complete export takes longer time.
      *
-     * @param _context      context for this request
+     * @param _paramCache   parameter cache
      * @param _prop         property for which the value is searched
      * @return value for given property
      * @throws MatrixException if the property value could not be extracted
      */
-    public String getPropValue(final Context _context,
+    public String getPropValue(final ParameterCache_mxJPO _paramCache,
                                final AdminPropertyDef _prop)
             throws MatrixException
     {
         final String curVersion;
         // check for existing administration type...
         if (this.getTypeDef().getMxAdminName() != null)  {
-            final String tmp = MqlUtil_mxJPO.execMql(_context, new StringBuilder()
+            final String tmp = MqlUtil_mxJPO.execMql(_paramCache.getContext(), new StringBuilder()
                     .append("print ").append(this.getTypeDef().getMxAdminName())
                     .append(" \"").append(this.getName()).append("\" ")
                     .append(this.getTypeDef().getMxAdminSuffix())
-                    .append(" select property[").append(_prop.getPropName()).append("] dump"));
-            final int length = 7 + _prop.getPropName().length();
+                    .append(" select property[").append(_prop.getPropName(_paramCache)).append("] dump"));
+            final int length = 7 + _prop.getPropName(_paramCache).length();
             curVersion = (tmp.length() >= length)
                          ? tmp.substring(length)
                          : "";
         // otherwise we have a business object....
         } else  {
             final String[] nameRev = this.getName().split("________");
-            curVersion = MqlUtil_mxJPO.execMql(_context, new StringBuilder()
+            curVersion = MqlUtil_mxJPO.execMql(_paramCache.getContext(), new StringBuilder()
                     .append("print bus \"")
                     .append(this.getTypeDef().getMxBusType())
                     .append("\" \"").append(nameRev[0])
                     .append("\" \"").append((nameRev.length > 1) ? nameRev[1] : "")
-                    .append("\" select attribute[").append(_prop.getAttrName()).append("] dump"));
+                    .append("\" select attribute[").append(_prop.getAttrName(_paramCache)).append("] dump"));
         }
 
         return curVersion;
