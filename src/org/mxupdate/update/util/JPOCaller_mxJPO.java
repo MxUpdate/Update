@@ -171,7 +171,7 @@ public class JPOCaller_mxJPO
                         .append(JPOCaller_mxJPO.ENV_CLASS_NAME).append(StringUtil_mxJPO.convertMql(sessionId))
                         .append("\""));
             // is original JPO calling class not current JPO calling class?
-            if ("${CLASSNAME}".equals(callerClazzName))  {
+            if (!"${CLASSNAME}".equals(callerClazzName))  {
                 final Class<?> callerClazz = Class.forName("org.mxupdate.update.util." + callerClazzName);
                 if (callerClazz == null)  {
                     throw new Error("JPO Caller class " + callerClazzName
