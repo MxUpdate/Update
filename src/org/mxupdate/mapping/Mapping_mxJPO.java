@@ -97,6 +97,16 @@ public class Mapping_mxJPO
     private final Map<AttributeDef,String> attributeMap = new HashMap<AttributeDef,String>();
 
     /**
+     * Maps from the mode enumeration {@link Mode_mxJPO} to the related
+     * instance holding the parameter names and description.
+     *
+     * @see Mode_mxJPO#defineValue(Mapping_mxJPO, String, String)
+     * @see #getModeMap()
+     */
+    private final Map<Mode_mxJPO,AbstractValue_mxJPO> modeMap
+            = new HashMap<Mode_mxJPO,AbstractValue_mxJPO>();
+
+    /**
      * Maps from the name of the parameter to the parameter instance.
      *
      * @see ParameterDef_mxJPO#defineValue(Mapping_mxJPO, String, String)
@@ -139,6 +149,16 @@ public class Mapping_mxJPO
     private final Map<String,TypeDefGroup_mxJPO> typeDefGroupMap = new HashMap<String,TypeDefGroup_mxJPO>();
 
     /**
+     * Maps from the update check enumeration item to related instance which
+     * holds the parameter list and description.
+     *
+     * @see UpdateCheck_mxJPO#defineValue(Mapping_mxJPO, String, String)
+     * @see #getUpdateCheckMap()
+     */
+    private final Map<UpdateCheck_mxJPO,AbstractValue_mxJPO> updateCheckMap
+            = new HashMap<UpdateCheck_mxJPO,AbstractValue_mxJPO>();
+
+    /**
      *
      * @param _context  context for this request
      * @throws MatrixException if the property program {@see #PROP_NAME} could
@@ -148,9 +168,6 @@ public class Mapping_mxJPO
     public Mapping_mxJPO(final Context _context)
             throws MatrixException, IOException, Exception
     {
-        Mode_mxJPO.resetValues();
-        UpdateCheck_mxJPO.resetValues();
-
         this.properties.putAll(MqlUtil_mxJPO.readPropertyProgram(_context, Mapping_mxJPO.PROP_NAME));
 
         // map attributes and types
@@ -173,7 +190,7 @@ public class Mapping_mxJPO
                                                                   .toUpperCase());
                 this.attributeMap.put(attr, value);
             } else if (key.startsWith("Mode."))  {
-                Mode_mxJPO.defineValue(key.substring(5), value);
+                Mode_mxJPO.defineValue(this, key.substring(5), value);
             } else if (key.startsWith("ParameterDef."))  {
                 ParameterDef_mxJPO.defineValue(this, key.substring(13), value);
             } else if (key.startsWith("TypeDef."))  {
@@ -181,9 +198,21 @@ public class Mapping_mxJPO
             } else if (key.startsWith("TypeDefGroup."))  {
                 TypeDefGroup_mxJPO.defineValue(this, key.substring(13), value);
             } else if (key.startsWith("UpdateCheck."))  {
-                UpdateCheck_mxJPO.defineValue(key.substring(12), value);
+                UpdateCheck_mxJPO.defineValue(this, key.substring(12), value);
             }
         }
+    }
+
+    /**
+     * Returns the mapping of the mode enumeration item and the related
+     * instance holding the parameter names and description.
+     *
+     * @return mapping between mode enumeration and related instance
+     * @see #modeMap
+     */
+    protected Map<Mode_mxJPO,AbstractValue_mxJPO> getModeMap()
+    {
+        return this.modeMap;
     }
 
     /**
@@ -294,6 +323,19 @@ public class Mapping_mxJPO
     public Collection<TypeDefGroup_mxJPO> getAllTypeDefGroups()
     {
         return this.typeDefGroupMap.values();
+    }
+
+    /**
+     * Returns the mapping between the update check enumeration item to related
+     * instance which holds the parameter list and description.
+     *
+     * @return mapping between type definition group name and the related type
+     *         definition group instance
+     * @see #updateCheckMap
+     */
+    protected Map<UpdateCheck_mxJPO,AbstractValue_mxJPO> getUpdateCheckMap()
+    {
+        return this.updateCheckMap;
     }
 
     /**

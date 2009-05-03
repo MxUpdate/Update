@@ -21,8 +21,8 @@
 package org.mxupdate.mapping;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
  * Enumeration of all modes which are supported by the MxUpdate.
@@ -53,45 +53,28 @@ public enum Mode_mxJPO
     HELP;
 
     /**
-     * Maps from the name of the type definition group to the related type
-     * definition group instance.
-     *
-     * @see Mode_mxJPO#defineValue(String, String)
-     */
-    private final static Map<Mode_mxJPO,AbstractValue_mxJPO> MAP
-            = new HashMap<Mode_mxJPO,AbstractValue_mxJPO>();
-
-    /**
-     * Resets type definition map.
-     *
-     * @see #MAP
-     */
-    protected static void resetValues()
-    {
-        MAP.clear();
-    }
-
-    /**
      * Defines the values of the mode enumerations.
      *
+     * @param _mapping  cache for all mapping
      * @param _key      key with name of enumeration and (separated by a point)
      *                  the key
      * @param _value    value which must be set
      * @throws Exception if the key is not known
      * @see AbstractValue_mxJPO
      */
-    protected static void defineValue(final String _key,
+    protected static void defineValue(final Mapping_mxJPO _mapping,
+                                      final String _key,
                                       final String _value)
             throws Exception
     {
-        final String enumName = _key.replaceAll("\\..*", "");
+        final String enumName = _key.replaceAll("\\..*", "").toUpperCase();
         final String key = _key.substring(enumName.length() + 1);
 
-        final Mode_mxJPO modeEnum = valueOf(enumName);
-        AbstractValue_mxJPO mode = MAP.get(modeEnum);
+        final Mode_mxJPO modeEnum = Mode_mxJPO.valueOf(enumName);
+        AbstractValue_mxJPO mode = _mapping.getModeMap().get(modeEnum);
         if (mode == null)  {
             mode = new AbstractValue_mxJPO(enumName);
-            MAP.put(modeEnum, mode);
+            _mapping.getModeMap().put(modeEnum, mode);
         }
 
         mode.defineValues(key, _value);
@@ -100,22 +83,26 @@ public enum Mode_mxJPO
     /**
      * Returns the description of parameters which defines mode.
      *
+     * @param _paramCache   for which parameter cache must the parameter
+     *                      description returned
      * @return description of parameter
      * @see AbstractValue_mxJPO#paramDesc
      */
-    public String getParameterDesc()
+    public String getParameterDesc(final ParameterCache_mxJPO _paramCache)
     {
-        return MAP.get(this).getParameterDesc();
+        return _paramCache.getMapping().getModeMap().get(this).getParameterDesc();
     }
 
     /**
      * Returns the list of parameters which defines this mode.
      *
+     * @param _paramCache   for which parameter cache must the parameter
+     *                      list returned
      * @return list of parameter strings
      * @see AbstractValue_mxJPO#paramList
      */
-    public Collection<String> getParameterList()
+    public Collection<String> getParameterList(final ParameterCache_mxJPO _paramCache)
     {
-        return MAP.get(this).getParameterList();
+        return _paramCache.getMapping().getModeMap().get(this).getParameterList();
     }
 }

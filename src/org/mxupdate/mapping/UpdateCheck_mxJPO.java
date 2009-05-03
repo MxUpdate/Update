@@ -21,8 +21,8 @@
 package org.mxupdate.mapping;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
  * Enumeration used to define was is checked if an update is done.
@@ -44,45 +44,28 @@ public enum UpdateCheck_mxJPO
     FILEDATE;
 
     /**
-     * Maps from the name of the type definition group to the related type
-     * definition group instance.
-     *
-     * @see Mode_mxJPO#defineValue(String, String)
-     */
-    private final static Map<UpdateCheck_mxJPO,AbstractValue_mxJPO> MAP
-            = new HashMap<UpdateCheck_mxJPO,AbstractValue_mxJPO>();
-
-    /**
-     * Resets type definition map.
-     *
-     * @see #MAP
-     */
-    protected static void resetValues()
-    {
-        MAP.clear();
-    }
-
-    /**
      * Defines the values of the mode enumerations.
      *
+     * @param _mapping  cache for all mapping
      * @param _key      key with name of enumeration and (separated by a point)
      *                  the key
      * @param _value    value which must be set
      * @throws Exception if the key is not known
      * @see AbstractValue_mxJPO
      */
-    protected static void defineValue(final String _key,
+    protected static void defineValue(final Mapping_mxJPO _mapping,
+                                      final String _key,
                                       final String _value)
             throws Exception
     {
         final String enumName = _key.replaceAll("\\..*", "");
         final String key = _key.substring(enumName.length() + 1);
 
-        final UpdateCheck_mxJPO updateCheckEnum = valueOf(enumName);
-        AbstractValue_mxJPO updateCheckValue = MAP.get(updateCheckEnum);
+        final UpdateCheck_mxJPO updateCheckEnum = UpdateCheck_mxJPO.valueOf(enumName);
+        AbstractValue_mxJPO updateCheckValue = _mapping.getUpdateCheckMap().get(updateCheckEnum);
         if (updateCheckValue == null)  {
             updateCheckValue = new AbstractValue_mxJPO(enumName);
-            MAP.put(updateCheckEnum, updateCheckValue);
+            _mapping.getUpdateCheckMap().put(updateCheckEnum, updateCheckValue);
         }
 
         updateCheckValue.defineValues(key, _value);
@@ -91,22 +74,26 @@ public enum UpdateCheck_mxJPO
     /**
      * Returns the description of parameters which defines mode.
      *
+     * @param _paramCache   for which parameter cache must the parameter
+     *                      description returned
      * @return description of parameter
      * @see AbstractValue_mxJPO#paramDesc
      */
-    public String getParameterDesc()
+    public String getParameterDesc(final ParameterCache_mxJPO _paramCache)
     {
-        return MAP.get(this).getParameterDesc();
+        return _paramCache.getMapping().getUpdateCheckMap().get(this).getParameterDesc();
     }
 
     /**
      * Returns the list of parameters which defines this mode.
      *
+     * @param _paramCache   for which parameter cache must the parameter
+     *                      list returned
      * @return list of parameter strings
      * @see AbstractValue_mxJPO#paramList
      */
-    public Collection<String> getParameterList()
+    public Collection<String> getParameterList(final ParameterCache_mxJPO _paramCache)
     {
-        return MAP.get(this).getParameterList();
+        return _paramCache.getMapping().getUpdateCheckMap().get(this).getParameterList();
     }
 }

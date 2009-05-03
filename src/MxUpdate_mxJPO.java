@@ -174,6 +174,11 @@ public class MxUpdate_mxJPO
      */
     private final Map<String,UpdateCheck_mxJPO> paramsUpdateChecks = new HashMap<String,UpdateCheck_mxJPO>();
 
+    /**
+     *
+     * @param _paramCache   parameter cache
+     * @throws MatrixException
+     */
     private void prepareParams(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
@@ -216,14 +221,14 @@ public class MxUpdate_mxJPO
         // modes
 
         for (final Mode_mxJPO mode : Mode_mxJPO.values())  {
-            for (final String param : mode.getParameterList())  {
+            for (final String param : mode.getParameterList(_paramCache))  {
                 final String paramStr = (param.length() > 1)
                                         ? "--" + param
                                         : "-" + param;
                 this.paramsModes.put(paramStr, mode);
             }
-            this.appendDescription(mode.getParameterDesc(),
-                                   mode.getParameterList(),
+            this.appendDescription(mode.getParameterDesc(_paramCache),
+                                   mode.getParameterList(_paramCache),
                                    null);
         }
 
@@ -231,15 +236,15 @@ public class MxUpdate_mxJPO
         // update checks
 
         for (final UpdateCheck_mxJPO updateCheck : UpdateCheck_mxJPO.values())  {
-            for (final String param : updateCheck.getParameterList())  {
+            for (final String param : updateCheck.getParameterList(_paramCache))  {
                 if (param.length() == 1)  {
                     this.paramsUpdateChecks.put("-" + param, updateCheck);
                 } else  {
                     this.paramsUpdateChecks.put("--" + param, updateCheck);
                 }
             }
-            this.appendDescription(updateCheck.getParameterDesc(),
-                                   updateCheck.getParameterList(),
+            this.appendDescription(updateCheck.getParameterDesc(_paramCache),
+                                   updateCheck.getParameterList(_paramCache),
                                    null);
         }
 
@@ -499,7 +504,7 @@ public class MxUpdate_mxJPO
            .append(' ');
         boolean first = true;
         for (final Mode_mxJPO mode : Mode_mxJPO.values())  {
-            final String param = mode.getParameterList().iterator().next();
+            final String param = mode.getParameterList(_paramCache).iterator().next();
             if (first)  {
                 first = false;
             } else  {
