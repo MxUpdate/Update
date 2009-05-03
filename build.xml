@@ -23,7 +23,7 @@
 
 <project default="makeall">
 
-    <property name="version" value="0.2.1"/>
+    <property name="version" value="0.2.2"/>
 
     <!-- defines the path where all the upload staff and the upload jar library 
          is located -->
