@@ -59,15 +59,41 @@ public abstract class AbstractAdminObject_mxJPO
     private static final long serialVersionUID = 6211240989585499402L;
 
     /**
+     * Key used to store the name of the program where all administration
+     * objects must be registered with symbolic names. For an OOTB installation
+     * the value is typically &quot;eServiceSchemaVariableMapping.tcl&quot;.
+     *
+     * @see #prepare(ParameterCache_mxJPO)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private static final String PARAM_SYMB_NAME_PROG = "RegisterSymbolicNames";
+
+    /**
      * Is the matrix object hidden?
      *
      * @see #isHidden()
      */
     private boolean hidden = false;
 
-    final Stack<Property> propertiesStack = new Stack<Property>();
+    /**
+     * Stack of the properties used while parsing the XML definition of the
+     * administration object. After the properties are parsed, they are stored
+     * in the properties map {@link #propertiesMap} from
+     * {@link #prepare(ParameterCache_mxJPO)}.
+     *
+     * @see #parse(String, String)
+     * @see #prepare(ParameterCache_mxJPO)
+     */
+    private final Stack<Property> propertiesStack = new Stack<Property>();
 
-    final Map<String,Property> propertiesMap = new TreeMap<String,Property>();
+    /**
+     * Holds the property values depending on the property name. The map is
+     * sorted and is set after parsing from
+     * {@link #prepare(ParameterCache_mxJPO)}.
+     *
+     * @see #prepare(ParameterCache_mxJPO)
+     */
+    private final Map<String,Property> propertiesMap = new TreeMap<String,Property>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -141,11 +167,29 @@ public abstract class AbstractAdminObject_mxJPO
         this.prepare(_paramCache);
     }
 
+    /**
+     * Returns the MQL export command to export the administration object as
+     * XML string.
+     *
+     * @return string value of the MQL command to export the administration
+     *         object as XML string
+     */
     protected String getExportMQL()
     {
         return "export " + this.getTypeDef().getMxAdminName() + " \"" + this.getName() + "\" xml";
     }
 
+    /**
+     * Parsed administration object related XML tags. This includes:
+     * <ul>
+     * <li>description</li>
+     * <li>is the object {@link #hidden}</li>
+     * <li>properties</li>
+     * </ul>
+     *
+     * @param _url      URL within the XML
+     * @param _content  value of the URL
+     */
     protected void parse(final String _url,
                          final String _content)
     {
@@ -220,7 +264,8 @@ public abstract class AbstractAdminObject_mxJPO
             this.setApplication(appl.value);
         }
         // sets the installation date depending on the properties
-        final Property installationDate = this.propertiesMap.get(PropertyDef_mxJPO.INSTALLEDDATE.getPropName(_paramCache));
+        final Property installationDate
+                = this.propertiesMap.get(PropertyDef_mxJPO.INSTALLEDDATE.getPropName(_paramCache));
         if (installationDate != null)  {
             this.setInstallationDate(installationDate.value);
         }
@@ -241,14 +286,17 @@ public abstract class AbstractAdminObject_mxJPO
         }
 
         // reads symbolic names of the administration objects
+        final String symbProg = _paramCache.getValueString(AbstractAdminObject_mxJPO.PARAM_SYMB_NAME_PROG);
+        final String symbProgIdxOf = new StringBuilder().append(" on program ").append(symbProg).append(' ').toString();
         final StringBuilder cmd = new StringBuilder()
-                .append("list property on program eServiceSchemaVariableMapping.tcl to ")
+                .append("escape list property on program \"")
+                            .append(StringUtil_mxJPO.convertMql(symbProg)).append("\" to ")
                     .append(this.getTypeDef().getMxAdminName())
                     .append(" \"").append(this.getName()).append("\" ")
                     .append(this.getTypeDef().getMxAdminSuffix());
         for (final String symbName : MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd).split("\n"))  {
             if (!"".equals(symbName))  {
-                this.getSymblicNames().add(symbName.substring(0, symbName.indexOf(" on program eServiceSchemaVariableMapping.tcl ")));
+                this.getSymblicNames().add(symbName.substring(0, symbName.indexOf(symbProgIdxOf)));
             }
         }
     }
@@ -487,23 +535,25 @@ public abstract class AbstractAdminObject_mxJPO
         postMQLCode.append(";\n");
 
         // check symbolic names
+        final String symbProg = _paramCache.getValueString(AbstractAdminObject_mxJPO.PARAM_SYMB_NAME_PROG);
         final String symbName = _tclVariables.get("SYMBOLICNAME");
         if (!this.getSymblicNames().contains(symbName))  {
             _paramCache.logTrace("    - register symbolic name '" + symbName + "'");
-            postMQLCode.append("add property \"").append(symbName).append("\" ")
-                    .append(" on program eServiceSchemaVariableMapping.tcl to ")
+            postMQLCode.append("escape add property \"").append(StringUtil_mxJPO.convertMql(symbName)).append("\" ")
+                    .append(" on program \"").append(StringUtil_mxJPO.convertMql(symbProg)).append("\" to ")
                     .append(this.getTypeDef().getMxAdminName())
-                    .append(" \"").append(this.getName()).append("\" ")
+                    .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
                     .append(this.getTypeDef().getMxAdminSuffix())
                     .append(";\n");
         }
         for (final String exSymbName : this.getSymblicNames())  {
             if (!symbName.equals(exSymbName))  {
                 _paramCache.logTrace("    - remove symbolic name '" + exSymbName + "'");
-                postMQLCode.append("delete property \"").append(exSymbName).append("\" ")
-                        .append(" on program eServiceSchemaVariableMapping.tcl to ")
+                postMQLCode.append("escape delete property \"")
+                                .append(StringUtil_mxJPO.convertMql(exSymbName)).append("\" ")
+                        .append(" on program \"").append(StringUtil_mxJPO.convertMql(symbProg)).append("\" to ")
                         .append(this.getTypeDef().getMxAdminName())
-                        .append(" \"").append(this.getName()).append("\" ")
+                        .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
                         .append(this.getTypeDef().getMxAdminSuffix())
                         .append(";\n");
             }
@@ -625,7 +675,7 @@ public abstract class AbstractAdminObject_mxJPO
         @Override
         public String toString()
         {
-            return "[name="+name+", value="+value+", flags="+flags+"]";
+            return "[name=" + this.name + ", value=" + this.value + ", flags=" + this.flags + "]";
         }
     }
 
@@ -634,8 +684,10 @@ public abstract class AbstractAdminObject_mxJPO
      */
     public class PadSaxHandler extends DefaultHandler
     {
-        final Stack<String> stack = new Stack<String>();
-        StringBuilder content = null;
+        private final Stack<String> stack = new Stack<String>();
+
+        private StringBuilder content = null;
+
         private boolean called = false;
 
         final Stack<Object> objects = new Stack<Object>();
@@ -643,7 +695,7 @@ public abstract class AbstractAdminObject_mxJPO
         private String getUrl()
         {
             final StringBuilder ret = new StringBuilder();
-            for (final String tag : stack.subList(2, stack.size()))  {
+            for (final String tag : this.stack.subList(2, this.stack.size()))  {
                 ret.append('/').append(tag);
             }
             return ret.toString();
@@ -669,25 +721,25 @@ public abstract class AbstractAdminObject_mxJPO
         {
 
           if (_length > 0) {
-            final String content = new String (_ch,_start,_length);
+            final String strContent = new String (_ch,_start,_length);
             if (!this.called)  {
               if (this.content == null)  {
                 this.content = new StringBuilder();
               }
-              this.content.append(content);
+              this.content.append(strContent);
             }
           }
         }
 
         @Override
-        public void endElement (final String uri,
-                                final String localName,
-                                final String qName)
+        public void endElement(final String uri,
+                               final String localName,
+                               final String qName)
                 throws SAXException
         {
             if (!this.called)
             {
-                evaluate();
+                this.evaluate();
                 this.called = true;
             }
             this.stack.pop();
@@ -702,7 +754,7 @@ public abstract class AbstractAdminObject_mxJPO
         {
             if (!this.called)
             {
-                evaluate();
+                this.evaluate();
             }
             this.called = false;
             this.content = null;
@@ -715,7 +767,7 @@ public abstract class AbstractAdminObject_mxJPO
             if (this.stack.size() > 2)  {
                 final String tag = this.stack.get(1);
                 if (!"creationProperties".equals(tag))  {
-                    AbstractAdminObject_mxJPO.this.parse(getUrl(),
+                    AbstractAdminObject_mxJPO.this.parse(this.getUrl(),
                                                          (this.content != null) ? this.content.toString() : null);
                 }
             }

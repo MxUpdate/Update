@@ -105,7 +105,7 @@ eval  {
 
     # get existing symbolic name (if exists)
     set sExists [mql list property \
-                    on program $asMapping(Program.RegisterSymbolicNames) \
+                    on program $asMapping(ParameterDef.RegisterSymbolicNames.Default) \
                     to ${_sKind} "${_sName}"]
     regsub -all { on program .*} "${sExists}" {} sExists
 
@@ -114,13 +114,13 @@ eval  {
       if {"${sExists}" != ""}  {
         puts "remove wrong registered property '${sExists}' for ${_sKind} '${_sName}'"
         mql delete property "${sExists}" \
-            on program $asMapping(Program.RegisterSymbolicNames) \
+            on program $asMapping(ParameterDef.RegisterSymbolicNames.Default) \
             to ${_sKind} "${_sName}"
       }
       # and create new one
       puts "created registered property '${sSymbName}' for ${_sKind} '${_sName}'"
       mql add property "${sSymbName}" \
-            on program $asMapping(Program.RegisterSymbolicNames) \
+            on program $asMapping(ParameterDef.RegisterSymbolicNames.Default) \
             to ${_sKind} "${_sName}"
     }
   }
