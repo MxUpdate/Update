@@ -26,11 +26,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import matrix.util.MatrixException;
+
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  *
@@ -46,9 +48,24 @@ public class Role_mxJPO
     private static final long serialVersionUID = -1889259829075111308L;
 
     /**
+     * Name of the parameter to define if current MX version supports role
+     * types.
+     *
+     * @see #prepare(ParameterCache_mxJPO)
+     */
+    private static final String PARAM_SUPPORT_ROLE_TYPES = "UserRoleSupportRoleType";
+
+    /**
      * Set to hold all parent roles.
      */
-    final Set<String> parentRoles = new TreeSet<String>();
+    private final Set<String> parentRoles = new TreeSet<String>();
+
+    /**
+     * Stores the information about the role type.
+     *
+     * @see RoleType
+     */
+    private RoleType roleType = RoleType.ROLE;
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -76,10 +93,43 @@ public class Role_mxJPO
             // to be ignored ...
         } else if ("/parentRole/roleRef".equals(_url))  {
             this.parentRoles.add(_content);
+        } else if ("/roleType".equals(_url))  {
+            // to be ignored, because read within prepare method
 
         } else  {
             super.parse(_url, _content);
         }
+    }
+
+    /**
+     * Prepares the internal information after the XML export was parsed by
+     * adding the information about the role type (because the role type
+     * information was numbers within the XML string).
+     *
+     * @param _paramCache   parameter cache with the MX context
+     * @throws MatrixException if the information about the role type could not
+     *                         be fetched or if the exception was thrown from
+     *                         called super method
+     * @see #roleType
+     * @see #PARAM_SUPPORT_ROLE_TYPES
+     */
+    @Override
+    protected void prepare(final ParameterCache_mxJPO _paramCache)
+            throws MatrixException
+    {
+        // must the role type evaluated?
+        if (_paramCache.getValueBoolean(Role_mxJPO.PARAM_SUPPORT_ROLE_TYPES))  {
+            final String testRoleType = MqlUtil_mxJPO.execMql(_paramCache.getContext(), new StringBuilder()
+                    .append("escape print role \"").append(StringUtil_mxJPO.convertMql(this.getName()))
+                    .append("\" select isanorg isaproject dump"));
+            if ("FALSE,TRUE".equals(testRoleType))  {
+                this.roleType = RoleType.PROJECT;
+            } else if ("TRUE,FALSE".equals(testRoleType)) {
+                this.roleType = RoleType.ORGANIZATION;
+            }
+        }
+
+        super.prepare(_paramCache);
     }
 
     /**
@@ -95,10 +145,20 @@ public class Role_mxJPO
                                final Appendable _out)
             throws IOException
     {
-        _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden");
+        _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden");
+        // role type
+        switch (this.roleType)  {
+            case PROJECT:
+                _out.append(" \\\n    asaproject");
+                break;
+            case ORGANIZATION:
+                _out.append(" \\\n    asanorg");
+                break;
+        }
+        // parent roles
         for (final String role : this.parentRoles)  {
             _out.append("\nmql mod role \"")
-                .append(convertTcl(role))
+                .append(StringUtil_mxJPO.convertTcl(role))
                 .append("\" child \"${NAME}\"");
         }
     }
@@ -110,6 +170,7 @@ public class Role_mxJPO
      * <ul>
      * <li>reset description</li>
      * <li>remove all parent groups</li>
+     * <li>define as &quot;normal&quot; role</li>
      * </ul>
      *
      * @param _paramCache       parameter cache
@@ -137,14 +198,32 @@ public class Role_mxJPO
     {
         // description and all parents
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append('\"')
+                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
                 .append(" description \"\"")
-                .append(" remove parent all;\n");
+                .append(" remove parent all");
+        // define normal role type
+        if (this.roleType != RoleType.ROLE)  {
+            preMQLCode.append(" asarole");
+        }
 
         // append already existing pre MQL code
-        preMQLCode.append(_preMQLCode);
+        preMQLCode.append(";\n")
+                  .append(_preMQLCode);
 
         super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+    }
+
+    /**
+     * Enumeration for role types.
+     */
+    private enum RoleType
+    {
+        /** Standard case, the role is a &quot;role&quot;. */
+        ROLE,
+        /** The role is a project role. */
+        PROJECT,
+        /** The role is an organizational role. */
+        ORGANIZATION;
     }
 }
