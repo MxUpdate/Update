@@ -196,9 +196,10 @@ public class Policy_mxJPO
         } else if ("/stateDefList/stateDef/userAccessList/userAccess/access".equals(_url))  {
             // to be ignored ...
         } else if (_url.startsWith("/stateDefList/stateDef/userAccessList/userAccess/access"))  {
-            this.states.peek().userAccess.peek().access.add(_url.replaceAll("^/stateDefList/stateDef/userAccessList/userAccess/access/", "")
-                                                                .replaceAll("Access$", "")
-                                                                .toLowerCase());
+            this.states.peek().userAccess.peek().access.add(
+                    _url.replaceAll("^/stateDefList/stateDef/userAccessList/userAccess/access/", "")
+                        .replaceAll("Access$", "")
+                        .toLowerCase());
         } else if ("/stateDefList/stateDef/userAccessList/userAccess/expressionFilter".equals(_url))  {
             this.states.peek().userAccess.peek().expressionFilter = _content;
 
@@ -263,7 +264,9 @@ public class Policy_mxJPO
     }
 
     /**
-     * Calls the state prepare method.
+     * Calls the state prepare method. All policies properties starting with
+     * <code>state_</code> are checked if they are defining a symbolic name of
+     * a state. If yes the related symbolic name of the state is updated.
      *
      * @param _paramCache   parameter cache
      * @throws MatrixException if the prepare within super class failed
@@ -281,7 +284,6 @@ public class Policy_mxJPO
                 for (final State state : this.states)  {
                     if (state.name.equals(property.getValue()))  {
                         state.nameSymbolic = property.getName();
-                        this.getPropertiesMap().remove(property.getName());
                     }
                 }
             }
@@ -398,6 +400,8 @@ public class Policy_mxJPO
      * <li>The new policy definition is parsed.</li>
      * <li>A delta MQL script generated to update the policy to the new target
      *     definition.</li>
+     * <li>All symbolic names for states are defined (as property on the
+     *     policy).</li>
      * <li>The delta MQL script is executed.</li>
      * </ul>
      *
@@ -423,11 +427,11 @@ public class Policy_mxJPO
                 .append("mod policy \"").append(this.getName()).append("\" ");
 
         // basic information
-        this.calcDelta(cmd, "description", policy.getDescription(), this.getDescription());
-        this.calcDelta(cmd, "type", policy.types, this.types);
-        this.calcDelta(cmd, "format", policy.formats, this.formats);
-        this.calcDelta(cmd, "defaultformat", policy.defaultFormat, this.defaultFormat);
-        this.calcDelta(cmd, "sequence", policy.sequence, this.sequence);
+        this.calcValueDelta(cmd, "description", policy.getDescription(), this.getDescription());
+        this.calcListDelta(cmd, "type", policy.types, this.types);
+        this.calcListDelta(cmd, "format", policy.formats, this.formats);
+        this.calcValueDelta(cmd, "defaultformat", policy.defaultFormat, this.defaultFormat);
+        this.calcValueDelta(cmd, "sequence", policy.sequence, this.sequence);
         // hidden flag, because hidden flag must be set with special syntax
         if (this.isHidden() != policy.isHidden())  {
             if (!policy.isHidden())  {
@@ -437,7 +441,7 @@ public class Policy_mxJPO
         }
         // because the store of a policy could not be removed....
         if ((policy.store != null) && !"".equals(policy.store))  {
-            this.calcDelta(cmd, "store", policy.store, this.store);
+            this.calcValueDelta(cmd, "store", policy.store, this.store);
         }
 
         // states....
@@ -472,10 +476,18 @@ throw new Exception("some states are not defined anymore!");
 
         // now update state information itself
         cmd.append(';')
-           .append("mod policy \"").append(this.getName()).append("\" ");
+           .append("mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ");
         for (final Map.Entry<State, State> entry : stateDeltaMap.entrySet())  {
             cmd.append("state \"").append(StringUtil_mxJPO.convertMql(entry.getKey().name)).append("\" ");
             entry.getKey().calcDelta(cmd, entry.getValue());
+        }
+
+        // set symbolic names for all policy states
+        cmd.append(';')
+           .append("mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ");
+        for (final State state : policy.states)  {
+            cmd.append("add property \"").append(StringUtil_mxJPO.convertMql(state.nameSymbolic))
+               .append("\" value \"").append(StringUtil_mxJPO.convertMql(state.name)).append('\"');
         }
 
         final boolean isMqlEscapeOn = MqlUtil_mxJPO.isEscapeOn(_paramCache.getContext());
@@ -499,17 +511,17 @@ throw new Exception("some states are not defined anymore!");
      * @param _curVal   current value in the database
      * @throws IOException if the delta could not appended
      */
-    protected void calcDelta(final Appendable _out,
-                             final String _kind,
-                             final String _newVal,
-                             final String _curVal)
+    protected void calcValueDelta(final Appendable _out,
+                                  final String _kind,
+                                  final String _newVal,
+                                  final String _curVal)
             throws IOException
     {
         final String curVal = (_curVal == null) ? "" : _curVal;
         final String newVal = (_newVal == null) ? "" : _newVal;
 
         if (!curVal.equals(newVal))  {
-            _out.append(_kind).append(" \"").append(newVal).append("\" ");
+            _out.append(_kind).append(" \"").append(StringUtil_mxJPO.convertMql(newVal)).append("\" ");
         }
     }
 
@@ -521,10 +533,10 @@ throw new Exception("some states are not defined anymore!");
      * @param _current  current values in MX
      * @throws IOException if the delta could not appended
      */
-    protected void calcDelta(final Appendable _out,
-                             final String _kind,
-                             final Set<String> _new,
-                             final Set<String> _current)
+    protected void calcListDelta(final Appendable _out,
+                                 final String _kind,
+                                 final Set<String> _new,
+                                 final Set<String> _current)
             throws IOException
     {
         boolean equal = (_current.size() == _new.size());
@@ -696,8 +708,8 @@ throw new Exception("some states are not defined anymore!");
             // basics
             _out.append("\n  state \"").append(StringUtil_mxJPO.convertTcl(this.name)).append("\"  {")
                 .append("\n    registeredName \"").append((this.nameSymbolic != null)
-                                                          ? StringUtil_mxJPO.convertTcl(this.nameSymbolic)
-                                                          : "state_" + StringUtil_mxJPO.convertTcl(this.name.replaceAll(" ", "_")))
+                                              ? StringUtil_mxJPO.convertTcl(this.nameSymbolic)
+                                              : "state_" + StringUtil_mxJPO.convertTcl(this.name.replaceAll(" ", "_")))
                                                   .append('\"')
                 .append("\n    revision \"").append(Boolean.toString(this.revisionable)).append('\"')
                 .append("\n    version \"").append(Boolean.toString(this.versionable)).append('\"')
@@ -889,6 +901,10 @@ throw new Exception("some states are not defined anymore!");
          *
          * @param _userAccess   user access instance to which this instance
          *                      must be compared to
+         * @return a negative integer, zero, or a positive integer as this
+         *         {@link #userRef} is less than, equal to, or greater than the
+         *         specified {@link #userRef} defined with
+         *         <code>_userAccess</code>
          */
         public int compareTo(final UserAccess _userAccess)
         {
@@ -983,7 +999,8 @@ throw new Exception("some states are not defined anymore!");
         {
             if ("".equals(this.branch))  {
                 if ((_oldSignature != null) && (_oldSignature.branch != null) && !"".equals(_oldSignature.branch))  {
-throw new Error("branch '" + _oldSignature.branch + "' exists for signature " + this.name + ", but is not defined anymore");
+throw new Error("branch '" + _oldSignature.branch + "' exists for signature "
+            + this.name + ", but is not defined anymore");
                 }
             } else  {
                 _out.append("branch \"").append(StringUtil_mxJPO.convertMql(this.branch)).append("\" ");
