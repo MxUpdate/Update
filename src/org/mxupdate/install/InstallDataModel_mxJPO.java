@@ -132,12 +132,13 @@ public class InstallDataModel_mxJPO
             throws Exception
     {
         final String progName = _paramCache.getValueString(InstallDataModel_mxJPO.PARAM_PROGAPPL);
+        final String applName = _paramCache.getValueString(InstallDataModel_mxJPO.PARAM_APPLNAME);
 
         _paramCache.logInfo("register MxUpdate " + _version);
         MqlUtil_mxJPO.execMql(_paramCache.getContext(), new StringBuilder()
-                .append("mod prog \"").append(progName).append("\" ")
-                .append("add property \"appVersionMxUpdate\" ")
-                .append("value \"").append(_version).append("\""));
+                .append("escape mod prog \"").append(StringUtil_mxJPO.convertMql(progName)).append("\" ")
+                .append("add property \"appVersion").append(StringUtil_mxJPO.convertMql(applName)).append("\" ")
+                .append("value \"").append(StringUtil_mxJPO.convertMql(_version)).append("\""));
     }
 
     /**
@@ -299,7 +300,9 @@ public class InstallDataModel_mxJPO
         }
 
         // write properties
-        if ("".equals(MqlUtil_mxJPO.execMql(_paramCache.getContext(), "list prog 'org.mxupdate.plugin.plugin.properties'")))  {
+        final String installed = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+                                                       "list prog 'org.mxupdate.plugin.plugin.properties'");
+        if ("".equals(installed))  {
             MqlUtil_mxJPO.execMql(_paramCache.getContext(), "escape add prog 'org.mxupdate.plugin.plugin.properties'");
         }
         MqlUtil_mxJPO.execMql(_paramCache.getContext(), new StringBuilder()
