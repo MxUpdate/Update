@@ -26,19 +26,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
-import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
+import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * Data model relationship class used to export and update relationships.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class Relationship_mxJPO
@@ -53,7 +51,7 @@ public class Relationship_mxJPO
      * Set holding all rules referencing this attribute.
      *
      * @see #parse(String, String)
-     * @see #writeObject(Appendable)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private final  Set<String> rules = new TreeSet<String>();
 
@@ -95,7 +93,7 @@ public class Relationship_mxJPO
     /**
      * From side type list.
      *
-     * @see #prepare(Context)
+     * @see #prepare(ParameterCache_mxJPO)
      * @see #fromTypeAll
      */
     private final Set<String> fromTypes = new TreeSet<String>();
@@ -103,7 +101,7 @@ public class Relationship_mxJPO
     /**
      * Are all types on the from side allowed?
      *
-     * @see #prepare(Context)
+     * @see #prepare(ParameterCache_mxJPO)
      * @see #fromTypes
      */
     private boolean fromTypeAll = false;
@@ -141,7 +139,7 @@ public class Relationship_mxJPO
     /**
      * To side type list.
      *
-     * @see #prepare(Context)
+     * @see #prepare(ParameterCache_mxJPO)
      * @see #toTypeAll
      */
     private final Set<String> toTypes = new TreeSet<String>();
@@ -149,7 +147,7 @@ public class Relationship_mxJPO
     /**
      * Are all types on the to side allowed?
      *
-     * @see #prepare(Context)
+     * @see #prepare(ParameterCache_mxJPO)
      * @see #toTypes
      */
     private boolean toTypeAll = false;
@@ -250,7 +248,7 @@ public class Relationship_mxJPO
             throws MatrixException
     {
         // evaluate all from types
-        final String[] fromTypesArr = execMql(_paramCache.getContext(),
+        final String[] fromTypesArr = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
                                               new StringBuilder("escape print rel \"")
                                                    .append(this.getName())
                                                    .append("\" select fromtype dump '\n'"))
@@ -264,7 +262,7 @@ public class Relationship_mxJPO
             }
         }
         // evaluate all to types
-        final String[] toTypesArr = execMql(_paramCache.getContext(),
+        final String[] toTypesArr = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
                                             new StringBuilder("escape print rel \"")
                                                  .append(this.getName())
                                                  .append("\" select totype dump '\n'"))
@@ -304,36 +302,38 @@ public class Relationship_mxJPO
             .append(" \\\n    ").append(this.preventDuplicates ? "" : "!").append("preventduplicates");
         // rules
         for (final String rule : this.rules)  {
-            _out.append(" \\\n    add rule \"").append(convertTcl(rule)).append('\"');
+            _out.append(" \\\n    add rule \"").append(StringUtil_mxJPO.convertTcl(rule)).append('\"');
         }
         // triggers
         this.writeTriggers(_out);
         _out.append(" \\\n    from")
             .append(" \\\n        ").append(this.fromPropagateModify ? "" : "!").append("propagatemodify")
             .append(" \\\n        ").append(this.fromPropagateConnection ? "" : "!").append("propagateconnection")
-            .append(" \\\n        meaning \"").append(convertTcl(this.fromMeaning)).append('\"')
-            .append(" \\\n        cardinality \"").append(convertTcl(this.fromCardinality)).append('\"')
-            .append(" \\\n        revision \"").append(convertTcl(this.fromRevisionAction)).append('\"')
-            .append(" \\\n        clone \"").append(convertTcl(this.fromCloneAction)).append('\"');
+            .append(" \\\n        meaning \"").append(StringUtil_mxJPO.convertTcl(this.fromMeaning)).append('\"')
+            .append(" \\\n        cardinality \"")
+                    .append(StringUtil_mxJPO.convertTcl(this.fromCardinality)).append('\"')
+            .append(" \\\n        revision \"")
+                    .append(StringUtil_mxJPO.convertTcl(this.fromRevisionAction)).append('\"')
+            .append(" \\\n        clone \"").append(StringUtil_mxJPO.convertTcl(this.fromCloneAction)).append('\"');
         if (this.fromTypeAll)  {
             _out.append(" \\\n        add type \"all\"");
         } else  {
             for (final String type : this.fromTypes)  {
-                _out.append(" \\\n        add type \"").append(convertTcl(type)).append('\"');
+                _out.append(" \\\n        add type \"").append(StringUtil_mxJPO.convertTcl(type)).append('\"');
             }
         }
         _out.append(" \\\n    to")
             .append(" \\\n        ").append(this.toPropagateModify ? "" : "!").append("propagatemodify")
             .append(" \\\n        ").append(this.toPropagateConnection ? "" : "!").append("propagateconnection")
-            .append(" \\\n        meaning \"").append(convertTcl(this.toMeaning)).append('\"')
-            .append(" \\\n        cardinality \"").append(convertTcl(this.toCardinality)).append('\"')
-            .append(" \\\n        revision \"").append(convertTcl(this.toRevisionAction)).append('\"')
-            .append(" \\\n        clone \"").append(convertTcl(this.toCloneAction)).append('\"');
+            .append(" \\\n        meaning \"").append(StringUtil_mxJPO.convertTcl(this.toMeaning)).append('\"')
+            .append(" \\\n        cardinality \"").append(StringUtil_mxJPO.convertTcl(this.toCardinality)).append('\"')
+            .append(" \\\n        revision \"").append(StringUtil_mxJPO.convertTcl(this.toRevisionAction)).append('\"')
+            .append(" \\\n        clone \"").append(StringUtil_mxJPO.convertTcl(this.toCloneAction)).append('\"');
         if (this.toTypeAll)  {
             _out.append(" \\\n        add type \"all\"");
         } else  {
             for (final String type : this.toTypes)  {
-                _out.append(" \\\n        add type \"").append(convertTcl(type)).append('\"');
+                _out.append(" \\\n        add type \"").append(StringUtil_mxJPO.convertTcl(type)).append('\"');
             }
         }
     }
@@ -380,10 +380,12 @@ public class Relationship_mxJPO
                 // remove hidden, description, prevent duplicate
                 .append(" !hidden description \"\" !preventduplicate")
                 // reset from information
-                .append(" from !propagatemodify !propagateconnection  meaning \"\" cardinality one revision none clone none ")
+                .append(" from !propagatemodify !propagateconnection ")
+                        .append("meaning \"\" cardinality one revision none clone none ")
                 .append(" from remove type all")
                 // reset to information
-                .append(" to !propagatemodify !propagateconnection  meaning \"\" cardinality one revision none clone none ")
+                .append(" to !propagatemodify !propagateconnection ")
+                        .append("meaning \"\" cardinality one revision none clone none ")
                 .append(" to remove type all");
         // remove all rules
         for (final String rule : this.rules)  {
