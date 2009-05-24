@@ -26,20 +26,18 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
-import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * The class parses the information about the portal and writes the script used
  * to update portals.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class Portal_mxJPO
@@ -82,7 +80,7 @@ public class Portal_mxJPO
     /**
      * Ordered channel references by row and column.
      *
-     * @see #prepare(Context)
+     * @see #prepare(ParameterCache_mxJPO)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     final Map<Integer,Map<Integer,ChannelRef>> orderedChannelRefs = new TreeMap<Integer,Map<Integer,ChannelRef>>();
@@ -179,18 +177,19 @@ public class Portal_mxJPO
                                final Appendable _out)
             throws IOException
     {
-        _out.append(" \\\n    label \"").append(convertTcl(this.label)).append("\"");
+        _out.append(" \\\n    label \"").append(StringUtil_mxJPO.convertTcl(this.label)).append("\"");
         if (this.href != null)  {
-            _out.append(" \\\n    href \"").append(convertTcl(this.href)).append("\"");
+            _out.append(" \\\n    href \"").append(StringUtil_mxJPO.convertTcl(this.href)).append("\"");
         }
         if (this.alt != null)  {
-            _out.append(" \\\n    alt \"").append(convertTcl(this.alt)).append("\"");
+            _out.append(" \\\n    alt \"").append(StringUtil_mxJPO.convertTcl(this.alt)).append("\"");
         }
         // settings
         for (final AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
             if (prop.getName().startsWith("%"))  {
-                _out.append(" \\\n    add setting \"").append(convertTcl(prop.getName().substring(1))).append("\"")
-                    .append(" \"").append(convertTcl(prop.getValue())).append("\"");
+                _out.append(" \\\n    add setting \"")
+                    .append(StringUtil_mxJPO.convertTcl(prop.getName().substring(1))).append("\"")
+                    .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getValue())).append("\"");
             }
         }
         // channel references
@@ -198,7 +197,7 @@ public class Portal_mxJPO
         for (final Map<Integer,ChannelRef> channelRefs : this.orderedChannelRefs.values())  {
             boolean firstCol = true;
             for (final ChannelRef channelRef : channelRefs.values())  {
-                _out.append(" \\\n    place \"").append(convertTcl(channelRef.name)).append("\"");
+                _out.append(" \\\n    place \"").append(StringUtil_mxJPO.convertTcl(channelRef.name)).append("\"");
                 if (!firstRow && firstCol)  {
                     _out.append(" newrow");
                 }

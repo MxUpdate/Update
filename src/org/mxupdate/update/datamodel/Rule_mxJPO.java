@@ -27,20 +27,16 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 
-import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertMql;
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
-import static org.mxupdate.update.util.StringUtil_mxJPO.joinTcl;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class Rule_mxJPO
@@ -71,7 +67,7 @@ public class Rule_mxJPO
     /**
      * Sorted set of user access (by name of the user).
      *
-     * @see #prepare(Context)   method used to sort the user access instances
+     * @see #prepare(ParameterCache_mxJPO)
      */
     private final Set<UserAccess> userAccessSorted = new TreeSet<UserAccess>();
 
@@ -166,23 +162,23 @@ public class Rule_mxJPO
             throws IOException
     {
         // hidden?
-        _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden");
+        _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden");
 
         // owner access
         _out.append(" \\\n    add owner \"")
-            .append(joinTcl(',', false, this.ownerAccess, null))
+            .append(StringUtil_mxJPO.joinTcl(',', false, this.ownerAccess, null))
             .append('\"')
         // public access
             .append(" \\\n    add public \"")
-            .append(joinTcl(',', false, this.publicAccess, null))
+            .append(StringUtil_mxJPO.joinTcl(',', false, this.publicAccess, null))
             .append('\"');
 
         // user access
         for (final UserAccess userAccess : this.userAccessSorted)  {
-            _out.append(" \\\n    add user \"").append(convertTcl(userAccess.userRef)).append("\" \"")
-                .append(joinTcl(',', false, userAccess.access, null))
+            _out.append(" \\\n    add user \"").append(StringUtil_mxJPO.convertTcl(userAccess.userRef)).append("\" \"")
+                .append(StringUtil_mxJPO.joinTcl(',', false, userAccess.access, null))
                 .append("\" filter \"")
-                .append(convertTcl(userAccess.expressionFilter))
+                .append(StringUtil_mxJPO.convertTcl(userAccess.expressionFilter))
                 .append("\"");
         }
     }
@@ -222,12 +218,12 @@ public class Rule_mxJPO
     {
         final StringBuilder preMQLCode = new StringBuilder()
             .append("escape mod ").append(this.getTypeDef().getMxAdminName())
-            .append(" \"").append(convertMql(this.getName())).append('\"')
+            .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
             .append(" !hidden owner none public none");
         // remove user access
         for (final UserAccess userAccess : this.userAccessSorted)  {
             preMQLCode.append(" remove user \"")
-                        .append(convertMql(userAccess.userRef))
+                        .append(StringUtil_mxJPO.convertMql(userAccess.userRef))
                         .append("\" all");
         }
 
@@ -242,7 +238,7 @@ public class Rule_mxJPO
      * Class used to hold the user access.
      */
     private class UserAccess
-            implements Comparable<UserAccess>
+            implements Comparable<Rule_mxJPO.UserAccess>
     {
         /**
          * Holds the user references of a user access.
@@ -265,6 +261,10 @@ public class Rule_mxJPO
          *
          * @param _userAccess   user access instance to which this instance
          *                      must be compared to
+         * @return a negative integer, zero, or a positive integer as this
+         *         object represented by {@link #userRef} is less than, equal
+         *         to, or greater than the specified object represented by
+         *         {@link #userRef}
          */
         public int compareTo(final UserAccess _userAccess)
         {

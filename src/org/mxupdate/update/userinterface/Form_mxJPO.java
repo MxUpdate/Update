@@ -24,8 +24,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import matrix.db.Context;
-
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
@@ -34,7 +32,7 @@ import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class Form_mxJPO
@@ -49,7 +47,7 @@ public class Form_mxJPO
      * TCL procedure used to order fields of form, because Matrix has a bug
      * that sometimes the fields of a form are not in the correct order.
      *
-     * @see #update(Context, CharSequence, CharSequence, Map)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private static final String ORDER_PROC
             = "proc orderFields {_name _fields}  {\n"

@@ -29,15 +29,14 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
-import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
+import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
-*
- * @author Tim Moxter
-* @version $Id$
-*/
+ *
+ * @author The MxUpdate Team
+ * @version $Id$
+ */
 public class Expression_mxJPO
         extends AbstractAdminObject_mxJPO
 {
@@ -50,7 +49,7 @@ public class Expression_mxJPO
      * Hold the expression itself.
      *
      * @see #prepare(ParameterCache_mxJPO)
-     * @see #writeObject(Appendable)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String expression = null;
 
@@ -99,10 +98,10 @@ public class Expression_mxJPO
             throws MatrixException
     {
         final String cmd = new StringBuilder()
-                .append("print expression \"").append(convertTcl(getName()))
+                .append("escape print expression \"").append(StringUtil_mxJPO.convertMql(this.getName()))
                 .append("\" select value dump")
                 .toString();
-        this.expression = execMql(_paramCache.getContext(), cmd);
+        this.expression = MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
         super.prepare(_paramCache);
     }
 
@@ -120,9 +119,9 @@ public class Expression_mxJPO
                                final Appendable _out)
             throws IOException
     {
-        _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden");
+        _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden");
         _out.append(" \\\n    value \"");
-        final String expr = convertTcl(this.expression);
+        final String expr = StringUtil_mxJPO.convertTcl(this.expression);
         // bug-fix: expression with starting and ending ' (but without ')
         // must have a " as first and last character
         if (expr.matches("^'[^']*'$"))  {

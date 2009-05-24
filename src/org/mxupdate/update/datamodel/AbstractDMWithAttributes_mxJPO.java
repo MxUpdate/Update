@@ -22,7 +22,6 @@ package org.mxupdate.update.datamodel;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -31,21 +30,16 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import matrix.db.Context;
-
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertMql;
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
-import static org.mxupdate.update.util.StringUtil_mxJPO.match;
-import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
+import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * The class is used to handle the export / import of administration objects
  * depending on attributes.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public abstract class AbstractDMWithAttributes_mxJPO
@@ -124,12 +118,9 @@ public abstract class AbstractDMWithAttributes_mxJPO
     /**
      * List of all attributes for this data model administration object.
      *
-     * @see #parse(String, String)              method used to parse attributes
-     * @see #writeEnd(Writer)                   method used to write attributes
-     *                                          into the TCL update script
-     * @see #jpoCallExecute(Context, String...) method used to update
-     *                                          attributes of administration
-     *                                          object
+     * @see #parse(String, String)
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
+     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
      */
     private final Set<String> attributes = new TreeSet<String>();
 
@@ -184,7 +175,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
         _out.append("\n\ntestAttributes -").append(this.getTypeDef().getMxAdminName())
             .append(" \"${NAME}\" -attributes [list \\\n");
         for (final String attr : this.attributes)  {
-            _out.append("    \"").append(convertTcl(attr)).append("\" \\\n");
+            _out.append("    \"").append(StringUtil_mxJPO.convertTcl(attr)).append("\" \\\n");
         }
         _out.append("]");
     }
@@ -218,7 +209,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
     {
         // add TCL code for the procedure
         final StringBuilder tclCode = new StringBuilder()
-                .append(TCL_PROCEDURE)
+                .append(AbstractDMWithAttributes_mxJPO.TCL_PROCEDURE)
                 .append(_preTCLCode);
 
         super.update(_paramCache, _preMQLCode, _postMQLCode, tclCode, _tclVariables, _sourceFile);
@@ -257,21 +248,25 @@ public abstract class AbstractDMWithAttributes_mxJPO
                 ignoreAttrs.add(_args[++idx]);
             } else if ("-interface".equals(arg))  {
                 name = _args[++idx];
-                final Collection<String> tmp1 = _paramCache.getValueList(PARAM_IGNORE_INTERFACE);
+                final Collection<String> tmp1
+                        = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_IGNORE_INTERFACE);
                 if (tmp1 != null)  {
                     ignoreAttrs.addAll(tmp1);
                 }
-                final Collection<String> tmp2 = _paramCache.getValueList(PARAM_REMOVE_INTERFACE);
+                final Collection<String> tmp2
+                        = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_REMOVE_INTERFACE);
                 if (tmp2 != null)  {
                     removeAttrs.addAll(tmp2);
                 }
             } else if ("-relationship".equals(arg))  {
                 name = _args[++idx];
-                final Collection<String> tmp1 = _paramCache.getValueList(PARAM_IGNORE_RELATIONSHIP);
+                final Collection<String> tmp1
+                        = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_IGNORE_RELATIONSHIP);
                 if (tmp1 != null)  {
                     ignoreAttrs.addAll(tmp1);
                 }
-                final Collection<String> tmp2 = _paramCache.getValueList(PARAM_REMOVE_RELATIONSHIP);
+                final Collection<String> tmp2
+                        = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_REMOVE_RELATIONSHIP);
                 if (tmp2 != null)  {
                     removeAttrs.addAll(tmp2);
                 }
@@ -279,11 +274,13 @@ public abstract class AbstractDMWithAttributes_mxJPO
                 removeAttrs.add(_args[++idx]);
             } else if ("-type".equals(arg))  {
                 name = _args[++idx];
-                final Collection<String> tmp1 = _paramCache.getValueList(PARAM_IGNORE_TYPE);
+                final Collection<String> tmp1
+                        = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_IGNORE_TYPE);
                 if (tmp1 != null)  {
                     ignoreAttrs.addAll(tmp1);
                 }
-                final Collection<String> tmp2 = _paramCache.getValueList(PARAM_REMOVE_TYPE);
+                final Collection<String> tmp2
+                        = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_REMOVE_TYPE);
                 if (tmp2 != null)  {
                     removeAttrs.addAll(tmp2);
                 }
@@ -319,7 +316,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
             if (!newAttrs.contains(attr))  {
                 boolean ignore = false;
                 for (final String ignoreAttr : ignoreAttrs)  {
-                    if (match(attr, ignoreAttr))  {
+                    if (StringUtil_mxJPO.match(attr, ignoreAttr))  {
                         ignore = true;
                         _paramCache.logDebug("    - attribute '" + attr + "' is not defined but will be ignored");
                         break;
@@ -328,14 +325,15 @@ public abstract class AbstractDMWithAttributes_mxJPO
                 if (!ignore)  {
                     boolean remove = false;
                     for (final String removeAttr : removeAttrs)  {
-                        if (match(attr, removeAttr))  {
+                        if (StringUtil_mxJPO.match(attr, removeAttr))  {
                             remove = true;
                             _paramCache.logDebug("    - attribute '" + attr + "' is not defined and will be removed");
-                            execMql(_paramCache.getContext(),
+                            MqlUtil_mxJPO.execMql(_paramCache.getContext(),
                                     new StringBuilder()
                                         .append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                                        .append(" \"").append(convertMql(this.getName())).append("\"")
-                                        .append(" remove attribute \"").append(convertMql(attr)).append("\""));
+                                        .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\"")
+                                        .append(" remove attribute \"")
+                                                .append(StringUtil_mxJPO.convertMql(attr)).append("\""));
                             break;
                         }
                     }
@@ -352,11 +350,11 @@ public abstract class AbstractDMWithAttributes_mxJPO
         for (final String attr : newAttrs)  {
             if (!this.attributes.contains(attr))  {
                 _paramCache.logDebug("    - add attribute '" + attr + "'");
-                execMql(_paramCache.getContext(),
+                MqlUtil_mxJPO.execMql(_paramCache.getContext(),
                         new StringBuilder()
                             .append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                            .append(" \"").append(convertMql(this.getName())).append("\"")
-                            .append(" add attribute \"").append(convertMql(attr)).append("\""));
+                            .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\"")
+                            .append(" add attribute \"").append(StringUtil_mxJPO.convertMql(attr)).append("\""));
             }
         }
     }

@@ -26,18 +26,16 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 
-import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class Channel_mxJPO
@@ -51,7 +49,7 @@ public class Channel_mxJPO
     /**
      * Alt (label) of the channel.
      *
-     * @see #parse(Context, String)
+     * @see #parse(String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String alt;
@@ -59,7 +57,7 @@ public class Channel_mxJPO
     /**
      * Height of the channel.
      *
-     * @see #parse(Context, String)
+     * @see #parse(String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private Integer height;
@@ -67,7 +65,7 @@ public class Channel_mxJPO
     /**
      * Href of the channel.
      *
-     * @see #parse(Context, String)
+     * @see #parse(String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String href;
@@ -75,7 +73,7 @@ public class Channel_mxJPO
     /**
      * Label of the channel.
      *
-     * @see #parse(Context, String)
+     * @see #parse(String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String label;
@@ -83,15 +81,15 @@ public class Channel_mxJPO
     /**
      * Stack with all referenced commands (used while parsing the channel).
      *
-     * @see #parse(Context, String)
-     * @see #prepare(Context)
+     * @see #parse(String, String)
+     * @see #prepare(ParameterCache_mxJPO)
      */
     private final Stack<CommandRef> commandRefs = new Stack<CommandRef>();
 
     /**
      * Ordered map of referenced commands.
      *
-     * @see #prepare(Context)
+     * @see #prepare(ParameterCache_mxJPO)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     final Map<Integer,CommandRef> orderCmds = new TreeMap<Integer,CommandRef>();
@@ -180,12 +178,12 @@ public class Channel_mxJPO
                                final Appendable _out)
             throws IOException
     {
-        _out.append(" \\\n    label \"").append(convertTcl(this.label)).append("\"");
+        _out.append(" \\\n    label \"").append(StringUtil_mxJPO.convertTcl(this.label)).append("\"");
         if (this.href != null)  {
-            _out.append(" \\\n    href \"").append(convertTcl(this.href)).append("\"");
+            _out.append(" \\\n    href \"").append(StringUtil_mxJPO.convertTcl(this.href)).append("\"");
         }
         if (this.alt != null)  {
-            _out.append(" \\\n    alt \"").append(convertTcl(this.alt)).append("\"");
+            _out.append(" \\\n    alt \"").append(StringUtil_mxJPO.convertTcl(this.alt)).append("\"");
         }
         if (this.height != null)  {
             _out.append(" \\\n    height \"").append(this.height.toString()).append("\"");
@@ -193,13 +191,14 @@ public class Channel_mxJPO
         // settings
         for (final AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
             if (prop.getName().startsWith("%"))  {
-                _out.append(" \\\n    add setting \"").append(convertTcl(prop.getName().substring(1))).append("\"")
-                    .append(" \"").append(convertTcl(prop.getValue())).append("\"");
+                _out.append(" \\\n    add setting \"")
+                    .append(StringUtil_mxJPO.convertTcl(prop.getName().substring(1))).append("\"")
+                    .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getValue())).append("\"");
             }
         }
         // referenced commands
         for (final CommandRef cmdRef : this.orderCmds.values())  {
-            _out.append(" \\\n    place \"").append(convertTcl(cmdRef.name)).append("\" after \"\"");
+            _out.append(" \\\n    place \"").append(StringUtil_mxJPO.convertTcl(cmdRef.name)).append("\" after \"\"");
         }
     }
 

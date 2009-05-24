@@ -35,7 +35,7 @@ import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 
 /**
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class Inquiry_mxJPO
@@ -60,7 +60,7 @@ public class Inquiry_mxJPO
      * Code for the inquiry.
      *
      * @see #parse(String, String)
-     * @see #writeEnd(Appendable)
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
     private String code = null;
 
@@ -68,7 +68,7 @@ public class Inquiry_mxJPO
      * Format for the inquiry.
      *
      * @see #parse(String, String)
-     * @see #writeObject(Appendable)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String format = null;
 
@@ -76,7 +76,7 @@ public class Inquiry_mxJPO
      * Pattern for the inquiry.
      *
      * @see #parse(String, String)
-     * @see #writeObject(Appendable)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String pattern = null;
 

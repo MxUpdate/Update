@@ -22,7 +22,6 @@ package org.mxupdate.update.datamodel;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -31,14 +30,13 @@ import java.util.regex.Pattern;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
-import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
+import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * Data model interface class.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class Interface_mxJPO
@@ -73,7 +71,7 @@ public class Interface_mxJPO
      * From which interfaces is this interface derived?
      *
      * @see #parse(String, String)
-     * @see #write(Writer)
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
     private final Set<String> derived = new TreeSet<String>();
 
@@ -81,7 +79,7 @@ public class Interface_mxJPO
      * Is the interface abstract?
      *
      * @see #parse(String, String)
-     * @see #write(Writer)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private boolean abstractFlag = false;
 
@@ -89,7 +87,7 @@ public class Interface_mxJPO
      * Are all types allowed for this interface?
      *
      * @see #parse(String, String)
-     * @see #write(Writer)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private boolean typesAll = false;
 
@@ -97,7 +95,7 @@ public class Interface_mxJPO
      * Information about all allowed types for this interface.
      *
      * @see #parse(String, String)
-     * @see #write(Writer)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private final Set<String> types = new TreeSet<String>();
 
@@ -179,7 +177,7 @@ public class Interface_mxJPO
             _out.append(" \\\n    add type all");
         } else  {
             for (final String type : this.types)  {
-                _out.append(" \\\n    add type \"").append(convertTcl(type)).append('\"');
+                _out.append(" \\\n    add type \"").append(StringUtil_mxJPO.convertTcl(type)).append('\"');
             }
         }
 
@@ -203,7 +201,7 @@ public class Interface_mxJPO
         _out.append("\n\ntestParents -").append(this.getTypeDef().getMxAdminName())
             .append(" \"${NAME}\" -parents [list \\\n");
         for (final String parent : this.derived)  {
-            _out.append("    \"").append(convertTcl(parent)).append("\" \\\n");
+            _out.append("    \"").append(StringUtil_mxJPO.convertTcl(parent)).append("\" \\\n");
         }
         _out.append("]");
 
@@ -264,7 +262,7 @@ public class Interface_mxJPO
 
         // add TCL code for the procedure
         final StringBuilder preTclCode = new StringBuilder()
-                .append(TCL_PROCEDURE)
+                .append(Interface_mxJPO.TCL_PROCEDURE)
                 .append(_preTCLCode);
 
         super.update(_paramCache, preMQLCode, _postMQLCode, preTclCode, _tclVariables, _sourceFile);
@@ -277,7 +275,7 @@ public class Interface_mxJPO
      * interfaces to the interface object. If an interface is not defined
      * anymore but assigned in MX, an exception is thrown.
      * If the first argument is not &quot;parents&quot; method
-     * {@link AbstractDMWithAttributes_mxJPO#jpoCallExecute(ParameterCache_mxJPO, String...)
+     * {@link AbstractDMWithAttributes_mxJPO#jpoCallExecute(ParameterCache_mxJPO, String...)}
      * is called.
      *
      * @param _paramCache   parameter cache
@@ -360,7 +358,7 @@ public class Interface_mxJPO
                     cmd.append(newParent);
                 }
                 cmd.append('\"');
-                execMql(_paramCache.getContext(), cmd);
+                MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
             }
         }
     }

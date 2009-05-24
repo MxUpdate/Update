@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 
-import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
@@ -39,7 +38,7 @@ import org.mxupdate.util.MqlUtil_mxJPO;
  * The class is used to evaluate information from attributes within MX used to
  * export, delete and update an attribute.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 abstract class AbstractAttribute_mxJPO
@@ -111,7 +110,7 @@ abstract class AbstractAttribute_mxJPO
      * All ranges but sorted after they are prepared.
      *
      * @see #ranges
-     * @see #prepare(Context)   sort the ranges
+     * @see #prepare(ParameterCache_mxJPO)
      */
     private final Set<Range> rangesSorted = new TreeSet<Range>();
 
@@ -133,7 +132,8 @@ abstract class AbstractAttribute_mxJPO
     /**
      * Holds the attribute type used to create a new attribute.
      *
-     * @see #create(ParameterCache_mxJPO, File)
+     * @see #create(ParameterCache_mxJPO)
+     * @see #AbstractAttribute_mxJPO(TypeDef_mxJPO, String, String, String)
      */
     private final String attrTypeCreate;
 

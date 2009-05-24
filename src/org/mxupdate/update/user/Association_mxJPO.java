@@ -153,7 +153,6 @@ public class Association_mxJPO
      * @param _prop         property for which the date value is searched
      * @return modified date of given update object
      * @throws MatrixException if the MQL print failed
-     * @see #VERSION_PATTERN
      */
     @Override
     public String getPropValue(final ParameterCache_mxJPO _paramCache,

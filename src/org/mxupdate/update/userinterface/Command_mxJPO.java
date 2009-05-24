@@ -29,12 +29,11 @@ import java.util.TreeSet;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class Command_mxJPO
@@ -94,7 +93,7 @@ public class Command_mxJPO
      * <ul>
      * <li>{@link #alt}</li>
      * <li>{@link #href}</li>
-     * <li>user references in {@link #userRef}</li>
+     * <li>user references in {@link #users}</li>
      * </ul>
      *
      * @param _url      URL to parse
@@ -134,16 +133,17 @@ public class Command_mxJPO
                                final Appendable _out)
             throws IOException
     {
-        _out.append(" \\\n    label \"").append(convertTcl(this.label)).append("\"")
-            .append(" \\\n    href \"").append(convertTcl(this.href)).append("\"")
-            .append(" \\\n    alt \"").append(convertTcl(this.alt)).append("\"");
+        _out.append(" \\\n    label \"").append(StringUtil_mxJPO.convertTcl(this.label)).append("\"")
+            .append(" \\\n    href \"").append(StringUtil_mxJPO.convertTcl(this.href)).append("\"")
+            .append(" \\\n    alt \"").append(StringUtil_mxJPO.convertTcl(this.alt)).append("\"");
         for (final String user : this.users)  {
-            _out.append(" \\\n    add user \"").append(convertTcl(user)).append("\"");
+            _out.append(" \\\n    add user \"").append(StringUtil_mxJPO.convertTcl(user)).append("\"");
         }
         for (final AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
             if (prop.getName().startsWith("%"))  {
-                _out.append(" \\\n    add setting \"").append(convertTcl(prop.getName().substring(1))).append("\"")
-                    .append(" \"").append(convertTcl(prop.getValue())).append("\"");
+                _out.append(" \\\n    add setting \"")
+                    .append(StringUtil_mxJPO.convertTcl(prop.getName().substring(1))).append("\"")
+                    .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getValue())).append("\"");
             }
         }
     }

@@ -30,13 +30,12 @@ import java.util.TreeSet;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * The class if used to handle fields for web forms and columns for web tables.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 abstract class AbstractUIWithFields_mxJPO
@@ -270,24 +269,28 @@ abstract class AbstractUIWithFields_mxJPO
         public void write(final Appendable _out)
                 throws IOException
         {
-            _out.append(" \\\n        name \"").append(convertTcl(this.name)).append("\"")
+            _out.append(" \\\n        name \"").append(StringUtil_mxJPO.convertTcl(this.name)).append("\"")
                 .append(" \\\n        label \"")
-                        .append((this.label != null) ? convertTcl(this.label) : "")
+                        .append((this.label != null) ? StringUtil_mxJPO.convertTcl(this.label) : "")
                         .append("\"");
             if (this.isBusinessObject && (this.expression != null))  {
-                _out.append(" \\\n        businessobject \"").append(convertTcl(this.expression)).append("\"");
+                _out.append(" \\\n        businessobject \"")
+                    .append(StringUtil_mxJPO.convertTcl(this.expression)).append("\"");
             }
             if (this.isRelationship && (this.expression != null))  {
-                _out.append(" \\\n        relationship \"").append(convertTcl(this.expression)).append("\"");
+                _out.append(" \\\n        relationship \"")
+                    .append(StringUtil_mxJPO.convertTcl(this.expression)).append("\"");
             }
 
             _out.append(" \\\n        range \"")
-                        .append((this.rangeHref != null) ? convertTcl(this.rangeHref) : "")
+                        .append((this.rangeHref != null) ? StringUtil_mxJPO.convertTcl(this.rangeHref) : "")
                         .append("\"")
-                .append(" \\\n        href \"").append((this.href != null) ? convertTcl(this.href) : "").append("\"")
-                .append(" \\\n        alt \"").append((this.alt != null) ? convertTcl(this.alt) : "").append("\"");
+                .append(" \\\n        href \"")
+                        .append((this.href != null) ? StringUtil_mxJPO.convertTcl(this.href) : "").append("\"")
+                .append(" \\\n        alt \"")
+                        .append((this.alt != null) ? StringUtil_mxJPO.convertTcl(this.alt) : "").append("\"");
             for (final String user : this.users)  {
-                _out.append(" \\\n        user \"").append(convertTcl(user)).append("\"");
+                _out.append(" \\\n        user \"").append(StringUtil_mxJPO.convertTcl(user)).append("\"");
             }
             if ("3".equals(this.sortType))  {
                 _out.append(" \\\n        sorttype other");
@@ -303,14 +306,14 @@ abstract class AbstractUIWithFields_mxJPO
                                      ? ""
                                      : setting.getValue();
                 _out.append(" \\\n        setting \"")
-                    .append(convertTcl(setting.getKey())).append("\" \"")
-                    .append(convertTcl(value)).append("\"");
+                    .append(StringUtil_mxJPO.convertTcl(setting.getKey())).append("\" \"")
+                    .append(StringUtil_mxJPO.convertTcl(value)).append("\"");
             }
         }
 
         /**
          * Returns the name of the form field / table column. The method is the
-         * getter method for instance variable {@see #name}.
+         * getter method for instance variable {@link #name}.
          *
          * @return name of field / column name
          * @see #name

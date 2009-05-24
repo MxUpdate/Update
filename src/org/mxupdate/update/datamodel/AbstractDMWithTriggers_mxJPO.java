@@ -23,26 +23,23 @@ package org.mxupdate.update.datamodel;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.Writer;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * Abstract class for all data model administration objects with triggers.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public abstract class AbstractDMWithTriggers_mxJPO
@@ -61,9 +58,9 @@ public abstract class AbstractDMWithTriggers_mxJPO
     /**
      * Map with all triggers for this type. The key is the name of the trigger.
      *
-     * @see #prepare(Context)           method where the map is prepared
+     * @see #prepare(ParameterCache_mxJPO)
      * @see #triggersStack              stack with trigger from parsing method
-     * @see #writeTriggers(Writer)      write the trigger information
+     * @see #writeTriggers(Appendable)
      */
     private final Map<String,Trigger> triggers = new TreeMap<String,Trigger>();
 
@@ -196,7 +193,7 @@ public abstract class AbstractDMWithTriggers_mxJPO
         /**
          * Used to parse the event type of the trigger from the {@link #name}.
          *
-         * @see #write(Writer)
+         * @see #getEventType()
          */
         private static final Pattern PATTERN_EVENTTYPE = Pattern.compile("^.*(?=((action)|(check)|(override))$)");
 
@@ -204,7 +201,7 @@ public abstract class AbstractDMWithTriggers_mxJPO
          * Used to parse the event kind (&quot;Action&quot;, &quot;Check&quot;
          * or &quot;Override&quot;).
          *
-         * @see #write(Writer)
+         * @see #getKind()
          */
         private static final Pattern PATTERN_KIND = Pattern.compile("((action)|(check)|(override))$");
 
@@ -233,7 +230,8 @@ public abstract class AbstractDMWithTriggers_mxJPO
          */
         protected String getEventType()
         {
-            final Matcher matchEventType = PATTERN_EVENTTYPE.matcher(this.name.toLowerCase());
+            final Matcher matchEventType
+                    = AbstractDMWithTriggers_mxJPO.Trigger.PATTERN_EVENTTYPE.matcher(this.name.toLowerCase());
             matchEventType.find();
             return matchEventType.group();
         }
@@ -247,7 +245,8 @@ public abstract class AbstractDMWithTriggers_mxJPO
          */
         protected String getKind()
         {
-            final Matcher matchKind = PATTERN_KIND.matcher(this.name.toLowerCase());
+            final Matcher matchKind
+                    = AbstractDMWithTriggers_mxJPO.Trigger.PATTERN_KIND.matcher(this.name.toLowerCase());
             matchKind.find();
             return matchKind.group();
         }
@@ -264,8 +263,8 @@ public abstract class AbstractDMWithTriggers_mxJPO
                 throws IOException
         {
             _out.append(" \\\n    add trigger ").append(this.getEventType()).append(' ').append(this.getKind())
-                .append(" \"").append(convertTcl(this.program)).append("\"")
-                .append(" input \"").append(convertTcl(this.arguments)).append("\"");
+                .append(" \"").append(StringUtil_mxJPO.convertTcl(this.program)).append("\"")
+                .append(" input \"").append(StringUtil_mxJPO.convertTcl(this.arguments)).append("\"");
         }
 
         /**
