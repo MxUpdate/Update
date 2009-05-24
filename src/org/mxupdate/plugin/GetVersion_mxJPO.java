@@ -43,14 +43,14 @@ public class GetVersion_mxJPO
      * Name of the parameter defining the program name where applications must
      * be registered.
      *
-     * @see #registerMxUpdate(ParameterCache_mxJPO, String)
+     * @see #mxMain(Context, String...)
      */
     private static final String PARAM_PROGAPPL = "RegisterApplicationProg";
 
     /**
      * Name of the parameter defining the application name.
      *
-     * @see #updateAttributes(ParameterCache_mxJPO, String)
+     * @see #mxMain(Context, String...)
      */
     private static final String PARAM_APPLNAME = "RegisterApplicationName";
 
