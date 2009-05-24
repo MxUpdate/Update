@@ -48,6 +48,16 @@ public class Relationship_mxJPO
     private static final long serialVersionUID = -5246287940374394548L;
 
     /**
+     * Name of the parameter to define that connections between relationships
+     * are from current MX version supported. The parameter is needed to
+     * support the case that an old MX version is used....
+     *
+     * @see #prepare(ParameterCache_mxJPO)
+     * @see #update(ParameterCache_mxJPO, File, String)
+     */
+    private static final String PARAM_SUPPORT_REL_CONS = "DMRelationSupportRelCons";
+
+    /**
      * Set holding all rules referencing this attribute.
      *
      * @see #parse(String, String)
@@ -107,6 +117,22 @@ public class Relationship_mxJPO
     private boolean fromTypeAll = false;
 
     /**
+     * From side relationship list.
+     *
+     * @see #prepare(ParameterCache_mxJPO)
+     * @see #fromRelationAll
+     */
+    private final Set<String> fromRelations = new TreeSet<String>();
+
+    /**
+     * Are all relationships on the from side allowed?
+     *
+     * @see #prepare(ParameterCache_mxJPO)
+     * @see #fromRelations
+     */
+    private boolean fromRelationAll = false;
+
+    /**
      * To side cardinality action.
      */
     private String toCardinality = "";
@@ -153,6 +179,22 @@ public class Relationship_mxJPO
     private boolean toTypeAll = false;
 
     /**
+     * To side relationship list.
+     *
+     * @see #prepare(ParameterCache_mxJPO)
+     * @see #fromRelationAll
+     */
+    private final Set<String> toRelations = new TreeSet<String>();
+
+    /**
+     * Are all relationships on the to side allowed?
+     *
+     * @see #prepare(ParameterCache_mxJPO)
+     * @see #toRelations
+     */
+    private boolean toRelationAll = false;
+
+    /**
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
@@ -177,6 +219,8 @@ public class Relationship_mxJPO
 
         } else if ("/fromSide".equals(_url))  {
             // to be ignored ...
+        } else if ("/fromSide/allowAllRelationships".equals(_url))  {
+            // to be ignored, because read within prepare method
         } else if ("/fromSide/allowAllTypes".equals(_url))  {
             // to be ignored, because read within prepare method
         } else if ("/fromSide/cardinality".equals(_url))  {
@@ -189,6 +233,10 @@ public class Relationship_mxJPO
             this.fromMeaning = _content;
         } else if ("/fromSide/propagateModify".equals(_url))  {
             this.fromPropagateModify = true;
+        } else if ("/fromSide/relationshipDefRefList".equals(_url))  {
+            // to be ignored ...
+        } else if ("/fromSide/relationshipDefRefList/relationshipDefRef".equals(_url))  {
+            // to be ignored, because read within prepare method
         } else if ("/fromSide/revisionAction".equals(_url))  {
             this.fromRevisionAction = _content;
         } else if ("/fromSide/typeRefList".equals(_url))  {
@@ -203,6 +251,8 @@ public class Relationship_mxJPO
 
         } else if ("/toSide".equals(_url))  {
             // to be ignored ...
+        } else if ("/toSide/allowAllRelationships".equals(_url))  {
+            // to be ignored, because read within prepare method
         } else if ("/toSide/allowAllTypes".equals(_url))  {
             // to be ignored, because read within prepare method
         } else if ("/toSide/cardinality".equals(_url))  {
@@ -215,6 +265,10 @@ public class Relationship_mxJPO
             this.toMeaning = _content;
         } else if ("/toSide/propagateModify".equals(_url))  {
             this.toPropagateModify = true;
+        } else if ("/toSide/relationshipDefRefList".equals(_url))  {
+            // to be ignored ...
+        } else if ("/toSide/relationshipDefRefList/relationshipDefRef".equals(_url))  {
+            // to be ignored, because read within prepare method
         } else if ("/toSide/revisionAction".equals(_url))  {
             this.toRevisionAction = _content;
         } else if ("/toSide/typeRefList".equals(_url))  {
@@ -276,6 +330,38 @@ public class Relationship_mxJPO
             }
         }
 
+        // are connections between relationships allowed?
+        if (_paramCache.getValueBoolean(Relationship_mxJPO.PARAM_SUPPORT_REL_CONS))  {
+            // evaluate all from relationships
+            final String[] fromRelsArr = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+                                                 new StringBuilder("escape print rel \"")
+                                                         .append(this.getName())
+                                                         .append("\" select fromrel dump '\n'"))
+                                         .split("\n");
+            for (final String fromRel : fromRelsArr)  {
+                if ("all".equals(fromRel))  {
+                    this.fromRelationAll = true;
+                    this.fromRelations.clear();
+                } else if (!"".equals(fromRel)) {
+                    this.fromRelations.add(fromRel);
+                }
+            }
+            // evaluate all to relationships
+            final String[] toRelsArr = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+                                                 new StringBuilder("escape print rel \"")
+                                                         .append(this.getName())
+                                                         .append("\" select torel dump '\n'"))
+                                         .split("\n");
+            for (final String toRel : toRelsArr)  {
+                if ("all".equals(toRel))  {
+                    this.toRelationAll = true;
+                    this.toRelations.clear();
+                } else if (!"".equals(toRel)) {
+                    this.toRelations.add(toRel);
+                }
+            }
+        }
+
         super.prepare(_paramCache);
     }
 
@@ -315,11 +401,21 @@ public class Relationship_mxJPO
             .append(" \\\n        revision \"")
                     .append(StringUtil_mxJPO.convertTcl(this.fromRevisionAction)).append('\"')
             .append(" \\\n        clone \"").append(StringUtil_mxJPO.convertTcl(this.fromCloneAction)).append('\"');
+        // from types
         if (this.fromTypeAll)  {
             _out.append(" \\\n        add type \"all\"");
         } else  {
             for (final String type : this.fromTypes)  {
                 _out.append(" \\\n        add type \"").append(StringUtil_mxJPO.convertTcl(type)).append('\"');
+            }
+        }
+        // from relationships
+        if (this.fromRelationAll)  {
+            _out.append(" \\\n        add relationship \"all\"");
+        } else  {
+            for (final String relation : this.fromRelations)  {
+                _out.append(" \\\n        add relationship \"")
+                    .append(StringUtil_mxJPO.convertTcl(relation)).append('\"');
             }
         }
         _out.append(" \\\n    to")
@@ -329,11 +425,21 @@ public class Relationship_mxJPO
             .append(" \\\n        cardinality \"").append(StringUtil_mxJPO.convertTcl(this.toCardinality)).append('\"')
             .append(" \\\n        revision \"").append(StringUtil_mxJPO.convertTcl(this.toRevisionAction)).append('\"')
             .append(" \\\n        clone \"").append(StringUtil_mxJPO.convertTcl(this.toCloneAction)).append('\"');
+        // to types
         if (this.toTypeAll)  {
             _out.append(" \\\n        add type \"all\"");
         } else  {
             for (final String type : this.toTypes)  {
                 _out.append(" \\\n        add type \"").append(StringUtil_mxJPO.convertTcl(type)).append('\"');
+            }
+        }
+        // to relationships
+        if (this.toRelationAll)  {
+            _out.append(" \\\n        add relationship \"all\"");
+        } else  {
+            for (final String relation : this.toRelations)  {
+                _out.append(" \\\n        add relationship \"")
+                    .append(StringUtil_mxJPO.convertTcl(relation)).append('\"');
             }
         }
     }
@@ -375,8 +481,8 @@ public class Relationship_mxJPO
             throws Exception
     {
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append('\"')
+                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
                 // remove hidden, description, prevent duplicate
                 .append(" !hidden description \"\" !preventduplicate")
                 // reset from information
@@ -387,17 +493,31 @@ public class Relationship_mxJPO
                 .append(" to !propagatemodify !propagateconnection ")
                         .append("meaning \"\" cardinality one revision none clone none ")
                 .append(" to remove type all");
+        // are connections between relationships allowed?
+        // => yes, than all relationships must be removed from from / to side
+        if (_paramCache.getValueBoolean(Relationship_mxJPO.PARAM_SUPPORT_REL_CONS))  {
+            preMQLCode.append(" from remove relationship all")
+                      .append(" to remove relationship all");
+        }
         // remove all rules
         for (final String rule : this.rules)  {
-            preMQLCode.append(" remove rule \"").append(rule).append('\"');
+            preMQLCode.append(" remove rule \"").append(StringUtil_mxJPO.convertMql(rule)).append('\"');
         }
         // remove all from types
         for (final String type : this.fromTypes)  {
-            preMQLCode.append(" from remove type \"").append(type).append('\"');
+            preMQLCode.append(" from remove type \"").append(StringUtil_mxJPO.convertMql(type)).append('\"');
+        }
+        // remove all from relationships
+        for (final String rel : this.fromRelations)  {
+            preMQLCode.append(" from remove relationship \"").append(StringUtil_mxJPO.convertMql(rel)).append('\"');
         }
         // remove all to types
         for (final String type : this.toTypes)  {
-            preMQLCode.append(" to remove type \"").append(type).append('\"');
+            preMQLCode.append(" to remove type \"").append(StringUtil_mxJPO.convertMql(type)).append('\"');
+        }
+        // remove all to relationships
+        for (final String rel : this.toRelations)  {
+            preMQLCode.append(" to remove relationship \"").append(StringUtil_mxJPO.convertMql(rel)).append('\"');
         }
 
         // append already existing pre MQL code
