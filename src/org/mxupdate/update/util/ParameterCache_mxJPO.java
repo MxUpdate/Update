@@ -36,7 +36,7 @@ import org.mxupdate.mapping.ParameterDef_mxJPO;
 /**
  * The class is used to stored the defined parameters from the console.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class ParameterCache_mxJPO
@@ -208,18 +208,33 @@ public class ParameterCache_mxJPO
 
         for (final ParameterDef_mxJPO paramDef : this.mapping.getAllParameterDefs())  {
             if (paramDef.getDefaultValue() != null)  {
-                if (paramDef.getType() == ParameterDef_mxJPO.Type.BOOLEAN)  {
-                    this.mapBoolean.put(paramDef.getName(),
-                                        Boolean.parseBoolean(paramDef.getDefaultValue()));
-                } else if (paramDef.getType() == ParameterDef_mxJPO.Type.INTEGER)  {
-                    this.mapInteger.put(paramDef.getName(),
-                                        Integer.parseInt(paramDef.getDefaultValue()));
-                } else if (paramDef.getType() == ParameterDef_mxJPO.Type.LIST)  {
-                    this.mapList.put(paramDef.getName(),
-                                     new ArrayList<String>(Arrays.asList(paramDef.getDefaultValue().split(","))));
-                } else if (paramDef.getType() == ParameterDef_mxJPO.Type.STRING)  {
-                    this.mapString.put(paramDef.getName(),
-                                       paramDef.getDefaultValue());
+                switch (paramDef.getType())  {
+                    case BOOLEAN:
+                        this.mapBoolean.put(paramDef.getName(),
+                                            Boolean.parseBoolean(paramDef.getDefaultValue()));
+                        break;
+                    case INTEGER:
+                        this.mapInteger.put(paramDef.getName(),
+                                            Integer.parseInt(paramDef.getDefaultValue()));
+                        break;
+                    case LIST:
+                        this.mapList.put(paramDef.getName(),
+                                         new ArrayList<String>(Arrays.asList(paramDef.getDefaultValue().split(","))));
+                        break;
+                    case MAP:
+                        if ((paramDef.getDefaultValue() != null) && !"".equals(paramDef.getDefaultValue()))  {
+                            final Map<String,String> values = new HashMap<String,String>();
+                            for (final String entry : paramDef.getDefaultValue().split(","))  {
+                                final String[] entryArr = entry.split("=", 2);
+                                values.put(entryArr[0], (entryArr.length > 1) ? entryArr[1] : null);
+                            }
+                            this.mapMap.put(paramDef.getName(), values);
+                        }
+                        break;
+                    case STRING:
+                        this.mapString.put(paramDef.getName(),
+                                           paramDef.getDefaultValue());
+                        break;
                 }
             }
         }

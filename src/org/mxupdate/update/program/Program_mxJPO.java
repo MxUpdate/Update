@@ -22,6 +22,7 @@ package org.mxupdate.update.program;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -32,7 +33,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class Program_mxJPO
@@ -42,6 +43,37 @@ public class Program_mxJPO
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = -3329894042318127257L;
+
+    /**
+     * Defines the parameter to define the string where the TCL update code
+     * starts.
+     *
+     * @see #update(ParameterCache_mxJPO, File, String)
+     */
+    private static final String PARAM_MARKSTART = "ProgramTclUpdateMarkStart";
+
+    /**
+     * Defines the parameter to define the string where the TCL update code
+     * ends.
+     *
+     * @see #update(ParameterCache_mxJPO, File, String)
+     */
+    private static final String PARAM_MARKEND = "ProgramTclUpdateMarkEnd";
+
+    /**
+     * Defines the parameter to define if embedded TCL update code within
+     * programs must be executed.
+     *
+     * @see #update(ParameterCache_mxJPO, File, String)
+     */
+    private static final String PARAM_NEEDED = "ProgramTclUpdateNeeded";
+
+    /**
+     *
+     *
+     * @see #update(ParameterCache_mxJPO, File, String)
+     */
+    private static final String PARAM_EXTENSION = "ProgramTclUpdateExtension";
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -118,7 +150,12 @@ public class Program_mxJPO
 
     /**
      * The program is updated if the modified date of the file is not the same
-     * as the the version property.
+     * as the the version property. Embedded TCL update code is searched
+     * depending on the file extension and the TCL update needed parameter
+     * {@link #PARAM_NEEDED}. If for a file extension a line prefix is defined,
+     * the line prefix is removed from the TCL update code (and also the mark
+     * texts defined with {@link #PARAM_MARKSTART} and {@link #PARAM_MARKEND}
+     * depends on the line prefix).
      *
      * @param _paramCache       parameter cache
      * @param _file             reference to the file to update
@@ -126,6 +163,10 @@ public class Program_mxJPO
      *                          (or <code>null</code> if the version must not
      *                          be set).
      * @throws Exception if update of the program failed
+     * @see #PARAM_EXTENSION
+     * @see #PARAM_MARKEND
+     * @see #PARAM_MARKSTART
+     * @see #PARAM_NEEDED
      */
     @Override
     public void update(final ParameterCache_mxJPO _paramCache,
@@ -135,10 +176,66 @@ public class Program_mxJPO
     {
         this.parse(_paramCache);
 
+        // get parameters
+        final String markStartStr = _paramCache.getValueString(Program_mxJPO.PARAM_MARKSTART).trim();
+        final String markEndStr = _paramCache.getValueString(Program_mxJPO.PARAM_MARKEND).trim();
+        final boolean exec = _paramCache.getValueBoolean(Program_mxJPO.PARAM_NEEDED);
+        final Map<String,String> extensions = _paramCache.getValueMap(Program_mxJPO.PARAM_EXTENSION, String.class);
+
+        // append to marker the line prefixes
+        final String fileExtension = _file.getName().substring(_file.getName().lastIndexOf('.'));
+        final String linePrefix = extensions.get(fileExtension);
+        final int linePrefixLength = (linePrefix != null) ? linePrefix.length() : -1;
+        final String markStart;
+        final String markEnd;
+        if (linePrefixLength > 0)  {
+            final StringBuilder markStartBld = new StringBuilder();
+            for (final String line : markStartStr.split("\n"))  {
+                markStartBld.append(linePrefix).append(line).append('\n');
+            }
+            markStart = markStartBld.toString();
+
+            final StringBuilder markEndBld = new StringBuilder();
+            for (final String line : markEndStr.split("\n"))  {
+                markEndBld.append(linePrefix).append(line).append('\n');
+            }
+            markEnd = markEndBld.toString();
+        } else  {
+            markStart = markStartStr;
+            markEnd = markEndStr;
+        }
+
         // update code
         final StringBuilder cmd = new StringBuilder()
                 .append("mod prog \"").append(this.getName())
                         .append("\" file \"").append(_file.getPath()).append("\";\n");
+
+        // append TCL code of file
+        final StringBuilder prgCode = this.getCode(_file);
+        final int start = prgCode.indexOf(markStart);
+        final int end = prgCode.indexOf(markEnd);
+        if ((start >= 0) && (end > 0))  {
+            final String tclCode = prgCode.substring(start + markStart.length(), end).trim();
+            if (!"".equals(tclCode))  {
+                // TCL code must be executed only if allowed
+                // and line prefix is defined
+                if (exec && (linePrefixLength >= 0))  {
+                    _paramCache.logTrace("    - TCL update code is executed");
+                    cmd.append("tcl;\neval {\n");
+                    // remove line prefixes from TCL code (if defined)
+                    if (linePrefixLength > 0)  {
+                        for (final String line : tclCode.split("\n"))  {
+                            cmd.append(line.substring(linePrefixLength)).append('\n');
+                        }
+                    } else  {
+                        cmd.append(tclCode);
+                    }
+                    cmd.append("\n}\nexit;\n");
+                } else  {
+                    _paramCache.logError("    - Warning! Existing TCL update code is not executed!");
+                }
+            }
+        }
 
         // and update
         this.update(_paramCache, cmd, _newVersion, _file);
