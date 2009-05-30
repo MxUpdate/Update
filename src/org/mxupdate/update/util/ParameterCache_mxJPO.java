@@ -21,6 +21,7 @@
 package org.mxupdate.update.util;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,7 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import matrix.db.Context;
-import matrix.db.MatrixWriter;
 
 import org.mxupdate.mapping.Mapping_mxJPO;
 import org.mxupdate.mapping.ParameterDef_mxJPO;
@@ -147,19 +147,6 @@ public class ParameterCache_mxJPO
     private final Context context;
 
     /**
-     * If set to <i>true</i> the logging is done through the matrix writer,
-     * otherwise the logging is done via {@link System#out}.
-     *
-     * @see #writer
-     * @see #logDebug(String)
-     * @see #logError(String)
-     * @see #logInfo(String)
-     * @see #logTrace(String)
-     * @see #logWarning(String)
-     */
-    private final boolean matrixLog;
-
-    /**
      * Stores the used writer instance for the logging instances.
      *
      * @see #logDebug(String)
@@ -169,6 +156,13 @@ public class ParameterCache_mxJPO
      * @see #logWarning(String)
      */
     private final PrintWriter writer;
+
+    /**
+     * Stores the writer of the logging string.
+     *
+     * @see #getLogString()
+     */
+    private final StringWriter stringWriter;
 
     /**
      * Stores the used mapping from this parameter cache instance.
@@ -183,7 +177,7 @@ public class ParameterCache_mxJPO
      * the parameter definitions are predefined in the parameter cache.
      *
      * @param _context      MX context
-     * @param _matrixLog    if set to <i>true</i> log via matrix writer,
+     * @param _stringLog    if set to <i>true</i> log via string writer,
      *                      <i>false</i> log via <code>System.out</code>
      * @throws Exception if the mapping could not be initialized
      * @see #context
@@ -192,9 +186,10 @@ public class ParameterCache_mxJPO
      * @see #mapMap
      * @see #mapString
      * @see #writer
+     * @see #stringWriter
      */
     public ParameterCache_mxJPO(final Context _context,
-                                final boolean _matrixLog)
+                                final boolean _stringLog)
             throws Exception
     {
         this.mapping = new Mapping_mxJPO(_context);
@@ -238,10 +233,11 @@ public class ParameterCache_mxJPO
                 }
             }
         }
-        this.matrixLog = _matrixLog;
-        if (this.matrixLog)  {
-            this.writer = new PrintWriter(new MatrixWriter(this.context));
+        if (_stringLog)  {
+            this.stringWriter = new StringWriter();
+            this.writer = new PrintWriter(this.stringWriter);
         } else  {
+            this.stringWriter = null;
             this.writer = new PrintWriter(System.out);
         }
     }
@@ -272,12 +268,8 @@ public class ParameterCache_mxJPO
         this.mapList = _original.mapList;
         this.mapMap = _original.mapMap;
         this.mapString = _original.mapString;
-        this.matrixLog = _original.matrixLog;
-        if (this.matrixLog)  {
-            this.writer = new PrintWriter(new MatrixWriter(this.context));
-        } else  {
-            this.writer = new PrintWriter(System.out);
-        }
+        this.writer = _original.writer;
+        this.stringWriter = null;
     }
 
     /**
@@ -491,6 +483,19 @@ public class ParameterCache_mxJPO
     public String getValueString(final String _key)
     {
         return this.mapString.get(_key);
+    }
+
+    /**
+     * String of the logging.
+     *
+     * @return string of the logging buffer if logged into string writer
+     * @see #stringWriter
+     */
+    public String getLogString()
+    {
+        return (this.stringWriter == null)
+               ? null
+               : this.stringWriter.getBuffer().toString();
     }
 
     /**

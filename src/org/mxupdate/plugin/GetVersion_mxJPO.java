@@ -21,6 +21,7 @@
 package org.mxupdate.plugin;
 
 import matrix.db.Context;
+import matrix.db.MatrixWriter;
 
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -78,6 +79,9 @@ public class GetVersion_mxJPO
                 .append("select property[appVersion").append(StringUtil_mxJPO.convertMql(applName)).append("].value ")
                 .append("dump"));
 
-        paramCache.logInfo(version);
+        final MatrixWriter writer = new MatrixWriter(_context);
+        writer.write(version);
+        writer.flush();
+        writer.close();
     }
 }

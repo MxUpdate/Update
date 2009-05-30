@@ -23,6 +23,7 @@ package org.mxupdate.plugin;
 import java.io.File;
 
 import matrix.db.Context;
+import matrix.db.MatrixWriter;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
@@ -32,7 +33,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  * The JPO class is the plug-in to return for a MxUpdate file name the related
  * MxUpdate script (or for programs the related source code).
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class GetMxUpdateCode_mxJPO
@@ -87,6 +88,9 @@ public class GetMxUpdateCode_mxJPO
 
         final StringBuilder cmd = new StringBuilder();
         instance.export(paramCache, cmd);
-        paramCache.logInfo(cmd.toString());
+        final MatrixWriter writer = new MatrixWriter(_context);
+        writer.write(cmd.toString());
+        writer.flush();
+        writer.close();
     }
 }
