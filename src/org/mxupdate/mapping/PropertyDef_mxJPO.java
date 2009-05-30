@@ -48,14 +48,14 @@ public enum PropertyDef_mxJPO
     /**
      * Used property name within the property file.
      *
-     * @see #defineValues(Mapping_mxJPO, String, String)
+     * @see #defineValue(Mapping_mxJPO, String, String)
      */
     private static final String PREFIX_PROPERTY_NAME = "PropertyName";
 
     /**
      * Used attribute name within the property file.
      *
-     * @see #defineValues(Mapping_mxJPO, String, String)
+     * @see #defineValue(Mapping_mxJPO, String, String)
      */
     private static final String PREFIX_ATTRIBUTE_NAME = "AttributeName";
 
@@ -95,7 +95,7 @@ public enum PropertyDef_mxJPO
      * @param _paramCache   for which parameter cache must the property
      *                      name returned
      * @return MX name of the property definition
-     * @see Mapping_mxJPO#adminPropertyEnum2Names
+     * @see Mapping_mxJPO#getPropertyEnum2Names()
      */
     public String getPropName(final ParameterCache_mxJPO _paramCache)
     {
@@ -113,7 +113,7 @@ public enum PropertyDef_mxJPO
      *                      enumeration is searched
      * @return related admin property enumeration element or
      *         <code>null</code> if not found
-     * @see Mapping_mxJPO#adminPropertyNames2Enum
+     * @see Mapping_mxJPO#getPropertyNames2Enum()
      */
     public static PropertyDef_mxJPO getEnumByPropName(final ParameterCache_mxJPO _paramCache,
                                                       final String _propName)
@@ -128,7 +128,7 @@ public enum PropertyDef_mxJPO
      * @param _paramCache   for which parameter cache must the attribute
      *                      returned
      * @return MX name of the property definition
-     * @see Mapping_mxJPO#adminPropertyAttributes
+     * @see Mapping_mxJPO#getPropertyAttributes()
      */
     public String getAttrName(final ParameterCache_mxJPO _paramCache)
     {

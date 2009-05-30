@@ -82,7 +82,7 @@ public class Mapping_mxJPO
      * @see ParameterDef_mxJPO#defineValue(Mapping_mxJPO, String, String)
      * @see #getAllParameterDefs()
      * @see #getParameterDef(String)
-     * @see #getParameterDefMap()
+     * @see #getParameterDefJPOsMap()
      */
     private final Map<String,ParameterDef_mxJPO> parameterDefMap = new HashMap<String,ParameterDef_mxJPO>();
 
@@ -158,7 +158,7 @@ public class Mapping_mxJPO
     /**
      *
      * @param _context  context for this request
-     * @throws MatrixException if the property program {@see #PROP_NAME} could
+     * @throws MatrixException if the property program {@link #PROP_NAME} could
      *                         not be read
      * @throws IOException     if the properties could not be parsed
      */

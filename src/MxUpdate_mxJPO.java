@@ -20,7 +20,6 @@
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,7 +61,7 @@ public class MxUpdate_mxJPO
      * String of the key within the parameter cache for the ignore file
      * parameter.
      *
-     * @see #evalMatches(ParameterCache_mxJPO, Map)
+     * @see #evalMatches(ParameterCache_mxJPO, Map, Map)
      */
     private static final String PARAM_IGNOREFILE = "PathIgnoreFile";
 
@@ -70,16 +69,16 @@ public class MxUpdate_mxJPO
      * String of the key within the parameter cache for the ignore path
      * parameter.
      *
-     * @see #evalMatches(ParameterCache_mxJPO, Map)
+     * @see #evalMatches(ParameterCache_mxJPO, Map, Map)
      */
     private static final String PARAM_IGNOREPATH = "PathIgnorePath";
 
     /**
      * String of the key within the parameter cache for the path parameter.
      *
-     * @see #delete(ParameterCache_mxJPO, Map)
-     * @see #evalMatches(ParameterCache_mxJPO, Map)
-     * @see #export(ParameterCache_mxJPO, Map)
+     * @see #delete(ParameterCache_mxJPO, Map, Map)
+     * @see #evalMatches(ParameterCache_mxJPO, Map, Map)
+     * @see #export(ParameterCache_mxJPO, Map, Map)
      */
     private static final String PARAM_PATH = "Path";
 
@@ -140,7 +139,8 @@ public class MxUpdate_mxJPO
     /**
      * Stores all parameters to be sure that a parameter is defined only once.
      *
-     * @see #appendDescription(String, Collection, Collection)
+     * @see #appendDescription(CharSequence, Collection, Collection)
+     * @see #prepareParams(ParameterCache_mxJPO)
      */
     private final Set<String> allParams = new HashSet<String>();
 
@@ -486,7 +486,7 @@ public class MxUpdate_mxJPO
      * Prints the help for the MxUpdate functionality.
      *
      * @param _paramCache   parameter cache
-     * @throws IOException
+     * @throws IOException if the help could not be printed
      * @see #description
      */
     private void printHelp(final ParameterCache_mxJPO _paramCache)
@@ -568,7 +568,7 @@ public class MxUpdate_mxJPO
         }
 
         // print copyright
-        for (final String copyright : _paramCache.getValueString(PARAM_HELP_COPYRIGHT).split("\n"))  {
+        for (final String copyright : _paramCache.getValueString(MxUpdate_mxJPO.PARAM_HELP_COPYRIGHT).split("\n"))  {
             out.append(prefix).append(copyright).append('\n');
         }
         out.append('\n');
@@ -578,7 +578,11 @@ public class MxUpdate_mxJPO
      * Exports matching administration objects to given path.
      *
      * @param _paramCache       parameter cache
-     * @param _clazz2matches    classes and their matched to export
+     * @param _clazz2matches    map of update classes and the depending
+     *                          list of string which must match to export
+     * @param _clazz2matchesOpp map of update classes and the depending list of
+     *                          match string of MX names which must be excluded
+     *                          from export
      * @throws Exception if none path or more than one path is defined or if
      *                   the export failed
      */
@@ -616,8 +620,17 @@ public class MxUpdate_mxJPO
     /**
      *
      * @param _paramCache       parameter cache
-     * @param _paths
-     * @param _clazz2matches
+     * @param _clazz2matches    all classes with the depending matches (if
+     *                          paths are defined, the names must match against
+     *                          the MX name; otherwise the found files must
+     *                          match)
+     * @param _clazz2matchesOpp all classes and the depending matches for the
+     *                          files which must be excluded from the matches
+     *                          defined in <code>_class2matched</code>
+     * @param _versionInfo      defines how it is checked if an update is
+     *                          required (see {@link UpdateCheck_mxJPO})
+     * @throws Exception if update failed
+     * @see UpdateCheck_mxJPO
      */
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches,
@@ -731,7 +744,16 @@ public class MxUpdate_mxJPO
         }
     }
 
-
+    /**
+     *
+     * @param _paramCache       parameter cache
+     * @param _clazz2matches    map of update classes and the depending
+     *                          list of string which must match to delete
+     * @param _clazz2matchesOpp map of update classes and the depending list of
+     *                          match string of MX names which must be excluded
+     *                          from deletion
+     * @throws Exception if the delete of administration objects failed
+     */
     protected void delete(final ParameterCache_mxJPO _paramCache,
                           final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches,
                           final Map<TypeDef_mxJPO,List<String>> _clazz2matchesOpp)
@@ -787,15 +809,13 @@ public class MxUpdate_mxJPO
      *                          parameter)
      * @param _clazz2matches    all classes with the depending matches (if
      *                          paths are defined, the names must match against
-     *                          the Matrix name; otherwise the found files must
+     *                          the MX name; otherwise the found files must
      *                          match)
+     * @param _clazz2matchesOpp all classes and the depending matches for the
+     *                          files which must be excluded from the matches
+     *                          defined in <code>_class2matched</code>
      * @return map of update classes and the depending files with their names
-     * @throws InvocationTargetException
-     * @throws IllegalAccessException
-     * @throws InstantiationException
-     * @throws NoSuchMethodException
-     * @throws IllegalArgumentException
-     * @throws SecurityException
+     * @throws Exception if match for the files failed
      * @see #PARAM_IGNOREFILE
      * @see #PARAM_IGNOREPATH
      * @see #PARAM_PATH
@@ -1035,12 +1055,14 @@ public class MxUpdate_mxJPO
      * Evaluate all matching administration objects within MX.
      *
      * @param _paramCache       parameter cache
-     * @param _clazz2matches    map of collection classes and the depending
+     * @param _clazz2matches    map of update classes and the depending
      *                          list of string which must match
+     * @param _clazz2matchesOpp map of update classes and the depending list of
+     *                          match string of MX names which must be excluded
      * @return map of classes and a set of matching names for this classes
      * @throws Exception if the match fails
-     * @see #export(ParameterCache_mxJPO, Map)
-     * @see #delete(ParameterCache_mxJPO, Map)
+     * @see #export(ParameterCache_mxJPO, Map, Map)
+     * @see #delete(ParameterCache_mxJPO, Map, Map)
      */
     protected Map<TypeDef_mxJPO,Set<String>> getMatching(final ParameterCache_mxJPO _paramCache,
                                                          final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches,

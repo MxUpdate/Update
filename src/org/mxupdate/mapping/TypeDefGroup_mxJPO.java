@@ -26,7 +26,7 @@ import java.util.Collection;
 /**
  * Groups the type definition enumeration used for the parameter definitions.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public final class TypeDefGroup_mxJPO
@@ -37,7 +37,7 @@ public final class TypeDefGroup_mxJPO
      * group is defined.
      *
      * @see #getTypeDefList()
-     * @see #defineValue(String, String)
+     * @see #defineValue(Mapping_mxJPO, String, String)
      */
     private Collection<String> typeDefList;
 

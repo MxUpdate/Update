@@ -33,7 +33,7 @@ import org.mxupdate.util.MqlUtil_mxJPO;
 /**
  * Enumeration for administration type definitions.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public final class TypeDef_mxJPO
@@ -42,14 +42,14 @@ public final class TypeDef_mxJPO
     /**
      * MQL command to list all MxUpdate JPOs.
      *
-     * @see #defineJPOClass(Context, String)
+     * @see #defineJPOClass(Context, Mapping_mxJPO, String)
      */
     private static final String MQL_LISTPROG = "list prog org.mxupdate.* select name classname dump '\t'";
 
     /**
      * Used prefix of admin type suffix.
      *
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      * @see #adminSuffix
      */
     private static final String PREFIX_ADMIN_SUFFIX = "AdminSuffix";
@@ -57,7 +57,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of the admin type name.
      *
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      * @see #adminType
      */
     private static final String PREFIX_ADMIN_TYPE = "AdminType";
@@ -66,7 +66,7 @@ public final class TypeDef_mxJPO
      * Used prefix of ignored attributes for business objects within the
      * property file.
      *
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      * @see #busIgnoredAttributes
      */
     private static final String PREFIX_BUS_IGNOREATTRIBUTES = "BusIgnoreAttributes";
@@ -74,7 +74,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of check exists definitions within the property file.
      *
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      * @see #busCheckExists
      */
     private static final String PREFIX_BUS_CHECKEXISTS = "BusCheckExists";
@@ -82,7 +82,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of policy definitions within the property file.
      *
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      * @see #busPolicy
      */
     private static final String PREFIX_BUS_POLICY = "BusPolicy";
@@ -90,7 +90,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of both relationship definitions within the property file.
      *
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      * @see #busRelsBoth
      */
     private static final String PREFIX_BUS_RELSBOTH = "BusRelsBoth";
@@ -98,7 +98,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of from relationship definitions within the property file.
      *
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      * @see #busRelsFrom
      */
     private static final String PREFIX_BUS_RELSFROM = "BusRelsFrom";
@@ -106,7 +106,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of to relationship definitions within the property file.
      *
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      * @see #busRelsTo
      */
     private static final String PREFIX_BUS_RELSTO = "BusRelsTo";
@@ -114,7 +114,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of business type definitions within the property file.
      *
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      * @see #busType
      */
     private static final String PREFIX_BUS_TYPE = "BusType";
@@ -122,7 +122,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of vault definitions within the property file.
      *
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      * @see #busVault
      */
     private static final String PREFIX_BUS_VAULT = "BusVault";
@@ -130,7 +130,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of type definitions within the property file.
      *
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      * @see #filePath
      */
     private static final String PREFIX_FILE_PATH = "FilePath";
@@ -138,7 +138,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of file last matching definitions within the property file.
      *
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      * @see #fileMatchLast
      */
     private static final String PREFIX_FILE_MATCHLAST = "FileMatchLast";
@@ -146,7 +146,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of file prefix definitions within the property file.
      *
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      * @see #filePrefix
      */
     private static final String PREFIX_FILE_PREFIX = "FilePrefix";
@@ -154,7 +154,7 @@ public final class TypeDef_mxJPO
     /**
      * Used file suffix of file suffix definitions within the property file.
      *
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      * @see #fileSuffix
      */
     private static final String PREFIX_FILE_SUFFIX = "FileSuffix";
@@ -162,7 +162,7 @@ public final class TypeDef_mxJPO
     /**
      * Used file suffix of icon path definitions within the property file.
      *
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      * @see #iconPath
      */
     private static final String PREFIX_ICONPATH = "Icon";
@@ -170,7 +170,7 @@ public final class TypeDef_mxJPO
     /**
      * Used prefix of the JPO name.
      *
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      * @see #jpoClass
      */
     private static final String PREFIX_JPO = "JPO";
@@ -178,7 +178,7 @@ public final class TypeDef_mxJPO
     /**
      * Used logging text of type definitions within the property file.
      *
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      * @see #textLogging
      */
     private static final String PREFIX_TEXT_LOGGING = "TextLogging";
@@ -186,7 +186,7 @@ public final class TypeDef_mxJPO
     /**
      * Used title of type definitions within the property file.
      *
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      * @see #textTitle
      */
     private static final String PREFIX_TEXT_TITLE = "TextTitle";
@@ -195,7 +195,7 @@ public final class TypeDef_mxJPO
      * Defines the name of the admin type.
      *
      * @see #getMxAdminName()
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      */
     private String adminType;
 
@@ -203,7 +203,7 @@ public final class TypeDef_mxJPO
      * Defines the suffix of the admin type.
      *
      * @see #getMxAdminSuffix()
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      */
     private String adminSuffix;
 
@@ -211,7 +211,7 @@ public final class TypeDef_mxJPO
      * Must be checked if the business type exists?
      *
      * @see #isBusCheckExists
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      */
     private boolean busCheckExists = false;
 
@@ -220,7 +220,7 @@ public final class TypeDef_mxJPO
      * within the update.
      *
      * @see #getMxBusIgnoredAttributes()
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      */
     private Collection<String> busIgnoredAttributes;
 
@@ -229,7 +229,7 @@ public final class TypeDef_mxJPO
      * names.
      *
      * @see #getMxBusPolicy()
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      */
     private String busPolicy;
 
@@ -238,7 +238,7 @@ public final class TypeDef_mxJPO
      * and run of update script.
      *
      * @see #getMxBusRelsBoth()
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      */
     private Collection<String> busRelsBoth;
 
@@ -247,7 +247,7 @@ public final class TypeDef_mxJPO
      * and run of update script.
      *
      * @see #getMxBusRelsFrom()
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      */
     private Collection<String> busRelsFrom;
 
@@ -256,7 +256,7 @@ public final class TypeDef_mxJPO
      * and run of update script.
      *
      * @see #getMxBusRelsTo()
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      */
     private Collection<String> busRelsTo;
 
@@ -265,7 +265,8 @@ public final class TypeDef_mxJPO
      * names.
      *
      * @see #getMxBusType()
-     * @see #defineValue(Context, String, String)
+     * @see #existsBusType(Context)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      */
     private String busType;
 
@@ -274,7 +275,7 @@ public final class TypeDef_mxJPO
      * names.
      *
      * @see #getMxBusVault()
-     * @see #defineValue(Context,  String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      */
     private String busVault;
 
@@ -282,7 +283,8 @@ public final class TypeDef_mxJPO
      * Must the matching files matched on last positions? E.g. required if no
      * {@link #filePrefix} and no {@link #fileSuffix} are defined.
      *
-     * @see #defineValue(Context, String, String)
+     * @see #isFileMatchLast()
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      */
     private boolean fileMatchLast = false;
 
@@ -290,7 +292,7 @@ public final class TypeDef_mxJPO
      * Mapping between internal used type definitions and the file paths.
      *
      * @see #getFilePath()
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      */
     private String filePath;
 
@@ -299,7 +301,7 @@ public final class TypeDef_mxJPO
      * file prefixes.
      *
      * @see #getFilePrefix()
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      */
     private String filePrefix;
 
@@ -308,7 +310,7 @@ public final class TypeDef_mxJPO
      * file suffixes.
      *
      * @see #getFileSuffix()
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      */
     private String fileSuffix;
 
@@ -316,7 +318,7 @@ public final class TypeDef_mxJPO
      * Stores the path to the icon for the type definition.
      *
      * @see #getIconPath()
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      * @see #PREFIX_ICONPATH
      */
     private String iconPath;
@@ -325,7 +327,7 @@ public final class TypeDef_mxJPO
      * Stores the class implementing the MxUpdate functionality.
      *
      * @see #newTypeInstance(String)
-     * @see #defineJPOClass(Context, String)
+     * @see #defineJPOClass(Context, Mapping_mxJPO, String)
      */
     private Class<? extends AbstractObject_mxJPO> jpoClass;
 
@@ -334,7 +336,7 @@ public final class TypeDef_mxJPO
      * logging string.
      *
      * @see #getLogging()
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      */
     private String textLogging;
 
@@ -343,7 +345,7 @@ public final class TypeDef_mxJPO
      * titles.
      *
      * @see #getTitle()
-     * @see #defineValue(Context, String, String)
+     * @see #defineValue(Context, Mapping_mxJPO, String, String)
      */
     private String textTitle;
 
@@ -358,8 +360,8 @@ public final class TypeDef_mxJPO
      * @param _value    value of the related value
      * @throws Exception if the values could not be defined or the JPO names
      *                   could not be extracted
-     * @see #MAP
-     * @see #defineJPOClass(Context, String)
+     * @see Mapping_mxJPO#getTypeDefMap()
+     * @see #defineJPOClass(Context, Mapping_mxJPO, String)
      */
     protected static void defineValue(final Context _context,
                                       final Mapping_mxJPO _mapping,
@@ -437,7 +439,7 @@ public final class TypeDef_mxJPO
      * @throws Exception if the list of MxUdpate JPOs could not evaluated or
      *                   if the related class could not be found
      * @see #MQL_LISTPROG
-     * @see Mapping_mxJPO#
+     * @see #jpoClass
      */
     @SuppressWarnings("unchecked")
     private void defineJPOClass(final Context _context,

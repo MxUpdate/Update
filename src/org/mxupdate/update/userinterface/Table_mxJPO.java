@@ -58,7 +58,7 @@ public class Table_mxJPO
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
      * @throws IOException if the TCL update code could not be written
-     * @see Field#write(Appendable)
+     * @see AbstractUIWithFields_mxJPO.Field#write(Appendable)
      */
     @Override
     protected void writeObject(final ParameterCache_mxJPO _paramCache,

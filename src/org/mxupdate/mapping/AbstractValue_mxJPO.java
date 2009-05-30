@@ -25,7 +25,7 @@ import java.util.Collection;
 
 /**
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 class AbstractValue_mxJPO
@@ -69,7 +69,7 @@ class AbstractValue_mxJPO
      * Holds the name of the value.
      *
      * @see #getName()
-     * @see #AbstractValues_mxJPO(String)
+     * @see #AbstractValue_mxJPO(String)
      */
     private final String name;
 
@@ -77,7 +77,7 @@ class AbstractValue_mxJPO
      * Defines the parameter description.
      *
      * @see #getParameterDesc()
-     * @see #defineValue(String, String)
+     * @see #defineValues(String, String)
      */
     private String paramDesc;
 
@@ -85,7 +85,7 @@ class AbstractValue_mxJPO
      * Defines the opposite parameter description.
      *
      * @see #getParameterDescOpp()
-     * @see #defineValue(String, String)
+     * @see #defineValues(String, String)
      */
     private String paramDescOpp;
 
@@ -93,7 +93,7 @@ class AbstractValue_mxJPO
      * Defines the list of arguments.
      *
      * @see #getParameterList()
-     * @see #defineValue(String, String)
+     * @see #defineValues(String, String)
      */
     private Collection<String> paramArgs;
 
@@ -101,7 +101,7 @@ class AbstractValue_mxJPO
      * Defines the list of parameters.
      *
      * @see #getParameterList()
-     * @see #defineValue(String, String)
+     * @see #defineValues(String, String)
      */
     private Collection<String> paramList;
 
@@ -109,7 +109,7 @@ class AbstractValue_mxJPO
      * Defines the list of opposite parameters.
      *
      * @see #getParameterListOpp()
-     * @see #defineValue(String, String)
+     * @see #defineValues(String, String)
      */
     private Collection<String> paramListOpp;
 

@@ -246,8 +246,9 @@ public class ParameterCache_mxJPO
      * Creates a new parameter caches class used for the clone. The new
      * parameter cache instance holds the new defined cache but all already
      * defined value maps {@link #mapBoolean}, {@link #mapList} and
-     * {@link #mapString}. For the writer in {@link #writer}Êa new instance is
-     * created depending on {@link #matrixLog}.
+     * {@link #mapString}. The {@link #stringWriter} is set always to
+     * <code>null</code>, because the {@link #writer} is used for logging
+     * purpose.
      *
      * @param _context      new matrix context
      * @param _original     original parameter cache class
@@ -257,6 +258,7 @@ public class ParameterCache_mxJPO
      * @see #mapList
      * @see #mapMap
      * @see #mapString
+     * @see #stringWriter
      */
     private ParameterCache_mxJPO(final Context _context,
                                  final ParameterCache_mxJPO _original)
