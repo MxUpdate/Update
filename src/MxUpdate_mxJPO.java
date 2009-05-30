@@ -123,6 +123,12 @@ public class MxUpdate_mxJPO
     private static final String PARAM_HELP_USAGE = "HelpUsage";
 
     /**
+     * String of the key within the parameter cache that administration objects
+     * compiled after they are updated.
+     */
+    private static final String PARAM_COMPILE = "Compile";
+
+    /**
      * Stored the descriptions of all parameters sorted by the parameters.
      * The key are the parameters. For the alpha numerical sort, each parameter
      * line must start with a '-' and a character. If the third character of
@@ -668,6 +674,8 @@ public class MxUpdate_mxJPO
             }
         }
         // update
+        final List<AbstractObject_mxJPO> compiles = new ArrayList<AbstractObject_mxJPO>();
+        final boolean compile = _paramCache.getValueBoolean(MxUpdate_mxJPO.PARAM_COMPILE);
         for (final TypeDef_mxJPO clazz : _paramCache.getMapping().getAllTypeDefs())  {
             final Map<File,String> clazzMap = clazz2names.get(clazz);
             if (clazzMap != null)  {
@@ -733,12 +741,30 @@ public class MxUpdate_mxJPO
                                 _paramCache.getContext().commit();
                             }
                             commit = true;
+                            if (compile)  {
+                                compiles.add(instance);
+                            }
                         } finally  {
                             if (!commit && !transActive && _paramCache.getContext().isTransactionActive())  {
                                 _paramCache.getContext().abort();
                             }
                         }
                     }
+                }
+            }
+        }
+
+        // compile
+        if (compile)  {
+            for (final AbstractObject_mxJPO instance : compiles)  {
+                try  {
+                    if (instance.compile(_paramCache))  {
+                        _paramCache.logInfo("compile " + instance.getTypeDef().getLogging()
+                                + " '" + instance.getName() + "'");
+                    }
+                } catch (final Exception e)  {
+                    _paramCache.logInfo("compile of " + instance.getTypeDef().getLogging()
+                            + " '" + instance.getName() + "' failed:\n" + e.toString());
                 }
             }
         }
