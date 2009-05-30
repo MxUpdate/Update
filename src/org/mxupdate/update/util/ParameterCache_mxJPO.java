@@ -442,13 +442,11 @@ public class ParameterCache_mxJPO
      *
      * @param <T>       class of the value of the map
      * @param _key      key of searched map value
-     * @param _clazz    clazz of the value of the map
      * @return map for related key (or <code>null</code> if map is not defined)
      * @see #mapMap
      */
     @SuppressWarnings("unchecked")
-    public <T> Map<String,T> getValueMap(final String _key,
-                                         final Class<T> _clazz)
+    public <T> Map<String,T> getValueMap(final String _key)
     {
         return (Map<String,T>) this.mapMap.get(_key);
     }

@@ -180,7 +180,7 @@ public class Program_mxJPO
         final String markStartStr = _paramCache.getValueString(Program_mxJPO.PARAM_MARKSTART).trim();
         final String markEndStr = _paramCache.getValueString(Program_mxJPO.PARAM_MARKEND).trim();
         final boolean exec = _paramCache.getValueBoolean(Program_mxJPO.PARAM_NEEDED);
-        final Map<String,String> extensions = _paramCache.getValueMap(Program_mxJPO.PARAM_EXTENSION, String.class);
+        final Map<String,String> extensions = _paramCache.<String>getValueMap(Program_mxJPO.PARAM_EXTENSION);
 
         // append to marker the line prefixes
         final String fileExtension = _file.getName().substring(_file.getName().lastIndexOf('.'));
