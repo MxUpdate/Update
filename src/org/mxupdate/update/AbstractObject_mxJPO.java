@@ -326,6 +326,21 @@ public abstract class AbstractObject_mxJPO
             throws Exception;
 
     /**
+     * Compiles this administration object. Because typically ad administration
+     * object must not be compile, nothing is done here.
+     *
+     * @param _paramCache       parameter cache
+     * @return <i>true</i> if administration object is compiled; otherwise
+     *         <i>false</i> (and here used always)
+     * @throws Exception if the compile failed
+     */
+    public boolean compile(final ParameterCache_mxJPO _paramCache)
+            throws Exception
+    {
+        return false;
+    }
+
+    /**
      * Reads for given file the code and returns them.
      *
      * @param _file     file to read the code

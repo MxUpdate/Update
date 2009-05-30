@@ -32,7 +32,7 @@ import matrix.util.MatrixException;
 /**
  * The JPO class holds utilities for easy MQL access.
  *
- * @author tmoxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public final class MqlUtil_mxJPO
@@ -49,19 +49,41 @@ public final class MqlUtil_mxJPO
      * Executes given MQL command and returns the trimmed result of the MQL
      * execution.
      *
-     * @param _context  context for this request
+     * @param _context  MX context for this request
      * @param _cmd      MQL command to execute
      * @return trimmed result of the MQL execution
-     * @throws MatrixException if MQL execution fails
+     * @throws MatrixException if MQL execution failed
      */
     public static String execMql(final Context _context,
                                  final CharSequence _cmd)
             throws MatrixException
     {
+        return execMql(_context, _cmd, true);
+    }
+
+    /**
+     * Executes given MQL command and returns the trimmed result of the MQL
+     * execution.
+     *
+     * @param _context              MX context for this request
+     * @param _cmd                  MQL command to execute
+     * @param _includeMQLCommand    must be MQL command included in the
+     *                              exception?
+     * @return trimmed result of the MQL execution
+     * @throws MatrixException if MQL execution failed; includes the MQL
+     *                         command if <code>_includeMQLCommand</code> is
+     *                         set to <i>true</i>
+     */
+    public static String execMql(final Context _context,
+                                 final CharSequence _cmd,
+                                 final boolean _includeMQLCommand)
+            throws MatrixException
+    {
         final MQLCommand mql = new MQLCommand();
         mql.executeCommand(_context, _cmd.toString());
         if ((mql.getError() != null) && !"".equals(mql.getError()))  {
-            throw new MatrixException(mql.getError() + "\nMQL command was:\n" + _cmd);
+            throw new MatrixException(mql.getError()
+                    + (_includeMQLCommand ? ("\nMQL command was:\n" + _cmd) : ""));
         }
         return mql.getResult().trim();
     }
@@ -71,7 +93,7 @@ public final class MqlUtil_mxJPO
      *
      * @param _context  context for this request
      * @return <i>true</i> if the escape is on; otherwise <i>false</i>
-     * @throws MatrixException
+     * @throws MatrixException if check failed
      */
     public static boolean isEscapeOn(final Context _context)
             throws MatrixException
@@ -145,7 +167,8 @@ public final class MqlUtil_mxJPO
         final String code = execMql(_context,
                                     new StringBuilder()
                                             .append("print prog \"").append(_name)
-                                            .append("\" select code dump"));
+                                            .append("\" select code dump"),
+                                    false);
 
         final InputStream is = new ByteArrayInputStream(code.getBytes());
         final Properties properties = new Properties();

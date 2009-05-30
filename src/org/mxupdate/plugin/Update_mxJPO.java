@@ -62,7 +62,7 @@ public class Update_mxJPO
         final Set<File> files = new HashSet<File>();
         files.add(new File(_args[0]));
         final MatrixWriter writer = new MatrixWriter(_context);
-        writer.write(this.updateFiles(_context, files));
+        writer.write(this.updateFiles(_context, files, false));
         writer.flush();
         writer.close();
     }
@@ -77,6 +77,9 @@ public class Update_mxJPO
      *                  <ul>
      *                  <li><b>{@link Set}&lt;{@link String}&gt;</b><br/>set of
      *                      file names which must be updated</li>
+     *                  <li><b>{@link Boolean}</b><br/> if set to <i>true</i>
+     *                      all included JPOs are compiled; otherwise no JPOs
+     *                      are compiled</li>
      *                  </ul>
      * @return logging information from the update
      * @throws Exception if the update failed
@@ -87,13 +90,14 @@ public class Update_mxJPO
             throws Exception
     {
         final Set<String> fileNames = this.<Set<String>>decode(_args[0]);
+        final boolean compile = this.<Boolean>decode(_args[1]);
 
         final Set<File> files = new HashSet<File>();
         for (final String fileName : fileNames)  {
             files.add(new File(fileName));
         }
 
-        return this.updateFiles(_context, files);
+        return this.updateFiles(_context, files, compile);
     }
 
     /**
@@ -109,6 +113,9 @@ public class Update_mxJPO
      *                  <li><b>{@link Map}&lt;{@link String},{@link String}&gt;
      *                      </b><br/>map of the file name and the related file
      *                      content which must be updated</li>
+     *                  <li><b>{@link Boolean}</b><br/> if set to <i>true</i>
+     *                      all included JPOs are compiled; otherwise no JPOs
+     *                      are compiled</li>
      *                  </ul>
      * @return logging information from the update
      * @throws Exception if the update failed
@@ -121,6 +128,7 @@ public class Update_mxJPO
         String ret = "";
 
         final Map<String,String> files = this.<Map<String,String>>decode(_args[0]);
+        final boolean compile = this.<Boolean>decode(_args[1]);
 
         // create temporary directory
         final File tmpDir = File.createTempFile("Update", "tmp");
@@ -142,7 +150,7 @@ public class Update_mxJPO
             }
 
             // and call update
-            ret = this.updateFiles(_context, localFiles);
+            ret = this.updateFiles(_context, localFiles, compile);
         } finally  {
             // at least remove all temporary stuff
             for (final File localFile : localFiles)  {
@@ -160,11 +168,14 @@ public class Update_mxJPO
      *
      * @param _context  MX context for this request
      * @param _files    set of all files to update
+     * @param _compile  if <i>true</i> related JPOs are compiled; if
+     *                  <i>false</i> no JPOs are compiled
      * @return logging information from the update
      * @throws Exception if update for the <code>_files</code> failed
      */
     protected String updateFiles(final Context _context,
-                                 final Set<File> _files)
+                                 final Set<File> _files,
+                                 final boolean _compile)
             throws Exception
     {
         // initialize mapping
@@ -212,11 +223,26 @@ public class Update_mxJPO
             }
         }
 
-        // and update
+        // update
         for (final Map.Entry<File,AbstractObject_mxJPO> instanceEntry : instances.entrySet())  {
             paramCache.logInfo("updated " + instanceEntry.getValue().getTypeDef().getLogging()
                     + " '" + instanceEntry.getValue().getName() + "'");
             instanceEntry.getValue().update(paramCache, instanceEntry.getKey(), "");
+        }
+
+        // at least compile (to be sure that all JPOs are updated)
+        if (_compile)  {
+            for (final Map.Entry<File,AbstractObject_mxJPO> instanceEntry : instances.entrySet())  {
+                try  {
+                    if (instanceEntry.getValue().compile(paramCache))  {
+                        paramCache.logInfo("compiled " + instanceEntry.getValue().getTypeDef().getLogging()
+                                + " '" + instanceEntry.getValue().getName() + "'");
+                    }
+                } catch (final Exception e)  {
+                    paramCache.logInfo("compile of " + instanceEntry.getValue().getTypeDef().getLogging()
+                            + " '" + instanceEntry.getValue().getName() + "' failed:\n" + e.toString());
+                }
+            }
         }
 
         return paramCache.getLogString();

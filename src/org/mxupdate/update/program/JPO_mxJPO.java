@@ -31,6 +31,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
@@ -325,5 +326,24 @@ public class JPO_mxJPO
 
         // and update
         this.update(_paramCache, cmd, _newVersion, _file);
+    }
+
+    /**
+     * Compile current JPO.
+     *
+     * @param _paramCache   parameter cache
+     * @return always <i>true</i>
+     * @throws Exception if the compile of the JPO failed
+     */
+    @Override
+    public boolean compile(final ParameterCache_mxJPO _paramCache)
+            throws Exception
+    {
+        MqlUtil_mxJPO.execMql(_paramCache.getContext(), new StringBuilder()
+                              .append("escape compile prog \"")
+                              .append(StringUtil_mxJPO.convertMql(this.getName()))
+                              .append('\"'),
+                              false);
+        return true;
     }
 }
