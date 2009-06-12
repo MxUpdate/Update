@@ -59,17 +59,7 @@ public abstract class AbstractAdminObject_mxJPO
     private static final long serialVersionUID = 6211240989585499402L;
 
     /**
-     * Key used to store the name of the program where all administration
-     * objects must be registered with symbolic names. For an OOTB installation
-     * the value is typically &quot;eServiceSchemaVariableMapping.tcl&quot;.
-     *
-     * @see #prepare(ParameterCache_mxJPO)
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     */
-    private static final String PARAM_SYMB_NAME_PROG = "RegisterSymbolicNames";
-
-    /**
-     * Is the matrix object hidden?
+     * Is the MX object hidden?
      *
      * @see #isHidden()
      */
@@ -139,6 +129,12 @@ public abstract class AbstractAdminObject_mxJPO
      * executes the post preparation {@link #prepare(ParameterCache_mxJPO)}.
      *
      * @param _paramCache   parameter cache
+     * @throws MatrixException  if the export of the admin object failed
+     * @throws SAXException     if the exported XML document could not be
+     *                          parsed
+     * @throws IOException      should not happen; only if the input source of
+     *                          the string reader which embeds the XML document
+     *                          failed
      * @see #getExportMQL()                 used to get the MQL command to get
      *                                      a XML representation
      * @see PadSaxHandler                   SAX handler to parse the XML file
@@ -239,7 +235,6 @@ public abstract class AbstractAdminObject_mxJPO
      * @throws MatrixException if the symbolic names could not be extracted
      * @see #propertiesStack
      * @see #propertiesMap
-     * @see #symbolicNames
      */
     protected void prepare(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
@@ -286,19 +281,7 @@ public abstract class AbstractAdminObject_mxJPO
         }
 
         // reads symbolic names of the administration objects
-        final String symbProg = _paramCache.getValueString(AbstractAdminObject_mxJPO.PARAM_SYMB_NAME_PROG);
-        final String symbProgIdxOf = new StringBuilder().append(" on program ").append(symbProg).append(' ').toString();
-        final StringBuilder cmd = new StringBuilder()
-                .append("escape list property on program \"")
-                            .append(StringUtil_mxJPO.convertMql(symbProg)).append("\" to ")
-                    .append(this.getTypeDef().getMxAdminName())
-                    .append(" \"").append(this.getName()).append("\" ")
-                    .append(this.getTypeDef().getMxAdminSuffix());
-        for (final String symbName : MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd).split("\n"))  {
-            if (!"".equals(symbName))  {
-                this.getSymblicNames().add(symbName.substring(0, symbName.indexOf(symbProgIdxOf)));
-            }
-        }
+        this.readSymbolicNames(_paramCache);
     }
 
     /**
@@ -534,30 +517,10 @@ public abstract class AbstractAdminObject_mxJPO
         }
         postMQLCode.append(";\n");
 
-        // check symbolic names
-        final String symbProg = _paramCache.getValueString(AbstractAdminObject_mxJPO.PARAM_SYMB_NAME_PROG);
-        final String symbName = _tclVariables.get("SYMBOLICNAME");
-        if (!this.getSymblicNames().contains(symbName))  {
-            _paramCache.logTrace("    - register symbolic name '" + symbName + "'");
-            postMQLCode.append("escape add property \"").append(StringUtil_mxJPO.convertMql(symbName)).append("\" ")
-                    .append(" on program \"").append(StringUtil_mxJPO.convertMql(symbProg)).append("\" to ")
-                    .append(this.getTypeDef().getMxAdminName())
-                    .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
-                    .append(this.getTypeDef().getMxAdminSuffix())
-                    .append(";\n");
-        }
-        for (final String exSymbName : this.getSymblicNames())  {
-            if (!symbName.equals(exSymbName))  {
-                _paramCache.logTrace("    - remove symbolic name '" + exSymbName + "'");
-                postMQLCode.append("escape delete property \"")
-                                .append(StringUtil_mxJPO.convertMql(exSymbName)).append("\" ")
-                        .append(" on program \"").append(StringUtil_mxJPO.convertMql(symbProg)).append("\" to ")
-                        .append(this.getTypeDef().getMxAdminName())
-                        .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
-                        .append(this.getTypeDef().getMxAdminSuffix())
-                        .append(";\n");
-            }
-        }
+        // append registration of symbolic names
+        this.appendSymbolicNameRegistration(_paramCache,
+                                            _tclVariables.get("SYMBOLICNAME"),
+                                            postMQLCode);
 
         // prepare map of all TCL variables incl. name of admin object
         final Map<String,String> tclVariables = new HashMap<String,String>();
@@ -672,6 +635,12 @@ public abstract class AbstractAdminObject_mxJPO
             return this.value;
         }
 
+        /**
+         * Returns the string representation of a property including the
+         * {@link #name}, {@link #value} and {@link #flags}.
+         *
+         * @return string representation of a property
+         */
         @Override
         public String toString()
         {
@@ -680,18 +649,146 @@ public abstract class AbstractAdminObject_mxJPO
     }
 
     /**
-     * Sax handler used to parse the XML exports.
+     * SAX handler used to parse the XML exports from XML.
      */
     public class PadSaxHandler extends DefaultHandler
     {
+        /**
+         * Holds the current stack (deep) of the tags. If a start element from
+         * {@link #startElement(String, String, String, Attributes)} is called
+         * a new string is added. If an evaluation of an element is ended from
+         * {@link #endElement(String, String, String)}, this element is removed
+         * from the stack.
+         *
+         * @see #getUrl()
+         * @see #startElement(String, String, String, Attributes)
+         * @see #endElement(String, String, String)
+         */
         private final Stack<String> stack = new Stack<String>();
 
+        /**
+         * Holds the string content within a XML tag. The content is build by
+         * {@link #characters(char[], int, int)} and reset by
+         * {@link #startElement(String, String, String, Attributes)}.
+         *
+         * @see #characters(char[], int, int)
+         */
         private StringBuilder content = null;
 
-        private boolean called = false;
+        /**
+         * Holds a flag if {@link #evaluate()} already called for an element.
+         * If not, the value is <i>false</i>. The value is always reset if
+         * an element is started in
+         * {@link #startElement(String, String, String, Attributes)}.
+         *
+         * @see #startElement(String, String, String, Attributes)
+         * @see #endElement(String, String, String)
+         */
+        private boolean evaluated = false;
 
-        final Stack<Object> objects = new Stack<Object>();
+        /**
+         * An input source defining the entity &quot;ematrixProductDtd&quot; to
+         * replace the original DTD file &quot;ematrixml.dtd&quot; which some
+         * XML parser wants to open.
+         *
+         * @param _publicId     not used
+         * @param _systemId     not used
+         * @return input source where only the &quot;ematrixProductDtd&quot;
+         *         entity is defined
+         */
+        @Override
+        public InputSource resolveEntity(final String _publicId,
+                                         final String _systemId)
+        {
+            return new InputSource(new StringReader("<!ENTITY ematrixProductDtd \"\">"));
+        }
 
+        /**
+         * Adds given characters to {@link #content} if the XML element was not
+         * already evaluated (checked with flag {@link #evaluated}).
+         *
+         * @param _ch   array of characters
+         * @param _start    start position within the array of characters
+         * @param _length   length of characters within the array of characters
+         * @see #content
+         */
+        @Override
+        public void characters(final char[] _ch,
+                               final int _start,
+                               final int _length)
+        {
+            if (_length > 0) {
+                if (!this.evaluated)  {
+                    if (this.content == null)  {
+                        this.content = new StringBuilder();
+                    }
+                    this.content.append(new String(_ch,_start,_length));
+                }
+            }
+        }
+
+        /**
+         * A definition of a XML element is started. If previous XML element
+         * was not evaluated, previous XML element is evaluated by calling
+         * {@link #evaluate()}. Current XML element is then added to the
+         * {@link #stack}.
+         *
+         * @param _uri          URI of the XML element (not used)
+         * @param _localName    local name of the XML element (not used)
+         * @param _qName        current name of the XML element
+         * @param _attributes   attributes of the XML element (not used)
+         * @see #stack
+         * @see #evaluated
+         * @see #evaluate()
+         */
+        @Override
+        public void startElement(final String _uri,
+                                 final String _localName,
+                                 final String _qName,
+                                 final Attributes _attributes)
+        {
+            if (!this.evaluated)  {
+                this.evaluate();
+            }
+            this.evaluated = false;
+            this.content = null;
+
+            this.stack.add(_qName);
+        }
+
+        /**
+         * A definition of a XML element is ended. If the XML element is not
+         * already evaluated (checked with flag {@link #evaluated}), current
+         * XML element is evaluated by {@link #evaluate()}. The XML element is
+         * removed from {@link #stack}.
+         *
+         * @param _uri          URI of the XML element (not used)
+         * @param _localName    local name of the XML element (not used)
+         * @param _qName        current name of the XML element (not used)
+         * @see #stack
+         * @see #evaluated
+         * @see #evaluate()
+         */
+        @Override
+        public void endElement(final String _uri,
+                               final String _localName,
+                               final String _qName)
+        {
+            if (!this.evaluated)  {
+                this.evaluate();
+                this.evaluated = true;
+            }
+            this.stack.pop();
+        }
+
+        /**
+         * Prepares an URL from current {@link #stack}. The URL is build
+         * starting with third element of the {@link #stack}. The first three
+         * elements are defined only for administration purpose.
+         *
+         * @return URL made from {@link #stack}
+         * @see #stack
+         */
         private String getUrl()
         {
             final StringBuilder ret = new StringBuilder();
@@ -702,66 +799,16 @@ public abstract class AbstractAdminObject_mxJPO
         }
 
         /**
-         * An input source defining the entity &quot;ematrixProductDtd&quot; to
-         * replace the original DTD file &quot;ematrixml.dtd&quot; which the
-         * XML parser wants to open.
+         * <p>Current XML element is evaluated. The path of the element defined
+         * by the {@link #stack} fetched from {@link #getUrl()} is used to
+         * identify the XML element. Evaluation of a XML element means to call
+         * {@link AbstractAdminObject_mxJPO#parse(String, String)}.</p>
+         * <p>The parser is only called if the deep of a XML element is higher
+         * than two, because this XML tags defines the administration element.
+         * Deep 0 till 2 is used from MX for administration.</p>
+         *
+         * @see #stack
          */
-        @Override
-        public InputSource resolveEntity(final String _publicId,
-                                         final String _systemId)
-        {
-            return new InputSource(new StringReader("<!ENTITY ematrixProductDtd \"\">"));
-        }
-
-        @Override
-        public void characters(final char[] _ch,
-                               final int _start,
-                               final int _length)
-            throws SAXException
-        {
-
-          if (_length > 0) {
-            final String strContent = new String (_ch,_start,_length);
-            if (!this.called)  {
-              if (this.content == null)  {
-                this.content = new StringBuilder();
-              }
-              this.content.append(strContent);
-            }
-          }
-        }
-
-        @Override
-        public void endElement(final String uri,
-                               final String localName,
-                               final String qName)
-                throws SAXException
-        {
-            if (!this.called)
-            {
-                this.evaluate();
-                this.called = true;
-            }
-            this.stack.pop();
-        }
-
-        @Override
-        public void startElement(final String _uri,
-                                 final String _localName,
-                                 final String _qName,
-                                 final Attributes _attributes)
-                throws SAXException
-        {
-            if (!this.called)
-            {
-                this.evaluate();
-            }
-            this.called = false;
-            this.content = null;
-
-            this.stack.add(_qName);
-        }
-
         private void evaluate()
         {
             if (this.stack.size() > 2)  {

@@ -33,6 +33,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
+ *
  * @author The MxUpdate Team
  * @version $Id$
  */
@@ -106,6 +107,22 @@ public abstract class AbstractProgram_mxJPO
         MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
     }
 
+    /**
+     * Current program is updated. The update has following steps:
+     * <ul>
+     * <li>all not &quot;standard&quot; properties are removed</li>
+     * <li>program / JPO is updated</li>
+     * <li>&quot;standard&quot; properties are set (version, file date,
+     *     installer, original name, application and author)</li>
+     * <li>registration of the symbolic name</li>
+     * </ul>
+     *
+     * @param _paramCache   parameter cache
+     * @param _updateCode   update code (which is executed in front of)
+     * @param _newVersion   new version of the program / JPO to set
+     * @param _file         file to update (to get the file date)
+     * @throws MatrixException if update of the program / JPO failed
+     */
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _updateCode,
                           final String _newVersion,
@@ -125,7 +142,8 @@ public abstract class AbstractProgram_mxJPO
         final int length = (prpArr.length + 1) / 2;
         for (int idxName = 0, idxTo = length; idxName < length; idxName++, idxTo++)  {
             final String name = prpArr[idxName].trim();
-            if (PropertyDef_mxJPO.getEnumByPropName(_paramCache, name) == null)  {
+            final PropertyDef_mxJPO propDef = PropertyDef_mxJPO.getEnumByPropName(_paramCache, name);
+            if (propDef == null)  {
 // TODO: if to is defined, the remove must be specified the to ....
                 final String to = (idxTo < length) ? prpArr[idxTo].trim() : "";
                 cmd.append("mod prog \"").append(this.getName())
@@ -148,7 +166,8 @@ public abstract class AbstractProgram_mxJPO
         if ((this.getInstallationDate() == null) || "".equals(this.getInstallationDate()))  {
             final String date = StringUtil_mxJPO.formatInstalledDate(_paramCache, new Date());
             _paramCache.logTrace("    - define installed date '" + date + "'");
-            cmd.append(" add property \"").append(PropertyDef_mxJPO.INSTALLEDDATE.getPropName(_paramCache)).append("\" ")
+            cmd.append(" add property \"")
+               .append(PropertyDef_mxJPO.INSTALLEDDATE.getPropName(_paramCache)).append("\" ")
                .append("value \"").append(date).append('\"');
         }
         // exists no installer property or installer property not equal?
@@ -182,9 +201,11 @@ public abstract class AbstractProgram_mxJPO
         if (appl == null)  {
             appl = "";
         }
-        _paramCache.logTrace("    - define application '" + appl + "'");
-        cmd.append(" add property \"").append(PropertyDef_mxJPO.APPLICATION.getPropName(_paramCache)).append("\" ")
-           .append("value \"").append(appl).append('\"');
+        if (!appl.equals(this.getApplication()))  {
+            _paramCache.logTrace("    - define application '" + appl + "'");
+            cmd.append(" add property \"").append(PropertyDef_mxJPO.APPLICATION.getPropName(_paramCache)).append("\" ")
+               .append("value \"").append(appl).append('\"');
+        }
         // exists no author property or author property not equal?
         final String author;
         if (_paramCache.contains(ParameterCache_mxJPO.KEY_AUTHOR))  {
@@ -200,6 +221,14 @@ public abstract class AbstractProgram_mxJPO
                .append("value \"").append(author).append('\"');
         }
         cmd.append(";\n");
+
+        // read symbolic names
+        this.readSymbolicNames(_paramCache);
+
+        // append registration of symbolic names
+        this.appendSymbolicNameRegistration(_paramCache,
+                                            this.calcDefaultSymbolicName(),
+                                            cmd);
 
         // and execute alls
         MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);

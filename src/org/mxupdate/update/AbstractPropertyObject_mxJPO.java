@@ -465,10 +465,7 @@ public abstract class AbstractPropertyObject_mxJPO
         String codeSymbName = null;
 
         if (this.getTypeDef().getMxAdminName() != null)  {
-            final String symbName = new StringBuilder().append(this.getTypeDef().getMxAdminName())
-                                    .append("_")
-                                    .append(this.getName().replaceAll(" ", "").replaceAll("/", ""))
-                                    .toString();
+            final String symbName = this.calcDefaultSymbolicName();
             if (_paramCache.getValueBoolean(AbstractPropertyObject_mxJPO.PARAM_CALCSYMBOLICNAMES))  {
                 codeSymbName = symbName;
                 _paramCache.logDebug("    - using calculated symbolic name '" + symbName + "'");

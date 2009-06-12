@@ -55,6 +55,15 @@ public abstract class AbstractObject_mxJPO
     private static final long serialVersionUID = -5505850566853070973L;
 
     /**
+     * Key used to store the name of the program where all administration
+     * objects must be registered with symbolic names. For an OOTB installation
+     * the value is typically &quot;eServiceSchemaVariableMapping.tcl&quot;.
+     *
+     * @see #readSymbolicNames(ParameterCache_mxJPO)
+     */
+    private static final String PARAM_SYMB_NAME_PROG = "RegisterSymbolicNames";
+
+    /**
      * Stores the version information of this object. If the value is
      * <code>null</code>, the version information is not defined.
      *
@@ -177,9 +186,10 @@ public abstract class AbstractObject_mxJPO
      * @param _path         path to write through (if required also including
      *                      depending file path defined from the information
      *                      annotation)
-     * @throws MatrixException
-     * @throws SAXException
-     * @throws IOException
+     * @throws MatrixException  if some MQL statement failed
+     * @throws SAXException     if the XML export of the object could not
+     *                          parsed (for admin objects)
+     * @throws IOException      if the TCL update code could not be written
      */
     public void export(final ParameterCache_mxJPO _paramCache,
                        final File _path)
@@ -198,11 +208,13 @@ public abstract class AbstractObject_mxJPO
 
     /**
      *
-     * @param _paramCache
-     * @param _out
-     * @throws MatrixException
-     * @throws SAXException
-     * @throws IOException
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance where the TCL update code is
+     *                      written
+     * @throws MatrixException  if some MQL statement failed
+     * @throws SAXException     if the XML export of the object could not
+     *                          parsed (for admin objects)
+     * @throws IOException      if the TCL update code could not be written
      * @see #parse(ParameterCache_mxJPO)
      * @see #write(ParameterCache_mxJPO, Appendable)
      */
@@ -569,6 +581,98 @@ public abstract class AbstractObject_mxJPO
     protected Set<String> getSymblicNames()
     {
         return this.symbolicNames;
+    }
+
+    /**
+     * Reads the symbolic names for current admin objects and stores them in
+     * {@link #symbolicNames}.
+     *
+     * @param _paramCache       parameter cache
+     * @throws MatrixException if the symbolic names could not be read
+     * @see #symbolicNames
+     */
+    protected void readSymbolicNames(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException
+    {
+        if (this.getTypeDef().getMxAdminName() != null)  {
+            final String symbProg = _paramCache.getValueString(AbstractObject_mxJPO.PARAM_SYMB_NAME_PROG);
+            final String symbProgIdxOf = new StringBuilder()
+                    .append(" on program ").append(symbProg).append(' ').toString();
+            final StringBuilder cmd = new StringBuilder()
+                    .append("escape list property on program \"")
+                                .append(StringUtil_mxJPO.convertMql(symbProg)).append("\" to ")
+                        .append(this.getTypeDef().getMxAdminName())
+                        .append(" \"").append(this.getName()).append("\" ")
+                        .append(this.getTypeDef().getMxAdminSuffix());
+            for (final String symbName : MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd).split("\n"))  {
+                if (!"".equals(symbName))  {
+                    this.symbolicNames.add(symbName.substring(0, symbName.indexOf(symbProgIdxOf)));
+                }
+            }
+        }
+    }
+
+    /**
+     * Appends the escaped MQL code to register given symbolic name
+     * <code>_symbName</code> depending on current defined symbolic names
+     * {@link #symbolicNames}. If not registered, a new registration is done.
+     * If wrong symbolic names are defined, they are removed.
+     *
+     * @param _paramCache   parameter cache
+     * @param _symbName     symbolic name which must be set
+     * @param _mqlCode      string builder where the MQL command must be
+     *                      appended
+     * @see #symbolicNames
+     */
+    protected void appendSymbolicNameRegistration(final ParameterCache_mxJPO _paramCache,
+                                                  final String _symbName,
+                                                  final StringBuilder _mqlCode)
+    {
+        if (this.getTypeDef().getMxAdminName() != null)  {
+            final String symbProg = _paramCache.getValueString(AbstractObject_mxJPO.PARAM_SYMB_NAME_PROG);
+            if (!this.symbolicNames.contains(_symbName))  {
+                _paramCache.logTrace("    - register symbolic name '" + _symbName + "'");
+                _mqlCode.append("escape add property \"").append(StringUtil_mxJPO.convertMql(_symbName)).append("\" ")
+                        .append(" on program \"").append(StringUtil_mxJPO.convertMql(symbProg)).append("\" to ")
+                        .append(this.getTypeDef().getMxAdminName())
+                        .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
+                        .append(this.getTypeDef().getMxAdminSuffix())
+                        .append(";\n");
+            }
+            for (final String exSymbName : this.symbolicNames)  {
+                if (!_symbName.equals(exSymbName))  {
+                    _paramCache.logTrace("    - remove symbolic name '" + exSymbName + "'");
+                    _mqlCode.append("escape delete property \"")
+                                    .append(StringUtil_mxJPO.convertMql(exSymbName)).append("\" ")
+                            .append(" on program \"").append(StringUtil_mxJPO.convertMql(symbProg)).append("\" to ")
+                            .append(this.getTypeDef().getMxAdminName())
+                            .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
+                            .append(this.getTypeDef().getMxAdminSuffix())
+                            .append(";\n");
+                }
+            }
+        }
+    }
+
+    /**
+     * The calculates and returns the default symbolic name. A typical symbolic
+     * name has as prefix the admin type name, then an underscore and at least
+     * the name of the admin object. All spaces and slashes are replaced by
+     * &quot;nothing&quot; (zero length string).
+     *
+     * @return calculated default symbolic name for administration objects (if
+     *         the administration object is a business object <code>null</code>
+     *         is returned)
+     */
+    protected String calcDefaultSymbolicName()
+    {
+        return (this.getTypeDef().getMxAdminName() == null)
+               ? null
+               : new StringBuilder()
+                        .append(this.getTypeDef().getMxAdminName())
+                        .append("_")
+                        .append(this.getName().replaceAll(" ", "").replaceAll("/", ""))
+                        .toString();
     }
 
     /**
