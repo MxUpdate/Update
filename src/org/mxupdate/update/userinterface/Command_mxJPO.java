@@ -28,6 +28,7 @@ import java.util.TreeSet;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.util.AdminProperty_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
@@ -139,8 +140,8 @@ public class Command_mxJPO
         for (final String user : this.users)  {
             _out.append(" \\\n    add user \"").append(StringUtil_mxJPO.convertTcl(user)).append("\"");
         }
-        for (final AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
-            if (prop.getName().startsWith("%"))  {
+        for (final AdminProperty_mxJPO prop : this.getPropertiesMap().values())  {
+            if (prop.isSetting())  {
                 _out.append(" \\\n    add setting \"")
                     .append(StringUtil_mxJPO.convertTcl(prop.getName().substring(1))).append("\"")
                     .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getValue())).append("\"");
@@ -187,8 +188,8 @@ public class Command_mxJPO
                 .append(" href \"\" description \"\" alt \"\" label \"\"");
 
         // reset settings
-        for (final AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
-            if (prop.getName().startsWith("%"))  {
+        for (final AdminProperty_mxJPO prop : this.getPropertiesMap().values())  {
+            if (prop.isSetting())  {
                 preMQLCode.append(" remove setting \"").append(prop.getName().substring(1)).append('\"');
             }
         }

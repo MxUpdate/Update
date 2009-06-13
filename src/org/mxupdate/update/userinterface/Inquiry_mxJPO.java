@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.util.AdminProperty_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
@@ -137,8 +138,8 @@ public class Inquiry_mxJPO
         _out.append(" \\\n    pattern \"").append(convertTcl(this.pattern)).append("\"")
             .append(" \\\n    format \"").append(convertTcl(this.format)).append("\"")
             .append(" \\\n    file \"${FILE}\"");
-        for (final AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
-            if (prop.getName().startsWith("%"))  {
+        for (final AdminProperty_mxJPO prop : this.getPropertiesMap().values())  {
+            if (prop.isSetting())  {
                 _out.append(" \\\n    add argument \"").append(convertTcl(prop.getName().substring(1))).append("\"")
                     .append(" \"").append(convertTcl(prop.getValue())).append("\"");
             }
@@ -206,8 +207,8 @@ public class Inquiry_mxJPO
                 .append(" description \"\" pattern \"\" code \"\"");
 
         // reset arguments
-        for (final AbstractAdminObject_mxJPO.Property prop : this.getPropertiesMap().values())  {
-            if (prop.getName().startsWith("%"))  {
+        for (final AdminProperty_mxJPO prop : this.getPropertiesMap().values())  {
+            if (prop.isSetting())  {
                 preMQLCode.append(" remove argument \"").append(prop.getName().substring(1)).append('\"');
             }
         }

@@ -37,6 +37,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.policy.PolicyDefParser_mxJPO;
+import org.mxupdate.update.util.AdminProperty_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.util.MqlUtil_mxJPO;
@@ -279,7 +280,7 @@ public class Policy_mxJPO
             state.prepare();
         }
         super.prepare(_paramCache);
-        for (final Property property : new HashSet<Property>(this.getPropertiesMap().values()))  {
+        for (final AdminProperty_mxJPO property : new HashSet<AdminProperty_mxJPO>(this.getPropertiesMap().values()))  {
             if (property.getName().startsWith("state_"))  {
                 for (final State state : this.states)  {
                     if (state.name.equals(property.getValue()))  {

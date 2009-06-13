@@ -22,7 +22,6 @@ package org.mxupdate.update;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.StringReader;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,6 +35,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.AdminProperty_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.util.MqlUtil_mxJPO;
@@ -74,7 +74,7 @@ public abstract class AbstractAdminObject_mxJPO
      * @see #parse(String, String)
      * @see #prepare(ParameterCache_mxJPO)
      */
-    private final Stack<Property> propertiesStack = new Stack<Property>();
+    private final Stack<AdminProperty_mxJPO> propertiesStack = new Stack<AdminProperty_mxJPO>();
 
     /**
      * Holds the property values depending on the property name. The map is
@@ -83,7 +83,7 @@ public abstract class AbstractAdminObject_mxJPO
      *
      * @see #prepare(ParameterCache_mxJPO)
      */
-    private final Map<String,Property> propertiesMap = new TreeMap<String,Property>();
+    private final Map<String,AdminProperty_mxJPO> propertiesMap = new TreeMap<String,AdminProperty_mxJPO>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -209,19 +209,11 @@ public abstract class AbstractAdminObject_mxJPO
         } else if ("/adminProperties/propertyList".equals(_url))  {
             // to be ignored ...
         } else if ("/adminProperties/propertyList/property".equals(_url))  {
-            this.propertiesStack.add(new Property());
-        } else if ("/adminProperties/propertyList/property/adminRef".equals(_url))  {
-            // to be ignored ...
-        } else if ("/adminProperties/propertyList/property/adminRef/adminName".equals(_url))  {
-            this.propertiesStack.peek().refAdminName = _content;
-        } else if ("/adminProperties/propertyList/property/adminRef/adminType".equals(_url))  {
-            this.propertiesStack.peek().refAdminType = _content;
-        } else if ("/adminProperties/propertyList/property/flags".equals(_url))  {
-            this.propertiesStack.peek().flags = _content;
-        } else if ("/adminProperties/propertyList/property/name".equals(_url))  {
-            this.propertiesStack.peek().name = _content;
-        } else if ("/adminProperties/propertyList/property/value".equals(_url))  {
-            this.propertiesStack.peek().value = _content;
+            this.propertiesStack.add(new AdminProperty_mxJPO());
+        } else if (_url.startsWith("/adminProperties/propertyList/property"))  {
+            if (!this.propertiesStack.peek().parse(_url.substring(38), _content))  {
+                System.err.println("unkown parsing property url: "+_url+"("+_content+")");
+            }
         } else  {
             System.err.println("unkown parsing url: "+_url+"("+_content+")");
         }
@@ -240,44 +232,46 @@ public abstract class AbstractAdminObject_mxJPO
             throws MatrixException
     {
         // sort the properties
-        for (final Property property : this.propertiesStack)  {
-            final StringBuilder key = new StringBuilder().append(property.name);
-            if ((property.refAdminName != null) && (property.refAdminName != null))  {
-                key.append("::").append(property.refAdminType)
-                   .append("::").append(property.refAdminName);
+        for (final AdminProperty_mxJPO property : this.propertiesStack)  {
+            final StringBuilder key = new StringBuilder().append(property.getName());
+            if ((property.getRefAdminName() != null) && (property.getRefAdminType() != null))  {
+                key.append("::").append(property.getRefAdminType())
+                   .append("::").append(property.getRefAdminName());
             }
             this.propertiesMap.put(key.toString(), property);
         }
         // set author depending on the properties
-        final Property author = this.propertiesMap.get(PropertyDef_mxJPO.AUTHOR.getPropName(_paramCache));
+        final AdminProperty_mxJPO author = this.propertiesMap.get(PropertyDef_mxJPO.AUTHOR.getPropName(_paramCache));
         if (author != null)  {
-            this.setAuthor(author.value);
+            this.setAuthor(author.getValue());
         }
         // set application depending on the properties
-        final Property appl = this.propertiesMap.get(PropertyDef_mxJPO.APPLICATION.getPropName(_paramCache));
+        final AdminProperty_mxJPO appl = this.propertiesMap.get(PropertyDef_mxJPO.APPLICATION.getPropName(_paramCache));
         if (appl != null)  {
-            this.setApplication(appl.value);
+            this.setApplication(appl.getValue());
         }
         // sets the installation date depending on the properties
-        final Property installationDate
+        final AdminProperty_mxJPO installationDate
                 = this.propertiesMap.get(PropertyDef_mxJPO.INSTALLEDDATE.getPropName(_paramCache));
         if (installationDate != null)  {
-            this.setInstallationDate(installationDate.value);
+            this.setInstallationDate(installationDate.getValue());
         }
         // sets the installer depending on the properties
-        final Property installer = this.propertiesMap.get(PropertyDef_mxJPO.INSTALLER.getPropName(_paramCache));
+        final AdminProperty_mxJPO installer
+                = this.propertiesMap.get(PropertyDef_mxJPO.INSTALLER.getPropName(_paramCache));
         if (installer != null)  {
-            this.setInstaller(installer.value);
+            this.setInstaller(installer.getValue());
         }
         // sets the original name depending on the properties
-        final Property origName = this.propertiesMap.get(PropertyDef_mxJPO.ORIGINALNAME.getPropName(_paramCache));
+        final AdminProperty_mxJPO origName
+                = this.propertiesMap.get(PropertyDef_mxJPO.ORIGINALNAME.getPropName(_paramCache));
         if (origName != null)  {
-            this.setOriginalName(origName.value);
+            this.setOriginalName(origName.getValue());
         }
         // sets the version depending on the properties
-        final Property version = this.propertiesMap.get(PropertyDef_mxJPO.VERSION.getPropName(_paramCache));
+        final AdminProperty_mxJPO version = this.propertiesMap.get(PropertyDef_mxJPO.VERSION.getPropName(_paramCache));
         if (version != null)  {
-            this.setVersion(version.value);
+            this.setVersion(version.getValue());
         }
 
         // reads symbolic names of the administration objects
@@ -347,21 +341,21 @@ public abstract class AbstractAdminObject_mxJPO
                                    final Appendable _out)
             throws IOException
     {
-        for (final Property prop : this.propertiesMap.values())  {
-            if ((PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.name) == null) && !prop.name.startsWith("%"))  {
-                _out.append("\nmql add property \"").append(StringUtil_mxJPO.convertTcl(prop.name)).append("\"")
+        for (final AdminProperty_mxJPO prop : this.propertiesMap.values())  {
+            if ((PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null) && !prop.isSetting())  {
+                _out.append("\nmql add property \"").append(StringUtil_mxJPO.convertTcl(prop.getName())).append("\"")
                     .append(" \\\n    on ")
                     .append(this.getTypeDef().getMxAdminName())
                     .append(" \"${NAME}\"");
                 if (!"".equals(this.getTypeDef().getMxAdminSuffix()))  {
                     _out.append(' ').append(this.getTypeDef().getMxAdminSuffix());
                 }
-                if ((prop.refAdminName) != null && (prop.refAdminType != null))  {
-                    _out.append("  \\\n    to ").append(prop.refAdminType)
-                        .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.refAdminName)).append("\"");
+                if ((prop.getRefAdminName()) != null && (prop.getRefAdminType() != null))  {
+                    _out.append("  \\\n    to ").append(prop.getRefAdminType())
+                        .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getRefAdminName())).append("\"");
                 }
-                if (prop.value != null)  {
-                    _out.append("  \\\n    value \"").append(StringUtil_mxJPO.convertTcl(prop.value)).append("\"");
+                if (prop.getValue() != null)  {
+                    _out.append("  \\\n    value \"").append(StringUtil_mxJPO.convertTcl(prop.getValue())).append("\"");
                 }
             }
         }
@@ -449,13 +443,13 @@ public abstract class AbstractAdminObject_mxJPO
                 .append("mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append("\" ")
                 .append(this.getTypeDef().getMxAdminSuffix());
-        for (final Property prop : this.propertiesMap.values())  {
+        for (final AdminProperty_mxJPO prop : this.propertiesMap.values())  {
             // % must be ignored because this means settings
-            if ((PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.name) == null) && !prop.name.startsWith("%"))  {
-                preMQLCode.append(" remove property \"").append(prop.name).append('\"');
-                if ((prop.refAdminName) != null && (prop.refAdminType != null))  {
-                    preMQLCode.append(" to ").append(prop.refAdminType)
-                              .append(" \"").append(prop.refAdminName).append('\"');
+            if ((PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null) && !prop.isSetting())  {
+                preMQLCode.append(" remove property \"").append(prop.getName()).append('\"');
+                if ((prop.getRefAdminName() != null) && (prop.getRefAdminType() != null))  {
+                    preMQLCode.append(" to ").append(prop.getRefAdminType())
+                              .append(" \"").append(prop.getRefAdminName()).append('\"');
                 }
             }
         }
@@ -545,7 +539,7 @@ public abstract class AbstractAdminObject_mxJPO
      *
      * @return value of instance variable {@link #propertiesMap}.
      */
-    protected Map<String,Property>  getPropertiesMap()
+    protected Map<String,AdminProperty_mxJPO>  getPropertiesMap()
     {
         return this.propertiesMap;
     }
@@ -574,79 +568,6 @@ public abstract class AbstractAdminObject_mxJPO
     }*/
 
     ///////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Property with name, value and referenced administration type. The kind
-     * of property (with reference, with value, ...) is stored as flag.
-     */
-    // TODO define class in own file
-   protected class Property
-            implements Serializable
-    {
-        /**
-         * Defines the serialize version unique identifier.
-         */
-        private static final long serialVersionUID = 7814222356799301361L;
-
-        /**
-         * Name of the property.
-         */
-        String name = null;
-
-        /**
-         * Value of the property.
-         */
-        String value = null;
-
-        /**
-         * Flag of the property.
-         */
-        String flags = null;
-
-        /**
-         * Type of the referenced administration object for this property (if
-         * defined).
-         */
-        String refAdminType = null;
-
-        /**
-         * Name of the referenced administration object for this property (if
-         * defined).
-         */
-        String refAdminName = null;
-
-        /**
-         * Getter method for instance variable {@link #name}.
-         *
-         * @return value of instance variable {@link #name}.
-         */
-        public String getName()
-        {
-            return this.name;
-        }
-
-        /**
-         * Getter method for instance variable {@link #value}.
-         *
-         * @return value of instance variable {@link #value}.
-         */
-        public String getValue()
-        {
-            return this.value;
-        }
-
-        /**
-         * Returns the string representation of a property including the
-         * {@link #name}, {@link #value} and {@link #flags}.
-         *
-         * @return string representation of a property
-         */
-        @Override
-        public String toString()
-        {
-            return "[name=" + this.name + ", value=" + this.value + ", flags=" + this.flags + "]";
-        }
-    }
 
     /**
      * SAX handler used to parse the XML exports from XML.
