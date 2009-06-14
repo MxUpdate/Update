@@ -35,11 +35,10 @@ import matrix.util.StringList;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
-import static org.mxupdate.update.util.StringUtil_mxJPO.joinTcl;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
+ * The class is used to handle administration persons.
  *
  * @author Tim Moxter
  * @version $Id$
@@ -148,6 +147,11 @@ public class PersonAdmin_mxJPO
     private String site;
 
     /**
+     * Defines the name of the assigned default application.
+     */
+    private String defaultApplication;
+
+    /**
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  person type definition
@@ -221,6 +225,11 @@ public class PersonAdmin_mxJPO
         } else if (_url.startsWith("/adminAccess"))  {
             this.adminAccess.add(_url.substring(13).replaceAll("Access$", ""));
 
+        } else if ("/defaultApplication".equals(_url))  {
+            // to be ignored
+        } else if ("/defaultApplication/applicationRef".equals(_url))  {
+            this.defaultApplication = _content;
+
         } else if ("/inactive".equals(_url))  {
             this.isInactive = true;
         } else if ("/applicationsOnly".equals(_url))  {
@@ -287,7 +296,8 @@ public class PersonAdmin_mxJPO
     protected String getExportMQL()
     {
         return new StringBuilder()
-                .append("export person \"").append(this.getName()).append("\" !mail !set xml")
+                .append("escape export person \"").append(StringUtil_mxJPO.convertMql(this.getName()))
+                .append("\" !mail !set xml")
                 .toString();
     }
 
@@ -301,25 +311,31 @@ public class PersonAdmin_mxJPO
                                final Appendable _out)
             throws IOException
     {
-        _out.append(" \\\n    access \"").append(joinTcl(',', false, this.access, "none")).append("\"")
-            .append(" \\\n    admin \"").append(joinTcl(',', false, this.adminAccess, "none")).append("\"")
-            .append(" \\\n    address \"").append(convertTcl(this.address)).append("\"")
-            .append(" \\\n    email \"").append(convertTcl(this.email)).append("\"")
-            .append(" \\\n    fax \"").append(convertTcl(this.fax)).append("\"")
-            .append(" \\\n    fullname \"").append(convertTcl(this.fullName)).append("\"")
-            .append(" \\\n    phone \"").append(convertTcl(this.phone)).append("\"")
-            .append(" \\\n    vault \"").append(convertTcl(this.vault)).append("\"");
+        _out.append(" \\\n    access \"")
+                    .append(StringUtil_mxJPO.joinTcl(',', false, this.access, "none")).append("\"")
+            .append(" \\\n    admin \"")
+                    .append(StringUtil_mxJPO.joinTcl(',', false, this.adminAccess, "none")).append("\"")
+            .append(" \\\n    address \"").append(StringUtil_mxJPO.convertTcl(this.address)).append("\"")
+            .append(" \\\n    email \"").append(StringUtil_mxJPO.convertTcl(this.email)).append("\"")
+            .append(" \\\n    fax \"").append(StringUtil_mxJPO.convertTcl(this.fax)).append("\"")
+            .append(" \\\n    fullname \"").append(StringUtil_mxJPO.convertTcl(this.fullName)).append("\"")
+            .append(" \\\n    phone \"").append(StringUtil_mxJPO.convertTcl(this.phone)).append("\"")
+            .append(" \\\n    vault \"").append(StringUtil_mxJPO.convertTcl(this.vault)).append("\"");
         if (this.site != null)  {
-            _out.append(" \\\n    site \"").append(convertTcl(this.site)).append("\"");
+            _out.append(" \\\n    site \"").append(StringUtil_mxJPO.convertTcl(this.site)).append("\"");
+        }
+        if (this.defaultApplication != null)  {
+            _out.append(" \\\n    application \"")
+                .append(StringUtil_mxJPO.convertTcl(this.defaultApplication)).append("\"");
         }
         for (final String group : this.groups)  {
             _out.append(" \\\n    assign group \"")
-                .append(convertTcl(group))
+                .append(StringUtil_mxJPO.convertTcl(group))
                 .append("\"");
         }
         for (final String role : this.roles)  {
             _out.append(" \\\n    assign role \"")
-                .append(convertTcl(role))
+                .append(StringUtil_mxJPO.convertTcl(role))
                 .append("\"");
         }
     }
@@ -408,7 +424,7 @@ public class PersonAdmin_mxJPO
         // append other pre MQL code
         final StringBuilder preMQLCode = new StringBuilder()
                 .append(_preMQLCode)
-                .append("mod person \"").append(this.getName()).append("\" ")
+                .append("escape mod person \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
                         .append("access none ")
                         .append("admin none ")
                         .append("address '' ")
@@ -416,7 +432,11 @@ public class PersonAdmin_mxJPO
                         .append("fax '' ")
                         .append("fullname '' ")
                         .append("phone '' ")
-                        .append("remove assign all;\n");
+                        .append("remove assign all");
+        if (this.defaultApplication != null)  {
+            preMQLCode.append(" application \"\"");
+        }
+        preMQLCode.append(";\n");
 
         super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
     }
