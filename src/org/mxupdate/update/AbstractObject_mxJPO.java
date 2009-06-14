@@ -196,7 +196,7 @@ public abstract class AbstractObject_mxJPO
             throws MatrixException, SAXException, IOException
     {
         this.parse(_paramCache);
-        final File file = new File(_path, StringUtil_mxJPO.convertToFileName(this.getFileName()));
+        final File file = new File(_path, this.getFileName());
         if (!file.getParentFile().exists())  {
             file.getParentFile().mkdirs();
         }
@@ -241,9 +241,11 @@ public abstract class AbstractObject_mxJPO
      * Parses all information for given administration object.
      *
      * @param _paramCache   parameter cache
-     * @throws MatrixException
-     * @throws SAXException
-     * @throws IOException
+     * @throws MatrixException  if XML export could not be created or if
+     *                          another MX action failed
+     * @throws SAXException     if the XML document could not be parsed
+     * @throws IOException      if the XML document could not be opened (should
+     *                          never happen)
      */
     protected abstract void parse(final ParameterCache_mxJPO _paramCache)
             throws MatrixException, SAXException, IOException;
@@ -690,10 +692,12 @@ public abstract class AbstractObject_mxJPO
     /**
      * Returns the file name for this MxUpdate administration object. The file
      * name is a concatenation of the defined file prefix within the
-     * information annotation , the name of the Mx object and the file suffix
-     * within the information annotation.
+     * information annotation , the name of the MX object and the file suffix
+     * within the information annotation. All special characters are converted
+     * automatically from {@link StringUtil_mxJPO#convertToFileName(String)}.
      *
      * @return file name of this administration (business) object
+     * @see #export(ParameterCache_mxJPO, File)
      */
     protected String getFileName() {
         final StringBuilder ret = new StringBuilder();
@@ -704,6 +708,6 @@ public abstract class AbstractObject_mxJPO
         if (this.getTypeDef().getFileSuffix() != null)  {
             ret.append(this.getTypeDef().getFileSuffix());
         }
-        return ret.toString();
+        return StringUtil_mxJPO.convertToFileName(ret.toString());
     }
 }
