@@ -20,7 +20,9 @@
 
 package org.mxupdate.mapping;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -165,7 +167,7 @@ public class Mapping_mxJPO
     public Mapping_mxJPO(final Context _context)
             throws MatrixException, IOException, Exception
     {
-        this.properties.putAll(MqlUtil_mxJPO.readPropertyProgram(_context, Mapping_mxJPO.PROP_NAME));
+        this.properties.putAll(this.readProperties(_context));
 
         // map attributes and types
         for (final Map.Entry<Object, Object> entry : this.properties.entrySet())  {
@@ -185,6 +187,33 @@ public class Mapping_mxJPO
                 UpdateCheck_mxJPO.defineValue(this, key.substring(12), value);
             }
         }
+    }
+
+    /**
+     * Reads the code of the program {@link #PROP_NAME} and evaluates the code
+     * of the program as properties.
+     *
+     * @param _context  MX context for this request
+     * @return read properties from MX
+     * @throws MatrixException  if the program could not be read
+     * @throws IOException      if the code of the program could not be parsed
+     *                          as properties
+     * @see #PROP_NAME
+     */
+    protected Properties readProperties(final Context _context)
+        throws MatrixException, IOException
+    {
+        final String code = MqlUtil_mxJPO.execMql(_context,
+                new StringBuilder()
+                        .append("print prog \"").append(Mapping_mxJPO.PROP_NAME)
+                        .append("\" select code dump"),
+                false);
+
+        final InputStream is = new ByteArrayInputStream(code.getBytes());
+        final Properties properties = new Properties();
+        properties.load(is);
+
+        return properties;
     }
 
     /**
