@@ -192,7 +192,7 @@ public class ParameterCache_mxJPO
                                 final boolean _stringLog)
             throws Exception
     {
-        this.mapping = new Mapping_mxJPO(_context);
+        this.mapping = this.initMapping(_context);
 
         this.context = _context;
         this.mapBoolean = new HashMap<String,Boolean>();
@@ -272,6 +272,21 @@ public class ParameterCache_mxJPO
         this.mapString = _original.mapString;
         this.writer = _original.writer;
         this.stringWriter = null;
+    }
+
+    /**
+     * Initializes the mapping for the parameter cache. The initialize is
+     * defined in a own method so that the method could be overwritten for test
+     * purposes.
+     *
+     * @param _context      MX context for this request
+     * @return initialized mapping
+     * @throws Exception if mapping could not be initialized
+     */
+    protected Mapping_mxJPO initMapping(final Context _context)
+        throws Exception
+    {
+        return new Mapping_mxJPO(_context);
     }
 
     /**

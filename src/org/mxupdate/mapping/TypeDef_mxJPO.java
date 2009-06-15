@@ -447,20 +447,25 @@ public final class TypeDef_mxJPO
                                 final String _jpoName)
             throws Exception
     {
-        if (_mapping.getTypeDefJPOsMap().isEmpty())  {
-            final String tmp = MqlUtil_mxJPO.execMql(_context, TypeDef_mxJPO.MQL_LISTPROG);
-            for (final String line : tmp.split("\n"))  {
-                final String[] arr = line.split("\t");
-                if (arr.length > 1)  {
-                    _mapping.getTypeDefJPOsMap().put(arr[0], arr[1]);
+        // within tests the context is always null
+        if (_context == null)  {
+            this.jpoClass = (Class<? extends AbstractObject_mxJPO>) Class.forName(_jpoName + "_mxJPO");
+        } else  {
+            if (_mapping.getTypeDefJPOsMap().isEmpty())  {
+                final String tmp = MqlUtil_mxJPO.execMql(_context, TypeDef_mxJPO.MQL_LISTPROG);
+                for (final String line : tmp.split("\n"))  {
+                    final String[] arr = line.split("\t");
+                    if (arr.length > 1)  {
+                        _mapping.getTypeDefJPOsMap().put(arr[0], arr[1]);
+                    }
                 }
             }
+            final String jpoClassName = _mapping.getTypeDefJPOsMap().get(_jpoName);
+            if (jpoClassName == null)  {
+                throw new Exception("unknown jpo class definition for " + _jpoName);
+            }
+            this.jpoClass = (Class<? extends AbstractObject_mxJPO>) Class.forName(jpoClassName);
         }
-        final String jpoClassName = _mapping.getTypeDefJPOsMap().get(_jpoName);
-        if (jpoClassName == null)  {
-            throw new Exception("unknown jpo class definition for " + _jpoName);
-        }
-        this.jpoClass = (Class<? extends AbstractObject_mxJPO>) Class.forName(jpoClassName);
     }
 
     /**

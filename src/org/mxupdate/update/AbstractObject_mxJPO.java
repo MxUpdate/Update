@@ -596,7 +596,8 @@ public abstract class AbstractObject_mxJPO
     protected void readSymbolicNames(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
-        if (this.getTypeDef().getMxAdminName() != null)  {
+        // context must be checked if used within automatic tests
+        if ((this.getTypeDef().getMxAdminName() != null) && (_paramCache.getContext() != null))  {
             final String symbProg = _paramCache.getValueString(AbstractObject_mxJPO.PARAM_SYMB_NAME_PROG);
             final String symbProgIdxOf = new StringBuilder()
                     .append(" on program ").append(symbProg).append(' ').toString();
