@@ -56,7 +56,7 @@ public class Dimension_mxJPO
      * @see #parse(String, String)
      * @see #prepare(ParameterCache_mxJPO)
      */
-    private final Set<Unit> units = new TreeSet<Unit>();
+    private final Set<Dimension_mxJPO.Unit> units = new TreeSet<Dimension_mxJPO.Unit>();
 
     /**
      * Holds current parsed unit.
@@ -267,7 +267,7 @@ public class Dimension_mxJPO
      * The class is used to store information about a single unit of a
      * dimension.
      */
-    private class Unit
+    public static class Unit
         implements Comparable<Dimension_mxJPO.Unit>
     {
         /**

@@ -1,0 +1,394 @@
+/*
+ * Copyright 2008-2009 The MxUpdate Team
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Revision:        $Rev$
+ * Last Changed:    $Date$
+ * Last Changed By: $Author$
+ */
+
+options {
+  JDK_VERSION = "1.5";
+  STATIC = false;
+  ERROR_REPORTING = false;
+  USER_TOKEN_MANAGER = false;
+}
+
+PARSER_BEGIN(DimensionDefParser)
+package org.mxupdate.update.datamodel.dimension;
+
+import java.lang.reflect.InvocationTargetException;
+import java.io.StringReader;
+import java.util.Collection;
+import java.util.Set;
+
+import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.datamodel.Dimension_mxJPO;
+import org.mxupdate.update.datamodel.Dimension_mxJPO.Unit;
+import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AdminProperty_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
+
+public class DimensionDefParser
+    extends AbstractParser_mxJPO
+{
+}
+PARSER_END(DimensionDefParser)
+
+SKIP :
+{
+    " "
+|   "\r"
+|   "\t"
+|   "\n"
+}
+
+TOKEN : /** first level */
+{
+      <DESCRIPTION:     "description">      : S_EXPECTED
+    | <HIDDEN:          "hidden">           : S_EXPECTED
+    | <UNIT:            "unit">             : UNITNAME_EXPECTED
+}
+
+
+/******************************************************************** String  */
+<S_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r" 
+}
+
+<S_EXPECTED> TOKEN :
+{
+      <S_STRING : (<S_APOSTROPHE>(<S_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<S_APOSTROPHE>)> : DEFAULT
+    | <S_SINGLE_STRING : (<S_CHAR>)+> : DEFAULT
+    | <#S_APOSTROPHE : "\"" >
+    | <#S_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/***************************************************************** Unit Name  */
+<UNITNAME_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r" 
+}
+
+<UNITNAME_EXPECTED> TOKEN :
+{
+      <UNITNAME_STRING : (<UNITNAME_APOSTROPHE>(<UNITNAME_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<UNITNAME_APOSTROPHE>)> : UNITDEF_EXPECTED
+    | <UNITNAME_SINGLE : (<UNITNAME_CHAR>)+> : DEFAULT
+    | <#UNITNAME_APOSTROPHE : "\"" >
+    | <#UNITNAME_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/********************************************************** Unit Value String */
+<UNITDEF_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r" 
+}
+
+<UNITDEF_EXPECTED> TOKEN :
+{
+      <UNITDEF_START :      "{">            : UNITDEF_EXPECTED
+    | <UNITDEF_END :        "}">            : DEFAULT
+    | <UNITDEF_DEFAULT:     "default">      : UNITDEF_BOOLEAN_EXPECTED
+    | <UNITDEF_DESCRIPTION: "description">  : UNITDEF_STRING_EXPECTED
+    | <UNITDEF_LABEL:       "label">        : UNITDEF_STRING_EXPECTED
+    | <UNITDEF_MULTIPLIER:  "multiplier">   : UNITDEF_DOUBLE_EXPECTED
+    | <UNITDEF_OFFSET:      "offset">       : UNITDEF_DOUBLE_EXPECTED
+    | <UNITDEF_SETTING:     "setting">      : UNITDEF_STRINGSTRING_EXPECTED
+    | <UNITDEF_PROPERTY:    "property">     : UNITDEF_STRING_EXPECTED
+    | <UNITDEF_PROPERTYVAL: "value">        : UNITDEF_STRING_EXPECTED
+    | <UNITDEF_PROPERTYTO:  "to">           : UNITDEF_STRINGSTRING_EXPECTED
+    | <UNITDEF_SYSTEM:      "system">       : UNITDEF_SYSTEMNAME_EXPECTED
+}
+
+/************************************************* Boolean for Unit Defnition */
+<UNITDEF_BOOLEAN_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r" 
+}
+
+<UNITDEF_BOOLEAN_EXPECTED> TOKEN :
+{
+      <UNITDEF_BOOLEAN_TRUE : ("true" | "\"true\"")> : UNITDEF_EXPECTED
+    | <UNITDEF_BOOLEAN_FALSE : ("false")> : UNITDEF_EXPECTED
+}
+
+/************************************************* String for Unit Definition */
+<UNITDEF_STRING_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r" 
+}
+
+<UNITDEF_STRING_EXPECTED> TOKEN :
+{
+      <UNITDEF_STRING_STRING : (<UNITDEF_STRING_APOSTROPHE>(<UNITDEF_STRING_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<UNITDEF_STRING_APOSTROPHE>)> : UNITDEF_EXPECTED
+    | <UNITDEF_STRING_SINGLE : (<UNITDEF_STRING_CHAR>)+> : UNITDEF_EXPECTED
+    | <#UNITDEF_STRING_APOSTROPHE : "\"" >
+    | <#UNITDEF_STRING_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/******************************************** Two Strings for Unit Definition */
+<UNITDEF_STRINGSTRING_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r" 
+}
+
+<UNITDEF_STRINGSTRING_EXPECTED> TOKEN :
+{
+      <UNITDEF_STRINGSTRING_STRING : (<UNITDEF_STRING_APOSTROPHE>(<UNITDEF_STRING_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<UNITDEF_STRING_APOSTROPHE>)> : UNITDEF_STRING_EXPECTED
+    | <UNITDEF_STRINGSTRING_SINGLE : (<UNITDEF_STRING_CHAR>)+> : UNITDEF_STRING_EXPECTED
+    | <#UNITDEF_STRINGSTRING_APOSTROPHE : "\"" >
+    | <#UNITDEF_STRINGSTRING_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/************************************************* Double for Unit Definition */
+<UNITDEF_DOUBLE_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r" 
+}
+
+<UNITDEF_DOUBLE_EXPECTED> TOKEN :
+{
+      <UNITDEF_DOUBLE_DOUBLE : ((["0"-"9"])* "." (["0"-"9"])*)> : UNITDEF_EXPECTED
+}
+
+/******************************************** System Name for Unit Definition */
+<UNITDEF_SYSTEMNAME_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r" 
+}
+
+<UNITDEF_SYSTEMNAME_EXPECTED> TOKEN :
+{
+      <UNITDEF_SYSTEMNAME_STRING : (<UNITDEF_SYSTEMNAME_APOSTROPHE>(<UNITDEF_SYSTEMNAME_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<UNITDEF_SYSTEMNAME_APOSTROPHE>)> : UNITDEF_SYSTEMDEF_EXPECTED
+    | <UNITDEF_SYSTEMNAME_SINGLE : (<UNITDEF_SYSTEMNAME_CHAR>)+> : UNITDEF_SYSTEMDEF_EXPECTED
+    | <#UNITDEF_SYSTEMNAME_APOSTROPHE : "\"" >
+    | <#UNITDEF_SYSTEMNAME_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/*************************************** System Defintion for Unit Definition */
+<UNITDEF_SYSTEMDEF_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r" 
+}
+
+<UNITDEF_SYSTEMDEF_EXPECTED> TOKEN :
+{
+      <UNITDEF_SYSTEMDEF_TO : "to"> : UNITDEF_SYSTEMDEF_EXPECTED
+    | <UNITDEF_SYSTEMDEF_UNIT : "unit"> : UNITDEF_SYSTEMUNIT_EXPECTED
+}
+
+/******************************************** System Unit for Unit Definition */
+<UNITDEF_SYSTEMUNIT_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r" 
+}
+
+<UNITDEF_SYSTEMUNIT_EXPECTED> TOKEN :
+{
+      <UNITDEF_SYSTEMUNIT_STRING : (<UNITDEF_SYSTEMUNIT_APOSTROPHE>(<UNITDEF_SYSTEMUNIT_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<UNITDEF_SYSTEMUNIT_APOSTROPHE>)> : UNITDEF_EXPECTED
+    | <UNITDEF_SYSTEMUNIT_SINGLE : (<UNITDEF_SYSTEMUNIT_CHAR>)+> : UNITDEF_EXPECTED
+    | <#UNITDEF_SYSTEMUNIT_APOSTROPHE : "\"" >
+    | <#UNITDEF_SYSTEMUNIT_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/**
+ * Parses one complete dimension definition.
+ *
+ * @param _paramCache   parameter cache
+ * @param _typeDef      type definition of the dimension (to instanciate the
+ *                      dimension)
+ * @param _mxName       MX name of the dimension
+ */
+Dimension_mxJPO dimension(final ParameterCache_mxJPO _paramCache,
+                          final TypeDef_mxJPO _typeDef,
+                          final String _mxName) 
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+: {
+    final Dimension_mxJPO dimension = (Dimension_mxJPO) _typeDef.newTypeInstance(_mxName);
+    String tmp;
+    Set<String> set;
+} {
+    ( (<DESCRIPTION>    tmp = sString() {this.setValue(dimension, "description", tmp);})
+    | (<HIDDEN>         tmp = sString() {/*this.setValue(dimension, "hidden", tmp);*/})
+    | (unit(dimension)) )*
+    {
+        this.prepareObject(_paramCache, dimension);
+        return dimension;
+    }
+}
+
+/**
+ * Parses for a dimension one unit definition.
+ *
+ * @param _dimension    dimension instance for which the unit must parsed
+ */
+void unit(final Dimension_mxJPO _dimension) : {
+    final Unit unit = new Unit();
+    Token tmpToken;
+    String tmpStr;
+}  {
+    <UNIT> 
+    (
+        (tmpToken = <UNITNAME_STRING>)   {this.setValue(unit, "name", this.getString(tmpToken.image));}
+        |
+        (tmpToken = <UNITNAME_SINGLE>)   {this.setValue(unit, "name", this.getSingle(tmpToken.image));}
+    )
+    <UNITDEF_START>
+        ( ( <UNITDEF_DEFAULT>   ( <UNITDEF_BOOLEAN_TRUE>                {this.setValue(unit, "defaultUnit", true);}
+                                | <UNITDEF_BOOLEAN_FALSE>               {this.setValue(unit, "defaultUnit", false);} ) )
+        | ( <UNITDEF_DESCRIPTION>   tmpStr = uvString()                 {this.setValue(unit, "description", tmpStr);} )
+        | ( <UNITDEF_LABEL>         tmpStr = uvString()                 {this.setValue(unit, "label", tmpStr);} )
+        | ( <UNITDEF_MULTIPLIER>    tmpToken = <UNITDEF_DOUBLE_DOUBLE>  {this.setValue(unit, "multiplier", Double.parseDouble(tmpToken.image));} )
+        | ( <UNITDEF_OFFSET>        tmpToken = <UNITDEF_DOUBLE_DOUBLE>  {this.setValue(unit, "offset", Double.parseDouble(tmpToken.image));} )
+        | ( unitSetting(unit) )
+        | ( unitProperty(unit) )
+        | ( unitSystem(unit) )
+        )*
+    <UNITDEF_END>
+    {
+        this.appendValue(_dimension, "units", unit);
+    }
+}
+
+/**
+ * Parses one setting for a unit definition. The setting is stored on the
+ * dimension as property where the name of the property is the key of the
+ * setting with % as prefix.
+ *
+ * @param _unit     unit instance for which the setting must be parsed
+ */
+void unitSetting(final Unit _unit) : {
+    Token tmp;
+    final String key, value;
+}  {
+    <UNITDEF_SETTING>      
+    (
+        (tmp = <UNITDEF_STRINGSTRING_STRING>) {key = this.getString(tmp.image);}
+        |
+        (tmp = <UNITDEF_STRINGSTRING_SINGLE>) {key = this.getSingle(tmp.image);}
+    )
+    (value = uvString()) 
+    {
+        final AdminProperty_mxJPO prop = new AdminProperty_mxJPO();
+        this.setValue(prop, "name", "%" + key);
+        this.setValue(prop, "value", value);
+        this.appendValue(_unit, "properties", prop);
+    }
+}
+
+/**
+ * Parses one property for a unit definition.
+ *
+ * @param _unit     unit instance for which the property must be parsed
+ */
+void unitProperty(final Unit _unit) : {
+    Token tmp;
+    String name = null;
+    String value = null;
+    String toType = null;
+    String toName = null;
+}  {
+    <UNITDEF_PROPERTY> name = uvString()
+    (
+          ( <UNITDEF_PROPERTYVAL> value = uvString() )
+        | ( <UNITDEF_PROPERTYTO> 
+                (
+                    (tmp = <UNITDEF_STRINGSTRING_STRING>) {toType = this.getString(tmp.image);}
+                    |
+                    (tmp = <UNITDEF_STRINGSTRING_SINGLE>) {toType = this.getSingle(tmp.image);}
+                )
+                toName = uvString() )
+    )* 
+    {
+        final AdminProperty_mxJPO prop = new AdminProperty_mxJPO();
+        this.setValue(prop, "name", name);
+        this.setValue(prop, "value", value);
+        this.setValue(prop, "refAdminType", toType);
+        this.setValue(prop, "refAdminName", toName);
+        this.appendValue(_unit, "properties", prop);
+    }
+}
+
+/**
+ * Parses the system information for a unit definition. The system information
+ * is stored as property where the referenced admin type is set to unit and the
+ * referenced admin name is the system unit.
+ *
+ * @param _unit     unit instance for which the system must be parsed
+ */
+void unitSystem(final Unit _unit) : {
+    Token tmp;
+    String name;
+    String unit;
+}  {
+    <UNITDEF_SYSTEM>
+    (
+        (tmp = <UNITDEF_SYSTEMNAME_STRING>) {name = this.getString(tmp.image);}
+        |
+        (tmp = <UNITDEF_SYSTEMNAME_SINGLE>) {name = this.getSingle(tmp.image);}
+    )
+    <UNITDEF_SYSTEMDEF_TO>
+    <UNITDEF_SYSTEMDEF_UNIT>
+    (
+        (tmp = <UNITDEF_SYSTEMUNIT_STRING>) {unit = this.getString(tmp.image);}
+        |
+        (tmp = <UNITDEF_SYSTEMUNIT_SINGLE>) {unit = this.getSingle(tmp.image);}
+    )
+    {
+        final AdminProperty_mxJPO prop = new AdminProperty_mxJPO();
+        this.setValue(prop, "name", name);
+        this.setValue(prop, "refAdminType", "unit");
+        this.setValue(prop, "refAdminName", unit);
+        this.appendValue(_unit, "properties", prop);
+    }
+}
+
+/**
+ * Evaluates a simple string.
+ *
+ * @return evaluated simple string
+ */
+String uvString() : {
+    Token tmp;
+    String ret;
+} {
+    (
+        (tmp = <UNITDEF_STRING_STRING>) {ret = this.getString(tmp.image);}
+        |
+        (tmp = <UNITDEF_STRING_SINGLE>) {ret = this.getSingle(tmp.image);}
+    )
+    {
+        return ret;
+    }
+}
+
+/**
+ * Evaluates a simple string.
+ *
+ * @return evaluated simple string
+ */
+String sString() : {
+    Token tmp;
+    String ret;
+} {
+    (
+        (tmp = <S_STRING>) {ret = this.getString(tmp.image);}
+        |
+        (tmp = <S_SINGLE_STRING>) {ret = this.getSingle(tmp.image);}
+    )
+    {
+        return ret;
+    }
+}
