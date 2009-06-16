@@ -56,27 +56,40 @@ SKIP :
 
 TOKEN : /** first level */
 {
-      <DESCRIPTION:     "description">      : S_EXPECTED
-    | <HIDDEN:          "hidden">           : S_EXPECTED
+      <DESCRIPTION:     "description">      : DESCRIPTION_EXPECTED
+    | <HIDDEN:          "hidden">           : HIDDEN_EXCPECTED
     | <UNIT:            "unit">             : UNITNAME_EXPECTED
 }
 
-
-/******************************************************************** String  */
-<S_EXPECTED> SKIP :
+/*************************************************** Boolean for Hidden Value */
+<HIDDEN_EXCPECTED> SKIP :
 {
   " " | "\t" | "\n" | "\r" 
 }
 
-<S_EXPECTED> TOKEN :
+<HIDDEN_EXCPECTED> TOKEN :
 {
-      <S_STRING : (<S_APOSTROPHE>(<S_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<S_APOSTROPHE>)> : DEFAULT
-    | <S_SINGLE_STRING : (<S_CHAR>)+> : DEFAULT
-    | <#S_APOSTROPHE : "\"" >
-    | <#S_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <HIDDEN_BOOLEAN_TRUE : (<HIDDEN_BOOLEAN_TRUESTR> | "\"" <HIDDEN_BOOLEAN_TRUESTR> "\"")> : DEFAULT
+    | <HIDDEN_BOOLEAN_FALSE : (<HIDDEN_BOOLEAN_FALSESTR> | "\"" <HIDDEN_BOOLEAN_FALSESTR> "\"")> : DEFAULT
+    | <#HIDDEN_BOOLEAN_TRUESTR : ["t","T"] ["r","R"] ["u","U"] ["e","E"]>
+    | <#HIDDEN_BOOLEAN_FALSESTR : ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"]>
 }
 
-/***************************************************************** Unit Name  */
+/***************************************************** String for Description */
+<DESCRIPTION_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r" 
+}
+
+<DESCRIPTION_EXPECTED> TOKEN :
+{
+      <DESCRIPTION_STRING : (<DESCRIPTION_APOSTROPHE>(<DESCRIPTION_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<DESCRIPTION_APOSTROPHE>)> : DEFAULT
+    | <DESCRIPTION_SINGLE : (<DESCRIPTION_CHAR>)+> : DEFAULT
+    | <#DESCRIPTION_APOSTROPHE : "\"" >
+    | <#DESCRIPTION_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/******************************************************* String for Unit Name */
 <UNITNAME_EXPECTED> SKIP :
 {
   " " | "\t" | "\n" | "\r" 
@@ -120,8 +133,10 @@ TOKEN : /** first level */
 
 <UNITDEF_BOOLEAN_EXPECTED> TOKEN :
 {
-      <UNITDEF_BOOLEAN_TRUE : ("true" | "\"true\"")> : UNITDEF_EXPECTED
-    | <UNITDEF_BOOLEAN_FALSE : ("false")> : UNITDEF_EXPECTED
+      <UNITDEF_BOOLEAN_TRUE : (<UNITDEF_BOOLEAN_TRUESTR> | "\"" <UNITDEF_BOOLEAN_TRUESTR> "\"")> : UNITDEF_EXPECTED
+    | <UNITDEF_BOOLEAN_FALSE : (<UNITDEF_BOOLEAN_FALSESTR> | "\"" <UNITDEF_BOOLEAN_FALSESTR> "\"")> : UNITDEF_EXPECTED
+    | <#UNITDEF_BOOLEAN_TRUESTR : ["t","T"] ["r","R"] ["u","U"] ["e","E"]>
+    | <#UNITDEF_BOOLEAN_FALSESTR : ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"]>
 }
 
 /************************************************* String for Unit Definition */
@@ -217,11 +232,13 @@ Dimension_mxJPO dimension(final ParameterCache_mxJPO _paramCache,
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
 : {
     final Dimension_mxJPO dimension = (Dimension_mxJPO) _typeDef.newTypeInstance(_mxName);
-    String tmp;
+    Token tmp;
     Set<String> set;
 } {
-    ( (<DESCRIPTION>    tmp = sString() {this.setValue(dimension, "description", tmp);})
-    | (<HIDDEN>         tmp = sString() {/*this.setValue(dimension, "hidden", tmp);*/})
+    ( (<DESCRIPTION>    ( tmp = <DESCRIPTION_STRING>    {this.setValue(dimension, "description", this.getString(tmp.image));}
+                        | tmp = <DESCRIPTION_SINGLE>    {this.setValue(dimension, "description", this.getSingle(tmp.image));} ) )
+    | (<HIDDEN>         ( <HIDDEN_BOOLEAN_TRUE>         {this.setValue(dimension, "hidden", true);}
+                        | <HIDDEN_BOOLEAN_FALSE>        {this.setValue(dimension, "hidden", false);} ) )
     | (unit(dimension)) )*
     {
         this.prepareObject(_paramCache, dimension);
@@ -368,25 +385,6 @@ String uvString() : {
         (tmp = <UNITDEF_STRING_STRING>) {ret = this.getString(tmp.image);}
         |
         (tmp = <UNITDEF_STRING_SINGLE>) {ret = this.getSingle(tmp.image);}
-    )
-    {
-        return ret;
-    }
-}
-
-/**
- * Evaluates a simple string.
- *
- * @return evaluated simple string
- */
-String sString() : {
-    Token tmp;
-    String ret;
-} {
-    (
-        (tmp = <S_STRING>) {ret = this.getString(tmp.image);}
-        |
-        (tmp = <S_SINGLE_STRING>) {ret = this.getSingle(tmp.image);}
     )
     {
         return ret;
