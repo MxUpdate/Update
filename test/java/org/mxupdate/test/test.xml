@@ -79,4 +79,9 @@
         </classes>
     </test>
 
+    <test name="5 - Test Updates for Policies" annotations="JDK">
+        <classes>
+            <class name="org.mxupdate.test.TestPolicy"/>
+        </classes>
+    </test>
 </suite>

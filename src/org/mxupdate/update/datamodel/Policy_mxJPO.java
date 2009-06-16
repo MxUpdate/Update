@@ -281,7 +281,7 @@ public class Policy_mxJPO
         }
         super.prepare(_paramCache);
         for (final AdminProperty_mxJPO property : new HashSet<AdminProperty_mxJPO>(this.getPropertiesMap().values()))  {
-            if (property.getName().startsWith("state_"))  {
+            if ((property.getName() != null) && property.getName().startsWith("state_"))  {
                 for (final State state : this.states)  {
                     if (state.name.equals(property.getValue()))  {
                         state.nameSymbolic = property.getName();
@@ -487,8 +487,10 @@ throw new Exception("some states are not defined anymore!");
         cmd.append(';')
            .append("mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ");
         for (final State state : policy.states)  {
-            cmd.append("add property \"").append(StringUtil_mxJPO.convertMql(state.nameSymbolic))
-               .append("\" value \"").append(StringUtil_mxJPO.convertMql(state.name)).append('\"');
+            if ((state.nameSymbolic != null) && !"".equals(state.nameSymbolic))  {
+                cmd.append(" add property \"").append(StringUtil_mxJPO.convertMql(state.nameSymbolic))
+                   .append("\" value \"").append(StringUtil_mxJPO.convertMql(state.name)).append('\"');
+            }
         }
 
         final boolean isMqlEscapeOn = MqlUtil_mxJPO.isEscapeOn(_paramCache.getContext());

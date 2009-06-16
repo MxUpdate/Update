@@ -104,7 +104,7 @@ public class AdminProperty_mxJPO
      */
     public boolean isSetting()
     {
-        return (this.name.charAt(0) == '%');
+        return ((this.name != null) && (this.name.charAt(0) == '%'));
     }
 
     /**

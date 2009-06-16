@@ -446,7 +446,11 @@ public abstract class AbstractAdminObject_mxJPO
         for (final AdminProperty_mxJPO prop : this.propertiesMap.values())  {
             // % must be ignored because this means settings
             if ((PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null) && !prop.isSetting())  {
-                preMQLCode.append(" remove property \"").append(prop.getName()).append('\"');
+                preMQLCode.append(" remove property \"");
+                if (prop.getName() != null)  {
+                    preMQLCode.append(prop.getName());
+                }
+                preMQLCode.append('\"');
                 if ((prop.getRefAdminName() != null) && (prop.getRefAdminType() != null))  {
                     preMQLCode.append(" to ").append(prop.getRefAdminType())
                               .append(" \"").append(prop.getRefAdminName()).append('\"');
