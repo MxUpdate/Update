@@ -87,7 +87,7 @@ public class Policy_mxJPO
     /**
      * Are all formats allowed of this policy?
      */
-    private boolean allFormats = false;
+    private boolean allFormats;
 
     /**
      * Sequence of this policy.
@@ -97,7 +97,7 @@ public class Policy_mxJPO
     /**
      * Store of this policy.
      */
-    private String store = null;
+    private String store;
 
     /**
      * Set of all types of this policy.
@@ -105,6 +105,11 @@ public class Policy_mxJPO
      * @see #parse(String, String)
      */
     private final Set<String> types = new TreeSet<String>();
+
+    /**
+     * Are all types allowed of this policy?
+     */
+    private boolean allTypes;
 
     /**
      * Stack with all states of this policy.
@@ -154,6 +159,8 @@ public class Policy_mxJPO
             // to be ignored ...
         } else if ("/typeRefList/typeRef".equals(_url))  {
             this.types.add(_content);
+        } else if ("/allowAllTypes".equals(_url))  {
+            this.allTypes = true;
 
         } else if ("/stateDefList".equals(_url))  {
             // to be ignored ...
@@ -311,9 +318,13 @@ public class Policy_mxJPO
         }
         _out.append("\n  description \"").append(StringUtil_mxJPO.convertTcl(this.getDescription())).append("\"");
         // types
-        _out.append("\n  type {")
-            .append(StringUtil_mxJPO.joinTcl(' ', true, this.types, null))
-            .append("}");
+        if (this.allTypes)  {
+            _out.append("\n  type all");
+        } else  {
+            _out.append("\n  type {")
+                .append(StringUtil_mxJPO.joinTcl(' ', true, this.types, null))
+                .append("}");
+        }
         // formats
         if (this.allFormats)  {
             _out.append("\n  format all");

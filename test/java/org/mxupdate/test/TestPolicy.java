@@ -24,13 +24,8 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import matrix.db.Context;
-
-import org.mxupdate.util.MqlUtil_mxJPO;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -41,46 +36,12 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 public class TestPolicy
+    extends AbstractTest
 {
-    /**
-     * MX context.
-     */
-    private Context context;
-
     /**
      * Policy update file.
      */
-    private File file;
-
-    /**
-     * Connects to MX.
-     *
-     * @throws Exception if connect failed
-     */
-    @BeforeClass
-    public void connect()
-        throws Exception
-    {
-        this.context = new Context("http://172.16.62.120:8080/ematrix");
-        this.context.resetContext("creator", "", null);
-        this.context.connect();
-
-        this.file = new File("test/java/org/mxupdate/test/testpolicy/POLICY_MxUpdate_Test.tcl");
-    }
-
-    /**
-     * Disconnects from MX.
-     *
-     * @throws Exception if disconnect failed
-     */
-    @AfterClass
-    public void close()
-        throws Exception
-    {
-        this.context.disconnect();
-        this.context.closeContext();
-        this.context = null;
-    }
+    private final File file = new File("test/java/org/mxupdate/test/testpolicy/POLICY_MxUpdate_Test.tcl");
 
     /**
      * Removes the MxUpdate test policy.
@@ -92,8 +53,8 @@ public class TestPolicy
     public void removePolicy()
         throws Exception
     {
-        if (!"".equals(MqlUtil_mxJPO.execMql(this.context, "list policy MxUpdate_Test")))  {
-            MqlUtil_mxJPO.execMql(this.context, "delete policy MxUpdate_Test");
+        if (!"".equals(this.mql("list policy MxUpdate_Test")))  {
+            this.mql("delete policy MxUpdate_Test");
         }
     }
 
@@ -106,18 +67,16 @@ public class TestPolicy
     public void testProperties()
         throws Exception
     {
-        MqlUtil_mxJPO.execMql(this.context,
-                              "exec prog MxUpdate --update --policy \"" + this.file.getAbsolutePath() + "\"");
+        this.mql("exec prog MxUpdate --update --policy \"" + this.file.getAbsolutePath() + "\"");
 
-        Assert.assertTrue(!"".equals(MqlUtil_mxJPO.execMql(this.context, "list policy MxUpdate_Test")),
+        Assert.assertTrue(!"".equals(this.mql("list policy MxUpdate_Test")),
                           "policy was not created!");
 
         // check that only 11 properties are defined....
         // 4 state properties + installer + installed date + original name +
         // file date + author + version + application
         final Set<String> propNames = new HashSet<String>();
-        final String propNamesStr = MqlUtil_mxJPO.execMql(this.context,
-                "print policy MxUpdate_Test select property.name dump '\n'");
+        final String propNamesStr = this.mql("print policy MxUpdate_Test select property.name dump '\n'");
         for (final String propName : propNamesStr.split("\n"))  {
             propNames.add(propName);
         }
@@ -133,22 +92,18 @@ public class TestPolicy
     public void testNullProperties()
         throws Exception
     {
-        MqlUtil_mxJPO.execMql(this.context,
-                              "add policy MxUpdate_Test state Pending property \"\" value Test");
-        MqlUtil_mxJPO.execMql(this.context,
-                              "exec prog MxUpdate --update --policy \"" + this.file.getAbsolutePath() + "\"");
+        this.mql("add policy MxUpdate_Test state Pending property \"\" value Test");
+        this.mql("exec prog MxUpdate --update --policy \"" + this.file.getAbsolutePath() + "\"");
         // check that only 11 properties are defined....
         // 4 state properties + installer + installed date + original name +
         // file date + author + version + application
         final Set<String> propNames = new HashSet<String>();
-        final String propNamesStr = MqlUtil_mxJPO.execMql(this.context,
-                "print policy MxUpdate_Test select property.name dump '\n'");
+        final String propNamesStr = this.mql("print policy MxUpdate_Test select property.name dump '\n'");
         for (final String propName : propNamesStr.split("\n"))  {
             propNames.add(propName);
         }
         Assert.assertTrue(!propNames.contains(""), "Update did not remove empty property!");
-        Assert.assertTrue(MqlUtil_mxJPO.execMql(this.context, "print policy MxUpdate_Test")
-                                       .indexOf("property  value Test") < 0,
+        Assert.assertTrue(this.mql("print policy MxUpdate_Test").indexOf("property  value Test") < 0,
                           "Update did not remove empty property!");
         Assert.assertTrue(propNames.size() == 11, "check that all properties are defined");
     }

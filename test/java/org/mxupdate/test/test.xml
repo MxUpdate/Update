@@ -84,4 +84,10 @@
             <class name="org.mxupdate.test.TestPolicy"/>
         </classes>
     </test>
+    
+    <test name="6 - Test Export of Policies" annotations="JDK">
+        <classes>
+            <class name="org.mxupdate.test.TestPolicyExport"/>
+        </classes>
+    </test>
 </suite>
