@@ -360,17 +360,9 @@ public class Policy_mxJPO
     }
 
     /**
-     * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this policy. Following steps
-     * are done:
-     * <ul>
-     * <li>reset description</li>
-     * <li>remove hidden and prevent duplicate flag</li>
-     * <li>reset from and to information</li>
-     * <li>remove all from and to types</li>
-     * </ul>
-     * Adds the TCL procedure {@link #TCL_PROCEDURE} so that attributes could
-     * be assigned to this administration object.
+     * The method overwrites the original method to add the TCL procedure
+     * {@link #TCL_PROCEDURE} so that the dimension could be updated with
+     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)}.
      *
      * @param _paramCache       parameter cache
      * @param _preMQLCode       MQL statements which must be called before the
