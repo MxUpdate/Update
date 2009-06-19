@@ -23,6 +23,7 @@ package org.mxupdate.test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import matrix.db.Context;
@@ -124,12 +125,12 @@ public class AbstractTest
             paramStrings[idx++] = new String(Base64.encodeBase64(out.toByteArray()));
         }
 
-        return new JPOReturn<T>((Map<String,?>) JPO.invoke(this.context,
-                                                           _jpo,
-                                                           null,
-                                                           _method,
-                                                           paramStrings,
-                                                           Object.class));
+        return new JPOReturn<T>(JPO.invoke(this.context,
+                                           _jpo,
+                                           null,
+                                           _method,
+                                           paramStrings,
+                                           Object.class));
     }
 
     /**
@@ -150,9 +151,15 @@ public class AbstractTest
          *
          * @param _jpoReturn    return map from the JPO invoke
          */
-        private JPOReturn(final Map<String,?> _jpoReturn)
+        @SuppressWarnings("unchecked")
+        private JPOReturn(final Object _jpoReturn)
         {
-            this.jpoReturn = _jpoReturn;
+            if (_jpoReturn instanceof String)  {
+                this.jpoReturn = new HashMap<String,Object>();
+                ((Map<String,Object>) this.jpoReturn).put("values", _jpoReturn);
+            } else  {
+                this.jpoReturn = (Map<String,?>) _jpoReturn;
+            }
         }
 
         /**

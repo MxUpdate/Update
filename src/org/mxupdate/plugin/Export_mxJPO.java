@@ -108,7 +108,7 @@ public class Export_mxJPO
     {
         // initialize mapping
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, true);
-        final Map<String,Collection<String>> exports = this.<Map<String,Collection<String>>>decode(_args[0]);
+        final Map<String,Collection<String>> exports = this.<Map<String,Collection<String>>>decode(_args, 0);
 
         // export all objects depending on the type definitions
         final Map<String,Collection<Map<String,String>>> ret = new HashMap<String,Collection<Map<String,String>>>();

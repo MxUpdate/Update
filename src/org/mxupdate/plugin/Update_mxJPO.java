@@ -79,7 +79,8 @@ public class Update_mxJPO
      *                      file names which must be updated</li>
      *                  <li><b>{@link Boolean}</b><br/> if set to <i>true</i>
      *                      all included JPOs are compiled; otherwise no JPOs
-     *                      are compiled</li>
+     *                      are compiled. Default is not to compile
+     *                      (<i>false</i>)</li>
      *                  </ul>
      * @return logging information from the update
      * @throws Exception if the update failed
@@ -89,8 +90,8 @@ public class Update_mxJPO
                                final String[] _args)
             throws Exception
     {
-        final Set<String> fileNames = this.<Set<String>>decode(_args[0]);
-        final boolean compile = this.<Boolean>decode(_args[1]);
+        final Set<String> fileNames = this.<Set<String>>decode(_args, 0);
+        final boolean compile = this.<Boolean>decode(_args, 1, false);
 
         final Set<File> files = new HashSet<File>();
         for (final String fileName : fileNames)  {
@@ -115,7 +116,8 @@ public class Update_mxJPO
      *                      content which must be updated</li>
      *                  <li><b>{@link Boolean}</b><br/> if set to <i>true</i>
      *                      all included JPOs are compiled; otherwise no JPOs
-     *                      are compiled</li>
+     *                      are compiled. Default is not to compile
+     *                      (<i>false</i>)</li>
      *                  </ul>
      * @return logging information from the update
      * @throws Exception if the update failed
@@ -127,8 +129,8 @@ public class Update_mxJPO
     {
         String ret = "";
 
-        final Map<String,String> files = this.<Map<String,String>>decode(_args[0]);
-        final boolean compile = this.<Boolean>decode(_args[1]);
+        final Map<String,String> files = this.<Map<String,String>>decode(_args, 0);
+        final boolean compile = this.<Boolean>decode(_args, 1, false);
 
         // create temporary directory
         final File tmpDir = File.createTempFile("Update", "tmp");

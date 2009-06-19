@@ -91,7 +91,13 @@
         </classes>
     </test>
 
-    <test name="6 - Test JPO Export" annotations="JDK">
+    <test name="7 - Test JPO Update" annotations="JDK">
+        <classes>
+            <class name="org.mxupdate.test.TestJPOUpdate"/>
+        </classes>
+    </test>
+
+    <test name="7 - Test JPO Export" annotations="JDK">
         <classes>
             <class name="org.mxupdate.test.TestJPOExport"/>
         </classes>

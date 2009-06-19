@@ -72,25 +72,61 @@ abstract class AbstractPlugin_mxJPO
      * &quot;standard&quot; feature of the {@link ObjectInputStream}.
      *
      * @param <T>       type of the object which must be decoded
-     * @param _value    string with the value to decode to a object
-     * @return object instance of given type <code>&lt;T&gt;</code>
-     * @throws IOException              if the value could not be decoded or
-     *                                  the or decoder stream could not be
-     *                                  opened
+     * @param _args     string array with all values (base64 encoded)
+     * @param _index    index within the string array
+     * @return decoded object instance of given type <code>&lt;T&gt;</code>
+     * @throws IOException              if the value could not be decoded,
+     *                                  the decoder stream could not be
+     *                                  opened or the argument at given
+     *                                  <code>_index</code> is not defined
      * @throws ClassNotFoundException   if the object itself could not be read
      *                                  from decoder stream
      */
     @SuppressWarnings("unchecked")
-    protected final <T> T decode(final String _value)
+    protected final <T> T decode(final String[] _args,
+                                 final int _index)
             throws IOException, ClassNotFoundException
     {
-        final byte[] bytes = Mime64.decode(_value);
+        if (_index >= _args.length)  {
+            throw new IOException("Argument " + _index + " is not defined!");
+        }
+
+        final byte[] bytes = Mime64.decode(_args[_index]);
 
         final ByteArrayInputStream in = new ByteArrayInputStream(bytes);
         final ObjectInputStream ois = new ObjectInputStream(in);
         final T fileNames = (T) ois.readObject();
         ois.close();
         return fileNames;
+    }
+
+    /**
+     * Works like {@link #decode(String[], int)}, only if at
+     * <code>_index</code> of the string array <code>_args</code> no value is
+     * defined, the default value <code>_default</code> is returned instead.
+     *
+     * @param <T>       type of the object which must be decoded
+     * @param _args     string array with all values (base64 encoded)
+     * @param _index    index within the string array
+     * @param _default  default value if the <code>_index</code> is not within
+     *                  the string array <code>_args</code>
+     * @return decoded object instance of given type <code>&lt;T&gt;</code>
+     * @throws IOException              if the value could not be decoded,
+     *                                  the decoder stream could not be
+     *                                  opened or the argument at given
+     *                                  <code>_index</code> is not defined
+     * @throws ClassNotFoundException   if the object itself could not be read
+     *                                  from decoder stream
+     * @see #decode(String[], int)
+     */
+    protected final <T> T decode(final String[] _args,
+                                 final int _index,
+                                 final T _default)
+    throws IOException, ClassNotFoundException
+    {
+        return (_index >= _args.length)
+               ? _default
+               : this.<T>decode(_args, _index);
     }
 
     /**
