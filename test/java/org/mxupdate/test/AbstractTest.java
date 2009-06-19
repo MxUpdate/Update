@@ -108,7 +108,6 @@ public class AbstractTest
      * @see #context
      * @see JPOReturn
      */
-    @SuppressWarnings("unchecked")
     protected <T> JPOReturn<T> jpoInvoke(final String _jpo,
                               final String _method,
                               final Object... _parameters)
