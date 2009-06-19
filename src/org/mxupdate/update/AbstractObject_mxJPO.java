@@ -700,7 +700,8 @@ public abstract class AbstractObject_mxJPO
      * @return file name of this administration (business) object
      * @see #export(ParameterCache_mxJPO, File)
      */
-    protected String getFileName() {
+    public String getFileName()
+    {
         final StringBuilder ret = new StringBuilder();
         if (this.getTypeDef().getFilePrefix() != null)  {
             ret.append(this.getTypeDef().getFilePrefix());

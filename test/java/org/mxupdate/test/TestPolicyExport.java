@@ -75,8 +75,9 @@ public class TestPolicyExport
         params.put("Policy", Arrays.asList(new String[]{TestPolicyExport.POLICY_NAME}));
         final Map<String,Collection<Map<String,String>>> bck =
                 this.<Map<String,Collection<Map<String,String>>>>jpoInvoke("org.mxupdate.plugin.Export",
-                                                                           "export",
-                                                                           params);
+                                                                           "exportByName",
+                                                                           params)
+                    .getValues();
 
         Assert.assertNotNull(bck);
         Assert.assertTrue(bck.containsKey("Policy"));
@@ -84,6 +85,9 @@ public class TestPolicyExport
         final Map<String,String> desc = bck.get("Policy").iterator().next();
         Assert.assertEquals(desc.get("name"), TestPolicyExport.POLICY_NAME, "returned name is equal to given name");
         Assert.assertEquals(desc.get("path"), "datamodel/policy", "path is not correct");
+        Assert.assertEquals(desc.get("filename"),
+                            "POLICY_" + TestPolicyExport.POLICY_NAME + ".tcl",
+                            "check that the correct file name is returned");
         final String code = desc.get("code");
         final String testCode = code.substring(code.lastIndexOf('#')).trim();
         Assert.assertTrue(testCode.indexOf(" type all") > 0, "checks that all types are defined");

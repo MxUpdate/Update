@@ -31,11 +31,13 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
  * The JPO class is the plug-in to return for a MxUpdate file name the related
- * MxUpdate script (or for programs the related source code).
+ * MxUpdate script (or for programs the related source code).<br/>
+ * The class will be replaced by {@link Export_mxJPO}.
  *
  * @author The MxUpdate Team
  * @version $Id$
  */
+@Deprecated
 public class GetMxUpdateCode_mxJPO
 {
     /**
@@ -52,7 +54,6 @@ public class GetMxUpdateCode_mxJPO
             throws Exception
     {
         // initialize mapping
-
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, true);
 
         final File file = new File(_args[0]);

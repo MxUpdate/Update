@@ -146,12 +146,15 @@ public class JPO_mxJPO
     }
 
     /**
-     * Returns the file name for this JPO.
+     * Returns the file name for this JPO. The original method is overwritten
+     * because the name of a JPO could include points ('.') in a name which
+     * defines a package of a JPO (and is not included in the file name
+     * itself).
      *
      * @return file name of this administration (business) object
      */
     @Override
-    protected String getFileName()
+    public String getFileName()
     {
         return new StringBuilder()
                 .append(this.getName().replaceAll("\\.", "/"))

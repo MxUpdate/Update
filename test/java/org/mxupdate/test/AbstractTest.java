@@ -23,6 +23,7 @@ package org.mxupdate.test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.Map;
 
 import matrix.db.Context;
 import matrix.db.JPO;
@@ -98,7 +99,7 @@ public class AbstractTest
      * @see #connect()
      */
     @SuppressWarnings("unchecked")
-    protected <T> T jpoInvoke(final String _jpo,
+    protected <T> JPOReturn<T> jpoInvoke(final String _jpo,
                               final String _method,
                               final Object... _parameters)
         throws IOException, MatrixException
@@ -114,7 +115,27 @@ public class AbstractTest
             paramStrings[idx++] = new String(Base64.encodeBase64(out.toByteArray()));
         }
 
-        return (T) JPO.invoke(this.context, _jpo, null, _method, paramStrings, Object.class);
+        return new JPOReturn<T>((Map<String,?>) JPO.invoke(this.context,
+                                                           _jpo,
+                                                           null,
+                                                           _method,
+                                                           paramStrings,
+                                                           Object.class));
     }
 
+    protected class JPOReturn<T>
+    {
+        final Map<String,?> jpoReturn;
+
+        private JPOReturn(final Map<String,?> _jpoReturn)
+        {
+            this.jpoReturn = _jpoReturn;
+        }
+
+        @SuppressWarnings("unchecked")
+        public T getValues()
+        {
+            return (T) this.jpoReturn.get("values");
+        }
+    }
 }
