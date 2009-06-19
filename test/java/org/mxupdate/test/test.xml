@@ -81,7 +81,7 @@
 
     <test name="5 - Test Policy Update" annotations="JDK">
         <classes>
-            <class name="org.mxupdate.test.TestPolicy"/>
+            <class name="org.mxupdate.test.TestPolicyUpdate"/>
         </classes>
     </test>
 
