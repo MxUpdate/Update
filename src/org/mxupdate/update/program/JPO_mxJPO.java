@@ -151,15 +151,39 @@ public class JPO_mxJPO
      * defines a package of a JPO (and is not included in the file name
      * itself).
      *
-     * @return file name of this administration (business) object
+     * @return file name of this administration (business) object (without
+     *         package names)
      */
     @Override
     public String getFileName()
     {
+        final int index = this.getName().lastIndexOf('.');
         return new StringBuilder()
-                .append(this.getName().replaceAll("\\.", "/"))
+                .append((index >= 0)
+                        ? this.getName().substring(index + 1)
+                        : this.getName())
                 .append(this.getTypeDef().getFileSuffix())
                 .toString();
+    }
+
+    /**
+     * Returns the path where the file is located of this JPO including the sub
+     * path of the JPO package. A JPO has a package if the JPO name includes
+     * points ('.').
+     *
+     * @return sub path including package path
+     * @see #getTypeDef()
+     */
+    @Override
+    public String getPath()
+    {
+        final StringBuilder ret = new StringBuilder()
+                .append(super.getPath());
+        final int index = this.getName().lastIndexOf('.');
+        if (index >= 0)  {
+            ret.append('/').append(this.getName().substring(0, index).replaceAll("\\.", "/"));
+        }
+        return ret.toString();
     }
 
     /**

@@ -76,6 +76,15 @@ public class AbstractTest
         this.context = null;
     }
 
+    /**
+     * Executes given MQL command statement <code>_cmd</code> and returns the
+     * result.
+     *
+     * @param _cmd  MQL command statement to execute
+     * @return returned string value from the called MQL command
+     *         <code>_cmd</code>
+     * @throws MatrixException if MQL execution failed
+     */
     protected String mql(final CharSequence _cmd)
         throws MatrixException
     {
@@ -95,8 +104,8 @@ public class AbstractTest
      * @throws IOException      if the parameter could not be encoded
      * @throws MatrixException  if the called <code>_jpo</code> throws an
      *                          exception
-     * @see #mxContext
-     * @see #connect()
+     * @see #context
+     * @see JPOReturn
      */
     @SuppressWarnings("unchecked")
     protected <T> JPOReturn<T> jpoInvoke(final String _jpo,
@@ -123,15 +132,35 @@ public class AbstractTest
                                                            Object.class));
     }
 
-    protected class JPOReturn<T>
+    /**
+     * Class holding the returned values from the JPO.
+     *
+     * @param <T>   type of the returned values
+     * @see AbstractTest#jpoInvoke(String, String, Object...)
+     */
+    protected final class JPOReturn<T>
     {
-        final Map<String,?> jpoReturn;
+        /**
+         * Returns map from the JPO invoke.
+         */
+        private final Map<String,?> jpoReturn;
 
+        /**
+         * Constructor to hold the return map from the JPO invoke.
+         *
+         * @param _jpoReturn    return map from the JPO invoke
+         */
         private JPOReturn(final Map<String,?> _jpoReturn)
         {
             this.jpoReturn = _jpoReturn;
         }
 
+        /**
+         * Returns the stored values from the JPO return.
+         *
+         * @return stored values from the JPO return
+         * @see #jpoReturn
+         */
         @SuppressWarnings("unchecked")
         public T getValues()
         {
