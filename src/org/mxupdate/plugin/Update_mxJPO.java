@@ -62,7 +62,7 @@ public class Update_mxJPO
         final Set<File> files = new HashSet<File>();
         files.add(new File(_args[0]));
         final MatrixWriter writer = new MatrixWriter(_context);
-        writer.write(this.updateFiles(_context, files, false));
+        writer.write(this.updateFiles(_context, null, files, false));
         writer.flush();
         writer.close();
     }
@@ -81,6 +81,12 @@ public class Update_mxJPO
      *                      all included JPOs are compiled; otherwise no JPOs
      *                      are compiled. Default is not to compile
      *                      (<i>false</i>)</li>
+     *                  <li><b>{@link Map}&lt;{@link String},{@link String}&gt;
+     *                      </b><br/>Sets the predefined parameter values (key
+     *                      of the map is name of the parameter, value of the
+     *                      map is the value of the parameter). Default is no
+     *                      predefined parameter valued (<code>null</code>).
+     *                      </li>
      *                  </ul>
      * @return logging information from the update
      * @throws Exception if the update failed
@@ -92,13 +98,14 @@ public class Update_mxJPO
     {
         final Set<String> fileNames = this.<Set<String>>decode(_args, 0);
         final boolean compile = this.<Boolean>decode(_args, 1, false);
+        final Map<String,String> paramValues = this.<Map<String,String>>decode(_args, 2, null);
 
         final Set<File> files = new HashSet<File>();
         for (final String fileName : fileNames)  {
             files.add(new File(fileName));
         }
 
-        return this.updateFiles(_context, files, compile);
+        return this.updateFiles(_context, paramValues, files, compile);
     }
 
     /**
@@ -118,6 +125,12 @@ public class Update_mxJPO
      *                      all included JPOs are compiled; otherwise no JPOs
      *                      are compiled. Default is not to compile
      *                      (<i>false</i>)</li>
+     *                  <li><b>{@link Map}&lt;{@link String},{@link String}&gt;
+     *                      </b><br/>Sets the predefined parameter values (key
+     *                      of the map is name of the parameter, value of the
+     *                      map is the value of the parameter). Default is no
+     *                      predefined parameter valued (<code>null</code>).
+     *                      </li>
      *                  </ul>
      * @return logging information from the update
      * @throws Exception if the update failed
@@ -131,6 +144,7 @@ public class Update_mxJPO
 
         final Map<String,String> files = this.<Map<String,String>>decode(_args, 0);
         final boolean compile = this.<Boolean>decode(_args, 1, false);
+        final Map<String,String> paramValues = this.<Map<String,String>>decode(_args, 2, null);
 
         // create temporary directory
         final File tmpDir = File.createTempFile("Update", "tmp");
@@ -152,7 +166,7 @@ public class Update_mxJPO
             }
 
             // and call update
-            ret = this.updateFiles(_context, localFiles, compile);
+            ret = this.updateFiles(_context, paramValues, localFiles, compile);
         } finally  {
             // at least remove all temporary stuff
             for (final File localFile : localFiles)  {
@@ -168,20 +182,22 @@ public class Update_mxJPO
      * Updates all configurations items specified through given set of MX
      * update files.
      *
-     * @param _context  MX context for this request
-     * @param _files    set of all files to update
-     * @param _compile  if <i>true</i> related JPOs are compiled; if
-     *                  <i>false</i> no JPOs are compiled
+     * @param _context      MX context for this request
+     * @param _paramValues  predefined parameters
+     * @param _files        set of all files to update
+     * @param _compile      if <i>true</i> related JPOs are compiled; if
+     *                      <i>false</i> no JPOs are compiled
      * @return logging information from the update
      * @throws Exception if update for the <code>_files</code> failed
      */
     protected String updateFiles(final Context _context,
+                                 final Map<String,String> _paramValues,
                                  final Set<File> _files,
                                  final boolean _compile)
             throws Exception
     {
         // initialize mapping
-        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, true);
+        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, true, _paramValues);
 
         // first found related type definition instances
         final Map<File,AbstractObject_mxJPO> instances = new TreeMap<File,AbstractObject_mxJPO>();

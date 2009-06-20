@@ -58,7 +58,7 @@ public class AbstractTest
     public void connect()
         throws Exception
     {
-        this.context = new Context("http://172.16.62.120:8080/ematrix");
+        this.context = new Context("http://172.16.62.130:8080/enovia");
         this.context.resetContext("creator", "", null);
         this.context.connect();
     }

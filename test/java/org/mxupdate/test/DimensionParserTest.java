@@ -25,14 +25,14 @@ import java.lang.reflect.Method;
 
 import org.mxupdate.test.util.TestParameterCache;
 import org.mxupdate.update.datamodel.Dimension_mxJPO;
-import org.mxupdate.update.datamodel.dimension.DimensionDefParser;
+import org.mxupdate.update.datamodel.dimension.DimensionDefParser_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
 
 /**
- * Class is used to test the dimension parser {@link DimensionDefParser} with
+ * Class is used to test the dimension parser {@link DimensionDefParser_mxJPO} with
  * some examples.
  *
  * @author The MxUpdate Team
@@ -69,7 +69,7 @@ public class DimensionParserTest
     {
         final ParameterCache_mxJPO paramCache = new TestParameterCache();
 
-        final DimensionDefParser parser = new DimensionDefParser(new StringReader(_definition));
+        final DimensionDefParser_mxJPO parser = new DimensionDefParser_mxJPO(new StringReader(_definition));
         final Dimension_mxJPO dimension = parser.dimension(paramCache,
                                                            paramCache.getMapping().getTypeDef("Dimension"),
                                                            "Test");

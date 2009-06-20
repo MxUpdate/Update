@@ -192,6 +192,33 @@ public class ParameterCache_mxJPO
                                 final boolean _stringLog)
             throws Exception
     {
+        this(_context, _stringLog, null);
+    }
+
+    /**
+     * Creates a new instance of the parameter cache. All default values from
+     * the parameter definitions are predefined in the parameter cache.
+     *
+     * @param _context      MX context
+     * @param _stringLog    if set to <i>true</i> log via string writer,
+     *                      <i>false</i> log via <code>System.out</code>
+     * @param _paramValues  predefined parameter values to set
+     * @throws Exception if the mapping could not be initialized or a
+     *                   predefined parameter in <code>_paramValues</code> is
+     *                   not known
+     * @see #context
+     * @see #mapBoolean
+     * @see #mapList
+     * @see #mapMap
+     * @see #mapString
+     * @see #writer
+     * @see #stringWriter
+     */
+    public ParameterCache_mxJPO(final Context _context,
+                                final boolean _stringLog,
+                                final Map<String,String> _paramValues)
+            throws Exception
+    {
         this.mapping = this.initMapping(_context);
 
         this.context = _context;
@@ -201,44 +228,68 @@ public class ParameterCache_mxJPO
         this.mapMap = new HashMap<String,Map<String,?>>();
         this.mapString = new HashMap<String,String>();
 
+        // evaluate default parameter values
         for (final ParameterDef_mxJPO paramDef : this.mapping.getAllParameterDefs())  {
             if (paramDef.getDefaultValue() != null)  {
-                switch (paramDef.getType())  {
-                    case BOOLEAN:
-                        this.mapBoolean.put(paramDef.getName(),
-                                            Boolean.parseBoolean(paramDef.getDefaultValue()));
-                        break;
-                    case INTEGER:
-                        this.mapInteger.put(paramDef.getName(),
-                                            Integer.parseInt(paramDef.getDefaultValue()));
-                        break;
-                    case LIST:
-                        this.mapList.put(paramDef.getName(),
-                                         new ArrayList<String>(Arrays.asList(paramDef.getDefaultValue().split(","))));
-                        break;
-                    case MAP:
-                        if ((paramDef.getDefaultValue() != null) && !"".equals(paramDef.getDefaultValue()))  {
-                            final Map<String,String> values = new HashMap<String,String>();
-                            for (final String entry : paramDef.getDefaultValue().split(","))  {
-                                final String[] entryArr = entry.split("=", 2);
-                                values.put(entryArr[0], (entryArr.length > 1) ? entryArr[1] : null);
-                            }
-                            this.mapMap.put(paramDef.getName(), values);
-                        }
-                        break;
-                    case STRING:
-                        this.mapString.put(paramDef.getName(),
-                                           paramDef.getDefaultValue());
-                        break;
-                }
+                this.defineParameter(paramDef, paramDef.getDefaultValue());
             }
         }
+        // evaluate predefined parameter values
+        if (_paramValues != null)  {
+            for (final Map.Entry<String,String> paramValue : _paramValues.entrySet())  {
+                final ParameterDef_mxJPO paramDef = this.mapping.getParameterDef(paramValue.getKey());
+                if (paramDef == null)  {
+                    throw new Exception("unknown parameter definition '" + paramValue.getKey() + "'");
+                }
+                this.defineParameter(paramDef, paramValue.getValue());
+            }
+        }
+
         if (_stringLog)  {
             this.stringWriter = new StringWriter();
             this.writer = new PrintWriter(this.stringWriter);
         } else  {
             this.stringWriter = null;
             this.writer = new PrintWriter(System.out);
+        }
+    }
+
+    /**
+     * Defines the parameter depending of the parameter definition
+     * <code>_paramDef</code> with related <code>_value</code>.
+     *
+     * @param _paramDef instance of the parameter definition
+     * @param _value    string value of the parameter to define
+     */
+    protected void defineParameter(final ParameterDef_mxJPO _paramDef,
+                                   final String _value)
+    {
+        switch (_paramDef.getType())  {
+            case BOOLEAN:
+                this.mapBoolean.put(_paramDef.getName(),
+                                    Boolean.parseBoolean(_value));
+                break;
+            case INTEGER:
+                this.mapInteger.put(_paramDef.getName(),
+                                    Integer.parseInt(_value));
+                break;
+            case LIST:
+                this.mapList.put(_paramDef.getName(),
+                                 new ArrayList<String>(Arrays.asList(_value.split(","))));
+                break;
+            case MAP:
+                if ((_value != null) && !"".equals(_value))  {
+                    final Map<String,String> values = new HashMap<String,String>();
+                    for (final String entry : _value.split(","))  {
+                        final String[] entryArr = entry.split("=", 2);
+                        values.put(entryArr[0], (entryArr.length > 1) ? entryArr[1] : null);
+                    }
+                    this.mapMap.put(_paramDef.getName(), values);
+                }
+                break;
+            case STRING:
+                this.mapString.put(_paramDef.getName(), _value);
+                break;
         }
     }
 

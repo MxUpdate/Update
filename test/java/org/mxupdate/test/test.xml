@@ -79,6 +79,12 @@
         </classes>
     </test>
 
+    <test name="5 - Test Dimension Update" annotations="JDK">
+        <classes>
+            <class name="org.mxupdate.test.TestDimensionUpdate"/>
+        </classes>
+    </test>
+
     <test name="5 - Test Policy Update" annotations="JDK">
         <classes>
             <class name="org.mxupdate.test.TestPolicyUpdate"/>

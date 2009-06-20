@@ -20,7 +20,10 @@
 
 package org.mxupdate.update.datamodel;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -31,9 +34,12 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.datamodel.dimension.DimensionDefParser_mxJPO;
 import org.mxupdate.update.util.AdminProperty_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * The class is used to export and import / update dimension administration
@@ -49,6 +55,56 @@ public class Dimension_mxJPO
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = 1831885950156884562L;
+
+    /**
+     * Called TCL procedure within the TCL update to parse the new dimension
+     * definition. The TCL procedure calls method
+     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)} with the new
+     * dimension definition. All quot's are replaced by <code>@0@0@</code> and
+     * all apostroph's are replaced by <code>@1@1@</code>.
+     *
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
+     */
+    private static final String TCL_PROCEDURE
+            = "proc updateDimension {_sDimension _lsArgs}  {\n"
+                + "regsub -all {'} $_lsArgs {@0@0@} sArg\n"
+                + "regsub -all {\\\"} $sArg {@1@1@} sArg\n"
+                + "regsub -all {\\\\\\[} $sArg {[} sArg\n"
+                + "regsub -all {\\\\\\]} $sArg {]} sArg\n"
+                + "mql exec prog org.mxupdate.update.util.JPOCaller dimension ${_sDimension} \"${sArg}\"\n"
+            + "}\n";
+
+    /**
+     * Name of the parameter to define that units are allowed to remove.
+     *
+     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
+     */
+    private static final String PARAM_ALLOW_REMOVE_UNIT = "DMDimAllowRemoveUnit";
+
+    /**
+     * Name of the parameter to define that a change of the default unit is
+     * allowed.
+     *
+     * @see Unit#appendDelta(ParameterCache_mxJPO, Unit, StringBuilder, StringBuilder)
+     */
+    private static final String PARAM_ALLOW_UPDATE_DEFAULT_UNIT = "DMDimAllowUpdateDefUnit";
+
+    /**
+     * Name of the parameter to define that the multiplier of an unit is
+     * allowed to change.
+     *
+     * @see Unit#appendDelta(ParameterCache_mxJPO, Unit, StringBuilder, StringBuilder)
+     */
+    private static final String PARAM_ALLOW_UPDATE_UNIT_MULTIPLIER = "DMDimAllowUpdateUnitMult";
+
+    /**
+     * Name of the parameter to define that the offset of an unit is allowed to
+     * change.
+     *
+     * @see Unit#appendDelta(ParameterCache_mxJPO, Unit, StringBuilder, StringBuilder)
+     */
+    private static final String PARAM_ALLOW_UPDATE_UNIT_OFFSET = "DMDimAllowUpdateUnitOffs";
 
     /**
      * Holds the list of already parsed units of this dimension.
@@ -146,8 +202,7 @@ public class Dimension_mxJPO
      * <li>If the {@link Unit#properties} includes settings they are extracted
      *     into {@link Unit#settings}.</li>
      * <li>If the {@link Unit#properties} includes a grouped system information
-     *     the values are written into {@link Unit#systemName} and
-     *     {@link Unit#systemUnit}.</li>
+     *     the values are written into {@link Unit#systemInfos}.</li>
      * </ul>
      *
      * @param _paramCache   parameter cache
@@ -172,8 +227,12 @@ public class Dimension_mxJPO
                     unit.settings.put(prop.getName().substring(1), prop.getValue());
                     unit.properties.remove(prop);
                 } else if ("unit".equals(prop.getRefAdminType()))  {
-                    unit.systemName = prop.getName();
-                    unit.systemUnit = prop.getRefAdminName();
+                    Set<String> units = unit.systemInfos.get(prop.getName());
+                    if (units == null)  {
+                        units = new TreeSet<String>();
+                        unit.systemInfos.put(prop.getName(), units);
+                    }
+                    units.add(prop.getRefAdminName());
                     unit.properties.remove(prop);
                 }
             }
@@ -213,10 +272,13 @@ public class Dimension_mxJPO
                     .append("    label \"").append(StringUtil_mxJPO.convertTcl(unit.label)).append("\"\n")
                     .append("    multiplier ").append(Double.toString(unit.multiplier)).append("\n")
                     .append("    offset ").append(Double.toString(unit.offset)).append("\n");
-            if ((unit.systemName != null) && (unit.systemUnit != null))  {
-                _out.append("    system \"").append(StringUtil_mxJPO.convertTcl(unit.systemName))
-                    .append("\" to unit \"").append(StringUtil_mxJPO.convertTcl(unit.systemUnit))
-                    .append("\"\n");
+            // system information
+            for (final Map.Entry<String, Set<String>> systemInfo : unit.systemInfos.entrySet())  {
+                for (final String unitName : systemInfo.getValue())  {
+                    _out.append("    system \"").append(StringUtil_mxJPO.convertTcl(systemInfo.getKey()))
+                        .append("\" to unit \"").append(StringUtil_mxJPO.convertTcl(unitName))
+                        .append("\"\n");
+                }
             }
             // settings
             for (final Map.Entry<String, String> setting : unit.settings.entrySet())  {
@@ -264,6 +326,152 @@ public class Dimension_mxJPO
     }
 
     /**
+     * The method overwrites the original method to add the TCL procedure
+     * {@link #TCL_PROCEDURE} so that the dimension could be updated with
+     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)}.
+     *
+     * @param _paramCache       parameter cache
+     * @param _preMQLCode       MQL statements which must be called before the
+     *                          TCL code is executed
+     * @param _postMQLCode      MQL statements which must be called after the
+     *                          TCL code is executed
+     * @param _preTCLCode       TCL code which is defined before the source
+     *                          file is sourced
+     * @param _tclVariables     map of all TCL variables where the key is the
+     *                          name and the value is value of the TCL variable
+     *                          (the value is automatically converted to TCL
+     *                          syntax!)
+     * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update from derived class failed
+     */
+    @Override
+    protected void update(final ParameterCache_mxJPO _paramCache,
+                          final CharSequence _preMQLCode,
+                          final CharSequence _postMQLCode,
+                          final CharSequence _preTCLCode,
+                          final Map<String,String> _tclVariables,
+                          final File _sourceFile)
+            throws Exception
+    {
+        // add TCL code for the procedure
+        final StringBuilder tclCode = new StringBuilder()
+                .append(Dimension_mxJPO.TCL_PROCEDURE)
+                .append(_preTCLCode);
+
+        super.update(_paramCache, _preMQLCode, _postMQLCode, tclCode, _tclVariables, _sourceFile);
+    }
+
+    /**
+     * The method is called within the update of an administration object. The
+     * method is called directly within the update.
+     * <ul>
+     * <li>All <code>@0@0@</code> are replaced by quot's and all
+     *     <code>@1@1@</code> are replaced by apostroph's.</li>
+     * <li>The new dimension definition is parsed.</li>
+     * <li>A delta MQL script generated to update the dimension to the new
+     *     target definition.</li>
+     * <li>The created delta MQL script is executed.</li>
+     * </ul>
+     *
+     * @param _paramCache   parameter cache
+     * @param _args         arguments from the TCL procedure
+     * @throws Exception if update failed, {@link UpdateException_mxJPO} if
+     *                   a unit could not be removed, a default unit is
+     *                   changed, a modified or offset of a unit is changed
+     * @see #TCL_PROCEDURE
+     */
+    @Override
+    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
+                               final String... _args)
+            throws Exception
+    {
+        if (!"dimension".equals(_args[0]))  {
+            super.jpoCallExecute(_paramCache, _args);
+        } else if (!this.getName().equals(_args[1])) {
+            throw new Exception("Dimension '" + _args[1]
+                    + "' is wanted to updated, but have dimension '" + _args[1] + "'!");
+        } else  {
+            final String code = _args[2].replaceAll("@0@0@", "'")
+                                        .replaceAll("@1@1@", "\\\"");
+
+            final DimensionDefParser_mxJPO parser = new DimensionDefParser_mxJPO(new StringReader(code));
+            final Dimension_mxJPO dimension = parser.dimension(_paramCache, this.getTypeDef(), this.getName());
+
+            final StringBuilder cmd = new StringBuilder()
+                    .append("escape mod dimension \"")
+                    .append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ");
+
+            // basic information
+            Dimension_mxJPO.calcValueDelta(cmd, "description", dimension.getDescription(), this.getDescription());
+            // hidden flag, because hidden flag must be set with special syntax
+            if (this.isHidden() != dimension.isHidden())  {
+                if (!dimension.isHidden())  {
+                    cmd.append('!');
+                }
+                cmd.append("hidden ");
+            }
+
+            // prepare maps of units depending on the unit name (as key)
+            final Map<String,Unit> curUnits = new HashMap<String,Unit>();
+            for (final Unit unit : this.units)  {
+                curUnits.put(unit.name, unit);
+            }
+            final Map<String,Unit> tarUnits = new HashMap<String,Unit>();
+            for (final Unit unit : dimension.units)  {
+                tarUnits.put(unit.name, unit);
+            }
+
+            // remove units which not needed anymore (or throw exception)
+            for (final Map.Entry<String,Unit> curUnit : curUnits.entrySet())  {
+                if (!tarUnits.containsKey(curUnit.getKey()))  {
+                    if (!_paramCache.getValueBoolean(Dimension_mxJPO.PARAM_ALLOW_REMOVE_UNIT))  {
+                        throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.DIMENSION_UPDATE_REMOVEUNIT);
+                    }
+                    cmd.append("remove unit \"").append(StringUtil_mxJPO.convertMql(curUnit.getKey())).append("\" ");
+                }
+            }
+
+            final StringBuilder postCmd = new StringBuilder();
+            for (final Map.Entry<String,Unit> tarUnit : tarUnits.entrySet())  {
+                if (!curUnits.containsKey(tarUnit.getKey()))  {
+                    _paramCache.logDebug("    add unit " + tarUnit.getKey());
+                    tarUnit.getValue().appendDelta(_paramCache, null, cmd, postCmd);
+                }
+            }
+
+            for (final Unit tarUnit : tarUnits.values())  {
+                if (curUnits.containsKey(tarUnit.name))  {
+                    tarUnit.appendDelta(_paramCache, curUnits.get(tarUnit.name), cmd, postCmd);
+                }
+            }
+
+            cmd.append(postCmd).append(";");
+            MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
+        }
+    }
+    /**
+     * Calculates the delta between the new and the old value. If a delta
+     * exists, the kind with the new delta is added to the string builder.
+     *
+     * @param _out      appendable instance where the delta must be append
+     * @param _kind     kind of the delta
+     * @param _newVal   new target value
+     * @param _curVal   current value in the database
+     */
+    protected static void calcValueDelta(final StringBuilder _out,
+                                         final String _kind,
+                                         final String _newVal,
+                                         final String _curVal)
+    {
+        final String curVal = (_curVal == null) ? "" : _curVal;
+        final String newVal = (_newVal == null) ? "" : _newVal;
+
+        if (!curVal.equals(newVal))  {
+            _out.append(_kind).append(" \"").append(StringUtil_mxJPO.convertMql(newVal)).append("\" ");
+        }
+    }
+
+    /**
      * The class is used to store information about a single unit of a
      * dimension.
      */
@@ -288,12 +496,12 @@ public class Dimension_mxJPO
         /**
          * Multiplier of the unit.
          */
-        private Double multiplier;
+        private double multiplier;
 
         /**
          * Offset of the unit.
          */
-        private Double offset;
+        private double offset;
 
         /**
          * Is the unit the default unit?
@@ -301,22 +509,14 @@ public class Dimension_mxJPO
         private boolean defaultUnit;
 
         /**
-         * System name of the unit (related to {@link #systemUnit}. Internally
-         * the system name is stored as property link and could be evaluated
-         * only after complete dimension parsing.
+         * System information of the unit. Internally the system information
+         * is stored as property link and could be evaluated only after
+         * complete dimension parsing. The key of the map is the system name,
+         * the values are the related names of the units.
          *
          * @see Dimension_mxJPO#prepare(ParameterCache_mxJPO)
          */
-        private String systemName;
-
-        /**
-         * System unit of the unit (related to {@link #systemName}. Internally
-         * the system unit is stored as property link and could be evaluated
-         * only after complete dimension parsing.
-         *
-         * @see Dimension_mxJPO#prepare(ParameterCache_mxJPO)
-         */
-        private String systemUnit;
+        private final Map<String,Set<String>> systemInfos = new TreeMap<String,Set<String>>();
 
         /**
          * Holds all unit specific settings for a dimension. The settings are
@@ -377,11 +577,205 @@ public class Dimension_mxJPO
         }
 
         /**
+         * <p>Appends the MQL delta commands to updated current unit definition
+         * <code>_current</code> to this new target unit definition.
+         * <p> FYI: For each setting which is modified a <code>modify
+         * unit</code> must be defined as prefix or otherwise only the last
+         * setting is correct (issue in MX kernel).</p>
+         *
+         * @param _paramCache   parameter cache
+         * @param _current      current unit definition in MX (or
+         *                      <code>null</code> if currently not existing)
+         * @param _cmd          string builder used to append MQL commands
+         * @param _postCmd      string builder used to append the system
+         *                      information (should be defined at least)
+         * @throws UpdateException_mxJPO if the multiplier or offset is changed
+         */
+        protected void appendDelta(final ParameterCache_mxJPO _paramCache,
+                                   final Unit _current,
+                                   final StringBuilder _cmd,
+                                   final StringBuilder _postCmd)
+            throws UpdateException_mxJPO
+        {
+            final StringBuilder modUnitCmd = new StringBuilder()
+                    .append("modify unit \"").append(StringUtil_mxJPO.convertMql(this.name)).append("\" ");
+            if (_current == null)  {
+                _cmd.append("add unit \"").append(StringUtil_mxJPO.convertMql(this.name))
+                    .append("\" ");
+                if (!this.defaultUnit)  {
+                    _cmd.append('!');
+                }
+                _cmd.append("default ")
+                    .append("multiplier ").append(this.multiplier).append(' ')
+                    .append("offset ").append(this.offset).append(' ');
+            } else  {
+                _cmd.append(modUnitCmd);
+                if (this.multiplier != _current.multiplier)  {
+                    if (!_paramCache.getValueBoolean(Dimension_mxJPO.PARAM_ALLOW_UPDATE_UNIT_MULTIPLIER))  {
+                        throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.DIMENSION_UPDATE_MULTIPLIER);
+                    }
+                    _cmd.append("multiplier ").append(this.multiplier).append(' ');
+                }
+                if (this.offset != _current.offset)  {
+                    if (!_paramCache.getValueBoolean(Dimension_mxJPO.PARAM_ALLOW_UPDATE_UNIT_OFFSET))  {
+                        throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.DIMENSION_UPDATE_OFFSET);
+                    }
+                    _cmd.append("offset ").append(this.offset).append(' ');
+                }
+                if (this.defaultUnit != _current.defaultUnit)  {
+                    if (!_paramCache.getValueBoolean(Dimension_mxJPO.PARAM_ALLOW_UPDATE_DEFAULT_UNIT))  {
+                        throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.DIMENSION_UPDATE_DEFAULTUNIT);
+                    }
+                    if (!this.defaultUnit)  {
+                        _cmd.append('!');
+                    }
+                    _cmd.append("default ");
+                }
+            }
+            Dimension_mxJPO.calcValueDelta(_cmd, "unitdescription", this.description,
+                    (_current != null) ? _current.description : null);
+            Dimension_mxJPO.calcValueDelta(_cmd, "label", this.label,
+                    (_current != null) ? _current.label : null);
+            // check for to many settings
+            if (_current != null)  {
+                for (final String curSetKey : _current.settings.keySet())  {
+                    if (!this.settings.containsKey(curSetKey))  {
+                        _cmd.append(modUnitCmd)
+                            .append("remove setting \"").append(StringUtil_mxJPO.convertMql(curSetKey)).append("\" ");
+                    }
+                }
+            }
+            // check for non existing settings or not equal values
+            for (final Map.Entry<String,String> setting : this.settings.entrySet())  {
+                final String thisValue = (setting.getValue() != null) ? setting.getValue() : "";
+                final String curValue = ((_current != null) && (_current.settings.get(setting.getKey()) != null))
+                                        ? _current.settings.get(setting.getKey())
+                                        : "";
+                if ((_current == null)
+                        || !_current.settings.containsKey(setting.getKey()) || !thisValue.equals(curValue))  {
+                    _cmd.append(modUnitCmd)
+                        .append("setting \"").append(StringUtil_mxJPO.convertMql(setting.getKey()))
+                        .append("\" \"").append(StringUtil_mxJPO.convertMql(setting.getValue()))
+                        .append("\" ");
+                }
+            }
+            // check system information to delete
+            if (_current != null)  {
+                for (final Map.Entry<String,Set<String>> systemInfo : _current.systemInfos.entrySet())  {
+                    if (!this.systemInfos.containsKey(systemInfo.getKey()))  {
+                        for (final String unitName : systemInfo.getValue())  {
+                            _cmd.append(modUnitCmd)
+                                .append("remove system \"")
+                                .append(StringUtil_mxJPO.convertMql(systemInfo.getKey()))
+                                .append("\" to unit \"")
+                                .append(StringUtil_mxJPO.convertMql(unitName))
+                                .append("\" ");
+                        }
+                    }
+                }
+            }
+            // check system information to add
+            // (system information must be set after all units are created)
+            for (final Map.Entry<String,Set<String>> systemInfo : this.systemInfos.entrySet())  {
+                if ((_current == null) || !_current.systemInfos.containsKey(systemInfo.getKey()))  {
+                    for (final String unitName : systemInfo.getValue())  {
+                        _postCmd.append(modUnitCmd)
+                                .append("system \"")
+                                .append(StringUtil_mxJPO.convertMql(systemInfo.getKey()))
+                                .append("\" to unit \"")
+                                .append(StringUtil_mxJPO.convertMql(unitName))
+                                .append("\" ");
+                    }
+                } else  {
+                    final Set<String> curUnits = _current.systemInfos.get(systemInfo.getKey());
+                    for (final String curUnitName : curUnits)  {
+                        if (!systemInfo.getValue().contains(curUnitName))  {
+                            _postCmd.append(modUnitCmd)
+                                    .append("remove system \"")
+                                    .append(StringUtil_mxJPO.convertMql(systemInfo.getKey()))
+                                    .append("\" to unit \"")
+                                    .append(StringUtil_mxJPO.convertMql(curUnitName))
+                                    .append("\" ");
+                        }
+                    }
+                    for (final String tarUnitName : systemInfo.getValue())  {
+                        if (!curUnits.contains(tarUnitName))  {
+                            _postCmd.append(modUnitCmd)
+                                    .append("system \"")
+                                    .append(StringUtil_mxJPO.convertMql(systemInfo.getKey()))
+                                    .append("\" to unit \"")
+                                    .append(StringUtil_mxJPO.convertMql(tarUnitName))
+                                    .append("\" ");
+                        }
+                    }
+                }
+            }
+            // check properties to remove
+            if (_current != null)  {
+                for (final AdminProperty_mxJPO curProp : _current.properties)  {
+                    boolean found = false;
+                    for (final AdminProperty_mxJPO tarProp : this.properties)  {
+                        if (tarProp.compareTo(curProp) == 0)  {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)  {
+                        _cmd.append(modUnitCmd)
+                            .append("remove property \"");
+                        if (curProp.getName() != null)  {
+                            _cmd.append(StringUtil_mxJPO.convertMql(curProp.getName()));
+                        }
+                        _cmd.append("\" ");
+                        if ((curProp.getRefAdminName() != null) && (curProp.getRefAdminType() != null))  {
+                            _cmd.append(" to \"")
+                            .append(StringUtil_mxJPO.convertMql(curProp.getRefAdminType()))
+                            .append("\" \"")
+                            .append(StringUtil_mxJPO.convertMql(curProp.getRefAdminName()))
+                            .append("\" ");
+                        }
+                    }
+                }
+            }
+            // check properties to add
+            for (final AdminProperty_mxJPO tarProp : this.properties)  {
+                boolean found = false;
+                if (_current != null)  {
+                    for (final AdminProperty_mxJPO curProp : _current.properties)  {
+                        if (tarProp.compareTo(curProp) == 0)  {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                if (!found)  {
+                    _cmd.append(modUnitCmd)
+                        .append("property \"");
+                    if (tarProp.getName() != null)  {
+                        _cmd.append(StringUtil_mxJPO.convertMql(tarProp.getName()));
+                    }
+                    _cmd.append("\" ");
+                    if ((tarProp.getRefAdminName() != null) && (tarProp.getRefAdminType() != null))  {
+                        _cmd.append(" to \"")
+                        .append(StringUtil_mxJPO.convertMql(tarProp.getRefAdminType()))
+                        .append("\" \"")
+                        .append(StringUtil_mxJPO.convertMql(tarProp.getRefAdminName()))
+                        .append("\" ");
+                    }
+                    if (tarProp.getValue() != null)  {
+                        _cmd.append(" value \"")
+                            .append(StringUtil_mxJPO.convertMql(tarProp.getValue()))
+                            .append("\" ");
+                    }
+                }
+            }
+        }
+
+        /**
          * Returns the string representation of this unit. The information
          * includes {@link #name}, {@link #description}, {@link #label},
          * {@link #multiplier}, {@link #offset}, {@link #defaultUnit},
-         * {@link #systemName}, {@link #systemUnit}, {@link #settings} and
-         * {@link #properties}.
+         * {@link #systemInfos}, {@link #settings} and {@link #properties}.
          *
          * @return string representation of this unit
          */
@@ -394,8 +788,7 @@ public class Dimension_mxJPO
                     + "multiplier = " + this.multiplier + ", "
                     + "offset = " + this.offset + ", "
                     + "defaultUnit = " + this.defaultUnit + ", "
-                    + "system name = " + this.systemName + ", "
-                    + "system unit = " + this.systemUnit + ", "
+                    + "system info = " + this.systemInfos + ", "
                     + "settings = " + this.settings + ", "
                     + "properties = " + this.properties + "]";
         }
