@@ -90,7 +90,7 @@ public class Update_mxJPO
      *                  </ul>
      * @return logging information from the update
      * @throws Exception if the update failed
-     * @see #updateFiles(Context, Set)
+     * @see #updateFiles(Context, Map, Set, boolean)
      */
     public String updateByName(final Context _context,
                                final String[] _args)
@@ -134,7 +134,7 @@ public class Update_mxJPO
      *                  </ul>
      * @return logging information from the update
      * @throws Exception if the update failed
-     * @see #updateFiles(Context, Set)
+     * @see #updateFiles(Context, Map, Set, boolean)
      */
     public String updateByContent(final Context _context,
                                   final String[] _args)

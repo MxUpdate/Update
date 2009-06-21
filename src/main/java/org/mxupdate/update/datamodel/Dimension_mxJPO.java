@@ -86,7 +86,7 @@ public class Dimension_mxJPO
      * Name of the parameter to define that a change of the default unit is
      * allowed.
      *
-     * @see Unit#appendDelta(ParameterCache_mxJPO, Unit, StringBuilder, StringBuilder)
+     * @see Dimension_mxJPO.Unit#appendDelta
      */
     private static final String PARAM_ALLOW_UPDATE_DEFAULT_UNIT = "DMDimAllowUpdateDefUnit";
 
@@ -94,7 +94,7 @@ public class Dimension_mxJPO
      * Name of the parameter to define that the multiplier of an unit is
      * allowed to change.
      *
-     * @see Unit#appendDelta(ParameterCache_mxJPO, Unit, StringBuilder, StringBuilder)
+     * @see Dimension_mxJPO.Unit#appendDelta
      */
     private static final String PARAM_ALLOW_UPDATE_UNIT_MULTIPLIER = "DMDimAllowUpdateUnitMult";
 
@@ -102,7 +102,7 @@ public class Dimension_mxJPO
      * Name of the parameter to define that the offset of an unit is allowed to
      * change.
      *
-     * @see Unit#appendDelta(ParameterCache_mxJPO, Unit, StringBuilder, StringBuilder)
+     * @see Dimension_mxJPO.Unit#appendDelta
      */
     private static final String PARAM_ALLOW_UPDATE_UNIT_OFFSET = "DMDimAllowUpdateUnitOffs";
 
@@ -248,7 +248,7 @@ public class Dimension_mxJPO
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
      * @throws IOException if the extension could not be written
-     * @see #attributes
+     * @see #units
      */
     @Override
     protected void write(final ParameterCache_mxJPO _paramCache,
@@ -539,7 +539,7 @@ public class Dimension_mxJPO
          * Holds all unit specific properties for a single unit. The properties
          * includes settings and the link to the system property. While the
          * dimension is parsed the properties holds also the {@link #settings},
-         * {@link #systemName} and {@link #systemUnit}.
+         * and {@link #systemInfos}.
          *
          * @see Dimension_mxJPO#parse(String, String)
          * @see Dimension_mxJPO#prepare(ParameterCache_mxJPO)
