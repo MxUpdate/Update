@@ -127,11 +127,34 @@ public class InstallDataModel_mxJPO
     private static final String TYPEDEF_TYPE = "Type";
 
     /**
+     * Name of the type definition for JPO programs.
+     *
+     * @see #registerPrograms(ParameterCache_mxJPO)
+     */
+    private static final String TYPEDEF_JPO = "JPO";
+
+    /**
+     * Name of the type definition for MQL programs.
+     *
+     * @see #registerPrograms(ParameterCache_mxJPO)
+     */
+    private static final String TYPEDEF_MQL = "Program";
+
+    /**
      * Name of the type definition for string attributes.
      *
      * @see #updateAttributes(ParameterCache_mxJPO, String, String, String, String, String, String)
      */
     private static final String TYPEDEF_ATTRIBUTE_STRING = "AttributeString";
+
+    /**
+     * MQL statement to list of MxUpdate Update programs for which the symbolic
+     * names must be registered.
+     *
+     * @see #registerPrograms(ParameterCache_mxJPO)
+     */
+    private static final String LIST_MXUPDATE_PROGRAMS
+            = "list program MxUpdate,org.mxupdate* select name isjavaprogram dump @";
 
     /**
      * Method used as entry from the MQL interface to install / update the data
@@ -142,16 +165,19 @@ public class InstallDataModel_mxJPO
      * <li>install trigger group relationship</li>
      * <li>update attributes in
      *     {@link #updateAttributes(ParameterCache_mxJPO, String, String, String, String, String, String)}</li>
-     * <li>update used business types by appending requried MxUpdate attributes
+     * <li>update used business types by appending required MxUpdate attributes
      *     in {@link #updateBusTypes(ParameterCache_mxJPO)}</li>
-     * <li>define plugin properties in
+     * <li>define plug-in properties in
      *     {@link #makePluginProperty(ParameterCache_mxJPO, File)}</li>
+     * <li>register the MxUdpate Update programs with their symbolic names in
+     *     {@link #registerPrograms(ParameterCache_mxJPO)}</li>
      * <li>register MxUpdate as application in
      *     {@link #registerMxUpdate(ParameterCache_mxJPO, String, String)}</li>
      * </ul>
      *
      * @param _context      MX context for this request
-     * @param _args         first value defines the source installation path,
+     * @param _args         first value defines the source installation path
+     *                      (in development it is the resources sub directory),
      *                      second value the version of MxUpdate which must be
      *                      installed
      * @throws Exception if installation failed
@@ -160,6 +186,7 @@ public class InstallDataModel_mxJPO
      * @see #installTriggerGroupRelation(ParameterCache_mxJPO, String, String, String, String, String, String)
      * @see #updateAttributes(ParameterCache_mxJPO, String, String, String, String, String, String)
      * @see #updateBusTypes(ParameterCache_mxJPO)
+     * @see #registerPrograms(ParameterCache_mxJPO)
      * @see #registerMxUpdate(ParameterCache_mxJPO, String, String)
      * @see #makePluginProperty(ParameterCache_mxJPO, File)
      */
@@ -197,7 +224,41 @@ public class InstallDataModel_mxJPO
                 fileDate, installedDate);
         this.updateBusTypes(paramCache);
         this.makePluginProperty(paramCache, path);
+        this.registerPrograms(paramCache);
         this.registerMxUpdate(paramCache, applName, applVersion);
+    }
+
+    /**
+     * All programs evaluated with {@link #LIST_MXUPDATE_PROGRAMS} are checked
+     * if they must be registered with a symbolic name. If they are not already
+     * registered, the registration of the symbolic names of the programs are
+     * done.
+     *
+     * @param _paramCache   parameter cache
+     * @throws Exception if registration of the symbolic names for all MxUpdate
+     *                   Update programs failed
+     * @see #LIST_MXUPDATE_PROGRAMS
+     */
+    protected void registerPrograms(final ParameterCache_mxJPO _paramCache)
+        throws Exception
+    {
+        final TypeDef_mxJPO jpoTypeDef
+                = _paramCache.getMapping().getTypeDef(InstallDataModel_mxJPO.TYPEDEF_JPO);
+        final TypeDef_mxJPO mqlTypeDef
+                = _paramCache.getMapping().getTypeDef(InstallDataModel_mxJPO.TYPEDEF_MQL);
+
+        final String progs = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+                                                   InstallDataModel_mxJPO.LIST_MXUPDATE_PROGRAMS);
+        for (final String progLine : progs.split("\n"))  {
+            final String[] progLineArr = progLine.split("@");
+            final String progName = progLineArr[0];
+            // do we have a JPO?
+            if ("true".equalsIgnoreCase(progLineArr[1]))  {
+                this.registerObject(_paramCache, jpoTypeDef.newTypeInstance(progName));
+            } else  {
+                this.registerObject(_paramCache, mqlTypeDef.newTypeInstance(progName));
+            }
+        }
     }
 
     /**

@@ -1,0 +1,202 @@
+##############################################################################
+#
+# Copyright 2008-2009 The MxUpdate Team
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Revision:        $Rev$
+# Last Changed:    $Date$
+# Last Changed By: $Author$
+#
+##############################################################################
+
+tcl;
+
+eval  {
+
+  set VERSION "0-4-0"
+
+  set ENV_NAME_MXUPDATE_PATH      "MXUPDATE_PATH"
+  set ENV_NAME_MAPPING_EXTENSION  "MXUPDATE_MAPPING_FILE"
+
+  # get the installation directory
+  # is the installation directory defined as local MX environment variable?
+  if {[mql exists env "${ENV_NAME_MXUPDATE_PATH}"] > 0} {
+    set sPath [mql get env "${ENV_NAME_MXUPDATE_PATH}"]
+  # maybe as global environment variable?
+  } elseif {[mql exists env global "${ENV_NAME_MXUPDATE_PATH}"] > 0} {
+    set sPath [mql get env global "${ENV_NAME_MXUPDATE_PATH}"]
+  # or as shell enviroment variable?
+  } elseif {[info exists env(${ENV_NAME_MXUPDATE_PATH})] > 0}  {
+    set sPath $env(${ENV_NAME_MXUPDATE_PATH})
+  # otherwise error!!!!
+  } else  {
+    error "\nRequired enviroment variable '${ENV_NAME_MXUPDATE_PATH}' is not defined!"
+  }
+
+  # get mapping file extension (if defined)
+  # is the mapping file extension defined as local MX environment variable?
+  if {[mql exists env "${ENV_NAME_MAPPING_EXTENSION}"] > 0} {
+    set sMappingFileExtension [mql get env "${ENV_NAME_MAPPING_EXTENSION}"]
+  # maybe as global environment variable?
+  } elseif {[mql exists env global "${ENV_NAME_MAPPING_EXTENSION}"] > 0} {
+    set sMappingFileExtension [mql get env global "${ENV_NAME_MAPPING_EXTENSION}"]
+  # or as shell enviroment variable?
+  } elseif {[info exists env(${ENV_NAME_MAPPING_EXTENSION})] > 0}  {
+    set sMappingFileExtension $env(${ENV_NAME_MAPPING_EXTENSION})
+  } else  {
+    set sMappingFileExtension ""
+  }
+
+  # check if development mode
+  set bIsDevelopment [expr [file exists [file join "${sPath}" org]] == 0]
+
+  # define path for mapping properties file
+  if ${bIsDevelopment}  {
+    set sMappingFileOriginal [file join "${sPath}" "resources" "org" "mxupdate" "mapping.properties"]
+  } else  {
+    set sMappingFileOriginal [file join "${sPath}" "org" "mxupdate" "mapping.properties"]
+  }
+
+  ##############################################################################
+  # Read the mapping configuration between MX names and internal used names
+  ##############################################################################
+  proc pReadMapping {_sRoot}  {
+    global asMapping
+    global sMappingFileExtension
+    global sMappingFileOriginal
+
+    # read original mapping file
+    set pFile [open [file join "${sMappingFileOriginal}"] r]
+    set lsMapping [split [read $pFile] "\n"]
+    close $pFile
+
+    # read extension file (if defined)
+    if {"${sMappingFileExtension}" != ""}  {
+      set pFile [open [file join "${sMappingFileExtension}"] r]
+      set lsMapping [concat $lsMapping [split [read $pFile] "\n"]]
+      close $pFile
+    }
+
+    # prepare mapping
+    foreach sOneLine ${lsMapping}  {
+      set sOneLine [string trim "${sOneLine}"]
+      # check for none empty line and none comment line 
+      if {([string length "${sOneLine}"] > 0) && ([string index "${sOneLine}" 0] != "#")}  {
+        # equal index position
+        set iIdx [string first "=" "${sOneLine}"]
+        if {${iIdx} > 0}  {
+          # extract key and value
+          set sKey [string trim [string range "${sOneLine}" 0 [expr ${iIdx} - 1]]]
+          set sVal [string trim [string range "${sOneLine}" [expr ${iIdx} + 1] end]]
+          set asMapping(${sKey}) "${sVal}"
+        }
+      }
+    }
+  }
+
+  ##############################################################################
+  # The procedure installs given property within the given root path.
+  ##############################################################################
+  proc pInstallProperties {_sRoot _sVersion _sProgName}  {
+    global asMapping
+    global sMappingFileExtension
+    global sMappingFileOriginal
+
+    # if a file extension exists, both file dates must be checked!
+    set sFileDate [clock format [file mtime "${sMappingFileOriginal}"]  -gmt true -format "%Y-%m-%d %H:%M:%S"]
+    if {"${sMappingFileExtension}" != ""}  {
+      set sFileDate "${sFileDate}, [clock format [file mtime "${sMappingFileExtension}"]  -gmt true -format "%Y-%m-%d %H:%M:%S"]"
+    }
+
+    if {[mql list prog "${_sProgName}"] == ""}  {
+      set sDate ""
+      mql add prog "${_sProgName}"
+    } else  {
+      set sDate [mql print prog "${_sProgName}" select property\[$asMapping(PropertyDef.FileDate.PropertyName)\].value dump]
+    }
+    if {"${sDate}" != "${sFileDate}"}  {
+      puts "update property '${_sProgName}'"
+
+      # read original properties
+      set pFile [open [file join "${sMappingFileOriginal}"] r]
+      set sCode [read $pFile]
+      close $pFile
+
+      # read extension file
+      if {"${sMappingFileExtension}" != ""}  {
+        set pFile [open [file join "${sMappingFileExtension}"] r]
+        set sCode "${sCode}\n[read $pFile]"
+        close $pFile
+      }
+
+      # update property program (with escape on because of special characters)
+      mql set escape on
+      mql mod prog ${_sProgName} \
+            code "${sCode}" \
+            add property $asMapping(PropertyDef.FileDate.PropertyName) value "${sFileDate}" \
+            add property $asMapping(PropertyDef.Version.PropertyName) value "${_sVersion}"
+      mql set escape off
+    }
+  }
+
+  ##############################################################################
+  # The procedure installs given JPO within the given root path.
+  ##############################################################################
+  proc pInstallJPO {_sRoot _sJPOName _sVersion}  {
+    global asMapping
+
+    regsub -all {\.} "${_sJPOName}" {/} sFileName
+    set sFileName [file join "${_sRoot}" "${sFileName}_mxJPO.java"]
+    set sFileDate [clock format [file mtime "${sFileName}"]  -gmt true -format "%Y-%m-%d %H:%M:%S"]
+    if {[mql list prog "${_sJPOName}"] == ""}  {
+      set sJPODate ""
+    } else  {
+      set sJPODate [mql print prog "${_sJPOName}" select property\[$asMapping(PropertyDef.FileDate.PropertyName)\].value dump]
+    }
+    if {"${sJPODate}" != "${sFileDate}"}  {
+      puts "update jpo '${_sJPOName}'"
+      mql insert prog "${sFileName}"
+      mql mod prog ${_sJPOName} \
+            add property $asMapping(PropertyDef.FileDate.PropertyName) value "${sFileDate}" \
+            add property $asMapping(PropertyDef.Version.PropertyName) value "${_sVersion}"
+    }
+  }
+
+  mql verbose off
+  mql set escape off
+
+  pReadMapping "${sPath}"
+
+  pInstallProperties "${sPath}" "${VERSION}" "org.mxupdate.mapping.properties"
+
+  if ${bIsDevelopment}  {
+    pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.install.Insert"     "${VERSION}"
+    pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.util.MqlUtil"       "${VERSION}"
+    mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}" "java"] "${VERSION}"
+  } else  {
+    pInstallJPO       [file join "${sPath}"]        "org.mxupdate.install.Insert"     "${VERSION}"
+    pInstallJPO       [file join "${sPath}"]        "org.mxupdate.util.MqlUtil"       "${VERSION}"
+    mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}"] "${VERSION}"
+  }
+
+  mql verbose on
+  mql compile prog org.mxupdate.*,MxUpdate
+  mql verbose off
+
+  if ${bIsDevelopment}  {
+    mql exec prog "org.mxupdate.install.InstallDataModel" [file join "${sPath}" "resources"] "${VERSION}"
+  } else  {
+    mql exec prog "org.mxupdate.install.InstallDataModel" [file join "${sPath}"] "${VERSION}"
+  }
+}
