@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!--
+ * Copyright 2009 The MxUpdate Team
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Revision:        $Rev$
+ * Last Changed:    $Date$
+ * Last Changed By: $Author$
+ */
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+    http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.mxupdate</groupId>
+    <artifactId>update</artifactId>
+    <packaging>jar</packaging>
+    <version>0.5.0</version>
+    <name>MxUpdate Update</name>
+    <url>http://www.mxupdate.org</url>
+
+    <repositories>
+        <repository>
+            <id>repository.riedelcastro.org</id>
+            <name>Riedelcastro's gcUpload</name>
+            <url>http://repository.riedelcastro.org/</url>
+        </repository>
+    </repositories>
+
+    <licenses>
+        <license>
+            <name>Apache 2.0 License</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <organization>
+        <name>The MxUpdate Team</name>
+        <url>http://www.mxupdate.org</url>
+    </organization>
+
+    <issueManagement>
+        <system>MxUpdate Issues on Google Code</system>
+        <url>http://code.google.com/p/mxupdate/issues</url>
+    </issueManagement>
+
+    <mailingLists>
+        <mailingList>
+            <name>SVN Commit Messages</name>
+            <subscribe>http://groups.google.com/group/mxupdate-commit/subscribe</subscribe>
+            <unsubscribe>http://groups.google.com/group/mxupdate-commit/subscribe</unsubscribe>
+            <post>mxupdate-commit@googlegroups.com</post>
+            <archive>http://groups.google.com/group/mxupdate-commit</archive>
+        </mailingList>
+        <mailingList>
+            <name>Developer Discussions</name>
+            <subscribe>http://groups.google.com/group/mxupdate-developer/subscribe</subscribe>
+            <unsubscribe>http://groups.google.com/group/mxupdate-developer/subscribe</unsubscribe>
+            <post>mxupdate-developer@googlegroups.com</post>
+            <archive>http://groups.google.com/group/mxupdate-developer</archive>
+        </mailingList>
+        <mailingList>
+            <name>Issue Changes</name>
+            <subscribe>http://groups.google.com/group/mxupdate-issue/subscribe</subscribe>
+            <unsubscribe>http://groups.google.com/group/mxupdate-issue/subscribe</unsubscribe>
+            <post>mxupdate-issue@googlegroups.com</post>
+            <archive>http://groups.google.com/group/mxupdate-issue</archive>
+        </mailingList>
+    </mailingLists>
+
+    <scm>
+        <connection>scm:svn:http://mxupdate.googlecode.com/svn/mxupdate-update</connection>
+        <developerConnection>scm:svn:https://mxupdate.googlecode.com/svn/mxupdate-update</developerConnection>
+        <tag>HEAD</tag>
+        <url>http://mxupdate.googlecode.com/svn/mxupdate-update</url>
+    </scm>
+
+    <dependencies>
+        <!-- MX dependency -->
+        <dependency>
+            <groupId>ematrix</groupId>
+            <artifactId>ematrix</artifactId>
+            <scope>system</scope>
+            <version>ALL</version>
+            <systemPath>${basedir}/lib/eMatrixServletRMI.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>ematrix</groupId>
+            <artifactId>fcsclient</artifactId>
+            <scope>system</scope>
+            <version>ALL</version>
+            <systemPath>${basedir}/lib/FcsClient.jar</systemPath>
+        </dependency>
+        <!-- for Base64 encoding / decoding within automatic tests -->
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.3</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- TestNG for automatic tests -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>5.8</version>
+            <scope>test</scope>
+            <classifier>jdk15</classifier>
+        </dependency>
+        <!-- TestNG for automatic tests -->
+        <dependency>
+                <groupId>org.riedelcastro</groupId>
+                <artifactId>gcupload-maven-plugin</artifactId>
+            <version>0.9</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <defaultGoal>package</defaultGoal>
+        <plugins>
+            <!--  define Java5 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                </configuration>
+            </plugin>
+            <!-- define test ng suite XML file -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.4.2</version>
+                <configuration>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>${basedir}/src/test/resources/testng.xml</suiteXmlFile>
+                    </suiteXmlFiles>
+                </configuration>
+            </plugin>
+            <!-- pack MxUpdate Update Install code + Javadoc -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/install.xml</descriptor>
+                        <descriptor>src/assembly/javadoc.xml</descriptor>
+                    </descriptors>
+                    <finalName>mxupdate.V${project.version}</finalName>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--  create JavaDoc -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <!-- with maven 2.1 this will be 'prepare-package' -->
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>javadoc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- google code upload -->
+            <plugin>
+                <groupId>org.riedelcastro</groupId>
+                <artifactId>gcupload-maven-plugin</artifactId>
+                <version>0.9</version>
+                <configuration>
+                    <projectName>mxupdate</projectName>
+                    <allowSnapshots>false</allowSnapshots>
+                    <uploads>
+                        <upload>
+                            <prefix>mxupdate.V${project.version}</prefix>
+                            <postfix>javadoc</postfix>
+                            <extensions>zip</extensions>
+                            <labels>Featured</labels>
+                            <summary>MxUpdate Update Deployment Tool V${project.version} JavaDoc</summary>
+                        </upload>
+                        <upload>
+                            <prefix>mxupdate.V${project.version}</prefix>
+                            <postfix>install</postfix>
+                            <extensions>tar.bz2</extensions>
+                            <labels>Featured</labels>
+                            <summary>MxUpdate Update Deployment Tool V${project.version} Installation Files as TarBZ2-Container</summary>
+                        </upload>
+                        <upload>
+                            <prefix>mxupdate.V${project.version}</prefix>
+                            <postfix>install</postfix>
+                            <extensions>tar.gz</extensions>
+                            <labels>Featured</labels>
+                            <summary>MxUpdate Update Deployment Tool V${project.version} Installation Files as TarGZ-Container</summary>
+                        </upload>
+                        <upload>
+                            <prefix>mxupdate.V${project.version}</prefix>
+                            <postfix>install</postfix>
+                            <extensions>zip</extensions>
+                            <labels>Featured</labels>
+                            <summary>MxUpdate Update Deployment Tool V${project.version} Installation Files as Zip-Container</summary>
+                        </upload>
+                    </uploads>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <reporting>
+        <plugins>
+            <!-- project info -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>dependencies</report>
+                            <!-- report>project-team</report -->
+                            <report>mailing-list</report>
+                            <report>issue-tracking</report>
+                            <report>license</report>
+                            <report>scm</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <!-- java doc -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <use>false</use>
+                    <show>private</show>
+                    <source>1.5</source>
+                    <doctitle>&lt;h1&gt;MxUpdate Update JPO V${project.version} API&lt;/h1&gt;</doctitle>
+                    <windowtitle>MxUpdate Update JPO V${project.version} API </windowtitle>
+                    <author/>
+                    <bottom>
+                        &lt;i&gt;
+                        Copyright 2008-2009 The MxUpdate Team&lt;br/&gt;
+                        &lt;br/&gt;
+                        Licensed under the Apache License, Version 2.0 (the "License")
+                        you may not use this file except in compliance with the License.
+                        You may obtain a copy of the License at
+                          &lt;a href="http://www.apache.org/licenses/LICENSE-2.0"&gt;http://www.apache.org/licenses/LICENSE-2.0&lt;/a&gt;.&lt;br/&gt;
+                        Unless required by applicable law or agreed to in writing, software
+                        distributed under the License is distributed on an "AS IS" BASIS,
+                        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                        See the License for the specific language governing permissions and
+                        limitations under the License.
+                        &lt;/i&gt;
+                    </bottom>
+                    <linksource>true</linksource>
+                    <links>
+                        <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
+                    </links>
+                    <tags>
+                        <tag>
+                            <name>todo</name>
+                            <placement>a</placement>
+                            <head>To do:</head>
+                        </tag>
+                    </tags>
+                </configuration>
+            </plugin>
+            <!-- source code -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jxr-maven-plugin</artifactId>
+                <configuration>
+                    <linkJavadoc>true</linkJavadoc>
+                    <javadocDir>../apidocs</javadocDir>
+                </configuration>
+            </plugin>
+            <!-- automatic tests (surefire) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+            </plugin>
+            <!-- PMD report -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <configuration>
+                    <linkXref>true</linkXref>
+                    <sourceEncoding>utf-8</sourceEncoding>
+                    <targetJdk>1.5</targetJdk>
+                    <excludes>
+                        <exclude>**/dimension/*.java</exclude>
+                        <exclude>**/policy/*.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+
+</project>

@@ -93,7 +93,7 @@ public class TestParameterCache
                 throws IOException
         {
             final Properties props =  new Properties();
-            props.load(new FileInputStream("src/org/mxupdate/mapping.properties"));
+            props.load(new FileInputStream("src/main/resources/org/mxupdate/mapping.properties"));
             return props;
         }
     }
