@@ -145,6 +145,34 @@ public abstract class AbstractParser_mxJPO
     }
 
     /**
+     * Sets the new <code>_values</code> for field <code>_fieldName</code> of
+     * <code>_object</code>.
+     *
+     * @param _object       object where the field must be updated
+     * @param _fieldName    name of the field to update
+     * @param _values       new values of the field
+     */
+    @SuppressWarnings("unchecked")
+    protected void setValue(final Object _object,
+                            final String _fieldName,
+                            final Collection<?> _values)
+    {
+        try  {
+            final Field field = this.getField(_object, _fieldName);
+            final boolean accessible = field.isAccessible();
+            try  {
+                field.setAccessible(true);
+                final Collection<Object> set = (Collection<Object>) field.get(_object);
+                set.addAll(_values);
+            } finally  {
+                field.setAccessible(accessible);
+            }
+        } catch (final Exception e)  {
+            throw new ParseUpdateError(e);
+        }
+    }
+
+    /**
      * Appends for field with <code>_fieldName</code> the <code>_value</code>
      * for object <code>_object</code>.
      *

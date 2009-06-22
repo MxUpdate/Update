@@ -20,11 +20,6 @@
 
 package org.mxupdate.test;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -36,6 +31,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
+@Test
 public class TestPolicyExport
     extends AbstractTest
 {
@@ -60,36 +56,102 @@ public class TestPolicyExport
     }
 
     /**
-     * Creates a new policy for all types and tries to export it. The check
-     * is done because of issue #30.
+     * Creates a new policy for all types and tries to export it.
      *
      * @throws Exception if test failed
+     * @see http://code.google.com/p/mxupdate/issues/detail?id=30
      */
-    @Test
     public void testExportPolicyForAllTypes()
         throws Exception
     {
         this.mql("add policy " + TestPolicyExport.POLICY_NAME + " type all");
 
-        final Map<String,Collection<String>> params = new HashMap<String,Collection<String>>();
-        params.put("Policy", Arrays.asList(new String[]{TestPolicyExport.POLICY_NAME}));
-        final Map<String,Collection<Map<String,String>>> bck =
-                this.<Map<String,Collection<Map<String,String>>>>jpoInvoke("org.mxupdate.plugin.Export",
-                                                                           "exportByName",
-                                                                           params)
-                    .getValues();
+        final Export export = this.export("Policy", TestPolicyExport.POLICY_NAME);
 
-        Assert.assertNotNull(bck);
-        Assert.assertTrue(bck.containsKey("Policy"));
-        Assert.assertEquals(bck.get("Policy").size(), 1, "one element is returned");
-        final Map<String,String> desc = bck.get("Policy").iterator().next();
-        Assert.assertEquals(desc.get("name"), TestPolicyExport.POLICY_NAME, "returned name is equal to given name");
-        Assert.assertEquals(desc.get("path"), "datamodel/policy", "path is not correct");
-        Assert.assertEquals(desc.get("filename"),
+        Assert.assertEquals(export.getName(), TestPolicyExport.POLICY_NAME, "returned name is equal to given name");
+        Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
+        Assert.assertEquals(export.getFileName(),
                             "POLICY_" + TestPolicyExport.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
-        final String code = desc.get("code");
+        final String code = export.getCode();
         final String testCode = code.substring(code.lastIndexOf('#')).trim();
         Assert.assertTrue(testCode.indexOf(" type all") > 0, "checks that all types are defined");
+    }
+
+    /**
+     * Creates a new policy with one state without state symbolic name. In the
+     * export a symbolic name of the state must be written.
+     *
+     * @throws Exception if test failed
+     */
+    public void testStateSymbolicNameExportedIfNotDefined()
+        throws Exception
+    {
+        this.mql("add policy " + TestPolicyExport.POLICY_NAME
+                + " state create");
+
+        final Export export = this.export("Policy", TestPolicyExport.POLICY_NAME);
+
+        Assert.assertEquals(export.getName(), TestPolicyExport.POLICY_NAME, "returned name is equal to given name");
+        Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
+        Assert.assertEquals(export.getFileName(),
+                            "POLICY_" + TestPolicyExport.POLICY_NAME + ".tcl",
+                            "check that the correct file name is returned");
+        final String code = export.getCode();
+        Assert.assertTrue(code.indexOf("registeredName \"state_create\"") >= 0,
+                          "check that symbolic name 'state_create' exists");
+    }
+
+    /**
+     * Creates a new policy with one state and with one symbolic name. The
+     * symbolic name of the state must not defined as property, only with
+     * &quot;registeredName&quot; in the update policy definition.
+     *
+     * @throws Exception if test failed
+     * @see http://code.google.com/p/mxupdate/issues/detail?id=33
+     */
+    public void testNoPropertyDefinitionForStateSymbolicName()
+        throws Exception
+    {
+        this.mql("add policy " + TestPolicyExport.POLICY_NAME
+                + " state create property state_create value create");
+
+        final Export export = this.export("Policy", TestPolicyExport.POLICY_NAME);
+
+        Assert.assertEquals(export.getName(), TestPolicyExport.POLICY_NAME, "returned name is equal to given name");
+        Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
+        Assert.assertEquals(export.getFileName(),
+                            "POLICY_" + TestPolicyExport.POLICY_NAME + ".tcl",
+                            "check that the correct file name is returned");
+        final String code = export.getCode();
+        Assert.assertTrue(code.indexOf("mql add property \"state_create\"") < 0,
+                          "check that no further property definition for the symbolic name of state exists");
+    }
+
+    /**
+     * Checks that two symbolic names for a state are correct exported as
+     * registered name in the update policy definiton.
+     *
+     * @throws Exception if test failed
+     * @see http://code.google.com/p/mxupdate/issues/detail?id=34
+     */
+    public void testAllSymbolicNamesForStatesDefined()
+        throws Exception
+    {
+        this.mql("add policy " + TestPolicyExport.POLICY_NAME
+                + " state create property state_create value create property state_exists value create");
+
+        final Export export = this.export("Policy", TestPolicyExport.POLICY_NAME);
+
+        Assert.assertEquals(export.getName(), TestPolicyExport.POLICY_NAME, "returned name is equal to given name");
+        Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
+        Assert.assertEquals(export.getFileName(),
+                            "POLICY_" + TestPolicyExport.POLICY_NAME + ".tcl",
+                            "check that the correct file name is returned");
+        final String code = export.getCode();
+        Assert.assertTrue(code.indexOf("registeredName \"state_create\"") >= 0,
+                          "check that symbolic name 'state_create' exists");
+        Assert.assertTrue(code.indexOf("registeredName \"state_exists\"") >= 0,
+                          "check that symbolic name 'state_exists' exists");
     }
 }

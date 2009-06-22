@@ -73,7 +73,6 @@ public class Policy_mxJPO
                 + "mql exec prog org.mxupdate.update.util.JPOCaller policy $_sPolicy \"${sArg}\"\n"
             + "}\n";
 
-
     /**
      * Default format of this policy.
      */
@@ -274,7 +273,8 @@ public class Policy_mxJPO
     /**
      * Calls the state prepare method. All policies properties starting with
      * <code>state_</code> are checked if they are defining a symbolic name of
-     * a state. If yes the related symbolic name of the state is updated.
+     * a state. If yes the related symbolic name of the state is updated and
+     * removed from the property list.
      *
      * @param _paramCache   parameter cache
      * @throws MatrixException if the prepare within super class failed
@@ -291,7 +291,8 @@ public class Policy_mxJPO
             if ((property.getName() != null) && property.getName().startsWith("state_"))  {
                 for (final State state : this.states)  {
                     if (state.name.equals(property.getValue()))  {
-                        state.nameSymbolic = property.getName();
+                        state.symbolicNames.add(property.getName());
+                        this.getPropertiesMap().remove(property.getName());
                     }
                 }
             }
@@ -424,8 +425,7 @@ public class Policy_mxJPO
                                     .replaceAll("@1@1@", "\\\"");
 
         final PolicyDefParser_mxJPO parser = new PolicyDefParser_mxJPO(new StringReader(code));
-        final Policy_mxJPO policy = parser.policy(this.getTypeDef(), _args[1]);
-        policy.prepare(_paramCache);
+        final Policy_mxJPO policy = parser.policy(_paramCache, this.getTypeDef(), _args[1]);
 
         final StringBuilder cmd = new StringBuilder()
                 .append("mod policy \"").append(this.getName()).append("\" ");
@@ -490,8 +490,8 @@ throw new Exception("some states are not defined anymore!");
         cmd.append(';')
            .append("mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ");
         for (final State state : policy.states)  {
-            if ((state.nameSymbolic != null) && !"".equals(state.nameSymbolic))  {
-                cmd.append(" add property \"").append(StringUtil_mxJPO.convertMql(state.nameSymbolic))
+            for (final String symbolicName : state.symbolicNames)  {
+                cmd.append(" add property \"").append(StringUtil_mxJPO.convertMql(symbolicName))
                    .append("\" value \"").append(StringUtil_mxJPO.convertMql(state.name)).append('\"');
             }
         }
@@ -587,7 +587,7 @@ throw new Exception("some states are not defined anymore!");
         /**
          * Symbolic Name of the state.
          */
-        private String nameSymbolic;
+        private final Set<String> symbolicNames = new TreeSet<String>();
 
         /**
          * Called action program for this state.
@@ -712,12 +712,19 @@ throw new Exception("some states are not defined anymore!");
                 throws IOException
         {
             // basics
-            _out.append("\n  state \"").append(StringUtil_mxJPO.convertTcl(this.name)).append("\"  {")
-                .append("\n    registeredName \"").append((this.nameSymbolic != null)
-                                              ? StringUtil_mxJPO.convertTcl(this.nameSymbolic)
-                                              : "state_" + StringUtil_mxJPO.convertTcl(this.name.replaceAll(" ", "_")))
-                                                  .append('\"')
-                .append("\n    revision \"").append(Boolean.toString(this.revisionable)).append('\"')
+            _out.append("\n  state \"").append(StringUtil_mxJPO.convertTcl(this.name)).append("\"  {");
+            if (this.symbolicNames.isEmpty())  {
+                _out.append("\n    registeredName \"")
+                    .append("state_").append(StringUtil_mxJPO.convertTcl(this.name.replaceAll(" ", "_")))
+                    .append('\"');
+            } else  {
+                for (final String symbolicName : this.symbolicNames)  {
+                    _out.append("\n    registeredName \"")
+                        .append(StringUtil_mxJPO.convertTcl(symbolicName))
+                        .append('\"');
+                }
+            }
+            _out.append("\n    revision \"").append(Boolean.toString(this.revisionable)).append('\"')
                 .append("\n    version \"").append(Boolean.toString(this.versionable)).append('\"')
                 .append("\n    promote \"").append(Boolean.toString(this.autoPromotion)).append('\"')
                 .append("\n    checkouthistory \"").append(Boolean.toString(this.checkoutHistory)).append('\"');

@@ -23,6 +23,8 @@ package org.mxupdate.test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +34,7 @@ import matrix.util.MatrixException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.mxupdate.util.MqlUtil_mxJPO;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
@@ -90,6 +93,35 @@ public class AbstractTest
         throws MatrixException
     {
         return MqlUtil_mxJPO.execMql(this.context, _cmd);
+    }
+
+    /**
+     * Export given configuration item <code>_type</code> with
+     * <code>_name</code>.
+     *
+     * @param _type     type to export
+     * @param _name     name to export
+     * @return map with the exported object
+     * @throws IOException      if the parameter could not be encoded
+     * @throws MatrixException  if MQL calls failed
+     */
+    protected Export export(final String _type,
+                            final String _name)
+        throws IOException, MatrixException
+    {
+        final Map<String,Collection<String>> params = new HashMap<String,Collection<String>>(1);
+        params.put(_type, Arrays.asList(new String[]{_name}));
+        final Map<String,Collection<Map<String,String>>> bck =
+                this.<Map<String,Collection<Map<String,String>>>>jpoInvoke("org.mxupdate.plugin.Export",
+                                                                           "exportByName",
+                                                                           params)
+                    .getValues();
+
+        Assert.assertNotNull(bck);
+        Assert.assertTrue(bck.containsKey(_type));
+        Assert.assertEquals(bck.get(_type).size(), 1, "one element is returned");
+
+        return new Export(bck.get(_type).iterator().next());
     }
 
     /**
@@ -171,6 +203,73 @@ public class AbstractTest
         public T getValues()
         {
             return (T) this.jpoReturn.get("values");
+        }
+    }
+
+    /**
+     * Class to hold an export.
+     */
+    protected final class Export
+    {
+        /**
+         * Map with the export description.
+         */
+        private final Map<String,String> exportDesc;
+
+        /**
+         * Constructor to initialize this export description.
+         *
+         * @param _exportDesc   export description with source code, file name,
+         *                      etc.
+         * @see #exportDesc
+         */
+        private Export(final Map<String,String> _exportDesc)
+        {
+            this.exportDesc = _exportDesc;
+        }
+
+        /**
+         * Returns the source code of a single export.
+         *
+         * @return source code of a single export
+         * @see #exportDesc
+         */
+        public String getCode()
+        {
+            return this.exportDesc.get("code");
+        }
+
+        /**
+         * Returns the name of a single export.
+         *
+         * @return name of a single export
+         * @see #exportDesc
+         */
+        public String getName()
+        {
+            return this.exportDesc.get("name");
+        }
+
+        /**
+         * Returns the file name of a single export.
+         *
+         * @return file name of a single export
+         * @see #exportDesc
+         */
+        public String getFileName()
+        {
+            return this.exportDesc.get("filename");
+        }
+
+        /**
+         * Returns the path of a single export.
+         *
+         * @return path of a single export
+         * @see #exportDesc
+         */
+        public String getPath()
+        {
+            return this.exportDesc.get("path");
         }
     }
 }

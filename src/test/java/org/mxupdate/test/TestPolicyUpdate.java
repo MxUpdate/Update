@@ -36,6 +36,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
+@Test
 public class TestPolicyUpdate
     extends AbstractTest
 {
@@ -233,5 +234,33 @@ public class TestPolicyUpdate
         Assert.assertTrue(this.mql("print policy MxUpdate_Test").indexOf("property  value Test") < 0,
                           "Update did not remove empty property!");
         Assert.assertTrue(propNames.size() == 11, "check that all properties are defined");
+    }
+
+    /**
+     * Tests that multiple symbolic names for a single state could be defined.
+     *
+     * @throws Exception if test failed
+     */
+    public void testMultipleStateSymbolicNames()
+        throws Exception
+    {
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + TestPolicyUpdate.POLICY_NAME + ".tcl",
+                   "updatePolicy \"${NAME}\" {"
+                    + "  state \"Pending\"  {"
+                    + "    registeredName \"state_Exists\""
+                    + "    registeredName \"state_Pending\""
+                    + "  }"
+                    + "}");
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+        Assert.assertEquals(this.mql("print policy " + TestPolicyUpdate.POLICY_NAME
+                                + " select property[state_Exists].value dump"),
+                            "Pending",
+                            "test that symbolic name 'state_Exists' is correct registered");
+        Assert.assertEquals(this.mql("print policy " + TestPolicyUpdate.POLICY_NAME
+                                + " select property[state_Pending].value dump"),
+                            "Pending",
+                            "test that symbolic name 'state_Pending' is correct registered");
     }
 }
