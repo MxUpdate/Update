@@ -109,4 +109,16 @@
         </classes>
     </test>
 
+    <test name="8 - Test Type Export" annotations="JDK">
+        <classes>
+            <class name="org.mxupdate.test.TypeExport"/>
+        </classes>
+    </test>
+
+    <test name="8 - Test Type Update" annotations="JDK">
+        <classes>
+            <class name="org.mxupdate.test.TypeUpdate"/>
+        </classes>
+    </test>
+
 </suite>

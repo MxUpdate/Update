@@ -23,11 +23,12 @@ package org.mxupdate.update.datamodel;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * Data model type class.
@@ -45,13 +46,28 @@ public class Type_mxJPO
 
     /**
      * Is the type abstract?
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private boolean abstractFlag = false;
 
     /**
      * From which type is this type derived?
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String derived = "ADMINISTRATION";
+
+    /**
+     * Defines all methods of this type.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private final Set<String> methods = new TreeSet<String>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -83,12 +99,27 @@ public class Type_mxJPO
         } else if ("/derivedFrom/typeRefList/typeRef".equals(_url))  {
             this.derived = _content;
 
+        } else if ("/methodList".equals(_url))  {
+            // to be ignored ...
+        } else if ("/methodList/programRef".equals(_url))  {
+            this.methods.add(_content);
+
         } else  {
             super.parse(_url, _content);
         }
     }
 
     /**
+     * Writes the type specific information in the TCL update file
+     * <code>_out</code>.
+     * The type specific information is:
+     * <ul>
+     * <li>{@link #derived}</li>
+     * <li>{@link #isHidden()}</li>
+     * <li>{@link #abstractFlag}</li>
+     * <li>{@link #methods}</li>
+     * <li>and triggers with {@link #writeTriggers(Appendable)}</li>
+     * </ul>
      *
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
@@ -100,9 +131,14 @@ public class Type_mxJPO
                                final Appendable _out)
             throws IOException
     {
-        _out.append(" \\\n    derived \"").append(convertTcl(this.derived)).append("\"")
-            .append(" \\\n    ").append(isHidden() ? "" : "!").append("hidden")
+        _out.append(" \\\n    derived \"").append(StringUtil_mxJPO.convertTcl(this.derived)).append("\"")
+            .append(" \\\n    ").append(this.isHidden() ? "" : "!").append("hidden")
             .append(" \\\n    abstract ").append(Boolean.toString(this.abstractFlag));
+        // methods
+        for (final String method : this.methods)  {
+            _out.append(" \\\n    add method \"").append(StringUtil_mxJPO.convertTcl(method)).append("\"");
+        }
+        // triggers
         this.writeTriggers(_out);
     }
 
@@ -113,6 +149,7 @@ public class Type_mxJPO
      * <ul>
      * <li>set not hidden</li>
      * <li>reset description</li>
+     * <li>remove all {@link #methods}</li>
      * </ul>
      *
      * @param _paramCache       parameter cache
@@ -139,12 +176,19 @@ public class Type_mxJPO
             throws Exception
     {
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append('\"')
-                .append(" !hidden description \"\";\n");
+                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
+                .append(" !hidden description \"\"");
+        // remove methods
+        for (final String method : this.methods)  {
+            preMQLCode.append(" remove method \"")
+                      .append(StringUtil_mxJPO.convertMql(method))
+                      .append('\"');
+        }
 
         // append already existing pre MQL code
-        preMQLCode.append(_preMQLCode);
+        preMQLCode.append(";\n")
+                  .append(_preMQLCode);
 
         super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
     }
