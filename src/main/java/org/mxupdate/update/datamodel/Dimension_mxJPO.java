@@ -76,6 +76,22 @@ public class Dimension_mxJPO
             + "}\n";
 
     /**
+     * Set of all ignored URLs from the XML definition for dimensions.
+     *
+     * @see #parse(String, String)
+     */
+    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    static  {
+        Dimension_mxJPO.IGNORED_URLS.add("/unitList");
+        Dimension_mxJPO.IGNORED_URLS.add("/unitList/unit/adminProperties");
+        Dimension_mxJPO.IGNORED_URLS.add("/unitList/unit/adminProperties/creationInfo");
+        Dimension_mxJPO.IGNORED_URLS.add("/unitList/unit/adminProperties/creationInfo/datetime");
+        Dimension_mxJPO.IGNORED_URLS.add("/unitList/unit/adminProperties/modificationInfo");
+        Dimension_mxJPO.IGNORED_URLS.add("/unitList/unit/adminProperties/modificationInfo/datetime");
+        Dimension_mxJPO.IGNORED_URLS.add("/unitList/unit/adminProperties/propertyList");
+    }
+
+    /**
      * Name of the parameter to define that units are allowed to remove.
      *
      * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
@@ -145,48 +161,36 @@ public class Dimension_mxJPO
     protected void parse(final String _url,
                          final String _content)
     {
-        if ("/unitList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/unitList/unit".equals(_url))  {
-            if (this.currentUnit != null)  {
-                this.units.add(this.currentUnit);
-            }
-            this.currentUnit = new Unit();
-        } else if ("/unitList/unit/adminProperties".equals(_url))  {
-            // to be ignored ...
-        } else if ("/unitList/unit/adminProperties/name".equals(_url))  {
-            this.currentUnit.name = _content;
-        } else if ("/unitList/unit/adminProperties/creationInfo".equals(_url))  {
-            // to be ignored ...
-        } else if ("/unitList/unit/adminProperties/creationInfo/datetime".equals(_url))  {
-            // to be ignored ...
-        } else if ("/unitList/unit/adminProperties/description".equals(_url))  {
-            this.currentUnit.description = _content;
-        } else if ("/unitList/unit/adminProperties/modificationInfo".equals(_url))  {
-            // to be ignored ...
-        } else if ("/unitList/unit/adminProperties/modificationInfo/datetime".equals(_url))  {
-            // to be ignored ...
-        } else if ("/unitList/unit/adminProperties/propertyList".equals(_url))  {
-            // to be ignored
-        } else if ("/unitList/unit/adminProperties/propertyList/property".equals(_url))  {
-            if (this.currentUnit.currentUnitProperty != null)  {
-                this.currentUnit.properties.add(this.currentUnit.currentUnitProperty);
-            }
-            this.currentUnit.currentUnitProperty = new AdminProperty_mxJPO();
-        } else if (_url.startsWith("/unitList/unit/adminProperties/propertyList/property"))  {
-            if (!this.currentUnit.currentUnitProperty.parse(_url.substring(52), _content))  {
+        if (!Dimension_mxJPO.IGNORED_URLS.contains(_url))  {
+            if ("/unitList/unit".equals(_url))  {
+                if (this.currentUnit != null)  {
+                    this.units.add(this.currentUnit);
+                }
+                this.currentUnit = new Unit();
+            } else if ("/unitList/unit/adminProperties/name".equals(_url))  {
+                this.currentUnit.name = _content;
+            } else if ("/unitList/unit/adminProperties/description".equals(_url))  {
+                this.currentUnit.description = _content;
+            } else if ("/unitList/unit/adminProperties/propertyList/property".equals(_url))  {
+                if (this.currentUnit.currentUnitProperty != null)  {
+                    this.currentUnit.properties.add(this.currentUnit.currentUnitProperty);
+                }
+                this.currentUnit.currentUnitProperty = new AdminProperty_mxJPO();
+            } else if (_url.startsWith("/unitList/unit/adminProperties/propertyList/property"))  {
+                if (!this.currentUnit.currentUnitProperty.parse(_url.substring(52), _content))  {
+                    super.parse(_url, _content);
+                }
+            } else if ("/unitList/unit/unitDefault".equals(_url))  {
+                this.currentUnit.defaultUnit = true;
+            } else if ("/unitList/unit/unitLabel".equals(_url))  {
+                this.currentUnit.label = _content;
+            } else if ("/unitList/unit/unitMultiplier".equals(_url))  {
+                this.currentUnit.multiplier = Double.parseDouble(_content);
+            } else if ("/unitList/unit/unitOffset".equals(_url))  {
+                this.currentUnit.offset = Double.parseDouble(_content);
+            } else  {
                 super.parse(_url, _content);
             }
-        } else if ("/unitList/unit/unitDefault".equals(_url))  {
-            this.currentUnit.defaultUnit = true;
-        } else if ("/unitList/unit/unitLabel".equals(_url))  {
-            this.currentUnit.label = _content;
-        } else if ("/unitList/unit/unitMultiplier".equals(_url))  {
-            this.currentUnit.multiplier = Double.parseDouble(_content);
-        } else if ("/unitList/unit/unitOffset".equals(_url))  {
-            this.currentUnit.offset = Double.parseDouble(_content);
-        } else  {
-            super.parse(_url, _content);
         }
     }
 
