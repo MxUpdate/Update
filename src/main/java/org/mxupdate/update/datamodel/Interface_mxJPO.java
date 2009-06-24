@@ -255,11 +255,13 @@ public class Interface_mxJPO
     /**
      * The method overwrites the original method to append the MQL statements
      * in the <code>_preMQLCode</code> to reset this interface and to append
-     * the tcl procedure {@link #TCL_PROCEDURE}. This information is reset:
+     * the TCL procedure {@link #TCL_PROCEDURE}. This information is reset:
      * <ul>
      * <li>set not hidden</li>
      * <li>reset description</li>
-     * <li>remove all types</li>
+     * <li>remove all types in {@link #allTypes} or {@link #types}</li>
+     * <li>remove all relationships in {@link #allRelationships} or
+     *     {@link #relationships}</li>
      * </ul>
      *
      * @param _paramCache       parameter cache
