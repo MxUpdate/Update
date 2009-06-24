@@ -22,6 +22,7 @@ package org.mxupdate.update.datamodel;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -68,6 +69,19 @@ public class Interface_mxJPO
             + "}\n";
 
     /**
+     * Set of all ignored URLs from the XML definition for interfaces.
+     *
+     * @see #parse(String, String)
+     */
+    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    static  {
+        Interface_mxJPO.IGNORED_URLS.add("/derivedFromInterface");
+        Interface_mxJPO.IGNORED_URLS.add("/derivedFromInterface/interfaceTypeRefList");
+        Interface_mxJPO.IGNORED_URLS.add("/relationshipDefRefList");
+        Interface_mxJPO.IGNORED_URLS.add("/typeRefList");
+    }
+
+    /**
      * From which interfaces is this interface derived?
      *
      * @see #parse(String, String)
@@ -81,23 +95,43 @@ public class Interface_mxJPO
      * @see #parse(String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
-    private boolean abstractFlag = false;
+    private boolean abstractFlag;
 
     /**
      * Are all types allowed for this interface?
      *
      * @see #parse(String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
-    private boolean typesAll = false;
+    private boolean allTypes;
 
     /**
      * Information about all allowed types for this interface.
      *
      * @see #parse(String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private final Set<String> types = new TreeSet<String>();
+
+    /**
+     * Are all relationships allowed for this interface?
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private boolean allRelationships;
+
+    /**
+     * Information about all allowed relationships for this interface.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private final Set<String> relationships = new TreeSet<String>();
 
     /**
      * Constructor used to initialize the interface class instance.
@@ -117,33 +151,29 @@ public class Interface_mxJPO
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
      * @see #abstractFlag
-     * @see #typesAll
+     * @see #allTypes
      * @see #types
      */
     @Override
     protected void parse(final String _url,
                          final String _content)
     {
-        if ("/abstract".equals(_url))  {
-            this.abstractFlag = true;
-
-        } else if ("/allowAllTypes".equals(_url))  {
-            this.typesAll = true;
-
-        } else if ("/derivedFromInterface".equals(_url))  {
-            // to be ignored ...
-        } else if ("/derivedFromInterface/interfaceTypeRefList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/derivedFromInterface/interfaceTypeRefList/interfaceTypeRef".equals(_url))  {
-            this.derived.add(_content);
-
-        } else if ("/typeRefList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/typeRefList/typeRef".equals(_url))  {
-            this.types.add(_content);
-
-        } else  {
-            super.parse(_url, _content);
+        if (!Interface_mxJPO.IGNORED_URLS.contains(_url))  {
+            if ("/abstract".equals(_url))  {
+                this.abstractFlag = true;
+            } else if ("/allowAllRelationships".equals(_url))  {
+                this.allRelationships = true;
+            } else if ("/allowAllTypes".equals(_url))  {
+                this.allTypes = true;
+            } else if ("/derivedFromInterface/interfaceTypeRefList/interfaceTypeRef".equals(_url))  {
+                this.derived.add(_content);
+            } else if ("/relationshipDefRefList/relationshipDefRef".equals(_url))  {
+                this.relationships.add(_content);
+            } else if ("/typeRefList/typeRef".equals(_url))  {
+                this.types.add(_content);
+            } else  {
+                super.parse(_url, _content);
+            }
         }
     }
 
@@ -152,8 +182,11 @@ public class Interface_mxJPO
      * interface specific information are:
      * <ul>
      * <li>abstract information {@link #abstractFlag}</li>
-     * <li>type information (all types define with {@link #typesAll} or all
-     *     types {@link #types})</li>
+     * <li>relationship information (all relationships defined with
+     *     {@link #allRelationships} or some relationships defined with
+     *     {@link #relationships})</li>
+     * <li>type information (all types defined with {@link #allTypes} or some
+     *     types defined with {@link #types})</li>
      * </ul>
      *
      * @param _paramCache   parameter cache
@@ -161,7 +194,9 @@ public class Interface_mxJPO
      * @throws IOException if the interface specific information could not be
      *                     written
      * @see #abstractFlag
-     * @see #typesAll
+     * @see #allRelationships
+     * @see #relationships
+     * @see #allTypes
      * @see #types
      */
     @Override
@@ -172,15 +207,24 @@ public class Interface_mxJPO
         // write abstract information
         _out.append(" \\\n    abstract ").append(Boolean.toString(this.abstractFlag));
 
+        // relationship information
+        if (this.allRelationships)  {
+            _out.append(" \\\n    add relationship all");
+        } else  {
+            for (final String relationship : this.relationships)  {
+                _out.append(" \\\n    add relationship \"")
+                    .append(StringUtil_mxJPO.convertTcl(relationship)).append('\"');
+            }
+        }
+
         // type information
-        if (this.typesAll)  {
+        if (this.allTypes)  {
             _out.append(" \\\n    add type all");
         } else  {
             for (final String type : this.types)  {
                 _out.append(" \\\n    add type \"").append(StringUtil_mxJPO.convertTcl(type)).append('\"');
             }
         }
-
     }
 
     /**
@@ -243,16 +287,26 @@ public class Interface_mxJPO
             throws Exception
     {
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append('\"')
+                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
                 .append(" !hidden description \"\"");
 
+        // relationship information
+        if (this.allRelationships)  {
+            preMQLCode.append(" remove relationship all");
+        } else  {
+            for (final String relationship : this.relationships)  {
+                preMQLCode.append(" remove relationship \"")
+                          .append(StringUtil_mxJPO.convertMql(relationship)).append('\"');
+            }
+        }
+
         // type information
-        if (this.typesAll)  {
+        if (this.allTypes)  {
             preMQLCode.append(" remove type all");
         } else  {
             for (final String type : this.types)  {
-                preMQLCode.append(" remove type \"").append(type).append('\"');
+                preMQLCode.append(" remove type \"").append(StringUtil_mxJPO.convertMql(type)).append('\"');
             }
         }
 
