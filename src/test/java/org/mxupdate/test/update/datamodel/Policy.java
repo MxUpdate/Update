@@ -18,13 +18,14 @@
  * Last Changed By: $Author$
  */
 
-package org.mxupdate.test;
+package org.mxupdate.test.update.datamodel;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.mxupdate.test.AbstractTest;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -37,7 +38,7 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 @Test
-public class TestPolicyUpdate
+public class Policy
     extends AbstractTest
 {
 
@@ -164,8 +165,8 @@ public class TestPolicyUpdate
     public void removePolicy()
         throws Exception
     {
-        if (!"".equals(this.mql("list policy " + TestPolicyUpdate.POLICY_NAME)))  {
-            this.mql("delete policy " + TestPolicyUpdate.POLICY_NAME);
+        if (!"".equals(this.mql("list policy " + Policy.POLICY_NAME)))  {
+            this.mql("delete policy " + Policy.POLICY_NAME);
         }
     }
 
@@ -176,13 +177,12 @@ public class TestPolicyUpdate
      * @throws Exception if MQL execution failed
      * @see http://code.google.com/p/mxupdate/issues/detail?id=29
      */
-    @Test(description = "Check that the new created policy has exact 11 properties defined")
     public void testProperties()
         throws Exception
     {
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + TestPolicyUpdate.POLICY_NAME + ".tcl",
-                   TestPolicyUpdate.POLICY_UPDATE_CODE);
+        params.put("POLICY_" + Policy.POLICY_NAME + ".tcl",
+                   Policy.POLICY_UPDATE_CODE);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(!"".equals(this.mql("list policy MxUpdate_Test")),
@@ -211,15 +211,14 @@ public class TestPolicyUpdate
      * @see http://code.google.com/p/mxupdate/issues/detail?id=28
      * @see http://code.google.com/p/mxupdate/issues/detail?id=29
      */
-    @Test(description = "Check that property with no name is removed")
     public void testNullProperties()
         throws Exception
     {
         this.mql("add policy MxUpdate_Test state Pending property \"\" value Test");
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + TestPolicyUpdate.POLICY_NAME + ".tcl",
-                   TestPolicyUpdate.POLICY_UPDATE_CODE);
+        params.put("POLICY_" + Policy.POLICY_NAME + ".tcl",
+                   Policy.POLICY_UPDATE_CODE);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         // check that only 11 properties are defined....
@@ -245,7 +244,7 @@ public class TestPolicyUpdate
         throws Exception
     {
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + TestPolicyUpdate.POLICY_NAME + ".tcl",
+        params.put("POLICY_" + Policy.POLICY_NAME + ".tcl",
                    "updatePolicy \"${NAME}\" {"
                     + "  state \"Pending\"  {"
                     + "    registeredName \"state_Exists\""
@@ -254,11 +253,11 @@ public class TestPolicyUpdate
                     + "}");
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
-        Assert.assertEquals(this.mql("print policy " + TestPolicyUpdate.POLICY_NAME
+        Assert.assertEquals(this.mql("print policy " + Policy.POLICY_NAME
                                 + " select property[state_Exists].value dump"),
                             "Pending",
                             "test that symbolic name 'state_Exists' is correct registered");
-        Assert.assertEquals(this.mql("print policy " + TestPolicyUpdate.POLICY_NAME
+        Assert.assertEquals(this.mql("print policy " + Policy.POLICY_NAME
                                 + " select property[state_Pending].value dump"),
                             "Pending",
                             "test that symbolic name 'state_Pending' is correct registered");

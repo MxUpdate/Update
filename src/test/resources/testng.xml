@@ -79,46 +79,20 @@
         </classes>
     </test>
 
-    <test name="5 - Test Dimension Update" annotations="JDK">
-        <classes>
-            <class name="org.mxupdate.test.TestDimensionUpdate"/>
-        </classes>
+
+
+    <test name="5 - Test Updates" annotations="JDK">
+        <packages>
+            <package name="org.mxupdate.test.update.datamodel"/>
+            <package name="org.mxupdate.test.update.program"/>
+        </packages>
     </test>
 
-    <test name="5 - Test Policy Update" annotations="JDK">
-        <classes>
-            <class name="org.mxupdate.test.TestPolicyUpdate"/>
-        </classes>
-    </test>
-
-    <test name="6 - Test Policy Export" annotations="JDK">
-        <classes>
-            <class name="org.mxupdate.test.TestPolicyExport"/>
-        </classes>
-    </test>
-
-    <test name="7 - Test JPO Update" annotations="JDK">
-        <classes>
-            <class name="org.mxupdate.test.TestJPOUpdate"/>
-        </classes>
-    </test>
-
-    <test name="7 - Test JPO Export" annotations="JDK">
-        <classes>
-            <class name="org.mxupdate.test.TestJPOExport"/>
-        </classes>
-    </test>
-
-    <test name="8 - Test Type Export" annotations="JDK">
-        <classes>
-            <class name="org.mxupdate.test.TypeExport"/>
-        </classes>
-    </test>
-
-    <test name="8 - Test Type Update" annotations="JDK">
-        <classes>
-            <class name="org.mxupdate.test.TypeUpdate"/>
-        </classes>
+    <test name="6 - Test Exports" annotations="JDK">
+        <packages>
+            <package name="org.mxupdate.test.export.datamodel"/>
+            <package name="org.mxupdate.test.export.program"/>
+        </packages>
     </test>
 
 </suite>

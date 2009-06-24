@@ -18,13 +18,14 @@
  * Last Changed By: $Author$
  */
 
-package org.mxupdate.test;
+package org.mxupdate.test.update.datamodel;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import matrix.util.MatrixException;
 
+import org.mxupdate.test.AbstractTest;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -37,7 +38,7 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 @Test
-public class TestDimensionUpdate
+public class Dimension
     extends AbstractTest
 {
     /**
@@ -52,11 +53,11 @@ public class TestDimensionUpdate
               "################################################################################\n"
             + "# DIMENSION:\n"
             + "# ~~~~~~~~~~\n"
-            + "# " + TestDimensionUpdate.DIMENSION_NAME + "\n"
+            + "# " + Dimension.DIMENSION_NAME + "\n"
             + "#\n"
             + "# SYMBOLIC NAME:\n"
             + "# ~~~~~~~~~~~~~~\n"
-            + "# dimension_" + TestDimensionUpdate.DIMENSION_NAME + "\n"
+            + "# dimension_" + Dimension.DIMENSION_NAME + "\n"
             + "#\n"
             + "# DESCRIPTION:\n"
             + "# ~~~~~~~~~~~~\n"
@@ -114,8 +115,8 @@ public class TestDimensionUpdate
     public void cleanup()
         throws Exception
     {
-        if (!"".equals(this.mql("list dimension " + TestDimensionUpdate.DIMENSION_NAME)))  {
-            this.mql("delete dimension " + TestDimensionUpdate.DIMENSION_NAME);
+        if (!"".equals(this.mql("list dimension " + Dimension.DIMENSION_NAME)))  {
+            this.mql("delete dimension " + Dimension.DIMENSION_NAME);
         }
     }
 
@@ -141,7 +142,7 @@ public class TestDimensionUpdate
     public void testUpdateDimensionDefaultUnitName1()
         throws Exception
     {
-        this.mql("add dimension " + TestDimensionUpdate.DIMENSION_NAME
+        this.mql("add dimension " + Dimension.DIMENSION_NAME
                 + " unit name1 "
                         + "default "
                         + "setting to abc "
@@ -163,7 +164,7 @@ public class TestDimensionUpdate
     public void testUpdateDimensionUnitName1()
         throws Exception
     {
-        this.mql("add dimension " + TestDimensionUpdate.DIMENSION_NAME
+        this.mql("add dimension " + Dimension.DIMENSION_NAME
                 + " unit name1 "
                         + "multiplier 1.0 "
                         + "offset 0.0 "
@@ -188,7 +189,7 @@ public class TestDimensionUpdate
     public void testUpdateFailedDimensionUnitName1()
         throws Exception
     {
-        this.mql("add dimension " + TestDimensionUpdate.DIMENSION_NAME
+        this.mql("add dimension " + Dimension.DIMENSION_NAME
                 + " unit name1 "
                         + "multiplier 1.0 "
                         + "offset 0.0 "
@@ -216,7 +217,7 @@ public class TestDimensionUpdate
     public void testUpdateDimensionDefaultUnitName1a()
         throws Exception
     {
-        this.mql("add dimension " + TestDimensionUpdate.DIMENSION_NAME
+        this.mql("add dimension " + Dimension.DIMENSION_NAME
                 + " unit name1 "
                         + "multiplier 2.0 "
                         + "offset 0.0 "
@@ -240,7 +241,7 @@ public class TestDimensionUpdate
     public void testUpdateFailedDimensionDefaultUnitName1a()
         throws MatrixException
     {
-        this.mql("add dimension " + TestDimensionUpdate.DIMENSION_NAME
+        this.mql("add dimension " + Dimension.DIMENSION_NAME
                 + " unit name1 "
                         + "multiplier 2.0 "
                         + "offset 0.0 "
@@ -268,7 +269,7 @@ public class TestDimensionUpdate
     public void testUpdateDimensionDefaultUnitName1b()
         throws Exception
     {
-        this.mql("add dimension " + TestDimensionUpdate.DIMENSION_NAME
+        this.mql("add dimension " + Dimension.DIMENSION_NAME
                 + " unit name1 "
                         + "multiplier 1.0 "
                         + "offset 1.0 "
@@ -292,7 +293,7 @@ public class TestDimensionUpdate
     public void testUpdateFailedDimensionDefaultUnitName1b()
         throws MatrixException
     {
-        this.mql("add dimension " + TestDimensionUpdate.DIMENSION_NAME
+        this.mql("add dimension " + Dimension.DIMENSION_NAME
                 + " unit name1 "
                         + "multiplier 1.0 "
                         + "offset 1.0 "
@@ -319,7 +320,7 @@ public class TestDimensionUpdate
     public void testUpdateDimensionNotDefaultUnitName2()
         throws Exception
     {
-        this.mql("add dimension " + TestDimensionUpdate.DIMENSION_NAME
+        this.mql("add dimension " + Dimension.DIMENSION_NAME
                 + " unit name2 "
                         + "multiplier 10.0 "
                         + "offset 20.0 "
@@ -342,7 +343,7 @@ public class TestDimensionUpdate
     public void testUpdateFailedDimensionDefaultUnitName2()
         throws MatrixException
     {
-        this.mql("add dimension " + TestDimensionUpdate.DIMENSION_NAME
+        this.mql("add dimension " + Dimension.DIMENSION_NAME
                 + " unit name1 "
                 + " unit name2 "
                         + "default "
@@ -375,14 +376,14 @@ public class TestDimensionUpdate
     public void testUpdateDimensionNotDefaultUnitName3()
         throws Exception
     {
-        this.mql("add dimension " + TestDimensionUpdate.DIMENSION_NAME + " "
+        this.mql("add dimension " + Dimension.DIMENSION_NAME + " "
                         + "unit 'name 3' "
                                 + "multiplier 30.0 "
                                 + "offset 40.0 "
                                 + "setting to abc "
                                 + "setting remove1 removeValue "
                                 + "setting \"remove 2\" removeValue2;"
-                + "mod dimension " + TestDimensionUpdate.DIMENSION_NAME + " "
+                + "mod dimension " + Dimension.DIMENSION_NAME + " "
                 + "modify unit 'name 3' system a to unit 'name 3' "
         + "modify unit 'name 3' system b to unit 'name 3';");
 
@@ -399,7 +400,7 @@ public class TestDimensionUpdate
     public void testUpdateDimensionRemovingUnit()
         throws Exception
     {
-        this.mql("add dimension " + TestDimensionUpdate.DIMENSION_NAME
+        this.mql("add dimension " + Dimension.DIMENSION_NAME
                 + " unit removeUnit ");
 
         final Map<String,String> params = new HashMap<String,String>(1);
@@ -419,7 +420,7 @@ public class TestDimensionUpdate
     public void testUpdateFailedDimensionRemovingUnit()
         throws MatrixException
     {
-        this.mql("add dimension " + TestDimensionUpdate.DIMENSION_NAME
+        this.mql("add dimension " + Dimension.DIMENSION_NAME
                 + " unit removeUnit ");
         Exception ex = null;
         try  {
@@ -444,8 +445,8 @@ public class TestDimensionUpdate
         throws Exception
     {
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("DIMENSION_" + TestDimensionUpdate.DIMENSION_NAME + ".tcl",
-                    TestDimensionUpdate.DIMENSION_CODE);
+        params.put("DIMENSION_" + Dimension.DIMENSION_NAME + ".tcl",
+                    Dimension.DIMENSION_CODE);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params, false, _params);
     }
 
@@ -458,19 +459,19 @@ public class TestDimensionUpdate
     private void checkAll()
         throws MatrixException
     {
-        Assert.assertTrue(!"".equals(this.mql("list dimension " + TestDimensionUpdate.DIMENSION_NAME)),
+        Assert.assertTrue(!"".equals(this.mql("list dimension " + Dimension.DIMENSION_NAME)),
                           "dimension was not created!");
-        Assert.assertEquals(this.mql("print dimension " + TestDimensionUpdate.DIMENSION_NAME
+        Assert.assertEquals(this.mql("print dimension " + Dimension.DIMENSION_NAME
                                     + " select description dump"),
                             "a simple description",
                             "Check that description is set");
-        Assert.assertEquals(this.mql("list property to dimension " + TestDimensionUpdate.DIMENSION_NAME),
-                            "dimension_" + TestDimensionUpdate.DIMENSION_NAME
+        Assert.assertEquals(this.mql("list property to dimension " + Dimension.DIMENSION_NAME),
+                            "dimension_" + Dimension.DIMENSION_NAME
                                     + " on program eServiceSchemaVariableMapping.tcl to dimension "
-                                    + TestDimensionUpdate.DIMENSION_NAME,
+                                    + Dimension.DIMENSION_NAME,
                             "Check for symbolic name registration.");
 
-        Assert.assertEquals(this.mql("print dimension " + TestDimensionUpdate.DIMENSION_NAME
+        Assert.assertEquals(this.mql("print dimension " + Dimension.DIMENSION_NAME
                                             + " select unit dump @")
                                     .replaceAll("name1", "")
                                     .replaceAll("name2", "")
@@ -478,7 +479,7 @@ public class TestDimensionUpdate
                             "@@",
                             "check that exact three units are defined");
 
-        Assert.assertEquals(this.mql("print dimension " + TestDimensionUpdate.DIMENSION_NAME
+        Assert.assertEquals(this.mql("print dimension " + Dimension.DIMENSION_NAME
                                     + " select unit[name1] dump"),
                             "TRUE",
                             "check that unit 'name1' exists");
@@ -491,7 +492,7 @@ public class TestDimensionUpdate
         this.checkUnit("name1", "setting[SettingKey2].value", "SettingValue2");
         this.checkUnit("name1", "setting[to]", "TRUE");
         this.checkUnit("name1", "setting[to].value", "SettingValue");
-        Assert.assertEquals(this.mql("print dimension " + TestDimensionUpdate.DIMENSION_NAME
+        Assert.assertEquals(this.mql("print dimension " + Dimension.DIMENSION_NAME
                                             + " select unit[name1].setting dump @")
                                     .replaceAll("to", "")
                                     .replaceAll("SettingKey2", ""),
@@ -511,7 +512,7 @@ public class TestDimensionUpdate
         this.checkUnit("name1", "property[test].to", "type Part");
         this.checkUnit("name1", "systemunit", "");
 
-        Assert.assertEquals(this.mql("print dimension " + TestDimensionUpdate.DIMENSION_NAME
+        Assert.assertEquals(this.mql("print dimension " + Dimension.DIMENSION_NAME
                                     + " select unit[name2] dump"),
                             "TRUE",
                             "Check that unit 'name2' exists");
@@ -524,7 +525,7 @@ public class TestDimensionUpdate
         this.checkUnit("name2", "systemunit", "name2");
         this.checkUnit("name2", "systemunit[Duration Units]", "name2");
 
-        Assert.assertEquals(this.mql("print dimension " + TestDimensionUpdate.DIMENSION_NAME
+        Assert.assertEquals(this.mql("print dimension " + Dimension.DIMENSION_NAME
                                     + " select unit[name 3] dump"),
                             "TRUE",
                             "Check that unit 'name 3' exists");
@@ -534,7 +535,7 @@ public class TestDimensionUpdate
         this.checkUnit("name 3", "multiplier", "30.0");
         this.checkUnit("name 3", "offset", "40.0");
         this.checkUnit("name 3", "property", "");
-        Assert.assertEquals(this.mql("print dimension " + TestDimensionUpdate.DIMENSION_NAME
+        Assert.assertEquals(this.mql("print dimension " + Dimension.DIMENSION_NAME
                                             + " select 'unit[name 3].systemunit[]' dump @")
                                     .replaceAll("name2", "")
                                     .replaceAll("name 3", ""),
@@ -561,7 +562,7 @@ public class TestDimensionUpdate
                            final String _target)
         throws MatrixException
     {
-        Assert.assertEquals(this.mql("print dimension " + TestDimensionUpdate.DIMENSION_NAME
+        Assert.assertEquals(this.mql("print dimension " + Dimension.DIMENSION_NAME
                                     + " select 'unit[" + _unit + "]." + _select + "' dump"),
                             _target,
                             "Check for unit '" + _unit + "' the " + _select + ".");

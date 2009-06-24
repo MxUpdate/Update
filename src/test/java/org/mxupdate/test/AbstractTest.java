@@ -48,6 +48,61 @@ import org.testng.annotations.BeforeClass;
 public class AbstractTest
 {
     /**
+     * Enumeration to define a mapping between the configuration items and the
+     * related administration types in MX and MxUpdate Update.
+     */
+    protected enum CI
+    {
+        /**
+         * Configuration item Data Model Interface.
+         */
+        INTERFACE("interface", "Interface"),
+
+        /**
+         * Configuration item Data Model Policy.
+         */
+        POLICY("policy", "Policy"),
+
+        /**
+         * Configuration item Data Model Relationship.
+         */
+        RELATIONSHIP("relationship", "Relationship"),
+
+        /**
+         * Configuration item Data Model Type.
+         */
+        TYPE("type", "Type"),
+
+        /**
+         * Configuration item Program JPO.
+         */
+        JPO("program", "JPO");
+
+        /**
+         * Related type name in MX.
+         */
+        final String mxType;
+
+        /**
+         * Related type name in MxUpdate Update.
+         */
+        final String updateType;
+
+        /**
+         * Constructor to initialize an enumeration instance.
+         *
+         * @param _mxType       related type name in MX
+         * @param _updateType   related type name in MxUpdate Update
+         */
+        CI(final String _mxType,
+           final String _updateType)
+        {
+            this.mxType = _mxType;
+            this.updateType = _updateType;
+        }
+    }
+
+    /**
      * MX context.
      */
     private Context context;
@@ -97,7 +152,13 @@ public class AbstractTest
 
     /**
      * Export given configuration item <code>_type</code> with
-     * <code>_name</code>.
+     * <code>_name</code>. The returned values from the export are checked for:
+     * <ul>
+     * <li>value is returned</li>
+     * <li>the returned export value includes exact one export for given
+     *     <code>_type</code></li>
+     * <li>the name of the exported object is equal <code>_name</code></li>
+     * </ul>
      *
      * @param _type     type to export
      * @param _name     name to export
@@ -105,12 +166,12 @@ public class AbstractTest
      * @throws IOException      if the parameter could not be encoded
      * @throws MatrixException  if MQL calls failed
      */
-    protected Export export(final String _type,
+    protected Export export(final CI _type,
                             final String _name)
         throws IOException, MatrixException
     {
         final Map<String,Collection<String>> params = new HashMap<String,Collection<String>>(1);
-        params.put(_type, Arrays.asList(new String[]{_name}));
+        params.put(_type.updateType, Arrays.asList(new String[]{_name}));
         final Map<String,Collection<Map<String,String>>> bck =
                 this.<Map<String,Collection<Map<String,String>>>>jpoInvoke("org.mxupdate.plugin.Export",
                                                                            "exportByName",
@@ -118,10 +179,14 @@ public class AbstractTest
                     .getValues();
 
         Assert.assertNotNull(bck);
-        Assert.assertTrue(bck.containsKey(_type));
-        Assert.assertEquals(bck.get(_type).size(), 1, "one element is returned");
+        Assert.assertTrue(bck.containsKey(_type.updateType));
+        Assert.assertEquals(bck.get(_type.updateType).size(), 1, "one element is returned");
 
-        return new Export(bck.get(_type).iterator().next());
+        final Export ret =  new Export(bck.get(_type.updateType).iterator().next());
+
+        Assert.assertEquals(ret.getName(), _name, "returned name is equal to given name");
+
+        return ret;
     }
 
     /**
@@ -142,6 +207,23 @@ public class AbstractTest
     }
 
     /**
+     * Makes a clean up for given configuration item <code>_type</code> with
+     * <code>_name</code>. This means the configuration item object is deleted.
+     *
+     * @param _type     configuration item type to clean up (delete)
+     * @param _name     name of the configuration item to clean up (delete)
+     * @throws MatrixException if delete failed
+     */
+    protected void cleanup(final CI _type,
+                           final String _name)
+        throws MatrixException
+    {
+        if (!"".equals(this.mql("list " + _type.mxType + " '" + _name + "'")))  {
+            this.mql("delete " + _type.mxType + " '" + _name + "'");
+        }
+    }
+
+    /**
      * Calls given <code>_method</code> in <code>_jpo</code>. The MX context
      * {@link #mxContext} is connected to the database if not already done.
      *
@@ -158,8 +240,8 @@ public class AbstractTest
      * @see JPOReturn
      */
     protected <T> JPOReturn<T> jpoInvoke(final String _jpo,
-                              final String _method,
-                              final Object... _parameters)
+                                         final String _method,
+                                         final Object... _parameters)
         throws IOException, MatrixException
     {
         // encode parameters

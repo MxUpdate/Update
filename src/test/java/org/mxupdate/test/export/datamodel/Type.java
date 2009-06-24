@@ -18,8 +18,9 @@
  * Last Changed By: $Author$
  */
 
-package org.mxupdate.test;
+package org.mxupdate.test.export.datamodel;
 
+import org.mxupdate.test.AbstractTest;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -32,7 +33,7 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 @Test
-public class TypeExport
+public class Type
     extends AbstractTest
 {
     /**
@@ -61,14 +62,14 @@ public class TypeExport
     public void cleanup()
         throws Exception
     {
-        if (!"".equals(this.mql("list type " + TypeExport.TYPE_NAME)))  {
-            this.mql("delete type " + TypeExport.TYPE_NAME);
+        if (!"".equals(this.mql("list type " + Type.TYPE_NAME)))  {
+            this.mql("delete type " + Type.TYPE_NAME);
         }
-        if (!"".equals(this.mql("list program '" + TypeExport.PROG_NAME1 + "'")))  {
-            this.mql("delete program '" + TypeExport.PROG_NAME1 + "'");
+        if (!"".equals(this.mql("list program '" + Type.PROG_NAME1 + "'")))  {
+            this.mql("delete program '" + Type.PROG_NAME1 + "'");
         }
-        if (!"".equals(this.mql("list program '" + TypeExport.PROG_NAME2 + "'")))  {
-            this.mql("delete program '" + TypeExport.PROG_NAME2 + "'");
+        if (!"".equals(this.mql("list program '" + Type.PROG_NAME2 + "'")))  {
+            this.mql("delete program '" + Type.PROG_NAME2 + "'");
         }
     }
 
@@ -81,7 +82,7 @@ public class TypeExport
     public void withoutMethod()
         throws Exception
     {
-        this.mql("add type " + TypeExport.TYPE_NAME);
+        this.mql("add type " + Type.TYPE_NAME);
 
         final String code = this.exportType();
         Assert.assertTrue(code.indexOf(" add method ") < 0, "checks that not method is exported");
@@ -96,12 +97,12 @@ public class TypeExport
     public void withOneMethod()
         throws Exception
     {
-        this.mql("add program '" + TypeExport.PROG_NAME1 + "' mql");
-        this.mql("add type " + TypeExport.TYPE_NAME
-                + " method '" + TypeExport.PROG_NAME1 + "'");
+        this.mql("add program '" + Type.PROG_NAME1 + "' mql");
+        this.mql("add type " + Type.TYPE_NAME
+                + " method '" + Type.PROG_NAME1 + "'");
 
         final String code = this.exportType();
-        final int idx1 = code.indexOf(" add method \"" + TypeExport.PROG_NAME1 + "\"");
+        final int idx1 = code.indexOf(" add method \"" + Type.PROG_NAME1 + "\"");
         final int idx2 = code.indexOf(" add method ", idx1 + 4);
 
         Assert.assertTrue(idx1 >= 0, "check that a method is defined in the TCL update code");
@@ -117,15 +118,15 @@ public class TypeExport
     public void withTwoMethods()
         throws Exception
     {
-        this.mql("add program '" + TypeExport.PROG_NAME1 + "' mql");
-        this.mql("add program '" + TypeExport.PROG_NAME2 + "' mql");
-        this.mql("add type " + TypeExport.TYPE_NAME
-                + " method '" + TypeExport.PROG_NAME1 + "'"
-                + " method '" + TypeExport.PROG_NAME2 + "'");
+        this.mql("add program '" + Type.PROG_NAME1 + "' mql");
+        this.mql("add program '" + Type.PROG_NAME2 + "' mql");
+        this.mql("add type " + Type.TYPE_NAME
+                + " method '" + Type.PROG_NAME1 + "'"
+                + " method '" + Type.PROG_NAME2 + "'");
 
         final String code = this.exportType();
-        final int idx1 = code.indexOf(" add method \"" + TypeExport.PROG_NAME1 + "\"");
-        final int idx2 = code.indexOf(" add method \"" + TypeExport.PROG_NAME2 + "\"");
+        final int idx1 = code.indexOf(" add method \"" + Type.PROG_NAME1 + "\"");
+        final int idx2 = code.indexOf(" add method \"" + Type.PROG_NAME2 + "\"");
         final int idx3 = code.indexOf(" add method ", (idx1 > idx2) ? idx1 + 4 : idx2 + 4);
 
         Assert.assertTrue(idx1 >= 0, "check that a method is defined in the TCL update code");
@@ -144,12 +145,11 @@ public class TypeExport
     private String exportType()
         throws Exception
     {
-        final Export export = this.export("Type", TypeExport.TYPE_NAME);
+        final Export export = this.export(CI.TYPE, Type.TYPE_NAME);
 
-        Assert.assertEquals(export.getName(), TypeExport.TYPE_NAME, "returned name is equal to given name");
         Assert.assertEquals(export.getPath(), "datamodel/type", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "TYPE_" + TypeExport.TYPE_NAME + ".tcl",
+                            "TYPE_" + Type.TYPE_NAME + ".tcl",
                             "check that the correct file name is returned");
 
         return export.getCode();

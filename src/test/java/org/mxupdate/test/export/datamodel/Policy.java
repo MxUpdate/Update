@@ -18,8 +18,9 @@
  * Last Changed By: $Author$
  */
 
-package org.mxupdate.test;
+package org.mxupdate.test.export.datamodel;
 
+import org.mxupdate.test.AbstractTest;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -32,7 +33,7 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 @Test
-public class TestPolicyExport
+public class Policy
     extends AbstractTest
 {
     /**
@@ -50,8 +51,8 @@ public class TestPolicyExport
     public void removeType()
         throws Exception
     {
-        if (!"".equals(this.mql("list policy " + TestPolicyExport.POLICY_NAME)))  {
-            this.mql("delete policy " + TestPolicyExport.POLICY_NAME);
+        if (!"".equals(this.mql("list policy " + Policy.POLICY_NAME)))  {
+            this.mql("delete policy " + Policy.POLICY_NAME);
         }
     }
 
@@ -64,14 +65,13 @@ public class TestPolicyExport
     public void testExportPolicyForAllTypes()
         throws Exception
     {
-        this.mql("add policy " + TestPolicyExport.POLICY_NAME + " type all");
+        this.mql("add policy " + Policy.POLICY_NAME + " type all");
 
-        final Export export = this.export("Policy", TestPolicyExport.POLICY_NAME);
+        final Export export = this.export(CI.POLICY, Policy.POLICY_NAME);
 
-        Assert.assertEquals(export.getName(), TestPolicyExport.POLICY_NAME, "returned name is equal to given name");
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + TestPolicyExport.POLICY_NAME + ".tcl",
+                            "POLICY_" + Policy.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         final String testCode = code.substring(code.lastIndexOf('#')).trim();
@@ -87,15 +87,14 @@ public class TestPolicyExport
     public void testStateSymbolicNameExportedIfNotDefined()
         throws Exception
     {
-        this.mql("add policy " + TestPolicyExport.POLICY_NAME
+        this.mql("add policy " + Policy.POLICY_NAME
                 + " state create");
 
-        final Export export = this.export("Policy", TestPolicyExport.POLICY_NAME);
+        final Export export = this.export(CI.POLICY, Policy.POLICY_NAME);
 
-        Assert.assertEquals(export.getName(), TestPolicyExport.POLICY_NAME, "returned name is equal to given name");
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + TestPolicyExport.POLICY_NAME + ".tcl",
+                            "POLICY_" + Policy.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(code.indexOf("registeredName \"state_create\"") >= 0,
@@ -113,15 +112,14 @@ public class TestPolicyExport
     public void testNoPropertyDefinitionForStateSymbolicName()
         throws Exception
     {
-        this.mql("add policy " + TestPolicyExport.POLICY_NAME
+        this.mql("add policy " + Policy.POLICY_NAME
                 + " state create property state_create value create");
 
-        final Export export = this.export("Policy", TestPolicyExport.POLICY_NAME);
+        final Export export = this.export(CI.POLICY, Policy.POLICY_NAME);
 
-        Assert.assertEquals(export.getName(), TestPolicyExport.POLICY_NAME, "returned name is equal to given name");
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + TestPolicyExport.POLICY_NAME + ".tcl",
+                            "POLICY_" + Policy.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(code.indexOf("mql add property \"state_create\"") < 0,
@@ -138,15 +136,14 @@ public class TestPolicyExport
     public void testAllSymbolicNamesForStatesDefined()
         throws Exception
     {
-        this.mql("add policy " + TestPolicyExport.POLICY_NAME
+        this.mql("add policy " + Policy.POLICY_NAME
                 + " state create property state_create value create property state_exists value create");
 
-        final Export export = this.export("Policy", TestPolicyExport.POLICY_NAME);
+        final Export export = this.export(CI.POLICY, Policy.POLICY_NAME);
 
-        Assert.assertEquals(export.getName(), TestPolicyExport.POLICY_NAME, "returned name is equal to given name");
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + TestPolicyExport.POLICY_NAME + ".tcl",
+                            "POLICY_" + Policy.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(code.indexOf("registeredName \"state_create\"") >= 0,

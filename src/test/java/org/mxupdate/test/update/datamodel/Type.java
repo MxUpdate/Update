@@ -18,8 +18,9 @@
  * Last Changed By: $Author$
  */
 
-package org.mxupdate.test;
+package org.mxupdate.test.update.datamodel;
 
+import org.mxupdate.test.AbstractTest;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -32,7 +33,7 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 @Test
-public class TypeUpdate
+public class Type
     extends AbstractTest
 {
     /**
@@ -61,14 +62,14 @@ public class TypeUpdate
     public void cleanup()
         throws Exception
     {
-        if (!"".equals(this.mql("list type " + TypeUpdate.TYPE_NAME)))  {
-            this.mql("delete type " + TypeUpdate.TYPE_NAME);
+        if (!"".equals(this.mql("list type " + Type.TYPE_NAME)))  {
+            this.mql("delete type " + Type.TYPE_NAME);
         }
-        if (!"".equals(this.mql("list program '" + TypeUpdate.PROG_NAME1 + "'")))  {
-            this.mql("delete program '" + TypeUpdate.PROG_NAME1 + "'");
+        if (!"".equals(this.mql("list program '" + Type.PROG_NAME1 + "'")))  {
+            this.mql("delete program '" + Type.PROG_NAME1 + "'");
         }
-        if (!"".equals(this.mql("list program '" + TypeUpdate.PROG_NAME2 + "'")))  {
-            this.mql("delete program '" + TypeUpdate.PROG_NAME2 + "'");
+        if (!"".equals(this.mql("list program '" + Type.PROG_NAME2 + "'")))  {
+            this.mql("delete program '" + Type.PROG_NAME2 + "'");
         }
     }
 
@@ -81,12 +82,12 @@ public class TypeUpdate
     public void noMethod4ExistingTypeWithNoMethod()
         throws Exception
     {
-        this.mql("add type '" + TypeUpdate.TYPE_NAME + "'");
+        this.mql("add type '" + Type.TYPE_NAME + "'");
 
-        this.update("TYPE_" + TypeUpdate.TYPE_NAME + ".tcl",
+        this.update("TYPE_" + Type.TYPE_NAME + ".tcl",
                     "mql mod type \"${NAME}\"");
 
-        Assert.assertEquals(this.mql("print type '" + TypeUpdate.TYPE_NAME + "' select method dump"),
+        Assert.assertEquals(this.mql("print type '" + Type.TYPE_NAME + "' select method dump"),
                             "",
                             "check that no method is defined");
     }
@@ -101,14 +102,14 @@ public class TypeUpdate
     public void noMethod4ExistingTypeWithOneMethod()
         throws Exception
     {
-        this.mql("add program '" + TypeUpdate.PROG_NAME1 + "' mql");
-        this.mql("add type " + TypeUpdate.TYPE_NAME
-                + " method '" + TypeUpdate.PROG_NAME1 + "'");
+        this.mql("add program '" + Type.PROG_NAME1 + "' mql");
+        this.mql("add type " + Type.TYPE_NAME
+                + " method '" + Type.PROG_NAME1 + "'");
 
-        this.update("TYPE_" + TypeUpdate.TYPE_NAME + ".tcl",
+        this.update("TYPE_" + Type.TYPE_NAME + ".tcl",
                     "mql mod type \"${NAME}\"");
 
-        Assert.assertEquals(this.mql("print type '" + TypeUpdate.TYPE_NAME + "' select method dump"),
+        Assert.assertEquals(this.mql("print type '" + Type.TYPE_NAME + "' select method dump"),
                             "",
                             "check that no method is defined");
     }
@@ -123,14 +124,14 @@ public class TypeUpdate
     public void oneMethod4ExistingTypeWithNoMethod()
         throws Exception
     {
-        this.mql("add program '" + TypeUpdate.PROG_NAME1 + "' mql");
-        this.mql("add type '" + TypeUpdate.TYPE_NAME + "'");
+        this.mql("add program '" + Type.PROG_NAME1 + "' mql");
+        this.mql("add type '" + Type.TYPE_NAME + "'");
 
-        this.update("TYPE_" + TypeUpdate.TYPE_NAME + ".tcl",
-                    "mql mod type \"${NAME}\" add method '" + TypeUpdate.PROG_NAME1 + "'");
+        this.update("TYPE_" + Type.TYPE_NAME + ".tcl",
+                    "mql mod type \"${NAME}\" add method '" + Type.PROG_NAME1 + "'");
 
-        Assert.assertEquals(this.mql("print type '" + TypeUpdate.TYPE_NAME + "' select method dump"),
-                            TypeUpdate.PROG_NAME1,
+        Assert.assertEquals(this.mql("print type '" + Type.TYPE_NAME + "' select method dump"),
+                            Type.PROG_NAME1,
                             "check that one method is defined");
     }
 }

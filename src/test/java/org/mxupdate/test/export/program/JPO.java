@@ -18,23 +18,22 @@
  * Last Changed By: $Author$
  */
 
-package org.mxupdate.test;
+package org.mxupdate.test.export.program;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.mxupdate.test.AbstractTest;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
- * Test class for JPO updates (imports).
+ * Test class for JPO exports (extracts).
  *
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class TestJPOUpdate
+@Test
+public class JPO
     extends AbstractTest
 {
     /**
@@ -63,7 +62,7 @@ public class TestJPOUpdate
      * @see #JPO_NAME1
      * @see #JPO_PACKAGE1
      */
-    private static final String JPO_COMPL1 = TestJPOUpdate.JPO_PACKAGE1 + "." + TestJPOUpdate.JPO_NAME1;
+    private static final String JPO_COMPL1 = JPO.JPO_PACKAGE1 + "." + JPO.JPO_NAME1;
 
     /**
      * Name of test JPO without package name.
@@ -82,38 +81,50 @@ public class TestJPOUpdate
     public void cleanup()
         throws Exception
     {
-        if (!"".equals(this.mql("list program " + TestJPOUpdate.JPO_COMPL1)))  {
-            this.mql("delete program " + TestJPOUpdate.JPO_COMPL1);
-        }
-        if (!"".equals(this.mql("list program " + TestJPOUpdate.JPO_NAME2)))  {
-            this.mql("delete program " + TestJPOUpdate.JPO_NAME2);
-        }
+        this.cleanup(CI.JPO, JPO.JPO_COMPL1);
+        this.cleanup(CI.JPO, JPO.JPO_NAME2);
     }
 
     /**
-     * Tests, if the JPO within MX is created and registered with the correct
-     * symbolic name.
+     * Checks that the new created JPO {@link #JPO_NAME2} is exported
+     * correctly.
      *
-     * @throws Exception if test failed
-     * @see http://code.google.com/p/mxupdate/issues/detail?id=22
+     * @throws Exception if check failed
      */
-    @Test
-    public void testJPOUpdate()
+    public void testExportJPOWithoutPackage()
         throws Exception
     {
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put(TestJPOUpdate.JPO_NAME2 + "_mxJPO.java",
-                   "public class " + TestJPOUpdate.JPO_NAME2 + "_mxJPO {}");
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.mql("add program " + JPO.JPO_NAME2 + " java");
 
-        Assert.assertTrue(!"".equals(this.mql("list program " + TestJPOUpdate.JPO_NAME2)),
-                          "check JPO is created");
-        Assert.assertTrue(!"".equals(this.mql("list property to program " + TestJPOUpdate.JPO_NAME2)),
-                          "check that the JPO is registered");
-        Assert.assertEquals(this.mql("list property to program " + TestJPOUpdate.JPO_NAME2),
-                            "program_" + TestJPOUpdate.JPO_NAME2
-                                    + " on program eServiceSchemaVariableMapping.tcl to program "
-                                    + TestJPOUpdate.JPO_NAME2,
-                            "check that the JPO is registered with correct symbolic name");
+        final Export export = this.export(CI.JPO, JPO.JPO_NAME2);
+
+        Assert.assertEquals(export.getPath(), "jpo", "path is not correct");
+        Assert.assertEquals(export.getFileName(),
+                            JPO.JPO_NAME2 + "_mxJPO.java",
+                            "check that the correct file name is returned");
+        Assert.assertEquals(export.getCode(), "", "checks that Java code is empty");
+    }
+
+    /**
+     * Checks that the new created JPO {@link #JPO_COMPL1} is exported
+     * correctly. The JPO includes package {@link #JPO_PACKAGE1}.
+     *
+     * @throws Exception if check failed
+     * @see http://code.google.com/p/mxupdate/issues/detail?id=26
+     */
+    public void testExportJPOWithPackage()
+        throws Exception
+    {
+        this.mql("add program " + JPO.JPO_COMPL1 + " java");
+
+        final Export export = this.export(CI.JPO, JPO.JPO_COMPL1);
+
+        Assert.assertEquals(export.getPath(), "jpo/" + JPO.JPO_PACKAGE1, "path is not correct");
+        Assert.assertEquals(export.getFileName(),
+                            JPO.JPO_NAME1 + "_mxJPO.java",
+                            "check that the correct file name is returned");
+        Assert.assertEquals(export.getCode().trim(),
+                            "package MxUpdate;",
+                            "checks that Java code has package definition");
     }
 }
