@@ -24,7 +24,7 @@ tcl;
 
 eval  {
 
-  set VERSION "0-5-0"
+  set VERSION "0-5-1"
 
   set ENV_NAME_MXUPDATE_PATH      "MXUPDATE_PATH"
   set ENV_NAME_MAPPING_EXTENSION  "MXUPDATE_MAPPING_FILE"
@@ -91,7 +91,7 @@ eval  {
     # prepare mapping
     foreach sOneLine ${lsMapping}  {
       set sOneLine [string trim "${sOneLine}"]
-      # check for none empty line and none comment line 
+      # check for none empty line and none comment line
       if {([string length "${sOneLine}"] > 0) && ([string index "${sOneLine}" 0] != "#")}  {
         # equal index position
         set iIdx [string first "=" "${sOneLine}"]
