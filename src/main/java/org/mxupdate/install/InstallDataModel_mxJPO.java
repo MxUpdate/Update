@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,7 +36,6 @@ import matrix.util.Mime64;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.plugin.GetProperties_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -154,7 +154,7 @@ public class InstallDataModel_mxJPO
      * @see #registerPrograms(ParameterCache_mxJPO)
      */
     private static final String LIST_MXUPDATE_PROGRAMS
-            = "list program MxUpdate,org.mxupdate* select name isjavaprogram dump @";
+            = "escape list program MxUpdate,org.mxupdate* select name isjavaprogram dump @";
 
     /**
      * Method used as entry from the MQL interface to install / update the data
@@ -170,7 +170,7 @@ public class InstallDataModel_mxJPO
      * <li>define plug-in properties in
      *     {@link #makePluginProperty(ParameterCache_mxJPO, File)}</li>
      * <li>register the MxUdpate Update programs with their symbolic names in
-     *     {@link #registerPrograms(ParameterCache_mxJPO)}</li>
+     *     {@link #registerPrograms(ParameterCache_mxJPO, String, String, String, String, String)}</li>
      * <li>register MxUpdate as application in
      *     {@link #registerMxUpdate(ParameterCache_mxJPO, String, String)}</li>
      * </ul>
@@ -186,7 +186,7 @@ public class InstallDataModel_mxJPO
      * @see #installTriggerGroupRelation(ParameterCache_mxJPO, String, String, String, String, String, String)
      * @see #updateAttributes(ParameterCache_mxJPO, String, String, String, String, String, String)
      * @see #updateBusTypes(ParameterCache_mxJPO)
-     * @see #registerPrograms(ParameterCache_mxJPO)
+     * @see #registerPrograms(ParameterCache_mxJPO, String, String, String, String, String)
      * @see #registerMxUpdate(ParameterCache_mxJPO, String, String)
      * @see #makePluginProperty(ParameterCache_mxJPO, File)
      */
@@ -224,22 +224,37 @@ public class InstallDataModel_mxJPO
                 fileDate, installedDate);
         this.updateBusTypes(paramCache);
         this.makePluginProperty(paramCache, path);
-        this.registerPrograms(paramCache);
+        this.registerPrograms(paramCache,
+                applName, applVersion,
+                authorName, installerName,
+                installedDate);
         this.registerMxUpdate(paramCache, applName, applVersion);
     }
 
     /**
      * All programs evaluated with {@link #LIST_MXUPDATE_PROGRAMS} are checked
-     * if they must be registered with a symbolic name. If they are not already
-     * registered, the registration of the symbolic names of the programs are
-     * done.
+     * if they must be registered with a symbolic name and all other specific
+     * properties are set. If they are not already registered, the registration
+     * of the symbolic names of the programs are done. And also all other
+     * properties are set only if they are not already set.
      *
-     * @param _paramCache   parameter cache
+     * @param _paramCache       parameter cache
+     * @param _applName         used application name of the MxUpdate Update
+     *                          deployment tool
+     * @param _applVersion      Mx Update version
+     * @param _authorName       used author name
+     * @param _installerName    used installer name
+     * @param _installedDate    used installed date
      * @throws Exception if registration of the symbolic names for all MxUpdate
      *                   Update programs failed
      * @see #LIST_MXUPDATE_PROGRAMS
      */
-    protected void registerPrograms(final ParameterCache_mxJPO _paramCache)
+    protected void registerPrograms(final ParameterCache_mxJPO _paramCache,
+                                    final String _applName,
+                                    final String _applVersion,
+                                    final String _authorName,
+                                    final String _installerName,
+                                    final String _installedDate)
         throws Exception
     {
         final TypeDef_mxJPO jpoTypeDef
@@ -249,15 +264,27 @@ public class InstallDataModel_mxJPO
 
         final String progs = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
                                                    InstallDataModel_mxJPO.LIST_MXUPDATE_PROGRAMS);
-        for (final String progLine : progs.split("\n"))  {
+        for (final String progLine : new TreeSet<String>(Arrays.asList(progs.split("\n"))))  {
             final String[] progLineArr = progLine.split("@");
             final String progName = progLineArr[0];
             // do we have a JPO?
+            final AbstractObject_mxJPO prog;
             if ("true".equalsIgnoreCase(progLineArr[1]))  {
-                this.registerObject(_paramCache, jpoTypeDef.newTypeInstance(progName));
+                prog = jpoTypeDef.newTypeInstance(progName);
             } else  {
-                this.registerObject(_paramCache, mqlTypeDef.newTypeInstance(progName));
+                prog = mqlTypeDef.newTypeInstance(progName);
             }
+            _paramCache.logInfo("check program '" + progName + "'");
+            this.registerObject(_paramCache, prog);
+            final StringBuilder cmd = new StringBuilder()
+                    .append("escape mod program \"").append(StringUtil_mxJPO.convertMql(progName)).append("\" ");
+            this.checkProperty(_paramCache, prog, PropertyDef_mxJPO.APPLICATION, _applName, cmd, false);
+            this.checkProperty(_paramCache, prog, PropertyDef_mxJPO.AUTHOR, _authorName, cmd, false);
+            this.checkProperty(_paramCache, prog, PropertyDef_mxJPO.INSTALLER, _installerName, cmd, false);
+            this.checkProperty(_paramCache, prog, PropertyDef_mxJPO.VERSION, _applVersion, cmd, false);
+            this.checkProperty(_paramCache, prog, PropertyDef_mxJPO.ORIGINALNAME, progName, cmd, false);
+            this.checkProperty(_paramCache, prog, PropertyDef_mxJPO.INSTALLEDDATE, _installedDate, cmd, true);
+            MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
         }
     }
 
@@ -544,20 +571,14 @@ public class InstallDataModel_mxJPO
                                      .getTypeDef(InstallDataModel_mxJPO.TYPEDEF_ATTRIBUTE_STRING)
                                      .newTypeInstance(propDef.getAttrName(_paramCache));
 
-                // check for correct application name
+                // check for correct property entries
                 this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.APPLICATION, _applName, cmd, false);
-                // check for correct author name
                 this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.AUTHOR, _authorName, cmd, false);
-                // check for correct installer name
                 this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.INSTALLER, _installerName, cmd, false);
-                // check for correct version
                 this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.VERSION, _applVersion, cmd, false);
-                // check for original name
                 this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.ORIGINALNAME,
                                    propDef.getAttrName(_paramCache), cmd, false);
-                // check for file date
                 this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.FILEDATE, _fileDate, cmd, true);
-                // check for installed date
                 this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.INSTALLEDDATE, _installedDate, cmd, true);
 
                 MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
@@ -610,7 +631,7 @@ public class InstallDataModel_mxJPO
      * Creates and stores the properties for the plugin. A property entry is
      * created for each type definition of {@link TypeDef_mxJPO} for which an
      * icon (path) is defined. The format of the properties is defined in
-     * {@link GetProperties_mxJPO}.
+     * {@link org.mxupdate.plugin.GetProperties_mxJPO}.
      *
      * @param _paramCache       parameter cache
      * @param _sourcePath       reference to the source path

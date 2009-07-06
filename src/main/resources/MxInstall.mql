@@ -144,8 +144,7 @@ eval  {
       mql set escape on
       mql mod prog ${_sProgName} \
             code "${sCode}" \
-            add property $asMapping(PropertyDef.FileDate.PropertyName) value "${sFileDate}" \
-            add property $asMapping(PropertyDef.Version.PropertyName) value "${_sVersion}"
+            add property $asMapping(PropertyDef.FileDate.PropertyName) value "${sFileDate}"
       mql set escape off
     }
   }
@@ -168,8 +167,7 @@ eval  {
       puts "update jpo '${_sJPOName}'"
       mql insert prog "${sFileName}"
       mql mod prog ${_sJPOName} \
-            add property $asMapping(PropertyDef.FileDate.PropertyName) value "${sFileDate}" \
-            add property $asMapping(PropertyDef.Version.PropertyName) value "${_sVersion}"
+            add property $asMapping(PropertyDef.FileDate.PropertyName) value "${sFileDate}"
     }
   }
 
@@ -182,7 +180,7 @@ eval  {
 
   if ${bIsDevelopment}  {
     pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.install.Insert"     "${VERSION}"
-    pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.util.MqlUtil"       "${VERSION}"
+    pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.install.JPOHandler" "${VERSION}"
     mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}" "java"] "${VERSION}"
   } else  {
     pInstallJPO       [file join "${sPath}"]        "org.mxupdate.install.Insert"     "${VERSION}"
