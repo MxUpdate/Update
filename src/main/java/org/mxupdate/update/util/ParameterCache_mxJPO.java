@@ -219,9 +219,10 @@ public class ParameterCache_mxJPO
                                 final Map<String,String> _paramValues)
             throws Exception
     {
+        this.context = _context;
+
         this.mapping = this.initMapping(_context);
 
-        this.context = _context;
         this.mapBoolean = new HashMap<String,Boolean>();
         this.mapInteger = new HashMap<String,Integer>();
         this.mapList = new HashMap<String,Collection<String>>();
@@ -337,7 +338,7 @@ public class ParameterCache_mxJPO
     protected Mapping_mxJPO initMapping(final Context _context)
         throws Exception
     {
-        return new Mapping_mxJPO(_context);
+        return new Mapping_mxJPO(this);
     }
 
     /**

@@ -28,7 +28,6 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.update.AbstractPropertyObject_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * The class could be executed within the TCL update to call the original JPO
@@ -105,7 +104,7 @@ public class JPOCaller_mxJPO
         final String sessionId = _paramCache.getContext().getSession().getSessionId();
         JPOCaller_mxJPO.PARAM_CACHE.put(sessionId, _paramCache);
         JPOCaller_mxJPO.CALLER_INSTANCE.put(sessionId, _instance);
-        MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+        MqlUtil_mxJPO.execMql(_paramCache,
                 new StringBuilder()
                     .append("escape set env global \"")
                     .append(JPOCaller_mxJPO.ENV_CLASS_NAME).append(StringUtil_mxJPO.convertMql(sessionId))
@@ -130,7 +129,7 @@ public class JPOCaller_mxJPO
         final String sessionId = _paramCache.getContext().getSession().getSessionId();
         JPOCaller_mxJPO.PARAM_CACHE.remove(sessionId);
         JPOCaller_mxJPO.CALLER_INSTANCE.remove(sessionId);
-        MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+        MqlUtil_mxJPO.execMql(_paramCache,
                 new StringBuilder()
                     .append("escape unset env global \"")
                     .append(JPOCaller_mxJPO.ENV_CLASS_NAME).append(StringUtil_mxJPO.convertMql(sessionId))
@@ -169,7 +168,7 @@ public class JPOCaller_mxJPO
                     new StringBuilder()
                         .append("escape get env global \"")
                         .append(JPOCaller_mxJPO.ENV_CLASS_NAME).append(StringUtil_mxJPO.convertMql(sessionId))
-                        .append("\""));
+                        .append("\""), false);
             // is original JPO calling class not current JPO calling class?
             if (!"${CLASSNAME}".equals(callerClazzName))  {
                 final Class<?> callerClazz = Class.forName("org.mxupdate.update.util." + callerClazzName);

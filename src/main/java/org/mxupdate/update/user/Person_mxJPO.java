@@ -40,13 +40,12 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.AbstractPropertyObject_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.xml.sax.SAXException;
 
 import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
 import static org.mxupdate.update.util.StringUtil_mxJPO.joinTcl;
-import static org.mxupdate.util.MqlUtil_mxJPO.setHistoryOff;
-import static org.mxupdate.util.MqlUtil_mxJPO.setHistoryOn;
 
 /**
  *
@@ -291,10 +290,10 @@ public class Person_mxJPO
 
             // update must be done with history off (because not required...)
             try  {
-                setHistoryOff(_paramCache.getContext());
+                MqlUtil_mxJPO.setHistoryOff(_paramCache);
                 super.update(_paramCache, preMQLCode, postMQLCode, _preTCLCode, tclVariables, _sourceFile);
             } finally  {
-                setHistoryOn(_paramCache.getContext());
+                MqlUtil_mxJPO.setHistoryOn(_paramCache);
             }
         }
     }

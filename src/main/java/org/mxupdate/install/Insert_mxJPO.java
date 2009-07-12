@@ -36,7 +36,7 @@ import matrix.db.Context;
 import matrix.db.MQLCommand;
 import matrix.util.MatrixException;
 
-import org.mxupdate.install.JPOHandler_mxJPO.ClassFile;
+import org.mxupdate.util.JPOHandler_mxJPO.ClassFile;
 
 /**
  * The JPO is used to install the Mx Update JPO file package. Because the Mx
@@ -98,8 +98,8 @@ public class Insert_mxJPO
         // get installed JPOs
         final Map<String,Date> installedProgs = this.evaluteInstalledJPOs(_context);
 
-        final org.mxupdate.install.JPOHandler_mxJPO jpoHandler
-                = new org.mxupdate.install.JPOHandler_mxJPO(rootPath);
+        final org.mxupdate.util.JPOHandler_mxJPO jpoHandler
+                = new org.mxupdate.util.JPOHandler_mxJPO(rootPath);
 
         // delete obsolete JPOs
         final Set<String> newJPOs = jpoHandler.getJpoNames();

@@ -29,9 +29,9 @@ import java.util.TreeSet;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * Data model relationship class used to export and update relationships.
@@ -302,7 +302,7 @@ public class Relationship_mxJPO
             throws MatrixException
     {
         // evaluate all from types
-        final String[] fromTypesArr = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+        final String[] fromTypesArr = MqlUtil_mxJPO.execMql(_paramCache,
                                               new StringBuilder("escape print rel \"")
                                                    .append(this.getName())
                                                    .append("\" select fromtype dump '\n'"))
@@ -316,7 +316,7 @@ public class Relationship_mxJPO
             }
         }
         // evaluate all to types
-        final String[] toTypesArr = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+        final String[] toTypesArr = MqlUtil_mxJPO.execMql(_paramCache,
                                             new StringBuilder("escape print rel \"")
                                                  .append(this.getName())
                                                  .append("\" select totype dump '\n'"))
@@ -333,7 +333,7 @@ public class Relationship_mxJPO
         // are connections between relationships allowed?
         if (_paramCache.getValueBoolean(Relationship_mxJPO.PARAM_SUPPORT_REL_CONS))  {
             // evaluate all from relationships
-            final String[] fromRelsArr = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+            final String[] fromRelsArr = MqlUtil_mxJPO.execMql(_paramCache,
                                                  new StringBuilder("escape print rel \"")
                                                          .append(this.getName())
                                                          .append("\" select fromrel dump '\n'"))
@@ -347,7 +347,7 @@ public class Relationship_mxJPO
                 }
             }
             // evaluate all to relationships
-            final String[] toRelsArr = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+            final String[] toRelsArr = MqlUtil_mxJPO.execMql(_paramCache,
                                                  new StringBuilder("escape print rel \"")
                                                          .append(this.getName())
                                                          .append("\" select torel dump '\n'"))

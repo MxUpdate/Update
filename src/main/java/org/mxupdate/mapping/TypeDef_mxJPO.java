@@ -28,7 +28,8 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.update.AbstractObject_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
  * Enumeration for administration type definitions.
@@ -352,18 +353,18 @@ public final class TypeDef_mxJPO
     /**
      * Defines the values of the type definition.
      *
-     * @param _context  MX context for this request
-     * @param _mapping  cache for all mapping
-     * @param _key      key of the type definition (including the name of type
-     *                  definition and the kind of the type definition
-     *                  separated by a point)
-     * @param _value    value of the related value
+     * @param _paramCache   parameter cache
+     * @param _mapping      cache for all mapping
+     * @param _key          key of the type definition (including the name of
+     *                      type definition and the kind of the type definition
+     *                      separated by a point)
+     * @param _value        value of the related value
      * @throws Exception if the values could not be defined or the JPO names
      *                   could not be extracted
      * @see Mapping_mxJPO#getTypeDefMap()
      * @see #defineJPOClass(Context, Mapping_mxJPO, String)
      */
-    protected static void defineValue(final Context _context,
+    protected static void defineValue(final ParameterCache_mxJPO _paramCache,
                                       final Mapping_mxJPO _mapping,
                                       final String _key,
                                       final String _value)
@@ -409,7 +410,7 @@ public final class TypeDef_mxJPO
         } else if (key.equals(TypeDef_mxJPO.PREFIX_ICONPATH))  {
             typeDef.iconPath = _value;
         } else if (key.equals(TypeDef_mxJPO.PREFIX_JPO))  {
-            typeDef.defineJPOClass(_context, _mapping, _value);
+            typeDef.defineJPOClass(_paramCache, _mapping, _value);
         } else if (key.equals(TypeDef_mxJPO.PREFIX_TEXT_LOGGING))  {
             typeDef.textLogging = _value;
         } else if (key.equals(TypeDef_mxJPO.PREFIX_TEXT_TITLE))  {
@@ -433,26 +434,26 @@ public final class TypeDef_mxJPO
     /**
      * Defines the class for given JPO name.
      *
-     * @param _context  MX context for this request
-     * @param _mapping  cache mapping
-     * @param _jpoName  name of searched JPO
+     * @param _paramCache   parameter cache
+     * @param _mapping      cache mapping
+     * @param _jpoName      name of searched JPO
      * @throws Exception if the list of MxUdpate JPOs could not evaluated or
      *                   if the related class could not be found
      * @see #MQL_LISTPROG
      * @see #jpoClass
      */
     @SuppressWarnings("unchecked")
-    private void defineJPOClass(final Context _context,
+    private void defineJPOClass(final ParameterCache_mxJPO _paramCache,
                                 final Mapping_mxJPO _mapping,
                                 final String _jpoName)
             throws Exception
     {
         // within tests the context is always null
-        if (_context == null)  {
+        if (_paramCache == null)  {
             this.jpoClass = (Class<? extends AbstractObject_mxJPO>) Class.forName(_jpoName + "_mxJPO");
         } else  {
             if (_mapping.getTypeDefJPOsMap().isEmpty())  {
-                final String tmp = MqlUtil_mxJPO.execMql(_context, TypeDef_mxJPO.MQL_LISTPROG);
+                final String tmp = MqlUtil_mxJPO.execMql(_paramCache, TypeDef_mxJPO.MQL_LISTPROG);
                 for (final String line : tmp.split("\n"))  {
                     final String[] arr = line.split("\t");
                     if (arr.length > 1)  {
@@ -510,14 +511,14 @@ public final class TypeDef_mxJPO
     /**
      * Checks if the business type defining this type definition exists.
      *
-     * @param _context      MX context for this request
+     * @param _paramCache   parameter cache with MX context
      * @return <i>true</i> if the business type exists; otherwise <i>false</i>
      * @throws MatrixException if the check failed
      */
-    public boolean existsBusType(final Context _context)
+    public boolean existsBusType(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
-        final String tmp = MqlUtil_mxJPO.execMql(_context,
+        final String tmp = MqlUtil_mxJPO.execMql(_paramCache,
                 new StringBuilder().append("list type '").append(this.busType).append("'"));
         return (tmp.length() > 0);
     }

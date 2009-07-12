@@ -28,9 +28,9 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  *
@@ -101,7 +101,7 @@ public class Expression_mxJPO
                 .append("escape print expression \"").append(StringUtil_mxJPO.convertMql(this.getName()))
                 .append("\" select value dump")
                 .toString();
-        this.expression = MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
+        this.expression = MqlUtil_mxJPO.execMql(_paramCache, cmd);
         super.prepare(_paramCache);
     }
 

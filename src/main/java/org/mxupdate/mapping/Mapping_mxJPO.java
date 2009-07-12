@@ -31,8 +31,8 @@ import java.util.Properties;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * The class is used to map from used names within the MxUpdate JPOs and the
@@ -159,15 +159,15 @@ public class Mapping_mxJPO
 
     /**
      *
-     * @param _context  context for this request
+     * @param _paramCache   parameter cache
      * @throws MatrixException if the property program {@link #PROP_NAME} could
      *                         not be read
      * @throws IOException     if the properties could not be parsed
      */
-    public Mapping_mxJPO(final Context _context)
+    public Mapping_mxJPO(final ParameterCache_mxJPO _paramCache)
             throws MatrixException, IOException, Exception
     {
-        this.properties.putAll(this.readProperties(_context));
+        this.properties.putAll(this.readProperties(_paramCache));
 
         // map attributes and types
         for (final Map.Entry<Object, Object> entry : this.properties.entrySet())  {
@@ -180,7 +180,7 @@ public class Mapping_mxJPO
             } else if (key.startsWith(Mapping_mxJPO.PREFIX_PROPERTYDEF))  {
                 PropertyDef_mxJPO.defineValue(this, key.substring(Mapping_mxJPO.LENGTH_PROPERTYDEF), value);
             } else if (key.startsWith("TypeDef."))  {
-                TypeDef_mxJPO.defineValue(_context, this, key.substring(8), value);
+                TypeDef_mxJPO.defineValue(_paramCache, this, key.substring(8), value);
             } else if (key.startsWith("TypeDefGroup."))  {
                 TypeDefGroup_mxJPO.defineValue(this, key.substring(13), value);
             } else if (key.startsWith("UpdateCheck."))  {
@@ -193,17 +193,17 @@ public class Mapping_mxJPO
      * Reads the code of the program {@link #PROP_NAME} and evaluates the code
      * of the program as properties.
      *
-     * @param _context  MX context for this request
+     * @param _paramCache   parameter cache
      * @return read properties from MX
      * @throws MatrixException  if the program could not be read
      * @throws IOException      if the code of the program could not be parsed
      *                          as properties
      * @see #PROP_NAME
      */
-    protected Properties readProperties(final Context _context)
+    protected Properties readProperties(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, IOException
     {
-        final String code = MqlUtil_mxJPO.execMql(_context,
+        final String code = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
                 new StringBuilder()
                         .append("print prog \"").append(Mapping_mxJPO.PROP_NAME)
                         .append("\" select code dump"),

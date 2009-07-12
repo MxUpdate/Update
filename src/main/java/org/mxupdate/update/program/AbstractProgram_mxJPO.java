@@ -28,9 +28,9 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  *
@@ -104,7 +104,7 @@ public abstract class AbstractProgram_mxJPO
                 .append("delete ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append("\" ")
                 .append(this.getTypeDef().getMxAdminSuffix());
-        MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
+        MqlUtil_mxJPO.execMql(_paramCache, cmd);
     }
 
     /**
@@ -135,7 +135,7 @@ public abstract class AbstractProgram_mxJPO
                 .append("\" execute user \"\";\n");
 
         // append MQL statements to reset properties
-        final String prpStr = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+        final String prpStr = MqlUtil_mxJPO.execMql(_paramCache,
                                       new StringBuilder().append("print program \"").append(this.getName())
                                            .append("\" select property.name property.to dump ' @@@@@@'"));
         final String[] prpArr = prpStr.toString().split("(@@@@@@)");
@@ -231,6 +231,6 @@ public abstract class AbstractProgram_mxJPO
                                             cmd);
 
         // and execute alls
-        MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
+        MqlUtil_mxJPO.execMql(_paramCache, cmd);
     }
 }

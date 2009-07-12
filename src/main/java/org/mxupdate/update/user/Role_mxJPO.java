@@ -30,9 +30,9 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  *
@@ -119,7 +119,7 @@ public class Role_mxJPO
     {
         // must the role type evaluated?
         if (_paramCache.getValueBoolean(Role_mxJPO.PARAM_SUPPORT_ROLE_TYPES))  {
-            final String testRoleType = MqlUtil_mxJPO.execMql(_paramCache.getContext(), new StringBuilder()
+            final String testRoleType = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
                     .append("escape print role \"").append(StringUtil_mxJPO.convertMql(this.getName()))
                     .append("\" select isanorg isaproject dump"));
             if ("FALSE,TRUE".equals(testRoleType))  {

@@ -18,7 +18,7 @@
  * Last Changed By: $Author$
  */
 
-package org.mxupdate.util;
+package org.mxupdate.update.util;
 
 import matrix.db.Context;
 import matrix.db.MQLCommand;
@@ -44,16 +44,16 @@ public final class MqlUtil_mxJPO
      * Executes given MQL command and returns the trimmed result of the MQL
      * execution.
      *
-     * @param _context  MX context for this request
-     * @param _cmd      MQL command to execute
+     * @param _paramCache   parameter cache
+     * @param _cmd          MQL command to execute
      * @return trimmed result of the MQL execution
      * @throws MatrixException if MQL execution failed
      */
-    public static String execMql(final Context _context,
+    public static String execMql(final ParameterCache_mxJPO _paramCache,
                                  final CharSequence _cmd)
             throws MatrixException
     {
-        return execMql(_context, _cmd, true);
+        return MqlUtil_mxJPO.execMql(_paramCache.getContext(), _cmd, true);
     }
 
     /**
@@ -86,61 +86,64 @@ public final class MqlUtil_mxJPO
     /**
      * Checks if the escape is on.
      *
-     * @param _context  context for this request
+     * @param _paramCache       parameter cache
      * @return <i>true</i> if the escape is on; otherwise <i>false</i>
      * @throws MatrixException if check failed
      */
-    public static boolean isEscapeOn(final Context _context)
+    @Deprecated()
+    public static boolean isEscapeOn(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
-        return "Escape processing is on".equals(execMql(_context, "print escape"));
+        return "Escape processing is on".equals(MqlUtil_mxJPO.execMql(_paramCache, "print escape"));
     }
 
     /**
      * Sets the escape on.
      *
-     * @param _context  context for this request
+     * @param _paramCache       parameter cache
      * @throws MatrixException if the escape could not be set to on
      */
-    public static void setEscapeOn(final Context _context)
+    @Deprecated()
+    public static void setEscapeOn(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
-        execMql(_context, "set escape on");
+        MqlUtil_mxJPO.execMql(_paramCache, "set escape on");
     }
 
     /**
      * Sets the escape off.
      *
-     * @param _context  context for this request
+     * @param _paramCache       parameter cache
      * @throws MatrixException if the escape could not be set to off
      */
-    public static void setEscapeOff(final Context _context)
+    @Deprecated()
+    public static void setEscapeOff(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
-        execMql(_context, "set escape off");
+        MqlUtil_mxJPO.execMql(_paramCache, "set escape off");
     }
 
     /**
      * Sets the history on.
      *
-     * @param _context  context for this request
+     * @param _paramCache       parameter cache
      * @throws MatrixException if the history could not be set to on
      */
-    public static void setHistoryOn(final Context _context)
+    public static void setHistoryOn(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
-        execMql(_context, "history on");
+        MqlUtil_mxJPO.execMql(_paramCache, "history on");
     }
 
     /**
      * Sets the history off.
      *
-     * @param _context  context for this request
+     * @param _paramCache       parameter cache
      * @throws MatrixException if the history could not be set to off
      */
-    public static void setHistoryOff(final Context _context)
+    public static void setHistoryOff(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
-        execMql(_context, "history off");
+        MqlUtil_mxJPO.execMql(_paramCache, "history off");
     }
 }

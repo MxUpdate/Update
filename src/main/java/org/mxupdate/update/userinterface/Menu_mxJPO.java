@@ -29,9 +29,9 @@ import java.util.TreeMap;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  *
@@ -125,7 +125,7 @@ public class Menu_mxJPO
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("print menu \"").append(this.getName()).append("\" select parent[Tree] dump");
-        if ("TRUE".equalsIgnoreCase(MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd)))  {
+        if ("TRUE".equalsIgnoreCase(MqlUtil_mxJPO.execMql(_paramCache, cmd)))  {
             this.treeMenu = true;
         }
         super.prepare(_paramCache);

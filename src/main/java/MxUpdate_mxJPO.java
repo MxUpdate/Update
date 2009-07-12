@@ -43,9 +43,9 @@ import org.mxupdate.mapping.TypeDefGroup_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.UpdateCheck_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * <tr>
@@ -260,7 +260,7 @@ public class MxUpdate_mxJPO
         // first create list all type definitions which could be used...
         final Set<TypeDef_mxJPO> all = new HashSet<TypeDef_mxJPO>();
         for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefs())  {
-            if (!typeDef.isBusCheckExists() || typeDef.existsBusType(_paramCache.getContext()))  {
+            if (!typeDef.isBusCheckExists() || typeDef.existsBusType(_paramCache))  {
                 all.add(typeDef);
                 if (typeDef.getParameterList() != null)  {
                     this.defineParameter(null,
@@ -414,7 +414,7 @@ public class MxUpdate_mxJPO
             this.prepareParams(paramCache);
 
             // to be sure....
-            MqlUtil_mxJPO.execMql(_context, "verbose off");
+            MqlUtil_mxJPO.execMql(_context, "verbose off", false);
 
             Mode_mxJPO mode = null;
 

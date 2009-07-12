@@ -180,7 +180,7 @@ eval  {
 
   if ${bIsDevelopment}  {
     pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.install.Insert"     "${VERSION}"
-    pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.install.JPOHandler" "${VERSION}"
+    pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.util.JPOHandler"    "${VERSION}"
     mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}" "java"] "${VERSION}"
   } else  {
     pInstallJPO       [file join "${sPath}"]        "org.mxupdate.install.Insert"     "${VERSION}"

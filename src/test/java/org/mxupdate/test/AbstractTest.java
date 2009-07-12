@@ -33,7 +33,7 @@ import matrix.db.JPO;
 import matrix.util.MatrixException;
 
 import org.apache.commons.codec.binary.Base64;
-import org.mxupdate.util.MqlUtil_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -116,7 +116,7 @@ public class AbstractTest
     public void connect()
         throws Exception
     {
-        this.context = new Context("http://172.16.62.130:8080/enovia");
+        this.context = new Context("http://172.16.62.130:8080/ENOVIA");
         this.context.resetContext("creator", "", null);
         this.context.connect();
     }
@@ -147,7 +147,7 @@ public class AbstractTest
     protected String mql(final CharSequence _cmd)
         throws MatrixException
     {
-        return MqlUtil_mxJPO.execMql(this.context, _cmd);
+        return MqlUtil_mxJPO.execMql(this.context, _cmd, true);
     }
 
     /**

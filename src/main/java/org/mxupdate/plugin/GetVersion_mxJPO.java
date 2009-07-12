@@ -23,9 +23,9 @@ package org.mxupdate.plugin;
 import matrix.db.Context;
 import matrix.db.MatrixWriter;
 
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * The JPO class returns the current installed version of the MxUpdate Update
@@ -74,7 +74,7 @@ public class GetVersion_mxJPO
         final String progName = paramCache.getValueString(GetVersion_mxJPO.PARAM_PROGAPPL);
         final String applName = paramCache.getValueString(GetVersion_mxJPO.PARAM_APPLNAME);
 
-        final String version = MqlUtil_mxJPO.execMql(paramCache.getContext(), new StringBuilder()
+        final String version = MqlUtil_mxJPO.execMql(paramCache, new StringBuilder()
                 .append("escape print prog \"").append(StringUtil_mxJPO.convertMql(progName)).append("\" ")
                 .append("select property[appVersion").append(StringUtil_mxJPO.convertMql(applName)).append("].value ")
                 .append("dump"));

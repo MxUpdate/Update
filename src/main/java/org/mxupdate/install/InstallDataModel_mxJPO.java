@@ -37,9 +37,9 @@ import matrix.util.Mime64;
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * Installs and updates the data model needed for MxUpdate. The JPO class is
@@ -262,7 +262,7 @@ public class InstallDataModel_mxJPO
         final TypeDef_mxJPO mqlTypeDef
                 = _paramCache.getMapping().getTypeDef(InstallDataModel_mxJPO.TYPEDEF_MQL);
 
-        final String progs = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+        final String progs = MqlUtil_mxJPO.execMql(_paramCache,
                                                    InstallDataModel_mxJPO.LIST_MXUPDATE_PROGRAMS);
         for (final String progLine : new TreeSet<String>(Arrays.asList(progs.split("\n"))))  {
             final String[] progLineArr = progLine.split("@");
@@ -284,7 +284,7 @@ public class InstallDataModel_mxJPO
             this.checkProperty(_paramCache, prog, PropertyDef_mxJPO.VERSION, _applVersion, cmd, false);
             this.checkProperty(_paramCache, prog, PropertyDef_mxJPO.ORIGINALNAME, progName, cmd, false);
             this.checkProperty(_paramCache, prog, PropertyDef_mxJPO.INSTALLEDDATE, _installedDate, cmd, true);
-            MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
+            MqlUtil_mxJPO.execMql(_paramCache, cmd);
         }
     }
 
@@ -306,7 +306,7 @@ public class InstallDataModel_mxJPO
         final String progName = _paramCache.getValueString(InstallDataModel_mxJPO.PARAM_PROGAPPL);
 
         _paramCache.logInfo("register MxUpdate " + _version);
-        MqlUtil_mxJPO.execMql(_paramCache.getContext(), new StringBuilder()
+        MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
                 .append("escape mod prog \"").append(StringUtil_mxJPO.convertMql(progName)).append("\" ")
                 .append("add property \"appVersion").append(StringUtil_mxJPO.convertMql(_applName)).append("\" ")
                 .append("value \"").append(StringUtil_mxJPO.convertMql(_version)).append("\""));
@@ -340,12 +340,12 @@ public class InstallDataModel_mxJPO
         final TypeDef_mxJPO trigGrpTypeDef
                 = _paramCache.getMapping().getTypeDef(InstallDataModel_mxJPO.TYPEDEF_TRIGGER_GROUP);
         _paramCache.logInfo("check type '" + trigGrpTypeDef.getMxBusType() + "'");
-        final String installed = MqlUtil_mxJPO.execMql(_paramCache.getContext(), new StringBuilder()
+        final String installed = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
                 .append("escape list type \"")
                         .append(StringUtil_mxJPO.convertMql(trigGrpTypeDef.getMxBusType())).append('\"'));
         if ("".equals(installed))  {
             _paramCache.logDebug("    - create");
-            MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+            MqlUtil_mxJPO.execMql(_paramCache,
                     new StringBuilder()
                         .append("escape add type \"")
                         .append(StringUtil_mxJPO.convertMql(trigGrpTypeDef.getMxBusType()))
@@ -376,7 +376,7 @@ public class InstallDataModel_mxJPO
                            trigGrpTypeDef.getMxBusType(), cmd, false);
         this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.FILEDATE, _fileDate, cmd, true);
         this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.INSTALLEDDATE, _installedDate, cmd, true);
-        MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
+        MqlUtil_mxJPO.execMql(_paramCache, cmd);
 
         this.registerObject(_paramCache, instance);
     }
@@ -414,11 +414,11 @@ public class InstallDataModel_mxJPO
         final String polName = trigGrpTypeDef.getMxBusPolicy();
 
         _paramCache.logInfo("check policy '" + polName + "'");
-        final String installed = MqlUtil_mxJPO.execMql(_paramCache.getContext(), new StringBuilder()
+        final String installed = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
                 .append("escape list policy \"").append(StringUtil_mxJPO.convertMql(polName)).append('\"'));
         if ("".equals(installed))  {
             _paramCache.logDebug("    - create");
-            MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+            MqlUtil_mxJPO.execMql(_paramCache,
                     new StringBuilder()
                         .append("escape copy policy \"")
                         .append(StringUtil_mxJPO.convertMql(trigTypeDef.getMxBusPolicy()))
@@ -447,7 +447,7 @@ public class InstallDataModel_mxJPO
         this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.ORIGINALNAME, polName, cmd, false);
         this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.FILEDATE, _fileDate, cmd, true);
         this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.INSTALLEDDATE, _installedDate, cmd, true);
-        MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
+        MqlUtil_mxJPO.execMql(_paramCache, cmd);
 
         this.registerObject(_paramCache, instance);
     }
@@ -482,11 +482,11 @@ public class InstallDataModel_mxJPO
         final String relName = trigGrpTypeDef.getMxBusRelsBoth().iterator().next();
 
         _paramCache.logInfo("check relationship '" + relName + "'");
-        final String installed = MqlUtil_mxJPO.execMql(_paramCache.getContext(), new StringBuilder()
+        final String installed = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
                 .append("escape list relationship \"").append(StringUtil_mxJPO.convertMql(relName)).append('\"'));
         if ("".equals(installed))  {
             _paramCache.logDebug("    - create");
-            MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+            MqlUtil_mxJPO.execMql(_paramCache,
                     new StringBuilder()
                         .append("escape add relationship \"")
                         .append(StringUtil_mxJPO.convertMql(relName))
@@ -518,7 +518,7 @@ public class InstallDataModel_mxJPO
         this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.ORIGINALNAME, relName, cmd, false);
         this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.FILEDATE, _fileDate, cmd, true);
         this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.INSTALLEDDATE, _installedDate, cmd, true);
-        MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
+        MqlUtil_mxJPO.execMql(_paramCache, cmd);
 
         this.registerObject(_paramCache, instance);
     }
@@ -549,13 +549,13 @@ public class InstallDataModel_mxJPO
             if ((propDef.getAttrName(_paramCache) != null) && !"".equals(propDef.getAttrName(_paramCache)))  {
                 _paramCache.logInfo("check attribute '" + propDef.getAttrName(_paramCache) + "'");
 
-                final String exists = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+                final String exists = MqlUtil_mxJPO.execMql(_paramCache,
                         new StringBuilder().append("list attribute '")
                                            .append(propDef.getAttrName(_paramCache))
                                            .append('\''));
                 if ("".equals(exists))  {
                     _paramCache.logDebug("    - create");
-                    MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+                    MqlUtil_mxJPO.execMql(_paramCache,
                             new StringBuilder()
                                 .append("escape add attribute \"")
                                 .append(StringUtil_mxJPO.convertMql(propDef.getAttrName(_paramCache)))
@@ -581,7 +581,7 @@ public class InstallDataModel_mxJPO
                 this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.FILEDATE, _fileDate, cmd, true);
                 this.checkProperty(_paramCache, instance, PropertyDef_mxJPO.INSTALLEDDATE, _installedDate, cmd, true);
 
-                MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
+                MqlUtil_mxJPO.execMql(_paramCache, cmd);
 
                 this.registerObject(_paramCache, instance);
             }
@@ -605,7 +605,7 @@ public class InstallDataModel_mxJPO
         for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefs())  {
             if ((typeDef.getMxBusType() != null) && !"".equals(typeDef.getMxBusType())
                     && (typeDef.getMxAdminName() == null)
-                    && (!typeDef.isBusCheckExists() || typeDef.existsBusType(_paramCache.getContext())))  {
+                    && (!typeDef.isBusCheckExists() || typeDef.existsBusType(_paramCache)))  {
                 _paramCache.logInfo("check type "+typeDef.getMxBusType());
                 for (final PropertyDef_mxJPO propDef : PropertyDef_mxJPO.values())  {
                     if ((propDef.getAttrName(_paramCache) != null) && !"".equals(propDef.getAttrName(_paramCache)))  {
@@ -613,10 +613,10 @@ public class InstallDataModel_mxJPO
                                 .append("print type \"").append(typeDef.getMxBusType())
                                 .append("\" select attribute[").append(propDef.getAttrName(_paramCache))
                                 .append("] dump");
-                        if ("false".equalsIgnoreCase(MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd)))  {
+                        if ("false".equalsIgnoreCase(MqlUtil_mxJPO.execMql(_paramCache, cmd)))  {
                             _paramCache.logDebug("    - add missing attribute '"
                                     + propDef.getAttrName(_paramCache) + "'");
-                            MqlUtil_mxJPO.execMql(_paramCache.getContext(), new StringBuilder()
+                            MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
                                     .append("mod type \"").append(typeDef.getMxBusType())
                                     .append("\" add attribute \"").append(propDef.getAttrName(_paramCache))
                                     .append('\"'));
@@ -682,12 +682,12 @@ public class InstallDataModel_mxJPO
         }
 
         // write properties
-        final String installed = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+        final String installed = MqlUtil_mxJPO.execMql(_paramCache,
                                                        "list prog 'org.mxupdate.plugin.plugin.properties'");
         if ("".equals(installed))  {
-            MqlUtil_mxJPO.execMql(_paramCache.getContext(), "escape add prog 'org.mxupdate.plugin.plugin.properties'");
+            MqlUtil_mxJPO.execMql(_paramCache, "escape add prog 'org.mxupdate.plugin.plugin.properties'");
         }
-        MqlUtil_mxJPO.execMql(_paramCache.getContext(), new StringBuilder()
+        MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
                 .append("escape mod prog 'org.mxupdate.plugin.plugin.properties' code \"")
                 .append(StringUtil_mxJPO.convertMql(propString)).append("\""));
     }
@@ -751,7 +751,7 @@ public class InstallDataModel_mxJPO
                     .append(_instance.getTypeDef().getMxAdminName())
                     .append(" \"").append(_instance.getName()).append("\" ")
                     .append(_instance.getTypeDef().getMxAdminSuffix());
-        for (final String symbName : MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd).split("\n"))  {
+        for (final String symbName : MqlUtil_mxJPO.execMql(_paramCache, cmd).split("\n"))  {
             if (!"".equals(symbName))  {
                 symbolicNames.add(symbName.substring(0, symbName.indexOf(symbProgIdxOf)));
             }
@@ -780,6 +780,6 @@ public class InstallDataModel_mxJPO
             }
         }
 
-        MqlUtil_mxJPO.execMql(_paramCache.getContext(), update);
+        MqlUtil_mxJPO.execMql(_paramCache, update);
     }
 }

@@ -25,10 +25,9 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
-import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  *
@@ -138,7 +137,7 @@ public class Form_mxJPO
     {
         _out.append("\n\norderFields \"${NAME}\" [list \\\n");
         for (final Field field : this.getFields())  {
-            _out.append("    \"").append(convertTcl(field.getName())).append("\" \\\n");
+            _out.append("    \"").append(StringUtil_mxJPO.convertTcl(field.getName())).append("\" \\\n");
         }
         _out.append("]");
     }
@@ -158,7 +157,7 @@ public class Form_mxJPO
         final StringBuilder cmd = new StringBuilder()
                 .append("add ").append(this.getTypeDef().getMxAdminName())
                         .append(" \"").append(this.getName()).append("\" web;");
-        execMql(_paramCache.getContext(), cmd);
+        MqlUtil_mxJPO.execMql(_paramCache, cmd);
     }
 
     /**
@@ -214,11 +213,10 @@ public class Form_mxJPO
 
         // append procedure to order fields of the form
         final StringBuilder tclCode = new StringBuilder()
-                .append(ORDER_PROC)
+                .append(Form_mxJPO.ORDER_PROC)
                 .append('\n')
                 .append(_preTCLCode);
 
         super.update(_paramCache, preMQLCode, _postMQLCode, tclCode, _tclVariables, _sourceFile);
     }
-
 }

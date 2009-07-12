@@ -38,9 +38,9 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.policy.PolicyDefParser_mxJPO;
 import org.mxupdate.update.util.AdminProperty_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * @author Tim Moxter
@@ -496,13 +496,13 @@ throw new Exception("some states are not defined anymore!");
             }
         }
 
-        final boolean isMqlEscapeOn = MqlUtil_mxJPO.isEscapeOn(_paramCache.getContext());
+        final boolean isMqlEscapeOn = MqlUtil_mxJPO.isEscapeOn(_paramCache);
         try  {
-            MqlUtil_mxJPO.setEscapeOn(_paramCache.getContext());
-            MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
+            MqlUtil_mxJPO.setEscapeOn(_paramCache);
+            MqlUtil_mxJPO.execMql(_paramCache, cmd);
         } finally  {
             if (!isMqlEscapeOn)  {
-                MqlUtil_mxJPO.setEscapeOff(_paramCache.getContext());
+                MqlUtil_mxJPO.setEscapeOff(_paramCache);
             }
         }
     }

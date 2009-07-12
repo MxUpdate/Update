@@ -30,9 +30,9 @@ import java.util.TreeSet;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * The class is used to evaluate information from attributes within MX used to
@@ -200,7 +200,7 @@ abstract class AbstractAttribute_mxJPO
     {
         final Set<String> ret = new TreeSet<String>();
         final int length = this.attrTypeList.length();
-        for (final String name : MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+        for (final String name : MqlUtil_mxJPO.execMql(_paramCache,
                                                        AbstractAttribute_mxJPO.SELECT_ATTRS).split("\n"))  {
             if (!"".equals(name))  {
                 if (name.startsWith(this.attrTypeList))  {
@@ -359,7 +359,7 @@ abstract class AbstractAttribute_mxJPO
                 .append("add ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append("\" ")
                 .append(" type ").append(this.attrTypeCreate);
-        MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
+        MqlUtil_mxJPO.execMql(_paramCache, cmd);
     }
 
     /**
@@ -489,7 +489,7 @@ abstract class AbstractAttribute_mxJPO
         if ((this.dimension == null) || "".equals(this.dimension))  {
             if (!"".equals(_dimension))  {
                 _paramCache.logDebug("    - set dimension '" + _dimension + "'");
-                MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+                MqlUtil_mxJPO.execMql(_paramCache,
                         new StringBuilder().append("escape mod attribute \"")
                         .append(StringUtil_mxJPO.convertMql(this.getName()))
                         .append("\" add dimension \"")

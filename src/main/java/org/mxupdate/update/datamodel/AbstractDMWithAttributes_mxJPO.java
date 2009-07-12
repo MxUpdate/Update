@@ -31,9 +31,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * The class is used to handle the export / import of administration objects
@@ -328,7 +328,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
                         if (StringUtil_mxJPO.match(attr, removeAttr))  {
                             remove = true;
                             _paramCache.logDebug("    - attribute '" + attr + "' is not defined and will be removed");
-                            MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+                            MqlUtil_mxJPO.execMql(_paramCache,
                                     new StringBuilder()
                                         .append("escape mod ").append(this.getTypeDef().getMxAdminName())
                                         .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\"")
@@ -350,7 +350,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
         for (final String attr : newAttrs)  {
             if (!this.attributes.contains(attr))  {
                 _paramCache.logDebug("    - add attribute '" + attr + "'");
-                MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+                MqlUtil_mxJPO.execMql(_paramCache,
                         new StringBuilder()
                             .append("escape mod ").append(this.getTypeDef().getMxAdminName())
                             .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\"")

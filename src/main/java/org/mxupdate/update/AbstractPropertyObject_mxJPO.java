@@ -29,9 +29,9 @@ import java.util.Map;
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.JPOCaller_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * @author The MxUpdate Team
@@ -552,7 +552,7 @@ public abstract class AbstractPropertyObject_mxJPO
         // execute update
         JPOCaller_mxJPO.defineInstance(_paramCache, this);
         try  {
-            final String[] ret = MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd).split("\n");
+            final String[] ret = MqlUtil_mxJPO.execMql(_paramCache, cmd).split("\n");
             if (!AbstractPropertyObject_mxJPO.TEST_EXECUTED.equals(ret[ret.length - 1]))  {
                 throw new Exception("Execution of the update was not complete! Update Failed!");
             }

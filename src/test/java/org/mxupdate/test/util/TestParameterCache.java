@@ -83,13 +83,13 @@ public class TestParameterCache
          * Read the properties directly from the file system at
          * &quot;src/org/mxupdate/mapping.properties&quot;.
          *
-         * @param _context      MX context for this request (not used)
+         * @param _paramCache       parameter cache
          * @return read properties
          * @throws IOException if the properties from the file could not be
          *                     read
          */
         @Override
-        protected Properties readProperties(final Context _context)
+        protected Properties readProperties(final ParameterCache_mxJPO _paramCache)
                 throws IOException
         {
             final Properties props =  new Properties();

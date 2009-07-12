@@ -43,9 +43,9 @@ import matrix.util.StringList;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * @author The MxUpdate Team
@@ -358,7 +358,7 @@ public class BusObject_mxJPO
             attrs = new HashMap<String,String>();
             cache.put(_relation, attrs);
 
-            final String attrStr = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+            final String attrStr = MqlUtil_mxJPO.execMql(_paramCache,
                     new StringBuilder("escape print rel \"").append(_relation)
                             .append("\" select attribute dump '\n'"));
             if (!"".equals(attrStr))  {
@@ -521,7 +521,7 @@ public class BusObject_mxJPO
         for (final AttributeValue attr : this.attrValuesSorted)  {
             if (!ignoreAttrs.contains(attr.name))  {
                 if (!defaultAttrValues.containsKey(attr.name))  {
-                    final String def = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+                    final String def = MqlUtil_mxJPO.execMql(_paramCache,
                                                new StringBuilder().append("print attr '")
                                                        .append(attr.name).append("' select default dump"));
                     defaultAttrValues.put(attr.name, def);
@@ -593,10 +593,10 @@ public class BusObject_mxJPO
 
         // update must be done with history off (because not required...)
         try  {
-            MqlUtil_mxJPO.setHistoryOff(_paramCache.getContext());
+            MqlUtil_mxJPO.setHistoryOff(_paramCache);
             super.update(_paramCache, preMQLCode, postMQLCode, _preTCLCode, tclVariables, _sourceFile);
         } finally  {
-            MqlUtil_mxJPO.setHistoryOn(_paramCache.getContext());
+            MqlUtil_mxJPO.setHistoryOn(_paramCache);
         }
     }
 

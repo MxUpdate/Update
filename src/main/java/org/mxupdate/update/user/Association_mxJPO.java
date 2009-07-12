@@ -29,9 +29,9 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  *
@@ -160,7 +160,7 @@ public class Association_mxJPO
             throws MatrixException
     {
         final String text = _prop.getPropName(_paramCache) + " on association " + this.getName() + " value ";
-        final String curValue = MqlUtil_mxJPO.execMql(_paramCache.getContext(), new StringBuilder()
+        final String curValue = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
                 .append("list property on asso \"").append(this.getName()).append("\""));
 
         final int idx = curValue.indexOf(text);

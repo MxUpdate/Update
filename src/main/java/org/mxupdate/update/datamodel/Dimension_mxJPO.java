@@ -36,10 +36,10 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.dimension.DimensionDefParser_mxJPO;
 import org.mxupdate.update.util.AdminProperty_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * The class is used to export and import / update dimension administration
@@ -450,7 +450,7 @@ public class Dimension_mxJPO
             }
 
             cmd.append(postCmd).append(";");
-            MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
+            MqlUtil_mxJPO.execMql(_paramCache, cmd);
         }
     }
     /**

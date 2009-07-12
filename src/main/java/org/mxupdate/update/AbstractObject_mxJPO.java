@@ -34,9 +34,9 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 import org.xml.sax.SAXException;
 
 /**
@@ -395,7 +395,7 @@ public abstract class AbstractObject_mxJPO
         final String curVersion;
         // check for existing administration type...
         if (this.getTypeDef().getMxAdminName() != null)  {
-            final String tmp = MqlUtil_mxJPO.execMql(_paramCache.getContext(), new StringBuilder()
+            final String tmp = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
                     .append("print ").append(this.getTypeDef().getMxAdminName())
                     .append(" \"").append(this.getName()).append("\" ")
                     .append(this.getTypeDef().getMxAdminSuffix())
@@ -407,7 +407,7 @@ public abstract class AbstractObject_mxJPO
         // otherwise we have a business object....
         } else  {
             final String[] nameRev = this.getName().split("________");
-            curVersion = MqlUtil_mxJPO.execMql(_paramCache.getContext(), new StringBuilder()
+            curVersion = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
                     .append("print bus \"")
                     .append(this.getTypeDef().getMxBusType())
                     .append("\" \"").append(nameRev[0])
@@ -607,7 +607,7 @@ public abstract class AbstractObject_mxJPO
                         .append(this.getTypeDef().getMxAdminName())
                         .append(" \"").append(this.getName()).append("\" ")
                         .append(this.getTypeDef().getMxAdminSuffix());
-            for (final String symbName : MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd).split("\n"))  {
+            for (final String symbName : MqlUtil_mxJPO.execMql(_paramCache, cmd).split("\n"))  {
                 if (!"".equals(symbName))  {
                     this.symbolicNames.add(symbName.substring(0, symbName.indexOf(symbProgIdxOf)));
                 }

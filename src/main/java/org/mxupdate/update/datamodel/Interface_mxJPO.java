@@ -30,9 +30,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * Data model interface class.
@@ -414,7 +414,7 @@ public class Interface_mxJPO
                     cmd.append(newParent);
                 }
                 cmd.append('\"');
-                MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
+                MqlUtil_mxJPO.execMql(_paramCache, cmd);
             }
         }
     }

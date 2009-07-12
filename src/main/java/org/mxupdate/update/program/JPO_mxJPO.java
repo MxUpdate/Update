@@ -30,9 +30,9 @@ import java.util.regex.Pattern;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 
 /**
  * The class is used to export, create, delete and update JPOs within MX.
@@ -134,7 +134,7 @@ public class JPO_mxJPO
         final StringBuilder cmd = new StringBuilder()
                 .append("list program * select name isjavaprogram dump \"\t\"");
         final Set<String> ret = new TreeSet<String>();
-        for (final String name : MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd).split("\n"))  {
+        for (final String name : MqlUtil_mxJPO.execMql(_paramCache, cmd).split("\n"))  {
             if (!"".equals(name))  {
                 final String[] nameArr = name.split("\t");
                 if ("TRUE".equals(nameArr[1]))  {
@@ -253,7 +253,7 @@ public class JPO_mxJPO
         final Boolean backslashDoubledVal = _paramCache.getValueBoolean(JPO_mxJPO.PARAM_BACKSLASHDOUBLED);
         final boolean backslashDoubled;
         if (backslashDoubledVal == null)  {
-            final String code = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+            final String code = MqlUtil_mxJPO.execMql(_paramCache,
                                         "print prog org.mxupdate.update.program.JPO select code dump");
             final int start = code.indexOf("JPO_REPLACE_TEST");
             final int end = code.indexOf('\n', start);
@@ -267,7 +267,7 @@ public class JPO_mxJPO
         final String name = this.getName() + JPO_mxJPO.NAME_SUFFIX;
         final StringBuilder cmd = new StringBuilder()
                 .append("print program \"").append(this.getName()).append("\" select code dump");
-        final String code = MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd)
+        final String code = MqlUtil_mxJPO.execMql(_paramCache, cmd)
                                 .replaceAll("\\" + "$\\{CLASSNAME\\}", name.replaceAll(".*\\.", ""))
                                 .replaceAll("(?<=\\"+ "$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", JPO_mxJPO.NAME_SUFFIX)
                                 .replaceAll("\\" + "$\\{CLASS\\:", "")
@@ -294,7 +294,7 @@ public class JPO_mxJPO
         final StringBuilder cmd = new StringBuilder()
                 .append("add ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append("\" java");
-        MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
+        MqlUtil_mxJPO.execMql(_paramCache, cmd);
     }
 
     /**

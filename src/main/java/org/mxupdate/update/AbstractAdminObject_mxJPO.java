@@ -36,9 +36,9 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.AdminProperty_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.MqlUtil_mxJPO;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -116,7 +116,7 @@ public abstract class AbstractAdminObject_mxJPO
                 .append(" ")
                 .append(this.getTypeDef().getMxAdminSuffix());
         final Set<String> ret = new TreeSet<String>();
-        for (final String name : MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd).split("\n"))  {
+        for (final String name : MqlUtil_mxJPO.execMql(_paramCache, cmd).split("\n"))  {
             if (!"".equals(name))  {
                 ret.add(name);
             }
@@ -146,7 +146,7 @@ public abstract class AbstractAdminObject_mxJPO
     protected void parse(final ParameterCache_mxJPO _paramCache)
             throws MatrixException, SAXException, IOException
     {
-        final String xml = MqlUtil_mxJPO.execMql(_paramCache.getContext(), this.getExportMQL());
+        final String xml = MqlUtil_mxJPO.execMql(_paramCache, this.getExportMQL());
 
         // create XML reader
         final XMLReader reader = XMLReaderFactory.createXMLReader();
@@ -375,7 +375,7 @@ public abstract class AbstractAdminObject_mxJPO
                 .append("delete ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(this.getName()).append("\" ")
                 .append(this.getTypeDef().getMxAdminSuffix());
-        MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
+        MqlUtil_mxJPO.execMql(_paramCache, cmd);
     }
 
     /**
@@ -392,7 +392,7 @@ public abstract class AbstractAdminObject_mxJPO
                 .append("add ").append(this.getTypeDef().getMxAdminName())
                         .append(" \"").append(this.getName()).append("\" ")
                         .append(this.getTypeDef().getMxAdminSuffix()).append(";");
-        MqlUtil_mxJPO.execMql(_paramCache.getContext(), cmd);
+        MqlUtil_mxJPO.execMql(_paramCache, cmd);
     }
 
     /**

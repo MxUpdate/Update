@@ -18,7 +18,7 @@
  * Last Changed By: $Author$
  */
 
-package org.mxupdate.install;
+package org.mxupdate.util;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -75,7 +75,7 @@ public class JPOHandler_mxJPO
      * @see ClassFile#getCode(Map)
      */
     private static final Pattern PATTERN_IMPORT
-            = Pattern.compile("(?<=^import[\\ \\t]?)[A-Za-z0-9\\.]*_"+"mxJPO(?=[\\ \\t]?;[\\ \\t]?$)");
+            = Pattern.compile("(?<=^import[\\ \\t]?)[A-Za-z0-9\\.\\_]*_"+"mxJPO(?=[\\ \\t]?;[\\ \\t]?$)");
 
     /**
      * Regular expression for a JPO name without a package (but in the front a
@@ -337,6 +337,17 @@ public class JPOHandler_mxJPO
         public String getJpoFileName()
         {
             return this.jpoFile.getName();
+        }
+
+        /**
+         * Returns the name of the package of the file.
+         *
+         * @return package of the file
+         * @see #pckName
+         */
+        public String getPckName()
+        {
+            return this.pckName;
         }
     }
 }

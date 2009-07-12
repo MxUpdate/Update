@@ -25,10 +25,8 @@ import java.io.Writer;
 import matrix.db.Context;
 import matrix.db.MatrixWriter;
 
-import org.mxupdate.install.InstallDataModel_mxJPO;
-import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.MqlUtil_mxJPO;
 
-import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
 
 /**
  * The JPO class returns the plugin properties stored in MX. To get the
@@ -38,7 +36,7 @@ import static org.mxupdate.util.MqlUtil_mxJPO.execMql;
  * </pre>
  * The JPO returns the in MX stored plugin properties as string. The plugin
  * properties was prepared from
- * {@link InstallDataModel_mxJPO#makePluginProperty(ParameterCache_mxJPO,File)}
+ * {@link org.mxupdate.install.InstallDataModel_mxJPO#makePluginProperty(org.mxupdate.update.util.ParameterCache_mxJPO,File)}
  * while the data model was installed.<br/>
  * The key of the properties are defined in this format:
  * <table border="1">
@@ -68,8 +66,8 @@ public class GetProperties_mxJPO
                        final String... _args)
             throws Exception
     {
-        final String prop = execMql(_context, new StringBuilder()
-                .append("print prog 'org.mxupdate.plugin.plugin.properties' select code dump;"));
+        final String prop = MqlUtil_mxJPO.execMql(_context, new StringBuilder()
+                .append("print prog 'org.mxupdate.plugin.plugin.properties' select code dump;"), true);
 
         final Writer writer = new MatrixWriter(_context);
         writer.append(prop);
