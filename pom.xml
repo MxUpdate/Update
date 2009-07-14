@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <!--
- * Copyright 2009 The MxUpdate Team
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- * Revision:        $Rev$
- * Last Changed:    $Date$
- * Last Changed By: $Author$
- */
+
+ Copyright 2008-2009 The MxUpdate Team
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+ Author:          The MxUpdate Team
+ Revision:        $Rev$
+ Last Changed:    $Date$
+ Last Changed By: $Author$
+
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -30,9 +32,15 @@
     <groupId>org.mxupdate</groupId>
     <artifactId>update</artifactId>
     <packaging>jar</packaging>
-    <version>0.5.1-SNAPSHOT</version>
+    <version>0.5.2</version>
     <name>MxUpdate Update</name>
     <url>http://www.mxupdate.org</url>
+
+    <description>
+        MxUpdate Update is a deployment tool for the Enovia PLM platform to
+        handle administration objects as single update files (configuration
+        items).
+    </description>
 
     <repositories>
         <repository>
@@ -89,6 +97,13 @@
         <developerConnection>scm:svn:https://mxupdate.googlecode.com/svn/mxupdate-update</developerConnection>
         <url>http://mxupdate.googlecode.com/svn/mxupdate-update</url>
     </scm>
+
+    <distributionManagement>
+        <site>
+            <name>MxUpdate Update Deployment Tool</name>
+             <url>svn:https://mxupdate.googlecode.com/svn/site/mxupdate-update</url>
+        </site>
+    </distributionManagement>
 
     <dependencies>
         <!-- MX dependency -->
@@ -228,6 +243,15 @@
                 </configuration>
             </plugin>
         </plugins>
+
+        <extensions>
+            <!--  needed that an upload of the site works -->
+            <extension>
+                <groupId>org.jvnet.wagon-svn</groupId>
+                <artifactId>wagon-svn</artifactId>
+                <version>1.9</version>
+            </extension>
+        </extensions>
     </build>
 
     <reporting>
@@ -239,6 +263,7 @@
                 <reportSets>
                     <reportSet>
                         <reports>
+                            <report>index</report>
                             <report>dependencies</report>
                             <!-- report>project-team</report -->
                             <report>mailing-list</report>
@@ -275,7 +300,7 @@
                         limitations under the License.
                         &lt;/i&gt;
                     </bottom>
-                    <linksource>true</linksource>
+                    <!-- linksource>true</linksource -->
                     <links>
                         <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
                     </links>
@@ -314,6 +339,14 @@
                         <exclude>**/dimension/*.java</exclude>
                         <exclude>**/policy/*.java</exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <!--  findbugs report -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <configuration>
+
                 </configuration>
             </plugin>
         </plugins>
