@@ -184,7 +184,7 @@ eval  {
     mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}" "java"] "${VERSION}"
   } else  {
     pInstallJPO       [file join "${sPath}"]        "org.mxupdate.install.Insert"     "${VERSION}"
-    pInstallJPO       [file join "${sPath}"]        "org.mxupdate.util.MqlUtil"       "${VERSION}"
+    pInstallJPO       [file join "${sPath}"]        "org.mxupdate.util.JPOHandler"    "${VERSION}"
     mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}"] "${VERSION}"
   }
 
