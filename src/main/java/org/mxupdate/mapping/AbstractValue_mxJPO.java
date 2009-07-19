@@ -66,6 +66,13 @@ class AbstractValue_mxJPO
     private static final String PREFIX_PARAM_LISTOPP = "ParameterListOpposite";
 
     /**
+     * Parameter to reference to the Wiki.
+     *
+     * @see #defineValues(String, String)
+     */
+    private static final String PREFIX_PARAM_WIKI = "Wiki";
+
+    /**
      * Holds the name of the value.
      *
      * @see #getName()
@@ -134,23 +141,23 @@ class AbstractValue_mxJPO
                                 final String _value)
             throws Exception
     {
-        if (_key.equals(PREFIX_PARAM_DESC))  {
+        if (AbstractValue_mxJPO.PREFIX_PARAM_DESC.equals(_key))  {
             this.paramDesc = _value;
-        } else if (_key.equals(PREFIX_PARAM_DESCOPP))  {
+        } else if (AbstractValue_mxJPO.PREFIX_PARAM_DESCOPP.equals(_key))  {
             this.paramDescOpp = _value;
-        } else if (_key.equals(PREFIX_PARAM_ARGS))  {
+        } else if (AbstractValue_mxJPO.PREFIX_PARAM_ARGS.equals(_key))  {
             if (!"".equals(_value.trim()))  {
                 this.paramArgs = Arrays.asList(_value.split(","));
             }
-        } else if (_key.equals(PREFIX_PARAM_LIST))  {
+        } else if (AbstractValue_mxJPO.PREFIX_PARAM_LIST.equals(_key))  {
             if (!"".equals(_value.trim()))  {
                 this.paramList = Arrays.asList(_value.split(","));
             }
-        } else if (_key.equals(PREFIX_PARAM_LISTOPP))  {
+        } else if (AbstractValue_mxJPO.PREFIX_PARAM_LISTOPP.equals(_key))  {
             if (!"".equals(_value.trim()))  {
                 this.paramListOpp = Arrays.asList(_value.split(","));
             }
-        } else  {
+        } else if (!AbstractValue_mxJPO.PREFIX_PARAM_WIKI.equals(_key))  {
             throw new Exception("unkown key " + _key + " with value '" + _value + "' defined!");
         }
     }
