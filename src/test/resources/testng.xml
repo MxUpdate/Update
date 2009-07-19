@@ -92,6 +92,7 @@
         <packages>
             <package name="org.mxupdate.test.export.datamodel"/>
             <package name="org.mxupdate.test.export.program"/>
+            <package name="org.mxupdate.test.export.userinterface"/>
         </packages>
     </test>
 

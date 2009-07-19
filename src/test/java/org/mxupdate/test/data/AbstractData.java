@@ -24,7 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.AbstractTest.CI;
+import org.testng.Assert;
 
 /**
  *
@@ -177,5 +179,44 @@ public abstract class AbstractData<T extends AbstractData<?>>
     public Map<String,String> getValues()
     {
         return this.values;
+    }
+
+    protected void append4CreateValues(final StringBuilder _cmd)
+    {
+        for (final Map.Entry<String,String> entry : this.values.entrySet())  {
+            _cmd.append(' ').append(entry.getKey()).append(" \"")
+                .append(this.getTest().convertMql(entry.getValue()))
+                .append('\"');
+        }
+    }
+
+    /**
+     * Checks the export of this data piece if all values are correct defined.
+     *
+     * @param _exportParser     parsed export
+     */
+    public void checkExport(final ExportParser _exportParser)
+    {
+        Assert.assertEquals(_exportParser.getName(),
+                            this.getName(),
+                            "check name");
+        Assert.assertEquals(_exportParser.getSymbolicName(),
+                            this.getSymbolicName(),
+                            "check symbolic name");
+        // check for all required values
+        for (final String valueName : this.ci.requiredExportValues)  {
+            Assert.assertEquals(_exportParser.getLines("/mql/" + valueName + "/@value").size(),
+                                1,
+                                "minimum and maximum one " + valueName + " is defined");
+        }
+        // check for defined values
+        for (final Map.Entry<String,String> entry : this.values.entrySet())  {
+            Assert.assertEquals(_exportParser.getLines("/mql/" + entry.getKey() + "/@value").size(),
+                                                       1,
+                                                       "minimum and maximum one " + entry.getKey() + " is defined");
+            Assert.assertEquals(_exportParser.getLines("/mql/" + entry.getKey() + "/@value").get(0),
+                                "\"" + this.getTest().convertTcl(entry.getValue()) + "\"",
+                                entry.getKey() + " is correct defined");
+        }
     }
 }

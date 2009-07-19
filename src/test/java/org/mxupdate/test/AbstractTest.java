@@ -89,7 +89,13 @@ public class AbstractTest
         /**
          * Configuration item command.
          */
-        COMMAND("command", "Command", "COMMAND");
+        COMMAND("command", "Command", "COMMAND", "description", "label", "href"),
+
+        /**
+         * Configuration item menu.
+         */
+        MENU("menu", "Menu", "MENU", "description", "label", "href");
+
 
         /**
          * Related type name in MX.
@@ -107,19 +113,31 @@ public class AbstractTest
         public final String header;
 
         /**
+         * Required values for the export. This values must be defined minimum
+         * and maximum one time in the configuration item file.
+         */
+        public final String[] requiredExportValues;
+
+        /**
          * Constructor to initialize an enumeration instance.
          *
-         * @param _mxType       related type name in MX
-         * @param _updateType   related type name in MxUpdate Update
-         * @param _header       used text in the header to define the name
+         * @param _mxType               related type name in MX
+         * @param _updateType           related type name in MxUpdate Update
+         * @param _header               used text in the header to define the
+         *                              name
+         * @param _requiredExportValues defines the required values of the
+         *                              export within the configuration item
+         *                              file
          */
         CI(final String _mxType,
            final String _updateType,
-           final String _header)
+           final String _header,
+           final String... _requiredExportValues)
         {
             this.mxType = _mxType;
             this.updateType = _updateType;
             this.header = _header;
+            this.requiredExportValues = _requiredExportValues;
         }
 
         /**

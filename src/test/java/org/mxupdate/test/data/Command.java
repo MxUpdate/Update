@@ -20,17 +20,13 @@
 
 package org.mxupdate.test.data;
 
-import java.util.HashMap;
+
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.ExportParser;
-import org.testng.Assert;
 
 /**
  * The class is used to define a command, create them and test the result.
@@ -39,17 +35,19 @@ import org.testng.Assert;
  * @version $Id$
  */
 public class Command
-    extends AbstractData<Command>
+    extends AbstractCommand<Command>
 {
     /**
-     * All settings of this command.
+     * All users of the command.
      *
-     * @see #settings
+     * @see #addUser(String)
+     * @see #create()
+     * @see #evalAdds4CheckExport(Set)
      */
-    private final Map<String,String> settings = new HashMap<String,String>();
+    private final Set<String> users = new HashSet<String>();
 
     /**
-     * Constructor to initalize this command.
+     * Constructor to initialize this command.
      *
      * @param _test     related test implementation (where this command is
      *                  defined)
@@ -62,17 +60,15 @@ public class Command
     }
 
     /**
-     * Defines a new setting for this command.
+     * Appends a new user to {@link #users}.
      *
-     * @param _key      key of the setting
-     * @param _value    value of the setting
+     * @param _user     user to add
      * @return this command instance
-     * @see #settings
+     * @see #users
      */
-    public Command setSetting(final String _key,
-                              final String _value)
+    public Command addUser(final String _user)
     {
-        this.settings.put(_key, _value);
+        this.users.add(_user);
         return this;
     }
 
@@ -82,21 +78,26 @@ public class Command
      * @return this command instance
      * @throws MatrixException if create failed
      */
+    @Override
     public Command create()
         throws MatrixException
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("escape add command \"" + this.getTest().convertMql(this.getName()) + "\"");
-        for (final Map.Entry<String,String> entry : this.getValues().entrySet())  {
-            cmd.append(' ').append(entry.getKey()).append(" \"")
-               .append(this.getTest().convertMql(entry.getValue()))
-               .append('\"');
+        if (!this.users.isEmpty())  {
+            cmd.append(" user ");
+            boolean first = true;
+            for (final String user : this.users)  {
+                if (first)  {
+                    first = false;
+                } else  {
+                    cmd.append(',');
+                }
+                cmd.append('\"').append(this.getTest().convertMql(user)).append('\"');
+            }
         }
-        for (final Map.Entry<String,String> entry : this.settings.entrySet())  {
-            cmd.append(" setting \"").append(this.getTest().convertMql(entry.getKey())).append("\" \"")
-               .append(this.getTest().convertMql(entry.getValue()))
-               .append('\"');
-        }
+        this.append4CreateValues(cmd);
+        this.append4CreateSettings(cmd);
 
         this.getTest().mql(cmd);
 
@@ -104,43 +105,19 @@ public class Command
     }
 
     /**
-     * Checks the export of a command if all values are correct defined.
+     * Evaluates all 'adds' in the configuration item file (e.g. add user, add
+     * setting, ...).
      *
-     * @param _exportParser     parsed export
+     * @param _needAdds     set with add strings used to append the adds for
+     *                      {@link #users}
+     * @see #users
      */
-    public void checkExport(final ExportParser _exportParser)
+    @Override
+    protected void evalAdds4CheckExport(final Set<String> _needAdds)
     {
-        Assert.assertEquals(_exportParser.getName(),
-                            this.getName(),
-                            "check name");
-        Assert.assertEquals(_exportParser.getSymbolicName(),
-                            this.getSymbolicName(),
-                            "check symbolic name");
-        Assert.assertEquals(_exportParser.getLines("/mql/label/@value").size(),
-                            1,
-                            "minimum and maximum one label is defined");
-        Assert.assertEquals(_exportParser.getLines("/mql/label/@value").get(0),
-                            "\"" + this.getTest().convertTcl(this.getValue("label")) + "\"",
-                            "label is correct defined");
-        Assert.assertEquals(_exportParser.getLines("/mql/description/@value").size(),
-                            1,
-                            "minimum and maximum one description is defined");
-        Assert.assertEquals(_exportParser.getLines("/mql/href/@value").size(),
-                            1,
-                            "minimum and maximum one href is defined");
-        Assert.assertEquals(_exportParser.getLines("/mql/href/@value").get(0),
-                            "\"" + this.getTest().convertTcl(this.getValue("href")) + "\"",
-                            "href is correct defined");
-        final Set<String> needAdds = new HashSet<String>();
-        for (final Map.Entry<String,String> entry : this.settings.entrySet())
-        {
-            needAdds.add("setting \"" + this.getTest().convertTcl(entry.getKey())
-                    + "\" \"" + this.getTest().convertTcl(entry.getValue()) +  "\"");
-        }
-        final List<String> foundAdds = _exportParser.getLines("/mql/add/@value");
-        Assert.assertEquals(foundAdds.size(), needAdds.size(), "all adds defined");
-        for (final String foundAdd : foundAdds)  {
-            Assert.assertTrue(needAdds.contains(foundAdd), "add '" + foundAdd + "' defined");
+        super.evalAdds4CheckExport(_needAdds);
+        for (final String user : this.users)  {
+            _needAdds.add("user \"" + this.getTest().convertTcl(user) + "\"");
         }
     }
 }

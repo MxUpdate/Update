@@ -22,7 +22,9 @@ package org.mxupdate.update.userinterface;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
 
@@ -34,6 +36,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
+ * The class is used to export and import / update menu configuration items.
  *
  * @author The MxUpdate Team
  * @version $Id$
@@ -45,6 +48,17 @@ public class Menu_mxJPO
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = 3617033695673460587L;
+
+    /**
+     * Set of all ignored URLs from the XML definition for menus.
+     *
+     * @see #parse(String, String)
+     */
+    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    static  {
+        Menu_mxJPO.IGNORED_URLS.add("/commandRefList");
+        Menu_mxJPO.IGNORED_URLS.add("/menuRefList");
+    }
 
     /**
      * Flag to store the information that the menu is a tree menu.
@@ -60,7 +74,7 @@ public class Menu_mxJPO
      *
      * @see MenuChild
      */
-    private final Stack<MenuChild> childs = new Stack<MenuChild>();
+    private final Stack<MenuChild> children = new Stack<MenuChild>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -76,7 +90,7 @@ public class Menu_mxJPO
 
     /**
      * Parses all menu related URL's. This means the names of all referenced
-     * children menus and commands are parsed and stored in {@link #childs}.
+     * children menus and commands are parsed and stored in {@link #children}.
      *
      * @param _url      URL to parse
      * @param _content  related content of the URL
@@ -85,30 +99,28 @@ public class Menu_mxJPO
     protected void parse(final String _url,
                          final String _content)
     {
-        if ("/commandRefList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/commandRefList/commandRef".equals(_url))  {
-            final MenuChild child = new MenuChild();
-            child.type = "command";
-            this.childs.add(child);
-        } else if ("/commandRefList/commandRef/name".equals(_url))  {
-            this.childs.peek().name = _content;
-        } else if ("/commandRefList/commandRef/order".equals(_url))  {
-            this.childs.peek().order = Integer.parseInt(_content);
+        if (!Menu_mxJPO.IGNORED_URLS.contains(_url))  {
+            if ("/commandRefList/commandRef".equals(_url))  {
+                final MenuChild child = new MenuChild();
+                child.type = "command";
+                this.children.add(child);
+            } else if ("/commandRefList/commandRef/name".equals(_url))  {
+                this.children.peek().name = _content;
+            } else if ("/commandRefList/commandRef/order".equals(_url))  {
+                this.children.peek().order = Integer.parseInt(_content);
 
-        } else if ("/menuRefList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/menuRefList/menuRef".equals(_url))  {
-            final MenuChild child = new MenuChild();
-            child.type = "menu";
-            this.childs.add(child);
-        } else if ("/menuRefList/menuRef/name".equals(_url))  {
-            this.childs.peek().name = _content;
-        } else if ("/menuRefList/menuRef/order".equals(_url))  {
-            this.childs.peek().order = Integer.parseInt(_content);
+            } else if ("/menuRefList/menuRef".equals(_url))  {
+                final MenuChild child = new MenuChild();
+                child.type = "menu";
+                this.children.add(child);
+            } else if ("/menuRefList/menuRef/name".equals(_url))  {
+                this.children.peek().name = _content;
+            } else if ("/menuRefList/menuRef/order".equals(_url))  {
+                this.children.peek().order = Integer.parseInt(_content);
 
-        } else  {
-            super.parse(_url, _content);
+            } else  {
+                super.parse(_url, _content);
+            }
         }
     }
 
@@ -124,7 +136,9 @@ public class Menu_mxJPO
             throws MatrixException
     {
         final StringBuilder cmd = new StringBuilder()
-                .append("print menu \"").append(this.getName()).append("\" select parent[Tree] dump");
+                .append("escape print menu \"")
+                .append(StringUtil_mxJPO.convertMql(this.getName()))
+                .append("\" select parent[Tree] dump");
         if ("TRUE".equalsIgnoreCase(MqlUtil_mxJPO.execMql(_paramCache, cmd)))  {
             this.treeMenu = true;
         }
@@ -145,7 +159,7 @@ public class Menu_mxJPO
 
         // order childs
         final Map<Integer,MenuChild> tmpChilds = new TreeMap<Integer,MenuChild>();
-        for (final MenuChild child : this.childs)  {
+        for (final MenuChild child : this.children)  {
             tmpChilds.put(child.order, child);
         }
 
@@ -209,7 +223,7 @@ public class Menu_mxJPO
         final StringBuilder preMQLCode = new StringBuilder()
                 .append("mod ").append(this.getTypeDef().getMxAdminName())
                         .append(" \"").append(this.getName()).append('\"');
-        for (final MenuChild child : this.childs)  {
+        for (final MenuChild child : this.children)  {
             preMQLCode.append(" remove ").append(child.type)
                       .append(" \"").append(child.name).append("\"");
         }
@@ -229,7 +243,7 @@ public class Menu_mxJPO
     /**
      * Stores a reference to a child of a menu.
      *
-     * @see Menu_mxJPO#childs
+     * @see Menu_mxJPO#children
      */
     private final class MenuChild
     {

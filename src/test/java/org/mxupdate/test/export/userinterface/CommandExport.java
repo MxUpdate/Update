@@ -25,8 +25,9 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.Command;
-import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -39,12 +40,42 @@ public class CommandExport
     extends AbstractTest
 {
     /**
+     * Data provider for test commands.
+     *
+     * @return object array with all test commands
+     */
+    @DataProvider(name = "commands")
+    public Object[][] getCommands()
+    {
+        final Command command1 = new Command(this, "hallo \" test")
+                .setValue("label", "command label \" \\ ' #")
+                .setValue("description", "\"\\\\ hallo")
+                .setValue("href", "${COMMON_DIR}/emxTree.jsp?mode=insert")
+                .setValue("alt", "${COMMON_DIR}/emxTreeAlt.jsp?mode=insert")
+                .setSetting("Setting 1", "Setting Value ' 1")
+                .setSetting("Setting 2", "Value2");
+        final Command command2 = new Command(this, "command")
+                .setValue("label", "aaa.bbb.ccc")
+                .setValue("description", "\"\\\\ hallo")
+                .setValue("href", "${COMMON_DIR}/emxTree.jsp?mode=insert")
+                .setValue("alt", "${COMMON_DIR}/emxTreeAlt.jsp?mode=insert")
+                .setSetting("Setting 1", "Setting Value ' 1")
+                .addUser("guest")
+                .addUser("creator");
+
+        return new Object[][]  {
+                new Object[]{command1},
+                new Object[]{command2}
+        };
+    }
+
+    /**
      * Cleanup all test commands.
      *
      * @throws MatrixException if cleanup failed
      */
     @BeforeMethod()
-    @AfterMethod()
+    @AfterClass()
     public void cleanup()
         throws MatrixException
     {
@@ -54,23 +85,16 @@ public class CommandExport
     /**
      * Tests a new created command and the related export.
      *
+     * @param _command      command to test
      * @throws Exception if test failed
      */
-    @Test()
-    public void test()
+    @Test(dataProvider = "commands")
+    public void test(final Command _command)
         throws Exception
     {
-        final Command command = new Command(this, "hallo \" test")
-                .setValue("label", "command label \" \\ ' #")
-                .setValue("description", "\"\\\\ hallo")
-                .setValue("href", "${COMMON_DIR}/emxTree.jsp?mode=insert")
-                .setValue("alt", "${COMMON_DIR}/emxTreeAlt.jsp?mode=insert")
-                .setSetting("Setting 1", "Setting Value ' 1")
-                .create();
-
-        final Export export = this.export(CI.COMMAND, command.getName());
+        _command.create();
+        final Export export = this.export(CI.COMMAND, _command.getName());
         final ExportParser exportParser = new ExportParser(CI.COMMAND, export.getCode());
-
-        command.checkExport(exportParser);
+        _command.checkExport(exportParser);
     }
 }
