@@ -22,6 +22,7 @@ package org.mxupdate.update.userinterface;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -33,6 +34,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
+ * The class is used to export and import / update command configuration items.
  *
  * @author The MxUpdate Team
  * @version $Id$
@@ -44,6 +46,18 @@ public class Command_mxJPO
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = -6311434999021971324L;
+
+    /**
+     * Set of all ignored URLs from the XML definition for commands.
+     *
+     * @see #parse(String, String)
+     */
+    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    static  {
+        Command_mxJPO.IGNORED_URLS.add("/code");
+        Command_mxJPO.IGNORED_URLS.add("/input");
+        Command_mxJPO.IGNORED_URLS.add("/userRefList");
+    }
 
     /**
      * Alt label of the command.
@@ -104,22 +118,18 @@ public class Command_mxJPO
     protected void parse(final String _url,
                          final String _content)
     {
-        if ("/alt".equals(_url))  {
-            this.alt = _content;
-        } else if ("/code".equals(_url))  {
-            // to be ignored ...
-        } else if ("/href".equals(_url))  {
-            this.href = _content;
-        } else if ("/input".equals(_url))  {
-            // to be ignored ...
-        } else if ("/label".equals(_url))  {
-            this.label = _content;
-        } else if ("/userRefList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/userRefList/userRef".equals(_url))  {
-            this.users.add(_content);
-        } else  {
-            super.parse(_url, _content);
+        if (!Command_mxJPO.IGNORED_URLS.contains(_url))  {
+            if ("/alt".equals(_url))  {
+                this.alt = _content;
+            } else if ("/href".equals(_url))  {
+                this.href = _content;
+            } else if ("/label".equals(_url))  {
+                this.label = _content;
+            } else if ("/userRefList/userRef".equals(_url))  {
+                this.users.add(_content);
+            } else  {
+                super.parse(_url, _content);
+            }
         }
     }
 
