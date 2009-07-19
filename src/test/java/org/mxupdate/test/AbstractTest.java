@@ -26,7 +26,9 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import matrix.db.Context;
 import matrix.db.JPO;
@@ -48,35 +50,46 @@ import org.testng.annotations.BeforeClass;
 public class AbstractTest
 {
     /**
+     * Prefix for all new created test objects. The prefix should be used from
+     * all test cases.
+     */
+    public static final String PREFIX = "MXUPDATE_";
+
+    /**
      * Enumeration to define a mapping between the configuration items and the
      * related administration types in MX and MxUpdate Update.
      */
-    protected enum CI
+    public enum CI
     {
         /**
          * Configuration item Data Model Interface.
          */
-        INTERFACE("interface", "Interface"),
+        INTERFACE("interface", "Interface", "INTERFACE"),
 
         /**
          * Configuration item Data Model Policy.
          */
-        POLICY("policy", "Policy"),
+        POLICY("policy", "Policy", "POLICY"),
 
         /**
          * Configuration item Data Model Relationship.
          */
-        RELATIONSHIP("relationship", "Relationship"),
+        RELATIONSHIP("relationship", "Relationship", "RELATIONSHIP"),
 
         /**
          * Configuration item Data Model Type.
          */
-        TYPE("type", "Type"),
+        TYPE("type", "Type", "TYPE"),
 
         /**
          * Configuration item Program JPO.
          */
-        JPO("program", "JPO");
+        JPO("program", "JPO", null),
+
+        /**
+         * Configuration item command.
+         */
+        COMMAND("command", "Command", "COMMAND");
 
         /**
          * Related type name in MX.
@@ -89,16 +102,34 @@ public class AbstractTest
         final String updateType;
 
         /**
+         * Used name in the header.
+         */
+        public final String header;
+
+        /**
          * Constructor to initialize an enumeration instance.
          *
          * @param _mxType       related type name in MX
          * @param _updateType   related type name in MxUpdate Update
+         * @param _header       used text in the header to define the name
          */
         CI(final String _mxType,
-           final String _updateType)
+           final String _updateType,
+           final String _header)
         {
             this.mxType = _mxType;
             this.updateType = _updateType;
+            this.header = _header;
+        }
+
+        /**
+         * Returns MX type of this configuration.
+         *
+         * @return MX type of this configuration item
+         */
+        public String getMxType()
+        {
+            return this.mxType;
         }
     }
 
@@ -116,7 +147,7 @@ public class AbstractTest
     public void connect()
         throws Exception
     {
-        this.context = new Context("http://172.16.62.130:8080/ENOVIA");
+        this.context = new Context("http://172.16.62.120:8080/ematrix");
         this.context.resetContext("creator", "", null);
         this.context.connect();
     }
@@ -144,10 +175,31 @@ public class AbstractTest
      *         <code>_cmd</code>
      * @throws MatrixException if MQL execution failed
      */
-    protected String mql(final CharSequence _cmd)
+    public String mql(final CharSequence _cmd)
         throws MatrixException
     {
         return MqlUtil_mxJPO.execMql(this.context, _cmd, true);
+    }
+
+    /**
+     * Executes given MQL command and splits the returned value by new line
+     * '\n' and returns this values as a set.
+     *
+     * @param _cmd                  MQL command to execute
+     * @return set of found values
+     * @throws MatrixException if MQL execution failed
+     */
+    public Set<String> mqlAsSet(final CharSequence _cmd)
+        throws MatrixException
+    {
+        final String bck = this.mql(_cmd);
+        final Set<String> ret;
+        if ("".equals(bck))  {
+            ret = new HashSet<String>(0);
+        } else  {
+            ret = new HashSet<String>(Arrays.asList(bck.split("\n")));
+        }
+        return ret;
     }
 
     /**
@@ -224,6 +276,26 @@ public class AbstractTest
     }
 
     /**
+     * Cleanups given configuration <code>_type</code>. This means that all
+     * existing administration object which starts with {@link #PREFIX} are
+     * deleted.
+     *
+     * @param _type     type of configuration item
+     * @throws MatrixException if cleanup for given configuration item
+     *                         <code>_type</code> failed
+     */
+    protected void cleanup(final CI _type)
+        throws MatrixException
+    {
+        final Set<String> elements = this.mqlAsSet("escape list " + _type.mxType);
+        for (final String element : elements)  {
+            if (element.startsWith(AbstractTest.PREFIX))  {
+                this.mql("escape delete " + _type.mxType + " \"" + this.convertMql(element) + "\"");
+            }
+        }
+    }
+
+    /**
      * Calls given <code>_method</code> in <code>_jpo</code>. The MX context
      * {@link #mxContext} is connected to the database if not already done.
      *
@@ -261,6 +333,39 @@ public class AbstractTest
                                            _method,
                                            paramStrings,
                                            Object.class));
+    }
+
+    /**
+     * Converts given string to MQL by escaping the &quot; so that in escape
+     * mode on string could be handled with &quot; and '.
+     *
+     * @param _text     character sequence to convert
+     * @return converted string
+     */
+    public String convertMql(final CharSequence _text)
+    {
+        return (_text != null)
+               ? _text.toString().replaceAll("\\\\", "\\\\\\\\")
+                                 .replaceAll("\\\"", "\\\\\"")
+               : "";
+    }
+
+    /**
+     * Converts given string to MQL by escaping the &quot; so that in escape
+     * mode on string could be handled with &quot; and '.
+     *
+     * @param _text     character sequence to convert
+     * @return converted string
+     */
+    public String convertTcl(final CharSequence _text)
+    {
+        return (_text != null)
+               ? _text.toString().replaceAll("\\\\", "\\\\\\\\")
+                                 .replaceAll("\\\"", "\\\\\"")
+                                 .replaceAll("\\$", "\\\\\\$")
+                                 .replaceAll("\\}", "\\\\}")
+                                 .replaceAll("\\{", "\\\\{")
+               : "";
     }
 
     /**
