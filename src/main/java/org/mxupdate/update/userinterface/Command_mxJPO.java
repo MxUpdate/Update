@@ -183,20 +183,22 @@ public class Command_mxJPO
     {
         // reset HRef, description, alt and label
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append('\"')
+                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
                 .append(" href \"\" description \"\" alt \"\" label \"\"");
 
         // reset settings
         for (final AdminProperty_mxJPO prop : this.getPropertiesMap().values())  {
             if (prop.isSetting())  {
-                preMQLCode.append(" remove setting \"").append(prop.getName().substring(1)).append('\"');
+                preMQLCode.append(" remove setting \"")
+                          .append(StringUtil_mxJPO.convertMql(prop.getName().substring(1)))
+                          .append('\"');
             }
         }
 
         // reset users
         for (final String user : this.users)  {
-            preMQLCode.append(" remove user \"").append(user).append('\"');
+            preMQLCode.append(" remove user \"").append(StringUtil_mxJPO.convertMql(user)).append('\"');
         }
 
         // append already existing pre MQL code

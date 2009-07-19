@@ -605,7 +605,7 @@ public abstract class AbstractObject_mxJPO
                     .append("escape list property on program \"")
                                 .append(StringUtil_mxJPO.convertMql(symbProg)).append("\" to ")
                         .append(this.getTypeDef().getMxAdminName())
-                        .append(" \"").append(this.getName()).append("\" ")
+                        .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
                         .append(this.getTypeDef().getMxAdminSuffix());
             for (final String symbName : MqlUtil_mxJPO.execMql(_paramCache, cmd).split("\n"))  {
                 if (!"".equals(symbName))  {

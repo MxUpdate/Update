@@ -172,7 +172,11 @@ public abstract class AbstractAdminObject_mxJPO
      */
     protected String getExportMQL()
     {
-        return "export " + this.getTypeDef().getMxAdminName() + " \"" + this.getName() + "\" xml";
+        return new StringBuilder()
+                .append("escape export ").append(this.getTypeDef().getMxAdminName())
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName()))
+                .append("\" xml")
+                .toString();
     }
 
     /**
