@@ -64,6 +64,14 @@ public abstract class AbstractObject_mxJPO
     private static final String PARAM_SYMB_NAME_PROG = "RegisterSymbolicNames";
 
     /**
+     * Key used to store the regular expression for allowed characters of
+     * symbolic names. All other characters are replaced by &quot;nothing&quot;.
+     *
+     * @see #calcDefaultSymbolicName(ParameterCache_mxJPO)
+     */
+    private static final String PARAM_CALC_SYMB_NAME_REG_EXP = "CalcSymbolicNameRegExp";
+
+    /**
      * Stores the version information of this object. If the value is
      * <code>null</code>, the version information is not defined.
      *
@@ -658,23 +666,28 @@ public abstract class AbstractObject_mxJPO
     }
 
     /**
-     * The calculates and returns the default symbolic name. A typical symbolic
-     * name has as prefix the admin type name, then an underscore and at least
-     * the name of the admin object. All spaces and slashes are replaced by
-     * &quot;nothing&quot; (zero length string).
+     * <p>The calculates and returns the default symbolic name. A typical
+     * symbolic name has as prefix the admin type name, then an underscore and
+     * at least the name of the admin object. All not allowed special
+     * characters are replaced by &quot;nothing&quot; (zero length string).</p>
+     * <p>The characters to replace are defined as parameter with name
+     * {@link #PARAM_CALC_SYMB_NAME_REG_EXP}.</p>
      *
+     * @param _paramCache   parameter cache
      * @return calculated default symbolic name for administration objects (if
      *         the administration object is a business object <code>null</code>
      *         is returned)
+     * @see #PARAM_CALC_SYMB_NAME_REG_EXPs
      */
-    protected String calcDefaultSymbolicName()
+    protected String calcDefaultSymbolicName(final ParameterCache_mxJPO _paramCache)
     {
+        final String regExp = _paramCache.getValueString(AbstractObject_mxJPO.PARAM_CALC_SYMB_NAME_REG_EXP);
         return (this.getTypeDef().getMxAdminName() == null)
                ? null
                : new StringBuilder()
                         .append(this.getTypeDef().getMxAdminName())
                         .append("_")
-                        .append(this.getName().replaceAll(" ", "").replaceAll("/", ""))
+                        .append(this.getName().replaceAll(regExp, ""))
                         .toString();
     }
 

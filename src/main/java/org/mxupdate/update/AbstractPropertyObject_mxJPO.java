@@ -197,9 +197,7 @@ public abstract class AbstractPropertyObject_mxJPO
         if (this.getTypeDef().getMxAdminName() != null)  {
             _out.append('#').append(AbstractPropertyObject_mxJPO.HEADER_SYMBOLIC_NAME).append(' ');
             if (this.getSymblicNames().isEmpty())  {
-                final StringBuilder symbName = new StringBuilder()
-                        .append(this.getTypeDef().getMxAdminName())
-                        .append("_").append(this.getName().replaceAll(" ", "").replaceAll("/", ""));
+                final String symbName = this.calcDefaultSymbolicName(_paramCache);
                 _paramCache.logWarning("    - No symbolic name defined for '" + this.getName()
                         + "'! Symbolic name '" + symbName + "' will be used!");
                 _out.append(symbName);
@@ -465,7 +463,7 @@ public abstract class AbstractPropertyObject_mxJPO
         String codeSymbName = null;
 
         if (this.getTypeDef().getMxAdminName() != null)  {
-            final String symbName = this.calcDefaultSymbolicName();
+            final String symbName = this.calcDefaultSymbolicName(_paramCache);
             if (_paramCache.getValueBoolean(AbstractPropertyObject_mxJPO.PARAM_CALCSYMBOLICNAMES))  {
                 codeSymbName = symbName;
                 _paramCache.logDebug("    - using calculated symbolic name '" + symbName + "'");

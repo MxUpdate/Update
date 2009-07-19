@@ -227,7 +227,7 @@ public abstract class AbstractProgram_mxJPO
 
         // append registration of symbolic names
         this.appendSymbolicNameRegistration(_paramCache,
-                                            this.calcDefaultSymbolicName(),
+                                            this.calcDefaultSymbolicName(_paramCache),
                                             cmd);
 
         // and execute alls
