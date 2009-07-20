@@ -230,10 +230,19 @@ public final class StringUtil_mxJPO
     }
 
     /**
+     * Returns the character on the position <code>_idx</code> within character
+     * array <code>_charFileName</code>. If the position does not exists, an
+     * exception will be thrown.
      *
-     * @param _charFileName
-     * @param _idx
-     * @return
+     * @param _charFileName     character array
+     * @param _idx              index in the character array
+     *                          <code>_charFileName</code>
+     * @return the character on index <code>_idx</code> in character array
+     *         <code>_charFile</code>
+     * @throws UpdateException_mxJPO if the number in <code>_idx</code> is
+     *                               greater then the length of the character
+     *                               array <code>_charFileName</code> (meaning
+     *                               array out of bound exception)
      */
     private static char convertFromFileNameGetChar(final char[] _charFileName,
                                                    final int _idx)
@@ -561,5 +570,4 @@ public final class StringUtil_mxJPO
          }
          return ret;
      }
-
 }
