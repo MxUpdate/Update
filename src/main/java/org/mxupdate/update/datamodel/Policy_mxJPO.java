@@ -43,7 +43,9 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
- * @author Tim Moxter
+ * The class is used to export and import / update policy configuration items.
+ *
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class Policy_mxJPO
@@ -53,6 +55,33 @@ public class Policy_mxJPO
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = 8645304838663417963L;
+
+    /**
+     * Set of all ignored URLs from the XML definition for policies.
+     *
+     * @see #parse(String, String)
+     */
+    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    static  {
+        Policy_mxJPO.IGNORED_URLS.add("/defaultFormat");
+        Policy_mxJPO.IGNORED_URLS.add("/formatRefList");
+        Policy_mxJPO.IGNORED_URLS.add("/typeRefList");
+        Policy_mxJPO.IGNORED_URLS.add("/stateDefList");
+        Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/ownerAccess");
+        Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/ownerAccess/access");
+        Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/publicAccess");
+        Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/publicAccess/access");
+        Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/userAccessList");
+        Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/userAccessList/userAccess/access");
+        Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/signatureDefList");
+        Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/signatureDefList/signatureDef/approveUserList");
+        Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/signatureDefList/signatureDef/ignoreUserList");
+        Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/signatureDefList/signatureDef/rejectUserList");
+        Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/actionProgram");
+        Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/checkProgram");
+        Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/routeUser");
+        Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/triggerList");
+    }
 
     /**
      * Called TCL procedure within the TCL update to parse the new policy
@@ -132,141 +161,108 @@ public class Policy_mxJPO
      *
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
+     * @see #IGNORED_URLS
      */
     @Override
     protected void parse(final String _url,
                          final String _content)
     {
-        if ("/defaultFormat".equals(_url))  {
-            // to be ignored ...
-        } else if ("/defaultFormat/formatRef".equals(_url))  {
-            this.defaultFormat = _content;
-        } else if ("/formatRefList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/formatRefList/formatRef".equals(_url))  {
-            this.formats.add(_content);
-        } else if ("/allowAllFormats".equals(_url))  {
-            this.allFormats = true;
+        if (!Policy_mxJPO.IGNORED_URLS.contains(_url))  {
+            if ("/defaultFormat/formatRef".equals(_url))  {
+                this.defaultFormat = _content;
+            } else if ("/formatRefList/formatRef".equals(_url))  {
+                this.formats.add(_content);
+            } else if ("/allowAllFormats".equals(_url))  {
+                this.allFormats = true;
 
-        } else if ("/sequence".equals(_url))  {
-            this.sequence = _content;
+            } else if ("/sequence".equals(_url))  {
+                this.sequence = _content;
 
-        } else if ("/storeRef".equals(_url))  {
-            this.store = _content;
+            } else if ("/storeRef".equals(_url))  {
+                this.store = _content;
 
-        } else if ("/typeRefList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/typeRefList/typeRef".equals(_url))  {
-            this.types.add(_content);
-        } else if ("/allowAllTypes".equals(_url))  {
-            this.allTypes = true;
+            } else if ("/typeRefList/typeRef".equals(_url))  {
+                this.types.add(_content);
+            } else if ("/allowAllTypes".equals(_url))  {
+                this.allTypes = true;
 
-        } else if ("/stateDefList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/stateDefList/stateDef".equals(_url))  {
-            this.states.add(new State());
-        } else if ("/stateDefList/stateDef/name".equals(_url))  {
-            this.states.peek().name = _content;
-        } else if ("/stateDefList/stateDef/autoPromotion".equals(_url))  {
-            this.states.peek().autoPromotion = true;
-        } else if ("/stateDefList/stateDef/checkoutHistory".equals(_url))  {
-            this.states.peek().checkoutHistory = true;
-        } else if ("/stateDefList/stateDef/revisionable".equals(_url))  {
-            this.states.peek().revisionable = true;
-        } else if ("/stateDefList/stateDef/versionable".equals(_url))  {
-            this.states.peek().versionable = true;
+            } else if ("/stateDefList/stateDef".equals(_url))  {
+                this.states.add(new State());
+            } else if ("/stateDefList/stateDef/name".equals(_url))  {
+                this.states.peek().name = _content;
+            } else if ("/stateDefList/stateDef/autoPromotion".equals(_url))  {
+                this.states.peek().autoPromotion = true;
+            } else if ("/stateDefList/stateDef/checkoutHistory".equals(_url))  {
+                this.states.peek().checkoutHistory = true;
+            } else if ("/stateDefList/stateDef/revisionable".equals(_url))  {
+                this.states.peek().revisionable = true;
+            } else if ("/stateDefList/stateDef/versionable".equals(_url))  {
+                this.states.peek().versionable = true;
 
-        } else if ("/stateDefList/stateDef/ownerAccess".equals(_url))  {
-            // to be ignored ...
-        } else if ("/stateDefList/stateDef/ownerAccess/access".equals(_url))  {
-            // to be ignored ...
-        } else if (_url.startsWith("/stateDefList/stateDef/ownerAccess/access"))  {
-            this.states.peek().ownerAccess.add(_url.replaceAll("^/stateDefList/stateDef/ownerAccess/access/", "")
-                                                   .replaceAll("Access$", "")
-                                                   .toLowerCase());
+            } else if (_url.startsWith("/stateDefList/stateDef/ownerAccess/access"))  {
+                this.states.peek().ownerAccess.add(_url.replaceAll("^/stateDefList/stateDef/ownerAccess/access/", "")
+                                                       .replaceAll("Access$", "")
+                                                       .toLowerCase());
 
-        } else if ("/stateDefList/stateDef/publicAccess".equals(_url))  {
-            // to be ignored ...
-        } else if ("/stateDefList/stateDef/publicAccess/access".equals(_url))  {
-            // to be ignored ...
-        } else if (_url.startsWith("/stateDefList/stateDef/publicAccess/access"))  {
-            this.states.peek().publicAccess.add(_url.replaceAll("^/stateDefList/stateDef/publicAccess/access/", "")
-                                                    .replaceAll("Access$", "")
-                                                    .toLowerCase());
+            } else if (_url.startsWith("/stateDefList/stateDef/publicAccess/access"))  {
+                this.states.peek().publicAccess.add(_url.replaceAll("^/stateDefList/stateDef/publicAccess/access/", "")
+                                                        .replaceAll("Access$", "")
+                                                        .toLowerCase());
 
-        } else if ("/stateDefList/stateDef/userAccessList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/stateDefList/stateDef/userAccessList/userAccess".equals(_url))  {
-            this.states.peek().userAccess.add(new UserAccess());
-        } else if ("/stateDefList/stateDef/userAccessList/userAccess/userRef".equals(_url))  {
-            this.states.peek().userAccess.peek().userRef = _content;
-        } else if ("/stateDefList/stateDef/userAccessList/userAccess/access".equals(_url))  {
-            // to be ignored ...
-        } else if (_url.startsWith("/stateDefList/stateDef/userAccessList/userAccess/access"))  {
-            this.states.peek().userAccess.peek().access.add(
-                    _url.replaceAll("^/stateDefList/stateDef/userAccessList/userAccess/access/", "")
-                        .replaceAll("Access$", "")
-                        .toLowerCase());
-        } else if ("/stateDefList/stateDef/userAccessList/userAccess/expressionFilter".equals(_url))  {
-            this.states.peek().userAccess.peek().expressionFilter = _content;
+            } else if ("/stateDefList/stateDef/userAccessList/userAccess".equals(_url))  {
+                this.states.peek().userAccess.add(new UserAccess());
+            } else if ("/stateDefList/stateDef/userAccessList/userAccess/userRef".equals(_url))  {
+                this.states.peek().userAccess.peek().userRef = _content;
+            } else if (_url.startsWith("/stateDefList/stateDef/userAccessList/userAccess/access"))  {
+                this.states.peek().userAccess.peek().access.add(
+                        _url.replaceAll("^/stateDefList/stateDef/userAccessList/userAccess/access/", "")
+                            .replaceAll("Access$", "")
+                            .toLowerCase());
+            } else if ("/stateDefList/stateDef/userAccessList/userAccess/expressionFilter".equals(_url))  {
+                this.states.peek().userAccess.peek().expressionFilter = _content;
 
-        } else if ("/stateDefList/stateDef/signatureDefList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/stateDefList/stateDef/signatureDefList/signatureDef".equals(_url))  {
-            this.states.peek().signatures.add(new Signature());
-        } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/name".equals(_url))  {
-            this.states.peek().signatures.peek().name = _content;
-        } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/expressionFilter".equals(_url))  {
-            this.states.peek().signatures.peek().filter= _content;
-        } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/stateDefRef".equals(_url))  {
-            this.states.peek().signatures.peek().branch = _content;
-        } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/approveUserList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/approveUserList/userRef".equals(_url))  {
-            this.states.peek().signatures.peek().approverUsers.add(_content);
-        } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/ignoreUserList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/ignoreUserList/userRef".equals(_url))  {
-            this.states.peek().signatures.peek().ignoreUsers.add(_content);
-        } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/rejectUserList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/rejectUserList/userRef".equals(_url))  {
-            this.states.peek().signatures.peek().rejectUsers.add(_content);
+            } else if ("/stateDefList/stateDef/signatureDefList/signatureDef".equals(_url))  {
+                this.states.peek().signatures.add(new Signature());
+            } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/name".equals(_url))  {
+                this.states.peek().signatures.peek().name = _content;
+            } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/expressionFilter".equals(_url))  {
+                this.states.peek().signatures.peek().filter= _content;
+            } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/stateDefRef".equals(_url))  {
+                this.states.peek().signatures.peek().branch = _content;
+            } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/approveUserList/userRef".equals(_url))  {
+                this.states.peek().signatures.peek().approverUsers.add(_content);
+            } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/ignoreUserList/userRef".equals(_url))  {
+                this.states.peek().signatures.peek().ignoreUsers.add(_content);
+            } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/rejectUserList/userRef".equals(_url))  {
+                this.states.peek().signatures.peek().rejectUsers.add(_content);
 
-        } else if ("/stateDefList/stateDef/actionProgram".equals(_url))  {
-            // to be ignored ...
-        } else if ("/stateDefList/stateDef/actionProgram/programRef".equals(_url))  {
-            this.states.peek().actionProgram = _content;
-        } else if ("/stateDefList/stateDef/actionProgram/inputArguments".equals(_url))  {
-            this.states.peek().actionInput = _content;
+            } else if ("/stateDefList/stateDef/actionProgram/programRef".equals(_url))  {
+                this.states.peek().actionProgram = _content;
+            } else if ("/stateDefList/stateDef/actionProgram/inputArguments".equals(_url))  {
+                this.states.peek().actionInput = _content;
 
-        } else if ("/stateDefList/stateDef/checkProgram".equals(_url))  {
-            // to be ignored ...
-        } else if ("/stateDefList/stateDef/checkProgram/programRef".equals(_url))  {
-            this.states.peek().checkProgram = _content;
-        } else if ("/stateDefList/stateDef/checkProgram/inputArguments".equals(_url))  {
-            this.states.peek().checkInput = _content;
+            } else if ("/stateDefList/stateDef/checkProgram/programRef".equals(_url))  {
+                this.states.peek().checkProgram = _content;
+            } else if ("/stateDefList/stateDef/checkProgram/inputArguments".equals(_url))  {
+                this.states.peek().checkInput = _content;
 
-        } else if ("/stateDefList/stateDef/routeMessage".equals(_url))  {
-            this.states.peek().routeMessage = _content;
-        } else if ("/stateDefList/stateDef/routeUser".equals(_url))  {
-            // to be ignored ...
-        } else if ("/stateDefList/stateDef/routeUser/userRef".equals(_url))  {
-            this.states.peek().routeUsers.add(_content);
+            } else if ("/stateDefList/stateDef/routeMessage".equals(_url))  {
+                this.states.peek().routeMessage = _content;
+            } else if ("/stateDefList/stateDef/routeUser/userRef".equals(_url))  {
+                this.states.peek().routeUsers.add(_content);
 
-        } else if ("/stateDefList/stateDef/triggerList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/stateDefList/stateDef/triggerList/trigger".equals(_url))  {
-            this.states.peek().triggersStack.add(new Trigger());
-        } else if ("/stateDefList/stateDef/triggerList/trigger/triggerName".equals(_url))  {
-            this.states.peek().triggersStack.peek().name = _content;
-        } else if ("/stateDefList/stateDef/triggerList/trigger/programRef".equals(_url))  {
-            this.states.peek().triggersStack.peek().program = _content;
-        } else if ("/stateDefList/stateDef/triggerList/trigger/inputArguments".equals(_url))  {
-            this.states.peek().triggersStack.peek().arguments = _content;
+            } else if ("/stateDefList/stateDef/triggerList/trigger".equals(_url))  {
+                this.states.peek().triggersStack.add(new Trigger());
+            } else if ("/stateDefList/stateDef/triggerList/trigger/triggerName".equals(_url))  {
+                this.states.peek().triggersStack.peek().name = _content;
+            } else if ("/stateDefList/stateDef/triggerList/trigger/programRef".equals(_url))  {
+                this.states.peek().triggersStack.peek().program = _content;
+            } else if ("/stateDefList/stateDef/triggerList/trigger/inputArguments".equals(_url))  {
+                this.states.peek().triggersStack.peek().arguments = _content;
 
-        } else  {
-            super.parse(_url, _content);
+            } else  {
+                super.parse(_url, _content);
+            }
         }
     }
 
