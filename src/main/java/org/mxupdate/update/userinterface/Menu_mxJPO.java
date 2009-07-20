@@ -221,17 +221,19 @@ public class Menu_mxJPO
     {
         // remove child commands / menus
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getTypeDef().getMxAdminName())
-                        .append(" \"").append(this.getName()).append('\"');
+                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                        .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"');
         for (final MenuChild child : this.children)  {
             preMQLCode.append(" remove ").append(child.type)
-                      .append(" \"").append(child.name).append("\"");
+                      .append(" \"").append(StringUtil_mxJPO.convertMql(child.name)).append("\"");
         }
         preMQLCode.append(";\n");
 
         // remove information about tree menu...
         if (this.treeMenu)  {
-            preMQLCode.append("mod menu Tree remove menu \"").append(this.getName()).append("\";\n");
+            preMQLCode.append("escape mod menu Tree remove menu \"")
+                      .append(StringUtil_mxJPO.convertMql(this.getName()))
+                      .append("\";\n");
         }
 
         // append already existing pre MQL code

@@ -107,47 +107,142 @@ public final class StringUtil_mxJPO
     }
 
     /**
-     * Converts given MX name to a name which could be used within a file
+     * <p>Decodes given MX name to a name which could be used within a file
      * system. This must be done because some characters could not handled
-     * correctly from the file system.
+     * correctly from the file system.</p>
+     * <p>Following characters are not converted:
      * <ul>
-     * <li>a backslash is converted to &quot;@5C&quot;</li>
-     * <li>a slash is converted to &quot;@2F&quot;</li>
-     * <li>% is converted to &quot;@25&quot;</li>
-     * <li>@ is converted to &quot;@@&quot;</li>
+     * <li>number</li>
+     * <li>alphabetic character (lower and upper case)</li>
+     * <li>left or right parenthesis</li>
+     * <li>plus '+' or minus '-'</li>
+     * <li>comma ',' or point '.'</li>
+     * <li>space</li>
+     * <li>equals sign '='</li>
+     * <li>underscore '_'</li>
      * </ul>
+     * </p>
+     * <p>All other characters are converted with the algorithm:
+     * <ul>
+     * <li>the &quot;at symbol&quot; '@' will be converted to double at symbol
+     *     '@@'</li>
+     * <li>if a character is in the range of 0 and 254 (ASCII character), then
+     *     the character is converted to a two characters long hexa-decimal
+     *     code with '@' as prefix (e.g. double quotes '=' is converted to
+     *     '@22')</li>
+     * <li>characters greater than 254 are converted to a four characters
+     *     long hexa-decimal code with '@u' as prefix (e.g. the euro sign
+     *     '&euro;' is converted to '@u20AC')</li>
+     * </ul>
+     * </p>
      *
      * @param _name     MX name to convert
      * @return converted file name
+     * @see #convertFromFileName(String)
      */
     public static String convertToFileName(final String _name)
     {
-        return _name.replaceAll("@", "@@")
-                    .replaceAll("%", "@25")
-                    .replaceAll("/", "@2F")
-                    .replaceAll("\\\\", "@5C");
+        final char[] charName = _name.toCharArray();
+        final StringBuilder fileName = new StringBuilder();
+        for (int idx = 0; idx < charName.length; idx++)  {
+            final char ch = charName[idx];
+            if (ch == '@')  {
+                fileName.append("@@");
+            } else if ((ch < '(' || ch > ')')
+                    && (ch < '+' || ch > '.')
+                    && (ch < '0' || ch > '9')
+                    && (ch < 'A' || ch > 'Z')
+                    && (ch < 'a' || ch > 'z')
+                    && (ch != ' ') && (ch != '=') && (ch != '_'))  {
+
+                final String hex = String.valueOf(Integer.toHexString(ch));
+                fileName.append('@');
+                switch (hex.length())  {
+                    case 1:
+                        fileName.append('0').append(hex);
+                        break;
+                    case 3:
+                        fileName.append("u0").append(hex);
+                        break;
+                    case 4:
+                        fileName.append('u').append(hex);
+                        break;
+                    default:
+                        fileName.append(hex);
+                        break;
+                }
+            } else  {
+                fileName.append(ch);
+            }
+        }
+        return fileName.toString();
     }
 
     /**
-     * Converts the given file name back to internal used names. This must be
-     * done because some characters could not handled correctly from the file
-     * system.
-     * <ul>
-     * <li>&quot;@5C&quot; is converted to a backslash</li>
-     * <li>&quot;@2F&quot; is converted to a slash</li>
-     * <li>&quot;@25&quot; is converted to %</li>
-     * <li>&quot;@@&quot; is converted to @</li>
-     * </ul>
+     * <p>Encodes the given file name back to internal used names. This must
+     * be done because some characters could not handled correctly from the
+     * file system.</p>
+     * <p>The same characters described in {@link #convertToFileName(String)}
+     * are converted back.</p>
      *
      * @param _fileName     name from file to convert
      * @return converted name extracted from a file name
+     * @throws UpdateException_mxJPO if the configuration item name could not
+     *                               be extracted from the file name
+     *                               <code>_fileName</code> because the encoded
+     *                               special characters are not in correct
+     *                               format
+     * @see #convertToFileName(String)
      */
     public static String convertFromFileName(final String _fileName)
+        throws UpdateException_mxJPO
     {
-        return _fileName.replaceAll("@5C", "\\\\")
-                        .replaceAll("@2F", "/")
-                        .replaceAll("@25", "%")
-                        .replaceAll("@@", "@");
+        final char[] charFileName = _fileName.toCharArray();
+        final StringBuilder name = new StringBuilder();
+        for (int idx = 0; idx < charFileName.length; idx++)  {
+            final char ch = charFileName[idx];
+            if (ch == '@')  {
+                switch (StringUtil_mxJPO.convertFromFileNameGetChar(charFileName, ++idx))  {
+                    case '@':
+                        name.append('@');
+                        break;
+                    case 'u':
+                        final char[] hex4 = new char[4];
+                        hex4[0] = StringUtil_mxJPO.convertFromFileNameGetChar(charFileName, ++idx);
+                        hex4[1] = StringUtil_mxJPO.convertFromFileNameGetChar(charFileName, ++idx);
+                        hex4[3] = StringUtil_mxJPO.convertFromFileNameGetChar(charFileName, ++idx);
+                        hex4[4] = StringUtil_mxJPO.convertFromFileNameGetChar(charFileName, ++idx);
+                        name.append((char) ((int) Integer.valueOf(new String(hex4), 16)));
+                        break;
+                    default:
+                        final char[] hex2 = new char[2];
+                        hex2[0] = StringUtil_mxJPO.convertFromFileNameGetChar(charFileName, idx);
+                        hex2[1] = StringUtil_mxJPO.convertFromFileNameGetChar(charFileName, ++idx);
+                        name.append((char) ((int) Integer.valueOf(new String(hex2), 16)));
+                        break;
+                }
+            } else  {
+                name.append(ch);
+            }
+        }
+
+        return name.toString();
+    }
+
+    /**
+     *
+     * @param _charFileName
+     * @param _idx
+     * @return
+     */
+    private static char convertFromFileNameGetChar(final char[] _charFileName,
+                                                   final int _idx)
+        throws UpdateException_mxJPO
+    {
+        if (_idx >= _charFileName.length)  {
+            throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.UTIL_STRINGUTIL_CONVERT_FROM_FILENAME);
+        }
+        return _charFileName[_idx];
     }
 
     /**

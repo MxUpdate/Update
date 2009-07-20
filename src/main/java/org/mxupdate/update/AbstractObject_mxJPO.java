@@ -37,6 +37,7 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.xml.sax.SAXException;
 
 /**
@@ -293,9 +294,12 @@ public abstract class AbstractObject_mxJPO
      * @param _file         file for which the MX name is searched
      * @return MX name or <code>null</code> if the file is not an update file
      *         for current type definition
+     * @throws UpdateException_mxJPO if the configuration item name could not
+     *                               be extracted from the file name
      */
     public String extractMxName(final ParameterCache_mxJPO _paramCache,
                                 final File _file)
+        throws UpdateException_mxJPO
     {
         final String suffix = this.getTypeDef().getFileSuffix();
         final int suffixLength = (suffix != null) ? suffix.length() : 0;

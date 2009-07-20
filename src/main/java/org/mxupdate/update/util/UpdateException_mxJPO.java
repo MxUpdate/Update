@@ -33,7 +33,9 @@ public class UpdateException_mxJPO
 {
     /**
      * <p>Enumeration for all known update errors. The codes itself are
-     * &quot;speaking&quot; numbers:
+     * &quot;speaking&quot; numbers.</p>
+     * <p>For classes implementing specific exports / updates for an
+     * administration object, following algorithm is used:
      * <ul>
      * <li>the first digit defines data model (1), program (2), user (3) or
      *     user interface (4)</li>
@@ -44,6 +46,18 @@ public class UpdateException_mxJPO
      *     </ul></li>
      * <li>the fourth and fifth digit defines the error itself</li>
      * </ul></p>
+     * <p>Exceptions from utility classes (package
+     *    org.mxupdate.update.util) starts with 90. The next digit
+     *    defines the class where the exception is thrown:
+     * <ul>
+     * <li>1: {@link org.mxupdate.update.util.AbstractParser_mxJPO}</li>
+     * <li>2: {@link org.mxupdate.update.util.AdminProperty_mxJPO}</li>
+     * <li>3: {@link org.mxupdate.update.util.JPOCaller_mxJPO}</li>
+     * <li>4: {@link org.mxupdate.update.util.MqlUtil_mxJPO}</li>
+     * <li>5: {@link org.mxupdate.update.util.ParmeterCache_mxJPO}</li>
+     * <li>6: {@link org.mxupdate.update.util.StringUtil_mxJPO}</li>
+     * </ul>
+     * </p>
      *
      * <p><b>Example:</b><br/>
      * 10601: 1 for data model, 06 for dimension, 01 for the error</p>
@@ -89,7 +103,16 @@ public class UpdateException_mxJPO
          * @see org.mxupdate.update.datamodel.Dimension_mxJPO
          */
         DIMENSION_UPDATE_REMOVEUNIT(10604,
-                "removing an unit from a dimension is not allowed (data will be changed potentially)");
+                "removing an unit from a dimension is not allowed (data will be changed potentially)"),
+
+        /**
+         * If the name of a configuration item could not be extracted from a
+         * file name.
+         *
+         * @see org.mxupdate.update.util.StringUtil_mxJPO#convertFromFileName(String)
+         */
+        UTIL_STRINGUTIL_CONVERT_FROM_FILENAME(90602,
+                "the file name is not correct defined and could not be converted back to a configuration item name");
 
         /**
          * Error code of this error enumeration.

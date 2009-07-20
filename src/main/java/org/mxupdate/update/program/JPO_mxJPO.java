@@ -33,6 +33,7 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * The class is used to export, create, delete and update JPOs within MX.
@@ -195,6 +196,8 @@ public class JPO_mxJPO
      * @param _file         file for which the MX name is searched
      * @return MX name or <code>null</code> if the file is not an update file
      *         for current type definition
+     * @throws UpdateException_mxJPO if the JPO name could not be extracted
+     *                               from the file name
      * @see #PATTERN_PACKAGE
      * @todo idea: maybe performance improvement by opening file itself and
      *       read only till class, interface or enum is defined....
@@ -202,6 +205,7 @@ public class JPO_mxJPO
     @Override
     public String extractMxName(final ParameterCache_mxJPO _paramCache,
                                 final File _file)
+        throws UpdateException_mxJPO
     {
         String mxName = super.extractMxName(_paramCache, _file);
 
