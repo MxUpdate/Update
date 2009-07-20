@@ -264,16 +264,17 @@ public class AbstractTest
      *
      * @param _fileName name of the file to update
      * @param _code     TCL update code
+     * @return returned string with the update logging
      * @throws IOException      if the parameter could not be encoded
      * @throws MatrixException  if MQL calls failed
      */
-    protected void update(final String _fileName,
-                          final String _code)
+    protected JPOReturn<String> update(final String _fileName,
+                                       final String _code)
         throws IOException, MatrixException
     {
         final Map<String,String> params = new HashMap<String,String>();
         params.put(_fileName, _code);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        return this.<String>jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
     }
 
     /**

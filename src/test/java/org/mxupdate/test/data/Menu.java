@@ -71,6 +71,26 @@ public class Menu
     }
 
     /**
+     * Prepares the configuration item update file depending on the
+     * configuration of this menu.
+     *
+     * @return code for the configuration item update file
+     */
+    public String ciFile()
+    {
+        final StringBuilder cmd = new StringBuilder()
+                .append("mql escape mod menu \"${NAME}\"");
+        for (final AbstractCommand<?> child : this.children)  {
+            cmd.append(" add ").append(child.getCI().getMxType())
+               .append(" \"").append(this.getTest().convertTcl(child.getName())).append('\"');
+        }
+        this.append4CIFileValues(cmd);
+        this.append4CIFileSettings(cmd);
+
+        return cmd.toString();
+    }
+
+    /**
      * Creates a this menu with all values and settings.
      *
      * @return this menu instance
@@ -80,10 +100,7 @@ public class Menu
     public Menu create()
         throws MatrixException
     {
-        // create all child commands / menus
-        for (final AbstractCommand<?> child : this.children)  {
-            child.create();
-        }
+        this.createChildren();
 
         final StringBuilder cmd = new StringBuilder()
                 .append("escape add menu \"" + this.getTest().convertMql(this.getName()) + "\"");
@@ -103,6 +120,22 @@ public class Menu
 
         this.getTest().mql(cmd);
 
+        return this;
+    }
+
+    /**
+     * Creates all child commands / menus.
+     *
+     * @return this menu instance
+     * @throws MatrixException if child commands / menus could not be created
+     * @see #children
+     */
+    public Menu createChildren()
+        throws MatrixException
+    {
+        for (final AbstractCommand<?> child : this.children)  {
+            child.create();
+        }
         return this;
     }
 

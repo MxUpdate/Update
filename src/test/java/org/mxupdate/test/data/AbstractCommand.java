@@ -100,6 +100,22 @@ abstract class AbstractCommand<T extends AbstractCommand<?>>
      * @param _cmd      string builder used to append the MQL commands
      * @see #settings
      */
+    protected void append4CIFileSettings(final StringBuilder _cmd)
+    {
+        for (final Map.Entry<String,String> entry : this.settings.entrySet())  {
+            _cmd.append(" add setting \"").append(this.getTest().convertTcl(entry.getKey())).append("\" \"")
+                .append(this.getTest().convertTcl(entry.getValue()))
+                .append('\"');
+        }
+    }
+
+    /**
+     * Appends to the MQL create commands in <code>_cmd</code> the
+     * {@link #settings}.
+     *
+     * @param _cmd      string builder used to append the MQL commands
+     * @see #settings
+     */
     protected void append4CreateSettings(final StringBuilder _cmd)
     {
         for (final Map.Entry<String,String> entry : this.settings.entrySet())  {

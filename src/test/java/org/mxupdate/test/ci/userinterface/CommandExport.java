@@ -25,18 +25,17 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.Command;
-import org.mxupdate.test.data.Menu;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
- * Test cases for the export of menus.
+ * Test cases for the export of commands.
  *
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class MenuExport
+public class CommandExport
     extends AbstractTest
 {
     /**
@@ -50,32 +49,28 @@ public class MenuExport
         throws MatrixException
     {
         this.cleanup(CI.COMMAND);
-        this.cleanup(CI.MENU);
     }
 
     /**
-     * Tests a 'simple' menu but with a quote in name and with one command and
-     * menu.
+     * Tests a new created command and the related export.
      *
      * @throws Exception if test failed
      */
     @Test()
-    public void testSingleMenu()
+    public void test()
         throws Exception
     {
-        final Menu menu = new Menu(this, "hallo \" test")
+        final Command command = new Command(this, "hallo \" test")
                 .setValue("label", "command label \" \\ ' #")
                 .setValue("description", "\"\\\\ hallo")
                 .setValue("href", "${COMMON_DIR}/emxTree.jsp?mode=insert")
                 .setValue("alt", "${COMMON_DIR}/emxTreeAlt.jsp?mode=insert")
                 .setSetting("Setting 1", "Setting Value ' 1")
-                .addChild(new Menu(this, "child menu 1"))
-                .addChild(new Command(this, "child command 1"))
                 .create();
 
-        final Export export = this.export(CI.MENU, menu.getName());
-        final ExportParser exportParser = new ExportParser(CI.MENU, export.getCode());
+        final Export export = this.export(CI.COMMAND, command.getName());
+        final ExportParser exportParser = new ExportParser(CI.COMMAND, export.getCode());
 
-        menu.checkExport(exportParser);
+        command.checkExport(exportParser);
     }
 }

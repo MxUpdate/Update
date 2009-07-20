@@ -73,6 +73,26 @@ public class Command
     }
 
     /**
+     * Prepares the configuration item update file depending on the
+     * configuration of this command.
+     *
+     * @return code for the configuration item update file
+     */
+    public String ciFile()
+    {
+        final StringBuilder cmd = new StringBuilder()
+                .append("mql escape mod command \"${NAME}\"");
+        for (final String user : this.users)  {
+            cmd.append(" add user \"")
+               .append(this.getTest().convertTcl(user)).append('\"');
+        }
+        this.append4CIFileValues(cmd);
+        this.append4CIFileSettings(cmd);
+
+        return cmd.toString();
+    }
+
+    /**
      * Creates a this command with all values and settings.
      *
      * @return this command instance

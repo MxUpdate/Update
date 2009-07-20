@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.mxupdate.test.AbstractTest.CI;
+import org.mxupdate.test.AbstractTest.Export;
 
 /**
  * The class parses informations from an MxUpdate export.
@@ -52,12 +53,23 @@ public class ExportParser
     private final CI ci;
 
     /**
+     * File name of the export.
+     *
+     * @see #getFileName()
+     */
+    private final String fileName;
+
+    /**
      * Parsed name from the header.
+     *
+     * @see #getName()
      */
     private final String name;
 
     /**
      * Parsed symbolic name from the header.
+     *
+     * @see #getSymbolicName()
      */
     private final String symbolicName;
 
@@ -74,36 +86,38 @@ public class ExportParser
     /**
      *
      * @param _ci       configuration item type
-     * @param _code     code of the configuration item
+     * @param _export   related export instance
      */
     public ExportParser(final CI _ci,
-                        final String _code)
+                        final Export _export)
     {
+        final String complCode = _export.getCode();
         this.ci = _ci;
+        this.fileName = _export.getFileName();
         // parse symbolic name
-        final int posSymbolicName = _code.indexOf(ExportParser.HEADER_SYMBOLIC_NAME);
+        final int posSymbolicName = complCode.indexOf(ExportParser.HEADER_SYMBOLIC_NAME);
         if (posSymbolicName >= 0)  {
             final int start = posSymbolicName + ExportParser.HEADER_SYMBOLIC_NAME.length();
-            final int end = _code.indexOf('\n', start);
-            this.symbolicName = _code.substring(start, end).trim();
+            final int end = complCode.indexOf('\n', start);
+            this.symbolicName = complCode.substring(start, end).trim();
         } else  {
             this.symbolicName = null;
         }
         // parse name in the header
-        final int posName = _code.indexOf("# " + this.ci.header + ":\n#");
+        final int posName = complCode.indexOf("# " + this.ci.header + ":\n#");
         if (posName >= 0)  {
             final int start = posName + (this.ci.header.length() * 2) + 9;
-            final int end = _code.indexOf('\n', start);
-            this.name = _code.substring(start, end).trim();
+            final int end = complCode.indexOf('\n', start);
+            this.name = complCode.substring(start, end).trim();
         } else  {
             this.name = null;
         }
         // extract update code
-        final int posHeaderEnd = _code.lastIndexOf(ExportParser.HEADER_START_END);
+        final int posHeaderEnd = complCode.lastIndexOf(ExportParser.HEADER_START_END);
         if (posHeaderEnd >=0)  {
-            this.code = _code.substring(posHeaderEnd + ExportParser.HEADER_START_END.length()).trim();
+            this.code = complCode.substring(posHeaderEnd + ExportParser.HEADER_START_END.length()).trim();
         } else  {
-            this.code = _code.trim();
+            this.code = complCode.trim();
         }
         // parse all lines
         new Line(Arrays.asList(this.code.split("\n")).iterator(), null);
@@ -123,6 +137,17 @@ public class ExportParser
             line.evalPath(path, 1, ret);
         }
         return ret;
+    }
+
+    /**
+     * Returns the file name.
+     *
+     * @return file name from the export
+     * @see #fileName
+     */
+    public String getFileName()
+    {
+        return this.fileName;
     }
 
     /**

@@ -92,7 +92,13 @@
         <packages>
             <package name="org.mxupdate.test.export.datamodel"/>
             <package name="org.mxupdate.test.export.program"/>
-            <package name="org.mxupdate.test.export.userinterface"/>
+        </packages>
+    </test>
+
+    <test name="7 - Test Configuration Items" annotatinos="JDK">
+        <packages>
+            <package name="org.mxupdate.test.ci"/>
+            <package name="org.mxupdate.test.ci.userinterface"/>
         </packages>
     </test>
 

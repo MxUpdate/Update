@@ -18,7 +18,7 @@
  * Last Changed By: $Author$
  */
 
-package org.mxupdate.test.export.userinterface;
+package org.mxupdate.test.ci.userinterface;
 
 import matrix.util.MatrixException;
 
@@ -36,7 +36,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class CommandExport
+public class CommandExportUpdate
     extends AbstractTest
 {
     /**
@@ -62,10 +62,12 @@ public class CommandExport
                 .setSetting("Setting 1", "Setting Value ' 1")
                 .addUser("guest")
                 .addUser("creator");
+        final Command command3 = new Command(this, "hallo\ttest");
 
         return new Object[][]  {
                 new Object[]{command1},
-                new Object[]{command2}
+                new Object[]{command2},
+                new Object[]{command3}
         };
     }
 
@@ -88,13 +90,30 @@ public class CommandExport
      * @param _command      command to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "commands")
-    public void test(final Command _command)
+    @Test(dataProvider = "commands", description = "test export of new created commands")
+    public void testExport(final Command _command)
         throws Exception
     {
         _command.create();
         final Export export = this.export(CI.COMMAND, _command.getName());
-        final ExportParser exportParser = new ExportParser(CI.COMMAND, export.getCode());
+        final ExportParser exportParser = new ExportParser(CI.COMMAND, export);
+        _command.checkExport(exportParser);
+    }
+
+    /**
+     * Tests an update of non existing command. The result is tested with by
+     * exporting the command and checking the result.
+     *
+     * @param _command      command to test
+     * @throws Exception if test failed
+     */
+    @Test(dataProvider = "commands", description = "test update of non existing command")
+    public void testUpdate(final Command _command)
+        throws Exception
+    {
+        this.update(_command.getCIFileName(), _command.ciFile());
+        final Export export = this.export(CI.COMMAND, _command.getName());
+        final ExportParser exportParser = new ExportParser(CI.COMMAND, export);
         _command.checkExport(exportParser);
     }
 }

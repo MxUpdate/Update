@@ -181,6 +181,75 @@ public abstract class AbstractData<T extends AbstractData<?>>
         return this.values;
     }
 
+    /**
+     * Returns the name of the configuration item file.
+     *
+     * @return name of the CI file
+     */
+    public String getCIFileName()
+    {
+        final char[] charName = this.name.toCharArray();
+        final StringBuilder fileName = new StringBuilder()
+                .append(this.ci.header).append('_');
+        for (int idx = 0; idx < charName.length; idx++)  {
+            final char ch = charName[idx];
+            if (ch == '@')  {
+                fileName.append("@@");
+            } else if ((ch < '(' || ch > ')')
+                    && (ch < '+' || ch > '.')
+                    && (ch < '0' || ch > '9')
+                    && (ch < 'A' || ch > 'Z')
+                    && (ch < 'a' || ch > 'z')
+                    && (ch != ' ') && (ch != '=') && (ch != '_'))  {
+
+                final String hex = String.valueOf(Integer.toHexString(ch));
+                fileName.append('@');
+                switch (hex.length())  {
+                    case 1:
+                        fileName.append('0').append(hex);
+                        break;
+                    case 3:
+                        fileName.append("u0").append(hex);
+                        break;
+                    case 4:
+                        fileName.append('u').append(hex);
+                        break;
+                    default:
+                        fileName.append(hex);
+                        break;
+                }
+            } else  {
+                fileName.append(ch);
+            }
+        }
+        fileName.append(".tcl");
+
+        return fileName.toString();
+    }
+
+    /**
+     * Appends the defined {@link #values} to the TCL code <code>_cmd</code> of
+     * the configuration item file.
+     *
+     * @param _cmd  string builder with the TCL commands of the configuration
+     *              item file
+     * @see #values
+     */
+    protected void append4CIFileValues(final StringBuilder _cmd)
+    {
+        for (final Map.Entry<String,String> entry : this.values.entrySet())  {
+            _cmd.append(' ').append(entry.getKey()).append(" \"")
+                .append(this.getTest().convertTcl(entry.getValue()))
+                .append('\"');
+        }
+    }
+
+    /**
+     * Appends the MQL commands to define all {@link #values}Êwithin a create.
+     *
+     * @param _cmd  string builder used to append MQL commands
+     * @see #values
+     */
     protected void append4CreateValues(final StringBuilder _cmd)
     {
         for (final Map.Entry<String,String> entry : this.values.entrySet())  {
@@ -197,6 +266,9 @@ public abstract class AbstractData<T extends AbstractData<?>>
      */
     public void checkExport(final ExportParser _exportParser)
     {
+        Assert.assertEquals(_exportParser.getFileName(),
+                            this.getCIFileName(),
+                            "check file name");
         Assert.assertEquals(_exportParser.getName(),
                             this.getName(),
                             "check name");
@@ -218,5 +290,17 @@ public abstract class AbstractData<T extends AbstractData<?>>
                                 "\"" + this.getTest().convertTcl(entry.getValue()) + "\"",
                                 entry.getKey() + " is correct defined");
         }
+    }
+
+    /**
+     * Returns the string representation of this data piece as concatenation of
+     * the configuration type {@link #ci} and the {@link #name}.
+     *
+     * @return string representation of this data piece
+     */
+    @Override
+    public String toString()
+    {
+        return "[" + this.ci.getMxType() + " '" + this.name + "']";
     }
 }
