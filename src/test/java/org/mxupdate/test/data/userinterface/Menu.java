@@ -18,7 +18,7 @@
  * Last Changed By: $Author$
  */
 
-package org.mxupdate.test.data;
+package org.mxupdate.test.data.userinterface;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 
 /**
- * The class is used to define a menu, create them and test the result.
+ * Used to define a menu, create them and test the result.
  *
  * @author The MxUpdate Team
  * @version $Id$
@@ -54,7 +54,7 @@ public class Menu
     public Menu(final AbstractTest _test,
                 final String _name)
     {
-        super(_test, AbstractTest.CI.MENU, _name);
+        super(_test, AbstractTest.CI.MENU, _name, "MENU_");
     }
 
     /**
@@ -82,7 +82,7 @@ public class Menu
                 .append("mql escape mod menu \"${NAME}\"");
         for (final AbstractCommand<?> child : this.children)  {
             cmd.append(" add ").append(child.getCI().getMxType())
-               .append(" \"").append(this.getTest().convertTcl(child.getName())).append('\"');
+               .append(" \"").append(AbstractTest.convertTcl(child.getName())).append('\"');
         }
         this.append4CIFileValues(cmd);
         this.append4CIFileSettings(cmd);
@@ -103,17 +103,17 @@ public class Menu
         this.createChildren();
 
         final StringBuilder cmd = new StringBuilder()
-                .append("escape add menu \"" + this.getTest().convertMql(this.getName()) + "\"");
+                .append("escape add menu \"" + AbstractTest.convertMql(this.getName()) + "\"");
         this.append4CreateValues(cmd);
         this.append4CreateSettings(cmd);
         cmd.append(';');
 
         // append all child command / menus
         if (!this.children.isEmpty())  {
-            cmd.append("escape mod menu \"" + this.getTest().convertMql(this.getName()) + "\"");
+            cmd.append("escape mod menu \"" + AbstractTest.convertMql(this.getName()) + "\"");
             for (final AbstractCommand<?> child : this.children)  {
                 cmd.append(" add ").append(child.getCI().getMxType())
-                   .append(" \"").append(this.getTest().convertMql(child.getName())).append('\"');
+                   .append(" \"").append(AbstractTest.convertMql(child.getName())).append('\"');
             }
             cmd.append(';');
         }
@@ -152,7 +152,7 @@ public class Menu
     {
         super.evalAdds4CheckExport(_needAdds);
         for (final AbstractCommand<?> child : this.children)  {
-            _needAdds.add(child.getCI().getMxType() + " \"" + this.getTest().convertTcl(child.getName()) + "\"");
+            _needAdds.add(child.getCI().getMxType() + " \"" + AbstractTest.convertTcl(child.getName()) + "\"");
         }
     }
 }

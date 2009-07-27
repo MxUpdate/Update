@@ -35,6 +35,7 @@ import matrix.db.JPO;
 import matrix.util.MatrixException;
 
 import org.apache.commons.codec.binary.Base64;
+import org.mxupdate.test.data.AbstractData;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -62,40 +63,69 @@ public class AbstractTest
     public enum CI
     {
         /**
+         * Configuration item Data Model Boolean Attribute.
+         */
+        ATTRIBUTE_BOOLEAN("attribute", "AttributeBoolean", "ATTRIBUTE", true),
+
+        /**
+         * Configuration item Data Model Date Attribute.
+         */
+        ATTRIBUTE_DATE("attribute", "AttributeDate", "ATTRIBUTE", true),
+
+        /**
+         * Configuration item Data Model Integer Attribute.
+         */
+        ATTRIBUTE_INTEGER("attribute", "AttributeInteger", "ATTRIBUTE", true),
+
+        /**
+         * Configuration item Data Model Real Attribute.
+         */
+        ATTRIBUTE_REAL("attribute", "AttributeReal", "ATTRIBUTE", true),
+
+        /**
+         * Configuration item Data Model String Attribute.
+         */
+        ATTRIBUTE_STRING("attribute", "AttributeString", "ATTRIBUTE", true),
+
+        /**
          * Configuration item Data Model Interface.
          */
-        INTERFACE("interface", "Interface", "INTERFACE"),
+        INTERFACE("interface", "Interface", "INTERFACE", true),
 
         /**
          * Configuration item Data Model Policy.
          */
-        POLICY("policy", "Policy", "POLICY"),
+        POLICY("policy", "Policy", "POLICY", true),
 
         /**
          * Configuration item Data Model Relationship.
          */
-        RELATIONSHIP("relationship", "Relationship", "RELATIONSHIP"),
+        RELATIONSHIP("relationship", "Relationship", "RELATIONSHIP", true),
 
         /**
          * Configuration item Data Model Type.
          */
-        TYPE("type", "Type", "TYPE"),
+        TYPE("type", "Type", "TYPE", true),
 
         /**
          * Configuration item Program JPO.
          */
-        JPO("program", "JPO", null),
+        JPO("program", "JPO", null, true),
+
+        /**
+         * Configuration item Program MQL.
+         */
+        MQL_PROGRAM("program", "MQL PROGRAM", null, true),
 
         /**
          * Configuration item command.
          */
-        COMMAND("command", "Command", "COMMAND", "description", "label", "href"),
+        COMMAND("command", "Command", "COMMAND", true),
 
         /**
          * Configuration item menu.
          */
-        MENU("menu", "Menu", "MENU", "description", "label", "href");
-
+        MENU("menu", "Menu", "MENU", true);
 
         /**
          * Related type name in MX.
@@ -113,10 +143,9 @@ public class AbstractTest
         public final String header;
 
         /**
-         * Required values for the export. This values must be defined minimum
-         * and maximum one time in the configuration item file.
+         * Does the wild card search for the type works?
          */
-        public final String[] requiredExportValues;
+        public final boolean wildcardSearch;
 
         /**
          * Constructor to initialize an enumeration instance.
@@ -125,19 +154,17 @@ public class AbstractTest
          * @param _updateType           related type name in MxUpdate Update
          * @param _header               used text in the header to define the
          *                              name
-         * @param _requiredExportValues defines the required values of the
-         *                              export within the configuration item
-         *                              file
+         * @param _wildcardSearch       wild card search allowed?
          */
         CI(final String _mxType,
            final String _updateType,
            final String _header,
-           final String... _requiredExportValues)
+           final boolean _wildcardSearch)
         {
             this.mxType = _mxType;
             this.updateType = _updateType;
             this.header = _header;
-            this.requiredExportValues = _requiredExportValues;
+            this.wildcardSearch = _wildcardSearch;
         }
 
         /**
@@ -157,6 +184,17 @@ public class AbstractTest
     private Context context;
 
     /**
+     * Returns the {@link #context} connection to MX.
+     *
+     * @return MX context
+     * @see #context
+     */
+    public Context getContext()
+    {
+        return this.context;
+    }
+
+    /**
      * Connects to MX.
      *
      * @throws Exception if connect failed
@@ -166,6 +204,8 @@ public class AbstractTest
         throws Exception
     {
         this.context = new Context("http://172.16.62.120:8080/ematrix");
+//        this.context = new Context("http://172.16.62.130:8080/ENOVIA");
+//        this.context = new Context("http://172.16.62.130:8080/enovia");
         this.context.resetContext("creator", "", null);
         this.context.connect();
     }
@@ -221,6 +261,20 @@ public class AbstractTest
     }
 
     /**
+     * Wrapper for {@link #export(CI, String)}.
+     *
+     * @param _object       object to export
+     * @return export instance
+     * @throws IOException      if the parameter could not be encoded
+     * @throws MatrixException  if MQL calls failed
+     */
+    protected Export export(final AbstractData<?> _object)
+        throws IOException, MatrixException
+    {
+        return this.export(_object.getCI(), _object.getName());
+    }
+
+    /**
      * Export given configuration item <code>_type</code> with
      * <code>_name</code>. The returned values from the export are checked for:
      * <ul>
@@ -257,6 +311,21 @@ public class AbstractTest
         Assert.assertEquals(ret.getName(), _name, "returned name is equal to given name");
 
         return ret;
+    }
+
+    /**
+     * Makes an update for given administration <code>_object</code>
+     * definition.
+     *
+     * @param _object   object if the update definition
+     * @return returned string with the update logging
+     * @throws IOException      if the parameter could not be encoded
+     * @throws MatrixException  if MQL calls failed
+     */
+    protected JPOReturn<String> update(final AbstractData<?> _object)
+        throws IOException, MatrixException
+    {
+        return this.update(_object.getCIFileName(), _object.ciFile());
     }
 
     /**
@@ -297,7 +366,9 @@ public class AbstractTest
     /**
      * Cleanups given configuration <code>_type</code>. This means that all
      * existing administration object which starts with {@link #PREFIX} are
-     * deleted.
+     * deleted. Only if {@link CI#wildcardSearch} is <i>true</i>, a search via
+     * wild card is done; otherwise a list of all administration object is
+     * used.
      *
      * @param _type     type of configuration item
      * @throws MatrixException if cleanup for given configuration item
@@ -306,10 +377,15 @@ public class AbstractTest
     protected void cleanup(final CI _type)
         throws MatrixException
     {
-        final Set<String> elements = this.mqlAsSet("escape list " + _type.mxType);
+        final Set<String> elements;
+        if (_type.wildcardSearch)  {
+            elements = this.mqlAsSet("escape list " + _type.mxType + " \"" + AbstractTest.PREFIX + "*\"");
+        } else  {
+            elements = this.mqlAsSet("escape list " + _type.mxType);
+        }
         for (final String element : elements)  {
             if (element.startsWith(AbstractTest.PREFIX))  {
-                this.mql("escape delete " + _type.mxType + " \"" + this.convertMql(element) + "\"");
+                this.mql("escape delete " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\"");
             }
         }
     }
@@ -361,7 +437,7 @@ public class AbstractTest
      * @param _text     character sequence to convert
      * @return converted string
      */
-    public String convertMql(final CharSequence _text)
+    public static String convertMql(final CharSequence _text)
     {
         return (_text != null)
                ? _text.toString().replaceAll("\\\\", "\\\\\\\\")
@@ -376,11 +452,29 @@ public class AbstractTest
      * @param _text     character sequence to convert
      * @return converted string
      */
-    public String convertTcl(final CharSequence _text)
+    public static String convertTcl(final CharSequence _text)
     {
         return (_text != null)
                ? _text.toString().replaceAll("\\\\", "\\\\\\\\")
                                  .replaceAll("\\\"", "\\\\\"")
+                                 .replaceAll("\\$", "\\\\\\$")
+                                 .replaceAll("\\}", "\\\\}")
+                                 .replaceAll("\\{", "\\\\{")
+               : "";
+    }
+
+    /**
+     * Converts given string to MQL by escaping the &quot; so that in escape
+     * mode on string could be handled with &quot; and '.
+     *
+     * @param _text     character sequence to convert
+     * @return converted string
+     */
+    public static String convertTclDoubleEscaped(final CharSequence _text)
+    {
+        return (_text != null)
+               ? _text.toString().replaceAll("\\\\", "\\\\\\\\")
+                                 .replaceAll("\\\"", "\\\\\\\\\\\\\"")
                                  .replaceAll("\\$", "\\\\\\$")
                                  .replaceAll("\\}", "\\\\}")
                                  .replaceAll("\\{", "\\\\{")

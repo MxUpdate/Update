@@ -22,6 +22,7 @@ package org.mxupdate.update.datamodel;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -72,6 +73,17 @@ abstract class AbstractAttribute_mxJPO
             = "proc defineAttrDimension {_sName _sDimension}  {\n"
                 + "mql exec prog org.mxupdate.update.util.JPOCaller defineAttrDimension $_sName $_sDimension\n"
             + "}\n";
+
+    /**
+     * Set of all ignored URLs from the XML definition for attributes.
+     *
+     * @see #parse(String, String)
+     */
+    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    static  {
+        AbstractAttribute_mxJPO.IGNORED_URLS.add("/rangeList");
+        AbstractAttribute_mxJPO.IGNORED_URLS.add("/rangeProgram");
+    }
 
     /**
      * Set holding all rules referencing this attribute.
@@ -225,47 +237,45 @@ abstract class AbstractAttribute_mxJPO
      *
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
+     * @see #IGNORED_URLS
      */
     @Override
     protected void parse(final String _url,
                          final String _content)
     {
+        if (!AbstractAttribute_mxJPO.IGNORED_URLS.contains(_url))  {
+            if ("/accessRuleRef".equals(_url))  {
+                this.rules.add(_content);
+            } else if ("/defaultValue".equals(_url))  {
+                this.defaultValue = _content;
+            } else if ("/dimensionRef".equals(_url))  {
+                this.dimension = _content;
+            } else if ("/multiline".equals(_url))  {
+                this.multiline = true;
+            } else if ("/primitiveType".equals(_url))  {
+                this.type = _content;
 
-        if ("/accessRuleRef".equals(_url))  {
-            this.rules.add(_content);
-        } else if ("/defaultValue".equals(_url))  {
-            this.defaultValue = _content;
-        } else if ("/dimensionRef".equals(_url))  {
-            this.dimension = _content;
-        } else if ("/multiline".equals(_url))  {
-            this.multiline = true;
-        } else if ("/primitiveType".equals(_url))  {
-            this.type = _content;
+            } else if ("/rangeList/range".equals(_url))  {
+                this.ranges.add(new Range());
+            } else if ("/rangeList/range/rangeType".equals(_url))  {
+                this.ranges.peek().type = _content;
+            } else if ("/rangeList/range/rangeValue".equals(_url))  {
+                this.ranges.peek().value1 = _content;
+            } else if ("/rangeList/range/includingValue".equals(_url))  {
+                this.ranges.peek().include1 = true;
+            } else if ("/rangeList/range/rangeSecondValue".equals(_url))  {
+                this.ranges.peek().value2 = _content;
+            } else if ("/rangeList/range/includingSecondValue".equals(_url))  {
+                this.ranges.peek().include2 = true;
 
-        } else if ("/rangeList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/rangeList/range".equals(_url))  {
-            this.ranges.add(new Range());
-        } else if ("/rangeList/range/rangeType".equals(_url))  {
-            this.ranges.peek().type = _content;
-        } else if ("/rangeList/range/rangeValue".equals(_url))  {
-            this.ranges.peek().value1 = _content;
-        } else if ("/rangeList/range/includingValue".equals(_url))  {
-            this.ranges.peek().include1 = true;
-        } else if ("/rangeList/range/rangeSecondValue".equals(_url))  {
-            this.ranges.peek().value2 = _content;
-        } else if ("/rangeList/range/includingSecondValue".equals(_url))  {
-            this.ranges.peek().include2 = true;
+            } else if ("/rangeProgram/programRef".equals(_url))  {
+                this.rangeProgramRef = _content;
+            } else if ("/rangeProgram/inputArguments".equals(_url))  {
+                this.rangeProgramInputArguments = _content;
 
-        } else if ("/rangeProgram".equals(_url))  {
-            // to be ignored ...
-        } else if ("/rangeProgram/programRef".equals(_url))  {
-            this.rangeProgramRef = _content;
-        } else if ("/rangeProgram/inputArguments".equals(_url))  {
-            this.rangeProgramInputArguments = _content;
-
-        } else  {
-            super.parse(_url, _content);
+            } else  {
+                super.parse(_url, _content);
+            }
         }
     }
 
@@ -356,8 +366,8 @@ abstract class AbstractAttribute_mxJPO
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
-                .append("add ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append("\" ")
+                .append("escape add ").append(this.getTypeDef().getMxAdminName())
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
                 .append(" type ").append(this.attrTypeCreate);
         MqlUtil_mxJPO.execMql(_paramCache, cmd);
     }
@@ -406,12 +416,12 @@ abstract class AbstractAttribute_mxJPO
     {
         // remove all properties
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append('\"')
+                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
                 .append(" !hidden description \"\" default \"\"");
         // remove rules
         for (final String rule : this.rules)  {
-            preMQLCode.append(" remove rule \"").append(rule).append('\"');
+            preMQLCode.append(" remove rule \"").append(StringUtil_mxJPO.convertMql(rule)).append('\"');
         }
         // remove ranges
         for (final Range range : this.rangesSorted)  {
@@ -602,14 +612,14 @@ abstract class AbstractAttribute_mxJPO
                 } else  {
                     _out.append(this.type);
                 }
-                _out.append(" \"").append(StringUtil_mxJPO.convertTcl(this.value1)).append("\"");
+                _out.append(" \"").append(StringUtil_mxJPO.convertTclDoubleEscaped(this.value1)).append("\"");
                 if ("between".equals(this.type))  {
                     if (this.include1)  {
                         _out.append(" inclusive");
                     } else  {
                         _out.append(" exclusive");
                     }
-                    _out.append(" \"").append(StringUtil_mxJPO.convertTcl(this.value2)).append("\"");
+                    _out.append(" \"").append(StringUtil_mxJPO.convertTclDoubleEscaped(this.value2)).append("\"");
                     if (this.include2)  {
                         _out.append(" inclusive");
                     } else  {
@@ -635,17 +645,19 @@ abstract class AbstractAttribute_mxJPO
             _out.append(" remove range ");
 
             if ("programRange".equals(this.type))  {
-                _out.append("program \"").append(AbstractAttribute_mxJPO.this.rangeProgramRef).append('\"');
+                _out.append("program \"")
+                    .append(StringUtil_mxJPO.convertMql(AbstractAttribute_mxJPO.this.rangeProgramRef))
+                    .append('\"');
             } else  {
                 _out.append(this.type)
-                    .append(" \"").append(this.value1).append('\"');
+                    .append(" \"").append(StringUtil_mxJPO.convertMql(this.value1)).append('\"');
                 if ("between".equals(this.type))  {
                     if (this.include1)  {
                         _out.append(" inclusive");
                     } else  {
                         _out.append(" exclusive");
                     }
-                    _out.append(" \"").append(this.value2).append("\"");
+                    _out.append(" \"").append(StringUtil_mxJPO.convertMql(this.value2)).append("\"");
                     if (this.include2)  {
                         _out.append(" inclusive");
                     } else  {

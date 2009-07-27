@@ -24,8 +24,8 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.Command;
-import org.mxupdate.test.data.Menu;
+import org.mxupdate.test.data.userinterface.Command;
+import org.mxupdate.test.data.userinterface.Menu;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;

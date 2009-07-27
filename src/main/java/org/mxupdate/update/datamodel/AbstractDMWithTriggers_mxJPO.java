@@ -84,19 +84,18 @@ public abstract class AbstractDMWithTriggers_mxJPO
     protected void parse(final String _url,
                          final String _content)
     {
-        if ("/triggerList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/triggerList/trigger".equals(_url))  {
-            this.triggersStack.add(new Trigger());
-        } else if ("/triggerList/trigger/triggerName".equals(_url))  {
-            this.triggersStack.peek().name = _content;
-        } else if ("/triggerList/trigger/programRef".equals(_url))  {
-            this.triggersStack.peek().program = _content;
-        } else if ("/triggerList/trigger/inputArguments".equals(_url))  {
-            this.triggersStack.peek().arguments = _content;
-
-        } else  {
-            super.parse(_url, _content);
+        if (!"/triggerList".equals(_url))  {
+            if ("/triggerList/trigger".equals(_url))  {
+                this.triggersStack.add(new Trigger());
+            } else if ("/triggerList/trigger/triggerName".equals(_url))  {
+                this.triggersStack.peek().name = _content;
+            } else if ("/triggerList/trigger/programRef".equals(_url))  {
+                this.triggersStack.peek().program = _content;
+            } else if ("/triggerList/trigger/inputArguments".equals(_url))  {
+                this.triggersStack.peek().arguments = _content;
+            } else  {
+                super.parse(_url, _content);
+            }
         }
     }
 
@@ -163,15 +162,17 @@ public abstract class AbstractDMWithTriggers_mxJPO
                           final File _sourceFile)
             throws Exception
     {
-        // remove all properties
-        final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append("\" ")
-                .append(this.getTypeDef().getMxAdminSuffix());
-        for (final Trigger trigger : this.triggers.values())  {
-            trigger.appendResetMQLStatement(preMQLCode);
+        final StringBuilder preMQLCode = new StringBuilder();
+        // remove all triggers
+        if (!this.triggers.isEmpty())  {
+            preMQLCode.append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                      .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
+                      .append(this.getTypeDef().getMxAdminSuffix());
+            for (final Trigger trigger : this.triggers.values())  {
+                trigger.appendResetMQLStatement(preMQLCode);
+            }
+            preMQLCode.append(";\n");
         }
-        preMQLCode.append(";\n");
 
         // append already existing pre MQL code
         preMQLCode.append(_preMQLCode);

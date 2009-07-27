@@ -18,7 +18,7 @@
  * Last Changed By: $Author$
  */
 
-package org.mxupdate.test.data;
+package org.mxupdate.test.data.userinterface;
 
 
 import java.util.HashSet;
@@ -29,7 +29,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 
 /**
- * The class is used to define a command, create them and test the result.
+ * Used to define a command, create them and test the result.
  *
  * @author The MxUpdate Team
  * @version $Id$
@@ -56,7 +56,7 @@ public class Command
     public Command(final AbstractTest _test,
                    final String _name)
     {
-        super(_test, AbstractTest.CI.COMMAND, _name);
+        super(_test, AbstractTest.CI.COMMAND, _name, "COMMAND_");
     }
 
     /**
@@ -84,7 +84,7 @@ public class Command
                 .append("mql escape mod command \"${NAME}\"");
         for (final String user : this.users)  {
             cmd.append(" add user \"")
-               .append(this.getTest().convertTcl(user)).append('\"');
+               .append(AbstractTest.convertTcl(user)).append('\"');
         }
         this.append4CIFileValues(cmd);
         this.append4CIFileSettings(cmd);
@@ -103,7 +103,7 @@ public class Command
         throws MatrixException
     {
         final StringBuilder cmd = new StringBuilder()
-                .append("escape add command \"" + this.getTest().convertMql(this.getName()) + "\"");
+                .append("escape add command \"" + AbstractTest.convertMql(this.getName()) + "\"");
         if (!this.users.isEmpty())  {
             cmd.append(" user ");
             boolean first = true;
@@ -113,7 +113,7 @@ public class Command
                 } else  {
                     cmd.append(',');
                 }
-                cmd.append('\"').append(this.getTest().convertMql(user)).append('\"');
+                cmd.append('\"').append(AbstractTest.convertMql(user)).append('\"');
             }
         }
         this.append4CreateValues(cmd);
@@ -137,7 +137,7 @@ public class Command
     {
         super.evalAdds4CheckExport(_needAdds);
         for (final String user : this.users)  {
-            _needAdds.add("user \"" + this.getTest().convertTcl(user) + "\"");
+            _needAdds.add("user \"" + AbstractTest.convertTcl(user) + "\"");
         }
     }
 }

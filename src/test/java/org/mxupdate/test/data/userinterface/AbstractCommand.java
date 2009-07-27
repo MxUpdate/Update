@@ -18,19 +18,15 @@
  * Last Changed By: $Author$
  */
 
-package org.mxupdate.test.data;
+package org.mxupdate.test.data.userinterface;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.ExportParser;
-import org.testng.Assert;
+import org.mxupdate.test.data.AbstractData;
 
 /**
  * Handles test data for commands / menus.
@@ -43,6 +39,16 @@ abstract class AbstractCommand<T extends AbstractCommand<?>>
     extends AbstractData<T>
 {
     /**
+     * Within export the description, label and href must be defined.
+     */
+    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(3);
+    static  {
+        AbstractCommand.REQUIRED_EXPORT_VALUES.add("description");
+        AbstractCommand.REQUIRED_EXPORT_VALUES.add("label");
+        AbstractCommand.REQUIRED_EXPORT_VALUES.add("href");
+    }
+
+    /**
      * All settings of this command.
      *
      * @see #append4CreateSettings(StringBuilder)
@@ -54,16 +60,18 @@ abstract class AbstractCommand<T extends AbstractCommand<?>>
 
     /**
      *
-     * @param _test     related test implementation (where this command is
-     *                  defined)
-     * @param _ci       configuration item type
-     * @param _name     name of command
+     * @param _test         related test implementation (where this command is
+     *                      defined)
+     * @param _ci           configuration item type
+     * @param _name         name of command
+     * @param _filePrefix   prefix for the file name
      */
     AbstractCommand(final AbstractTest _test,
                     final AbstractTest.CI _ci,
-                    final String _name)
+                    final String _name,
+                    final String _filePrefix)
     {
-        super(_test, _ci, _name);
+        super(_test, _ci, _name, _filePrefix, AbstractCommand.REQUIRED_EXPORT_VALUES);
     }
 
     /**
@@ -103,8 +111,8 @@ abstract class AbstractCommand<T extends AbstractCommand<?>>
     protected void append4CIFileSettings(final StringBuilder _cmd)
     {
         for (final Map.Entry<String,String> entry : this.settings.entrySet())  {
-            _cmd.append(" add setting \"").append(this.getTest().convertTcl(entry.getKey())).append("\" \"")
-                .append(this.getTest().convertTcl(entry.getValue()))
+            _cmd.append(" add setting \"").append(AbstractTest.convertTcl(entry.getKey())).append("\" \"")
+                .append(AbstractTest.convertTcl(entry.getValue()))
                 .append('\"');
         }
     }
@@ -119,37 +127,9 @@ abstract class AbstractCommand<T extends AbstractCommand<?>>
     protected void append4CreateSettings(final StringBuilder _cmd)
     {
         for (final Map.Entry<String,String> entry : this.settings.entrySet())  {
-            _cmd.append(" setting \"").append(this.getTest().convertMql(entry.getKey())).append("\" \"")
-                .append(this.getTest().convertMql(entry.getValue()))
+            _cmd.append(" setting \"").append(AbstractTest.convertMql(entry.getKey())).append("\" \"")
+                .append(AbstractTest.convertMql(entry.getValue()))
                 .append('\"');
-        }
-    }
-
-    /**
-     * Creates the related command / menu which is defined with this instance.
-     *
-     * @return this instance
-     * @throws MatrixException if create failed
-     */
-    public abstract T create()
-        throws MatrixException;
-
-    /**
-     * Checks the export of a command if all values are correct defined.
-     *
-     * @param _exportParser     parsed export
-     */
-    @Override
-    public void checkExport(final ExportParser _exportParser)
-    {
-        super.checkExport(_exportParser);
-
-        final Set<String> needAdds = new HashSet<String>();
-        this.evalAdds4CheckExport(needAdds);
-        final List<String> foundAdds = _exportParser.getLines("/mql/add/@value");
-        Assert.assertEquals(foundAdds.size(), needAdds.size(), "all adds defined");
-        for (final String foundAdd : foundAdds)  {
-            Assert.assertTrue(needAdds.contains(foundAdd), "add '" + foundAdd + "' defined");
         }
     }
 
@@ -161,12 +141,13 @@ abstract class AbstractCommand<T extends AbstractCommand<?>>
      *                      {@link #settings}
      * @see #settings
      */
+    @Override
     protected void evalAdds4CheckExport(final Set<String> _needAdds)
     {
         for (final Map.Entry<String,String> entry : this.settings.entrySet())
         {
-            _needAdds.add("setting \"" + this.getTest().convertTcl(entry.getKey())
-                    + "\" \"" + this.getTest().convertTcl(entry.getValue()) +  "\"");
+            _needAdds.add("setting \"" + AbstractTest.convertTcl(entry.getKey())
+                    + "\" \"" + AbstractTest.convertTcl(entry.getValue()) +  "\"");
         }
     }
 }

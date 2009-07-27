@@ -21,21 +21,36 @@
 package org.mxupdate.test.data;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.AbstractTest.CI;
 import org.testng.Assert;
 
 /**
+ * Defines common information from administration objects used to create,
+ * update and check them.
  *
- * @param <T>
+ * @param <T>       class which is derived from this class
  * @author The MxUpdate Team
  * @version $Id$
  */
 public abstract class AbstractData<T extends AbstractData<?>>
 {
+    /**
+     * Regular expression to defines the list of not allowed characters  of
+     * symbolic names which are removed for the calculated symbolic name.
+     *
+     * @see #AbstractData(AbstractTest, AbstractTest.CI, String, String, Set)
+     */
+    private static final String NOT_ALLOWED_CHARS
+            = "[^%&()+-0123456789:=ABCDEFGHIJKLMNOPQRSTUVWXYZ^_abcdefghijklmnopqrstuvwxyz~]";
+
     /**
      * Related test case where this data piece was created.
      */
@@ -44,7 +59,7 @@ public abstract class AbstractData<T extends AbstractData<?>>
     /**
      * Related configuration item of this data piece.
      */
-    private final CI ci;
+    private final AbstractTest.CI ci;
 
     /**
      * Name of the data piece.
@@ -66,21 +81,50 @@ public abstract class AbstractData<T extends AbstractData<?>>
     private final Map<String,String> values = new HashMap<String,String>();
 
     /**
+     * Defines the values which must be defined for exports. They are tested
+     * for existence from {@link #checkExport(ExportParser)}. This values must
+     * be defined minimum and maximum one time in the configuration item file.
+     *
+     * @see #checkExport(ExportParser)
+     */
+    private final Set<String> requiredExportValues;
+
+    /**
+     * Flag to indicate that this data piece is creatd.
+     *
+     * @see #isCreated()
+     * @see #setCreated(boolean)
+     */
+    private boolean created;
+
+    /**
+     * Prefix used for the file name.
+     */
+    private final String filePrefix;
+
+    /**
      * Constructor to initialize this data piece.
      *
-     * @param _test     related test case
-     * @param _ci       related configuration type
-     * @param _name     name of the administration object
+     * @param _test                 related test case
+     * @param _ci                   related configuration type
+     * @param _name                 name of the administration object
+     * @param _filePrefix           prefix for the file name
+     * @param _requiredExportValues defines the required values of the
+     *                              export within the configuration item
+     *                              file
      */
     protected AbstractData(final AbstractTest _test,
-                           final CI _ci,
-                           final String _name)
+                           final AbstractTest.CI _ci,
+                           final String _name,
+                           final String _filePrefix,
+                           final Set<String> _requiredExportValues)
     {
         this.test = _test;
         this.ci = _ci;
         this.name = AbstractTest.PREFIX + _name;
-        this.symbolicName = _ci.getMxType() + "_"
-                + this.name.replaceAll("[^%&()+-0123456789:=ABCDEFGHIJKLMNOPQRSTUVWXYZ^_abcdefghijklmnopqrstuvwxyz~]", "");
+        this.symbolicName = _ci.getMxType() + "_" + this.name.replaceAll(AbstractData.NOT_ALLOWED_CHARS, "");
+        this.filePrefix = _filePrefix;
+        this.requiredExportValues = _requiredExportValues;
     }
 
     /**
@@ -100,7 +144,7 @@ public abstract class AbstractData<T extends AbstractData<?>>
      * @return configuration item type
      * @see #ci
      */
-    protected CI getCI()
+    public AbstractTest.CI getCI()
     {
         return this.ci;
     }
@@ -189,8 +233,7 @@ public abstract class AbstractData<T extends AbstractData<?>>
     public String getCIFileName()
     {
         final char[] charName = this.name.toCharArray();
-        final StringBuilder fileName = new StringBuilder()
-                .append(this.ci.header).append('_');
+        final StringBuilder fileName = new StringBuilder().append(this.filePrefix);
         for (int idx = 0; idx < charName.length; idx++)  {
             final char ch = charName[idx];
             if (ch == '@')  {
@@ -228,6 +271,14 @@ public abstract class AbstractData<T extends AbstractData<?>>
     }
 
     /**
+     * Returns the update definition of this configuration item.
+     *
+     * @return file content of the configuration item used to make an update
+     */
+    public abstract String ciFile();
+
+
+    /**
      * Appends the defined {@link #values} to the TCL code <code>_cmd</code> of
      * the configuration item file.
      *
@@ -239,8 +290,14 @@ public abstract class AbstractData<T extends AbstractData<?>>
     {
         for (final Map.Entry<String,String> entry : this.values.entrySet())  {
             _cmd.append(' ').append(entry.getKey()).append(" \"")
-                .append(this.getTest().convertTcl(entry.getValue()))
+                .append(AbstractTest.convertTcl(entry.getValue()))
                 .append('\"');
+        }
+        // check for add values
+        final Set<String> needAdds = new HashSet<String>();
+        this.evalAdds4CheckExport(needAdds);
+        for (final String needAdd : needAdds)  {
+            _cmd.append(" add ").append(needAdd);
         }
     }
 
@@ -248,23 +305,58 @@ public abstract class AbstractData<T extends AbstractData<?>>
      * Appends the MQL commands to define all {@link #values}Êwithin a create.
      *
      * @param _cmd  string builder used to append MQL commands
+     * @throws MatrixException if used object could not be created
      * @see #values
      */
     protected void append4CreateValues(final StringBuilder _cmd)
+        throws MatrixException
     {
         for (final Map.Entry<String,String> entry : this.values.entrySet())  {
             _cmd.append(' ').append(entry.getKey()).append(" \"")
-                .append(this.getTest().convertMql(entry.getValue()))
+                .append(AbstractTest.convertMql(entry.getValue()))
                 .append('\"');
         }
     }
 
     /**
+     * Defines if the related object in MX is already created.
+     *
+     * @param _created  new created value
+     * @see #created
+     */
+    protected void setCreated(final boolean _created)
+    {
+        this.created = _created;
+    }
+
+    /**
+     * Returns <i>true</i> if the related object in MX is created.
+     *
+     * @return <i>true</i> if the related object in MX is created; otherwise
+     *         <i>false</i>
+     * @see #created
+     */
+    protected boolean isCreated()
+    {
+        return this.created;
+    }
+
+    /**
+     * Creates the related MX object for this data piece.
+     *
+     * @return this instance
+     * @throws MatrixException if create failed
+     */
+    public abstract T create() throws MatrixException;
+
+    /**
      * Checks the export of this data piece if all values are correct defined.
      *
      * @param _exportParser     parsed export
+     * @throws MatrixException if check failed
      */
     public void checkExport(final ExportParser _exportParser)
+        throws MatrixException
     {
         Assert.assertEquals(_exportParser.getFileName(),
                             this.getCIFileName(),
@@ -276,7 +368,7 @@ public abstract class AbstractData<T extends AbstractData<?>>
                             this.getSymbolicName(),
                             "check symbolic name");
         // check for all required values
-        for (final String valueName : this.ci.requiredExportValues)  {
+        for (final String valueName : this.requiredExportValues)  {
             Assert.assertEquals(_exportParser.getLines("/mql/" + valueName + "/@value").size(),
                                 1,
                                 "minimum and maximum one " + valueName + " is defined");
@@ -287,9 +379,28 @@ public abstract class AbstractData<T extends AbstractData<?>>
                                                        1,
                                                        "minimum and maximum one " + entry.getKey() + " is defined");
             Assert.assertEquals(_exportParser.getLines("/mql/" + entry.getKey() + "/@value").get(0),
-                                "\"" + this.getTest().convertTcl(entry.getValue()) + "\"",
+                                "\"" + AbstractTest.convertTcl(entry.getValue()) + "\"",
                                 entry.getKey() + " is correct defined");
         }
+        // check for add values
+        final Set<String> needAdds = new HashSet<String>();
+        this.evalAdds4CheckExport(needAdds);
+        final List<String> foundAdds = _exportParser.getLines("/mql/add/@value");
+        Assert.assertEquals(foundAdds.size(), needAdds.size(), "all adds defined");
+        for (final String foundAdd : foundAdds)  {
+            Assert.assertTrue(needAdds.contains(foundAdd), "check that add '" + foundAdd + "' is defined");
+        }
+    }
+
+    /**
+     * Evaluates all 'adds' in the configuration item file (e.g. add
+     * setting, ...). Because for the abstract data no adds exists this method
+     * is only a dummy.
+     *
+     * @param _needAdds     set with add strings used to append the adds
+     */
+    protected void evalAdds4CheckExport(final Set<String> _needAdds)
+    {
     }
 
     /**

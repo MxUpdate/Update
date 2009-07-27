@@ -90,6 +90,26 @@ public final class StringUtil_mxJPO
                                  .replaceAll("\\]", "\\\\]")
                : "";
     }
+    /**
+     * Converts given string by escaping all special characters for TCL for
+     * escaped MQL commands. In some cases a quote must be converted to
+     * backslash backslash backslash quote '\\\&quot;'.
+     *
+     * @param _text     character stream to convert
+     * @return converted string
+     */
+    public static String convertTclDoubleEscaped(final CharSequence _text)
+    {
+        return (_text != null)
+               ? _text.toString().replaceAll("\\\\", "\\\\\\\\")
+                                 .replaceAll("\\\"", "\\\\\\\\\\\\\"")
+                                 .replaceAll("\\" + "$", "\\\\\\" + "$")
+                                 .replaceAll("\\{", "\\\\{")
+                                 .replaceAll("\\}", "\\\\}")
+                                 .replaceAll("\\[", "\\\\[")
+                                 .replaceAll("\\]", "\\\\]")
+               : "";
+    }
 
     /**
      * Converts given string by escaping the &quot; so that in escape mode on

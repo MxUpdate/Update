@@ -302,7 +302,7 @@ public abstract class AbstractAdminObject_mxJPO
             throws IOException
     {
         this.writeHeader(_paramCache, _out);
-        _out.append("mql mod ")
+        _out.append("mql escape mod ")
             .append(this.getTypeDef().getMxAdminName())
             .append(" \"${NAME}\"");
         if (!"".equals(this.getTypeDef().getMxAdminSuffix()))  {
