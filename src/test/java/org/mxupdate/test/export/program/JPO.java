@@ -22,7 +22,6 @@ package org.mxupdate.test.export.program;
 
 import org.mxupdate.test.AbstractTest;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -32,7 +31,6 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
-@Test
 public class JPO
     extends AbstractTest
 {
@@ -69,6 +67,38 @@ public class JPO
      */
     private static final String JPO_NAME2 = "MxUpdate_Test";
 
+    private static final String CODE_NAME = AbstractTest.PREFIX + "3InstallTester";
+
+    private static final String CODE = ""
+        + "import java.io.File;\n"
+        + "import java.io.FileOutputStream;\n"
+        + "import matrix.db.Context;\n"
+        + "import matrix.db.MQLCommand;\n"
+        + "public class " + JPO.CODE_NAME + "_mxJPO\n"
+        + "{\n"
+        + "    public String execute(final Context _context,final String[] _args)\n"
+        + "        throws Exception\n"
+        + "    {"
+        + "        final File file = File.createTempFile(\"PREFIX\", _args[0] + \".java\");\n"
+        + "        try {\n"
++ "System.out.println(_args[1]);"
+        + "            final FileOutputStream out = new FileOutputStream(file);\n"
+        + "            try {\n"
+        + "                out.write(_args[1].getBytes());\n"
+        + "            } finally  {\n"
+        + "                out.close();\n"
+        + "            }\n"
+        + "            (new MQLCommand()).executeCommand(_context,\n"
+        + "                \"add program \\\"\" + _args[0] + \"\\\" "
+                                    + "java "
+                                    + "file \\\"\" + file.toString() + \"\\\"\");\n"
+        + "        } finally  {\n"
+        + "            file.delete();\n"
+        + "        }\n"
+        + "        return \"INSTALLED\";"
+        + "    }\n"
+        + "}\n";
+
     /**
      * Cleanups the MX system by deleting the test JPOs with names
      * {@link #JPO_COMPL1} and {@link #JPO_NAME2}.
@@ -76,13 +106,14 @@ public class JPO
      * @throws Exception if cleanup failed
      * @see #JPO_NAME
      */
-    @BeforeMethod
-    @AfterMethod
+    @BeforeMethod()
+//    @AfterMethod
     public void cleanup()
         throws Exception
     {
         this.cleanup(CI.JPO, JPO.JPO_COMPL1);
         this.cleanup(CI.JPO, JPO.JPO_NAME2);
+        this.cleanup(CI.JPO);
     }
 
     /**
@@ -91,6 +122,7 @@ public class JPO
      *
      * @throws Exception if check failed
      */
+    @Test(enabled = false)
     public void testExportJPOWithoutPackage()
         throws Exception
     {
@@ -112,6 +144,7 @@ public class JPO
      * @throws Exception if check failed
      * @see http://code.google.com/p/mxupdate/issues/detail?id=26
      */
+    @Test(enabled = false)
     public void testExportJPOWithPackage()
         throws Exception
     {
@@ -126,5 +159,21 @@ public class JPO
         Assert.assertEquals(export.getCode().trim(),
                             "package MxUpdate;",
                             "checks that Java code has package definition");
+    }
+
+    @Test()
+    public void testExportWithBackslashes()
+        throws Exception
+    {
+        this.update(JPO.CODE_NAME + "_mxJPO.java", JPO.CODE);
+        this.mql("compile prog \"" + JPO.CODE_NAME + "\" force update");
+matrix.db.JPO.invoke(this.getContext(), JPO.CODE_NAME, null, "execute", new String[]{ AbstractTest.PREFIX + "Test",
+"public class ${CLASSNAME}  {public void test() {String t = \"\\\\\\\";}}"});
+
+//        this.mql("escape add program " + JPO.JPO_COMPL1 + " java code \"public class ${CLASSNAME}  {\npublic void test() {\nString t = \"\\\"\n}\n  }\"");
+//        final Export export = this.export(CI.JPO, JPO.JPO_NAME1);
+//        System.out.println("export="+export.getCode().trim());
+//        matrix.db.Program p = new matrix.db.Program("Test2", false, false, false, false);
+//        System.out.println(""+p.hashCode());
     }
 }

@@ -22,6 +22,7 @@ package org.mxupdate.update.datamodel;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -43,6 +44,18 @@ public class Type_mxJPO
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = 7501426743362043943L;
+
+    /**
+     * Set of all ignored URLs from the XML definition for types.
+     *
+     * @see #parse(String, String)
+     */
+    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    static  {
+        Type_mxJPO.IGNORED_URLS.add("/derivedFrom");
+        Type_mxJPO.IGNORED_URLS.add("/derivedFrom/typeRefList");
+        Type_mxJPO.IGNORED_URLS.add("/methodList");
+    }
 
     /**
      * Is the type abstract?
@@ -82,30 +95,34 @@ public class Type_mxJPO
     }
 
     /**
+     * <p>Parses all type specific values. This includes:
+     * <ul>
+     * <li>{@link #abstractFlag information about is the type abstract}</li>
+     * <li>{@link #derived from information from which type this type is
+     *     derived}</li>
+     * <li>{@link #methods type methods}</li>
+     * </ul></p>
+     * <p>If an <code>_url</code> is included in {@link #IGNORED_URLS}, this
+     * URL is ignored.</p>
+     *
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
+     * @see #IGNORED_URLS
      */
     @Override
     protected void parse(final String _url,
                          final String _content)
     {
-        if ("/abstract".equals(_url))  {
-            this.abstractFlag = true;
-
-        } else if ("/derivedFrom".equals(_url))  {
-            // to be ignored ...
-        } else if ("/derivedFrom/typeRefList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/derivedFrom/typeRefList/typeRef".equals(_url))  {
-            this.derived = _content;
-
-        } else if ("/methodList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/methodList/programRef".equals(_url))  {
-            this.methods.add(_content);
-
-        } else  {
-            super.parse(_url, _content);
+        if (!Type_mxJPO.IGNORED_URLS.contains(_url))  {
+            if ("/abstract".equals(_url))  {
+                this.abstractFlag = true;
+            } else if ("/derivedFrom/typeRefList/typeRef".equals(_url))  {
+                this.derived = _content;
+            } else if ("/methodList/programRef".equals(_url))  {
+                this.methods.add(_content);
+            } else  {
+                super.parse(_url, _content);
+            }
         }
     }
 

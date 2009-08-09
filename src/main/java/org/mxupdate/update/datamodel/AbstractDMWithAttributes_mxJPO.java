@@ -27,8 +27,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
@@ -100,17 +98,40 @@ public abstract class AbstractDMWithAttributes_mxJPO
 
     /**
      * Called TCL procedure within the TCL update to assign attributes to this
-     * administration object.
+     * administration object. The given values of the arguments are converted
+     * so that the values are handled correctly from TCL and MQL.
      *
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     * @see #jpoCallExecuteConvert(String)
      */
     private static final String TCL_PROCEDURE
             = "proc testAttributes {args}  {\n"
                 + "set iIdx 0\n"
                 + "set lsCmd [list mql exec prog org.mxupdate.update.util.JPOCaller attributes]\n"
                 + "while {$iIdx < [llength $args]}  {\n"
-                +   "lappend lsCmd [lindex $args $iIdx]\n"
-                +   "incr iIdx\n"
+                +     "set sValue [lindex $args $iIdx]\n"
+                +     "if {($iIdx > 0) && ([lindex $args [expr $iIdx - 1]] == \"-attributes\")}  {\n"
+                +         "set sCmd \"\"\n"
+                +         "foreach sOneValue $sValue  {\n"
+                +             "regsub -all {@} \"${sOneValue}\" \"@@\" sOneValue\n"
+                +             "regsub -all { } \"${sOneValue}\" \"@20\" sOneValue\n"
+                +             "regsub -all {\\\"} \"${sOneValue}\" \"@22\" sOneValue\n"
+                +             "regsub -all {'} \"${sOneValue}\" \"@27\" sOneValue\n"
+                +             "regsub -all \"\\{\" \"${sOneValue}\" \"@7B\" sOneValue\n"
+                +             "regsub -all \"\\}\" \"${sOneValue}\" \"@7D\" sOneValue\n"
+                +             "set sCmd \"${sCmd} ${sOneValue}\"\n"
+                +         "}\n"
+                +         "lappend lsCmd ${sCmd}\n"
+                +     "} else  {\n"
+                +         "regsub -all {@} \"${sValue}\" \"@@\" sValue\n"
+                +         "regsub -all { } \"${sValue}\" \"@20\" sValue\n"
+                +         "regsub -all {\\\"} \"${sValue}\" \"@22\" sValue\n"
+                +         "regsub -all {'} \"${sValue}\" \"@27\" sValue\n"
+                +         "regsub -all \"\\{\" \"${sValue}\" \"@7B\" sValue\n"
+                +         "regsub -all \"\\}\" \"${sValue}\" \"@7D\" sValue\n"
+                +         "lappend lsCmd ${sValue}\n"
+                +     "}\n"
+                +     "incr iIdx\n"
                 + "}\n"
                 + "eval $lsCmd\n"
             + "}\n";
@@ -245,9 +266,9 @@ public abstract class AbstractDMWithAttributes_mxJPO
             if ("-attributes".equals(arg))  {
                 attrStr = _args[++idx];
             } else if ("-ignoreattr".equals(arg))  {
-                ignoreAttrs.add(_args[++idx]);
+                ignoreAttrs.add(this.jpoCallExecuteConvert(_args[++idx]));
             } else if ("-interface".equals(arg))  {
-                name = _args[++idx];
+                name = this.jpoCallExecuteConvert(_args[++idx]);
                 final Collection<String> tmp1
                         = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_IGNORE_INTERFACE);
                 if (tmp1 != null)  {
@@ -259,7 +280,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
                     removeAttrs.addAll(tmp2);
                 }
             } else if ("-relationship".equals(arg))  {
-                name = _args[++idx];
+                name = this.jpoCallExecuteConvert(_args[++idx]);
                 final Collection<String> tmp1
                         = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_IGNORE_RELATIONSHIP);
                 if (tmp1 != null)  {
@@ -271,9 +292,9 @@ public abstract class AbstractDMWithAttributes_mxJPO
                     removeAttrs.addAll(tmp2);
                 }
             } else if ("-removeattr".equals(arg))  {
-                removeAttrs.add(_args[++idx]);
+                removeAttrs.add(this.jpoCallExecuteConvert(_args[++idx]));
             } else if ("-type".equals(arg))  {
-                name = _args[++idx];
+                name = this.jpoCallExecuteConvert(_args[++idx]);
                 final Collection<String> tmp1
                         = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_IGNORE_TYPE);
                 if (tmp1 != null)  {
@@ -301,13 +322,13 @@ public abstract class AbstractDMWithAttributes_mxJPO
 
         // get all attributes
 // TODO: if a { or } is in an attribute name, the list is not created correctly
-        final Pattern pattern = Pattern.compile("(\\{[^\\{\\}]*\\} )|([^ \\{\\}]* )");
+/*        final Pattern pattern = Pattern.compile("(\\{[^\\{\\}]*\\} )|([^ \\{\\}]* )");
         final Matcher matcher = pattern.matcher(attrStr + " ");
+*/
         final Set<String> newAttrs = new TreeSet<String>();
-        while (matcher.find())  {
-            final String attrName = matcher.group().trim().replaceAll("(^\\{)|(\\}$)", "");
+        for (final String attrName : attrStr.split(" "))  {
             if (!"".equals(attrName))  {
-                newAttrs.add(attrName);
+                newAttrs.add(this.jpoCallExecuteConvert(attrName));
             }
         }
 
@@ -359,4 +380,19 @@ public abstract class AbstractDMWithAttributes_mxJPO
         }
     }
 
+    /**
+     *
+     * @param _value    value to convert
+     * @return
+     * @see #TCL_PROCEDURE
+     */
+    protected String jpoCallExecuteConvert(final String _value)
+    {
+        return _value.replaceAll("@20", " ")
+                     .replaceAll("@22", "\\\"")
+                     .replaceAll("@27", "'")
+                     .replaceAll("@7B", "{")
+                     .replaceAll("@7D", "}")
+                     .replaceAll("@@", "@");
+    }
 }

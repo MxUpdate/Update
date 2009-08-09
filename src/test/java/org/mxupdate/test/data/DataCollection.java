@@ -33,6 +33,7 @@ import org.mxupdate.test.data.datamodel.AttributeDate;
 import org.mxupdate.test.data.datamodel.AttributeInteger;
 import org.mxupdate.test.data.datamodel.AttributeReal;
 import org.mxupdate.test.data.datamodel.AttributeString;
+import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.program.AbstractProgram;
 import org.mxupdate.test.data.program.MQLProgram;
 import org.mxupdate.test.data.userinterface.Command;
@@ -86,6 +87,14 @@ public class DataCollection
     private final Map<String,AbstractProgram<?>> programs = new HashMap<String,AbstractProgram<?>>();
 
     /**
+     * All types.
+     *
+     * @see #getType(String)
+     * @see #getTypes()
+     */
+    private final Map<String,TypeData> types = new HashMap<String,TypeData>();
+
+    /**
      * Initializes this data collection instance with the test instance.
      *
      * @param _test     related test instance
@@ -108,6 +117,9 @@ public class DataCollection
         }
         for (final AbstractAttribute<?> attribute : this.attributes.values())  {
             attribute.create();
+        }
+        for (final TypeData type : this.types.values())  {
+            type.create();
         }
         for (final Command command : this.commands.values())  {
             command.create();
@@ -270,5 +282,32 @@ public class DataCollection
     public Collection<AbstractProgram<?>> getPrograms()
     {
         return this.programs.values();
+    }
+
+    /**
+     * Returns the related type instance for <code>_name</code>. If a
+     * type is not already defined, a type instance is created.
+     *
+     * @param _name     name of searched type
+     * @return type instance
+     * @see #types
+     */
+    public TypeData getType(final String _name)
+    {
+        if (!this.types.containsKey(_name))  {
+            this.types.put(_name, new TypeData(this.test, _name));
+        }
+        return this.types.get(_name);
+    }
+
+    /**
+     * Returns all types of this data collection.
+     *
+     * @return collection of all types
+     * @see #types
+     */
+    public Collection<TypeData> getTypes()
+    {
+        return this.types.values();
     }
 }

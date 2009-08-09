@@ -262,14 +262,21 @@ public class ExportParser
             if (_prevLine == null)  {
                 this.parent = null;
                 ExportParser.this.rootLines.add(this);
+            } else if ("".equals(this.line))  {
+                this.parent = null;
             } else  {
                 Line curPar = _prevLine;
-                while ((curPar.shifting >= this.shifting) && (curPar != null))  {
+                while ((curPar != null) && (curPar.shifting >= this.shifting))  {
                     curPar = curPar.parent;
                 }
                 this.parent = curPar;
-                this.parent.children.add(this);
+                if (this.parent == null)  {
+                    ExportParser.this.rootLines.add(this);
+                } else  {
+                    this.parent.children.add(this);
+                }
             }
+            // evaluate next line
             if (_lineIter.hasNext())  {
                 new Line(_lineIter, this);
             }
@@ -291,6 +298,10 @@ public class ExportParser
                 if (_index < (_path.length - 2))  {
                     for (final Line child : this.children)  {
                         child.evalPath(_path, _index + 1, _ret);
+                    }
+                } else if (_index == (_path.length - 1))  {
+                    for (final Line child : this.children)  {
+                        _ret.add(child.line.trim());
                     }
                 } else if ("@value".equals(_path[_index + 1]))  {
                     _ret.add(this.value);
