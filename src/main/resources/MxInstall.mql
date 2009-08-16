@@ -28,6 +28,7 @@ eval  {
 
   set ENV_NAME_MXUPDATE_PATH      "MXUPDATE_PATH"
   set ENV_NAME_MAPPING_EXTENSION  "MXUPDATE_MAPPING_FILE"
+  set ENV_NAME_DEVELOPMENT        "MXUPDATE_DEVELOPMENT"
 
   # get the installation directory
   # is the installation directory defined as local MX environment variable?
@@ -58,11 +59,25 @@ eval  {
     set sMappingFileExtension ""
   }
 
-  # check if development mode
-  set bIsDevelopment [expr [file exists [file join "${sPath}" org]] == 0]
+  # check if development mode is used
+  # is the development mode is defined as local MX environment variable?
+  if {[mql exists env "${ENV_NAME_DEVELOPMENT}"] > 0} {
+    set bDevelopmentMode [mql get env "${ENV_NAME_DEVELOPMENT}"]
+  # maybe as global environment variable?
+  } elseif {[mql exists env global "${ENV_NAME_DEVELOPMENT}"] > 0} {
+    set bDevelopmentMode [mql get env global "${ENV_NAME_DEVELOPMENT}"]
+  # or as shell enviroment variable?
+  } elseif {[info exists env(${ENV_NAME_DEVELOPMENT})] > 0}  {
+    set bDevelopmentMode $env(${ENV_NAME_DEVELOPMENT})
+  } else  {
+    set bDevelopmentMode "false"
+  }
+
+  # check if original structure is used (defined within SVN)
+  set bIsOrigStructure [expr [file exists [file join "${sPath}" org]] == 0]
 
   # define path for mapping properties file
-  if ${bIsDevelopment}  {
+  if ${bIsOrigStructure}  {
     set sMappingFileOriginal [file join "${sPath}" "resources" "org" "mxupdate" "mapping.properties"]
   } else  {
     set sMappingFileOriginal [file join "${sPath}" "org" "mxupdate" "mapping.properties"]
@@ -167,7 +182,44 @@ eval  {
       puts "update jpo '${_sJPOName}'"
       mql insert prog "${sFileName}"
       mql mod prog ${_sJPOName} \
+            add property "compiled" value "false" \
             add property $asMapping(PropertyDef.FileDate.PropertyName) value "${sFileDate}"
+    }
+  }
+
+  ##############################################################################
+  # The procedure compiles all MxUpdate JPOs if required by testing property
+  # "compiled" on the MxUpdate JPOs (which all must be true, otherwise a
+  # compile with force update must be done).
+  # The compile with force update is only done if not in development mode!
+  ##############################################################################
+  proc pCompileJPO {}  {
+    global bDevelopmentMode
+
+    set llsProgs [split [mql list prog org.mxupdate.*,MxUpdate select name property\[compiled\].value dump "\t"] "\n"]
+    set bCompile "false"
+    foreach lsOneProg ${llsProgs}  {
+      set lsOneProg [split ${lsOneProg} "\t"]
+      if {([llength ${lsOneProg}] == 1) || ([lindex ${lsOneProg} 1] != "true")}  {
+        set bCompile "true"
+        break
+      }
+    }
+
+    if {${bCompile} == "true"}  {
+      puts "some JPOs are changed, complete recompile needed"
+      mql verbose on
+      if {${bDevelopmentMode} == "true"}  {
+        puts "development mode! only simple compile is done!"
+        mql compile prog org.mxupdate.*,MxUpdate
+      } else  {
+        mql compile prog org.mxupdate.*,MxUpdate force update
+      }
+      mql verbose off
+      foreach lsOneProg ${llsProgs}  {
+        set lsOneProg [split ${lsOneProg} "\t"]
+        mql mod prog [lindex ${lsOneProg} 0] add property "compiled" value "true"
+      }
     }
   }
 
@@ -178,7 +230,7 @@ eval  {
 
   pInstallProperties "${sPath}" "${VERSION}" "org.mxupdate.mapping.properties"
 
-  if ${bIsDevelopment}  {
+  if ${bIsOrigStructure}  {
     pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.install.Insert"     "${VERSION}"
     pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.util.JPOHandler"    "${VERSION}"
     mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}" "java"] "${VERSION}"
@@ -188,11 +240,9 @@ eval  {
     mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}"] "${VERSION}"
   }
 
-  mql verbose on
-  mql compile prog org.mxupdate.*,MxUpdate
-  mql verbose off
+  pCompileJPO
 
-  if ${bIsDevelopment}  {
+  if ${bIsOrigStructure}  {
     mql exec prog "org.mxupdate.install.InstallDataModel" [file join "${sPath}" "resources"] "${VERSION}"
   } else  {
     mql exec prog "org.mxupdate.install.InstallDataModel" [file join "${sPath}"] "${VERSION}"

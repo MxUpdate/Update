@@ -54,6 +54,13 @@ public class Insert_mxJPO
     private static final String PROP_FILEDATE = "file date";
 
     /**
+     * Name of the JPO property holding the information if a MxUpdate JPO is
+     * already compiled. The value <i>false</i> means that a complete compile
+     * with force update must be done.
+     */
+    private static final String PROP_COMPILED = "compiled";
+
+    /**
      * MQL command line to list the installed MxUpdate JPOs and the depending
      * last modified date of the installed file.
      *
@@ -205,6 +212,11 @@ System.out.println("program '" + name + "' is ignored because not a JPO");
                             .append("escape insert program \"")
                                             .append(this.convertMql(file.toString().replaceAll("\\\\", "/")))
                                             .append("\";")
+                            .append("escape mod program \"")
+                                            .append(this.convertMql(_classFile.getJpoName())).append('\"')
+                                    .append(" add property \"")
+                                            .append(this.convertMql(Insert_mxJPO.PROP_COMPILED))
+                                            .append("\" value \"false\";")
                             .append("escape mod program \"")
                                             .append(this.convertMql(_classFile.getJpoName())).append('\"')
                                     .append(" add property \"")
