@@ -20,8 +20,6 @@
 
 package org.mxupdate.test.data.program;
 
-import java.util.Set;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.AbstractTest.CI;
 import org.mxupdate.test.data.AbstractData;
@@ -34,9 +32,17 @@ import org.mxupdate.test.data.AbstractData;
  * @version $Id$
  * @param <T>   defines the class which is derived from this class
  */
-public abstract class AbstractProgram<T extends AbstractProgram<?>>
+public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
     extends AbstractData<T>
 {
+    /**
+     * Related code of this program.
+     *
+     * @see #setCode(String)
+     * @see #getCode()
+     */
+    private String code = "";
+
     /**
      * Initialize the values for program objects.
      *
@@ -45,17 +51,50 @@ public abstract class AbstractProgram<T extends AbstractProgram<?>>
      * @param _name                 name of the program
      * @param _filePrefix           prefix for the file name
      * @param _ciPath               path of the configuration item file
-     * @param _requiredExportValues defines the required values of the
-     *                              export within the configuration item
-     *                              file
      */
-    protected AbstractProgram(final AbstractTest _test,
+    protected AbstractProgramData(final AbstractTest _test,
                               final CI _ci,
                               final String _name,
                               final String _filePrefix,
-                              final String _ciPath,
-                              final Set<String> _requiredExportValues)
+                              final String _ciPath)
     {
-        super(_test, _ci, _name, _filePrefix, _ciPath, _requiredExportValues);
+        super(_test, _ci, _name, _filePrefix, _ciPath, null);
+    }
+
+    /**
+     * The related configuration item file is the {@link #code} of the program.
+     *
+     *  @return {@link #code} of the program
+     *  @see #code
+     */
+    @Override
+    public String ciFile()
+    {
+        return this.code;
+    }
+
+    /**
+     * Defines the {@link #code} for this program.
+     *
+     * @param _code     new code of this program
+     * @return this program instance
+     * @see #code
+     */
+    @SuppressWarnings("unchecked")
+    public T setCode(final String _code)
+    {
+        this.code = _code;
+        return (T) this;
+    }
+
+    /**
+     * Returns the {@link #code} of this program.
+     *
+     * @return related {@link #code} of this program
+     * @see #code
+     */
+    public String getCode()
+    {
+        return this.code;
     }
 }

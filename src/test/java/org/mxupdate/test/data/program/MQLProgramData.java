@@ -31,8 +31,8 @@ import org.mxupdate.test.AbstractTest;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class MQLProgram
-    extends AbstractProgram<MQLProgram>
+public class MQLProgramData
+    extends AbstractProgramData<MQLProgramData>
 {
     /**
      * Initializes this MQL program.
@@ -40,19 +40,10 @@ public class MQLProgram
      * @param _test     related test instance
      * @param _name     name of the MQL program
      */
-    public MQLProgram(final AbstractTest _test,
-                      final String _name)
+    public MQLProgramData(final AbstractTest _test,
+                          final String _name)
     {
-        super(_test, AbstractTest.CI.MQL_PROGRAM, _name, "", "program/mql", null);
-    }
-
-    /**
-     * @return always null
-     */
-    @Override
-    public String ciFile()
-    {
-        return null;
+        super(_test, AbstractTest.CI.MQL_PROGRAM, _name, "", "program/mql");
     }
 
     /**
@@ -62,13 +53,28 @@ public class MQLProgram
      * @throws MatrixException if create of the MQL program failed
      */
     @Override
-    public MQLProgram create()
+    public MQLProgramData create()
         throws MatrixException
     {
         if (!this.isCreated())  {
             this.setCreated(true);
-            this.getTest().mql("escape add program \"" + AbstractTest.convertMql(this.getName()) + "\" mql");
+            this.getTest().mql("escape add program \"" + AbstractTest.convertMql(this.getName()) + "\" mql "
+                    + "code \"" + AbstractTest.convertMql(this.getCode()) + "\"");
         }
         return this;
+    }
+
+    /**
+     * Returns the configuration item file name of this MQL program. The
+     * configuration item file name of a MQL program excludes the
+     * <code>.tcl</code> extension.
+     *
+     * @return file name of a JPO
+     */
+    @Override
+    public String getCIFileName()
+    {
+        final String ciFileName = super.getCIFileName();
+        return ciFileName.replaceAll("\\.tcl$", "");
     }
 }

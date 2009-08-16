@@ -115,7 +115,7 @@ public class AbstractTest
         /**
          * Configuration item Program MQL.
          */
-        MQL_PROGRAM("program", "MQL PROGRAM", null, true),
+        MQL_PROGRAM("program", "Program", null, true),
 
         /**
          * Configuration item command.

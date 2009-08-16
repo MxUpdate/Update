@@ -84,21 +84,20 @@
     <test name="5 - Test Updates" annotations="JDK">
         <packages>
             <package name="org.mxupdate.test.update.datamodel"/>
-            <package name="org.mxupdate.test.update.program"/>
         </packages>
     </test>
 
     <test name="6 - Test Exports" annotations="JDK">
         <packages>
             <package name="org.mxupdate.test.export.datamodel"/>
-            <package name="org.mxupdate.test.export.program"/>
         </packages>
     </test>
 
-    <test name="7 - Test Configuration Items" annotatinos="JDK">
+    <test name="7 - Test Configuration Items" annotations="JDK">
         <packages>
             <package name="org.mxupdate.test.ci"/>
             <package name="org.mxupdate.test.ci.datamodel"/>
+            <package name="org.mxupdate.test.ci.program"/>
             <package name="org.mxupdate.test.ci.userinterface"/>
         </packages>
     </test>

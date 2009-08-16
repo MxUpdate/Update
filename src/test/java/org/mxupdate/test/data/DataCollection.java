@@ -34,8 +34,9 @@ import org.mxupdate.test.data.datamodel.AttributeInteger;
 import org.mxupdate.test.data.datamodel.AttributeReal;
 import org.mxupdate.test.data.datamodel.AttributeString;
 import org.mxupdate.test.data.datamodel.TypeData;
-import org.mxupdate.test.data.program.AbstractProgram;
-import org.mxupdate.test.data.program.MQLProgram;
+import org.mxupdate.test.data.program.AbstractProgramData;
+import org.mxupdate.test.data.program.JPOProgramData;
+import org.mxupdate.test.data.program.MQLProgramData;
 import org.mxupdate.test.data.userinterface.Command;
 import org.mxupdate.test.data.userinterface.InquiryData;
 import org.mxupdate.test.data.userinterface.Menu;
@@ -97,7 +98,7 @@ public class DataCollection
      * @see #getPrograms()
      * @see #create()
      */
-    private final Map<String,AbstractProgram<?>> programs = new HashMap<String,AbstractProgram<?>>();
+    private final Map<String,AbstractProgramData<?>> programs = new HashMap<String,AbstractProgramData<?>>();
 
     /**
      * All types.
@@ -126,7 +127,7 @@ public class DataCollection
     public void create()
         throws MatrixException
     {
-        for (final AbstractProgram<?> program : this.programs.values())  {
+        for (final AbstractProgramData<?> program : this.programs.values())  {
             program.create();
         }
         for (final AbstractAttribute<?> attribute : this.attributes.values())  {
@@ -291,19 +292,35 @@ public class DataCollection
     }
 
     /**
-     * Returns the related program instance for <code>_name</code>. If a
+     * Returns the related JPO program instance for <code>_name</code>. If a
+     * JPO program is not already defined, a JPO program instance is created.
+     *
+     * @param _name     name of searched JPO program
+     * @return JPO program instance
+     * @see #programs
+     */
+    public JPOProgramData getJPOProgram(final String _name)
+    {
+        if (!this.programs.containsKey(_name))  {
+            this.programs.put(_name, new JPOProgramData(this.test, _name));
+        }
+        return (JPOProgramData) this.programs.get(_name);
+    }
+
+    /**
+     * Returns the related MQL program instance for <code>_name</code>. If a
      * MQL program is not already defined, a MQL program instance is created.
      *
      * @param _name     name of searched MQL program
      * @return MQL program instance
      * @see #programs
      */
-    public MQLProgram getMQLProgram(final String _name)
+    public MQLProgramData getMQLProgram(final String _name)
     {
         if (!this.programs.containsKey(_name))  {
-            this.programs.put(_name, new MQLProgram(this.test, _name));
+            this.programs.put(_name, new MQLProgramData(this.test, _name));
         }
-        return (MQLProgram) this.programs.get(_name);
+        return (MQLProgramData) this.programs.get(_name);
     }
 
     /**
@@ -312,7 +329,7 @@ public class DataCollection
      * @return collection of all programs
      * @see #programs
      */
-    public Collection<AbstractProgram<?>> getPrograms()
+    public Collection<AbstractProgramData<?>> getPrograms()
     {
         return this.programs.values();
     }

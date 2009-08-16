@@ -41,7 +41,7 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
  * @author Tim Moxter
  * @version $Id$
  */
-public class JPO_mxJPO
+public class JPOProgram_mxJPO
         extends AbstractProgram_mxJPO
 {
     /**
@@ -114,7 +114,7 @@ public class JPO_mxJPO
      * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the JPO object
      */
-    public JPO_mxJPO(final TypeDef_mxJPO _typeDef,
+    public JPOProgram_mxJPO(final TypeDef_mxJPO _typeDef,
                      final String _mxName)
     {
         super(_typeDef, _mxName);
@@ -217,7 +217,7 @@ public class JPO_mxJPO
                 throw new Error("could not open file " + _file, e);
             }
             for (final String line : code.split("\n"))  {
-                final Matcher pckMatch = JPO_mxJPO.PATTERN_PACKAGE.matcher(line);
+                final Matcher pckMatch = JPOProgram_mxJPO.PATTERN_PACKAGE.matcher(line);
                 if (pckMatch.find())  {
                     mxName = pckMatch.group().replace(';', ' ').trim() + "." + mxName;
                     break;
@@ -254,26 +254,27 @@ public class JPO_mxJPO
         }
 
         // old MX style or new? (means backslashes are doubled...)
-        final Boolean backslashDoubledVal = _paramCache.getValueBoolean(JPO_mxJPO.PARAM_BACKSLASHDOUBLED);
+        final Boolean backslashDoubledVal = _paramCache.getValueBoolean(JPOProgram_mxJPO.PARAM_BACKSLASHDOUBLED);
         final boolean backslashDoubled;
         if (backslashDoubledVal == null)  {
             final String code = MqlUtil_mxJPO.execMql(_paramCache,
-                                        "print prog org.mxupdate.update.program.JPO select code dump");
+                                        "print prog org.mxupdate.update.program.JPOProgram select code dump");
             final int start = code.indexOf("JPO_REPLACE_TEST");
             final int end = code.indexOf('\n', start);
             backslashDoubled = code.substring(start + 20, end - 2).length() == 4;
-            _paramCache.defineValueBoolean(JPO_mxJPO.PARAM_BACKSLASHDOUBLED, backslashDoubled);
+            _paramCache.defineValueBoolean(JPOProgram_mxJPO.PARAM_BACKSLASHDOUBLED, backslashDoubled);
         } else  {
             backslashDoubled = backslashDoubledVal;
         }
 
         // replace class names and references to other JPOs
-        final String name = this.getName() + JPO_mxJPO.NAME_SUFFIX;
+        final String name = this.getName() + JPOProgram_mxJPO.NAME_SUFFIX;
         final StringBuilder cmd = new StringBuilder()
                 .append("print program \"").append(this.getName()).append("\" select code dump");
         final String code = MqlUtil_mxJPO.execMql(_paramCache, cmd)
                                 .replaceAll("\\" + "$\\{CLASSNAME\\}", name.replaceAll(".*\\.", ""))
-                                .replaceAll("(?<=\\"+ "$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", JPO_mxJPO.NAME_SUFFIX)
+                                .replaceAll("(?<=\\"+ "$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}",
+                                            JPOProgram_mxJPO.NAME_SUFFIX)
                                 .replaceAll("\\" + "$\\{CLASS\\:", "")
                                 .trim();
 
@@ -328,9 +329,9 @@ public class JPO_mxJPO
         this.parse(_paramCache);
 
         // get parameters
-        final String markStart = _paramCache.getValueString(JPO_mxJPO.PARAM_MARKSTART).trim();
-        final String markEnd = _paramCache.getValueString(JPO_mxJPO.PARAM_MARKEND).trim();
-        final boolean exec = _paramCache.getValueBoolean(JPO_mxJPO.PARAM_NEEDED);
+        final String markStart = _paramCache.getValueString(JPOProgram_mxJPO.PARAM_MARKSTART).trim();
+        final String markEnd = _paramCache.getValueString(JPOProgram_mxJPO.PARAM_MARKEND).trim();
+        final boolean exec = _paramCache.getValueBoolean(JPOProgram_mxJPO.PARAM_NEEDED);
 
         final StringBuilder cmd = new StringBuilder();
 

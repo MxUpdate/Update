@@ -288,6 +288,16 @@ public abstract class AbstractData<T extends AbstractData<?>>
      */
     public abstract String ciFile();
 
+    /**
+     * Returns the path of the configuration item.
+     *
+     * @return path of the configuration item
+     * @see #ciPath
+     */
+    public String getCiPath()
+    {
+        return this.ciPath;
+    }
 
     /**
      * Appends the defined {@link #values} to the TCL code <code>_cmd</code> of
@@ -451,7 +461,8 @@ public abstract class AbstractData<T extends AbstractData<?>>
         for (final Map.Entry<String,String> entry : this.values.entrySet())  {
             Assert.assertEquals(_exportParser.getLines("/mql/" + entry.getKey() + "/@value").size(),
                                                        1,
-                                                       "check that minimum and maximum one " + entry.getKey() + " is defined");
+                                                       "check that minimum and maximum one "
+                                                               + entry.getKey() + " is defined");
             Assert.assertEquals(_exportParser.getLines("/mql/" + entry.getKey() + "/@value").get(0),
                                 "\"" + AbstractTest.convertTcl(entry.getValue()) + "\"",
                                 "check that " + entry.getKey() + " is correct defined");

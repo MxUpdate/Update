@@ -26,7 +26,7 @@ import org.mxupdate.test.data.DataCollection;
 import org.mxupdate.test.data.datamodel.AbstractAttribute;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger;
 import org.mxupdate.test.data.datamodel.TypeData;
-import org.mxupdate.test.data.program.AbstractProgram;
+import org.mxupdate.test.data.program.AbstractProgramData;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -134,7 +134,7 @@ public class TypeExportUpdate
             attribute.create();
         }
         // create referenced methods
-        for (final AbstractProgram<?> method : _data.getPrograms())  {
+        for (final AbstractProgramData<?> method : _data.getPrograms())  {
             method.create();
         }
 
@@ -179,7 +179,7 @@ public class TypeExportUpdate
     {
         final DataCollection data1 = new DataCollection(this);
         final TypeData type = data1.getType("TestType");
-        final AbstractProgram<?> method = data1.getMQLProgram("TestProg1");
+        final AbstractProgramData<?> method = data1.getMQLProgram("TestProg1");
         data1.create();
         this.mql("mod type \"" + AbstractTest.convertMql(type.getName())
                 + "\" add method \"" + AbstractTest.convertMql(method.getName()) + "\"");
@@ -204,7 +204,7 @@ public class TypeExportUpdate
     {
         final DataCollection data1 = new DataCollection(this);
         final TypeData type = data1.getType("TestType");
-        final AbstractProgram<?> method = data1.getMQLProgram("TestProg1");
+        final AbstractProgramData<?> method = data1.getMQLProgram("TestProg1");
         data1.create();
         // method must be defined after create (to test the update..)
         type.addMethod(method);

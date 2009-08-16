@@ -27,7 +27,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.program.AbstractProgram;
+import org.mxupdate.test.data.program.AbstractProgramData;
 import org.testng.Assert;
 
 /**
@@ -50,10 +50,10 @@ public class TypeData
     /**
      * All methods of this type.
      *
-     * @see #addMethod(AbstractProgram)
+     * @see #addMethod(AbstractProgramData)
      * @see #create()
      */
-    private final Set<AbstractProgram<?>> methods = new HashSet<AbstractProgram<?>>();
+    private final Set<AbstractProgramData<?>> methods = new HashSet<AbstractProgramData<?>>();
 
     /**
      * All attributes of this type.
@@ -82,7 +82,7 @@ public class TypeData
      * @return this type data instance
      * @see #methods
      */
-    public TypeData addMethod(final AbstractProgram<?> _method)
+    public TypeData addMethod(final AbstractProgramData<?> _method)
     {
         this.methods.add(_method);
         return this;
@@ -143,7 +143,7 @@ public class TypeData
             cmd.append("escape add type \"").append(AbstractTest.convertMql(this.getName())).append('\"');
 
             // append methods
-            for (final AbstractProgram<?> method : this.methods)  {
+            for (final AbstractProgramData<?> method : this.methods)  {
                 method.create();
                 cmd.append(" method \"").append(AbstractTest.convertMql(method.getName())).append("\"");
             }
@@ -175,7 +175,7 @@ public class TypeData
         super.evalAdds4CheckExport(_needAdds);
 
         // append methods
-        for (final AbstractProgram<?> method : this.methods)  {
+        for (final AbstractProgramData<?> method : this.methods)  {
             final StringBuilder cmd = new StringBuilder()
                     .append("method \"").append(AbstractTest.convertTcl(method.getName())).append("\"");
             _needAdds.add(cmd.toString());

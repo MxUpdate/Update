@@ -33,10 +33,13 @@ import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
+ * The class is used to export, create, delete and update MQL programs within
+ * MX.
+ *
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class Program_mxJPO
+public class MQLProgram_mxJPO
         extends AbstractProgram_mxJPO
 {
     /**
@@ -81,7 +84,7 @@ public class Program_mxJPO
      * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the program object
      */
-    public Program_mxJPO(final TypeDef_mxJPO _typeDef,
+    public MQLProgram_mxJPO(final TypeDef_mxJPO _typeDef,
                          final String _mxName)
     {
         super(_typeDef, _mxName);
@@ -177,10 +180,10 @@ public class Program_mxJPO
         this.parse(_paramCache);
 
         // get parameters
-        final String markStartStr = _paramCache.getValueString(Program_mxJPO.PARAM_MARKSTART).trim();
-        final String markEndStr = _paramCache.getValueString(Program_mxJPO.PARAM_MARKEND).trim();
-        final boolean exec = _paramCache.getValueBoolean(Program_mxJPO.PARAM_NEEDED);
-        final Map<String,String> extensions = _paramCache.<String>getValueMap(Program_mxJPO.PARAM_EXTENSION);
+        final String markStartStr = _paramCache.getValueString(MQLProgram_mxJPO.PARAM_MARKSTART).trim();
+        final String markEndStr = _paramCache.getValueString(MQLProgram_mxJPO.PARAM_MARKEND).trim();
+        final boolean exec = _paramCache.getValueBoolean(MQLProgram_mxJPO.PARAM_NEEDED);
+        final Map<String,String> extensions = _paramCache.<String>getValueMap(MQLProgram_mxJPO.PARAM_EXTENSION);
 
         // append to marker the line prefixes
         final String fileExtension = _file.getName().substring(_file.getName().lastIndexOf('.'));

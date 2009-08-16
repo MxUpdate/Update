@@ -28,7 +28,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.AbstractTest.CI;
 import org.mxupdate.test.data.AbstractData;
-import org.mxupdate.test.data.program.AbstractProgram;
+import org.mxupdate.test.data.program.AbstractProgramData;
 
 /**
  * The class is used to define all administration objects which could have
@@ -139,7 +139,7 @@ public abstract class AbstractDataWithTrigger<T extends AbstractDataWithTrigger<
         /**
          * Called program of this trigger.
          */
-        private final AbstractProgram<?> program;
+        private final AbstractProgramData<?> program;
 
         /**
          * Input value of this trigger.
@@ -157,7 +157,7 @@ public abstract class AbstractDataWithTrigger<T extends AbstractDataWithTrigger<
          */
         private AbstractTrigger(final String _eventType,
                                 final String _kind,
-                                final AbstractProgram<?> _program)
+                                final AbstractProgramData<?> _program)
         {
             this.eventType = _eventType;
             this.kind = _kind;
@@ -233,7 +233,7 @@ public abstract class AbstractDataWithTrigger<T extends AbstractDataWithTrigger<
          * @param _program      called program of the trigger
          */
         public TriggerAction(final String _eventType,
-                             final AbstractProgram<?> _program)
+                             final AbstractProgramData<?> _program)
         {
             super(_eventType, "action", _program);
         }
@@ -253,7 +253,7 @@ public abstract class AbstractDataWithTrigger<T extends AbstractDataWithTrigger<
          * @param _program      called program of the trigger
          */
         public TriggerCheck(final String _eventType,
-                             final AbstractProgram<?> _program)
+                             final AbstractProgramData<?> _program)
         {
             super(_eventType, "check", _program);
         }
@@ -273,7 +273,7 @@ public abstract class AbstractDataWithTrigger<T extends AbstractDataWithTrigger<
          * @param _program      called program of the trigger
          */
         public TriggerOverride(final String _eventType,
-                               final AbstractProgram<?> _program)
+                               final AbstractProgramData<?> _program)
         {
             super(_eventType, "override", _program);
         }

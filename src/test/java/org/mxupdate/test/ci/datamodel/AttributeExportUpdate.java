@@ -28,7 +28,7 @@ import org.mxupdate.test.data.DataCollection;
 import org.mxupdate.test.data.datamodel.AbstractAttribute;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger;
 import org.mxupdate.test.data.datamodel.AttributeString;
-import org.mxupdate.test.data.program.AbstractProgram;
+import org.mxupdate.test.data.program.AbstractProgramData;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -138,7 +138,7 @@ public class AttributeExportUpdate
     public void testUpdate(final DataCollection _data)
         throws Exception
     {
-        for (final AbstractProgram<?> program : _data.getPrograms())  {
+        for (final AbstractProgramData<?> program : _data.getPrograms())  {
             program.create();
         }
 
