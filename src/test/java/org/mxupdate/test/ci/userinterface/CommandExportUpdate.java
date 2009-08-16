@@ -95,8 +95,7 @@ public class CommandExportUpdate
         throws Exception
     {
         _command.create();
-        final Export export = this.export(CI.COMMAND, _command.getName());
-        final ExportParser exportParser = new ExportParser(CI.COMMAND, export);
+        final ExportParser exportParser = _command.export();
         _command.checkExport(exportParser);
     }
 
@@ -112,8 +111,7 @@ public class CommandExportUpdate
         throws Exception
     {
         this.update(_command.getCIFileName(), _command.ciFile());
-        final Export export = this.export(CI.COMMAND, _command.getName());
-        final ExportParser exportParser = new ExportParser(CI.COMMAND, export);
+        final ExportParser exportParser = _command.export();
         _command.checkExport(exportParser);
     }
 }

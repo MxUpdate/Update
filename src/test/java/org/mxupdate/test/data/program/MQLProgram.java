@@ -43,11 +43,11 @@ public class MQLProgram
     public MQLProgram(final AbstractTest _test,
                       final String _name)
     {
-        super(_test, AbstractTest.CI.MQL_PROGRAM, _name, "", null);
+        super(_test, AbstractTest.CI.MQL_PROGRAM, _name, "", "program/mql", null);
     }
 
     /**
-     * @return always nu,,
+     * @return always null
      */
     @Override
     public String ciFile()
@@ -71,5 +71,4 @@ public class MQLProgram
         }
         return this;
     }
-
 }

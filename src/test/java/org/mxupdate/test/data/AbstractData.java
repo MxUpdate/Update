@@ -20,6 +20,9 @@
 
 package org.mxupdate.test.data;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -103,12 +106,18 @@ public abstract class AbstractData<T extends AbstractData<?>>
     private final String filePrefix;
 
     /**
+     * Path where the configuration item update file is located.
+     */
+    private final String ciPath;
+
+    /**
      * Constructor to initialize this data piece.
      *
      * @param _test                 related test case
      * @param _ci                   related configuration type
      * @param _name                 name of the administration object
      * @param _filePrefix           prefix for the file name
+     * @param _ciPath               path of the configuration item file
      * @param _requiredExportValues defines the required values of the
      *                              export within the configuration item
      *                              file
@@ -117,6 +126,7 @@ public abstract class AbstractData<T extends AbstractData<?>>
                            final AbstractTest.CI _ci,
                            final String _name,
                            final String _filePrefix,
+                           final String _ciPath,
                            final Set<String> _requiredExportValues)
     {
         this.test = _test;
@@ -124,6 +134,7 @@ public abstract class AbstractData<T extends AbstractData<?>>
         this.name = AbstractTest.PREFIX + _name;
         this.symbolicName = _ci.getMxType() + "_" + this.name.replaceAll(AbstractData.NOT_ALLOWED_CHARS, "");
         this.filePrefix = _filePrefix;
+        this.ciPath = _ciPath;
         this.requiredExportValues = _requiredExportValues;
     }
 
@@ -308,7 +319,7 @@ public abstract class AbstractData<T extends AbstractData<?>>
      * @throws MatrixException if used object could not be created
      * @see #values
      */
-    protected void append4CreateValues(final StringBuilder _cmd)
+    protected void append4Create(final StringBuilder _cmd)
         throws MatrixException
     {
         for (final Map.Entry<String,String> entry : this.values.entrySet())  {
@@ -350,6 +361,72 @@ public abstract class AbstractData<T extends AbstractData<?>>
     public abstract T create() throws MatrixException;
 
     /**
+     * Exports this data piece from MX. The returned values from the export are
+     * checked for:
+     * <ul>
+     * <li>value is returned</li>
+     * <li>returned export value includes exact one export for given
+     *     {@link #ci configuration item type}</li>
+     * <li>name of the exported object is equal {@link #name}</li>
+     * <li>path of the exported object is equal {@link #ciPath}</li>
+     * <li>file name of the export object is equal returned value from
+     *     {@link #getCIFileName()}</li>
+     * </ul>
+     *
+     * @return parsed export
+     * @throws IOException      if the parameter could not be encoded
+     * @throws MatrixException  if MQL calls failed
+     */
+    public ExportParser export()
+        throws IOException, MatrixException
+    {
+        final Map<String,Collection<String>> params = new HashMap<String,Collection<String>>(1);
+        params.put(this.ci.updateType, Arrays.asList(new String[]{this.getName()}));
+        final Map<String,Collection<Map<String,String>>> bck =
+                this.test.<Map<String,Collection<Map<String,String>>>>jpoInvoke("org.mxupdate.plugin.Export",
+                                                                                "exportByName",
+                                                                                params)
+                    .getValues();
+
+        // check existence and element is defined
+        Assert.assertNotNull(bck);
+        Assert.assertTrue(bck.containsKey(this.ci.updateType));
+        Assert.assertEquals(bck.get(this.ci.updateType).size(), 1, "one element is returned");
+
+        // parse first element
+        final Map<String,String> exportDesc = bck.get(this.getCI().updateType).iterator().next();
+        final ExportParser ret = this.parseExport(this.ci, exportDesc.get("code"));
+
+        // check returned configuration item name
+        Assert.assertEquals(exportDesc.get("name"),
+                            this.name,
+                            "returned name is equal to given name");
+        // check path of the configuration item update file
+        Assert.assertEquals(exportDesc.get("path"),
+                            this.ciPath,
+                            "check path where the configuration item update file is located is correct");
+        // check file name of the configuration item update file
+        Assert.assertEquals(exportDesc.get("filename"),
+                            this.getCIFileName(),
+                            "check that the correct configuration item file name is returned");
+
+        return ret;
+    }
+
+    /**
+     * Returns the parsed export instance.
+     *
+     * @param _ci       related configuration item type
+     * @param _code     code of the exported configuration item
+     * @return parsed export instance
+     */
+    protected ExportParser parseExport(final AbstractTest.CI _ci,
+                                       final String _code)
+    {
+        return new ExportParser(_ci, _code);
+    }
+
+    /**
      * Checks the export of this data piece if all values are correct defined.
      *
      * @param _exportParser     parsed export
@@ -358,9 +435,6 @@ public abstract class AbstractData<T extends AbstractData<?>>
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        Assert.assertEquals(_exportParser.getFileName(),
-                            this.getCIFileName(),
-                            "check file name");
         Assert.assertEquals(_exportParser.getName(),
                             this.getName(),
                             "check name");
@@ -371,16 +445,16 @@ public abstract class AbstractData<T extends AbstractData<?>>
         for (final String valueName : this.requiredExportValues)  {
             Assert.assertEquals(_exportParser.getLines("/mql/" + valueName + "/@value").size(),
                                 1,
-                                "minimum and maximum one " + valueName + " is defined");
+                                "required check that minimum and maximum one " + valueName + " is defined");
         }
         // check for defined values
         for (final Map.Entry<String,String> entry : this.values.entrySet())  {
             Assert.assertEquals(_exportParser.getLines("/mql/" + entry.getKey() + "/@value").size(),
                                                        1,
-                                                       "minimum and maximum one " + entry.getKey() + " is defined");
+                                                       "check that minimum and maximum one " + entry.getKey() + " is defined");
             Assert.assertEquals(_exportParser.getLines("/mql/" + entry.getKey() + "/@value").get(0),
                                 "\"" + AbstractTest.convertTcl(entry.getValue()) + "\"",
-                                entry.getKey() + " is correct defined");
+                                "check that " + entry.getKey() + " is correct defined");
         }
         // check for add values
         final Set<String> needAdds = new HashSet<String>();

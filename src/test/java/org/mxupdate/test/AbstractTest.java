@@ -123,6 +123,11 @@ public class AbstractTest
         COMMAND("command", "Command", "COMMAND", true),
 
         /**
+         * Configuration item inquiry.
+         */
+        INQUIRY("inquiry", "Inquiry", "INQUIRY", true),
+
+        /**
          * Configuration item menu.
          */
         MENU("menu", "Menu", "MENU", true);
@@ -135,7 +140,7 @@ public class AbstractTest
         /**
          * Related type name in MxUpdate Update.
          */
-        final String updateType;
+        public final String updateType;
 
         /**
          * Used name in the header.
@@ -258,20 +263,6 @@ public class AbstractTest
             ret = new HashSet<String>(Arrays.asList(bck.split("\n")));
         }
         return ret;
-    }
-
-    /**
-     * Wrapper for {@link #export(CI, String)}.
-     *
-     * @param _object       object to export
-     * @return export instance
-     * @throws IOException      if the parameter could not be encoded
-     * @throws MatrixException  if MQL calls failed
-     */
-    protected Export export(final AbstractData<?> _object)
-        throws IOException, MatrixException
-    {
-        return this.export(_object.getCI(), _object.getName());
     }
 
     /**
@@ -406,9 +397,9 @@ public class AbstractTest
      * @see #context
      * @see JPOReturn
      */
-    protected <T> JPOReturn<T> jpoInvoke(final String _jpo,
-                                         final String _method,
-                                         final Object... _parameters)
+    public <T> JPOReturn<T> jpoInvoke(final String _jpo,
+                                      final String _method,
+                                      final Object... _parameters)
         throws IOException, MatrixException
     {
         // encode parameters
@@ -487,7 +478,7 @@ public class AbstractTest
      * @param <T>   type of the returned values
      * @see AbstractTest#jpoInvoke(String, String, Object...)
      */
-    protected final class JPOReturn<T>
+    public final class JPOReturn<T>
     {
         /**
          * Returns map from the JPO invoke.
@@ -540,7 +531,7 @@ public class AbstractTest
          *                      etc.
          * @see #exportDesc
          */
-        private Export(final Map<String,String> _exportDesc)
+        public Export(final Map<String,String> _exportDesc)
         {
             this.exportDesc = _exportDesc;
         }

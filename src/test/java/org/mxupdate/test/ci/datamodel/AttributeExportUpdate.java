@@ -116,14 +116,12 @@ public class AttributeExportUpdate
 
         for (final AbstractAttribute<?> attribute : _data.getAttributes())  {
             // create and export
-            final Export export = this.export(attribute);
-            final ExportParser exportParser = new ExportParser(attribute.getCI(), export);
+            final ExportParser exportParser = attribute.export();
             attribute.checkExport(exportParser);
 
             // make update with exported CI file and check result again
-            this.update(attribute.getCIFileName(), export.getCode());
-            final Export export2 = this.export(attribute);
-            final ExportParser exportParser2 = new ExportParser(attribute.getCI(), export2);
+            this.update(attribute.getCIFileName(), exportParser.getOrigCode());
+            final ExportParser exportParser2 = attribute.export();
             attribute.checkExport(exportParser2);
         }
     }
@@ -149,14 +147,12 @@ public class AttributeExportUpdate
             this.update(attribute);
 
             // export and check
-            final Export export = this.export(attribute);
-            final ExportParser exportParser = new ExportParser(attribute.getCI(), export);
+            final ExportParser exportParser = attribute.export();
             attribute.checkExport(exportParser);
 
             // update with exported file and check again
-            this.update(attribute.getCIFileName(), export.getCode());
-            final Export export2 = this.export(attribute);
-            final ExportParser exportParser2 = new ExportParser(attribute.getCI(), export2);
+            this.update(attribute.getCIFileName(), exportParser.getOrigCode());
+            final ExportParser exportParser2 = attribute.export();
             attribute.checkExport(exportParser2);
         }
     }

@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import matrix.util.MatrixException;
+
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.AbstractData;
 
@@ -51,7 +53,7 @@ abstract class AbstractCommand<T extends AbstractCommand<?>>
     /**
      * All settings of this command.
      *
-     * @see #append4CreateSettings(StringBuilder)
+     * @see #append4Create(StringBuilder)
      * @see #getSettings()
      * @see #setSetting(String, String)
      * @see #evalAdds4CheckExport(Set)
@@ -65,13 +67,15 @@ abstract class AbstractCommand<T extends AbstractCommand<?>>
      * @param _ci           configuration item type
      * @param _name         name of command
      * @param _filePrefix   prefix for the file name
+     * @param _ciPath       path of the configuration item file
      */
     AbstractCommand(final AbstractTest _test,
                     final AbstractTest.CI _ci,
                     final String _name,
-                    final String _filePrefix)
+                    final String _filePrefix,
+                    final String _ciPath)
     {
-        super(_test, _ci, _name, _filePrefix, AbstractCommand.REQUIRED_EXPORT_VALUES);
+        super(_test, _ci, _name, _filePrefix, _ciPath, AbstractCommand.REQUIRED_EXPORT_VALUES);
     }
 
     /**
@@ -122,10 +126,14 @@ abstract class AbstractCommand<T extends AbstractCommand<?>>
      * {@link #settings}.
      *
      * @param _cmd      string builder used to append the MQL commands
+     * @throws MatrixException if append failed
      * @see #settings
      */
-    protected void append4CreateSettings(final StringBuilder _cmd)
+    @Override()
+    protected void append4Create(final StringBuilder _cmd)
+        throws MatrixException
     {
+        super.append4Create(_cmd);
         for (final Map.Entry<String,String> entry : this.settings.entrySet())  {
             _cmd.append(" setting \"").append(AbstractTest.convertMql(entry.getKey())).append("\" \"")
                 .append(AbstractTest.convertMql(entry.getValue()))

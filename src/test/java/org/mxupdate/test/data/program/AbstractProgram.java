@@ -44,6 +44,7 @@ public abstract class AbstractProgram<T extends AbstractProgram<?>>
      * @param _ci                   related configuration type
      * @param _name                 name of the program
      * @param _filePrefix           prefix for the file name
+     * @param _ciPath               path of the configuration item file
      * @param _requiredExportValues defines the required values of the
      *                              export within the configuration item
      *                              file
@@ -52,8 +53,9 @@ public abstract class AbstractProgram<T extends AbstractProgram<?>>
                               final CI _ci,
                               final String _name,
                               final String _filePrefix,
+                              final String _ciPath,
                               final Set<String> _requiredExportValues)
     {
-        super(_test, _ci, _name, _filePrefix, _requiredExportValues);
+        super(_test, _ci, _name, _filePrefix, _ciPath, _requiredExportValues);
     }
 }

@@ -54,7 +54,7 @@ public class Menu
     public Menu(final AbstractTest _test,
                 final String _name)
     {
-        super(_test, AbstractTest.CI.MENU, _name, "MENU_");
+        super(_test, AbstractTest.CI.MENU, _name, "MENU_", "userinterface/menu");
     }
 
     /**
@@ -76,6 +76,7 @@ public class Menu
      *
      * @return code for the configuration item update file
      */
+    @Override
     public String ciFile()
     {
         final StringBuilder cmd = new StringBuilder()
@@ -104,8 +105,7 @@ public class Menu
 
         final StringBuilder cmd = new StringBuilder()
                 .append("escape add menu \"" + AbstractTest.convertMql(this.getName()) + "\"");
-        this.append4CreateValues(cmd);
-        this.append4CreateSettings(cmd);
+        this.append4Create(cmd);
         cmd.append(';');
 
         // append all child command / menus

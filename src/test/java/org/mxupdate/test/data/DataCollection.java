@@ -37,6 +37,7 @@ import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.program.AbstractProgram;
 import org.mxupdate.test.data.program.MQLProgram;
 import org.mxupdate.test.data.userinterface.Command;
+import org.mxupdate.test.data.userinterface.InquiryData;
 import org.mxupdate.test.data.userinterface.Menu;
 
 /**
@@ -61,6 +62,7 @@ public class DataCollection
      * @see #getAttributeReal(String)
      * @see #getAttributeString(String)
      * @see #getAttributes()
+     * @see #create()
      */
     private final Map<String,AbstractAttribute<?>> attributes = new HashMap<String,AbstractAttribute<?>>();
 
@@ -68,13 +70,23 @@ public class DataCollection
      * All commands.
      *
      * @see #getCommand(String)
+     * @see #create()
      */
     private final Map<String,Command> commands = new HashMap<String,Command>();
+
+    /**
+     * All inquiries.
+     *
+     * @see #getInquiry(String)
+     * @see #create()
+     */
+    private final Map<String,InquiryData> inquiries = new HashMap<String,InquiryData>();
 
     /**
      * All menus.
      *
      * @see #getMenu(String)
+     * @see #create()
      */
     private final Map<String,Menu> menus = new HashMap<String,Menu>();
 
@@ -83,6 +95,7 @@ public class DataCollection
      *
      * @see #getMQLProgram(String)
      * @see #getPrograms()
+     * @see #create()
      */
     private final Map<String,AbstractProgram<?>> programs = new HashMap<String,AbstractProgram<?>>();
 
@@ -91,6 +104,7 @@ public class DataCollection
      *
      * @see #getType(String)
      * @see #getTypes()
+     * @see #create()
      */
     private final Map<String,TypeData> types = new HashMap<String,TypeData>();
 
@@ -123,6 +137,9 @@ public class DataCollection
         }
         for (final Command command : this.commands.values())  {
             command.create();
+        }
+        for (final InquiryData inquiry : this.inquiries.values())  {
+            inquiry.create();
         }
         for (final Menu menu : this.menus.values())  {
             menu.create();
@@ -239,6 +256,22 @@ public class DataCollection
             this.commands.put(_name, new Command(this.test, _name));
         }
         return this.commands.get(_name);
+    }
+
+    /**
+     * Returns the related inquiry instance for <code>_name</code>. If an
+     * inquiry is not already defined, a new inquiry instance is created.
+     *
+     * @param _name     name of searched inquiry
+     * @return inquiry instance
+     * @see #inquiries
+     */
+    public InquiryData getInquiry(final String _name)
+    {
+        if (!this.inquiries.containsKey(_name))  {
+            this.inquiries.put(_name, new InquiryData(this.test, _name));
+        }
+        return this.inquiries.get(_name);
     }
 
     /**

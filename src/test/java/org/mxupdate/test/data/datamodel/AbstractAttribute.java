@@ -65,10 +65,10 @@ public abstract class AbstractAttribute<T extends AbstractAttribute<?>>
 
     /**
      *
-     * @param _test     related test instance
-     * @param _ci       related configuration type of this attribute
-     * @param _name     name of this attribute
-     * @param _attrType type of this attribute
+     * @param _test         related test instance
+     * @param _ci           related configuration type of this attribute
+     * @param _name         name of this attribute
+     * @param _attrType     type of this attribute
      * @param _filePrefix   prefix for the file name
      */
     protected AbstractAttribute(final AbstractTest _test,
@@ -77,7 +77,8 @@ public abstract class AbstractAttribute<T extends AbstractAttribute<?>>
                                 final String _attrType,
                                 final String _filePrefix)
     {
-        super(_test, _ci, _name, _filePrefix, AbstractAttribute.REQUIRED_EXPORT_VALUES);
+        super(_test, _ci, _name, _filePrefix, "datamodel/attribute",
+              AbstractAttribute.REQUIRED_EXPORT_VALUES);
         this.attrType = _attrType;
     }
 
@@ -113,7 +114,7 @@ public abstract class AbstractAttribute<T extends AbstractAttribute<?>>
             cmd.append("escape add attribute \"").append(AbstractTest.convertMql(this.getName()))
                .append("\" type ").append(this.attrType);
 
-            this.append4CreateValues(cmd);
+            this.append4Create(cmd);
 
             for (final Range range : this.ranges)  {
                 range.appendCreate(cmd);

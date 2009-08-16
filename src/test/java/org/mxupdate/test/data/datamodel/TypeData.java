@@ -70,7 +70,9 @@ public class TypeData
     public TypeData(final AbstractTest _test,
                     final String _name)
     {
-        super(_test, AbstractTest.CI.TYPE, _name, "TYPE_", TypeData.REQUIRED_EXPORT_VALUES);
+        super(_test, AbstractTest.CI.TYPE, _name,
+              "TYPE_", "datamodel/type",
+              TypeData.REQUIRED_EXPORT_VALUES);
     }
 
     /**
@@ -152,7 +154,7 @@ public class TypeData
                 cmd.append(" attribute \"").append(AbstractTest.convertMql(attribute.getName())).append("\"");
             }
 
-            this.append4CreateValues(cmd);
+            this.append4Create(cmd);
 
             this.getTest().mql(cmd);
         }

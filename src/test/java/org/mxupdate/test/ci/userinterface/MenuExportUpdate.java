@@ -88,10 +88,7 @@ public class MenuExportUpdate
         throws Exception
     {
         _menu.create();
-
-        final Export export = this.export(CI.MENU, _menu.getName());
-        final ExportParser exportParser = new ExportParser(CI.MENU, export);
-
+        final ExportParser exportParser = _menu.export();
         _menu.checkExport(exportParser);
     }
 
@@ -108,8 +105,7 @@ public class MenuExportUpdate
     {
         _menu.createChildren();
         this.update(_menu.getCIFileName(), _menu.ciFile());
-        final Export export = this.export(CI.MENU, _menu.getName());
-        final ExportParser exportParser = new ExportParser(CI.MENU, export);
+        final ExportParser exportParser = _menu.export();
         _menu.checkExport(exportParser);
     }
 }

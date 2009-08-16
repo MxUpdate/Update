@@ -55,6 +55,7 @@ public abstract class AbstractDataWithTrigger<T extends AbstractDataWithTrigger<
      * @param _ci                   related configuration type
      * @param _name                 name of the administration object
      * @param _filePrefix           prefix for the file name
+     * @param _ciPath               path of the configuration item file
      * @param _requiredExportValues defines the required values of the
      *                              export within the configuration item
      *                              file
@@ -63,9 +64,10 @@ public abstract class AbstractDataWithTrigger<T extends AbstractDataWithTrigger<
                                       final CI _ci,
                                       final String _name,
                                       final String _filePrefix,
+                                      final String _ciPath,
                                       final Set<String> _requiredExportValues)
     {
-        super(_test, _ci, _name, _filePrefix, _requiredExportValues);
+        super(_test, _ci, _name, _filePrefix, _ciPath, _requiredExportValues);
     }
 
     /**
@@ -93,10 +95,10 @@ public abstract class AbstractDataWithTrigger<T extends AbstractDataWithTrigger<
      * @see #triggers
      */
     @Override
-    protected void append4CreateValues(final StringBuilder _cmd)
+    protected void append4Create(final StringBuilder _cmd)
         throws MatrixException
     {
-        super.append4CreateValues(_cmd);
+        super.append4Create(_cmd);
         for (final AbstractTrigger<?> trigger : this.triggers)  {
             trigger.append4Create(_cmd);
         }

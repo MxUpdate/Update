@@ -56,7 +56,7 @@ public class Command
     public Command(final AbstractTest _test,
                    final String _name)
     {
-        super(_test, AbstractTest.CI.COMMAND, _name, "COMMAND_");
+        super(_test, AbstractTest.CI.COMMAND, _name, "COMMAND_", "userinterface/command");
     }
 
     /**
@@ -78,6 +78,7 @@ public class Command
      *
      * @return code for the configuration item update file
      */
+    @Override
     public String ciFile()
     {
         final StringBuilder cmd = new StringBuilder()
@@ -116,8 +117,7 @@ public class Command
                 cmd.append('\"').append(AbstractTest.convertMql(user)).append('\"');
             }
         }
-        this.append4CreateValues(cmd);
-        this.append4CreateSettings(cmd);
+        this.append4Create(cmd);
 
         this.getTest().mql(cmd);
 

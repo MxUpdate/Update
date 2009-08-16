@@ -31,10 +31,10 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.AdminProperty_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
+ * The class is used to export and import / update inquiry configuration items.
  *
  * @author The MxUpdate Team
  * @version $Id$
@@ -55,7 +55,6 @@ public class Inquiry_mxJPO
         = "################################################################################\n"
         + "# INQUIRY CODE                                                                 #\n"
         + "################################################################################";
-
 
     /**
      * Code for the inquiry.
@@ -135,13 +134,14 @@ public class Inquiry_mxJPO
                                final Appendable _out)
             throws IOException
     {
-        _out.append(" \\\n    pattern \"").append(convertTcl(this.pattern)).append("\"")
-            .append(" \\\n    format \"").append(convertTcl(this.format)).append("\"")
-            .append(" \\\n    file \"${FILE}\"");
+        _out.append(" \\\n    pattern \"").append(StringUtil_mxJPO.convertTcl(this.pattern)).append("\"")
+            .append(" \\\n    format \"").append(StringUtil_mxJPO.convertTcl(this.format)).append("\"")
+            .append(" \\\n    file [file join \"${FILE}\"]");
         for (final AdminProperty_mxJPO prop : this.getPropertiesMap().values())  {
             if (prop.isSetting())  {
-                _out.append(" \\\n    add argument \"").append(convertTcl(prop.getName().substring(1))).append("\"")
-                    .append(" \"").append(convertTcl(prop.getValue())).append("\"");
+                _out.append(" \\\n    add argument \"")
+                    .append(StringUtil_mxJPO.convertTcl(prop.getName().substring(1))).append("\"")
+                    .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getValue())).append("\"");
             }
         }
    }
@@ -160,8 +160,11 @@ public class Inquiry_mxJPO
             throws IOException
     {
         _out.append("\n\n# do not change the next three lines, they are needed as separator information:\n")
-            .append(INQUIRY_SEPARATOR)
-            .append("\n\n").append(this.code);
+            .append(Inquiry_mxJPO.INQUIRY_SEPARATOR)
+            .append("\n\n");
+        if (this.code != null)  {
+            _out.append(this.code);
+        }
     }
 
     /**
@@ -202,14 +205,15 @@ public class Inquiry_mxJPO
     {
         // reset HRef, description, alt, label and height
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append('\"')
+                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
                 .append(" description \"\" pattern \"\" code \"\"");
 
         // reset arguments
         for (final AdminProperty_mxJPO prop : this.getPropertiesMap().values())  {
             if (prop.isSetting())  {
-                preMQLCode.append(" remove argument \"").append(prop.getName().substring(1)).append('\"');
+                preMQLCode.append(" remove argument \"")
+                          .append(StringUtil_mxJPO.convertMql(prop.getName().substring(1))).append('\"');
             }
         }
 
@@ -219,12 +223,13 @@ public class Inquiry_mxJPO
 
         // separate the inquiry code and the TCL code
         final StringBuilder orgCode = this.getCode(_sourceFile);
-        final int idx = orgCode.lastIndexOf(INQUIRY_SEPARATOR);
+        final int idx = orgCode.lastIndexOf(Inquiry_mxJPO.INQUIRY_SEPARATOR);
         final CharSequence code = (idx >= 0)
                                   ? orgCode.subSequence(0, idx)
                                   : orgCode;
         final CharSequence inqu = (idx >= 0)
-                                  ? orgCode.subSequence(idx + INQUIRY_SEPARATOR.length() + 1, orgCode.length())
+                                  ? orgCode.subSequence(idx + Inquiry_mxJPO.INQUIRY_SEPARATOR.length() + 1,
+                                                        orgCode.length())
                                   : "";
 
         final File tmpInqFile = File.createTempFile("TMP_", ".inquiry");

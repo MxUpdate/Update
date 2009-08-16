@@ -112,8 +112,7 @@ public class TypeExportUpdate
 
         _data.create();
 
-        final Export export = this.export(CI.TYPE, type.getName());
-        final ExportParser exportParser = new ExportParser(CI.TYPE, export);
+        final ExportParser exportParser = type.export();
         type.checkExport(exportParser);
     }
 
@@ -142,8 +141,7 @@ public class TypeExportUpdate
         final TypeData type = _data.getType(_name);
 
         this.update(type);
-        final Export export = this.export(CI.TYPE, type.getName());
-        final ExportParser exportParser = new ExportParser(CI.TYPE, export);
+        final ExportParser exportParser = type.export();
         type.checkExport(exportParser);
     }
 
@@ -284,17 +282,8 @@ public class TypeExportUpdate
     private ExportParser exportType(final TypeData _type)
         throws Exception
     {
-        final Export export = this.export(_type.getCI(), _type.getName());
-
-        Assert.assertEquals(export.getPath(), "datamodel/type", "path is not correct");
-        Assert.assertEquals(export.getFileName(),
-                            _type.getCIFileName(),
-                            "check that the correct file name is returned");
-
-        final ExportParser exportParser = new ExportParser(_type.getCI(), export);
-
+        final ExportParser exportParser = _type.export();
         _type.checkExport(exportParser);
-
         return exportParser;
     }
 }
