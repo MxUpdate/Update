@@ -32,7 +32,7 @@
     <groupId>org.mxupdate</groupId>
     <artifactId>update</artifactId>
     <packaging>jar</packaging>
-    <version>0.6.1</version>
+    <version>0.6.2</version>
     <name>MxUpdate Update</name>
     <url>http://www.mxupdate.org</url>
 
