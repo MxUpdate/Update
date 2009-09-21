@@ -186,7 +186,8 @@ public class MQLProgram_mxJPO
         final Map<String,String> extensions = _paramCache.<String>getValueMap(MQLProgram_mxJPO.PARAM_EXTENSION);
 
         // append to marker the line prefixes
-        final String fileExtension = _file.getName().substring(_file.getName().lastIndexOf('.'));
+        final int fileExtIdx = _file.getName().lastIndexOf('.');
+        final String fileExtension = (fileExtIdx >= 0) ? _file.getName().substring(fileExtIdx) : null;
         final String linePrefix = extensions.get(fileExtension);
         final int linePrefixLength = (linePrefix != null) ? linePrefix.length() : -1;
         final String markStart;

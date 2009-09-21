@@ -39,24 +39,38 @@ public class MQLExportUpdate
     extends AbstractTest
 {
     /**
-     * Data provider for test MQL programs.
+     * Data provider for test MQL programs (with and without extensions).
      *
      * @return object array with all test MQL programs
      */
     @DataProvider(name = "mqlprograms")
-    public Object[][] getInquiries()
+    public Object[][] getMQLPrograms()
     {
+        // without extension with code
         final DataCollection data1 = new DataCollection(this);
         data1.getMQLProgram("Test1")
              .setCode("test");
 
+        // without extension without code
         final DataCollection data2 = new DataCollection(this);
         data2.getMQLProgram("Test2")
+             .setCode("");
+
+        // with extension with code
+        final DataCollection data3 = new DataCollection(this);
+        data1.getMQLProgram("Test3.tcl")
+             .setCode("test");
+
+        // with extension without code
+        final DataCollection data4 = new DataCollection(this);
+        data2.getMQLProgram("Test4.tcl")
              .setCode("");
 
         return new Object[][]  {
                 new Object[]{data1, "Test1"},
                 new Object[]{data2, "Test2"},
+                new Object[]{data3, "Test3.tcl"},
+                new Object[]{data4, "Test4.tcl"},
         };
     }
 
@@ -104,5 +118,35 @@ public class MQLExportUpdate
         Assert.assertEquals(export.getCode(),
                             mqlProgram.getCode(),
                             "checks MQL program code");
+    }
+
+    /**
+     * Tests, if the MQL program within MX is created and registered with the
+     * correct symbolic name.
+     *
+     * @param _data     data collection to test
+     * @param _name     name of the inquiry to test
+     * @throws Exception if test failed
+     * @see http://code.google.com/p/mxupdate/issues/detail?id=22
+     */
+    @Test(dataProvider = "mqlprograms", description = "test update of non existing MQL programs")
+    public void testUpdate(final DataCollection _data,
+                           final String _name)
+        throws Exception
+    {
+        final MQLProgramData mqlProgram = _data.getMQLProgram(_name);
+
+        // first update with original content
+        this.update(mqlProgram.getCIFileName(), mqlProgram.ciFile());
+
+        Assert.assertTrue(!"".equals(this.mql("list program " + mqlProgram.getName())),
+                          "check JPO is created");
+        Assert.assertTrue(!"".equals(this.mql("list property to program " + mqlProgram.getName())),
+                          "check that the JPO is registered");
+        Assert.assertEquals(this.mql("list property to program " + mqlProgram.getName()),
+                            "program_" + mqlProgram.getName()
+                                    + " on program eServiceSchemaVariableMapping.tcl to program "
+                                    + mqlProgram.getName(),
+                            "check that the JPO is registered with correct symbolic name");
     }
 }
