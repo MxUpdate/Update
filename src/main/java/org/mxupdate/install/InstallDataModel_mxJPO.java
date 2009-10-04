@@ -90,6 +90,30 @@ public class InstallDataModel_mxJPO
     private static final String PARAM_INSTALLER = "RegisterInstallerName";
 
     /**
+     * Name of the parameter defining the description for the trigger group
+     * policy description.
+     *
+     * @see #installTriggerGroupPolicy(ParameterCache_mxJPO, String, String, String, String, String, String)
+     */
+    private static final String PARAM_TRIGGER_GROUP_POLICY_DESCRIPTION = "InstallTriggerGroupPolicyDesc";
+
+    /**
+     * Name of the parameter defining the description for the trigger group
+     * relationship description.
+     *
+     * @see #installTriggerGroupRelation(ParameterCache_mxJPO, String, String, String, String, String, String)
+     */
+    private static final String PARAM_TRIGGER_GROUP_RELATION_DESCRIPTION = "InstallTriggerGroupRelationDesc";
+
+    /**
+     * Name of the parameter defining the description for the trigger group
+     * type description.
+     *
+     * @see #installTriggerGroupType(ParameterCache_mxJPO, File, String, String, String, String, String, String)
+     */
+    private static final String PARAM_TRIGGER_GROUP_TYPE_DESCRIPTION = "InstallTriggerGroupTypeDesc";
+
+    /**
      * Name of the type definition for the trigger group.
      *
      * @see #installTriggerGroupPolicy(ParameterCache_mxJPO, String, String, String, String, String, String)
@@ -325,6 +349,7 @@ public class InstallDataModel_mxJPO
      * @param _fileDate         used file date
      * @param _installedDate    used installed date
      * @throws Exception if the trigger group type could not be installed
+     * @see #PARAM_TRIGGER_GROUP_TYPE_DESCRIPTION
      */
     protected void installTriggerGroupType(final ParameterCache_mxJPO _paramCache,
                                            final File _path,
@@ -339,6 +364,8 @@ public class InstallDataModel_mxJPO
 
         final TypeDef_mxJPO trigGrpTypeDef
                 = _paramCache.getMapping().getTypeDef(InstallDataModel_mxJPO.TYPEDEF_TRIGGER_GROUP);
+        final String desc = _paramCache.getValueString(InstallDataModel_mxJPO.PARAM_TRIGGER_GROUP_TYPE_DESCRIPTION);
+
         _paramCache.logInfo("check type '" + trigGrpTypeDef.getMxBusType() + "'");
         final String installed = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
                 .append("escape list type \"")
@@ -351,11 +378,21 @@ public class InstallDataModel_mxJPO
                         .append(StringUtil_mxJPO.convertMql(trigGrpTypeDef.getMxBusType()))
                         .append("\""));
         }
-        _paramCache.logDebug("    - update description");
+
         final StringBuilder cmd = new StringBuilder()
                 .append("escape mod type \"")
-                .append(StringUtil_mxJPO.convertMql(trigGrpTypeDef.getMxBusType())).append("\" ")
-                .append("description \"Type used to group trigger definitions.\" ");
+                .append(StringUtil_mxJPO.convertMql(trigGrpTypeDef.getMxBusType())).append("\" ");
+
+        // check type description
+        final String existingDesc = MqlUtil_mxJPO.execMql(
+                _paramCache,
+                new StringBuilder().append("escape print type \"")
+                        .append(StringUtil_mxJPO.convertMql(trigGrpTypeDef.getMxBusType()))
+                        .append("\" select description dump"));
+        if ((desc != null) && !desc.equals(existingDesc))  {
+            _paramCache.logDebug("    - update description");
+            cmd.append("description \"").append(StringUtil_mxJPO.convertMql(desc)).append("\" ");
+        }
 
         // update type icon
         final File file = new File(_path, trigGrpTypeDef.getIconPath());
@@ -397,6 +434,7 @@ public class InstallDataModel_mxJPO
      * @param _installedDate    used installed date
      * @throws Exception if the trigger group relationship could not be
      *                   installed
+     * @see #PARAM_TRIGGER_GROUP_POLICY_DESCRIPTION
      */
     protected void installTriggerGroupPolicy(final ParameterCache_mxJPO _paramCache,
                                              final String _applName,
@@ -412,6 +450,7 @@ public class InstallDataModel_mxJPO
         final TypeDef_mxJPO trigGrpTypeDef
                 = _paramCache.getMapping().getTypeDef(InstallDataModel_mxJPO.TYPEDEF_TRIGGER_GROUP);
         final String polName = trigGrpTypeDef.getMxBusPolicy();
+        final String desc = _paramCache.getValueString(InstallDataModel_mxJPO.PARAM_TRIGGER_GROUP_POLICY_DESCRIPTION);
 
         _paramCache.logInfo("check policy '" + polName + "'");
         final String installed = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
@@ -427,14 +466,40 @@ public class InstallDataModel_mxJPO
                         .append("\" remove state Inactive"));
         }
 
-        _paramCache.logDebug("    - update description");
-        _paramCache.logDebug("    - update types");
         final StringBuilder cmd = new StringBuilder()
                 .append("escape mod policy \"")
-                .append(StringUtil_mxJPO.convertMql(polName)).append("\" ")
-                .append("description \"Policy used to group trigger definitions.\" ")
-                .append("remove type all add type \"")
-                    .append(StringUtil_mxJPO.convertMql(trigTypeDef.getMxBusType())).append("\" ");
+                .append(StringUtil_mxJPO.convertMql(polName)).append("\" ");
+
+        // check policy description
+        final String existingDesc = MqlUtil_mxJPO.execMql(
+                _paramCache,
+                new StringBuilder().append("escape print policy \"")
+                        .append(StringUtil_mxJPO.convertMql(polName)).append("\" select description dump"));
+        if ((desc != null) && !desc.equals(existingDesc))  {
+            _paramCache.logDebug("    - update description");
+            cmd.append("description \"").append(StringUtil_mxJPO.convertMql(desc)).append("\" ");
+        }
+
+        // assign trigger group type; remove all other types
+        final String existingTypes = MqlUtil_mxJPO.execMql(
+                _paramCache,
+                new StringBuilder().append("escape print policy \"")
+                        .append(StringUtil_mxJPO.convertMql(polName)).append("\" select type dump '\n'"));
+        boolean found = false;
+        if (!"".equals(existingTypes))  {
+            for (final String oneType : existingTypes.split("\n"))  {
+                if (trigGrpTypeDef.getMxBusType().equals(oneType))  {
+                    found = true;
+                } else  {
+                    _paramCache.logInfo("    - remove type '" + oneType + "'");
+                    cmd.append("remove type \"").append(StringUtil_mxJPO.convertMql(oneType)).append("\" ");
+                }
+            }
+        }
+        if (!found)  {
+            _paramCache.logDebug("    - assign type '" + trigGrpTypeDef.getMxBusType() + "'");
+            cmd.append("add type \"").append(StringUtil_mxJPO.convertMql(trigGrpTypeDef.getMxBusType())).append("\" ");
+        }
 
         // append property settings
         final AbstractObject_mxJPO instance = _paramCache.getMapping()
@@ -465,6 +530,7 @@ public class InstallDataModel_mxJPO
      * @param _installedDate    used installed date
      * @throws Exception if the trigger group relationship could not be
      *                   installed
+     * @see #PARAM_TRIGGER_GROUP_RELATION_DESCRIPTION
      */
     protected void installTriggerGroupRelation(final ParameterCache_mxJPO _paramCache,
                                                final String _applName,
@@ -480,6 +546,7 @@ public class InstallDataModel_mxJPO
         final TypeDef_mxJPO trigGrpTypeDef
                 = _paramCache.getMapping().getTypeDef(InstallDataModel_mxJPO.TYPEDEF_TRIGGER_GROUP);
         final String relName = trigGrpTypeDef.getMxBusRelsBoth().iterator().next();
+        final String desc = _paramCache.getValueString(InstallDataModel_mxJPO.PARAM_TRIGGER_GROUP_RELATION_DESCRIPTION);
 
         _paramCache.logInfo("check relationship '" + relName + "'");
         final String installed = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
@@ -492,20 +559,29 @@ public class InstallDataModel_mxJPO
                         .append(StringUtil_mxJPO.convertMql(relName))
                         .append("\""));
         }
-        _paramCache.logDebug("    - update description");
-        _paramCache.logDebug("    - update from / to types");
         _paramCache.logDebug("    - update prevent duplicates");
         final StringBuilder cmd = new StringBuilder()
                 .append("escape mod relationship \"")
                 .append(StringUtil_mxJPO.convertMql(relName)).append("\" ")
-                .append("preventduplicates ")
-                .append("description \"Relationship used to group trigger definitions.\" ")
-                .append("from remove type all add type \"")
-                        .append(StringUtil_mxJPO.convertMql(trigGrpTypeDef.getMxBusType())).append("\" ")
-                .append("to remove type all add type \"")
-                        .append(StringUtil_mxJPO.convertMql(trigTypeDef.getMxBusType())).append("\" ")
-                        .append(" add type \"")
-                        .append(StringUtil_mxJPO.convertMql(trigGrpTypeDef.getMxBusType())).append("\" ");
+                .append("preventduplicates ");
+
+        // check relationship description
+        final String existingDesc = MqlUtil_mxJPO.execMql(
+                _paramCache,
+                new StringBuilder().append("escape print relationship \"")
+                        .append(StringUtil_mxJPO.convertMql(relName)).append("\" select description dump"));
+        if ((desc != null) && !desc.equals(existingDesc))  {
+            _paramCache.logDebug("    - update description");
+            cmd.append("description \"").append(StringUtil_mxJPO.convertMql(desc)).append("\" ");
+        }
+
+        _paramCache.logDebug("    - update from / to types");
+        cmd.append("from remove type all add type \"")
+                .append(StringUtil_mxJPO.convertMql(trigGrpTypeDef.getMxBusType())).append("\" ")
+           .append("to remove type all add type \"")
+                .append(StringUtil_mxJPO.convertMql(trigTypeDef.getMxBusType())).append("\" ")
+                .append(" add type \"")
+                .append(StringUtil_mxJPO.convertMql(trigGrpTypeDef.getMxBusType())).append("\" ");
 
         // append property settings
         final AbstractObject_mxJPO instance = _paramCache.getMapping()
