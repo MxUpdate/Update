@@ -33,6 +33,7 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * Data model interface class.
@@ -154,7 +155,7 @@ public class Interface_mxJPO
      * @see #allTypes
      * @see #types
      */
-    @Override
+    @Override()
     protected void parse(final String _url,
                          final String _content)
     {
@@ -199,7 +200,7 @@ public class Interface_mxJPO
      * @see #allTypes
      * @see #types
      */
-    @Override
+    @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
             throws IOException
@@ -237,7 +238,7 @@ public class Interface_mxJPO
      * @throws IOException if the extension could not be written
      * @see #derived
      */
-    @Override
+    @Override()
     protected void writeEnd(final ParameterCache_mxJPO _paramCache,
                             final Appendable _out)
             throws IOException
@@ -279,7 +280,7 @@ public class Interface_mxJPO
      * @throws Exception if the update from derived class failed
      * @see #TCL_PROCEDURE
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
@@ -341,7 +342,7 @@ public class Interface_mxJPO
      *                   interface is assigned to the interface object
      *                   within MX but not defined anymore
      */
-    @Override
+    @Override()
     public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
                                final String... _args)
             throws Exception
@@ -362,18 +363,20 @@ public class Interface_mxJPO
                 } else if ("-parents".equals(arg))  {
                     parentsStr = _args[++idx];
                 } else  {
-                    throw new Exception("unknown parameter \"" + arg + "\"");
+                    throw new UpdateException_mxJPO(
+                            UpdateException_mxJPO.Error.DM_INTERFACE_UPDATE_UKNOWN_PARAMETER,
+                            arg);
                 }
                 idx++;
             }
 
             // check for equal administration name
             if (!this.getName().equals(name))  {
-                throw new Exception(this.getTypeDef().getLogging()
-                        + " '" + this.getName() + "' was called to"
-                        + " update via update script, but "
-                        + this.getTypeDef().getLogging() + " '" + name + "' was"
-                        + " called in the procedure...");
+                throw new UpdateException_mxJPO(
+                        UpdateException_mxJPO.Error.DM_INTERFACE_UPDATE_WRONG_NAME,
+                        this.getTypeDef().getLogging(),
+                        this.getName(),
+                        name);
             }
 
             // get all parent interfaces
@@ -390,17 +393,19 @@ public class Interface_mxJPO
             // check if all current parents are within new parents
             for (final String curParent : this.derived)  {
                 if (!newParents.contains(curParent))  {
-                    throw new Exception("Current parent " + this.getTypeDef().getLogging()
-                            + " '" + curParent + "' must be removed from " + this.getTypeDef().getLogging()
-                            + " '" + this.getName() + "'. This is not allowed!");
+                    throw new UpdateException_mxJPO(
+                            UpdateException_mxJPO.Error.DM_INTERFACE_UPDATE_REMOVING_PARENT,
+                            this.getTypeDef().getLogging(),
+                            this.getName(),
+                            curParent);
                 }
             }
 
             // and append all not current derived parents
             if (!newParents.isEmpty())  {
                 final StringBuilder cmd = new StringBuilder()
-                        .append("mod ").append(this.getTypeDef().getMxAdminName())
-                        .append(" '").append(this.getName()).append("\' derived \"");
+                        .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                        .append(" '").append(StringUtil_mxJPO.convertMql(this.getName())).append("\' derived ");
                 boolean first = true;
                 for (final String newParent : newParents)  {
                     if (!this.derived.contains(newParent))  {
@@ -411,9 +416,8 @@ public class Interface_mxJPO
                     } else  {
                         cmd.append(',');
                     }
-                    cmd.append(newParent);
+                    cmd.append('\"').append(StringUtil_mxJPO.convertMql(newParent)).append('\"');
                 }
-                cmd.append('\"');
                 MqlUtil_mxJPO.execMql(_paramCache, cmd);
             }
         }

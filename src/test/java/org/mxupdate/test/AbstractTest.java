@@ -37,6 +37,7 @@ import matrix.util.MatrixException;
 import org.apache.commons.codec.binary.Base64;
 import org.mxupdate.test.data.AbstractData;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -308,6 +309,43 @@ public class AbstractTest
      * Makes an update for given administration <code>_object</code>
      * definition.
      *
+     * @param _object       object if the update definition
+     * @param _errorCode    expected error code
+     */
+    protected void updateFailure(final AbstractData<?> _object,
+                                 final UpdateException_mxJPO.Error _errorCode)
+    {
+        this.updateFailure(_object.getCIFileName(), _object.ciFile(), _errorCode);
+    }
+
+    /**
+     * Makes an update for given <code>_fileName</code> and <code>_code</code>.
+     *
+     * @param _fileName     name of the file to update
+     * @param _code         TCL update code
+     * @param _errorCode    expected error code
+     */
+    protected void updateFailure(final String _fileName,
+                                 final String _code,
+                                 final UpdateException_mxJPO.Error _errorCode)
+    {
+         Exception ex = null;
+         try  {
+             final Map<String,String> params = new HashMap<String,String>();
+             params.put(_fileName, _code);
+             this.<String>jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+         } catch (final Exception e)  {
+             ex = e;
+         }
+         Assert.assertNotNull(ex, "check that action is not allowed");
+         Assert.assertTrue(ex.getMessage().indexOf("UpdateError #" + _errorCode.getCode() + ":") >= 0,
+                           "check for correct error code #" + _errorCode.getCode());
+    }
+
+    /**
+     * Makes an update for given administration <code>_object</code>
+     * definition.
+     *
      * @param _object   object if the update definition
      * @return returned string with the update logging
      * @throws IOException      if the parameter could not be encoded
@@ -373,6 +411,11 @@ public class AbstractTest
             elements = this.mqlAsSet("escape list " + _type.mxType + " \"" + AbstractTest.PREFIX + "*\"");
         } else  {
             elements = this.mqlAsSet("escape list " + _type.mxType);
+        }
+        if (_type == CI.INTERFACE)  {
+            for (final String element : elements)  {
+                this.mql("escape mod " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\" remove derived");
+            }
         }
         for (final String element : elements)  {
             if (element.startsWith(AbstractTest.PREFIX))  {

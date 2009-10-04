@@ -20,6 +20,8 @@
 
 package org.mxupdate.update.util;
 
+import java.text.MessageFormat;
+
 /**
  * Exception class to throw errors within updates (if a check for an update
  * failed).
@@ -106,6 +108,58 @@ public class UpdateException_mxJPO
                 "removing an unit from a dimension is not allowed (data will be changed potentially)"),
 
         /**
+         * <p>A wrong parameter was given the the called TCL procedure
+         * <code>testParents</code> which defines the derived interfaces.</p>
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>wrong parameter</li>
+         * </ol>
+         * </p>
+         *
+         * @see org.mxupdate.update.datamodel.Interface_mxJPO
+         */
+        DM_INTERFACE_UPDATE_UKNOWN_PARAMETER(10901, "Unknown parameter {0} defined."),
+
+        /**
+         * <p>The name of the interface which calls the TCL procedure
+         * <code>testParents</code> and which is defined within the call as
+         * parameter is not equal.</p>
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>administration type (should be interface)</li>
+         * <li>name of the interface which calls the TCL update procedure</li>
+         * <li>name of the interface which is defined as parameter for the TCL
+         *     update procedure</li>
+         * </ol>
+         * </p>
+         *
+         * @see org.mxupdate.update.datamodel.Interface_mxJPO
+         */
+        DM_INTERFACE_UPDATE_WRONG_NAME(10902,
+                "{0} ''{1}'' was called to update via update script, but {0} ''{1}'' was called in the TCL procedure."),
+
+        /**
+         * <p>An interface is already derived from another interface, but
+         * within the update this derived interface must be removed. This could
+         * end in potentially losing data and so this action is not allowed.</p>
+         *
+         * <p>Parameters:<br/>
+         * <ol>
+         * <li>administration type (should be interface)</li>
+         * <li>interface which is tried to update</li>
+         * <li>current derived interface which must be removed (but is not
+         *     allowed)</li>
+         * </ol>
+         * </p>
+         *
+         * @see org.mxupdate.update.datamodel.Interface_mxJPO
+         */
+        DM_INTERFACE_UPDATE_REMOVING_PARENT(10903,
+                "Current parent {0} ''{2}'' must be removed from {0} ''{1}''. This is not allowed!"),
+
+        /**
          * If the name of a configuration item could not be extracted from a
          * file name.
          *
@@ -170,12 +224,16 @@ public class UpdateException_mxJPO
      * Constructor to initialize this exception. The exception message will
      * be a concatenation of the {@link Error#code} and {@link Error#text}.
      *
-     * @param _error    error enumeration instance
+     * @param _error        error enumeration instance
+     * @param _arguments    arguments for the exception text used to format the
+     *                      message
      * @see #error
      */
-    public UpdateException_mxJPO(final Error _error)
+    public UpdateException_mxJPO(final Error _error,
+                                 final Object... _arguments)
     {
-        super("UpdateError #" + _error.getCode() + ": " + _error.getText());
+        super("UpdateError #" + _error.getCode() + ": " +
+                MessageFormat.format(_error.getText(), _arguments));
         this.error = _error;
     }
 

@@ -27,82 +27,60 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.program.AbstractProgramData;
 import org.testng.Assert;
 
 /**
- * Used to define a type, create them and test the result.
+ * Used to define a relationship, create them and test the result.
  *
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class TypeData
-    extends AbstractDataWithTrigger<TypeData>
+public class RelationshipData
+    extends AbstractDataWithTrigger<RelationshipData>
 {
     /**
      * Within export the description must be defined.
      */
     private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(1);
     static  {
-        TypeData.REQUIRED_EXPORT_VALUES.add("description");
+        RelationshipData.REQUIRED_EXPORT_VALUES.add("description");
     }
 
     /**
-     * All methods of this type.
-     *
-     * @see #addMethod(AbstractProgramData)
-     * @see #create()
-     */
-    private final Set<AbstractProgramData<?>> methods = new HashSet<AbstractProgramData<?>>();
-
-    /**
-     * All attributes of this type.
+     * All attributes of this relationship.
      */
     private final Set<AbstractAttribute<?>> attributes = new HashSet<AbstractAttribute<?>>();
 
     /**
-     * Initialize this type data with given <code>_name</code>.
+     * Initialize this relationship data with given <code>_name</code>.
      *
-     * @param _test     related test implementation (where this type is
+     * @param _test     related test implementation (where this relationship is
      *                  defined)
-     * @param _name     name of the type
+     * @param _name     name of the relationship
      */
-    public TypeData(final AbstractTest _test,
-                    final String _name)
+    public RelationshipData(final AbstractTest _test,
+                            final String _name)
     {
-        super(_test, AbstractTest.CI.TYPE, _name,
-              "TYPE_", "datamodel/type",
-              TypeData.REQUIRED_EXPORT_VALUES);
+        super(_test, AbstractTest.CI.RELATIONSHIP, _name,
+              "RELATIONSHIP_", "datamodel/relationship",
+              RelationshipData.REQUIRED_EXPORT_VALUES);
     }
 
     /**
-     * Assigns the <code>_method</code> to this type.
-     *
-     * @param _method   method to assign
-     * @return this type data instance
-     * @see #methods
-     */
-    public TypeData addMethod(final AbstractProgramData<?> _method)
-    {
-        this.methods.add(_method);
-        return this;
-    }
-
-    /**
-     * Assigns the <code>_attribute</code> to this type.
+     * Assigns the <code>_attribute</code> to this relationship.
      *
      * @param _attribute        attribute to assign
-     * @return this type data instance
+     * @return this relationship data instance
      * @see #attributes
      */
-    public TypeData addAttribute(final AbstractAttribute<?> _attribute)
+    public RelationshipData addAttribute(final AbstractAttribute<?> _attribute)
     {
         this.attributes.add(_attribute);
         return this;
     }
 
     /**
-     * Returns the TCL update file of this type data instance.
+     * Returns the TCL update file of this relationship data instance.
      *
      * @return TCL update file content
      */
@@ -110,11 +88,11 @@ public class TypeData
     public String ciFile()
     {
         final StringBuilder cmd = new StringBuilder()
-                .append("mql escape mod type \"${NAME}\"");
+                .append("mql escape mod relationship \"${NAME}\"");
         this.append4CIFileValues(cmd);
 
         // append attributes
-        cmd.append("\n\ntestAttributes -type \"${NAME}\" -attributes [list \\\n");
+        cmd.append("\n\ntestAttributes -relationship \"${NAME}\" -attributes [list \\\n");
         for (final AbstractAttribute<?> attribute : this.attributes)  {
             cmd.append("    \"").append(AbstractTest.convertTcl(attribute.getName())).append("\" \\\n");
         }
@@ -124,29 +102,23 @@ public class TypeData
     }
 
     /**
-     * Create the related type in MX for this type data instance and appends
-     * the {@link #methods} and {@link #attributes}.
+     * Create the related relationship in MX for this relationship data
+     * instance and appends the {@link #attributes}.
      *
-     * @return this type data instance
+     * @return this relationship data instance
      * @throws MatrixException if create failed
      * @see #methods
      * @see #attributes
      */
     @Override()
-    public TypeData create()
+    public RelationshipData create()
         throws MatrixException
     {
         if (!this.isCreated())  {
             this.setCreated(true);
 
             final StringBuilder cmd = new StringBuilder();
-            cmd.append("escape add type \"").append(AbstractTest.convertMql(this.getName())).append('\"');
-
-            // append methods
-            for (final AbstractProgramData<?> method : this.methods)  {
-                method.create();
-                cmd.append(" method \"").append(AbstractTest.convertMql(method.getName())).append("\"");
-            }
+            cmd.append("escape add relationship \"").append(AbstractTest.convertMql(this.getName())).append('\"');
 
             // append attributes
             for (final AbstractAttribute<?> attribute : this.attributes)  {
@@ -160,26 +132,6 @@ public class TypeData
         }
 
         return this;
-    }
-
-    /**
-     * Appends the adds for the {@link #methods} and {@link #attributes}.
-     *
-     * @param _needAdds     set with add strings used to append the adds
-     * @see #methods
-     * @see #attributes
-     */
-    @Override()
-    protected void evalAdds4CheckExport(final Set<String> _needAdds)
-    {
-        super.evalAdds4CheckExport(_needAdds);
-
-        // append methods
-        for (final AbstractProgramData<?> method : this.methods)  {
-            final StringBuilder cmd = new StringBuilder()
-                    .append("method \"").append(AbstractTest.convertTcl(method.getName())).append("\"");
-            _needAdds.add(cmd.toString());
-        }
     }
 
     /**

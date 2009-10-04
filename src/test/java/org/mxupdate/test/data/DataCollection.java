@@ -33,6 +33,8 @@ import org.mxupdate.test.data.datamodel.AttributeDate;
 import org.mxupdate.test.data.datamodel.AttributeInteger;
 import org.mxupdate.test.data.datamodel.AttributeReal;
 import org.mxupdate.test.data.datamodel.AttributeString;
+import org.mxupdate.test.data.datamodel.InterfaceData;
+import org.mxupdate.test.data.datamodel.RelationshipData;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.program.AbstractProgramData;
 import org.mxupdate.test.data.program.JPOProgramData;
@@ -84,6 +86,14 @@ public class DataCollection
     private final Map<String,InquiryData> inquiries = new HashMap<String,InquiryData>();
 
     /**
+     * All interfaces.
+     *
+     * @see #getInterface(String)
+     * @see #create()
+     */
+    private final Map<String,InterfaceData> interfaces = new HashMap<String,InterfaceData>();
+
+    /**
      * All menus.
      *
      * @see #getMenu(String)
@@ -99,6 +109,14 @@ public class DataCollection
      * @see #create()
      */
     private final Map<String,AbstractProgramData<?>> programs = new HashMap<String,AbstractProgramData<?>>();
+
+    /**
+     * All relationships.
+     *
+     * @see #getRelationship(String)
+     * @see #create()
+     */
+    private final Map<String,RelationshipData> relationships = new HashMap<String,RelationshipData>();
 
     /**
      * All types.
@@ -135,6 +153,12 @@ public class DataCollection
         }
         for (final TypeData type : this.types.values())  {
             type.create();
+        }
+        for (final RelationshipData relationship : this.relationships.values())  {
+            relationship.create();
+        }
+        for (final InterfaceData inter : this.interfaces.values())  {
+            inter.create();
         }
         for (final Command command : this.commands.values())  {
             command.create();
@@ -276,6 +300,22 @@ public class DataCollection
     }
 
     /**
+     * Returns the related interface instance for <code>_name</code>. If an
+     * interface is not already defined, a new interface instance is created.
+     *
+     * @param _name     name of searched inquiry
+     * @return interface instance
+     * @see #interfaces
+     */
+    public InterfaceData getInterface(final String _name)
+    {
+        if (!this.interfaces.containsKey(_name))  {
+            this.interfaces.put(_name, new InterfaceData(this.test, _name));
+        }
+        return this.interfaces.get(_name);
+    }
+
+    /**
      * Returns the related menu instance for <code>_name</code>. If a
      * menu is not already defined, a new menu instance is created.
      *
@@ -332,6 +372,22 @@ public class DataCollection
     public Collection<AbstractProgramData<?>> getPrograms()
     {
         return this.programs.values();
+    }
+
+    /**
+     * Returns the related relationship instance for <code>_name</code>. If a
+     * relationship is not already defined, a relationship instance is created.
+     *
+     * @param _name     name of searched relationship
+     * @return relationship instance
+     * @see #relationships
+     */
+    public RelationshipData getRelationship(final String _name)
+    {
+        if (!this.relationships.containsKey(_name))  {
+            this.relationships.put(_name, new RelationshipData(this.test, _name));
+        }
+        return this.relationships.get(_name);
     }
 
     /**
