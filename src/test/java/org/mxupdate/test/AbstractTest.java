@@ -109,14 +109,19 @@ public class AbstractTest
         TYPE("type", "Type", "TYPE", true),
 
         /**
-         * Configuration item Program JPO.
+         * Configuration item JPO program.
          */
         JPO("program", "JPO", null, true),
 
         /**
-         * Configuration item Program MQL.
+         * Configuration item MQL program.
          */
         MQL_PROGRAM("program", "Program", null, true),
+
+        /**
+         * Configuration item page program.
+         */
+        PAGE("page", "Page", null, true),
 
         /**
          * Configuration item command.

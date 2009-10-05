@@ -39,6 +39,7 @@ import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.program.AbstractProgramData;
 import org.mxupdate.test.data.program.JPOProgramData;
 import org.mxupdate.test.data.program.MQLProgramData;
+import org.mxupdate.test.data.program.PageData;
 import org.mxupdate.test.data.userinterface.Command;
 import org.mxupdate.test.data.userinterface.InquiryData;
 import org.mxupdate.test.data.userinterface.Menu;
@@ -100,6 +101,14 @@ public class DataCollection
      * @see #create()
      */
     private final Map<String,Menu> menus = new HashMap<String,Menu>();
+
+    /**
+     * All pages.
+     *
+     * @see #getPage(String)
+     * @see #create()
+     */
+    private final Map<String,PageData> pages = new HashMap<String,PageData>();
 
     /**
      * All programs.
@@ -361,6 +370,22 @@ public class DataCollection
             this.programs.put(_name, new MQLProgramData(this.test, _name));
         }
         return (MQLProgramData) this.programs.get(_name);
+    }
+
+    /**
+     * Returns the related page instance for <code>_name</code>. If a
+     * page is not already defined, a page instance is created.
+     *
+     * @param _name     name of searched page
+     * @return page instance
+     * @see #pages
+     */
+    public PageData getPage(final String _name)
+    {
+        if (!this.pages.containsKey(_name))  {
+            this.pages.put(_name, new PageData(this.test, _name));
+        }
+        return this.pages.get(_name);
     }
 
     /**

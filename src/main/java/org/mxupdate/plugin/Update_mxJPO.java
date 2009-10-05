@@ -140,6 +140,7 @@ public class Update_mxJPO
                                   final String[] _args)
             throws Exception
     {
+try {
         String ret = "";
 
         final Map<String,String> files = this.<Map<String,String>>decode(_args, 0);
@@ -176,6 +177,10 @@ public class Update_mxJPO
         }
 
         return ret;
+} catch (final Exception e)  {
+    e.printStackTrace();
+    throw e;
+}
     }
 
     /**

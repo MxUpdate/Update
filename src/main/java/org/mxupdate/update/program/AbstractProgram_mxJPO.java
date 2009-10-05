@@ -131,13 +131,47 @@ public abstract class AbstractProgram_mxJPO
     {
         // append statement to reset execute user
         final StringBuilder cmd = new StringBuilder()
-                .append("mod prog \"").append(this.getName())
+                .append("mod ").append(this.getTypeDef().getMxAdminName()).append(" \"").append(this.getName())
                 .append("\" execute user \"\";\n");
 
+        this.appendResetProperties(_paramCache, cmd);
+
+        // append update code
+        cmd.append(_updateCode);
+
+        // append standard properties
+        this.appendProperties(_paramCache, cmd, _newVersion, _file);
+
+        // read symbolic names
+        this.readSymbolicNames(_paramCache);
+
+        // append registration of symbolic names
+        this.appendSymbolicNameRegistration(_paramCache,
+                                            this.calcDefaultSymbolicName(_paramCache),
+                                            cmd);
+
+        // and execute alls
+        MqlUtil_mxJPO.execMql(_paramCache, cmd);
+    }
+
+    /**
+     * Appends the MQL code to reset the not standard properties.
+     *
+     * @param _paramCache   parameter cache
+     * @param _cmd          string builder with the update code
+     * @throws MatrixException if property information from this object could
+     *                         not be fetched
+     */
+    protected void appendResetProperties(final ParameterCache_mxJPO _paramCache,
+                                         final StringBuilder _cmd)
+        throws MatrixException
+    {
         // append MQL statements to reset properties
         final String prpStr = MqlUtil_mxJPO.execMql(_paramCache,
-                                      new StringBuilder().append("print program \"").append(this.getName())
-                                           .append("\" select property.name property.to dump ' @@@@@@'"));
+                                      new StringBuilder().append("escape print ")
+                                              .append(this.getTypeDef().getMxAdminName()).append(" \"")
+                                              .append(StringUtil_mxJPO.convertMql(this.getName()))
+                                              .append("\" select property.name property.to dump ' @@@@@@'"));
         final String[] prpArr = prpStr.toString().split("(@@@@@@)");
         final int length = (prpArr.length + 1) / 2;
         for (int idxName = 0, idxTo = length; idxName < length; idxName++, idxTo++)  {
@@ -146,27 +180,43 @@ public abstract class AbstractProgram_mxJPO
             if (propDef == null)  {
 // TODO: if to is defined, the remove must be specified the to ....
                 final String to = (idxTo < length) ? prpArr[idxTo].trim() : "";
-                cmd.append("mod prog \"").append(this.getName())
-                   .append("\" remove property \"").append(name).append("\";\n");
+                _cmd.append("escape mod ").append(this.getTypeDef().getMxAdminName()).append(" \"")
+                    .append(StringUtil_mxJPO.convertMql(this.getName()))
+                    .append("\" remove property \"").append(name).append("\";\n");
             }
         }
+    }
 
+    /**
+     * Appends the MQL code to set the &quot;standard&quot; properties to the
+     * <code>_cmd</code> string builder.
+     *
+     * @param _paramCache   parameter cache
+     * @param _cmd          string builder with the update code
+     * @param _newVersion   new version of the program / JPO to set
+     * @param _file         file to update (to get the file date)
+     */
+    protected void appendProperties(final ParameterCache_mxJPO _paramCache,
+                                    final StringBuilder _cmd,
+                                    final String _newVersion,
+                                    final File _file)
+    {
         // append update code
-        cmd.append(_updateCode)
-           .append("mod prog \"").append(this.getName()).append('\"');
+        _cmd.append("escape mod ").append(this.getTypeDef().getMxAdminName())
+            .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"');
 
         // define version property
-        cmd.append(" add property \"").append(PropertyDef_mxJPO.VERSION.getPropName(_paramCache)).append("\" ")
-           .append("value \"").append(_newVersion != null ? _newVersion : "").append('\"');
+        _cmd.append(" add property \"").append(PropertyDef_mxJPO.VERSION.getPropName(_paramCache)).append("\" ")
+            .append("value \"").append(_newVersion != null ? _newVersion : "").append('\"');
         // define file date property
-        cmd.append(" add property \"").append(PropertyDef_mxJPO.FILEDATE.getPropName(_paramCache)).append("\" ")
-           .append("value \"")
-           .append(StringUtil_mxJPO.formatFileDate(_paramCache, new Date(_file.lastModified()))).append('\"');
+        _cmd.append(" add property \"").append(PropertyDef_mxJPO.FILEDATE.getPropName(_paramCache)).append("\" ")
+            .append("value \"")
+            .append(StringUtil_mxJPO.formatFileDate(_paramCache, new Date(_file.lastModified()))).append('\"');
         // is installed date property defined?
         if ((this.getInstallationDate() == null) || "".equals(this.getInstallationDate()))  {
             final String date = StringUtil_mxJPO.formatInstalledDate(_paramCache, new Date());
             _paramCache.logTrace("    - define installed date '" + date + "'");
-            cmd.append(" add property \"")
+            _cmd.append(" add property \"")
                .append(PropertyDef_mxJPO.INSTALLEDDATE.getPropName(_paramCache)).append("\" ")
                .append("value \"").append(date).append('\"');
         }
@@ -181,14 +231,15 @@ public abstract class AbstractProgram_mxJPO
         }
         if (installer != null)  {
             _paramCache.logTrace("    - define installer '" + installer + "'");
-            cmd.append(" add property \"").append(PropertyDef_mxJPO.INSTALLER.getPropName(_paramCache)).append("\" ")
+            _cmd.append(" add property \"").append(PropertyDef_mxJPO.INSTALLER.getPropName(_paramCache)).append("\" ")
                .append("value \"").append(installer).append('\"');
         }
         // is original name property defined?
         if ((this.getOriginalName() == null) && "".equals(this.getOriginalName()))  {
             _paramCache.logTrace("    - define original name '" + this.getName() + "'");
-            cmd.append(" add property \"").append(PropertyDef_mxJPO.ORIGINALNAME.getPropName(_paramCache)).append("\" ")
-               .append("value \"").append(this.getName()).append('\"');
+            _cmd.append(" add property \"")
+                .append(PropertyDef_mxJPO.ORIGINALNAME.getPropName(_paramCache)).append("\" ")
+                .append("value \"").append(this.getName()).append('\"');
         }
         // exists no application property or application property not equal?
         String appl = null;
@@ -203,7 +254,7 @@ public abstract class AbstractProgram_mxJPO
         }
         if (!appl.equals(this.getApplication()))  {
             _paramCache.logTrace("    - define application '" + appl + "'");
-            cmd.append(" add property \"").append(PropertyDef_mxJPO.APPLICATION.getPropName(_paramCache)).append("\" ")
+            _cmd.append(" add property \"").append(PropertyDef_mxJPO.APPLICATION.getPropName(_paramCache)).append("\" ")
                .append("value \"").append(appl).append('\"');
         }
         // exists no author property or author property not equal?
@@ -217,20 +268,9 @@ public abstract class AbstractProgram_mxJPO
         }
         if (author != null)  {
             _paramCache.logTrace("    - define author '" + author + "'");
-            cmd.append(" add property \"").append(PropertyDef_mxJPO.AUTHOR.getPropName(_paramCache)).append("\" ")
+            _cmd.append(" add property \"").append(PropertyDef_mxJPO.AUTHOR.getPropName(_paramCache)).append("\" ")
                .append("value \"").append(author).append('\"');
         }
-        cmd.append(";\n");
-
-        // read symbolic names
-        this.readSymbolicNames(_paramCache);
-
-        // append registration of symbolic names
-        this.appendSymbolicNameRegistration(_paramCache,
-                                            this.calcDefaultSymbolicName(_paramCache),
-                                            cmd);
-
-        // and execute alls
-        MqlUtil_mxJPO.execMql(_paramCache, cmd);
+        _cmd.append(";\n");
     }
 }

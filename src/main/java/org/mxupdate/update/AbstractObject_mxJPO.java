@@ -408,8 +408,8 @@ public abstract class AbstractObject_mxJPO
         // check for existing administration type...
         if (this.getTypeDef().getMxAdminName() != null)  {
             final String tmp = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
-                    .append("print ").append(this.getTypeDef().getMxAdminName())
-                    .append(" \"").append(this.getName()).append("\" ")
+                    .append("escape print ").append(this.getTypeDef().getMxAdminName())
+                    .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
                     .append(this.getTypeDef().getMxAdminSuffix())
                     .append(" select property[").append(_prop.getPropName(_paramCache)).append("] dump"));
             final int length = 7 + _prop.getPropName(_paramCache).length();
