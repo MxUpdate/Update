@@ -136,12 +136,6 @@
             <scope>test</scope>
             <classifier>jdk15</classifier>
         </dependency>
-        <!-- TestNG for automatic tests -->
-        <dependency>
-                <groupId>org.riedelcastro</groupId>
-                <artifactId>gcupload-maven-plugin</artifactId>
-            <version>0.9</version>
-        </dependency>
     </dependencies>
 
     <build>
@@ -170,90 +164,97 @@
                     </suiteXmlFiles>
                 </configuration>
             </plugin>
-            <!-- pack MxUpdate Update Install code + Javadoc -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/assembly/install.xml</descriptor>
-                        <descriptor>src/assembly/javadoc.xml</descriptor>
-                    </descriptors>
-                    <finalName>mxupdate.V${project.version}</finalName>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!--  create JavaDoc -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <!-- with maven 2.1 this will be 'prepare-package' -->
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>javadoc</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- google code upload -->
-            <plugin>
-                <groupId>org.riedelcastro</groupId>
-                <artifactId>gcupload-maven-plugin</artifactId>
-                <version>0.9</version>
-                <configuration>
-                    <projectName>mxupdate</projectName>
-                    <allowSnapshots>false</allowSnapshots>
-                    <uploads>
-                        <upload>
-                            <prefix>mxupdate.V${project.version}</prefix>
-                            <postfix>javadoc</postfix>
-                            <extensions>zip</extensions>
-                            <labels>Featured</labels>
-                            <summary>MxUpdate Update Deployment Tool V${project.version} JavaDoc</summary>
-                        </upload>
-                        <upload>
-                            <prefix>mxupdate.V${project.version}</prefix>
-                            <postfix>install</postfix>
-                            <extensions>tar.bz2</extensions>
-                            <labels>Featured</labels>
-                            <summary>MxUpdate Update Deployment Tool V${project.version} Installation Files as TarBZ2-Container</summary>
-                        </upload>
-                        <upload>
-                            <prefix>mxupdate.V${project.version}</prefix>
-                            <postfix>install</postfix>
-                            <extensions>tar.gz</extensions>
-                            <labels>Featured</labels>
-                            <summary>MxUpdate Update Deployment Tool V${project.version} Installation Files as TarGZ-Container</summary>
-                        </upload>
-                        <upload>
-                            <prefix>mxupdate.V${project.version}</prefix>
-                            <postfix>install</postfix>
-                            <extensions>zip</extensions>
-                            <labels>Featured</labels>
-                            <summary>MxUpdate Update Deployment Tool V${project.version} Installation Files as Zip-Container</summary>
-                        </upload>
-                    </uploads>
-                </configuration>
-            </plugin>
         </plugins>
-
-        <extensions>
-            <!--  needed that an upload of the site works -->
-            <extension>
-                <groupId>org.jvnet.wagon-svn</groupId>
-                <artifactId>wagon-svn</artifactId>
-                <version>1.9</version>
-            </extension>
-        </extensions>
     </build>
+
+    <profiles>
+        <profile>
+            <id>release-profile</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- pack MxUpdate Update Install code + Javadoc -->
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/assembly/install.xml</descriptor>
+                                <descriptor>src/assembly/javadoc.xml</descriptor>
+                            </descriptors>
+                            <finalName>mxupdate.V${project.version}</finalName>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!--  create JavaDoc -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <!-- with maven 2.1 this will be 'prepare-package' -->
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>javadoc</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- google code upload -->
+                    <plugin>
+                        <groupId>org.riedelcastro</groupId>
+                        <artifactId>gcupload-maven-plugin</artifactId>
+                        <version>0.9</version>
+                        <configuration>
+                            <projectName>mxupdate</projectName>
+                            <allowSnapshots>false</allowSnapshots>
+                            <uploads>
+                                <upload>
+                                    <prefix>mxupdate.V${project.version}</prefix>
+                                    <postfix>javadoc</postfix>
+                                    <extensions>zip</extensions>
+                                    <labels>Featured</labels>
+                                    <summary>MxUpdate Update Deployment Tool V${project.version} JavaDoc</summary>
+                                </upload>
+                                <upload>
+                                    <prefix>mxupdate.V${project.version}</prefix>
+                                    <postfix>install</postfix>
+                                    <extensions>tar.bz2</extensions>
+                                    <labels>Featured</labels>
+                                    <summary>MxUpdate Update Deployment Tool V${project.version} Installation Files as TarBZ2-Container</summary>
+                                </upload>
+                                <upload>
+                                    <prefix>mxupdate.V${project.version}</prefix>
+                                    <postfix>install</postfix>
+                                    <extensions>tar.gz</extensions>
+                                    <labels>Featured</labels>
+                                    <summary>MxUpdate Update Deployment Tool V${project.version} Installation Files as TarGZ-Container</summary>
+                                </upload>
+                                <upload>
+                                    <prefix>mxupdate.V${project.version}</prefix>
+                                    <postfix>install</postfix>
+                                    <extensions>zip</extensions>
+                                    <labels>Featured</labels>
+                                    <summary>MxUpdate Update Deployment Tool V${project.version} Installation Files as Zip-Container</summary>
+                                </upload>
+                            </uploads>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <reporting>
         <plugins>
