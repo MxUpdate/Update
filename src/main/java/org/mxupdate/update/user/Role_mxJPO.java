@@ -35,6 +35,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
+ * The class is used to export, create, delete and update roles within MX.
  *
  * @author Tim Moxter
  * @version $Id$
@@ -154,10 +155,13 @@ public class Role_mxJPO
             case ORGANIZATION:
                 _out.append(" \\\n    asanorg");
                 break;
+            case ROLE:
+            default:
+                // the role is the default value
         }
         // parent roles
         for (final String role : this.parentRoles)  {
-            _out.append("\nmql mod role \"")
+            _out.append("\nmql escape mod role \"")
                 .append(StringUtil_mxJPO.convertTcl(role))
                 .append("\" child \"${NAME}\"");
         }

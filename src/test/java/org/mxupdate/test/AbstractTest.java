@@ -124,6 +124,11 @@ public class AbstractTest
         PAGE("page", "Page", null, true),
 
         /**
+         * Configuration item role.
+         */
+        ROLE("role", "Role", "ROLE", true),
+
+        /**
          * Configuration item command.
          */
         COMMAND("command", "Command", "COMMAND", true),
@@ -417,7 +422,7 @@ public class AbstractTest
         } else  {
             elements = this.mqlAsSet("escape list " + _type.mxType);
         }
-        if (_type == CI.INTERFACE)  {
+        if (_type == AbstractTest.CI.INTERFACE)  {
             for (final String element : elements)  {
                 this.mql("escape mod " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\" remove derived");
             }

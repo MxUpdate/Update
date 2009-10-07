@@ -40,6 +40,7 @@ import org.mxupdate.test.data.program.AbstractProgramData;
 import org.mxupdate.test.data.program.JPOProgramData;
 import org.mxupdate.test.data.program.MQLProgramData;
 import org.mxupdate.test.data.program.PageData;
+import org.mxupdate.test.data.user.RoleData;
 import org.mxupdate.test.data.userinterface.Command;
 import org.mxupdate.test.data.userinterface.InquiryData;
 import org.mxupdate.test.data.userinterface.Menu;
@@ -128,6 +129,14 @@ public class DataCollection
     private final Map<String,RelationshipData> relationships = new HashMap<String,RelationshipData>();
 
     /**
+     * All roles.
+     *
+     * @see #getRole(String)
+     * @see #create()
+     */
+    private final Map<String,RoleData> roles = new HashMap<String,RoleData>();
+
+    /**
      * All types.
      *
      * @see #getType(String)
@@ -168,6 +177,9 @@ public class DataCollection
         }
         for (final InterfaceData inter : this.interfaces.values())  {
             inter.create();
+        }
+        for (final RoleData role : this.roles.values())  {
+            role.create();
         }
         for (final Command command : this.commands.values())  {
             command.create();
@@ -413,6 +425,22 @@ public class DataCollection
             this.relationships.put(_name, new RelationshipData(this.test, _name));
         }
         return this.relationships.get(_name);
+    }
+
+    /**
+     * Returns the related role instance for <code>_name</code>. If a
+     * role is not already defined, a role instance is created.
+     *
+     * @param _name     name of searched role
+     * @return role instance
+     * @see #roles
+     */
+    public RoleData getRole(final String _name)
+    {
+        if (!this.roles.containsKey(_name))  {
+            this.roles.put(_name, new RoleData(this.test, _name));
+        }
+        return this.roles.get(_name);
     }
 
     /**
