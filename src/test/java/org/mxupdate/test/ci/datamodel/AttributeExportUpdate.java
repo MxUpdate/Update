@@ -68,9 +68,9 @@ public class AttributeExportUpdate
 
         final DataCollection data6 = new DataCollection(this);
         data5.getAttributeString("Test")
-                .addRange(new AttributeString.Range("=", ""))
-                .addRange(new AttributeString.Range("=", "\""))
-                .addRange(new AttributeString.Range("=", "Test"))
+                .addRange(new AttributeStringData.Range("=", ""))
+                .addRange(new AttributeStringData.Range("=", "\""))
+                .addRange(new AttributeStringData.Range("=", "Test"))
                 .addTrigger(new AbstractDataWithTrigger.TriggerAction("modify", data5.getMQLProgram("Test Program")));
 
         final DataCollection data7 = new DataCollection(this);
