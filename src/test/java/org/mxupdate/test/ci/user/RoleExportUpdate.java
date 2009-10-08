@@ -58,8 +58,8 @@ public class RoleExportUpdate
 
         final RoleData role3 = new RoleData(this, "hallo \" test")
                 .setValue("description", "\"\\\\ hallo")
-                .assignParentRole(new RoleData(this, "hallo parent1 \" test"))
-                .assignParentRole(new RoleData(this, "hallo parent2 \" test"));
+                .assignParent(new RoleData(this, "hallo parent1 \" test"))
+                .assignParent(new RoleData(this, "hallo parent2 \" test"));
 
         final RoleData role4 = new RoleData(this, "hallo \" test")
                 .setSite(new SiteData(this, "Test \" Site"));
@@ -113,7 +113,7 @@ public class RoleExportUpdate
         throws Exception
     {
         // create all parent roles
-        for (final RoleData parentRole : _role.getParentRoles())  {
+        for (final RoleData parentRole : _role.getParent())  {
             parentRole.create();
         }
 

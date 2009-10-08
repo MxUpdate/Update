@@ -124,6 +124,11 @@ public class AbstractTest
         PAGE("page", "Page", null, true),
 
         /**
+         * Configuration item group.
+         */
+        GROUP("group", "Group", "GROUP", true),
+
+        /**
          * Configuration item role.
          */
         ROLE("role", "Role", "ROLE", true),

@@ -105,7 +105,6 @@ public class Role_mxJPO
     }
 
     /**
-     * Parses all role specific URLs.
      * <p>Parses all role specific URL values. This includes:
      * <ul>
      * <li>{@link #parentRoles parent roles}</li>

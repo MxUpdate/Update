@@ -23,25 +23,25 @@ package org.mxupdate.test.data.user;
 import org.mxupdate.test.AbstractTest;
 
 /**
- * The class is used to define all role objects used to create / update and
+ * The class is used to define all group objects used to create / update and
  * to export.
  *
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class RoleData
-    extends AbstractCollectionUser<RoleData>
+public class GroupData
+    extends AbstractCollectionUser<GroupData>
 {
     /**
      * Constructor to initialize this role.
      *
-     * @param _test     related test implementation (where this role is
+     * @param _test     related test implementation (where this group is
      *                  defined)
-     * @param _name     name of the role
+     * @param _name     name of the group
      */
-    public RoleData(final AbstractTest _test,
-                    final String _name)
+    public GroupData(final AbstractTest _test,
+                     final String _name)
     {
-        super(_test, AbstractTest.CI.ROLE, _name, "ROLE_", "user/role");
+        super(_test, AbstractTest.CI.GROUP, _name, "GROUP_", "user/group");
     }
 }

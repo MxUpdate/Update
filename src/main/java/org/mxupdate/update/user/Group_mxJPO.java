@@ -22,6 +22,7 @@ package org.mxupdate.update.user;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -29,10 +30,10 @@ import java.util.TreeSet;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
+ * The class is used to export, create, delete and update groups within MX.
  *
  * @author Tim Moxter
  * @version $Id$
@@ -46,9 +47,27 @@ public class Group_mxJPO
     private static final long serialVersionUID = -4819262751735809709L;
 
     /**
+     * Set of all ignored URLs from the XML definition for groups.
+     *
+     * @see #parse(String, String)
+     */
+    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    static  {
+        Group_mxJPO.IGNORED_URLS.add("/homeSite");
+        Group_mxJPO.IGNORED_URLS.add("/parentGroup");
+    }
+
+    /**
      * Set to hold all parent groups.
      */
     final Set<String> parentGroups = new TreeSet<String>();
+
+    /**
+     * Related site of this group.
+     *
+     * @see #parse(String, String)
+     */
+    private String site;
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -63,7 +82,13 @@ public class Group_mxJPO
     }
 
     /**
-     * Parses all group specific URLs.
+     * <p>Parses all role specific URL values. This includes:
+     * <ul>
+     * <li>{@link #parentGroups parent groups}</li>
+     * <li>{@link #site}</li>
+     * </ul></p>
+     * <p>If an <code>_url</code> is included in {@link #IGNORED_URLS}, this
+     * URL is ignored.</p>
      *
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
@@ -72,13 +97,14 @@ public class Group_mxJPO
     protected void parse(final String _url,
                       final String _content)
     {
-        if ("/parentGroup".equals(_url))  {
-            // to be ignored ...
-        } else if ("/parentGroup/groupRef".equals(_url))  {
-            this.parentGroups.add(_content);
-
-        } else  {
-            super.parse(_url, _content);
+        if (!Group_mxJPO.IGNORED_URLS.contains(_url))  {
+            if ("/parentGroup/groupRef".equals(_url))  {
+                this.parentGroups.add(_content);
+            } else if ("/homeSite/siteRef".equals(_url))  {
+                this.site = _content;
+            } else  {
+                super.parse(_url, _content);
+            }
         }
     }
 
@@ -96,10 +122,17 @@ public class Group_mxJPO
                                final Appendable _out)
             throws IOException
     {
-        _out.append(" \\\n    ").append(isHidden() ? "hidden" : "!hidden");
+        _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden");
+
+        // site
+        if (this.site != null)  {
+            _out.append(" \\\n    site \"").append(StringUtil_mxJPO.convertTcl(this.site)).append('\"');
+        }
+
+        // parent groups
         for (final String group : this.parentGroups)  {
-            _out.append("\nmql mod group \"")
-                .append(convertTcl(group))
+            _out.append("\nmql escape mod group \"")
+                .append(StringUtil_mxJPO.convertTcl(group))
                 .append("\" child \"${NAME}\"");
         }
     }
@@ -138,13 +171,17 @@ public class Group_mxJPO
     {
         // description and all parents
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append('\"')
+                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
                 .append(" description \"\"")
-                .append(" remove parent all;\n");
+                .append(" remove parent all");
+        // remove site (if exists)
+        if (this.site != null)  {
+            preMQLCode.append(" site \"\"");
+        }
 
         // append already existing pre MQL code
-        preMQLCode.append(_preMQLCode);
+        preMQLCode.append(";\n").append(_preMQLCode);
 
         super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
     }
