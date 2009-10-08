@@ -22,6 +22,7 @@ package org.mxupdate.update.user;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -41,7 +42,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public class Role_mxJPO
-        extends AbstractAdminObject_mxJPO
+    extends AbstractAdminObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
@@ -57,14 +58,37 @@ public class Role_mxJPO
     private static final String PARAM_SUPPORT_ROLE_TYPES = "UserRoleSupportRoleType";
 
     /**
+     * Set of all ignored URLs from the XML definition for roles.
+     *
+     * @see #parse(String, String)
+     */
+    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    static  {
+        Role_mxJPO.IGNORED_URLS.add("/homeSite");
+        Role_mxJPO.IGNORED_URLS.add("/parentRole");
+        // new URIL to be ignored, because read within prepare method
+        Role_mxJPO.IGNORED_URLS.add("/roleType");
+    }
+
+    /**
      * Set to hold all parent roles.
+     *
+     * @see #parse(String, String)
      */
     private final Set<String> parentRoles = new TreeSet<String>();
+
+    /**
+     * Related site of this role.
+     *
+     * @see #parse(String, String)
+     */
+    private String site;
 
     /**
      * Stores the information about the role type.
      *
      * @see RoleType
+     * @see #prepare(ParameterCache_mxJPO)
      */
     private RoleType roleType = RoleType.ROLE;
 
@@ -82,23 +106,31 @@ public class Role_mxJPO
 
     /**
      * Parses all role specific URLs.
+     * <p>Parses all role specific URL values. This includes:
+     * <ul>
+     * <li>{@link #parentRoles parent roles}</li>
+     * <li>{@link #site}</li>
+     * </ul></p>
+     * <p>If an <code>_url</code> is included in {@link #IGNORED_URLS}, this
+     * URL is ignored.</p>
      *
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
+     * @see #IGNORED_URLS
+     * @see #prepare(ParameterCache_mxJPO)
      */
-    @Override
+    @Override()
     protected void parse(final String _url,
                          final String _content)
     {
-        if ("/parentRole".equals(_url))  {
-            // to be ignored ...
-        } else if ("/parentRole/roleRef".equals(_url))  {
-            this.parentRoles.add(_content);
-        } else if ("/roleType".equals(_url))  {
-            // to be ignored, because read within prepare method
-
-        } else  {
-            super.parse(_url, _content);
+        if (!Role_mxJPO.IGNORED_URLS.contains(_url))  {
+            if ("/parentRole/roleRef".equals(_url))  {
+                this.parentRoles.add(_content);
+            } else if ("/homeSite/siteRef".equals(_url))  {
+                this.site = _content;
+            } else  {
+                super.parse(_url, _content);
+            }
         }
     }
 
@@ -114,9 +146,9 @@ public class Role_mxJPO
      * @see #roleType
      * @see #PARAM_SUPPORT_ROLE_TYPES
      */
-    @Override
+    @Override()
     protected void prepare(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+        throws MatrixException
     {
         // must the role type evaluated?
         if (_paramCache.getValueBoolean(Role_mxJPO.PARAM_SUPPORT_ROLE_TYPES))  {
@@ -141,12 +173,18 @@ public class Role_mxJPO
      * @param _out          appendable instance to the TCL update file
      * @throws IOException if the TCL update code could not written
      */
-    @Override
+    @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
-            throws IOException
+        throws IOException
     {
         _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden");
+
+        // site
+        if (this.site != null)  {
+            _out.append(" \\\n    site \"").append(StringUtil_mxJPO.convertTcl(this.site)).append('\"');
+        }
+
         // role type
         switch (this.roleType)  {
             case PROJECT:
@@ -191,14 +229,14 @@ public class Role_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update from derived class failed
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         // description and all parents
         final StringBuilder preMQLCode = new StringBuilder()
@@ -209,6 +247,10 @@ public class Role_mxJPO
         // define normal role type
         if (this.roleType != RoleType.ROLE)  {
             preMQLCode.append(" asarole");
+        }
+        // remove site (if exists)
+        if (this.site != null)  {
+            preMQLCode.append(" site \"\"");
         }
 
         // append already existing pre MQL code

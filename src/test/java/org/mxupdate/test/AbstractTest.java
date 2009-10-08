@@ -141,7 +141,12 @@ public class AbstractTest
         /**
          * Configuration item menu.
          */
-        MENU("menu", "Menu", "MENU", true);
+        MENU("menu", "Menu", "MENU", true),
+
+        /**
+         * Configuration item site.
+         */
+        SITE("site", "Site", "SITE", true);
 
         /**
          * Related type name in MX.

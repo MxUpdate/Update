@@ -28,6 +28,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractData;
+import org.mxupdate.test.data.other.SiteData;
 import org.testng.Assert;
 
 /**
@@ -44,6 +45,11 @@ public class RoleData
      * Is the role hidden?
      */
     private boolean hidden;
+
+    /**
+     * Assigned site for this role.
+     */
+    private SiteData site;
 
     /**
      * Parent roles to which this role is assigned.
@@ -89,6 +95,35 @@ public class RoleData
     }
 
     /**
+     * Defines related site for this role.
+     *
+     * @param _site     site to assign
+     * @return this role data instance
+     * @see #site
+     */
+    public RoleData setSite(final SiteData _site)
+    {
+        this.site = _site;
+        if (_site == null)  {
+            this.getValues().remove("site");
+        } else  {
+            this.setValue("site", this.site.getName());
+        }
+        return this;
+    }
+
+    /**
+     * Returns related {@link #site} of this role.
+     *
+     * @return assigned site; or <code>null</code> if not defined
+     * @see #site
+     */
+    public SiteData getSite()
+    {
+        return this.site;
+    }
+
+    /**
      * Assigns <code>_role</code> to the list of
      * {@link #parentRoles parent roles}.
      *
@@ -124,11 +159,13 @@ public class RoleData
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("mql escape mod role \"${NAME}\"");
+        // hidden flag
         if (this.hidden)  {
             cmd.append(" \\\n    hidden");
         } else  {
             cmd.append(" \\\n    !hidden");
         }
+
         this.append4CIFileValues(cmd);
 
         cmd.append(";\n");
@@ -154,10 +191,15 @@ public class RoleData
         if (!this.isCreated())  {
             final StringBuilder cmd = new StringBuilder()
                     .append("escape add role \"").append(AbstractTest.convertMql(this.getName())).append("\"");
+            // hidden flag
             if (this.hidden)  {
                 cmd.append("hidden");
             } else  {
                 cmd.append("!hidden");
+            }
+            // if site assigned, the site must be created
+            if (this.site != null)  {
+                this.site.create();
             }
             this.append4Create(cmd);
 
@@ -169,10 +211,11 @@ public class RoleData
             }
 
             this.getTest().mql(cmd);
+
+            this.setCreated(true);
         }
         return this;
     }
-
 
     /**
      * Checks the export of this data piece if all values are correct defined.
@@ -185,6 +228,16 @@ public class RoleData
         throws MatrixException
     {
         super.checkExport(_exportParser);
+
+        // check hidden flag
+        final Set<String> main = new HashSet<String>(_exportParser.getLines("/mql/"));
+        if (this.hidden)  {
+            Assert.assertTrue(main.contains("hidden") || main.contains("hidden \\"),
+                              "check that role '" + this.getName() + "' is hidden");
+        } else  {
+            Assert.assertTrue(main.contains("!hidden") || main.contains("!hidden \\"),
+                              "check that role '" + this.getName() + "' is not hidden");
+        }
 
         // check parent roles
         final Set<String> pars = new HashSet<String>(_exportParser.getLines("/mql/@value"));

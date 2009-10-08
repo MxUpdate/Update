@@ -24,7 +24,9 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.data.other.SiteData;
 import org.mxupdate.test.data.user.RoleData;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -51,13 +53,22 @@ public class RoleExportUpdate
                 .setValue("description", "\"\\\\ hallo");
 
         final RoleData role2 = new RoleData(this, "hallo \" test")
+                .setHidden(true)
+                .setValue("description", "\"\\\\ hallo");
+
+        final RoleData role3 = new RoleData(this, "hallo \" test")
                 .setValue("description", "\"\\\\ hallo")
                 .assignParentRole(new RoleData(this, "hallo parent1 \" test"))
                 .assignParentRole(new RoleData(this, "hallo parent2 \" test"));
 
+        final RoleData role4 = new RoleData(this, "hallo \" test")
+                .setSite(new SiteData(this, "Test \" Site"));
+
         return new Object[][]  {
                 new Object[]{role1},
                 new Object[]{role2},
+                new Object[]{role3},
+                new Object[]{role4},
         };
     }
 
@@ -73,6 +84,7 @@ public class RoleExportUpdate
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.ROLE);
+        this.cleanup(AbstractTest.CI.SITE);
     }
 
     /**
@@ -105,6 +117,11 @@ public class RoleExportUpdate
             parentRole.create();
         }
 
+        // create site
+        if (_role.getSite() != null)  {
+            _role.getSite().create();
+        }
+
         // first update with original content
         this.update(_role.getCIFileName(), _role.ciFile());
         final ExportParser exportParser = _role.export();
@@ -115,4 +132,25 @@ public class RoleExportUpdate
         _role.checkExport(_role.export());
     }
 
+    /**
+     * Test an update of a role where the site is removed.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "update existing existing role with site by removing site")
+    public void removeExistingSite()
+        throws Exception
+    {
+        final RoleData role = new RoleData(this, "hallo \" test")
+                .setSite(new SiteData(this, "Test \" Site"));
+        role.create();
+        role.setSite(null);
+        this.update(role.getCIFileName(), role.ciFile());
+
+        Assert.assertEquals(this.mql("escape print role \""
+                                    + AbstractTest.convertMql(role.getName())
+                                    + "\" select site dump"),
+                            "",
+                            "check that no site is defined");
+    }
 }
