@@ -39,7 +39,7 @@ import org.testng.Assert;
  * @version $Id$
  * @param <T>   defines the class which is derived from this class
  */
-public abstract class AbstractAttribute<T extends AbstractAttribute<?>>
+public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     extends AbstractDataWithTrigger<T>
 {
     /**
@@ -47,8 +47,8 @@ public abstract class AbstractAttribute<T extends AbstractAttribute<?>>
      */
     private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(2);
     static  {
-        AbstractAttribute.REQUIRED_EXPORT_VALUES.add("description");
-        AbstractAttribute.REQUIRED_EXPORT_VALUES.add("default");
+        AbstractAttributeData.REQUIRED_EXPORT_VALUES.add("description");
+        AbstractAttributeData.REQUIRED_EXPORT_VALUES.add("default");
     }
 
     /**
@@ -71,14 +71,14 @@ public abstract class AbstractAttribute<T extends AbstractAttribute<?>>
      * @param _attrType     type of this attribute
      * @param _filePrefix   prefix for the file name
      */
-    protected AbstractAttribute(final AbstractTest _test,
+    protected AbstractAttributeData(final AbstractTest _test,
                                 final AbstractTest.CI _ci,
                                 final String _name,
                                 final String _attrType,
                                 final String _filePrefix)
     {
         super(_test, _ci, _name, _filePrefix, "datamodel/attribute",
-              AbstractAttribute.REQUIRED_EXPORT_VALUES);
+              AbstractAttributeData.REQUIRED_EXPORT_VALUES);
         this.attrType = _attrType;
     }
 

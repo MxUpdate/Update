@@ -58,7 +58,7 @@ public class TypeData
     /**
      * All attributes of this type.
      */
-    private final Set<AbstractAttribute<?>> attributes = new HashSet<AbstractAttribute<?>>();
+    private final Set<AbstractAttributeData<?>> attributes = new HashSet<AbstractAttributeData<?>>();
 
     /**
      * Initialize this type data with given <code>_name</code>.
@@ -95,7 +95,7 @@ public class TypeData
      * @return this type data instance
      * @see #attributes
      */
-    public TypeData addAttribute(final AbstractAttribute<?> _attribute)
+    public TypeData addAttribute(final AbstractAttributeData<?> _attribute)
     {
         this.attributes.add(_attribute);
         return this;
@@ -115,7 +115,7 @@ public class TypeData
 
         // append attributes
         cmd.append("\n\ntestAttributes -type \"${NAME}\" -attributes [list \\\n");
-        for (final AbstractAttribute<?> attribute : this.attributes)  {
+        for (final AbstractAttributeData<?> attribute : this.attributes)  {
             cmd.append("    \"").append(AbstractTest.convertTcl(attribute.getName())).append("\" \\\n");
         }
         cmd.append("]\n");
@@ -149,7 +149,7 @@ public class TypeData
             }
 
             // append attributes
-            for (final AbstractAttribute<?> attribute : this.attributes)  {
+            for (final AbstractAttributeData<?> attribute : this.attributes)  {
                 attribute.create();
                 cmd.append(" attribute \"").append(AbstractTest.convertMql(attribute.getName())).append("\"");
             }
@@ -196,7 +196,7 @@ public class TypeData
 
         // check attributes
         final Set<String> attrs = new HashSet<String>(_exportParser.getLines("/testAttributes/"));
-        for (final AbstractAttribute<?> attribute : this.attributes)  {
+        for (final AbstractAttributeData<?> attribute : this.attributes)  {
             final String attrName = "\"" + AbstractTest.convertTcl(attribute.getName()) + "\" \\";
             Assert.assertTrue(attrs.contains(attrName),
                               "check that attribute '" + attribute.getName() + "' is defined");

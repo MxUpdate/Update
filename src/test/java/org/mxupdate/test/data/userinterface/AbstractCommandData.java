@@ -37,7 +37,7 @@ import org.mxupdate.test.data.AbstractData;
  * @author The MxUpdate Team
  * @version $Id$
  */
-abstract class AbstractCommand<T extends AbstractCommand<?>>
+abstract class AbstractCommandData<T extends AbstractCommandData<?>>
     extends AbstractData<T>
 {
     /**
@@ -45,9 +45,9 @@ abstract class AbstractCommand<T extends AbstractCommand<?>>
      */
     private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(3);
     static  {
-        AbstractCommand.REQUIRED_EXPORT_VALUES.add("description");
-        AbstractCommand.REQUIRED_EXPORT_VALUES.add("label");
-        AbstractCommand.REQUIRED_EXPORT_VALUES.add("href");
+        AbstractCommandData.REQUIRED_EXPORT_VALUES.add("description");
+        AbstractCommandData.REQUIRED_EXPORT_VALUES.add("label");
+        AbstractCommandData.REQUIRED_EXPORT_VALUES.add("href");
     }
 
     /**
@@ -69,13 +69,13 @@ abstract class AbstractCommand<T extends AbstractCommand<?>>
      * @param _filePrefix   prefix for the file name
      * @param _ciPath       path of the configuration item file
      */
-    AbstractCommand(final AbstractTest _test,
+    AbstractCommandData(final AbstractTest _test,
                     final AbstractTest.CI _ci,
                     final String _name,
                     final String _filePrefix,
                     final String _ciPath)
     {
-        super(_test, _ci, _name, _filePrefix, _ciPath, AbstractCommand.REQUIRED_EXPORT_VALUES);
+        super(_test, _ci, _name, _filePrefix, _ciPath, AbstractCommandData.REQUIRED_EXPORT_VALUES);
     }
 
     /**

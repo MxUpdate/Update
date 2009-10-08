@@ -29,8 +29,8 @@ import org.mxupdate.test.AbstractTest.CI;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class AttributeInteger
-    extends AbstractAttribute<AttributeInteger>
+public class AttributeStringData
+    extends AbstractAttributeData<AttributeStringData>
 {
     /**
      * Initialize this string attribute with given <code>_name</code>.
@@ -39,9 +39,9 @@ public class AttributeInteger
      *                  defined)
      * @param _name     name of the string attribute
      */
-    public AttributeInteger(final AbstractTest _test,
-                            final String _name)
+    public AttributeStringData(final AbstractTest _test,
+                           final String _name)
     {
-        super(_test, CI.ATTRIBUTE_INTEGER, _name, "integer", "INTEGER_");
+        super(_test, CI.ATTRIBUTE_STRING, _name, "string", "STRING_");
     }
 }

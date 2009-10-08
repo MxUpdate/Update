@@ -23,7 +23,7 @@ package org.mxupdate.test.ci.datamodel;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.DataCollection;
-import org.mxupdate.test.data.datamodel.AbstractAttribute;
+import org.mxupdate.test.data.datamodel.AbstractAttributeData;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.program.AbstractProgramData;
@@ -130,7 +130,7 @@ public class TypeExportUpdate
         throws Exception
     {
         // create referenced attributes
-        for (final AbstractAttribute<?> attribute : _data.getAttributes())  {
+        for (final AbstractAttributeData<?> attribute : _data.getAttributes())  {
             attribute.create();
         }
         // create referenced methods

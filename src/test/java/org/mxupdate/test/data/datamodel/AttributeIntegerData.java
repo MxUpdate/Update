@@ -29,8 +29,8 @@ import org.mxupdate.test.AbstractTest.CI;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class AttributeDate
-    extends AbstractAttribute<AttributeDate>
+public class AttributeIntegerData
+    extends AbstractAttributeData<AttributeIntegerData>
 {
     /**
      * Initialize this string attribute with given <code>_name</code>.
@@ -39,9 +39,9 @@ public class AttributeDate
      *                  defined)
      * @param _name     name of the string attribute
      */
-    public AttributeDate(final AbstractTest _test,
-                         final String _name)
+    public AttributeIntegerData(final AbstractTest _test,
+                            final String _name)
     {
-        super(_test, CI.ATTRIBUTE_DATE, _name, "date", "DATE_");
+        super(_test, CI.ATTRIBUTE_INTEGER, _name, "integer", "INTEGER_");
     }
 }

@@ -24,8 +24,8 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.userinterface.Command;
-import org.mxupdate.test.data.userinterface.Menu;
+import org.mxupdate.test.data.userinterface.CommandData;
+import org.mxupdate.test.data.userinterface.MenuData;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -48,14 +48,14 @@ public class MenuExportUpdate
     @DataProvider(name = "menus")
     public Object[][] getMenus()
     {
-        final Menu menu = new Menu(this, "hallo \" test")
+        final MenuData menu = new MenuData(this, "hallo \" test")
                 .setValue("label", "command label \" \\ ' #")
                 .setValue("description", "\"\\\\ hallo")
                 .setValue("href", "${COMMON_DIR}/emxTree.jsp?mode=insert")
                 .setValue("alt", "${COMMON_DIR}/emxTreeAlt.jsp?mode=insert")
                 .setSetting("Setting 1", "Setting Value ' 1")
-                .addChild(new Menu(this, "child menu 1"))
-                .addChild(new Command(this, "child command 1"));
+                .addChild(new MenuData(this, "child menu 1"))
+                .addChild(new CommandData(this, "child command 1"));
 
         return new Object[][]  {
                 new Object[]{menu}
@@ -84,7 +84,7 @@ public class MenuExportUpdate
      * @throws Exception if test failed
      */
     @Test(dataProvider = "menus", description = "test export of a single menu")
-    public void testExportSingleMenu(final Menu _menu)
+    public void testExportSingleMenu(final MenuData _menu)
         throws Exception
     {
         _menu.create();
@@ -100,7 +100,7 @@ public class MenuExportUpdate
      * @throws Exception if test failed
      */
     @Test(dataProvider = "menus", description = "test update of non existing menu")
-    public void testUpdate(final Menu _menu)
+    public void testUpdate(final MenuData _menu)
         throws Exception
     {
         _menu.createChildren();

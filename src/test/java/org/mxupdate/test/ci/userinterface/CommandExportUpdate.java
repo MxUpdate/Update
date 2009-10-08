@@ -24,7 +24,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.userinterface.Command;
+import org.mxupdate.test.data.userinterface.CommandData;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -47,14 +47,14 @@ public class CommandExportUpdate
     @DataProvider(name = "commands")
     public Object[][] getCommands()
     {
-        final Command command1 = new Command(this, "hallo \" test")
+        final CommandData command1 = new CommandData(this, "hallo \" test")
                 .setValue("label", "command label \" \\ ' #")
                 .setValue("description", "\"\\\\ hallo")
                 .setValue("href", "${COMMON_DIR}/emxTree.jsp?mode=insert")
                 .setValue("alt", "${COMMON_DIR}/emxTreeAlt.jsp?mode=insert")
                 .setSetting("Setting 1", "Setting Value ' 1")
                 .setSetting("Setting 2", "Value2");
-        final Command command2 = new Command(this, "command")
+        final CommandData command2 = new CommandData(this, "command")
                 .setValue("label", "aaa.bbb.ccc")
                 .setValue("description", "\"\\\\ hallo")
                 .setValue("href", "${COMMON_DIR}/emxTree.jsp?mode=insert")
@@ -62,7 +62,7 @@ public class CommandExportUpdate
                 .setSetting("Setting 1", "Setting Value ' 1")
                 .addUser("guest")
                 .addUser("creator");
-        final Command command3 = new Command(this, "hallo\ttest");
+        final CommandData command3 = new CommandData(this, "hallo\ttest");
 
         return new Object[][]  {
                 new Object[]{command1},
@@ -91,7 +91,7 @@ public class CommandExportUpdate
      * @throws Exception if test failed
      */
     @Test(dataProvider = "commands", description = "test export of new created commands")
-    public void testExport(final Command _command)
+    public void testExport(final CommandData _command)
         throws Exception
     {
         _command.create();
@@ -107,7 +107,7 @@ public class CommandExportUpdate
      * @throws Exception if test failed
      */
     @Test(dataProvider = "commands", description = "test update of non existing command")
-    public void testUpdate(final Command _command)
+    public void testUpdate(final CommandData _command)
         throws Exception
     {
         this.update(_command.getCIFileName(), _command.ciFile());

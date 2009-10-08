@@ -29,8 +29,8 @@ import org.mxupdate.test.AbstractTest.CI;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class AttributeBoolean
-    extends AbstractAttribute<AttributeBoolean>
+public class AttributeBooleanData
+    extends AbstractAttributeData<AttributeBooleanData>
 {
     /**
      * Initialize this boolean attribute with given <code>_name</code>.
@@ -39,7 +39,7 @@ public class AttributeBoolean
      *                  defined)
      * @param _name     name of the boolean attribute
      */
-    public AttributeBoolean(final AbstractTest _test,
+    public AttributeBooleanData(final AbstractTest _test,
                             final String _name)
     {
         super(_test, CI.ATTRIBUTE_BOOLEAN, _name, "boolean", "BOOLEAN_");

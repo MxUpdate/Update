@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.DataCollection;
-import org.mxupdate.test.data.datamodel.AttributeString;
+import org.mxupdate.test.data.datamodel.AttributeStringData;
 import org.mxupdate.test.data.datamodel.InterfaceData;
 import org.mxupdate.test.data.datamodel.RelationshipData;
 import org.mxupdate.test.data.datamodel.TypeData;
@@ -108,7 +108,7 @@ public class InterfaceExportUpdate
         throws Exception
     {
         final DataCollection data = new DataCollection(this);
-        final AttributeString attr = data.getAttributeString("Attribute");
+        final AttributeStringData attr = data.getAttributeString("Attribute");
         final InterfaceData inter = data.getInterface("TestInterface").addAttribute(attr);
         data.create();
 
@@ -213,8 +213,8 @@ public class InterfaceExportUpdate
         final DataCollection data = new DataCollection(this);
         final InterfaceData parent1 = data.getInterface("TestInerfaceParent \" 1");
         final InterfaceData parent2 = data.getInterface("TestInerfaceParent \" 2");
-        final AttributeString attr1 = data.getAttributeString("Attribute \" 1");
-        final AttributeString attr2 = data.getAttributeString("Attribute \" 2");
+        final AttributeStringData attr1 = data.getAttributeString("Attribute \" 1");
+        final AttributeStringData attr2 = data.getAttributeString("Attribute \" 2");
         final TypeData type1 = data.getType("TestType \" 1");
         final TypeData type2 = data.getType("TestType \" 2");
         final RelationshipData rel1 = data.getRelationship("TestRel \" 1");
@@ -292,7 +292,7 @@ public class InterfaceExportUpdate
         throws Exception
     {
         final DataCollection data = new DataCollection(this);
-        final AttributeString attr = data.getAttributeString("Attribute");
+        final AttributeStringData attr = data.getAttributeString("Attribute");
         data.create();
 
         final InterfaceData inter = data.getInterface("TestInterface").addAttribute(attr);
@@ -535,8 +535,8 @@ public class InterfaceExportUpdate
         final DataCollection data = new DataCollection(this);
         final InterfaceData parent1 = data.getInterface("TestInterfaceParent \" 1");
         final InterfaceData parent2 = data.getInterface("TestInterfaceParent \" 2");
-        final AttributeString attr1 = data.getAttributeString("Attribute \" 1");
-        final AttributeString attr2 = data.getAttributeString("Attribute \" 2");
+        final AttributeStringData attr1 = data.getAttributeString("Attribute \" 1");
+        final AttributeStringData attr2 = data.getAttributeString("Attribute \" 2");
         final TypeData type1 = data.getType("TestType \" 1");
         final TypeData type2 = data.getType("TestType \" 2");
         final RelationshipData rel1 = data.getRelationship("TestRel \" 1");

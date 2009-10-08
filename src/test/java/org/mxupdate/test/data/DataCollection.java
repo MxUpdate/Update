@@ -27,12 +27,12 @@ import java.util.Map;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.datamodel.AbstractAttribute;
-import org.mxupdate.test.data.datamodel.AttributeBoolean;
-import org.mxupdate.test.data.datamodel.AttributeDate;
-import org.mxupdate.test.data.datamodel.AttributeInteger;
-import org.mxupdate.test.data.datamodel.AttributeReal;
-import org.mxupdate.test.data.datamodel.AttributeString;
+import org.mxupdate.test.data.datamodel.AbstractAttributeData;
+import org.mxupdate.test.data.datamodel.AttributeBooleanData;
+import org.mxupdate.test.data.datamodel.AttributeDateData;
+import org.mxupdate.test.data.datamodel.AttributeIntegerData;
+import org.mxupdate.test.data.datamodel.AttributeRealData;
+import org.mxupdate.test.data.datamodel.AttributeStringData;
 import org.mxupdate.test.data.datamodel.InterfaceData;
 import org.mxupdate.test.data.datamodel.RelationshipData;
 import org.mxupdate.test.data.datamodel.TypeData;
@@ -41,9 +41,9 @@ import org.mxupdate.test.data.program.JPOProgramData;
 import org.mxupdate.test.data.program.MQLProgramData;
 import org.mxupdate.test.data.program.PageData;
 import org.mxupdate.test.data.user.RoleData;
-import org.mxupdate.test.data.userinterface.Command;
+import org.mxupdate.test.data.userinterface.CommandData;
 import org.mxupdate.test.data.userinterface.InquiryData;
-import org.mxupdate.test.data.userinterface.Menu;
+import org.mxupdate.test.data.userinterface.MenuData;
 
 /**
  * Collection of test data.
@@ -69,7 +69,7 @@ public class DataCollection
      * @see #getAttributes()
      * @see #create()
      */
-    private final Map<String,AbstractAttribute<?>> attributes = new HashMap<String,AbstractAttribute<?>>();
+    private final Map<String,AbstractAttributeData<?>> attributes = new HashMap<String,AbstractAttributeData<?>>();
 
     /**
      * All commands.
@@ -77,7 +77,7 @@ public class DataCollection
      * @see #getCommand(String)
      * @see #create()
      */
-    private final Map<String,Command> commands = new HashMap<String,Command>();
+    private final Map<String,CommandData> commands = new HashMap<String,CommandData>();
 
     /**
      * All inquiries.
@@ -101,7 +101,7 @@ public class DataCollection
      * @see #getMenu(String)
      * @see #create()
      */
-    private final Map<String,Menu> menus = new HashMap<String,Menu>();
+    private final Map<String,MenuData> menus = new HashMap<String,MenuData>();
 
     /**
      * All pages.
@@ -166,7 +166,7 @@ public class DataCollection
         for (final AbstractProgramData<?> program : this.programs.values())  {
             program.create();
         }
-        for (final AbstractAttribute<?> attribute : this.attributes.values())  {
+        for (final AbstractAttributeData<?> attribute : this.attributes.values())  {
             attribute.create();
         }
         for (final TypeData type : this.types.values())  {
@@ -181,13 +181,13 @@ public class DataCollection
         for (final RoleData role : this.roles.values())  {
             role.create();
         }
-        for (final Command command : this.commands.values())  {
+        for (final CommandData command : this.commands.values())  {
             command.create();
         }
         for (final InquiryData inquiry : this.inquiries.values())  {
             inquiry.create();
         }
-        for (final Menu menu : this.menus.values())  {
+        for (final MenuData menu : this.menus.values())  {
             menu.create();
         }
     }
@@ -201,12 +201,12 @@ public class DataCollection
      * @return boolean attribute instance
      * @see #attributesBoolean
      */
-    public AttributeBoolean getAttributeBoolean(final String _name)
+    public AttributeBooleanData getAttributeBoolean(final String _name)
     {
         if (!this.attributes.containsKey(_name))  {
-            this.attributes.put(_name, new AttributeBoolean(this.test, _name));
+            this.attributes.put(_name, new AttributeBooleanData(this.test, _name));
         }
-        return (AttributeBoolean) this.attributes.get(_name);
+        return (AttributeBooleanData) this.attributes.get(_name);
     }
 
     /**
@@ -218,12 +218,12 @@ public class DataCollection
      * @return date attribute instance
      * @see #attributesDate
      */
-    public AttributeDate getAttributeDate(final String _name)
+    public AttributeDateData getAttributeDate(final String _name)
     {
         if (!this.attributes.containsKey(_name))  {
-            this.attributes.put(_name, new AttributeDate(this.test, _name));
+            this.attributes.put(_name, new AttributeDateData(this.test, _name));
         }
-        return (AttributeDate) this.attributes.get(_name);
+        return (AttributeDateData) this.attributes.get(_name);
     }
 
     /**
@@ -235,12 +235,12 @@ public class DataCollection
      * @return integer attribute instance
      * @see #attributesInteger
      */
-    public AttributeInteger getAttributeInteger(final String _name)
+    public AttributeIntegerData getAttributeInteger(final String _name)
     {
         if (!this.attributes.containsKey(_name))  {
-            this.attributes.put(_name, new AttributeInteger(this.test, _name));
+            this.attributes.put(_name, new AttributeIntegerData(this.test, _name));
         }
-        return (AttributeInteger) this.attributes.get(_name);
+        return (AttributeIntegerData) this.attributes.get(_name);
     }
 
     /**
@@ -252,12 +252,12 @@ public class DataCollection
      * @return real attribute instance
      * @see #attributesReal
      */
-    public AttributeReal getAttributeReal(final String _name)
+    public AttributeRealData getAttributeReal(final String _name)
     {
         if (!this.attributes.containsKey(_name))  {
-            this.attributes.put(_name, new AttributeReal(this.test, _name));
+            this.attributes.put(_name, new AttributeRealData(this.test, _name));
         }
-        return (AttributeReal) this.attributes.get(_name);
+        return (AttributeRealData) this.attributes.get(_name);
     }
 
     /**
@@ -269,12 +269,12 @@ public class DataCollection
      * @return string attribute instance
      * @see #attributesString
      */
-    public AttributeString getAttributeString(final String _name)
+    public AttributeStringData getAttributeString(final String _name)
     {
         if (!this.attributes.containsKey(_name))  {
-            this.attributes.put(_name, new AttributeString(this.test, _name));
+            this.attributes.put(_name, new AttributeStringData(this.test, _name));
         }
-        return (AttributeString) this.attributes.get(_name);
+        return (AttributeStringData) this.attributes.get(_name);
     }
 
     /**
@@ -283,7 +283,7 @@ public class DataCollection
      * @return collection of all attributes
      * @see #attributes
      */
-    public Collection<AbstractAttribute<?>> getAttributes()
+    public Collection<AbstractAttributeData<?>> getAttributes()
     {
         return this.attributes.values();
     }
@@ -296,10 +296,10 @@ public class DataCollection
      * @return command instance
      * @see #commands
      */
-    public Command getCommand(final String _name)
+    public CommandData getCommand(final String _name)
     {
         if (!this.commands.containsKey(_name))  {
-            this.commands.put(_name, new Command(this.test, _name));
+            this.commands.put(_name, new CommandData(this.test, _name));
         }
         return this.commands.get(_name);
     }
@@ -344,10 +344,10 @@ public class DataCollection
      * @return menu instance
      * @see #menus
      */
-    public Menu getMenu(final String _name)
+    public MenuData getMenu(final String _name)
     {
         if (!this.menus.containsKey(_name))  {
-            this.menus.put(_name, new Menu(this.test, _name));
+            this.menus.put(_name, new MenuData(this.test, _name));
         }
         return this.menus.get(_name);
     }

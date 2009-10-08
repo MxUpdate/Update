@@ -25,9 +25,9 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.DataCollection;
-import org.mxupdate.test.data.datamodel.AbstractAttribute;
+import org.mxupdate.test.data.datamodel.AbstractAttributeData;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger;
-import org.mxupdate.test.data.datamodel.AttributeString;
+import org.mxupdate.test.data.datamodel.AttributeStringData;
 import org.mxupdate.test.data.program.AbstractProgramData;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -114,7 +114,7 @@ public class AttributeExportUpdate
     {
         _data.create();
 
-        for (final AbstractAttribute<?> attribute : _data.getAttributes())  {
+        for (final AbstractAttributeData<?> attribute : _data.getAttributes())  {
             // create and export
             final ExportParser exportParser = attribute.export();
             attribute.checkExport(exportParser);
@@ -142,7 +142,7 @@ public class AttributeExportUpdate
             program.create();
         }
 
-        for (final AbstractAttribute<?> attribute : _data.getAttributes())  {
+        for (final AbstractAttributeData<?> attribute : _data.getAttributes())  {
             // update with non existing attribute
             this.update(attribute);
 

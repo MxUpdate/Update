@@ -49,7 +49,7 @@ public class RelationshipData
     /**
      * All attributes of this relationship.
      */
-    private final Set<AbstractAttribute<?>> attributes = new HashSet<AbstractAttribute<?>>();
+    private final Set<AbstractAttributeData<?>> attributes = new HashSet<AbstractAttributeData<?>>();
 
     /**
      * Initialize this relationship data with given <code>_name</code>.
@@ -73,7 +73,7 @@ public class RelationshipData
      * @return this relationship data instance
      * @see #attributes
      */
-    public RelationshipData addAttribute(final AbstractAttribute<?> _attribute)
+    public RelationshipData addAttribute(final AbstractAttributeData<?> _attribute)
     {
         this.attributes.add(_attribute);
         return this;
@@ -93,7 +93,7 @@ public class RelationshipData
 
         // append attributes
         cmd.append("\n\ntestAttributes -relationship \"${NAME}\" -attributes [list \\\n");
-        for (final AbstractAttribute<?> attribute : this.attributes)  {
+        for (final AbstractAttributeData<?> attribute : this.attributes)  {
             cmd.append("    \"").append(AbstractTest.convertTcl(attribute.getName())).append("\" \\\n");
         }
         cmd.append("]\n");
@@ -121,7 +121,7 @@ public class RelationshipData
             cmd.append("escape add relationship \"").append(AbstractTest.convertMql(this.getName())).append('\"');
 
             // append attributes
-            for (final AbstractAttribute<?> attribute : this.attributes)  {
+            for (final AbstractAttributeData<?> attribute : this.attributes)  {
                 attribute.create();
                 cmd.append(" attribute \"").append(AbstractTest.convertMql(attribute.getName())).append("\"");
             }
@@ -148,7 +148,7 @@ public class RelationshipData
 
         // check attributes
         final Set<String> attrs = new HashSet<String>(_exportParser.getLines("/testAttributes/"));
-        for (final AbstractAttribute<?> attribute : this.attributes)  {
+        for (final AbstractAttributeData<?> attribute : this.attributes)  {
             final String attrName = "\"" + AbstractTest.convertTcl(attribute.getName()) + "\" \\";
             Assert.assertTrue(attrs.contains(attrName),
                               "check that attribute '" + attribute.getName() + "' is defined");

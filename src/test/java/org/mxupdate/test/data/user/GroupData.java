@@ -30,7 +30,7 @@ import org.mxupdate.test.AbstractTest;
  * @version $Id$
  */
 public class GroupData
-    extends AbstractCollectionUser<GroupData>
+    extends AbstractCollectionUserData<GroupData>
 {
     /**
      * Constructor to initialize this role.

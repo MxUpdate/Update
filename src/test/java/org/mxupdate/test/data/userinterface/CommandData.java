@@ -34,8 +34,8 @@ import org.mxupdate.test.AbstractTest;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class Command
-    extends AbstractCommand<Command>
+public class CommandData
+    extends AbstractCommandData<CommandData>
 {
     /**
      * All users of the command.
@@ -53,7 +53,7 @@ public class Command
      *                  defined)
      * @param _name     name of the command
      */
-    public Command(final AbstractTest _test,
+    public CommandData(final AbstractTest _test,
                    final String _name)
     {
         super(_test, AbstractTest.CI.COMMAND, _name, "COMMAND_", "userinterface/command");
@@ -66,7 +66,7 @@ public class Command
      * @return this command instance
      * @see #users
      */
-    public Command addUser(final String _user)
+    public CommandData addUser(final String _user)
     {
         this.users.add(_user);
         return this;
@@ -100,7 +100,7 @@ public class Command
      * @throws MatrixException if create failed
      */
     @Override
-    public Command create()
+    public CommandData create()
         throws MatrixException
     {
         final StringBuilder cmd = new StringBuilder()

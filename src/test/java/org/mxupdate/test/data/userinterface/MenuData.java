@@ -34,15 +34,15 @@ import org.mxupdate.test.AbstractTest;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class Menu
-    extends AbstractCommand<Menu>
+public class MenuData
+    extends AbstractCommandData<MenuData>
 {
     /**
      * List of all children commands / menus.
      *
-     * @see #addChild(AbstractCommand)
+     * @see #addChild(AbstractCommandData)
      */
-    private final List<AbstractCommand<?>> children = new ArrayList<AbstractCommand<?>>();
+    private final List<AbstractCommandData<?>> children = new ArrayList<AbstractCommandData<?>>();
 
     /**
      * Constructor to initialize this menu.
@@ -51,7 +51,7 @@ public class Menu
      *                  defined)
      * @param _name     name of the menu
      */
-    public Menu(final AbstractTest _test,
+    public MenuData(final AbstractTest _test,
                 final String _name)
     {
         super(_test, AbstractTest.CI.MENU, _name, "MENU_", "userinterface/menu");
@@ -64,7 +64,7 @@ public class Menu
      * @return this menu instance
      * @see #children
      */
-    public Menu addChild(final AbstractCommand<?> _child)
+    public MenuData addChild(final AbstractCommandData<?> _child)
     {
         this.children.add(_child);
         return this;
@@ -81,7 +81,7 @@ public class Menu
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("mql escape mod menu \"${NAME}\"");
-        for (final AbstractCommand<?> child : this.children)  {
+        for (final AbstractCommandData<?> child : this.children)  {
             cmd.append(" add ").append(child.getCI().getMxType())
                .append(" \"").append(AbstractTest.convertTcl(child.getName())).append('\"');
         }
@@ -98,7 +98,7 @@ public class Menu
      * @throws MatrixException if create failed
      */
     @Override
-    public Menu create()
+    public MenuData create()
         throws MatrixException
     {
         this.createChildren();
@@ -111,7 +111,7 @@ public class Menu
         // append all child command / menus
         if (!this.children.isEmpty())  {
             cmd.append("escape mod menu \"" + AbstractTest.convertMql(this.getName()) + "\"");
-            for (final AbstractCommand<?> child : this.children)  {
+            for (final AbstractCommandData<?> child : this.children)  {
                 cmd.append(" add ").append(child.getCI().getMxType())
                    .append(" \"").append(AbstractTest.convertMql(child.getName())).append('\"');
             }
@@ -130,10 +130,10 @@ public class Menu
      * @throws MatrixException if child commands / menus could not be created
      * @see #children
      */
-    public Menu createChildren()
+    public MenuData createChildren()
         throws MatrixException
     {
-        for (final AbstractCommand<?> child : this.children)  {
+        for (final AbstractCommandData<?> child : this.children)  {
             child.create();
         }
         return this;
@@ -151,7 +151,7 @@ public class Menu
     protected void evalAdds4CheckExport(final Set<String> _needAdds)
     {
         super.evalAdds4CheckExport(_needAdds);
-        for (final AbstractCommand<?> child : this.children)  {
+        for (final AbstractCommandData<?> child : this.children)  {
             _needAdds.add(child.getCI().getMxType() + " \"" + AbstractTest.convertTcl(child.getName()) + "\"");
         }
     }

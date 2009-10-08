@@ -60,11 +60,11 @@ public class InterfaceData
     /**
      * All attributes of this interface.
      *
-     * @see #addAttribute(AbstractAttribute)
+     * @see #addAttribute(AbstractAttributeData)
      * @see #create()
      * @see #checkExport(ExportParser)
      */
-    private final Set<AbstractAttribute<?>> attributes = new HashSet<AbstractAttribute<?>>();
+    private final Set<AbstractAttributeData<?>> attributes = new HashSet<AbstractAttributeData<?>>();
 
     /**
      * All assigned types for this interface.
@@ -153,7 +153,7 @@ public class InterfaceData
      * @return this interface data instance
      * @see #attributes
      */
-    public InterfaceData addAttribute(final AbstractAttribute<?> _attribute)
+    public InterfaceData addAttribute(final AbstractAttributeData<?> _attribute)
     {
         this.attributes.add(_attribute);
         return this;
@@ -291,7 +291,7 @@ public class InterfaceData
 
         // append attributes
         cmd.append("\n\ntestAttributes -interface \"${NAME}\" -attributes [list \\\n");
-        for (final AbstractAttribute<?> attribute : this.attributes)  {
+        for (final AbstractAttributeData<?> attribute : this.attributes)  {
             cmd.append("    \"").append(AbstractTest.convertTcl(attribute.getName())).append("\" \\\n");
         }
         cmd.append("]\n");
@@ -374,7 +374,7 @@ public class InterfaceData
             }
 
             // append attributes
-            for (final AbstractAttribute<?> attribute : this.attributes)  {
+            for (final AbstractAttributeData<?> attribute : this.attributes)  {
                 attribute.create();
                 cmd.append(" attribute \"").append(AbstractTest.convertMql(attribute.getName())).append("\"");
             }
@@ -411,7 +411,7 @@ public class InterfaceData
 
         // check attributes
         final Set<String> attrs = new HashSet<String>(_exportParser.getLines("/testAttributes/"));
-        for (final AbstractAttribute<?> attribute : this.attributes)  {
+        for (final AbstractAttributeData<?> attribute : this.attributes)  {
             final String attrName = "\"" + AbstractTest.convertTcl(attribute.getName()) + "\" \\";
             Assert.assertTrue(attrs.contains(attrName),
                               "check that attribute '" + attribute.getName() + "' is defined");

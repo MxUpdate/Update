@@ -29,8 +29,8 @@ import org.mxupdate.test.AbstractTest.CI;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class AttributeReal
-    extends AbstractAttribute<AttributeReal>
+public class AttributeDateData
+    extends AbstractAttributeData<AttributeDateData>
 {
     /**
      * Initialize this string attribute with given <code>_name</code>.
@@ -39,9 +39,9 @@ public class AttributeReal
      *                  defined)
      * @param _name     name of the string attribute
      */
-    public AttributeReal(final AbstractTest _test,
+    public AttributeDateData(final AbstractTest _test,
                          final String _name)
     {
-        super(_test, CI.ATTRIBUTE_REAL, _name, "real", "REAL_");
+        super(_test, CI.ATTRIBUTE_DATE, _name, "date", "DATE_");
     }
 }

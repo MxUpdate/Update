@@ -39,7 +39,7 @@ import org.testng.Assert;
  * @version $Id$
  * @param <T> class derived from abstract collection user
  */
-public class AbstractCollectionUser<T extends AbstractCollectionUser<?>>
+public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
     extends AbstractData<T>
 {
     /**
@@ -55,7 +55,7 @@ public class AbstractCollectionUser<T extends AbstractCollectionUser<?>>
     /**
      * Parent roles to which this role is assigned.
      *
-     * @see #assignParent(AbstractCollectionUser)
+     * @see #assignParent(AbstractCollectionUserData)
      * @see #checkExport(ExportParser)
      */
     private final Set<T> parent = new HashSet<T>();
@@ -65,7 +65,7 @@ public class AbstractCollectionUser<T extends AbstractCollectionUser<?>>
      */
     private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(3);
     static  {
-        AbstractCollectionUser.REQUIRED_EXPORT_VALUES.add("description");
+        AbstractCollectionUserData.REQUIRED_EXPORT_VALUES.add("description");
     }
 
     /**
@@ -78,13 +78,13 @@ public class AbstractCollectionUser<T extends AbstractCollectionUser<?>>
      * @param _filePrefix   prefix for the file name
      * @param _ciPath       path of the configuration item file
      */
-    public AbstractCollectionUser(final AbstractTest _test,
+    public AbstractCollectionUserData(final AbstractTest _test,
                                   final AbstractTest.CI _ci,
                                   final String _name,
                                   final String _filePrefix,
                                   final String _ciPath)
     {
-        super(_test, _ci, _name, _filePrefix, _ciPath, AbstractCollectionUser.REQUIRED_EXPORT_VALUES);
+        super(_test, _ci, _name, _filePrefix, _ciPath, AbstractCollectionUserData.REQUIRED_EXPORT_VALUES);
     }
 
     /**
