@@ -118,6 +118,17 @@ public class ExportParser
         new Line(Arrays.asList(this.code.split("\n")).iterator(), null);
     }
 
+    public ExportParser(final String _name,
+                        final Line...  rootLines)
+    {
+        this.origCode = null;
+        this.ci = null;
+        this.symbolicName = null;
+        this.name = _name;
+        this.code = null;
+        this.rootLines.addAll(Arrays.asList(rootLines));
+    }
+
     /**
      * Extracts from the <code>_origCode</code> the update code without header.
      *
@@ -151,6 +162,17 @@ public class ExportParser
             line.evalPath(path, 1, ret);
         }
         return ret;
+    }
+
+    /**
+     * Returns the {@link #rootLines list of all root lines} for the parsed
+     * export.
+     *
+     * @return list of all root lines
+     */
+    public List<Line> getRootLines()
+    {
+        return this.rootLines;
     }
 
     /**
@@ -260,6 +282,17 @@ public class ExportParser
          * Count of spaces before first character of the line.
          */
         private final int shifting;
+
+        /**
+         * Returns the {@link #value} of this line.
+         *
+         * @return value of this line
+         * @see #value
+         */
+        public String getValue()
+        {
+            return this.value;
+        }
 
         /**
          *

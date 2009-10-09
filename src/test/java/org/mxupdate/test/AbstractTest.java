@@ -512,6 +512,8 @@ public class AbstractTest
                ? _text.toString().replaceAll("\\\\", "\\\\\\\\")
                                  .replaceAll("\\\"", "\\\\\"")
                                  .replaceAll("\\$", "\\\\\\$")
+                                 .replaceAll("\\]", "\\\\]")
+                                 .replaceAll("\\[", "\\\\[")
                                  .replaceAll("\\}", "\\\\}")
                                  .replaceAll("\\{", "\\\\{")
                : "";

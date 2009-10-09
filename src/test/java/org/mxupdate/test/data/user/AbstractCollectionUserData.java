@@ -27,33 +27,27 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.AbstractData;
 import org.mxupdate.test.data.other.SiteData;
 import org.testng.Assert;
 
 /**
- * The class is used to define all role objects used to create / update and
- * to export.
+ * The class is used to define all collection user objects used to create /
+ * update and to export.
  *
  * @author The MxUpdate Team
  * @version $Id$
  * @param <T> class derived from abstract collection user
  */
 public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
-    extends AbstractData<T>
+    extends AbstractUserData<T>
 {
-    /**
-     * Is the role hidden?
-     */
-    private boolean hidden;
-
     /**
      * Assigned site for this collection user.
      */
     private SiteData site;
 
     /**
-     * Parent roles to which this role is assigned.
+     * Parent collection users to which this collection user is assigned.
      *
      * @see #assignParent(AbstractCollectionUserData)
      * @see #checkExport(ExportParser)
@@ -69,7 +63,7 @@ public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
     }
 
     /**
-     * Constructor to initialize this role.
+     * Constructor to initialize this collection user.
      *
      * @param _test         related test implementation (where this collection
      *                      user is defined)
@@ -88,25 +82,10 @@ public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
     }
 
     /**
-     * Defines if this role data instance must be hidden.
-     *
-     * @param _hidden       <i>true</i> if the role is hidden; otherwise
-     *                      <i>false</i>
-     * @return this role data instance
-     * @see #hidden
-     */
-    @SuppressWarnings("unchecked")
-    public T setHidden(final boolean _hidden)
-    {
-        this.hidden = _hidden;
-        return (T) this;
-    }
-
-    /**
-     * Defines related site for this role.
+     * Defines related site for this collection user.
      *
      * @param _site     site to assign
-     * @return this role data instance
+     * @return this data instance
      * @see #site
      */
     @SuppressWarnings("unchecked")
@@ -122,7 +101,7 @@ public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
     }
 
     /**
-     * Returns related {@link #site} of this role.
+     * Returns related {@link #site} of this collection user.
      *
      * @return assigned site; or <code>null</code> if not defined
      * @see #site
@@ -133,8 +112,8 @@ public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
     }
 
     /**
-     * Assigns <code>_role</code> to the list of
-     * {@link #parent parent roles}.
+     * Assigns <code>_parent</code> to the list of
+     * {@link #parent parent collection users}.
      *
      * @param _parent   parent collection user to assign
      * @return this collection user data instance
@@ -148,9 +127,9 @@ public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
     }
 
     /**
-     * Returns all assigned {@link #parent parent roles}.
+     * Returns all assigned {@link #parent parent collection users}.
      *
-     * @return all assigned parent roles
+     * @return all assigned parent collection users
      * @see #parent
      */
     public Set<T> getParent()
@@ -160,7 +139,7 @@ public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
 
     /**
      * Prepares the configuration item update file depending on the
-     * configuration of this role.
+     * configuration of this collection user.
      *
      * @return code for the configuration item update file
      */
@@ -170,7 +149,7 @@ public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
         final StringBuilder cmd = new StringBuilder()
                 .append("mql escape mod " + this.getCI().getMxType() + " \"${NAME}\"");
         // hidden flag
-        if (this.hidden)  {
+        if (this.isHidden())  {
             cmd.append(" \\\n    hidden");
         } else  {
             cmd.append(" \\\n    !hidden");
@@ -178,6 +157,7 @@ public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
 
         this.append4CIFileValues(cmd);
 
+        // define parent collection users
         cmd.append(";\n");
         for (final T user : this.parent)  {
             cmd.append("mql escape mod ")
@@ -185,14 +165,17 @@ public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
                .append("\" child \"${NAME}\";\n");;
         }
 
+        // append all workspace related objects
+        cmd.append(this.ciFileWorkspaceObjects());
+
         return cmd.toString();
     }
 
     /**
-     * Creates this role.
+     * Creates this collection user.
      *
      * @throws MatrixException if create failed
-     * @return this role data instance
+     * @return this collection user data instance
      * @see #hidden
      */
     @SuppressWarnings("unchecked")
@@ -206,10 +189,10 @@ public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
                     .append(this.getCI().getMxType())
                     .append(" \"").append(AbstractTest.convertMql(this.getName())).append("\"");
             // hidden flag
-            if (this.hidden)  {
-                cmd.append("hidden");
+            if (this.isHidden())  {
+                cmd.append(" hidden");
             } else  {
-                cmd.append("!hidden");
+                cmd.append(" !hidden");
             }
             // if site assigned, the site must be created
             if (this.site != null)  {
@@ -227,6 +210,8 @@ public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
 
             this.getTest().mql(cmd);
 
+            this.createWorkspaceObjects();
+
             this.setCreated(true);
         }
         return (T) this;
@@ -234,6 +219,7 @@ public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
 
     /**
      * Checks the export of this data piece if all values are correct defined.
+     * The hidden flag and the {@link #parent collection users} are checked.
      *
      * @param _exportParser     parsed export
      * @throws MatrixException if check failed
@@ -246,7 +232,7 @@ public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
 
         // check hidden flag
         final Set<String> main = new HashSet<String>(_exportParser.getLines("/mql/"));
-        if (this.hidden)  {
+        if (this.isHidden())  {
             Assert.assertTrue(main.contains("hidden") || main.contains("hidden \\"),
                               "check that " + this.getCI().getMxType() + " '" + this.getName() + "' is hidden");
         } else  {
@@ -254,12 +240,17 @@ public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
                               "check that " + this.getCI().getMxType() + " '" + this.getName() + "' is not hidden");
         }
 
-        // check parent roles
+        // check parent collection users
         final Set<String> pars = new HashSet<String>(_exportParser.getLines("/mql/@value"));
         pars.remove("escape mod " + this.getCI().getMxType() + " \"${NAME}\"");
         for (final T user : this.parent)  {
             pars.remove("escape mod " + user.getCI().getMxType() + " \""
                     + AbstractTest.convertTcl(user.getName()) + "\" child \"${NAME}\"");
+        }
+        for (final String par : new HashSet<String>(pars))  {
+            if (par.startsWith("escape add"))  {
+                pars.remove(par);
+            }
         }
         Assert.assertTrue(pars.isEmpty(),
                           "check that all parent " + this.getCI().getMxType() + "s are correct defined " + pars);

@@ -84,6 +84,14 @@ public abstract class AbstractData<T extends AbstractData<?>>
     private final Map<String,String> values = new HashMap<String,String>();
 
     /**
+     * Is the role hidden?
+     *
+     * @see #setHidden(boolean)
+     * @see #isHidden()
+     */
+    private boolean hidden = false;
+
+    /**
      * Defines the values which must be defined for exports. They are tested
      * for existence from {@link #checkExport(ExportParser)}. This values must
      * be defined minimum and maximum one time in the configuration item file.
@@ -132,7 +140,9 @@ public abstract class AbstractData<T extends AbstractData<?>>
         this.test = _test;
         this.ci = _ci;
         this.name = AbstractTest.PREFIX + _name;
-        this.symbolicName = _ci.getMxType() + "_" + this.name.replaceAll(AbstractData.NOT_ALLOWED_CHARS, "");
+        this.symbolicName = (_ci != null)
+                            ? _ci.getMxType() + "_" + this.name.replaceAll(AbstractData.NOT_ALLOWED_CHARS, "")
+                            : null;
         this.filePrefix = _filePrefix;
         this.ciPath = _ciPath;
         this.requiredExportValues = _requiredExportValues;
@@ -234,6 +244,33 @@ public abstract class AbstractData<T extends AbstractData<?>>
     public Map<String,String> getValues()
     {
         return this.values;
+    }
+
+    /**
+     * Defines if this data instance must be hidden.
+     *
+     * @param _hidden       <i>true</i> if the data instance is hidden;
+     *                      otherwise <i>false</i>
+     * @return this role data instance
+     * @see #hidden
+     */
+    @SuppressWarnings("unchecked")
+    public T setHidden(final boolean _hidden)
+    {
+        this.hidden = _hidden;
+        return (T) this;
+    }
+
+    /**
+     * Returns <i>true</i> if this data instance is {@link #hidden}.
+     *
+     * @return <i>true</i> if this data instance is hidden; otherwise
+     *         <i>false</i>
+     * @see #hidden
+     */
+    public boolean isHidden()
+    {
+        return this.hidden;
     }
 
     /**

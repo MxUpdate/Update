@@ -49,26 +49,107 @@ public class RoleExportUpdate
     @DataProvider(name = "roles")
     public Object[][] getRoles()
     {
-        final RoleData role1 = new RoleData(this, "hallo \" test")
-                .setValue("description", "\"\\\\ hallo");
-
-        final RoleData role2 = new RoleData(this, "hallo \" test")
-                .setHidden(true)
-                .setValue("description", "\"\\\\ hallo");
-
-        final RoleData role3 = new RoleData(this, "hallo \" test")
-                .setValue("description", "\"\\\\ hallo")
-                .assignParent(new RoleData(this, "hallo parent1 \" test"))
-                .assignParent(new RoleData(this, "hallo parent2 \" test"));
-
-        final RoleData role4 = new RoleData(this, "hallo \" test")
-                .setSite(new SiteData(this, "Test \" Site"));
-
         return new Object[][]  {
-                new Object[]{role1},
-                new Object[]{role2},
-                new Object[]{role3},
-                new Object[]{role4},
+                new Object[]{
+                        "simple role",
+                        new RoleData(this, "hallo \" test")
+                            .setValue("description", "\"\\\\ hallo")},
+                new Object[]{
+                        "hidden role",
+                        new RoleData(this, "hallo \" test")
+                                .setHidden(true)
+                                .setValue("description", "\"\\\\ hallo")},
+                new Object[]{
+                        "role with two parent roles",
+                        new RoleData(this, "hallo \" test")
+                                .setValue("description", "\"\\\\ hallo")
+                                .assignParent(new RoleData(this, "hallo parent1 \" test"))
+                                .assignParent(new RoleData(this, "hallo parent2 \" test"))},
+                new Object[]{
+                        "role with assigned site",
+                        new RoleData(this, "hallo \" test")
+                                .setSite(new SiteData(this, "Test \" Site"))},
+                new Object[]{
+                        "role with two cues",
+                        new RoleData(this, "hallo \" test")
+                                .newCue("my cue \"test\"").getUser()
+                                .newCue("cue b").getUser()},
+                new Object[]{
+                        "role with complex cue",
+                        new RoleData(this, "hallo \" test")
+                                .newCue("my cue \"test\"")
+                                        .setValue("appliesto", "businessobject")
+                                        .setValue("type", "TYPE \"")
+                                        .setValue("name", "NAME \"")
+                                        .setValue("revision", "revision \"")
+                                        .setValue("vault", "vault \"")
+                                        .setValue("owner", "owner \"")
+                                        .setValue("color", "black")
+                                        .setValue("highlight", "red")
+                                        .setValue("font", "arial")
+                                        .setValue("linestyle", "dashed")
+                                        .setValue("where", "LL = \"attribute[hallo]\"")
+                                        .<RoleData>getUser()},
+                new Object[]{
+                        "role with cue which applies to relationship",
+                        new RoleData(this, "hallo \" test")
+                            .newCue("my cue \"test\"")
+                                .setValue("appliesto", "relationship")
+                                .<RoleData>getUser()},
+                new Object[]{
+                        "role with cue which applies to both business object and relationship",
+                        new RoleData(this, "hallo \" test")
+                                .newCue("my cue \"test\"")
+                                        .setValue("appliesto", "all")
+                                        .<RoleData>getUser()},
+                new Object[]{
+                        "role with cue with order -1",
+                        new RoleData(this, "hallo \" test")
+                                .newCue("my cue \"test\"")
+                                        .setValue("order", "-1")
+                                        .<RoleData>getUser()},
+                new Object[]{
+                        "role with cue with order 0",
+                        new RoleData(this, "hallo \" test")
+                                .newCue("my cue \"test\"")
+                                        .setValue("order", "0")
+                                        .<RoleData>getUser()},
+                new Object[]{
+                        "role with cue with order 1",
+                        new RoleData(this, "hallo \" test")
+                                .newCue("my cue \"test\"")
+                                        .setValue("order", "1")
+                                        .<RoleData>getUser()},
+                new Object[]{
+                        "role with cue with visible user definition",
+                        new RoleData(this, "hallo \" test")
+                                .newCue("my cue \"test\"")
+                                        .setVisible("creator","guest","Test Everything")
+                                        .<RoleData>getUser()},
+                new Object[]{
+                        "role with not active cue",
+                        new RoleData(this, "hallo \" test")
+                                .newCue("my cue \"test\"")
+                                        .setActive(false)
+                                        .<RoleData>getUser()},
+                new Object[]{
+                        "role with active cue",
+                        new RoleData(this, "hallo \" test")
+                                .newCue("my cue \"test\"")
+                                        .setActive(true)
+                                        .<RoleData>getUser()},
+                new Object[]{
+                        "role with not hidden cue",
+                        new RoleData(this, "hallo \" test")
+                                .newCue("my cue \"test\"")
+                                        .setHidden(false)
+                                        .<RoleData>getUser()},
+                new Object[]{
+                        "role with hidden cue",
+                        new RoleData(this, "hallo \" test")
+                                .newCue("my cue \"test\"")
+                                        .setHidden(true)
+                                        .<RoleData>getUser()},
         };
     }
 
@@ -90,11 +171,13 @@ public class RoleExportUpdate
     /**
      * Tests a new created role and the related export.
      *
-     * @param _role     role to test
+     * @param _description  description of the test case
+     * @param _role         role to test
      * @throws Exception if test failed
      */
     @Test(dataProvider = "roles", description = "test export of new created role")
-    public void simpleExport(final RoleData _role)
+    public void simpleExport(final String _description,
+                             final RoleData _role)
         throws Exception
     {
         _role.create();
@@ -105,11 +188,13 @@ public class RoleExportUpdate
      * Tests an update of non existing role. The result is tested with by
      * exporting the role and checking the result.
      *
-     * @param _role     role to test
+     * @param _description  description of the test case
+     * @param _role         role to test
      * @throws Exception if test failed
      */
     @Test(dataProvider = "roles", description = "test update of non existing role")
-    public void simpleUpdate(final RoleData _role)
+    public void simpleUpdate(final String _description,
+                             final RoleData _role)
         throws Exception
     {
         // create all parent roles

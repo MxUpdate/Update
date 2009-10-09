@@ -30,7 +30,6 @@ import java.util.TreeSet;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -42,7 +41,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public class Role_mxJPO
-    extends AbstractAdminObject_mxJPO
+    extends AbstractUser_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
@@ -93,7 +92,8 @@ public class Role_mxJPO
     private RoleType roleType = RoleType.ROLE;
 
     /**
-     * Constructor used to initialize the type definition enumeration.
+     * Constructor used to initialize this role definition with related type
+     * definition <code>_typeDef</code> for given <code>_name</code>.
      *
      * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the administration object
@@ -202,6 +202,8 @@ public class Role_mxJPO
                 .append(StringUtil_mxJPO.convertTcl(role))
                 .append("\" child \"${NAME}\"");
         }
+        // workspace objects
+        this.writeWorkspaceObjects(_paramCache, _out);
     }
 
     /**
