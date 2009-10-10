@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
@@ -39,7 +38,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public class Group_mxJPO
-        extends AbstractAdminObject_mxJPO
+    extends AbstractUser_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
@@ -117,7 +116,7 @@ public class Group_mxJPO
      * @throws IOException if the TCL update code for the group could not be
      *                     written
      */
-    @Override
+    @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
             throws IOException
@@ -135,6 +134,9 @@ public class Group_mxJPO
                 .append(StringUtil_mxJPO.convertTcl(group))
                 .append("\" child \"${NAME}\"");
         }
+
+        // workspace objects
+        this.writeWorkspaceObjects(_paramCache, _out);
     }
 
     /**
@@ -160,7 +162,7 @@ public class Group_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update from derived class failed
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
