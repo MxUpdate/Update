@@ -33,17 +33,18 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.Assert;
 
 /**
  * Defines common information from administration objects used to create,
  * update and check them.
  *
- * @param <T>       class which is derived from this class
+ * @param <DATA>    class which is derived from this class
  * @author The MxUpdate Team
  * @version $Id$
  */
-public abstract class AbstractData<T extends AbstractData<?>>
+public abstract class AbstractData<DATA extends AbstractData<?>>
 {
     /**
      * Regular expression to defines the list of not allowed characters  of
@@ -119,6 +120,13 @@ public abstract class AbstractData<T extends AbstractData<?>>
     private final String ciPath;
 
     /**
+     * All properties for this data piece.
+     *
+     * @see #addProperty(PropertyDef)
+     */
+    private final Set<PropertyDef> properties = new HashSet<PropertyDef>();
+
+    /**
      * Constructor to initialize this data piece.
      *
      * @param _test                 related test case
@@ -139,7 +147,7 @@ public abstract class AbstractData<T extends AbstractData<?>>
     {
         this.test = _test;
         this.ci = _ci;
-        this.name = AbstractTest.PREFIX + _name;
+        this.name = (_name != null) ? AbstractTest.PREFIX + _name : null;
         this.symbolicName = (_ci != null)
                             ? _ci.getMxType() + "_" + this.name.replaceAll(AbstractData.NOT_ALLOWED_CHARS, "")
                             : null;
@@ -189,10 +197,10 @@ public abstract class AbstractData<T extends AbstractData<?>>
      * @see #symbolicName
      */
     @SuppressWarnings("unchecked")
-    public T setSymbolicName(final String _symbolicName)
+    public DATA setSymbolicName(final String _symbolicName)
     {
         this.symbolicName = _symbolicName;
-        return (T) this;
+        return (DATA) this;
     }
 
     /**
@@ -215,11 +223,11 @@ public abstract class AbstractData<T extends AbstractData<?>>
      * @see #values
      */
     @SuppressWarnings("unchecked")
-    public T setValue(final String _key,
+    public DATA setValue(final String _key,
                       final String _value)
     {
         this.values.put(_key, _value);
-        return (T) this;
+        return (DATA) this;
     }
 
     /**
@@ -255,10 +263,10 @@ public abstract class AbstractData<T extends AbstractData<?>>
      * @see #hidden
      */
     @SuppressWarnings("unchecked")
-    public T setHidden(final boolean _hidden)
+    public DATA setHidden(final boolean _hidden)
     {
         this.hidden = _hidden;
-        return (T) this;
+        return (DATA) this;
     }
 
     /**
@@ -271,6 +279,30 @@ public abstract class AbstractData<T extends AbstractData<?>>
     public boolean isHidden()
     {
         return this.hidden;
+    }
+
+    /**
+     * Assigns <code>_property</code> to this data piece.
+     *
+     * @param _property     property to add / assign
+     * @return this data piece instance
+     * @see #properties
+     */
+    @SuppressWarnings("unchecked")
+    public DATA addProperty(final PropertyDef _property)
+    {
+        this.properties.add(_property);
+        return (DATA) this;
+    }
+
+    /**
+     * Returns all assigned {@link #properties} from this data piece.
+     *
+     * @return all defined properties
+     */
+    public Set<PropertyDef> getProperties()
+    {
+        return this.properties;
     }
 
     /**
@@ -405,7 +437,7 @@ public abstract class AbstractData<T extends AbstractData<?>>
      * @return this instance
      * @throws MatrixException if create failed
      */
-    public abstract T create() throws MatrixException;
+    public abstract DATA create() throws MatrixException;
 
     /**
      * Exports this data piece from MX. The returned values from the export are
@@ -489,10 +521,12 @@ public abstract class AbstractData<T extends AbstractData<?>>
                             this.getSymbolicName(),
                             "check symbolic name");
         // check for all required values
-        for (final String valueName : this.requiredExportValues)  {
-            Assert.assertEquals(_exportParser.getLines("/mql/" + valueName + "/@value").size(),
-                                1,
-                                "required check that minimum and maximum one " + valueName + " is defined");
+        if (this.requiredExportValues != null)  {
+            for (final String valueName : this.requiredExportValues)  {
+                Assert.assertEquals(_exportParser.getLines("/mql/" + valueName + "/@value").size(),
+                                    1,
+                                    "required check that minimum and maximum one " + valueName + " is defined");
+            }
         }
         // check for defined values
         for (final Map.Entry<String,String> entry : this.values.entrySet())  {
@@ -511,6 +545,38 @@ public abstract class AbstractData<T extends AbstractData<?>>
         Assert.assertEquals(foundAdds.size(), needAdds.size(), "all adds defined");
         for (final String foundAdd : foundAdds)  {
             Assert.assertTrue(needAdds.contains(foundAdd), "check that add '" + foundAdd + "' is defined");
+        }
+    }
+
+    /**
+     * Checks for given <code>_tag</code> in the <code>_exportParser</code>
+     * if the <code>_value</code> exists and is correct defined. If
+     * <code>_value</code> is <code>null</code>, it is checked that no value is
+     * defined.
+     *
+     * @param _exportParser     parsed export
+     * @param _kind             kind of the check
+     * @param _tag              tag to check
+     * @param _value            value to check (or <code>null</code> if value
+     *                          is not defined)
+     */
+    protected void checkSingleValue(final ExportParser _exportParser,
+                                    final String _kind,
+                                    final String _tag,
+                                    final String _value)
+    {
+        if (_value != null)  {
+            Assert.assertEquals(_exportParser.getLines("/mql/" + _tag + "/@value").size(),
+                                1,
+                                "check " + _kind + " '" + this.getName() + "' that " + _tag + " is defined");
+            Assert.assertEquals(_exportParser.getLines("/mql/" + _tag + "/@value").get(0),
+                                _value,
+                                "check " + _kind + " '" + this.getName() + "' that " + _tag + " is " + _value);
+
+        } else  {
+            Assert.assertEquals(_exportParser.getLines("/mql/" + _tag + "/@value").size(),
+                                0,
+                                "check " + _kind + " '" + this.getName() + "' that no " + _tag + " is defined");
         }
     }
 

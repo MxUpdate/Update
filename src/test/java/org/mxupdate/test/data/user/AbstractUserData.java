@@ -29,6 +29,11 @@ import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractData;
 import org.mxupdate.test.data.user.workspace.CueData;
+import org.mxupdate.test.data.user.workspace.FilterData;
+import org.mxupdate.test.data.user.workspace.QueryData;
+import org.mxupdate.test.data.user.workspace.TableData;
+import org.mxupdate.test.data.user.workspace.TipData;
+import org.mxupdate.test.data.user.workspace.ToolSetData;
 import org.testng.Assert;
 
 /**
@@ -37,15 +42,76 @@ import org.testng.Assert;
  *
  * @author The MxUpdate Team
  * @version $Id$
- * @param <T> class derived from abstract user
+ * @param <DATA> class derived from abstract user
  */
-public abstract class AbstractUserData<T extends AbstractUserData<?>>
-    extends AbstractData<T>
+public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
+    extends AbstractData<DATA>
 {
     /**
      * Related cues of the workspace data from this user.
+     *
+     * @see #newCue(String)
+     * @see #getCues()
+     * @see #ciFileWorkspaceObjects()
+     * @see #createWorkspaceObjects()
+     * @see #checkExport(ExportParser)
      */
-    private final Set<CueData<T>> cues = new HashSet<CueData<T>>();
+    private final Set<CueData<DATA>> cues = new HashSet<CueData<DATA>>();
+
+    /**
+     * Related filters of the workspace data from this user.
+     *
+     * @see #newFilter(String)
+     * @see #getFilters()
+     * @see #ciFileWorkspaceObjects()
+     * @see #createWorkspaceObjects()
+     * @see #checkExport(ExportParser)
+     */
+    private final Set<FilterData<DATA>> filters = new HashSet<FilterData<DATA>>();
+
+    /**
+     * Related queries of the workspace data from this user.
+     *
+     * @see #newQuery(String)
+     * @see #getQueries()
+     * @see #ciFileWorkspaceObjects()
+     * @see #createWorkspaceObjects()
+     * @see #checkExport(ExportParser)
+     */
+    private final Set<QueryData<DATA>> queries = new HashSet<QueryData<DATA>>();
+
+    /**
+     * Related tables of the workspace data from this user.
+     *
+     * @see #newTable(String)
+     * @see #getTables()
+     * @see #ciFileWorkspaceObjects()
+     * @see #createWorkspaceObjects()
+     * @see #checkExport(ExportParser)
+     */
+    private final Set<TableData<DATA>> tables = new HashSet<TableData<DATA>>();
+
+    /**
+     * Related tips of the workspace data from this user.
+     *
+     * @see #newTip(String)
+     * @see #getTips()
+     * @see #ciFileWorkspaceObjects()
+     * @see #createWorkspaceObjects()
+     * @see #checkExport(ExportParser)
+     */
+    private final Set<TipData<DATA>> tips = new HashSet<TipData<DATA>>();
+
+    /**
+     * Related tool sets of the workspace data from this user.
+     *
+     * @see #newToolSet(String)
+     * @see #getToolSets()
+     * @see #ciFileWorkspaceObjects()
+     * @see #createWorkspaceObjects()
+     * @see #checkExport(ExportParser)
+     */
+    private final Set<ToolSetData<DATA>> toolSets = new HashSet<ToolSetData<DATA>>();
 
     /**
      * Constructor to initialize this user.
@@ -78,11 +144,152 @@ public abstract class AbstractUserData<T extends AbstractUserData<?>>
      * @see #cues
      */
     @SuppressWarnings("unchecked")
-    public CueData<T> newCue(final String _name)
+    public CueData<DATA> newCue(final String _name)
     {
-        final CueData<T> ret = new CueData<T>(this.getTest(), (T) this, _name);
+        final CueData<DATA> ret = new CueData<DATA>(this.getTest(), (DATA) this, _name);
         this.cues.add(ret);
         return ret;
+    }
+
+    /**
+     * Returns all defined {@link #cues} for this user.
+     *
+     * @return all defined cues
+     * @see #cues
+     */
+    public Set<CueData<DATA>> getCues()
+    {
+        return this.cues;
+    }
+
+    /**
+     * Creates for given <code>_name</code> for this user a new filter.
+     *
+     * @param _name     name of the new filter for this user
+     * @return new created filter instance for this user
+     * @see #filters
+     */
+    @SuppressWarnings("unchecked")
+    public FilterData<DATA> newFilter(final String _name)
+    {
+        final FilterData<DATA> ret = new FilterData<DATA>(this.getTest(), (DATA) this, _name);
+        this.filters.add(ret);
+        return ret;
+    }
+
+    /**
+     * Returns all defined {@link #filters} for this user.
+     *
+     * @return all defined filters
+     * @see #filters
+     */
+    public Set<FilterData<DATA>> getFilters()
+    {
+        return this.filters;
+    }
+
+    /**
+     * Creates for given <code>_name</code> for this user a new query.
+     *
+     * @param _name     name of the new query for this user
+     * @return new created query instance for this user
+     * @see #queries
+     */
+    @SuppressWarnings("unchecked")
+    public QueryData<DATA> newQuery(final String _name)
+    {
+        final QueryData<DATA> ret = new QueryData<DATA>(this.getTest(), (DATA) this, _name);
+        this.queries.add(ret);
+        return ret;
+    }
+
+    /**
+     * Returns all defined {@link #queries} for this user.
+     *
+     * @return all defined queries
+     * @see #queries
+     */
+    public Set<QueryData<DATA>> getQueries()
+    {
+        return this.queries;
+    }
+
+    /**
+     * Creates for given <code>_name</code> for this user a new table.
+     *
+     * @param _name     name of the new table for this user
+     * @return new created table instance for this user
+     * @see #tables
+     */
+    @SuppressWarnings("unchecked")
+    public TableData<DATA> newTable(final String _name)
+    {
+        final TableData<DATA> ret = new TableData<DATA>(this.getTest(), (DATA) this, _name);
+        this.tables.add(ret);
+        return ret;
+    }
+
+    /**
+     * Returns all defined {@link #tables} for this user.
+     *
+     * @return all defined tables
+     * @see #toolSets
+     */
+    public Set<TableData<DATA>> getTables()
+    {
+        return this.tables;
+    }
+
+    /**
+     * Creates for given <code>_name</code> for this user a new tip.
+     *
+     * @param _name     name of the new tip for this user
+     * @return new created tip instance for this user
+     * @see #tips
+     */
+    @SuppressWarnings("unchecked")
+    public TipData<DATA> newTip(final String _name)
+    {
+        final TipData<DATA> ret = new TipData<DATA>(this.getTest(), (DATA) this, _name);
+        this.tips.add(ret);
+        return ret;
+    }
+
+    /**
+     * Returns all defined {@link #tips} for this user.
+     *
+     * @return all defined tips
+     * @see #tips
+     */
+    public Set<TipData<DATA>> getTips()
+    {
+        return this.tips;
+    }
+
+    /**
+     * Creates for given <code>_name</code> for this user a new tool set.
+     *
+     * @param _name     name of the new tool set for this user
+     * @return new created tool set instance for this user
+     * @see #toolSets
+     */
+    @SuppressWarnings("unchecked")
+    public ToolSetData<DATA> newToolSet(final String _name)
+    {
+        final ToolSetData<DATA> ret = new ToolSetData<DATA>(this.getTest(), (DATA) this, _name);
+        this.toolSets.add(ret);
+        return ret;
+    }
+
+    /**
+     * Returns all defined {@link #toolSets} for this user.
+     *
+     * @return all defined tool sets
+     * @see #toolSets
+     */
+    public Set<ToolSetData<DATA>> getToolSets()
+    {
+        return this.toolSets;
     }
 
     /**
@@ -90,6 +297,11 @@ public abstract class AbstractUserData<T extends AbstractUserData<?>>
      * This includes:
      * <ul>
      * <li>{@link #cues}</li>
+     * <li>{@link #filters}</li>
+     * <li>{@link #queries}</li>
+     * <li>{@link #tables}</li>
+     * <li>{@link #tips}</li>
+     * <li>{@link #toolSets tool sets}</li>
      * </ul>
      *
      * @return part of the CI file for the user specific workspace objects
@@ -99,15 +311,48 @@ public abstract class AbstractUserData<T extends AbstractUserData<?>>
         final StringBuilder cmd = new StringBuilder();
 
         // cues
-        for (final CueData<T> cue : this.cues)  {
-            cmd.append(cue.ciFile());
+        for (final CueData<DATA> cue : this.cues)  {
+            cmd.append(cue.ciFile()).append('\n');
+        }
+
+        // filters
+        for (final FilterData<DATA> filter : this.filters)  {
+            cmd.append(filter.ciFile()).append('\n');
+        }
+
+        // queries
+        for (final QueryData<DATA> query : this.queries)  {
+            cmd.append(query.ciFile()).append('\n');
+        }
+
+        // tables
+        for (final TableData<DATA> table : this.tables)  {
+            cmd.append(table.ciFile()).append('\n');
+        }
+
+        // tips
+        for (final TipData<DATA> tip : this.tips)  {
+            cmd.append(tip.ciFile()).append('\n');
+        }
+
+        // tool sets
+        for (final ToolSetData<DATA> toolSet : this.toolSets)  {
+            cmd.append(toolSet.ciFile()).append('\n');
         }
 
         return cmd.toString();
     }
 
     /**
-     * Creates all workspace objects.
+     * Creates all workspace objects. This includes:
+     * <ul>
+     * <li>{@link #cues}</li>
+     * <li>{@link #filters}</li>
+     * <li>{@link #queries}</li>
+     * <li>{@link #tables}</li>
+     * <li>{@link #tips}</li>
+     * <li>{@link #toolSets}</li>
+     * </ul>
      *
      * @throws MatrixException if create of the workspace objects for this user
      *                         failed
@@ -116,14 +361,49 @@ public abstract class AbstractUserData<T extends AbstractUserData<?>>
     protected void createWorkspaceObjects()
         throws MatrixException
     {
-        for (final CueData<T> cue : this.cues)  {
+        // cues
+        for (final CueData<DATA> cue : this.cues)  {
             cue.create();
+        }
+
+        // filters
+        for (final FilterData<DATA> filter : this.filters)  {
+            filter.create();
+        }
+
+        // queries
+        for (final QueryData<DATA> query : this.queries)  {
+            query.create();
+        }
+
+        // tables
+        for (final TableData<DATA> table : this.tables)  {
+            table.create();
+        }
+
+        // tips
+        for (final TipData<DATA> tip : this.tips)  {
+            tip.create();
+        }
+
+        // tool sets
+        for (final ToolSetData<DATA> toolSet : this.toolSets)  {
+            toolSet.create();
         }
     }
 
     /**
      * Checks the export of this data piece if all values are correct defined.
-     * All workspace objects for this user are checked that they are defined.
+     * Following workspace objects for this user are checked that they are
+     * defined:
+     * <ul>
+     * <li>{@link #cues}</li>
+     * <li>{@link #filters}</li>
+     * <li>{@link #queries}</li>
+     * <li>{@link #tables}</li>
+     * <li>{@link #tips}</li>
+     * <li>{@link #toolSets}</li>
+     * </ul>
      *
      * @param _exportParser     parsed export
      * @throws MatrixException if check failed
@@ -134,11 +414,17 @@ public abstract class AbstractUserData<T extends AbstractUserData<?>>
     {
         super.checkExport(_exportParser);
 
-        final Set<CueData<T>> tmpCues = new HashSet<CueData<T>>(this.cues);
+        final Set<CueData<DATA>> tmpCues            = new HashSet<CueData<DATA>>(this.cues);
+        final Set<FilterData<DATA>> tmpFilters      = new HashSet<FilterData<DATA>>(this.filters);
+        final Set<QueryData<DATA>> tmpQueries       = new HashSet<QueryData<DATA>>(this.queries);
+        final Set<TableData<DATA>> tmpTables        = new HashSet<TableData<DATA>>(this.tables);
+        final Set<TipData<DATA>> tmpTips            = new HashSet<TipData<DATA>>(this.tips);
+        final Set<ToolSetData<DATA>> tmpToolSets    = new HashSet<ToolSetData<DATA>>(this.toolSets);
 
         for (final ExportParser.Line rootLine : _exportParser.getRootLines())  {
+            // cues
             if (rootLine.getValue().startsWith("escape add cue "))  {
-                for (final CueData<T> cue : this.cues)  {
+                for (final CueData<DATA> cue : this.cues)  {
                     final String key = new StringBuilder()
                             .append("escape add cue \"")
                             .append(AbstractTest.convertTcl(cue.getName()))
@@ -150,8 +436,83 @@ public abstract class AbstractUserData<T extends AbstractUserData<?>>
                     }
                 }
             }
+            // filters
+            if (rootLine.getValue().startsWith("escape add filter "))  {
+                for (final FilterData<DATA> filter : this.filters)  {
+                    final String key = new StringBuilder()
+                            .append("escape add filter \"")
+                            .append(AbstractTest.convertTcl(filter.getName()))
+                            .append("\"").toString();
+                    if (key.equals(rootLine.getValue()))  {
+                        tmpFilters.remove(filter);
+                        filter.checkExport(new ExportParser(filter.getName(), rootLine));
+                        break;
+                    }
+                }
+            }
+            // queries
+            if (rootLine.getValue().startsWith("escape add query "))  {
+                for (final QueryData<DATA> query : this.queries)  {
+                    final String key = new StringBuilder()
+                            .append("escape add query \"")
+                            .append(AbstractTest.convertTcl(query.getName()))
+                            .append("\"").toString();
+                    if (key.equals(rootLine.getValue()))  {
+                        tmpQueries.remove(query);
+                        query.checkExport(new ExportParser(query.getName(), rootLine));
+                        break;
+                    }
+                }
+            }
+            // tables
+            if (rootLine.getValue().startsWith("escape add table "))  {
+                for (final TableData<DATA> table : this.tables)  {
+                    final String key = new StringBuilder()
+                            .append("escape add table \"")
+                            .append(AbstractTest.convertTcl(table.getName()))
+                            .append("\"").toString();
+                    if (key.equals(rootLine.getValue()))  {
+                        tmpTables.remove(table);
+                        table.checkExport(new ExportParser(table.getName(), rootLine));
+                        break;
+                    }
+                }
+            }
+            // tips
+            if (rootLine.getValue().startsWith("escape add tip "))  {
+                for (final TipData<DATA> tip : this.tips)  {
+                    final String key = new StringBuilder()
+                            .append("escape add tip \"")
+                            .append(AbstractTest.convertTcl(tip.getName()))
+                            .append("\"").toString();
+                    if (key.equals(rootLine.getValue()))  {
+                        tmpTips.remove(tip);
+                        tip.checkExport(new ExportParser(tip.getName(), rootLine));
+                        break;
+                    }
+                }
+            }
+            // tool sets
+            if (rootLine.getValue().startsWith("escape add toolset "))  {
+                for (final ToolSetData<DATA> toolSet : this.toolSets)  {
+                    final String key = new StringBuilder()
+                            .append("escape add toolset \"")
+                            .append(AbstractTest.convertTcl(toolSet.getName()))
+                            .append("\"").toString();
+                    if (key.equals(rootLine.getValue()))  {
+                        tmpToolSets.remove(toolSet);
+                        toolSet.checkExport(new ExportParser(toolSet.getName(), rootLine));
+                        break;
+                    }
+                }
+            }
         }
 
-        Assert.assertTrue(tmpCues.isEmpty(), "check that all cues are defined in the update file");
+        Assert.assertTrue(tmpCues.isEmpty(),        "check that all cues are defined in the update file");
+        Assert.assertTrue(tmpFilters.isEmpty(),     "check that all filters are defined in the update file");
+        Assert.assertTrue(tmpQueries.isEmpty(),     "check that all queries are defined in the update file");
+        Assert.assertTrue(tmpTables.isEmpty(),      "check that all tables are defined in the update file");
+        Assert.assertTrue(tmpTips.isEmpty(),        "check that all tips are defined in the update file");
+        Assert.assertTrue(tmpToolSets.isEmpty(),    "check that all tool sets are defined in the update file");
     }
 }

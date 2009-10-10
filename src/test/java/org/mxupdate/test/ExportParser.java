@@ -118,15 +118,44 @@ public class ExportParser
         new Line(Arrays.asList(this.code.split("\n")).iterator(), null);
     }
 
+    /**
+     * Creates a new export parser used e.g. to check elements within a sub
+     * structure.
+     *
+     * @param _name         name of the administration object
+     * @param _rootLines    depending root lines
+     */
     public ExportParser(final String _name,
-                        final Line...  rootLines)
+                        final Line...  _rootLines)
     {
         this.origCode = null;
         this.ci = null;
         this.symbolicName = null;
         this.name = _name;
         this.code = null;
-        this.rootLines.addAll(Arrays.asList(rootLines));
+        this.rootLines.addAll(Arrays.asList(_rootLines));
+    }
+
+    /**
+     * Used to check an export depending on a deep hierarchy and to change the
+     * tag of the root.
+     *
+     * @param _name         name of the administration object
+     * @param _lineTag      tag of the parsed line
+     * @param _lineValue    value of the parsed line
+     * @param _children     all child lines of the parsed line
+     */
+    public ExportParser(final String _name,
+                        final String _lineTag,
+                        final String _lineValue,
+                        final List<Line> _children)
+    {
+        this.origCode = null;
+        this.ci = null;
+        this.symbolicName = null;
+        this.name = _name;
+        this.code = null;
+        this.rootLines.add(new Line(_lineTag, _lineValue, _children));
     }
 
     /**
@@ -284,17 +313,6 @@ public class ExportParser
         private final int shifting;
 
         /**
-         * Returns the {@link #value} of this line.
-         *
-         * @return value of this line
-         * @see #value
-         */
-        public String getValue()
-        {
-            return this.value;
-        }
-
-        /**
          *
          * @param _lineIter     line iterator
          * @param _prevLine     previsous line
@@ -327,6 +345,59 @@ public class ExportParser
             if (_lineIter.hasNext())  {
                 new Line(_lineIter, this);
             }
+        }
+
+        /**
+         * Used to simulate a parsed export but with another root tag.
+         *
+         * @param _tag          tag of the line
+         * @param _value        value of the line
+         * @param _children     all child lines
+         * @see ExportParser#ExportParser(String, String, String, List)
+         */
+        private Line(final String _tag,
+                     final String _value,
+                     final List<ExportParser.Line> _children)
+        {
+            this.line = null;
+            this.parent = null;
+            this.shifting = 0;
+            this.tag = _tag;
+            this.value = _value;
+            this.children.addAll(_children);
+        }
+
+        /**
+         * Returns the {@link #tag} of this line.
+         *
+         * @return tag of this line
+         * @see #tag
+         */
+        public String getTag()
+        {
+            return this.tag;
+        }
+
+        /**
+         * Returns the {@link #value} of this line.
+         *
+         * @return value of this line
+         * @see #value
+         */
+        public String getValue()
+        {
+            return this.value;
+        }
+
+        /**
+         * Returns all {@link #children child lines} for this line definition.
+         *
+         * @return all child lines
+         * @see #children
+         */
+        public List<ExportParser.Line> getChildren()
+        {
+            return this.children;
         }
 
         /**
