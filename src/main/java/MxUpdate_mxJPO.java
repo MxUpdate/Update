@@ -553,7 +553,7 @@ public class MxUpdate_mxJPO
                 } else  {
                     out.append(line).append('\n');
                     line = new StringBuilder().append(prefix);
-                    for (int i = 1; i < lengthParam; i++)  {
+                    for (int i = 0; i < lengthParam; i++)  {
                         line.append(' ');
                     }
                 }
@@ -562,7 +562,7 @@ public class MxUpdate_mxJPO
                         if (line.length() > lengthLine)  {
                             out.append(line).append('\n');
                             line = new StringBuilder().append(prefix);
-                            for (int i = 1; i < lengthParam; i++)  {
+                            for (int i = 0; i < lengthParam; i++)  {
                                 line.append(' ');
                             }
                         }
