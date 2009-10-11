@@ -65,6 +65,8 @@ public class PersonAdmin_mxJPO
         PersonAdmin_mxJPO.IGNORED_URLS.add("/defaultApplication");
         PersonAdmin_mxJPO.IGNORED_URLS.add("/homeVault");
         PersonAdmin_mxJPO.IGNORED_URLS.add("/password");
+        PersonAdmin_mxJPO.IGNORED_URLS.add("/passwordModification");
+        PersonAdmin_mxJPO.IGNORED_URLS.add("/passwordModification/datetime");
     }
 
     /**
