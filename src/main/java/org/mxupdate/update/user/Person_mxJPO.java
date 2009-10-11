@@ -42,10 +42,8 @@ import org.mxupdate.update.AbstractPropertyObject_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.xml.sax.SAXException;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
-import static org.mxupdate.update.util.StringUtil_mxJPO.joinTcl;
 
 /**
  *
@@ -233,7 +231,7 @@ public class Person_mxJPO
             if (!"".equals(this.getTypeDef().getMxAdminSuffix()))  {
                 _out.append(" ").append(this.getTypeDef().getMxAdminSuffix());
             }
-            _out.append(" \\\n    description \"").append(convertTcl(this.getDescription())).append("\"");
+            _out.append(" \\\n    description \"").append(StringUtil_mxJPO.convertTcl(this.getDescription())).append("\"");
             this.writeObject(_paramCache, _out);
             this.writeProperties(_paramCache, _out);
         }
@@ -421,14 +419,14 @@ public class Person_mxJPO
                 throws IOException
         {
             _out.append("mql mod bus \"${OBJECTID}\"")
-                .append(" \\\n    description \"").append(convertTcl(this.getBusDescription())).append("\"");
+                .append(" \\\n    description \"").append(StringUtil_mxJPO.convertTcl(this.getBusDescription())).append("\"");
             for (final AttributeValue attr : this.getAttrValuesSorted())  {
-                _out.append(" \\\n    \"").append(convertTcl(attr.name))
-                    .append("\" \"").append(convertTcl(attr.value)).append("\"");
+                _out.append(" \\\n    \"").append(StringUtil_mxJPO.convertTcl(attr.name))
+                    .append("\" \"").append(StringUtil_mxJPO.convertTcl(attr.value)).append("\"");
               }
             // member of
             _out.append("\n# member of")
-                .append("\nset lsCur [mql print bus \"${OBJECTID}\" select \"to\\[Member|from.type==Company\\].from.name\" dump \"\\n\"]")
+                .append("\nset lsCur [split [mql print bus \"${OBJECTID}\" select \"to\\[Member|from.type==Company\\].from.name\" dump \"\\n\"] \"\\n\"]")
                 .append("\nforeach sCur ${lsCur}  {")
                 .append("\n  puts \"    - remove as member from '${sCur}'\"")
                 .append("\n  mql disconnect bus \"${OBJECTID}\" \\")
@@ -436,25 +434,26 @@ public class Person_mxJPO
                 .append("\n      from Company \"${sCur}\" -")
                 .append("\n}");
             if (this.memberOf != null)  {
-                _out.append("\nputs \"    - assign as member from '").append(convertTcl(this.memberOf)).append("'\"")
+                _out.append("\nputs \"    - assign as member from '").append(StringUtil_mxJPO.convertTcl(this.memberOf)).append("'\"")
                     .append("\nmql connect bus \"${OBJECTID}\" \\")
                     .append("\n    relationship \"Member\" \\")
-                    .append("\n    from Company \"").append(convertTcl(this.memberOf)).append("\" - \\")
-                    .append("\n    \"Project Access\" \"").append(convertTcl(this.memberAccess)).append("\" \\")
-                    .append("\n    \"Project Role\" \"").append(convertTcl(joinTcl('~', false, this.memberRoles, null))).append("\"");
+                    .append("\n    from Company \"").append(StringUtil_mxJPO.convertTcl(this.memberOf)).append("\" - \\")
+                    .append("\n    \"Project Access\" \"").append(StringUtil_mxJPO.convertTcl(this.memberAccess)).append("\" \\")
+                    .append("\n    \"Project Role\" \"")
+                            .append(StringUtil_mxJPO.convertTcl(StringUtil_mxJPO.joinTcl('~', false, this.memberRoles, null))).append("\"");
             }
             // employees
             final List<String> employees = new ArrayList<String>();
             if (this.employeeOf != null)  {
                 employees.add(this.employeeOf);
             }
-            _out.append(writeCons("employee",
-                                  employees,
-                                  "Employee"))
+            _out.append(this.writeCons("employee",
+                                       employees,
+                                       "Employee"))
             // organization representatives
-                .append(writeCons("organization representative",
-                                  this.representativeOf,
-                                  "Organization Representative"));
+                .append(this.writeCons("organization representative",
+                                       this.representativeOf,
+                                       "Organization Representative"));
             // state
             if ("Active".equals(this.status))  {
                 _out.append("\nmql promote bus \"${OBJECTID}\"");
@@ -469,10 +468,11 @@ public class Person_mxJPO
         {
             final StringBuilder ret = new StringBuilder()
                     .append("\n# ").append(_title)
-                    .append("\nset lsCur [mql print bus \"${OBJECTID}\" select \"to\\[").append(_relationship).append("\\].from.name\" dump \"\\n\"]")
+                    .append("\nset lsCur [split [mql print bus \"${OBJECTID}\" select \"to\\[")
+                                                .append(_relationship).append("\\].from.name\" dump \"\\n\"] \"\\n\"]")
                     .append("\nset lsNew [list");
             for (final String repr : _values)  {
-                ret.append(" \"").append(convertTcl(repr)).append('\"');
+                ret.append(" \"").append(StringUtil_mxJPO.convertTcl(repr)).append('\"');
             }
             ret.append("]")
                .append("\nforeach sCur ${lsCur}  {")
