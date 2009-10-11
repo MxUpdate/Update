@@ -42,6 +42,6 @@ public class RoleData
     public RoleData(final AbstractTest _test,
                     final String _name)
     {
-        super(_test, AbstractTest.CI.ROLE, _name, "ROLE_", "user/role");
+        super(_test, AbstractTest.CI.ROLE, _name);
     }
 }

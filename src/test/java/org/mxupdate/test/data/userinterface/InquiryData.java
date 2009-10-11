@@ -86,9 +86,7 @@ public class InquiryData
     public InquiryData(final AbstractTest _test,
                        final String _name)
     {
-        super(_test, AbstractTest.CI.INQUIRY, _name,
-              "INQUIRY_", "userinterface/inquiry",
-              InquiryData.REQUIRED_EXPORT_VALUES);
+        super(_test, AbstractTest.CI.INQUIRY, _name, InquiryData.REQUIRED_EXPORT_VALUES);
     }
 
     /**

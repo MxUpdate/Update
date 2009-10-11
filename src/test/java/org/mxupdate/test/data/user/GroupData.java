@@ -42,6 +42,6 @@ public class GroupData
     public GroupData(final AbstractTest _test,
                      final String _name)
     {
-        super(_test, AbstractTest.CI.GROUP, _name, "GROUP_", "user/group");
+        super(_test, AbstractTest.CI.GROUP, _name);
     }
 }

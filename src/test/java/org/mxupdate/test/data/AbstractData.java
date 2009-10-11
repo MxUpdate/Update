@@ -90,7 +90,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @see #setHidden(boolean)
      * @see #isHidden()
      */
-    private boolean hidden = false;
+    private Boolean hidden = false;
 
     /**
      * Defines the values which must be defined for exports. They are tested
@@ -110,16 +110,6 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     private boolean created;
 
     /**
-     * Prefix used for the file name.
-     */
-    private final String filePrefix;
-
-    /**
-     * Path where the configuration item update file is located.
-     */
-    private final String ciPath;
-
-    /**
      * All properties for this data piece.
      *
      * @see #addProperty(PropertyDef)
@@ -132,8 +122,6 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @param _test                 related test case
      * @param _ci                   related configuration type
      * @param _name                 name of the administration object
-     * @param _filePrefix           prefix for the file name
-     * @param _ciPath               path of the configuration item file
      * @param _requiredExportValues defines the required values of the
      *                              export within the configuration item
      *                              file
@@ -141,8 +129,6 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     protected AbstractData(final AbstractTest _test,
                            final AbstractTest.CI _ci,
                            final String _name,
-                           final String _filePrefix,
-                           final String _ciPath,
                            final Set<String> _requiredExportValues)
     {
         this.test = _test;
@@ -151,8 +137,6 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
         this.symbolicName = (_ci != null)
                             ? _ci.getMxType() + "_" + this.name.replaceAll(AbstractData.NOT_ALLOWED_CHARS, "")
                             : null;
-        this.filePrefix = _filePrefix;
-        this.ciPath = _ciPath;
         this.requiredExportValues = _requiredExportValues;
     }
 
@@ -263,7 +247,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @see #hidden
      */
     @SuppressWarnings("unchecked")
-    public DATA setHidden(final boolean _hidden)
+    public DATA setHidden(final Boolean _hidden)
     {
         this.hidden = _hidden;
         return (DATA) this;
@@ -276,7 +260,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      *         <i>false</i>
      * @see #hidden
      */
-    public boolean isHidden()
+    public Boolean isHidden()
     {
         return this.hidden;
     }
@@ -313,7 +297,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     public String getCIFileName()
     {
         final char[] charName = this.name.toCharArray();
-        final StringBuilder fileName = new StringBuilder().append(this.filePrefix);
+        final StringBuilder fileName = new StringBuilder().append(this.getCI().filePrefix);
         for (int idx = 0; idx < charName.length; idx++)  {
             final char ch = charName[idx];
             if (ch == '@')  {
@@ -356,17 +340,6 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @return file content of the configuration item used to make an update
      */
     public abstract String ciFile();
-
-    /**
-     * Returns the path of the configuration item.
-     *
-     * @return path of the configuration item
-     * @see #ciPath
-     */
-    public String getCiPath()
-    {
-        return this.ciPath;
-    }
 
     /**
      * Appends the defined {@link #values} to the TCL code <code>_cmd</code> of
@@ -482,7 +455,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
                             "returned name is equal to given name");
         // check path of the configuration item update file
         Assert.assertEquals(exportDesc.get("path"),
-                            this.ciPath,
+                            this.getCI().filePath,
                             "check path where the configuration item update file is located is correct");
         // check file name of the configuration item update file
         Assert.assertEquals(exportDesc.get("filename"),

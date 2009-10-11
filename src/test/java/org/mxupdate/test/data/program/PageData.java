@@ -43,7 +43,7 @@ public class PageData
     public PageData(final AbstractTest _test,
                           final String _name)
     {
-        super(_test, AbstractTest.CI.PAGE, _name, "PAGE_", "program/page");
+        super(_test, AbstractTest.CI.PAGE, _name);
     }
 
     /**

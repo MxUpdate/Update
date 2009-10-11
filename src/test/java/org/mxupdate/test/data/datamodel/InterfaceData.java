@@ -117,7 +117,6 @@ public class InterfaceData
                          final String _name)
     {
         super(_test, AbstractTest.CI.INTERFACE, _name,
-              "INTERFACE_", "datamodel/interface",
               InterfaceData.REQUIRED_EXPORT_VALUES);
     }
 

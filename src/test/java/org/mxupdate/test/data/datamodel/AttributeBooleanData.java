@@ -40,8 +40,8 @@ public class AttributeBooleanData
      * @param _name     name of the boolean attribute
      */
     public AttributeBooleanData(final AbstractTest _test,
-                            final String _name)
+                                final String _name)
     {
-        super(_test, CI.ATTRIBUTE_BOOLEAN, _name, "boolean", "BOOLEAN_");
+        super(_test, CI.ATTRIBUTE_BOOLEAN, _name, "boolean");
     }
 }

@@ -52,9 +52,9 @@ public class MenuData
      * @param _name     name of the menu
      */
     public MenuData(final AbstractTest _test,
-                final String _name)
+                    final String _name)
     {
-        super(_test, AbstractTest.CI.MENU, _name, "MENU_", "userinterface/menu");
+        super(_test, AbstractTest.CI.MENU, _name);
     }
 
     /**

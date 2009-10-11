@@ -62,7 +62,6 @@ public class RelationshipData
                             final String _name)
     {
         super(_test, AbstractTest.CI.RELATIONSHIP, _name,
-              "RELATIONSHIP_", "datamodel/relationship",
               RelationshipData.REQUIRED_EXPORT_VALUES);
     }
 

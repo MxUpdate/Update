@@ -42,6 +42,6 @@ public class AttributeIntegerData
     public AttributeIntegerData(final AbstractTest _test,
                             final String _name)
     {
-        super(_test, CI.ATTRIBUTE_INTEGER, _name, "integer", "INTEGER_");
+        super(_test, CI.ATTRIBUTE_INTEGER, _name, "integer");
     }
 }

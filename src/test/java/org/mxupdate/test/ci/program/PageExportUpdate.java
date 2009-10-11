@@ -111,7 +111,7 @@ public class PageExportUpdate
 
         // check oath
         Assert.assertEquals(export.getPath(),
-                            page.getCiPath(),
+                            page.getCI().filePath,
                             "check path is correct");
 
         // check file name

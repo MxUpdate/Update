@@ -40,8 +40,8 @@ public class AttributeDateData
      * @param _name     name of the string attribute
      */
     public AttributeDateData(final AbstractTest _test,
-                         final String _name)
+                             final String _name)
     {
-        super(_test, CI.ATTRIBUTE_DATE, _name, "date", "DATE_");
+        super(_test, CI.ATTRIBUTE_DATE, _name, "date");
     }
 }

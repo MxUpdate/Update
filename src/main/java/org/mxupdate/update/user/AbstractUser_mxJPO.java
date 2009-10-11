@@ -45,7 +45,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * information within MX. Common user information are all workspace related
  * objects.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public abstract class AbstractUser_mxJPO
@@ -64,6 +64,7 @@ public abstract class AbstractUser_mxJPO
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
+        AbstractUser_mxJPO.IGNORED_URLS.add("/homeSite");
         AbstractUser_mxJPO.IGNORED_URLS.add("/cueList");
         AbstractUser_mxJPO.IGNORED_URLS.add("/filterList");
         AbstractUser_mxJPO.IGNORED_URLS.add("/queryList");
@@ -73,6 +74,14 @@ public abstract class AbstractUser_mxJPO
         AbstractUser_mxJPO.IGNORED_URLS.add("/tipList");
         AbstractUser_mxJPO.IGNORED_URLS.add("/toolsetList");
     }
+
+    /**
+     * Related site of this group.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
+     */
+    private String site;
 
     /**
      * Maps depending on the name of the cue to related cue information. The
@@ -199,6 +208,7 @@ public abstract class AbstractUser_mxJPO
     /**
      * <p>Parses all common user specific URL values. This includes:
      * <ul>
+     * <li>{@link #site}</li>
      * <li>{@link #cues}</li>
      * <li>{@link #filters}</li>
      * <li>{@link #queries}</li>
@@ -218,7 +228,10 @@ public abstract class AbstractUser_mxJPO
                          final String _content)
     {
         if (!AbstractUser_mxJPO.IGNORED_URLS.contains(_url))  {
-            if ("/cueList/cue".equals(_url))  {
+            if ("/homeSite/siteRef".equals(_url))  {
+                this.site = _content;
+
+            } else if ("/cueList/cue".equals(_url))  {
                 this.currentCue = new Cue_mxJPO(this);
             } else if ("/cueList/cue/name".equals(_url))  {
                 this.cues.put(_content, this.currentCue);
@@ -327,6 +340,32 @@ public abstract class AbstractUser_mxJPO
     }
 
     /**
+     * Writes specific information about the cached user to the given
+     * writer instance. This includes:
+     * <ul>
+     * <li>{@link #isHidden() hidden flag}</li>
+     * <li>{@link #site assigned site}</li>
+     * </ul>
+     *
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the TCL update code for the group could not be
+     *                     written
+     */
+    @Override()
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
+            throws IOException
+    {
+        _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden");
+
+        // site
+        if (this.site != null)  {
+            _out.append(" \\\n    site \"").append(StringUtil_mxJPO.convertTcl(this.site)).append('\"');
+        }
+    }
+
+    /**
      * Writes specific information about the cached role to the given
      * writer instance. The included information is:
      * <ul>
@@ -342,8 +381,9 @@ public abstract class AbstractUser_mxJPO
      * @param _out          appendable instance to the TCL update file
      * @throws IOException if the TCL update code could not written
      */
-    protected void writeWorkspaceObjects(final ParameterCache_mxJPO _paramCache,
-                                         final Appendable _out)
+    @Override
+    protected void writeEnd(final ParameterCache_mxJPO _paramCache,
+                            final Appendable _out)
         throws IOException
     {
         // cues
@@ -381,6 +421,7 @@ public abstract class AbstractUser_mxJPO
      * in the <code>_preMQLCode</code> to reset this user. Following steps are
      * done:
      * <ul>
+     * <li>remove assigned {@link #site}</li>
      * <li>remove all {@link #cues}</li>
      * <li>remove all {@link #filters}</li>
      * <li>remove all {@link #queries}</li>
@@ -413,6 +454,20 @@ public abstract class AbstractUser_mxJPO
         throws Exception
     {
         final StringBuilder preMQLCode = new StringBuilder();
+
+        // remove hidden flag
+        if (this.isHidden())  {
+            preMQLCode.append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                      .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
+                      .append("!hidden;\n");
+        }
+
+        // remove site...
+        if (this.site != null)  {
+            preMQLCode.append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                      .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
+                      .append(" site \"\";\n");
+        }
 
         // remove all assigned cues
         for (final Cue_mxJPO cue : this.cues.values())  {

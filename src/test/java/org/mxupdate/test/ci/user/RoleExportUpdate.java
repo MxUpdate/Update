@@ -69,6 +69,16 @@ public class RoleExportUpdate
                                 .setHidden(true)
                                 .setValue("description", "\"\\\\ hallo")},
                 new Object[]{
+                        "not hidden role",
+                        new RoleData(this, "hallo \" test")
+                                .setHidden(false)
+                                .setValue("description", "\"\\\\ hallo")},
+                new Object[]{
+                        "default hidden role",
+                        new RoleData(this, "hallo \" test")
+                                .setHidden(null)
+                                .setValue("description", "\"\\\\ hallo")},
+                new Object[]{
                         "role with two parent roles",
                         new RoleData(this, "hallo \" test")
                                 .setValue("description", "\"\\\\ hallo")
@@ -612,9 +622,8 @@ public class RoleExportUpdate
         };
     }
 
-
     /**
-     * Cleanup all test commands.
+     * Cleanup all test roles.
      *
      * @throws MatrixException if cleanup failed
      */
@@ -740,19 +749,35 @@ public class RoleExportUpdate
      * @throws Exception if test failed
      */
     @Test(description = "update existing existing role with site by removing site")
-    public void removeExistingSite()
+    public void checkExistingSiteRemovedWithinUpdate()
         throws Exception
     {
         final RoleData role = new RoleData(this, "hallo \" test")
                 .setSite(new SiteData(this, "Test \" Site"));
         role.create();
         role.setSite(null);
-        this.update(role.getCIFileName(), role.ciFile());
+        this.update(role);
 
-        Assert.assertEquals(this.mql("escape print role \""
-                                    + AbstractTest.convertMql(role.getName())
-                                    + "\" select site dump"),
+        Assert.assertEquals(this.mql("escape print role \"" + AbstractTest.convertMql(role.getName()) + "\" select site dump"),
                             "",
                             "check that no site is defined");
+    }
+
+    /**
+     * Check that the hidden flag is removed within update.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "check that the hidden flag is removed within update")
+    public void checkHiddenFlagRemoveWithinUpdate()
+        throws Exception
+    {
+        final RoleData role = new RoleData(this, "hallo \" test").setHidden(true);
+        role.create();
+        role.setHidden(null);
+        this.update(role);
+        Assert.assertEquals(this.mql("escape print role \"" + AbstractTest.convertMql(role.getName()) + "\" select hidden dump"),
+                            "FALSE",
+                            "check that role is not hidden");
     }
 }

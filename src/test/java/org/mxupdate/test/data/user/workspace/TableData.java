@@ -277,7 +277,7 @@ public class TableData<USER extends AbstractUserData<?>>
         public FieldData(final AbstractTest _test,
                          final String _name)
         {
-            super(_test, null, _name, null, null, null);
+            super(_test, null, _name, null);
         }
 
         /**

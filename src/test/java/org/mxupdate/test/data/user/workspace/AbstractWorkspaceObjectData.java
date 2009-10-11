@@ -83,7 +83,7 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
                                 final String _name,
                                 final Set<String> _requiredExportValues)
     {
-        super(_test, null, _name, null, null, _requiredExportValues);
+        super(_test, null, _name, _requiredExportValues);
         this.mxAdminType = _mxAdminType;
         this.user = _user;
     }

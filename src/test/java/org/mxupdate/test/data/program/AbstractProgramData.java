@@ -49,16 +49,12 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
      * @param _test                 related test case
      * @param _ci                   related configuration type
      * @param _name                 name of the program
-     * @param _filePrefix           prefix for the file name
-     * @param _ciPath               path of the configuration item file
      */
     protected AbstractProgramData(final AbstractTest _test,
                               final CI _ci,
-                              final String _name,
-                              final String _filePrefix,
-                              final String _ciPath)
+                              final String _name)
     {
-        super(_test, _ci, _name, _filePrefix, _ciPath, null);
+        super(_test, _ci, _name, null);
     }
 
     /**

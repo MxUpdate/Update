@@ -27,7 +27,6 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.other.SiteData;
 import org.testng.Assert;
 
 /**
@@ -36,23 +35,18 @@ import org.testng.Assert;
  *
  * @author The MxUpdate Team
  * @version $Id$
- * @param <T> class derived from abstract collection user
+ * @param <DATA> class derived from abstract collection user
  */
-public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
-    extends AbstractUserData<T>
+public class AbstractCollectionUserData<DATA extends AbstractCollectionUserData<?>>
+    extends AbstractUserData<DATA>
 {
-    /**
-     * Assigned site for this collection user.
-     */
-    private SiteData site;
-
     /**
      * Parent collection users to which this collection user is assigned.
      *
      * @see #assignParent(AbstractCollectionUserData)
      * @see #checkExport(ExportParser)
      */
-    private final Set<T> parent = new HashSet<T>();
+    private final Set<DATA> parent = new HashSet<DATA>();
 
     /**
      * Within export the description must be defined.
@@ -69,46 +63,12 @@ public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
      *                      user is defined)
      * @param _ci           related configuration type
      * @param _name         name of the collection user
-     * @param _filePrefix   prefix for the file name
-     * @param _ciPath       path of the configuration item file
      */
     public AbstractCollectionUserData(final AbstractTest _test,
                                   final AbstractTest.CI _ci,
-                                  final String _name,
-                                  final String _filePrefix,
-                                  final String _ciPath)
+                                  final String _name)
     {
-        super(_test, _ci, _name, _filePrefix, _ciPath, AbstractCollectionUserData.REQUIRED_EXPORT_VALUES);
-    }
-
-    /**
-     * Defines related site for this collection user.
-     *
-     * @param _site     site to assign
-     * @return this data instance
-     * @see #site
-     */
-    @SuppressWarnings("unchecked")
-    public T setSite(final SiteData _site)
-    {
-        this.site = _site;
-        if (_site == null)  {
-            this.getValues().remove("site");
-        } else  {
-            this.setValue("site", this.site.getName());
-        }
-        return (T) this;
-    }
-
-    /**
-     * Returns related {@link #site} of this collection user.
-     *
-     * @return assigned site; or <code>null</code> if not defined
-     * @see #site
-     */
-    public SiteData getSite()
-    {
-        return this.site;
+        super(_test, _ci, _name, AbstractCollectionUserData.REQUIRED_EXPORT_VALUES);
     }
 
     /**
@@ -120,10 +80,10 @@ public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
      * @see #parent
      */
     @SuppressWarnings("unchecked")
-    public T assignParent(final T _parent)
+    public DATA assignParent(final DATA _parent)
     {
         this.parent.add(_parent);
-        return (T) this;
+        return (DATA) this;
     }
 
     /**
@@ -132,41 +92,31 @@ public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
      * @return all assigned parent collection users
      * @see #parent
      */
-    public Set<T> getParent()
+    public Set<DATA> getParent()
     {
         return this.parent;
     }
 
     /**
      * Prepares the configuration item update file depending on the
-     * configuration of this collection user.
+     * configuration of this collection user. This includes:
+     * <ul>
+     * <li>{@link #parent parent collection users}</li>
+     * </ul>
      *
      * @return code for the configuration item update file
      */
     @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("mql escape mod " + this.getCI().getMxType() + " \"${NAME}\"");
-        // hidden flag
-        if (this.isHidden())  {
-            cmd.append(" \\\n    hidden");
-        } else  {
-            cmd.append(" \\\n    !hidden");
-        }
-
-        this.append4CIFileValues(cmd);
+        final StringBuilder cmd = new StringBuilder().append(super.ciFile());
 
         // define parent collection users
-        cmd.append(";\n");
-        for (final T user : this.parent)  {
+        for (final DATA user : this.parent)  {
             cmd.append("mql escape mod ")
                .append(user.getCI().getMxType()).append(" \"").append(AbstractTest.convertTcl(user.getName()))
                .append("\" child \"${NAME}\";\n");;
         }
-
-        // append all workspace related objects
-        cmd.append(this.ciFileWorkspaceObjects());
 
         return cmd.toString();
     }
@@ -174,52 +124,33 @@ public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
     /**
      * Creates this collection user.
      *
-     * @throws MatrixException if create failed
      * @return this collection user data instance
-     * @see #hidden
+     * @throws MatrixException if create failed
      */
     @SuppressWarnings("unchecked")
     @Override()
-    public T create()
+    public DATA create()
         throws MatrixException
     {
         if (!this.isCreated())  {
-            final StringBuilder cmd = new StringBuilder()
-                    .append("escape add ")
-                    .append(this.getCI().getMxType())
-                    .append(" \"").append(AbstractTest.convertMql(this.getName())).append("\"");
-            // hidden flag
-            if (this.isHidden())  {
-                cmd.append(" hidden");
-            } else  {
-                cmd.append(" !hidden");
-            }
-            // if site assigned, the site must be created
-            if (this.site != null)  {
-                this.site.create();
-            }
-            this.append4Create(cmd);
+            super.create();
 
-            cmd.append(";\n");
-            for (final T user : this.parent)  {
+            // assign parent objects
+            final StringBuilder cmd = new StringBuilder();
+            for (final DATA user : this.parent)  {
                 user.create();
                 cmd.append("escape mod ")
                    .append(user.getCI().getMxType()).append(" \"").append(AbstractTest.convertMql(user.getName()))
                    .append("\" child \"").append(AbstractTest.convertMql(this.getName())).append("\";\n");;
             }
-
             this.getTest().mql(cmd);
-
-            this.createWorkspaceObjects();
-
-            this.setCreated(true);
         }
-        return (T) this;
+        return (DATA) this;
     }
 
     /**
      * Checks the export of this data piece if all values are correct defined.
-     * The hidden flag and the {@link #parent collection users} are checked.
+     * The {@link #parent collection users} are checked.
      *
      * @param _exportParser     parsed export
      * @throws MatrixException if check failed
@@ -230,20 +161,10 @@ public class AbstractCollectionUserData<T extends AbstractCollectionUserData<?>>
     {
         super.checkExport(_exportParser);
 
-        // check hidden flag
-        final Set<String> main = new HashSet<String>(_exportParser.getLines("/mql/"));
-        if (this.isHidden())  {
-            Assert.assertTrue(main.contains("hidden") || main.contains("hidden \\"),
-                              "check that " + this.getCI().getMxType() + " '" + this.getName() + "' is hidden");
-        } else  {
-            Assert.assertTrue(main.contains("!hidden") || main.contains("!hidden \\"),
-                              "check that " + this.getCI().getMxType() + " '" + this.getName() + "' is not hidden");
-        }
-
         // check parent collection users
         final Set<String> pars = new HashSet<String>(_exportParser.getLines("/mql/@value"));
         pars.remove("escape mod " + this.getCI().getMxType() + " \"${NAME}\"");
-        for (final T user : this.parent)  {
+        for (final DATA user : this.parent)  {
             pars.remove("escape mod " + user.getCI().getMxType() + " \""
                     + AbstractTest.convertTcl(user.getName()) + "\" child \"${NAME}\"");
         }

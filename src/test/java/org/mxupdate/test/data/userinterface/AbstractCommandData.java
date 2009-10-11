@@ -66,16 +66,12 @@ abstract class AbstractCommandData<T extends AbstractCommandData<?>>
      *                      defined)
      * @param _ci           configuration item type
      * @param _name         name of command
-     * @param _filePrefix   prefix for the file name
-     * @param _ciPath       path of the configuration item file
      */
     AbstractCommandData(final AbstractTest _test,
-                    final AbstractTest.CI _ci,
-                    final String _name,
-                    final String _filePrefix,
-                    final String _ciPath)
+                        final AbstractTest.CI _ci,
+                        final String _name)
     {
-        super(_test, _ci, _name, _filePrefix, _ciPath, AbstractCommandData.REQUIRED_EXPORT_VALUES);
+        super(_test, _ci, _name, AbstractCommandData.REQUIRED_EXPORT_VALUES);
     }
 
     /**

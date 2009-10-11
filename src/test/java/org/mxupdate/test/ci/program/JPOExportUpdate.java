@@ -95,9 +95,9 @@ public class JPOExportUpdate
         // check path
         final String path;
         if (jpo.getName().indexOf('.') < 0)  {
-            path = jpo.getCiPath();
+            path = jpo.getCI().filePath;
         } else  {
-            path = jpo.getCiPath() + "/" + jpo.getName().replaceAll("\\.[^.]*$", "").replaceAll("\\.", "/");
+            path = jpo.getCI().filePath + "/" + jpo.getName().replaceAll("\\.[^.]*$", "").replaceAll("\\.", "/");
         }
         Assert.assertEquals(export.getPath(), path, "check path is correct");
 

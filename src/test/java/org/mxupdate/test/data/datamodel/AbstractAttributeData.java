@@ -69,16 +69,13 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * @param _ci           related configuration type of this attribute
      * @param _name         name of this attribute
      * @param _attrType     type of this attribute
-     * @param _filePrefix   prefix for the file name
      */
     protected AbstractAttributeData(final AbstractTest _test,
-                                final AbstractTest.CI _ci,
-                                final String _name,
-                                final String _attrType,
-                                final String _filePrefix)
+                                    final AbstractTest.CI _ci,
+                                    final String _name,
+                                    final String _attrType)
     {
-        super(_test, _ci, _name, _filePrefix, "datamodel/attribute",
-              AbstractAttributeData.REQUIRED_EXPORT_VALUES);
+        super(_test, _ci, _name, AbstractAttributeData.REQUIRED_EXPORT_VALUES);
         this.attrType = _attrType;
     }
 

@@ -106,7 +106,7 @@ public class MQLExportUpdate
 
         // check oath
         Assert.assertEquals(export.getPath(),
-                            mqlProgram.getCiPath(),
+                            mqlProgram.getCI().filePath,
                             "check path is correct");
 
         // check file name

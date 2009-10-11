@@ -28,6 +28,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractData;
+import org.mxupdate.test.data.other.SiteData;
 import org.mxupdate.test.data.user.workspace.CueData;
 import org.mxupdate.test.data.user.workspace.FilterData;
 import org.mxupdate.test.data.user.workspace.QueryData;
@@ -47,6 +48,11 @@ import org.testng.Assert;
 public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
     extends AbstractData<DATA>
 {
+    /**
+     * Assigned site for this user.
+     */
+    private SiteData site;
+
     /**
      * Related cues of the workspace data from this user.
      *
@@ -120,8 +126,6 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
      *                              user is defined)
      * @param _ci                   related configuration type
      * @param _name                 name of the user
-     * @param _filePrefix           prefix for the file name
-     * @param _ciPath               path of the configuration item file
      * @param _requiredExportValues defines the required values of the
      *                              export within the configuration item
      *                              file
@@ -129,11 +133,39 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
     protected AbstractUserData(final AbstractTest _test,
                                final AbstractTest.CI _ci,
                                final String _name,
-                               final String _filePrefix,
-                               final String _ciPath,
                                final Set<String> _requiredExportValues)
     {
-        super(_test, _ci, _name, _filePrefix, _ciPath, _requiredExportValues);
+        super(_test, _ci, _name, _requiredExportValues);
+    }
+
+    /**
+     * Defines related site for this user.
+     *
+     * @param _site     site to assign
+     * @return this user data instance
+     * @see #site
+     */
+    @SuppressWarnings("unchecked")
+    public DATA setSite(final SiteData _site)
+    {
+        this.site = _site;
+        if (_site == null)  {
+            this.getValues().remove("site");
+        } else  {
+            this.setValue("site", this.site.getName());
+        }
+        return (DATA) this;
+    }
+
+    /**
+     * Returns related {@link #site} of this user.
+     *
+     * @return assigned site; or <code>null</code> if not defined
+     * @see #site
+     */
+    public SiteData getSite()
+    {
+        return this.site;
     }
 
     /**
@@ -293,7 +325,8 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
     }
 
     /**
-     * Creates the part of the CI file for the user specific workspace object.
+     * <p>Prepares the configuration item update file depending on the
+     * configuration of this user.</p>
      * This includes:
      * <ul>
      * <li>{@link #cues}</li>
@@ -304,11 +337,25 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
      * <li>{@link #toolSets tool sets}</li>
      * </ul>
      *
-     * @return part of the CI file for the user specific workspace objects
+     * @return code for the configuration item update file
      */
-    protected String ciFileWorkspaceObjects()
+    @Override()
+    public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder();
+        final StringBuilder cmd = new StringBuilder()
+                .append("mql escape mod " + this.getCI().getMxType() + " \"${NAME}\"");
+        // hidden flag
+        if (this.isHidden() != null)  {
+            if (this.isHidden())  {
+                cmd.append(" \\\n    hidden");
+            } else  {
+                cmd.append(" \\\n    !hidden");
+            }
+        }
+
+        this.append4CIFileValues(cmd);
+
+        cmd.append(";\n");
 
         // cues
         for (final CueData<DATA> cue : this.cues)  {
@@ -344,7 +391,7 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
     }
 
     /**
-     * Creates all workspace objects. This includes:
+     * Creates this user. This includes:
      * <ul>
      * <li>{@link #cues}</li>
      * <li>{@link #filters}</li>
@@ -354,42 +401,67 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
      * <li>{@link #toolSets}</li>
      * </ul>
      *
-     * @throws MatrixException if create of the workspace objects for this user
-     *                         failed
-     * @see #cues
+     * @return this collection user data instance
+     * @throws MatrixException if create failed
      */
-    protected void createWorkspaceObjects()
-        throws MatrixException
+    @SuppressWarnings("unchecked")
+    @Override()
+    public DATA create() throws MatrixException
     {
-        // cues
-        for (final CueData<DATA> cue : this.cues)  {
-            cue.create();
-        }
+        if (!this.isCreated())  {
+            final StringBuilder cmd = new StringBuilder()
+                    .append("escape add ")
+                    .append(this.getCI().getMxType())
+                    .append(" \"").append(AbstractTest.convertMql(this.getName())).append("\"");
+            // hidden flag
+            if (this.isHidden() != null)  {
+                if (this.isHidden())  {
+                    cmd.append(" hidden");
+                } else  {
+                    cmd.append(" !hidden");
+                }
+            }
+            // if site assigned, the site must be created
+            if (this.site != null)  {
+                this.site.create();
+            }
+            this.append4Create(cmd);
+            cmd.append(";\n");
+            this.getTest().mql(cmd);
 
-        // filters
-        for (final FilterData<DATA> filter : this.filters)  {
-            filter.create();
-        }
+            this.setCreated(true);
 
-        // queries
-        for (final QueryData<DATA> query : this.queries)  {
-            query.create();
-        }
+            // cues
+            for (final CueData<DATA> cue : this.cues)  {
+                cue.create();
+            }
 
-        // tables
-        for (final TableData<DATA> table : this.tables)  {
-            table.create();
-        }
+            // filters
+            for (final FilterData<DATA> filter : this.filters)  {
+                filter.create();
+            }
 
-        // tips
-        for (final TipData<DATA> tip : this.tips)  {
-            tip.create();
-        }
+            // queries
+            for (final QueryData<DATA> query : this.queries)  {
+                query.create();
+            }
 
-        // tool sets
-        for (final ToolSetData<DATA> toolSet : this.toolSets)  {
-            toolSet.create();
+            // tables
+            for (final TableData<DATA> table : this.tables)  {
+                table.create();
+            }
+
+            // tips
+            for (final TipData<DATA> tip : this.tips)  {
+                tip.create();
+            }
+
+            // tool sets
+            for (final ToolSetData<DATA> toolSet : this.toolSets)  {
+                toolSet.create();
+            }
         }
+        return (DATA) this;
     }
 
     /**
@@ -397,6 +469,8 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
      * Following workspace objects for this user are checked that they are
      * defined:
      * <ul>
+     * <li>hidden flag</li>
+     * <li>{@link #site}</li>
      * <li>{@link #cues}</li>
      * <li>{@link #filters}</li>
      * <li>{@link #queries}</li>
@@ -414,6 +488,25 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
     {
         super.checkExport(_exportParser);
 
+        // site
+        this.checkSingleValue(_exportParser,
+                              this.getCI().getMxType(),
+                              "site",
+                              (this.site != null)
+                                      ? "\"" + AbstractTest.convertTcl(this.site.getName()) + "\""
+                                      : null);
+
+        // check hidden flag
+        final Set<String> main = new HashSet<String>(_exportParser.getLines("/mql/"));
+        if ((this.isHidden() != null) && this.isHidden())  {
+            Assert.assertTrue(main.contains("hidden") || main.contains("hidden \\"),
+                              "check that " + this.getCI().getMxType() + " '" + this.getName() + "' is hidden");
+        } else  {
+            Assert.assertTrue(main.contains("!hidden") || main.contains("!hidden \\"),
+                              "check that " + this.getCI().getMxType() + " '" + this.getName() + "' is not hidden");
+        }
+
+        // all workspace objects
         final Set<CueData<DATA>> tmpCues            = new HashSet<CueData<DATA>>(this.cues);
         final Set<FilterData<DATA>> tmpFilters      = new HashSet<FilterData<DATA>>(this.filters);
         final Set<QueryData<DATA>> tmpQueries       = new HashSet<QueryData<DATA>>(this.queries);

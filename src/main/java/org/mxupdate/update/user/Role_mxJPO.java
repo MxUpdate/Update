@@ -37,7 +37,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 /**
  * The class is used to export, create, delete and update roles within MX.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class Role_mxJPO
@@ -63,7 +63,6 @@ public class Role_mxJPO
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
-        Role_mxJPO.IGNORED_URLS.add("/homeSite");
         Role_mxJPO.IGNORED_URLS.add("/parentRole");
         // new URIL to be ignored, because read within prepare method
         Role_mxJPO.IGNORED_URLS.add("/roleType");
@@ -75,13 +74,6 @@ public class Role_mxJPO
      * @see #parse(String, String)
      */
     private final Set<String> parentRoles = new TreeSet<String>();
-
-    /**
-     * Related site of this role.
-     *
-     * @see #parse(String, String)
-     */
-    private String site;
 
     /**
      * Stores the information about the role type.
@@ -108,7 +100,6 @@ public class Role_mxJPO
      * <p>Parses all role specific URL values. This includes:
      * <ul>
      * <li>{@link #parentRoles parent roles}</li>
-     * <li>{@link #site}</li>
      * </ul></p>
      * <p>If an <code>_url</code> is included in {@link #IGNORED_URLS}, this
      * URL is ignored.</p>
@@ -125,8 +116,6 @@ public class Role_mxJPO
         if (!Role_mxJPO.IGNORED_URLS.contains(_url))  {
             if ("/parentRole/roleRef".equals(_url))  {
                 this.parentRoles.add(_content);
-            } else if ("/homeSite/siteRef".equals(_url))  {
-                this.site = _content;
             } else  {
                 super.parse(_url, _content);
             }
@@ -177,12 +166,7 @@ public class Role_mxJPO
                                final Appendable _out)
         throws IOException
     {
-        _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden");
-
-        // site
-        if (this.site != null)  {
-            _out.append(" \\\n    site \"").append(StringUtil_mxJPO.convertTcl(this.site)).append('\"');
-        }
+        super.writeObject(_paramCache, _out);
 
         // role type
         switch (this.roleType)  {
@@ -202,8 +186,6 @@ public class Role_mxJPO
                 .append(StringUtil_mxJPO.convertTcl(role))
                 .append("\" child \"${NAME}\"");
         }
-        // workspace objects
-        this.writeWorkspaceObjects(_paramCache, _out);
     }
 
     /**
@@ -248,10 +230,6 @@ public class Role_mxJPO
         // define normal role type
         if (this.roleType != RoleType.ROLE)  {
             preMQLCode.append(" asarole");
-        }
-        // remove site (if exists)
-        if (this.site != null)  {
-            preMQLCode.append(" site \"\"");
         }
 
         // append already existing pre MQL code

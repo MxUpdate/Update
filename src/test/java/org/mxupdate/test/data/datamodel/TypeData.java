@@ -71,7 +71,6 @@ public class TypeData
                     final String _name)
     {
         super(_test, AbstractTest.CI.TYPE, _name,
-              "TYPE_", "datamodel/type",
               TypeData.REQUIRED_EXPORT_VALUES);
     }
 

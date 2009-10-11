@@ -66,92 +66,98 @@ public class AbstractTest
         /**
          * Configuration item Data Model Boolean Attribute.
          */
-        ATTRIBUTE_BOOLEAN("attribute", "AttributeBoolean", "ATTRIBUTE", true),
+        ATTRIBUTE_BOOLEAN("attribute", "AttributeBoolean", "ATTRIBUTE", "BOOLEAN_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model Date Attribute.
          */
-        ATTRIBUTE_DATE("attribute", "AttributeDate", "ATTRIBUTE", true),
+        ATTRIBUTE_DATE("attribute", "AttributeDate", "ATTRIBUTE", "DATE_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model Integer Attribute.
          */
-        ATTRIBUTE_INTEGER("attribute", "AttributeInteger", "ATTRIBUTE", true),
+        ATTRIBUTE_INTEGER("attribute", "AttributeInteger", "ATTRIBUTE", "INTEGER_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model Real Attribute.
          */
-        ATTRIBUTE_REAL("attribute", "AttributeReal", "ATTRIBUTE", true),
+        ATTRIBUTE_REAL("attribute", "AttributeReal", "ATTRIBUTE", "REAL_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model String Attribute.
          */
-        ATTRIBUTE_STRING("attribute", "AttributeString", "ATTRIBUTE", true),
+        ATTRIBUTE_STRING("attribute", "AttributeString", "ATTRIBUTE", "STRING_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model Interface.
          */
-        INTERFACE("interface", "Interface", "INTERFACE", true),
+        INTERFACE("interface", "Interface", "INTERFACE", "INTERFACE_", "datamodel/interface", true),
 
         /**
          * Configuration item Data Model Policy.
          */
-        POLICY("policy", "Policy", "POLICY", true),
+        POLICY("policy", "Policy", "POLICY", "POLICY_", "datamodel/policy", true),
 
         /**
          * Configuration item Data Model Relationship.
          */
-        RELATIONSHIP("relationship", "Relationship", "RELATIONSHIP", true),
+        RELATIONSHIP("relationship", "Relationship", "RELATIONSHIP", "RELATIONSHIP_", "datamodel/relationship", true),
 
         /**
          * Configuration item Data Model Type.
          */
-        TYPE("type", "Type", "TYPE", true),
+        TYPE("type", "Type", "TYPE", "TYPE_", "datamodel/type", true),
 
         /**
          * Configuration item JPO program.
          */
-        JPO("program", "JPO", null, true),
+        JPO("program", "JPO", null, "", "program/jpo", true),
 
         /**
          * Configuration item MQL program.
          */
-        MQL_PROGRAM("program", "Program", null, true),
+        MQL_PROGRAM("program", "Program", null, "", "program/mql", true),
 
         /**
          * Configuration item page program.
          */
-        PAGE("page", "Page", null, true),
+        PAGE("page", "Page", null, "PAGE_", "program/page", true),
 
         /**
          * Configuration item group.
          */
-        GROUP("group", "Group", "GROUP", true),
+        GROUP("group", "Group", "GROUP", "GROUP_", "user/group", true),
+
+        /**
+         * Configuration item administration person.
+         */
+        PERSONADMIN("person", "PersonAdmin", "PERSONADMIN", "PERSONADMIN_", "user/personadmin", true),
 
         /**
          * Configuration item role.
          */
-        ROLE("role", "Role", "ROLE", true),
+        ROLE("role", "Role", "ROLE", "ROLE_", "user/role", true),
 
         /**
          * Configuration item command.
          */
-        COMMAND("command", "Command", "COMMAND", true),
+        COMMAND("command", "Command", "COMMAND", "COMMAND_", "userinterface/command", true),
 
         /**
          * Configuration item inquiry.
          */
-        INQUIRY("inquiry", "Inquiry", "INQUIRY", true),
+        INQUIRY("inquiry", "Inquiry", "INQUIRY", "INQUIRY_", "userinterface/inquiry", true),
 
         /**
          * Configuration item menu.
          */
-        MENU("menu", "Menu", "MENU", true),
+        MENU("menu", "Menu", "MENU", "MENU_", "userinterface/menu", true),
 
         /**
-         * Configuration item site.
+         * Configuration item site (not handled as configuration item from the
+         * update tool itself).
          */
-        SITE("site", "Site", "SITE", true);
+        SITE("site", "Site", null, null, null, true);
 
         /**
          * Related type name in MX.
@@ -169,6 +175,16 @@ public class AbstractTest
         public final String header;
 
         /**
+         * Prefix used for the file name.
+         */
+        public final String filePrefix;
+
+        /**
+         * Path where the configuration item update file is located.
+         */
+        public final String filePath;
+
+        /**
          * Does the wild card search for the type works?
          */
         public final boolean wildcardSearch;
@@ -180,16 +196,22 @@ public class AbstractTest
          * @param _updateType           related type name in MxUpdate Update
          * @param _header               used text in the header to define the
          *                              name
+         * @param _filePrefix           prefix used for the file
+         * @param _filePath             file path
          * @param _wildcardSearch       wild card search allowed?
          */
         CI(final String _mxType,
            final String _updateType,
            final String _header,
+           final String _filePrefix,
+           final String _filePath,
            final boolean _wildcardSearch)
         {
             this.mxType = _mxType;
             this.updateType = _updateType;
             this.header = _header;
+            this.filePrefix = _filePrefix;
+            this.filePath = _filePath;
             this.wildcardSearch = _wildcardSearch;
         }
 

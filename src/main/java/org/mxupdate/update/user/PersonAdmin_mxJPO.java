@@ -22,6 +22,7 @@ package org.mxupdate.update.user;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -33,23 +34,38 @@ import matrix.util.MatrixException;
 import matrix.util.StringList;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * The class is used to handle administration persons.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class PersonAdmin_mxJPO
-        extends AbstractAdminObject_mxJPO
+        extends AbstractUser_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = -8458972437612839433L;
+
+    /**
+     * Set of all ignored URLs from the XML definition for persons.
+     *
+     * @see #parse(String, String)
+     */
+    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    static  {
+        PersonAdmin_mxJPO.IGNORED_URLS.add("/assignmentList");
+        PersonAdmin_mxJPO.IGNORED_URLS.add("/assignmentList/assignment");
+        PersonAdmin_mxJPO.IGNORED_URLS.add("/access");
+        PersonAdmin_mxJPO.IGNORED_URLS.add("/adminAccess");
+        PersonAdmin_mxJPO.IGNORED_URLS.add("/defaultApplication");
+        PersonAdmin_mxJPO.IGNORED_URLS.add("/homeVault");
+        PersonAdmin_mxJPO.IGNORED_URLS.add("/password");
+    }
 
     /**
      * Holds all group assignments of this person.
@@ -142,11 +158,6 @@ public class PersonAdmin_mxJPO
     private final Set<String> adminAccess = new TreeSet<String>();
 
     /**
-     * Defines the site of the person.
-     */
-    private String site;
-
-    /**
      * Defines the name of the assigned default application.
      */
     private String defaultApplication;
@@ -199,89 +210,90 @@ public class PersonAdmin_mxJPO
     }
 
     /**
+     * <p>Parses all person specific URL values. This includes:
+     * <ul>
+     * <li>{@link #groups assigned groups}</li>
+     * <li>{@link #roles assigned roles}</li>
+     * <li>{@link #access}</li>
+     * <li>{@link #adminAccess business administration access}</li>
+     * <li>is person {@link #isInactive inactive}</li>
+     * <li>flag if the person is an {@link #isApplicationUser application user}
+     *     </li>
+     * <li>flag if the person is a {@link #isFullUser full user}</li>
+     * <li>flag if the person is a
+     *     {@link #isBusinessAdministrator business administrator}</li>
+     * <li>flag if the person is a
+     *     {@link #isSystemAdministrator system administrator}</li>
+     * <li>flag if the person is a {@link #isTrusted trusted} person</li>
+     * <li>person wants {@link #wantsEmail email}</li>
+     * <li>person wants {@link #wantsIconMail icon mail}</li>
+     * <li>{@link #address}</li>
+     * <li>{@link #email email address}</li>
+     * <li>{@link #fax fax number}</li>
+     * <li>{@link #fullName full name}</li>
+     * <li>{@link #vault default vault}</li>
+     * <li>{@link #phone phone number}</li>
+     * </ul></p>
+     * <p>If an <code>_url</code> is included in {@link #IGNORED_URLS}, this
+     * URL is ignored.</p>
+     *
      * @param _url      URL to parse
      * @param _content  content depending on the URL
+     * @see #IGNORED_URLS
      */
-    @Override
+    @Override()
     protected void parse(final String _url,
                          final String _content)
     {
-        if ("/assignmentList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/assignmentList/assignment".equals(_url))  {
-            // to be ignored ...
-        } else if ("/assignmentList/assignment/groupRef".equals(_url))  {
-            this.groups.add(_content);
-        } else if ("/assignmentList/assignment/roleRef".equals(_url))  {
-            this.roles.add(_content);
+        if (!PersonAdmin_mxJPO.IGNORED_URLS.contains(_url))  {
+            if ("/assignmentList/assignment/groupRef".equals(_url))  {
+                this.groups.add(_content);
+            } else if ("/assignmentList/assignment/roleRef".equals(_url))  {
+                this.roles.add(_content);
 
-        } else if ("/access".equals(_url))  {
-            // to be ignored ...
-        } else if (_url.startsWith("/access"))  {
-            this.access.add(_url.substring(8).replaceAll("Access$", ""));
+            } else if (_url.startsWith("/access"))  {
+                this.access.add(_url.substring(8).replaceAll("Access$", ""));
 
-        } else if ("/adminAccess".equals(_url))  {
-            // to be ignored ...
-        } else if (_url.startsWith("/adminAccess"))  {
-            this.adminAccess.add(_url.substring(13).replaceAll("Access$", ""));
+            } else if (_url.startsWith("/adminAccess"))  {
+                this.adminAccess.add(_url.substring(13).replaceAll("Access$", ""));
 
-        } else if ("/defaultApplication".equals(_url))  {
-            // to be ignored
-        } else if ("/defaultApplication/applicationRef".equals(_url))  {
-            this.defaultApplication = _content;
+            } else if ("/defaultApplication/applicationRef".equals(_url))  {
+                this.defaultApplication = _content;
 
-        } else if ("/inactive".equals(_url))  {
-            this.isInactive = true;
-        } else if ("/applicationsOnly".equals(_url))  {
-            this.isApplicationUser = true;
-        } else if ("/fullUser".equals(_url))  {
-            this.isFullUser = true;
-        } else if ("/businessAdministrator".equals(_url))  {
-            this.isBusinessAdministrator = true;
-        } else if ("/systemAdministrator".equals(_url))  {
-            this.isSystemAdministrator = true;
-        } else if ("/trusted".equals(_url))  {
-            this.isTrusted = true;
+            } else if ("/inactive".equals(_url))  {
+                this.isInactive = true;
+            } else if ("/applicationsOnly".equals(_url))  {
+                this.isApplicationUser = true;
+            } else if ("/fullUser".equals(_url))  {
+                this.isFullUser = true;
+            } else if ("/businessAdministrator".equals(_url))  {
+                this.isBusinessAdministrator = true;
+            } else if ("/systemAdministrator".equals(_url))  {
+                this.isSystemAdministrator = true;
+            } else if ("/trusted".equals(_url))  {
+                this.isTrusted = true;
 
-        } else if ("/wantsEmail".equals(_url))  {
-            this.wantsEmail = true;
-        } else if ("/wantsIconMail".equals(_url))  {
-            this.wantsIconMail = true;
+            } else if ("/wantsEmail".equals(_url))  {
+                this.wantsEmail = true;
+            } else if ("/wantsIconMail".equals(_url))  {
+                this.wantsIconMail = true;
 
-        } else if ("/address".equals(_url))  {
-            this.address = _content;
-        } else if ("/email".equals(_url))  {
-            this.email = _content;
-        } else if ("/fax".equals(_url))  {
-            this.fax = _content;
-        } else if ("/fullName".equals(_url))  {
-            this.fullName = _content;
-        } else if ("/homeVault".equals(_url))  {
-            // to be ignored ...
-        } else if ("/homeVault/vaultRef".equals(_url))  {
-            this.vault = _content;
-        } else if ("/phone".equals(_url))  {
-            this.phone = _content;
+            } else if ("/address".equals(_url))  {
+                this.address = _content;
+            } else if ("/email".equals(_url))  {
+                this.email = _content;
+            } else if ("/fax".equals(_url))  {
+                this.fax = _content;
+            } else if ("/fullName".equals(_url))  {
+                this.fullName = _content;
+            } else if ("/homeVault/vaultRef".equals(_url))  {
+                this.vault = _content;
+            } else if ("/phone".equals(_url))  {
+                this.phone = _content;
 
-        } else if ("/homeSite".equals(_url))  {
-        // to be ignored
-        } else if ("/homeSite/siteRef".equals(_url))  {
-            this.site = _content;
-
-        // password must be ignored...
-        } else if (_url.startsWith("/password"))  {
-
-        // to be ignored ...
-        } else if (_url.startsWith("/cueList"))  {
-        } else if (_url.startsWith("/filterList"))  {
-        } else if (_url.startsWith("/queryList"))  {
-        } else if (_url.startsWith("/tableList"))  {
-        } else if (_url.startsWith("/tipList"))  {
-        } else if (_url.startsWith("/toolsetList"))  {
-        } else if (_url.startsWith("/viewList"))  {
-
-        } else  {
-            super.parse(_url, _content);
+            } else  {
+                super.parse(_url, _content);
+            }
         }
     }
 
@@ -311,6 +323,8 @@ public class PersonAdmin_mxJPO
                                final Appendable _out)
             throws IOException
     {
+        super.writeObject(_paramCache, _out);
+
         _out.append(" \\\n    access \"")
                     .append(StringUtil_mxJPO.joinTcl(',', false, this.access, "none")).append("\"")
             .append(" \\\n    admin \"")
@@ -321,9 +335,6 @@ public class PersonAdmin_mxJPO
             .append(" \\\n    fullname \"").append(StringUtil_mxJPO.convertTcl(this.fullName)).append("\"")
             .append(" \\\n    phone \"").append(StringUtil_mxJPO.convertTcl(this.phone)).append("\"")
             .append(" \\\n    vault \"").append(StringUtil_mxJPO.convertTcl(this.vault)).append("\"");
-        if (this.site != null)  {
-            _out.append(" \\\n    site \"").append(StringUtil_mxJPO.convertTcl(this.site)).append("\"");
-        }
         if (this.defaultApplication != null)  {
             _out.append(" \\\n    application \"")
                 .append(StringUtil_mxJPO.convertTcl(this.defaultApplication)).append("\"");
@@ -349,11 +360,12 @@ public class PersonAdmin_mxJPO
      * @param _out          appendable instance to the TCL update file
      * @throws IOException if the extension could not be written
      */
-    @Override
+    @Override()
     protected void writeEnd(final ParameterCache_mxJPO _paramCache,
                             final Appendable _out)
             throws IOException
     {
+        super.writeEnd(_paramCache, _out);
         _out.append("\nmql mod person \"${NAME}\" type ");
         if (!this.isApplicationUser)  {
             _out.append("not");
@@ -384,7 +396,7 @@ public class PersonAdmin_mxJPO
     /**
      * The method overwrites the original method to
      * <ul>
-     * <li>reset the description</li>
+     * <li>reset the comment (description)</li>
      * <li>set the version and author attribute</li>
      * <li>reset all not ignored attributes</li>
      * <li>define the TCL variable &quot;OBJECTID&quot; with the object id of
@@ -425,6 +437,7 @@ public class PersonAdmin_mxJPO
         final StringBuilder preMQLCode = new StringBuilder()
                 .append(_preMQLCode)
                 .append("escape mod person \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
+                        .append("comment '' ")
                         .append("access none ")
                         .append("admin none ")
                         .append("address '' ")

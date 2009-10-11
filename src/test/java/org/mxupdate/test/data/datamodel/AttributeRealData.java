@@ -42,6 +42,6 @@ public class AttributeRealData
     public AttributeRealData(final AbstractTest _test,
                          final String _name)
     {
-        super(_test, CI.ATTRIBUTE_REAL, _name, "real", "REAL_");
+        super(_test, CI.ATTRIBUTE_REAL, _name, "real");
     }
 }

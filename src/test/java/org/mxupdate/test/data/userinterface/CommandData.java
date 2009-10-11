@@ -54,9 +54,9 @@ public class CommandData
      * @param _name     name of the command
      */
     public CommandData(final AbstractTest _test,
-                   final String _name)
+                       final String _name)
     {
-        super(_test, AbstractTest.CI.COMMAND, _name, "COMMAND_", "userinterface/command");
+        super(_test, AbstractTest.CI.COMMAND, _name);
     }
 
     /**
