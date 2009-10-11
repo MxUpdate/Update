@@ -37,6 +37,7 @@ import org.mxupdate.update.user.workspace.Query_mxJPO;
 import org.mxupdate.update.user.workspace.Table_mxJPO;
 import org.mxupdate.update.user.workspace.Tip_mxJPO;
 import org.mxupdate.update.user.workspace.ToolSet_mxJPO;
+import org.mxupdate.update.user.workspace.View_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
@@ -73,6 +74,7 @@ public abstract class AbstractUser_mxJPO
         AbstractUser_mxJPO.IGNORED_URLS.add("/tableList/table/adminProperties");
         AbstractUser_mxJPO.IGNORED_URLS.add("/tipList");
         AbstractUser_mxJPO.IGNORED_URLS.add("/toolsetList");
+        AbstractUser_mxJPO.IGNORED_URLS.add("/viewList");
     }
 
     /**
@@ -193,6 +195,24 @@ public abstract class AbstractUser_mxJPO
     private ToolSet_mxJPO currentToolSet;
 
     /**
+     * Maps depending on the name of the view to related view information. The
+     * map is used to sort the tool sets depending on the name.
+     *
+     * @see #parse(String, String)
+     * @see #prepare(ParameterCache_mxJPO)
+     * @see #writeWorkspaceObjects(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private final Map<String,View_mxJPO> views = new TreeMap<String,View_mxJPO>();
+
+    /**
+     * Current tip which is read.
+     *
+     * @see #parse(String, String)
+     */
+    private View_mxJPO currentView;
+
+    /**
      * Constructor used to initialize this user definition with related type
      * definition <code>_typeDef</code> for given <code>_name</code>.
      *
@@ -214,7 +234,8 @@ public abstract class AbstractUser_mxJPO
      * <li>{@link #queries}</li>
      * <li>{@link #tables}</li>
      * <li>{@link #tips}</li>
-     * <li>{@link #toolSets}</li>
+     * <li>{@link #toolSets tool sets}</li>
+     * <li>{@link #views}</li>
      * </ul></p>
      * <p>If an <code>_url</code> is included in {@link #IGNORED_URLS}, this
      * URL is ignored.</p>
@@ -281,6 +302,14 @@ public abstract class AbstractUser_mxJPO
             } else if (_url.startsWith("/toolsetList/toolset/"))  {
                 this.currentToolSet.parse(_url.substring(20), _content);
 
+            } else if ("/viewList/view".equals(_url))  {
+                this.currentView = new View_mxJPO(this);
+            } else if ("/viewList/view/name".equals(_url))  {
+                this.views.put(_content, this.currentView);
+                this.currentView.parse(_url.substring(14), _content);
+            } else if (_url.startsWith("/viewList/view/"))  {
+                this.currentView.parse(_url.substring(14), _content);
+
             } else  {
                 super.parse(_url, _content);
             }
@@ -296,7 +325,8 @@ public abstract class AbstractUser_mxJPO
      * <li>{@link #queries}</li>
      * <li>{@link #tables}</li>
      * <li>{@link #tips}</li>
-     * <li>{@link #toolSets}</li>
+     * <li>{@link #toolSets tool sets}</li>
+     * <li>{@link #views}</li>
      * </ul></p>
      *
      * @param _paramCache   parameter cache
@@ -337,6 +367,11 @@ public abstract class AbstractUser_mxJPO
         for (final ToolSet_mxJPO toolSet : this.toolSets.values())  {
             toolSet.prepare(_paramCache);
         }
+
+        // views
+        for (final View_mxJPO view : this.views.values())  {
+            view.prepare(_paramCache);
+        }
     }
 
     /**
@@ -374,7 +409,8 @@ public abstract class AbstractUser_mxJPO
      * <li>{@link #queries}</li>
      * <li>{@link #tables}</li>
      * <li>{@link #tips}</li>
-     * <li>{@link #toolSets}</li>
+     * <li>{@link #toolSets tool sets}</li>
+     * <li>{@link #views}</li>
      * </ul>
      *
      * @param _paramCache   parameter cache
@@ -415,6 +451,11 @@ public abstract class AbstractUser_mxJPO
         for (final ToolSet_mxJPO toolSet : this.toolSets.values())  {
             toolSet.write(_paramCache, _out);
         }
+
+        // views
+        for (final View_mxJPO view : this.views.values())  {
+            view.write(_paramCache, _out);
+        }
     }
     /**
      * The method overwrites the original method to append the MQL statements
@@ -427,7 +468,8 @@ public abstract class AbstractUser_mxJPO
      * <li>remove all {@link #queries}</li>
      * <li>remove all {@link #tables}</li>
      * <li>remove all {@link #tips}</li>
-     * <li>remove all {@link #toolSets}</li>
+     * <li>remove all {@link #toolSets tool sets}</li>
+     * <li>remove all {@link #views}</li>
      * </ul>
      *
      * @param _paramCache       parameter cache
@@ -518,6 +560,15 @@ public abstract class AbstractUser_mxJPO
         for (final ToolSet_mxJPO toolSet : this.toolSets.values())  {
             preMQLCode.append("escape delete toolset \"")
                       .append(StringUtil_mxJPO.convertMql(toolSet.getName()))
+                      .append("\" user \"")
+                      .append(StringUtil_mxJPO.convertMql(this.getName()))
+                      .append("\";\n");
+        }
+
+        // remove all assigned views
+        for (final View_mxJPO view : this.views.values())  {
+            preMQLCode.append("escape delete view \"")
+                      .append(StringUtil_mxJPO.convertMql(view.getName()))
                       .append("\" user \"")
                       .append(StringUtil_mxJPO.convertMql(this.getName()))
                       .append("\";\n");

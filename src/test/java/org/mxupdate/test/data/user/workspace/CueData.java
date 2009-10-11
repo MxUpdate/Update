@@ -27,7 +27,7 @@ import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.user.AbstractUserData;
 
 /**
- * The class is used to define all cue objects related to used used to create
+ * The class is used to define all cue objects related to users used to create
  * / update and to export.
  *
  * @author The MxUpdate Team

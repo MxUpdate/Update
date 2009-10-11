@@ -28,30 +28,30 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
- * User specific class to store the workspace object for one tool set.
+ * User specific class to store the workspace object for one view.
  *
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class ToolSet_mxJPO
-    extends AbstractVisualWorkspaceObject_mxJPO
+public class View_mxJPO
+    extends AbstractWorkspaceObject_mxJPO
 {
     /**
      * Default constructor.
      *
      * @param _user         related user for this workspace object
      */
-    public ToolSet_mxJPO(final AbstractUser_mxJPO _user)
+    public View_mxJPO(final AbstractUser_mxJPO _user)
     {
-        super(_user, "toolset");
+        super(_user, "view");
     }
 
     /**
-     * <p>Writes all tool set specific values to the TCL update file
+     * <p>Writes all view specific values to the TCL update file
      * <code>_out</code>. This includes:
      * <ul>
-     * <li>all member programs defined via the properties with the name
-     *     &quot;%Member&quot;</li>
+     * <li>all assign visual workspace objects defined via the properties with
+     *     the name &quot;%Member&quot;</li>
      * </ul></p>
      *
      * @param _paramCache   parameter cache
@@ -67,8 +67,17 @@ public class ToolSet_mxJPO
 
         // methods
         for (final AdminProperty_mxJPO prop : this.getProperties())  {
+System.out.println("prop.getName()="+prop.getName());
             if (prop.isSetting() && "%Member".equals(prop.getName()))  {
-                _out.append(" \\\n    program \"").append(StringUtil_mxJPO.convertTcl(prop.getRefAdminName())).append("\"");
+                _out.append(" \\\n    ");
+                if ("4".equals(prop.getFlags()))  {
+                    _out.append("in");
+                }
+                _out.append("active ").append(prop.getRefAdminType())
+                    .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getRefAdminName())).append("\"");
+                System.out.println("     props.getRefAdminName="+prop.getRefAdminName());
+                System.out.println("     props.value="+prop.getValue());
+System.out.println("     props.flag="+prop.getFlags());
             }
         }
     }

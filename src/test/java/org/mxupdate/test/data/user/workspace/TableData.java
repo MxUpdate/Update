@@ -35,7 +35,7 @@ import org.mxupdate.test.data.user.AbstractUserData;
 import org.testng.Assert;
 
 /**
- * The class is used to define all table objects related to used used to
+ * The class is used to define all table objects related to users used to
  * create / update and to export.
  *
  * @author The MxUpdate Team
@@ -66,7 +66,7 @@ public class TableData<USER extends AbstractUserData<?>>
      *
      * @param _test     related test case
      * @param _user     user for which this table is defined
-     * @param _name     name of the tip
+     * @param _name     name of the table
      */
     public TableData(final AbstractTest _test,
                      final USER _user,

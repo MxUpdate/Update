@@ -35,6 +35,7 @@ import org.mxupdate.test.data.user.workspace.QueryData;
 import org.mxupdate.test.data.user.workspace.TableData;
 import org.mxupdate.test.data.user.workspace.TipData;
 import org.mxupdate.test.data.user.workspace.ToolSetData;
+import org.mxupdate.test.data.user.workspace.ViewData;
 import org.testng.Assert;
 
 /**
@@ -58,8 +59,8 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
      *
      * @see #newCue(String)
      * @see #getCues()
-     * @see #ciFileWorkspaceObjects()
-     * @see #createWorkspaceObjects()
+     * @see #ciFile()
+     * @see #create()
      * @see #checkExport(ExportParser)
      */
     private final Set<CueData<DATA>> cues = new HashSet<CueData<DATA>>();
@@ -69,8 +70,8 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
      *
      * @see #newFilter(String)
      * @see #getFilters()
-     * @see #ciFileWorkspaceObjects()
-     * @see #createWorkspaceObjects()
+     * @see #ciFile()
+     * @see #create()
      * @see #checkExport(ExportParser)
      */
     private final Set<FilterData<DATA>> filters = new HashSet<FilterData<DATA>>();
@@ -80,8 +81,8 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
      *
      * @see #newQuery(String)
      * @see #getQueries()
-     * @see #ciFileWorkspaceObjects()
-     * @see #createWorkspaceObjects()
+     * @see #ciFile()
+     * @see #create()
      * @see #checkExport(ExportParser)
      */
     private final Set<QueryData<DATA>> queries = new HashSet<QueryData<DATA>>();
@@ -91,8 +92,8 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
      *
      * @see #newTable(String)
      * @see #getTables()
-     * @see #ciFileWorkspaceObjects()
-     * @see #createWorkspaceObjects()
+     * @see #ciFile()
+     * @see #create()
      * @see #checkExport(ExportParser)
      */
     private final Set<TableData<DATA>> tables = new HashSet<TableData<DATA>>();
@@ -102,8 +103,8 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
      *
      * @see #newTip(String)
      * @see #getTips()
-     * @see #ciFileWorkspaceObjects()
-     * @see #createWorkspaceObjects()
+     * @see #ciFile()
+     * @see #create()
      * @see #checkExport(ExportParser)
      */
     private final Set<TipData<DATA>> tips = new HashSet<TipData<DATA>>();
@@ -113,11 +114,22 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
      *
      * @see #newToolSet(String)
      * @see #getToolSets()
-     * @see #ciFileWorkspaceObjects()
-     * @see #createWorkspaceObjects()
+     * @see #ciFile()
+     * @see #create()
      * @see #checkExport(ExportParser)
      */
     private final Set<ToolSetData<DATA>> toolSets = new HashSet<ToolSetData<DATA>>();
+
+    /**
+     * Related views of the workspace data from this user.
+     *
+     * @see #newView(String)
+     * @see #getViews()
+     * @see #ciFile()
+     * @see #create()
+     * @see #checkExport(ExportParser)
+     */
+    private final Set<ViewData<DATA>> views = new HashSet<ViewData<DATA>>();
 
     /**
      * Constructor to initialize this user.
@@ -314,7 +326,7 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
     }
 
     /**
-     * Returns all defined {@link #toolSets} for this user.
+     * Returns all defined {@link #toolSets tool sets} for this user.
      *
      * @return all defined tool sets
      * @see #toolSets
@@ -322,6 +334,32 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
     public Set<ToolSetData<DATA>> getToolSets()
     {
         return this.toolSets;
+    }
+
+    /**
+     * Creates for given <code>_name</code> for this user a new view.
+     *
+     * @param _name     name of the new view for this user
+     * @return new created view instance for this user
+     * @see #views
+     */
+    @SuppressWarnings("unchecked")
+    public ViewData<DATA> newView(final String _name)
+    {
+        final ViewData<DATA> ret = new ViewData<DATA>(this.getTest(), (DATA) this, _name);
+        this.views.add(ret);
+        return ret;
+    }
+
+    /**
+     * Returns all defined {@link #views} for this user.
+     *
+     * @return all defined views
+     * @see #views
+     */
+    public Set<ViewData<DATA>> getViews()
+    {
+        return this.views;
     }
 
     /**
@@ -335,6 +373,7 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
      * <li>{@link #tables}</li>
      * <li>{@link #tips}</li>
      * <li>{@link #toolSets tool sets}</li>
+     * <li>{@link #views}</li>
      * </ul>
      *
      * @return code for the configuration item update file
@@ -387,6 +426,11 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
             cmd.append(toolSet.ciFile()).append('\n');
         }
 
+        // views
+        for (final ViewData<DATA> view : this.views)  {
+            cmd.append(view.ciFile()).append('\n');
+        }
+
         return cmd.toString();
     }
 
@@ -398,7 +442,8 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
      * <li>{@link #queries}</li>
      * <li>{@link #tables}</li>
      * <li>{@link #tips}</li>
-     * <li>{@link #toolSets}</li>
+     * <li>{@link #toolSets tool sets}</li>
+     * <li>{@link #views}</li>
      * </ul>
      *
      * @return this collection user data instance
@@ -460,6 +505,11 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
             for (final ToolSetData<DATA> toolSet : this.toolSets)  {
                 toolSet.create();
             }
+
+            // views
+            for (final ViewData<DATA> view : this.views)  {
+                view.create();
+            }
         }
         return (DATA) this;
     }
@@ -476,7 +526,8 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
      * <li>{@link #queries}</li>
      * <li>{@link #tables}</li>
      * <li>{@link #tips}</li>
-     * <li>{@link #toolSets}</li>
+     * <li>{@link #toolSets tool sets}</li>
+     * <li>{@link #views}</li>
      * </ul>
      *
      * @param _exportParser     parsed export
@@ -513,6 +564,7 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
         final Set<TableData<DATA>> tmpTables        = new HashSet<TableData<DATA>>(this.tables);
         final Set<TipData<DATA>> tmpTips            = new HashSet<TipData<DATA>>(this.tips);
         final Set<ToolSetData<DATA>> tmpToolSets    = new HashSet<ToolSetData<DATA>>(this.toolSets);
+        final Set<ViewData<DATA>> tmpViews          = new HashSet<ViewData<DATA>>(this.views);
 
         for (final ExportParser.Line rootLine : _exportParser.getRootLines())  {
             // cues
@@ -599,6 +651,20 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                     }
                 }
             }
+            // views
+            if (rootLine.getValue().startsWith("escape add view "))  {
+                for (final ViewData<DATA> view : this.views)  {
+                    final String key = new StringBuilder()
+                            .append("escape add view \"")
+                            .append(AbstractTest.convertTcl(view.getName()))
+                            .append("\"").toString();
+                    if (key.equals(rootLine.getValue()))  {
+                        tmpViews.remove(view);
+                        view.checkExport(new ExportParser(view.getName(), rootLine));
+                        break;
+                    }
+                }
+            }
         }
 
         Assert.assertTrue(tmpCues.isEmpty(),        "check that all cues are defined in the update file");
@@ -607,5 +673,6 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
         Assert.assertTrue(tmpTables.isEmpty(),      "check that all tables are defined in the update file");
         Assert.assertTrue(tmpTips.isEmpty(),        "check that all tips are defined in the update file");
         Assert.assertTrue(tmpToolSets.isEmpty(),    "check that all tool sets are defined in the update file");
+        Assert.assertTrue(tmpViews.isEmpty(),       "check that all views are defined in the update file");
     }
 }

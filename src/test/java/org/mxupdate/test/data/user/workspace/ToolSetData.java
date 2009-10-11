@@ -29,9 +29,10 @@ import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.program.AbstractProgramData;
 import org.mxupdate.test.data.user.AbstractUserData;
+import org.testng.Assert;
 
 /**
- * The class is used to define all tool set objects related to used used to
+ * The class is used to define all tool set objects related to users used to
  * create / update and to export.
  *
  * @author The MxUpdate Team
@@ -146,6 +147,18 @@ public class ToolSetData<USER extends AbstractUserData<?>>
         throws MatrixException
     {
         super.checkExport(_exportParser);
-// TODO::::
+
+        // prepare target programs
+        final Set<String> targets = new HashSet<String>();
+        for(final AbstractProgramData<?> program : this.programs)  {
+            targets.add("\"" + AbstractTest.convertTcl(program.getName()) + "\"");
+        }
+        // check against parsed programs
+        for (final String current : _exportParser.getLines("/mql/program/@value"))  {
+            final String test = current.replaceAll("\\\\$", "").trim();
+            Assert.assertTrue(targets.contains(test), "check that program " + test + " must be defined");
+            targets.remove(test);
+        }
+        Assert.assertTrue(targets.isEmpty(), "check that all programs are defined");
     }
 }

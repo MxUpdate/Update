@@ -68,12 +68,10 @@ abstract class AbstractVisualWorkspaceObject_mxJPO
     }
 
     /**
-     * <p>Parses all common visual query workspace object specific URL values.
+     * <p>Parses all common visual workspace object specific URL values.
      * This includes:
      * <ul>
      * <li>{@link #active active flag}</li>
-     * <li>{@link #appliesTo applies to business object, connection or both}
-     *     </li>
      * </ul></p>
      *
      * @param _url      URL to parse

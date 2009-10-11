@@ -245,7 +245,6 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
         }
 
         this.append4CIFileValues(cmd);
-
         return cmd.toString();
     }
 

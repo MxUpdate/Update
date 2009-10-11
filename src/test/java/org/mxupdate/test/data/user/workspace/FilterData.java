@@ -31,7 +31,7 @@ import org.mxupdate.test.data.user.AbstractUserData;
 import org.testng.Assert;
 
 /**
- * The class is used to define all filter objects related to used used to
+ * The class is used to define all filter objects related to users used to
  * create / update and to export.
  *
  * @author The MxUpdate Team

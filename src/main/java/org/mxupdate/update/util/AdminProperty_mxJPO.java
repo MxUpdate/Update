@@ -150,6 +150,16 @@ public class AdminProperty_mxJPO
     }
 
     /**
+     * Getter method for instance variable {@link #flags}.
+     *
+     * @return value of instance variable {@link #flags}.
+     */
+    public String getFlags()
+    {
+        return this.flags;
+    }
+
+    /**
      * <p>Compares this administration property instance with
      * <code>_toCompare</code> administration property. The algorithm uses
      * <ul>
@@ -203,7 +213,7 @@ public class AdminProperty_mxJPO
      *
      * @return string representation of a property
      */
-    @Override
+    @Override()
     public String toString()
     {
         return "[name=" + this.name + ", value=" + this.value + ", flags=" + this.flags + "]";
