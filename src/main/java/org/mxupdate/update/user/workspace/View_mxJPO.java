@@ -67,7 +67,6 @@ public class View_mxJPO
 
         // methods
         for (final AdminProperty_mxJPO prop : this.getProperties())  {
-System.out.println("prop.getName()="+prop.getName());
             if (prop.isSetting() && "%Member".equals(prop.getName()))  {
                 _out.append(" \\\n    ");
                 if ("4".equals(prop.getFlags()))  {
@@ -75,9 +74,6 @@ System.out.println("prop.getName()="+prop.getName());
                 }
                 _out.append("active ").append(prop.getRefAdminType())
                     .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getRefAdminName())).append("\"");
-                System.out.println("     props.getRefAdminName="+prop.getRefAdminName());
-                System.out.println("     props.value="+prop.getValue());
-System.out.println("     props.flag="+prop.getFlags());
             }
         }
     }
