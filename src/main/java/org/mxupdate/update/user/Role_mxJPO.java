@@ -22,6 +22,7 @@ package org.mxupdate.update.user;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -49,14 +50,6 @@ public class Role_mxJPO
     private static final long serialVersionUID = -1889259829075111308L;
 
     /**
-     * Name of the parameter to define if current MX version supports role
-     * types.
-     *
-     * @see #prepare(ParameterCache_mxJPO)
-     */
-    private static final String PARAM_SUPPORT_ROLE_TYPES = "UserRoleSupportRoleType";
-
-    /**
      * Set of all ignored URLs from the XML definition for roles.
      *
      * @see #parse(String, String)
@@ -67,6 +60,22 @@ public class Role_mxJPO
         // new URIL to be ignored, because read within prepare method
         Role_mxJPO.IGNORED_URLS.add("/roleType");
     }
+
+    /**
+     * Name of the parameter to define if current MX version supports role
+     * types.
+     *
+     * @see #prepare(ParameterCache_mxJPO)
+     */
+    private static final String PARAM_SUPPORT_ROLE_TYPES = "UserRoleSupportRoleType";
+
+    /**
+     * Defines the parameter for the match of roles for which workspace objects
+     * are not handled (neither exported nor updated).
+     *
+     * @see #ignoreWorkspaceObjects(ParameterCache_mxJPO)
+     */
+    private static final String PARAM_IGNORE_WSO_ROLES = "UserIgnoreWSO4Roles";
 
     /**
      * Set to hold all parent roles.
@@ -237,6 +246,35 @@ public class Role_mxJPO
                   .append(_preMQLCode);
 
         super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+    }
+
+    /**
+     * <p>Calculates if workspace objects for this role are not handled. This
+     * is done by checking if the name of this role matches one of the match
+     * lists defined with parameter {@link #PARAM_IGNORE_WSO_ROLES}. In this
+     * case the the workspace objects are ignored for this role.</p>
+     *
+     * @param _paramCache       parameter cache
+     * @return <i>true</i> if the handling of workspace objects for this role
+     *         is ignored
+     * @see #PARAM_IGNORE_WSO_ROLES
+     */
+    @Override()
+    protected boolean ignoreWorkspaceObjects(final ParameterCache_mxJPO _paramCache)
+    {
+        boolean ignore = super.ignoreWorkspaceObjects(_paramCache);
+        if (!ignore)  {
+            final Collection<String> ignoreMatches = _paramCache.getValueList(Role_mxJPO.PARAM_IGNORE_WSO_ROLES);
+            if (ignoreMatches != null)  {
+                for (final String ignoreMatch : ignoreMatches)  {
+                    if (StringUtil_mxJPO.match(this.getName(), ignoreMatch))  {
+                        ignore = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return ignore;
     }
 
     /**
