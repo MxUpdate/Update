@@ -26,8 +26,10 @@ import java.util.Map;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
+ * The class is used to export, create, delete and update tables within MX.
  *
  * @author The MxUpdate Team
  * @version $Id$
@@ -50,6 +52,28 @@ public class Table_mxJPO
                        final String _mxName)
     {
         super(_typeDef, _mxName);
+    }
+
+    /**
+     * <p>Parses all table specific URL values. If a derived table is defined
+     * and the value from where the table is derived is not <code>null</code>
+     * and error message is shown.
+     *
+     * @param _url      URL to parse
+     * @param _content  related content of the URL to parse
+     * @see #IGNORED_URLS
+     */
+    @Override()
+    protected void parse(final String _url,
+                         final String _content)
+    {
+        if ("/derivedtable".equals(_url))  {
+            if (_content != null)  {
+System.err.println("The table is derived from '" + _content + "'! This is currently not supported!");
+            }
+        } else  {
+            super.parse(_url, _content);
+        }
     }
 
     /**
@@ -105,14 +129,14 @@ public class Table_mxJPO
     {
         // set to not hidden
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append('\"')
+                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
                 .append(' ').append(this.getTypeDef().getMxAdminSuffix())
                 .append(" !hidden");
 
         // remove all columns
         for (final Field column : this.getFields())  {
-            preMQLCode.append(" column delete name \"").append(column.getName()).append('\"');
+            preMQLCode.append(" column delete name \"").append(StringUtil_mxJPO.convertMql(column.getName())).append('\"');
         }
 
         // append already existing pre MQL code

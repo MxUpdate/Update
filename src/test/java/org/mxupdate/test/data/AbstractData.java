@@ -351,6 +351,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      */
     protected void append4CIFileValues(final StringBuilder _cmd)
     {
+        // values
         for (final Map.Entry<String,String> entry : this.values.entrySet())  {
             _cmd.append(' ').append(entry.getKey()).append(" \"")
                 .append(AbstractTest.convertTcl(entry.getValue()))
@@ -362,10 +363,25 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
         for (final String needAdd : needAdds)  {
             _cmd.append(" add ").append(needAdd);
         }
+        // properties
+        for (final PropertyDef property : this.getProperties())  {
+            _cmd.append(" property \"").append(AbstractTest.convertTcl(property.getName())).append("\"");
+            if (property.getTo() != null)  {
+                _cmd.append(" to ").append(property.getTo().getCI().getMxType()).append(" \"")
+                    .append(AbstractTest.convertTcl(property.getTo().getName())).append("\"");
+                if (property.getTo().getCI() == AbstractTest.CI.UI_TABLE)  {
+                    _cmd.append(" system");
+                }
+            }
+            if (property.getValue() != null)  {
+                _cmd.append(" value \"").append(AbstractTest.convertTcl(property.getValue())).append("\"");
+            }
+        }
     }
 
     /**
-     * Appends the MQL commands to define all {@link #values}Êwithin a create.
+     * Appends the MQL commands to define all {@link #values}Êand
+     * {@link #properties} within a create.
      *
      * @param _cmd  string builder used to append MQL commands
      * @throws MatrixException if used object could not be created
@@ -374,10 +390,26 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     protected void append4Create(final StringBuilder _cmd)
         throws MatrixException
     {
+        // values
         for (final Map.Entry<String,String> entry : this.values.entrySet())  {
             _cmd.append(' ').append(entry.getKey()).append(" \"")
                 .append(AbstractTest.convertMql(entry.getValue()))
                 .append('\"');
+        }
+        // properties
+        for (final PropertyDef property : this.properties)  {
+            _cmd.append(" property \"").append(AbstractTest.convertMql(property.getName())).append("\"");
+            if (property.getTo() != null)  {
+                property.getTo().create();
+                _cmd.append(" to ").append(property.getTo().getCI().getMxType()).append(" \"")
+                    .append(AbstractTest.convertMql(property.getTo().getName())).append("\"");
+                if (property.getTo().getCI() == AbstractTest.CI.UI_TABLE)  {
+                    _cmd.append(" system");
+                }
+            }
+            if (property.getValue() != null)  {
+                _cmd.append(" value \"").append(AbstractTest.convertMql(property.getValue())).append("\"");
+            }
         }
     }
 

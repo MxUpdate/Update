@@ -100,6 +100,7 @@ public abstract class AbstractAdminObject_mxJPO
      * {@link #prepare(ParameterCache_mxJPO)}.
      *
      * @see #prepare(ParameterCache_mxJPO)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private final Map<String,AdminProperty_mxJPO> propertiesMap = new TreeMap<String,AdminProperty_mxJPO>();
 
@@ -341,8 +342,8 @@ public abstract class AbstractAdminObject_mxJPO
     }
 
     /**
-     * Writes the MQL code to add all none standard properties to the TCL
-     * update file.
+     * Writes the MQL code to add all none standard
+     * {@link #propertiesMap properties} to the TCL update file.
      *
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
@@ -354,7 +355,7 @@ public abstract class AbstractAdminObject_mxJPO
     {
         for (final AdminProperty_mxJPO prop : this.propertiesMap.values())  {
             if ((PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null) && !prop.isSetting())  {
-                _out.append("\nmql add property \"").append(StringUtil_mxJPO.convertTcl(prop.getName())).append("\"")
+                _out.append("\nmql escape add property \"").append(StringUtil_mxJPO.convertTcl(prop.getName())).append("\"")
                     .append(" \\\n    on ")
                     .append(this.getTypeDef().getMxAdminName())
                     .append(" \"${NAME}\"");
@@ -364,9 +365,13 @@ public abstract class AbstractAdminObject_mxJPO
                 if ((prop.getRefAdminName()) != null && (prop.getRefAdminType() != null))  {
                     _out.append("  \\\n    to ").append(prop.getRefAdminType())
                         .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getRefAdminName())).append("\"");
+                    // if target is a table, a system is required!
+                    if ("table".equals(prop.getRefAdminType()))  {
+                        _out.append(" system");
+                    }
                 }
                 if (prop.getValue() != null)  {
-                    _out.append("  \\\n    value \"").append(StringUtil_mxJPO.convertTcl(prop.getValue())).append("\"");
+                    _out.append(" \\\n    value \"").append(StringUtil_mxJPO.convertTcl(prop.getValue())).append("\"");
                 }
             }
         }
@@ -409,7 +414,7 @@ public abstract class AbstractAdminObject_mxJPO
     /**
      * The method overwrites the original method append MQL code to
      * <ul>
-     * <li>remove all existing properties</li>
+     * <li>remove all existing {@link #propertiesMap properties}</li>
      * <li>define the TCL variable for the name</li>
      * <li>define property &quot;version&quot;</li>
      * <li>define property &quot;file date&quot;</li>
@@ -450,25 +455,28 @@ public abstract class AbstractAdminObject_mxJPO
             throws Exception
     {
         // remove all properties
-        final StringBuilder preMQLCode = new StringBuilder()
-                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
-                .append(this.getTypeDef().getMxAdminSuffix());
+        final StringBuilder preMQLCode = new StringBuilder();
         for (final AdminProperty_mxJPO prop : this.propertiesMap.values())  {
             // % must be ignored because this means settings
             if ((PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null) && !prop.isSetting())  {
-                preMQLCode.append(" remove property \"");
+                preMQLCode.append("escape delete property \"");
                 if (prop.getName() != null)  {
                     preMQLCode.append(StringUtil_mxJPO.convertMql(prop.getName()));
                 }
-                preMQLCode.append('\"');
+                preMQLCode.append("\" on ").append(this.getTypeDef().getMxAdminName())
+                        .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
+                        .append(this.getTypeDef().getMxAdminSuffix());
                 if ((prop.getRefAdminName() != null) && (prop.getRefAdminType() != null))  {
                     preMQLCode.append(" to ").append(prop.getRefAdminType())
                               .append(" \"").append(StringUtil_mxJPO.convertMql(prop.getRefAdminName())).append('\"');
+                    // if target is a table, a system is required!
+                    if ("table".equals(prop.getRefAdminType()))  {
+                        preMQLCode.append(" system");
+                    }
                 }
+                preMQLCode.append(";\n");
             }
         }
-        preMQLCode.append(";\n");
 
         // append already existing pre MQL code
         preMQLCode.append(_preMQLCode);

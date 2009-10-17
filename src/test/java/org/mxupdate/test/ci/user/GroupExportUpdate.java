@@ -57,7 +57,7 @@ public class GroupExportUpdate
      * @return group instance
      */
     @Override()
-    protected GroupData createNewUserData(final String _name)
+    protected GroupData createNewData(final String _name)
     {
         return new GroupData(this, _name);
     }
@@ -150,12 +150,16 @@ public class GroupExportUpdate
         for (final GroupData parent : _group.getParent())  {
             parent.create();
         }
-
+        // create referenced property value
+        for (final PropertyDef prop : _group.getProperties())  {
+            if (prop.getTo() != null)  {
+                prop.getTo().create();
+            }
+        }
         // create site
         if (_group.getSite() != null)  {
             _group.getSite().create();
         }
-
         // create cue properties
         for (final CueData<GroupData> cue : _group.getCues())  {
             for (final PropertyDef prop : cue.getProperties())  {
@@ -164,7 +168,6 @@ public class GroupExportUpdate
                 }
             }
         }
-
         // create filter properties
         for (final FilterData<GroupData> filter : _group.getFilters())  {
             for (final PropertyDef prop : filter.getProperties())  {
@@ -173,7 +176,6 @@ public class GroupExportUpdate
                 }
             }
         }
-
         // create query properties
         for (final QueryData<GroupData> query : _group.getQueries())  {
             for (final PropertyDef prop : query.getProperties())  {
@@ -182,7 +184,6 @@ public class GroupExportUpdate
                 }
             }
         }
-
         // create table properties
         for (final TableData<GroupData> table : _group.getTables())  {
             for (final PropertyDef prop : table.getProperties())  {
@@ -191,7 +192,6 @@ public class GroupExportUpdate
                 }
             }
         }
-
         // create tip properties
         for (final TipData<GroupData> tip : _group.getTips())  {
             for (final PropertyDef prop : tip.getProperties())  {
@@ -200,7 +200,6 @@ public class GroupExportUpdate
                 }
             }
         }
-
         // create tool set properties and programs
         for (final ToolSetData<GroupData> toolSet : _group.getToolSets())  {
             for (final PropertyDef prop : toolSet.getProperties())  {
@@ -212,7 +211,6 @@ public class GroupExportUpdate
                 prog.create();
             }
         }
-
         // create view properties
         for (final ViewData<GroupData> view : _group.getViews())  {
             for (final PropertyDef prop : view.getProperties())  {

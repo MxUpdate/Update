@@ -60,7 +60,7 @@ public class PersonExportUpdate
      * @return person instance
      */
     @Override()
-    protected PersonAdminData createNewUserData(final String _name)
+    protected PersonAdminData createNewData(final String _name)
     {
         return new PersonAdminData(this, _name);
     }
@@ -204,21 +204,24 @@ public class PersonExportUpdate
                              final PersonAdminData _person)
         throws Exception
     {
+        // create referenced property value
+        for (final PropertyDef prop : _person.getProperties())  {
+            if (prop.getTo() != null)  {
+                prop.getTo().create();
+            }
+        }
         // create site
         if (_person.getSite() != null)  {
             _person.getSite().create();
         }
-
         // create assigned roles
         for (final RoleData role : _person.getRoles())  {
             role.create();
         }
-
         // create assigned groups
         for (final GroupData group : _person.getGroups())  {
             group.create();
         }
-
         // create cue properties
         for (final CueData<PersonAdminData> cue : _person.getCues())  {
             for (final PropertyDef prop : cue.getProperties())  {
@@ -227,7 +230,6 @@ public class PersonExportUpdate
                 }
             }
         }
-
         // create filter properties
         for (final FilterData<PersonAdminData> filter : _person.getFilters())  {
             for (final PropertyDef prop : filter.getProperties())  {
@@ -236,7 +238,6 @@ public class PersonExportUpdate
                 }
             }
         }
-
         // create query properties
         for (final QueryData<PersonAdminData> query : _person.getQueries())  {
             for (final PropertyDef prop : query.getProperties())  {
@@ -245,7 +246,6 @@ public class PersonExportUpdate
                 }
             }
         }
-
         // create table properties
         for (final TableData<PersonAdminData> table : _person.getTables())  {
             for (final PropertyDef prop : table.getProperties())  {
@@ -254,7 +254,6 @@ public class PersonExportUpdate
                 }
             }
         }
-
         // create tip properties
         for (final TipData<PersonAdminData> tip : _person.getTips())  {
             for (final PropertyDef prop : tip.getProperties())  {
@@ -263,7 +262,6 @@ public class PersonExportUpdate
                 }
             }
         }
-
         // create tool set properties and programs
         for (final ToolSetData<PersonAdminData> toolSet : _person.getToolSets())  {
             for (final PropertyDef prop : toolSet.getProperties())  {
@@ -275,7 +273,6 @@ public class PersonExportUpdate
                 prog.create();
             }
         }
-
         // create view properties
         for (final ViewData<PersonAdminData> view : _person.getViews())  {
             for (final PropertyDef prop : view.getProperties())  {

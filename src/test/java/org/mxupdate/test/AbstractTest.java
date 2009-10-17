@@ -49,7 +49,7 @@ import org.testng.annotations.BeforeClass;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class AbstractTest
+public abstract class AbstractTest
 {
     /**
      * Prefix for all new created test objects. The prefix should be used from
@@ -141,17 +141,27 @@ public class AbstractTest
         /**
          * Configuration item command.
          */
-        COMMAND("command", "Command", "COMMAND", "COMMAND_", "userinterface/command", true),
+        UI_COMMAND("command", "Command", "COMMAND", "COMMAND_", "userinterface/command", true),
+
+        /**
+         * Configuration item form.
+         */
+        UI_FORM("form", "Form", "FORM", "FORM_", "userinterface/form", true),
 
         /**
          * Configuration item inquiry.
          */
-        INQUIRY("inquiry", "Inquiry", "INQUIRY", "INQUIRY_", "userinterface/inquiry", true),
+        UI_INQUIRY("inquiry", "Inquiry", "INQUIRY", "INQUIRY_", "userinterface/inquiry", true),
 
         /**
          * Configuration item menu.
          */
-        MENU("menu", "Menu", "MENU", "MENU_", "userinterface/menu", true),
+        UI_MENU("menu", "Menu", "MENU", "MENU_", "userinterface/menu", true),
+
+        /**
+         * Configuration item table.
+         */
+        UI_TABLE("table", "Table", "TABLE", "TABLE_", "userinterface/table", false),
 
         /**
          * Configuration item site (not handled as configuration item from the
@@ -247,7 +257,7 @@ public class AbstractTest
      *
      * @throws Exception if connect failed
      */
-    @BeforeClass
+    @BeforeClass()
     public void connect()
         throws Exception
     {
@@ -263,7 +273,7 @@ public class AbstractTest
      *
      * @throws Exception if disconnect failed
      */
-    @AfterClass
+    @AfterClass()
     public void close()
         throws Exception
     {
@@ -449,19 +459,28 @@ public class AbstractTest
         throws MatrixException
     {
         final Set<String> elements;
-        if (_type.wildcardSearch)  {
-            elements = this.mqlAsSet("escape list " + _type.mxType + " \"" + AbstractTest.PREFIX + "*\"");
-        } else  {
-            elements = this.mqlAsSet("escape list " + _type.mxType);
-        }
-        if (_type == AbstractTest.CI.INTERFACE)  {
+        if (_type == AbstractTest.CI.UI_TABLE)  {
+            elements = this.mqlAsSet("escape list table system");
             for (final String element : elements)  {
-                this.mql("escape mod " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\" remove derived");
+                if (element.startsWith(AbstractTest.PREFIX))  {
+                    this.mql("escape delete " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\" system");
+                }
             }
-        }
-        for (final String element : elements)  {
-            if (element.startsWith(AbstractTest.PREFIX))  {
-                this.mql("escape delete " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\"");
+        } else  {
+            if (_type.wildcardSearch)  {
+                elements = this.mqlAsSet("escape list " + _type.mxType + " \"" + AbstractTest.PREFIX + "*\"");
+            } else  {
+                elements = this.mqlAsSet("escape list " + _type.mxType);
+            }
+            if (_type == AbstractTest.CI.INTERFACE)  {
+                for (final String element : elements)  {
+                    this.mql("escape mod " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\" remove derived");
+                }
+            }
+            for (final String element : elements)  {
+                if (element.startsWith(AbstractTest.PREFIX))  {
+                    this.mql("escape delete " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\"");
+                }
             }
         }
     }

@@ -57,7 +57,7 @@ public class RoleExportUpdate
      * @return role instance
      */
     @Override()
-    protected RoleData createNewUserData(final String _name)
+    protected RoleData createNewData(final String _name)
     {
         return new RoleData(this, _name);
     }
@@ -112,6 +112,8 @@ public class RoleExportUpdate
     public void cleanup()
         throws MatrixException
     {
+        this.cleanup(AbstractTest.CI.PERSONADMIN);
+        this.cleanup(AbstractTest.CI.GROUP);
         this.cleanup(AbstractTest.CI.ROLE);
         this.cleanup(AbstractTest.CI.SITE);
         this.cleanup(AbstractTest.CI.MQL_PROGRAM);
@@ -146,16 +148,20 @@ public class RoleExportUpdate
                              final RoleData _role)
         throws Exception
     {
+        // create referenced property value
+        for (final PropertyDef prop : _role.getProperties())  {
+            if (prop.getTo() != null)  {
+                prop.getTo().create();
+            }
+        }
         // create all parent roles
         for (final RoleData parentRole : _role.getParent())  {
             parentRole.create();
         }
-
         // create site
         if (_role.getSite() != null)  {
             _role.getSite().create();
         }
-
         // create cue properties
         for (final CueData<RoleData> cue : _role.getCues())  {
             for (final PropertyDef prop : cue.getProperties())  {
@@ -164,7 +170,6 @@ public class RoleExportUpdate
                 }
             }
         }
-
         // create filter properties
         for (final FilterData<RoleData> filter : _role.getFilters())  {
             for (final PropertyDef prop : filter.getProperties())  {
@@ -173,7 +178,6 @@ public class RoleExportUpdate
                 }
             }
         }
-
         // create query properties
         for (final QueryData<RoleData> query : _role.getQueries())  {
             for (final PropertyDef prop : query.getProperties())  {
@@ -182,7 +186,6 @@ public class RoleExportUpdate
                 }
             }
         }
-
         // create table properties
         for (final TableData<RoleData> table : _role.getTables())  {
             for (final PropertyDef prop : table.getProperties())  {
@@ -191,7 +194,6 @@ public class RoleExportUpdate
                 }
             }
         }
-
         // create tip properties
         for (final TipData<RoleData> tip : _role.getTips())  {
             for (final PropertyDef prop : tip.getProperties())  {
@@ -200,7 +202,6 @@ public class RoleExportUpdate
                 }
             }
         }
-
         // create tool set properties and programs
         for (final ToolSetData<RoleData> toolSet : _role.getToolSets())  {
             for (final PropertyDef prop : toolSet.getProperties())  {
@@ -212,7 +213,6 @@ public class RoleExportUpdate
                 prog.create();
             }
         }
-
         // create view properties
         for (final ViewData<RoleData> view : _role.getViews())  {
             for (final PropertyDef prop : view.getProperties())  {

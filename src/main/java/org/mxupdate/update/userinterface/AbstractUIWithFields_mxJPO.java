@@ -140,6 +140,8 @@ public abstract class AbstractUIWithFields_mxJPO
             AbstractUIWithFields_mxJPO.Field.IGNORED_URLS.add("/fieldOrder");
             // the geometry information is defined as sub tags
             AbstractUIWithFields_mxJPO.Field.IGNORED_URLS.add("/geometry");
+            AbstractUIWithFields_mxJPO.Field.IGNORED_URLS.add("/fieldSettingList");
+            AbstractUIWithFields_mxJPO.Field.IGNORED_URLS.add("/fieldUserList");
         }
 
         /**
@@ -390,6 +392,10 @@ System.err.println("unknown sort type '" + _content + "'");
                     this.isBusinessObject = true;
                 } else if ("/usesRelationship".equals(_url))  {
                     this.isRelationship = true;
+                } else if ("/fieldType".equals(_url))  {
+if (!"select".equals(_content))  {
+    System.err.println("unknown field type '" + _content + "'");
+}
 
                 } else if ("/global".equals(_url))  {
                     this.users.add("all");

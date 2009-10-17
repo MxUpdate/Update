@@ -21,23 +21,26 @@
 package org.mxupdate.update.userinterface;
 
 /**
+ * Handles one setting within a user interface object.
  *
- * @author tmoxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 class Setting_mxJPO
 {
+    /**
+     * Name of the setting.
+     */
     String name = null;
+
+    /**
+     * Value of the setting.
+     */
     String value = null;
-
-    void write()
-    {
-
-    }
 
     @Override
     public String toString()
     {
-        return "[name="+name+", value="+value+"]";
+        return "[name=" + name + ", value=" + value + "]";
     }
 }

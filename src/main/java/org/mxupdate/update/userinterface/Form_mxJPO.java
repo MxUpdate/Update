@@ -22,7 +22,9 @@ package org.mxupdate.update.userinterface;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
@@ -30,12 +32,13 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
+ * The class is used to export, create, delete and update forms within MX.
  *
  * @author The MxUpdate Team
  * @version $Id$
  */
 public class Form_mxJPO
-        extends AbstractUIWithFields_mxJPO
+    extends AbstractUIWithFields_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
@@ -61,6 +64,22 @@ public class Form_mxJPO
             + "}";
 
     /**
+     * Set of all ignored URLs from the XML definition for forms.
+     *
+     * @see #parse(String, String)
+     */
+    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    static  {
+        Form_mxJPO.IGNORED_URLS.add("/footer");
+        Form_mxJPO.IGNORED_URLS.add("/header");
+        Form_mxJPO.IGNORED_URLS.add("/height");
+        Form_mxJPO.IGNORED_URLS.add("/leftMargin");
+        Form_mxJPO.IGNORED_URLS.add("/rightMargin");
+        Form_mxJPO.IGNORED_URLS.add("/webform");
+        Form_mxJPO.IGNORED_URLS.add("/width");
+    }
+
+    /**
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
@@ -73,31 +92,20 @@ public class Form_mxJPO
     }
 
     /**
-     * The fields of the web form are parsed.
+     * <p>Parses all form specific URL values. No specific values for the web
+     * form exists</p>
+     * <p>If an <code>_url</code> is included in {@link #IGNORED_URLS}, this
+     * URL is ignored.</p>
      *
      * @param _url      URL to parse
      * @param _content  related content of the URL to parse
-     * @see #fields
+     * @see #IGNORED_URLS
      */
-    @Override
+    @Override()
     protected void parse(final String _url,
                          final String _content)
     {
-        if (_url.startsWith("/footer"))  {
-            // to be ignored ...
-        } else if (_url.startsWith("/header"))  {
-            // to be ignored ...
-        } else if (_url.startsWith("/height"))  {
-            // to be ignored ...
-        } else if (_url.startsWith("/leftMargin"))  {
-            // to be ignored ...
-        } else if (_url.startsWith("/rightMargin"))  {
-            // to be ignored ...
-        } else if (_url.startsWith("/webform"))  {
-            // to be ignored ...
-        } else if (_url.startsWith("/width"))  {
-            // to be ignored ...
-        } else  {
+        if (!Form_mxJPO.IGNORED_URLS.contains(_url))  {
             super.parse(_url, _content);
         }
     }
@@ -111,7 +119,7 @@ public class Form_mxJPO
      *                     written
      * @see AbstractUIWithFields_mxJPO.Field#write(Appendable)
      */
-    @Override
+    @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
             throws IOException
@@ -130,7 +138,7 @@ public class Form_mxJPO
      * @param _out          appendable instance to the TCL update file
      * @throws IOException if the extension could not be written
      */
-    @Override
+    @Override()
     protected void writeEnd(final ParameterCache_mxJPO _paramCache,
                             final Appendable _out)
             throws IOException
@@ -155,8 +163,8 @@ public class Form_mxJPO
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
-                .append("add ").append(this.getTypeDef().getMxAdminName())
-                        .append(" \"").append(this.getName()).append("\" web;");
+                .append("escape add ").append(this.getTypeDef().getMxAdminName())
+                        .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" web;");
         MqlUtil_mxJPO.execMql(_paramCache, cmd);
     }
 
@@ -170,7 +178,7 @@ public class Form_mxJPO
      * </ul>
      * The update of web forms works sometimes not correctly for the correct
      * order of fields. Because of that, the TCL update code is includes a
-     * procedure to order the form fields.
+     * {@link #ORDER_PROC procedure} to order the form fields.
      *
      * @param _paramCache       parameter cache
      * @param _preMQLCode       MQL statements which must be called before the
@@ -187,7 +195,7 @@ public class Form_mxJPO
      * @throws Exception if the update from derived class failed
      * @see #ORDER_PROC
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
@@ -198,13 +206,13 @@ public class Form_mxJPO
     {
         // reset HRef, description, alt and label
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append('\"')
+                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
                 .append(" !hidden");
 
         // remove all fields
         for (final Field field : this.getFields())  {
-            preMQLCode.append(" field delete name \"").append(field.getName()).append('\"');
+            preMQLCode.append(" field delete name \"").append(StringUtil_mxJPO.convertMql(field.getName())).append('\"');
         }
 
         // append already existing pre MQL code

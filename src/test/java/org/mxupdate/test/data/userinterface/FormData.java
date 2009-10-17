@@ -18,7 +18,7 @@
  * Last Changed By: $Author$
  */
 
-package org.mxupdate.test.data.user.workspace;
+package org.mxupdate.test.data.userinterface;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -30,114 +30,123 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.user.AbstractUserData;
-import org.mxupdate.test.data.userinterface.FieldData;
+import org.mxupdate.test.data.AbstractData;
 import org.testng.Assert;
 
 /**
- * The class is used to define all table objects related to users used to
- * create / update and to export.
+ * Used to define a web form, create them and test the result.
  *
  * @author The MxUpdate Team
  * @version $Id$
- * @param <USER> class of the related user for which this table is defined
  */
-public class TableData<USER extends AbstractUserData<?>>
-    extends AbstractVisualWorkspaceObjectData<TableData<USER>,USER>
+public class FormData
+    extends AbstractData<FormData>
 {
     /**
      * Within export the description must be defined.
      */
     private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(3);
     static  {
+        FormData.REQUIRED_EXPORT_VALUES.add("description");
     }
 
     /**
-     * All columns of this user specific table.
+     * All fields of this form.
      *
      * @see #newField(String)
      * @see #append4Create(StringBuilder)
      * @see #ciFile()
      */
-    private final List<FieldData<TableData<USER>>> fields = new ArrayList<FieldData<TableData<USER>>>();
+    private final List<FieldData<FormData>> fields = new ArrayList<FieldData<FormData>>();
 
     /**
-     * Default constructor.
+     * Constructor to initialize this form.
      *
-     * @param _test     related test case
-     * @param _user     user for which this table is defined
-     * @param _name     name of the table
+     * @param _test     related test implementation (where this form is
+     *                  defined)
+     * @param _name     name of the form
      */
-    public TableData(final AbstractTest _test,
-                     final USER _user,
-                     final String _name)
+    public FormData(final AbstractTest _test,
+                    final String _name)
     {
-        super(_test, "table", _user, _name, TableData.REQUIRED_EXPORT_VALUES);
+        super(_test, AbstractTest.CI.UI_FORM, _name, FormData.REQUIRED_EXPORT_VALUES);
     }
 
     /**
      * Creates a new column / field instance for
-     * {@link #fields the list of all columns} in this user specific table.
+     * {@link #fields the list of all columns} in this web form.
      *
      * @param _name     name of the field (could be also <code>null</code>).
      * @return new create field (column) instance
      * @see #fields
      */
-    public FieldData<TableData<USER>> newField(final String _name)
+    public FieldData<FormData> newField(final String _name)
     {
-        final FieldData<TableData<USER>> ret = new FieldData<TableData<USER>>(this.getTest(), this, _name);
+        final FieldData<FormData> ret = new FieldData<FormData>(this.getTest(), this, _name);
         this.fields.add(ret);
         return ret;
     }
 
     /**
-     * Appends the MQL commands to define the {@link #fields}Êwithin a create
-     * and in front of the definition the units.
+     * Returns all fields of this web form.
      *
-     * @param _cmd  string builder used to append MQL commands
-     * @throws MatrixException if used object could not be created
+     * @return all fields
      * @see #fields
      */
-    @Override()
-    protected void append4Create(final StringBuilder _cmd)
-        throws MatrixException
+    public List<FieldData<FormData>> getFields()
     {
-        _cmd.append(" units points");
-        super.append4Create(_cmd);
-        for (final FieldData<TableData<USER>> field : this.fields)  {
-            _cmd.append(" column");
-            field.append4Create(_cmd);
-        }
+        return this.fields;
     }
 
     /**
-     * Returns the CI file appended with all
-     * {@link #fields column informations} of this user specific table.
+     * Prepares the configuration item update file depending on the
+     * configuration of this form.
      *
-     * @return string content of the CI file
-     * @see #fields
+     * @return code for the configuration item update file
      */
     @Override()
     public String ciFile()
     {
-        // for tables the unit must be defined! (exact behind the user!)
         final StringBuilder cmd = new StringBuilder()
-                .append(super.ciFile().replaceFirst("user \"\\$\\{NAME\\}\"",
-                                                    "user \"\\$\\{NAME\\}\" \\\\\n    units points"));
-
+                .append("mql escape mod form \"${NAME}\"");
+        this.append4CIFileValues(cmd);
         // and all fields...
-        for (final FieldData<TableData<USER>> field : this.fields)  {
-            cmd.append(" \\\n    column").append(field.ciFile());
+        for (final FieldData<FormData> field : this.fields)  {
+            cmd.append(" \\\n    field").append(field.ciFile());
         }
         return cmd.toString();
     }
 
     /**
-     * <p>Checks the export of this user specific table that all values are
-     * correct defined.</p>
-     * <p>For user specific tables, following points must be checked:
+     * Creates a this form with all values.
+     *
+     * @return this form instance
+     * @throws MatrixException if create failed
+     */
+    @Override()
+    public FormData create()
+        throws MatrixException
+    {
+        final StringBuilder cmd = new StringBuilder()
+                .append("escape add form \"" + AbstractTest.convertMql(this.getName()) + "\" web");
+        this.append4Create(cmd);
+        // append all fields
+        for (final FieldData<FormData> field : this.fields)  {
+            cmd.append(" field");
+            field.append4Create(cmd);
+        }
+
+        this.getTest().mql(cmd);
+
+        return this;
+    }
+
+    /**
+     * <p>Checks the export of this web form that all values are correct
+     * defined.</p>
+     * <p>For web forms, following points must be checked:
      * <ul>
-     * <li>{@link #fields table columns}</li>
+     * <li>{@link #fields web form fields}</li>
      * </ul><p>
      *
      * @param _exportParser     parsed export
@@ -149,16 +158,13 @@ public class TableData<USER extends AbstractUserData<?>>
     {
         super.checkExport(_exportParser);
 
-        // check correct units definition
-        this.checkSingleValue(_exportParser, "table", "units", "points");
-
         // fetch all columns of the table
         final List<ExportParser.Line> columnLines = new ArrayList<ExportParser.Line>();
         // first only the table is the root line...
         for (final ExportParser.Line rootLine : _exportParser.getRootLines())  {
             // loop through all columns
             for (final ExportParser.Line line : rootLine.getChildren())  {
-                if ("column".equals(line.getTag()))  {
+                if ("field".equals(line.getTag()))  {
                     columnLines.add(line);
                 }
             }
@@ -169,9 +175,9 @@ public class TableData<USER extends AbstractUserData<?>>
                             this.fields.size(),
                             "check that all columns / fields are correct defined");
         final Iterator<ExportParser.Line> columnLinesIter = columnLines.iterator();
-        final Iterator<FieldData<TableData<USER>>> fieldsIter = this.fields.iterator();
+        final Iterator<FieldData<FormData>> fieldsIter = this.fields.iterator();
         while (columnLinesIter.hasNext() && fieldsIter.hasNext())  {
-            final FieldData<TableData<USER>> field = fieldsIter.next();
+            final FieldData<FormData> field = fieldsIter.next();
             final ExportParser.Line line = columnLinesIter.next();
             field.checkExport(new ExportParser(field.getName(), "mql", line.getValue(), line.getChildren()));
         }

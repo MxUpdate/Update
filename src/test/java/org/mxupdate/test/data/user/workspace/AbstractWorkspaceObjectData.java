@@ -187,19 +187,6 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
                 _cmd.append('\"').append(AbstractTest.convertMql(user)).append('\"');
             }
         }
-
-        // properties
-        for (final PropertyDef property : this.getProperties())  {
-            _cmd.append(" property \"").append(AbstractTest.convertMql(property.getName())).append("\"");
-            if (property.getTo() != null)  {
-                property.getTo().create();
-                _cmd.append(" to ").append(property.getTo().getCI().getMxType()).append(" \"")
-                    .append(AbstractTest.convertMql(property.getTo().getName())).append("\"");
-            }
-            if (property.getValue() != null)  {
-                _cmd.append(" value \"").append(AbstractTest.convertMql(property.getValue())).append("\"");
-            }
-        }
     }
 
     /**
@@ -229,18 +216,6 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
                 cmd.append(" \\\n    visible \"")
                    .append(AbstractTest.convertTcl(user))
                    .append('\"');
-            }
-        }
-
-        // properties
-        for (final PropertyDef property : this.getProperties())  {
-            cmd.append(" property \"").append(AbstractTest.convertTcl(property.getName())).append("\"");
-            if (property.getTo() != null)  {
-                cmd.append(" to ").append(property.getTo().getCI().getMxType()).append(" \"")
-                    .append(AbstractTest.convertTcl(property.getTo().getName())).append("\"");
-            }
-            if (property.getValue() != null)  {
-                cmd.append(" value \"").append(AbstractTest.convertTcl(property.getValue())).append("\"");
             }
         }
 

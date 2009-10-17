@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.data.program.MQLProgramData;
 import org.mxupdate.test.data.user.AbstractUserData;
 import org.mxupdate.test.data.user.workspace.FilterData;
@@ -39,7 +39,7 @@ import org.mxupdate.test.data.util.PropertyDef;
  * @param <USER> user class which is tested
  */
 abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
-    extends AbstractTest
+    extends AbstractDataExportUpdate<USER>
 {
     /**
      * Prepares the test data.
@@ -48,6 +48,7 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
      * @param _datas    specific test data to append
      * @return prepared test data
      */
+    @Override()
     protected Object[][] prepareData(final String _logText,
                                      final Object[]... _datas)
     {
@@ -62,16 +63,8 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
         this.appendToolSet(_logText, ret);
         this.appendView(_logText, ret);
 
-        return ret.toArray(new Object[ret.size()][]);
+        return super.prepareData(_logText, ret.toArray(new Object[ret.size()][]));
     }
-
-    /**
-     * Creates for given <code>_name</code> related user instance.
-     *
-     * @param _name     name of the user
-     * @return new create user instance
-     */
-    protected abstract USER createNewUserData(final String _name);
 
     /**
      * Appends the test data for the cues related to an user.
@@ -84,12 +77,12 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
     {
         _ret.add(new Object[]{
                 _logText + " with two cues",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newCue("my cue \"test\"").getUser()
                         .newCue("cue b").getUser()});
         _ret.add(new Object[]{
                 _logText + " with complex cue",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newCue("my cue \"test\"")
                                 .setValue("appliesto", "businessobject")
                                 .setValue("type", "TYPE \"")
@@ -105,89 +98,89 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with cue which applies to relationship",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                     .newCue("my cue \"test\"")
                         .setValue("appliesto", "relationship")
                         .getUser()});
         _ret.add(new Object[]{
                 _logText + " with cue which applies to both business object and relationship",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newCue("my cue \"test\"")
                                 .setValue("appliesto", "all")
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with cue with order -1",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newCue("my cue \"test\"")
                                 .setValue("order", "-1")
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with cue with order 0",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newCue("my cue \"test\"")
                                 .setValue("order", "0")
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with cue with order 1",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newCue("my cue \"test\"")
                                 .setValue("order", "1")
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with cue with visible user definition",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newCue("my cue \"test\"")
                                 .setVisible("creator","guest","Test Everything")
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with not active cue",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newCue("my cue \"test\"")
                                 .setActive(false)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with active cue",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newCue("my cue \"test\"")
                                 .setActive(true)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with not hidden cue",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newCue("my cue \"test\"")
                                 .setHidden(false)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with hidden cue",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newCue("my cue \"test\"")
                                 .setHidden(true)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with cue with property name",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newCue("my cue \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\""))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with cue with property name and value",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newCue("my cue \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\"", "my \"value\""))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with cue with property name, value and referenced admin object",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newCue("my cue \"test\"")
-                                .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewUserData("property \" " + _logText)))
+                                .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewData("property \" " + _logText)))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with cue with multiple properties",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newCue("my cue \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\" 1"))
                                 .addProperty(new PropertyDef("my test \"property\" 2", "my \"value\""))
-                                .addProperty(new PropertyDef("my test \"property\" 3", this.createNewUserData("property \" " + _logText)))
+                                .addProperty(new PropertyDef("my test \"property\" 3", this.createNewData("property \" " + _logText)))
                                 .getUser()});
     }
 
@@ -202,12 +195,12 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
     {
         _ret.add(new Object[]{
                 _logText + " with two filters",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newFilter("my filter \"test\"").getUser()
                         .newFilter("filter b").getUser()});
         _ret.add(new Object[]{
                 _logText + " with complex filter",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newFilter("my filter \"test\"")
                                 .setValue("appliesto", "businessobject")
                                 .setValue("type", "TYPE \"")
@@ -219,83 +212,83 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with filter which applies to relationship",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newFilter("my filter \"test\"")
                                 .setValue("appliesto", "relationship")
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with filter with visible user definition",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newFilter("my filter \"test\"")
                                 .setVisible("creator","guest","Test Everything")
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with not active filter",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newFilter("my filter \"test\"")
                                 .setActive(false)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with active filter",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newFilter("my filter \"test\"")
                                 .setActive(true)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with not hidden filter",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newFilter("my filter \"test\"")
                                 .setHidden(false)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with hidden filter",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newFilter("my filter \"test\"")
                                 .setHidden(true)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with filter in the to direction",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newFilter("my filter \"test\"")
                                 .setDirection(FilterData.Direction.TO)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with filter in the from direction",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newFilter("my filter \"test\"")
                                 .setDirection(FilterData.Direction.FROM)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with filter in the both direction",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newFilter("my filter \"test\"")
                                 .setDirection(FilterData.Direction.BOTH)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with filter with property name",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newFilter("my filter \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\""))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with filter with property name and value",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newFilter("my filter \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\"", "my \"value\""))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with filter with property name, value and referenced admin object",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newFilter("my filter \"test\"")
-                                .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewUserData("property \" " + _logText)))
+                                .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewData("property \" " + _logText)))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with filter with multiple properties",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newFilter("my filter \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\" 1"))
                                 .addProperty(new PropertyDef("my test \"property\" 2", "my \"value\""))
-                                .addProperty(new PropertyDef("my test \"property\" 3", this.createNewUserData("property \" " + _logText)))
+                                .addProperty(new PropertyDef("my test \"property\" 3", this.createNewData("property \" " + _logText)))
                                 .getUser()});
     }
 
@@ -310,12 +303,12 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
     {
         _ret.add(new Object[]{
                 _logText + " with two queries",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newQuery("my query \"test\"").getUser()
                         .newQuery("query b").getUser()});
         _ret.add(new Object[]{
                 _logText + " with complex query",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newQuery("my query \"test\"")
                                 .setValue("type", "TYPE \"")
                                 .setValue("name", "NAME \"")
@@ -326,59 +319,59 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with query with visible user definition",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newQuery("my query \"test\"")
                                 .setVisible("creator","guest","Test Everything")
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with not hidden query",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newQuery("my query \"test\"")
                                 .setHidden(false)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with hidden query",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newQuery("my query \"test\"")
                                 .setHidden(true)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with query with expand type true",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newQuery("my query \"test\"")
                                 .setExpandType(true)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with query with expand type false",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newQuery("my query \"test\"")
                                 .setExpandType(false)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with query with property name",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newQuery("my query \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\""))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with query with property name and value",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newQuery("my query \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\"", "my \"value\""))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with query with property name, value and referenced admin object",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newQuery("my query \"test\"")
-                                .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewUserData("property \" " + _logText)))
+                                .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewData("property \" " + _logText)))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with query with multiple properties",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newQuery("my query \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\" 1"))
                                 .addProperty(new PropertyDef("my test \"property\" 2", "my \"value\""))
-                                .addProperty(new PropertyDef("my test \"property\" 3", this.createNewUserData("property \" " + _logText)))
+                                .addProperty(new PropertyDef("my test \"property\" 3", this.createNewData("property \" " + _logText)))
                                 .getUser()});
     }
 
@@ -393,12 +386,12 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
     {
         _ret.add(new Object[]{
                 _logText + " with two tables",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTable("my table \"test\"").getUser()
                         .newTable("table b").setActive(false).getUser()});
         _ret.add(new Object[]{
                 _logText + " with complex table",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTable("my table \"test\"")
                                 .newField(null)
                                         .setValue("businessobject", "name")
@@ -408,78 +401,78 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
                                         .setValue("update", "an \"update href\"")
                                         .setValue("program", "MxUpdate")
                                         .setHidden(true)
-                                        .getTable()
+                                        .getFormTable()
                                 .newField(null)
                                         .setValue("relationship", "type")
-                                        .getTable()
-                                .newField("scale 50")               .setScale(50.0).getTable()
-                                .newField("scale 50.5")             .setScale(50.5).getTable()
-                                .newField("no size")                .setSize(null, null).getTable()
-                                .newField("size 1 1")               .setSize(1.0, 1.0).getTable()
-                                .newField("size 0.5 0.5")           .setSize(0.5, 0.5).getTable()
-                                .newField("size 100 59")            .setSize(100.0, 59.0).getTable()
-                                .newField("no minimum size")        .setMinSize(null, null).getTable()
-                                .newField("minimum size 0 0")       .setMinSize(0.0, 0.0).getTable()
-                                .newField("minimum size 0.5 0.5")   .setMinSize(0.5, 0.5).getTable()
-                                .newField("minimum size 100 59")      .setMinSize(100.0, 59.0).getTable()
-                                .newField("default auto height")    .setAutoHeight(null).getTable()
-                                .newField("auto height true")       .setAutoHeight(true).getTable()
-                                .newField("auto height false")      .setAutoHeight(false).getTable()
-                                .newField("default auto width")     .setAutoWidth(null).getTable()
-                                .newField("auto width true")        .setAutoWidth(true).getTable()
-                                .newField("auto width false")       .setAutoWidth(false).getTable()
-                                .newField("default (none) sorttype").setSortType(null).getTable()
-                                .newField("sorttype alpha")         .setSortType("alpha").getTable()
-                                .newField("sorttype numeric")       .setSortType("numeric").getTable()
-                                .newField("sorttype other")         .setSortType("other").getTable()
-                                .newField("sorttype none")          .setSortType("none").getTable()
-                                .newField("default not editable")   .setEditable(null).getTable()
-                                .newField("editable ")              .setEditable(true).getTable()
-                                .newField("not editable")           .setEditable(false).getTable()
+                                        .getFormTable()
+                                .newField("scale 50")               .setScale(50.0).getFormTable()
+                                .newField("scale 50.5")             .setScale(50.5).getFormTable()
+                                .newField("no size")                .setSize(null, null).getFormTable()
+                                .newField("size 1 1")               .setSize(1.0, 1.0).getFormTable()
+                                .newField("size 0.5 0.5")           .setSize(0.5, 0.5).getFormTable()
+                                .newField("size 100 59")            .setSize(100.0, 59.0).getFormTable()
+                                .newField("no minimum size")        .setMinSize(null, null).getFormTable()
+                                .newField("minimum size 0 0")       .setMinSize(0.0, 0.0).getFormTable()
+                                .newField("minimum size 0.5 0.5")   .setMinSize(0.5, 0.5).getFormTable()
+                                .newField("minimum size 100 59")      .setMinSize(100.0, 59.0).getFormTable()
+                                .newField("default auto height")    .setAutoHeight(null).getFormTable()
+                                .newField("auto height true")       .setAutoHeight(true).getFormTable()
+                                .newField("auto height false")      .setAutoHeight(false).getFormTable()
+                                .newField("default auto width")     .setAutoWidth(null).getFormTable()
+                                .newField("auto width true")        .setAutoWidth(true).getFormTable()
+                                .newField("auto width false")       .setAutoWidth(false).getFormTable()
+                                .newField("default (none) sorttype").setSortType(null).getFormTable()
+                                .newField("sorttype alpha")         .setSortType("alpha").getFormTable()
+                                .newField("sorttype numeric")       .setSortType("numeric").getFormTable()
+                                .newField("sorttype other")         .setSortType("other").getFormTable()
+                                .newField("sorttype none")          .setSortType("none").getFormTable()
+                                .newField("default not editable")   .setEditable(null).getFormTable()
+                                .newField("editable ")              .setEditable(true).getFormTable()
+                                .newField("not editable")           .setEditable(false).getFormTable()
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with table with visible user definition",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTable("my table \"test\"")
                                 .setVisible("creator","guest","Test Everything")
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with not active table",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTable("my table \"test\"")
                                 .setActive(false)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with active table",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTable("my table \"test\"")
                                 .setActive(true)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with table with property name",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTable("my table \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\""))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with table with property name and value",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTable("my table \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\"", "my \"value\""))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with table with property name, value and referenced admin object",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTable("my table \"test\"")
-                                .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewUserData("property \" " + _logText)))
+                                .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewData("property \" " + _logText)))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with table with multiple properties",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTable("my table \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\" 1"))
                                 .addProperty(new PropertyDef("my test \"property\" 2", "my \"value\""))
-                                .addProperty(new PropertyDef("my test \"property\" 3", this.createNewUserData("property \" " + _logText)))
+                                .addProperty(new PropertyDef("my test \"property\" 3", this.createNewData("property \" " + _logText)))
                                 .getUser()});
 
     }
@@ -495,12 +488,12 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
     {
         _ret.add(new Object[]{
                 _logText + " with two tips",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTip("my tip \"test\"").getUser()
                         .newTip("tip b").getUser()});
         _ret.add(new Object[]{
                 _logText + " with complex tip",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTip("my tip \"test\"")
                                 .setValue("appliesto", "businessobject")
                                 .setValue("type", "TYPE \"")
@@ -512,71 +505,71 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with tip which applies to relationship",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTip("my tip \"test\"")
                                 .setValue("appliesto", "relationship")
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with tip with visible user definition",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTip("my tip \"test\"")
                                 .setVisible("creator","guest","Test Everything")
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with not active tip",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTip("my tip \"test\"")
                                 .setActive(false)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with active tip",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTip("my tip \"test\"")
                                 .setActive(true)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with not hidden tip",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTip("my tip \"test\"")
                                 .setHidden(false)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with hidden tip",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTip("my tip \"test\"")
                                 .setHidden(true)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with tip with expression",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTip("my tip \"test\"")
                                 .setValue("expression", "this is a \"expression\" with {braces}")
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with tip with property name",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTip("my tip \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\""))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with tip with property name and value",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTip("my tip \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\"", "my \"value\""))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with tip with property name, value and referenced admin object",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTip("my tip \"test\"")
-                                .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewUserData("property \" " + _logText)))
+                                .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewData("property \" " + _logText)))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with tip with multiple properties",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTip("my tip \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\" 1"))
                                 .addProperty(new PropertyDef("my test \"property\" 2", "my \"value\""))
-                                .addProperty(new PropertyDef("my test \"property\" 3", this.createNewUserData("property \" " + _logText)))
+                                .addProperty(new PropertyDef("my test \"property\" 3", this.createNewData("property \" " + _logText)))
                                 .getUser()});
     }
 
@@ -591,71 +584,71 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
     {
         _ret.add(new Object[]{
                 _logText + " with two tool sets",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newToolSet("my tool set \"test\"").getUser()
                         .newToolSet("tool set b").getUser()});
         _ret.add(new Object[]{
                 _logText + " with tool set with two programs",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newToolSet("my tool set \"test\"")
                                 .addProgram(new MQLProgramData(this, "\"tool set\" program 1"))
                                 .addProgram(new MQLProgramData(this, "\"tool set\" program 2"))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with tool set with visible user definition",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newToolSet("my tool set \"test\"")
                                 .setVisible("creator","guest","Test Everything")
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with not active tool set",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newToolSet("my tool set \"test\"")
                                 .setActive(false)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with active tool set",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newToolSet("my tool set \"test\"")
                                 .setActive(true)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with not hidden tool set",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newToolSet("my tool set \"test\"")
                                 .setHidden(false)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with hidden tool set",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newTip("my tool set \"test\"")
                                 .setHidden(true)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with tool set with property name",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newToolSet("my tool set \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\""))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with tool set with property name and value",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newToolSet("my tool set \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\"", "my \"value\""))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with tool set with property name, value and referenced admin object",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newToolSet("my tool set \"test\"")
-                                .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewUserData("property \" " + _logText)))
+                                .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewData("property \" " + _logText)))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with tool set with multiple properties",
-                this.createNewUserData("hallo \" test")
+                this.createNewData("hallo \" test")
                         .newToolSet("my tool set \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\" 1"))
                                 .addProperty(new PropertyDef("my test \"property\" 2", "my \"value\""))
-                                .addProperty(new PropertyDef("my test \"property\" 3", this.createNewUserData("property \" " + _logText)))
+                                .addProperty(new PropertyDef("my test \"property\" 3", this.createNewData("property \" " + _logText)))
                                 .getUser()});
     }
 
@@ -670,7 +663,7 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
     {
         _ret.add(new Object[]{
                 _logText + " with two views",
-                this.createNewUserData("hello \" test")
+                this.createNewData("hello \" test")
                         .newView("my view \"test\"").getUser()
                         .newView("view b").getUser()});
         _ret.add(new Object[]{
@@ -690,47 +683,47 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
                                          new String[]{"not active table '1'",       "not active table \"2\""})});
         _ret.add(new Object[]{
                 _logText + " with view with visible user definition",
-                this.createNewUserData("hello \" test")
+                this.createNewData("hello \" test")
                         .newView("my cue \"test\"")
                                 .setVisible("creator","guest","Test Everything")
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with not hidden view",
-                this.createNewUserData("hello \" test")
+                this.createNewData("hello \" test")
                         .newView("my cue \"test\"")
                                 .setHidden(false)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with hidden view",
-                this.createNewUserData("hello \" test")
+                this.createNewData("hello \" test")
                         .newView("my cue \"test\"")
                                 .setHidden(true)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with view with property name",
-                this.createNewUserData("hello \" test")
+                this.createNewData("hello \" test")
                         .newView("my cue \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\""))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with view with property name and value",
-                this.createNewUserData("hello \" test")
+                this.createNewData("hello \" test")
                         .newView("my cue \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\"", "my \"value\""))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with view with property name, value and referenced admin object",
-                this.createNewUserData("hello \" test")
+                this.createNewData("hello \" test")
                         .newView("my cue \"test\"")
-                                .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewUserData(" property \" " + _logText)))
+                                .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewData(" property \" " + _logText)))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with view with multiple properties",
-                this.createNewUserData("hello \" test")
+                this.createNewData("hello \" test")
                         .newView("my cue \"test\"")
                                 .addProperty(new PropertyDef("my test \"property\" 1"))
                                 .addProperty(new PropertyDef("my test \"property\" 2", "my \"value\""))
-                                .addProperty(new PropertyDef("my test \"property\" 3", this.createNewUserData( "property \" " + _logText)))
+                                .addProperty(new PropertyDef("my test \"property\" 3", this.createNewData( "property \" " + _logText)))
                                 .getUser()});
 
     }
@@ -765,7 +758,7 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
                                      final String[] _activeTableNames,
                                      final String[] _notActiveTableNames)
     {
-        final USER userData = this.createNewUserData(_name);
+        final USER userData = this.createNewData(_name);
         final ViewData<USER> view = userData.newView(_viewName);
         if (_activeCueNames != null)  {
             for (final String name : _activeCueNames)  {
