@@ -457,18 +457,28 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      *     {@link #getCIFileName()}</li>
      * </ul>
      *
+     * @param _params       parameters
      * @return parsed export
      * @throws IOException      if the parameter could not be encoded
      * @throws MatrixException  if MQL calls failed
      */
-    public ExportParser export()
+    public ExportParser export(final String... _params)
         throws IOException, MatrixException
     {
-        final Map<String,Collection<String>> params = new HashMap<String,Collection<String>>(1);
-        params.put(this.ci.updateType, Arrays.asList(new String[]{this.getName()}));
+        final Map<String,Collection<String>> files = new HashMap<String,Collection<String>>(1);
+        files.put(this.ci.updateType, Arrays.asList(new String[]{this.getName()}));
+
+        final Map<String,String> params = new HashMap<String,String>();
+        if (_params != null)  {
+            for (int idx = 0; idx < _params.length; idx += 2)  {
+                params.put(_params[idx], _params[idx + 1]);
+            }
+        }
+
         final Map<String,Collection<Map<String,String>>> bck =
                 this.test.<Map<String,Collection<Map<String,String>>>>jpoInvoke("org.mxupdate.plugin.Export",
                                                                                 "exportByName",
+                                                                                files,
                                                                                 params)
                     .getValues();
 
@@ -565,10 +575,10 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @param _value            value to check (or <code>null</code> if value
      *                          is not defined)
      */
-    protected void checkSingleValue(final ExportParser _exportParser,
-                                    final String _kind,
-                                    final String _tag,
-                                    final String _value)
+    public void checkSingleValue(final ExportParser _exportParser,
+                                 final String _kind,
+                                 final String _tag,
+                                 final String _value)
     {
         if (_value != null)  {
             Assert.assertEquals(_exportParser.getLines("/mql/" + _tag + "/@value").size(),
@@ -595,10 +605,10 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @param _exists           <i>true</i> means that the tag must exists;
      *                          otherwise value must not defined
      */
-    protected void checkValueExists(final ExportParser _exportParser,
-                                    final String _kind,
-                                    final String _tag,
-                                    final boolean _exists)
+    public void checkValueExists(final ExportParser _exportParser,
+                                 final String _kind,
+                                 final String _tag,
+                                 final boolean _exists)
     {
         this.checkSingleValue(_exportParser, _kind, _tag, _exists ? "" : null);
     }

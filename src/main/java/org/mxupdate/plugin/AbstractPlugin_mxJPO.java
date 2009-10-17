@@ -85,7 +85,7 @@ abstract class AbstractPlugin_mxJPO
     @SuppressWarnings("unchecked")
     protected final <T> T decode(final String[] _args,
                                  final int _index)
-            throws IOException, ClassNotFoundException
+        throws IOException, ClassNotFoundException
     {
         if (_index >= _args.length)  {
             throw new IOException("Argument " + _index + " is not defined!");
@@ -122,11 +122,12 @@ abstract class AbstractPlugin_mxJPO
     protected final <T> T decode(final String[] _args,
                                  final int _index,
                                  final T _default)
-    throws IOException, ClassNotFoundException
+        throws IOException, ClassNotFoundException
     {
-        return (_index >= _args.length)
-               ? _default
-               : this.<T>decode(_args, _index);
+        final T ret = ((_index >= _args.length) || (_args[_index] == null))
+                      ? _default
+                      : this.<T>decode(_args, _index);
+        return (ret == null) ? _default : ret;
     }
 
     /**

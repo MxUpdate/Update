@@ -76,53 +76,53 @@ public class PersonExportUpdate
         return super.prepareData("person",
                 new Object[]{
                         "simple person",
-                        new PersonAdminData(this, "hallo \" test")
+                        new PersonAdminData(this, "hello \" test")
                                 .setValue("description", "\"\\\\ hallo")},
                 new Object[]{
                         "person with some access",
-                        new PersonAdminData(this, "hallo \" test")
+                        new PersonAdminData(this, "hello \" test")
                                 .addAccess("changeName", "changeVault")},
                 new Object[]{
                         "person with normal access but specific changeName / changevault access but no business access",
-                        new PersonAdminData(this, "hallo \" test")
+                        new PersonAdminData(this, "hello \" test")
                                 .addType("application", "full", "notbusiness", "notsystem", "notinactive", "nottrusted")
                                 .addAccess("changeName", "changeVault")},
                 new Object[]{
                         "person with normal access but non specific access but no business access",
-                        new PersonAdminData(this, "hallo \" test")
+                        new PersonAdminData(this, "hello \" test")
                                 .addType("application", "full", "notbusiness", "notsystem", "notinactive", "nottrusted")
                                 },
                 new Object[]{
                         "person as business administration for types",
-                        new PersonAdminData(this, "hallo \" test")
+                        new PersonAdminData(this, "hello \" test")
                                 .addType("application", "notfull", "business", "notsystem", "notinactive", "nottrusted")
                                 .addAdminAccess("type")},
                 new Object[]{
                         "person as business administration for types and vaults",
-                        new PersonAdminData(this, "hallo \" test")
+                        new PersonAdminData(this, "hello \" test")
                                 .addType("application", "notfull", "business", "notsystem", "notinactive", "nottrusted")
                                 .addAdminAccess("type", "vault")},
                 new Object[]{
                         "person with one group",
-                        new PersonAdminData(this, "hallo \" test")
+                        new PersonAdminData(this, "hello \" test")
                                 .addGroup(new GroupData(this, "test \"group\""))},
                 new Object[]{
                         "person with two groups",
-                        new PersonAdminData(this, "hallo \" test")
+                        new PersonAdminData(this, "hello \" test")
                                 .addGroup(new GroupData(this, "test \"group\" 1"))
                                 .addGroup(new GroupData(this, "test \"group\" 2"))},
                 new Object[]{
                         "person with one role",
-                        new PersonAdminData(this, "hallo \" test")
+                        new PersonAdminData(this, "hello \" test")
                                 .addRole(new RoleData(this, "test \"role\""))},
                 new Object[]{
                         "person with two roles",
-                        new PersonAdminData(this, "hallo \" test")
+                        new PersonAdminData(this, "hello \" test")
                                 .addRole(new RoleData(this, "test \"role\" 1"))
                                 .addRole(new RoleData(this, "test \"role\" 2"))},
                 new Object[]{
                         "person with two groups and roles",
-                        new PersonAdminData(this, "hallo \" test")
+                        new PersonAdminData(this, "hello \" test")
                                 .addGroup(new GroupData(this, "test \"group\" 1"))
                                 .addGroup(new GroupData(this, "test \"group\" 2"))
                                 .addRole(new RoleData(this, "test \"role\" 1"))
@@ -130,33 +130,62 @@ public class PersonExportUpdate
 
                 new Object[]{
                         "hidden person",
-                        new PersonAdminData(this, "hallo \" test")
+                        new PersonAdminData(this, "hello \" test")
                                 .setHidden(true)
                                 .setValue("description", "\"\\\\ hallo")},
                 new Object[]{
                         "not hidden person",
-                        new PersonAdminData(this, "hallo \" test")
+                        new PersonAdminData(this, "hello \" test")
                                 .setHidden(false)
                                 .setValue("description", "\"\\\\ hallo")},
                 new Object[]{
                         "default hidden person",
-                        new PersonAdminData(this, "hallo \" test")
+                        new PersonAdminData(this, "hello \" test")
                                 .setHidden(null)
                                 .setValue("description", "\"\\\\ hallo")},
                 new Object[]{
                         "person with assigned site",
-                        new PersonAdminData(this, "hallo \" test")
+                        new PersonAdminData(this, "hello \" test")
                                 .setSite(new SiteData(this, "Test \" Site"))},
                 new Object[]{
                         "complex person",
-                        new PersonAdminData(this, "hallo \" test")
+                        new PersonAdminData(this, "hello \" test")
                                 .setValue("fullname", "test person \"full name\"")
                                 .setValue("description", "test person \"comment\"")
                                 .setValue("address", "test person \"address\"")
                                 .setValue("email", "test person \"email\" address")
-                                .setValue("phone", "test person \"phone\"")});
+                                .setValue("phone", "test person \"phone\"")},
+                new Object[]{
+                        "person no password expires flag defined",
+                        new PersonAdminData(this, "hello \" test")
+                                .setPasswordNeverExpires(null)},
+                new Object[]{
+                        "person with password expires flag defined to true",
+                        new PersonAdminData(this, "hello \" test")
+                                .setPasswordNeverExpires(true)},
+                new Object[]{
+                        "person with password expires flag defined to false",
+                        new PersonAdminData(this, "hello \" test")
+                                .setPasswordNeverExpires(false)});
     }
 
+    /**
+     * Returns the mapping if for given parameter the workspace objects must be
+     * ignored to remove or not.
+     *
+     * @return map between the parameter and the workspace objects are ignored
+     *         to removed
+     */
+    @DataProvider(name = "wsoParameters")
+    public Object[][] getWSOParameters()
+    {
+        return new Object[][]{
+                new Object[]{"UserIgnoreWSO4Users", true},
+                new Object[]{"UserIgnoreWSO4Persons", true},
+                new Object[]{"UserIgnoreWSO4Roles", false},
+                new Object[]{"UserIgnoreWSO4Groups", false}
+        };
+    }
 
     /**
      * Cleanup all test persons.
@@ -297,7 +326,7 @@ public class PersonExportUpdate
      *
      * @throws Exception if test failed
      */
-    @Test(enabled=false,description = "update existing existing person with site by removing site")
+    @Test(description = "update existing existing person with site by removing site")
     public void checkExistingSiteRemovedWithinUpdate()
         throws Exception
     {
@@ -319,16 +348,61 @@ public class PersonExportUpdate
      *
      * @throws Exception if test failed
      */
-    @Test(enabled=false,description = "check that the hidden flag is removed within update")
+    @Test(description = "check that the hidden flag is removed within update")
     public void checkHiddenFlagRemoveWithinUpdate()
         throws Exception
     {
-        final PersonAdminData person = new PersonAdminData(this, "hallo \" test").setHidden(true);
+        final PersonAdminData person = new PersonAdminData(this, "hello \" test").setHidden(true);
         person.create();
-        person.setHidden(null);
+        person.setPasswordNeverExpires(null);
         this.update(person);
+
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select hidden dump"),
                             "FALSE",
                             "check that person is not hidden");
+    }
+
+    /**
+     * Check that the password never expires flag is removed within update.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "check that the hidden flag is removed within update")
+    public void checkPasswordNeverExpiresFlagRemoveWithinUpdate()
+        throws Exception
+    {
+        final PersonAdminData person = new PersonAdminData(this, "hello \" test").setPasswordNeverExpires(true);
+        person.create();
+        person.setPasswordNeverExpires(null);
+        this.update(person);
+
+        Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select neverexpires dump"),
+                            "FALSE",
+                            "check that password of person expires");
+    }
+
+    /**
+     * Checks that the password never expires flag is not reset if the
+     * parameter 'UserPersonIgnorePswdNeverExpires' is defined.
+     *
+     * @throws Exception if check failed
+     */
+    @Test(description = "checks that the password never expires flag is not reset if the parameter 'UserPersonIgnorePswdNeverExpires' is defined")
+    public void checkWithIgnoreParameterPasswordNeverExpiresFlagIsNotRemoved()
+        throws Exception
+    {
+        final PersonAdminData person = new PersonAdminData(this, "hello \" test").setPasswordNeverExpires(true);
+        person.create();
+        person.setPasswordNeverExpires(null);
+        this.update(person, "UserPersonIgnorePswdNeverExpires", "true");
+
+        // check not updated
+        Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select neverexpires dump"),
+                            "TRUE",
+                            "check that password of person never expires");
+        // check not defined within update file
+        final ExportParser exportParser = person.export("UserPersonIgnorePswdNeverExpires", "true");
+        person.checkValueExists(exportParser, "person", "neverexpires", false);
+        person.checkValueExists(exportParser, "person", "!neverexpires", false);
     }
 }

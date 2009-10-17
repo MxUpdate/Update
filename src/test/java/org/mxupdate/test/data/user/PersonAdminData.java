@@ -100,6 +100,18 @@ public class PersonAdminData
     private final Set<GroupData> groups = new HashSet<GroupData>();
 
     /**
+     * Flag to indicate that the password never expires. If <code>null</code>
+     * the password will expire (same value as <i>false</i>; see
+     * {@link #checkExport(ExportParser)}).
+     *
+     * @see #setPasswordNeverExpires(Boolean)
+     * @see #append4CIFileValues(StringBuilder)
+     * @see #append4Create(StringBuilder)
+     * @see #checkExport(ExportParser)
+     */
+    private Boolean passwordNeverExpires;
+
+    /**
      * Constructor to initialize this administration person.
      *
      * @param _test     related test implementation (where this administration
@@ -200,6 +212,20 @@ public class PersonAdminData
     }
 
     /**
+     * Defines if for this administration person the password never expires.
+     *
+     * @param _passwordNeverExpires     <i>true</i> to define that the password
+     *                                  never expires
+     * @return this person administration data instance
+     * @see #passwordNeverExpires
+     */
+    public PersonAdminData setPasswordNeverExpires(final Boolean _passwordNeverExpires)
+    {
+        this.passwordNeverExpires = _passwordNeverExpires;
+        return this;
+    }
+
+    /**
      * Appends the person specific values to the TCL update code
      * <code>_cmd</code> of the configuration item file. This includes:
      * <ul>
@@ -208,6 +234,7 @@ public class PersonAdminData
      * <li>{@link #types}</li>
      * <li>{@link #groups}<li>
      * <li>{@link #roles}</li>
+     * <li>{@link #passwordNeverExpires password never expires flag}</li>
      * </ul>
      *
      * @param _cmd  string builder with the TCL commands of the configuration
@@ -231,6 +258,14 @@ public class PersonAdminData
         for (final RoleData role : this.roles)  {
             _cmd.append(" assign role \"").append(AbstractTest.convertTcl(role.getName())).append("\"");
         }
+        // password never expires flag
+        if (this.passwordNeverExpires != null)  {
+            _cmd.append(' ');
+            if (!this.passwordNeverExpires)  {
+                _cmd.append('!');
+            }
+            _cmd.append("neverexpires");
+        }
     }
 
     /**
@@ -242,6 +277,7 @@ public class PersonAdminData
      * <li>{@link #types}</li>
      * <li>{@link #groups}<li>
      * <li>{@link #roles}</li>
+     * <li>{@link #passwordNeverExpires password never expires flag}</li>
      * </ul>
      *
      * @param _cmd  string builder used to append MQL commands
@@ -256,27 +292,31 @@ public class PersonAdminData
 
         // assign access
         _cmd.append(" access ").append(StringUtil_mxJPO.joinMql(',', false, this.access, "none"));
-
         // assign administration access
         if (!this.adminAccess.isEmpty())  {
             _cmd.append(" admin ").append(StringUtil_mxJPO.joinMql(',', false, this.adminAccess, null));
         }
-
         // assign access
         if (!this.types.isEmpty())  {
             _cmd.append(" type ").append(StringUtil_mxJPO.joinMql(',', false, this.types, null));
         }
-
         // groups
         for (final GroupData group : this.groups)  {
             group.create();
             _cmd.append(" assign group \"").append(AbstractTest.convertMql(group.getName())).append("\"");
         }
-
         // roles
         for (final RoleData role : this.roles)  {
             role.create();
             _cmd.append(" assign role \"").append(AbstractTest.convertMql(role.getName())).append("\"");
+        }
+        // password never expires flag
+        if (this.passwordNeverExpires != null)  {
+            _cmd.append(' ');
+            if (!this.passwordNeverExpires)  {
+                _cmd.append('!');
+            }
+            _cmd.append("neverexpires");
         }
     }
 
@@ -289,6 +329,8 @@ public class PersonAdminData
      *     </li>
      * <li>all {@link #groups} are correct defined</li>
      * <li>all {@link #roles} are correct defined</li>
+     * <li>{@link #passwordNeverExpires password never expires flag} is defined
+     *     if set to true</li>
      * </ul>
      *
      * @param _exportParser     parsed export
@@ -329,5 +371,8 @@ public class PersonAdminData
             }
         }
         Assert.assertEquals(assigns.size(), 0, "check that all assignments for groups / roles are defined");
+        // password never expires flag
+        this.checkValueExists(_exportParser, "person", "neverexpires", (this.passwordNeverExpires != null) && this.passwordNeverExpires);
+        this.checkValueExists(_exportParser, "person", "!neverexpires", (this.passwordNeverExpires == null) || !this.passwordNeverExpires);
     }
 }

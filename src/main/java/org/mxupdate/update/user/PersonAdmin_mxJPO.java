@@ -79,72 +79,124 @@ public class PersonAdmin_mxJPO
     private static final String PARAM_IGNORE_WSO_PERSONS = "UserIgnoreWSO4Persons";
 
     /**
+     * If the parameter is set the 'password never expires' - flag for persons
+     * is ignored. This means that the flag is not managed anymore from the
+     * MxUpdate Update tool.
+     *
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private static final String PARAM_IGNORE_PSWD_NEVER_EXPIRES = "UserPersonIgnorePswdNeverExpires";
+
+    /**
      * Holds all group assignments of this person.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private final Set<String> groups = new TreeSet<String>();
 
     /**
      * Holds all role assignments of this person.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private final Set<String> roles = new TreeSet<String>();
 
     /**
      * Full name of the person.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String fullName;
 
     /**
      * Email address of the person.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String email;
 
     /**
      * Address of the person.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String address;
 
     /**
      * Fax of the person.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String fax;
 
     /**
      * Phone of the person.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String phone;
 
     /**
      * Default vault of the person.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String vault;
 
     /**
      * Is the person not active?
+     *
+     * @see #parse(String, String)
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
     private boolean isInactive = false;
 
     /**
      * Is the person an application user?
+     *
+     * @see #parse(String, String)
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
     private boolean isApplicationUser = false;
 
     /**
      * Is the person a full user?
+     *
+     * @see #parse(String, String)
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
     private boolean isFullUser = false;
 
     /**
      * Is the person a business administrator?
+     *
+     * @see #parse(String, String)
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
     private boolean isBusinessAdministrator = false;
 
     /**
      * Is the person a system administrator?
+     *
+     * @see #parse(String, String)
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
     private boolean isSystemAdministrator = false;
 
     /**
      * Is the person a trusted user?
+     *
+     * @see #parse(String, String)
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
     private boolean isTrusted = false;
 
@@ -160,18 +212,36 @@ public class PersonAdmin_mxJPO
 
     /**
      * Set of access for this person.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private final Set<String> access = new TreeSet<String>();
 
     /**
      * Set of administration access for this person.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private final Set<String> adminAccess = new TreeSet<String>();
 
     /**
      * Defines the name of the assigned default application.
+     *
+     * @see #parse(String, String)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String defaultApplication;
+
+    /**
+     * The password of the person never expires.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
+     */
+    private boolean passwordNeverExpires = false;
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -195,7 +265,7 @@ public class PersonAdmin_mxJPO
      * @return set of person names for which no person business object exists
      * @throws MatrixException if the query for person objects failed
      */
-    @Override
+    @Override()
     public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
@@ -244,6 +314,7 @@ public class PersonAdmin_mxJPO
      * <li>{@link #fullName full name}</li>
      * <li>{@link #vault default vault}</li>
      * <li>{@link #phone phone number}</li>
+     * <li>{@link #passwordNeverExpires password never expires flag}</li>
      * </ul></p>
      * <p>If an <code>_url</code> is included in {@link #IGNORED_URLS}, this
      * URL is ignored.</p>
@@ -302,6 +373,9 @@ public class PersonAdmin_mxJPO
             } else if ("/phone".equals(_url))  {
                 this.phone = _content;
 
+            } else if ("/passwordNeverExpires".equals(_url))  {
+                this.passwordNeverExpires = true;
+
             } else  {
                 super.parse(_url, _content);
             }
@@ -315,7 +389,7 @@ public class PersonAdmin_mxJPO
      *
      * @return MQL command to make an XML export of the person
      */
-    @Override
+    @Override()
     protected String getExportMQL()
     {
         return new StringBuilder()
@@ -325,17 +399,39 @@ public class PersonAdmin_mxJPO
     }
 
     /**
+     * Writes specific information about the cached administration person to
+     * the given TCL update file <code>_out</code>. The included information is
+     * <ul>
+     * <li>{@link #passwordNeverExpires password never expires flag} (if
+     *     parameter {@link #PARAM_IGNORE_PSWD_NEVER_EXPIRES} is not set)</li>
+     * <li>{@link #access}</li>
+     * <li>{@link #adminAccess business administration access}</li>
+     * <li>{@link #address}</li>
+     * <li>{@link #email email address}</li>
+     * <li>{@link #fax fax number}</li>
+     * <li>{@link #fullName full name}</li>
+     * <li>{@link #phone phone number}</li>
+     * <li>{@link #vault default vault}</li>
+     * <li>{@link #defaultApplication default application} (if defined)</li>
+     * <li>assigned {@link #groups}</li>
+     * <li>assigned {@link #roles}</li>
+     * </ul>
+     *
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
      * @throws IOException if the TCL update code could not written
+     * @see #PARAM_IGNORE_PSWD_NEVER_EXPIRES
      */
-    @Override
+    @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
             throws IOException
     {
         super.writeObject(_paramCache, _out);
 
+        if (!_paramCache.getValueBoolean(PersonAdmin_mxJPO.PARAM_IGNORE_PSWD_NEVER_EXPIRES))  {
+            _out.append(" \\\n    ").append(this.passwordNeverExpires ? "" : "!").append("neverexpires");
+        }
         _out.append(" \\\n    access \"")
                     .append(StringUtil_mxJPO.joinTcl(',', false, this.access, "none")).append("\"")
             .append(" \\\n    admin \"")
@@ -412,6 +508,9 @@ public class PersonAdmin_mxJPO
      * <li>reset all not ignored attributes</li>
      * <li>define the TCL variable &quot;OBJECTID&quot; with the object id of
      *     the represented business object</li>
+     * <li>sets the {@link #passwordNeverExpires password never expires flag}
+     *     to <i>false</i> (means that the password expires); depends on
+     *     parameter {@link #PARAM_IGNORE_PSWD_NEVER_EXPIRES}</li>
      * </ul>
      * The original method of the super class if called surrounded with a
      * history off, because if the update itself is done the modified basic
@@ -435,7 +534,7 @@ public class PersonAdmin_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update from derived class failed
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
@@ -457,6 +556,9 @@ public class PersonAdmin_mxJPO
                         .append("fullname '' ")
                         .append("phone '' ")
                         .append("remove assign all");
+        if (!_paramCache.getValueBoolean(PersonAdmin_mxJPO.PARAM_IGNORE_PSWD_NEVER_EXPIRES))  {
+            preMQLCode.append(" !neverexpires");
+        }
         if (this.defaultApplication != null)  {
             preMQLCode.append(" application \"\"");
         }

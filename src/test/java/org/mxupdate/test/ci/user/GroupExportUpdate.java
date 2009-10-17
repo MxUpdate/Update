@@ -102,6 +102,25 @@ public class GroupExportUpdate
                                 .setSite(new SiteData(this, "Test \" Site"))});
     }
 
+
+    /**
+     * Returns the mapping if for given parameter the workspace objects must be
+     * ignored to remove or not.
+     *
+     * @return map between the parameter and the workspace objects are ignored
+     *         to removed
+     */
+    @DataProvider(name = "wsoParameters")
+    public Object[][] getWSOParameters()
+    {
+        return new Object[][]{
+                new Object[]{"UserIgnoreWSO4Users", true},
+                new Object[]{"UserIgnoreWSO4Persons", false},
+                new Object[]{"UserIgnoreWSO4Roles", false},
+                new Object[]{"UserIgnoreWSO4Groups", true}
+        };
+    }
+
     /**
      * Cleanup all test persons.
      *

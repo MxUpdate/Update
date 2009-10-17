@@ -97,6 +97,12 @@ public class Export_mxJPO
      *                      <br/>a map depending on the (administration) type
      *                      (as key) and the related list of (administration)
      *                      MX names</li>
+     *                  <li><b>{@link Map}&lt;{@link String},{@link String}&gt;
+     *                      </b><br/>Sets the predefined parameter values (key
+     *                      of the map is name of the parameter, value of the
+     *                      map is the value of the parameter). Default is no
+     *                      predefined parameter valued (<code>null</code>).
+     *                      </li>
      *                  </ul>
      * @return packed return values in maps
      * @throws Exception if export failed
@@ -107,8 +113,9 @@ public class Export_mxJPO
         throws Exception
     {
         // initialize mapping
-        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, true);
         final Map<String,Collection<String>> exports = this.<Map<String,Collection<String>>>decode(_args, 0);
+        final Map<String,String> paramValues = this.<Map<String,String>>decode(_args, 1, null);
+        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, true, paramValues);
 
         // export all objects depending on the type definitions
         final Map<String,Collection<Map<String,String>>> ret = new HashMap<String,Collection<Map<String,String>>>();

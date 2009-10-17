@@ -398,33 +398,43 @@ public abstract class AbstractTest
      * Makes an update for given administration <code>_object</code>
      * definition.
      *
-     * @param _object   object if the update definition
+     * @param _object       object if the update definition
+     * @param _params       parameters
      * @return returned string with the update logging
      * @throws IOException      if the parameter could not be encoded
      * @throws MatrixException  if MQL calls failed
      */
-    protected JPOReturn<String> update(final AbstractData<?> _object)
+    protected JPOReturn<String> update(final AbstractData<?> _object,
+                                       final String... _params)
         throws IOException, MatrixException
     {
-        return this.update(_object.getCIFileName(), _object.ciFile());
+        return this.update(_object.getCIFileName(), _object.ciFile(), _params);
     }
 
     /**
      * Makes an update for given <code>_fileName</code> and <code>_code</code>.
      *
-     * @param _fileName name of the file to update
-     * @param _code     TCL update code
+     * @param _fileName     name of the file to update
+     * @param _code         TCL update code
+     * @param _params       parameters
      * @return returned string with the update logging
      * @throws IOException      if the parameter could not be encoded
      * @throws MatrixException  if MQL calls failed
      */
     protected JPOReturn<String> update(final String _fileName,
-                                       final String _code)
+                                       final String _code,
+                                       final String... _params)
         throws IOException, MatrixException
     {
+        final Map<String,String> files = new HashMap<String,String>();
+        files.put(_fileName, _code);
         final Map<String,String> params = new HashMap<String,String>();
-        params.put(_fileName, _code);
-        return this.<String>jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        if (_params != null)  {
+            for (int idx = 0; idx < _params.length; idx += 2)  {
+                params.put(_params[idx], _params[idx + 1]);
+            }
+        }
+        return this.<String>jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", files, null, params);
     }
 
     /**

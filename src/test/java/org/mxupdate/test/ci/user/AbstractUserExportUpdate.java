@@ -25,11 +25,19 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
+import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.program.MQLProgramData;
 import org.mxupdate.test.data.user.AbstractUserData;
+import org.mxupdate.test.data.user.workspace.CueData;
 import org.mxupdate.test.data.user.workspace.FilterData;
+import org.mxupdate.test.data.user.workspace.QueryData;
+import org.mxupdate.test.data.user.workspace.TableData;
+import org.mxupdate.test.data.user.workspace.TipData;
+import org.mxupdate.test.data.user.workspace.ToolSetData;
 import org.mxupdate.test.data.user.workspace.ViewData;
 import org.mxupdate.test.data.util.PropertyDef;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Prepares test data for users (group, role and person).
@@ -38,7 +46,7 @@ import org.mxupdate.test.data.util.PropertyDef;
  * @version $Id$
  * @param <USER> user class which is tested
  */
-abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
+public abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
     extends AbstractDataExportUpdate<USER>
 {
     /**
@@ -815,5 +823,166 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
             }
         }
         return userData;
+    }
+
+    /**
+     * Checks if for given parameter the cue workspace objects are ignored
+     * (and not removed).
+     *
+     * @param _paramName    name of the used parameter to check
+     * @param _ignored      is the user ignored?
+     * @throws Exception if check failed
+     */
+    @Test(dataProvider = "wsoParameters", description = "check that cue the workspace objects are (not) removed")
+    public void checkWSOCueNotRemoved(final String _paramName,
+                                      final boolean _ignored)
+        throws Exception
+    {
+        final USER user = this.createNewData("hello \" test");
+        final CueData<USER> cue = user.newCue("cue not removed test");
+        user.create();
+        user.getCues().clear();
+        this.update(user, _paramName, "*");
+        Assert.assertEquals(this.mql("escape list cue user \"" + AbstractTest.convertMql(user.getName()) + "\""),
+                            _ignored ? cue.getName() : "",
+                            "check that cue exists");
+    }
+
+    /**
+     * Checks if for given parameter the filter workspace objects are ignored
+     * (and not removed).
+     *
+     * @param _paramName    name of the used parameter to check
+     * @param _ignored      is the user ignored?
+     * @throws Exception if check failed
+     */
+    @Test(dataProvider = "wsoParameters", description = "check that the filter workspace objects are (not) removed")
+    public void checkWSOFilterNotRemoved(final String _paramName,
+                                         final boolean _ignored)
+        throws Exception
+    {
+        final USER user = this.createNewData("hello \" test");
+        final FilterData<USER> filter = user.newFilter("filter not removed test");
+        user.create();
+        user.getFilters().clear();
+        this.update(user, _paramName, "*");
+        Assert.assertEquals(this.mql("escape list filter user \"" + AbstractTest.convertMql(user.getName()) + "\""),
+                            _ignored ? filter.getName() : "",
+                            "check that filter exists");
+    }
+
+    /**
+     * Checks if for given parameter the query workspace objects are ignored
+     * (and not removed).
+     *
+     * @param _paramName    name of the used parameter to check
+     * @param _ignored      is the user ignored?
+     * @throws Exception if check failed
+     */
+    @Test(dataProvider = "wsoParameters", description = "check that the query workspace objects are (not) removed")
+    public void checkWSOQueryNotRemoved(final String _paramName,
+                                        final boolean _ignored)
+        throws Exception
+    {
+        final USER user = this.createNewData("hello \" test");
+        final QueryData<USER> query = user.newQuery("query not removed test");
+        user.create();
+        user.getQueries().clear();
+        this.update(user, _paramName, "*");
+        Assert.assertEquals(this.mql("escape list query user \"" + AbstractTest.convertMql(user.getName()) + "\""),
+                            _ignored ? query.getName() : "",
+                            "check that query exists");
+    }
+
+    /**
+     * Checks if for given parameter the table workspace objects are ignored
+     * (and not removed).
+     *
+     * @param _paramName    name of the used parameter to check
+     * @param _ignored      is the user ignored?
+     * @throws Exception if check failed
+     */
+    @Test(dataProvider = "wsoParameters", description = "check that the table workspace objects are (not) removed")
+    public void checkWSOTableNotRemoved(final String _paramName,
+                                        final boolean _ignored)
+        throws Exception
+    {
+        final USER user = this.createNewData("hello \" test");
+        final TableData<USER> table = user.newTable("table not removed test");
+        user.create();
+        user.getTables().clear();
+        this.update(user, _paramName, "*");
+        Assert.assertEquals(this.mql("escape list table user \"" + AbstractTest.convertMql(user.getName()) + "\""),
+                            _ignored ? table.getName() : "",
+                            "check that table exists");
+    }
+
+    /**
+     * Checks if for given parameter the tip workspace objects are ignored
+     * (and not removed).
+     *
+     * @param _paramName    name of the used parameter to check
+     * @param _ignored      is the user ignored?
+     * @throws Exception if check failed
+     */
+    @Test(dataProvider = "wsoParameters", description = "check that the tip workspace objects are (not) removed")
+    public void checkWSOTipNotRemoved(final String _paramName,
+                                      final boolean _ignored)
+        throws Exception
+    {
+        final USER user = this.createNewData("hello \" test");
+        final TipData<USER> tip = user.newTip("tip not removed test");
+        user.create();
+        user.getTips().clear();
+        this.update(user, _paramName, "*");
+        Assert.assertEquals(this.mql("escape list tip user \"" + AbstractTest.convertMql(user.getName()) + "\""),
+                            _ignored ? tip.getName() : "",
+                            "check that tip exists");
+    }
+
+    /**
+     * Checks if for given parameter the tool set workspace objects are ignored
+     * (and not removed).
+     *
+     * @param _paramName    name of the used parameter to check
+     * @param _ignored      is the user ignored?
+     * @throws Exception if check failed
+     */
+    @Test(dataProvider = "wsoParameters", description = "check that the tool set workspace objects are (not) removed")
+    public void checkWSOToolSetNotRemoved(final String _paramName,
+                                          final boolean _ignored)
+        throws Exception
+    {
+        final USER user = this.createNewData("hello \" test");
+        final ToolSetData<USER> toolSet = user.newToolSet("tool set not removed test");
+        user.create();
+        user.getToolSets().clear();
+        this.update(user, _paramName, "*");
+        Assert.assertEquals(this.mql("escape list toolset user \"" + AbstractTest.convertMql(user.getName()) + "\""),
+                            _ignored ? toolSet.getName() : "",
+                            "check that tool set exists");
+    }
+
+    /**
+     * Checks if for given parameter the view workspace objects are ignored
+     * (and not removed).
+     *
+     * @param _paramName    name of the used parameter to check
+     * @param _ignored      is the user ignored?
+     * @throws Exception if check failed
+     */
+    @Test(dataProvider = "wsoParameters", description = "check that the view workspace objects are (not) removed")
+    public void checkWSOViewNotRemoved(final String _paramName,
+                                       final boolean _ignored)
+        throws Exception
+    {
+        final USER user = this.createNewData("hello \" test");
+        final ViewData<USER> view = user.newView("view not removed test");
+        user.create();
+        user.getViews().clear();
+        this.update(user, _paramName, "*");
+        Assert.assertEquals(this.mql("escape list view user \"" + AbstractTest.convertMql(user.getName()) + "\""),
+                            _ignored ? view.getName() : "",
+                            "check that view exists");
     }
 }
