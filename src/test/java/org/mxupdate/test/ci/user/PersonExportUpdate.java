@@ -354,7 +354,7 @@ public class PersonExportUpdate
     {
         final PersonAdminData person = new PersonAdminData(this, "hello \" test").setHidden(true);
         person.create();
-        person.setPasswordNeverExpires(null);
+        person.setHidden(null);
         this.update(person);
 
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select hidden dump"),

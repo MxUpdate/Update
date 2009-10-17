@@ -516,7 +516,7 @@ public abstract class AbstractUser_mxJPO
         if (this.isHidden())  {
             preMQLCode.append("escape mod ").append(this.getTypeDef().getMxAdminName())
                       .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                      .append("!hidden;\n");
+                      .append(" !hidden;\n");
         }
 
         // remove site...
