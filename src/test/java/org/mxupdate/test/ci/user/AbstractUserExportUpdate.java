@@ -400,7 +400,6 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
                                         .setValue("range", "a \"range href\"")
                                         .setValue("update", "an \"update href\"")
                                         .setValue("program", "MxUpdate")
-                                        .setHidden(true)
                                         .getFormTable()
                                 .newField(null)
                                         .setValue("relationship", "type")
@@ -449,6 +448,12 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
                                 .setActive(true)
                                 .getUser()});
         _ret.add(new Object[]{
+                _logText + " with table and hidden field",
+                this.createNewData("hallo \" test")
+                        .newTable("my table \"test\"")
+                                .newField("field").setHidden(true).getFormTable()
+                                .getUser()});
+        _ret.add(new Object[]{
                 _logText + " with table with property name",
                 this.createNewData("hallo \" test")
                         .newTable("my table \"test\"")
@@ -474,7 +479,6 @@ abstract class AbstractUserExportUpdate<USER extends AbstractUserData<USER>>
                                 .addProperty(new PropertyDef("my test \"property\" 2", "my \"value\""))
                                 .addProperty(new PropertyDef("my test \"property\" 3", this.createNewData("property \" " + _logText)))
                                 .getUser()});
-
     }
 
     /**

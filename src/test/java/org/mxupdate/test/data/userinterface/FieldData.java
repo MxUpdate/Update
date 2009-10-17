@@ -331,6 +331,10 @@ public class FieldData<FORMTABLE extends AbstractData<?>>
         if (this.getName() != null)  {
             cmd.append(" name \"").append(AbstractTest.convertTcl(this.getName())).append("\"");
         }
+        // hidden flag
+        if (this.isHidden())  {
+            cmd.append(" hidden");
+        }
         // sort type
         if (this.sortType != null)  {
             cmd.append(" sorttype ").append(this.sortType);
@@ -461,12 +465,15 @@ public class FieldData<FORMTABLE extends AbstractData<?>>
         super.checkExport(_exportParser);
 
         // sort type (default value is none and must be ignored...)
-        this.checkSingleValue(_exportParser, "column", "sorttype", ((this.sortType != null) && !this.sortType.equals("none")) ? this.sortType : null);
+        this.checkSingleValue(_exportParser, "column / field", "sorttype", ((this.sortType != null) && !this.sortType.equals("none")) ? this.sortType : null);
+
+        // hidden flag
+        this.checkValueExists(_exportParser, "column / field", "hidden", this.isHidden());
 
         // size
         this.checkSingleValue(
                 _exportParser,
-                "column",
+                "column / field",
                 "size",
                 ((this.width != null) && (this.height != null)
                                 && ((this.width.doubleValue() != 1.0) || (this.height.doubleValue() != 1.0)))
@@ -476,7 +483,7 @@ public class FieldData<FORMTABLE extends AbstractData<?>>
         // minimum size
         this.checkSingleValue(
                 _exportParser,
-                "column",
+                "column / field",
                 "minsize",
                 ((this.minWidth != null) && (this.minHeight != null)
                                 && ((this.minWidth.doubleValue() != 0.0) || (this.minHeight.doubleValue() != 0.0)))
@@ -484,16 +491,16 @@ public class FieldData<FORMTABLE extends AbstractData<?>>
                         : null);
 
         // auto height
-        this.checkSingleValue(_exportParser, "column", "autoheight", ((this.autoHeight != null) && this.autoHeight) ? "true" : null);
+        this.checkSingleValue(_exportParser, "column / field", "autoheight", ((this.autoHeight != null) && this.autoHeight) ? "true" : null);
 
         // auto width
-        this.checkSingleValue(_exportParser, "column", "autowidth", ((this.autoWidth != null) && this.autoWidth) ? "true" : null);
+        this.checkSingleValue(_exportParser, "column / field", "autowidth", ((this.autoWidth != null) && this.autoWidth) ? "true" : null);
 
         // scale
-        this.checkSingleValue(_exportParser, "column", "scale", (this.scale != null) ? String.valueOf(this.scale.longValue()) : null);
+        this.checkSingleValue(_exportParser, "column / field", "scale", (this.scale != null) ? String.valueOf(this.scale.longValue()) : null);
 
         // editable flag
-        this.checkSingleValue(_exportParser, "column", "edit", ((this.editable != null) && this.editable)? "true" : null);
+        this.checkSingleValue(_exportParser, "column / field", "edit", ((this.editable != null) && this.editable)? "true" : null);
 
         // settings
         final Set<String> curSettings = new HashSet<String>(_exportParser.getLines("/mql/setting/@value"));

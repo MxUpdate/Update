@@ -321,6 +321,18 @@ public abstract class AbstractUIWithFields_mxJPO
         private boolean editable = false;
 
         /**
+         * <p>Is the table column hidden? The default value is <i>false</i>.
+         * Only if this column is hidden method {@link #write(Appendable)}
+         * will write the edit flag!</p>
+         * <p>The flag only belongs to tables. Forms does not known the flag
+         * (and ignored because default value is <i>false</i>).</p>
+         *
+         * @see #parse(String, String)
+         * @see #write(Appendable)
+         */
+        private boolean hidden = false;
+
+        /**
          * Parses a field / column. This includes:
          * <ul>
          * <li>{@link #alt} label</li>
@@ -341,7 +353,8 @@ public abstract class AbstractUIWithFields_mxJPO
          *     {@link #minWidth minimum width}</li>
          * <li>{@link #autoHeight auto height flag}</li>
          * <li>{@link #autoWidth auto width flag}</li>
-         * <li>{@link #editable edit flag for web tables}</li>
+         * <li>{@link #editable edit flag} for web tables</li>
+         * <li>{@link #hidden hidden flag} for web tables</li>
          * <li>{@link #settings}</li>
          * </ul>
          *
@@ -424,12 +437,16 @@ if (!"select".equals(_content))  {
                 } else if ("/geometry/autoWidth".equals(_url))  {
                     this.autoWidth = true;
                 } else if ("/geometry/xLocation".equals(_url))  {
-                    if (!"0.0".equals(_content))  {
+                    // must be parsed because of old MX versions (and numbers
+                    // are exported with a comma instead of a point)
+                    if (Double.parseDouble(_content.replace(',', '.')) != 0.0)  {
 // TODO:
 System.err.println("x location is not 0.0 and this is currently not supported");
                     }
                 } else if ("/geometry/yLocation".equals(_url))  {
-                    if (!"0.0".equals(_content))  {
+                    // must be parsed because of old MX versions (and numbers
+                    // are exported with a comma instead of a point)
+                    if (Double.parseDouble(_content.replace(',', '.')) != 0.0)  {
 // TODO:
 System.err.println("y location is not 0.0 and this is currently not supported");
                     }
@@ -437,6 +454,8 @@ System.err.println("y location is not 0.0 and this is currently not supported");
                 // only for web tables...
                 } else if ("/editable".equals(_url))  {
                     this.editable = true;
+                } else if ("/hidden".equals(_url))  {
+                    this.hidden = true;
 
                 } else  {
                     System.err.println("unknown column / field parsing url " + _url + "(" + _content + ")");
@@ -465,7 +484,8 @@ System.err.println("y location is not 0.0 and this is currently not supported");
          *     {@link #minWidth minimum width}</li>
          * <li>{@link #autoHeight auto height flag}</li>
          * <li>{@link #autoWidth auto width flag}</li>
-         * <li>{@link #editable edit flag for web tables}</li>
+         * <li>{@link #editable edit flag} for web tables</li>
+         * <li>{@link #hidden hidden flag} for web tables</li>
          * <li>{@link #settings}</li>
          * </ul>
          *
@@ -537,6 +557,11 @@ System.err.println("y location is not 0.0 and this is currently not supported");
             // editable flag for web tables
             if (this.editable)  {
                 _out.append(" \\\n        edit true");
+            }
+
+            // hidden flag for web tables
+            if (this.hidden)  {
+                _out.append(" \\\n        hidden");
             }
 
             // settings

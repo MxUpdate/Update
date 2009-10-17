@@ -586,6 +586,24 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     }
 
     /**
+     * Checks in the <code>_exportParser</code> if given <code>_tag</code>
+     * exists (with zero length value).
+     *
+     * @param _exportParser     parsed export
+     * @param _kind             kind of the check
+     * @param _tag              tag to check
+     * @param _exists           <i>true</i> means that the tag must exists;
+     *                          otherwise value must not defined
+     */
+    protected void checkValueExists(final ExportParser _exportParser,
+                                    final String _kind,
+                                    final String _tag,
+                                    final boolean _exists)
+    {
+        this.checkSingleValue(_exportParser, _kind, _tag, _exists ? "" : null);
+    }
+
+    /**
      * Evaluates all 'adds' in the configuration item file (e.g. add
      * setting, ...). Because for the abstract data no adds exists this method
      * is only a dummy.

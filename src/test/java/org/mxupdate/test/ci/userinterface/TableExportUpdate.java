@@ -74,13 +74,13 @@ public class TableExportUpdate
                         new TableData(this, "hallo \" test")
                             .setValue("description", "\"\\\\ hallo")},
                 new Object[]{
-                        "simple form with two fields",
+                        "simple table with two fields",
                         new TableData(this, "hallo \" test")
                             .setValue("description", "\"\\\\ hallo")
                             .newField("field \"1\"").getFormTable()
                             .newField("field \"2\"").getFormTable()},
                 new Object[]{
-                        "simple form with complex field",
+                        "simple table with complex field",
                         new TableData(this, "hallo \" test")
                             .setValue("description", "\"\\\\ hallo")
                             .newField("field")
@@ -93,25 +93,31 @@ public class TableExportUpdate
                                     .setSetting("second \"key\"", "second \"value\"")
                                     .getFormTable()},
                 new Object[]{
-                        "form with business object select",
+                        "table with business object select",
                         new TableData(this, "hallo \" test")
                             .setValue("description", "\"\\\\ hallo")
                             .newField("field")
                                     .setValue("businessobject", "select \"expression\"")
                                     .getFormTable()},
                 new Object[]{
-                        "form with relationship select",
+                        "table with relationship select",
                         new TableData(this, "hallo \" test")
                             .setValue("description", "\"\\\\ hallo")
                             .newField("field")
                                     .setValue("relationship", "select \"expression\"")
                                     .getFormTable()},
                 new Object[]{
-                        "form with one role and one group",
+                        "table with one role and one group",
                         new TableData(this, "hallo \" test")
                             .newField("field")
                                     .addUser(new RoleData(this, "user \"role\""))
                                     .addUser(new GroupData(this, "user \"group\""))
+                                    .getFormTable()},
+                new Object[]{
+                        "table with one hidden column",
+                        new TableData(this, "hallo \" test")
+                            .newField("field")
+                                    .setHidden(true)
                                     .getFormTable()}
         );
     }
@@ -139,7 +145,7 @@ public class TableExportUpdate
      * @param _table        table to test
      * @throws Exception if test failed
      */
-    @Test(enabled=false,dataProvider = "tables", description = "test export of new created table")
+    @Test(dataProvider = "tables", description = "test export of new created table")
     public void simpleExport(final String _description,
                              final TableData _table)
         throws Exception
