@@ -27,6 +27,7 @@ import java.util.Set;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.user.AbstractUserData;
 
 /**
  * Used to define a command, create them and test the result.
@@ -40,11 +41,12 @@ public class CommandData
     /**
      * All users of the command.
      *
-     * @see #addUser(String)
+     * @see #addUser(AbstractUserData)
+     * @see #getUsers()
      * @see #create()
      * @see #evalAdds4CheckExport(Set)
      */
-    private final Set<String> users = new HashSet<String>();
+    private final Set<AbstractUserData<?>> users = new HashSet<AbstractUserData<?>>();
 
     /**
      * Constructor to initialize this command.
@@ -56,7 +58,7 @@ public class CommandData
     public CommandData(final AbstractTest _test,
                        final String _name)
     {
-        super(_test, AbstractTest.CI.COMMAND, _name);
+        super(_test, AbstractTest.CI.UI_COMMAND, _name);
     }
 
     /**
@@ -66,10 +68,21 @@ public class CommandData
      * @return this command instance
      * @see #users
      */
-    public CommandData addUser(final String _user)
+    public CommandData addUser(final AbstractUserData<?> _user)
     {
         this.users.add(_user);
         return this;
+    }
+
+    /**
+     * Returns all assigned {@link #users} of this command.
+     *
+     * @return all assigned users
+     * @see #users
+     */
+    public Set<AbstractUserData<?>> getUsers()
+    {
+        return this.users;
     }
 
     /**
@@ -83,9 +96,9 @@ public class CommandData
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("mql escape mod command \"${NAME}\"");
-        for (final String user : this.users)  {
+        for (final AbstractUserData<?> user : this.users)  {
             cmd.append(" add user \"")
-               .append(AbstractTest.convertTcl(user)).append('\"');
+               .append(AbstractTest.convertTcl(user.getName())).append('\"');
         }
         this.append4CIFileValues(cmd);
         this.append4CIFileSettings(cmd);
@@ -108,13 +121,14 @@ public class CommandData
         if (!this.users.isEmpty())  {
             cmd.append(" user ");
             boolean first = true;
-            for (final String user : this.users)  {
+            for (final AbstractUserData<?> user : this.users)  {
+                user.create();
                 if (first)  {
                     first = false;
                 } else  {
                     cmd.append(',');
                 }
-                cmd.append('\"').append(AbstractTest.convertMql(user)).append('\"');
+                cmd.append('\"').append(AbstractTest.convertMql(user.getName())).append('\"');
             }
         }
         this.append4Create(cmd);
@@ -136,8 +150,8 @@ public class CommandData
     protected void evalAdds4CheckExport(final Set<String> _needAdds)
     {
         super.evalAdds4CheckExport(_needAdds);
-        for (final String user : this.users)  {
-            _needAdds.add("user \"" + AbstractTest.convertTcl(user) + "\"");
+        for (final AbstractUserData<?> user : this.users)  {
+            _needAdds.add("user \"" + AbstractTest.convertTcl(user.getName()) + "\"");
         }
     }
 }

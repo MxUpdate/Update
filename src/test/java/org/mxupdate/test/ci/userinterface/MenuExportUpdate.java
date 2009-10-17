@@ -22,10 +22,12 @@ package org.mxupdate.test.ci.userinterface;
 
 import matrix.util.MatrixException;
 
+import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.userinterface.CommandData;
 import org.mxupdate.test.data.userinterface.MenuData;
+import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -38,8 +40,20 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 public class MenuExportUpdate
-    extends AbstractTest
+    extends AbstractDataExportUpdate<MenuData>
 {
+    /**
+     * Creates for given <code>_name</code> a new menu instance.
+     *
+     * @param _name     name of the menu instance
+     * @return menu instance
+     */
+    @Override()
+    protected MenuData createNewData(final String _name)
+    {
+        return new MenuData(this, _name);
+    }
+
     /**
      * Data provider for test menus.
      *
@@ -48,18 +62,17 @@ public class MenuExportUpdate
     @DataProvider(name = "menus")
     public Object[][] getMenus()
     {
-        final MenuData menu = new MenuData(this, "hallo \" test")
-                .setValue("label", "command label \" \\ ' #")
-                .setValue("description", "\"\\\\ hallo")
-                .setValue("href", "${COMMON_DIR}/emxTree.jsp?mode=insert")
-                .setValue("alt", "${COMMON_DIR}/emxTreeAlt.jsp?mode=insert")
-                .setSetting("Setting 1", "Setting Value ' 1")
-                .addChild(new MenuData(this, "child menu 1"))
-                .addChild(new CommandData(this, "child command 1"));
-
-        return new Object[][]  {
-                new Object[]{menu}
-        };
+        return this.prepareData("menu",
+                new Object[]{
+                        "",
+                        new MenuData(this, "hallo \" test")
+                                .setValue("label", "command label \" \\ ' #")
+                                .setValue("description", "\"\\\\ hallo")
+                                .setValue("href", "${COMMON_DIR}/emxTree.jsp?mode=insert")
+                                .setValue("alt", "${COMMON_DIR}/emxTreeAlt.jsp?mode=insert")
+                                .setSetting("Setting 1", "Setting Value ' 1")
+                                .addChild(new MenuData(this, "child menu 1"))
+                                .addChild(new CommandData(this, "child command 1"))});
     }
 
     /**
@@ -72,40 +85,56 @@ public class MenuExportUpdate
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(CI.COMMAND);
-        this.cleanup(CI.MENU);
+        this.cleanup(AbstractTest.CI.UI_COMMAND);
+        this.cleanup(AbstractTest.CI.UI_MENU);
     }
 
     /**
      * Tests a 'simple' menu but with a quote in name and with one command and
      * menu.
      *
-     * @param _menu     menu to test
+     * @param _description  description of the test case
+     * @param _menu         menu to test
      * @throws Exception if test failed
      */
     @Test(dataProvider = "menus", description = "test export of a single menu")
-    public void testExportSingleMenu(final MenuData _menu)
+    public void testExportSingleMenu(final String _description,
+                                     final MenuData _menu)
         throws Exception
     {
         _menu.create();
-        final ExportParser exportParser = _menu.export();
-        _menu.checkExport(exportParser);
+        _menu.checkExport(_menu.export());
     }
 
     /**
      * Tests an update of non existing command. The result is tested with by
      * exporting the command and checking the result.
      *
-     * @param _menu     menu to test
+     * @param _description  description of the test case
+     * @param _menu         menu to test
      * @throws Exception if test failed
      */
     @Test(dataProvider = "menus", description = "test update of non existing menu")
-    public void testUpdate(final MenuData _menu)
+    public void testUpdate(final String _description,
+                           final MenuData _menu)
         throws Exception
     {
+        // create referenced property value
+        for (final PropertyDef prop : _menu.getProperties())  {
+            if (prop.getTo() != null)  {
+                prop.getTo().create();
+            }
+        }
+        // create child menus / commands
         _menu.createChildren();
-        this.update(_menu.getCIFileName(), _menu.ciFile());
+
+        // first update with original content
+        this.update(_menu);
         final ExportParser exportParser = _menu.export();
         _menu.checkExport(exportParser);
+
+        // second update with delivered content
+        this.update(_menu.getCIFileName(), exportParser.getOrigCode());
+        _menu.checkExport(_menu.export());
     }
 }

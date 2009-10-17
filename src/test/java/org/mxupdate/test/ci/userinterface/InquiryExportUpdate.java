@@ -22,10 +22,11 @@ package org.mxupdate.test.ci.userinterface;
 
 import matrix.util.MatrixException;
 
+import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.DataCollection;
 import org.mxupdate.test.data.userinterface.InquiryData;
+import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -38,8 +39,20 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 public class InquiryExportUpdate
-    extends AbstractTest
+    extends AbstractDataExportUpdate<InquiryData>
 {
+    /**
+     * Creates for given <code>_name</code> a new inquiry instance.
+     *
+     * @param _name     name of the inquiry instance
+     * @return inquiry instance
+     */
+    @Override()
+    protected InquiryData createNewData(final String _name)
+    {
+        return new InquiryData(this, _name);
+    }
+
     /**
      * Data provider for test inquiries.
      *
@@ -48,33 +61,29 @@ public class InquiryExportUpdate
     @DataProvider(name = "inquires")
     public Object[][] getInquiries()
     {
-        final DataCollection data1 = new DataCollection(this);
-        data1.getInquiry("Test1")
-             .setValue("description", "test description")
-             .setValue("pattern", "${ID}|*")
-             .setValue("format", "${ID}")
-             .setArgument("TYPE", "MY_TYPE")
-             .setArgument("NAME", "MY_NAME")
-             .setArgument("REVISION", "MY_REVISION")
-             .setCode("print bus '${TYPE}' '${NAME}' '${REVISION}' select id dump");
-
-        final DataCollection data2 = new DataCollection(this);
-        data2.getInquiry("Test2")
-             .setValue("description", "test description");
-
-        final DataCollection data3 = new DataCollection(this);
-        data3.getInquiry("Test3 \" test")
-             .setValue("description", "test description \" '")
-             .setValue("pattern", "patternprefix \" patternsuffix")
-             .setValue("format", "formatprefix \" formatsuffix")
-             .setArgument("ARGUMENT \" ARGSUFFIX", "argumentprefix \" argumentsuffix")
-             .setCode("print bus '${TYPE}' '${NAME}' '${REVISION}' select id dump");
-
-        return new Object[][]  {
-                new Object[]{data1, "Test1"},
-                new Object[]{data2, "Test2"},
-                new Object[]{data3, "Test3 \" test"},
-        };
+        return this.prepareData("command",
+                new Object[]{
+                        "complex inquiry with all values and three arguments",
+                        new InquiryData(this, "Test1")
+                             .setValue("description", "test description")
+                             .setValue("pattern", "${ID}|*")
+                             .setValue("format", "${ID}")
+                             .setArgument("TYPE", "MY_TYPE")
+                             .setArgument("NAME", "MY_NAME")
+                             .setArgument("REVISION", "MY_REVISION")
+                             .setCode("print bus '${TYPE}' '${NAME}' '${REVISION}' select id dump")},
+                new Object[]{
+                        "simple inquiry only with description",
+                        new InquiryData(this, "Test2")
+                             .setValue("description", "test description")},
+                new Object[]{
+                        "complex inquiry with all values and one argument",
+                        new InquiryData(this, "Test3 \" test")
+                             .setValue("description", "test description \" '")
+                             .setValue("pattern", "patternprefix \" patternsuffix")
+                             .setValue("format", "formatprefix \" formatsuffix")
+                             .setArgument("ARGUMENT \" ARGSUFFIX", "argumentprefix \" argumentsuffix")
+                             .setCode("print bus '${TYPE}' '${NAME}' '${REVISION}' select id dump")});
     }
 
     /**
@@ -87,47 +96,52 @@ public class InquiryExportUpdate
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(CI.INQUIRY);
+        this.cleanup(AbstractTest.CI.UI_INQUIRY);
     }
 
     /**
      * Tests a new created inquiry and the related export.
      *
-     * @param _data     data collection to test
-     * @param _name     name of the inquiry to test
+     * @param _description  description of the test case
+     * @param _inquiry      inquiry to test
      * @throws Exception if test failed
      */
     @Test(dataProvider = "inquires", description = "test export of new created inquires")
-    public void testExport(final DataCollection _data,
-                           final String _name)
+    public void testExport(final String _description,
+                           final InquiryData _inquiry)
         throws Exception
     {
-        _data.create();
-        final InquiryData inquiry = _data.getInquiry(_name);
-        final ExportParser exportParser = inquiry.export();
-        inquiry.checkExport(exportParser);
+        _inquiry.create();
+        _inquiry.checkExport(_inquiry.export());
     }
 
     /**
      * Tests an update of non existing inquiry. The result is tested by
      * exporting the inquiry and checking the result.
      *
-     * @param _data     data collection to test
-     * @param _name     name of the inquiry to test
+     * @param _description  description of the test case
+     * @param _inquiry      inquiry to test
      * @throws Exception if test failed
      */
     @Test(dataProvider = "inquires", description = "test update of non existing inquiry")
-    public void testUpdate(final DataCollection _data,
-                           final String _name)
+    public void testUpdate(final String _description,
+                           final InquiryData _inquiry)
         throws Exception
     {
-        final InquiryData inquiry = _data.getInquiry(_name);
+        // create referenced property value
+        for (final PropertyDef prop : _inquiry.getProperties())  {
+            if (prop.getTo() != null)  {
+                prop.getTo().create();
+            }
+        }
+
         // first update with original content
-        this.update(inquiry.getCIFileName(), inquiry.ciFile());
-        final ExportParser exportParser = inquiry.export();
-        inquiry.checkExport(exportParser);
+        this.update(_inquiry);
+        final ExportParser exportParser = _inquiry.export();
+        _inquiry.checkExport(exportParser);
+
         // second update with delivered content
-        this.update(inquiry.getCIFileName(), exportParser.getOrigCode());
-        inquiry.checkExport(inquiry.export());
+        this.update(_inquiry.getCIFileName(), exportParser.getOrigCode());
+        _inquiry.checkExport(_inquiry.export());
     }
 }

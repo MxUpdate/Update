@@ -54,7 +54,7 @@ public class MenuData
     public MenuData(final AbstractTest _test,
                     final String _name)
     {
-        super(_test, AbstractTest.CI.MENU, _name);
+        super(_test, AbstractTest.CI.UI_MENU, _name);
     }
 
     /**
