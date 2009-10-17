@@ -240,7 +240,7 @@ public class TypeExportUpdate
      * @throws Exception if test failed
      * @see http://code.google.com/p/mxupdate/issues/detail?id=36
      */
-    @Test(enabled=false,description = "export type with one method")
+    @Test(description = "export type with one method")
     public void exportWithOneMethod()
         throws Exception
     {
