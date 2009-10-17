@@ -24,10 +24,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.TreeSet;
 
 import matrix.db.Context;
@@ -88,6 +90,13 @@ public class InstallDataModel_mxJPO
      * @see #mxMain(Context, String...)
      */
     private static final String PARAM_INSTALLER = "RegisterInstallerName";
+
+    /**
+     * Name of the parameter defining the format of the file date / format.
+     *
+     * @see #mxMain(Context, String...)
+     */
+    private static final String PARAM_INSTALLFILEDATEFORMAT = "InstallFileDateFormatJava";
 
     /**
      * Name of the parameter defining the description for the trigger group
@@ -227,7 +236,10 @@ public class InstallDataModel_mxJPO
         final String applName = paramCache.getValueString(InstallDataModel_mxJPO.PARAM_APPLNAME);
         final String authorName = paramCache.getValueString(InstallDataModel_mxJPO.PARAM_AUTHOR);
         final String installerName = paramCache.getValueString(InstallDataModel_mxJPO.PARAM_INSTALLER);
-        final String fileDate = StringUtil_mxJPO.formatFileDate(paramCache, new Date());
+        final SimpleDateFormat dateFormat = new SimpleDateFormat(paramCache.getValueString(InstallDataModel_mxJPO.PARAM_INSTALLFILEDATEFORMAT));
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+00"));
+
+        final String fileDate = dateFormat.format(new Date());
         final String installedDate = StringUtil_mxJPO.formatInstalledDate(paramCache, new Date());
 
         this.installTriggerGroupType(paramCache, path,
@@ -281,10 +293,8 @@ public class InstallDataModel_mxJPO
                                     final String _installedDate)
         throws Exception
     {
-        final TypeDef_mxJPO jpoTypeDef
-                = _paramCache.getMapping().getTypeDef(InstallDataModel_mxJPO.TYPEDEF_JPO);
-        final TypeDef_mxJPO mqlTypeDef
-                = _paramCache.getMapping().getTypeDef(InstallDataModel_mxJPO.TYPEDEF_MQL);
+        final TypeDef_mxJPO jpoTypeDef = _paramCache.getMapping().getTypeDef(InstallDataModel_mxJPO.TYPEDEF_JPO);
+        final TypeDef_mxJPO mqlTypeDef = _paramCache.getMapping().getTypeDef(InstallDataModel_mxJPO.TYPEDEF_MQL);
 
         final String progs = MqlUtil_mxJPO.execMql(_paramCache,
                                                    InstallDataModel_mxJPO.LIST_MXUPDATE_PROGRAMS);

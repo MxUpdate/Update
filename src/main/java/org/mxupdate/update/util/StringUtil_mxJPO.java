@@ -30,6 +30,7 @@ import java.util.SimpleTimeZone;
 import java.util.Stack;
 
 /**
+ * String utility class.
  *
  * @author Tim Moxter
  * @version $Id$
@@ -334,8 +335,7 @@ public final class StringUtil_mxJPO
     public static String formatFileDate(final ParameterCache_mxJPO _paramCache,
                                         final Date _date)
     {
-        final DateFormat fileFormat
-                = new SimpleDateFormat(_paramCache.getValueString(StringUtil_mxJPO.PARAM_FILEDATEFORMAT));
+        final DateFormat fileFormat = new SimpleDateFormat(_paramCache.getValueString(StringUtil_mxJPO.PARAM_FILEDATEFORMAT));
         fileFormat.setTimeZone(StringUtil_mxJPO.TIMEZONE);
         return fileFormat.format(_date);
     }
@@ -355,8 +355,7 @@ public final class StringUtil_mxJPO
                                      final String _date)
             throws ParseException
     {
-        final DateFormat fileFormat
-                = new SimpleDateFormat(_paramCache.getValueString(StringUtil_mxJPO.PARAM_FILEDATEFORMAT));
+        final DateFormat fileFormat = new SimpleDateFormat(_paramCache.getValueString(StringUtil_mxJPO.PARAM_FILEDATEFORMAT));
         fileFormat.setTimeZone(StringUtil_mxJPO.TIMEZONE);
         return fileFormat.parse(_date);
     }

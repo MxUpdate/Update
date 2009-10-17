@@ -72,14 +72,6 @@ public class Insert_mxJPO
                     + "dump \"\t\"";
 
     /**
-     * Defines the date / time format used for the MxUpdate JPOs.
-     */
-    static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    static  {
-        Insert_mxJPO.DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("GMT+00"));
-    }
-
-    /**
      * Defines the date format used for the installation date.
      */
     static final SimpleDateFormat DATE_INSTALLED = new SimpleDateFormat("MM-dd-yyyy");
@@ -88,11 +80,16 @@ public class Insert_mxJPO
     }
 
     /**
+     * Inserts all MxUpdate JPOs which are changed.
      *
      * @param _context  context for this request
-     * @param _args     arguements from the MX console including as first
-     *                  parameter the root path and as second parameter the
-     *                  MxUpdate version
+     * @param _args     arguments from the MX console:
+     *                  <ul>
+     *                  <li>first parameter is the root path</li>
+     *                  <li>second parameter is the MxUpdate version</li>
+     *                  <li>third parameter is the format of the date /
+     *                      time</li>
+     *                  </ul>
      * @throws Exception if installation of the MxUpdate JPOs failed
      */
     public void mxMain(final Context _context,
@@ -101,9 +98,11 @@ public class Insert_mxJPO
     {
         final File rootPath = new File(_args[0]);
         final String version = _args[1];
+        final SimpleDateFormat dateFormat = new SimpleDateFormat(_args[2]);
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+00"));
 
         // get installed JPOs
-        final Map<String,Date> installedProgs = this.evaluteInstalledJPOs(_context);
+        final Map<String,Date> installedProgs = this.evaluteInstalledJPOs(_context, dateFormat);
 
         final org.mxupdate.util.JPOHandler_mxJPO jpoHandler
                 = new org.mxupdate.util.JPOHandler_mxJPO(rootPath);
@@ -124,12 +123,14 @@ System.out.println("delete jpo '" + progName + "'");
             // install all JPOs from current package
             if (!installedProgs.containsKey(classFile.getJpoName()))  {
 System.out.println("install jpo '" + classFile.getJpoName() + "'");
-                this.update(_context, classFile, version);
+                this.update(_context, classFile, version, dateFormat);
             } else  {
                 final Date mxDate = installedProgs.get(classFile.getJpoName());
-                if ((mxDate == null) || !mxDate.equals(classFile.getLastModified()))  {
+                // the compare must be done via string compare (because of
+                // delivered milliseconds in TCL)
+                if ((mxDate == null) || !dateFormat.format(classFile.getLastModified()).equals(dateFormat.format(mxDate)))  {
 System.out.println("update jpo '" + classFile.getJpoName() + "'");
-                    this.update(_context, classFile, version);
+                    this.update(_context, classFile, version, dateFormat);
                 }
             }
         }
@@ -142,13 +143,15 @@ System.out.println("update jpo '" + classFile.getJpoName() + "'");
      * <code>.properties</code>, an information is printed that the program is
      * ignored.
      *
-     * @param _context  context for this request
+     * @param _context      context for this request
+     * @param _dateFormat   date / time formatter
      * @return map of already installed JPOs and the last modified date of the
      *         installed file
      * @throws MatrixException if the installed JPOs could not be evaluated
      * @see #CMD_LISTJPOS
      */
-    protected Map<String,Date> evaluteInstalledJPOs(final Context _context)
+    protected Map<String,Date> evaluteInstalledJPOs(final Context _context,
+                                                    final SimpleDateFormat _dateFormat)
             throws MatrixException
     {
         final String jpos = this.execMql(_context, Insert_mxJPO.CMD_LISTJPOS);
@@ -161,7 +164,7 @@ System.out.println("update jpo '" + classFile.getJpoName() + "'");
             if ("TRUE".equalsIgnoreCase(isJava))  {
                 Date mxDate;
                 try  {
-                    mxDate = Insert_mxJPO.DATE_FORMAT.parse(modDate);
+                    mxDate = _dateFormat.parse(modDate);
                 } catch (final ParseException e)  {
                     mxDate = null;
                 }
@@ -183,13 +186,15 @@ System.out.println("program '" + name + "' is ignored because not a JPO");
      * @param _classFile    class file instance (represents the JPO which must
      *                      be updates)
      * @param _version      application version
+     * @param _dateFormat   date / time formatter
      * @throws IOException if the JPO file could not be read
      * @throws MatrixException if the JPO could not updated
      * @see #getCode(Map)
      */
     public void update(final Context _context,
                        final ClassFile _classFile,
-                       final String _version)
+                       final String _version,
+                       final SimpleDateFormat _dateFormat)
             throws IOException, MatrixException
     {
         final CharSequence code = _classFile.getCode();
@@ -221,8 +226,7 @@ System.out.println("program '" + name + "' is ignored because not a JPO");
                                             .append(this.convertMql(_classFile.getJpoName())).append('\"')
                                     .append(" add property \"")
                                             .append(this.convertMql(Insert_mxJPO.PROP_FILEDATE)).append("\" value \"")
-                                            .append(this.convertMql(Insert_mxJPO.DATE_FORMAT
-                                                    .format(_classFile.getLastModified())))
+                                            .append(this.convertMql(_dateFormat.format(_classFile.getLastModified())))
                                             .append('\"'));
             } finally  {
                 file.delete();

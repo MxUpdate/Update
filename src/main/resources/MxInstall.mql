@@ -129,9 +129,9 @@ eval  {
     global sMappingFileOriginal
 
     # if a file extension exists, both file dates must be checked!
-    set sFileDate [clock format [file mtime "${sMappingFileOriginal}"]  -gmt true -format "%Y-%m-%d %H:%M:%S"]
+    set sFileDate [clock format [file mtime "${sMappingFileOriginal}"]  -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]
     if {"${sMappingFileExtension}" != ""}  {
-      set sFileDate "${sFileDate}, [clock format [file mtime "${sMappingFileExtension}"]  -gmt true -format "%Y-%m-%d %H:%M:%S"]"
+      set sFileDate "${sFileDate}, [clock format [file mtime "${sMappingFileExtension}"]  -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]"
     }
 
     if {[mql list prog "${_sProgName}"] == ""}  {
@@ -172,7 +172,7 @@ eval  {
 
     regsub -all {\.} "${_sJPOName}" {/} sFileName
     set sFileName [file join "${_sRoot}" "${sFileName}_mxJPO.java"]
-    set sFileDate [clock format [file mtime "${sFileName}"]  -gmt true -format "%Y-%m-%d %H:%M:%S"]
+    set sFileDate [clock format [file mtime "${sFileName}"]  -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]
     if {[mql list prog "${_sJPOName}"] == ""}  {
       set sJPODate ""
     } else  {
@@ -233,11 +233,11 @@ eval  {
   if ${bIsOrigStructure}  {
     pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.install.Insert"     "${VERSION}"
     pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.util.JPOHandler"    "${VERSION}"
-    mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}" "java"] "${VERSION}"
+    mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}" "java"] "${VERSION}" "$asMapping(ParameterDef.InstallFileDateFormatJava.Default)"
   } else  {
     pInstallJPO       [file join "${sPath}"]        "org.mxupdate.install.Insert"     "${VERSION}"
     pInstallJPO       [file join "${sPath}"]        "org.mxupdate.util.JPOHandler"    "${VERSION}"
-    mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}"] "${VERSION}"
+    mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}"] "${VERSION}" "$asMapping(ParameterDef.InstallFileDateFormatJava.Default)"
   }
 
   pCompileJPO
