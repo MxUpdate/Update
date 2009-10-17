@@ -459,13 +459,15 @@ public abstract class AbstractAdminObject_mxJPO
         for (final AdminProperty_mxJPO prop : this.propertiesMap.values())  {
             // % must be ignored because this means settings
             if ((PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null) && !prop.isSetting())  {
-                preMQLCode.append("escape delete property \"");
+                // must be done via modify because of properties without names
+                preMQLCode.append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                          .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
+                          .append(this.getTypeDef().getMxAdminSuffix())
+                          .append(" remove property \"");
                 if (prop.getName() != null)  {
                     preMQLCode.append(StringUtil_mxJPO.convertMql(prop.getName()));
                 }
-                preMQLCode.append("\" on ").append(this.getTypeDef().getMxAdminName())
-                        .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
-                        .append(this.getTypeDef().getMxAdminSuffix());
+                preMQLCode.append('\"');
                 if ((prop.getRefAdminName() != null) && (prop.getRefAdminType() != null))  {
                     preMQLCode.append(" to ").append(prop.getRefAdminType())
                               .append(" \"").append(StringUtil_mxJPO.convertMql(prop.getRefAdminName())).append('\"');

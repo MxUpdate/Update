@@ -37,7 +37,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
-@Test
+@Test()
 public class Policy
     extends AbstractTest
 {
@@ -160,8 +160,8 @@ public class Policy
      *
      * @throws Exception if MQL execution failed
      */
-    @BeforeMethod
-    @AfterMethod
+    @BeforeMethod()
+    @AfterMethod()
     public void removePolicy()
         throws Exception
     {
@@ -175,7 +175,6 @@ public class Policy
      * does not define a symbolic name (with empty name).
      *
      * @throws Exception if MQL execution failed
-     * @see http://code.google.com/p/mxupdate/issues/detail?id=29
      */
     public void testProperties()
         throws Exception
@@ -208,8 +207,6 @@ public class Policy
      * be done.
      *
      * @throws Exception if MQL execution failed
-     * @see http://code.google.com/p/mxupdate/issues/detail?id=28
-     * @see http://code.google.com/p/mxupdate/issues/detail?id=29
      */
     public void testNullProperties()
         throws Exception
