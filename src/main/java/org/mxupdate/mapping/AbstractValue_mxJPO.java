@@ -158,7 +158,7 @@ class AbstractValue_mxJPO
                 this.paramListOpp = Arrays.asList(_value.split(","));
             }
         } else if (!AbstractValue_mxJPO.PREFIX_PARAM_WIKI.equals(_key))  {
-            throw new Exception("unkown key " + _key + " with value '" + _value + "' defined!");
+            throw new Exception("unknown key " + _key + " with value '" + _value + "' defined!");
         }
     }
 

@@ -178,13 +178,13 @@ abstract class AbstractWorkspaceObject_mxJPO
                 this.propertiesStack.add(new AdminProperty_mxJPO());
             } else if (_url.startsWith("/propertyList/property"))  {
                 if (!this.propertiesStack.peek().parse(_url.substring(22), _content))  {
-                    System.err.println("unkown parsing property url: "+_url+"("+_content+")");
+                    System.err.println("unknown parsing property url: "+_url+"("+_content+")");
                 }
 
             } else if ("/visibleUserList/userRef".equals(_url))  {
                 this.visibleFor.add(_content);
             } else  {
-                System.err.println("unkown workspace object parsing url: "+_url+"("+_content+")");
+                System.err.println("unknown workspace object parsing url: "+_url+"("+_content+")");
             }
         }
     }

@@ -223,10 +223,10 @@ public abstract class AbstractAdminObject_mxJPO
                 this.propertiesStack.add(new AdminProperty_mxJPO());
             } else if (_url.startsWith("/adminProperties/propertyList/property"))  {
                 if (!this.propertiesStack.peek().parse(_url.substring(38), _content))  {
-                    System.err.println("unkown parsing property url: "+_url+"("+_content+")");
+                    System.err.println("unknown parsing property url: "+_url+"("+_content+")");
                 }
             } else  {
-                System.err.println("unkown parsing url: "+_url+"("+_content+")");
+                System.err.println("unknown parsing url: "+_url+"("+_content+")");
             }
         }
     }

@@ -84,7 +84,7 @@ public enum PropertyDef_mxJPO
             _mapping.getPropertyEnum2Names().put(propDef, _value);
             _mapping.getPropertyNames2Enum().put(_value, propDef);
         } else  {
-            throw new Exception("unkown key " + _key + " with value '" + _value + "' defined!");
+            throw new Exception("unknown key " + _key + " with value '" + _value + "' defined!");
         }
     }
 
