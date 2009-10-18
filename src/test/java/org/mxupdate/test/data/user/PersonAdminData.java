@@ -141,7 +141,7 @@ public class PersonAdminData
     public PersonAdminData(final AbstractTest _test,
                            final String _name)
     {
-        super(_test, AbstractTest.CI.PERSONADMIN, _name, PersonAdminData.REQUIRED_EXPORT_VALUES);
+        super(_test, AbstractTest.CI.USR_PERSONADMIN, _name, PersonAdminData.REQUIRED_EXPORT_VALUES);
     }
 
     /**

@@ -73,7 +73,7 @@ public class JPOExportUpdate
     public void cleanup()
         throws Exception
     {
-        this.cleanup(CI.JPO);
+        this.cleanup(CI.PRG_JPO);
     }
 
     /**
@@ -90,7 +90,7 @@ public class JPOExportUpdate
     {
         final JPOProgramData jpo = _data.getJPOProgram(_name);
         jpo.create();
-        final Export export = this.export(CI.JPO, jpo.getName());
+        final Export export = this.export(CI.PRG_JPO, jpo.getName());
 
         // check path
         final String path;

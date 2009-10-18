@@ -42,6 +42,6 @@ public class AttributeStringData
     public AttributeStringData(final AbstractTest _test,
                            final String _name)
     {
-        super(_test, CI.ATTRIBUTE_STRING, _name, "string");
+        super(_test, CI.DM_ATTRIBUTE_STRING, _name, "string");
     }
 }

@@ -48,7 +48,7 @@ public class PageExportUpdate
     public void cleanup()
         throws Exception
     {
-        this.cleanup(CI.PAGE);
+        this.cleanup(CI.PRG_PAGE);
     }
 
     /**
@@ -107,7 +107,7 @@ public class PageExportUpdate
     {
         final PageData page = _data.getPage(_name);
         page.create();
-        final Export export = this.export(CI.PAGE, page.getName());
+        final Export export = this.export(CI.PRG_PAGE, page.getName());
 
         // check oath
         Assert.assertEquals(export.getPath(),

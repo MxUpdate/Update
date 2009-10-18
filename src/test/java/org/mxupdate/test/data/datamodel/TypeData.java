@@ -70,7 +70,7 @@ public class TypeData
     public TypeData(final AbstractTest _test,
                     final String _name)
     {
-        super(_test, AbstractTest.CI.TYPE, _name,
+        super(_test, AbstractTest.CI.DM_TYPE, _name,
               TypeData.REQUIRED_EXPORT_VALUES);
     }
 

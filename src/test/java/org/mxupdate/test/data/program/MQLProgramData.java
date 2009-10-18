@@ -43,7 +43,7 @@ public class MQLProgramData
     public MQLProgramData(final AbstractTest _test,
                           final String _name)
     {
-        super(_test, AbstractTest.CI.MQL_PROGRAM, _name);
+        super(_test, AbstractTest.CI.PRG_MQL_PROGRAM, _name);
     }
 
     /**

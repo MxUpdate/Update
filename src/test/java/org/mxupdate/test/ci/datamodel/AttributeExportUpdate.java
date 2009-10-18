@@ -98,8 +98,8 @@ public class AttributeExportUpdate
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(CI.ATTRIBUTE_STRING);
-        this.cleanup(CI.MQL_PROGRAM);
+        this.cleanup(CI.DM_ATTRIBUTE_STRING);
+        this.cleanup(CI.PRG_MQL_PROGRAM);
     }
 
     /**

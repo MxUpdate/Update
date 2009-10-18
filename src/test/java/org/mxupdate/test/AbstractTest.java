@@ -66,77 +66,77 @@ public abstract class AbstractTest
         /**
          * Configuration item Data Model Boolean Attribute.
          */
-        ATTRIBUTE_BOOLEAN("attribute", "AttributeBoolean", "ATTRIBUTE", "BOOLEAN_", "datamodel/attribute", true),
+        DM_ATTRIBUTE_BOOLEAN("attribute", "AttributeBoolean", "ATTRIBUTE", "BOOLEAN_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model Date Attribute.
          */
-        ATTRIBUTE_DATE("attribute", "AttributeDate", "ATTRIBUTE", "DATE_", "datamodel/attribute", true),
+        DM_ATTRIBUTE_DATE("attribute", "AttributeDate", "ATTRIBUTE", "DATE_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model Integer Attribute.
          */
-        ATTRIBUTE_INTEGER("attribute", "AttributeInteger", "ATTRIBUTE", "INTEGER_", "datamodel/attribute", true),
+        DM_ATTRIBUTE_INTEGER("attribute", "AttributeInteger", "ATTRIBUTE", "INTEGER_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model Real Attribute.
          */
-        ATTRIBUTE_REAL("attribute", "AttributeReal", "ATTRIBUTE", "REAL_", "datamodel/attribute", true),
+        DM_ATTRIBUTE_REAL("attribute", "AttributeReal", "ATTRIBUTE", "REAL_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model String Attribute.
          */
-        ATTRIBUTE_STRING("attribute", "AttributeString", "ATTRIBUTE", "STRING_", "datamodel/attribute", true),
+        DM_ATTRIBUTE_STRING("attribute", "AttributeString", "ATTRIBUTE", "STRING_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model Interface.
          */
-        INTERFACE("interface", "Interface", "INTERFACE", "INTERFACE_", "datamodel/interface", true),
+        DM_INTERFACE("interface", "Interface", "INTERFACE", "INTERFACE_", "datamodel/interface", true),
 
         /**
          * Configuration item Data Model Policy.
          */
-        POLICY("policy", "Policy", "POLICY", "POLICY_", "datamodel/policy", true),
+        DM_POLICY("policy", "Policy", "POLICY", "POLICY_", "datamodel/policy", true),
 
         /**
          * Configuration item Data Model Relationship.
          */
-        RELATIONSHIP("relationship", "Relationship", "RELATIONSHIP", "RELATIONSHIP_", "datamodel/relationship", true),
+        DM_RELATIONSHIP("relationship", "Relationship", "RELATIONSHIP", "RELATIONSHIP_", "datamodel/relationship", true),
 
         /**
          * Configuration item Data Model Type.
          */
-        TYPE("type", "Type", "TYPE", "TYPE_", "datamodel/type", true),
+        DM_TYPE("type", "Type", "TYPE", "TYPE_", "datamodel/type", true),
 
         /**
          * Configuration item JPO program.
          */
-        JPO("program", "JPO", null, "", "program/jpo", true),
+        PRG_JPO("program", "JPO", null, "", "program/jpo", true),
 
         /**
          * Configuration item MQL program.
          */
-        MQL_PROGRAM("program", "Program", null, "", "program/mql", true),
+        PRG_MQL_PROGRAM("program", "Program", null, "", "program/mql", true),
 
         /**
          * Configuration item page program.
          */
-        PAGE("page", "Page", null, "PAGE_", "program/page", true),
+        PRG_PAGE("page", "Page", null, "PAGE_", "program/page", true),
 
         /**
          * Configuration item group.
          */
-        GROUP("group", "Group", "GROUP", "GROUP_", "user/group", true),
+        USR_GROUP("group", "Group", "GROUP", "GROUP_", "user/group", true),
 
         /**
          * Configuration item administration person.
          */
-        PERSONADMIN("person", "PersonAdmin", "PERSONADMIN", "PERSONADMIN_", "user/personadmin", true),
+        USR_PERSONADMIN("person", "PersonAdmin", "PERSONADMIN", "PERSONADMIN_", "user/personadmin", true),
 
         /**
          * Configuration item role.
          */
-        ROLE("role", "Role", "ROLE", "ROLE_", "user/role", true),
+        USR_ROLE("role", "Role", "ROLE", "ROLE_", "user/role", true),
 
         /**
          * Configuration item command.
@@ -167,7 +167,7 @@ public abstract class AbstractTest
          * Configuration item site (not handled as configuration item from the
          * update tool itself).
          */
-        SITE("site", "Site", null, null, null, true);
+        OTHER_SITE("site", "Site", null, null, null, true);
 
         /**
          * Related type name in MX.
@@ -482,7 +482,7 @@ public abstract class AbstractTest
             } else  {
                 elements = this.mqlAsSet("escape list " + _type.mxType);
             }
-            if (_type == AbstractTest.CI.INTERFACE)  {
+            if (_type == AbstractTest.CI.DM_INTERFACE)  {
                 for (final String element : elements)  {
                     this.mql("escape mod " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\" remove derived");
                 }

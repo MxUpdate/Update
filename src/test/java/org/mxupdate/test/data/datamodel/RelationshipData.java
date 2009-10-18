@@ -61,7 +61,7 @@ public class RelationshipData
     public RelationshipData(final AbstractTest _test,
                             final String _name)
     {
-        super(_test, AbstractTest.CI.RELATIONSHIP, _name,
+        super(_test, AbstractTest.CI.DM_RELATIONSHIP, _name,
               RelationshipData.REQUIRED_EXPORT_VALUES);
     }
 

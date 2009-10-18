@@ -127,8 +127,8 @@ public class FormExportUpdate
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.UI_FORM);
-        this.cleanup(AbstractTest.CI.ROLE);
-        this.cleanup(AbstractTest.CI.GROUP);
+        this.cleanup(AbstractTest.CI.USR_ROLE);
+        this.cleanup(AbstractTest.CI.USR_GROUP);
     }
 
 

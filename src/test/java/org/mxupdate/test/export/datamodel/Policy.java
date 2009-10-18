@@ -67,7 +67,7 @@ public class Policy
     {
         this.mql("add policy " + Policy.POLICY_NAME + " type all");
 
-        final Export export = this.export(CI.POLICY, Policy.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, Policy.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
@@ -90,7 +90,7 @@ public class Policy
         this.mql("add policy " + Policy.POLICY_NAME
                 + " state create");
 
-        final Export export = this.export(CI.POLICY, Policy.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, Policy.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
@@ -115,7 +115,7 @@ public class Policy
         this.mql("add policy " + Policy.POLICY_NAME
                 + " state create property state_create value create");
 
-        final Export export = this.export(CI.POLICY, Policy.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, Policy.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
@@ -139,7 +139,7 @@ public class Policy
         this.mql("add policy " + Policy.POLICY_NAME
                 + " state create property state_create value create property state_exists value create");
 
-        final Export export = this.export(CI.POLICY, Policy.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, Policy.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),

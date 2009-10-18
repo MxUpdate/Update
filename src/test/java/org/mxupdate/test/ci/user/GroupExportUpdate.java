@@ -131,9 +131,9 @@ public class GroupExportUpdate
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(AbstractTest.CI.GROUP);
-        this.cleanup(AbstractTest.CI.SITE);
-        this.cleanup(AbstractTest.CI.MQL_PROGRAM);
+        this.cleanup(AbstractTest.CI.USR_GROUP);
+        this.cleanup(AbstractTest.CI.OTHER_SITE);
+        this.cleanup(AbstractTest.CI.PRG_MQL_PROGRAM);
     }
 
     /**

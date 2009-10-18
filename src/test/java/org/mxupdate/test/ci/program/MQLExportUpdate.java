@@ -84,7 +84,7 @@ public class MQLExportUpdate
     public void cleanup()
         throws Exception
     {
-        this.cleanup(CI.MQL_PROGRAM);
+        this.cleanup(CI.PRG_MQL_PROGRAM);
     }
 
 
@@ -102,7 +102,7 @@ public class MQLExportUpdate
     {
         final MQLProgramData mqlProgram = _data.getMQLProgram(_name);
         mqlProgram.create();
-        final Export export = this.export(CI.MQL_PROGRAM, mqlProgram.getName());
+        final Export export = this.export(CI.PRG_MQL_PROGRAM, mqlProgram.getName());
 
         // check oath
         Assert.assertEquals(export.getPath(),

@@ -133,9 +133,9 @@ public class TableExportUpdate
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.UI_TABLE);
-        this.cleanup(AbstractTest.CI.PERSONADMIN);
-        this.cleanup(AbstractTest.CI.ROLE);
-        this.cleanup(AbstractTest.CI.GROUP);
+        this.cleanup(AbstractTest.CI.USR_PERSONADMIN);
+        this.cleanup(AbstractTest.CI.USR_ROLE);
+        this.cleanup(AbstractTest.CI.USR_GROUP);
     }
 
     /**

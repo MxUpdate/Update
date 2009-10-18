@@ -55,10 +55,10 @@ public class InterfaceExportUpdate
     public void cleanup()
         throws Exception
     {
-        this.cleanup(CI.ATTRIBUTE_STRING);
-        this.cleanup(CI.INTERFACE);
-        this.cleanup(CI.TYPE);
-        this.cleanup(CI.RELATIONSHIP);
+        this.cleanup(CI.DM_ATTRIBUTE_STRING);
+        this.cleanup(CI.DM_INTERFACE);
+        this.cleanup(CI.DM_TYPE);
+        this.cleanup(CI.DM_RELATIONSHIP);
     }
 
     /**

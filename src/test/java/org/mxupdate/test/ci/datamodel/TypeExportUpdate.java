@@ -86,13 +86,13 @@ public class TypeExportUpdate
     public void cleanup()
         throws Exception
     {
-        this.cleanup(AbstractTest.CI.MQL_PROGRAM);
-        this.cleanup(AbstractTest.CI.ATTRIBUTE_BOOLEAN);
-        this.cleanup(AbstractTest.CI.ATTRIBUTE_DATE);
-        this.cleanup(AbstractTest.CI.ATTRIBUTE_INTEGER);
-        this.cleanup(AbstractTest.CI.ATTRIBUTE_REAL);
-        this.cleanup(AbstractTest.CI.ATTRIBUTE_STRING);
-        this.cleanup(AbstractTest.CI.TYPE);
+        this.cleanup(AbstractTest.CI.PRG_MQL_PROGRAM);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_BOOLEAN);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_DATE);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_INTEGER);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_REAL);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_STRING);
+        this.cleanup(AbstractTest.CI.DM_TYPE);
     }
 
 

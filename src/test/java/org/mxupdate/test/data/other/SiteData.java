@@ -45,7 +45,7 @@ public class SiteData
     public SiteData(final AbstractTest _test,
                     final String _name)
     {
-        super(_test, AbstractTest.CI.SITE, _name, null);
+        super(_test, AbstractTest.CI.OTHER_SITE, _name, null);
     }
 
     /**

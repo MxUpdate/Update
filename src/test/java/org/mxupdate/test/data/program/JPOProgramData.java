@@ -43,7 +43,7 @@ public class JPOProgramData
     public JPOProgramData(final AbstractTest _test,
                           final String _name)
     {
-        super(_test, AbstractTest.CI.JPO, _name);
+        super(_test, AbstractTest.CI.PRG_JPO, _name);
     }
 
     /**

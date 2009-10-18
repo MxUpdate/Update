@@ -226,11 +226,11 @@ public class PersonExportUpdate
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(AbstractTest.CI.PERSONADMIN);
-        this.cleanup(AbstractTest.CI.GROUP);
-        this.cleanup(AbstractTest.CI.ROLE);
-        this.cleanup(AbstractTest.CI.SITE);
-        this.cleanup(AbstractTest.CI.MQL_PROGRAM);
+        this.cleanup(AbstractTest.CI.USR_PERSONADMIN);
+        this.cleanup(AbstractTest.CI.USR_GROUP);
+        this.cleanup(AbstractTest.CI.USR_ROLE);
+        this.cleanup(AbstractTest.CI.OTHER_SITE);
+        this.cleanup(AbstractTest.CI.PRG_MQL_PROGRAM);
     }
 
     /**

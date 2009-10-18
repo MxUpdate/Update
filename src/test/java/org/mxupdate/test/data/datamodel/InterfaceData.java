@@ -116,7 +116,7 @@ public class InterfaceData
     public InterfaceData(final AbstractTest _test,
                          final String _name)
     {
-        super(_test, AbstractTest.CI.INTERFACE, _name,
+        super(_test, AbstractTest.CI.DM_INTERFACE, _name,
               InterfaceData.REQUIRED_EXPORT_VALUES);
     }
 
