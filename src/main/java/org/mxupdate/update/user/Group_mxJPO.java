@@ -191,12 +191,7 @@ public class Group_mxJPO
         if (!ignore)  {
             final Collection<String> ignoreMatches = _paramCache.getValueList(Group_mxJPO.PARAM_IGNORE_WSO_GROUPS);
             if (ignoreMatches != null)  {
-                for (final String ignoreMatch : ignoreMatches)  {
-                    if (StringUtil_mxJPO.match(this.getName(), ignoreMatch))  {
-                        ignore = true;
-                        break;
-                    }
-                }
+                ignore = StringUtil_mxJPO.match(this.getName(), ignoreMatches);
             }
         }
         return ignore;

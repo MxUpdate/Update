@@ -20,6 +20,9 @@
 
 package org.mxupdate.test.ci.user;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
@@ -73,7 +76,7 @@ public class PersonExportUpdate
     @DataProvider(name = "persons")
     public Object[][] getPersons()
     {
-        return super.prepareData("person",
+        return this.prepareData("person",
                 new Object[]{
                         "simple person",
                         new PersonAdminData(this, "hello \" test")
@@ -166,7 +169,33 @@ public class PersonExportUpdate
                 new Object[]{
                         "person with password expires flag defined to false",
                         new PersonAdminData(this, "hello \" test")
-                                .setPasswordNeverExpires(false)});
+                                .setPasswordNeverExpires(false)},
+                new Object[]{
+                        "person with no wants email flag",
+                        new PersonAdminData(this, "hello \" test")
+                                .setWantsEmail(null)},
+                new Object[]{
+                        "person with wants email flag to true",
+                        new PersonAdminData(this, "hello \" test")
+                                .setWantsEmail(true)},
+                new Object[]{
+                        "person with wants email flag to false",
+                         new PersonAdminData(this, "hello \" test")
+                                .setWantsEmail(false)},
+                new Object[]{
+                        "person with no wants icon mail flag",
+                        new PersonAdminData(this, "hello \" test")
+                                .setWantsIconMail(null)},
+                new Object[]{
+                        "person with wants icon mail flag to true",
+                        new PersonAdminData(this, "hello \" test")
+                                .setWantsIconMail(true)},
+                new Object[]{
+                        "person with wants icon mail flag to false",
+                         new PersonAdminData(this, "hello \" test")
+                                .setWantsIconMail(false)}
+
+        );
     }
 
     /**
@@ -394,15 +423,108 @@ public class PersonExportUpdate
         final PersonAdminData person = new PersonAdminData(this, "hello \" test").setPasswordNeverExpires(true);
         person.create();
         person.setPasswordNeverExpires(null);
-        this.update(person, "UserPersonIgnorePswdNeverExpires", "true");
+        this.update(person, "UserPersonIgnorePswdNeverExpires", "*");
 
         // check not updated
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select neverexpires dump"),
                             "TRUE",
                             "check that password of person never expires");
         // check not defined within update file
-        final ExportParser exportParser = person.export("UserPersonIgnorePswdNeverExpires", "true");
+        final ExportParser exportParser = person.export("UserPersonIgnorePswdNeverExpires", "*");
         person.checkValueExists(exportParser, "person", "neverexpires", false);
         person.checkValueExists(exportParser, "person", "!neverexpires", false);
+    }
+
+    /**
+     * Check that the wants email flag is removed within update.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "check that the wants email flag is removed within update")
+    public void checkWantsEmailFlagRemoveWithinUpdate()
+        throws Exception
+    {
+        final PersonAdminData person = new PersonAdminData(this, "hello \" test").setWantsEmail(true);
+        person.create();
+        person.setWantsEmail(null);
+        this.update(person);
+
+        Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select emailenabled dump"),
+                            "FALSE",
+                            "check that 'wants email' flag is disabled");
+    }
+
+    /**
+     * Checks that 'the wants email' - flag is not reset if the
+     * parameter 'UserPersonIgnoreWantsEmail' is defined.
+     *
+     * @throws Exception if check failed
+     */
+    @Test(description = "checks that the 'wants email' - flag is not reset if the parameter 'UserPersonIgnoreWantsEmail' is defined")
+    public void checkWithIgnoreParameterWantsEmailFlag()
+        throws Exception
+    {
+        final PersonAdminData person = new PersonAdminData(this, "hello \" test").setWantsEmail(true);
+        person.create();
+        person.setWantsEmail(null);
+        this.update(person, "UserPersonIgnoreWantsEmail", "*");
+
+        // check not updated
+        Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select emailenabled dump"),
+                            "TRUE",
+                            "check that 'wants email' flag is enabled");
+        // check not defined within update file
+        final ExportParser exportParser = person.export("UserPersonIgnoreWantsEmail", "*");
+        final Set<String> enabled = new HashSet<String>(exportParser.getLines("/mql/enable/@value"));
+        final Set<String> disabled = new HashSet<String>(exportParser.getLines("/mql/disable/@value"));
+        Assert.assertFalse(enabled.contains("email"), "check email not enabled");
+        Assert.assertFalse(disabled.contains("email"), "check email not disabled");
+    }
+
+    /**
+     * Check that the wants email flag is removed within update.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "check that the wants email flag is set within update")
+    public void checkWantsIconMailFlagSetWithinUpdate()
+        throws Exception
+    {
+        final PersonAdminData person = new PersonAdminData(this, "hello \" test").setWantsIconMail(false);
+        person.create();
+        person.setWantsIconMail(null);
+        this.update(person);
+
+        Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select iconmailenabled dump"),
+                            "TRUE",
+                            "check that 'wants icon mail' flag is enabled");
+    }
+
+
+    /**
+     * Checks that 'the wants icon mail' - flag is not reset if the
+     * parameter 'UserPersonIgnoreWantsIconMail' is defined.
+     *
+     * @throws Exception if check failed
+     */
+    @Test(description = "checks that the 'wants icon mail' - flag is not reset if the parameter 'UserPersonIgnoreWantsIconMail' is defined")
+    public void checkWithIgnoreParameterWantsIconMailFlag()
+        throws Exception
+    {
+        final PersonAdminData person = new PersonAdminData(this, "hello \" test").setWantsIconMail(false);
+        person.create();
+        person.setWantsIconMail(null);
+        this.update(person, "UserPersonIgnoreWantsIconMail", "*");
+
+        // check not updated
+        Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select iconmailenabled dump"),
+                            "FALSE",
+                            "check that 'wants icon mail' flag is disabled");
+        // check not defined within update file
+        final ExportParser exportParser = person.export("UserPersonIgnoreWantsIconMail", "*");
+        final Set<String> enabled = new HashSet<String>(exportParser.getLines("/mql/enable/@value"));
+        final Set<String> disabled = new HashSet<String>(exportParser.getLines("/mql/disable/@value"));
+        Assert.assertFalse(enabled.contains("iconmail"), "check icon mail not enabled");
+        Assert.assertFalse(disabled.contains("iconmail"), "check icon mail not disabled");
     }
 }

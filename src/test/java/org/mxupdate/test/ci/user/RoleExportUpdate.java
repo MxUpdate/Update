@@ -70,7 +70,7 @@ public class RoleExportUpdate
     @DataProvider(name = "roles")
     public Object[][] getRoles()
     {
-        return super.prepareData("role",
+        return this.prepareData("role",
                 new Object[]{
                         "simple role",
                         new RoleData(this, "hallo \" test")

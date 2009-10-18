@@ -89,6 +89,26 @@ public class PersonAdmin_mxJPO
     private static final String PARAM_IGNORE_PSWD_NEVER_EXPIRES = "UserPersonIgnorePswdNeverExpires";
 
     /**
+     * If the parameter is set the 'wants email' - flag for persons is ignored.
+     * This means that the flag is not managed anymore from the MxUpdate Update
+     * tool.
+     *
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private static final String PARAM_IGNORE_WANTS_EMAIL = "UserPersonIgnoreWantsEmail";
+
+    /**
+     * If the parameter is set the 'wants icon mail' - flag for persons is
+     * ignored. This means that the flag is not managed anymore from the
+     * MxUpdate Update tool.
+     *
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private static final String PARAM_IGNORE_WANTS_ICON_MAIL = "UserPersonIgnoreWantsIconMail";
+
+    /**
      * Holds all group assignments of this person.
      *
      * @see #parse(String, String)
@@ -129,7 +149,7 @@ public class PersonAdmin_mxJPO
     private String address;
 
     /**
-     * Fax of the person.
+     * Fax number of the person.
      *
      * @see #parse(String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
@@ -137,7 +157,7 @@ public class PersonAdmin_mxJPO
     private String fax;
 
     /**
-     * Phone of the person.
+     * Phone number of the person.
      *
      * @see #parse(String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
@@ -202,11 +222,17 @@ public class PersonAdmin_mxJPO
 
     /**
      * Person wants email?
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private boolean wantsEmail = false;
 
     /**
      * Person wants (internal) icon mail.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private boolean wantsIconMail = false;
 
@@ -406,6 +432,10 @@ public class PersonAdmin_mxJPO
      *     parameter {@link #PARAM_IGNORE_PSWD_NEVER_EXPIRES} is not set)</li>
      * <li>{@link #access}</li>
      * <li>{@link #adminAccess business administration access}</li>
+     * <li>person wants {@link #wantsEmail email} (if parameter
+     *     {@link #PARAM_IGNORE_WANTS_EMAIL} is not set)</li>
+     * <li>person wants {@link #wantsIconMail icon mail} (if parameter
+     *     {@link #PARAM_IGNORE_WANTS_ICON_MAIL} is not set)</li>
      * <li>{@link #address}</li>
      * <li>{@link #email email address}</li>
      * <li>{@link #fax fax number}</li>
@@ -421,22 +451,33 @@ public class PersonAdmin_mxJPO
      * @param _out          appendable instance to the TCL update file
      * @throws IOException if the TCL update code could not written
      * @see #PARAM_IGNORE_PSWD_NEVER_EXPIRES
+     * @see #PARAM_IGNORE_WANTS_EMAIL
      */
     @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
-            throws IOException
+        throws IOException
     {
         super.writeObject(_paramCache, _out);
 
-        if (!_paramCache.getValueBoolean(PersonAdmin_mxJPO.PARAM_IGNORE_PSWD_NEVER_EXPIRES))  {
+        // password never expires flag if not matched
+        final Collection<String> ignorePswdNeverExpires = _paramCache.getValueList(PersonAdmin_mxJPO.PARAM_IGNORE_PSWD_NEVER_EXPIRES);
+        if ((ignorePswdNeverExpires == null) || !StringUtil_mxJPO.match(this.getName(), ignorePswdNeverExpires))  {
             _out.append(" \\\n    ").append(this.passwordNeverExpires ? "" : "!").append("neverexpires");
         }
-        _out.append(" \\\n    access \"")
-                    .append(StringUtil_mxJPO.joinTcl(',', false, this.access, "none")).append("\"")
-            .append(" \\\n    admin \"")
-                    .append(StringUtil_mxJPO.joinTcl(',', false, this.adminAccess, "none")).append("\"")
-            .append(" \\\n    address \"").append(StringUtil_mxJPO.convertTcl(this.address)).append("\"")
+        _out.append(" \\\n    access \"").append(StringUtil_mxJPO.joinTcl(',', false, this.access, "none")).append("\"")
+            .append(" \\\n    admin \"").append(StringUtil_mxJPO.joinTcl(',', false, this.adminAccess, "none")).append("\"");
+        // wants email only if not matched
+        final Collection<String> ignoreWantsEmail = _paramCache.getValueList(PersonAdmin_mxJPO.PARAM_IGNORE_WANTS_EMAIL);
+        if ((ignoreWantsEmail == null) || !StringUtil_mxJPO.match(this.getName(), ignoreWantsEmail))  {
+            _out.append(" \\\n    ").append(this.wantsEmail ? "enable" : "disable").append(" email");
+        }
+        // wants icon mail only if not matched
+        final Collection<String> ignoreWantsIconMail = _paramCache.getValueList(PersonAdmin_mxJPO.PARAM_IGNORE_WANTS_ICON_MAIL);
+        if ((ignoreWantsIconMail == null) || !StringUtil_mxJPO.match(this.getName(), ignoreWantsIconMail))  {
+            _out.append(" \\\n    ").append(this.wantsIconMail ? "enable" : "disable").append(" iconmail");
+        }
+        _out.append(" \\\n    address \"").append(StringUtil_mxJPO.convertTcl(this.address)).append("\"")
             .append(" \\\n    email \"").append(StringUtil_mxJPO.convertTcl(this.email)).append("\"")
             .append(" \\\n    fax \"").append(StringUtil_mxJPO.convertTcl(this.fax)).append("\"")
             .append(" \\\n    fullname \"").append(StringUtil_mxJPO.convertTcl(this.fullName)).append("\"")
@@ -511,6 +552,10 @@ public class PersonAdmin_mxJPO
      * <li>sets the {@link #passwordNeverExpires password never expires flag}
      *     to <i>false</i> (means that the password expires); depends on
      *     parameter {@link #PARAM_IGNORE_PSWD_NEVER_EXPIRES}</li>
+     * <li>disables that the person wants email; depends on
+     *     parameter {@link #PARAM_IGNORE_WANTS_EMAIL}</li>
+     * <li>enables that the person wants icon mail; depends on
+     *     parameter {@link #PARAM_IGNORE_WANTS_ICON_MAIL}</li>
      * </ul>
      * The original method of the super class if called surrounded with a
      * history off, because if the update itself is done the modified basic
@@ -533,6 +578,9 @@ public class PersonAdmin_mxJPO
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update from derived class failed
+     * @see #PARAM_IGNORE_PSWD_NEVER_EXPIRES
+     * @see #PARAM_IGNORE_WANTS_EMAIL
+     * @see #PARAM_IGNORE_WANTS_ICON_MAIL
      */
     @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
@@ -541,7 +589,7 @@ public class PersonAdmin_mxJPO
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         // append other pre MQL code
         final StringBuilder preMQLCode = new StringBuilder()
@@ -556,7 +604,19 @@ public class PersonAdmin_mxJPO
                         .append("fullname '' ")
                         .append("phone '' ")
                         .append("remove assign all");
-        if (!_paramCache.getValueBoolean(PersonAdmin_mxJPO.PARAM_IGNORE_PSWD_NEVER_EXPIRES))  {
+        // reset wants email if not ignored
+        final Collection<String> ignoreWantsEmail = _paramCache.getValueList(PersonAdmin_mxJPO.PARAM_IGNORE_WANTS_EMAIL);
+        if ((ignoreWantsEmail == null) || !StringUtil_mxJPO.match(this.getName(), ignoreWantsEmail))  {
+            preMQLCode.append(" disable email");
+        }
+        // reset wants icon mail if not ignored
+        final Collection<String> ignoreWantsIconMail = _paramCache.getValueList(PersonAdmin_mxJPO.PARAM_IGNORE_WANTS_ICON_MAIL);
+        if ((ignoreWantsIconMail == null) || !StringUtil_mxJPO.match(this.getName(), ignoreWantsIconMail))  {
+            preMQLCode.append(" enable iconmail");
+        }
+        // reset password never expires if not ignored
+        final Collection<String> ignorePswdNeverExpires = _paramCache.getValueList(PersonAdmin_mxJPO.PARAM_IGNORE_PSWD_NEVER_EXPIRES);
+        if ((ignorePswdNeverExpires == null) || !StringUtil_mxJPO.match(this.getName(), ignorePswdNeverExpires))  {
             preMQLCode.append(" !neverexpires");
         }
         if (this.defaultApplication != null)  {
@@ -585,12 +645,7 @@ public class PersonAdmin_mxJPO
         if (!ignore)  {
             final Collection<String> ignoreMatches = _paramCache.getValueList(PersonAdmin_mxJPO.PARAM_IGNORE_WSO_PERSONS);
             if (ignoreMatches != null)  {
-                for (final String ignoreMatch : ignoreMatches)  {
-                    if (StringUtil_mxJPO.match(this.getName(), ignoreMatch))  {
-                        ignore = true;
-                        break;
-                    }
-                }
+                ignore = StringUtil_mxJPO.match(this.getName(), ignoreMatches);
             }
         }
         return ignore;

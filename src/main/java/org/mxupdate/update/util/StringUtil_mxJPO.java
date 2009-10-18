@@ -446,6 +446,29 @@ public final class StringUtil_mxJPO
     }
 
     /**
+     * Checks if at minimum one element of the wild cards are matched from the
+     * file name.
+     *
+     * @param _filename         file name to check
+     * @param _wildcardMatchers list of wild card matches
+     * @return <i>true</i> if <code>_filename</code> matches at minimum one
+     *         element of the list of <code>_wildcardMatchers</code>
+     * @see #match(String, String)
+     */
+    public static boolean match(final String _filename,
+                                final Collection<String> _wildcardMatchers)
+    {
+        boolean ret = false;
+        for (final String wildcardMatcher : _wildcardMatchers)  {
+            if (StringUtil_mxJPO.match(_filename, wildcardMatcher))  {
+                ret = true;
+                break;
+            }
+        }
+        return ret;
+    }
+
+    /**
      * The method is original implemented by the project on
      * <a href="http://commons.apache.org/io">Apache Commons IO</a> and copied
      * from method <code>wildcardMatch</code> within class
@@ -474,7 +497,7 @@ public final class StringUtil_mxJPO
     //                 }
     //                 filename = caseSensitivity.convertCase(filename);
     //                 wildcardMatcher = caseSensitivity.convertCase(wildcardMatcher);
-            final String[] wcs = splitOnTokens(_wildcardMatcher);
+            final String[] wcs = StringUtil_mxJPO.splitOnTokens(_wildcardMatcher);
             boolean anyChars = false;
             int textIdx = 0;
             int wcsIdx = 0;

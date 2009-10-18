@@ -112,6 +112,26 @@ public class PersonAdminData
     private Boolean passwordNeverExpires;
 
     /**
+     * Person wants email?
+     *
+     * @see #setWantsEmail(Boolean)
+     * @see #append4CIFileValues(StringBuilder)
+     * @see #append4Create(StringBuilder)
+     * @see #checkExport(ExportParser)
+     */
+    private Boolean wantsEmail;
+
+    /**
+     * Person wants (internal) icon mail.
+     *
+     * @see #setWantsIconMail(Boolean)
+     * @see #append4CIFileValues(StringBuilder)
+     * @see #append4Create(StringBuilder)
+     * @see #checkExport(ExportParser)
+     */
+    private Boolean wantsIconMail;
+
+    /**
      * Constructor to initialize this administration person.
      *
      * @param _test     related test implementation (where this administration
@@ -226,6 +246,33 @@ public class PersonAdminData
     }
 
     /**
+     * Defines that the person wants email.
+     *
+     * @param _wantsEmail   <i>true</i> to define that the person wants email
+     * @return this person administration data instance
+     * @see #wantsEmail
+     */
+    public PersonAdminData setWantsEmail(final Boolean _wantsEmail)
+    {
+        this.wantsEmail = _wantsEmail;
+        return this;
+    }
+
+    /**
+     * Defines that the person wants email.
+     *
+     * @param _wantsIconMail    <i>true</i> to define that the person wants
+     *                          icon mail
+     * @return this person administration data instance
+     * @see #wantsIconMail
+     */
+    public PersonAdminData setWantsIconMail(final Boolean _wantsIconMail)
+    {
+        this.wantsIconMail = _wantsIconMail;
+        return this;
+    }
+
+    /**
      * Appends the person specific values to the TCL update code
      * <code>_cmd</code> of the configuration item file. This includes:
      * <ul>
@@ -235,13 +282,15 @@ public class PersonAdminData
      * <li>{@link #groups}<li>
      * <li>{@link #roles}</li>
      * <li>{@link #passwordNeverExpires password never expires flag}</li>
+     * <li>{@link #wantsEmail wants email flag}</li>
+     * <li>{@link #wantsIconMail wants icon mail flag}</li>
      * </ul>
      *
      * @param _cmd  string builder with the TCL commands of the configuration
      *              item file
      * @see #values
      */
-    @Override
+    @Override()
     protected void append4CIFileValues(final StringBuilder _cmd)
     {
         super.append4CIFileValues(_cmd);
@@ -266,6 +315,18 @@ public class PersonAdminData
             }
             _cmd.append("neverexpires");
         }
+        // wants email
+        if (this.wantsEmail != null)  {
+            _cmd.append(' ')
+                .append(this.wantsEmail ? "enable" : "disable")
+                .append(" email");
+        }
+        // wants icon mail
+        if (this.wantsIconMail != null)  {
+            _cmd.append(' ')
+                .append(this.wantsIconMail ? "enable" : "disable")
+                .append(" iconmail");
+        }
     }
 
     /**
@@ -278,6 +339,8 @@ public class PersonAdminData
      * <li>{@link #groups}<li>
      * <li>{@link #roles}</li>
      * <li>{@link #passwordNeverExpires password never expires flag}</li>
+     * <li>{@link #wantsEmail wants email flag}</li>
+     * <li>{@link #wantsIconMail wants icon mail flag}</li>
      * </ul>
      *
      * @param _cmd  string builder used to append MQL commands
@@ -318,6 +381,18 @@ public class PersonAdminData
             }
             _cmd.append("neverexpires");
         }
+        // wants email
+        if (this.wantsEmail != null)  {
+            _cmd.append(' ')
+                .append(this.wantsEmail ? "enable" : "disable")
+                .append(" email");
+        }
+        // wants icon mail
+        if (this.wantsIconMail != null)  {
+            _cmd.append(' ')
+                .append(this.wantsIconMail ? "enable" : "disable")
+                .append(" iconmail");
+        }
     }
 
     /**
@@ -331,6 +406,8 @@ public class PersonAdminData
      * <li>all {@link #roles} are correct defined</li>
      * <li>{@link #passwordNeverExpires password never expires flag} is defined
      *     if set to true</li>
+     * <li>{@link #wantsEmail wants email flag} is correct defined</li>
+     * <li>{@link #wantsIconMail wants icon mail flag} is correct defined</li>
      * </ul>
      *
      * @param _exportParser     parsed export
@@ -362,6 +439,7 @@ public class PersonAdminData
         for (final RoleData role : this.roles)  {
             assigns.add("role \"" + AbstractTest.convertTcl(role.getName()) + "\"");
         }
+
         // remove all assigned groups / roles in the TCL update file
         for (final String assign : _exportParser.getLines("/mql/assign/@value"))  {
             if (assigns.contains(assign))  {
@@ -371,8 +449,27 @@ public class PersonAdminData
             }
         }
         Assert.assertEquals(assigns.size(), 0, "check that all assignments for groups / roles are defined");
+
         // password never expires flag
         this.checkValueExists(_exportParser, "person", "neverexpires", (this.passwordNeverExpires != null) && this.passwordNeverExpires);
         this.checkValueExists(_exportParser, "person", "!neverexpires", (this.passwordNeverExpires == null) || !this.passwordNeverExpires);
+
+        // email / icon mail flags
+        final Set<String> enabled = new HashSet<String>(_exportParser.getLines("/mql/enable/@value"));
+        final Set<String> disabled = new HashSet<String>(_exportParser.getLines("/mql/disable/@value"));
+        if ((this.wantsEmail != null) && this.wantsEmail)  {
+            Assert.assertTrue(enabled.contains("email"), "check email enabled");
+            Assert.assertFalse(disabled.contains("email"), "check email not disabled");
+        } else  {
+            Assert.assertFalse(enabled.contains("email"), "check email not enabled");
+            Assert.assertTrue(disabled.contains("email"), "check email disabled");
+        }
+        if ((this.wantsIconMail == null) || this.wantsIconMail)  {
+            Assert.assertTrue(enabled.contains("iconmail"), "check icon mail enabled");
+            Assert.assertFalse(disabled.contains("iconmail"), "check icon mail not disabled");
+        } else  {
+            Assert.assertFalse(enabled.contains("iconmail"), "check icon mail not enabled");
+            Assert.assertTrue(disabled.contains("iconmail"), "check icon mail disabled");
+        }
     }
 }

@@ -70,7 +70,7 @@ public class GroupExportUpdate
     @DataProvider(name = "groups")
     public Object[][] getGroups()
     {
-        return super.prepareData("group",
+        return this.prepareData("group",
                 new Object[]{
                         "simple group",
                         new GroupData(this, "hallo \" test")
