@@ -30,7 +30,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.AbstractData;
+import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.user.AbstractUserData;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.Assert;
@@ -45,7 +45,7 @@ import org.testng.Assert;
  * @param <USER> for which user class the workspace object class is defined
  */
 abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectData<?,USER>, USER extends AbstractUserData<?>>
-    extends AbstractData<DATA>
+    extends AbstractAdminData<DATA>
 {
     /**
      * Related user to which is workspace object belongs through.

@@ -28,7 +28,7 @@ import java.util.Set;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.AbstractData;
+import org.mxupdate.test.data.AbstractAdminData;
 
 /**
  * Handles test data for commands / menus.
@@ -38,7 +38,7 @@ import org.mxupdate.test.data.AbstractData;
  * @version $Id$
  */
 abstract class AbstractCommandData<T extends AbstractCommandData<?>>
-    extends AbstractData<T>
+    extends AbstractAdminData<T>
 {
     /**
      * Within export the description, label and href must be defined.

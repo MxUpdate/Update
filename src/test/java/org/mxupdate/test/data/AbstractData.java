@@ -24,16 +24,12 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.Assert;
 
 /**
@@ -46,15 +42,6 @@ import org.testng.Assert;
  */
 public abstract class AbstractData<DATA extends AbstractData<?>>
 {
-    /**
-     * Regular expression to defines the list of not allowed characters  of
-     * symbolic names which are removed for the calculated symbolic name.
-     *
-     * @see #AbstractData(AbstractTest, AbstractTest.CI, String, String, Set)
-     */
-    private static final String NOT_ALLOWED_CHARS
-            = "[^%&()+-0123456789:=ABCDEFGHIJKLMNOPQRSTUVWXYZ^_abcdefghijklmnopqrstuvwxyz~]";
-
     /**
      * Related test case where this data piece was created.
      */
@@ -71,11 +58,6 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     private final String name;
 
     /**
-     * Symbolic name of the data piece.
-     */
-    private String symbolicName;
-
-    /**
      * Values of this data piece.
      *
      * @see #setValue(String, String)
@@ -83,23 +65,6 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @see #getValues()
      */
     private final Map<String,String> values = new HashMap<String,String>();
-
-    /**
-     * Is the role hidden?
-     *
-     * @see #setHidden(boolean)
-     * @see #isHidden()
-     */
-    private Boolean hidden = false;
-
-    /**
-     * Defines the values which must be defined for exports. They are tested
-     * for existence from {@link #checkExport(ExportParser)}. This values must
-     * be defined minimum and maximum one time in the configuration item file.
-     *
-     * @see #checkExport(ExportParser)
-     */
-    private final Set<String> requiredExportValues;
 
     /**
      * Flag to indicate that this data piece is creatd.
@@ -110,34 +75,19 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     private boolean created;
 
     /**
-     * All properties for this data piece.
-     *
-     * @see #addProperty(PropertyDef)
-     */
-    private final Set<PropertyDef> properties = new HashSet<PropertyDef>();
-
-    /**
      * Constructor to initialize this data piece.
      *
      * @param _test                 related test case
      * @param _ci                   related configuration type
      * @param _name                 name of the administration object
-     * @param _requiredExportValues defines the required values of the
-     *                              export within the configuration item
-     *                              file
      */
     protected AbstractData(final AbstractTest _test,
                            final AbstractTest.CI _ci,
-                           final String _name,
-                           final Set<String> _requiredExportValues)
+                           final String _name)
     {
         this.test = _test;
         this.ci = _ci;
         this.name = (_name != null) ? AbstractTest.PREFIX + _name : null;
-        this.symbolicName = (_ci != null)
-                            ? _ci.getMxType() + "_" + this.name.replaceAll(AbstractData.NOT_ALLOWED_CHARS, "")
-                            : null;
-        this.requiredExportValues = _requiredExportValues;
     }
 
     /**
@@ -174,31 +124,6 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     }
 
     /**
-     * Defines the symbolic name of this data piece.
-     *
-     * @param _symbolicName     new symbolic name
-     * @return this original data instance
-     * @see #symbolicName
-     */
-    @SuppressWarnings("unchecked")
-    public DATA setSymbolicName(final String _symbolicName)
-    {
-        this.symbolicName = _symbolicName;
-        return (DATA) this;
-    }
-
-    /**
-     * Returns the symbolic name of the abstract data element.
-     *
-     * @return symbolic name of the abstract data element
-     * @see #symbolicName
-     */
-    public String getSymbolicName()
-    {
-        return this.symbolicName;
-    }
-
-    /**
      * Defines a new value entry which is put into {@link #values}.
      *
      * @param _key      key of the value (e.g. &quot;description&quot;)
@@ -208,7 +133,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      */
     @SuppressWarnings("unchecked")
     public DATA setValue(final String _key,
-                      final String _value)
+                         final String _value)
     {
         this.values.put(_key, _value);
         return (DATA) this;
@@ -236,57 +161,6 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     public Map<String,String> getValues()
     {
         return this.values;
-    }
-
-    /**
-     * Defines if this data instance must be hidden.
-     *
-     * @param _hidden       <i>true</i> if the data instance is hidden;
-     *                      otherwise <i>false</i>
-     * @return this role data instance
-     * @see #hidden
-     */
-    @SuppressWarnings("unchecked")
-    public DATA setHidden(final Boolean _hidden)
-    {
-        this.hidden = _hidden;
-        return (DATA) this;
-    }
-
-    /**
-     * Returns <i>true</i> if this data instance is {@link #hidden}.
-     *
-     * @return <i>true</i> if this data instance is hidden; otherwise
-     *         <i>false</i>
-     * @see #hidden
-     */
-    public Boolean isHidden()
-    {
-        return this.hidden;
-    }
-
-    /**
-     * Assigns <code>_property</code> to this data piece.
-     *
-     * @param _property     property to add / assign
-     * @return this data piece instance
-     * @see #properties
-     */
-    @SuppressWarnings("unchecked")
-    public DATA addProperty(final PropertyDef _property)
-    {
-        this.properties.add(_property);
-        return (DATA) this;
-    }
-
-    /**
-     * Returns all assigned {@link #properties} from this data piece.
-     *
-     * @return all defined properties
-     */
-    public Set<PropertyDef> getProperties()
-    {
-        return this.properties;
     }
 
     /**
@@ -340,78 +214,6 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @return file content of the configuration item used to make an update
      */
     public abstract String ciFile();
-
-    /**
-     * Appends the defined {@link #values} to the TCL code <code>_cmd</code> of
-     * the configuration item file.
-     *
-     * @param _cmd  string builder with the TCL commands of the configuration
-     *              item file
-     * @see #values
-     */
-    protected void append4CIFileValues(final StringBuilder _cmd)
-    {
-        // values
-        for (final Map.Entry<String,String> entry : this.values.entrySet())  {
-            _cmd.append(' ').append(entry.getKey()).append(" \"")
-                .append(AbstractTest.convertTcl(entry.getValue()))
-                .append('\"');
-        }
-        // check for add values
-        final Set<String> needAdds = new HashSet<String>();
-        this.evalAdds4CheckExport(needAdds);
-        for (final String needAdd : needAdds)  {
-            _cmd.append(" add ").append(needAdd);
-        }
-        // properties
-        for (final PropertyDef property : this.getProperties())  {
-            _cmd.append(" property \"").append(AbstractTest.convertTcl(property.getName())).append("\"");
-            if (property.getTo() != null)  {
-                _cmd.append(" to ").append(property.getTo().getCI().getMxType()).append(" \"")
-                    .append(AbstractTest.convertTcl(property.getTo().getName())).append("\"");
-                if (property.getTo().getCI() == AbstractTest.CI.UI_TABLE)  {
-                    _cmd.append(" system");
-                }
-            }
-            if (property.getValue() != null)  {
-                _cmd.append(" value \"").append(AbstractTest.convertTcl(property.getValue())).append("\"");
-            }
-        }
-    }
-
-    /**
-     * Appends the MQL commands to define all {@link #values}Êand
-     * {@link #properties} within a create.
-     *
-     * @param _cmd  string builder used to append MQL commands
-     * @throws MatrixException if used object could not be created
-     * @see #values
-     */
-    protected void append4Create(final StringBuilder _cmd)
-        throws MatrixException
-    {
-        // values
-        for (final Map.Entry<String,String> entry : this.values.entrySet())  {
-            _cmd.append(' ').append(entry.getKey()).append(" \"")
-                .append(AbstractTest.convertMql(entry.getValue()))
-                .append('\"');
-        }
-        // properties
-        for (final PropertyDef property : this.properties)  {
-            _cmd.append(" property \"").append(AbstractTest.convertMql(property.getName())).append("\"");
-            if (property.getTo() != null)  {
-                property.getTo().create();
-                _cmd.append(" to ").append(property.getTo().getCI().getMxType()).append(" \"")
-                    .append(AbstractTest.convertMql(property.getTo().getName())).append("\"");
-                if (property.getTo().getCI() == AbstractTest.CI.UI_TABLE)  {
-                    _cmd.append(" system");
-                }
-            }
-            if (property.getValue() != null)  {
-                _cmd.append(" value \"").append(AbstractTest.convertMql(property.getValue())).append("\"");
-            }
-        }
-    }
 
     /**
      * Defines if the related object in MX is already created.
@@ -529,38 +331,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        Assert.assertEquals(_exportParser.getName(),
-                            this.getName(),
-                            "check name");
-        Assert.assertEquals(_exportParser.getSymbolicName(),
-                            this.getSymbolicName(),
-                            "check symbolic name");
-        // check for all required values
-        if (this.requiredExportValues != null)  {
-            for (final String valueName : this.requiredExportValues)  {
-                Assert.assertEquals(_exportParser.getLines("/mql/" + valueName + "/@value").size(),
-                                    1,
-                                    "required check that minimum and maximum one " + valueName + " is defined");
-            }
-        }
-        // check for defined values
-        for (final Map.Entry<String,String> entry : this.values.entrySet())  {
-            Assert.assertEquals(_exportParser.getLines("/mql/" + entry.getKey() + "/@value").size(),
-                                                       1,
-                                                       "check that minimum and maximum one "
-                                                               + entry.getKey() + " is defined");
-            Assert.assertEquals(_exportParser.getLines("/mql/" + entry.getKey() + "/@value").get(0),
-                                "\"" + AbstractTest.convertTcl(entry.getValue()) + "\"",
-                                "check that " + entry.getKey() + " is correct defined");
-        }
-        // check for add values
-        final Set<String> needAdds = new HashSet<String>();
-        this.evalAdds4CheckExport(needAdds);
-        final List<String> foundAdds = _exportParser.getLines("/mql/add/@value");
-        Assert.assertEquals(foundAdds.size(), needAdds.size(), "all adds defined");
-        for (final String foundAdd : foundAdds)  {
-            Assert.assertTrue(needAdds.contains(foundAdd), "check that add '" + foundAdd + "' is defined");
-        }
+        Assert.assertEquals(_exportParser.getName(), this.getName(), "check name");
     }
 
     /**
@@ -583,10 +354,10 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
         if (_value != null)  {
             Assert.assertEquals(_exportParser.getLines("/mql/" + _tag + "/@value").size(),
                                 1,
-                                "check " + _kind + " '" + this.getName() + "' that " + _tag + " is defined");
+                                "check " + _kind + " for '" + this.getName() + "' that " + _tag + " is defined");
             Assert.assertEquals(_exportParser.getLines("/mql/" + _tag + "/@value").get(0),
                                 _value,
-                                "check " + _kind + " '" + this.getName() + "' that " + _tag + " is " + _value);
+                                "check " + _kind + " for '" + this.getName() + "' that " + _tag + " is " + _value);
 
         } else  {
             Assert.assertEquals(_exportParser.getLines("/mql/" + _tag + "/@value").size(),
@@ -614,17 +385,6 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     }
 
     /**
-     * Evaluates all 'adds' in the configuration item file (e.g. add
-     * setting, ...). Because for the abstract data no adds exists this method
-     * is only a dummy.
-     *
-     * @param _needAdds     set with add strings used to append the adds
-     */
-    protected void evalAdds4CheckExport(final Set<String> _needAdds)
-    {
-    }
-
-    /**
      * Returns the string representation of this data piece as concatenation of
      * the configuration type {@link #ci} and the {@link #name}.
      *
@@ -633,6 +393,6 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     @Override
     public String toString()
     {
-        return "[" + this.ci.getMxType() + " '" + this.name + "']";
+        return "[" + this.ci.updateType + " '" + this.name + "']";
     }
 }

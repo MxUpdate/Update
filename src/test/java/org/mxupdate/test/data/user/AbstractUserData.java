@@ -27,7 +27,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.AbstractData;
+import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.other.SiteData;
 import org.mxupdate.test.data.user.workspace.CueData;
 import org.mxupdate.test.data.user.workspace.FilterData;
@@ -47,7 +47,7 @@ import org.testng.Assert;
  * @param <DATA> class derived from abstract user
  */
 public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
-    extends AbstractData<DATA>
+    extends AbstractAdminData<DATA>
 {
     /**
      * Assigned site for this user.

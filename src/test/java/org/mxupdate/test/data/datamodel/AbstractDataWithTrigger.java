@@ -27,7 +27,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.AbstractTest.CI;
-import org.mxupdate.test.data.AbstractData;
+import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.program.AbstractProgramData;
 
 /**
@@ -39,7 +39,7 @@ import org.mxupdate.test.data.program.AbstractProgramData;
  * @param <T>   defines the class which is derived from this class
  */
 public abstract class AbstractDataWithTrigger<T extends AbstractDataWithTrigger<?>>
-    extends AbstractData<T>
+    extends AbstractAdminData<T>
 {
     /**
      * Defines all assigned triggers to this administration object.

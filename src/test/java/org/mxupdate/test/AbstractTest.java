@@ -35,6 +35,7 @@ import matrix.db.JPO;
 import matrix.util.MatrixException;
 
 import org.apache.commons.codec.binary.Base64;
+import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.AbstractData;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
@@ -66,113 +67,140 @@ public abstract class AbstractTest
         /**
          * Configuration item Data Model Boolean Attribute.
          */
-        DM_ATTRIBUTE_BOOLEAN("attribute", "AttributeBoolean", "ATTRIBUTE", "BOOLEAN_", "datamodel/attribute", true),
+        DM_ATTRIBUTE_BOOLEAN("attribute", null, null, null, "AttributeBoolean", "ATTRIBUTE", "BOOLEAN_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model Date Attribute.
          */
-        DM_ATTRIBUTE_DATE("attribute", "AttributeDate", "ATTRIBUTE", "DATE_", "datamodel/attribute", true),
+        DM_ATTRIBUTE_DATE("attribute", null, null, null, "AttributeDate", "ATTRIBUTE", "DATE_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model Integer Attribute.
          */
-        DM_ATTRIBUTE_INTEGER("attribute", "AttributeInteger", "ATTRIBUTE", "INTEGER_", "datamodel/attribute", true),
+        DM_ATTRIBUTE_INTEGER("attribute", null, null, null, "AttributeInteger", "ATTRIBUTE", "INTEGER_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model Real Attribute.
          */
-        DM_ATTRIBUTE_REAL("attribute", "AttributeReal", "ATTRIBUTE", "REAL_", "datamodel/attribute", true),
+        DM_ATTRIBUTE_REAL("attribute", null, null, null, "AttributeReal", "ATTRIBUTE", "REAL_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model String Attribute.
          */
-        DM_ATTRIBUTE_STRING("attribute", "AttributeString", "ATTRIBUTE", "STRING_", "datamodel/attribute", true),
+        DM_ATTRIBUTE_STRING("attribute", null, null, null, "AttributeString", "ATTRIBUTE", "STRING_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model Interface.
          */
-        DM_INTERFACE("interface", "Interface", "INTERFACE", "INTERFACE_", "datamodel/interface", true),
+        DM_INTERFACE("interface", null, null, null, "Interface", "INTERFACE", "INTERFACE_", "datamodel/interface", true),
 
         /**
          * Configuration item Data Model Policy.
          */
-        DM_POLICY("policy", "Policy", "POLICY", "POLICY_", "datamodel/policy", true),
+        DM_POLICY("policy", null, null, null, "Policy", "POLICY", "POLICY_", "datamodel/policy", true),
 
         /**
          * Configuration item Data Model Relationship.
          */
-        DM_RELATIONSHIP("relationship", "Relationship", "RELATIONSHIP", "RELATIONSHIP_", "datamodel/relationship", true),
+        DM_RELATIONSHIP("relationship", null, null, null, "Relationship", "RELATIONSHIP", "RELATIONSHIP_", "datamodel/relationship", true),
 
         /**
          * Configuration item Data Model Type.
          */
-        DM_TYPE("type", "Type", "TYPE", "TYPE_", "datamodel/type", true),
+        DM_TYPE("type", null, null, null, "Type", "TYPE", "TYPE_", "datamodel/type", true),
+
+        /**
+         * Configuration item IEF Global Configuration.
+         */
+        IEF_GLOBAL_CONFIG(null, "MCADInteg-GlobalConfig", "MCADInteg-ConfigObjectPolicy", "eService Administration",
+                          "IEFGlobalConfig", "IEFGLOBALCONFIG", "IEFGLOBALCONFIG_", "integration/globalconfig", true),
+
+        /**
+         * Configuration item IEF Global Registry.
+         */
+        IEF_GLOBAL_REGISTRY(null, "IEF-GlobalRegistry", "MCADInteg-ConfigObjectPolicy", "eService Administration",
+                            "IEFGlobalRegistry", "IEFGLOBALREGISTRY", "IEFGLOBALREGISTRY_", "integration/globalregistry", true),
 
         /**
          * Configuration item JPO program.
          */
-        PRG_JPO("program", "JPO", null, "", "program/jpo", true),
+        PRG_JPO("program", null, null, null, "JPO", null, "", "program/jpo", true),
 
         /**
          * Configuration item MQL program.
          */
-        PRG_MQL_PROGRAM("program", "Program", null, "", "program/mql", true),
+        PRG_MQL_PROGRAM("program", null, null, null, "Program", null, "", "program/mql", true),
 
         /**
          * Configuration item page program.
          */
-        PRG_PAGE("page", "Page", null, "PAGE_", "program/page", true),
+        PRG_PAGE("page", null, null, null, "Page", null, "PAGE_", "program/page", true),
 
         /**
          * Configuration item group.
          */
-        USR_GROUP("group", "Group", "GROUP", "GROUP_", "user/group", true),
+        USR_GROUP("group", null, null, null, "Group", "GROUP", "GROUP_", "user/group", true),
 
         /**
          * Configuration item administration person.
          */
-        USR_PERSONADMIN("person", "PersonAdmin", "PERSONADMIN", "PERSONADMIN_", "user/personadmin", true),
+        USR_PERSONADMIN("person", null, null, null, "PersonAdmin", "PERSONADMIN", "PERSONADMIN_", "user/personadmin", true),
 
         /**
          * Configuration item role.
          */
-        USR_ROLE("role", "Role", "ROLE", "ROLE_", "user/role", true),
+        USR_ROLE("role", null, null, null, "Role", "ROLE", "ROLE_", "user/role", true),
 
         /**
          * Configuration item command.
          */
-        UI_COMMAND("command", "Command", "COMMAND", "COMMAND_", "userinterface/command", true),
+        UI_COMMAND("command", null, null, null, "Command", "COMMAND", "COMMAND_", "userinterface/command", true),
 
         /**
          * Configuration item form.
          */
-        UI_FORM("form", "Form", "FORM", "FORM_", "userinterface/form", true),
+        UI_FORM("form", null, null, null, "Form", "FORM", "FORM_", "userinterface/form", true),
 
         /**
          * Configuration item inquiry.
          */
-        UI_INQUIRY("inquiry", "Inquiry", "INQUIRY", "INQUIRY_", "userinterface/inquiry", true),
+        UI_INQUIRY("inquiry", null, null, null, "Inquiry", "INQUIRY", "INQUIRY_", "userinterface/inquiry", true),
 
         /**
          * Configuration item menu.
          */
-        UI_MENU("menu", "Menu", "MENU", "MENU_", "userinterface/menu", true),
+        UI_MENU("menu", null, null, null, "Menu", "MENU", "MENU_", "userinterface/menu", true),
 
         /**
          * Configuration item table.
          */
-        UI_TABLE("table", "Table", "TABLE", "TABLE_", "userinterface/table", false),
+        UI_TABLE("table", null, null, null, "Table", "TABLE", "TABLE_", "userinterface/table", false),
 
         /**
          * Configuration item site (not handled as configuration item from the
          * update tool itself).
          */
-        OTHER_SITE("site", "Site", null, null, null, true);
+        OTHER_SITE("site", null, null, null, "Site", null, null, null, true);
 
         /**
          * Related type name in MX.
          */
         final String mxType;
+
+        /**
+         * Related type of the business object.
+         */
+        private final String busType;
+
+        /**
+         * Related policy of the business object.
+         */
+        private final String busPolicy;
+
+        /**
+         * Related vault of the business object.
+         */
+        private final String busVault;
 
         /**
          * Related type name in MxUpdate Update.
@@ -203,6 +231,9 @@ public abstract class AbstractTest
          * Constructor to initialize an enumeration instance.
          *
          * @param _mxType               related type name in MX
+         * @param _busType              related type of the business object
+         * @param _busPolicy            related policy of the business object
+         * @param _busVault             related vault of the business object
          * @param _updateType           related type name in MxUpdate Update
          * @param _header               used text in the header to define the
          *                              name
@@ -211,6 +242,9 @@ public abstract class AbstractTest
          * @param _wildcardSearch       wild card search allowed?
          */
         CI(final String _mxType,
+           final String _busType,
+           final String _busPolicy,
+           final String _busVault,
            final String _updateType,
            final String _header,
            final String _filePrefix,
@@ -218,6 +252,9 @@ public abstract class AbstractTest
            final boolean _wildcardSearch)
         {
             this.mxType = _mxType;
+            this.busType = _busType;
+            this.busPolicy = _busPolicy;
+            this.busVault = _busVault;
             this.updateType = _updateType;
             this.header = _header;
             this.filePrefix = _filePrefix;
@@ -233,6 +270,39 @@ public abstract class AbstractTest
         public String getMxType()
         {
             return this.mxType;
+        }
+
+        /**
+         * Returns the type of the business object for this configuration.
+         *
+         * @return type of the business object
+         * @see #busType
+         */
+        public String getBusType()
+        {
+            return this.busType;
+        }
+
+        /**
+         * Returns the policy of the business object for this configuration.
+         *
+         * @return policy of the business object
+         * @see #busPolicy
+         */
+        public String getBusPolicy()
+        {
+            return this.busPolicy;
+        }
+
+        /**
+         * Returns the vault of the business object for this configuration.
+         *
+         * @return vault of the business object
+         * @see #busVault
+         */
+        public String getBusVault()
+        {
+            return this.busVault;
         }
     }
 
@@ -364,7 +434,7 @@ public abstract class AbstractTest
      * @param _object       object if the update definition
      * @param _errorCode    expected error code
      */
-    protected void updateFailure(final AbstractData<?> _object,
+    protected void updateFailure(final AbstractAdminData<?> _object,
                                  final UpdateException_mxJPO.Error _errorCode)
     {
         this.updateFailure(_object.getCIFileName(), _object.ciFile(), _errorCode);
@@ -468,29 +538,41 @@ public abstract class AbstractTest
     protected void cleanup(final CI _type)
         throws MatrixException
     {
-        final Set<String> elements;
-        if (_type == AbstractTest.CI.UI_TABLE)  {
-            elements = this.mqlAsSet("escape list table system");
-            for (final String element : elements)  {
-                if (element.startsWith(AbstractTest.PREFIX))  {
-                    this.mql("escape delete " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\" system");
-                }
-            }
-        } else  {
-            if (_type.wildcardSearch)  {
-                elements = this.mqlAsSet("escape list " + _type.mxType + " \"" + AbstractTest.PREFIX + "*\"");
-            } else  {
-                elements = this.mqlAsSet("escape list " + _type.mxType);
-            }
-            if (_type == AbstractTest.CI.DM_INTERFACE)  {
+        // administration objects
+        if (_type.getMxType() != null)  {
+            final Set<String> elements;
+            if (_type == AbstractTest.CI.UI_TABLE)  {
+                elements = this.mqlAsSet("escape list table system");
                 for (final String element : elements)  {
-                    this.mql("escape mod " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\" remove derived");
+                    if (element.startsWith(AbstractTest.PREFIX))  {
+                        this.mql("escape delete " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\" system");
+                    }
+                }
+            } else  {
+                if (_type.wildcardSearch)  {
+                    elements = this.mqlAsSet("escape list " + _type.mxType + " \"" + AbstractTest.PREFIX + "*\"");
+                } else  {
+                    elements = this.mqlAsSet("escape list " + _type.mxType);
+                }
+                if (_type == AbstractTest.CI.DM_INTERFACE)  {
+                    for (final String element : elements)  {
+                        this.mql("escape mod " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\" remove derived");
+                    }
+                }
+                for (final String element : elements)  {
+                    if (element.startsWith(AbstractTest.PREFIX))  {
+                        this.mql("escape delete " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\"");
+                    }
                 }
             }
-            for (final String element : elements)  {
-                if (element.startsWith(AbstractTest.PREFIX))  {
-                    this.mql("escape delete " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\"");
-                }
+        }
+        // business objects
+        if (_type.getBusType() != null)  {
+            final Set<String> busIds = this.mqlAsSet("escape temp query bus \""
+                    + AbstractTest.convertMql(_type.getBusType())
+                    + "\" \"" + AbstractTest.PREFIX + "*\" * select id dump '\t' recordseparator '\n'");
+            for (final String busId : busIds)  {
+                this.mql("delete bus " + busId.split("\t")[3]);
             }
         }
     }

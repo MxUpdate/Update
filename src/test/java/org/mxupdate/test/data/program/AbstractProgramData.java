@@ -22,7 +22,7 @@ package org.mxupdate.test.data.program;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.AbstractTest.CI;
-import org.mxupdate.test.data.AbstractData;
+import org.mxupdate.test.data.AbstractAdminData;
 
 /**
  * The class is used to define all program objects used to create / update and
@@ -33,7 +33,7 @@ import org.mxupdate.test.data.AbstractData;
  * @param <T>   defines the class which is derived from this class
  */
 public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
-    extends AbstractData<T>
+    extends AbstractAdminData<T>
 {
     /**
      * Related code of this program.

@@ -29,7 +29,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.AbstractData;
+import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.user.AbstractUserData;
 import org.testng.Assert;
 
@@ -40,8 +40,8 @@ import org.testng.Assert;
  * @version $Id$
  * @param <FORMTABLE>   class of the related table / form
  */
-public class FieldData<FORMTABLE extends AbstractData<?>>
-    extends AbstractData<FieldData<FORMTABLE>>
+public class FieldData<FORMTABLE extends AbstractAdminData<?>>
+    extends AbstractAdminData<FieldData<FORMTABLE>>
 {
     /**
      * Related table / form which defines this field.

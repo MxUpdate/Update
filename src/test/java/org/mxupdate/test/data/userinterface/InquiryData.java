@@ -29,7 +29,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.AbstractData;
+import org.mxupdate.test.data.AbstractAdminData;
 import org.testng.Assert;
 
 /**
@@ -39,7 +39,7 @@ import org.testng.Assert;
  * @version $Id$
  */
 public class InquiryData
-    extends AbstractData<InquiryData>
+    extends AbstractAdminData<InquiryData>
 {
     /**
      * Within export the description, pattern, format and file must be defined.

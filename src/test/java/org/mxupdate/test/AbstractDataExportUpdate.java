@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.mxupdate.test.data.AbstractData;
+import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.util.PropertyDef;
 
 /**
@@ -34,7 +34,7 @@ import org.mxupdate.test.data.util.PropertyDef;
  * @version $Id$
  * @param <DATA> class of the data
  */
-public abstract class AbstractDataExportUpdate<DATA extends AbstractData<?>>
+public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>>
     extends AbstractTest
 {
     /**

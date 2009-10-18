@@ -30,7 +30,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.AbstractData;
+import org.mxupdate.test.data.AbstractAdminData;
 import org.testng.Assert;
 
 /**
@@ -40,7 +40,7 @@ import org.testng.Assert;
  * @version $Id$
  */
 public class TableData
-    extends AbstractData<TableData>
+    extends AbstractAdminData<TableData>
 {
     /**
      * Within export the description must be defined.

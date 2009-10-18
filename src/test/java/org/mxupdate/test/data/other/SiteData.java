@@ -23,7 +23,7 @@ package org.mxupdate.test.data.other;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.AbstractData;
+import org.mxupdate.test.data.AbstractAdminData;
 
 /**
  * The class is used to define all site objects used to create / update and
@@ -33,7 +33,7 @@ import org.mxupdate.test.data.AbstractData;
  * @version $Id$
  */
 public class SiteData
-    extends AbstractData<SiteData>
+    extends AbstractAdminData<SiteData>
 {
     /**
      * Constructor to initialize this site.
@@ -49,7 +49,7 @@ public class SiteData
     }
 
     /**
-     * Only a stub method, because required from {@link AbstractData}.
+     * Only a stub method, because required from {@link AbstractAdminData}.
      *
      * @return always <code>null</code>
      */

@@ -20,7 +20,7 @@
 
 package org.mxupdate.test.data.util;
 
-import org.mxupdate.test.data.AbstractData;
+import org.mxupdate.test.data.AbstractAdminData;
 
 /**
  * The class is used for the property definition of administration objects.
@@ -34,9 +34,9 @@ public class PropertyDef
      * Name of this property.
      *
      * @see #PropertyDef(String)
-     * @see #PropertyDef(String, AbstractData)
+     * @see #PropertyDef(String, AbstractAdminData)
      * @see #PropertyDef(String, String)
-     * @see #PropertyDef(String, String, AbstractData)
+     * @see #PropertyDef(String, String, AbstractAdminData)
      * @see #getName()
      */
     private final String name;
@@ -45,7 +45,7 @@ public class PropertyDef
      * Value of the property.
      *
      * @see #PropertyDef(String, String)
-     * @see #PropertyDef(String, String, AbstractData)
+     * @see #PropertyDef(String, String, AbstractAdminData)
      * @see #getValue()
      */
     private final String value;
@@ -53,11 +53,11 @@ public class PropertyDef
     /**
      * Target administration object of this property.
      *
-     * @see #PropertyDef(String, AbstractData)
-     * @see #PropertyDef(String, String, AbstractData)
+     * @see #PropertyDef(String, AbstractAdminData)
+     * @see #PropertyDef(String, String, AbstractAdminData)
      * @see #getTo()
      */
-    private final AbstractData<?> to;
+    private final AbstractAdminData<?> to;
 
     /**
      * Initializes only the {@link #name}.
@@ -92,7 +92,7 @@ public class PropertyDef
      * @param _to       target object of the property
      */
     public PropertyDef(final String _name,
-                       final AbstractData<?> _to)
+                       final AbstractAdminData<?> _to)
     {
         this.name = _name;
         this.value = null;
@@ -109,7 +109,7 @@ public class PropertyDef
      */
     public PropertyDef(final String _name,
                         final String _value,
-                        final AbstractData<?> _to)
+                        final AbstractAdminData<?> _to)
     {
         this.name = _name;
         this.value = _value;
@@ -144,7 +144,7 @@ public class PropertyDef
      * @return target administration object of property
      * @see #to
      */
-    public AbstractData<?> getTo()
+    public AbstractAdminData<?> getTo()
     {
         return this.to;
     }

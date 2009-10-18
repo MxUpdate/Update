@@ -97,6 +97,7 @@
         <packages>
             <package name="org.mxupdate.test.ci"/>
             <package name="org.mxupdate.test.ci.datamodel"/>
+            <package name="org.mxupdate.test.ci.integration"/>
             <package name="org.mxupdate.test.ci.program"/>
             <package name="org.mxupdate.test.ci.user"/>
             <package name="org.mxupdate.test.ci.userinterface"/>

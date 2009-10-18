@@ -48,6 +48,9 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
+ * The class is used to export, create, delete and update business objects
+ * within MX.
+ *
  * @author The MxUpdate Team
  * @version $Id$
  */
@@ -413,7 +416,7 @@ public class BusObject_mxJPO
             throws IOException
     {
         this.writeHeader(_paramCache, _out);
-        _out.append("mql mod bus \"${OBJECTID}\"")
+        _out.append("mql escape mod bus \"${OBJECTID}\"")
             .append(" \\\n    description \"")
             .append(StringUtil_mxJPO.convertTcl(this.busDescription))
             .append("\"");
