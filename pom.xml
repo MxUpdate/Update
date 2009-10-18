@@ -42,14 +42,6 @@
         items).
     </description>
 
-    <repositories>
-        <repository>
-            <id>repository.riedelcastro.org</id>
-            <name>Riedelcastro's gcUpload</name>
-            <url>http://repository.riedelcastro.org/</url>
-        </repository>
-    </repositories>
-
     <licenses>
         <license>
             <name>Apache 2.0 License</name>
@@ -65,7 +57,7 @@
 
     <issueManagement>
         <system>MxUpdate Issues on Google Code</system>
-        <url>http://code.google.com/p/mxupdate/issues</url>
+        <url>http://issues.mxupdate.org</url>
     </issueManagement>
 
     <mailingLists>
@@ -164,12 +156,26 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
-                        <version>2.4.2</version>
                         <configuration>
                             <argLine>-Xmx1024m</argLine>
                             <suiteXmlFiles>
                                 <suiteXmlFile>${basedir}/src/test/resources/testng.xml</suiteXmlFile>
                             </suiteXmlFiles>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>no-tests</id>
+            <build>
+                <plugins>
+                    <!-- skip tests -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -183,6 +189,14 @@
                     <value>true</value>
                 </property>
             </activation>
+            <repositories>
+                <!-- needed for gcupload plug-in -->
+                <repository>
+                    <id>repository.riedelcastro.org</id>
+                    <name>Riedelcastro's gcUpload</name>
+                    <url>http://repository.riedelcastro.org/</url>
+                </repository>
+            </repositories>
             <build>
                 <plugins>
                     <!-- pack MxUpdate Update Install code + Javadoc -->
@@ -217,6 +231,14 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                    <!-- skip tests -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
                     </plugin>
                     <!-- google code upload -->
                     <plugin>
@@ -335,6 +357,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                    <skipTests>true</skipTests>
+                </configuration>
             </plugin>
             <!-- PMD report -->
             <plugin>
@@ -355,7 +381,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
                 <configuration>
-
+                    <excludeFilterFile>src/findbugs/findbugs-exclude.xml</excludeFilterFile>
                 </configuration>
             </plugin>
         </plugins>

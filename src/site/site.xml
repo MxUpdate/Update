@@ -32,11 +32,11 @@
 
     <body>
         <links>
-            <item name="MxUpdate" href="http://www.mxupdate.org/" />
+            <item name="MxUpdate" href="http://code.google.com/p/mxupdate/" />
             <item name="Maven" href="http://maven.apache.org/"/>
         </links>
         <menu name="Main">
-            <item name="MxUpdate@GoogleCode" href="http://www.mxupdate.org/"/>
+            <item name="MxUpdate @ Google Code" href="http://code.google.com/p/mxupdate/"/>
         </menu>
         <menu ref="parent" />
         <menu ref="modules" />
