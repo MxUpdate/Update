@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import matrix.db.Context;
 import matrix.util.MatrixException;
 
 import org.mxupdate.update.util.MqlUtil_mxJPO;
@@ -52,14 +51,14 @@ public class Mapping_mxJPO
     /**
      * Used prefix of property definition within the property file.
      *
-     * @see #Mapping_mxJPO(Context)
+     * @see #Mapping_mxJPO(ParameterCache_mxJPO)
      */
     private static final String PREFIX_PROPERTYDEF = "PropertyDef.";
 
     /**
      * Length of the prefix of property definition within the property file.
      *
-     * @see #Mapping_mxJPO(Context)
+     * @see #Mapping_mxJPO(ParameterCache_mxJPO)
      */
     private static final int LENGTH_PROPERTYDEF = Mapping_mxJPO.PREFIX_PROPERTYDEF.length();
 
@@ -119,7 +118,7 @@ public class Mapping_mxJPO
      * Maps from the name of the type definition group to the related type
      * definition group instance.
      *
-     * @see TypeDef_mxJPO#defineValue(Context, Mapping_mxJPO, String, String)
+     * @see TypeDef_mxJPO#defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
      * @see #getTypeDef(String)
      * @see #getAllTypeDefs()
      * @see #getTypeDefMap()
@@ -130,8 +129,8 @@ public class Mapping_mxJPO
      * Map between the JPO name and the class name used within MX for type
      * definition.
      *
-     * @see TypeDef_mxJPO#defineValue(Context, Mapping_mxJPO, String, String)
-     * @see TypeDef_mxJPO#defineJPOClass(Context, Mapping_mxJPO, String)
+     * @see TypeDef_mxJPO#defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
+     * @see TypeDef_mxJPO#defineJPOClass(ParameterCache_mxJPO, Mapping_mxJPO, String)
      * @see #getTypeDefJPOsMap()
      */
     private final Map<String,String> typeDefJPOsMap = new HashMap<String,String>();

@@ -681,7 +681,7 @@ public abstract class AbstractObject_mxJPO
      * @return calculated default symbolic name for administration objects (if
      *         the administration object is a business object <code>null</code>
      *         is returned)
-     * @see #PARAM_CALC_SYMB_NAME_REG_EXPs
+     * @see #PARAM_CALC_SYMB_NAME_REG_EXP
      */
     protected String calcDefaultSymbolicName(final ParameterCache_mxJPO _paramCache)
     {

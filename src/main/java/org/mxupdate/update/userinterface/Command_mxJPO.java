@@ -147,6 +147,7 @@ public class Command_mxJPO
         _out.append(" \\\n    label \"").append(StringUtil_mxJPO.convertTcl(this.label)).append("\"")
             .append(" \\\n    href \"").append(StringUtil_mxJPO.convertTcl(this.href)).append("\"")
             .append(" \\\n    alt \"").append(StringUtil_mxJPO.convertTcl(this.alt)).append("\"");
+        // users must be sorted alpha-numerically
         for (final String user : this.users)  {
             _out.append(" \\\n    add user \"").append(StringUtil_mxJPO.convertTcl(user)).append("\"");
         }

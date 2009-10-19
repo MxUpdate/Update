@@ -531,7 +531,7 @@ System.err.println("y location is not 0.0 and this is currently not supported");
             // scale
             if (this.scale != null)  {
                 _out.append(" \\\n        scale ");
-                if (this.scale == new Long(this.scale.longValue()).doubleValue())  {
+                if (this.scale == Long.valueOf(this.scale.longValue()).doubleValue())  {
                     _out.append(String.valueOf(this.scale.longValue()));
                 } else  {
                     _out.append(String.valueOf(this.scale.doubleValue()));

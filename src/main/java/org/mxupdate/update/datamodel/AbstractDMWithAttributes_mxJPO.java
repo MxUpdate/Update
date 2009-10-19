@@ -383,7 +383,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
     /**
      *
      * @param _value    value to convert
-     * @return
+     * @return replaced value from the converted value used for the JPO call
      * @see #TCL_PROCEDURE
      */
     protected String jpoCallExecuteConvert(final String _value)

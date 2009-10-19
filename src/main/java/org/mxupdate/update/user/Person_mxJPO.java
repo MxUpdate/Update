@@ -38,7 +38,6 @@ import matrix.util.StringList;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
-import org.mxupdate.update.AbstractPropertyObject_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -196,8 +195,8 @@ public class Person_mxJPO
 
         /**
          * Because the original method
-         * {@link AbstractPropertyObject_mxJPO#parse(ParameterCache_mxJPO)} is
-         * protected, but called from
+         * {@link org.mxupdate.update.AbstractPropertyObject_mxJPO#parse(ParameterCache_mxJPO)}
+         * is protected, but called from
          * {@link Person_mxJPO#parse(ParameterCache_mxJPO)}, the original
          * method must be overwritten and only called. So the original method
          * could be used to parse the business administration part of the

@@ -64,7 +64,7 @@ public class Insert_mxJPO
      * MQL command line to list the installed MxUpdate JPOs and the depending
      * last modified date of the installed file.
      *
-     * @see #evaluteInstalledJPOs(Context)
+     * @see #evaluteInstalledJPOs(Context, SimpleDateFormat)
      */
     private static final String CMD_LISTJPOS
             = "list prog \"MxUpdate,org.mxupdate.*,net.sourceforge.mxupdate.*\" "
@@ -189,7 +189,7 @@ System.out.println("program '" + name + "' is ignored because not a JPO");
      * @param _dateFormat   date / time formatter
      * @throws IOException if the JPO file could not be read
      * @throws MatrixException if the JPO could not updated
-     * @see #getCode(Map)
+     * @see ClassFile#getCode()
      */
     public void update(final Context _context,
                        final ClassFile _classFile,

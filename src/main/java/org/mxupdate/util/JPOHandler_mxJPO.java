@@ -55,7 +55,7 @@ public class JPOHandler_mxJPO
     /**
      * File name and file extension together.
      *
-     * @see #evaluateFiles(Map, Map, File, File)
+     * @see #evaluateFiles(File, File)
      */
     private static final String JPO_FILE_EXTENSION
             = JPOHandler_mxJPO.JPO_EXTENSION + JPOHandler_mxJPO.JAVA_FILE_EXTENSION;
@@ -65,14 +65,14 @@ public class JPOHandler_mxJPO
      * from the JPO because Matrix does internally handle all JPOs within the
      * default package.
      *
-     * @see ClassFile#getCode(Map)
+     * @see ClassFile#getCode()
      */
     private static final Pattern PATTERN_PACKAGE = Pattern.compile("^package [A-Za-z0-9\\.]*;$");
 
     /**
      * Regular expression for the import statement of JPOs.
      *
-     * @see ClassFile#getCode(Map)
+     * @see ClassFile#getCode()
      */
     private static final Pattern PATTERN_IMPORT
             = Pattern.compile("(?<=^import[\\ \\t]?)[A-Za-z0-9\\.\\_]*_"+"mxJPO(?=[\\ \\t]?;[\\ \\t]?$)");
@@ -82,14 +82,14 @@ public class JPOHandler_mxJPO
      * package is defined). The expression is used to extract the JPO class
      * name from the import definition.
      *
-     * @see ClassFile#getCode(Map)
+     * @see ClassFile#getCode()
      */
     private static final Pattern PATTERN_JPOWITHOUTPCK = Pattern.compile("(?<=\\.)[A-Za-z0-9]*_"+"mxJPO");
 
     /**
      * Regular expression for a referenced JPO within the Java source code.
      *
-     * @see ClassFile#getCode(Map)
+     * @see ClassFile#getCode()
      */
     private static final Pattern PATTERN_JPO
             = Pattern.compile("((?<=[+ \\(\\)\\t\\r\\n@\\<,!])|(^))[A-Za-z0-9\\.]*\\_"+"mxJPO");

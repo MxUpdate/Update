@@ -22,6 +22,7 @@ package org.mxupdate.update.datamodel;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -480,8 +481,13 @@ public class Dimension_mxJPO
      * dimension.
      */
     public static class Unit
-        implements Comparable<Dimension_mxJPO.Unit>
+        implements Comparable<Dimension_mxJPO.Unit>, Serializable
     {
+        /**
+         * Defines the serialize version unique identifier.
+         */
+        private static final long serialVersionUID = 8304234012828651268L;
+
         /**
          * Name of the unit.
          */

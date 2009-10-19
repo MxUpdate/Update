@@ -22,6 +22,7 @@ package org.mxupdate.update;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -699,9 +700,14 @@ public class BusObject_mxJPO
      * attribute name. If numbers within attribute are used, the order is
      * done depending on the numbers.
      */
-    protected class AttributeValue
-            implements Comparable<BusObject_mxJPO.AttributeValue>
+    protected static class AttributeValue
+            implements Comparable<BusObject_mxJPO.AttributeValue>, Serializable
     {
+        /**
+         * Defines the serialize version unique identifier.
+         */
+        private static final long serialVersionUID = 1147382775996454936L;
+
         /**
          * Holds the user references of a user access.
          */
@@ -792,9 +798,14 @@ public class BusObject_mxJPO
      * all attributes values and the type, name with revision of the connected
      * business object.
      */
-    private class Connection
-            implements Comparable<BusObject_mxJPO.Connection>
+    private static class Connection
+            implements Comparable<BusObject_mxJPO.Connection>, Serializable
     {
+        /**
+         * Defines the serialize version unique identifier.
+         */
+        private static final long serialVersionUID = 8222078899759850622L;
+
         /**
          * Type of the business object.
          */

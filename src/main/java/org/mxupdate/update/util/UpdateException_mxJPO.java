@@ -56,7 +56,7 @@ public class UpdateException_mxJPO
      * <li>2: {@link org.mxupdate.update.util.AdminProperty_mxJPO}</li>
      * <li>3: {@link org.mxupdate.update.util.JPOCaller_mxJPO}</li>
      * <li>4: {@link org.mxupdate.update.util.MqlUtil_mxJPO}</li>
-     * <li>5: {@link org.mxupdate.update.util.ParmeterCache_mxJPO}</li>
+     * <li>5: {@link org.mxupdate.update.util.ParameterCache_mxJPO}</li>
      * <li>6: {@link org.mxupdate.update.util.StringUtil_mxJPO}</li>
      * </ul>
      * </p>

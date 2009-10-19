@@ -100,7 +100,7 @@ public abstract class AbstractUser_mxJPO
      *
      * @see #parse(String, String)
      * @see #prepare(ParameterCache_mxJPO)
-     * @see #writeWorkspaceObjects(ParameterCache_mxJPO, Appendable)
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private final Map<String,Cue_mxJPO> cues = new TreeMap<String,Cue_mxJPO>();
@@ -118,7 +118,7 @@ public abstract class AbstractUser_mxJPO
      *
      * @see #parse(String, String)
      * @see #prepare(ParameterCache_mxJPO)
-     * @see #writeWorkspaceObjects(ParameterCache_mxJPO, Appendable)
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private final Map<String,Filter_mxJPO> filters = new TreeMap<String,Filter_mxJPO>();
@@ -136,7 +136,7 @@ public abstract class AbstractUser_mxJPO
      *
      * @see #parse(String, String)
      * @see #prepare(ParameterCache_mxJPO)
-     * @see #writeWorkspaceObjects(ParameterCache_mxJPO, Appendable)
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private final Map<String,Query_mxJPO> queries = new TreeMap<String,Query_mxJPO>();
@@ -154,7 +154,7 @@ public abstract class AbstractUser_mxJPO
      *
      * @see #parse(String, String)
      * @see #prepare(ParameterCache_mxJPO)
-     * @see #writeWorkspaceObjects(ParameterCache_mxJPO, Appendable)
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private final Map<String,Table_mxJPO> tables = new TreeMap<String,Table_mxJPO>();
@@ -172,7 +172,7 @@ public abstract class AbstractUser_mxJPO
      *
      * @see #parse(String, String)
      * @see #prepare(ParameterCache_mxJPO)
-     * @see #writeWorkspaceObjects(ParameterCache_mxJPO, Appendable)
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private final Map<String,Tip_mxJPO> tips = new TreeMap<String,Tip_mxJPO>();
@@ -191,7 +191,7 @@ public abstract class AbstractUser_mxJPO
      *
      * @see #parse(String, String)
      * @see #prepare(ParameterCache_mxJPO)
-     * @see #writeWorkspaceObjects(ParameterCache_mxJPO, Appendable)
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private final Map<String,ToolSet_mxJPO> toolSets = new TreeMap<String,ToolSet_mxJPO>();
@@ -209,7 +209,7 @@ public abstract class AbstractUser_mxJPO
      *
      * @see #parse(String, String)
      * @see #prepare(ParameterCache_mxJPO)
-     * @see #writeWorkspaceObjects(ParameterCache_mxJPO, Appendable)
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private final Map<String,View_mxJPO> views = new TreeMap<String,View_mxJPO>();

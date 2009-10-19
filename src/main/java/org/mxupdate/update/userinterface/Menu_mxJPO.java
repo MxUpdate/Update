@@ -210,7 +210,7 @@ public class Menu_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update from derived class failed
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
@@ -247,7 +247,7 @@ public class Menu_mxJPO
      *
      * @see Menu_mxJPO#children
      */
-    private final class MenuChild
+    private static final class MenuChild
     {
         /**
          * Type of the menu child.

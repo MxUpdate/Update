@@ -162,14 +162,14 @@ public class InstallDataModel_mxJPO
     /**
      * Name of the type definition for JPO programs.
      *
-     * @see #registerPrograms(ParameterCache_mxJPO)
+     * @see #registerPrograms(ParameterCache_mxJPO, String, String, String, String, String)
      */
     private static final String TYPEDEF_JPO = "JPO";
 
     /**
      * Name of the type definition for MQL programs.
      *
-     * @see #registerPrograms(ParameterCache_mxJPO)
+     * @see #registerPrograms(ParameterCache_mxJPO, String, String, String, String, String)
      */
     private static final String TYPEDEF_MQL = "Program";
 
@@ -184,7 +184,7 @@ public class InstallDataModel_mxJPO
      * MQL statement to list of MxUpdate Update programs for which the symbolic
      * names must be registered.
      *
-     * @see #registerPrograms(ParameterCache_mxJPO)
+     * @see #registerPrograms(ParameterCache_mxJPO, String, String, String, String, String)
      */
     private static final String LIST_MXUPDATE_PROGRAMS
             = "escape list program MxUpdate,org.mxupdate* select name isjavaprogram dump @";
