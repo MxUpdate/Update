@@ -172,13 +172,17 @@ eval  {
 
     regsub -all {\.} "${_sJPOName}" {/} sFileName
     set sFileName [file join "${_sRoot}" "${sFileName}_mxJPO.java"]
-    set sFileDate [clock format [file mtime "${sFileName}"]  -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]
     if {[mql list prog "${_sJPOName}"] == ""}  {
       set sJPODate ""
     } else  {
       set sJPODate [mql print prog "${_sJPOName}" select property\[$asMapping(PropertyDef.FileDate.PropertyName)\].value dump]
     }
-    if {"${sJPODate}" != "${sFileDate}"}  {
+    # daylight saving problem... test +/- 1 hour
+    set iLastMod [file mtime "${sFileName}"]
+    set sFileDate   [clock format ${iLastMod}  -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]
+    set sFileDateP1 [clock format [expr ${iLastMod} + 3600] -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]
+    set sFileDateM1 [clock format [expr ${iLastMod} - 3600] -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]
+    if {("${sJPODate}" != "${sFileDate}") && ("${sJPODate}" != "${sFileDateP1}") && ("${sJPODate}" != "${sFileDateM1}")}  {
       puts "update jpo '${_sJPOName}'"
       mql insert prog "${sFileName}"
       mql mod prog ${_sJPOName} \
