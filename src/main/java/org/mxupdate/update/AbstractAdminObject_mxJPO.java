@@ -617,7 +617,8 @@ public abstract class AbstractAdminObject_mxJPO
     /**
      * SAX handler used to parse the XML exports from XML.
      */
-    public class PadSaxHandler extends DefaultHandler
+    public class PadSaxHandler
+        extends DefaultHandler
     {
         /**
          * Holds the current stack (deep) of the tags. If a start element from
@@ -683,13 +684,11 @@ public abstract class AbstractAdminObject_mxJPO
                                final int _start,
                                final int _length)
         {
-            if (_length > 0) {
-                if (!this.evaluated)  {
-                    if (this.content == null)  {
-                        this.content = new StringBuilder();
-                    }
-                    this.content.append(new String(_ch,_start,_length));
+            if ((_length > 0) && (!this.evaluated))  {
+                if (this.content == null)  {
+                    this.content = new StringBuilder();
                 }
+                this.content.append(new String(_ch,_start,_length));
             }
         }
 
@@ -707,7 +706,7 @@ public abstract class AbstractAdminObject_mxJPO
          * @see #evaluated
          * @see #evaluate()
          */
-        @Override
+        @Override()
         public void startElement(final String _uri,
                                  final String _localName,
                                  final String _qName,

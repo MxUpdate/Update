@@ -21,6 +21,8 @@
 package org.mxupdate.update.util;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Property with name, value and referenced administration type. The kind
@@ -31,12 +33,22 @@ import java.io.Serializable;
  * @version $Id$
  */
 public class AdminProperty_mxJPO
-        implements Serializable, Comparable<AdminProperty_mxJPO>
+    implements Serializable, Comparable<AdminProperty_mxJPO>
 {
     /**
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = 7814222356799301361L;
+
+    /**
+     * Set of all ignored URLs from the XML definition for admin properties.
+     *
+     * @see #parse(String, String)
+     */
+    private static final Set<String> IGNORED_URLS = new HashSet<String>(1);
+    static  {
+        AdminProperty_mxJPO.IGNORED_URLS.add("/adminRef");
+    }
 
     /**
      * Name of the property.
@@ -66,32 +78,42 @@ public class AdminProperty_mxJPO
     private String refAdminName = null;
 
     /**
-     * Parses administration property related XML elements and updates this
-     * property instance.
+     * <p>Parses administration property related XML elements and updates this
+     * property instance. This includes:
+     * <ul>
+     * <li>{@link #refAdminName name of referenced administration object}</li>
+     * <li>{@link #refAdminType type of referenced administration object}</li>
+     * <li>{@link #flags}</li>
+     * <li>{@link #name}</li>
+     * <li>{@link #value}</li>
+     * </ul></p>
+     * <p>If an <code>_url</code> is included in {@link #IGNORED_URLS}, this
+     * URL is ignored.</p>
      *
      * @param _url      URL of the XML elements
      * @param _content  content within the <code>_url</code> of XML elements
      * @return <i>true</i> if the <code>_url</code> could be parsed; otherwise
      *         <i>false</i>
+     * @see #IGNORED_URLS
      */
     public boolean parse(final String _url,
                          final String _content)
     {
         boolean parsed = true;
-        if ("/adminRef".equals(_url))  {
-            // to be ignored ...
-        } else if ("/adminRef/adminName".equals(_url))  {
-            this.refAdminName = _content;
-        } else if ("/adminRef/adminType".equals(_url))  {
-            this.refAdminType = _content;
-        } else if ("/flags".equals(_url))  {
-            this.flags = _content;
-        } else if ("/name".equals(_url))  {
-            this.name = _content;
-        } else if ("/value".equals(_url))  {
-            this.value = _content;
-        } else  {
-            parsed = false;
+        if (!AdminProperty_mxJPO.IGNORED_URLS.contains(_url))  {
+            if ("/adminRef/adminName".equals(_url))  {
+                this.refAdminName = _content;
+            } else if ("/adminRef/adminType".equals(_url))  {
+                this.refAdminType = _content;
+            } else if ("/flags".equals(_url))  {
+                this.flags = _content;
+            } else if ("/name".equals(_url))  {
+                this.name = _content;
+            } else if ("/value".equals(_url))  {
+                this.value = _content;
+            } else  {
+                parsed = false;
+            }
         }
         return parsed;
     }
@@ -180,9 +202,9 @@ public class AdminProperty_mxJPO
     {
         return ((this.refAdminType != null) && (this.refAdminName != null))
                ? ((_toCompare.refAdminType != null) && (_toCompare.refAdminName != null))
-                       ? this.refAdminType.equals(_toCompare.refAdminType)
-                               ? this.refAdminName.equals(_toCompare.refAdminName)
-                                       ? this.name.equals(_toCompare.name)
+                       ? (this.refAdminType.compareTo(_toCompare.refAdminType) == 0)
+                               ? (this.refAdminName.compareTo(_toCompare.refAdminName) == 0)
+                                       ? (this.name.compareTo(_toCompare.name) == 0)
                                                ? (this.value != null)
                                                        ? (_toCompare.value != null)
                                                                ? this.value.compareTo(_toCompare.value)
@@ -196,7 +218,7 @@ public class AdminProperty_mxJPO
                        : 1
                : ((_toCompare.refAdminType != null) && (_toCompare.refAdminName != null))
                        ? -1
-                       : this.name.equals(_toCompare.name)
+                       : (this.name.compareTo(_toCompare.name) == 0)
                                ? (this.value != null)
                                        ? (_toCompare.value != null)
                                                ? this.value.compareTo(_toCompare.value)

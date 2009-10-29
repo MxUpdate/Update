@@ -43,7 +43,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 abstract class AbstractAttribute_mxJPO
-        extends AbstractDMWithTriggers_mxJPO
+    extends AbstractDMWithTriggers_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
@@ -206,18 +206,16 @@ abstract class AbstractAttribute_mxJPO
      * @see #SELECT_ATTRS
      * @see #attrTypeList
      */
-    @Override
+    @Override()
     public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+        throws MatrixException
     {
         final Set<String> ret = new TreeSet<String>();
         final int length = this.attrTypeList.length();
         for (final String name : MqlUtil_mxJPO.execMql(_paramCache,
                                                        AbstractAttribute_mxJPO.SELECT_ATTRS).split("\n"))  {
-            if (!"".equals(name))  {
-                if (name.startsWith(this.attrTypeList))  {
-                    ret.add(name.substring(length));
-                }
+            if (!"".equals(name) && name.startsWith(this.attrTypeList))  {
+                ret.add(name.substring(length));
             }
         }
         return ret;
@@ -239,7 +237,7 @@ abstract class AbstractAttribute_mxJPO
      * @param _content  content of the URL to parse
      * @see #IGNORED_URLS
      */
-    @Override
+    @Override()
     protected void parse(final String _url,
                          final String _content)
     {
@@ -285,9 +283,9 @@ abstract class AbstractAttribute_mxJPO
      * @param _paramCache   parameter cache
      * @throws MatrixException if the prepare from the derived class failed
      */
-    @Override
+    @Override()
     protected void prepare(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+        throws MatrixException
     {
         for (final Range range : this.ranges)  {
             this.rangesSorted.add(range);
@@ -304,10 +302,10 @@ abstract class AbstractAttribute_mxJPO
      * @throws IOException if the TCL update code could not be written to the
      *                     writer instance
      */
-    @Override
+    @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
-            throws IOException
+        throws IOException
     {
         _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden");
         if ("string".equalsIgnoreCase(this.type))  {
@@ -338,10 +336,10 @@ abstract class AbstractAttribute_mxJPO
      * @throws IOException if the TCL update code could not be written to the
      *                     writer instance
      */
-    @Override
+    @Override()
     protected void writeEnd(final ParameterCache_mxJPO _paramCache,
                             final Appendable _out)
-            throws IOException
+        throws IOException
     {
         super.writeEnd(_paramCache, _out);
         if (this.dimension != null)  {
@@ -361,9 +359,9 @@ abstract class AbstractAttribute_mxJPO
      *                   created
      * @see #attrTypeCreate
      */
-    @Override
+    @Override()
     public void create(final ParameterCache_mxJPO _paramCache)
-            throws Exception
+        throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("escape add ").append(this.getTypeDef().getMxAdminName())
@@ -405,14 +403,14 @@ abstract class AbstractAttribute_mxJPO
      * @see #dimensionUpdated
      * @see #TCL_PROCEDURE
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         // remove all properties
         final StringBuilder preMQLCode = new StringBuilder()
@@ -459,10 +457,10 @@ abstract class AbstractAttribute_mxJPO
      * @see #updateDimension(ParameterCache_mxJPO, String)
      * @see #dimensionUpdated
      */
-    @Override
+    @Override()
     public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
                                final String... _args)
-            throws Exception
+        throws Exception
     {
         // check if dimension is defined
         if ("defineAttrDimension".equals(_args[0]))  {
@@ -494,7 +492,7 @@ abstract class AbstractAttribute_mxJPO
      */
     protected void updateDimension(final ParameterCache_mxJPO _paramCache,
                                    final String _dimension)
-            throws Exception
+        throws Exception
     {
         if ((this.dimension == null) || "".equals(this.dimension))  {
             if (!"".equals(_dimension))  {
@@ -517,7 +515,7 @@ abstract class AbstractAttribute_mxJPO
      * Class holding range values of this attribute.
      */
     private class Range
-            implements Comparable<AbstractAttribute_mxJPO.Range>
+        implements Comparable<AbstractAttribute_mxJPO.Range>
     {
         /**
          * Holds the range type. Typically following range types are known:
