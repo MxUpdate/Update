@@ -297,10 +297,23 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
         Assert.assertEquals(exportDesc.get("name"),
                             this.name,
                             "returned name is equal to given name");
-        // check path of the configuration item update file
-        Assert.assertEquals(exportDesc.get("path"),
-                            this.getCI().filePath,
-                            "check path where the configuration item update file is located is correct");
+        if (this.ci != AbstractTest.CI.PRG_JPO)  {
+            // check path of the configuration item update file
+            Assert.assertEquals(exportDesc.get("path"),
+                                this.getCI().filePath,
+                                "check path where the configuration item update file is located is correct");
+        } else  {
+            // check path for JPOs (because of packages...)
+            final String path;
+            if (this.name.indexOf('.') < 0)  {
+                path = this.ci.filePath;
+            } else  {
+                path = this.ci.filePath + "/" + this.name.replaceAll("\\.[^.]*$", "").replaceAll("\\.", "/");
+            }
+            Assert.assertEquals(exportDesc.get("path"),
+                                path,
+                                "check path where the configuration item update file is located is correct");
+        }
         // check file name of the configuration item update file
         Assert.assertEquals(exportDesc.get("filename"),
                             this.getCIFileName(),

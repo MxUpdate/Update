@@ -517,7 +517,8 @@ public abstract class AbstractPropertyObject_mxJPO
      *                          name and the value is value of the TCL variable
      *                          (the value is automatically converted to TCL
      *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update
+     * @param _sourceFile       souce file with the TCL code to update; if
+     *                          <code>null</code> file is not called (sourced)
      * @throws Exception if update failed
      */
     protected void update(final ParameterCache_mxJPO _paramCache,
@@ -541,9 +542,11 @@ public abstract class AbstractPropertyObject_mxJPO
         }
         // append TCL code, end of TCL mode and post MQL statements
         // (source with the file must be replace for windows ...)
-        cmd.append(_preTCLCode)
-           .append("\nsource \"").append(_sourceFile.toString().replaceAll("\\\\", "/")).append("\"")
-           .append("\n}\nexit;\n")
+        cmd.append(_preTCLCode);
+        if (_sourceFile != null)  {
+            cmd.append("\nsource \"").append(_sourceFile.toString().replaceAll("\\\\", "/")).append("\"");
+        }
+        cmd.append("\n}\nexit;\n")
            .append(_postMQLCode)
            .append("output '';output '").append(AbstractPropertyObject_mxJPO.TEST_EXECUTED).append("';");
 

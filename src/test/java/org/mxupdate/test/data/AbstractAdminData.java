@@ -180,7 +180,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     }
 
     /**
-     * Appends the defined {@link ##getValues() values} to the TCL code
+     * Appends the defined {@link #getValues() values} to the TCL code
      * <code>_cmd</code> of the configuration item file.
      *
      * @param _cmd  string builder with the TCL commands of the configuration

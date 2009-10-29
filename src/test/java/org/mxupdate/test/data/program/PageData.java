@@ -23,6 +23,7 @@ package org.mxupdate.test.data.program;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.AbstractAdminData;
 
 /**
  * The class is used to define all page program objects used to create / update
@@ -32,8 +33,16 @@ import org.mxupdate.test.AbstractTest;
  * @version $Id$
  */
 public class PageData
-    extends AbstractProgramData<PageData>
+    extends AbstractAdminData<PageData>
 {
+    /**
+     * Related code of this program.
+     *
+     * @see #setCode(String)
+     * @see #getCode()
+     */
+    private String code = "";
+
     /**
      * Initializes this MQL program.
      *
@@ -43,7 +52,43 @@ public class PageData
     public PageData(final AbstractTest _test,
                           final String _name)
     {
-        super(_test, AbstractTest.CI.PRG_PAGE, _name);
+        super(_test, AbstractTest.CI.PRG_PAGE, _name, null);
+    }
+
+    /**
+     * Defines the {@link #code} for this page.
+     *
+     * @param _code     new code of this page
+     * @return this page instance
+     * @see #code
+     */
+    public PageData setCode(final String _code)
+    {
+        this.code = _code;
+        return this;
+    }
+
+    /**
+     * Returns the {@link #code} of this page.
+     *
+     * @return related {@link #code} of this page
+     * @see #code
+     */
+    public String getCode()
+    {
+        return this.code;
+    }
+
+    /**
+     * The related configuration item file is the {@link #code} of the program.
+     *
+     *  @return {@link #code} of the program
+     *  @see #code
+     */
+    @Override()
+    public String ciFile()
+    {
+        return this.code;
     }
 
     /**
@@ -52,14 +97,14 @@ public class PageData
      * @return this MQL program instance
      * @throws MatrixException if create of the MQL program failed
      */
-    @Override
+    @Override()
     public PageData create()
         throws MatrixException
     {
         if (!this.isCreated())  {
             this.setCreated(true);
             this.getTest().mql("escape add page \"" + AbstractTest.convertMql(this.getName()) + "\" "
-                    + "content \"" + AbstractTest.convertMql(this.getCode()) + "\"");
+                    + "content \"" + AbstractTest.convertMql(this.code) + "\"");
         }
         return this;
     }
@@ -71,7 +116,7 @@ public class PageData
      *
      * @return file name of a JPO
      */
-    @Override
+    @Override()
     public String getCIFileName()
     {
         final String ciFileName = super.getCIFileName();

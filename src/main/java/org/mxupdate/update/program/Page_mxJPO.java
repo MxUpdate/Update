@@ -23,6 +23,7 @@ package org.mxupdate.update.program;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -40,7 +41,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public class Page_mxJPO
-        extends AbstractProgram_mxJPO
+    extends AbstractCode_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
@@ -48,7 +49,8 @@ public class Page_mxJPO
     private static final long serialVersionUID = -2142094727046919689L;
 
     /**
-     * Constructor used to initialize the type definition enumeration.
+     * Constructor used to initialize the type definition enumeration and the
+     * name.
      *
      * @param _typeDef      defines the related type definition enumeration
      * @param _mxName       MX name of the page object
@@ -82,6 +84,34 @@ public class Page_mxJPO
     }
 
     /**
+     * Pages could not handle symbolic names. Therefore the original method
+     * must be overwritten so that nothing happens.
+     *
+     * @param _paramCache   parameter cache
+     */
+    @Override()
+    protected void readSymbolicNames(final ParameterCache_mxJPO _paramCache)
+    {
+    }
+
+    /**
+     * At the end of the update of the page the append statements to define
+     * symbolic names are not allowed because pages could not handle symbolic
+     * names.
+     *
+     * @param _paramCache   parameter cache - ignored
+     * @param _symbName     symbolic name which must be set - ignored
+     * @param _mqlCode      string builder where the MQL command must be
+     *                      appended - ignored
+     */
+    @Override()
+    protected void appendSymbolicNameRegistration(final ParameterCache_mxJPO _paramCache,
+                                                  final String _symbName,
+                                                  final StringBuilder _mqlCode)
+    {
+    }
+
+    /**
      * Writes the code from the page to given writer instance.
      *
      * @param _paramCache   parameter cache
@@ -90,62 +120,55 @@ public class Page_mxJPO
      * @throws IOException      if the source code could not be written to the
      *                          writer instance
      */
-    @Override
+    @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
             throws IOException, MatrixException
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("escape print page \"")
-                .append(StringUtil_mxJPO.convertMql(this.getName()))
-                .append("\" select content dump");
-        _out.append(MqlUtil_mxJPO.execMql(_paramCache, cmd));
+        _out.append(this.getCode());
     }
 
     /**
-     * Creates given program object from given type with given name.
-     *
-     * @param _paramCache   parameter cache
-     * @throws Exception if the program could not be created
-     */
-    @Override()
-    public void create(final ParameterCache_mxJPO _paramCache)
-            throws Exception
-    {
-        final StringBuilder cmd = new StringBuilder()
-                .append("escape add ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"');
-        MqlUtil_mxJPO.execMql(_paramCache, cmd);
-    }
-
-    /**
-     * The page is updated if the modified date of the file is not the same
-     * as the the version property.
+     * The method overwrites the original method to append the MQL statements
+     * in the <code>_preMQLCode</code> to update this page program. Following
+     * steps are done within update:
+     * <ul>
+     * <li>The program is updated with the content of <code>_sourceFile</code>.
+     *     </li>
+     * <li>If the file name includes a '@' the file content is copied to a new
+     *     file and updated the new file (because of a bug in MX that a MQL
+     *     program could not be updated with @ in file names).</li>
+     * </ul>
      *
      * @param _paramCache       parameter cache
-     * @param _file             reference to the file to update
-     * @param _newVersion       new version which must be set within the update
-     *                          (or <code>null</code> if the version must not
-     *                          be set).
-     * @throws Exception if update of the page object failed
+     * @param _preMQLCode       MQL statements which must be called before the
+     *                          TCL code is executed
+     * @param _postMQLCode      MQL statements which must be called after the
+     *                          TCL code is executed
+     * @param _preTCLCode       TCL code which is defined before the source
+     *                          file is sourced
+     * @param _tclVariables     map of all TCL variables where the key is the
+     *                          name and the value is value of the TCL variable
+     *                          (the value is automatically converted to TCL
+     *                          syntax!)
+     * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update from derived class failed
      */
     @Override()
-    public void update(final ParameterCache_mxJPO _paramCache,
-                       final File _file,
-                       final String _newVersion)
-            throws Exception
+    protected void update(final ParameterCache_mxJPO _paramCache,
+                          final CharSequence _preMQLCode,
+                          final CharSequence _postMQLCode,
+                          final CharSequence _preTCLCode,
+                          final Map<String,String> _tclVariables,
+                          final File _sourceFile)
+        throws Exception
     {
-        this.parse(_paramCache);
-
-        final StringBuilder cmd = new StringBuilder();
-
-        // append MQL statements to reset properties
-        this.appendResetProperties(_paramCache, cmd);
+        final StringBuilder preMQLCode = new StringBuilder();
 
         // pages could not be updated if there are add's in the file name
         // (because special characters are used for the page name)
-        if (_file.getPath().indexOf('@') >= 0)  {
-            final StringBuilder prgCode = this.getCode(_file);
+        if (_sourceFile.getPath().indexOf('@') >= 0)  {
+            final StringBuilder prgCode = this.getCode(_sourceFile);
             final File tempFile = File.createTempFile("MxUpdatePage", ".page");
             try  {
                 final FileWriter writer = new FileWriter(tempFile);
@@ -155,31 +178,33 @@ public class Page_mxJPO
                     writer.close();
                 }
                 // update code
-                cmd.append("escape mod page \"").append(StringUtil_mxJPO.convertMql(this.getName()))
-                   .append("\" file \"")
-                   .append(StringUtil_mxJPO.convertMql(tempFile.getPath()))
-                   .append("\";\n");
+                preMQLCode.append("escape mod page \"").append(StringUtil_mxJPO.convertMql(this.getName()))
+                          .append("\" file \"")
+                          .append(StringUtil_mxJPO.convertMql(tempFile.getPath()))
+                          .append("\";\n");
 
-                // append standard properties
-                this.appendProperties(_paramCache, cmd, _newVersion, _file);
+                // append already existing pre MQL code
+                preMQLCode.append(";\n")
+                          .append(_preMQLCode);
 
-                // and execute alls
-                MqlUtil_mxJPO.execMql(_paramCache, cmd);
+                // and update
+                super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, null);
             } finally  {
                 tempFile.delete();
             }
         } else  {
             // update code
-            cmd.append("escape mod page \"").append(StringUtil_mxJPO.convertMql(this.getName()))
-               .append("\" file \"")
-               .append(StringUtil_mxJPO.convertMql(_file.getPath()))
-               .append("\";\n");
+            preMQLCode.append("escape mod page \"").append(StringUtil_mxJPO.convertMql(this.getName()))
+                      .append("\" file \"")
+                      .append(StringUtil_mxJPO.convertMql(_sourceFile.getPath()))
+                      .append("\";\n");
 
-            // append standard properties
-            this.appendProperties(_paramCache, cmd, _newVersion, _file);
+            // append already existing pre MQL code
+            preMQLCode.append(";\n")
+                      .append(_preMQLCode);
 
-            // and execute alls
-            MqlUtil_mxJPO.execMql(_paramCache, cmd);
+            // and update
+            super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, null);
         }
     }
 }

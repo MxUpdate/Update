@@ -35,6 +35,22 @@ public class MQLProgramData
     extends AbstractProgramData<MQLProgramData>
 {
     /**
+     * Start marker for the update code.
+     */
+    private static final String MARK_START
+            = "################################################################################\n"
+            + "# START NEEDED MQL UPDATE FOR THIS PROGRAM                                     #\n"
+            + "################################################################################";
+
+    /**
+     * End marker for the update code.
+     */
+    private static final String MARK_END
+            = "################################################################################\n"
+            + "# END NEEDED MQL UPDATE FOR THIS PROGRAM                                       #\n"
+            + "################################################################################";
+
+    /**
      * Initializes this MQL program.
      *
      * @param _test     related test instance
@@ -52,14 +68,23 @@ public class MQLProgramData
      * @return this MQL program instance
      * @throws MatrixException if create of the MQL program failed
      */
-    @Override
+    @Override()
     public MQLProgramData create()
         throws MatrixException
     {
         if (!this.isCreated())  {
+            final StringBuilder cmd = new StringBuilder()
+                    .append("escape add program \"").append(AbstractTest.convertMql(this.getName()))
+                    .append("\" mql ")
+                    .append("code \"").append(AbstractTest.convertMql(this.getCode())).append("\"");
+            this.append4Create(cmd);
+            cmd.append(";\n")
+               .append("escape add property ").append(this.getSymbolicName())
+               .append(" on program eServiceSchemaVariableMapping.tcl")
+               .append(" to program \"").append(AbstractTest.convertMql(this.getName())).append("\"");
+
+            this.getTest().mql(cmd);
             this.setCreated(true);
-            this.getTest().mql("escape add program \"" + AbstractTest.convertMql(this.getName()) + "\" mql "
-                    + "code \"" + AbstractTest.convertMql(this.getCode()) + "\"");
         }
         return this;
     }
@@ -71,10 +96,39 @@ public class MQLProgramData
      *
      * @return file name of a JPO
      */
-    @Override
+    @Override()
     public String getCIFileName()
     {
         final String ciFileName = super.getCIFileName();
         return ciFileName.replaceAll("\\.tcl$", "");
+    }
+
+    /**
+     * The related configuration item file is the {@link #code} of the program.
+     *
+     *  @return {@link #code} of the program
+     *  @see #code
+     */
+    @Override()
+    public String ciFile()
+    {
+        final StringBuilder cmd = new StringBuilder()
+           .append(MQLProgramData.MARK_START)
+           .append("\nmql escape mod program ${NAME} ");
+        this.append4CIFileValues(cmd);
+        cmd.append("\n")
+           .append(MQLProgramData.MARK_END)
+           .append("\n");
+
+        final StringBuilder ciFile = new StringBuilder();
+        for (final String line : cmd.toString().split("\n"))  {
+            if (this.getName().endsWith(".tcl"))  {
+                ciFile.append('#');
+            }
+            ciFile.append(line).append('\n');
+        }
+        ciFile.append('\n').append(this.getCode());
+
+        return ciFile.toString();
     }
 }

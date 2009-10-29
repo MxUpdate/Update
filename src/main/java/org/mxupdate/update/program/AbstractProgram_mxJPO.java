@@ -20,25 +20,20 @@
 
 package org.mxupdate.update.program;
 
-import java.io.File;
-import java.util.Date;
+import java.io.IOException;
 
-import matrix.util.MatrixException;
-
-import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.AbstractObject_mxJPO;
-import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
+ * Common definition for the code of a program.
  *
  * @author The MxUpdate Team
  * @version $Id$
  */
 public abstract class AbstractProgram_mxJPO
-        extends AbstractObject_mxJPO
+        extends AbstractCode_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
@@ -46,6 +41,56 @@ public abstract class AbstractProgram_mxJPO
     private static final long serialVersionUID = -6353366924945315894L;
 
     /**
+     * User in which context the MQL program is executed.
+     *
+     * @see #parse(String, String)
+     * @see #writeUpdateCode(ParameterCache_mxJPO, Appendable, String, String, String)
+     */
+    private String user;
+
+    /**
+     * Execution of the program is deferred.
+     *
+     * @see #parse(String, String)
+     * @see #writeUpdateCode(ParameterCache_mxJPO, Appendable, String, String, String)
+     */
+    private boolean deferred = false;
+
+    /**
+     * The program needs context of a business object.
+     *
+     * @see #parse(String, String)
+     * @see #writeUpdateCode(ParameterCache_mxJPO, Appendable, String, String, String)
+     */
+    private boolean needsBusinessObjectContext;
+
+    /**
+     * Program is downloadable.
+     *
+     * @see #parse(String, String)
+     * @see #writeUpdateCode(ParameterCache_mxJPO, Appendable, String, String, String)
+     */
+    private boolean downloadable = false;
+
+    /**
+     * Program uses pipes.
+     *
+     * @see #parse(String, String)
+     * @see #writeUpdateCode(ParameterCache_mxJPO, Appendable, String, String, String)
+     */
+    private boolean pipe = false;
+
+    /**
+     * Program is pooled (used for TCL).
+     *
+     * @see #parse(String, String)
+     * @see #writeUpdateCode(ParameterCache_mxJPO, Appendable, String, String, String)
+     */
+    private boolean pooled = false;
+
+    /**
+     * Constructor used to initialize the type definition enumeration and the
+     * name.
      *
      * @param _typeDef  type definition of the program
      * @param _mxName   MX name of the program object
@@ -57,220 +102,189 @@ public abstract class AbstractProgram_mxJPO
     }
 
     /**
-     * All basic properties are read and initialized. Basic attributes are:
+     * <p>Parses all program specific URL values. This includes:
      * <ul>
-     * <li>name</li>
-     * <li>author</li>
-     * <li>application</li>
-     * <li>installation date</li>
-     * <li>installer</li>
-     * <li>original name</li>
-     * <li>version</li>
+     * <li>{@link #deferred} execution</li>
+     * <li>execute {@link #user}</li>
+     * <li>{@link #needsBusinessObjectContext needs context} of a business
+     *      object</li>
+     * <li>program is {@link #downloadable}</li>
+     * <li>input / output of the program is {@link #pipe piped}</li>
+     * <li>program is {@link #pooled}</li>
+     * </ul></p>
+     *
+     * @param _url      URL to parse
+     * @param _content  content depending on the URL
+     */
+    @Override()
+    protected void parse(final String _url,
+                         final String _content)
+    {
+        if ("/deferred".equals(_url))  {
+            this.deferred = true;
+        } else if ("/downloadable".equals(_url) || "/usesInterface".equals(_url))  {
+            this.downloadable = true;
+        } else if ("/mqlPipe".equals(_url))  {
+            this.pipe = true;
+        } else if ("/needsContext".equals(_url))  {
+            this.needsBusinessObjectContext = true;
+        } else if ("/pooled".equals(_url))  {
+            this.pooled = true;
+        } else if ("/userRef".equals(_url))  {
+            this.user = _content;
+        } else  {
+            super.parse(_url, _content);
+        }
+    }
+
+    /**
+     * Appends the TCL update code to <code>_out</code> for this MQL program.
+     * This includes:
+     * <ul>
+     * <li>{@link #deferred} execution</li>
+     * <li>execute {@link #user}</li>
+     * <li>{@link #getDescription() description}</li>
+     * <li>{@link #isHidden() hidden flag}</li>
+     * <li>{@link #needsBusinessObjectContext needs context} of a business
+     *      object</li>
+     * <li>program is {@link #downloadable}</li>
+     * <li>input / output of the program is {@link #pipe piped}</li>
+     * <li>program is {@link #pooled}</li>
      * </ul>
      *
      * @param _paramCache   parameter cache
-     * @throws MatrixException if the &quot;basic&quot; properties could not be
-     *                         read from the program object
+     * @param _out          update file (where the MQL program with the TCL
+     *                      update file is written)
+     * @param _markStart    start marker of the TCL update
+     * @param _markEnd      end marker of the TCL update
+     * @param _linePrefix   line prefix (before each TCL update line)
+     * @throws IOException if the TCL code could not be written to the file
      */
-    @Override
-    protected void parse(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+    protected void writeUpdateCode(final ParameterCache_mxJPO _paramCache,
+                                   final Appendable _out,
+                                   final String _markStart,
+                                   final String _markEnd,
+                                   final String _linePrefix)
+        throws IOException
     {
-        // set author depending on the properties
-        this.setAuthor(this.getPropValue(_paramCache, PropertyDef_mxJPO.AUTHOR));
-        // set application depending on the properties
-        this.setApplication(this.getPropValue(_paramCache, PropertyDef_mxJPO.APPLICATION));
-        // sets the installation date depending on the properties
-        this.setInstallationDate(this.getPropValue(_paramCache, PropertyDef_mxJPO.INSTALLEDDATE));
-        // sets the installer depending on the properties
-        this.setInstaller(this.getPropValue(_paramCache, PropertyDef_mxJPO.INSTALLER));
-        // sets the original name depending on the properties
-        this.setOriginalName(this.getPropValue(_paramCache, PropertyDef_mxJPO.ORIGINALNAME));
-        // sets the version depending on the properties
-        this.setVersion(this.getPropValue(_paramCache, PropertyDef_mxJPO.VERSION));
-    }
-
-    /**
-     * Deletes administration object from given type with given name.
-     *
-     * @param _paramCache   parameter cache
-     * @throws Exception if delete failed
-     */
-    @Override
-    public void delete(final ParameterCache_mxJPO _paramCache)
-            throws Exception
-    {
-        final StringBuilder cmd = new StringBuilder()
-                .append("delete ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append("\" ")
-                .append(this.getTypeDef().getMxAdminSuffix());
-        MqlUtil_mxJPO.execMql(_paramCache, cmd);
-    }
-
-    /**
-     * Current program is updated. The update has following steps:
-     * <ul>
-     * <li>all not &quot;standard&quot; properties are removed</li>
-     * <li>program / JPO is updated</li>
-     * <li>&quot;standard&quot; properties are set (version, file date,
-     *     installer, original name, application and author)</li>
-     * <li>registration of the symbolic name</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @param _updateCode   update code (which is executed in front of)
-     * @param _newVersion   new version of the program / JPO to set
-     * @param _file         file to update (to get the file date)
-     * @throws MatrixException if update of the program / JPO failed
-     */
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final CharSequence _updateCode,
-                          final String _newVersion,
-                          final File _file)
-            throws MatrixException
-    {
-        // append statement to reset execute user
-        final StringBuilder cmd = new StringBuilder()
-                .append("mod ").append(this.getTypeDef().getMxAdminName()).append(" \"").append(this.getName())
-                .append("\" execute user \"\";\n");
-
-        this.appendResetProperties(_paramCache, cmd);
-
-        // append update code
-        cmd.append(_updateCode);
-
-        // append standard properties
-        this.appendProperties(_paramCache, cmd, _newVersion, _file);
-
-        // read symbolic names
-        this.readSymbolicNames(_paramCache);
-
-        // append registration of symbolic names
-        this.appendSymbolicNameRegistration(_paramCache,
-                                            this.calcDefaultSymbolicName(_paramCache),
-                                            cmd);
-
-        // and execute alls
-        MqlUtil_mxJPO.execMql(_paramCache, cmd);
-    }
-
-    /**
-     * Appends the MQL code to reset the not standard properties.
-     *
-     * @param _paramCache   parameter cache
-     * @param _cmd          string builder with the update code
-     * @throws MatrixException if property information from this object could
-     *                         not be fetched
-     */
-    protected void appendResetProperties(final ParameterCache_mxJPO _paramCache,
-                                         final StringBuilder _cmd)
-        throws MatrixException
-    {
-        // append MQL statements to reset properties
-        final String prpStr = MqlUtil_mxJPO.execMql(_paramCache,
-                                      new StringBuilder().append("escape print ")
-                                              .append(this.getTypeDef().getMxAdminName()).append(" \"")
-                                              .append(StringUtil_mxJPO.convertMql(this.getName()))
-                                              .append("\" select property.name property.to dump ' @@@@@@'"));
-        final String[] prpArr = prpStr.toString().split("(@@@@@@)");
-        final int length = (prpArr.length + 1) / 2;
-        for (int idxName = 0, idxTo = length; idxName < length; idxName++, idxTo++)  {
-            final String name = prpArr[idxName].trim();
-            final PropertyDef_mxJPO propDef = PropertyDef_mxJPO.getEnumByPropName(_paramCache, name);
-            if (propDef == null)  {
-// TODO: if to is defined, the remove must be specified the to ....
-                final String to = (idxTo < length) ? prpArr[idxTo].trim() : "";
-                _cmd.append("escape mod ").append(this.getTypeDef().getMxAdminName()).append(" \"")
-                    .append(StringUtil_mxJPO.convertMql(this.getName()))
-                    .append("\" remove property \"").append(name).append("\";\n");
+        final StringBuilder cmd = new StringBuilder();
+        if (this.deferred || this.needsBusinessObjectContext
+                || this.downloadable || this.pipe || this.pooled
+                || (this.user != null)
+                || ((this.getDescription() != null) && !"".equals(this.getDescription()))
+                || this.isHidden())  {
+            cmd.append("\nmql mod program \"${NAME}\"");
+            if (this.deferred)  {
+                cmd.append(" \\\n    execute deferred");
+            }
+            if (this.user != null)  {
+                cmd.append(" \\\n    execute user \"").append(StringUtil_mxJPO.convertTcl(this.user)).append('\"');
+            }
+            if ((this.getDescription() != null) && !"".equals(this.getDescription()))  {
+                cmd.append(" \\\n    description \"").append(StringUtil_mxJPO.convertTcl(this.getDescription())).append('\"');
+            }
+            if (this.isHidden())  {
+                cmd.append(" \\\n    hidden");
+            }
+            if (this.needsBusinessObjectContext)  {
+                cmd.append(" \\\n    needsbusinessobject");
+            }
+            if (this.downloadable)  {
+                cmd.append(" \\\n    downloadable");
+            }
+            if (this.pipe)  {
+                cmd.append(" \\\n    pipe");
+            }
+            if (this.pooled)  {
+                cmd.append(" \\\n    pooled");
             }
         }
+
+        this.writeProperties(_paramCache, cmd);
+
+        if (!"".equals(cmd.toString()))  {
+            _out.append(_markStart.trim()).append('\n')
+                .append(this.makeLinePrefix(_linePrefix, cmd));
+            if (_linePrefix != null)  {
+                _out.append(_linePrefix);
+            }
+            _out.append('\n').append(_markEnd.trim()).append("\n\n");
+        }
     }
 
     /**
-     * Appends the MQL code to set the &quot;standard&quot; properties to the
-     * <code>_cmd</code> string builder.
+     * For each line in the <code>_lines</code> text (separated by new line)
+     * the <code>_linePrefix</code> is added.
+     *
+     * @param _linePrefix   prefix for the lines; or <code>null</code> if no
+     *                      line prefix is defined
+     * @param _lines        complete lines as text with new lines
+     * @return new lines with prefixes
+     */
+    protected String makeLinePrefix(final String _linePrefix,
+                                    final CharSequence _lines)
+    {
+        final StringBuilder ret = new StringBuilder();
+
+        if ((_linePrefix != null) && !"".equals(_linePrefix))  {
+            for (final String line : _lines.toString().split("\n"))  {
+                ret.append(_linePrefix).append(line).append('\n');
+            }
+        } else  {
+            ret.append(_lines);
+        }
+
+        return ret.toString();
+    }
+
+    /**
+     * Extracts from <code>_prgCode</code> the TCL update code which is between
+     * <code>_markStart</code> and <code>_markEnd</code> defined. Each line of
+     * the code starts with <code>_linePrefix</code>. Only if
+     * <code>_execute</code> is set, the found TCL code is returned.
      *
      * @param _paramCache   parameter cache
-     * @param _cmd          string builder with the update code
-     * @param _newVersion   new version of the program / JPO to set
-     * @param _file         file to update (to get the file date)
+     * @param _execute      <i>true</i> if TCL update code will be executed
+     * @param _prgCode      program code
+     * @param _markStart    start marker
+     * @param _markEnd      end marker
+     * @param _linePrefix   line prefix
+     * @return extracted TCL update code from <code>_prgCode</code>
      */
-    protected void appendProperties(final ParameterCache_mxJPO _paramCache,
-                                    final StringBuilder _cmd,
-                                    final String _newVersion,
-                                    final File _file)
+    protected String extractTclUpdateCode(final ParameterCache_mxJPO _paramCache,
+                                          final boolean _execute,
+                                          final StringBuilder _prgCode,
+                                          final String _markStart,
+                                          final String _markEnd,
+                                          final String _linePrefix)
     {
-        // append update code
-        _cmd.append("escape mod ").append(this.getTypeDef().getMxAdminName())
-            .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"');
+        String ret = "";
 
-        // define version property
-        _cmd.append(" add property \"").append(PropertyDef_mxJPO.VERSION.getPropName(_paramCache)).append("\" ")
-            .append("value \"").append(_newVersion != null ? _newVersion : "").append('\"');
-        // define file date property
-        _cmd.append(" add property \"").append(PropertyDef_mxJPO.FILEDATE.getPropName(_paramCache)).append("\" ")
-            .append("value \"")
-            .append(StringUtil_mxJPO.formatFileDate(_paramCache, new Date(_file.lastModified()))).append('\"');
-        // is installed date property defined?
-        if ((this.getInstallationDate() == null) || "".equals(this.getInstallationDate()))  {
-            final String date = StringUtil_mxJPO.formatInstalledDate(_paramCache, new Date());
-            _paramCache.logTrace("    - define installed date '" + date + "'");
-            _cmd.append(" add property \"")
-               .append(PropertyDef_mxJPO.INSTALLEDDATE.getPropName(_paramCache)).append("\" ")
-               .append("value \"").append(date).append('\"');
+        final int start = _prgCode.indexOf(_markStart);
+        final int end = _prgCode.indexOf(_markEnd);
+        if ((start >= 0) && (end > 0))  {
+            final String tclCode = _prgCode.substring(start + _markStart.length(), end).trim();
+            if (!"".equals(tclCode))  {
+                // TCL code must be executed only if allowed
+                // and line prefix is defined
+                if (_execute)  {
+                    _paramCache.logTrace("    - TCL update code is executed");
+                    // remove line prefixes from TCL code (if defined)
+                    final int linePrefixLength = (_linePrefix != null) ? _linePrefix.length() : -1;
+                    if (linePrefixLength > 0)  {
+                        final StringBuilder tclUpdateCode = new StringBuilder();
+                        for (final String line : tclCode.split("\n"))  {
+                            tclUpdateCode.append(line.substring(linePrefixLength)).append('\n');
+                        }
+                        ret = tclUpdateCode.toString();
+                    } else  {
+                        ret = tclCode;
+                    }
+                } else  {
+                    _paramCache.logError("    - Warning! Existing TCL update code is not executed!");
+                }
+            }
         }
-        // exists no installer property or installer property not equal?
-        final String installer;
-        if (_paramCache.contains(ParameterCache_mxJPO.KEY_INSTALLER))  {
-            installer = _paramCache.getValueString(ParameterCache_mxJPO.KEY_INSTALLER);
-        } else if ((this.getInstaller() == null) || "".equals(this.getInstaller()))  {
-            installer = _paramCache.getValueString(ParameterCache_mxJPO.KEY_DEFAULTINSTALLER);
-        } else  {
-            installer = null;
-        }
-        if (installer != null)  {
-            _paramCache.logTrace("    - define installer '" + installer + "'");
-            _cmd.append(" add property \"").append(PropertyDef_mxJPO.INSTALLER.getPropName(_paramCache)).append("\" ")
-               .append("value \"").append(installer).append('\"');
-        }
-        // is original name property defined?
-        if ((this.getOriginalName() == null) && "".equals(this.getOriginalName()))  {
-            _paramCache.logTrace("    - define original name '" + this.getName() + "'");
-            _cmd.append(" add property \"")
-                .append(PropertyDef_mxJPO.ORIGINALNAME.getPropName(_paramCache)).append("\" ")
-                .append("value \"").append(this.getName()).append('\"');
-        }
-        // exists no application property or application property not equal?
-        String appl = null;
-        if (_paramCache.contains(ParameterCache_mxJPO.KEY_APPLICATION))  {
-            appl = _paramCache.getValueString(ParameterCache_mxJPO.KEY_APPLICATION);
-        }
-        if ((appl == null) || "".equals(appl))  {
-            appl = _paramCache.getValueString(ParameterCache_mxJPO.KEY_DEFAULTAPPLICATION);
-        }
-        if (appl == null)  {
-            appl = "";
-        }
-        if (!appl.equals(this.getApplication()))  {
-            _paramCache.logTrace("    - define application '" + appl + "'");
-            _cmd.append(" add property \"").append(PropertyDef_mxJPO.APPLICATION.getPropName(_paramCache)).append("\" ")
-               .append("value \"").append(appl).append('\"');
-        }
-        // exists no author property or author property not equal?
-        final String author;
-        if (_paramCache.contains(ParameterCache_mxJPO.KEY_AUTHOR))  {
-            author = _paramCache.getValueString(ParameterCache_mxJPO.KEY_AUTHOR);
-        } else if ((this.getAuthor() == null) || "".equals(this.getAuthor()))  {
-            author = _paramCache.getValueString(ParameterCache_mxJPO.KEY_DEFAULTAUTHOR);
-        } else  {
-            author = null;
-        }
-        if (author != null)  {
-            _paramCache.logTrace("    - define author '" + author + "'");
-            _cmd.append(" add property \"").append(PropertyDef_mxJPO.AUTHOR.getPropName(_paramCache)).append("\" ")
-               .append("value \"").append(author).append('\"');
-        }
-        _cmd.append(";\n");
+        return ret;
     }
 }

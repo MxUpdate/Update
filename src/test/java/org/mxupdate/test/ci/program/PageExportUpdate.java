@@ -21,7 +21,6 @@
 package org.mxupdate.test.ci.program;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.DataCollection;
 import org.mxupdate.test.data.program.PageData;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -59,95 +58,98 @@ public class PageExportUpdate
     @DataProvider(name = "pages")
     public Object[][] getPagePrograms()
     {
-        // without extension with code
-        final DataCollection data1 = new DataCollection(this);
-        data1.getPage("Test1")
-             .setCode("test");
-
-        // without extension without code
-        final DataCollection data2 = new DataCollection(this);
-        data2.getPage("Test2")
-             .setCode("");
-
-        // with extension with code
-        final DataCollection data3 = new DataCollection(this);
-        data3.getPage("Test3.tcl")
-             .setCode("test");
-
-        // with extension without code
-        final DataCollection data4 = new DataCollection(this);
-        data4.getPage("Test4.tcl")
-             .setCode("");
-
-        // with extension without code
-        final DataCollection data5 = new DataCollection(this);
-        data5.getPage("Test \" 5.tcl")
-             .setCode("");
-
         return new Object[][]  {
-                new Object[]{data1, "Test1"},
-                new Object[]{data2, "Test2"},
-                new Object[]{data3, "Test3.tcl"},
-                new Object[]{data4, "Test4.tcl"},
-                new Object[]{data5, "Test \" 5.tcl"},
+                new Object[]{
+                        "without extension with code",
+                        new PageData(this, "Test1").setCode("test")},
+                new Object[]{
+                        "without extension without code",
+                        new PageData(this, "Test2").setCode("")},
+                new Object[]{
+                        "with extension with code",
+                        new PageData(this, "Test3.tcl").setCode("test")},
+                new Object[]{
+                        "with extension without code",
+                        new PageData(this, "Test4.tcl").setCode("")},
+                new Object[]{
+                        "with extension without code",
+                        new PageData(this, "Test \" 5.tcl").setCode("")},
+                new Object[]{
+                        "with extension and CDATA tag end",
+                        new PageData(this, "Test.tcl").setCode("<]]>")},
         };
     }
 
     /**
-     * Checks that the new created MQL progam is exported correctly.
+     * Checks that the new created pages is exported correctly.
      *
-     * @param _data     data collection to test
-     * @param _name     name of the inquiry to test
+     * @param _description  description of the test data
+     * @param _page         page to test
      * @throws Exception if test failed
      */
     @Test(dataProvider = "pages", description = "test export of pages")
-    public void testExport(final DataCollection _data,
-                           final String _name)
+    public void simpleExport(final String _description,
+                             final PageData _page)
         throws Exception
     {
-        final PageData page = _data.getPage(_name);
-        page.create();
-        final Export export = this.export(CI.PRG_PAGE, page.getName());
+        _page.create();
+        final Export export = this.export(CI.PRG_PAGE, _page.getName());
 
         // check oath
         Assert.assertEquals(export.getPath(),
-                            page.getCI().filePath,
+                            _page.getCI().filePath,
                             "check path is correct");
 
         // check file name
         Assert.assertEquals(export.getFileName(),
-                            page.getCIFileName(),
+                            _page.getCIFileName(),
                             "check that the correct file name is returned");
 
         // check JPO code
         Assert.assertEquals(export.getCode(),
-                            page.getCode(),
-                            "checks MQL program code");
+                            _page.getCode(),
+                            "checks page program code");
     }
 
     /**
      * Tests, if the MQL program within MX is created and registered with the
      * correct symbolic name.
      *
-     * @param _data     data collection to test
-     * @param _name     name of the inquiry to test
+     * @param _description  description of the test data
+     * @param _page         page to test
      * @throws Exception if test failed
      */
     @Test(dataProvider = "pages", description = "test update of non existing pages")
-    public void testUpdate(final DataCollection _data,
-                           final String _name)
+    public void simpleUpdate(final String _description,
+                             final PageData _page)
         throws Exception
     {
-        final PageData page = _data.getPage(_name);
-
         // first update with original content
-        this.update(page.getCIFileName(), page.ciFile());
+        this.update(_page.getCIFileName(), _page.ciFile());
 
-        Assert.assertTrue(!"".equals(this.mql("list page " + page.getName())),
+        Assert.assertTrue(!"".equals(this.mql("list page " + _page.getName())),
                           "check page is created");
         Assert.assertEquals(this.mql("escape print page \""
-                                    + AbstractTest.convertMql(page.getName()) + "\" select content dump"),
-                            page.getCode(),
+                                    + AbstractTest.convertMql(_page.getName()) + "\" select content dump"),
+                            _page.getCode(),
                             "check correct code");
+    }
+
+
+    /**
+     * Check that the end tag of CDATA is correct translated to
+     * 'Inserted_by_ENOVIA'.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "check that the end tag of CDATA is correct translated to 'Inserted_by_ENOVIA'")
+    public void checkCDataTranslation()
+        throws Exception
+    {
+        final String name = AbstractTest.PREFIX + "_Test";
+        this.mql("add page " + name + " content '<]]>'");
+        final String xml = this.mql("export page " + name + " xml");
+        Assert.assertTrue(xml.indexOf("<pageContent><![CDATA[<]Inserted_by_ENOVIA]Inserted_by_ENOVIA>]]></pageContent>") >= 0,
+                          "check translation of the CDATA conversion");
     }
 }

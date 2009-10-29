@@ -108,8 +108,8 @@ public class PropertyDef
      * @param _to       target object of the property
      */
     public PropertyDef(final String _name,
-                        final String _value,
-                        final AbstractAdminData<?> _to)
+                       final String _value,
+                       final AbstractAdminData<?> _to)
     {
         this.name = _name;
         this.value = _value;

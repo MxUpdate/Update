@@ -48,6 +48,9 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
+ * The class is used to export, create, delete and update administration
+ * objects within MX.
+ *
  * @author The MxUpdate Team
  * @version $Id$
  */
@@ -125,7 +128,7 @@ public abstract class AbstractAdminObject_mxJPO
      * @throws MatrixException if the query for current administration object
      *                         failed
      */
-    @Override
+    @Override()
     public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
@@ -161,9 +164,9 @@ public abstract class AbstractAdminObject_mxJPO
      *                                      handler
      * @see #prepare(ParameterCache_mxJPO)  called post preparation method
      */
-    @Override
+    @Override()
     protected void parse(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException, SAXException, IOException
+        throws MatrixException, SAXException, IOException
     {
         final String xml = MqlUtil_mxJPO.execMql(_paramCache, this.getExportMQL());
 
@@ -296,11 +299,12 @@ public abstract class AbstractAdminObject_mxJPO
      * @param _out          writer instance
      * @throws IOException  if the write of the TCL update to the writer
      *                      instance failed
+     * @throws MatrixException if an execution of a MQL command failed
      */
-    @Override
+    @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
-            throws IOException
+            throws IOException, MatrixException
     {
         this.writeHeader(_paramCache, _out);
         _out.append("mql escape mod ")
@@ -388,8 +392,8 @@ public abstract class AbstractAdminObject_mxJPO
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
-                .append("delete ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append("\" ")
+                .append("escape delete ").append(this.getTypeDef().getMxAdminName())
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
                 .append(this.getTypeDef().getMxAdminSuffix());
         MqlUtil_mxJPO.execMql(_paramCache, cmd);
     }
@@ -400,9 +404,9 @@ public abstract class AbstractAdminObject_mxJPO
      * @param _paramCache   parameter cache
      * @throws Exception if the new administration object could not be created
      */
-    @Override
+    @Override()
     public void create(final ParameterCache_mxJPO _paramCache)
-            throws Exception
+        throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("escape add ").append(this.getTypeDef().getMxAdminName())
@@ -445,14 +449,14 @@ public abstract class AbstractAdminObject_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update from the derived class failed
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         // remove all properties
         final StringBuilder preMQLCode = new StringBuilder();
@@ -658,7 +662,7 @@ public abstract class AbstractAdminObject_mxJPO
          * @return input source where only the &quot;ematrixProductDtd&quot;
          *         entity is defined
          */
-        @Override
+        @Override()
         public InputSource resolveEntity(final String _publicId,
                                          final String _systemId)
         {
@@ -674,7 +678,7 @@ public abstract class AbstractAdminObject_mxJPO
          * @param _length   length of characters within the array of characters
          * @see #content
          */
-        @Override
+        @Override()
         public void characters(final char[] _ch,
                                final int _start,
                                final int _length)
@@ -731,7 +735,7 @@ public abstract class AbstractAdminObject_mxJPO
          * @see #evaluated
          * @see #evaluate()
          */
-        @Override
+        @Override()
         public void endElement(final String _uri,
                                final String _localName,
                                final String _qName)

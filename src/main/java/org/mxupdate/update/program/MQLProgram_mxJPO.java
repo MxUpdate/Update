@@ -21,7 +21,9 @@
 package org.mxupdate.update.program;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -31,6 +33,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * The class is used to export, create, delete and update MQL programs within
@@ -40,7 +43,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  * @version $Id$
  */
 public class MQLProgram_mxJPO
-        extends AbstractProgram_mxJPO
+    extends AbstractProgram_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
@@ -48,10 +51,21 @@ public class MQLProgram_mxJPO
     private static final long serialVersionUID = -3329894042318127257L;
 
     /**
+     * Set of all ignored URLs from the XML definition for MQL programs.
+     *
+     * @see #parse(String, String)
+     */
+    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    static  {
+        MQLProgram_mxJPO.IGNORED_URLS.add("/mqlProgram");
+    }
+
+    /**
      * Defines the parameter to define the string where the TCL update code
      * starts.
      *
-     * @see #update(ParameterCache_mxJPO, File, String)
+     * @see #write(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private static final String PARAM_MARKSTART = "ProgramTclUpdateMarkStart";
 
@@ -59,7 +73,8 @@ public class MQLProgram_mxJPO
      * Defines the parameter to define the string where the TCL update code
      * ends.
      *
-     * @see #update(ParameterCache_mxJPO, File, String)
+     * @see #write(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private static final String PARAM_MARKEND = "ProgramTclUpdateMarkEnd";
 
@@ -67,19 +82,22 @@ public class MQLProgram_mxJPO
      * Defines the parameter to define if embedded TCL update code within
      * programs must be executed.
      *
-     * @see #update(ParameterCache_mxJPO, File, String)
+     * @see #write(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private static final String PARAM_NEEDED = "ProgramTclUpdateNeeded";
 
     /**
+     * Defines the parameter which maps from the file extension to the used
+     * line prefix.
      *
-     *
-     * @see #update(ParameterCache_mxJPO, File, String)
+     * @see #getLinePrefix(ParameterCache_mxJPO, String)
      */
     private static final String PARAM_EXTENSION = "ProgramTclUpdateExtension";
 
     /**
-     * Constructor used to initialize the type definition enumeration.
+     * Constructor used to initialize the type definition enumeration and the
+     * name.
      *
      * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the program object
@@ -98,7 +116,7 @@ public class MQLProgram_mxJPO
      * @throws MatrixException if the &quot;<code>list program</code>&quot;
      *                         failed which is used to evaluate the JPO names
      */
-    @Override
+    @Override()
     public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
@@ -117,7 +135,24 @@ public class MQLProgram_mxJPO
     }
 
     /**
-     * Writes the code from the program to given writer instance.
+     * <p>If an <code>_url</code> is included in {@link #IGNORED_URLS}, this
+     * URL is ignored.</p>
+     *
+     * @param _url      URL to parse
+     * @param _content  content depending on the URL
+     * @see #IGNORED_URLS
+     */
+    @Override()
+    protected void parse(final String _url,
+                         final String _content)
+    {
+        if (!MQLProgram_mxJPO.IGNORED_URLS.contains(_url))  {
+            super.parse(_url, _content);
+        }
+    }
+
+    /**
+     * Writes the code from the MQL program to given writer instance.
      *
      * @param _paramCache   parameter cache
      * @param _out          writer instance
@@ -125,14 +160,50 @@ public class MQLProgram_mxJPO
      * @throws IOException      if the source code could not be written to the
      *                          writer instance
      */
-    @Override
+    @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
             throws IOException, MatrixException
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("print program \"").append(this.getName()).append("\" select code dump");
-        _out.append(MqlUtil_mxJPO.execMql(_paramCache, cmd));
+        final String markStartStr = _paramCache.getValueString(MQLProgram_mxJPO.PARAM_MARKSTART).trim();
+        final String markEndStr = _paramCache.getValueString(MQLProgram_mxJPO.PARAM_MARKEND).trim();
+
+        // get line prefix
+        final String linePrefix = this.getLinePrefix(_paramCache, this.getName());
+
+        // append to marker the line prefixes
+        final String markStart = this.makeLinePrefix(linePrefix, markStartStr);
+        final String markEnd = this.makeLinePrefix(linePrefix, markEndStr);
+
+        this.writeUpdateCode(_paramCache, _out, markStart, markEnd, linePrefix);
+
+        // append original code (without old TCL update code)
+        final int start = this.getCode().indexOf(markStart);
+        final int end = this.getCode().indexOf(markEnd);
+        if ((start >= 0) && (end > 0))  {
+            _out.append(this.getCode().substring(0, start).trim())
+                .append(this.getCode().substring(end + markEnd.length()).trim());
+        } else  {
+            _out.append(this.getCode());
+        }
+    }
+
+    /**
+     * Depending on the extension of given <code>_fileName</code> the defined
+     * line prefix defined with parameter {@link #PARAM_EXTENSION} is returned.
+     *
+     * @param _paramCache   parameter cache
+     * @param _fileName     name of the file with the extension
+     * @return related of the extension the found extension
+     * @see #PARAM_EXTENSION
+     */
+    protected String getLinePrefix(final ParameterCache_mxJPO _paramCache,
+                                   final String _fileName)
+    {
+        final Map<String,String> extensions = _paramCache.<String>getValueMap(MQLProgram_mxJPO.PARAM_EXTENSION);
+        final int fileExtIdx = _fileName.lastIndexOf('.');
+        final String fileExtension = (fileExtIdx >= 0) ? _fileName.substring(fileExtIdx) : null;
+        return extensions.get(fileExtension);
     }
 
     /**
@@ -141,107 +212,133 @@ public class MQLProgram_mxJPO
      * @param _paramCache   parameter cache
      * @throws Exception if the program could not be created
      */
-    @Override
+    @Override()
     public void create(final ParameterCache_mxJPO _paramCache)
             throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
-                .append("add ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append('\"');
+                .append("escape add ").append(this.getTypeDef().getMxAdminName())
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"');
         MqlUtil_mxJPO.execMql(_paramCache, cmd);
     }
 
     /**
-     * The program is updated if the modified date of the file is not the same
-     * as the the version property. Embedded TCL update code is searched
-     * depending on the file extension and the TCL update needed parameter
-     * {@link #PARAM_NEEDED}. If for a file extension a line prefix is defined,
-     * the line prefix is removed from the TCL update code (and also the mark
-     * texts defined with {@link #PARAM_MARKSTART} and {@link #PARAM_MARKEND}
-     * depends on the line prefix).
+     * The method overwrites the original method to append the MQL statements
+     * in the <code>_preMQLCode</code> to update this MQL program. Following
+     * steps are done within update:
+     * <ul>
+     * <li>An existing execute user is removed.</li>
+     * <li>Execution of the JPO is immediate.</li>
+     * <li>The description is set to an empty string.</li>
+     * <li>The MQL program is set to not hidden.</li>
+     * <li>The MQL program does not need the context of a business object.</li>
+     * <li>The MQL program is not downloadable.</li>
+     * <li>The input / output of the MQL program is not piped.</li>
+     * <li>The MQL program is not pooled (used only for TCL programs).</li>
+     * <li>The program is updated with the content of <code>_sourceFile</code>.
+     *     </li>
+     * <li>If the file name includes a '@' the file content is copied to a new
+     *     file and updated the new file (because of a bug in MX that a MQL
+     *     program could not be updated with @ in file names).</li>
+     * <li>Embedded TCL update code is searched depending on the file extension
+     *     and the TCL update needed parameter {@link #PARAM_NEEDED}. If for a
+     *     file extension a line prefix is defined, the line prefix is removed
+     *     from the TCL update code (and also the mark texts defined with
+     *     {@link #PARAM_MARKSTART} and {@link #PARAM_MARKEND} depends on the
+     *     line prefix).</li>
+     * </ul>
      *
      * @param _paramCache       parameter cache
-     * @param _file             reference to the file to update
-     * @param _newVersion       new version which must be set within the update
-     *                          (or <code>null</code> if the version must not
-     *                          be set).
-     * @throws Exception if update of the program failed
+     * @param _preMQLCode       MQL statements which must be called before the
+     *                          TCL code is executed
+     * @param _postMQLCode      MQL statements which must be called after the
+     *                          TCL code is executed
+     * @param _preTCLCode       TCL code which is defined before the source
+     *                          file is sourced
+     * @param _tclVariables     map of all TCL variables where the key is the
+     *                          name and the value is value of the TCL variable
+     *                          (the value is automatically converted to TCL
+     *                          syntax!)
+     * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update from derived class failed
      * @see #PARAM_EXTENSION
      * @see #PARAM_MARKEND
      * @see #PARAM_MARKSTART
      * @see #PARAM_NEEDED
      */
-    @Override
-    public void update(final ParameterCache_mxJPO _paramCache,
-                       final File _file,
-                       final String _newVersion)
-            throws Exception
+    @Override()
+    protected void update(final ParameterCache_mxJPO _paramCache,
+                          final CharSequence _preMQLCode,
+                          final CharSequence _postMQLCode,
+                          final CharSequence _preTCLCode,
+                          final Map<String,String> _tclVariables,
+                          final File _sourceFile)
+        throws Exception
     {
-        this.parse(_paramCache);
-
         // get parameters
         final String markStartStr = _paramCache.getValueString(MQLProgram_mxJPO.PARAM_MARKSTART).trim();
         final String markEndStr = _paramCache.getValueString(MQLProgram_mxJPO.PARAM_MARKEND).trim();
         final boolean exec = _paramCache.getValueBoolean(MQLProgram_mxJPO.PARAM_NEEDED);
-        final Map<String,String> extensions = _paramCache.<String>getValueMap(MQLProgram_mxJPO.PARAM_EXTENSION);
+
+        // get line prefix and length of line prefix
+        final String linePrefix = this.getLinePrefix(_paramCache, _sourceFile.getName());
 
         // append to marker the line prefixes
-        final int fileExtIdx = _file.getName().lastIndexOf('.');
-        final String fileExtension = (fileExtIdx >= 0) ? _file.getName().substring(fileExtIdx) : null;
-        final String linePrefix = extensions.get(fileExtension);
-        final int linePrefixLength = (linePrefix != null) ? linePrefix.length() : -1;
-        final String markStart;
-        final String markEnd;
-        if (linePrefixLength > 0)  {
-            final StringBuilder markStartBld = new StringBuilder();
-            for (final String line : markStartStr.split("\n"))  {
-                markStartBld.append(linePrefix).append(line).append('\n');
-            }
-            markStart = markStartBld.toString();
+        final String markStart = this.makeLinePrefix(linePrefix, markStartStr);
+        final String markEnd = this.makeLinePrefix(linePrefix, markEndStr);
 
-            final StringBuilder markEndBld = new StringBuilder();
-            for (final String line : markEndStr.split("\n"))  {
-                markEndBld.append(linePrefix).append(line).append('\n');
-            }
-            markEnd = markEndBld.toString();
-        } else  {
-            markStart = markStartStr;
-            markEnd = markEndStr;
-        }
+        //
+        File tempFile = null;
+        try  {
+            if (_sourceFile.getPath().contains("@"))  {
+                tempFile = File.createTempFile("MXUPDATE", "TMP");
 
-        // update code
-        final StringBuilder cmd = new StringBuilder()
-                .append("mod prog \"").append(this.getName())
-                        .append("\" file \"").append(_file.getPath()).append("\";\n");
-
-        // append TCL code of file
-        final StringBuilder prgCode = this.getCode(_file);
-        final int start = prgCode.indexOf(markStart);
-        final int end = prgCode.indexOf(markEnd);
-        if ((start >= 0) && (end > 0))  {
-            final String tclCode = prgCode.substring(start + markStart.length(), end).trim();
-            if (!"".equals(tclCode))  {
-                // TCL code must be executed only if allowed
-                // and line prefix is defined
-                if (exec && (linePrefixLength >= 0))  {
-                    _paramCache.logTrace("    - TCL update code is executed");
-                    cmd.append("tcl;\neval {\n");
-                    // remove line prefixes from TCL code (if defined)
-                    if (linePrefixLength > 0)  {
-                        for (final String line : tclCode.split("\n"))  {
-                            cmd.append(line.substring(linePrefixLength)).append('\n');
-                        }
-                    } else  {
-                        cmd.append(tclCode);
+                FileWriter out = null;
+                try  {
+                    out = new FileWriter(tempFile);
+                    out.write(this.getCode());
+                } finally  {
+                    if (out != null)  {
+                        out.close();
                     }
-                    cmd.append("\n}\nexit;\n");
-                } else  {
-                    _paramCache.logError("    - Warning! Existing TCL update code is not executed!");
                 }
             }
-        }
 
-        // and update
-        this.update(_paramCache, cmd, _newVersion, _file);
+            final StringBuilder preMQLCode = new StringBuilder();
+            final StringBuilder preTCLCode = new StringBuilder();
+
+            // update code; reset execute user
+            preMQLCode.append("escape mod prog \"").append(StringUtil_mxJPO.convertMql(this.getName()))
+                      .append("\" execute user \"\" execute immediate !needsbusinessobject !downloadable !pipe !pooled description \"\" !hidden file \"");
+            if (tempFile != null)  {
+                preMQLCode.append(StringUtil_mxJPO.convertMql(tempFile.getPath()));
+            } else  {
+                preMQLCode.append(StringUtil_mxJPO.convertMql(_sourceFile.getPath()));
+            }
+            preMQLCode.append("\";\n");
+
+            // append TCL code of file
+            preTCLCode.append(this.extractTclUpdateCode(_paramCache,
+                                                        exec,
+                                                        this.getCode(_sourceFile),
+                                                        markStart,
+                                                        markEnd,
+                                                        linePrefix));
+
+            // append already existing pre MQL code
+            preMQLCode.append(";\n")
+                      .append(_preMQLCode);
+
+            // append procedure to order fields of the form
+            preTCLCode.append('\n')
+                      .append(_preTCLCode);
+
+            // and update
+            super.update(_paramCache, preMQLCode, _postMQLCode, preTCLCode, _tclVariables, null);
+        } finally  {
+            if (tempFile != null)  {
+                tempFile.delete();
+            }
+        }
     }
 }

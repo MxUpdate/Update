@@ -22,6 +22,8 @@ package org.mxupdate.update.program;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -50,37 +52,29 @@ public class JPOProgram_mxJPO
     private static final long serialVersionUID = -4933461290880123088L;
 
     /**
-     * The variable is used to evaluate if MX doubles backslashes (done from
-     * old MX versions). The name of the variable and the variable definition
-     * must not be changed or formatted in another way. Otherwise the test for
-     * doubled backslashes fails....
+     * Set of all ignored URLs from the XML definition for JPO programs.
      *
-     * @see #write(ParameterCache_mxJPO, Appendable)
+     * @see #parse(String, String)
      */
-    @SuppressWarnings("unused")
-    private static final String JPO_REPLACE_TEST = "\\";
+    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    static  {
+        JPOProgram_mxJPO.IGNORED_URLS.add("/javaProgram");
+    }
 
     /**
      * String with name suffix (used also from the extract routine from
      * Matrix).
      *
-     * @see #export(ParameterCache_mxJPO, File)
-     */
-    private static final String NAME_SUFFIX = "_" + "mxJPO";
-
-    /**
-     * Defines the parameter to cache the information if the backslashes within
-     * MX are doubled (old MX versions) or not (new MX versions).
-     *
      * @see #write(ParameterCache_mxJPO, Appendable)
      */
-    private static final String PARAM_BACKSLASHDOUBLED = "JPOBackslashDoubled";
+    private static final String NAME_SUFFIX = "_" + "mxJPO";
 
     /**
      * Defines the parameter to define the string where the TCL update code
      * starts.
      *
-     * @see #update(ParameterCache_mxJPO, File, String)
+     * @see #write(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private static final String PARAM_MARKSTART = "JPOTclUpdateMarkStart";
 
@@ -88,7 +82,8 @@ public class JPOProgram_mxJPO
      * Defines the parameter to define the string where the TCL update code
      * ends.
      *
-     * @see #update(ParameterCache_mxJPO, File, String)
+     * @see #write(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private static final String PARAM_MARKEND = "JPOTclUpdateMarkEnd";
 
@@ -96,7 +91,7 @@ public class JPOProgram_mxJPO
      * Defines the parameter to define if embedded TCL update code within JPOs
      * must be executed.
      *
-     * @see #update(ParameterCache_mxJPO, File, String)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private static final String PARAM_NEEDED = "JPOTclUpdateNeeded";
 
@@ -109,13 +104,33 @@ public class JPOProgram_mxJPO
     private static final Pattern PATTERN_PACKAGE = Pattern.compile("(?<=package)[ \\t]+[A-Za-z0-9\\._]*[ \\t]*;");
 
     /**
-     * Constructor used to initialize the type definition enumeration.
+     * Used line prefix for the TCL update code.
+     *
+     * @see #write(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private static final String LINE_PREFIX = "//";
+
+    /**
+     * The flag indicates that the back slashes are converted. In older MX
+     * versions double back slashes was escaped. In this cases all escaped
+     * double back slashes must be replaced. In newer MX versions this
+     * 'feature' does not exists anymore if an MQL insert was done.
+     *
+     * @see #parse(String,String)
+     * @see #write(ParameterCache_mxJPO, Appendable)
+     */
+    private boolean backslashUpgraded = false;
+
+    /**
+     * Constructor used to initialize the type definition enumeration and the
+     * name.
      *
      * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the JPO object
      */
     public JPOProgram_mxJPO(final TypeDef_mxJPO _typeDef,
-                     final String _mxName)
+                            final String _mxName)
     {
         super(_typeDef, _mxName);
     }
@@ -128,7 +143,7 @@ public class JPOProgram_mxJPO
      * @throws MatrixException if the &quot;<code>list program</code>&quot;
      *                         failed which is used to evaluate the JPO names
      */
-    @Override
+    @Override()
     public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
@@ -155,7 +170,7 @@ public class JPOProgram_mxJPO
      * @return file name of this administration (business) object (without
      *         package names)
      */
-    @Override
+    @Override()
     public String getFileName()
     {
         final int index = this.getName().lastIndexOf('.');
@@ -175,11 +190,10 @@ public class JPOProgram_mxJPO
      * @return sub path including package path
      * @see #getTypeDef()
      */
-    @Override
+    @Override()
     public String getPath()
     {
-        final StringBuilder ret = new StringBuilder()
-                .append(super.getPath());
+        final StringBuilder ret = new StringBuilder().append(super.getPath());
         final int index = this.getName().lastIndexOf('.');
         if (index >= 0)  {
             ret.append('/').append(this.getName().substring(0, index).replaceAll("\\.", "/"));
@@ -202,7 +216,7 @@ public class JPOProgram_mxJPO
      * @todo idea: maybe performance improvement by opening file itself and
      *       read only till class, interface or enum is defined....
      */
-    @Override
+    @Override()
     public String extractMxName(final ParameterCache_mxJPO _paramCache,
                                 final File _file)
         throws UpdateException_mxJPO
@@ -228,6 +242,33 @@ public class JPOProgram_mxJPO
     }
 
     /**
+     * <p>Parses all common program specific URL values. This includes:
+     * <ul>
+     * <li>{@link #backslashUpgraded back slash flag} to indicate the they are
+     *     upgraded</li>
+     * </ul></p>
+     * <p>If an <code>_url</code> is included in {@link #IGNORED_URLS}, this
+     * URL is ignored.</p>
+     *
+     * @param _url      URL to parse
+     * @param _content  content depending on the URL
+     * @see #IGNORED_URLS
+     */
+    @Override()
+    protected void parse(final String _url,
+                         final String _content)
+    {
+        if (!JPOProgram_mxJPO.IGNORED_URLS.contains(_url))  {
+            if ("/backslashUpgraded".equals(_url))  {
+                this.backslashUpgraded = true;
+            } else  {
+                super.parse(_url, _content);
+            }
+        }
+    }
+
+
+    /**
      * Writes given JPO to given path for given name. The JPO code is first
      * converted, because Matrix uses keywords which must be replaced to have
      * real Java code. The conversion works like the original extract method,
@@ -240,11 +281,16 @@ public class JPOProgram_mxJPO
      * @throws MatrixException if the source code of the JPO could not be
      *                         extracted from MX
      */
-    @Override
+    @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
             throws IOException, MatrixException
     {
+        final String markStart = this.makeLinePrefix(JPOProgram_mxJPO.LINE_PREFIX, _paramCache.getValueString(JPOProgram_mxJPO.PARAM_MARKSTART).trim());
+        final String markEnd = this.makeLinePrefix(JPOProgram_mxJPO.LINE_PREFIX, _paramCache.getValueString(JPOProgram_mxJPO.PARAM_MARKEND).trim());
+
+        this.writeUpdateCode(_paramCache, _out, markStart, markEnd, JPOProgram_mxJPO.LINE_PREFIX);
+
         // define package name (if points within JPO name)
         final int idx = this.getName().lastIndexOf('.');
         if (idx > 0)  {
@@ -253,25 +299,22 @@ public class JPOProgram_mxJPO
                 .append(";\n");
         }
 
-        // old MX style or new? (means backslashes are doubled...)
-        final Boolean backslashDoubledVal = _paramCache.getValueBoolean(JPOProgram_mxJPO.PARAM_BACKSLASHDOUBLED);
-        final boolean backslashDoubled;
-        if (backslashDoubledVal == null)  {
-            final String code = MqlUtil_mxJPO.execMql(_paramCache,
-                                        "print prog org.mxupdate.update.program.JPOProgram select code dump");
-            final int start = code.indexOf("JPO_REPLACE_TEST");
-            final int end = code.indexOf('\n', start);
-            backslashDoubled = code.substring(start + 20, end - 2).length() == 4;
-            _paramCache.defineValueBoolean(JPOProgram_mxJPO.PARAM_BACKSLASHDOUBLED, backslashDoubled);
+        // get original code (without old TCL update code)
+        final int start = this.getCode().indexOf(markStart);
+        final int end = this.getCode().indexOf(markEnd);
+        final String origCode;
+        if ((start >= 0) && (end > start))  {
+            origCode = new StringBuilder()
+                    .append(this.getCode().substring(0, start).trim())
+                    .append(this.getCode().substring(end + markEnd.length()).trim())
+                    .toString();
         } else  {
-            backslashDoubled = backslashDoubledVal;
+            origCode = this.getCode();
         }
 
         // replace class names and references to other JPOs
         final String name = this.getName() + JPOProgram_mxJPO.NAME_SUFFIX;
-        final StringBuilder cmd = new StringBuilder()
-                .append("print program \"").append(this.getName()).append("\" select code dump");
-        final String code = MqlUtil_mxJPO.execMql(_paramCache, cmd)
+        final String code = origCode
                                 .replaceAll("\\" + "$\\{CLASSNAME\\}", name.replaceAll(".*\\.", ""))
                                 .replaceAll("(?<=\\"+ "$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}",
                                             JPOProgram_mxJPO.NAME_SUFFIX)
@@ -279,7 +322,7 @@ public class JPOProgram_mxJPO
                                 .trim();
 
         // for old MX all backslashes are doubled...
-        if (backslashDoubled)  {
+        if (!this.backslashUpgraded)  {
             _out.append(code.replaceAll("\\\\\\\\", "\\\\"));
         } else  {
             _out.append(code);
@@ -292,7 +335,7 @@ public class JPOProgram_mxJPO
      * @param _paramCache   parameter cache
      * @throws Exception if create of JPO failed
      */
-    @Override
+    @Override()
     public void create(final ParameterCache_mxJPO _paramCache)
             throws Exception
     {
@@ -303,61 +346,94 @@ public class JPOProgram_mxJPO
     }
 
     /**
-     * The JPO is updated by following steps if the modified date of the file
-     * is not the same as the the version property. Following steps are done:
+     * The method overwrites the original method to append the MQL statements
+     * in the <code>_preMQLCode</code> to update this JPO program. Following
+     * steps are done within update:
      * <ul>
-     * <li>reset the execute user</li>
-     * <li>remove all properties</li>
-     * <li>append TCL code of JPO</li>
-     * <li>define new version</li>
-     * <li>insert JPO code</li>
+     * <li>An existing execute user is removed.</li>
+     * <li>Execution of the JPO is immediate.</li>
+     * <li>The description is set to an empty string.</li>
+     * <li>The JPO program is set to not hidden.</li>
+     * <li>The JPO program does not need the context of a business object.</li>
+     * <li>The MQL program is not downloadable.</li>
+     * <li>The input / output of the MQL program is not piped.</li>
+     * <li>The MQL program is not pooled (used only for TCL programs).</li>
+     * <li>The JPO is updated with the content of <code>_sourceFile</code>.
+     *     </li>
+     * <li>Embedded TCL update code is searched depending on the file extension
+     *     and the TCL update needed parameter {@link #PARAM_NEEDED}. If for a
+     *     file extension a line prefix is defined, the line prefix is removed
+     *     from the TCL update code (and also the mark texts defined with
+     *     {@link #PARAM_MARKSTART} and {@link #PARAM_MARKEND} depends on the
+     *     line prefix).</li>
      * </ul>
      *
      * @param _paramCache       parameter cache
-     * @param _file             reference to the file to update
-     * @param _newVersion       new version which must be set within the update
-     *                          (or <code>null</code> if the version must not
-     *                          be set).
-     * @throws Exception if update of the JPO failed
+     * @param _preMQLCode       MQL statements which must be called before the
+     *                          TCL code is executed
+     * @param _postMQLCode      MQL statements which must be called after the
+     *                          TCL code is executed
+     * @param _preTCLCode       TCL code which is defined before the source
+     *                          file is sourced
+     * @param _tclVariables     map of all TCL variables where the key is the
+     *                          name and the value is value of the TCL variable
+     *                          (the value is automatically converted to TCL
+     *                          syntax!)
+     * @param _sourceFile       souce file with the TCL code to update
+     * @throws Exception if the update from derived class failed
+     * @see #PARAM_MARKEND
+     * @see #PARAM_MARKSTART
+     * @see #PARAM_NEEDED
      */
-    @Override
-    public void update(final ParameterCache_mxJPO _paramCache,
-                       final File _file,
-                       final String _newVersion)
-            throws Exception
+    @Override()
+    protected void update(final ParameterCache_mxJPO _paramCache,
+                          final CharSequence _preMQLCode,
+                          final CharSequence _postMQLCode,
+                          final CharSequence _preTCLCode,
+                          final Map<String,String> _tclVariables,
+                          final File _sourceFile)
+        throws Exception
     {
-        this.parse(_paramCache);
+        final StringBuilder preMQLCode = new StringBuilder();
+        final StringBuilder preTCLCode = new StringBuilder();
 
         // get parameters
         final String markStart = _paramCache.getValueString(JPOProgram_mxJPO.PARAM_MARKSTART).trim();
         final String markEnd = _paramCache.getValueString(JPOProgram_mxJPO.PARAM_MARKEND).trim();
+        final String markStartWithPrefix = this.makeLinePrefix(JPOProgram_mxJPO.LINE_PREFIX, markStart);
+        final String markEndWithPrefix = this.makeLinePrefix(JPOProgram_mxJPO.LINE_PREFIX, markEnd);
         final boolean exec = _paramCache.getValueBoolean(JPOProgram_mxJPO.PARAM_NEEDED);
 
-        final StringBuilder cmd = new StringBuilder();
+        // update JPO code; reset execute user + description + hidden flag
+        preMQLCode.append("escape mod prog \"").append(StringUtil_mxJPO.convertMql(this.getName()))
+                  .append("\" execute user \"\" execute immediate !needsbusinessobject !downloadable !pipe !pooled description \"\" !hidden;\n")
+                  .append("insert prog \"").append(_sourceFile.getPath()).append("\";\n");
 
-        // update JPO code
-        cmd.append("insert prog \"").append(_file.getPath()).append("\";\n");
+        // append TCL code of file (first without line prefix, then with)
+        final StringBuilder jpoCode = this.getCode(_sourceFile);
+        preTCLCode.append(this.extractTclUpdateCode(_paramCache,
+                                                    exec,
+                                                    jpoCode,
+                                                    markStart,
+                                                    markEnd,
+                                                    null))
+                  .append(this.extractTclUpdateCode(_paramCache,
+                                                    exec,
+                                                    jpoCode,
+                                                    markStartWithPrefix,
+                                                    markEndWithPrefix,
+                                                    JPOProgram_mxJPO.LINE_PREFIX));
 
-        // append TCL code of JPO
-        final StringBuilder jpoCode = this.getCode(_file);
-        final int start = jpoCode.indexOf(markStart);
-        final int end = jpoCode.indexOf(markEnd);
-        if ((start >= 0) && (end > 0))  {
-            final String tclCode = jpoCode.substring(start + markStart.length(), end).trim();
-            if (!"".equals(tclCode))  {
-                if (exec)  {
-                    _paramCache.logTrace("    - TCL update code is executed");
-                    cmd.append("tcl;\neval {\n")
-                       .append(tclCode)
-                       .append("\n}\nexit;\n");
-                } else  {
-                    _paramCache.logError("    - Warning! Existing TCL update code is not executed!");
-                }
-            }
-        }
+        // append already existing pre MQL code
+        preMQLCode.append(";\n")
+                  .append(_preMQLCode);
+
+        // append procedure to order fields of the form
+        preTCLCode.append('\n')
+                  .append(_preTCLCode);
 
         // and update
-        this.update(_paramCache, cmd, _newVersion, _file);
+        super.update(_paramCache, preMQLCode, _postMQLCode, preTCLCode, _tclVariables, null);
     }
 
     /**
@@ -367,7 +443,7 @@ public class JPOProgram_mxJPO
      * @return always <i>true</i>
      * @throws Exception if the compile of the JPO failed
      */
-    @Override
+    @Override()
     public boolean compile(final ParameterCache_mxJPO _paramCache)
             throws Exception
     {
