@@ -189,6 +189,13 @@
                     <value>true</value>
                 </property>
             </activation>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>repository.riedelcastro.org</id>
+                    <name>Riedelcastro's gcUpload</name>
+                    <url>http://repository.riedelcastro.org/</url>
+                </pluginRepository>
+            </pluginRepositories>
             <repositories>
                 <!-- needed for gcupload plug-in -->
                 <repository>
