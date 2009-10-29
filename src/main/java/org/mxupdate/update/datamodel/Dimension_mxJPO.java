@@ -560,7 +560,7 @@ public class Dimension_mxJPO
          * Compares this dimension with <code>_toCompare</code> dimension. The
          * algorithm checks {@link #name} for both dimension and is defined as:
          * <ul>
-         * <li>If both {@link #name} are <code>null</code> then a &quot;0&quot;
+         * <li>If both {@link #name} are <code>null</code> then a &quot;0&quot;
          *     is returned.</li>
          * <li>If only the {@link #name} of this unit is <code>null</code> then
          *     a &quot;-1&quot; is returned.</li>
