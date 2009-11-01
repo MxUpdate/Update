@@ -55,7 +55,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @version $Id$
  */
 public abstract class AbstractAdminObject_mxJPO
-        extends AbstractPropertyObject_mxJPO
+    extends AbstractPropertyObject_mxJPO
 {
     /**
      * Defines the serialize version unique identifier.
@@ -168,8 +168,6 @@ public abstract class AbstractAdminObject_mxJPO
     protected void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, SAXException, IOException
     {
-        final String xml = MqlUtil_mxJPO.execMql(_paramCache, this.getExportMQL());
-
         // create XML reader
         final XMLReader reader = XMLReaderFactory.createXMLReader();
         // register Sax Content Handler
@@ -178,11 +176,27 @@ public abstract class AbstractAdminObject_mxJPO
         reader.setDTDHandler(handler);
         reader.setEntityResolver(handler);
         // parse the XML string of the export
-        final InputSource inputSource = new InputSource(new StringReader(xml));
+        final InputSource inputSource = new InputSource(new StringReader(this.execXMLExport(_paramCache)));
         inputSource.setEncoding("UTF8");
         reader.parse(inputSource);
         // prepare post preparation
         this.prepare(_paramCache);
+    }
+
+    /**
+     * With the MQL commands from {@link #getExportMQL()} the XML export is
+     * executed and the result returned. The method could be used to overwrite
+     * the returned XML export; e.g. if the XML export from MX has some
+     * 'problems'.
+     *
+     * @param _paramCache   parameter cache
+     * @return string from the XML export
+     * @throws MatrixException if export failed
+     */
+    protected String execXMLExport(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException
+    {
+        return MqlUtil_mxJPO.execMql(_paramCache, this.getExportMQL());
     }
 
     /**
