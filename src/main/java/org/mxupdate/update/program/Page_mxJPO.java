@@ -23,14 +23,12 @@ package org.mxupdate.update.program;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
-
-import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
@@ -49,6 +47,32 @@ public class Page_mxJPO
     private static final long serialVersionUID = -2142094727046919689L;
 
     /**
+     * Defines the parameter for the comment in front of the separator between
+     * TCL update code and the page content.
+     *
+     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private static final String PARAM_SEPARATOR_COMMENT = "ProgramPageSeparatorComment";
+
+    /**
+     * Defines the parameter for the separator between TCL update code and the
+     * page content.
+     *
+     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private static final String PARAM_SEPARATOR_TEXT = "ProgramPageSeparatorText";
+
+    /**
+     * Related mime-type of this page.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
+     */
+    private String mimeType;
+
+    /**
      * Constructor used to initialize the type definition enumeration and the
      * name.
      *
@@ -59,28 +83,6 @@ public class Page_mxJPO
                       final String _mxName)
     {
         super(_typeDef, _mxName);
-    }
-
-    /**
-     * Searches for all pages and returns this list.
-     *
-     * @param _paramCache   parameter cache
-     * @return set of all pages
-     * @throws MatrixException if the &quot;<code>list page</code>&quot;
-     *                         failed which is used to evaluate the JPO names
-     */
-    @Override()
-    public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
-    {
-        final StringBuilder cmd = new StringBuilder().append("list page *");
-        final Set<String> ret = new TreeSet<String>();
-        for (final String name : MqlUtil_mxJPO.execMql(_paramCache, cmd).split("\n"))  {
-            if (!"".equals(name))  {
-                ret.add(name);
-            }
-        }
-        return ret;
     }
 
     /**
@@ -112,20 +114,79 @@ public class Page_mxJPO
     }
 
     /**
-     * Writes the code from the page to given writer instance.
+     * Because no symbolic names are allowed for pages (not supported from MX),
+     * <code>null</code> must be always returned.
      *
-     * @param _paramCache   parameter cache
-     * @param _out          writer instance
-     * @throws MatrixException  if the print of the code of the program failed
-     * @throws IOException      if the source code could not be written to the
-     *                          writer instance
+     * @return allways <code>null</code>
      */
     @Override()
-    protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Appendable _out)
-            throws IOException, MatrixException
+    protected Set<String> getSymbolicNames()
     {
-        _out.append(this.getCode());
+        return null;
+    }
+
+    /**
+     * <p>Parses all page specific URL values. This includes:
+     * <ul>
+     * <li>{@link #mimeType mime type}</li>
+     * </ul></p>
+     *
+     * @param _url      URL to parse
+     * @param _content  content depending on the URL
+     */
+    @Override()
+    protected void parse(final String _url,
+                         final String _content)
+    {
+        if ("/mimeType".equals(_url))  {
+            this.mimeType = _content;
+        } else  {
+            super.parse(_url, _content);
+        }
+    }
+
+    /**
+     * Writes the page specific information to the TCL update write. This
+     * includes:
+     * <ul>
+     * <li>{@link #mimeType mime type}</li>
+     * <li>file definition for the {@link #getCode() page content}</li>
+     * </ul>
+     *
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the TCL update code for the menu could not be
+     *                     written
+     * @see #getCode()
+     */
+    @Override()
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
+        throws IOException
+    {
+        _out.append(" \\\n    mime \"").append((this.mimeType == null) ? "" : StringUtil_mxJPO.convertTcl(this.mimeType)).append("\"")
+            .append(" \\\n    file [file join \"${FILE}\"]");
+    }
+
+    /**
+     * At the end of the TCL update file the {@link #getCode() page content}
+     * must be appended.
+     *
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the extension could not be written
+     * @see #getCode()
+     */
+    @Override()
+    protected void writeEnd(final ParameterCache_mxJPO _paramCache,
+                            final Appendable _out)
+        throws IOException
+    {
+        _out.append("\n\n").append(_paramCache.getValueString(Page_mxJPO.PARAM_SEPARATOR_COMMENT))
+            .append('\n').append(_paramCache.getValueString(Page_mxJPO.PARAM_SEPARATOR_TEXT)).append("\n\n");
+        if (this.getCode() != null)  {
+            _out.append(this.getCode());
+        }
     }
 
     /**
@@ -133,11 +194,11 @@ public class Page_mxJPO
      * in the <code>_preMQLCode</code> to update this page program. Following
      * steps are done within update:
      * <ul>
-     * <li>The program is updated with the content of <code>_sourceFile</code>.
-     *     </li>
-     * <li>If the file name includes a '@' the file content is copied to a new
-     *     file and updated the new file (because of a bug in MX that a MQL
-     *     program could not be updated with @ in file names).</li>
+     * <li>The description is set to zero length string.</li>
+     * <li>The mime type is reset.</li>
+     * <li>The page content is removed.</li>
+     * <li>The page content is extracted from the <code>_sourceFile</code> and
+     *     the path to the file set as TCL variable <code>FILE</code>.
      * </ul>
      *
      * @param _paramCache       parameter cache
@@ -163,48 +224,59 @@ public class Page_mxJPO
                           final File _sourceFile)
         throws Exception
     {
-        final StringBuilder preMQLCode = new StringBuilder();
+        final String sep = _paramCache.getValueString(Page_mxJPO.PARAM_SEPARATOR_TEXT);
 
-        // pages could not be updated if there are add's in the file name
-        // (because special characters are used for the page name)
-        if (_sourceFile.getPath().indexOf('@') >= 0)  {
-            final StringBuilder prgCode = this.getCode(_sourceFile);
-            final File tempFile = File.createTempFile("MxUpdatePage", ".page");
+        // reset HRef, description, alt, label and height
+        final StringBuilder preMQLCode = new StringBuilder()
+                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
+                .append(" description \"\" mime \"\" content \"\"");
+
+        // append already existing pre MQL code
+        preMQLCode.append(";\n")
+                  .append(_preMQLCode);
+
+        // separate the page content content and the TCL update code
+        final StringBuilder orgCode = this.getCode(_sourceFile);
+        final int idx = orgCode.lastIndexOf(sep);
+        final CharSequence code = (idx >= 0)
+                                  ? orgCode.subSequence(0, idx)
+                                  : orgCode;
+        final CharSequence page = (idx >= 0)
+                                  ? orgCode.subSequence(idx + sep.length() + 1, orgCode.length())
+                                  : "";
+
+        final File tmpPageFile = File.createTempFile("TMP_", ".page");
+        try  {
+            final File tmpTclFile = File.createTempFile("TMP_", ".tcl");
             try  {
-                final FileWriter writer = new FileWriter(tempFile);
+                // write TCL update code
+                final Writer outTCL = new FileWriter(tmpTclFile);
                 try  {
-                    writer.write(prgCode.toString());
+                    outTCL.append(code.toString().trim());
                 } finally  {
-                    writer.close();
+                    outTCL.close();
                 }
-                // update code
-                preMQLCode.append("escape mod page \"").append(StringUtil_mxJPO.convertMql(this.getName()))
-                          .append("\" file \"")
-                          .append(StringUtil_mxJPO.convertMql(tempFile.getPath()))
-                          .append("\";\n");
 
-                // append already existing pre MQL code
-                preMQLCode.append(";\n")
-                          .append(_preMQLCode);
+                // write page content
+                final Writer outPage = new FileWriter(tmpPageFile);
+                try  {
+                    outPage.append(page.toString().trim());
+                } finally {
+                    outPage.close();
+                }
+
+                // define TCL variable for the file
+                final Map<String,String> tclVariables = new HashMap<String,String>(_tclVariables);
+                tclVariables.put("FILE", tmpPageFile.getPath());
 
                 // and update
-                super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, null);
+                super.update(_paramCache, preMQLCode, _postMQLCode, code, tclVariables, tmpTclFile);
             } finally  {
-                tempFile.delete();
+                tmpTclFile.delete();
             }
-        } else  {
-            // update code
-            preMQLCode.append("escape mod page \"").append(StringUtil_mxJPO.convertMql(this.getName()))
-                      .append("\" file \"")
-                      .append(StringUtil_mxJPO.convertMql(_sourceFile.getPath()))
-                      .append("\";\n");
-
-            // append already existing pre MQL code
-            preMQLCode.append(";\n")
-                      .append(_preMQLCode);
-
-            // and update
-            super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, null);
+        } finally  {
+            tmpPageFile.delete();
         }
     }
 }

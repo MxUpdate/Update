@@ -61,7 +61,7 @@ public class InquiryExportUpdate
     @DataProvider(name = "inquires")
     public Object[][] getInquiries()
     {
-        return this.prepareData("command",
+        return this.prepareData("inquiry",
                 new Object[]{
                         "complex inquiry with all values and three arguments",
                         new InquiryData(this, "Test1")
@@ -106,9 +106,10 @@ public class InquiryExportUpdate
      * @param _inquiry      inquiry to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "inquires", description = "test export of new created inquires")
-    public void testExport(final String _description,
-                           final InquiryData _inquiry)
+    @Test(dataProvider = "inquires",
+          description = "test export of new created inquires")
+    public void simpleExport(final String _description,
+                             final InquiryData _inquiry)
         throws Exception
     {
         _inquiry.create();
@@ -123,9 +124,10 @@ public class InquiryExportUpdate
      * @param _inquiry      inquiry to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "inquires", description = "test update of non existing inquiry")
-    public void testUpdate(final String _description,
-                           final InquiryData _inquiry)
+    @Test(dataProvider = "inquires",
+          description = "test update of non existing inquiry")
+    public void simpleUpdate(final String _description,
+                             final InquiryData _inquiry)
         throws Exception
     {
         // create referenced property value

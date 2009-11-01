@@ -84,6 +84,17 @@ public class Person_mxJPO
     }
 
     /**
+     * Symbolic names from the {@link #personAdmin} are returned.
+     *
+     * @return symbolic names from the administration part of the person
+     */
+    @Override()
+    protected Set<String> getSymbolicNames()
+    {
+        return this.personAdmin.getSymbolicNames();
+    }
+
+    /**
      * The list of all person names are evaluated with the help of the business
      * person objects. From the return values of the query for all business
      * person objects, only the business object name is returned in the set
@@ -95,7 +106,7 @@ public class Person_mxJPO
      * @throws MatrixException if the query for persons failed
      * @see #personBus
      */
-    @Override
+    @Override()
     public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
@@ -115,9 +126,9 @@ public class Person_mxJPO
      * @see #personAdmin
      * @see #personBus
      */
-    @Override
+    @Override()
     protected void parse(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException, SAXException, IOException
+        throws MatrixException, SAXException, IOException
     {
         this.personAdmin.parse(_paramCache);
         this.personBus.parse(_paramCache);
@@ -129,9 +140,9 @@ public class Person_mxJPO
      * @param _paramCache   parameter cache
      * @throws Exception if delete of person failed
      */
-    @Override
+    @Override()
     public void delete(final ParameterCache_mxJPO _paramCache)
-            throws Exception
+        throws Exception
     {
         this.personBus.delete(_paramCache);
         this.personAdmin.delete(_paramCache);
@@ -143,28 +154,28 @@ public class Person_mxJPO
      * @param _paramCache   parameter cache
      * @throws Exception if create of person failed
      */
-    @Override
+    @Override()
     public void create(final ParameterCache_mxJPO _paramCache)
-            throws Exception
+        throws Exception
     {
         this.personAdmin.create(_paramCache);
         this.personBus.create(_paramCache);
     }
 
-    @Override
+    @Override()
     public void update(final ParameterCache_mxJPO _paramCache,
                        final File _file,
                        final String _newVersion)
-            throws Exception
+        throws Exception
     {
         this.personBus.parse(_paramCache);
         this.personAdmin.update(_paramCache, _file, _newVersion);
     }
 
-    @Override
+    @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
-            throws IOException
+        throws IOException
     {
         this.personAdmin.write(_paramCache, _out);
         _out.append('\n');
@@ -172,8 +183,12 @@ public class Person_mxJPO
         this.personAdmin.writeEnd(_paramCache, _out);
     }
 
-    class PersonAdmin
-            extends PersonAdmin_mxJPO
+    /**
+     * Handles the administration part of the person. The class is used that
+     * some methods could be called from this person class.
+     */
+    private final class PersonAdmin
+        extends PersonAdmin_mxJPO
     {
         /**
          * Defines the serialize version unique identifier.
@@ -195,7 +210,23 @@ public class Person_mxJPO
 
         /**
          * Because the original method
-         * {@link org.mxupdate.update.AbstractPropertyObject_mxJPO#parse(ParameterCache_mxJPO)}
+         * {@link PersonAdmin_mxJPO#getSymbolicNames()}
+         * is protected, but called from
+         * {@link Person_mxJPO#getSymbolicNames()}, the original
+         * method must be overwritten and only called.
+         *
+         * @return set of symbolic names for the administration part of the
+         *         person
+         */
+        @Override()
+        protected Set<String> getSymbolicNames()
+        {
+            return super.getSymbolicNames();
+        }
+
+        /**
+         * Because the original method
+         * {@link PersonAdmin_mxJPO#parse(ParameterCache_mxJPO)}
          * is protected, but called from
          * {@link Person_mxJPO#parse(ParameterCache_mxJPO)}, the original
          * method must be overwritten and only called. So the original method
@@ -204,9 +235,9 @@ public class Person_mxJPO
          *
          * @param _paramCache   parameter cache
          */
-        @Override
+        @Override()
         protected void parse(final ParameterCache_mxJPO _paramCache)
-                throws MatrixException, SAXException, IOException
+            throws MatrixException, SAXException, IOException
         {
             super.parse(_paramCache);
         }
@@ -218,10 +249,10 @@ public class Person_mxJPO
          * @throws IOException if the TCL update code for the person could not
          *                     be written
          */
-        @Override
+        @Override()
         public void write(final ParameterCache_mxJPO _paramCache,
                           final Appendable _out)
-                throws IOException
+            throws IOException
         {
             this.writeHeader(_paramCache, _out);
             _out.append("mql mod ")
@@ -266,14 +297,14 @@ public class Person_mxJPO
          * @param _sourceFile       souce file with the TCL code to update
          * @throws Exception if the update from derived class failed
          */
-        @Override
+        @Override()
         protected void update(final ParameterCache_mxJPO _paramCache,
                               final CharSequence _preMQLCode,
                               final CharSequence _postMQLCode,
                               final CharSequence _preTCLCode,
                               final Map<String,String> _tclVariables,
                               final File _sourceFile)
-                throws Exception
+            throws Exception
         {
             final StringBuilder preMQLCode = new StringBuilder();
 
@@ -295,8 +326,12 @@ public class Person_mxJPO
         }
     }
 
-    class PersonBus
-            extends BusObject_mxJPO
+    /**
+     * Handles the business object part of a person. Class is also needed so
+     * that protected methods could be called from this class.
+     */
+    private static final class PersonBus
+        extends BusObject_mxJPO
     {
         /**
          * Defines the serialize version unique identifier.
@@ -354,9 +389,9 @@ public class Person_mxJPO
          *
          * @param _paramCache   parameter cache
          */
-        @Override
+        @Override()
         protected void parse(final ParameterCache_mxJPO _paramCache)
-                throws MatrixException
+            throws MatrixException
         {
             super.parse(_paramCache);
 
@@ -412,10 +447,10 @@ public class Person_mxJPO
          *                      for the business object part must be written
          * @throws IOException if the TCL update code could not written
          */
-        @Override
+        @Override()
         public void write(final ParameterCache_mxJPO _paramCache,
                           final Appendable _out)
-                throws IOException
+            throws IOException
         {
             _out.append("mql mod bus \"${OBJECTID}\"")
                 .append(" \\\n    description \"").append(StringUtil_mxJPO.convertTcl(this.getBusDescription())).append("\"");
@@ -498,7 +533,7 @@ public class Person_mxJPO
                                      final StringBuilder _preMQLCode,
                                      final StringBuilder _postMQLCode,
                                      final Map<String,String> _tclVariables)
-                throws MatrixException
+            throws MatrixException
         {
             // found the business object
             final BusinessObject bus = new BusinessObject(this.getBusType(),

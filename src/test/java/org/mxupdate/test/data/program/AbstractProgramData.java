@@ -100,8 +100,8 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
      * @param _name                 name of the program
      */
     protected AbstractProgramData(final AbstractTest _test,
-                              final AbstractTest.CI _ci,
-                              final String _name)
+                                  final AbstractTest.CI _ci,
+                                  final String _name)
     {
         super(_test, _ci, _name, null);
     }
@@ -200,7 +200,7 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
     /**
      * Defines the {@link #downloadable} for this program.
      *
-     * @param _downloadable     i>true</i> if program is downloadable
+     * @param _downloadable     <i>true</i> if program is downloadable
      * @return this program instance
      * @see #downloadable
      */

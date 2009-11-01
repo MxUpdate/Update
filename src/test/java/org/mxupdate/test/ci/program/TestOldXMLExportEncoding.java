@@ -21,6 +21,7 @@
 package org.mxupdate.test.ci.program;
 
 import org.mxupdate.update.program.AbstractCode_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -139,6 +140,18 @@ public class TestOldXMLExportEncoding
         private String encode(final String _xml)
         {
             return this.encodeXMLExport(_xml);
+        }
+
+        /**
+         * Only a stub method because not required for the test.
+         *
+         * @param _paramCache   parameter cache
+         * @param _out          TCL update file
+         */
+        @Override()
+        protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                                   final Appendable _out)
+        {
         }
     }
 }

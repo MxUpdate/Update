@@ -74,7 +74,7 @@ public abstract class AbstractCode_mxJPO
     private static final String CODE_TAG_START = "<code><![CDATA[";
 
     /**
-     * Length of the {@link #CODE_TAG_START}Êstring.
+     * Length of the {@link #CODE_TAG_START} string.
      *
      * @see #encodeXMLExport(String)
      */
@@ -200,18 +200,5 @@ public abstract class AbstractCode_mxJPO
         } else  {
             super.parse(_url, _content);
         }
-    }
-
-    /**
-     * Must be implemented so that the class could be derived. The method is
-     * only a stub implementation.
-     *
-     * @param _paramCache   parameter cache; ignored
-     * @param _out          ignored
-     */
-    @Override()
-    protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
-    {
     }
 }

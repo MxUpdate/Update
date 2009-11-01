@@ -87,7 +87,9 @@ public class Export_mxJPO
      *                                      configuration item</li>
      * <li>{@link #RETURN_KEY_FILENAME}:    file name of the configuration
      *                                      item</li>
-     * </ul>
+     * </ul></p>
+     * <p>If an exception is thrown the exception is packed in the returned
+     * map.</p>
      *
      * @param _context  MX context for this request
      * @param _args     encoded arguments from the Eclipse plug-in:
@@ -105,40 +107,47 @@ public class Export_mxJPO
      *                      </li>
      *                  </ul>
      * @return packed return values in maps
-     * @throws Exception if export failed
      * @see AbstractPlugin_mxJPO#prepareReturn(String, String, Exception, Object)
      */
     public Map<String,?> exportByName(final Context _context,
                                       final String... _args)
-        throws Exception
     {
-        // initialize mapping
-        final Map<String,Collection<String>> exports = this.<Map<String,Collection<String>>>decode(_args, 0);
-        final Map<String,String> paramValues = this.<Map<String,String>>decode(_args, 1, null);
-        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, true, paramValues);
+        Map<String,?> packedRet = null;
+        try  {
+            // initialize mapping
+            final Map<String,Collection<String>> exports = this.<Map<String,Collection<String>>>decode(_args, 0);
+            final Map<String,String> paramValues = this.<Map<String,String>>decode(_args, 1, null);
+            final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, true, paramValues);
 
-        // export all objects depending on the type definitions
-        final Map<String,Collection<Map<String,String>>> ret = new HashMap<String,Collection<Map<String,String>>>();
-        for (final Map.Entry<String,Collection<String>> entry : exports.entrySet())  {
-            final TypeDef_mxJPO typeDef = paramCache.getMapping().getTypeDef(entry.getKey());
-            final Collection<Map<String,String>> extracts = new HashSet<Map<String,String>>();
-            ret.put(entry.getKey(), extracts);
-            for (final String mxName : entry.getValue())  {
-                final AbstractObject_mxJPO instance = typeDef.newTypeInstance(mxName);
-                final StringBuilder code = new StringBuilder();
-                instance.export(paramCache, code);
-                final Map<String,String> desc = new HashMap<String,String>();
-                desc.put(Export_mxJPO.RETURN_KEY_NAME, instance.getName());
-                desc.put(Export_mxJPO.RETURN_KEY_CODE, code.toString());
-                desc.put(Export_mxJPO.RETURN_KEY_PATH, instance.getPath());
-                desc.put(Export_mxJPO.RETURN_KEY_FILENAME, instance.getFileName());
-                extracts.add(desc);
+            // export all objects depending on the type definitions
+            final Map<String,Collection<Map<String,String>>> ret = new HashMap<String,Collection<Map<String,String>>>();
+            for (final Map.Entry<String,Collection<String>> entry : exports.entrySet())  {
+                final TypeDef_mxJPO typeDef = paramCache.getMapping().getTypeDef(entry.getKey());
+                final Collection<Map<String,String>> extracts = new HashSet<Map<String,String>>();
+                ret.put(entry.getKey(), extracts);
+                for (final String mxName : entry.getValue())  {
+                    final AbstractObject_mxJPO instance = typeDef.newTypeInstance(mxName);
+                    final StringBuilder code = new StringBuilder();
+                    instance.export(paramCache, code);
+                    final Map<String,String> desc = new HashMap<String,String>();
+                    desc.put(Export_mxJPO.RETURN_KEY_NAME, instance.getName());
+                    desc.put(Export_mxJPO.RETURN_KEY_CODE, code.toString());
+                    desc.put(Export_mxJPO.RETURN_KEY_PATH, instance.getPath());
+                    desc.put(Export_mxJPO.RETURN_KEY_FILENAME, instance.getFileName());
+                    extracts.add(desc);
+                }
             }
-        }
 
-        return this.prepareReturn(paramCache.getLogString(),
-                                  (String) null,
-                                  (Exception) null,
-                                  ret);
+            packedRet = this.prepareReturn(paramCache.getLogString(),
+                                           (String) null,
+                                           (Exception) null,
+                                           ret);
+        } catch (final Exception e)  {
+            packedRet = this.prepareReturn((String) null,
+                                           (String) null,
+                                           e,
+                                           null);
+        }
+        return packedRet;
     }
 }

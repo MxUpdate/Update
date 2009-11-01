@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.Set;
-import java.util.TreeSet;
 
 import matrix.util.MatrixException;
 
@@ -54,15 +53,6 @@ public abstract class AbstractObject_mxJPO
      * Defines the serialize version unique identifier.
      */
     private static final long serialVersionUID = -5505850566853070973L;
-
-    /**
-     * Key used to store the name of the program where all administration
-     * objects must be registered with symbolic names. For an OOTB installation
-     * the value is typically &quot;eServiceSchemaVariableMapping.tcl&quot;.
-     *
-     * @see #readSymbolicNames(ParameterCache_mxJPO)
-     */
-    private static final String PARAM_SYMB_NAME_PROG = "RegisterSymbolicNames";
 
     /**
      * Key used to store the regular expression for allowed characters of
@@ -143,12 +133,6 @@ public abstract class AbstractObject_mxJPO
      * @see #getOriginalName()
      */
     private String originalName;
-
-    /**
-     * All current defined symbolic names for MX administration objects (not
-     * for business administration objects!) are stored.
-     */
-    private final Set<String> symbolicNames = new TreeSet<String>();
 
     /**
      * Initialize the type definition enumeration.
@@ -585,89 +569,12 @@ public abstract class AbstractObject_mxJPO
     }
 
     /**
-     * Returns the set of all defined symbolic names of this administration
-     * (not business!) object. The method is the getter method for
-     * {@link #symbolicNames}.
+     * Must return all defined symbolic names for the object. If no symbolic
+     * names are defined, <code>null</code> must be returned
      *
-     * @return all defined symbolic names
-     * @see #symbolicNames
+     * @return all defined symbolic names; or <code>null</code> if not defined
      */
-    protected Set<String> getSymblicNames()
-    {
-        return this.symbolicNames;
-    }
-
-    /**
-     * Reads the symbolic names for current admin objects and stores them in
-     * {@link #symbolicNames}.
-     *
-     * @param _paramCache       parameter cache
-     * @throws MatrixException if the symbolic names could not be read
-     * @see #symbolicNames
-     */
-    protected void readSymbolicNames(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
-    {
-        // context must be checked if used within automatic tests
-        if ((this.getTypeDef().getMxAdminName() != null) && (_paramCache.getContext() != null))  {
-            final String symbProg = _paramCache.getValueString(AbstractObject_mxJPO.PARAM_SYMB_NAME_PROG);
-            final String symbProgIdxOf = new StringBuilder()
-                    .append(" on program ").append(symbProg).append(' ').toString();
-            final StringBuilder cmd = new StringBuilder()
-                    .append("escape list property on program \"")
-                                .append(StringUtil_mxJPO.convertMql(symbProg)).append("\" to ")
-                        .append(this.getTypeDef().getMxAdminName())
-                        .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
-                        .append(this.getTypeDef().getMxAdminSuffix());
-            for (final String symbName : MqlUtil_mxJPO.execMql(_paramCache, cmd).split("\n"))  {
-                if (!"".equals(symbName))  {
-                    this.symbolicNames.add(symbName.substring(0, symbName.indexOf(symbProgIdxOf)));
-                }
-            }
-        }
-    }
-
-    /**
-     * Appends the escaped MQL code to register given symbolic name
-     * <code>_symbName</code> depending on current defined symbolic names
-     * {@link #symbolicNames}. If not registered, a new registration is done.
-     * If wrong symbolic names are defined, they are removed.
-     *
-     * @param _paramCache   parameter cache
-     * @param _symbName     symbolic name which must be set
-     * @param _mqlCode      string builder where the MQL command must be
-     *                      appended
-     * @see #symbolicNames
-     */
-    protected void appendSymbolicNameRegistration(final ParameterCache_mxJPO _paramCache,
-                                                  final String _symbName,
-                                                  final StringBuilder _mqlCode)
-    {
-        if (this.getTypeDef().getMxAdminName() != null)  {
-            final String symbProg = _paramCache.getValueString(AbstractObject_mxJPO.PARAM_SYMB_NAME_PROG);
-            if (!this.symbolicNames.contains(_symbName))  {
-                _paramCache.logTrace("    - register symbolic name '" + _symbName + "'");
-                _mqlCode.append("escape add property \"").append(StringUtil_mxJPO.convertMql(_symbName)).append("\" ")
-                        .append(" on program \"").append(StringUtil_mxJPO.convertMql(symbProg)).append("\" to ")
-                        .append(this.getTypeDef().getMxAdminName())
-                        .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
-                        .append(this.getTypeDef().getMxAdminSuffix())
-                        .append(";\n");
-            }
-            for (final String exSymbName : this.symbolicNames)  {
-                if (!_symbName.equals(exSymbName))  {
-                    _paramCache.logTrace("    - remove symbolic name '" + exSymbName + "'");
-                    _mqlCode.append("escape delete property \"")
-                                    .append(StringUtil_mxJPO.convertMql(exSymbName)).append("\" ")
-                            .append(" on program \"").append(StringUtil_mxJPO.convertMql(symbProg)).append("\" to ")
-                            .append(this.getTypeDef().getMxAdminName())
-                            .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
-                            .append(this.getTypeDef().getMxAdminSuffix())
-                            .append(";\n");
-                }
-            }
-        }
-    }
+    protected abstract Set<String> getSymbolicNames();
 
     /**
      * <p>The calculates and returns the default symbolic name. A typical

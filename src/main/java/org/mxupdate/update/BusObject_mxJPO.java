@@ -176,6 +176,18 @@ public class BusObject_mxJPO
     }
 
     /**
+     * Because no symbolic names are allowed for business objects,
+     * <code>null</code> must be always returned.
+     *
+     * @return allways <code>null</code>
+     */
+    @Override()
+    protected Set<String> getSymbolicNames()
+    {
+        return null;
+    }
+
+    /**
      * Searches for all business object of current type definition and returns
      * all MX names. The revision of the business object is appended to the
      * name of the business object split by {@link #SPLIT_NAME}.

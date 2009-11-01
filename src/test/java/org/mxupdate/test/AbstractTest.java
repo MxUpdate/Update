@@ -134,7 +134,7 @@ public abstract class AbstractTest
         /**
          * Configuration item page program.
          */
-        PRG_PAGE("page", null, null, null, "Page", null, "PAGE_", "program/page", true),
+        PRG_PAGE("page", null, null, null, "Page", "PAGE", "PAGE_", "program/page", true),
 
         /**
          * Configuration item group.
@@ -709,6 +709,17 @@ public abstract class AbstractTest
         public T getValues()
         {
             return (T) this.jpoReturn.get("values");
+        }
+
+        /**
+         * Returns the stored exception from the JPO return.
+         *
+         * @return stored Exception from the JPO return
+         * @see #jpoReturn
+         */
+        public Exception getException()
+        {
+            return (Exception) this.jpoReturn.get("exception");
         }
     }
 

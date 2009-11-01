@@ -193,26 +193,26 @@ public abstract class AbstractPropertyObject_mxJPO
         }
         _out.append("\n")
             .append("# ").append(this.getName()).append("\n");
-        // symbolic name only if an administration type is defined
-        if (this.getTypeDef().getMxAdminName() != null)  {
+        // symbolic name only if defined
+        if (this.getSymbolicNames() != null)  {
             _out.append('#').append(AbstractPropertyObject_mxJPO.HEADER_SYMBOLIC_NAME).append(' ');
-            if (this.getSymblicNames().isEmpty())  {
+            if (this.getSymbolicNames().isEmpty())  {
                 final String symbName = this.calcDefaultSymbolicName(_paramCache);
                 _paramCache.logWarning("    - No symbolic name defined for '" + this.getName()
                         + "'! Symbolic name '" + symbName + "' will be used!");
                 _out.append(symbName);
-            } else if (this.getSymblicNames().size() > 1)  {
-                final String symbName = this.getSymblicNames().iterator().next();
-                _paramCache.logError("    - Found " + this.getSymblicNames().size()
+            } else if (this.getSymbolicNames().size() > 1)  {
+                final String symbName = this.getSymbolicNames().iterator().next();
+                _paramCache.logError("    - Found " + this.getSymbolicNames().size()
                         + " symbolic names! Only one is allowed! '"
                         + symbName + "' will be used!");
                 _paramCache.logTrace("    - Following symbolic names found:");
-                for (final String origSymb : this.getSymblicNames())  {
+                for (final String origSymb : this.getSymbolicNames())  {
                     _paramCache.logTrace("      * '" + origSymb + "'");
                 }
                 _out.append(symbName);
             } else  {
-                _out.append(this.getSymblicNames().iterator().next());
+                _out.append(this.getSymbolicNames().iterator().next());
             }
             _out.append('\n');
         }

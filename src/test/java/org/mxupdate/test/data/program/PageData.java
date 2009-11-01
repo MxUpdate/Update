@@ -20,10 +20,15 @@
 
 package org.mxupdate.test.data.program;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
+import org.testng.Assert;
 
 /**
  * The class is used to define all page program objects used to create / update
@@ -36,12 +41,33 @@ public class PageData
     extends AbstractAdminData<PageData>
 {
     /**
+     * Within export the description and mime type must be defined.
+     *
+     * @see #PageData(AbstractTest, String)
+     */
+    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(2);
+    static  {
+        PageData.REQUIRED_EXPORT_VALUES.add("description");
+        PageData.REQUIRED_EXPORT_VALUES.add("mime");
+    }
+
+    /**
+     * Separator used between the configuration item update code the the
+     * page content itself.
+     */
+    private static final String PAGE_CONTENT_SEPARATOR
+            = "# do not change the next three lines, they are needed as separator information:\n"
+            + "################################################################################\n"
+            + "# PAGE CONTENT                                                                 #\n"
+            + "################################################################################";
+
+    /**
      * Related code of this program.
      *
-     * @see #setCode(String)
+     * @see #setContent(String)
      * @see #getCode()
      */
-    private String code = "";
+    private String content = "";
 
     /**
      * Initializes this MQL program.
@@ -50,45 +76,67 @@ public class PageData
      * @param _name     name of the MQL program
      */
     public PageData(final AbstractTest _test,
-                          final String _name)
+                    final String _name)
     {
-        super(_test, AbstractTest.CI.PRG_PAGE, _name, null);
+        super(_test, AbstractTest.CI.PRG_PAGE, _name, PageData.REQUIRED_EXPORT_VALUES);
     }
 
     /**
-     * Defines the {@link #code} for this page.
+     * Defines the {@link #content} for this page.
      *
-     * @param _code     new code of this page
+     * @param _content     new code of this page
      * @return this page instance
-     * @see #code
+     * @see #content
      */
-    public PageData setCode(final String _code)
+    public PageData setContent(final String _content)
     {
-        this.code = _code;
+        this.content = _content;
         return this;
     }
 
     /**
-     * Returns the {@link #code} of this page.
+     * Returns the {@link #content} of this page.
      *
-     * @return related {@link #code} of this page
-     * @see #code
+     * @return related {@link #content} of this page
+     * @see #content
      */
     public String getCode()
     {
-        return this.code;
+        return this.content;
     }
 
     /**
-     * The related configuration item file is the {@link #code} of the program.
+     * Returns the symbolic name of a page object which must be always
+     * <code>null</code>.
      *
-     *  @return {@link #code} of the program
-     *  @see #code
+     * @return always <code>null</code>
+     */
+    @Override()
+    public String getSymbolicName()
+    {
+        return null;
+    }
+
+    /**
+     * The related configuration item file is the {@link #content} of the page.
+     *
+     *  @return {@link #content} of the page
+     *  @see #content
      */
     @Override()
     public String ciFile()
     {
-        return this.code;
+        final StringBuilder cmd = new StringBuilder()
+                .append("mql escape mod page \"${NAME}\" file [file join \"${FILE}\"]");
+        this.append4CIFileValues(cmd);
+
+        // append embedded inquiry code
+        if (this.content != null)  {
+            cmd.append("\n\n").append(PageData.PAGE_CONTENT_SEPARATOR).append('\n')
+               .append(this.content);
+        }
+
+        return cmd.toString();
     }
 
     /**
@@ -103,8 +151,16 @@ public class PageData
     {
         if (!this.isCreated())  {
             this.setCreated(true);
-            this.getTest().mql("escape add page \"" + AbstractTest.convertMql(this.getName()) + "\" "
-                    + "content \"" + AbstractTest.convertMql(this.code) + "\"");
+
+            final StringBuilder cmd = new StringBuilder()
+                    .append("escape add page \"").append(AbstractTest.convertMql(this.getName())).append("\"");
+            this.append4Create(cmd);
+            // append content
+            if (this.content != null)  {
+                cmd.append(" content \"").append(AbstractTest.convertMql(this.content)).append("\"");
+            }
+
+            this.getTest().mql(cmd);
         }
         return this;
     }
@@ -121,5 +177,108 @@ public class PageData
     {
         final String ciFileName = super.getCIFileName();
         return ciFileName.replaceAll("\\.tcl$", "");
+    }
+
+    /**
+     * Checks the export of this page all values and the embedded page content
+     * are correct defined. The original method is overwritten to test the page
+     * content.
+     *
+     * @param _exportParser     parsed export
+     * @throws MatrixException if check failed
+     */
+    @Override()
+    public void checkExport(final ExportParser _exportParser)
+        throws MatrixException
+    {
+        super.checkExport(_exportParser);
+
+        // check no symbolic name is defined
+        Assert.assertTrue((_exportParser.getSymbolicName() == null),
+                          "check that no symbolic name is defined");
+
+        // check embedded inquiry code
+        final PageExportParser exportParser = (PageExportParser) _exportParser;
+        if (this.content == null)  {
+            Assert.assertEquals(exportParser.pageContent,
+                                "",
+                                "check that no embedded page content is defined");
+        } else  {
+            Assert.assertEquals(exportParser.pageContent,
+                                this.content,
+                                "check that correct embedded page content is defined");
+        }
+    }
+
+    /**
+     * Returns the parsed export instance.
+     *
+     * @param _ci       related configuration item type
+     * @param _code     code of the exported configuration item
+     * @return parsed export instance
+     */
+    @Override()
+    protected ExportParser parseExport(final AbstractTest.CI _ci,
+                                       final String _code)
+    {
+        return new PageExportParser(_ci, _code);
+    }
+
+    /**
+     * The class overwrites the original export parser to handle the embedded
+     * page content within configuration item update files.
+     */
+    private static class PageExportParser
+        extends ExportParser
+    {
+        /**
+         * Defines the embedded page content within the configuration item
+         * update code.
+         *
+         * @see #extractUpdateCode(String)
+         */
+        private final String pageContent;
+
+        /**
+         * Initializes the inquiry export parser.
+         *
+         * @param _ci       type of the configuration item
+         * @param _code     exported configuration item update code
+         */
+        public PageExportParser(final AbstractTest.CI _ci,
+                                   final String _code)
+        {
+            super(_ci, _code);
+            final int idx = _code.indexOf(PageData.PAGE_CONTENT_SEPARATOR);
+            if (idx >= 0)  {
+                this.pageContent = _code.substring(idx + PageData.PAGE_CONTENT_SEPARATOR.length()).trim();
+            } else  {
+                this.pageContent = "";
+            }
+        }
+
+        /**
+         * Extracts from the <code>_origCode</code> the update code without
+         * header. Because the configuration item update code of an page
+         * includes also the content of the page, this page content must be
+         * removed from the original configuration item code so that the
+         * update code could be extracted correct.
+         *
+         * @param _origCode     original code from which the update code must
+         *                      be extracted
+         * @return extracted update code (without header and page content)
+         */
+        @Override()
+        protected String extractUpdateCode(final String _origCode)
+        {
+            final String origCode;
+            final int idx = _origCode.indexOf(PageData.PAGE_CONTENT_SEPARATOR);
+            if (idx >= 0)  {
+                origCode = _origCode.substring(0, idx);
+            } else  {
+                origCode = _origCode;
+            }
+            return super.extractUpdateCode(origCode);
+        }
     }
 }

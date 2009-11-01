@@ -21,6 +21,7 @@
 package org.mxupdate.test.ci.program;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.program.PageData;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -61,22 +62,35 @@ public class PageExportUpdate
         return new Object[][]  {
                 new Object[]{
                         "without extension with code",
-                        new PageData(this, "Test1").setCode("test")},
+                        new PageData(this, "Test1").setContent("test")},
                 new Object[]{
                         "without extension without code",
-                        new PageData(this, "Test2").setCode("")},
+                        new PageData(this, "Test2").setContent("")},
                 new Object[]{
                         "with extension with code",
-                        new PageData(this, "Test3.tcl").setCode("test")},
+                        new PageData(this, "Test3.tcl").setContent("test")},
                 new Object[]{
                         "with extension without code",
-                        new PageData(this, "Test4.tcl").setCode("")},
+                        new PageData(this, "Test4.tcl").setContent("")},
                 new Object[]{
                         "with extension without code",
-                        new PageData(this, "Test \" 5.tcl").setCode("")},
+                        new PageData(this, "Test \" 5.tcl").setContent("")},
                 new Object[]{
                         "with extension and CDATA tag end",
-                        new PageData(this, "Test.tcl").setCode("<]]>")},
+                        new PageData(this, "Test.tcl").setContent("<]]>")},
+                new Object[]{
+                        "with description",
+                        new PageData(this, "Test")
+                                .setValue("description", "My \"Test\" description")
+                                .setContent("Test Code")},
+                new Object[]{
+                        "with mime type",
+                        new PageData(this, "Test")
+                                .setValue("mime", "text/plain")
+                                .setContent("Test Code")},
+                new Object[]{
+                        "without code",
+                        new PageData(this, "Test")},
         };
     }
 
@@ -87,28 +101,14 @@ public class PageExportUpdate
      * @param _page         page to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "pages", description = "test export of pages")
+    @Test(dataProvider = "pages",
+          description = "test export of pages")
     public void simpleExport(final String _description,
                              final PageData _page)
         throws Exception
     {
         _page.create();
-        final Export export = this.export(CI.PRG_PAGE, _page.getName());
-
-        // check oath
-        Assert.assertEquals(export.getPath(),
-                            _page.getCI().filePath,
-                            "check path is correct");
-
-        // check file name
-        Assert.assertEquals(export.getFileName(),
-                            _page.getCIFileName(),
-                            "check that the correct file name is returned");
-
-        // check JPO code
-        Assert.assertEquals(export.getCode(),
-                            _page.getCode(),
-                            "checks page program code");
+        _page.checkExport(_page.export());
     }
 
     /**
@@ -119,7 +119,8 @@ public class PageExportUpdate
      * @param _page         page to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "pages", description = "test update of non existing pages")
+    @Test(dataProvider = "pages",
+          description = "test update of non existing pages")
     public void simpleUpdate(final String _description,
                              final PageData _page)
         throws Exception
@@ -127,12 +128,19 @@ public class PageExportUpdate
         // first update with original content
         this.update(_page.getCIFileName(), _page.ciFile());
 
-        Assert.assertTrue(!"".equals(this.mql("list page " + _page.getName())),
-                          "check page is created");
-        Assert.assertEquals(this.mql("escape print page \""
-                                    + AbstractTest.convertMql(_page.getName()) + "\" select content dump"),
-                            _page.getCode(),
-                            "check correct code");
+        // first update with original content
+        this.update(_page);
+        final ExportParser exportParser = _page.export();
+        _page.checkExport(exportParser);
+
+        // second update with delivered content
+        this.update(_page.getCIFileName(), exportParser.getOrigCode());
+        _page.checkExport(_page.export());
+
+        // and check that both export code is equal
+        Assert.assertEquals(exportParser.getOrigCode(),
+                            _page.export().getOrigCode(),
+                            "check that first and second export is equal");
     }
 
 

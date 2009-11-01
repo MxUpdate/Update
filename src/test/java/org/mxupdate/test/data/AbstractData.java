@@ -30,6 +30,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.AbstractTest.JPOReturn;
 import org.testng.Assert;
 
 /**
@@ -277,20 +278,27 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
             }
         }
 
-        final Map<String,Collection<Map<String,String>>> bck =
+        final JPOReturn<Map<String,Collection<Map<String,String>>>> jpoReturn =
                 this.test.<Map<String,Collection<Map<String,String>>>>jpoInvoke("org.mxupdate.plugin.Export",
                                                                                 "exportByName",
                                                                                 files,
-                                                                                params)
-                    .getValues();
+                                                                                params);
+
+        // check for no exception
+        if (jpoReturn.getException() != null)  {
+            throw new MatrixException(jpoReturn.getException());
+        }
+
+        // extract values
+        final Map<String,Collection<Map<String,String>>> values = jpoReturn.getValues();
 
         // check existence and element is defined
-        Assert.assertNotNull(bck);
-        Assert.assertTrue(bck.containsKey(this.ci.updateType));
-        Assert.assertEquals(bck.get(this.ci.updateType).size(), 1, "one element is returned");
+        Assert.assertNotNull(values);
+        Assert.assertTrue(values.containsKey(this.ci.updateType));
+        Assert.assertEquals(values.get(this.ci.updateType).size(), 1, "one element is returned");
 
         // parse first element
-        final Map<String,String> exportDesc = bck.get(this.getCI().updateType).iterator().next();
+        final Map<String,String> exportDesc = values.get(this.getCI().updateType).iterator().next();
         final ExportParser ret = this.parseExport(this.ci, exportDesc.get("code"));
 
         // check returned configuration item name
