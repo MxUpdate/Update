@@ -166,20 +166,6 @@ public class PageData
     }
 
     /**
-     * Returns the configuration item file name of this MQL program. The
-     * configuration item file name of a MQL program excludes the
-     * <code>.tcl</code> extension.
-     *
-     * @return file name of a JPO
-     */
-    @Override()
-    public String getCIFileName()
-    {
-        final String ciFileName = super.getCIFileName();
-        return ciFileName.replaceAll("\\.tcl$", "");
-    }
-
-    /**
      * Checks the export of this page all values and the embedded page content
      * are correct defined. The original method is overwritten to test the page
      * content.
