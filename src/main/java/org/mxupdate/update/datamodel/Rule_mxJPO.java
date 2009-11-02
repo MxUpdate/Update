@@ -40,13 +40,8 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public class Rule_mxJPO
-        extends AbstractAdminObject_mxJPO
+    extends AbstractAdminObject_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -3114403435479263346L;
-
     /**
      * Set holding the complete owner access.
      */
@@ -89,7 +84,7 @@ public class Rule_mxJPO
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
      */
-    @Override
+    @Override()
     protected void parse(final String _url,
                          final String _content)
     {
@@ -137,9 +132,9 @@ public class Rule_mxJPO
      *                          called)
      * @throws MatrixException if the prepare from derived class failed
      */
-    @Override
+    @Override()
     protected void prepare(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+        throws MatrixException
     {
         for (final UserAccess range : this.userAccess)  {
             this.userAccessSorted.add(range);
@@ -156,10 +151,10 @@ public class Rule_mxJPO
      * @throws IOException if the TCL update code for the rule could not be
      *                     written
      */
-    @Override
+    @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
-            throws IOException
+        throws IOException
     {
         // hidden?
         _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden");
@@ -207,14 +202,14 @@ public class Rule_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the called update from derived class failed
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         final StringBuilder preMQLCode = new StringBuilder()
             .append("escape mod ").append(this.getTypeDef().getMxAdminName())
@@ -238,7 +233,7 @@ public class Rule_mxJPO
      * Class used to hold the user access.
      */
     private class UserAccess
-            implements Comparable<Rule_mxJPO.UserAccess>
+        implements Comparable<Rule_mxJPO.UserAccess>
     {
         /**
          * Holds the user references of a user access.

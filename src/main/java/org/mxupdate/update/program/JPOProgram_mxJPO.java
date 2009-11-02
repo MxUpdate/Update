@@ -40,17 +40,12 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
 /**
  * The class is used to export, create, delete and update JPOs within MX.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class JPOProgram_mxJPO
-        extends AbstractProgram_mxJPO
+    extends AbstractProgram_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -4933461290880123088L;
-
     /**
      * Set of all ignored URLs from the XML definition for JPO programs.
      *
@@ -145,7 +140,7 @@ public class JPOProgram_mxJPO
      */
     @Override()
     public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+        throws MatrixException
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("list program * select name isjavaprogram dump \"\t\"");
@@ -284,7 +279,7 @@ public class JPOProgram_mxJPO
     @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
-            throws IOException, MatrixException
+        throws IOException, MatrixException
     {
         final String markStart = this.makeLinePrefix(JPOProgram_mxJPO.LINE_PREFIX, _paramCache.getValueString(JPOProgram_mxJPO.PARAM_MARKSTART).trim());
         final String markEnd = this.makeLinePrefix(JPOProgram_mxJPO.LINE_PREFIX, _paramCache.getValueString(JPOProgram_mxJPO.PARAM_MARKEND).trim());
@@ -337,7 +332,7 @@ public class JPOProgram_mxJPO
      */
     @Override()
     public void create(final ParameterCache_mxJPO _paramCache)
-            throws Exception
+        throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("add ").append(this.getTypeDef().getMxAdminName())
@@ -445,7 +440,7 @@ public class JPOProgram_mxJPO
      */
     @Override()
     public boolean compile(final ParameterCache_mxJPO _paramCache)
-            throws Exception
+        throws Exception
     {
         MqlUtil_mxJPO.execMql(_paramCache.getContext(), new StringBuilder()
                               .append("escape compile prog \"")

@@ -46,11 +46,6 @@ abstract class AbstractAttribute_mxJPO
     extends AbstractDMWithTriggers_mxJPO
 {
     /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -502565364090887306L;
-
-    /**
      * MQL list statement with select for the attribute type and name used
      * to get the list of all attribute MX names depending on the attribute
      * type.

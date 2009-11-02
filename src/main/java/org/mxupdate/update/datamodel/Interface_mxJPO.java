@@ -42,13 +42,8 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
  * @version $Id$
  */
 public class Interface_mxJPO
-        extends AbstractDMWithAttributes_mxJPO
+    extends AbstractDMWithAttributes_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = 7025932171586411284L;
-
     /**
      * Called TCL procedure within the TCL update to assign parent interface to
      * this interface object. The first argument of the JPO caller is
@@ -203,7 +198,7 @@ public class Interface_mxJPO
     @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
-            throws IOException
+        throws IOException
     {
         // write abstract information
         _out.append(" \\\n    abstract ").append(Boolean.toString(this.abstractFlag));
@@ -241,7 +236,7 @@ public class Interface_mxJPO
     @Override()
     protected void writeEnd(final ParameterCache_mxJPO _paramCache,
                             final Appendable _out)
-            throws IOException
+        throws IOException
     {
         _out.append("\n\ntestParents -").append(this.getTypeDef().getMxAdminName())
             .append(" \"${NAME}\" -parents [list \\\n");
@@ -287,7 +282,7 @@ public class Interface_mxJPO
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         final StringBuilder preMQLCode = new StringBuilder()
                 .append("escape mod ").append(this.getTypeDef().getMxAdminName())

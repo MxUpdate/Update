@@ -22,7 +22,6 @@ package org.mxupdate.update.datamodel;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,13 +48,8 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public class Policy_mxJPO
-        extends AbstractDMWithTriggers_mxJPO
+    extends AbstractDMWithTriggers_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = 8645304838663417963L;
-
     /**
      * Set of all ignored URLs from the XML definition for policies.
      *
@@ -163,7 +157,7 @@ public class Policy_mxJPO
      * @param _content  content of the URL to parse
      * @see #IGNORED_URLS
      */
-    @Override
+    @Override()
     protected void parse(final String _url,
                          final String _content)
     {
@@ -275,9 +269,9 @@ public class Policy_mxJPO
      * @param _paramCache   parameter cache
      * @throws MatrixException if the prepare within super class failed
      */
-    @Override
+    @Override()
     protected void prepare(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+        throws MatrixException
     {
         for (final State state : this.states)  {
             state.prepare();
@@ -302,10 +296,10 @@ public class Policy_mxJPO
      * @param _out          writer instance
      * @throws IOException if the TCL update code could not be written
      */
-    @Override
+    @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
-            throws IOException
+        throws IOException
     {
         this.writeHeader(_paramCache, _out);
         _out.append("updatePolicy \"${NAME}\" {");
@@ -350,7 +344,7 @@ public class Policy_mxJPO
      * @param _out          appendable instance to the TCL update file (not
      *                      used)
      */
-    @Override
+    @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
     {
@@ -375,14 +369,14 @@ public class Policy_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update from derived class failed
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         // add TCL code for the procedure
         final StringBuilder tclCode = new StringBuilder()
@@ -412,10 +406,10 @@ public class Policy_mxJPO
      *                   not be updated
      * @see #TCL_PROCEDURE
      */
-    @Override
+    @Override()
     public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
                                final String... _args)
-            throws Exception
+        throws Exception
     {
         final String code = _args[2].replaceAll("@0@0@", "'")
                                     .replaceAll("@1@1@", "\\\"");
@@ -568,13 +562,7 @@ throw new Exception("some states are not defined anymore!");
      * Class defining states of a policy.
      */
     public static class State
-            implements Serializable
     {
-        /**
-         * Defines the serialize version unique identifier.
-         */
-        private static final long serialVersionUID = -5507116248555405867L;
-
         /**
          * Name of the state.
          */
@@ -882,13 +870,8 @@ throw new Exception("some states are not defined anymore!");
      * Class used to hold the user access for a state.
      */
     public static class UserAccess
-            implements Comparable<Policy_mxJPO.UserAccess>, Serializable
+            implements Comparable<Policy_mxJPO.UserAccess>
     {
-        /**
-         * Defines the serialize version unique identifier.
-         */
-        private static final long serialVersionUID = -8442325362152826050L;
-
         /**
          * Holds the user references of a user access.
          */
@@ -925,13 +908,7 @@ throw new Exception("some states are not defined anymore!");
      * Class defining a signature for a state.
      */
     public static class Signature
-            implements Serializable
     {
-        /**
-         * Defines the serialize version unique identifier.
-         */
-        private static final long serialVersionUID = -8959837947086801473L;
-
         /**
          * Name of the signature.
          */
@@ -970,7 +947,7 @@ throw new Exception("some states are not defined anymore!");
          * @throws IOException if the TCL update code could not appended
          */
         protected void writeObject(final Appendable _out)
-                throws IOException
+            throws IOException
         {
             _out.append("\n    signature \"").append(StringUtil_mxJPO.convertTcl(this.name)).append("\" {")
                 .append("\n      branch \"").append(StringUtil_mxJPO.convertTcl(this.branch)).append("\"")
@@ -1004,7 +981,7 @@ throw new Exception("some states are not defined anymore!");
          */
         protected void calcDelta(final Appendable _out,
                                  final Signature _oldSignature)
-                throws IOException
+            throws IOException
         {
             if ("".equals(this.branch))  {
                 if ((_oldSignature != null) && (_oldSignature.branch != null) && !"".equals(_oldSignature.branch))  {

@@ -22,7 +22,6 @@ package org.mxupdate.update.datamodel;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,11 +51,6 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
 public class Dimension_mxJPO
     extends AbstractAdminObject_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = 1831885950156884562L;
-
     /**
      * Called TCL procedure within the TCL update to parse the new dimension
      * definition. The TCL procedure calls method
@@ -481,13 +475,8 @@ public class Dimension_mxJPO
      * dimension.
      */
     public static class Unit
-        implements Comparable<Dimension_mxJPO.Unit>, Serializable
+        implements Comparable<Dimension_mxJPO.Unit>
     {
-        /**
-         * Defines the serialize version unique identifier.
-         */
-        private static final long serialVersionUID = 8304234012828651268L;
-
         /**
          * Name of the unit.
          */
@@ -789,7 +778,7 @@ public class Dimension_mxJPO
          *
          * @return string representation of this unit
          */
-        @Override
+        @Override()
         public String toString()
         {
             return "[dimension name = " + this.name + ", "

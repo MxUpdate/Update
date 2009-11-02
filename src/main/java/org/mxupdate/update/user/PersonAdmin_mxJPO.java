@@ -45,13 +45,8 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public class PersonAdmin_mxJPO
-        extends AbstractUser_mxJPO
+    extends AbstractUser_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -8458972437612839433L;
-
     /**
      * Set of all ignored URLs from the XML definition for persons.
      *
@@ -293,7 +288,7 @@ public class PersonAdmin_mxJPO
      */
     @Override()
     public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+        throws MatrixException
     {
         final Set<String> persons = super.getMxNames(_paramCache);
 

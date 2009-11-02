@@ -40,13 +40,8 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public class Relationship_mxJPO
-        extends AbstractDMWithAttributes_mxJPO
+    extends AbstractDMWithAttributes_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -5246287940374394548L;
-
     /**
      * Name of the parameter to define that connections between relationships
      * are from current MX version supported. The parameter is needed to
@@ -210,7 +205,7 @@ public class Relationship_mxJPO
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
      */
-    @Override
+    @Override()
     protected void parse(final String _url,
                          final String _content)
     {
@@ -297,9 +292,9 @@ public class Relationship_mxJPO
      *                         failed
      * @todo support for from / to relationships
      */
-    @Override
+    @Override()
     protected void prepare(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+        throws MatrixException
     {
         // evaluate all from types
         final String[] fromTypesArr = MqlUtil_mxJPO.execMql(_paramCache,
@@ -379,10 +374,10 @@ public class Relationship_mxJPO
      * @throws IOException if the TCL code to the TCL update file could not be
      *                     written
      */
-    @Override
+    @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
-            throws IOException
+        throws IOException
     {
         _out.append(" \\\n    ").append(this.isHidden() ? "" : "!").append("hidden")
             .append(" \\\n    ").append(this.preventDuplicates ? "" : "!").append("preventduplicates");
@@ -444,7 +439,6 @@ public class Relationship_mxJPO
         }
     }
 
-
     /**
      * The method overwrites the original method to append the MQL statements
      * in the <code>_preMQLCode</code> to reset this relationship. This
@@ -471,14 +465,14 @@ public class Relationship_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update from derived class failed
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         final StringBuilder preMQLCode = new StringBuilder()
                 .append("escape mod ").append(this.getTypeDef().getMxAdminName())

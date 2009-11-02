@@ -26,17 +26,12 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
  * The class is used to evaluate information from date attributes within MX
  * used to export, delete and update a date attribute.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class AttributeDate_mxJPO
-        extends AbstractAttribute_mxJPO
+    extends AbstractAttribute_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = 7874723331157760342L;
-
     /**
      * Constructor used to initialize the date attribute instance with
      * related type definition and attribute name.

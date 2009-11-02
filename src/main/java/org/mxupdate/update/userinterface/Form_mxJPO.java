@@ -41,11 +41,6 @@ public class Form_mxJPO
     extends AbstractUIWithFields_mxJPO
 {
     /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = 8819919834817411562L;
-
-    /**
      * TCL procedure used to order fields of form, because Matrix has a bug
      * that sometimes the fields of a form are not in the correct order.
      *
@@ -122,7 +117,7 @@ public class Form_mxJPO
     @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
-            throws IOException
+        throws IOException
     {
         for (final Field field : this.getFields())  {
             _out.append(" \\\n    field");
@@ -141,7 +136,7 @@ public class Form_mxJPO
     @Override()
     protected void writeEnd(final ParameterCache_mxJPO _paramCache,
                             final Appendable _out)
-            throws IOException
+        throws IOException
     {
         _out.append("\n\norderFields \"${NAME}\" [list \\\n");
         for (final Field field : this.getFields())  {
@@ -158,9 +153,9 @@ public class Form_mxJPO
      * @param _paramCache   parameter cache
      * @throws Exception if the web form could not be created within MX
      */
-    @Override
+    @Override()
     public void create(final ParameterCache_mxJPO _paramCache)
-            throws Exception
+        throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("escape add ").append(this.getTypeDef().getMxAdminName())
@@ -202,7 +197,7 @@ public class Form_mxJPO
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         // reset HRef, description, alt and label
         final StringBuilder preMQLCode = new StringBuilder()

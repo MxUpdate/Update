@@ -41,13 +41,8 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public abstract class AbstractDMWithAttributes_mxJPO
-        extends AbstractDMWithTriggers_mxJPO
+    extends AbstractDMWithTriggers_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -2194896309854537398L;
-
     /**
      * Name of parameter to define ignored attributes within the test
      * attributes procedure for interfaces.
@@ -165,7 +160,7 @@ public abstract class AbstractDMWithAttributes_mxJPO
      * @param _content  content of the URL to parse
      * @see #attributes
      */
-    @Override
+    @Override()
     protected void parse(final String _url,
                          final String _content)
     {
@@ -188,10 +183,10 @@ public abstract class AbstractDMWithAttributes_mxJPO
      * @throws IOException if the extension could not be written
      * @see #attributes
      */
-    @Override
+    @Override()
     protected void writeEnd(final ParameterCache_mxJPO _paramCache,
                             final Appendable _out)
-            throws IOException
+        throws IOException
     {
         _out.append("\n\ntestAttributes -").append(this.getTypeDef().getMxAdminName())
             .append(" \"${NAME}\" -attributes [list \\\n");
@@ -219,14 +214,14 @@ public abstract class AbstractDMWithAttributes_mxJPO
      * @throws Exception if the update from derived class failed
      * @see #TCL_PROCEDURE
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         // add TCL code for the procedure
         final StringBuilder tclCode = new StringBuilder()
@@ -250,10 +245,10 @@ public abstract class AbstractDMWithAttributes_mxJPO
      *                   attribute is assigned to an administration object
      *                   within MX but not defined anymore
      */
-    @Override
+    @Override()
     public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
                                final String... _args)
-            throws Exception
+        throws Exception
     {
         int idx = 1;
         String name = null;

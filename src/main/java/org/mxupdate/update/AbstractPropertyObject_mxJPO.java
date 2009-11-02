@@ -38,13 +38,8 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public abstract class AbstractPropertyObject_mxJPO
-        extends AbstractObject_mxJPO
+    extends AbstractObject_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -2794355865894159489L;
-
     /**
      * String of the key within the parmater cache to define that symbolic
      * names must be always calculated.
@@ -310,11 +305,11 @@ public abstract class AbstractPropertyObject_mxJPO
      * @see #HEADER_ORIGINALNAME
      * @see #HEADER_VERSION
      */
-    @Override
+    @Override()
     public void update(final ParameterCache_mxJPO _paramCache,
                        final File _file,
                        final String _newVersion)
-            throws Exception
+        throws Exception
     {
         // parse objects
         this.parse(_paramCache);
@@ -400,7 +395,7 @@ public abstract class AbstractPropertyObject_mxJPO
      */
     public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
                                final String... _args)
-            throws Exception
+        throws Exception
     {
     }
 
@@ -527,7 +522,7 @@ public abstract class AbstractPropertyObject_mxJPO
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         final StringBuilder cmd = new StringBuilder().append(_preMQLCode);
 

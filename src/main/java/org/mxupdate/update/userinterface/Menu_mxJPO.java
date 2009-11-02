@@ -42,13 +42,8 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public class Menu_mxJPO
-        extends Command_mxJPO
+    extends Command_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = 3617033695673460587L;
-
     /**
      * Set of all ignored URLs from the XML definition for menus.
      *
@@ -95,7 +90,7 @@ public class Menu_mxJPO
      * @param _url      URL to parse
      * @param _content  related content of the URL
      */
-    @Override
+    @Override()
     protected void parse(final String _url,
                          final String _content)
     {
@@ -131,9 +126,9 @@ public class Menu_mxJPO
      *                         {@link #treeMenu} failed
      * @see #treeMenu
      */
-    @Override
+    @Override()
     protected void prepare(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+        throws MatrixException
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("escape print menu \"")
@@ -150,10 +145,10 @@ public class Menu_mxJPO
      * @param _out          appendable instance to the TCL update file
      * @throws IOException if the TCL update code could not be written
      */
-    @Override
+    @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
-            throws IOException
+        throws IOException
     {
         super.writeObject(_paramCache, _out);
 
@@ -176,10 +171,10 @@ public class Menu_mxJPO
      * @param _out          appendable instance to the TCL update file
      * @throws IOException if the TCL update code could not be written
      */
-    @Override
+    @Override()
     protected void writeEnd(final ParameterCache_mxJPO _paramCache,
                             final Appendable _out)
-            throws IOException
+        throws IOException
     {
         if (this.treeMenu)  {
             _out.append("\n\nmql mod menu \"Tree\" \\\n    add menu \"${NAME}\"");
@@ -217,7 +212,7 @@ public class Menu_mxJPO
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         // remove child commands / menus
         final StringBuilder preMQLCode = new StringBuilder()

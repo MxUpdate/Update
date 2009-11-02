@@ -26,17 +26,12 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
  * The class is used to evaluate information from string attributes within MX
  * used to export, delete and update a string attribute.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class AttributeString_mxJPO
-        extends AbstractAttribute_mxJPO
+    extends AbstractAttribute_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = 6661180759502308818L;
-
     /**
      * Constructor used to initialize the string attribute instance with
      * related type definition and attribute name.

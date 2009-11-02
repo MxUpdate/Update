@@ -22,7 +22,6 @@ package org.mxupdate.update.datamodel;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Map;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -43,13 +42,8 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public abstract class AbstractDMWithTriggers_mxJPO
-        extends AbstractAdminObject_mxJPO
+    extends AbstractAdminObject_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -3691181822025363195L;
-
     /**
      * Stack with all triggers for this type.
      */
@@ -80,7 +74,7 @@ public abstract class AbstractDMWithTriggers_mxJPO
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
      */
-    @Override
+    @Override()
     protected void parse(final String _url,
                          final String _content)
     {
@@ -106,9 +100,9 @@ public abstract class AbstractDMWithTriggers_mxJPO
      * @throws MatrixException if the preparation from derived class failed
      * @see #triggersStack
      */
-    @Override
+    @Override()
     protected void prepare(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+        throws MatrixException
     {
         // sort all triggers
         for (final Trigger trigger : this.triggersStack)  {
@@ -126,7 +120,7 @@ public abstract class AbstractDMWithTriggers_mxJPO
      * @see #triggers
      */
     protected void writeTriggers(final Appendable _out)
-            throws IOException
+        throws IOException
     {
         // output of triggers, but sorted!
         for (final Trigger trigger : this.triggers.values())  {
@@ -153,14 +147,14 @@ public abstract class AbstractDMWithTriggers_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update from derived class failed
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         final StringBuilder preMQLCode = new StringBuilder();
         // remove all triggers
@@ -184,13 +178,7 @@ public abstract class AbstractDMWithTriggers_mxJPO
      * Class used to store informations about triggers.
      */
     public static class Trigger
-            implements Serializable
     {
-        /**
-         * Defines the serialize version unique identifier.
-         */
-        private static final long serialVersionUID = -241775149089053095L;
-
         /**
          * Used to parse the event type of the trigger from the {@link #name}.
          *

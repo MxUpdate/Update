@@ -32,13 +32,8 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public class NumberGenerator_mxJPO
-        extends BusObject_mxJPO
+    extends BusObject_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -3678077121553752020L;
-
     /**
      * String of the key within the parameter cache to define the name of the
      * attribute which holds the next number of the number generator.
@@ -69,16 +64,16 @@ public class NumberGenerator_mxJPO
      * @throws IOException if the TCL update code for the number generator
      *                     could not be written
      */
-    @Override
+    @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
-            throws IOException
+        throws IOException
     {
         this.writeHeader(_paramCache, _out);
         _out.append("mql mod bus \"${OBJECTID}\"")
             .append(" \\\n    description \"").append(StringUtil_mxJPO.convertTcl(this.getDescription())).append("\"");
         String nextNumber = null;
-        final String attrNextNumber = _paramCache.getValueString(PARAM_ATTR_NUMBERGENERATOR_NEXTNUMBER);
+        final String attrNextNumber = _paramCache.getValueString(NumberGenerator_mxJPO.PARAM_ATTR_NUMBERGENERATOR_NEXTNUMBER);
         for (final AttributeValue attr : this.getAttrValuesSorted())  {
             if (attrNextNumber.equals(attr.name))  {
                 nextNumber = attr.value;

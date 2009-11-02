@@ -40,13 +40,8 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public abstract class AbstractUIWithFields_mxJPO
-        extends AbstractAdminObject_mxJPO
+    extends AbstractAdminObject_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -7882575497009341882L;
-
     /**
      * Set of all ignored URLs from the XML definition for web forms / web
      * tables.

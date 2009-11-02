@@ -46,11 +46,6 @@ public class MQLProgram_mxJPO
     extends AbstractProgram_mxJPO
 {
     /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -3329894042318127257L;
-
-    /**
      * Set of all ignored URLs from the XML definition for MQL programs.
      *
      * @see #parse(String, String)
@@ -103,7 +98,7 @@ public class MQLProgram_mxJPO
      * @param _mxName   MX name of the program object
      */
     public MQLProgram_mxJPO(final TypeDef_mxJPO _typeDef,
-                         final String _mxName)
+                            final String _mxName)
     {
         super(_typeDef, _mxName);
     }
@@ -118,7 +113,7 @@ public class MQLProgram_mxJPO
      */
     @Override()
     public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+        throws MatrixException
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("list program * select name isjavaprogram dump \"\t\"");
@@ -163,7 +158,7 @@ public class MQLProgram_mxJPO
     @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
-            throws IOException, MatrixException
+        throws IOException, MatrixException
     {
         final String markStartStr = _paramCache.getValueString(MQLProgram_mxJPO.PARAM_MARKSTART).trim();
         final String markEndStr = _paramCache.getValueString(MQLProgram_mxJPO.PARAM_MARKEND).trim();
@@ -214,7 +209,7 @@ public class MQLProgram_mxJPO
      */
     @Override()
     public void create(final ParameterCache_mxJPO _paramCache)
-            throws Exception
+        throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("escape add ").append(this.getTypeDef().getMxAdminName())

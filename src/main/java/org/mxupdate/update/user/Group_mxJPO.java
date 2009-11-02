@@ -42,11 +42,6 @@ public class Group_mxJPO
     extends AbstractUser_mxJPO
 {
     /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -4819262751735809709L;
-
-    /**
      * Set of all ignored URLs from the XML definition for groups.
      *
      * @see #parse(String, String)
@@ -92,9 +87,9 @@ public class Group_mxJPO
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
      */
-    @Override
+    @Override()
     protected void parse(final String _url,
-                      final String _content)
+                         final String _content)
     {
         if (!Group_mxJPO.IGNORED_URLS.contains(_url))  {
             if ("/parentGroup/groupRef".equals(_url))  {
@@ -117,7 +112,7 @@ public class Group_mxJPO
     @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
-            throws IOException
+        throws IOException
     {
         super.writeObject(_paramCache, _out);
 
@@ -159,7 +154,7 @@ public class Group_mxJPO
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         // description and all parents
         final StringBuilder preMQLCode = new StringBuilder()

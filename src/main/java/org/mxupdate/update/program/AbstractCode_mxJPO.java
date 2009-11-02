@@ -36,10 +36,6 @@ public abstract class AbstractCode_mxJPO
     extends AbstractAdminObject_mxJPO
 {
     /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -6353366924945315894L;
-    /**
      * Defines the parameter for old MX versions which has the encoding problem
      * for double closing square brackets. Only if this parameter is defined
      * the encoding {@link #encodeXMLExport(String) work around method} is

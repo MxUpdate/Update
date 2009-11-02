@@ -45,11 +45,6 @@ public class Role_mxJPO
     extends AbstractUser_mxJPO
 {
     /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -1889259829075111308L;
-
-    /**
      * Set of all ignored URLs from the XML definition for roles.
      *
      * @see #parse(String, String)

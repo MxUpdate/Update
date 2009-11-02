@@ -39,13 +39,8 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public class Association_mxJPO
-        extends AbstractAdminObject_mxJPO
+    extends AbstractAdminObject_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -3663847015076548873L;
-
     /**
      * Stores the definition of this association instance.
      */
@@ -69,7 +64,7 @@ public class Association_mxJPO
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
      */
-    @Override
+    @Override()
     protected void parse(final String _url,
                          final String _content)
     {
@@ -90,10 +85,10 @@ public class Association_mxJPO
      * @throws IOException if the TCL update code for the association could not
      *                     be written
      */
-    @Override
+    @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
-            throws IOException
+        throws IOException
     {
         _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden")
             .append(" \\\n    definition \"").append(StringUtil_mxJPO.convertTcl(this.definition)).append("\"");
@@ -122,14 +117,14 @@ public class Association_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update from derived class failed
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         // description and definition
         final StringBuilder preMQLCode = new StringBuilder()
@@ -154,10 +149,10 @@ public class Association_mxJPO
      * @return modified date of given update object
      * @throws MatrixException if the MQL print failed
      */
-    @Override
+    @Override()
     public String getPropValue(final ParameterCache_mxJPO _paramCache,
                                final PropertyDef_mxJPO _prop)
-            throws MatrixException
+        throws MatrixException
     {
         final String text = _prop.getPropName(_paramCache) + " on association " + this.getName() + " value ";
         final String curValue = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()

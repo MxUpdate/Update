@@ -58,11 +58,6 @@ public abstract class AbstractAdminObject_mxJPO
     extends AbstractPropertyObject_mxJPO
 {
     /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = 6211240989585499402L;
-
-    /**
      * Key used to store the name of the program where all administration
      * objects must be registered with symbolic names. For an OOTB installation
      * the value is typically &quot;eServiceSchemaVariableMapping.tcl&quot;.
@@ -232,7 +227,7 @@ public abstract class AbstractAdminObject_mxJPO
      */
     @Override()
     public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+        throws MatrixException
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("list ")
@@ -360,7 +355,7 @@ public abstract class AbstractAdminObject_mxJPO
      * @see #propertiesMap
      */
     protected void prepare(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+        throws MatrixException
     {
         // sort the properties
         for (final AdminProperty_mxJPO property : this.propertiesStack)  {
@@ -420,7 +415,7 @@ public abstract class AbstractAdminObject_mxJPO
     @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
-            throws IOException, MatrixException
+        throws IOException, MatrixException
     {
         this.writeHeader(_paramCache, _out);
         _out.append("mql escape mod ")
@@ -443,7 +438,7 @@ public abstract class AbstractAdminObject_mxJPO
      */
     protected abstract void writeObject(final ParameterCache_mxJPO _paramCache,
                                         final Appendable _out)
-            throws IOException;
+        throws IOException;
 
     /**
      * At the end of the write to the TCL update file in some cases some
@@ -457,7 +452,7 @@ public abstract class AbstractAdminObject_mxJPO
      */
     protected void writeEnd(final ParameterCache_mxJPO _paramCache,
                             final Appendable _out)
-            throws IOException
+        throws IOException
     {
     }
 
@@ -471,7 +466,7 @@ public abstract class AbstractAdminObject_mxJPO
      */
     protected void writeProperties(final ParameterCache_mxJPO _paramCache,
                                    final Appendable _out)
-            throws IOException
+        throws IOException
     {
         for (final AdminProperty_mxJPO prop : this.propertiesMap.values())  {
             if ((PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null) && !prop.isSetting())  {
@@ -505,7 +500,7 @@ public abstract class AbstractAdminObject_mxJPO
      */
     @Override
     public void delete(final ParameterCache_mxJPO _paramCache)
-            throws Exception
+        throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("escape delete ").append(this.getTypeDef().getMxAdminName())

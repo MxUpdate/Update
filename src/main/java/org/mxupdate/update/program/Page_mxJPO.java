@@ -42,16 +42,10 @@ public class Page_mxJPO
     extends AbstractCode_mxJPO
 {
     /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -2142094727046919689L;
-
-    /**
      * Defines the parameter for the comment in front of the separator between
      * TCL update code and the page content.
      *
-     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
     private static final String PARAM_SEPARATOR_COMMENT = "ProgramPageSeparatorComment";
 
@@ -59,7 +53,7 @@ public class Page_mxJPO
      * Defines the parameter for the separator between TCL update code and the
      * page content.
      *
-     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private static final String PARAM_SEPARATOR_TEXT = "ProgramPageSeparatorText";
@@ -176,6 +170,8 @@ public class Page_mxJPO
      * @param _out          appendable instance to the TCL update file
      * @throws IOException if the extension could not be written
      * @see #getCode()
+     * @see #PARAM_SEPARATOR_COMMENT
+     * @see #PARAM_SEPARATOR_TEXT
      */
     @Override()
     protected void writeEnd(final ParameterCache_mxJPO _paramCache,
@@ -214,6 +210,7 @@ public class Page_mxJPO
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update from derived class failed
+     * @see #PARAM_SEPARATOR_TEXT
      */
     @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
@@ -224,8 +221,6 @@ public class Page_mxJPO
                           final File _sourceFile)
         throws Exception
     {
-        final String sep = _paramCache.getValueString(Page_mxJPO.PARAM_SEPARATOR_TEXT);
-
         // reset HRef, description, alt, label and height
         final StringBuilder preMQLCode = new StringBuilder()
                 .append("escape mod ").append(this.getTypeDef().getMxAdminName())
@@ -237,6 +232,7 @@ public class Page_mxJPO
                   .append(_preMQLCode);
 
         // separate the page content content and the TCL update code
+        final String sep = _paramCache.getValueString(Page_mxJPO.PARAM_SEPARATOR_TEXT);
         final StringBuilder orgCode = this.getCode(_sourceFile);
         final int idx = orgCode.lastIndexOf(sep);
         final CharSequence code = (idx >= 0)

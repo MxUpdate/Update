@@ -33,13 +33,8 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public abstract class AbstractProgram_mxJPO
-        extends AbstractCode_mxJPO
+    extends AbstractCode_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -6353366924945315894L;
-
     /**
      * User in which context the MQL program is executed.
      *

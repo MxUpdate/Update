@@ -20,7 +20,6 @@
 
 package org.mxupdate.update.util;
 
-import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -33,13 +32,8 @@ import java.util.Set;
  * @version $Id$
  */
 public class AdminProperty_mxJPO
-    implements Serializable, Comparable<AdminProperty_mxJPO>
+    implements Comparable<AdminProperty_mxJPO>
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = 7814222356799301361L;
-
     /**
      * Set of all ignored URLs from the XML definition for admin properties.
      *

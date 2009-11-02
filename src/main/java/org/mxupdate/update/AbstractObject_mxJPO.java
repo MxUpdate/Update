@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.Writer;
 import java.util.Set;
 
@@ -47,13 +46,7 @@ import org.xml.sax.SAXException;
  * @version $Id$
  */
 public abstract class AbstractObject_mxJPO
-        implements Serializable
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -5505850566853070973L;
-
     /**
      * Key used to store the regular expression for allowed characters of
      * symbolic names. All other characters are replaced by &quot;nothing&quot;.
@@ -186,7 +179,7 @@ public abstract class AbstractObject_mxJPO
      */
     public void export(final ParameterCache_mxJPO _paramCache,
                        final File _path)
-            throws MatrixException, SAXException, IOException
+        throws MatrixException, SAXException, IOException
     {
         this.parse(_paramCache);
         final File file = new File(_path, this.getFileName());
@@ -213,7 +206,7 @@ public abstract class AbstractObject_mxJPO
      */
     public void export(final ParameterCache_mxJPO _paramCache,
                        final Appendable _out)
-            throws MatrixException, SAXException, IOException
+        throws MatrixException, SAXException, IOException
     {
         this.parse(_paramCache);
         this.write(_paramCache, _out);
@@ -241,7 +234,7 @@ public abstract class AbstractObject_mxJPO
      *                          never happen)
      */
     protected abstract void parse(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException, SAXException, IOException;
+        throws MatrixException, SAXException, IOException;
 
     /**
      * Returns a list of names exists within MX.
@@ -251,7 +244,7 @@ public abstract class AbstractObject_mxJPO
      * @throws MatrixException if the search within MX failed
      */
     public abstract Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException;
+        throws MatrixException;
 
     /**
      * Checks if given MX name without prefix and suffix matches given match
@@ -309,7 +302,7 @@ public abstract class AbstractObject_mxJPO
      * @throws Exception if delete failed
      */
     public abstract void delete(final ParameterCache_mxJPO _paramCache)
-            throws Exception;
+        throws Exception;
 
     /**
      * Creates a new administration object with given name.
@@ -318,7 +311,7 @@ public abstract class AbstractObject_mxJPO
      * @throws Exception if create failed
      */
     public abstract void create(final ParameterCache_mxJPO _paramCache)
-            throws Exception;
+        throws Exception;
 
     /**
      * Updated this administration (business) object.
@@ -333,7 +326,7 @@ public abstract class AbstractObject_mxJPO
     public abstract void update(final ParameterCache_mxJPO _paramCache,
                                 final File _file,
                                 final String _newVersion)
-            throws Exception;
+        throws Exception;
 
     /**
      * Compiles this administration object. Because typically ad administration
@@ -345,7 +338,7 @@ public abstract class AbstractObject_mxJPO
      * @throws Exception if the compile failed
      */
     public boolean compile(final ParameterCache_mxJPO _paramCache)
-            throws Exception
+        throws Exception
     {
         return false;
     }
@@ -358,7 +351,7 @@ public abstract class AbstractObject_mxJPO
      * @throws IOException if the file could not be opened or read
      */
     protected StringBuilder getCode(final File _file)
-            throws IOException
+        throws IOException
     {
         // read code
         final StringBuilder code = new StringBuilder();
@@ -386,7 +379,7 @@ public abstract class AbstractObject_mxJPO
      */
     public String getPropValue(final ParameterCache_mxJPO _paramCache,
                                final PropertyDef_mxJPO _prop)
-            throws MatrixException
+        throws MatrixException
     {
         final String curVersion;
         // check for existing administration type...

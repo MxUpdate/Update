@@ -22,7 +22,6 @@ package org.mxupdate.update;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,13 +55,8 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public class BusObject_mxJPO
-        extends AbstractPropertyObject_mxJPO
+    extends AbstractPropertyObject_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -5381775541507933947L;
-
     /**
      * Key used to store default attribute values within the parameter cache.
      *
@@ -197,9 +191,9 @@ public class BusObject_mxJPO
      * @throws MatrixException if the query for all business objects for given
      *                         type failed
      */
-    @Override
+    @Override()
     public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+        throws MatrixException
     {
         final StringList selects = new StringList();
         selects.addElement("name");
@@ -237,7 +231,7 @@ public class BusObject_mxJPO
      * @param _match        string which must be matched
      * @return <i>true</i> if the given MX name matches; otherwise <i>false</i>
      */
-    @Override
+    @Override()
     public boolean matchMxName(final ParameterCache_mxJPO _paramCache,
                                final String _mxName,
                                final String _match)
@@ -263,9 +257,9 @@ public class BusObject_mxJPO
      * @see #busStates
      * @see #busVault
      */
-    @Override
+    @Override()
     protected void parse(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+        throws MatrixException
     {
         final BusinessObject bus = new BusinessObject(this.getBusType(),
                                                       this.getBusName(),
@@ -364,7 +358,7 @@ public class BusObject_mxJPO
                               final String _relation,
                               final boolean _getFrom,
                               final boolean _getTo)
-            throws MatrixException
+        throws MatrixException
     {
         // get attributes from relationship
         final Map<String,Map> cache = _paramCache.defineValueMap(BusObject_mxJPO.PARAM_RELATION_ATTRS, Map.class);
@@ -383,7 +377,6 @@ public class BusObject_mxJPO
                 }
             };
         }
-
 
         final StringList busSelect = new StringList(3);
         busSelect.addElement("type");
@@ -423,10 +416,10 @@ public class BusObject_mxJPO
      * @throws IOException if the TCL update code for the business object could
      *                     not be written
      */
-    @Override
+    @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
-            throws IOException
+        throws IOException
     {
         this.writeHeader(_paramCache, _out);
         _out.append("mql escape mod bus \"${OBJECTID}\"")
@@ -447,16 +440,15 @@ public class BusObject_mxJPO
         }
     }
 
-
     /**
      * Deletes administration business object from given type with given name.
      *
      * @param _paramCache   parameter cache
      * @throws Exception if delete of the business object failed
      */
-    @Override
+    @Override()
     public void delete(final ParameterCache_mxJPO _paramCache)
-            throws Exception
+        throws Exception
     {
         final TypeDef_mxJPO typeDef = this.getTypeDef();
         final BusinessObject bus = new BusinessObject(typeDef.getMxBusType(),
@@ -472,9 +464,9 @@ public class BusObject_mxJPO
      * @param _paramCache   parameter cache
      * @throws Exception if the business object could not be created
      */
-    @Override
+    @Override()
     public void create(final ParameterCache_mxJPO _paramCache)
-            throws Exception
+        throws Exception
     {
         final TypeDef_mxJPO busType = this.getTypeDef();
         final BusinessObject bus = new BusinessObject(busType.getMxBusType(),
@@ -515,14 +507,14 @@ public class BusObject_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update executed within derived class failed
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         // resets the description
         final StringBuilder preMQLCode = new StringBuilder()
@@ -713,13 +705,8 @@ public class BusObject_mxJPO
      * done depending on the numbers.
      */
     protected static class AttributeValue
-            implements Comparable<BusObject_mxJPO.AttributeValue>, Serializable
+        implements Comparable<BusObject_mxJPO.AttributeValue>
     {
-        /**
-         * Defines the serialize version unique identifier.
-         */
-        private static final long serialVersionUID = 1147382775996454936L;
-
         /**
          * Holds the user references of a user access.
          */
@@ -811,13 +798,8 @@ public class BusObject_mxJPO
      * business object.
      */
     private static class Connection
-            implements Comparable<BusObject_mxJPO.Connection>, Serializable
+        implements Comparable<BusObject_mxJPO.Connection>
     {
-        /**
-         * Defines the serialize version unique identifier.
-         */
-        private static final long serialVersionUID = 8222078899759850622L;
-
         /**
          * Type of the business object.
          */
@@ -889,7 +871,7 @@ public class BusObject_mxJPO
          * @see #name
          * @see #revision
          */
-        @Override
+        @Override()
         public String toString()
         {
             return "[type = " + this.type + ","

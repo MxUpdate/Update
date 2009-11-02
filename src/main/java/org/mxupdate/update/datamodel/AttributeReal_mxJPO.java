@@ -26,17 +26,12 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
  * The class is used to evaluate information from real attributes within MX
  * used to export, delete and update a real attribute.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class AttributeReal_mxJPO
-        extends AbstractAttribute_mxJPO
+    extends AbstractAttribute_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -7258928738295721822L;
-
     /**
      * Constructor used to initialize the real attribute instance with
      * related type definition and attribute name.

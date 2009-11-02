@@ -34,17 +34,12 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 /**
  * Data model type class.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class Type_mxJPO
-        extends AbstractDMWithAttributes_mxJPO
+    extends AbstractDMWithAttributes_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = 7501426743362043943L;
-
     /**
      * Set of all ignored URLs from the XML definition for types.
      *
@@ -109,7 +104,7 @@ public class Type_mxJPO
      * @param _content  content of the URL to parse
      * @see #IGNORED_URLS
      */
-    @Override
+    @Override()
     protected void parse(final String _url,
                          final String _content)
     {
@@ -143,10 +138,10 @@ public class Type_mxJPO
      * @throws IOException if the TCL update code for the type could not be
      *                     written
      */
-    @Override
+    @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
-            throws IOException
+        throws IOException
     {
         _out.append(" \\\n    derived \"").append(StringUtil_mxJPO.convertTcl(this.derived)).append("\"")
             .append(" \\\n    ").append(this.isHidden() ? "" : "!").append("hidden")
@@ -183,14 +178,14 @@ public class Type_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update from derived class failed
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         final StringBuilder preMQLCode = new StringBuilder()
                 .append("escape mod ").append(this.getTypeDef().getMxAdminName())

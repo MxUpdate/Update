@@ -35,13 +35,8 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public class Table_mxJPO
-        extends AbstractUIWithFields_mxJPO
+    extends AbstractUIWithFields_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -518184934631890227L;
-
     /**
      * Constructor used to initialize the type definition enumeration.
      *
@@ -84,10 +79,10 @@ System.err.println("The table is derived from '" + _content + "'! This is curren
      * @throws IOException if the TCL update code could not be written
      * @see AbstractUIWithFields_mxJPO.Field#write(Appendable)
      */
-    @Override
+    @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
-            throws IOException
+        throws IOException
     {
         for (final Field column : this.getFields())  {
             _out.append(" \\\n    column");
@@ -118,14 +113,14 @@ System.err.println("The table is derived from '" + _content + "'! This is curren
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update from derived class failed
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         // set to not hidden
         final StringBuilder preMQLCode = new StringBuilder()

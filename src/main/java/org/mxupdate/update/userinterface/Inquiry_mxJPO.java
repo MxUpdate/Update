@@ -40,21 +40,24 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public class Inquiry_mxJPO
-       extends AbstractAdminObject_mxJPO
+    extends AbstractAdminObject_mxJPO
 {
     /**
-     * Defines the serialize version unique identifier.
+     * Defines the parameter for the comment in front of the separator between
+     * TCL update code and the inquiry code.
+     *
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
-    private static final long serialVersionUID = -6884861954912987897L;
+    private static final String PARAM_SEPARATOR_COMMENT = "UIInquirySeparatorComment";
 
     /**
-     * Separator used between the inquiry update statements and the inquiry
-     * code itself.
+     * Defines the parameter for the separator between TCL update code and the
+     * inquiry.
+     *
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
-    private static final String INQUIRY_SEPARATOR
-        = "################################################################################\n"
-        + "# INQUIRY CODE                                                                 #\n"
-        + "################################################################################";
+    private static final String PARAM_SEPARATOR_TEXT = "UIInquirySeparatorText";
 
     /**
      * Code for the inquiry.
@@ -62,7 +65,7 @@ public class Inquiry_mxJPO
      * @see #parse(String, String)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
-    private String code = null;
+    private String code;
 
     /**
      * Format for the inquiry.
@@ -70,7 +73,7 @@ public class Inquiry_mxJPO
      * @see #parse(String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
-    private String format = null;
+    private String format;
 
     /**
      * Pattern for the inquiry.
@@ -78,7 +81,7 @@ public class Inquiry_mxJPO
      * @see #parse(String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
-    private String pattern = null;
+    private String pattern;
 
     /**
      * Constructor used to initialize the inquiry instance.
@@ -101,7 +104,7 @@ public class Inquiry_mxJPO
      * @see #format
      * @see #pattern
      */
-    @Override
+    @Override()
     protected void parse(final String _url,
                          final String _content)
     {
@@ -129,10 +132,10 @@ public class Inquiry_mxJPO
      * @see #format
      * @see #getPropertiesMap()
      */
-    @Override
+    @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
-            throws IOException
+        throws IOException
     {
         _out.append(" \\\n    pattern \"").append(StringUtil_mxJPO.convertTcl(this.pattern)).append("\"")
             .append(" \\\n    format \"").append(StringUtil_mxJPO.convertTcl(this.format)).append("\"")
@@ -144,7 +147,7 @@ public class Inquiry_mxJPO
                     .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getValue())).append("\"");
             }
         }
-   }
+    }
 
     /**
      * At the end of the TCL update file the inquiry code must be appended.
@@ -153,15 +156,16 @@ public class Inquiry_mxJPO
      * @param _out          appendable instance to the TCL update file
      * @throws IOException if the extension could not be written
      * @see #code
+     * @see #PARAM_SEPARATOR_COMMENT
+     * @see #PARAM_SEPARATOR_TEXT
      */
-    @Override
+    @Override()
     protected void writeEnd(final ParameterCache_mxJPO _paramCache,
                             final Appendable _out)
-            throws IOException
+        throws IOException
     {
-        _out.append("\n\n# do not change the next three lines, they are needed as separator information:\n")
-            .append(Inquiry_mxJPO.INQUIRY_SEPARATOR)
-            .append("\n\n");
+        _out.append("\n\n").append(_paramCache.getValueString(Inquiry_mxJPO.PARAM_SEPARATOR_COMMENT))
+            .append('\n').append(_paramCache.getValueString(Inquiry_mxJPO.PARAM_SEPARATOR_TEXT)).append("\n\n");
         if (this.code != null)  {
             _out.append(this.code);
         }
@@ -176,7 +180,7 @@ public class Inquiry_mxJPO
      * Also the MQL statements to reset this inquiry are appended to the
      * statements in <code>_preMQLCode</code> to:
      * <ul>
-     * <li>reset the description, pattern and code</li>
+     * <li>reset the description, pattern, format and code</li>
      * <li>remove all arguments</li>
      * </ul>
      *
@@ -193,21 +197,22 @@ public class Inquiry_mxJPO
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update from derived class failed
+     * @see #PARAM_SEPARATOR_TEXT
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         // reset HRef, description, alt, label and height
         final StringBuilder preMQLCode = new StringBuilder()
                 .append("escape mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                .append(" description \"\" pattern \"\" code \"\"");
+                .append(" description \"\" pattern \"\" format \"\" code \"\"");
 
         // reset arguments
         for (final AdminProperty_mxJPO prop : this.getPropertiesMap().values())  {
@@ -222,41 +227,48 @@ public class Inquiry_mxJPO
                   .append(_preMQLCode);
 
         // separate the inquiry code and the TCL code
+        final String sep = _paramCache.getValueString(Inquiry_mxJPO.PARAM_SEPARATOR_TEXT);
         final StringBuilder orgCode = this.getCode(_sourceFile);
-        final int idx = orgCode.lastIndexOf(Inquiry_mxJPO.INQUIRY_SEPARATOR);
+        final int idx = orgCode.lastIndexOf(sep);
         final CharSequence code = (idx >= 0)
                                   ? orgCode.subSequence(0, idx)
                                   : orgCode;
         final CharSequence inqu = (idx >= 0)
-                                  ? orgCode.subSequence(idx + Inquiry_mxJPO.INQUIRY_SEPARATOR.length() + 1,
+                                  ? orgCode.subSequence(idx + sep.length() + 1,
                                                         orgCode.length())
                                   : "";
 
-        final File tmpInqFile = File.createTempFile("TMP_", ".inquiry");
         final File tmpTclFile = File.createTempFile("TMP_", ".tcl");
-
         try  {
-            // write TCL code
-            final Writer outTCL = new FileWriter(tmpTclFile);
-            outTCL.append(code.toString().trim());
-            outTCL.flush();
-            outTCL.close();
+            final File tmpInqFile = File.createTempFile("TMP_", ".inquiry");
+            try  {
+                // write TCL code
+                final Writer outTCL = new FileWriter(tmpTclFile);
+                try {
+                    outTCL.append(code.toString().trim());
+                } finally  {
+                    outTCL.close();
+                }
 
-            // write inquiry code
-            final Writer outInq = new FileWriter(tmpInqFile);
-            outInq.append(inqu.toString().trim());
-            outInq.flush();
-            outInq.close();
+                // write inquiry code
+                final Writer outInq = new FileWriter(tmpInqFile);
+                try {
+                    outInq.append(inqu.toString().trim());
+                } finally  {
+                    outInq.close();
+                }
 
-            // define TCL variable for the file
-            final Map<String,String> tclVariables = new HashMap<String,String>();
-            tclVariables.putAll(_tclVariables);
-            tclVariables.put("FILE", tmpInqFile.getPath());
+                // define TCL variable for the file
+                final Map<String,String> tclVariables = new HashMap<String,String>();
+                tclVariables.putAll(_tclVariables);
+                tclVariables.put("FILE", tmpInqFile.getPath());
 
-            // and update
-            super.update(_paramCache, preMQLCode, _postMQLCode, code, tclVariables, tmpTclFile);
+                // and update
+                super.update(_paramCache, preMQLCode, _postMQLCode, code, tclVariables, tmpTclFile);
+            } finally  {
+                tmpInqFile.delete();
+            }
         } finally  {
-            tmpInqFile.delete();
             tmpTclFile.delete();
         }
     }

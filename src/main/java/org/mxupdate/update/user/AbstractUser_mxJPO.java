@@ -54,11 +54,6 @@ public abstract class AbstractUser_mxJPO
     extends AbstractAdminObject_mxJPO
 {
     /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = 4072711818597692656L;
-
-    /**
      * Set of all ignored URLs from the XML definition for common stuff of
      * users.
      *
@@ -399,7 +394,7 @@ public abstract class AbstractUser_mxJPO
     @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
-            throws IOException
+        throws IOException
     {
         _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden");
 

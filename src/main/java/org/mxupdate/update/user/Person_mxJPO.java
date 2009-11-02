@@ -46,17 +46,12 @@ import org.xml.sax.SAXException;
 
 /**
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class Person_mxJPO
         extends AbstractObject_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = 213737109331352452L;
-
     /**
      * Administration person instance (used to parse the admin part of a
      * person).
@@ -190,11 +185,6 @@ public class Person_mxJPO
     private final class PersonAdmin
         extends PersonAdmin_mxJPO
     {
-        /**
-         * Defines the serialize version unique identifier.
-         */
-        private static final long serialVersionUID = -3816908902276144444L;
-
         /**
          * Constructor used to initialize the administration object instance
          * for persons.
@@ -333,11 +323,6 @@ public class Person_mxJPO
     private static final class PersonBus
         extends BusObject_mxJPO
     {
-        /**
-         * Defines the serialize version unique identifier.
-         */
-        private static final long serialVersionUID = 5091746765762271832L;
-
         /**
          * Current state of the business object person.
          */

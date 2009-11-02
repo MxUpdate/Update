@@ -40,13 +40,8 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public class Command_mxJPO
-        extends AbstractAdminObject_mxJPO
+    extends AbstractAdminObject_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -6311434999021971324L;
-
     /**
      * Set of all ignored URLs from the XML definition for commands.
      *
@@ -114,7 +109,7 @@ public class Command_mxJPO
      * @param _url      URL to parse
      * @param _content  related content of the URL to parse
      */
-    @Override
+    @Override()
     protected void parse(final String _url,
                          final String _content)
     {
@@ -139,10 +134,10 @@ public class Command_mxJPO
      * @throws IOException if the TCL update code for the command could not be
      *                     written
      */
-    @Override
+    @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
-            throws IOException
+        throws IOException
     {
         _out.append(" \\\n    label \"").append(StringUtil_mxJPO.convertTcl(this.label)).append("\"")
             .append(" \\\n    href \"").append(StringUtil_mxJPO.convertTcl(this.href)).append("\"")
@@ -183,14 +178,14 @@ public class Command_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update from derived class failed
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         // reset HRef, description, alt and label
         final StringBuilder preMQLCode = new StringBuilder()

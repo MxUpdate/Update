@@ -42,13 +42,8 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @version $Id$
  */
 public class Portal_mxJPO
-         extends AbstractAdminObject_mxJPO
+    extends AbstractAdminObject_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -3337088092343095556L;
-
     /**
      * Alt (label) of the portal.
      *
@@ -105,7 +100,7 @@ public class Portal_mxJPO
      * @param _url      url of the XML tag
      * @param _content  content of the XML tag
      */
-    @Override
+    @Override()
     protected void parse(final String _url,
                          final String _content)
     {
@@ -140,9 +135,9 @@ public class Portal_mxJPO
      * @see #channelRefs        stack of not ordered channel references
      * @see #orderedChannelRefs ordered channel references
      */
-    @Override
+    @Override()
     protected void prepare(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+        throws MatrixException
     {
         // sort the channels by row and column
         for (final ChannelRef channelRef : this.channelRefs)  {
@@ -173,10 +168,10 @@ public class Portal_mxJPO
      * @param _out          writer instance to the TCL update file
      * @throws IOException if the TCL update code could not be written
      */
-    @Override
+    @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
-            throws IOException
+        throws IOException
     {
         _out.append(" \\\n    label \"").append(StringUtil_mxJPO.convertTcl(this.label)).append("\"");
         if (this.href != null)  {
@@ -232,14 +227,14 @@ public class Portal_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update from derived class failed
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
                           final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
-            throws Exception
+        throws Exception
     {
         // HRef, description, alt and label
         final StringBuilder preMQLCode = new StringBuilder()

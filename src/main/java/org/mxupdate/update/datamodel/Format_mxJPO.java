@@ -25,22 +25,16 @@ import java.io.IOException;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
-import static org.mxupdate.update.util.StringUtil_mxJPO.convertTcl;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  *
- * @author tmoxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class Format_mxJPO
-        extends AbstractAdminObject_mxJPO
+    extends AbstractAdminObject_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = -2981049394263810538L;
-
     /**
      * Reference to the edit program.
      */
@@ -89,7 +83,7 @@ public class Format_mxJPO
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
      */
-    @Override
+    @Override()
     protected void parse(final String _url,
                          final String _content)
     {
@@ -124,17 +118,17 @@ public class Format_mxJPO
      * @throws IOException if the TCL update code for the format could not be
      *                     written
      */
-    @Override
+    @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
-            throws IOException
+        throws IOException
     {
-        _out.append(" \\\n    ").append(isHidden() ? "hidden" : "nothidden")
-            .append(" \\\n    version \"").append((this.version != null) ? convertTcl(this.version) : "").append('\"')
-            .append(" \\\n    suffix \"").append((this.fileSuffix != null) ? convertTcl(this.fileSuffix) : "").append('\"')
-            .append(" \\\n    mime \"").append((this.fileType != null) ? convertTcl(this.fileType) : "").append('\"')
-            .append(" \\\n    view \"").append((this.commandView != null) ? convertTcl(this.commandView) : "").append('\"')
-            .append(" \\\n    edit \"").append((this.commandEdit != null) ? convertTcl(this.commandEdit) : "").append('\"')
-            .append(" \\\n    print \"").append((this.commandPrint != null) ? convertTcl(this.commandPrint) : "").append('\"');
+        _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "nothidden")
+            .append(" \\\n    version \"").append((this.version != null) ? StringUtil_mxJPO.convertTcl(this.version) : "").append('\"')
+            .append(" \\\n    suffix \"").append((this.fileSuffix != null) ? StringUtil_mxJPO.convertTcl(this.fileSuffix) : "").append('\"')
+            .append(" \\\n    mime \"").append((this.fileType != null) ? StringUtil_mxJPO.convertTcl(this.fileType) : "").append('\"')
+            .append(" \\\n    view \"").append((this.commandView != null) ? StringUtil_mxJPO.convertTcl(this.commandView) : "").append('\"')
+            .append(" \\\n    edit \"").append((this.commandEdit != null) ? StringUtil_mxJPO.convertTcl(this.commandEdit) : "").append('\"')
+            .append(" \\\n    print \"").append((this.commandPrint != null) ? StringUtil_mxJPO.convertTcl(this.commandPrint) : "").append('\"');
     }
 }

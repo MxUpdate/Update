@@ -26,17 +26,12 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
  * The class is used to evaluate information from boolean attributes within MX
  * used to export, delete and update a boolean attribute.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class AttributeBoolean_mxJPO
-        extends AbstractAttribute_mxJPO
+    extends AbstractAttribute_mxJPO
 {
-    /**
-     * Defines the serialize version unique identifier.
-     */
-    private static final long serialVersionUID = 4298165547836491153L;
-
     /**
      * Constructor used to initialize the boolean attribute instance with
      * related type definition and attribute name.
