@@ -155,7 +155,7 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(STATE);
     tmpStr = sString();
                                 setValue(state, "name", tmpStr);
-    jj_consume_token(91);
+    jj_consume_token(92);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -164,6 +164,7 @@ public class PolicyDefParser_mxJPO
       case VERSION:
       case PROMOTE:
       case CHECKOUTHISTORY:
+      case REVOKE:
       case OWNER:
       case PUBLIC:
       case USER:
@@ -253,6 +254,20 @@ public class PolicyDefParser_mxJPO
       case PUBLIC:
         statePublicAccess(state);
         break;
+      case REVOKE:
+        jj_consume_token(REVOKE);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case OWNER:
+          stateOwnerRevoke(state);
+          break;
+        case PUBLIC:
+          statePublicRevoke(state);
+          break;
+        default:
+          jj_consume_token(-1);
+          throw new ParseException_mxJPO();
+        }
+        break;
       case ACTION:
         jj_consume_token(ACTION);
         tmpStr = sString();
@@ -290,7 +305,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(92);
+    jj_consume_token(93);
         this.appendValue(_policy, "states", state);
   }
 
@@ -313,7 +328,7 @@ public class PolicyDefParser_mxJPO
       ;
     }
         this.setValue(_state, "ownerAccess", accessSet);
-        this.setValue(_state, "ownerFilter", filter);
+        this.setValue(_state, "ownerAccessFilter", filter);
   }
 
 /**
@@ -335,7 +350,51 @@ public class PolicyDefParser_mxJPO
       ;
     }
         this.setValue(_state, "publicAccess", accessSet);
-        this.setValue(_state, "publicFilter", filter);
+        this.setValue(_state, "publicAccessFilter", filter);
+  }
+
+/**
+ * Parses the access and filter expression for the owner revoke definition.
+ *
+ * @param _state    current parsed state of the policy
+ */
+  final public void stateOwnerRevoke(final Policy_mxJPO.State _state) throws ParseException_mxJPO {
+    String filter = null;
+    Set<String> accessSet;
+    jj_consume_token(OWNER);
+    accessSet = lList();
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case FILTER:
+      jj_consume_token(FILTER);
+      filter = sString();
+      break;
+    default:
+      ;
+    }
+        this.setValue(_state, "ownerRevoke", accessSet);
+        this.setValue(_state, "ownerRevokeFilter", filter);
+  }
+
+/**
+ * Parses the access and filter expression for the public revoke definition.
+ *
+ * @param _state    current parsed state of the policy
+ */
+  final public void statePublicRevoke(final Policy_mxJPO.State _state) throws ParseException_mxJPO {
+    String filter = null;
+    Set<String> accessSet;
+    jj_consume_token(PUBLIC);
+    accessSet = lList();
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case FILTER:
+      jj_consume_token(FILTER);
+      filter = sString();
+      break;
+    default:
+      ;
+    }
+        this.setValue(_state, "publicRevoke", accessSet);
+        this.setValue(_state, "publicRevokeFilter", filter);
   }
 
 /**
@@ -401,7 +460,7 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(SIGNATURE);
     tmpStr = sString();
                                     this.setValue(signature, "name", tmpStr);
-    jj_consume_token(91);
+    jj_consume_token(92);
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -446,7 +505,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(92);
+    jj_consume_token(93);
         this.appendValue(_state, "signatures", signature);
   }
 

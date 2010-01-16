@@ -74,6 +74,7 @@ TOKEN : /** State and depending signature and trigger Tokens */
     | <VERSION:         "version">          : B_EXPECTED
     | <PROMOTE:         "promote">          : B_EXPECTED
     | <CHECKOUTHISTORY: "checkouthistory">  : B_EXPECTED
+    | <REVOKE:          "revoke">           : DEFAULT
     | <OWNER:           "owner">            : L_EXPECTED
     | <PUBLIC:          "public">           : L_EXPECTED
     | <USER:            "user">             : SL_EXPECTED
@@ -286,6 +287,7 @@ void state(final Policy_mxJPO _policy) : {
                                 | <BOOLEAN_FALSE>   {this.setValue(state, "checkoutHistory", false);} ) )
         | stateOwnerAccess(state)
         | statePublicAccess(state)
+        | ( <REVOKE> ( stateOwnerRevoke(state) | statePublicRevoke(state) ) )
         | (<ACTION>             tmpStr = sString()  {this.setValue(state, "actionProgram", tmpStr);}
            <INPUT>              tmpStr = sString()  {this.setValue(state, "actionInput", tmpStr);})
         | (<CHECK>              tmpStr = sString()  {this.setValue(state, "checkProgram", tmpStr);}
@@ -315,7 +317,7 @@ void stateOwnerAccess(final Policy_mxJPO.State _state) : {
     ( <FILTER> filter = sString() )?
     {
         this.setValue(_state, "ownerAccess", accessSet);
-        this.setValue(_state, "ownerFilter", filter);
+        this.setValue(_state, "ownerAccessFilter", filter);
     }
 }
 
@@ -332,7 +334,41 @@ void statePublicAccess(final Policy_mxJPO.State _state) : {
     ( <FILTER> filter = sString() )?
     {
         this.setValue(_state, "publicAccess", accessSet);
-        this.setValue(_state, "publicFilter", filter);
+        this.setValue(_state, "publicAccessFilter", filter);
+    }
+}
+
+/**
+ * Parses the access and filter expression for the owner revoke definition.
+ *
+ * @param _state    current parsed state of the policy
+ */
+void stateOwnerRevoke(final Policy_mxJPO.State _state) : {
+    String filter = null;
+    Set<String> accessSet;
+}  {
+    ( <OWNER> accessSet = lList() )
+    ( <FILTER> filter = sString() )?
+    {
+        this.setValue(_state, "ownerRevoke", accessSet);
+        this.setValue(_state, "ownerRevokeFilter", filter);
+    }
+}
+
+/**
+ * Parses the access and filter expression for the public revoke definition.
+ *
+ * @param _state    current parsed state of the policy
+ */
+void statePublicRevoke(final Policy_mxJPO.State _state) : {
+    String filter = null;
+    Set<String> accessSet;
+}  {
+    ( <PUBLIC> accessSet = lList() )
+    ( <FILTER> filter = sString() )?
+    {
+        this.setValue(_state, "publicRevoke", accessSet);
+        this.setValue(_state, "publicRevokeFilter", filter);
     }
 }
 

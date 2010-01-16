@@ -316,6 +316,82 @@ public class PolicyExportUpdateTest
     }
 
     /**
+     * Test export with owner revoke for a state with filter expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("88")
+    @Test(description = "export with owner revoke for a state with filter expression")
+    public void exportStateOwnerRevokeWithFilterExpression()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create revoke owner read,show filter type==Part");
+
+        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+
+        Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
+        Assert.assertEquals(export.getFileName(),
+                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "check that the correct file name is returned");
+        final String code = export.getCode();
+        Assert.assertTrue(
+                code.indexOf("\n    revoke owner {read show} filter \"type==Part\"\n") >= 0,
+                "check the for owner filter is exported");
+    }
+
+    /**
+     * Test export with none owner revoke.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("88")
+    @Test(description = "export with none owner revoke")
+    public void exportStateOwnerRevokeWithoutDefinition()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create revoke owner none filter ''");
+
+        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+
+        Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
+        Assert.assertEquals(export.getFileName(),
+                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "check that the correct file name is returned");
+        final String code = export.getCode();
+        Assert.assertTrue(
+                code.indexOf("revoke owner") < 0,
+                "check the for owner revoke is not exported");
+    }
+
+    /**
+     * Test export with owner revoke for a state without filter expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("88")
+    @Test(description = "export with owner revoke for a state without filter expression")
+    public void exportStateOwnerRevokeWithoutFilterExpression()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create revoke owner read,show filter ''");
+
+        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+
+        Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
+        Assert.assertEquals(export.getFileName(),
+                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "check that the correct file name is returned");
+        final String code = export.getCode();
+
+        Assert.assertTrue(
+                code.indexOf("\n    revoke owner {read show}\n") >= 0,
+                "check the for owner revoke filter is not exported");
+    }
+
+    /**
      * Test export with public access for a state with filter expression.
      *
      * @throws Exception if test failed
@@ -337,7 +413,7 @@ public class PolicyExportUpdateTest
         final String code = export.getCode();
         Assert.assertTrue(
                 code.indexOf("\n    public {read show} filter \"type==Part\"\n") >= 0,
-                "check the for owner filter is exported");
+                "check the for public access filter is exported");
     }
 
     /**
@@ -362,7 +438,83 @@ public class PolicyExportUpdateTest
         final String code = export.getCode();
         Assert.assertTrue(
                 code.indexOf("\n    public {read show}\n") >= 0,
-                "check the for owner filter is exported");
+                "check the for public access filter is not exported");
+    }
+
+    /**
+     * Test export with none public revoke.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("88")
+    @Test(description = "export with none public revoke")
+    public void exportStatePublicRevokeWithoutDefinition()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create revoke public none filter ''");
+
+        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+
+        Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
+        Assert.assertEquals(export.getFileName(),
+                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "check that the correct file name is returned");
+        final String code = export.getCode();
+
+        Assert.assertTrue(
+                code.indexOf("\n    revoke public") < 0,
+                "check the for public revoke is not exported");
+    }
+
+    /**
+     * Test export with public revoke for a state with filter expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("88")
+    @Test(description = "export with public revoke for a state with filter expression")
+    public void exportStatePublicRevokeWithFilterExpression()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create revoke public read,show filter type==Part");
+
+        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+
+        Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
+        Assert.assertEquals(export.getFileName(),
+                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "check that the correct file name is returned");
+        final String code = export.getCode();
+        Assert.assertTrue(
+                code.indexOf("\n    revoke public {read show} filter \"type==Part\"\n") >= 0,
+                "check the for public revoke filter is exported");
+    }
+
+    /**
+     * Test export with public revoke for a state without filter expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("88")
+    @Test(description = "export with public revoke for a state without filter expression")
+    public void exportStatePublicRevokeWithoutFilterExpression()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create revoke public read,show filter ''");
+
+        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+
+        Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
+        Assert.assertEquals(export.getFileName(),
+                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "check that the correct file name is returned");
+        final String code = export.getCode();
+        Assert.assertTrue(
+                code.indexOf("\n    revoke public {read show}\n") >= 0,
+                "check the for public revoke filter is exported");
     }
 
     /**
@@ -756,11 +908,198 @@ public class PolicyExportUpdateTest
                 "check that owner access without filter expression defined");
     }
 
+    /**
+     * Test create owner revoke with empty owner filter definition.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("88")
+    @Test(description = "create owner revoke with empty owner filter definition")
+    public void updateStateOwnerRevokeWithEmptyFilterExpression()
+        throws Exception
+    {
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    revoke owner {read show} filter \"\"\n"
+            + "  }\n"
+            + "}";
 
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
+        Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n    public"),
+                "check that owner revoke without filter expression defined");
+    }
 
+    /**
+     * Test create owner revoke with empty owner filter definition for existing
+     * definition.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("88")
+    @Test(description = "update owner revoke with empty owner filter definition for existing filter expression")
+    public void updateStateOwnerRevokeWithEmptyFilterExpression4Existing()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create revoke owner read,show filter \"type!=Part\"");
 
+        Assert.assertTrue(
+               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n     filter type!=Part"),
+               "check that owner revoke with filter expression defined");
 
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    revoke owner {read show} filter \"\"\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+        Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n    public"),
+                "check that owner revoke without filter expression defined");
+    }
+
+    /**
+     * Test create owner revoke with filter expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("88")
+    @Test(description = "create owner revoke with filter expression")
+    public void updateStateOwnerRevokeWithFilterExpression()
+        throws Exception
+    {
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    revoke owner {read show} filter \"type==Part\"\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+        Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n     filter type==Part"),
+                "check that owner revoke with filter expression defined");
+    }
+
+    /**
+     * Test update owner revoke with filter expression for existing filter
+     * expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("88")
+    @Test(description = "update owner revoke with filter expression for existing filter expression")
+    public void updateStateOwnerRevokeWithFilterExpression4Existing()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create revoke owner read,show filter \"type!=Part\"");
+
+        Assert.assertTrue(
+               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n     filter type!=Part"),
+               "check that owner revoke with filter expression defined");
+
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    revoke owner {read show} filter \"type==Part\"\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+        Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n     filter type==Part"),
+                "check that owner revoke with filter expression defined");
+    }
+
+    /**
+     * Test create owner revoke without filter expression for non existing
+     * state.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("88")
+    @Test(description = "create owner revoke without filter expression for non existing state")
+    public void updateStateOwnerRevokeWithoutFilterExpression()
+        throws Exception
+    {
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    revoke owner {read show}\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+         Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n    public"),
+                "check that owner revoke without filter expression defined");
+    }
+
+    /**
+     * Test update owner revoke without filter expression for existing state
+     * with existing owner filter expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("88")
+    @Test(description = "update owner revoke without filter expression for existing state with existing owner filter expression")
+    public void updateStateOwnerRevokeWithoutFilterExpression4Existing()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create revoke owner read,show filter \"type==Part\"");
+
+        Assert.assertTrue(
+               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n     filter type==Part"),
+               "check that revoke owner revoke with filter expression defined");
+
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    revoke owner {read show}\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+         Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n    public"),
+                "check that owner revoke without filter expression defined");
+    }
 
     /**
      * Test create public access with empty public filter definition.
@@ -954,6 +1293,201 @@ public class PolicyExportUpdateTest
                 this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    public read,show\n  nothidden"),
                 "check that public access without filter expression defined");
     }
+
+    /**
+     * Test create public access with empty public filter definition.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("88")
+    @Test(description = "create public access with empty public filter definition")
+    public void updateStatePublicRevokeWithEmptyFilterExpression()
+        throws Exception
+    {
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    revoke public {read show} filter \"\"\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+        Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n  nothidden"),
+                "check that public revoke  without filter expression defined");
+    }
+
+    /**
+     * Test create public access with empty public filter definition for existing
+     * definition.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("88")
+    @Test(description = "update public access with empty public filter definition for existing filter expression")
+    public void updateStatePublicRevokeWithEmptyFilterExpression4Existing()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create revoke public read,show filter \"type!=Part\"");
+
+        Assert.assertTrue(
+               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n     filter type!=Part"),
+               "check that public revoke with filter expression defined");
+
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    revoke public {read show} filter \"\"\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+        Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n  nothidden"),
+                "check that public revoke without filter expression defined");
+    }
+
+    /**
+     * Test create public access with filter expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("88")
+    @Test(description = "create public access with filter expression")
+    public void updateStatePublicRevokeWithFilterExpression()
+        throws Exception
+    {
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    revoke public {read show} filter \"type==Part\"\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+        Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n     filter type==Part"),
+                "check that public revoke with filter expression defined");
+    }
+
+    /**
+     * Test update public access with filter expression for existing filter
+     * expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("88")
+    @Test(description = "update public access with filter expression for existing filter expression")
+    public void updateStatePublicRevokeWithFilterExpression4Existing()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create revoke public read,show filter \"type!=Part\"");
+
+        Assert.assertTrue(
+               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n     filter type!=Part"),
+               "check that public revoke with filter expression defined");
+
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    revoke public {read show} filter \"type==Part\"\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+        Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n     filter type==Part"),
+                "check that public revoke with filter expression defined");
+    }
+
+    /**
+     * Test create public access without filter expression for non existing
+     * state.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("88")
+    @Test(description = "create public access without filter expression for non existing state")
+    public void updateStatePublicRevokeWithoutFilterExpression()
+        throws Exception
+    {
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    revoke public {read show}\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+         Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n  nothidden"),
+                "check that public revoke without filter expression defined");
+    }
+
+    /**
+     * Test update public access without filter expression for existing state
+     * with existing public filter expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("88")
+    @Test(description = "update public access without filter expression for existing state with existing public filter expression")
+    public void updateStatePublicRevokeWithoutFilterExpression4Existing()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create revoke public read,show filter \"type==Part\"");
+
+        Assert.assertTrue(
+               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n     filter type==Part"),
+               "check that public revoke with filter expression defined");
+
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    revoke public {read show}\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+         Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n  nothidden"),
+                "check that public revoke without filter expression defined");
+    }
+
+
 
     /**
      * Test update of policy with all types in braces.
