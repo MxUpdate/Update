@@ -26,7 +26,6 @@ public class PolicyDefParser_mxJPO
                     final String _mxName) throws ParseException_mxJPO, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
     final Policy_mxJPO policy = (Policy_mxJPO) _typeDef.newTypeInstance(_mxName);
     String tmp;
-    Set<String> set;
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -47,43 +46,39 @@ public class PolicyDefParser_mxJPO
       case DESCRIPTION:
         jj_consume_token(DESCRIPTION);
         tmp = sString();
-                                             setValue(policy, "description", tmp);
-        break;
-      case TYPE:
-        jj_consume_token(TYPE);
-        set = lList();
-                                             setValue(policy, "types", set);
+                                                setValue(policy, "description", tmp);
         break;
       case FORMAT:
-        jj_consume_token(FORMAT);
-        set = lList();
-                                             setValue(policy, "formats", set);
+        format(policy);
+        break;
+      case TYPE:
+        type(policy);
         break;
       case DEFAULTFORMAT:
         jj_consume_token(DEFAULTFORMAT);
         tmp = sString();
-                                             setValue(policy, "defaultFormat", tmp);
+                                                setValue(policy, "defaultFormat", tmp);
         break;
       case SEQUENCE:
         jj_consume_token(SEQUENCE);
         tmp = sString();
-                                             setValue(policy, "sequence", tmp);
+                                                setValue(policy, "sequence", tmp);
         break;
       case STORE:
         jj_consume_token(STORE);
         tmp = sString();
-                                             setValue(policy, "store", tmp);
+                                                setValue(policy, "store", tmp);
         break;
       case HIDDEN:
         jj_consume_token(HIDDEN);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case BOOLEAN_TRUE:
           jj_consume_token(BOOLEAN_TRUE);
-                                             this.setValue(policy, "hidden", true);
+                                                this.setValue(policy, "hidden", true);
           break;
         case BOOLEAN_FALSE:
           jj_consume_token(BOOLEAN_FALSE);
-                                             this.setValue(policy, "hidden", false);
+                                               this.setValue(policy, "hidden", false);
           break;
         default:
           jj_consume_token(-1);
@@ -103,6 +98,56 @@ public class PolicyDefParser_mxJPO
     throw new Error("Missing return statement in function");
   }
 
+/**
+ * Format of a policy definition.
+ *
+ * @param _policy   current parsed policy
+ */
+  final public void format(final Policy_mxJPO _policy) throws ParseException_mxJPO {
+    Set<String> set;
+    jj_consume_token(FORMAT);
+    if (jj_2_1(2)) {
+      jj_consume_token(LALL_ALL);
+                      set = new HashSet<String>();set.add("all");
+    } else {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LALL_CURLY_BRACKET_OPEN:
+      case L_CURLY_BRACKET_OPEN:
+        set = lList();
+        break;
+      default:
+        jj_consume_token(-1);
+        throw new ParseException_mxJPO();
+      }
+    }
+        setValue(_policy, "formats", set);
+  }
+
+/**
+ * Format of a type definition.
+ *
+ * @param _policy   current parsed policy
+ */
+  final public void type(final Policy_mxJPO _policy) throws ParseException_mxJPO {
+    Set<String> set;
+    jj_consume_token(TYPE);
+    if (jj_2_2(2)) {
+      jj_consume_token(LALL_ALL);
+                      set = new HashSet<String>();set.add("all");
+    } else {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LALL_CURLY_BRACKET_OPEN:
+      case L_CURLY_BRACKET_OPEN:
+        set = lList();
+        break;
+      default:
+        jj_consume_token(-1);
+        throw new ParseException_mxJPO();
+      }
+    }
+        setValue(_policy, "types", set);
+  }
+
   final public void state(final Policy_mxJPO _policy) throws ParseException_mxJPO {
     final Policy_mxJPO.State state = new Policy_mxJPO.State();
     String tmpStr;
@@ -110,7 +155,7 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(STATE);
     tmpStr = sString();
                                 setValue(state, "name", tmpStr);
-    jj_consume_token(85);
+    jj_consume_token(91);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -249,7 +294,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(86);
+    jj_consume_token(92);
         this.appendValue(_policy, "states", state);
   }
 
@@ -311,7 +356,7 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(SIGNATURE);
     tmpStr = sString();
                                     this.setValue(signature, "name", tmpStr);
-    jj_consume_token(85);
+    jj_consume_token(91);
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -356,7 +401,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(86);
+    jj_consume_token(92);
         this.appendValue(_state, "signatures", signature);
   }
 
@@ -396,7 +441,17 @@ public class PolicyDefParser_mxJPO
   final public Set<String> lList() throws ParseException_mxJPO {
     Token_mxJPO tmp;
     Set<String> ret = new HashSet<String>();
-    jj_consume_token(L_CURLY_BRACKET_OPEN);
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case L_CURLY_BRACKET_OPEN:
+      jj_consume_token(L_CURLY_BRACKET_OPEN);
+      break;
+    case LALL_CURLY_BRACKET_OPEN:
+      jj_consume_token(LALL_CURLY_BRACKET_OPEN);
+      break;
+    default:
+      jj_consume_token(-1);
+      throw new ParseException_mxJPO();
+    }
     label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -483,6 +538,28 @@ public class PolicyDefParser_mxJPO
     throw new Error("Missing return statement in function");
   }
 
+  private boolean jj_2_1(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_1(); }
+    catch(LookaheadSuccess ls) { return true; }
+  }
+
+  private boolean jj_2_2(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_2(); }
+    catch(LookaheadSuccess ls) { return true; }
+  }
+
+  private boolean jj_3_1() {
+    if (jj_scan_token(LALL_ALL)) return true;
+    return false;
+  }
+
+  private boolean jj_3_2() {
+    if (jj_scan_token(LALL_ALL)) return true;
+    return false;
+  }
+
   /** Generated Token Manager. */
   public PolicyDefParserTokenManager_mxJPO token_source;
   SimpleCharStream_mxJPO jj_input_stream;
@@ -491,6 +568,8 @@ public class PolicyDefParser_mxJPO
   /** Next token. */
   public Token_mxJPO jj_nt;
   private int jj_ntk;
+  private Token_mxJPO jj_scanpos, jj_lastpos;
+  private int jj_la;
 
   /** Constructor with InputStream. */
   public PolicyDefParser_mxJPO(java.io.InputStream stream) {
@@ -556,6 +635,24 @@ public class PolicyDefParser_mxJPO
     }
     token = oldToken;
     throw generateParseException();
+  }
+
+  static private final class LookaheadSuccess extends java.lang.Error { }
+  final private LookaheadSuccess jj_ls = new LookaheadSuccess();
+  private boolean jj_scan_token(int kind) {
+    if (jj_scanpos == jj_lastpos) {
+      jj_la--;
+      if (jj_scanpos.next == null) {
+        jj_lastpos = jj_scanpos = jj_scanpos.next = token_source.getNextToken();
+      } else {
+        jj_lastpos = jj_scanpos = jj_scanpos.next;
+      }
+    } else {
+      jj_scanpos = jj_scanpos.next;
+    }
+    if (jj_scanpos.kind != kind) return true;
+    if (jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;
+    return false;
   }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ options {
   USER_TOKEN_MANAGER = false;
 //  USER_CHAR_STREAM = true;
 //  OPTIMIZE_TOKEN_MANAGER = true;
+  SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
 }
 
 PARSER_BEGIN(PolicyDefParser)
@@ -56,14 +57,14 @@ SKIP :
 
 TOKEN : /** first level */
 {
-      <DESCRIPTION:     "description">      : S_EXPECTED
-    | <TYPE:            "type">             : L_EXPECTED
-    | <FORMAT:          "format">           : L_EXPECTED
-    | <STORE:           "store">            : S_EXPECTED
-    | <DEFAULTFORMAT:   "defaultformat">    : S_EXPECTED
-    | <SEQUENCE:        "sequence">         : S_EXPECTED
-    | <HIDDEN:          "hidden">           : B_EXPECTED
-    | <STATE:           "state">            : S_EXPECTED
+    <DESCRIPTION:     "description">      : S_EXPECTED
+  | <TYPE:            "type">             : LALL_EXPECTED
+  | <FORMAT:          "format">           : LALL_EXPECTED
+  | <STORE:           "store">            : S_EXPECTED
+  | <DEFAULTFORMAT:   "defaultformat">    : S_EXPECTED
+  | <SEQUENCE:        "sequence">         : S_EXPECTED
+  | <HIDDEN:          "hidden">           : B_EXPECTED
+  | <STATE:           "state">            : S_EXPECTED
 }
 
 TOKEN : /** State and depending signature and trigger Tokens */
@@ -93,7 +94,7 @@ TOKEN : /** State and depending signature and trigger Tokens */
 /*************************************************** Boolean for Hidden Value */
 <B_EXPECTED> SKIP :
 {
-  " " | "\t" | "\n" | "\r" 
+  " " | "\t" | "\n" | "\r"
 }
 
 <B_EXPECTED> TOKEN :
@@ -123,7 +124,7 @@ TOKEN : /** State and depending signature and trigger Tokens */
 /************************************************************* String -> List */
 <SL_EXPECTED> SKIP :
 {
-  " " | "\t" | "\n" | "\r" 
+  " " | "\t" | "\n" | "\r"
 }
 
 <SL_EXPECTED> TOKEN :
@@ -137,7 +138,7 @@ TOKEN : /** State and depending signature and trigger Tokens */
 /******************************************************************** String  */
 <S_EXPECTED> SKIP :
 {
-  " " | "\t" | "\n" | "\r" 
+  " " | "\t" | "\n" | "\r"
 }
 
 <S_EXPECTED> TOKEN :
@@ -146,6 +147,17 @@ TOKEN : /** State and depending signature and trigger Tokens */
     | <S_SINGLE_STRING : (<S_CHAR>)+> : DEFAULT
     | <#S_APOSTROPHE: "\"" >
     | <#S_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/**************************************************************** List or All */
+<LALL_EXPECTED> SKIP:
+{
+  " " | "\t" | "\n" | "\r"
+}
+<LALL_EXPECTED> TOKEN : /* List of Strings */
+{
+    < LALL_CURLY_BRACKET_OPEN : "{" >    : L2_EXPECTED
+  | < LALL_ALL : "all" > : DEFAULT
 }
 
 /*********************************************************************** List */
@@ -193,25 +205,66 @@ TOKEN : /** State and depending signature and trigger Tokens */
  */
 Policy_mxJPO policy(final ParameterCache_mxJPO _paramCache,
                     final TypeDef_mxJPO _typeDef,
-                    final String _mxName) 
+                    final String _mxName)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
 : {
     final Policy_mxJPO policy = (Policy_mxJPO) _typeDef.newTypeInstance(_mxName);
     String tmp;
-    Set<String> set;
 } {
-    ( (<DESCRIPTION>    tmp = sString()     {setValue(policy, "description", tmp);})
-    | (<TYPE>           set = lList()       {setValue(policy, "types", set);})
-    | (<FORMAT>         set = lList()       {setValue(policy, "formats", set);})
-    | (<DEFAULTFORMAT>  tmp = sString()     {setValue(policy, "defaultFormat", tmp);})
-    | (<SEQUENCE>       tmp = sString()     {setValue(policy, "sequence", tmp);})
-    | (<STORE>          tmp = sString()     {setValue(policy, "store", tmp);})
-    | (<HIDDEN>         ( <BOOLEAN_TRUE>    {this.setValue(policy, "hidden", true);}
-                        | <BOOLEAN_FALSE>   {this.setValue(policy, "hidden", false);} ) )
-    | (state(policy)) )*
+    (
+        ( <DESCRIPTION>    tmp = sString()     {setValue(policy, "description", tmp);} )
+      | ( format(policy) )
+      | ( type(policy) )
+      | ( <DEFAULTFORMAT>  tmp = sString()     {setValue(policy, "defaultFormat", tmp);} )
+      | ( <SEQUENCE>       tmp = sString()     {setValue(policy, "sequence", tmp);} )
+      | ( <STORE>          tmp = sString()     {setValue(policy, "store", tmp);} )
+      | ( <HIDDEN>         ( <BOOLEAN_TRUE>    {this.setValue(policy, "hidden", true);}
+                          | <BOOLEAN_FALSE>   {this.setValue(policy, "hidden", false);} ) )
+      | ( state(policy) )
+    )*
     {
         this.prepareObject(_paramCache, policy);
         return policy;
+    }
+}
+
+/**
+ * Format of a policy definition.
+ *
+ * @param _policy   current parsed policy
+ */
+void format(final Policy_mxJPO _policy) :
+{
+    Set<String> set;
+}
+{
+    <FORMAT>
+    ( LOOKAHEAD(2)
+        ( <LALL_ALL> {set = new HashSet<String>();set.add("all");} )
+      | ( set = lList() )
+    )
+    {
+        setValue(_policy, "formats", set);
+    }
+}
+
+/**
+ * Format of a type definition.
+ *
+ * @param _policy   current parsed policy
+ */
+void type(final Policy_mxJPO _policy) :
+{
+    Set<String> set;
+}
+{
+    <TYPE>
+    ( LOOKAHEAD(2)
+        ( <LALL_ALL> {set = new HashSet<String>();set.add("all");} )
+      | ( set = lList() )
+    )
+    {
+        setValue(_policy, "types", set);
     }
 }
 
@@ -320,7 +373,7 @@ Set<String> lList() :  {
     Set<String> ret = new HashSet<String>();
 }  {
     (
-        <L_CURLY_BRACKET_OPEN>
+        ( <L_CURLY_BRACKET_OPEN> | <LALL_CURLY_BRACKET_OPEN> )
             (
                 (tmp = <L_STRING>) {ret.add(this.getString(tmp.image));}
                 |
