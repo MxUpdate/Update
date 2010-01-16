@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -197,11 +197,15 @@ public class Policy_mxJPO
                 this.states.peek().ownerAccess.add(_url.replaceAll("^/stateDefList/stateDef/ownerAccess/access/", "")
                                                        .replaceAll("Access$", "")
                                                        .toLowerCase());
+            } else if ("/stateDefList/stateDef/ownerAccess/expressionFilter".equals(_url))  {
+                this.states.peek().ownerFilter = _content;
 
             } else if (_url.startsWith("/stateDefList/stateDef/publicAccess/access"))  {
                 this.states.peek().publicAccess.add(_url.replaceAll("^/stateDefList/stateDef/publicAccess/access/", "")
                                                         .replaceAll("Access$", "")
                                                         .toLowerCase());
+            } else if ("/stateDefList/stateDef/publicAccess/expressionFilter".equals(_url))  {
+                this.states.peek().publicFilter = _content;
 
             } else if ("/stateDefList/stateDef/userAccessList/userAccess".equals(_url))  {
                 this.states.peek().userAccess.add(new UserAccess());
@@ -411,6 +415,7 @@ public class Policy_mxJPO
                                final String... _args)
         throws Exception
     {
+try {
         final String code = _args[2].replaceAll("@0@0@", "'")
                                     .replaceAll("@1@1@", "\\\"");
 
@@ -495,6 +500,10 @@ throw new Exception("some states are not defined anymore!");
                 MqlUtil_mxJPO.setEscapeOff(_paramCache);
             }
         }
+} catch (final NullPointerException e) {
+    e.printStackTrace();
+    throw e;
+}
     }
 
     /**
@@ -629,9 +638,19 @@ throw new Exception("some states are not defined anymore!");
         private final Set<String> ownerAccess = new TreeSet<String>();
 
         /**
+         * String holding the filter expression for the owner.
+         */
+        private String ownerFilter;
+
+        /**
          * Set holding the complete public access.
          */
         private final Set<String> publicAccess = new TreeSet<String>();
+
+        /**
+         * String holding the filter expression for the public.
+         */
+        private String publicFilter;
 
         /**
          * Stack used to hold the user access while parsing.
@@ -722,11 +741,21 @@ throw new Exception("some states are not defined anymore!");
             // owner access
             _out.append("\n    owner {")
                 .append(StringUtil_mxJPO.joinTcl(' ', false, this.ownerAccess, null))
-                .append("}")
+                .append("}");
+            if ((this.ownerFilter != null) && !"".equals(this.ownerFilter))  {
+                _out.append(" filter \"")
+                    .append(StringUtil_mxJPO.convertTcl(this.ownerFilter))
+                    .append("\"");
+            }
             // public access
-                .append("\n    public {")
+            _out.append("\n    public {")
                 .append(StringUtil_mxJPO.joinTcl(' ', false, this.publicAccess, null))
                 .append("}");
+            if ((this.publicFilter != null) && !"".equals(this.publicFilter))  {
+                _out.append(" filter \"")
+                    .append(StringUtil_mxJPO.convertTcl(this.publicFilter))
+                    .append("\"");
+            }
             // user access
             for (final UserAccess userAccess : this.userAccessSorted)  {
                 _out.append("\n    user \"").append(StringUtil_mxJPO.convertTcl(userAccess.userRef)).append("\" {")
@@ -785,11 +814,25 @@ throw new Exception("some states are not defined anymore!");
             // owner access
             _out.append("owner ")
                 .append(StringUtil_mxJPO.joinMql(',', false, this.ownerAccess, "none"))
-                .append(' ')
+                .append(' ');
+            if ((this.ownerFilter != null) || ((_oldState != null) && (_oldState.ownerFilter != null)))  {
+                _out.append(" filter \"");
+                if (this.ownerFilter != null)  {
+                    _out.append(StringUtil_mxJPO.convertMql(this.ownerFilter));
+                }
+                _out.append("\" ");
+            }
             // public access
-                .append("public ")
+            _out.append("public ")
                 .append(StringUtil_mxJPO.joinMql(',', false, this.publicAccess, "none"))
                 .append(' ');
+            if ((this.publicFilter != null) || ((_oldState != null) && (_oldState.publicFilter != null)))  {
+                _out.append(" filter \"");
+                if (this.publicFilter != null)  {
+                    _out.append(StringUtil_mxJPO.convertMql(this.publicFilter));
+                }
+                _out.append("\" ");
+            }
             // user access
             final Set<String> newUsers = new HashSet<String>();
             for (final UserAccess userAccess : this.userAccess)  {

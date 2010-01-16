@@ -213,31 +213,6 @@ public class PolicyExportUpdateTest
     }
 
     /**
-     * Creates a new policy with one state without state symbolic name. In the
-     * export a symbolic name of the state must be written.
-     *
-     * @throws Exception if test failed
-     */
-    @IssueLink("11")
-    @Test(description = "export of state symbolic name export if not defined")
-    public void exportStateSymbolicNameExportedIfNotDefined()
-        throws Exception
-    {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
-                + " state create");
-
-        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
-
-        Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
-        Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
-                            "check that the correct file name is returned");
-        final String code = export.getCode();
-        Assert.assertTrue(code.indexOf("registeredName \"state_create\"") >= 0,
-                          "check that symbolic name 'state_create' exists");
-    }
-
-    /**
      * Creates a new policy with one state and with one symbolic name. The
      * symbolic name of the state must not defined as property, only with
      * &quot;registeredName&quot; in the update policy definition.
@@ -288,6 +263,131 @@ public class PolicyExportUpdateTest
                           "check that symbolic name 'state_create' exists");
         Assert.assertTrue(code.indexOf("registeredName \"state_exists\"") >= 0,
                           "check that symbolic name 'state_exists' exists");
+    }
+
+    /**
+     * Test export with owner access for a state with filter expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("87")
+    @Test(description = "export with owner access for a state with filter expression")
+    public void exportStateOwnerAccessWithFilterExpression()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create owner read,show filter type==Part");
+
+        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+
+        Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
+        Assert.assertEquals(export.getFileName(),
+                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "check that the correct file name is returned");
+        final String code = export.getCode();
+        Assert.assertTrue(
+                code.indexOf("\n    owner {read show} filter \"type==Part\"\n") >= 0,
+                "check the for owner filter is exported");
+    }
+
+    /**
+     * Test export with owner access for a state without filter expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("87")
+    @Test(description = "export with owner access for a state without filter expression")
+    public void exportStateOwnerAccessWithoutFilterExpression()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create owner read,show filter ''");
+
+        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+
+        Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
+        Assert.assertEquals(export.getFileName(),
+                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "check that the correct file name is returned");
+        final String code = export.getCode();
+        Assert.assertTrue(
+                code.indexOf("\n    owner {read show}\n") >= 0,
+                "check the for owner filter is exported");
+    }
+
+    /**
+     * Test export with public access for a state with filter expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("87")
+    @Test(description = "export with public access for a state with filter expression")
+    public void exportStatePublicAccessWithFilterExpression()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create public read,show filter type==Part");
+
+        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+
+        Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
+        Assert.assertEquals(export.getFileName(),
+                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "check that the correct file name is returned");
+        final String code = export.getCode();
+        Assert.assertTrue(
+                code.indexOf("\n    public {read show} filter \"type==Part\"\n") >= 0,
+                "check the for owner filter is exported");
+    }
+
+    /**
+     * Test export with public access for a state without filter expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("87")
+    @Test(description = "export with public access for a state without filter expression")
+    public void exportStatePublicAccessWithoutFilterExpression()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create public read,show filter ''");
+
+        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+
+        Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
+        Assert.assertEquals(export.getFileName(),
+                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "check that the correct file name is returned");
+        final String code = export.getCode();
+        Assert.assertTrue(
+                code.indexOf("\n    public {read show}\n") >= 0,
+                "check the for owner filter is exported");
+    }
+
+    /**
+     * Creates a new policy with one state without state symbolic name. In the
+     * export a symbolic name of the state must be written.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("11")
+    @Test(description = "export of state symbolic name export if not defined")
+    public void exportStateSymbolicNameExportedIfNotDefined()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create");
+
+        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+
+        Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
+        Assert.assertEquals(export.getFileName(),
+                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "check that the correct file name is returned");
+        final String code = export.getCode();
+        Assert.assertTrue(code.indexOf("registeredName \"state_create\"") >= 0,
+                          "check that symbolic name 'state_create' exists");
     }
 
     /**
@@ -438,7 +538,7 @@ public class PolicyExportUpdateTest
      * @throws Exception if MQL execution failed
      */
     @IssueLink("11")
-    @Test(description = "")
+    @Test(description = "check update of policy without state symbolic names are updated without property definition for states")
     public void updateProperties()
         throws Exception
     {
@@ -463,6 +563,397 @@ public class PolicyExportUpdateTest
                           "Update did set an empty property!");
     }
 
+    /**
+     * Test create owner access with empty owner filter definition.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("87")
+    @Test(description = "create owner access with empty owner filter definition")
+    public void updateStateOwnerAccessWithEmptyFilterExpression()
+        throws Exception
+    {
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    owner {read show} filter \"\"\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+        Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    owner read,show\n    public"),
+                "check that owner access without filter expression defined");
+    }
+
+    /**
+     * Test create owner access with empty owner filter definition for existing
+     * definition.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("87")
+    @Test(description = "update owner access with empty owner filter definition for existing filter expression")
+    public void updateStateOwnerAccessWithEmptyFilterExpression4Existing()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create owner read,show filter \"type!=Part\"");
+
+        Assert.assertTrue(
+               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    owner read,show\n     filter type!=Part"),
+               "check that owner access with filter expression defined");
+
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    owner {read show} filter \"\"\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+        Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    owner read,show\n    public"),
+                "check that owner access without filter expression defined");
+    }
+
+    /**
+     * Test create owner access with filter expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("87")
+    @Test(description = "create owner access with filter expression")
+    public void updateStateOwnerAccessWithFilterExpression()
+        throws Exception
+    {
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    owner {read show} filter \"type==Part\"\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+        Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    owner read,show\n     filter type==Part"),
+                "check that owner access with filter expression defined");
+    }
+
+    /**
+     * Test update owner access with filter expression for existing filter
+     * expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("87")
+    @Test(description = "update owner access with filter expression for existing filter expression")
+    public void updateStateOwnerAccessWithFilterExpression4Existing()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create owner read,show filter \"type!=Part\"");
+
+        Assert.assertTrue(
+               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    owner read,show\n     filter type!=Part"),
+               "check that owner access with filter expression defined");
+
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    owner {read show} filter \"type==Part\"\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+        Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    owner read,show\n     filter type==Part"),
+                "check that owner access with filter expression defined");
+    }
+
+    /**
+     * Test create owner access without filter expression for non existing
+     * state.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("87")
+    @Test(description = "create owner access without filter expression for non existing state")
+    public void updateStateOwnerAccessWithoutFilterExpression()
+        throws Exception
+    {
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    owner {read show}\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+         Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    owner read,show\n    public"),
+                "check that owner access without filter expression defined");
+    }
+
+    /**
+     * Test update owner access without filter expression for existing state
+     * with existing owner filter expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("87")
+    @Test(description = "update owner access without filter expression for existing state with existing owner filter expression")
+    public void updateStateOwnerAccessWithoutFilterExpression4Existing()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create owner read,show filter \"type==Part\"");
+
+        Assert.assertTrue(
+               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    owner read,show\n     filter type==Part"),
+               "check that owner access with filter expression defined");
+
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    owner {read show}\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+         Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    owner read,show\n    public"),
+                "check that owner access without filter expression defined");
+    }
+
+
+
+
+
+
+
+    /**
+     * Test create public access with empty public filter definition.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("87")
+    @Test(description = "create public access with empty public filter definition")
+    public void updateStatePublicAccessWithEmptyFilterExpression()
+        throws Exception
+    {
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    public {read show} filter \"\"\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+        Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    public read,show\n  nothidden"),
+                "check that public access without filter expression defined");
+    }
+
+    /**
+     * Test create public access with empty public filter definition for existing
+     * definition.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("87")
+    @Test(description = "update public access with empty public filter definition for existing filter expression")
+    public void updateStatePublicAccessWithEmptyFilterExpression4Existing()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create public read,show filter \"type!=Part\"");
+
+        Assert.assertTrue(
+               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    public read,show\n     filter type!=Part"),
+               "check that public access with filter expression defined");
+
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    public {read show} filter \"\"\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+        Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    public read,show\n  nothidden"),
+                "check that public access without filter expression defined");
+    }
+
+    /**
+     * Test create public access with filter expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("87")
+    @Test(description = "create public access with filter expression")
+    public void updateStatePublicAccessWithFilterExpression()
+        throws Exception
+    {
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    public {read show} filter \"type==Part\"\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+        Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    public read,show\n     filter type==Part"),
+                "check that public access with filter expression defined");
+    }
+
+    /**
+     * Test update public access with filter expression for existing filter
+     * expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("87")
+    @Test(description = "update public access with filter expression for existing filter expression")
+    public void updateStatePublicAccessWithFilterExpression4Existing()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create public read,show filter \"type!=Part\"");
+
+        Assert.assertTrue(
+               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    public read,show\n     filter type!=Part"),
+               "check that public access with filter expression defined");
+
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    public {read show} filter \"type==Part\"\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+        Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    public read,show\n     filter type==Part"),
+                "check that public access with filter expression defined");
+    }
+
+    /**
+     * Test create public access without filter expression for non existing
+     * state.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("87")
+    @Test(description = "create public access without filter expression for non existing state")
+    public void updateStatePublicAccessWithoutFilterExpression()
+        throws Exception
+    {
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    public {read show}\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+         Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    public read,show\n  nothidden"),
+                "check that public access without filter expression defined");
+    }
+
+    /**
+     * Test update public access without filter expression for existing state
+     * with existing public filter expression.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("87")
+    @Test(description = "update public access without filter expression for existing state with existing public filter expression")
+    public void updateStatePublicAccessWithoutFilterExpression4Existing()
+        throws Exception
+    {
+        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+                + " state create public read,show filter \"type==Part\"");
+
+        Assert.assertTrue(
+               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    public read,show\n     filter type==Part"),
+               "check that public access with filter expression defined");
+
+        final String updateCode =
+            "updatePolicy \"${NAME}\" {\n"
+            + "  description \"\"\n"
+            + "  type {all}\n"
+            + "  state \"create\"  {\n"
+            + "    public {read show}\n"
+            + "  }\n"
+            + "}";
+
+        final Map<String,String> params = new HashMap<String,String>();
+        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+
+         Assert.assertTrue(
+                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    public read,show\n  nothidden"),
+                "check that public access without filter expression defined");
+    }
 
     /**
      * Test update of policy with all types in braces.

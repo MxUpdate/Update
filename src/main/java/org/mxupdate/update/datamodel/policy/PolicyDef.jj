@@ -284,8 +284,8 @@ void state(final Policy_mxJPO _policy) : {
                                 | <BOOLEAN_FALSE>   {this.setValue(state, "autoPromotion", false);} ) )
         | (<CHECKOUTHISTORY>    ( <BOOLEAN_TRUE>    {this.setValue(state, "checkoutHistory", true);}
                                 | <BOOLEAN_FALSE>   {this.setValue(state, "checkoutHistory", false);} ) )
-        | (<OWNER>              tmpSet = lList()    {this.setValue(state, "ownerAccess", tmpSet);})
-        | (<PUBLIC>             tmpSet = lList()    {this.setValue(state, "publicAccess", tmpSet);})
+        | stateOwnerAccess(state)
+        | statePublicAccess(state)
         | (<ACTION>             tmpStr = sString()  {this.setValue(state, "actionProgram", tmpStr);}
            <INPUT>              tmpStr = sString()  {this.setValue(state, "actionInput", tmpStr);})
         | (<CHECK>              tmpStr = sString()  {this.setValue(state, "checkProgram", tmpStr);}
@@ -302,6 +302,45 @@ void state(final Policy_mxJPO _policy) : {
     }
 }
 
+/**
+ * Parses the access and filter expression for the owner definition.
+ *
+ * @param _state    current parsed state of the policy
+ */
+void stateOwnerAccess(final Policy_mxJPO.State _state) : {
+    String filter = null;
+    Set<String> accessSet;
+}  {
+    ( <OWNER> accessSet = lList() )
+    ( <FILTER> filter = sString() )?
+    {
+        this.setValue(_state, "ownerAccess", accessSet);
+        this.setValue(_state, "ownerFilter", filter);
+    }
+}
+
+/**
+ * Parses the access and filter expression for the public definition.
+ *
+ * @param _state    current parsed state of the policy
+ */
+void statePublicAccess(final Policy_mxJPO.State _state) : {
+    String filter = null;
+    Set<String> accessSet;
+}  {
+    ( <PUBLIC> accessSet = lList() )
+    ( <FILTER> filter = sString() )?
+    {
+        this.setValue(_state, "publicAccess", accessSet);
+        this.setValue(_state, "publicFilter", filter);
+    }
+}
+
+/**
+ * Parses the access and filter expression for a user definition.
+ *
+ * @param _state    current parsed state of the policy
+ */
 void stateUser(final Policy_mxJPO.State _state) : {
     final Policy_mxJPO.UserAccess userAccess = new Policy_mxJPO.UserAccess();
     String user, filter = null;

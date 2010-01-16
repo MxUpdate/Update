@@ -248,14 +248,10 @@ public class PolicyDefParser_mxJPO
         }
         break;
       case OWNER:
-        jj_consume_token(OWNER);
-        tmpSet = lList();
-                                                     this.setValue(state, "ownerAccess", tmpSet);
+        stateOwnerAccess(state);
         break;
       case PUBLIC:
-        jj_consume_token(PUBLIC);
-        tmpSet = lList();
-                                                     this.setValue(state, "publicAccess", tmpSet);
+        statePublicAccess(state);
         break;
       case ACTION:
         jj_consume_token(ACTION);
@@ -298,6 +294,55 @@ public class PolicyDefParser_mxJPO
         this.appendValue(_policy, "states", state);
   }
 
+/**
+ * Parses the access and filter expression for the owner definition.
+ *
+ * @param _state    current parsed state of the policy
+ */
+  final public void stateOwnerAccess(final Policy_mxJPO.State _state) throws ParseException_mxJPO {
+    String filter = null;
+    Set<String> accessSet;
+    jj_consume_token(OWNER);
+    accessSet = lList();
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case FILTER:
+      jj_consume_token(FILTER);
+      filter = sString();
+      break;
+    default:
+      ;
+    }
+        this.setValue(_state, "ownerAccess", accessSet);
+        this.setValue(_state, "ownerFilter", filter);
+  }
+
+/**
+ * Parses the access and filter expression for the public definition.
+ *
+ * @param _state    current parsed state of the policy
+ */
+  final public void statePublicAccess(final Policy_mxJPO.State _state) throws ParseException_mxJPO {
+    String filter = null;
+    Set<String> accessSet;
+    jj_consume_token(PUBLIC);
+    accessSet = lList();
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case FILTER:
+      jj_consume_token(FILTER);
+      filter = sString();
+      break;
+    default:
+      ;
+    }
+        this.setValue(_state, "publicAccess", accessSet);
+        this.setValue(_state, "publicFilter", filter);
+  }
+
+/**
+ * Parses the access and filter expression for a user definition.
+ *
+ * @param _state    current parsed state of the policy
+ */
   final public void stateUser(final Policy_mxJPO.State _state) throws ParseException_mxJPO {
     final Policy_mxJPO.UserAccess userAccess = new Policy_mxJPO.UserAccess();
     String user, filter = null;
