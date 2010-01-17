@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
      * Regular expression to defines the list of not allowed characters  of
      * symbolic names which are removed for the calculated symbolic name.
      *
-     * @see #AbstractData(AbstractTest, AbstractTest.CI, String, String, Set)
+     * @see #AbstractAdminData(AbstractTest, org.mxupdate.test.AbstractTest.CI, String, Set)
      */
     private static final String NOT_ALLOWED_CHARS
             = "[^%&()+-0123456789:=ABCDEFGHIJKLMNOPQRSTUVWXYZ^_abcdefghijklmnopqrstuvwxyz~]";
@@ -60,7 +60,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     /**
      * Is the role hidden?
      *
-     * @see #setHidden(boolean)
+     * @see #setHidden(Boolean)
      * @see #isHidden()
      */
     private Boolean hidden = false;

@@ -616,8 +616,7 @@ public abstract class AbstractTest
     }
 
     /**
-     * Calls given <code>_method</code> in <code>_jpo</code>. The MX context
-     * {@link #mxContext} is connected to the database if not already done.
+     * Calls given <code>_method</code> in <code>_jpo</code>.
      *
      * @param <T>           class which is returned
      * @param _jpo          name of JPO to call
@@ -628,7 +627,6 @@ public abstract class AbstractTest
      * @throws IOException      if the parameter could not be encoded
      * @throws MatrixException  if the called <code>_jpo</code> throws an
      *                          exception
-     * @see #context
      * @see JPOReturn
      */
     public <T> JPOReturn<T> jpoInvoke(final String _jpo,

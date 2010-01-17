@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.mxupdate.test.data.DataCollection;
 import org.mxupdate.test.data.program.JPOProgramData;
 import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.data.util.PropertyDef;
+import org.mxupdate.test.util.IssueLink;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -39,7 +40,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class JPOExportUpdate
+public class JPOTest
     extends AbstractDataExportUpdate<JPOProgramData>
 {
     /**
@@ -58,8 +59,8 @@ public class JPOExportUpdate
      * Data provider for test JPOs.
      *
      * @return object array with all test JPOs
-     * @see http://code.google.com/p/mxupdate/issues/detail?id=26
      */
+    @IssueLink("26")
     @DataProvider(name = "jpos")
     public Object[][] getJPOs()
     {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.mxupdate.test.data.datamodel.AbstractAttributeData;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.program.AbstractProgramData;
+import org.mxupdate.test.util.IssueLink;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -39,7 +40,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class TypeExportUpdate
+public class TypeTest
     extends AbstractTest
 {
     /**
@@ -76,8 +77,7 @@ public class TypeExportUpdate
     }
 
     /**
-     * Removes the MxUpdate test type {@link #TYPE_NAME} and test programs
-     * {@link #PROG_NAME1} and {@PROG_NAME2}.
+     * Removes the MxUpdate programs, attributes and types.
      *
      * @throws Exception if MQL execution failed
      */
@@ -149,8 +149,8 @@ public class TypeExportUpdate
      * Test update for existing type with no method and as target no method.
      *
      * @throws Exception if test failed
-     * @see http://code.google.com/p/mxupdate/issues/detail?id=36
      */
+    @IssueLink("36")
     @Test(description = "update type with no method for existing type with no method")
     public void updateNoMethod4ExistingTypeWithNoMethod()
         throws Exception
@@ -171,8 +171,8 @@ public class TypeExportUpdate
      * update without method.
      *
      * @throws Exception if test failed
-     * @see http://code.google.com/p/mxupdate/issues/detail?id=36
      */
+    @IssueLink("36")
     @Test(description = "update type with no method for existing type with one method")
     public void updateNoMethod4ExistingTypeWithOneMethod()
         throws Exception
@@ -196,8 +196,8 @@ public class TypeExportUpdate
      * with one method.
      *
      * @throws Exception if test failed
-     * @see http://code.google.com/p/mxupdate/issues/detail?id=36
      */
+    @IssueLink("36")
     @Test(description = "update type with method for existing type with no method")
     public void updateOneMethod4ExistingTypeWithNoMethod()
         throws Exception
@@ -221,8 +221,8 @@ public class TypeExportUpdate
      * Tests that a type without method is exported correctly.
      *
      * @throws Exception if test failed
-     * @see http://code.google.com/p/mxupdate/issues/detail?id=36
      */
+    @IssueLink("36")
     @Test(description = "export type without method")
     public void exportWithoutMethod()
         throws Exception
@@ -238,8 +238,8 @@ public class TypeExportUpdate
      * Tests that a type with one method is exported correctly.
      *
      * @throws Exception if test failed
-     * @see http://code.google.com/p/mxupdate/issues/detail?id=36
      */
+    @IssueLink("36")
     @Test(description = "export type with one method")
     public void exportWithOneMethod()
         throws Exception
@@ -256,8 +256,8 @@ public class TypeExportUpdate
      * Tests that a type with two method is exported correctly.
      *
      * @throws Exception if test failed
-     * @see http://code.google.com/p/mxupdate/issues/detail?id=36
      */
+    @IssueLink("36")
     @Test(description = "export type with two methods")
     public void exportWithTwoMethods()
         throws Exception
@@ -272,8 +272,8 @@ public class TypeExportUpdate
     }
 
     /**
-     * Exports test type {@link #TYPE_NAME}, checks the exports and returns the
-     * related parsed export.
+     * Exports test type, checks the exports and returns the related parsed
+     * export.
      *
      * @param _type     type to export
      * @return parsed export of the exported type

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.integration.IEFGlobalRegistry;
+import org.mxupdate.test.data.integration.IEFGlobalRegistryData;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -36,7 +36,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class IEFGlobalRegistryExportUpdate
+public class IEFGlobalRegistryTest
     extends AbstractTest
 {
     /**
@@ -50,18 +50,18 @@ public class IEFGlobalRegistryExportUpdate
         return new Object[][]  {
                 new Object[]{
                         "simple object",
-                        new IEFGlobalRegistry(this, "HelloTest", "1")},
+                        new IEFGlobalRegistryData(this, "HelloTest", "1")},
                 new Object[]{
                         "simple object with description",
-                        new IEFGlobalRegistry(this, "Hello \"Test\"", "1")
+                        new IEFGlobalRegistryData(this, "Hello \"Test\"", "1")
                                 .setDescription("a \"description\"")},
                 new Object[]{
                         "simple object with description and single apostrophe",
-                        new IEFGlobalRegistry(this, "Hello \"Test\" 'with single apostrophe'", "1")
+                        new IEFGlobalRegistryData(this, "Hello \"Test\" 'with single apostrophe'", "1")
                                 .setDescription("a \"description\" with single 'apostrophe'")},
                 new Object[]{
                         "complex object",
-                        new IEFGlobalRegistry(this, "HelloTest", "1")
+                        new IEFGlobalRegistryData(this, "HelloTest", "1")
                                 .setValue("IEF-RegistryData", "complex \"data\" 'and single 'apostrophe'")},
         };
     }
@@ -89,7 +89,7 @@ public class IEFGlobalRegistryExportUpdate
      */
     @Test(dataProvider = "busDatas", description = "test export of new created integration global registry objects")
     public void simpleExport(final String _description,
-                             final IEFGlobalRegistry _globalRegistry)
+                             final IEFGlobalRegistryData _globalRegistry)
         throws Exception
     {
         _globalRegistry.create();
@@ -106,7 +106,7 @@ public class IEFGlobalRegistryExportUpdate
      */
     @Test(dataProvider = "busDatas", description = "test update of non existing table")
     public void simpleUpdate(final String _description,
-                             final IEFGlobalRegistry _globalRegistry)
+                             final IEFGlobalRegistryData _globalRegistry)
         throws Exception
     {
         // first update with original content

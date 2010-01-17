@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,12 +41,11 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class InterfaceExportUpdate
+public class InterfaceTest
     extends AbstractTest
 {
     /**
-     * Removes the MxUpdate test type {@link #TYPE_NAME} and test programs
-     * {@link #PROG_NAME1} and {@PROG_NAME2}.
+     * Removes the MxUpdate attributes, interfaces, types and relationships.
      *
      * @throws Exception if MQL execution failed
      */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -303,7 +303,16 @@ public class ViewData<USER extends AbstractUserData<?>>
      *
      * @param _cmd  string builder used to append MQL commands
      * @throws MatrixException if used object could not be created
-     * @see #fields
+     * @see #cuesActive
+     * @see #cuesNotActive
+     * @see #filtersActive
+     * @see #filtersNotActive
+     * @see #tablesActive
+     * @see #tablesNotActive
+     * @see #tipsActive
+     * @see #tipsNotActive
+     * @see #toolSetsActive
+     * @see #toolSetsNotActive
      */
     @Override()
     protected void append4Create(final StringBuilder _cmd)

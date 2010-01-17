@@ -38,7 +38,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class PolicyExportUpdateTest
+public class PolicyTest
     extends AbstractTest
 {
     /**
@@ -58,11 +58,11 @@ public class PolicyExportUpdateTest
               "################################################################################\n"
             + "# POLICY:\n"
             + "# ~~~~~~~\n"
-            + "# " + PolicyExportUpdateTest.POLICY_NAME + "\n"
+            + "# " + PolicyTest.POLICY_NAME + "\n"
             + "#\n"
             + "# SYMBOLIC NAME:\n"
             + "# ~~~~~~~~~~~~~~\n"
-            + "# policy_" + PolicyExportUpdateTest.POLICY_NAME + "\n"
+            + "# policy_" + PolicyTest.POLICY_NAME + "\n"
             + "#\n"
             + "# DESCRIPTION:\n"
             + "# ~~~~~~~~~~~~\n"
@@ -169,8 +169,8 @@ public class PolicyExportUpdateTest
     public void removePolicy()
         throws Exception
     {
-        if (!"".equals(this.mql("list policy " + PolicyExportUpdateTest.POLICY_NAME)))  {
-            this.mql("delete policy " + PolicyExportUpdateTest.POLICY_NAME);
+        if (!"".equals(this.mql("list policy " + PolicyTest.POLICY_NAME)))  {
+            this.mql("delete policy " + PolicyTest.POLICY_NAME);
         }
     }
 
@@ -184,8 +184,8 @@ public class PolicyExportUpdateTest
     public void removeType()
         throws Exception
     {
-        if (!"".equals(this.mql("list type " + PolicyExportUpdateTest.TYPE_NAME)))  {
-            this.mql("delete type " + PolicyExportUpdateTest.TYPE_NAME);
+        if (!"".equals(this.mql("list type " + PolicyTest.TYPE_NAME)))  {
+            this.mql("delete type " + PolicyTest.TYPE_NAME);
         }
     }
 
@@ -199,13 +199,13 @@ public class PolicyExportUpdateTest
     public void exportPolicyForAllTypes()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME + " type all");
+        this.mql("add policy " + PolicyTest.POLICY_NAME + " type all");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyTest.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         final String testCode = code.substring(code.lastIndexOf('#')).trim();
@@ -224,14 +224,14 @@ public class PolicyExportUpdateTest
     public void exportNoPropertyDefinitionForStateSymbolicName()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create property state_create value create");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyTest.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(code.indexOf("mql add property \"state_create\"") < 0,
@@ -249,14 +249,14 @@ public class PolicyExportUpdateTest
     public void exportAllSymbolicNamesForStatesDefined()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create property state_create value create property state_exists value create");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyTest.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(code.indexOf("registeredName \"state_create\"") >= 0,
@@ -275,14 +275,14 @@ public class PolicyExportUpdateTest
     public void exportStateOwnerAccessWithFilterExpression()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create owner read,show filter type==Part");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyTest.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(
@@ -300,14 +300,14 @@ public class PolicyExportUpdateTest
     public void exportStateOwnerAccessWithoutFilterExpression()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create owner read,show filter ''");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyTest.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(
@@ -325,14 +325,14 @@ public class PolicyExportUpdateTest
     public void exportStateOwnerRevokeWithFilterExpression()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create revoke owner read,show filter type==Part");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyTest.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(
@@ -350,14 +350,14 @@ public class PolicyExportUpdateTest
     public void exportStateOwnerRevokeWithoutDefinition()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create revoke owner none filter ''");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyTest.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(
@@ -375,14 +375,14 @@ public class PolicyExportUpdateTest
     public void exportStateOwnerRevokeWithoutFilterExpression()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create revoke owner read,show filter ''");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyTest.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
 
@@ -401,14 +401,14 @@ public class PolicyExportUpdateTest
     public void exportStatePublicAccessWithFilterExpression()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create public read,show filter type==Part");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyTest.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(
@@ -426,14 +426,14 @@ public class PolicyExportUpdateTest
     public void exportStatePublicAccessWithoutFilterExpression()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create public read,show filter ''");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyTest.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(
@@ -451,14 +451,14 @@ public class PolicyExportUpdateTest
     public void exportStatePublicRevokeWithoutDefinition()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create revoke public none filter ''");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyTest.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
 
@@ -477,14 +477,14 @@ public class PolicyExportUpdateTest
     public void exportStatePublicRevokeWithFilterExpression()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create revoke public read,show filter type==Part");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyTest.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(
@@ -502,14 +502,14 @@ public class PolicyExportUpdateTest
     public void exportStatePublicRevokeWithoutFilterExpression()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create revoke public read,show filter ''");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyTest.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(
@@ -528,14 +528,14 @@ public class PolicyExportUpdateTest
     public void exportStateSymbolicNameExportedIfNotDefined()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyExportUpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyTest.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(code.indexOf("registeredName \"state_create\"") >= 0,
@@ -559,11 +559,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n  format all\n"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n  format all\n"),
                 "check that all formats are defined");
     }
 
@@ -584,11 +584,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n  format all\n"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n  format all\n"),
                 "check that all formats are defined");
     }
 
@@ -609,11 +609,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertEquals(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " select format dump"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " select format dump"),
                 "generic",
                 "check for format generic");
     }
@@ -629,7 +629,7 @@ public class PolicyExportUpdateTest
         throws Exception
     {
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
                    "updatePolicy \"${NAME}\" {"
                     + "  state \"Pending\"  {"
                     + "    registeredName \"state_Exists\""
@@ -638,11 +638,11 @@ public class PolicyExportUpdateTest
                     + "}");
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
-        Assert.assertEquals(this.mql("print policy " + PolicyExportUpdateTest.POLICY_NAME
+        Assert.assertEquals(this.mql("print policy " + PolicyTest.POLICY_NAME
                                 + " select property[state_Exists].value dump"),
                             "Pending",
                             "test that symbolic name 'state_Exists' is correct registered");
-        Assert.assertEquals(this.mql("print policy " + PolicyExportUpdateTest.POLICY_NAME
+        Assert.assertEquals(this.mql("print policy " + PolicyTest.POLICY_NAME
                                 + " select property[state_Pending].value dump"),
                             "Pending",
                             "test that symbolic name 'state_Pending' is correct registered");
@@ -665,8 +665,8 @@ public class PolicyExportUpdateTest
         this.mql("add policy MxUpdate_Test state Pending property \"\" value Test");
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
-                   PolicyExportUpdateTest.POLICY_UPDATE_CODE);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
+                   PolicyTest.POLICY_UPDATE_CODE);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         // check that only 11 properties are defined....
@@ -695,8 +695,8 @@ public class PolicyExportUpdateTest
         throws Exception
     {
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl",
-                   PolicyExportUpdateTest.POLICY_UPDATE_CODE);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
+                   PolicyTest.POLICY_UPDATE_CODE);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(!"".equals(this.mql("list policy MxUpdate_Test")),
@@ -735,11 +735,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    owner read,show\n    public"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    owner read,show\n    public"),
                 "check that owner access without filter expression defined");
     }
 
@@ -754,11 +754,11 @@ public class PolicyExportUpdateTest
     public void updateStateOwnerAccessWithEmptyFilterExpression4Existing()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create owner read,show filter \"type!=Part\"");
 
         Assert.assertTrue(
-               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    owner read,show\n     filter type!=Part"),
+               this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    owner read,show\n     filter type!=Part"),
                "check that owner access with filter expression defined");
 
         final String updateCode =
@@ -771,11 +771,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    owner read,show\n    public"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    owner read,show\n    public"),
                 "check that owner access without filter expression defined");
     }
 
@@ -799,11 +799,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    owner read,show\n     filter type==Part"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    owner read,show\n     filter type==Part"),
                 "check that owner access with filter expression defined");
     }
 
@@ -818,11 +818,11 @@ public class PolicyExportUpdateTest
     public void updateStateOwnerAccessWithFilterExpression4Existing()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create owner read,show filter \"type!=Part\"");
 
         Assert.assertTrue(
-               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    owner read,show\n     filter type!=Part"),
+               this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    owner read,show\n     filter type!=Part"),
                "check that owner access with filter expression defined");
 
         final String updateCode =
@@ -835,11 +835,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    owner read,show\n     filter type==Part"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    owner read,show\n     filter type==Part"),
                 "check that owner access with filter expression defined");
     }
 
@@ -864,11 +864,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
          Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    owner read,show\n    public"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    owner read,show\n    public"),
                 "check that owner access without filter expression defined");
     }
 
@@ -883,11 +883,11 @@ public class PolicyExportUpdateTest
     public void updateStateOwnerAccessWithoutFilterExpression4Existing()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create owner read,show filter \"type==Part\"");
 
         Assert.assertTrue(
-               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    owner read,show\n     filter type==Part"),
+               this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    owner read,show\n     filter type==Part"),
                "check that owner access with filter expression defined");
 
         final String updateCode =
@@ -900,11 +900,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
          Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    owner read,show\n    public"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    owner read,show\n    public"),
                 "check that owner access without filter expression defined");
     }
 
@@ -928,11 +928,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n    public"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n    public"),
                 "check that owner revoke without filter expression defined");
     }
 
@@ -947,11 +947,11 @@ public class PolicyExportUpdateTest
     public void updateStateOwnerRevokeWithEmptyFilterExpression4Existing()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create revoke owner read,show filter \"type!=Part\"");
 
         Assert.assertTrue(
-               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n     filter type!=Part"),
+               this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n     filter type!=Part"),
                "check that owner revoke with filter expression defined");
 
         final String updateCode =
@@ -964,11 +964,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n    public"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n    public"),
                 "check that owner revoke without filter expression defined");
     }
 
@@ -992,11 +992,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n     filter type==Part"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n     filter type==Part"),
                 "check that owner revoke with filter expression defined");
     }
 
@@ -1011,11 +1011,11 @@ public class PolicyExportUpdateTest
     public void updateStateOwnerRevokeWithFilterExpression4Existing()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create revoke owner read,show filter \"type!=Part\"");
 
         Assert.assertTrue(
-               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n     filter type!=Part"),
+               this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n     filter type!=Part"),
                "check that owner revoke with filter expression defined");
 
         final String updateCode =
@@ -1028,11 +1028,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n     filter type==Part"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n     filter type==Part"),
                 "check that owner revoke with filter expression defined");
     }
 
@@ -1057,11 +1057,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
          Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n    public"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n    public"),
                 "check that owner revoke without filter expression defined");
     }
 
@@ -1076,11 +1076,11 @@ public class PolicyExportUpdateTest
     public void updateStateOwnerRevokeWithoutFilterExpression4Existing()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create revoke owner read,show filter \"type==Part\"");
 
         Assert.assertTrue(
-               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n     filter type==Part"),
+               this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n     filter type==Part"),
                "check that revoke owner revoke with filter expression defined");
 
         final String updateCode =
@@ -1093,11 +1093,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
          Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n    public"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n    public"),
                 "check that owner revoke without filter expression defined");
     }
 
@@ -1121,11 +1121,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    public read,show\n  nothidden"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    public read,show\n  nothidden"),
                 "check that public access without filter expression defined");
     }
 
@@ -1140,11 +1140,11 @@ public class PolicyExportUpdateTest
     public void updateStatePublicAccessWithEmptyFilterExpression4Existing()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create public read,show filter \"type!=Part\"");
 
         Assert.assertTrue(
-               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    public read,show\n     filter type!=Part"),
+               this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    public read,show\n     filter type!=Part"),
                "check that public access with filter expression defined");
 
         final String updateCode =
@@ -1157,11 +1157,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    public read,show\n  nothidden"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    public read,show\n  nothidden"),
                 "check that public access without filter expression defined");
     }
 
@@ -1185,11 +1185,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    public read,show\n     filter type==Part"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    public read,show\n     filter type==Part"),
                 "check that public access with filter expression defined");
     }
 
@@ -1204,11 +1204,11 @@ public class PolicyExportUpdateTest
     public void updateStatePublicAccessWithFilterExpression4Existing()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create public read,show filter \"type!=Part\"");
 
         Assert.assertTrue(
-               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    public read,show\n     filter type!=Part"),
+               this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    public read,show\n     filter type!=Part"),
                "check that public access with filter expression defined");
 
         final String updateCode =
@@ -1221,11 +1221,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    public read,show\n     filter type==Part"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    public read,show\n     filter type==Part"),
                 "check that public access with filter expression defined");
     }
 
@@ -1250,11 +1250,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
          Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    public read,show\n  nothidden"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    public read,show\n  nothidden"),
                 "check that public access without filter expression defined");
     }
 
@@ -1269,11 +1269,11 @@ public class PolicyExportUpdateTest
     public void updateStatePublicAccessWithoutFilterExpression4Existing()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create public read,show filter \"type==Part\"");
 
         Assert.assertTrue(
-               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    public read,show\n     filter type==Part"),
+               this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    public read,show\n     filter type==Part"),
                "check that public access with filter expression defined");
 
         final String updateCode =
@@ -1286,11 +1286,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
          Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    public read,show\n  nothidden"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    public read,show\n  nothidden"),
                 "check that public access without filter expression defined");
     }
 
@@ -1314,11 +1314,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n  nothidden"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n  nothidden"),
                 "check that public revoke  without filter expression defined");
     }
 
@@ -1333,11 +1333,11 @@ public class PolicyExportUpdateTest
     public void updateStatePublicRevokeWithEmptyFilterExpression4Existing()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create revoke public read,show filter \"type!=Part\"");
 
         Assert.assertTrue(
-               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n     filter type!=Part"),
+               this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n     filter type!=Part"),
                "check that public revoke with filter expression defined");
 
         final String updateCode =
@@ -1350,11 +1350,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n  nothidden"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n  nothidden"),
                 "check that public revoke without filter expression defined");
     }
 
@@ -1378,11 +1378,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n     filter type==Part"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n     filter type==Part"),
                 "check that public revoke with filter expression defined");
     }
 
@@ -1397,11 +1397,11 @@ public class PolicyExportUpdateTest
     public void updateStatePublicRevokeWithFilterExpression4Existing()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create revoke public read,show filter \"type!=Part\"");
 
         Assert.assertTrue(
-               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n     filter type!=Part"),
+               this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n     filter type!=Part"),
                "check that public revoke with filter expression defined");
 
         final String updateCode =
@@ -1414,11 +1414,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n     filter type==Part"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n     filter type==Part"),
                 "check that public revoke with filter expression defined");
     }
 
@@ -1443,11 +1443,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
          Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n  nothidden"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n  nothidden"),
                 "check that public revoke without filter expression defined");
     }
 
@@ -1462,11 +1462,11 @@ public class PolicyExportUpdateTest
     public void updateStatePublicRevokeWithoutFilterExpression4Existing()
         throws Exception
     {
-        this.mql("add policy " + PolicyExportUpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyTest.POLICY_NAME
                 + " state create revoke public read,show filter \"type==Part\"");
 
         Assert.assertTrue(
-               this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n     filter type==Part"),
+               this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n     filter type==Part"),
                "check that public revoke with filter expression defined");
 
         final String updateCode =
@@ -1479,11 +1479,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
          Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n  nothidden"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n  nothidden"),
                 "check that public revoke without filter expression defined");
     }
 
@@ -1506,11 +1506,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n  type all\n"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n  type all\n"),
                 "check that all types are defined");
     }
 
@@ -1531,11 +1531,11 @@ public class PolicyExportUpdateTest
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertTrue(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " ").contains("\n  type all\n"),
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n  type all\n"),
                 "check that all types are defined");
     }
 
@@ -1549,21 +1549,21 @@ public class PolicyExportUpdateTest
     public void updateTypeOne()
         throws Exception
     {
-        this.mql("add type " + PolicyExportUpdateTest.TYPE_NAME);
+        this.mql("add type " + PolicyTest.TYPE_NAME);
 
         final String updateCode =
             "updatePolicy \"${NAME}\" {\n"
             + "  description \"\"\n"
-            + "  type {" + PolicyExportUpdateTest.TYPE_NAME + "}\n"
+            + "  type {" + PolicyTest.TYPE_NAME + "}\n"
             + "}";
 
         final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyExportUpdateTest.POLICY_NAME + ".tcl", updateCode);
+        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
         this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertEquals(
-                this.mql("print pol " + PolicyExportUpdateTest.POLICY_NAME + " select type dump"),
-                PolicyExportUpdateTest.TYPE_NAME,
+                this.mql("print pol " + PolicyTest.POLICY_NAME + " select type dump"),
+                PolicyTest.TYPE_NAME,
                 "check for correct type");
     }
 }

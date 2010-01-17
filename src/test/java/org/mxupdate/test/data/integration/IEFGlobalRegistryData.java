@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ import org.mxupdate.test.data.AbstractBusData;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class IEFGlobalRegistry
-    extends AbstractBusData<IEFGlobalRegistry>
+public class IEFGlobalRegistryData
+    extends AbstractBusData<IEFGlobalRegistryData>
 {
     /**
      * Initialize this IEF global registry object with given
@@ -42,7 +42,7 @@ public class IEFGlobalRegistry
      * @param _name     name of the IEF global registry object
      * @param _revision revision of the IEF global registry object
      */
-    public IEFGlobalRegistry(final AbstractTest _test,
+    public IEFGlobalRegistryData(final AbstractTest _test,
                              final String _name,
                              final String _revision)
     {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -199,7 +199,7 @@ public class DataCollection
      *
      * @param _name     name of searched boolean attribute
      * @return boolean attribute instance
-     * @see #attributesBoolean
+     * @see #attributes
      */
     public AttributeBooleanData getAttributeBoolean(final String _name)
     {
@@ -216,7 +216,7 @@ public class DataCollection
      *
      * @param _name     name of searched date attribute
      * @return date attribute instance
-     * @see #attributesDate
+     * @see #attributes
      */
     public AttributeDateData getAttributeDate(final String _name)
     {
@@ -233,7 +233,7 @@ public class DataCollection
      *
      * @param _name     name of searched integer attribute
      * @return integer attribute instance
-     * @see #attributesInteger
+     * @see #attributes
      */
     public AttributeIntegerData getAttributeInteger(final String _name)
     {
@@ -250,7 +250,7 @@ public class DataCollection
      *
      * @param _name     name of searched real attribute
      * @return real attribute instance
-     * @see #attributesReal
+     * @see #attributes
      */
     public AttributeRealData getAttributeReal(final String _name)
     {
@@ -267,7 +267,7 @@ public class DataCollection
      *
      * @param _name     name of searched string attribute
      * @return string attribute instance
-     * @see #attributesString
+     * @see #attributes
      */
     public AttributeStringData getAttributeString(final String _name)
     {

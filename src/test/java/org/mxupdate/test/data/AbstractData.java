@@ -160,7 +160,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * Returns the description of the abstract data element.
      *
      * @return description of the abstract data element
-     * @see #description
+     * @see #values
      */
     public Map<String,String> getValues()
     {
@@ -270,7 +270,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * <li>returned export value includes exact one export for given
      *     {@link #ci configuration item type}</li>
      * <li>name of the exported object is equal {@link #name}</li>
-     * <li>path of the exported object is equal {@link #ciPath}</li>
+     * <li>path of the exported object is equal {@link #ciFile()}</li>
      * <li>file name of the export object is equal returned value from
      *     {@link #getCIFileName()}</li>
      * </ul>

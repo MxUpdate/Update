@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import org.mxupdate.test.data.user.AbstractUserData;
 import org.mxupdate.test.data.user.GroupData;
 import org.mxupdate.test.data.user.RoleData;
 import org.mxupdate.test.data.userinterface.FieldData;
-import org.mxupdate.test.data.userinterface.TableData;
+import org.mxupdate.test.data.userinterface.FormData;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -37,52 +37,52 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test cases for the export / update of web tables.
+ * Test cases for the export / update of web forms.
  *
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class TableExportUpdate
-    extends AbstractDataExportUpdate<TableData>
+public class FormTest
+    extends AbstractDataExportUpdate<FormData>
 {
     /**
-     * Creates for given <code>_name</code> a new table instance.
+     * Creates for given <code>_name</code> a new form instance.
      *
-     * @param _name     name of the table instance
-     * @return table instance
+     * @param _name     name of the form instance
+     * @return form instance
      */
     @Override()
-    protected TableData createNewData(final String _name)
+    protected FormData createNewData(final String _name)
     {
-        return new TableData(this, _name);
+        return new FormData(this, _name);
     }
 
     /**
-     * Data provider for test tables.
+     * Data provider for test forms.
      *
-     * @return object array with all test tables
+     * @return object array with all test forms
      */
-    @DataProvider(name = "tables")
-    public Object[][] getTables()
+    @DataProvider(name = "forms")
+    public Object[][] getForms()
     {
-        return this.prepareData("table",
+        return this.prepareData("form",
                 new Object[]{
-                        "table without anything (to test required fields)",
-                        new TableData(this, "hello \" test")},
+                        "form without anything (to test required fields)",
+                        new FormData(this, "hello \" test")},
                 new Object[]{
-                        "simple table",
-                        new TableData(this, "hallo \" test")
-                            .setValue("description", "\"\\\\ hallo")},
+                        "simple form",
+                        new FormData(this, "hello \" test")
+                            .setValue("description", "\"\\\\ hello")},
                 new Object[]{
-                        "simple table with two fields",
-                        new TableData(this, "hallo \" test")
-                            .setValue("description", "\"\\\\ hallo")
+                        "simple form with two fields",
+                        new FormData(this, "hello \" test")
+                            .setValue("description", "\"\\\\ hello")
                             .newField("field \"1\"").getFormTable()
                             .newField("field \"2\"").getFormTable()},
                 new Object[]{
-                        "simple table with complex field",
-                        new TableData(this, "hallo \" test")
-                            .setValue("description", "\"\\\\ hallo")
+                        "simple form with complex field",
+                        new FormData(this, "hello \" test")
+                            .setValue("description", "\"\\\\ hello")
                             .newField("field")
                                     .setValue("label", "an \"label\"")
                                     .setValue("range", "an \"range\"")
@@ -93,37 +93,31 @@ public class TableExportUpdate
                                     .setSetting("second \"key\"", "second \"value\"")
                                     .getFormTable()},
                 new Object[]{
-                        "table with business object select",
-                        new TableData(this, "hallo \" test")
-                            .setValue("description", "\"\\\\ hallo")
+                        "form with business object select",
+                        new FormData(this, "hello \" test")
+                            .setValue("description", "\"\\\\ hello")
                             .newField("field")
                                     .setValue("businessobject", "select \"expression\"")
                                     .getFormTable()},
                 new Object[]{
-                        "table with relationship select",
-                        new TableData(this, "hallo \" test")
-                            .setValue("description", "\"\\\\ hallo")
+                        "form with relationship select",
+                        new FormData(this, "hello \" test")
+                            .setValue("description", "\"\\\\ hello")
                             .newField("field")
                                     .setValue("relationship", "select \"expression\"")
                                     .getFormTable()},
                 new Object[]{
-                        "table with one role and one group",
-                        new TableData(this, "hallo \" test")
+                        "form with one role and one group",
+                        new FormData(this, "hello \" test")
                             .newField("field")
                                     .addUser(new RoleData(this, "user \"role\""))
                                     .addUser(new GroupData(this, "user \"group\""))
-                                    .getFormTable()},
-                new Object[]{
-                        "table with one hidden column",
-                        new TableData(this, "hallo \" test")
-                            .newField("field")
-                                    .setHidden(true)
                                     .getFormTable()}
         );
     }
 
     /**
-     * Cleanup all test web tables.
+     * Cleanup all test web forms.
      *
      * @throws MatrixException if cleanup failed
      */
@@ -132,61 +126,61 @@ public class TableExportUpdate
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(AbstractTest.CI.UI_TABLE);
-        this.cleanup(AbstractTest.CI.USR_PERSONADMIN);
+        this.cleanup(AbstractTest.CI.UI_FORM);
         this.cleanup(AbstractTest.CI.USR_ROLE);
         this.cleanup(AbstractTest.CI.USR_GROUP);
     }
 
+
     /**
-     * Tests a new created table and the related export.
+     * Tests a new created form and the related export.
      *
      * @param _description  description of the test case
-     * @param _table        table to test
+     * @param _form         form to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "tables", description = "test export of new created table")
+    @Test(dataProvider = "forms", description = "test export of new created form")
     public void simpleExport(final String _description,
-                             final TableData _table)
+                             final FormData _form)
         throws Exception
     {
-        _table.create();
-        _table.checkExport(_table.export());
+        _form.create();
+        _form.checkExport(_form.export());
     }
 
     /**
-     * Tests an update of non existing table. The result is tested with by
-     * exporting the table and checking the result.
+     * Tests an update of non existing form. The result is tested with by
+     * exporting the form and checking the result.
      *
      * @param _description  description of the test case
-     * @param _table        table to test
+     * @param _form         form to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "tables", description = "test update of non existing table")
+    @Test(dataProvider = "forms", description = "test update of non existing form")
     public void simpleUpdate(final String _description,
-                             final TableData _table)
+                             final FormData _form)
         throws Exception
     {
         // create users
-        for (final FieldData<TableData> field : _table.getFields())  {
+        for (final FieldData<FormData> field : _form.getFields())  {
             for (final AbstractUserData<?> user : field.getUsers())  {
                 user.create();
             }
         }
         // create referenced property value
-        for (final PropertyDef prop : _table.getProperties())  {
+        for (final PropertyDef prop : _form.getProperties())  {
             if (prop.getTo() != null)  {
                 prop.getTo().create();
             }
         }
 
         // first update with original content
-        this.update(_table);
-        final ExportParser exportParser = _table.export();
-        _table.checkExport(exportParser);
+        this.update(_form);
+        final ExportParser exportParser = _form.export();
+        _form.checkExport(exportParser);
 
         // second update with delivered content
-        this.update(_table.getCIFileName(), exportParser.getOrigCode());
-        _table.checkExport(_table.export());
+        this.update(_form.getCIFileName(), exportParser.getOrigCode());
+        _form.checkExport(_form.export());
     }
 }

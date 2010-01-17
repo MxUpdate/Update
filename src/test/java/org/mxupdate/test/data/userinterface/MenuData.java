@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,10 +144,10 @@ public class MenuData
      * setting, ...).
      *
      * @param _needAdds     set with add strings used to append the adds for
-     *                      {@link #users}
-     * @see #users
+     *                      {@link #children}
+     * @see #children
      */
-    @Override
+    @Override()
     protected void evalAdds4CheckExport(final Set<String> _needAdds)
     {
         super.evalAdds4CheckExport(_needAdds);

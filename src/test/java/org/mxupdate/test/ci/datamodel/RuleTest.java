@@ -36,7 +36,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class RuleExportUpdate
+public class RuleTest
     extends AbstractDataExportUpdate<RuleData>
 {
     /**
@@ -119,8 +119,7 @@ public class RuleExportUpdate
     }
 
     /**
-     * Removes the MxUpdate test type {@link #TYPE_NAME} and test programs
-     * {@link #PROG_NAME1} and {@PROG_NAME2}.
+     * Removes the MxUpdate rules.
      *
      * @throws Exception if MQL execution failed
      */
@@ -131,7 +130,6 @@ public class RuleExportUpdate
     {
         this.cleanup(CI.DM_RULE);
     }
-
 
     /**
      * Tests a new created rule and the related export.
