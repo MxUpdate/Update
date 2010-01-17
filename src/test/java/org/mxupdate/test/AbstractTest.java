@@ -95,6 +95,12 @@ public abstract class AbstractTest
         DM_INTERFACE("interface", null, null, null, "Interface", "INTERFACE", "INTERFACE_", "datamodel/interface", true),
 
         /**
+         * Configuration item IEF Global Configuration.
+         */
+        DM_NOTIFICATION(null, "Notification", "Business Rule", "eService Administration",
+                              "Notification", "NOTIFICATION", "NOTIFICATION_", "datamodel/notification", true),
+
+        /**
          * Configuration item Data Model Policy.
          */
         DM_POLICY("policy", null, null, null, "Policy", "POLICY", "POLICY_", "datamodel/policy", true),
