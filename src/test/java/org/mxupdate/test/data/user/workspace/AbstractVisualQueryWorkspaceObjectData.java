@@ -108,7 +108,7 @@ abstract class AbstractVisualQueryWorkspaceObjectData<DATA extends AbstractVisua
     }
 
     /**
-     * Appends the MQL commands to define the {@link #active flag}Êwithin a
+     * Appends the MQL commands to define the {@link #active flag} within a
      * create.
      *
      * @param _cmd  string builder used to append MQL commands

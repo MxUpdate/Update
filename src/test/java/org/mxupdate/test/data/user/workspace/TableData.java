@@ -91,7 +91,7 @@ public class TableData<USER extends AbstractUserData<?>>
     }
 
     /**
-     * Appends the MQL commands to define the {@link #fields}Êwithin a create
+     * Appends the MQL commands to define the {@link #fields} within a create
      * and in front of the definition the units.
      *
      * @param _cmd  string builder used to append MQL commands

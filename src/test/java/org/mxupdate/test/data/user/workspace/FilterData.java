@@ -107,7 +107,7 @@ public class FilterData<USER extends AbstractUserData<?>>
     }
 
     /**
-     * Appends the MQL commands to define the {@link #direction}Êwithin a
+     * Appends the MQL commands to define the {@link #direction} within a
      * create.
      *
      * @param _cmd  string builder used to append MQL commands

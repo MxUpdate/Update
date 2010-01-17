@@ -155,7 +155,7 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
 
     /**
      * Appends the MQL commands to define the hidden flag and the
-     * {@link #visible users}Êwithin a create.
+     * {@link #visible users} within a create.
      *
      * @param _cmd  string builder used to append MQL commands
      * @throws MatrixException if used object could not be created

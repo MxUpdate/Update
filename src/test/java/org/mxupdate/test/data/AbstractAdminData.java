@@ -218,7 +218,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     }
 
     /**
-     * Appends the MQL commands to define all {@link #values}Êand
+     * Appends the MQL commands to define all {@link #values} and
      * {@link #properties} within a create.
      *
      * @param _cmd  string builder used to append MQL commands
