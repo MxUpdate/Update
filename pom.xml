@@ -2,7 +2,7 @@
 
 <!--
 
- Copyright 2008-2009 The MxUpdate Team
+ Copyright 2008-2010 The MxUpdate Team
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -24,15 +24,14 @@
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-    http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.mxupdate</groupId>
     <artifactId>update</artifactId>
     <packaging>jar</packaging>
-    <version>0.7.2</version>
+    <version>0.8.0</version>
     <name>MxUpdate Update</name>
     <url>http://www.mxupdate.org</url>
 
@@ -41,7 +40,6 @@
         handle administration objects as single update files (configuration
         items).
     </description>
-
     <licenses>
         <license>
             <name>Apache 2.0 License</name>
@@ -49,17 +47,17 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-
+    <developers>
+    </developers>
+    <inceptionYear>2008</inceptionYear>
     <organization>
         <name>The MxUpdate Team</name>
         <url>http://www.mxupdate.org</url>
     </organization>
-
     <issueManagement>
         <system>MxUpdate Issues on Google Code</system>
         <url>http://issues.mxupdate.org</url>
     </issueManagement>
-
     <mailingLists>
         <mailingList>
             <name>SVN Commit Messages</name>
@@ -100,6 +98,8 @@
     <properties>
         <!-- correct encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- MX version -->
+        <mxversion>V6-R2010x</mxversion>
     </properties>
 
     <dependencies>
@@ -109,14 +109,14 @@
             <artifactId>ematrix</artifactId>
             <scope>system</scope>
             <version>ALL</version>
-            <systemPath>${basedir}/lib/eMatrixServletRMI.jar</systemPath>
+            <systemPath>${basedir}/lib/eMatrixServletRMI.${mxversion}.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>ematrix</groupId>
             <artifactId>fcsclient</artifactId>
             <scope>system</scope>
             <version>ALL</version>
-            <systemPath>${basedir}/lib/FcsClient.jar</systemPath>
+            <systemPath>${basedir}/lib/FcsClient.${mxversion}.jar</systemPath>
         </dependency>
         <!-- for Base64 encoding / decoding within automatic tests -->
         <dependency>
@@ -138,15 +138,18 @@
     <build>
         <defaultGoal>package</defaultGoal>
         <plugins>
-            <!--  define Java5 -->
+            <!--
+                define Java 6 with UTF-8 encoding
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                     <showDeprecation>true</showDeprecation>
                     <showWarnings>true</showWarnings>
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
         </plugins>
@@ -381,7 +384,7 @@
                 <configuration>
                     <linkXref>true</linkXref>
                     <sourceEncoding>utf-8</sourceEncoding>
-                    <targetJdk>1.5</targetJdk>
+                    <targetJdk>1.6</targetJdk>
                     <excludes>
                         <exclude>**/dimension/*.java</exclude>
                         <exclude>**/policy/*.java</exclude>
