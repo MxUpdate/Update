@@ -85,10 +85,7 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
                               final String _name,
                               final String _revision)
     {
-        super(_test, _ci, AbstractTest.PREFIX + _name + AbstractBusData.SEPARATOR + _revision);
-        this.type = null;
-        this.busName = AbstractTest.PREFIX + _name;
-        this.busRevision = _revision;
+        this(_test, _ci, null, _name, _revision);
     }
 
     /**
@@ -106,12 +103,48 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
                               final String _name,
                               final String _revision)
     {
-        super(_test, _ci, _type.getName() + AbstractBusData.SEPARATOR + AbstractBusData.SEPARATOR
+        super(_test,
+              _ci,
+              ((_type != null)
+                      ? (_type.getName() + AbstractBusData.SEPARATOR + AbstractBusData.SEPARATOR)
+                      : (_ci.hasBusTypeDerived()
+                              ? (_ci.getBusType() + AbstractBusData.SEPARATOR + AbstractBusData.SEPARATOR)
+                              : ""))
                             + AbstractTest.PREFIX + _name + AbstractBusData.SEPARATOR
                             + _revision);
         this.type = _type;
         this.busName = AbstractTest.PREFIX + _name;
         this.busRevision = _revision;
+    }
+
+    /**
+     * Returns the name of the configuration item file. Because it could be
+     * that business objects which have derived types, but where no type is
+     * defined, the CI file name is without the type.
+     *
+     * @return name of the CI file
+     */
+    @Override()
+    public String getCIFileName()
+    {
+        String ret = super.getCIFileName();
+        if ((this.type == null) && this.getCI().hasBusTypeDerived())  {
+            ret = ret.replace(this.getCI().getBusType() + AbstractBusData.SEPARATOR + AbstractBusData.SEPARATOR, "");
+        }
+        return ret;
+    }
+
+    /**
+     * Returns expected name of the CI file from the export. Because
+     * {@link #getCIFileName()} is overwritten, the original method
+     * {@link AbstractData#getCIFileName()} is called.
+     *
+     * @return expected name of the CI file
+     */
+    @Override()
+    public String getCIFileNameFromExport()
+    {
+        return super.getCIFileName();
     }
 
     /**

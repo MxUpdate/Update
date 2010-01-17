@@ -171,13 +171,22 @@ public class BusObject_mxJPO
     public BusObject_mxJPO(final TypeDef_mxJPO _typeDef,
                            final String _mxName)
     {
-        super(_typeDef, _mxName);
+        super(_typeDef,
+              (_typeDef.hasMxBusTypeDerived() && (_mxName != null) && !_mxName.contains(BusObject_mxJPO.SPLIT_TYPE))
+                      ? new StringBuilder().append(_typeDef.getMxBusType()).append(BusObject_mxJPO.SPLIT_TYPE).append(_mxName).toString()
+                      : _mxName);
 
         if (_mxName != null)  {
             if (_typeDef.hasMxBusTypeDerived())  {
                 final String[] typeNameRev = this.getName().split(BusObject_mxJPO.SPLIT_TYPE);
-                this.busType = typeNameRev[0];
-                final String[] nameRev = typeNameRev[1].split(BusObject_mxJPO.SPLIT_NAME);
+                final String[] nameRev;
+                if (typeNameRev.length == 2)  {
+                    this.busType = typeNameRev[0];
+                    nameRev = typeNameRev[1].split(BusObject_mxJPO.SPLIT_NAME);
+                } else  {
+                    this.busType = _typeDef.getMxBusType();
+                    nameRev = this.getName().split(BusObject_mxJPO.SPLIT_NAME);
+                }
                 this.busName = nameRev[0];
                 this.busRevision = (nameRev.length > 1) ? nameRev[1] : "";
             } else  {

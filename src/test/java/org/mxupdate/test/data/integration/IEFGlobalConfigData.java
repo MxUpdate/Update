@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ package org.mxupdate.test.data.integration;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.AbstractBusData;
+import org.mxupdate.test.data.datamodel.TypeData;
 
 /**
  * Used to define an integration global configuration, create them and test the
@@ -30,8 +31,8 @@ import org.mxupdate.test.data.AbstractBusData;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class IEFGlobalConfig
-    extends AbstractBusData<IEFGlobalConfig>
+public class IEFGlobalConfigData
+    extends AbstractBusData<IEFGlobalConfigData>
 {
     /**
      * Initialize this IEF global configuration object with given
@@ -39,13 +40,15 @@ public class IEFGlobalConfig
      *
      * @param _test     related test implementation (where this IEF global
      *                  configuration object is defined)
+     * @param _type     derived type from <code>MCADInteg-GlobalConfig</code>
      * @param _name     name of the IEF global configuration object
      * @param _revision revision of the IEF global configuration object
      */
-    public IEFGlobalConfig(final AbstractTest _test,
-                           final String _name,
-                           final String _revision)
+    public IEFGlobalConfigData(final AbstractTest _test,
+                               final TypeData _type,
+                               final String _name,
+                               final String _revision)
     {
-        super(_test, AbstractTest.CI.IEF_GLOBAL_CONFIG, _name, _revision);
+        super(_test, AbstractTest.CI.IEF_GLOBAL_CONFIG, _type, _name, _revision);
     }
 }

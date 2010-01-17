@@ -210,6 +210,11 @@ public abstract class AbstractTest
         private final String busType;
 
         /**
+         * Are business objects derived from {@link #busType type}?
+         */
+        private final boolean hasDerived;
+
+        /**
          * Related policy of the business object.
          */
         private final String busPolicy;
@@ -273,6 +278,7 @@ public abstract class AbstractTest
         {
             this.mxType = _mxType;
             this.busType = _busType;
+            this.hasDerived = _hasDerived;
             this.busPolicy = _busPolicy;
             this.busVault = _busVault;
             this.updateType = _updateType;
@@ -301,6 +307,18 @@ public abstract class AbstractTest
         public String getBusType()
         {
             return this.busType;
+        }
+
+        /**
+         * Checks if business types could be derived.
+         *
+         * @return <i>true</i> if business type could be derived; otherwise
+         *         <i>false</i>
+         * @see #hasDerived
+         */
+        public boolean hasBusTypeDerived()
+        {
+            return this.hasDerived;
         }
 
         /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,8 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.integration.IEFGlobalConfig;
+import org.mxupdate.test.data.datamodel.TypeData;
+import org.mxupdate.test.data.integration.IEFGlobalConfigData;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -37,7 +38,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class IEFGlobalConfigExportUpdate
+public class IEFGlobalConfigTest
     extends AbstractTest
 {
     /**
@@ -51,19 +52,32 @@ public class IEFGlobalConfigExportUpdate
         return new Object[][]  {
                 new Object[]{
                         "simple object",
-                        new IEFGlobalConfig(this, "HelloTest", "1")},
+                        new IEFGlobalConfigData(this,
+                                                new TypeData(this, "GlobalConfig").setValue("derived", "MCADInteg-GlobalConfig"),
+                                                "HelloTest", "1")},
                 new Object[]{
                         "simple object with description",
-                        new IEFGlobalConfig(this, "Hello \"Test\"", "1")
+                        new IEFGlobalConfigData(this,
+                                                new TypeData(this, "GlobalConfig").setValue("derived", "MCADInteg-GlobalConfig"),
+                                                "Hello \"Test\"", "1")
                                 .setDescription("a \"description\"")},
                 new Object[]{
                         "simple object with description and single apostrophe",
-                        new IEFGlobalConfig(this, "Hello \"Test\" 'with single apostrophe'", "1")
+                        new IEFGlobalConfigData(this,
+                                                new TypeData(this, "GlobalConfig").setValue("derived", "MCADInteg-GlobalConfig"),
+                                                "Hello \"Test\" 'with single apostrophe'", "1")
                                 .setDescription("a \"description\" with single 'apostrophe'")},
                 new Object[]{
                         "complex object",
-                        new IEFGlobalConfig(this, "HelloTest", "1")
+                        new IEFGlobalConfigData(this,
+                                                new TypeData(this, "GlobalConfig").setValue("derived", "MCADInteg-GlobalConfig"),
+                                                "HelloTest", "1")
                                 .setValue("MCADInteg-TypeFormatMapping", "complex \"data\" 'and single 'apostrophe'")},
+                new Object[]{
+                        "simple object with default global config type",
+                        new IEFGlobalConfigData(this,
+                                                null,
+                                                "HelloTest", "1")},
         };
     }
 
@@ -78,6 +92,7 @@ public class IEFGlobalConfigExportUpdate
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.IEF_GLOBAL_CONFIG);
+        this.cleanup(AbstractTest.CI.DM_TYPE);
     }
 
     /**
@@ -90,16 +105,20 @@ public class IEFGlobalConfigExportUpdate
      */
     @Test(dataProvider = "busDatas", description = "test export of new created integration global configuration objects")
     public void simpleExport(final String _description,
-                             final IEFGlobalConfig _globalConfig)
+                             final IEFGlobalConfigData _globalConfig)
         throws Exception
     {
+        if (_globalConfig.getType() != null)  {
+            _globalConfig.getType().create();
+        }
         _globalConfig.create();
         _globalConfig.checkExport(_globalConfig.export());
     }
 
     /**
-     * Tests an update of non existing table. The result is tested with by
-     * exporting the table and checking the result.
+     * Tests an update of non existing IEF global configuration. The result is
+     * tested with by exporting the IEF global configuration and checking the
+     * result.
      *
      * @param _description      description of the test case
      * @param _globalConfig   global configuration to test
@@ -107,9 +126,13 @@ public class IEFGlobalConfigExportUpdate
      */
     @Test(dataProvider = "busDatas", description = "test update of non existing table")
     public void simpleUpdate(final String _description,
-                             final IEFGlobalConfig _globalConfig)
+                             final IEFGlobalConfigData _globalConfig)
         throws Exception
     {
+        if (_globalConfig.getType() != null)  {
+            _globalConfig.getType().create();
+        }
+
         // first update with original content
         this.update(_globalConfig);
         final ExportParser exportParser = _globalConfig.export();

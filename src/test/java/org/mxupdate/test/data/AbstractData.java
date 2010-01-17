@@ -213,6 +213,18 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     }
 
     /**
+     * Returns the expected name of the configuration item file from the
+     * export.
+     *
+     * @return name of the CI file
+     */
+    public String getCIFileNameFromExport()
+    {
+        return this.getCIFileName();
+    }
+
+
+    /**
      * Returns the update definition of this configuration item.
      *
      * @return file content of the configuration item used to make an update
@@ -327,7 +339,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
         }
         // check file name of the configuration item update file
         Assert.assertEquals(exportDesc.get("filename"),
-                            this.getCIFileName(),
+                            this.getCIFileNameFromExport(),
                             "check that the correct configuration item file name is returned");
 
         return ret;
