@@ -299,6 +299,8 @@ public class Rule_mxJPO
      * <ul>
      * <li>set to not hidden</li>
      * <li>no owner and public access</li>
+     * <li>no public or owner revoke definition (only if not defined or if not
+     *     <code>none</code>)</li>
      * <li>remove all users</li>
      * </ul>
      *
