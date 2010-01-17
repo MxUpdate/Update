@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import matrix.util.MatrixException;
 import matrix.util.Mime64;
 
 /**
@@ -148,7 +149,14 @@ abstract class AbstractPlugin_mxJPO
         final Map<String,Object> jpoReturn = new HashMap<String,Object>(4);
         jpoReturn.put(AbstractPlugin_mxJPO.RETURN_KEY_LOG,       _log);
         jpoReturn.put(AbstractPlugin_mxJPO.RETURN_KEY_ERROR,     _error);
-        jpoReturn.put(AbstractPlugin_mxJPO.RETURN_KEY_EXCEPTION, _exception);
+        // MatrixException could not serialized and must be converted
+        if (_exception instanceof MatrixException)  {
+            final Exception newEx = new Exception(((MatrixException) _exception).toJniFormat());
+            newEx.setStackTrace(_exception.getStackTrace());
+            jpoReturn.put(AbstractPlugin_mxJPO.RETURN_KEY_EXCEPTION, newEx);
+        } else  {
+            jpoReturn.put(AbstractPlugin_mxJPO.RETURN_KEY_EXCEPTION, _exception);
+        }
         jpoReturn.put(AbstractPlugin_mxJPO.RETURN_KEY_VALUES,    _values);
         return jpoReturn;
     }
