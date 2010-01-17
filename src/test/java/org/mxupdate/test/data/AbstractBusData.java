@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.data.datamodel.TypeData;
 
 /**
  * Defines common information from business objects used to create, update and
@@ -38,6 +39,29 @@ import org.mxupdate.test.ExportParser;
 public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
     extends AbstractData<DATA>
 {
+    /**
+     * Used to separate type, name and revision of business objects within
+     * name of files.
+     */
+    private static final String SEPARATOR = "________";
+
+    /**
+     * Related business type of this business object (if the type has children).
+     *
+     * @see #AbstractBusData(AbstractTest, AbstractTest.CI, String, String)
+     */
+    private final TypeData type;
+
+    /**
+     * Name of the business object.
+     */
+    private final String busName;
+
+    /**
+     * Revision of the business object.
+     */
+    private final String busRevision;
+
     /**
      * Description of the business object.
      *
@@ -61,7 +85,46 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
                               final String _name,
                               final String _revision)
     {
-        super(_test, _ci, _name + "________" + _revision);
+        super(_test, _ci, AbstractTest.PREFIX + _name + AbstractBusData.SEPARATOR + _revision);
+        this.type = null;
+        this.busName = AbstractTest.PREFIX + _name;
+        this.busRevision = _revision;
+    }
+
+    /**
+     * Constructor to initialize this data piece.
+     *
+     * @param _test                 related test case
+     * @param _ci                   related configuration type
+     * @param _type                 derived type
+     * @param _name                 name of the business object
+     * @param _revision             revision of the business object
+     */
+    protected AbstractBusData(final AbstractTest _test,
+                              final AbstractTest.CI _ci,
+                              final TypeData _type,
+                              final String _name,
+                              final String _revision)
+    {
+        super(_test, _ci, _type.getName() + AbstractBusData.SEPARATOR + AbstractBusData.SEPARATOR
+                            + AbstractTest.PREFIX + _name + AbstractBusData.SEPARATOR
+                            + _revision);
+        this.type = _type;
+        this.busName = AbstractTest.PREFIX + _name;
+        this.busRevision = _revision;
+    }
+
+    /**
+     * Returns the type in the case that derived types are used for this
+     * business object.
+     *
+     * @return related type (or <code>null</code> if not a specific derived type
+     *         is defined)
+     * @see #type
+     */
+    public TypeData getType()
+    {
+        return this.type;
     }
 
     /**
@@ -89,11 +152,11 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
     public DATA create()
         throws MatrixException
     {
-        final String[] nameArr = this.getName().split("________");
         final StringBuilder cmd = new StringBuilder()
-                .append("escape add bus \"").append(AbstractTest.convertMql(this.getCI().getBusType()))
-                .append("\" \"").append(AbstractTest.convertMql(nameArr[0]))
-                .append("\" \"").append(AbstractTest.convertMql((nameArr.length > 1) ? nameArr[1] : ""))
+                .append("escape add bus \"")
+                    .append(AbstractTest.convertMql((this.type != null) ? this.type.getName() : this.getCI().getBusType()))
+                .append("\" \"").append(AbstractTest.convertMql(this.busName))
+                .append("\" \"").append(AbstractTest.convertMql((this.busRevision != null) ? this.busRevision : ""))
                 .append("\" description \"").append(AbstractTest.convertMql((this.description != null) ? this.description : ""))
                 .append("\" policy \"").append(AbstractTest.convertMql(this.getCI().getBusPolicy()))
                 .append("\" vault \"").append(AbstractTest.convertMql(this.getCI().getBusVault()))

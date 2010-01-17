@@ -67,131 +67,137 @@ public abstract class AbstractTest
         /**
          * Configuration item Data Model Boolean Attribute.
          */
-        DM_ATTRIBUTE_BOOLEAN("attribute", null, null, null, "AttributeBoolean", "ATTRIBUTE", "BOOLEAN_", "datamodel/attribute", true),
+        DM_ATTRIBUTE_BOOLEAN("attribute", null, false, null, null, "AttributeBoolean", "ATTRIBUTE", "BOOLEAN_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model Date Attribute.
          */
-        DM_ATTRIBUTE_DATE("attribute", null, null, null, "AttributeDate", "ATTRIBUTE", "DATE_", "datamodel/attribute", true),
+        DM_ATTRIBUTE_DATE("attribute", null, false, null, null, "AttributeDate", "ATTRIBUTE", "DATE_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model Integer Attribute.
          */
-        DM_ATTRIBUTE_INTEGER("attribute", null, null, null, "AttributeInteger", "ATTRIBUTE", "INTEGER_", "datamodel/attribute", true),
+        DM_ATTRIBUTE_INTEGER("attribute", null, false, null, null, "AttributeInteger", "ATTRIBUTE", "INTEGER_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model Real Attribute.
          */
-        DM_ATTRIBUTE_REAL("attribute", null, null, null, "AttributeReal", "ATTRIBUTE", "REAL_", "datamodel/attribute", true),
+        DM_ATTRIBUTE_REAL("attribute", null, false, null, null, "AttributeReal", "ATTRIBUTE", "REAL_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model String Attribute.
          */
-        DM_ATTRIBUTE_STRING("attribute", null, null, null, "AttributeString", "ATTRIBUTE", "STRING_", "datamodel/attribute", true),
+        DM_ATTRIBUTE_STRING("attribute", null, false, null, null, "AttributeString", "ATTRIBUTE", "STRING_", "datamodel/attribute", true),
 
         /**
          * Configuration item Data Model Interface.
          */
-        DM_INTERFACE("interface", null, null, null, "Interface", "INTERFACE", "INTERFACE_", "datamodel/interface", true),
+        DM_INTERFACE("interface", null, false, null, null, "Interface", "INTERFACE", "INTERFACE_", "datamodel/interface", true),
 
         /**
          * Configuration item IEF Global Configuration.
          */
-        DM_NOTIFICATION(null, "Notification", "Business Rule", "eService Administration",
+        DM_NOTIFICATION(null, "Notification", false, "Business Rule", "eService Administration",
                               "Notification", "NOTIFICATION", "NOTIFICATION_", "datamodel/notification", true),
 
         /**
          * Configuration item Data Model Policy.
          */
-        DM_POLICY("policy", null, null, null, "Policy", "POLICY", "POLICY_", "datamodel/policy", true),
+        DM_POLICY("policy", null, false, null, null, "Policy", "POLICY", "POLICY_", "datamodel/policy", true),
 
         /**
          * Configuration item Data Model Relationship.
          */
-        DM_RELATIONSHIP("relationship", null, null, null, "Relationship", "RELATIONSHIP", "RELATIONSHIP_", "datamodel/relationship", true),
+        DM_RELATIONSHIP("relationship", null, false, null, null, "Relationship", "RELATIONSHIP", "RELATIONSHIP_", "datamodel/relationship", true),
 
         /**
          * Configuration item Data Model Rule.
          */
-        DM_RULE("rule", null, null, null, "Rule", "RULE", "RULE_", "datamodel/rule", true),
+        DM_RULE("rule", null, false, null, null, "Rule", "RULE", "RULE_", "datamodel/rule", true),
 
         /**
          * Configuration item Data Model Type.
          */
-        DM_TYPE("type", null, null, null, "Type", "TYPE", "TYPE_", "datamodel/type", true),
+        DM_TYPE("type", null, false, null, null, "Type", "TYPE", "TYPE_", "datamodel/type", true),
 
         /**
          * Configuration item IEF Global Configuration.
          */
-        IEF_GLOBAL_CONFIG(null, "MCADInteg-GlobalConfig", "MCADInteg-ConfigObjectPolicy", "eService Administration",
+        IEF_EBOMSYNC_CONFIG(null, "IEF-EBOMSyncConfig", true, "IEF-EBOMSyncConfig", "eService Administration",
+                            "IEFEBOMSyncConfig", "IEFEBOMSYNC", "IEFEBOMSYNC_", "integration/ebomsync", true),
+
+        /**
+         * Configuration item IEF Global Configuration.
+         */
+        IEF_GLOBAL_CONFIG(null, "MCADInteg-GlobalConfig", true, "MCADInteg-ConfigObjectPolicy", "eService Administration",
                           "IEFGlobalConfig", "IEFGLOBALCONFIG", "IEFGLOBALCONFIG_", "integration/globalconfig", true),
 
         /**
          * Configuration item IEF Global Registry.
          */
-        IEF_GLOBAL_REGISTRY(null, "IEF-GlobalRegistry", "MCADInteg-ConfigObjectPolicy", "eService Administration",
+        IEF_GLOBAL_REGISTRY(null, "IEF-GlobalRegistry", false, "MCADInteg-ConfigObjectPolicy", "eService Administration",
                             "IEFGlobalRegistry", "IEFGLOBALREGISTRY", "IEFGLOBALREGISTRY_", "integration/globalregistry", true),
 
         /**
          * Configuration item JPO program.
          */
-        PRG_JPO("program", null, null, null, "JPO", null, "", "program/jpo", true),
+        PRG_JPO("program", null, false, null, null, "JPO", null, "", "program/jpo", true),
 
         /**
          * Configuration item MQL program.
          */
-        PRG_MQL_PROGRAM("program", null, null, null, "Program", null, "", "program/mql", true),
+        PRG_MQL_PROGRAM("program", null, false, null, null, "Program", null, "", "program/mql", true),
 
         /**
          * Configuration item page program.
          */
-        PRG_PAGE("page", null, null, null, "Page", "PAGE", "PAGE_", "program/page", true),
+        PRG_PAGE("page", null, false, null, null, "Page", "PAGE", "PAGE_", "program/page", true),
 
         /**
          * Configuration item group.
          */
-        USR_GROUP("group", null, null, null, "Group", "GROUP", "GROUP_", "user/group", true),
+        USR_GROUP("group", null, false, null, null, "Group", "GROUP", "GROUP_", "user/group", true),
 
         /**
          * Configuration item administration person.
          */
-        USR_PERSONADMIN("person", null, null, null, "PersonAdmin", "PERSONADMIN", "PERSONADMIN_", "user/personadmin", true),
+        USR_PERSONADMIN("person", null, false, null, null, "PersonAdmin", "PERSONADMIN", "PERSONADMIN_", "user/personadmin", true),
 
         /**
          * Configuration item role.
          */
-        USR_ROLE("role", null, null, null, "Role", "ROLE", "ROLE_", "user/role", true),
+        USR_ROLE("role", null, false, null, null, "Role", "ROLE", "ROLE_", "user/role", true),
 
         /**
          * Configuration item command.
          */
-        UI_COMMAND("command", null, null, null, "Command", "COMMAND", "COMMAND_", "userinterface/command", true),
+        UI_COMMAND("command", null, false, null, null, "Command", "COMMAND", "COMMAND_", "userinterface/command", true),
 
         /**
          * Configuration item form.
          */
-        UI_FORM("form", null, null, null, "Form", "FORM", "FORM_", "userinterface/form", true),
+        UI_FORM("form", null, false, null, null, "Form", "FORM", "FORM_", "userinterface/form", true),
 
         /**
          * Configuration item inquiry.
          */
-        UI_INQUIRY("inquiry", null, null, null, "Inquiry", "INQUIRY", "INQUIRY_", "userinterface/inquiry", true),
+        UI_INQUIRY("inquiry", null, false, null, null, "Inquiry", "INQUIRY", "INQUIRY_", "userinterface/inquiry", true),
 
         /**
          * Configuration item menu.
          */
-        UI_MENU("menu", null, null, null, "Menu", "MENU", "MENU_", "userinterface/menu", true),
+        UI_MENU("menu", null, false, null, null, "Menu", "MENU", "MENU_", "userinterface/menu", true),
 
         /**
          * Configuration item table.
          */
-        UI_TABLE("table", null, null, null, "Table", "TABLE", "TABLE_", "userinterface/table", false),
+        UI_TABLE("table", null, false, null, null, "Table", "TABLE", "TABLE_", "userinterface/table", false),
 
         /**
          * Configuration item site (not handled as configuration item from the
          * update tool itself).
          */
-        OTHER_SITE("site", null, null, null, "Site", null, null, null, true);
+        OTHER_SITE("site", null, false, null, null, "Site", null, null, null, true);
 
         /**
          * Related type name in MX.
@@ -243,6 +249,8 @@ public abstract class AbstractTest
          *
          * @param _mxType               related type name in MX
          * @param _busType              related type of the business object
+         * @param _hasDerived           does the configuration item works with
+         *                              derived types?
          * @param _busPolicy            related policy of the business object
          * @param _busVault             related vault of the business object
          * @param _updateType           related type name in MxUpdate Update
@@ -254,6 +262,7 @@ public abstract class AbstractTest
          */
         CI(final String _mxType,
            final String _busType,
+           final boolean _hasDerived,
            final String _busPolicy,
            final String _busVault,
            final String _updateType,

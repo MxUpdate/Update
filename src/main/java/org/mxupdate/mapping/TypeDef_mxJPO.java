@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,6 +118,15 @@ public final class TypeDef_mxJPO
      * @see #busType
      */
     private static final String PREFIX_BUS_TYPE = "BusType";
+
+    /**
+     * Used prefix of business type derived definitions within the property
+     * file.
+     *
+     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
+     * @see #busTypeDerived
+     */
+    private static final String PREFIX_BUS_TYPE_DERIVED = "BusTypeDerived";
 
     /**
      * Used prefix of vault definitions within the property file.
@@ -271,6 +280,16 @@ public final class TypeDef_mxJPO
     private String busType;
 
     /**
+     * If set to <i>true</i> business objects are using types which are derived
+     * from the defined {@link #busType business type}.
+     *
+     * @see #busType
+     * @see #hasMxBusTypeDerived()
+     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
+     */
+    private boolean busTypeDerived = false;
+
+    /**
      * Mapping between internal used type definitions and the MX vault
      * names.
      *
@@ -396,6 +415,8 @@ public final class TypeDef_mxJPO
             typeDef.busPolicy = _value;
         } else if (key.equals(TypeDef_mxJPO.PREFIX_BUS_TYPE))  {
             typeDef.busType = _value;
+        } else if (key.equals(TypeDef_mxJPO.PREFIX_BUS_TYPE_DERIVED))  {
+            typeDef.busTypeDerived = Boolean.valueOf(_value);
         } else if (key.equals(TypeDef_mxJPO.PREFIX_BUS_VAULT))  {
             typeDef.busVault = _value;
         } else if (key.equals(TypeDef_mxJPO.PREFIX_FILE_MATCHLAST))  {
@@ -593,6 +614,19 @@ public final class TypeDef_mxJPO
     public String getMxBusType()
     {
         return this.busType;
+    }
+
+    /**
+     * Returns if business objects are using types which are derived from given
+     * {@link #busType business type}.
+     *
+     * @return <i>true</i> if business objects are using derived business
+     *          types; otherwise <i>false</i>
+     * @see #busTypeDerived
+     */
+    public boolean hasMxBusTypeDerived()
+    {
+        return this.busTypeDerived;
     }
 
     /**

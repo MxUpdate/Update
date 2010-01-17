@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.AbstractTest.JPOReturn;
 import org.testng.Assert;
 
 /**
@@ -88,7 +87,11 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     {
         this.test = _test;
         this.ci = _ci;
-        this.name = (_name != null) ? AbstractTest.PREFIX + _name : null;
+        if (_ci.getBusType() != null)  {
+            this.name = _name;
+        } else  {
+            this.name = (_name != null) ? AbstractTest.PREFIX + _name : null;
+        }
     }
 
     /**
@@ -278,7 +281,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
             }
         }
 
-        final JPOReturn<Map<String,Collection<Map<String,String>>>> jpoReturn =
+        final AbstractTest.JPOReturn<Map<String,Collection<Map<String,String>>>> jpoReturn =
                 this.test.<Map<String,Collection<Map<String,String>>>>jpoInvoke("org.mxupdate.plugin.Export",
                                                                                 "exportByName",
                                                                                 files,
@@ -411,7 +414,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      *
      * @return string representation of this data piece
      */
-    @Override
+    @Override()
     public String toString()
     {
         return "[" + this.ci.updateType + " '" + this.name + "']";

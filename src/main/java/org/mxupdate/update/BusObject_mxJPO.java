@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,12 +78,26 @@ public class BusObject_mxJPO
     public static final String SPLIT_NAME = "________";
 
     /**
+     * String used to split the type and name with revision of administration
+     * business object.
+     */
+    public static final String SPLIT_TYPE = BusObject_mxJPO.SPLIT_NAME + BusObject_mxJPO.SPLIT_NAME;
+
+    /**
      * Sorted set of attribute values.
      *
      * @see #parse(ParameterCache_mxJPO)
      * @see #getAttrValuesSorted()
      */
     private final Set<AttributeValue> attrValuesSorted = new TreeSet<AttributeValue>();
+
+    /**
+     * Type of business object.
+     *
+     * @see #parse(ParameterCache_mxJPO)
+     * @see #getBusType()
+     */
+    private final String busType;
 
     /**
      * Name of business object.
@@ -160,10 +174,20 @@ public class BusObject_mxJPO
         super(_typeDef, _mxName);
 
         if (_mxName != null)  {
-            final String[] nameRev = this.getName().split(BusObject_mxJPO.SPLIT_NAME);
-            this.busName = nameRev[0];
-            this.busRevision = (nameRev.length > 1) ? nameRev[1] : "";
+            if (_typeDef.hasMxBusTypeDerived())  {
+                final String[] typeNameRev = this.getName().split(BusObject_mxJPO.SPLIT_TYPE);
+                this.busType = typeNameRev[0];
+                final String[] nameRev = typeNameRev[1].split(BusObject_mxJPO.SPLIT_NAME);
+                this.busName = nameRev[0];
+                this.busRevision = (nameRev.length > 1) ? nameRev[1] : "";
+            } else  {
+                final String[] nameRev = this.getName().split(BusObject_mxJPO.SPLIT_NAME);
+                this.busType = _typeDef.getMxBusType();
+                this.busName = nameRev[0];
+                this.busRevision = (nameRev.length > 1) ? nameRev[1] : "";
+            }
         } else  {
+            this.busType = _typeDef.getMxBusType();
             this.busName = null;
             this.busRevision = null;
         }
@@ -184,7 +208,9 @@ public class BusObject_mxJPO
     /**
      * Searches for all business object of current type definition and returns
      * all MX names. The revision of the business object is appended to the
-     * name of the business object split by {@link #SPLIT_NAME}.
+     * name of the business object split by {@link #SPLIT_NAME}. If types which
+     * are derived from original type are used, the type is the prefix of the
+     * name with the prefix {@link #SPLIT_TYPE}.
      *
      * @param _paramCache   parameter cache
      * @return set of found business object names (and revision)
@@ -195,7 +221,8 @@ public class BusObject_mxJPO
     public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
-        final StringList selects = new StringList();
+        final StringList selects = new StringList(3);
+        selects.addElement("type");
         selects.addElement("name");
         selects.addElement("revision");
 
@@ -208,9 +235,14 @@ public class BusObject_mxJPO
         final Set<String> ret = new TreeSet<String>();
         for (final Object mapObj : list)  {
             final BusinessObjectWithSelect map = (BusinessObjectWithSelect) mapObj;
+            final String busType = (String) map.getSelectDataList("type").get(0);
             final String busName = (String) map.getSelectDataList("name").get(0);
             final String busRevision = (String) map.getSelectDataList("revision").get(0);
-            final StringBuilder name = new StringBuilder().append(busName);
+            final StringBuilder name = new StringBuilder();
+            if (this.getTypeDef().hasMxBusTypeDerived())  {
+                name.append(busType).append(BusObject_mxJPO.SPLIT_TYPE);
+            }
+            name.append(busName);
             if ((busRevision != null) && !"".equals(busRevision))  {
                 name.append(BusObject_mxJPO.SPLIT_NAME).append(busRevision);
             }
@@ -450,8 +482,7 @@ public class BusObject_mxJPO
     public void delete(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        final TypeDef_mxJPO typeDef = this.getTypeDef();
-        final BusinessObject bus = new BusinessObject(typeDef.getMxBusType(),
+        final BusinessObject bus = new BusinessObject(this.busType,
                                                       this.busName,
                                                       this.busRevision,
                                                       null);
@@ -468,12 +499,11 @@ public class BusObject_mxJPO
     public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        final TypeDef_mxJPO busType = this.getTypeDef();
-        final BusinessObject bus = new BusinessObject(busType.getMxBusType(),
-                                                      this.getBusName(),
-                                                      this.getBusRevision(),
-                                                      busType.getMxBusVault());
-        bus.create(_paramCache.getContext(), busType.getMxBusPolicy());
+        final BusinessObject bus = new BusinessObject(this.busType,
+                                                      this.busName,
+                                                      this.busRevision,
+                                                      this.getTypeDef().getMxBusVault());
+        bus.create(_paramCache.getContext(), this.getTypeDef().getMxBusPolicy());
     }
 
     /**
@@ -609,14 +639,14 @@ public class BusObject_mxJPO
     }
 
     /**
-     * Returns the business type of this business object instance. The business
-     * type is evaluated from the business type annotation.
+     * Returns the business type of this business object instance.
      *
      * @return business type
+     * @see #busType
      */
     protected String getBusType()
     {
-        return this.getTypeDef().getMxBusType();
+        return this.busType;
     }
 
     /**
