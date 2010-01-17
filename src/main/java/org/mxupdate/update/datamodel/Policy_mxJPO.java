@@ -433,7 +433,6 @@ public class Policy_mxJPO
                                final String... _args)
         throws Exception
     {
-try {
         final String code = _args[2].replaceAll("@0@0@", "'")
                                     .replaceAll("@1@1@", "\\\"");
 
@@ -518,10 +517,6 @@ throw new Exception("some states are not defined anymore!");
                 MqlUtil_mxJPO.setEscapeOff(_paramCache);
             }
         }
-} catch (final NullPointerException e) {
-    e.printStackTrace();
-    throw e;
-}
     }
 
     /**
