@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# Copyright 2008-2009 The MxUpdate Team
+# Copyright 2008-2010 The MxUpdate Team
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ tcl;
 
 eval  {
 
-  set VERSION "0-7-2"
+  set VERSION "0-8-0-1"
 
   set ENV_NAME_MXUPDATE_PATH      "MXUPDATE_PATH"
   set ENV_NAME_MAPPING_EXTENSION  "MXUPDATE_MAPPING_FILE"
