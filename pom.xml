@@ -98,8 +98,6 @@
     <properties>
         <!-- correct encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- MX version -->
-        <mxversion>V6-R2010x</mxversion>
     </properties>
 
     <dependencies>
@@ -109,14 +107,14 @@
             <artifactId>ematrix</artifactId>
             <scope>system</scope>
             <version>ALL</version>
-            <systemPath>${basedir}/lib/eMatrixServletRMI.${mxversion}.jar</systemPath>
+            <systemPath>${org.mxupdate.mx.jar.ematrix}</systemPath>
         </dependency>
         <dependency>
             <groupId>ematrix</groupId>
             <artifactId>fcsclient</artifactId>
             <scope>system</scope>
             <version>ALL</version>
-            <systemPath>${basedir}/lib/FcsClient.${mxversion}.jar</systemPath>
+            <systemPath>${org.mxupdate.mx.jar.fcsclient}</systemPath>
         </dependency>
         <!-- for Base64 encoding / decoding within automatic tests -->
         <dependency>
@@ -132,6 +130,13 @@
             <version>5.8</version>
             <scope>test</scope>
             <classifier>jdk15</classifier>
+        </dependency>
+        <!-- needed to load settings (URL etc.) from the maven settings file -->
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-settings</artifactId>
+            <version>2.2.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

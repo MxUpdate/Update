@@ -21,6 +21,7 @@
 package org.mxupdate.test;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
@@ -35,6 +36,9 @@ import matrix.db.JPO;
 import matrix.util.MatrixException;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.maven.settings.DefaultMavenSettingsBuilder;
+import org.apache.maven.settings.Profile;
+import org.apache.maven.settings.Settings;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.AbstractData;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
@@ -42,6 +46,8 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Optional;
+import org.testng.annotations.Parameters;
 
 /**
  * Abstract test class to connect to MX and disconnect incl. some helper
@@ -57,6 +63,21 @@ public abstract class AbstractTest
      * all test cases.
      */
     public static final String PREFIX = "MXUPDATE_";
+
+    /**
+     * Name of the property used for the URL to the MX instance.
+     */
+    private static final String PROP_URL = "org.mxupdate.mx.url";
+
+    /**
+     * Name of the property used for the user to the MX instance.
+     */
+    private static final String PROP_USER = "org.mxupdate.mx.user";
+
+    /**
+     * Name of the property used for the password to the MX instance.
+     */
+    private static final String PROP_PASSWORD = "org.mxupdate.mx.password";
 
     /**
      * Enumeration to define a mapping between the configuration items and the
@@ -350,6 +371,44 @@ public abstract class AbstractTest
     private Context context;
 
     /**
+     * Settings for maven.
+     */
+    private Settings settings;
+
+    /**
+     * Returns depending on the <code>_key</code> related value within the
+     * properties.
+     *
+     * @param _key      searched key within property settings
+     * @return value of the property
+     * @throws Exception if setting could not be fetched
+     * @see #settings
+     */
+    private String getSetting(final String _key)
+        throws Exception
+    {
+        if (this.settings == null)  {
+            final DefaultMavenSettingsBuilder builder = new DefaultMavenSettingsBuilder();
+            final File settingsFile = new File(new File(System.getProperty("user.home")), ".m2/settings.xml");
+            this.settings = builder.buildSettings(settingsFile);
+        }
+        String tmp = null;
+        for (final String active : this.settings.getActiveProfiles())  {
+            tmp = ((Profile) this.settings.getProfilesAsMap().get(active)).getProperties().getProperty(_key);
+            if (tmp != null)  {
+                break;
+            }
+        }
+        final String ret;
+        if (tmp != null)  {
+            ret = tmp;
+        } else  {
+            ret = "";
+        }
+        return ret;
+    }
+
+    /**
      * Returns the {@link #context} connection to MX.
      *
      * @return MX context
@@ -363,16 +422,24 @@ public abstract class AbstractTest
     /**
      * Connects to MX.
      *
+     * @param _url      URL for the MX connection
+     * @param _user     user for the MX connection
+     * @param _password password for the MX connection
      * @throws Exception if connect failed
      */
     @BeforeClass()
-    public void connect()
+    @Parameters({AbstractTest.PROP_URL, AbstractTest.PROP_USER, AbstractTest.PROP_PASSWORD})
+    public void connect(@Optional() final String _url,
+                        @Optional() final String _user,
+                        @Optional() final String _password)
         throws Exception
     {
-//        this.context = new Context("http://172.16.62.120:8080/ematrix");
-//        this.context = new Context("http://172.16.62.130:8080/ENOVIA");
-        this.context = new Context("http://172.16.62.129:8888/enovia");
-        this.context.resetContext("creator", "", null);
+        final String url        = (_url != null)        ? _url      : this.getSetting(AbstractTest.PROP_URL);
+        final String user       = (_user != null)       ? _user     : this.getSetting(AbstractTest.PROP_USER);
+        final String password   = (_password != null)   ? _password : this.getSetting(AbstractTest.PROP_PASSWORD);
+
+        this.context = new Context(url);
+        this.context.resetContext(user, password, null);
         this.context.connect();
     }
 
