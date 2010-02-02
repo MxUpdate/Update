@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  * @version $Id$
  */
 public class Update_mxJPO
-        extends AbstractPlugin_mxJPO
+    extends AbstractPlugin_mxJPO
 {
     /**
      * Main method to create or update given TCL update file.
@@ -54,10 +54,10 @@ public class Update_mxJPO
      * @throws Exception if the update failed
      * @deprecated
      */
-    @Deprecated
+    @Deprecated()
     public void mxMain(final Context _context,
                        final String... _args)
-            throws Exception
+        throws Exception
     {
         final Set<File> files = new HashSet<File>();
         files.add(new File(_args[0]));
@@ -87,6 +87,10 @@ public class Update_mxJPO
      *                      map is the value of the parameter). Default is no
      *                      predefined parameter valued (<code>null</code>).
      *                      </li>
+     *                  <li><b>{@link Boolean}</b><br/> if set to <i>true</i>
+     *                      the returned value is also written into the
+     *                      {@link MatrixWriter matrix writer} (e.g. required
+     *                      if called via MQL console)</li>
      *                  </ul>
      * @return logging information from the update
      * @throws Exception if the update failed
@@ -94,18 +98,29 @@ public class Update_mxJPO
      */
     public String updateByName(final Context _context,
                                final String[] _args)
-            throws Exception
+        throws Exception
     {
         final Set<String> fileNames = this.<Set<String>>decode(_args, 0);
         final boolean compile = this.<Boolean>decode(_args, 1, false);
         final Map<String,String> paramValues = this.<Map<String,String>>decode(_args, 2, null);
+        final boolean write = this.<Boolean>decode(_args, 3, false);
 
         final Set<File> files = new HashSet<File>();
         for (final String fileName : fileNames)  {
             files.add(new File(fileName));
         }
 
-        return this.updateFiles(_context, paramValues, files, compile);
+        final String ret = this.updateFiles(_context, paramValues, files, compile);
+
+        // if write flag is set write to matrix writer
+        if (write)  {
+            final MatrixWriter writer = new MatrixWriter(_context);
+            writer.write(ret);
+            writer.flush();
+            writer.close();
+        }
+
+        return ret;
     }
 
     /**
@@ -131,6 +146,10 @@ public class Update_mxJPO
      *                      map is the value of the parameter). Default is no
      *                      predefined parameter valued (<code>null</code>).
      *                      </li>
+     *                  <li><b>{@link Boolean}</b><br/> if set to <i>true</i>
+     *                      the returned value is also written into the
+     *                      {@link MatrixWriter matrix writer} (e.g. required
+     *                      if called via MQL console)</li>
      *                  </ul>
      * @return logging information from the update
      * @throws Exception if the update failed
@@ -138,14 +157,14 @@ public class Update_mxJPO
      */
     public String updateByContent(final Context _context,
                                   final String[] _args)
-            throws Exception
+        throws Exception
     {
-try {
         String ret = "";
 
         final Map<String,String> files = this.<Map<String,String>>decode(_args, 0);
         final boolean compile = this.<Boolean>decode(_args, 1, false);
         final Map<String,String> paramValues = this.<Map<String,String>>decode(_args, 2, null);
+        final boolean write = this.<Boolean>decode(_args, 3, false);
 
         // create temporary directory
         final File tmpDir = File.createTempFile("Update", "tmp");
@@ -176,11 +195,15 @@ try {
             tmpDir.delete();
         }
 
+        // if write flag is set write to matrix writer
+        if (write)  {
+            final MatrixWriter writer = new MatrixWriter(_context);
+            writer.write(ret);
+            writer.flush();
+            writer.close();
+        }
+
         return ret;
-} catch (final Exception e)  {
-    e.printStackTrace();
-    throw e;
-}
     }
 
     /**
@@ -199,40 +222,13 @@ try {
                                  final Map<String,String> _paramValues,
                                  final Set<File> _files,
                                  final boolean _compile)
-            throws Exception
+        throws Exception
     {
         // initialize mapping
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, true, _paramValues);
 
         // first found related type definition instances
-        final Map<File,AbstractObject_mxJPO> instances = new TreeMap<File,AbstractObject_mxJPO>();
-        for (final File file : _files)  {
-            boolean found = false;
-            for (final TypeDef_mxJPO typeDef : paramCache.getMapping().getAllTypeDefs())  {
-                if (!typeDef.isFileMatchLast())  {
-                    final AbstractObject_mxJPO instance = typeDef.newTypeInstance(null);
-                    final String mxName = instance.extractMxName(paramCache, file);
-                    if (mxName != null)  {
-                        instances.put(file, typeDef.newTypeInstance(mxName));
-                        found  = true;
-                        break;
-                    }
-                }
-            }
-            if (!found)  {
-                for (final TypeDef_mxJPO typeDef : paramCache.getMapping().getAllTypeDefs())  {
-                    if (typeDef.isFileMatchLast())  {
-                        final AbstractObject_mxJPO instance = typeDef.newTypeInstance(null);
-                        final String mxName = instance.extractMxName(paramCache, file);
-                        if (mxName != null)  {
-                            instances.put(file, typeDef.newTypeInstance(mxName));
-                            found = true;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
+        final Map<File,AbstractObject_mxJPO> instances = this.evalInstances(paramCache, _files);
 
         // check if objects must be created
         final Map<TypeDef_mxJPO,Set<String>> allMxNames = new HashMap<TypeDef_mxJPO,Set<String>>();
@@ -255,19 +251,74 @@ try {
 
         // at least compile (to be sure that all JPOs are updated)
         if (_compile)  {
-            for (final Map.Entry<File,AbstractObject_mxJPO> instanceEntry : instances.entrySet())  {
-                try  {
-                    if (instanceEntry.getValue().compile(paramCache))  {
-                        paramCache.logInfo("compiled " + instanceEntry.getValue().getTypeDef().getLogging()
-                                + " '" + instanceEntry.getValue().getName() + "'");
+            this.compile(paramCache, instances);
+        }
+        return paramCache.getLogString();
+    }
+
+    /**
+     * Evaluates depending on the file (names) related MX type definition
+     * instances.
+     *
+     * @param _paramCache   parameter cache with MX context
+     * @param _files        set with all files
+     * @return map with the files and depending MX type definition instance
+     * @throws Exception if instances could not be evaluated
+     */
+    protected Map<File,AbstractObject_mxJPO> evalInstances(final ParameterCache_mxJPO _paramCache,
+                                                           final Set<File> _files)
+        throws Exception
+    {
+        final Map<File,AbstractObject_mxJPO> instances = new TreeMap<File,AbstractObject_mxJPO>();
+        for (final File file : _files)  {
+            boolean found = false;
+            for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefs())  {
+                if (!typeDef.isFileMatchLast())  {
+                    final AbstractObject_mxJPO instance = typeDef.newTypeInstance(null);
+                    final String mxName = instance.extractMxName(_paramCache, file);
+                    if (mxName != null)  {
+                        instances.put(file, typeDef.newTypeInstance(mxName));
+                        found  = true;
+                        break;
                     }
-                } catch (final Exception e)  {
-                    paramCache.logInfo("compile of " + instanceEntry.getValue().getTypeDef().getLogging()
-                            + " '" + instanceEntry.getValue().getName() + "' failed:\n" + e.toString());
+                }
+            }
+            if (!found)  {
+                for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefs())  {
+                    if (typeDef.isFileMatchLast())  {
+                        final AbstractObject_mxJPO instance = typeDef.newTypeInstance(null);
+                        final String mxName = instance.extractMxName(_paramCache, file);
+                        if (mxName != null)  {
+                            instances.put(file, typeDef.newTypeInstance(mxName));
+                            found = true;
+                            break;
+                        }
+                    }
                 }
             }
         }
+        return instances;
+    }
 
-        return paramCache.getLogString();
+    /**
+     * Compile all JPO's.
+     *
+     * @param _paramCache   parameter cache with MX context
+     * @param _instances    instqnces to compile
+     */
+    protected void compile(final ParameterCache_mxJPO _paramCache,
+                           final Map<File,AbstractObject_mxJPO> _instances)
+    {
+        for (final Map.Entry<File,AbstractObject_mxJPO> instanceEntry : _instances.entrySet())  {
+            try  {
+                if (instanceEntry.getValue().compile(_paramCache))  {
+                    _paramCache.logInfo("compiled " + instanceEntry.getValue().getTypeDef().getLogging()
+                            + " '" + instanceEntry.getValue().getName() + "'");
+                }
+            } catch (final Exception e)  {
+                _paramCache.logInfo("compile of " + instanceEntry.getValue().getTypeDef().getLogging()
+                        + " '" + instanceEntry.getValue().getName() + "' failed:\n" + e.toString());
+            }
+        }
     }
 }
