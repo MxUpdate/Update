@@ -103,7 +103,7 @@ public class Update_mxJPO
         final Set<String> fileNames = this.<Set<String>>decode(_args, 0);
         final boolean compile = this.<Boolean>decode(_args, 1, false);
         final Map<String,String> paramValues = this.<Map<String,String>>decode(_args, 2, null);
-        final boolean write = this.<Boolean>decode(_args, 3, false);
+        final int paramVersion = this.<Integer>decode(_args, 3, 0);
 
         final Set<File> files = new HashSet<File>();
         for (final String fileName : fileNames)  {
@@ -113,9 +113,9 @@ public class Update_mxJPO
         final String ret = this.updateFiles(_context, paramValues, files, compile);
 
         // if write flag is set write to matrix writer
-        if (write)  {
+        if (paramVersion == 1)  {
             final MatrixWriter writer = new MatrixWriter(_context);
-            writer.write(ret);
+            writer.write(this.encode(ret, null, null, null));
             writer.flush();
             writer.close();
         }
@@ -164,7 +164,7 @@ public class Update_mxJPO
         final Map<String,String> files = this.<Map<String,String>>decode(_args, 0);
         final boolean compile = this.<Boolean>decode(_args, 1, false);
         final Map<String,String> paramValues = this.<Map<String,String>>decode(_args, 2, null);
-        final boolean write = this.<Boolean>decode(_args, 3, false);
+        final int paramVersion = this.<Integer>decode(_args, 3, 0);
 
         // create temporary directory
         final File tmpDir = File.createTempFile("Update", "tmp");
@@ -196,9 +196,9 @@ public class Update_mxJPO
         }
 
         // if write flag is set write to matrix writer
-        if (write)  {
+        if (paramVersion == 1)  {
             final MatrixWriter writer = new MatrixWriter(_context);
-            writer.write(ret);
+            writer.write(this.encode(ret, null, null, null));
             writer.flush();
             writer.close();
         }
