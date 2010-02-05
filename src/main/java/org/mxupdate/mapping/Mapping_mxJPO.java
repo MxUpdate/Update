@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,6 +147,17 @@ public class Mapping_mxJPO
     private final Map<String,TypeDefGroup_mxJPO> typeDefGroupMap = new HashMap<String,TypeDefGroup_mxJPO>();
 
     /**
+     * Maps from the name of the type definition tree to the related type
+     * definition tree instance.
+     *
+     * @see TypeDefTree_mxJPO#defineValue(Mapping_mxJPO, String, String)
+     * @see #getTypeDefTree(String)
+     * @see #getAllTypeDefTrees()
+     * @see #getTypeDefTreeMap()
+     */
+    private final Map<String,TypeDefTree_mxJPO> typeDefTreeMap = new HashMap<String,TypeDefTree_mxJPO>();
+
+    /**
      * Maps from the update check enumeration item to related instance which
      * holds the parameter list and description.
      *
@@ -182,6 +193,8 @@ public class Mapping_mxJPO
                 TypeDef_mxJPO.defineValue(_paramCache, this, key.substring(8), value);
             } else if (key.startsWith("TypeDefGroup."))  {
                 TypeDefGroup_mxJPO.defineValue(this, key.substring(13), value);
+            } else if (key.startsWith("TypeDefTree."))  {
+                TypeDefTree_mxJPO.defineValue(this, key.substring(12), value);
             } else if (key.startsWith("UpdateCheck."))  {
                 UpdateCheck_mxJPO.defineValue(this, key.substring(12), value);
             }
@@ -374,19 +387,6 @@ public class Mapping_mxJPO
     }
 
     /**
-     * Returns the mapping between the update check enumeration item to related
-     * instance which holds the parameter list and description.
-     *
-     * @return mapping between type definition group name and the related type
-     *         definition group instance
-     * @see #updateCheckMap
-     */
-    protected Map<UpdateCheck_mxJPO,AbstractValue_mxJPO> getUpdateCheckMap()
-    {
-        return this.updateCheckMap;
-    }
-
-    /**
      * Returns the mapping between the type definition group name and the
      * related type definition group instance.
      *
@@ -397,5 +397,55 @@ public class Mapping_mxJPO
     protected Map<String,TypeDefGroup_mxJPO> getTypeDefGroupMap()
     {
         return this.typeDefGroupMap;
+    }
+
+    /**
+     * Returns for given name the related type definition tree instance.
+     *
+     * @param _name name of the searched type definition tree instance
+     * @return found type definition tree instance (or <code>null</code> if
+     *         not found)
+     * @see #typeDefTreeMap
+     */
+    public TypeDefTree_mxJPO getTypeDefTree(final String _name)
+    {
+        return this.typeDefTreeMap.get(_name);
+    }
+
+    /**
+     * Returns the list of all type definition tree instances.
+     *
+     * @return list of all type definition tree instances
+     * @see #typeDefTreeMap
+     */
+    public Collection<TypeDefTree_mxJPO> getAllTypeDefTrees()
+    {
+        return this.typeDefTreeMap.values();
+    }
+
+    /**
+     * Returns the mapping between the type definition tree name and the
+     * related type definition tree instance.
+     *
+     * @return mapping between type definition tree name and the related type
+     *         definition tree instance
+     * @see #typeDefTreeMap
+     */
+    protected Map<String,TypeDefTree_mxJPO> getTypeDefTreeMap()
+    {
+        return this.typeDefTreeMap;
+    }
+
+    /**
+     * Returns the mapping between the update check enumeration item to related
+     * instance which holds the parameter list and description.
+     *
+     * @return mapping between type definition group name and the related type
+     *         definition group instance
+     * @see #updateCheckMap
+     */
+    protected Map<UpdateCheck_mxJPO,AbstractValue_mxJPO> getUpdateCheckMap()
+    {
+        return this.updateCheckMap;
     }
 }
