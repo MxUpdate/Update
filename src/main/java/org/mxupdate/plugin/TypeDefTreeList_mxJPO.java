@@ -23,9 +23,6 @@ package org.mxupdate.plugin;
 import java.util.HashMap;
 import java.util.Map;
 
-import matrix.db.Context;
-import matrix.db.MatrixWriter;
-
 import org.mxupdate.mapping.TypeDefTree_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
@@ -36,42 +33,40 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class TypeDefTreeList_mxJPO
+class TypeDefTreeList_mxJPO
     extends AbstractPlugin_mxJPO
 {
     /**
      * Key in the map for one tree node entry for the label.
      */
-    private static final String RETURN_VALUE_KEY_LABEL = "Label";
+    private static final String RETURN_VALUE_KEY_LABEL = "Label"; //$NON-NLS-1$
 
     /**
      * Key in the map for one tree node entry for the type definition tree
      * list.
      */
-    private static final String RETURN_VALUE_KEY_TREE_LIST = "TypeDefTreeList";
+    private static final String RETURN_VALUE_KEY_TREE_LIST = "TypeDefTreeList"; //$NON-NLS-1$
 
     /**
      * Key in the map for one tree node entry for the type definition list.
      */
-    private static final String RETURN_VALUE_KEY_TYPE_LIST = "TypeDefList";
+    private static final String RETURN_VALUE_KEY_TYPE_LIST = "TypeDefList"; //$NON-NLS-1$
 
     /**
      * Evaluates the type definition tree list used from the Eclipse plug-in.
      *
-     * @param _context  MX context for this request
-     * @param _args     no arguments are used
+     * @param _paramCache   parameter cache with the MX context
+     * @param _arguments    ignored, because no arguments required
+     * @return type definition tree packed in the map
      * @throws Exception if the encoding of the return value failed
      */
-    public void list(final Context _context,
-                     final String... _args)
+    Map<String,?> execute(final ParameterCache_mxJPO _paramCache,
+                          final Map<String,Object> _arguments)
         throws Exception
     {
-        // initialize mapping
-        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, true, null);
-
         // prepare map of all trees
         final Map<String,Map<String,?>> allTrees = new HashMap<String,Map<String,?>>();
-        for (final TypeDefTree_mxJPO tree : paramCache.getMapping().getAllTypeDefTrees())  {
+        for (final TypeDefTree_mxJPO tree : _paramCache.getMapping().getAllTypeDefTrees())  {
             final Map<String,Object> treeItem = new HashMap<String,Object>();
             treeItem.put(TypeDefTreeList_mxJPO.RETURN_VALUE_KEY_LABEL, tree.getLabel());
             treeItem.put(TypeDefTreeList_mxJPO.RETURN_VALUE_KEY_TREE_LIST, tree.getSubTypeDefTreeList());
@@ -79,10 +74,6 @@ public class TypeDefTreeList_mxJPO
             allTrees.put(tree.getName(), treeItem);
         }
 
-        // and write return values to the matrix writer
-        final MatrixWriter writer = new MatrixWriter(_context);
-        writer.write(this.encode(null, null, null, allTrees));
-        writer.flush();
-        writer.close();
+        return this.prepareReturn(null, null, null, allTrees);
     }
 }

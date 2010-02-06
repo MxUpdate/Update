@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,9 @@
 
 package org.mxupdate.plugin;
 
-import java.util.Collection;
+import java.io.File;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-
-import matrix.db.Context;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
@@ -39,33 +36,54 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class Export_mxJPO
+class Export_mxJPO
     extends AbstractPlugin_mxJPO
 {
     /**
-     * Name of the key in the returned mapped for the &quot;name&quot; of the
+     * Argument key for the items.
+     */
+    private static final String ARGUMENT_KEY_NAME = "Name"; //$NON-NLS-1$
+
+    /**
+     * Argument key for the type definition.
+     */
+    private static final String ARGUMENT_KEY_TYPEDEF = "TypeDef"; //$NON-NLS-1$
+
+    /**
+     * Argument key for the file name.
+     */
+    private static final String ARGUMENT_KEY_FILENAME = "FileName"; //$NON-NLS-1$
+
+    /**
+     * Name of the key in the returned mapped for the &quot;Name&quot; of the
      * administration object (which administration object is exported).
      */
-    private static final String RETURN_KEY_NAME = "name";
+    private static final String RETURN_KEY_NAME = "Name"; //$NON-NLS-1$
 
     /**
-     * Name of the key in the returned mapped for the &quot;code&quot; of the
+     * Name of the key in the returned mapped for the &quot;Code&quot; of the
      * administration object (the TCL update code itself).
      */
-    private static final String RETURN_KEY_CODE = "code";
+    private static final String RETURN_KEY_CODE = "Code"; //$NON-NLS-1$
 
     /**
-     * Name of the key in the returned mapped for the &quot;path&quot; of the
-     * administration object (where is the TCL update code located in the file
-     * system).
+     * Name of the key in the returned mapped for the &quot;FilePath&quot; of
+     * the administration object (where is the TCL update code located in the
+     * file system).
      */
-    private static final String RETURN_KEY_PATH = "path";
+    private static final String RETURN_KEY_PATH = "FilePath"; //$NON-NLS-1$
 
     /**
-     * Name of the key in the returned mapped for the &quot;file name&quot; of
+     * Name of the key in the returned mapped for the &quot;FileName&quot; of
      * the administration object (what is the name of the file).
      */
-    private static final String RETURN_KEY_FILENAME = "filename";
+    private static final String RETURN_KEY_FILENAME = "FileName"; //$NON-NLS-1$
+
+    /**
+     * Key in the map for the name of the type definition of found one
+     * configuration item..
+     */
+    private static final String RETURN_KEY_TYPEDEF = "TypeDef"; //$NON-NLS-1$
 
     /**
      * <p>All given administration objects are exported and the related update
@@ -73,12 +91,27 @@ public class Export_mxJPO
      * <code>_args</code> are identified by the administration type (see
      * {@link TypeDef_mxJPO}) and the MX names of the administration objects.
      * </p>
+     * <p>The <code>_arguments</code> differs between two different possible
+     * modes. The first possibility depends on the file name with the argument
+     * key
+     * <ul>
+     * <li>{@link #ARGUMENT_KEY_FILENAME}: name of the file to export</li>
+     * </ul>
+     * The second possibility depends on the type definition and the name of
+     * the configuration item with the argument keys
+     * <ul>
+     * <li>{@link #ARGUMENT_KEY_TYPEDEF}: type definition</li>
+     * <li>{@link #ARGUMENT_KEY_NAME}: name of the configuration item</li>
+     * </ul>
+     * </p>
      * <p>The returned packed values (packed with method
      * {@link AbstractPlugin_mxJPO#prepareReturn(String, String, Exception, Object)})
      * includes the logging messages itself and for configuration item type
-     * a collection of exporting information as map. The exporting information
-     * map defines three keys:
+     * a map with exporting information. The exporting information map defines
+     * four keys:
      * <ul>
+     * <li>{@link #RETURN_KEY_TYPEDEF}:     type definition of the
+     *                                      configuration item</li>
      * <li>{@link #RETURN_KEY_NAME}:        name of the configuration item</li>
      * <li>{@link #RETURN_KEY_PATH}:        path within the file directory of
      *                                      the configuration item (without
@@ -91,54 +124,77 @@ public class Export_mxJPO
      * <p>If an exception is thrown the exception is packed in the returned
      * map.</p>
      *
-     * @param _context  MX context for this request
-     * @param _args     encoded arguments from the Eclipse plug-in:
-     *                  <ul>
-     *                  <li><b>{@link Map}&lt;{@link String},{@link Collection}
-     *                         &lt;{@link String}&gt;&gt;</b>
-     *                      <br/>a map depending on the (administration) type
-     *                      (as key) and the related list of (administration)
-     *                      MX names</li>
-     *                  <li><b>{@link Map}&lt;{@link String},{@link String}&gt;
-     *                      </b><br/>Sets the predefined parameter values (key
-     *                      of the map is name of the parameter, value of the
-     *                      map is the value of the parameter). Default is no
-     *                      predefined parameter valued (<code>null</code>).
-     *                      </li>
-     *                  </ul>
+     * @param _paramCache   parameter cache with the MX context
+     * @param _arguments    map with all search arguments
      * @return packed return values in maps
      * @see AbstractPlugin_mxJPO#prepareReturn(String, String, Exception, Object)
      */
-    public Map<String,?> exportByName(final Context _context,
-                                      final String... _args)
+    Map<String,?> execute(final ParameterCache_mxJPO _paramCache,
+                          final Map<String,Object> _arguments)
     {
         Map<String,?> packedRet = null;
         try  {
-            // initialize mapping
-            final Map<String,Collection<String>> exports = this.<Map<String,Collection<String>>>decode(_args, 0);
-            final Map<String,String> paramValues = this.<Map<String,String>>decode(_args, 1, null);
-            final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, true, paramValues);
+            final String fileName = this.getArgument(_arguments, Export_mxJPO.ARGUMENT_KEY_FILENAME, null);
 
-            // export all objects depending on the type definitions
-            final Map<String,Collection<Map<String,String>>> ret = new HashMap<String,Collection<Map<String,String>>>();
-            for (final Map.Entry<String,Collection<String>> entry : exports.entrySet())  {
-                final TypeDef_mxJPO typeDef = paramCache.getMapping().getTypeDef(entry.getKey());
-                final Collection<Map<String,String>> extracts = new HashSet<Map<String,String>>();
-                ret.put(entry.getKey(), extracts);
-                for (final String mxName : entry.getValue())  {
-                    final AbstractObject_mxJPO instance = typeDef.newTypeInstance(mxName);
-                    final StringBuilder code = new StringBuilder();
-                    instance.export(paramCache, code);
-                    final Map<String,String> desc = new HashMap<String,String>();
-                    desc.put(Export_mxJPO.RETURN_KEY_NAME, instance.getName());
-                    desc.put(Export_mxJPO.RETURN_KEY_CODE, code.toString());
-                    desc.put(Export_mxJPO.RETURN_KEY_PATH, instance.getPath());
-                    desc.put(Export_mxJPO.RETURN_KEY_FILENAME, instance.getFileName());
-                    extracts.add(desc);
+            AbstractObject_mxJPO instance = null;
+
+            if (fileName != null)  {
+                final File file = new File(fileName);
+
+                // first found related type definition
+                for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefs())  {
+                    if (!typeDef.isFileMatchLast())  {
+                        instance = typeDef.newTypeInstance(null);
+                        final String mxName = instance.extractMxName(_paramCache, file);
+                        if (mxName != null)  {
+                            instance = typeDef.newTypeInstance(mxName);
+                            break;
+                        } else  {
+                            instance = null;
+                        }
+                    }
                 }
+                if (instance == null)  {
+                    for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefs())  {
+                        if (typeDef.isFileMatchLast())  {
+                            instance = typeDef.newTypeInstance(null);
+                            final String mxName = instance.extractMxName(_paramCache, file);
+                            if (mxName != null)  {
+                                instance = typeDef.newTypeInstance(mxName);
+                                break;
+                            } else  {
+                                instance = null;
+                            }
+                        }
+                    }
+                }
+            } else  {
+                // initialize arguments
+                final String typeDefName = this.getArgument(_arguments, Export_mxJPO.ARGUMENT_KEY_TYPEDEF, null);
+                final String item = this.getArgument(_arguments, Export_mxJPO.ARGUMENT_KEY_NAME, null);
+
+                // export all objects depending on the type definitions
+                final TypeDef_mxJPO typeDef = _paramCache.getMapping().getTypeDef(typeDefName);
+                instance = typeDef.newTypeInstance(item);
             }
 
-            packedRet = this.prepareReturn(paramCache.getLogString(),
+            // export code
+            final Map<String,String> ret;
+            if (instance == null)  {
+                ret = null;
+            } else  {
+                final StringBuilder code = new StringBuilder();
+                instance.export(_paramCache, code);
+
+                ret = new HashMap<String,String>();
+                ret.put(Export_mxJPO.RETURN_KEY_TYPEDEF,    instance.getTypeDef().getName());
+                ret.put(Export_mxJPO.RETURN_KEY_NAME,       instance.getName());
+                ret.put(Export_mxJPO.RETURN_KEY_CODE,       code.toString());
+                ret.put(Export_mxJPO.RETURN_KEY_PATH,       instance.getPath());
+                ret.put(Export_mxJPO.RETURN_KEY_FILENAME,   instance.getFileName());
+            }
+
+            packedRet = this.prepareReturn(_paramCache.getLogString(),
                                            (String) null,
                                            (Exception) null,
                                            ret);

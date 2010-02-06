@@ -47,7 +47,92 @@ public class Update_mxJPO
     extends AbstractPlugin_mxJPO
 {
     /**
-     * Main method to create or update given TCL update file.
+     * Argument key for the compile flag.
+     */
+    private static final String ARGUMENT_KEY_COMPILE = "Compile"; //$NON-NLS-1$
+
+    /**
+     * Argument key for the file names.
+     */
+    private static final String ARGUMENT_KEY_FILENAMES = "FileNames"; //$NON-NLS-1$
+
+    /**
+     * Argument key for the files with content.
+     */
+    private static final String ARGUMENT_KEY_FILECONTENTS = "FileContents"; //$NON-NLS-1$
+
+    /**
+     * Executes the update.
+     *
+     * @param _paramCache   parameter cache with the MX context
+     * @param _arguments    map with all update arguments
+     * @return log information from the update / compile
+     * @throws Exception if update failed
+     */
+    Map<String,?> execute(final ParameterCache_mxJPO _paramCache,
+                          final Map<String,Object> _arguments)
+        throws Exception
+    {
+        final boolean compile = this.getArgument(_arguments, Update_mxJPO.ARGUMENT_KEY_COMPILE, false);
+        final Set<String> fileNames = this.getArgument(_arguments, Update_mxJPO.ARGUMENT_KEY_FILENAMES, null);
+        final Map<String,String> fileContents = this.getArgument(_arguments, Update_mxJPO.ARGUMENT_KEY_FILECONTENTS, null);
+
+        String ret = null;
+
+        // if file with content a temporary directory must be created!
+        final File tmpDir;
+        if (fileContents != null)  {
+            // create temporary directory
+            tmpDir = File.createTempFile("Update", "tmp");
+            tmpDir.delete();
+            tmpDir.mkdir();
+        } else  {
+            tmpDir = null;
+        }
+
+        final Set<File> localFiles = new HashSet<File>();
+        try  {
+            // store all files in temporary directory
+            if (fileContents != null)  {
+                for (final Map.Entry<String,String> fileEntry : fileContents.entrySet())  {
+                    final String fileName = (new File(fileEntry.getKey())).getName();
+
+                    final File localFile = new File(tmpDir, fileName);
+                    final Writer writer = new FileWriter(localFile);
+                    writer.write(fileEntry.getValue());
+                    writer.close();
+
+                    localFiles.add(localFile);
+                }
+            }
+
+            // and call update
+            final Set<File> updateFiles = new HashSet<File>();
+            updateFiles.addAll(localFiles);
+
+            // append already existing files
+            if (fileNames != null)  {
+                for (final String fileName : fileNames)  {
+                    updateFiles.add(new File(fileName));
+                }
+            }
+
+            ret = this.updateFiles(_paramCache, updateFiles, compile);
+        } finally  {
+            // at least remove all temporary stuff
+            for (final File localFile : localFiles)  {
+                localFile.delete();
+            }
+            if (tmpDir != null)  {
+                tmpDir.delete();
+            }
+        }
+
+        return this.prepareReturn(ret, null, null, null);
+    }
+
+    /**
+     * Depreciated because only used from old Eclipse plug-in.
      *
      * @param _context  MX context for this request
      * @param _args     first index of the arguments defined the file to update
@@ -62,7 +147,7 @@ public class Update_mxJPO
         final Set<File> files = new HashSet<File>();
         files.add(new File(_args[0]));
         final MatrixWriter writer = new MatrixWriter(_context);
-        writer.write(this.updateFiles(_context, null, files, false));
+        writer.write(this.updateFiles(new ParameterCache_mxJPO(_context, true, null), files, false));
         writer.flush();
         writer.close();
     }
@@ -81,44 +166,30 @@ public class Update_mxJPO
      *                      all included JPOs are compiled; otherwise no JPOs
      *                      are compiled. Default is not to compile
      *                      (<i>false</i>)</li>
-     *                  <li><b>{@link Map}&lt;{@link String},{@link String}&gt;
-     *                      </b><br/>Sets the predefined parameter values (key
-     *                      of the map is name of the parameter, value of the
-     *                      map is the value of the parameter). Default is no
-     *                      predefined parameter valued (<code>null</code>).
-     *                      </li>
-     *                  <li><b>{@link Boolean}</b><br/> if set to <i>true</i>
-     *                      the returned value is also written into the
-     *                      {@link MatrixWriter matrix writer} (e.g. required
-     *                      if called via MQL console)</li>
      *                  </ul>
      * @return logging information from the update
      * @throws Exception if the update failed
-     * @see #updateFiles(Context, Map, Set, boolean)
+     * @see #updateFiles(ParameterCache_mxJPO, Set, boolean)
+     * @deprecated
      */
+    @Deprecated()
     public String updateByName(final Context _context,
                                final String[] _args)
         throws Exception
     {
+        // initialize mapping
+        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, true, null);
+
         final Set<String> fileNames = this.<Set<String>>decode(_args, 0);
         final boolean compile = this.<Boolean>decode(_args, 1, false);
-        final Map<String,String> paramValues = this.<Map<String,String>>decode(_args, 2, null);
-        final int paramVersion = this.<Integer>decode(_args, 3, 0);
 
         final Set<File> files = new HashSet<File>();
         for (final String fileName : fileNames)  {
             files.add(new File(fileName));
         }
 
-        final String ret = this.updateFiles(_context, paramValues, files, compile);
+        final String ret = this.updateFiles(paramCache, files, compile);
 
-        // if write flag is set write to matrix writer
-        if (paramVersion == 1)  {
-            final MatrixWriter writer = new MatrixWriter(_context);
-            writer.write(this.encode(ret, null, null, null));
-            writer.flush();
-            writer.close();
-        }
 
         return ret;
     }
@@ -140,31 +211,24 @@ public class Update_mxJPO
      *                      all included JPOs are compiled; otherwise no JPOs
      *                      are compiled. Default is not to compile
      *                      (<i>false</i>)</li>
-     *                  <li><b>{@link Map}&lt;{@link String},{@link String}&gt;
-     *                      </b><br/>Sets the predefined parameter values (key
-     *                      of the map is name of the parameter, value of the
-     *                      map is the value of the parameter). Default is no
-     *                      predefined parameter valued (<code>null</code>).
-     *                      </li>
-     *                  <li><b>{@link Boolean}</b><br/> if set to <i>true</i>
-     *                      the returned value is also written into the
-     *                      {@link MatrixWriter matrix writer} (e.g. required
-     *                      if called via MQL console)</li>
      *                  </ul>
      * @return logging information from the update
      * @throws Exception if the update failed
-     * @see #updateFiles(Context, Map, Set, boolean)
+     * @see #updateFiles(ParameterCache_mxJPO, Set, boolean)
+     * @deprecated
      */
+    @Deprecated()
     public String updateByContent(final Context _context,
                                   final String[] _args)
         throws Exception
     {
+        // initialize mapping
+        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, true, null);
+
         String ret = "";
 
         final Map<String,String> files = this.<Map<String,String>>decode(_args, 0);
         final boolean compile = this.<Boolean>decode(_args, 1, false);
-        final Map<String,String> paramValues = this.<Map<String,String>>decode(_args, 2, null);
-        final int paramVersion = this.<Integer>decode(_args, 3, 0);
 
         // create temporary directory
         final File tmpDir = File.createTempFile("Update", "tmp");
@@ -186,21 +250,13 @@ public class Update_mxJPO
             }
 
             // and call update
-            ret = this.updateFiles(_context, paramValues, localFiles, compile);
+            ret = this.updateFiles(paramCache, localFiles, compile);
         } finally  {
             // at least remove all temporary stuff
             for (final File localFile : localFiles)  {
                 localFile.delete();
             }
             tmpDir.delete();
-        }
-
-        // if write flag is set write to matrix writer
-        if (paramVersion == 1)  {
-            final MatrixWriter writer = new MatrixWriter(_context);
-            writer.write(this.encode(ret, null, null, null));
-            writer.flush();
-            writer.close();
         }
 
         return ret;
@@ -210,50 +266,45 @@ public class Update_mxJPO
      * Updates all configurations items specified through given set of MX
      * update files.
      *
-     * @param _context      MX context for this request
-     * @param _paramValues  predefined parameters
+     * @param _paramCache   predefined parameters with MX context
      * @param _files        set of all files to update
      * @param _compile      if <i>true</i> related JPOs are compiled; if
      *                      <i>false</i> no JPOs are compiled
      * @return logging information from the update
      * @throws Exception if update for the <code>_files</code> failed
      */
-    protected String updateFiles(final Context _context,
-                                 final Map<String,String> _paramValues,
+    protected String updateFiles(final ParameterCache_mxJPO _paramCache,
                                  final Set<File> _files,
                                  final boolean _compile)
         throws Exception
     {
-        // initialize mapping
-        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, true, _paramValues);
-
         // first found related type definition instances
-        final Map<File,AbstractObject_mxJPO> instances = this.evalInstances(paramCache, _files);
+        final Map<File,AbstractObject_mxJPO> instances = this.evalInstances(_paramCache, _files);
 
         // check if objects must be created
         final Map<TypeDef_mxJPO,Set<String>> allMxNames = new HashMap<TypeDef_mxJPO,Set<String>>();
         for (final AbstractObject_mxJPO instance : instances.values())  {
             if (!allMxNames.containsKey(instance.getTypeDef()))  {
-                allMxNames.put(instance.getTypeDef(), instance.getMxNames(paramCache));
+                allMxNames.put(instance.getTypeDef(), instance.getMxNames(_paramCache));
             }
             if (!allMxNames.get(instance.getTypeDef()).contains(instance.getName()))  {
-                paramCache.logInfo("created " + instance.getTypeDef().getLogging() + " '" + instance.getName() + "'");
-                instance.create(paramCache);
+                _paramCache.logInfo("created " + instance.getTypeDef().getLogging() + " '" + instance.getName() + "'");
+                instance.create(_paramCache);
             }
         }
 
         // update
         for (final Map.Entry<File,AbstractObject_mxJPO> instanceEntry : instances.entrySet())  {
-            paramCache.logInfo("updated " + instanceEntry.getValue().getTypeDef().getLogging()
+            _paramCache.logInfo("updated " + instanceEntry.getValue().getTypeDef().getLogging()
                     + " '" + instanceEntry.getValue().getName() + "'");
-            instanceEntry.getValue().update(paramCache, instanceEntry.getKey(), "");
+            instanceEntry.getValue().update(_paramCache, instanceEntry.getKey(), "");
         }
 
         // at least compile (to be sure that all JPOs are updated)
         if (_compile)  {
-            this.compile(paramCache, instances);
+            this.compile(_paramCache, instances);
         }
-        return paramCache.getLogString();
+        return _paramCache.getLogString();
     }
 
     /**

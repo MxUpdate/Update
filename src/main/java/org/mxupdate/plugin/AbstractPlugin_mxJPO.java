@@ -21,10 +21,8 @@
 package org.mxupdate.plugin;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,6 +65,25 @@ abstract class AbstractPlugin_mxJPO
      * @see #prepareReturn(String, String, Exception, Object)
      */
     private static final String RETURN_KEY_VALUES = "values";
+
+    /**
+     * Returns the argument for given key if defined.
+     *
+     * @param <T>           searched class of the argument
+     * @param _arguments    arguments map
+     * @param _key          key within the arguments map
+     * @param _default      default value (if key is not defined in the
+     *                      arguments map)
+     * @return found value in the arguments map or <code>_default</code> if not
+     *         found
+     */
+    @SuppressWarnings("unchecked")
+    protected final <T> T getArgument(final Map<String,Object> _arguments,
+                                      final String _key,
+                                      final T _default)
+    {
+        return (_arguments.get(_key) != null) ? (T) _arguments.get(_key) : _default;
+    }
 
     /**
      * Decodes given string value to an object of given type
@@ -131,36 +148,6 @@ abstract class AbstractPlugin_mxJPO
                       ? _default
                       : this.<T>decode(_args, _index);
         return (ret == null) ? _default : ret;
-    }
-
-    /**
-     * Packs the parameters into a map
-     * (with {@link #prepareReturn(String, String, Exception, Object)}) and
-     * encodes this map as string (in Base64).
-     *
-     * @param <T>           defines the Java type of the values
-     * @param _log          log message
-     * @param _error        error message
-     * @param _exception    throws exception
-     * @param _values       values itself
-     * @return packed return values including log etc. as string encoded
-     * @throws IOException if encoding failed
-     * @see #prepareReturn(String, String, Exception, Object)
-     */
-    protected final <T> String encode(final String _log,
-                                      final String _error,
-                                      final Exception _exception,
-                                      final T _values)
-        throws IOException
-    {
-        final Map<String, Object> bck = this.<T>prepareReturn(_log, _error, _exception , _values);
-
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        final ObjectOutputStream oos = new ObjectOutputStream(out);
-        oos.writeObject(bck);
-        oos.close();
-
-        return Mime64.encode(out.toByteArray());
     }
 
     /**
