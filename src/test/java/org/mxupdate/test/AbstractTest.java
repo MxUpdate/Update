@@ -20,12 +20,13 @@
 
 package org.mxupdate.test;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -33,6 +34,7 @@ import java.util.Set;
 
 import matrix.db.Context;
 import matrix.db.JPO;
+import matrix.db.MQLCommand;
 import matrix.util.MatrixException;
 
 import org.apache.commons.codec.binary.Base64;
@@ -506,26 +508,25 @@ public abstract class AbstractTest
      * @param _type     type to export
      * @param _name     name to export
      * @return map with the exported object
-     * @throws IOException      if the parameter could not be encoded
-     * @throws MatrixException  if MQL calls failed
+     * @throws Exception  if MQL calls failed
      */
     protected Export export(final CI _type,
                             final String _name)
-        throws IOException, MatrixException
+        throws Exception
     {
-        final Map<String,Collection<String>> params = new HashMap<String,Collection<String>>(1);
-        params.put(_type.updateType, Arrays.asList(new String[]{_name}));
-        final Map<String,Collection<Map<String,String>>> bck =
-                this.<Map<String,Collection<Map<String,String>>>>jpoInvoke("org.mxupdate.plugin.Export",
-                                                                           "exportByName",
-                                                                           params)
-                    .getValues();
+        final Map<?,?> bck = this.executeEncoded("Export",
+                                                 null,
+                                                 "TypeDef", _type.updateType,
+                                                 "Name", _name);
+        // extract values
+        final Map<?,?> values = (Map<?,?>) bck.get("values");
 
         Assert.assertNotNull(bck);
-        Assert.assertTrue(bck.containsKey(_type.updateType));
-        Assert.assertEquals(bck.get(_type.updateType).size(), 1, "one element is returned");
+        Assert.assertEquals((String) values.get("TypeDef"),
+                            _type.updateType,
+                            "check correct type definition");
 
-        final Export ret =  new Export(bck.get(_type.updateType).iterator().next());
+        final Export ret =  new Export(values);
 
         Assert.assertEquals(ret.getName(), _name, "returned name is equal to given name");
 
@@ -538,9 +539,11 @@ public abstract class AbstractTest
      *
      * @param _object       object if the update definition
      * @param _errorCode    expected error code
+     * @throws Exception if update with failure failed
      */
     protected void updateFailure(final AbstractAdminData<?> _object,
                                  final UpdateException_mxJPO.Error _errorCode)
+        throws Exception
     {
         this.updateFailure(_object.getCIFileName(), _object.ciFile(), _errorCode);
     }
@@ -551,19 +554,15 @@ public abstract class AbstractTest
      * @param _fileName     name of the file to update
      * @param _code         TCL update code
      * @param _errorCode    expected error code
+     * @throws Exception if update with failure failed
      */
     protected void updateFailure(final String _fileName,
                                  final String _code,
                                  final UpdateException_mxJPO.Error _errorCode)
+        throws Exception
     {
-         Exception ex = null;
-         try  {
-             final Map<String,String> params = new HashMap<String,String>();
-             params.put(_fileName, _code);
-             this.<String>jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
-         } catch (final Exception e)  {
-             ex = e;
-         }
+        final Map<?,?> bck = this.update(_fileName, _code);
+        final Exception ex = (Exception) bck.get("exception");
          Assert.assertNotNull(ex, "check that action is not allowed");
          Assert.assertTrue(ex.getMessage().indexOf("UpdateError #" + _errorCode.getCode() + ":") >= 0,
                            "check for correct error code #" + _errorCode.getCode());
@@ -575,15 +574,13 @@ public abstract class AbstractTest
      *
      * @param _object       object if the update definition
      * @param _params       parameters
-     * @return returned string with the update logging
-     * @throws IOException      if the parameter could not be encoded
-     * @throws MatrixException  if MQL calls failed
+     * @throws Exception  if update failed
      */
-    protected JPOReturn<String> update(final AbstractData<?> _object,
+    protected void update(final AbstractData<?> _object,
                                        final String... _params)
-        throws IOException, MatrixException
+        throws Exception
     {
-        return this.update(_object.getCIFileName(), _object.ciFile(), _params);
+        this.update(_object.getCIFileName(), _object.ciFile(), _params);
     }
 
     /**
@@ -592,14 +589,13 @@ public abstract class AbstractTest
      * @param _fileName     name of the file to update
      * @param _code         TCL update code
      * @param _params       parameters
-     * @return returned string with the update logging
-     * @throws IOException      if the parameter could not be encoded
-     * @throws MatrixException  if MQL calls failed
+     * @return values from the called dispatcher
+     * @throws Exception  if update failed
      */
-    protected JPOReturn<String> update(final String _fileName,
-                                       final String _code,
-                                       final String... _params)
-        throws IOException, MatrixException
+    protected Map<?,?> update(final String _fileName,
+                              final String _code,
+                              final String... _params)
+        throws Exception
     {
         final Map<String,String> files = new HashMap<String,String>();
         files.put(_fileName, _code);
@@ -609,7 +605,9 @@ public abstract class AbstractTest
                 params.put(_params[idx], _params[idx + 1]);
             }
         }
-        return this.<String>jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", files, null, params);
+        return this.executeEncoded("Update",
+                                   params,
+                                   "FileContents", files);
     }
 
     /**
@@ -719,6 +717,105 @@ public abstract class AbstractTest
                                            paramStrings,
                                            Object.class));
     }
+
+
+    /**
+     * Calls given <code>_method</code> in of the MxUpdate eclipse plug-in
+     * dispatcher. The MX context {@link #mxContext} is connected to the
+     * database if not already done.
+     *
+     * @param _method       method of the called <code>_jpo</code>
+     * @param _params       extra parameters
+     * @param _arguments    list of all parameters for the <code>_jpo</code>
+     *                      which are automatically encoded encoded
+     * @return returned value from the called <code>_jpo</code>
+     * @throws IOException      if the parameter could not be encoded
+     * @throws MatrixException  if the called <code>_jpo</code> throws an
+     *                          exception
+     * @throws ClassNotFoundException if the class which is decoded from the
+     *                          returned string value could not be found
+     * @see #mxContext
+     * @see #connect()
+     */
+    public Map<?,?> executeEncoded(final String _method,
+                                      final Map<String,String> _params,
+                                      final Object... _arguments)
+        throws IOException, MatrixException, ClassNotFoundException
+    {
+        // prepare arguments in a map
+        final Map<String,Object> arguments;
+        if ((_arguments == null) || (_arguments.length == 0))  {
+            arguments = null;
+        } else  {
+            arguments = new HashMap<String,Object>();
+            for (int idx = 0; idx < _arguments.length; )  {
+                arguments.put((String) _arguments[idx++], _arguments[idx++]);
+            }
+        }
+
+        // prepare MQL statement with encoded parameters
+        final StringBuilder cmd = new StringBuilder()
+            .append("exec prog ").append("org.mxupdate.plugin.Dispatcher \"")
+            .append(this.encode(_params)).append("\" \"")
+            .append(this.encode(_method)).append("\" \"")
+            .append(this.encode(arguments)).append("\"");
+
+        // execute MQL command
+        final MQLCommand mql = new MQLCommand();
+        mql.executeCommand(this.context, cmd.toString());
+        if ((mql.getError() != null) && !"".equals(mql.getError()))  { //$NON-NLS-1$
+            throw new MatrixException(mql.getError());
+        }
+
+        return this.<Map<?,?>>decode(mql.getResult());
+    }
+
+    /**
+     * Encodes given <code>_object</code> to a string with <b>base64</b>.
+     *
+     * @param _object   object to encode
+     * @return encoded string
+     * @throws IOException if encode failed
+     */
+    protected String encode(final Object _object)
+        throws IOException
+    {
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        final ObjectOutputStream oos = new ObjectOutputStream(out);
+        oos.writeObject(_object);
+        oos.close();
+        return new String(Base64.encodeBase64(out.toByteArray()));
+    }
+
+    /**
+     * Decodes given string value to an object of given type
+     * <code>&lt;T&gt;</code>. First the string is <b>base64</b> decoded, then
+     * the object instance is extracted from the decoded bytes via the Java
+     * &quot;standard&quot; feature of the {@link ObjectInputStream}.
+     *
+     * @param <T>   type of the object which must be decoded
+     * @param _arg  string argument with encoded instance of
+     *              <code>&lt;T&gt;</code>
+     * @return decoded object instance of given type <code>&lt;T&gt;</code>
+     * @throws IOException              if the value could not be decoded,
+     *                                  the decoder stream could not be
+     *                                  opened or the argument at given
+     *                                  <code>_index</code> is not defined
+     * @throws ClassNotFoundException   if the object itself could not be read
+     *                                  from decoder stream
+     */
+    @SuppressWarnings("unchecked")
+    protected final <T> T decode(final String _arg)
+        throws IOException, ClassNotFoundException
+    {
+        final byte[] bytes = Base64.decodeBase64(_arg.getBytes());
+        final ByteArrayInputStream in = new ByteArrayInputStream(bytes);
+        final ObjectInputStream ois = new ObjectInputStream(in);
+        final T ret = (T) ois.readObject();
+        ois.close();
+        return ret;
+    }
+
 
     /**
      * Converts given string to MQL by escaping the &quot; so that in escape
@@ -834,7 +931,7 @@ public abstract class AbstractTest
         /**
          * Map with the export description.
          */
-        private final Map<String,String> exportDesc;
+        private final Map<?,?> exportDesc;
 
         /**
          * Constructor to initialize this export description.
@@ -843,7 +940,7 @@ public abstract class AbstractTest
          *                      etc.
          * @see #exportDesc
          */
-        public Export(final Map<String,String> _exportDesc)
+        public Export(final Map<?,?> _exportDesc)
         {
             this.exportDesc = _exportDesc;
         }
@@ -856,7 +953,7 @@ public abstract class AbstractTest
          */
         public String getCode()
         {
-            return this.exportDesc.get("code");
+            return (String) this.exportDesc.get("Code");
         }
 
         /**
@@ -867,7 +964,7 @@ public abstract class AbstractTest
          */
         public String getName()
         {
-            return this.exportDesc.get("name");
+            return (String) this.exportDesc.get("Name");
         }
 
         /**
@@ -878,7 +975,7 @@ public abstract class AbstractTest
          */
         public String getFileName()
         {
-            return this.exportDesc.get("filename");
+            return (String) this.exportDesc.get("FileName");
         }
 
         /**
@@ -889,7 +986,7 @@ public abstract class AbstractTest
          */
         public String getPath()
         {
-            return this.exportDesc.get("path");
+            return (String) this.exportDesc.get("FilePath");
         }
     }
 }

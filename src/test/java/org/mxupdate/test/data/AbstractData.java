@@ -20,7 +20,6 @@
 
 package org.mxupdate.test.data;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -277,11 +276,10 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      *
      * @param _params       parameters
      * @return parsed export
-     * @throws IOException      if the parameter could not be encoded
-     * @throws MatrixException  if MQL calls failed
+     * @throws Exception if export failed
      */
     public ExportParser export(final String... _params)
-        throws IOException, MatrixException
+        throws Exception
     {
         final Map<String,Collection<String>> files = new HashMap<String,Collection<String>>(1);
         files.put(this.ci.updateType, Arrays.asList(new String[]{this.getName()}));
@@ -293,36 +291,35 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
             }
         }
 
-        final AbstractTest.JPOReturn<Map<String,Collection<Map<String,String>>>> jpoReturn =
-                this.test.<Map<String,Collection<Map<String,String>>>>jpoInvoke("org.mxupdate.plugin.Export",
-                                                                                "exportByName",
-                                                                                files,
-                                                                                params);
+        final Map<?,?> bck = this.test.executeEncoded("Export",
+                                                      params,
+                                                      "TypeDef", this.ci.updateType,
+                                                      "Name", this.getName());
 
         // check for no exception
-        if (jpoReturn.getException() != null)  {
-            throw new MatrixException(jpoReturn.getException());
+        if (bck.get("exception") != null)  {
+            throw new MatrixException((Exception) bck.get("exception"));
         }
 
         // extract values
-        final Map<String,Collection<Map<String,String>>> values = jpoReturn.getValues();
+        final Map<?,?> values = (Map<?,?>) bck.get("values");
 
         // check existence and element is defined
         Assert.assertNotNull(values);
-        Assert.assertTrue(values.containsKey(this.ci.updateType));
-        Assert.assertEquals(values.get(this.ci.updateType).size(), 1, "one element is returned");
+        Assert.assertEquals((String) values.get("TypeDef"),
+                            this.ci.updateType,
+                            "check correct type definition");
 
         // parse first element
-        final Map<String,String> exportDesc = values.get(this.getCI().updateType).iterator().next();
-        final ExportParser ret = this.parseExport(this.ci, exportDesc.get("code"));
+        final ExportParser ret = this.parseExport(this.ci, (String) values.get("Code"));
 
         // check returned configuration item name
-        Assert.assertEquals(exportDesc.get("name"),
+        Assert.assertEquals((String) values.get("Name"),
                             this.name,
                             "returned name is equal to given name");
         if (this.ci != AbstractTest.CI.PRG_JPO)  {
             // check path of the configuration item update file
-            Assert.assertEquals(exportDesc.get("path"),
+            Assert.assertEquals((String) values.get("FilePath"),
                                 this.getCI().filePath,
                                 "check path where the configuration item update file is located is correct");
         } else  {
@@ -333,12 +330,12 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
             } else  {
                 path = this.ci.filePath + "/" + this.name.replaceAll("\\.[^.]*$", "").replaceAll("\\.", "/");
             }
-            Assert.assertEquals(exportDesc.get("path"),
+            Assert.assertEquals((String) values.get("FilePath"),
                                 path,
                                 "check path where the configuration item update file is located is correct");
         }
         // check file name of the configuration item update file
-        Assert.assertEquals(exportDesc.get("filename"),
+        Assert.assertEquals((String) values.get("FileName"),
                             this.getCIFileNameFromExport(),
                             "check that the correct configuration item file name is returned");
 

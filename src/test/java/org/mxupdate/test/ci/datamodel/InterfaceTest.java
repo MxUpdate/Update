@@ -611,9 +611,12 @@ public class InterfaceTest
     /**
      * Checks for correct error code if wrong interface name is used for
      * calling the procedure 'testParents'.
+     *
+     * @throws Exception if test failed
      */
     @Test(description = "negative test for interface update with wrong interface name for TCL procedure 'testParents'")
     public void exceptionUpdateWrongName()
+        throws Exception
     {
         final DataCollection data = new DataCollection(this);
         final InterfaceData inter = data.getInterface("TestInterface");
@@ -626,9 +629,12 @@ public class InterfaceTest
     /**
      * Checks for correct error code if wrong parameters are used for calling
      * the procedure 'testParents'.
+     *
+     * @throws Exception if test failed
      */
     @Test(description = "negative test for interface update with wrong parameters for TCL procedure 'testParents'")
     public void exceptionUpdateWrongParentParameter()
+        throws Exception
     {
         final DataCollection data = new DataCollection(this);
         final InterfaceData inter = data.getInterface("TestInterface");

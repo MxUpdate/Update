@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
 
 package org.mxupdate.test.ci;
 
-import matrix.util.MatrixException;
+import java.util.Map;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.update.util.UpdateException_mxJPO.Error;
@@ -46,12 +46,8 @@ public class Common
     public void updateWrongFileName()
         throws Exception
     {
-        MatrixException ex = null;
-        try  {
-            this.update("COMMAND_Start@.tcl", "");
-        } catch (final MatrixException e)  {
-            ex = e;
-        }
+        final Map<?,?> bck = this.update("COMMAND_Start@.tcl", "");
+        final Exception ex = (Exception) bck.get("exception");
         Assert.assertTrue((ex != null), "an matrix exception must be thrown");
         Assert.assertTrue(ex.getMessage().contains("UpdateError #"
                                                     + Error.UTIL_STRINGUTIL_CONVERT_FROM_FILENAME.getCode()

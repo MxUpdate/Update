@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 
 package org.mxupdate.test.update.datamodel;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import matrix.util.MatrixException;
@@ -129,7 +128,7 @@ public class Dimension
     public void testCreateNewDimension()
         throws Exception
     {
-        this.updateDim(null);
+        this.updateDim();
         this.checkAll();
     }
 
@@ -149,7 +148,7 @@ public class Dimension
                         + "setting remove1 removeValue "
                         + "setting \"remove 2\" removeValue2;");
 
-        this.updateDim(null);
+        this.updateDim();
         this.checkAll();
     }
 
@@ -172,10 +171,7 @@ public class Dimension
                         + "setting remove1 removeValue "
                         + "setting \"remove 2\" removeValue2;");
 
-        final Map<String,String> params = new HashMap<String,String>(1);
-        params.put("DMDimAllowUpdateDefUnit", "true");
-
-        this.updateDim(params);
+        this.updateDim("DMDimAllowUpdateDefUnit", "true");
         this.checkAll();
     }
 
@@ -197,12 +193,9 @@ public class Dimension
                         + "setting remove1 removeValue "
                         + "setting \"remove 2\" removeValue2;");
 
-        Exception ex = null;
-        try  {
-            this.updateDim(null);
-        } catch (final Exception e)  {
-            ex = e;
-        }
+        final Map<?,?> bck = this.updateDim();
+        final Exception ex = (Exception) bck.get("exception");
+
         Assert.assertNotNull(ex, "check that changing default unit is not allowed");
         Assert.assertTrue(ex.getMessage().indexOf("UpdateError #10603:") >= 0,
                           "check that an error for modify default dimension unit was thrown");
@@ -225,21 +218,18 @@ public class Dimension
                         + "setting remove1 removeValue "
                         + "setting \"remove 2\" removeValue2;");
 
-        final Map<String,String> params = new HashMap<String,String>(2);
-        params.put("DMDimAllowUpdateDefUnit", "true");
-        params.put("DMDimAllowUpdateUnitMult", "true");
-
-        this.updateDim(params);
+        this.updateDim("DMDimAllowUpdateDefUnit", "true",
+                       "DMDimAllowUpdateUnitMult", "true");
         this.checkAll();
     }
 
     /**
      * Test that for dimension with a unit the multiplier could not be changed.
      *
-     * @throws MatrixException if test dimension could not be created
+     * @throws Exception if test dimension could not be created
      */
     public void testUpdateFailedDimensionDefaultUnitName1a()
-        throws MatrixException
+        throws Exception
     {
         this.mql("add dimension " + Dimension.DIMENSION_NAME
                 + " unit name1 "
@@ -249,12 +239,9 @@ public class Dimension
                         + "setting remove1 removeValue "
                         + "setting \"remove 2\" removeValue2;");
 
-        Exception ex = null;
-        try  {
-            this.updateDim(null);
-        } catch (final Exception e)  {
-            ex = e;
-        }
+        final Map<?,?> bck = this.updateDim();
+        final Exception ex = (Exception) bck.get("exception");
+
         Assert.assertNotNull(ex, "check that changing dimension unit multiplier is not allowed");
         Assert.assertTrue(ex.getMessage().indexOf("UpdateError #10601:") >= 0,
                           "check that an error for modify dimension unit multiplier was thrown");
@@ -277,21 +264,18 @@ public class Dimension
                         + "setting remove1 removeValue "
                         + "setting \"remove 2\" removeValue2;");
 
-        final Map<String,String> params = new HashMap<String,String>(2);
-        params.put("DMDimAllowUpdateDefUnit", "true");
-        params.put("DMDimAllowUpdateUnitOffs", "true");
-
-        this.updateDim(params);
+        this.updateDim("DMDimAllowUpdateDefUnit", "true",
+                       "DMDimAllowUpdateUnitOffs", "true");
         this.checkAll();
     }
 
     /**
      * Test that for dimension with a unit the offset could not be changed.
      *
-     * @throws MatrixException if test dimension could not be created
+     * @throws Exception if test dimension could not be created
      */
     public void testUpdateFailedDimensionDefaultUnitName1b()
-        throws MatrixException
+        throws Exception
     {
         this.mql("add dimension " + Dimension.DIMENSION_NAME
                 + " unit name1 "
@@ -300,12 +284,10 @@ public class Dimension
                         + "setting to abc "
                         + "setting remove1 removeValue "
                         + "setting \"remove 2\" removeValue2;");
-        Exception ex = null;
-        try  {
-            this.updateDim(null);
-        } catch (final Exception e)  {
-            ex = e;
-        }
+
+        final Map<?,?> bck = this.updateDim();
+        final Exception ex = (Exception) bck.get("exception");
+
         Assert.assertNotNull(ex, "check that changing dimension unit offset is not allowed");
         Assert.assertTrue(ex.getMessage().indexOf("UpdateError #10602:") >= 0,
                           "check that an error for modify dimension unit offset was thrown");
@@ -329,7 +311,7 @@ public class Dimension
                         + "setting \"remove 2\" removeValue2 "
                         + "property a value b;");
 
-        this.updateDim(null);
+        this.updateDim();
         this.checkAll();
     }
 
@@ -337,11 +319,11 @@ public class Dimension
      * Test for changing the default unit from &quot;name2&quot; to
      * &quot;name1&quot; which must be failed.
      *
-     * @throws MatrixException if the dimension to update could not be added
-     *                         (created)
+     * @throws Exception if the dimension to update could not be added
+     *                   (created)
      */
     public void testUpdateFailedDimensionDefaultUnitName2()
-        throws MatrixException
+        throws Exception
     {
         this.mql("add dimension " + Dimension.DIMENSION_NAME
                 + " unit name1 "
@@ -352,15 +334,8 @@ public class Dimension
                         + "setting \"remove 2\" removeValue2 "
                         + "property a value b;");
 
-        final Map<String,String> params = new HashMap<String,String>(1);
-        params.put("DMDimAllowUpdateUnitMult", "true");
-
-        Exception ex = null;
-        try  {
-            this.updateDim(params);
-        } catch (final Exception e)  {
-            ex = e;
-        }
+        final Map<?,?> bck = this.updateDim("DMDimAllowUpdateUnitMult", "true");
+        final Exception ex = (Exception) bck.get("exception");
 
         Assert.assertNotNull(ex, "check that changing default unit is not allowed");
         Assert.assertTrue(ex.getMessage().indexOf("UpdateError #10603:") >= 0,
@@ -387,7 +362,7 @@ public class Dimension
                 + "modify unit 'name 3' system a to unit 'name 3' "
         + "modify unit 'name 3' system b to unit 'name 3';");
 
-        this.updateDim(null);
+        this.updateDim();
         this.checkAll();
     }
 
@@ -403,10 +378,7 @@ public class Dimension
         this.mql("add dimension " + Dimension.DIMENSION_NAME
                 + " unit removeUnit ");
 
-        final Map<String,String> params = new HashMap<String,String>(1);
-        params.put("DMDimAllowRemoveUnit", "true");
-
-        this.updateDim(params);
+        this.updateDim("DMDimAllowRemoveUnit", "true");
         this.checkAll();
     }
 
@@ -415,19 +387,17 @@ public class Dimension
      * unit which is not defined in the TCL update code
      * {@link #DIMENSION_CODE}.
      *
-     * @throws MatrixException if dimension could not be created
+     * @throws Exception if dimension could not be created
      */
     public void testUpdateFailedDimensionRemovingUnit()
-        throws MatrixException
+        throws Exception
     {
         this.mql("add dimension " + Dimension.DIMENSION_NAME
                 + " unit removeUnit ");
-        Exception ex = null;
-        try  {
-            this.updateDim(null);
-        } catch (final Exception e)  {
-            ex = e;
-        }
+
+        final Map<?,?> bck = this.updateDim();
+        final Exception ex = (Exception) bck.get("exception");
+
         Assert.assertNotNull(ex, "check that a unit to remove is not allowed");
         Assert.assertTrue(ex.getMessage().indexOf("UpdateError #10604:") >= 0,
                           "check that an error for removing an unit was thrown");
@@ -438,16 +408,16 @@ public class Dimension
      * code {@link #DIMENSION_CODE}.
      *
      * @param _params   predefined parameters for the update
+     * @return values from the called dispatcher
      * @throws Exception if create / update of the test dimension failed
      * @see #DIMENSION_CODE
      */
-    private void updateDim(final Map<String,String> _params)
+    private Map<?,?> updateDim(final String... _params)
         throws Exception
     {
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("DIMENSION_" + Dimension.DIMENSION_NAME + ".tcl",
-                    Dimension.DIMENSION_CODE);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params, false, _params);
+        return this.update("DIMENSION_" + Dimension.DIMENSION_NAME + ".tcl",
+                           Dimension.DIMENSION_CODE,
+                           _params);
     }
 
     /**

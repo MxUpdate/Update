@@ -29,6 +29,8 @@ import java.util.Map;
 import matrix.util.MatrixException;
 import matrix.util.Mime64;
 
+import org.mxupdate.update.util.UpdateException_mxJPO;
+
 /**
  * Abstract class which defines common methods to extract called parameters
  * from the Eclipse plug-in.
@@ -171,6 +173,10 @@ abstract class AbstractPlugin_mxJPO
         // MatrixException could not serialized and must be converted
         if (_exception instanceof MatrixException)  {
             final Exception newEx = new Exception(((MatrixException) _exception).toJniFormat());
+            newEx.setStackTrace(_exception.getStackTrace());
+            jpoReturn.put(AbstractPlugin_mxJPO.RETURN_KEY_EXCEPTION, newEx);
+        } else if (_exception instanceof UpdateException_mxJPO)  {
+            final Exception newEx = new Exception(_exception.getMessage());
             newEx.setStackTrace(_exception.getStackTrace());
             jpoReturn.put(AbstractPlugin_mxJPO.RETURN_KEY_EXCEPTION, newEx);
         } else  {

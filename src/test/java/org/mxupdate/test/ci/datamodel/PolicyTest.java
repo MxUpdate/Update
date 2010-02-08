@@ -20,9 +20,7 @@
 
 package org.mxupdate.test.ci.datamodel;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.mxupdate.test.AbstractTest;
@@ -558,9 +556,7 @@ public class PolicyTest
             + "  format {all}\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n  format all\n"),
@@ -583,9 +579,7 @@ public class PolicyTest
             + "  format all\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n  format all\n"),
@@ -608,9 +602,7 @@ public class PolicyTest
             + "  format {generic}\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertEquals(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " select format dump"),
@@ -628,15 +620,13 @@ public class PolicyTest
     public void updateMultipleStateSymbolicNames()
         throws Exception
     {
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
-                   "updatePolicy \"${NAME}\" {"
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
+                    "updatePolicy \"${NAME}\" {"
                     + "  state \"Pending\"  {"
                     + "    registeredName \"state_Exists\""
                     + "    registeredName \"state_Pending\""
                     + "  }"
                     + "}");
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
 
         Assert.assertEquals(this.mql("print policy " + PolicyTest.POLICY_NAME
                                 + " select property[state_Exists].value dump"),
@@ -664,10 +654,8 @@ public class PolicyTest
     {
         this.mql("add policy MxUpdate_Test state Pending property \"\" value Test");
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
-                   PolicyTest.POLICY_UPDATE_CODE);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
+                    PolicyTest.POLICY_UPDATE_CODE);
 
         // check that only 11 properties are defined....
         // 4 state properties + installer + installed date + original name +
@@ -694,10 +682,8 @@ public class PolicyTest
     public void updateProperties()
         throws Exception
     {
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
-                   PolicyTest.POLICY_UPDATE_CODE);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
+                    PolicyTest.POLICY_UPDATE_CODE);
 
         Assert.assertTrue(!"".equals(this.mql("list policy MxUpdate_Test")),
                           "policy was not created!");
@@ -734,9 +720,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    owner read,show\n    public"),
@@ -770,9 +754,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    owner read,show\n    public"),
@@ -798,9 +780,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    owner read,show\n     filter type==Part"),
@@ -834,9 +814,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    owner read,show\n     filter type==Part"),
@@ -863,9 +841,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
          Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    owner read,show\n    public"),
@@ -899,9 +875,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
          Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    owner read,show\n    public"),
@@ -927,9 +901,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n    public"),
@@ -963,9 +935,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n    public"),
@@ -991,9 +961,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n     filter type==Part"),
@@ -1027,9 +995,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n     filter type==Part"),
@@ -1056,9 +1022,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
          Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n    public"),
@@ -1092,9 +1056,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
          Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke owner read,show\n    public"),
@@ -1120,9 +1082,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    public read,show\n  nothidden"),
@@ -1156,9 +1116,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    public read,show\n  nothidden"),
@@ -1184,9 +1142,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    public read,show\n     filter type==Part"),
@@ -1220,9 +1176,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    public read,show\n     filter type==Part"),
@@ -1249,9 +1203,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
          Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    public read,show\n  nothidden"),
@@ -1285,9 +1237,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
          Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    public read,show\n  nothidden"),
@@ -1313,9 +1263,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n  nothidden"),
@@ -1349,9 +1297,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n  nothidden"),
@@ -1377,9 +1323,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n     filter type==Part"),
@@ -1413,9 +1357,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n     filter type==Part"),
@@ -1442,9 +1384,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
          Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n  nothidden"),
@@ -1478,9 +1418,7 @@ public class PolicyTest
             + "  }\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
          Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n    revoke public read,show\n  nothidden"),
@@ -1505,9 +1443,7 @@ public class PolicyTest
             + "  type {all}\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n  type all\n"),
@@ -1530,9 +1466,7 @@ public class PolicyTest
             + "  type all\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n  type all\n"),
@@ -1557,9 +1491,7 @@ public class PolicyTest
             + "  type {" + PolicyTest.TYPE_NAME + "}\n"
             + "}";
 
-        final Map<String,String> params = new HashMap<String,String>();
-        params.put("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-        this.jpoInvoke("org.mxupdate.plugin.Update", "updateByContent", params);
+        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
 
         Assert.assertEquals(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " select type dump"),
