@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -673,10 +673,18 @@ public class MxUpdate_mxJPO
                 }
             }
         }
+        // dimension must be the first one
+        final TypeDef_mxJPO defTypeDef = _paramCache.getMapping().getTypeDef("Dimension");
+        final Collection<TypeDef_mxJPO> tmpClazz = _paramCache.getMapping().getAllTypeDefs();
+        tmpClazz.remove(defTypeDef);
+        final Collection<TypeDef_mxJPO> allClazz = new ArrayList<TypeDef_mxJPO>(tmpClazz.size() + 1);
+        allClazz.add(defTypeDef);
+        allClazz.addAll(tmpClazz);
+
         // update
         final List<AbstractObject_mxJPO> compiles = new ArrayList<AbstractObject_mxJPO>();
         final boolean compile = _paramCache.getValueBoolean(MxUpdate_mxJPO.PARAM_COMPILE);
-        for (final TypeDef_mxJPO clazz : _paramCache.getMapping().getAllTypeDefs())  {
+        for (final TypeDef_mxJPO clazz : allClazz)  {
             final Map<File,String> clazzMap = clazz2names.get(clazz);
             if (clazzMap != null)  {
                 for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
