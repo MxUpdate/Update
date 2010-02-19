@@ -262,6 +262,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         throws MatrixException
     {
         super.checkExport(_exportParser);
+        this.checkExportProperties(_exportParser);
         Assert.assertEquals(_exportParser.getSymbolicName(), this.getSymbolicName(), "check symbolic name");
         // check for defined values
         for (final Map.Entry<String,String> entry : this.getValues().entrySet())  {
@@ -282,6 +283,56 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         Assert.assertEquals(foundAdds.size(), needAdds.size(), "all adds defined");
         for (final String foundAdd : foundAdds)  {
             Assert.assertTrue(needAdds.contains(foundAdd), "check that add '" + foundAdd + "' is defined");
+        }
+    }
+
+    /**
+     * Checks that all properties within the export file are correct defined
+     * and equal to the defined properties of this CI file.
+     *
+     * @param _exportParser     parsed export
+     */
+    protected void checkExportProperties(final ExportParser _exportParser)
+    {
+        // only if this instance is a configuration item the check is done..
+        if (this.getCI() != null)  {
+            final Set<String> propDefs = new HashSet<String>();
+            for (final ExportParser.Line rootLine : _exportParser.getRootLines())  {
+                if (rootLine.getValue().startsWith("escape add property"))  {
+                    final StringBuilder propDef = new StringBuilder().append(rootLine.getValue());
+                    for (final ExportParser.Line childLine : rootLine.getChildren())  {
+                        propDef.append(' ').append(childLine.getTag()).append(' ')
+                               .append(childLine.getValue());
+                    }
+                    propDefs.add(propDef.toString());
+                }
+            }
+            for (final PropertyDef prop : this.properties)  {
+                final StringBuilder propDef = new StringBuilder()
+                        .append("escape add property \"").append(AbstractTest.convertTcl(prop.getName()))
+                        .append("\" on ").append(this.getCI().getMxType())
+                        .append(" \"${NAME}\"");
+                if (this.getCI() == AbstractTest.CI.UI_TABLE)  {
+                    propDef.append(" system");
+                }
+                if (prop.getTo() != null)  {
+                    propDef.append(" to ").append(prop.getTo().getCI().getMxType())
+                           .append(" \"").append(AbstractTest.convertTcl(prop.getTo().getName())).append('\"');
+                    if (prop.getTo().getCI() == AbstractTest.CI.UI_TABLE)  {
+                        propDef.append(" system");
+                    }
+                }
+                if (prop.getValue() != null)  {
+                    propDef.append(" value \"").append(AbstractTest.convertTcl(prop.getValue())).append('\"');
+                }
+                final String propDefStr = propDef.toString();
+                Assert.assertTrue(
+                        propDefs.contains(propDefStr),
+                        "check that property is defined in ci file (have " + propDefStr + ")");
+                propDefs.remove(propDefStr);
+            }
+
+            Assert.assertEquals(propDefs.size(), 0, "check that not too much properties are defined (have " + propDefs + ")");
         }
     }
 
