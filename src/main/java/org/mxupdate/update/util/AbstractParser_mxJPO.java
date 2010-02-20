@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ public abstract class AbstractParser_mxJPO
                             final String _value)
     {
         try  {
-            final Field field = this.getField(_object, _fieldName);
+            final Field field = this.getField(_object, _fieldName).field;
             final boolean accessible = field.isAccessible();
             try  {
                 field.setAccessible(true);
@@ -105,7 +105,7 @@ public abstract class AbstractParser_mxJPO
                             final Double _value)
     {
         try  {
-            final Field field = this.getField(_object, _fieldName);
+            final Field field = this.getField(_object, _fieldName).field;
             final boolean accessible = field.isAccessible();
             try  {
                 field.setAccessible(true);
@@ -131,7 +131,7 @@ public abstract class AbstractParser_mxJPO
                             final Boolean _value)
     {
         try  {
-            final Field field = this.getField(_object, _fieldName);
+            final Field field = this.getField(_object, _fieldName).field;
             final boolean accessible = field.isAccessible();
             try  {
                 field.setAccessible(true);
@@ -158,7 +158,7 @@ public abstract class AbstractParser_mxJPO
                             final Collection<?> _values)
     {
         try  {
-            final Field field = this.getField(_object, _fieldName);
+            final Field field = this.getField(_object, _fieldName).field;
             final boolean accessible = field.isAccessible();
             try  {
                 field.setAccessible(true);
@@ -186,7 +186,7 @@ public abstract class AbstractParser_mxJPO
                                final Object _value)
     {
         try  {
-            final Field field = this.getField(_object, _fieldName);
+            final Field field = this.getField(_object, _fieldName).field;
             final boolean accessible = field.isAccessible();
             try  {
                 field.setAccessible(true);
@@ -204,28 +204,44 @@ public abstract class AbstractParser_mxJPO
      * Searches for given name the field within the object.
      *
      * @param _object       object where the field is searched
-     * @param _fieldName    name of searched field
-     * @return found field
+     * @param _fieldNames   path of searched fields
+     * @return found field with related object
      */
-    protected Field getField(final Object _object,
-                             final String _fieldName)
+    protected FieldObject getField(final Object _object,
+                                   final String... _fieldNames)
     {
+        FieldObject ret = new FieldObject();
+        ret.object = _object;
         Class<?> clazz = _object.getClass();
-        Field field = null;
         try  {
-            field = clazz.getDeclaredField(_fieldName);
+            ret.field = clazz.getDeclaredField(_fieldNames[0]);
         } catch (final NoSuchFieldException e)  {
         }
-        while ((field == null) && (clazz != null))  {
+        while ((ret.field == null) && (clazz != null))  {
             clazz = clazz.getSuperclass();
             if (clazz != null)  {
                 try  {
-                    field = clazz.getDeclaredField(_fieldName);
+                    ret.field = clazz.getDeclaredField(_fieldNames[0]);
                 } catch (final NoSuchFieldException e)  {
                 }
             }
         }
-        return field;
+        if ((_fieldNames.length > 1) && (ret.field != null))  {
+            final boolean accessible = ret.field.isAccessible();
+            final Object object;
+            try  {
+                ret.field.setAccessible(true);
+                 object = ret.field.get(_object);
+            } catch (final IllegalAccessException e)  {
+                throw new ParseUpdateError(e);
+            } finally  {
+                ret.field.setAccessible(accessible);
+            }
+            final String[] newFieldNames = new String[_fieldNames.length - 1];
+            System.arraycopy(_fieldNames, 1, newFieldNames, 0, _fieldNames.length - 1);
+            ret = this.getField(object, newFieldNames);
+        }
+        return ret;
     }
 
     /**
@@ -260,7 +276,7 @@ public abstract class AbstractParser_mxJPO
      * The error is thrown if the object which is currently read could not
      * updated.
      */
-    public class ParseUpdateError
+    public static class ParseUpdateError
         extends Error
     {
         /**
@@ -277,6 +293,80 @@ public abstract class AbstractParser_mxJPO
         public ParseUpdateError(final Throwable _cause)
         {
             super(_cause);
+        }
+    }
+
+    /**
+     * Class used to store depending on a field the related object.
+     *
+     * @see AbstractParser_mxJPO#getField(Object, String...)
+     */
+    protected static class FieldObject
+    {
+        /**
+         * Field.
+         */
+        private Field field;
+
+        /**
+         * Object.
+         */
+        private Object object;
+
+        /**
+         * Returns the field.
+         *
+         * @return field
+         * @see #field
+         */
+        public Field getField()
+        {
+            return this.field;
+        }
+
+        /**
+         * Returns current value of {@link #field} within {@link #object}.
+         *
+         * @param <T>   type of value
+         * @return current value
+         */
+        @SuppressWarnings("unchecked")
+        public <T> T get()
+        {
+            final Object ret;
+            try  {
+                final boolean accessible = this.field.isAccessible();
+                try  {
+                    this.field.setAccessible(true);
+                    ret = this.field.get(this.object);
+                } finally  {
+                    this.field.setAccessible(accessible);
+                }
+            } catch (final Exception e)  {
+                throw new AbstractParser_mxJPO.ParseUpdateError(e);
+            }
+            return (T) ret;
+        }
+
+        /**
+         * Defines new value for given {@link #field} on given {@link #object}.
+         *
+         * @param <T>       type of the value
+         * @param _value    value itself
+         */
+        public <T> void set(final T _value)
+        {
+            try  {
+                final boolean accessible = this.field.isAccessible();
+                try  {
+                    this.field.setAccessible(true);
+                    this.field.set(this.object, _value);
+                } finally  {
+                    this.field.setAccessible(accessible);
+                }
+            } catch (final Exception e)  {
+                throw new AbstractParser_mxJPO.ParseUpdateError(e);
+            }
         }
     }
 }

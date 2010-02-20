@@ -23,11 +23,18 @@ package org.mxupdate.test.ci.datamodel;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.data.datamodel.FormatData;
+import org.mxupdate.test.data.datamodel.PolicyData;
+import org.mxupdate.test.data.datamodel.TypeData;
+import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.util.IssueLink;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -37,7 +44,7 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 public class PolicyTest
-    extends AbstractTest
+    extends AbstractDataExportUpdate<PolicyData>
 {
     /**
      * Name of test policy.
@@ -158,6 +165,214 @@ public class PolicyTest
             + "}";
 
     /**
+     * Creates for given <code>_name</code> a new policy instance.
+     *
+     * @param _name     name of the policy instance
+     * @return policy instance
+     */
+    @Override()
+    protected PolicyData createNewData(final String _name)
+    {
+        return new PolicyData(this, _name);
+    }
+
+    /**
+     * Data provider for test policies.
+     *
+     * @return object array with all test policies
+     */
+    @IssueLink({"30", "86", "99"})
+    @DataProvider(name = "policies")
+    public Object[][] getPolicies()
+    {
+        return this.prepareData("policy",
+                new Object[]{
+                        "policy with other symbolic name",
+                        new PolicyData(this, "hello \" test")
+                                .setSymbolicName("policy_Test")},
+
+                new Object[]{
+                        "policy with complex description",
+                        new PolicyData(this, "hello \" test")
+                                .setValue("description", "\"\\\\ hello")},
+
+                new Object[]{
+                        "policy with default format",
+                        new PolicyData(this, "hello \" test")
+                                .setValue("defaultformat", "generic")},
+
+                new Object[]{
+                        "policy with sequence",
+                        new PolicyData(this, "hello \" test")
+                                .setValue("sequence", "1,2,3,A,B,C")},
+
+                new Object[]{
+                        "policy with store",
+                        new PolicyData(this, "hello \" test")
+                                .setValue("store", "STORE")},
+
+                new Object[]{
+                        "policy with default hidden flag",
+                        new PolicyData(this, "hello \" test")
+                                .setHidden(null)},
+                new Object[]{
+                        "policy with hidden flag false",
+                        new PolicyData(this, "hello \" test")
+                                .setHidden(false)},
+                new Object[]{
+                        "policy with hidden flag true",
+                        new PolicyData(this, "hello \" test")
+                                .setHidden(true)},
+
+                // issue 30
+                new Object[]{
+                        "issue #30: policy with all types",
+                        new PolicyData(this, "hello \" test")
+                                .setAllTypes(true)},
+
+                // issue 86
+                new Object[]{
+                        "issue #86: policy with one type",
+                        new PolicyData(this, "hello \" test")
+                                .appendTypes(new TypeData(this, "Type \"Test\""))},
+                new Object[]{
+                        "issue #86: policy with two type",
+                        new PolicyData(this, "hello \" test")
+                                .appendTypes(new TypeData(this, "Type \"Test\" 1"))
+                                .appendTypes(new TypeData(this, "Type \"Test\" 2"))},
+
+                new Object[]{
+                        "issue #86: policy with all formats",
+                        new PolicyData(this, "hello \" test")
+                                .setAllFormats(true)},
+                new Object[]{
+                        "issue #86: policy with one format",
+                        new PolicyData(this, "hello \" test")
+                                .appendFormats(new FormatData(this, "Type \"Test\""))},
+                new Object[]{
+                        "issue #86: policy with two formats",
+                        new PolicyData(this, "hello \" test")
+                                .appendFormats(new FormatData(this, "Type \"Test\" 1"))
+                                .appendFormats(new FormatData(this, "Type \"Test\" 2"))},
+
+                // issue 99
+                new Object[]{
+                        "issue #99: policy with default all state flag",
+                        new PolicyData(this, "hello \" test")
+                                .setAllState(null)},
+                new Object[]{
+                        "issue #99: policy with all state flag false",
+                        new PolicyData(this, "hello \" test")
+                                .setAllState(false)},
+                new Object[]{
+                        "issue #99: policy with all state flag true",
+                        new PolicyData(this, "hello \" test")
+                                .setAllState(true)},
+                new Object[]{
+                        "issue #99: policy with all state flag true and read / show owner access",
+                        new PolicyData(this, "hello \" test")
+                                .setAllState(true)
+                                .getAllStateAccess().addOwnerAccess("read", "show")},
+                new Object[]{
+                        "issue #99: policy with all state flag true and all owner access",
+                        new PolicyData(this, "hello \" test")
+                                .setAllState(true)
+                                .getAllStateAccess().addOwnerAccess("all")},
+                new Object[]{
+                        "issue #99: policy with all state flag true and read / show owner access and filter expression",
+                        new PolicyData(this, "hello \" test")
+                                .setAllState(true)
+                                .getAllStateAccess().addOwnerAccess("read", "show")
+                                .getAllStateAccess().setOwnerAccessFilter("current==\"hello\"")},
+                new Object[]{
+                        "issue #99: policy with all state flag true and read / show owner revoke",
+                        new PolicyData(this, "hello \" test")
+                                .setAllState(true)
+                                .getAllStateAccess().addOwnerRevoke("read", "show")},
+                new Object[]{
+                        "issue #99: policy with all state flag true and all owner revoke",
+                        new PolicyData(this, "hello \" test")
+                                .setAllState(true)
+                                .getAllStateAccess().addOwnerRevoke("all")},
+                new Object[]{
+                        "issue #99: policy with all state flag true and read / show owner revoke and filter expression",
+                        new PolicyData(this, "hello \" test")
+                                .setAllState(true)
+                                .getAllStateAccess().addOwnerRevoke("read", "show")
+                                .getAllStateAccess().setOwnerRevokeFilter("current==\"hello\"")},
+                new Object[]{
+                        "issue #99: policy with all state flag true and read / show public access",
+                        new PolicyData(this, "hello \" test")
+                                .setAllState(true)
+                                .getAllStateAccess().addPublicAccess("read", "show")},
+                new Object[]{
+                        "issue #99: policy with all state flag true and all public access",
+                        new PolicyData(this, "hello \" test")
+                                .setAllState(true)
+                                .getAllStateAccess().addPublicAccess("all")},
+                new Object[]{
+                        "issue #99: policy with all state flag true and read / show public access and filter expression",
+                        new PolicyData(this, "hello \" test")
+                                .setAllState(true)
+                                .getAllStateAccess().addPublicAccess("read", "show")
+                                .getAllStateAccess().setPublicAccessFilter("current==\"hello\"")},
+                new Object[]{
+                        "issue #99: policy with all state flag true and read / show public revoke",
+                        new PolicyData(this, "hello \" test")
+                                .setAllState(true)
+                                .getAllStateAccess().addPublicRevoke("read", "show")},
+                new Object[]{
+                        "issue #99: policy with all state flag true and all public revoke",
+                        new PolicyData(this, "hello \" test")
+                                .setAllState(true)
+                                .getAllStateAccess().addPublicRevoke("all")},
+                new Object[]{
+                        "issue #99: policy with all state flag true and read / show public revoke and filter expression",
+                        new PolicyData(this, "hello \" test")
+                                .setAllState(true)
+                                .getAllStateAccess().addPublicRevoke("read", "show")
+                                .getAllStateAccess().setPublicRevokeFilter("current==\"hello\"")},
+                new Object[]{
+                        "issue #99: policy with user access",
+                        new PolicyData(this, "hello \" test")
+                                .setAllState(true)
+                                .getAllStateAccess().addUserAccess(
+                                        new PolicyData.UserAccessFilter()
+                                                .setUser("creator")
+                                                .addAccess("read", "show"))},
+                new Object[]{
+                        "issue #99: policy with user access add filter expression",
+                        new PolicyData(this, "hello \" test")
+                                .setAllState(true)
+                                .getAllStateAccess().addUserAccess(
+                                        new PolicyData.UserAccessFilter()
+                                                .setUser("creator")
+                                                .addAccess("read", "show")
+                                                .setFilter("current==\"hello\""))},
+                new Object[]{
+                        "issue #99: policy with all user access",
+                        new PolicyData(this, "hello \" test")
+                                .setAllState(true)
+                                .getAllStateAccess().addUserAccess(
+                                        new PolicyData.UserAccessFilter()
+                                                .setUser("creator")
+                                                .addAccess("all"))},
+                new Object[]{
+                        "issue #99: policy with two different user access",
+                        new PolicyData(this, "hello \" test")
+                                .setAllState(true)
+                                .getAllStateAccess().addUserAccess(
+                                        new PolicyData.UserAccessFilter()
+                                                .setUser("creator")
+                                                .addAccess("all"))
+                                .getAllStateAccess().addUserAccess(
+                                        new PolicyData.UserAccessFilter()
+                                                .setUser("guest")
+                                                .addAccess("read", "show"))}
+                );
+    }
+
+    /**
      * Removes the MxUpdate test policy {@link #POLICY_NAME}.
      *
      * @throws Exception if MQL execution failed
@@ -188,27 +403,19 @@ public class PolicyTest
     }
 
     /**
-     * Creates a new policy for all types and tries to export it.
+     * Deletes all test data model object.
      *
-     * @throws Exception if test failed
+     * @throws Exception if clean up failed
      */
-    @IssueLink("30")
-    @Test(description = "export policy for all types")
-    public void exportPolicyForAllTypes()
+    @BeforeMethod()
+    @AfterMethod()
+    public void cleanup()
         throws Exception
     {
-        this.mql("add policy " + PolicyTest.POLICY_NAME + " type all");
-
-        final Export export = this.export(CI.DM_POLICY, PolicyTest.POLICY_NAME);
-
-        Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
-        Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
-                            "check that the correct file name is returned");
-        final String code = export.getCode();
-        final String testCode = code.substring(code.lastIndexOf('#')).trim();
-        Assert.assertTrue(testCode.indexOf(" type all") > 0, "checks that all types are defined");
-    }
+        this.cleanup(AbstractTest.CI.DM_POLICY);
+        this.cleanup(AbstractTest.CI.DM_TYPE);
+        this.cleanup(AbstractTest.CI.DM_FORMAT);
+   }
 
     /**
      * Creates a new policy with one state and with one symbolic name. The
@@ -584,30 +791,6 @@ public class PolicyTest
         Assert.assertTrue(
                 this.mql("print pol " + PolicyTest.POLICY_NAME + " ").contains("\n  format all\n"),
                 "check that all formats are defined");
-    }
-
-    /**
-     * Test update of policy with one format.
-     *
-     * @throws Exception if test failed
-     */
-    @IssueLink("86")
-    @Test(description = "update policy with one format")
-    public void updateFormatOne()
-        throws Exception
-    {
-        final String updateCode =
-            "updatePolicy \"${NAME}\" {\n"
-            + "  description \"\"\n"
-            + "  format {generic}\n"
-            + "}";
-
-        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
-
-        Assert.assertEquals(
-                this.mql("print pol " + PolicyTest.POLICY_NAME + " select format dump"),
-                "generic",
-                "check for format generic");
     }
 
     /**
@@ -1474,28 +1657,57 @@ public class PolicyTest
     }
 
     /**
-     * Test update of policy with one type.
+     * Tests a new created policy and the related export.
      *
+     * @param _description  description of the test case
+     * @param _policy       policy to test
      * @throws Exception if test failed
      */
-    @IssueLink("86")
-    @Test(description = "update policy with one type")
-    public void updateTypeOne()
+    @Test(dataProvider = "policies",
+          description = "test export of new created policies")
+    public void testExport(final String _description,
+                           final PolicyData _policy)
         throws Exception
     {
-        this.mql("add type " + PolicyTest.TYPE_NAME);
+        _policy.create()
+               .checkExport(_policy.export());
+    }
 
-        final String updateCode =
-            "updatePolicy \"${NAME}\" {\n"
-            + "  description \"\"\n"
-            + "  type {" + PolicyTest.TYPE_NAME + "}\n"
-            + "}";
+    /**
+     * Tests an update of non existing command. The result is tested with by
+     * exporting the command and checking the result.
+     *
+     * @param _description  description of the test case
+     * @param _policy       policy to test
+     * @throws Exception if test failed
+     */
+    @Test(dataProvider = "policies", description = "test update of non existing policy")
+    public void testUpdate(final String _description,
+                           final PolicyData _policy)
+        throws Exception
+    {
+        // create referenced property value
+        for (final PropertyDef prop : _policy.getProperties())  {
+            if (prop.getTo() != null)  {
+                prop.getTo().create();
+            }
+        }
+        // create assigned types
+        for (final TypeData type : _policy.getTypes())  {
+            type.create();
+        }
+        // create assigned formats
+        for (final FormatData format : _policy.getFormats())  {
+            format.create();
+        }
 
-        this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl", updateCode);
+        // first update with original content
+        _policy.update();
+        final ExportParser exportParser = _policy.export();
+        _policy.checkExport(exportParser);
 
-        Assert.assertEquals(
-                this.mql("print pol " + PolicyTest.POLICY_NAME + " select type dump"),
-                PolicyTest.TYPE_NAME,
-                "check for correct type");
+        // second update with delivered content
+        this.update(_policy.getCIFileName(), exportParser.getOrigCode());
+        _policy.checkExport(_policy.export());
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 package org.mxupdate.test.data.util;
 
+import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.AbstractAdminData;
 
 /**
@@ -78,7 +79,7 @@ public class PropertyDef
      * @param _value    value of the property
      */
     public PropertyDef(final String _name,
-                        final String _value)
+                       final String _value)
     {
         this.name = _name;
         this.value = _value;
@@ -147,5 +148,33 @@ public class PropertyDef
     public AbstractAdminData<?> getTo()
     {
         return this.to;
+    }
+
+    /**
+     * Creates the CI TCL string used within CI files.
+     *
+     * @param _ci   CI type where this property is defined
+     * @return CI TCL string
+     */
+    public String getCITCLString(final AbstractTest.CI _ci)
+    {
+        final StringBuilder propDef = new StringBuilder()
+        .append("mql escape add property \"").append(AbstractTest.convertTcl(this.name))
+        .append("\" on ").append(_ci.getMxType())
+        .append(" \"${NAME}\"");
+        if (_ci == AbstractTest.CI.UI_TABLE)  {
+            propDef.append(" system");
+        }
+        if (this.to != null)  {
+            propDef.append(" to ").append(this.to.getCI().getMxType())
+                   .append(" \"").append(AbstractTest.convertTcl(this.to.getName())).append('\"');
+            if (this.to.getCI() == AbstractTest.CI.UI_TABLE)  {
+                propDef.append(" system");
+            }
+        }
+        if (this.value != null)  {
+            propDef.append(" value \"").append(AbstractTest.convertTcl(this.value)).append('\"');
+        }
+        return propDef.toString();
     }
 }

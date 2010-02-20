@@ -60,6 +60,17 @@ public class Policy_mxJPO
         Policy_mxJPO.IGNORED_URLS.add("/defaultFormat");
         Policy_mxJPO.IGNORED_URLS.add("/formatRefList");
         Policy_mxJPO.IGNORED_URLS.add("/typeRefList");
+        Policy_mxJPO.IGNORED_URLS.add("/allstateDef/name");
+        Policy_mxJPO.IGNORED_URLS.add("/allstateDef/ownerAccess");
+        Policy_mxJPO.IGNORED_URLS.add("/allstateDef/ownerAccess/access");
+        Policy_mxJPO.IGNORED_URLS.add("/allstateDef/ownerRevoke");
+        Policy_mxJPO.IGNORED_URLS.add("/allstateDef/ownerRevoke/access");
+        Policy_mxJPO.IGNORED_URLS.add("/allstateDef/publicAccess");
+        Policy_mxJPO.IGNORED_URLS.add("/allstateDef/publicAccess/access");
+        Policy_mxJPO.IGNORED_URLS.add("/allstateDef/publicRevoke");
+        Policy_mxJPO.IGNORED_URLS.add("/allstateDef/publicRevoke/access");
+        Policy_mxJPO.IGNORED_URLS.add("/allstateDef/userAccessList");
+        Policy_mxJPO.IGNORED_URLS.add("/allstateDef/userAccessList/userAccess/access");
         Policy_mxJPO.IGNORED_URLS.add("/stateDefList");
         Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/ownerAccess");
         Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/ownerAccess/access");
@@ -134,8 +145,25 @@ public class Policy_mxJPO
 
     /**
      * Are all types allowed of this policy?
+     *
+     * @see #parse(String, String)
      */
     private boolean allTypes;
+
+    /**
+     * Are access for all states defined?
+     *
+     * @see #parse(String, String)
+     * @see #write(ParameterCache_mxJPO, Appendable)
+     */
+    private boolean allState = false;
+
+    /**
+     * Access definitions for all states.
+     *
+     * @see #parse(String, String)
+     */
+    private final Access allStateAccess = new Access();
 
     /**
      * Stack with all states of this policy.
@@ -184,97 +212,19 @@ public class Policy_mxJPO
             } else if ("/allowAllTypes".equals(_url))  {
                 this.allTypes = true;
 
+            } else if ("/allstateDef".equals(_url))  {
+                this.allState = true;
+            } else if (_url.startsWith("/allstateDef"))  {
+                if (!this.allStateAccess.parse(_url.substring(12), _content))  {
+                    super.parse(_url, _content);
+                }
+
             } else if ("/stateDefList/stateDef".equals(_url))  {
                 this.states.add(new State());
-            } else if ("/stateDefList/stateDef/name".equals(_url))  {
-                this.states.peek().name = _content;
-            } else if ("/stateDefList/stateDef/autoPromotion".equals(_url))  {
-                this.states.peek().autoPromotion = true;
-            } else if ("/stateDefList/stateDef/checkoutHistory".equals(_url))  {
-                this.states.peek().checkoutHistory = true;
-            } else if ("/stateDefList/stateDef/revisionable".equals(_url))  {
-                this.states.peek().revisionable = true;
-            } else if ("/stateDefList/stateDef/versionable".equals(_url))  {
-                this.states.peek().versionable = true;
-
-            } else if (_url.startsWith("/stateDefList/stateDef/ownerAccess/access"))  {
-                this.states.peek().ownerAccess.add(_url.replaceAll("^/stateDefList/stateDef/ownerAccess/access/", "")
-                                                       .replaceAll("Access$", "")
-                                                       .toLowerCase());
-            } else if ("/stateDefList/stateDef/ownerAccess/expressionFilter".equals(_url))  {
-                this.states.peek().ownerAccessFilter = _content;
-
-            } else if (_url.startsWith("/stateDefList/stateDef/ownerRevoke/access"))  {
-                this.states.peek().ownerRevoke.add(_url.replaceAll("^/stateDefList/stateDef/ownerRevoke/access/", "")
-                                                       .replaceAll("Access$", "")
-                                                       .toLowerCase());
-            } else if ("/stateDefList/stateDef/ownerRevoke/expressionFilter".equals(_url))  {
-                this.states.peek().ownerRevokeFilter = _content;
-
-            } else if (_url.startsWith("/stateDefList/stateDef/publicAccess/access"))  {
-                this.states.peek().publicAccess.add(_url.replaceAll("^/stateDefList/stateDef/publicAccess/access/", "")
-                                                        .replaceAll("Access$", "")
-                                                        .toLowerCase());
-            } else if ("/stateDefList/stateDef/publicAccess/expressionFilter".equals(_url))  {
-                this.states.peek().publicAccessFilter = _content;
-
-            } else if (_url.startsWith("/stateDefList/stateDef/publicRevoke/access"))  {
-                this.states.peek().publicRevoke.add(_url.replaceAll("^/stateDefList/stateDef/publicRevoke/access/", "")
-                                                        .replaceAll("Access$", "")
-                                                        .toLowerCase());
-            } else if ("/stateDefList/stateDef/publicRevoke/expressionFilter".equals(_url))  {
-                this.states.peek().publicRevokeFilter = _content;
-
-            } else if ("/stateDefList/stateDef/userAccessList/userAccess".equals(_url))  {
-                this.states.peek().userAccess.add(new UserAccess());
-            } else if ("/stateDefList/stateDef/userAccessList/userAccess/userRef".equals(_url))  {
-                this.states.peek().userAccess.peek().userRef = _content;
-            } else if (_url.startsWith("/stateDefList/stateDef/userAccessList/userAccess/access"))  {
-                this.states.peek().userAccess.peek().access.add(
-                        _url.replaceAll("^/stateDefList/stateDef/userAccessList/userAccess/access/", "")
-                            .replaceAll("Access$", "")
-                            .toLowerCase());
-            } else if ("/stateDefList/stateDef/userAccessList/userAccess/expressionFilter".equals(_url))  {
-                this.states.peek().userAccess.peek().expressionFilter = _content;
-
-            } else if ("/stateDefList/stateDef/signatureDefList/signatureDef".equals(_url))  {
-                this.states.peek().signatures.add(new Signature());
-            } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/name".equals(_url))  {
-                this.states.peek().signatures.peek().name = _content;
-            } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/expressionFilter".equals(_url))  {
-                this.states.peek().signatures.peek().filter= _content;
-            } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/stateDefRef".equals(_url))  {
-                this.states.peek().signatures.peek().branch = _content;
-            } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/approveUserList/userRef".equals(_url))  {
-                this.states.peek().signatures.peek().approverUsers.add(_content);
-            } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/ignoreUserList/userRef".equals(_url))  {
-                this.states.peek().signatures.peek().ignoreUsers.add(_content);
-            } else if ("/stateDefList/stateDef/signatureDefList/signatureDef/rejectUserList/userRef".equals(_url))  {
-                this.states.peek().signatures.peek().rejectUsers.add(_content);
-
-            } else if ("/stateDefList/stateDef/actionProgram/programRef".equals(_url))  {
-                this.states.peek().actionProgram = _content;
-            } else if ("/stateDefList/stateDef/actionProgram/inputArguments".equals(_url))  {
-                this.states.peek().actionInput = _content;
-
-            } else if ("/stateDefList/stateDef/checkProgram/programRef".equals(_url))  {
-                this.states.peek().checkProgram = _content;
-            } else if ("/stateDefList/stateDef/checkProgram/inputArguments".equals(_url))  {
-                this.states.peek().checkInput = _content;
-
-            } else if ("/stateDefList/stateDef/routeMessage".equals(_url))  {
-                this.states.peek().routeMessage = _content;
-            } else if ("/stateDefList/stateDef/routeUser/userRef".equals(_url))  {
-                this.states.peek().routeUsers.add(_content);
-
-            } else if ("/stateDefList/stateDef/triggerList/trigger".equals(_url))  {
-                this.states.peek().triggersStack.add(new Trigger());
-            } else if ("/stateDefList/stateDef/triggerList/trigger/triggerName".equals(_url))  {
-                this.states.peek().triggersStack.peek().name = _content;
-            } else if ("/stateDefList/stateDef/triggerList/trigger/programRef".equals(_url))  {
-                this.states.peek().triggersStack.peek().program = _content;
-            } else if ("/stateDefList/stateDef/triggerList/trigger/inputArguments".equals(_url))  {
-                this.states.peek().triggersStack.peek().arguments = _content;
+            } else if (_url.startsWith("/stateDefList/stateDef"))  {
+                if (!this.states.peek().parse(_url.substring(22), _content))  {
+                    super.parse(_url, _content);
+                }
 
             } else  {
                 super.parse(_url, _content);
@@ -283,10 +233,11 @@ public class Policy_mxJPO
     }
 
     /**
-     * Calls the state prepare method. All policies properties starting with
-     * <code>state_</code> are checked if they are defining a symbolic name of
-     * a state. If yes the related symbolic name of the state is updated and
-     * removed from the property list.
+     * Calls the {@link #allStateAccess all states} and single state prepare
+     * methods. All policies properties starting with <code>state_</code> are
+     * checked if they are defining a symbolic name of a state. If yes the
+     * related symbolic name of the state is updated and removed from the
+     * property list.
      *
      * @param _paramCache   parameter cache
      * @throws MatrixException if the prepare within super class failed
@@ -295,6 +246,7 @@ public class Policy_mxJPO
     protected void prepare(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
+        this.allStateAccess.prepare();
         for (final State state : this.states)  {
             state.prepare();
         }
@@ -313,6 +265,10 @@ public class Policy_mxJPO
 
     /**
      * Writes the update script for this policy.
+     * The policy specific information are:
+     * <ul>
+     * <li>{@link #allState all state access flag}</li>
+     * </ul>
      *
      * @param _paramCache   parameter cache
      * @param _out          writer instance
@@ -350,6 +306,12 @@ public class Policy_mxJPO
             .append("\n  sequence \"").append(StringUtil_mxJPO.convertTcl(this.sequence)).append('\"')
             .append("\n  store \"").append(StringUtil_mxJPO.convertTcl(this.store)).append('\"')
             .append("\n  hidden \"").append(Boolean.toString(this.isHidden())).append("\"");
+        // all state access
+        if (this.allState)  {
+            _out.append("\n  allstate {");
+            this.allStateAccess.writeObject(_out);
+            _out.append("\n  }");
+        }
         // all states
         for (final State state : this.states)  {
             state.writeObject(_out);
@@ -440,7 +402,7 @@ public class Policy_mxJPO
         final Policy_mxJPO policy = parser.policy(_paramCache, this.getTypeDef(), _args[1]);
 
         final StringBuilder cmd = new StringBuilder()
-                .append("mod policy \"").append(this.getName()).append("\" ");
+                .append("escape mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ");
 
         // basic information
         this.calcValueDelta(cmd, "description", policy.getDescription(), this.getDescription());
@@ -459,18 +421,66 @@ public class Policy_mxJPO
         if ((policy.store != null) && !"".equals(policy.store))  {
             this.calcValueDelta(cmd, "store", policy.store, this.store);
         }
+        cmd.append(";\n");
+
+        this.calcAllStateAccess(_paramCache, cmd, policy);
+        this.calcStatesDelta(_paramCache, cmd, policy);
+
+        MqlUtil_mxJPO.execMql(_paramCache, cmd);
+    }
+
+    /**
+     * Calculates the delta for the all state definition between this policy
+     * and given new (target) policy <code>_newPolicy</code>.
+     *
+     * @param _paramCache   parameter cache (used for logging purposes)
+     * @param _cmd          string builder for the MQL commands
+     * @param _newPolicy    new target policy definition
+     * @throws Exception if calculation of the delta failed
+     */
+    protected void calcAllStateAccess(final ParameterCache_mxJPO _paramCache,
+                                      final StringBuilder _cmd,
+                                      final Policy_mxJPO _newPolicy)
+        throws Exception
+    {
+        if (_newPolicy.allState)  {
+            _cmd.append("escape mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName()))
+                .append("\" add allstate allstate");
+            _newPolicy.allStateAccess.calcDelta(_cmd, this.allStateAccess);
+            _cmd.append(";\n");
+        } else if (this.allState)  {
+            _cmd.append("escape mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName()))
+                .append("\" remove allstate").append(";\n");
+        }
+    }
+
+    /**
+     * Calculates the delta for states between this policy and given new policy
+     * <code>_newPolicy</code>.
+     *
+     * @param _paramCache   parameter cache (used for logging purposes)
+     * @param _cmd          string builder for the MQL commands
+     * @param _newPolicy    new target policy definition
+     * @throws Exception if calculation of the delta failed
+     */
+    protected void calcStatesDelta(final ParameterCache_mxJPO _paramCache,
+                                   final StringBuilder _cmd,
+                                   final Policy_mxJPO _newPolicy)
+        throws Exception
+    {
+        _cmd.append("escape mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"');
 
         // states....
         // (first add new states because of references in branches)
         final Iterator<State> curStateIter = this.states.iterator();
-        final Iterator<State> newStateIter = policy.states.iterator();
+        final Iterator<State> newStateIter = _newPolicy.states.iterator();
         final Map<State,State> stateDeltaMap = new HashMap<State,State>();
         while (curStateIter.hasNext() && newStateIter.hasNext())  {
             final State curState = curStateIter.next();
             State newState = newStateIter.next();
             while (!curState.name.equals(newState.name) && newStateIter.hasNext())  {
-                cmd.append("add state \"").append(StringUtil_mxJPO.convertMql(newState.name))
-                   .append("\" before \"").append(StringUtil_mxJPO.convertMql(curState.name)).append("\" ");
+                _cmd.append(" add state \"").append(StringUtil_mxJPO.convertMql(newState.name))
+                    .append("\" before \"").append(StringUtil_mxJPO.convertMql(curState.name)).append('\"');
                 _paramCache.logDebug("    - insert new state '" + newState.name + "' before '" + curState.name + "'");
                 stateDeltaMap.put(newState, null);
                 newState = newStateIter.next();
@@ -481,7 +491,7 @@ public class Policy_mxJPO
         }
         while (newStateIter.hasNext())  {
             final State newState = newStateIter.next();
-            cmd.append("add state \"").append(StringUtil_mxJPO.convertMql(newState.name)).append("\" ");
+            _cmd.append(" add state \"").append(StringUtil_mxJPO.convertMql(newState.name)).append('\"');
             _paramCache.logDebug("    - add new state '" + newState.name + "'");
             stateDeltaMap.put(newState, null);
         }
@@ -491,32 +501,23 @@ throw new Exception("some states are not defined anymore!");
         }
 
         // now update state information itself
-        cmd.append(';')
-           .append("mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ");
+        _cmd.append(";\n")
+            .append("escape mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"');
         for (final Map.Entry<State, State> entry : stateDeltaMap.entrySet())  {
-            cmd.append("state \"").append(StringUtil_mxJPO.convertMql(entry.getKey().name)).append("\" ");
-            entry.getKey().calcDelta(cmd, entry.getValue());
+            _cmd.append(" state \"").append(StringUtil_mxJPO.convertMql(entry.getKey().name)).append('\"');
+            entry.getKey().calcDelta(_cmd, entry.getValue());
         }
 
         // set symbolic names for all policy states
-        cmd.append(';')
-           .append("mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ");
-        for (final State state : policy.states)  {
+        _cmd.append(";\n")
+            .append("escape mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"');
+        for (final State state : _newPolicy.states)  {
             for (final String symbolicName : state.symbolicNames)  {
-                cmd.append(" add property \"").append(StringUtil_mxJPO.convertMql(symbolicName))
-                   .append("\" value \"").append(StringUtil_mxJPO.convertMql(state.name)).append('\"');
+                _cmd.append(" add property \"").append(StringUtil_mxJPO.convertMql(symbolicName))
+                    .append("\" value \"").append(StringUtil_mxJPO.convertMql(state.name)).append('\"');
             }
         }
-
-        final boolean isMqlEscapeOn = MqlUtil_mxJPO.isEscapeOn(_paramCache);
-        try  {
-            MqlUtil_mxJPO.setEscapeOn(_paramCache);
-            MqlUtil_mxJPO.execMql(_paramCache, cmd);
-        } finally  {
-            if (!isMqlEscapeOn)  {
-                MqlUtil_mxJPO.setEscapeOff(_paramCache);
-            }
-        }
+        _cmd.append(";\n");
     }
 
     /**
@@ -539,7 +540,7 @@ throw new Exception("some states are not defined anymore!");
         final String newVal = (_newVal == null) ? "" : _newVal;
 
         if (!curVal.equals(newVal))  {
-            _out.append(_kind).append(" \"").append(StringUtil_mxJPO.convertMql(newVal)).append("\" ");
+            _out.append(_kind).append(" \"").append(StringUtil_mxJPO.convertMql(newVal)).append('\"');
         }
     }
 
@@ -567,15 +568,276 @@ throw new Exception("some states are not defined anymore!");
             }
         }
         if (!equal)  {
-            for (final String format : _current)  {
-                if (!_new.contains(format))  {
-                    _out.append("remove ").append(_kind).append(" \"").append(format).append("\" ");
+            for (final String curValue : _current)  {
+                if (!_new.contains(curValue))  {
+                    _out.append(" remove ").append(_kind).append(" \"").append(StringUtil_mxJPO.convertMql(curValue)).append('\"');
                 }
             }
-            for (final String format : _new)  {
-                if (!_current.contains(format))  {
-                    _out.append("add ").append(_kind).append(" \"").append(format).append("\" ");
+            for (final String newValue : _new)  {
+                if (!_current.contains(newValue))  {
+                    _out.append(" add ").append(_kind).append(" \"").append(StringUtil_mxJPO.convertMql(newValue)).append('\"');
                 }
+            }
+        }
+    }
+
+    /**
+     * Class used to define the access and filter double.
+     */
+    protected static class AccessFilterDouble
+    {
+        /**
+         * Set holding the complete access.
+         */
+        protected final Set<String> access = new TreeSet<String>();
+
+        /**
+         * String holding the filter expression.
+         */
+        protected String filter;
+
+        /**
+         * Returns <i>true</i> if {@link #access} is empty or contains only
+         * <code>none</code> and {@link #filter} is <code>null</code> or empty
+         * string.
+         *
+         * @return <i>true</i> if empty; otherwise <i>false</i>
+         */
+        protected boolean isEmpty()
+        {
+            return ((this.access.isEmpty() || ((this.access.size() == 1) && this.access.contains("none"))))
+                    && ((this.filter == null) || "".equals(this.filter));
+        }
+
+        /**
+         * Returns the string used within the configuration item.
+         *
+         * @return CI string
+         */
+        protected String getCIString()
+        {
+            final StringBuilder strg = new StringBuilder();
+            strg.append("{")
+                .append(StringUtil_mxJPO.joinTcl(' ', false, this.access, null))
+                .append("}");
+            if ((this.filter != null) && !"".equals(this.filter))  {
+                strg.append(" filter \"")
+                    .append(StringUtil_mxJPO.convertTcl(this.filter))
+                    .append('\"');
+            }
+            return strg.toString();
+        }
+
+        /**
+         * Prepares the MQL update string for this access / filter double.
+         *
+         * @param _oldAccessFilter      old access filter (which is used if
+         *                              there is a filter defined which must be
+         *                              overwritten)
+         * @return MQL update string
+         */
+        protected String getMQLUpdateString(final AccessFilterDouble _oldAccessFilter)
+        {
+            final StringBuilder strg = new StringBuilder();
+            strg.append(StringUtil_mxJPO.joinMql(',', false, this.access, "none")).append(' ');
+            if ((this.filter != null) || ((_oldAccessFilter != null) && (_oldAccessFilter.filter != null)))  {
+                strg.append(" filter \"");
+                if (this.filter != null)  {
+                    strg.append(StringUtil_mxJPO.convertMql(this.filter));
+                }
+                strg.append('\"');
+            }
+            return strg.toString();
+        }
+    }
+
+    /**
+     * Access definition for owner / public definitions (depending on one state
+     * or for {@link Policy_mxJPO#allStateAccess all states}).
+     */
+    public static class Access
+    {
+        /**
+         * Set holding the complete owner access.
+         */
+        protected final AccessFilterDouble ownerAccess = new AccessFilterDouble();
+
+        /**
+         * Set holding the complete owner revoke.
+         */
+        protected final AccessFilterDouble ownerRevoke = new AccessFilterDouble();
+
+        /**
+         * Set holding the complete public access.
+         */
+        protected final AccessFilterDouble publicAccess = new AccessFilterDouble();
+
+        /**
+         * Set holding the complete public revoke.
+         */
+        protected final AccessFilterDouble publicRevoke = new AccessFilterDouble();
+
+        /**
+         * Stack used to hold the user access while parsing.
+         *
+         * @see #parse(String, String)
+         */
+        protected final Stack<UserAccessFilter> userAccess = new Stack<UserAccessFilter>();
+
+        /**
+         * Sorted set of user access (by name of the user).
+         *
+         * @see #prepare()     method used to sort the user access instances
+         */
+        protected final Set<UserAccessFilter> userAccessSorted = new TreeSet<UserAccessFilter>();
+
+        /**
+         * Parses given access <code>_url</code>.
+         *
+         * @param _url      access URL to parse
+         * @param _content  content of the access URL
+         * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+         *         <i>false</i>
+         */
+        protected boolean parse(final String _url,
+                                final String _content)
+        {
+            boolean ret = true;
+            if (_url.startsWith("/ownerAccess/access"))  {
+                this.ownerAccess.access.add(_url.replaceAll("^/ownerAccess/access/", "").replaceAll("Access$", "").toLowerCase());
+            } else if ("/ownerAccess/expressionFilter".equals(_url))  {
+                this.ownerAccess.filter = _content;
+
+            } else if (_url.startsWith("/ownerRevoke/access"))  {
+                this.ownerRevoke.access.add(_url.replaceAll("^/ownerRevoke/access/", "").replaceAll("Access$", "").toLowerCase());
+            } else if ("/ownerRevoke/expressionFilter".equals(_url))  {
+                this.ownerRevoke.filter = _content;
+
+            } else if (_url.startsWith("/publicAccess/access"))  {
+                this.publicAccess.access.add(_url.replaceAll("^/publicAccess/access/", "").replaceAll("Access$", "").toLowerCase());
+            } else if ("/publicAccess/expressionFilter".equals(_url))  {
+                this.publicAccess.filter = _content;
+
+            } else if (_url.startsWith("/publicRevoke/access"))  {
+                this.publicRevoke.access.add(_url.replaceAll("^/publicRevoke/access/", "").replaceAll("Access$", "").toLowerCase());
+            } else if ("/publicRevoke/expressionFilter".equals(_url))  {
+                this.publicRevoke.filter = _content;
+
+            } else if ("/userAccessList/userAccess".equals(_url))  {
+                this.userAccess.add(new UserAccessFilter());
+            } else if ("/userAccessList/userAccess/userRef".equals(_url))  {
+                this.userAccess.peek().userRef = _content;
+            } else if (_url.startsWith("/userAccessList/userAccess/access"))  {
+                this.userAccess.peek().access.add(_url.replaceAll("^/userAccessList/userAccess/access/", "").replaceAll("Access$", "").toLowerCase());
+            } else if ("/userAccessList/userAccess/expressionFilter".equals(_url))  {
+                this.userAccess.peek().filter = _content;
+            } else  {
+                ret = false;
+            }
+            return ret;
+        }
+
+        /**
+         * The user access are sorted.
+         *
+         * @see #userAccess         unsorted list of user access
+         * @see #userAccessSorted   sorted list user access (after this method is
+         *                          called)
+         */
+        protected void prepare()
+        {
+            this.userAccessSorted.addAll(this.userAccess);
+        }
+
+        /**
+         * Writes specific information about this state to the given writer
+         * instance.
+         * <ul>
+         * <li>{@link #ownerAccess owner access}</li>
+         * <li>{@link #ownerRevoke owner revoke}</li>
+         * <li>{@link #publicAccess public access}</li>
+         * <li>{@link #publicRevoke public revoke}</li>
+         * <li>{@link #userAccessSorted user access}</li>
+         * </ul>
+         *
+         * @param _out      writer instance
+         * @throws IOException if the TCL update code could not be written
+         */
+        protected void writeObject(final Appendable _out)
+            throws IOException
+        {
+            // owner access
+            _out.append("\n    owner ").append(this.ownerAccess.getCIString());
+            // owner revoke
+            if (!this.ownerRevoke.isEmpty())  {
+                _out.append("\n    revoke owner ").append(this.ownerRevoke.getCIString());
+            }
+            // public access
+            _out.append("\n    public ").append(this.publicAccess.getCIString());
+            // public revoke (only written if defined (and not none!)
+            if (!this.publicRevoke.isEmpty())  {
+                _out.append("\n    revoke public ").append(this.publicRevoke.getCIString());
+            }
+            // user access
+            for (final UserAccessFilter userAccess : this.userAccessSorted)  {
+                _out.append("\n    user \"").append(StringUtil_mxJPO.convertTcl(userAccess.userRef)).append("\" {")
+                    .append(StringUtil_mxJPO.joinTcl(' ', false, userAccess.access, null))
+                    .append('}');
+                if (userAccess.filter != null)  {
+                    _out.append(" filter \"")
+                        .append(StringUtil_mxJPO.convertTcl(userAccess.filter))
+                        .append("\"");
+                }
+            }
+        }
+
+        /**
+         * Calculates the delta between this new target access definition and
+         * current definition <code>_oldAccess</code> within MX. The MQL
+         * statements to change are written to <code>_out</code>.
+         *
+         * @param _out          writer instance
+         * @param _oldAccess    current access definition
+         * @throws IOException if write failed
+         */
+        protected void calcDelta(final Appendable _out,
+                                 final Access _oldAccess)
+            throws IOException
+        {
+            // owner access
+            _out.append(" owner ").append(this.ownerAccess.getMQLUpdateString((_oldAccess != null) ? _oldAccess.publicAccess : null));
+            // owner revoke
+            if (!this.ownerRevoke.isEmpty() || ((_oldAccess != null) && (!_oldAccess.ownerRevoke.isEmpty())))  {
+                _out.append(" revoke owner ").append(this.ownerRevoke.getMQLUpdateString((_oldAccess != null) ? _oldAccess.ownerRevoke : null));
+            }
+            // public access
+            _out.append(" public ").append(this.publicAccess.getMQLUpdateString((_oldAccess != null) ? _oldAccess.publicAccess : null));
+            // public revoke
+            if (!this.publicRevoke.isEmpty() || ((_oldAccess != null) && (!_oldAccess.publicRevoke.isEmpty())))  {
+                _out.append(" revoke public ").append(this.publicRevoke.getMQLUpdateString((_oldAccess != null) ? _oldAccess.publicRevoke : null));
+            }
+            // user access
+            final Set<String> newUsers = new HashSet<String>();
+            for (final UserAccessFilter userAccess : this.userAccess)  {
+                newUsers.add(userAccess.userRef);
+            }
+            final Set<String> oldUser = new HashSet<String>();
+            if (_oldAccess != null)  {
+                for (final UserAccessFilter userAccess : _oldAccess.userAccess)  {
+                    if (newUsers.contains(userAccess.userRef))  {
+                        oldUser.add(userAccess.userRef);
+                    } else  {
+                        _out.append(" remove user \"")
+                            .append(StringUtil_mxJPO.convertMql(userAccess.userRef))
+                            .append("\" all");
+                    }
+                }
+            }
+            for (final UserAccessFilter userAccess : this.userAccess)  {
+                if ((_oldAccess != null) && !oldUser.contains(userAccess.userRef))  {
+                    _out.append(" add");
+                }
+                _out.append(" user ").append(userAccess.getMQLUpdateString(null));
             }
         }
     }
@@ -584,6 +846,7 @@ throw new Exception("some states are not defined anymore!");
      * Class defining states of a policy.
      */
     public static class State
+        extends Policy_mxJPO.Access
     {
         /**
          * Name of the state.
@@ -646,60 +909,6 @@ throw new Exception("some states are not defined anymore!");
         private final Set<String> routeUsers = new TreeSet<String>();
 
         /**
-         * Set holding the complete owner access.
-         */
-        private final Set<String> ownerAccess = new TreeSet<String>();
-
-        /**
-         * String holding the filter expression for the owner access.
-         */
-        private String ownerAccessFilter;
-
-        /**
-         * Set holding the complete owner revoke.
-         */
-        private final Set<String> ownerRevoke = new TreeSet<String>();
-
-        /**
-         * String holding the filter expression for the owner revoke.
-         */
-        private String ownerRevokeFilter;
-
-        /**
-         * Set holding the complete public access.
-         */
-        private final Set<String> publicAccess = new TreeSet<String>();
-
-        /**
-         * String holding the filter expression for the public access.
-         */
-        private String publicAccessFilter;
-
-        /**
-         * Set holding the complete public revoke.
-         */
-        private final Set<String> publicRevoke = new TreeSet<String>();
-
-        /**
-         * String holding the filter expression for the public revoke.
-         */
-        private String publicRevokeFilter;
-
-        /**
-         * Stack used to hold the user access while parsing.
-         *
-         * @see #parse(String, String)
-         */
-        private final Stack<UserAccess> userAccess = new Stack<UserAccess>();
-
-        /**
-         * Sorted set of user access (by name of the user).
-         *
-         * @see #prepare()     method used to sort the user access instances
-         */
-        private final Set<UserAccess> userAccessSorted = new TreeSet<UserAccess>();
-
-        /**
          * Stack with all triggers for this state.
          */
         private final Stack<Trigger> triggersStack = new Stack<Trigger>();
@@ -719,18 +928,75 @@ throw new Exception("some states are not defined anymore!");
         private final Stack<Signature> signatures = new Stack<Signature>();
 
         /**
-         * The user access and trigger instances are sorted.
-         *
-         * @see #userAccess         unsorted list of user access
-         * @see #userAccessSorted   sorted list user access (after this method is
-         *                          called)
+         * {@inheritDoc}
          */
+        @Override()
+        protected boolean parse(final String _url,
+                                final String _content)
+        {
+            boolean ret = true;
+            if ("/name".equals(_url))  {
+                this.name = _content;
+            } else if ("/autoPromotion".equals(_url))  {
+                this.autoPromotion = true;
+            } else if ("/checkoutHistory".equals(_url))  {
+                this.checkoutHistory = true;
+            } else if ("/revisionable".equals(_url))  {
+                this.revisionable = true;
+            } else if ("/versionable".equals(_url))  {
+                this.versionable = true;
+
+            } else if ("/signatureDefList/signatureDef".equals(_url))  {
+                this.signatures.add(new Signature());
+            } else if ("/signatureDefList/signatureDef/name".equals(_url))  {
+                this.signatures.peek().name = _content;
+            } else if ("/signatureDefList/signatureDef/expressionFilter".equals(_url))  {
+                this.signatures.peek().filter= _content;
+            } else if ("/signatureDefList/signatureDef/stateDefRef".equals(_url))  {
+                this.signatures.peek().branch = _content;
+            } else if ("/signatureDefList/signatureDef/approveUserList/userRef".equals(_url))  {
+                this.signatures.peek().approverUsers.add(_content);
+            } else if ("/signatureDefList/signatureDef/ignoreUserList/userRef".equals(_url))  {
+                this.signatures.peek().ignoreUsers.add(_content);
+            } else if ("/signatureDefList/signatureDef/rejectUserList/userRef".equals(_url))  {
+                this.signatures.peek().rejectUsers.add(_content);
+
+            } else if ("/actionProgram/programRef".equals(_url))  {
+                this.actionProgram = _content;
+            } else if ("/actionProgram/inputArguments".equals(_url))  {
+                this.actionInput = _content;
+
+            } else if ("/checkProgram/programRef".equals(_url))  {
+                this.checkProgram = _content;
+            } else if ("/checkProgram/inputArguments".equals(_url))  {
+                this.checkInput = _content;
+
+            } else if ("/routeMessage".equals(_url))  {
+                this.routeMessage = _content;
+            } else if ("/routeUser/userRef".equals(_url))  {
+                this.routeUsers.add(_content);
+
+            } else if ("/triggerList/trigger".equals(_url))  {
+                this.triggersStack.add(new Trigger());
+            } else if ("/triggerList/trigger/triggerName".equals(_url))  {
+                this.triggersStack.peek().name = _content;
+            } else if ("/triggerList/trigger/programRef".equals(_url))  {
+                this.triggersStack.peek().program = _content;
+            } else if ("/triggerList/trigger/inputArguments".equals(_url))  {
+                this.triggersStack.peek().arguments = _content;
+            } else  {
+                ret = super.parse(_url, _content);
+            }
+            return ret;
+        }
+
+        /**
+         * The user access and trigger instances are sorted.
+         */
+        @Override()
         protected void prepare()
         {
-            // sort user access
-            for (final UserAccess range : this.userAccess)  {
-                this.userAccessSorted.add(range);
-            }
+            super.prepare();
             // sort all triggers
             for (final Trigger trigger : this.triggersStack)  {
                 this.triggers.put(trigger.name, trigger);
@@ -741,19 +1007,12 @@ throw new Exception("some states are not defined anymore!");
          * Writes specific information about this state to the given writer
          * instance.
          * <ul>
-         * <li>{@link #ownerAccess owner access} with
-         *     {@link #ownerAccessFilter filter}</li>
-         * <li>{@link #ownerRevoke owner revoke} with
-         *     {@link #ownerRevokeFilter filter}</li>
-         * <li>{@link #publicAccess public access} with
-         *     {@link #publicAccessFilter filter}</li>
-         * <li>{@link #publicRevoke public revoke} with
-         *     {@link #publicRevokeFilter filter}</li>
          * </ul>
          *
          * @param _out      writer instance
          * @throws IOException if the TCL update code could not be written
          */
+        @Override
         protected void writeObject(final Appendable _out)
                 throws IOException
         {
@@ -781,59 +1040,8 @@ throw new Exception("some states are not defined anymore!");
                     .append("} \"")
                     .append(StringUtil_mxJPO.convertTcl(this.routeMessage)).append('\"');
             }
-            // owner access
-            _out.append("\n    owner {")
-                .append(StringUtil_mxJPO.joinTcl(' ', false, this.ownerAccess, null))
-                .append("}");
-            if ((this.ownerAccessFilter != null) && !"".equals(this.ownerAccessFilter))  {
-                _out.append(" filter \"")
-                    .append(StringUtil_mxJPO.convertTcl(this.ownerAccessFilter))
-                    .append("\"");
-            }
-            // owner revoke
-            if ((!this.ownerRevoke.isEmpty() && !((this.ownerRevoke.size() == 1) && this.ownerRevoke.contains("none")))
-                    || ((this.ownerRevokeFilter != null) && !"".equals(this.ownerRevokeFilter)))  {
-                _out.append("\n    revoke owner {")
-                    .append(StringUtil_mxJPO.joinTcl(' ', false, this.ownerRevoke, null))
-                    .append("}");
-                if ((this.ownerRevokeFilter != null) && !"".equals(this.ownerRevokeFilter))  {
-                    _out.append(" filter \"")
-                        .append(StringUtil_mxJPO.convertTcl(this.ownerRevokeFilter))
-                        .append("\"");
-                }
-            }
-            // public access
-            _out.append("\n    public {")
-                .append(StringUtil_mxJPO.joinTcl(' ', false, this.publicAccess, null))
-                .append("}");
-            if ((this.publicAccessFilter != null) && !"".equals(this.publicAccessFilter))  {
-                _out.append(" filter \"")
-                    .append(StringUtil_mxJPO.convertTcl(this.publicAccessFilter))
-                    .append("\"");
-            }
-            // public revoke (only written if defined (and not none!)
-            if ((!this.publicRevoke.isEmpty() && !((this.publicRevoke.size() == 1) && this.publicRevoke.contains("none")))
-                    || ((this.publicRevokeFilter != null) && !"".equals(this.publicRevokeFilter)))  {
-                _out.append("\n    revoke public {")
-                    .append(StringUtil_mxJPO.joinTcl(' ', false, this.publicRevoke, null))
-                    .append("}");
-                if ((this.publicRevokeFilter != null) && !"".equals(this.publicRevokeFilter))  {
-                    _out.append(" filter \"")
-                        .append(StringUtil_mxJPO.convertTcl(this.publicRevokeFilter))
-                        .append("\"");
-                }
-            }
-            // user access
-            for (final UserAccess userAccess : this.userAccessSorted)  {
-                _out.append("\n    user \"").append(StringUtil_mxJPO.convertTcl(userAccess.userRef)).append("\" {")
-                    .append(StringUtil_mxJPO.joinTcl(' ', false, userAccess.access, null))
-                    .append('}');
-                if (userAccess.expressionFilter != null)  {
-                    _out.append(" filter \"")
-                        .append(StringUtil_mxJPO.convertTcl(userAccess.expressionFilter))
-                        .append("\"");
-                }
-            }
+            // write access statements
+            super.writeObject(_out);
             _out.append("\n    action \"").append(StringUtil_mxJPO.convertTcl(this.actionProgram))
                 .append("\" input \"").append(StringUtil_mxJPO.convertTcl(this.actionInput)).append('\"')
                 .append("\n    check \"").append(StringUtil_mxJPO.convertTcl(this.checkProgram))
@@ -863,119 +1071,37 @@ throw new Exception("some states are not defined anymore!");
                 throws IOException
         {
             // basics
-            _out.append("promote ").append(String.valueOf(this.autoPromotion)).append(' ')
-                .append("revision ").append(String.valueOf(this.revisionable)).append(' ')
-                .append("checkouthistory ").append(String.valueOf(this.checkoutHistory)).append(' ')
-                .append("version ").append(String.valueOf(this.versionable)).append(' ')
-                .append("action \"").append(StringUtil_mxJPO.convertMql(this.actionProgram)).append("\" ")
-                .append("input \"").append(StringUtil_mxJPO.convertMql(this.actionInput)).append("\" ")
-                .append("check \"").append(StringUtil_mxJPO.convertMql(this.checkProgram)).append("\" ")
-                .append("input \"").append(StringUtil_mxJPO.convertMql(this.checkInput)).append("\" ");
+            _out.append(" promote ").append(String.valueOf(this.autoPromotion))
+                .append(" revision ").append(String.valueOf(this.revisionable))
+                .append(" checkouthistory ").append(String.valueOf(this.checkoutHistory))
+                .append(" version ").append(String.valueOf(this.versionable))
+                .append(" action \"").append(StringUtil_mxJPO.convertMql(this.actionProgram)).append('\"')
+                .append(" input \"").append(StringUtil_mxJPO.convertMql(this.actionInput)).append('\"')
+                .append(" check \"").append(StringUtil_mxJPO.convertMql(this.checkProgram)).append('\"')
+                .append(" input \"").append(StringUtil_mxJPO.convertMql(this.checkInput)).append('\"');
             // route message
-            _out.append("route message \"").append(StringUtil_mxJPO.convertMql(this.routeMessage)).append("\" ");
+            _out.append(" route message \"").append(StringUtil_mxJPO.convertMql(this.routeMessage)).append('\"');
             for (final String routeUser : this.routeUsers)  {
                 if ((_oldState == null) || !_oldState.routeUsers.contains(routeUser))  {
-                    _out.append("add route \"").append(StringUtil_mxJPO.convertMql(routeUser)).append("\" ");
+                    _out.append(" add route \"").append(StringUtil_mxJPO.convertMql(routeUser)).append('\"');
                 }
             }
-            // owner access
-            _out.append("owner ")
-                .append(StringUtil_mxJPO.joinMql(',', false, this.ownerAccess, "none"))
-                .append(' ');
-            if ((this.ownerAccessFilter != null) || ((_oldState != null) && (_oldState.ownerAccessFilter != null)))  {
-                _out.append(" filter \"");
-                if (this.ownerAccessFilter != null)  {
-                    _out.append(StringUtil_mxJPO.convertMql(this.ownerAccessFilter));
-                }
-                _out.append("\" ");
-            }
-            // owner revoke
-            if (!this.ownerRevoke.isEmpty() || ((this.ownerRevokeFilter != null) && !"".equals(this.ownerRevokeFilter))
-                    || ((_oldState != null)
-                            && (!_oldState.ownerRevoke.isEmpty() || (_oldState.ownerRevokeFilter != null && !"".equals(_oldState.ownerRevokeFilter)))))  {
-
-                _out.append("revoke owner ")
-                .append(StringUtil_mxJPO.joinMql(',', false, this.ownerRevoke, "none"))
-                .append(' ');
-                if ((this.ownerRevokeFilter != null) || ((_oldState != null) && (_oldState.ownerRevokeFilter != null)))  {
-                    _out.append(" filter \"");
-                    if (this.ownerRevokeFilter != null)  {
-                        _out.append(StringUtil_mxJPO.convertMql(this.ownerRevokeFilter));
-                    }
-                    _out.append("\" ");
-                }
-            }
-            // public access
-            _out.append("public ")
-                .append(StringUtil_mxJPO.joinMql(',', false, this.publicAccess, "none"))
-                .append(' ');
-            if ((this.publicAccessFilter != null) || ((_oldState != null) && (_oldState.publicAccessFilter != null)))  {
-                _out.append(" filter \"");
-                if (this.publicAccessFilter != null)  {
-                    _out.append(StringUtil_mxJPO.convertMql(this.publicAccessFilter));
-                }
-                _out.append("\" ");
-            }
-            // public revoke
-            if (!this.publicRevoke.isEmpty() || ((this.publicRevokeFilter != null) && !"".equals(this.publicRevokeFilter))
-                    || ((_oldState != null)
-                            && (!_oldState.publicRevoke.isEmpty() || (_oldState.publicRevokeFilter != null && !"".equals(_oldState.publicRevokeFilter)))))  {
-
-                _out.append("revoke public ")
-                .append(StringUtil_mxJPO.joinMql(',', false, this.publicRevoke, "none"))
-                .append(' ');
-                if ((this.publicRevokeFilter != null) || ((_oldState != null) && (_oldState.publicRevokeFilter != null)))  {
-                    _out.append(" filter \"");
-                    if (this.publicRevokeFilter != null)  {
-                        _out.append(StringUtil_mxJPO.convertMql(this.publicRevokeFilter));
-                    }
-                    _out.append("\" ");
-                }
-            }
-            // user access
-            final Set<String> newUsers = new HashSet<String>();
-            for (final UserAccess userAccess : this.userAccess)  {
-                newUsers.add(userAccess.userRef);
-            }
-            final Set<String> oldUser = new HashSet<String>();
-            if (_oldState != null)  {
-                for (final UserAccess userAccess : _oldState.userAccess)  {
-                    if (newUsers.contains(userAccess.userRef))  {
-                        oldUser.add(userAccess.userRef);
-                    } else  {
-                        _out.append("remove user \"")
-                            .append(StringUtil_mxJPO.convertMql(userAccess.userRef))
-                            .append("\" all ");
-                    }
-                }
-            }
-            for (final UserAccess userAccess : this.userAccess)  {
-                if ((_oldState != null) && !oldUser.contains(userAccess.userRef))  {
-                    _out.append("add ");
-                }
-                _out.append("user \"").append(userAccess.userRef).append("\" ")
-                    .append(StringUtil_mxJPO.joinMql(',', false, userAccess.access, "none"))
-                    .append(" ")
-                    .append("filter \"")
-                    .append(StringUtil_mxJPO.convertMql(userAccess.expressionFilter))
-                    .append("\" ");
-            }
+            super.calcDelta(_out, _oldState);
             // triggers
             if (_oldState != null)  {
                 for (final Trigger trigger : _oldState.triggers.values())  {
                     if (!this.triggers.containsKey(trigger.name))  {
-                        _out.append("remove trigger ")
+                        _out.append(" remove trigger ")
                             .append(trigger.getEventType())
                             .append(' ')
-                            .append(trigger.getKind())
-                            .append(' ');
+                            .append(trigger.getKind());
                     }
                 }
             }
             for (final Trigger trigger : this.triggers.values())  {
-                _out.append("add trigger ").append(trigger.getEventType()).append(' ').append(trigger.getKind())
+                _out.append(" add trigger ").append(trigger.getEventType()).append(' ').append(trigger.getKind())
                     .append(" \"").append(StringUtil_mxJPO.convertMql(trigger.program)).append("\"")
-                    .append(" input \"").append(StringUtil_mxJPO.convertMql(trigger.arguments)).append("\" ");
+                    .append(" input \"").append(StringUtil_mxJPO.convertMql(trigger.arguments)).append('\"');
             }
             // signatures
             final Set<String> newSigs = new HashSet<String>();
@@ -988,46 +1114,38 @@ throw new Exception("some states are not defined anymore!");
                     if (newSigs.contains(signature.name))  {
                         oldSigs.put(signature.name, signature);
                     } else  {
-                        _out.append("remove signature \"")
+                        _out.append(" remove signature \"")
                             .append(StringUtil_mxJPO.convertMql(signature.name))
-                            .append("\" ");
+                            .append('\"');
                     }
                 }
             }
             for (final Signature signature : this.signatures)  {
                 final Signature oldSig;
                 if ((_oldState != null) && !oldSigs.containsKey(signature.name))  {
-                    _out.append("add ");
+                    _out.append(" add ");
                     oldSig = null;
                 } else  {
                     oldSig = oldSigs.get(signature.name);
                 }
-                _out.append("signature \"").append(StringUtil_mxJPO.convertMql(signature.name)).append("\" ");
+                _out.append(" signature \"").append(StringUtil_mxJPO.convertMql(signature.name)).append('\"');
                 signature.calcDelta(_out, oldSig);
             }
         }
     }
 
+
     /**
      * Class used to hold the user access for a state.
      */
-    public static class UserAccess
-            implements Comparable<Policy_mxJPO.UserAccess>
+    public static class UserAccessFilter
+        extends Policy_mxJPO.AccessFilterDouble
+        implements Comparable<Policy_mxJPO.UserAccessFilter>
     {
         /**
          * Holds the user references of a user access.
          */
         private String userRef;
-
-        /**
-         * Holds the access of the user.
-         */
-        private final Set<String> access = new TreeSet<String>();
-
-        /**
-         * Holds the expression filter of a user access.
-         */
-        private String expressionFilter;
 
         /**
          * Compares this user access instance to another user access instance.
@@ -1040,9 +1158,40 @@ throw new Exception("some states are not defined anymore!");
          *         specified {@link #userRef} defined with
          *         <code>_userAccess</code>
          */
-        public int compareTo(final UserAccess _userAccess)
+        public int compareTo(final UserAccessFilter _userAccess)
         {
             return this.userRef.compareTo(_userAccess.userRef);
+        }
+
+        /**
+         * The {@link #userRef reference to the user} is prefixed to the access
+         * string.
+         * {@inheritDoc}
+         */
+        @Override()
+        protected String getCIString()
+        {
+            return new StringBuilder()
+                .append('\"').append(StringUtil_mxJPO.convertTcl(this.userRef)).append("\" ")
+                .append(super.getCIString())
+                .toString();
+        }
+
+        /**
+         * Prepares the MQL update string for this access / filter double.
+         *
+         * @param _oldAccessFilter      old access filter (which is used if
+         *                              there is a filter defined which must be
+         *                              overwritten)
+         * @return MQL update string
+         */
+        @Override()
+        protected String getMQLUpdateString(final AccessFilterDouble _oldAccessFilter)
+        {
+            return new StringBuilder()
+                .append('\"').append(StringUtil_mxJPO.convertTcl(this.userRef)).append("\" ")
+                .append(super.getMQLUpdateString(_oldAccessFilter))
+                .toString();
         }
     }
 
@@ -1131,45 +1280,45 @@ throw new Error("branch '" + _oldSignature.branch + "' exists for signature "
             + this.name + ", but is not defined anymore");
                 }
             } else  {
-                _out.append("branch \"").append(StringUtil_mxJPO.convertMql(this.branch)).append("\" ");
+                _out.append(" branch \"").append(StringUtil_mxJPO.convertMql(this.branch)).append('\"');
             }
-            _out.append("filter \"").append(StringUtil_mxJPO.convertMql(this.filter)).append("\" ");
+            _out.append(" filter \"").append(StringUtil_mxJPO.convertMql(this.filter)).append('\"');
             // update approve users
             for (final String approver : this.approverUsers)  {
                 if ((_oldSignature == null) || !_oldSignature.approverUsers.contains(approver))  {
-                    _out.append("add approve \"").append(StringUtil_mxJPO.convertMql(approver)).append("\" ");
+                    _out.append(" add approve \"").append(StringUtil_mxJPO.convertMql(approver)).append('\"');
                 }
             }
             if (_oldSignature != null)  {
                 for (final String approver : _oldSignature.approverUsers)  {
                     if (!this.approverUsers.contains(approver))  {
-                        _out.append("remove approve \"").append(StringUtil_mxJPO.convertMql(approver)).append("\" ");
+                        _out.append(" remove approve \"").append(StringUtil_mxJPO.convertMql(approver)).append('\"');
                     }
                 }
             }
             // update ignore user
             for (final String ignore : this.ignoreUsers)  {
                 if ((_oldSignature == null) || !_oldSignature.ignoreUsers.contains(ignore))  {
-                    _out.append("add ignore \"").append(StringUtil_mxJPO.convertMql(ignore)).append("\" ");
+                    _out.append(" add ignore \"").append(StringUtil_mxJPO.convertMql(ignore)).append('\"');
                 }
             }
             if (_oldSignature != null)  {
                 for (final String ignore : _oldSignature.ignoreUsers)  {
                     if (!this.ignoreUsers.contains(ignore))  {
-                        _out.append("remove ignore \"").append(StringUtil_mxJPO.convertMql(ignore)).append("\" ");
+                        _out.append(" remove ignore \"").append(StringUtil_mxJPO.convertMql(ignore)).append('\"');
                     }
                 }
             }
             // update reject users
             for (final String reject : this.rejectUsers)  {
                 if ((_oldSignature == null) || !_oldSignature.rejectUsers.contains(reject))  {
-                    _out.append("add reject \"").append(StringUtil_mxJPO.convertMql(reject)).append("\" ");
+                    _out.append(" add reject \"").append(StringUtil_mxJPO.convertMql(reject)).append('\"');
                 }
             }
             if (_oldSignature != null)  {
                 for (final String reject : _oldSignature.rejectUsers)  {
                     if (!this.rejectUsers.contains(reject))  {
-                        _out.append("remove reject \"").append(StringUtil_mxJPO.convertMql(reject)).append("\" ");
+                        _out.append(" remove reject \"").append(StringUtil_mxJPO.convertMql(reject)).append('\"');
                     }
                 }
             }

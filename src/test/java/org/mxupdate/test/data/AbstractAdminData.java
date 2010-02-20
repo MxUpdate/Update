@@ -299,7 +299,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
             final Set<String> propDefs = new HashSet<String>();
             for (final ExportParser.Line rootLine : _exportParser.getRootLines())  {
                 if (rootLine.getValue().startsWith("escape add property"))  {
-                    final StringBuilder propDef = new StringBuilder().append(rootLine.getValue());
+                    final StringBuilder propDef = new StringBuilder().append("mql ").append(rootLine.getValue());
                     for (final ExportParser.Line childLine : rootLine.getChildren())  {
                         propDef.append(' ').append(childLine.getTag()).append(' ')
                                .append(childLine.getValue());
@@ -308,24 +308,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
                 }
             }
             for (final PropertyDef prop : this.properties)  {
-                final StringBuilder propDef = new StringBuilder()
-                        .append("escape add property \"").append(AbstractTest.convertTcl(prop.getName()))
-                        .append("\" on ").append(this.getCI().getMxType())
-                        .append(" \"${NAME}\"");
-                if (this.getCI() == AbstractTest.CI.UI_TABLE)  {
-                    propDef.append(" system");
-                }
-                if (prop.getTo() != null)  {
-                    propDef.append(" to ").append(prop.getTo().getCI().getMxType())
-                           .append(" \"").append(AbstractTest.convertTcl(prop.getTo().getName())).append('\"');
-                    if (prop.getTo().getCI() == AbstractTest.CI.UI_TABLE)  {
-                        propDef.append(" system");
-                    }
-                }
-                if (prop.getValue() != null)  {
-                    propDef.append(" value \"").append(AbstractTest.convertTcl(prop.getValue())).append('\"');
-                }
-                final String propDefStr = propDef.toString();
+                final String propDefStr = prop.getCITCLString(this.getCI());
                 Assert.assertTrue(
                         propDefs.contains(propDefStr),
                         "check that property is defined in ci file (have " + propDefStr + ")");

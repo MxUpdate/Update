@@ -262,6 +262,21 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     public abstract DATA create() throws MatrixException;
 
     /**
+     * Updates current configuration item.
+     *
+     * @param _params   parameters
+     * @throws Exception if update failed
+     */
+    public void update(final String... _params)
+        throws Exception
+    {
+        final Map<?,?> bck = this.getTest().update(this.getCIFileName(), this.ciFile(), _params);
+        if (bck.get("exception") != null)  {
+            throw (Exception) bck.get("exception");
+        }
+    }
+
+    /**
      * Exports this data piece from MX. The returned values from the export are
      * checked for:
      * <ul>

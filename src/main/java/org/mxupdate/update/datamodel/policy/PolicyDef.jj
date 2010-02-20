@@ -65,6 +65,7 @@ TOKEN : /** first level */
   | <SEQUENCE:        "sequence">         : S_EXPECTED
   | <HIDDEN:          "hidden">           : B_EXPECTED
   | <STATE:           "state">            : S_EXPECTED
+  | <ALLSTATE:        "allstate">         : DEFAULT
 }
 
 TOKEN : /** State and depending signature and trigger Tokens */
@@ -200,7 +201,7 @@ TOKEN : /** State and depending signature and trigger Tokens */
  * Parses one complete policy definition.
  *
  * @param _paramCache   parameter cache
- * @param _typeDef      type definition of the policy (to instanciate the
+ * @param _typeDef      type definition of the policy (to instantiate the
  *                      policy)
  * @param _mxName       MX name of the policy
  */
@@ -213,14 +214,15 @@ Policy_mxJPO policy(final ParameterCache_mxJPO _paramCache,
     String tmp;
 } {
     (
-        ( <DESCRIPTION>    tmp = sString()     {setValue(policy, "description", tmp);} )
+        ( <DESCRIPTION>    tmp = sString()     {this.getField(policy, "description").set(tmp);} )
       | ( format(policy) )
       | ( type(policy) )
-      | ( <DEFAULTFORMAT>  tmp = sString()     {setValue(policy, "defaultFormat", tmp);} )
-      | ( <SEQUENCE>       tmp = sString()     {setValue(policy, "sequence", tmp);} )
-      | ( <STORE>          tmp = sString()     {setValue(policy, "store", tmp);} )
-      | ( <HIDDEN>         ( <BOOLEAN_TRUE>    {this.setValue(policy, "hidden", true);}
-                          | <BOOLEAN_FALSE>   {this.setValue(policy, "hidden", false);} ) )
+      | ( <DEFAULTFORMAT>  tmp = sString()     {this.getField(policy, "defaultFormat").set(tmp);} )
+      | ( <SEQUENCE>       tmp = sString()     {this.getField(policy, "sequence").set(tmp);} )
+      | ( <STORE>          tmp = sString()     {this.getField(policy, "store").set(tmp);} )
+      | ( <HIDDEN>         ( <BOOLEAN_TRUE>    {this.getField(policy, "hidden").set(true);}
+                          | <BOOLEAN_FALSE>    {this.getField(policy, "hidden").set(false);} ) )
+      | ( allstate(policy) )
       | ( state(policy) )
     )*
     {
@@ -245,7 +247,7 @@ void format(final Policy_mxJPO _policy) :
       | ( set = lList() )
     )
     {
-        setValue(_policy, "formats", set);
+        this.getField(_policy, "formats").set(set);
     }
 }
 
@@ -265,35 +267,62 @@ void type(final Policy_mxJPO _policy) :
       | ( set = lList() )
     )
     {
-        setValue(_policy, "types", set);
+        this.getField(_policy, "types").set(set);
     }
 }
 
+/**
+ * Parses the all state definition.
+ *
+ * @param _policy   policy for which the all state definition is parsed
+ */
+void allstate(final Policy_mxJPO _policy) : {
+    final Policy_mxJPO.Access access = this.getField(_policy, "allStateAccess").<Policy_mxJPO.Access>get();
+} {
+    <ALLSTATE>
+    "{"
+        (
+            stateOwnerAccess(access)
+          | statePublicAccess(access)
+          | ( <REVOKE> ( stateOwnerRevoke(access) | statePublicRevoke(access) ) )
+          | stateUser(access)
+        )*
+    "}"
+    {
+        this.getField(_policy, "allState").set(true);
+    }
+}
+
+/**
+ * Parses one state definition.
+ *
+ * @param _policy   policy for which the all state definition is parsed
+ */
 void state(final Policy_mxJPO _policy) : {
     final Policy_mxJPO.State state = new Policy_mxJPO.State();
     String tmpStr;
     Set<String> tmpSet;
 } {
-    <STATE> tmpStr = sString() {setValue(state, "name", tmpStr);}
+    <STATE> tmpStr = sString() {this.getField(state, "name").set(tmpStr);}
     "{"
         ( (<REGISTEREDNAME>     tmpStr = sString()  {this.appendValue(state, "symbolicNames", tmpStr);})
-        | (<REVISION>           ( <BOOLEAN_TRUE>    {this.setValue(state, "revisionable", true);}
-                                | <BOOLEAN_FALSE>   {this.setValue(state, "revisionable", false);} ) )
-        | (<VERSION>            ( <BOOLEAN_TRUE>    {this.setValue(state, "versionable", true);}
-                                | <BOOLEAN_FALSE>   {this.setValue(state, "versionable", false);} ) )
-        | (<PROMOTE>            ( <BOOLEAN_TRUE>    {this.setValue(state, "autoPromotion", true);}
-                                | <BOOLEAN_FALSE>   {this.setValue(state, "autoPromotion", false);} ) )
-        | (<CHECKOUTHISTORY>    ( <BOOLEAN_TRUE>    {this.setValue(state, "checkoutHistory", true);}
-                                | <BOOLEAN_FALSE>   {this.setValue(state, "checkoutHistory", false);} ) )
+        | (<REVISION>           ( <BOOLEAN_TRUE>    {this.getField(state, "revisionable").set(true);}
+                                | <BOOLEAN_FALSE>   {this.getField(state, "revisionable").set(false);} ) )
+        | (<VERSION>            ( <BOOLEAN_TRUE>    {this.getField(state, "versionable").set(true);}
+                                | <BOOLEAN_FALSE>   {this.getField(state, "versionable").set(false);} ) )
+        | (<PROMOTE>            ( <BOOLEAN_TRUE>    {this.getField(state, "autoPromotion").set(true);}
+                                | <BOOLEAN_FALSE>   {this.getField(state, "autoPromotion").set(false);} ) )
+        | (<CHECKOUTHISTORY>    ( <BOOLEAN_TRUE>    {this.getField(state, "checkoutHistory").set(true);}
+                                | <BOOLEAN_FALSE>   {this.getField(state, "checkoutHistory").set(false);} ) )
         | stateOwnerAccess(state)
         | statePublicAccess(state)
         | ( <REVOKE> ( stateOwnerRevoke(state) | statePublicRevoke(state) ) )
-        | (<ACTION>             tmpStr = sString()  {this.setValue(state, "actionProgram", tmpStr);}
-           <INPUT>              tmpStr = sString()  {this.setValue(state, "actionInput", tmpStr);})
-        | (<CHECK>              tmpStr = sString()  {this.setValue(state, "checkProgram", tmpStr);}
-           <INPUT>              tmpStr = sString()  {this.setValue(state, "checkInput", tmpStr);})
-        | (<ROUTE>              tmpSet = lsList()   {this.setValue(state, "routeUsers", tmpSet);}
-                                tmpStr = sString()  {this.setValue(state, "routeMessage", tmpStr);})
+        | (<ACTION>             tmpStr = sString()  {this.getField(state, "actionProgram").set(tmpStr);}
+           <INPUT>              tmpStr = sString()  {this.getField(state, "actionInput").set(tmpStr);})
+        | (<CHECK>              tmpStr = sString()  {this.getField(state, "checkProgram").set(tmpStr);}
+           <INPUT>              tmpStr = sString()  {this.getField(state, "checkInput").set(tmpStr);})
+        | (<ROUTE>              tmpSet = lsList()   {this.getField(state, "routeUsers").set(tmpSet);}
+                                tmpStr = sString()  {this.getField(state, "routeMessage").set(tmpStr);})
         | stateUser(state)
         | stateTrigger(state)
         | stateSignature(state)
@@ -307,88 +336,88 @@ void state(final Policy_mxJPO _policy) : {
 /**
  * Parses the access and filter expression for the owner definition.
  *
- * @param _state    current parsed state of the policy
+ * @param _access   current parsed access definition of the policy
  */
-void stateOwnerAccess(final Policy_mxJPO.State _state) : {
+void stateOwnerAccess(final Policy_mxJPO.Access _access) : {
     String filter = null;
     Set<String> accessSet;
 }  {
     ( <OWNER> accessSet = lList() )
     ( <FILTER> filter = sString() )?
     {
-        this.setValue(_state, "ownerAccess", accessSet);
-        this.setValue(_state, "ownerAccessFilter", filter);
+        this.getField(_access, "ownerAccess", "access").set(accessSet);
+        this.getField(_access, "ownerAccess", "filter").set(filter);
     }
 }
 
 /**
  * Parses the access and filter expression for the public definition.
  *
- * @param _state    current parsed state of the policy
+ * @param _access   current parsed access definition of the policy
  */
-void statePublicAccess(final Policy_mxJPO.State _state) : {
+void statePublicAccess(final Policy_mxJPO.Access _access) : {
     String filter = null;
     Set<String> accessSet;
 }  {
     ( <PUBLIC> accessSet = lList() )
     ( <FILTER> filter = sString() )?
     {
-        this.setValue(_state, "publicAccess", accessSet);
-        this.setValue(_state, "publicAccessFilter", filter);
+        this.getField(_access, "publicAccess", "access").set(accessSet);
+        this.getField(_access, "publicAccess", "filter").set(filter);
     }
 }
 
 /**
  * Parses the access and filter expression for the owner revoke definition.
  *
- * @param _state    current parsed state of the policy
+ * @param _access   current parsed access definition of the policy
  */
-void stateOwnerRevoke(final Policy_mxJPO.State _state) : {
+void stateOwnerRevoke(final Policy_mxJPO.Access _access) : {
     String filter = null;
     Set<String> accessSet;
 }  {
     ( <OWNER> accessSet = lList() )
     ( <FILTER> filter = sString() )?
     {
-        this.setValue(_state, "ownerRevoke", accessSet);
-        this.setValue(_state, "ownerRevokeFilter", filter);
+        this.getField(_access, "ownerRevoke", "access").set(accessSet);
+        this.getField(_access, "ownerRevoke", "filter").set(filter);
     }
 }
 
 /**
  * Parses the access and filter expression for the public revoke definition.
  *
- * @param _state    current parsed state of the policy
+ * @param _access   current parsed access definition of the policy
  */
-void statePublicRevoke(final Policy_mxJPO.State _state) : {
+void statePublicRevoke(final Policy_mxJPO.Access _access) : {
     String filter = null;
     Set<String> accessSet;
 }  {
     ( <PUBLIC> accessSet = lList() )
     ( <FILTER> filter = sString() )?
     {
-        this.setValue(_state, "publicRevoke", accessSet);
-        this.setValue(_state, "publicRevokeFilter", filter);
+        this.getField(_access, "publicRevoke", "access").set(accessSet);
+        this.getField(_access, "publicRevoke", "filter").set(filter);
     }
 }
 
 /**
  * Parses the access and filter expression for a user definition.
  *
- * @param _state    current parsed state of the policy
+ * @param _access   current parsed access definition of the policy
  */
-void stateUser(final Policy_mxJPO.State _state) : {
-    final Policy_mxJPO.UserAccess userAccess = new Policy_mxJPO.UserAccess();
+void stateUser(final Policy_mxJPO.Access _access) : {
+    final Policy_mxJPO.UserAccessFilter userAccess = new Policy_mxJPO.UserAccessFilter();
     String user, filter = null;
     Set<String> accessSet;
 }  {
     <USER> user = slString() accessSet = lList()
     (<FILTER> filter = sString())?
     {
-        this.setValue(userAccess, "userRef", user);
-        this.setValue(userAccess, "access", accessSet);
-        this.setValue(userAccess, "expressionFilter", filter);
-        this.appendValue(_state, "userAccess", userAccess);
+        this.getField(userAccess, "userRef").set(user);
+        this.getField(userAccess, "access").set(accessSet);
+        this.getField(userAccess, "filter").set(filter);
+        this.appendValue(_access, "userAccess", userAccess);
     }
 }
 
@@ -397,11 +426,11 @@ void stateTrigger(final Policy_mxJPO.State _state) : {
     String tmp;
 } {
     <TRIGGER> tmp = sString()
-            ( <ACTION>      {this.setValue(trigger, "name", tmp + "Action");}
-            | <CHECK>       {this.setValue(trigger, "name", tmp + "Check");}
-            | <OVERRIDE>    {this.setValue(trigger, "name", tmp + "Override");})
-            tmp = sString() {this.setValue(trigger, "program", tmp);}
-            <INPUT> tmp = sString() {setValue(trigger, "arguments", tmp);}
+            ( <ACTION>      {this.getField(trigger, "name").set(tmp + "Action");}
+            | <CHECK>       {this.getField(trigger, "name").set(tmp + "Check");}
+            | <OVERRIDE>    {this.getField(trigger, "name").set(tmp + "Override");})
+            tmp = sString() {this.getField(trigger, "program").set(tmp);}
+            <INPUT> tmp = sString() {this.getField(trigger, "arguments").set(tmp);}
     {
         this.appendValue(_state, "triggersStack", trigger);
     }
@@ -412,13 +441,13 @@ void stateSignature(final Policy_mxJPO.State _state) : {
     String tmpStr;
     Set<String> tmpSet;
 } {
-    <SIGNATURE> tmpStr = sString() {this.setValue(signature, "name", tmpStr);}
+    <SIGNATURE> tmpStr = sString() {this.getField(signature, "name").set(tmpStr);}
     "{"
-        ( (<BRANCH> tmpStr = sString()  {this.setValue(signature, "branch", tmpStr);})
-        | (<APPROVE> tmpSet = lList()   {this.setValue(signature, "approverUsers", tmpSet);})
-        | (<IGNORE> tmpSet = lList()    {this.setValue(signature, "ignoreUsers", tmpSet);})
-        | (<REJECT> tmpSet = lList()    {this.setValue(signature, "rejectUsers", tmpSet);})
-        | (<FILTER> tmpStr = sString()  {this.setValue(signature, "filter", tmpStr);})) *
+        ( (<BRANCH> tmpStr = sString()  {this.getField(signature, "branch").set(tmpStr);})
+        | (<APPROVE> tmpSet = lList()   {this.getField(signature, "approverUsers").set(tmpSet);})
+        | (<IGNORE> tmpSet = lList()    {this.getField(signature, "ignoreUsers").set(tmpSet);})
+        | (<REJECT> tmpSet = lList()    {this.getField(signature, "rejectUsers").set(tmpSet);})
+        | (<FILTER> tmpStr = sString()  {this.getField(signature, "filter").set(tmpStr);})) *
     "}"
     {
         this.appendValue(_state, "signatures", signature);

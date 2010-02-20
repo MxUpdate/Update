@@ -113,6 +113,11 @@ public abstract class AbstractTest
         DM_ATTRIBUTE_STRING("attribute", null, false, null, null, "AttributeString", "ATTRIBUTE", "STRING_", "datamodel/attribute", true),
 
         /**
+         * Configuration item Data Model Format.
+         */
+        DM_FORMAT("format", null, false, null, null, "Format", "FORMAT", "FORMAT_", "datamodel/format", true),
+
+        /**
          * Configuration item Data Model Interface.
          */
         DM_INTERFACE("interface", null, false, null, null, "Interface", "INTERFACE", "INTERFACE_", "datamodel/interface", true),
@@ -574,13 +579,14 @@ public abstract class AbstractTest
      *
      * @param _object       object if the update definition
      * @param _params       parameters
+     * @return values from the called dispatcher
      * @throws Exception  if update failed
      */
-    protected void update(final AbstractData<?> _object,
-                                       final String... _params)
+    protected Map<?,?> update(final AbstractData<?> _object,
+                              final String... _params)
         throws Exception
     {
-        this.update(_object.getCIFileName(), _object.ciFile(), _params);
+        return this.update(_object.getCIFileName(), _object.ciFile(), _params);
     }
 
     /**
@@ -592,9 +598,9 @@ public abstract class AbstractTest
      * @return values from the called dispatcher
      * @throws Exception  if update failed
      */
-    protected Map<?,?> update(final String _fileName,
-                              final String _code,
-                              final String... _params)
+    public Map<?,?> update(final String _fileName,
+                           final String _code,
+                           final String... _params)
         throws Exception
     {
         final Map<String,String> files = new HashMap<String,String>();
