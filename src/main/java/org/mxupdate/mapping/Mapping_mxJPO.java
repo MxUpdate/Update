@@ -27,6 +27,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 
 import matrix.util.MatrixException;
 
@@ -125,6 +127,8 @@ public class Mapping_mxJPO
      */
     private final Map<String,TypeDef_mxJPO> typeDefMap = new HashMap<String,TypeDef_mxJPO>();
 
+    private final Set<TypeDef_mxJPO> typeDefSorted = new TreeSet<TypeDef_mxJPO>();
+
     /**
      * Map between the JPO name and the class name used within MX for type
      * definition.
@@ -199,6 +203,7 @@ public class Mapping_mxJPO
                 UpdateCheck_mxJPO.defineValue(this, key.substring(12), value);
             }
         }
+        this.typeDefSorted.addAll(this.typeDefMap.values());
     }
 
     /**
@@ -326,14 +331,14 @@ public class Mapping_mxJPO
     }
 
     /**
-     * Returns the list of all type definition instances.
+     * Returns the sorted list of all type definition instances.
      *
-     * @return list of all type definition instances
-     * @see #typeDefMap
+     * @return list of all sorted type definition instances
+     * @see #typeDefSorted
      */
     public Collection<TypeDef_mxJPO> getAllTypeDefs()
     {
-        return this.typeDefMap.values();
+        return this.typeDefSorted;
     }
 
     /**

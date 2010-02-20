@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import matrix.db.Context;
 import matrix.db.MatrixWriter;
@@ -35,6 +34,7 @@ import matrix.db.MatrixWriter;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.util.UpdateUtil_mxJPO;
 
 /**
  * The JPO class is the plug-in to create or update configuration items defined
@@ -278,32 +278,7 @@ public class Update_mxJPO
                                  final boolean _compile)
         throws Exception
     {
-        // first found related type definition instances
-        final Map<File,AbstractObject_mxJPO> instances = this.evalInstances(_paramCache, _files);
-
-        // check if objects must be created
-        final Map<TypeDef_mxJPO,Set<String>> allMxNames = new HashMap<TypeDef_mxJPO,Set<String>>();
-        for (final AbstractObject_mxJPO instance : instances.values())  {
-            if (!allMxNames.containsKey(instance.getTypeDef()))  {
-                allMxNames.put(instance.getTypeDef(), instance.getMxNames(_paramCache));
-            }
-            if (!allMxNames.get(instance.getTypeDef()).contains(instance.getName()))  {
-                _paramCache.logInfo("created " + instance.getTypeDef().getLogging() + " '" + instance.getName() + "'");
-                instance.create(_paramCache);
-            }
-        }
-
-        // update
-        for (final Map.Entry<File,AbstractObject_mxJPO> instanceEntry : instances.entrySet())  {
-            _paramCache.logInfo("updated " + instanceEntry.getValue().getTypeDef().getLogging()
-                    + " '" + instanceEntry.getValue().getName() + "'");
-            instanceEntry.getValue().update(_paramCache, instanceEntry.getKey(), "");
-        }
-
-        // at least compile (to be sure that all JPOs are updated)
-        if (_compile)  {
-            this.compile(_paramCache, instances);
-        }
+        UpdateUtil_mxJPO.update(_paramCache, this.evalInstances(_paramCache, _files), null);
         return _paramCache.getLogString();
     }
 
@@ -316,11 +291,11 @@ public class Update_mxJPO
      * @return map with the files and depending MX type definition instance
      * @throws Exception if instances could not be evaluated
      */
-    protected Map<File,AbstractObject_mxJPO> evalInstances(final ParameterCache_mxJPO _paramCache,
-                                                           final Set<File> _files)
+    protected Map<TypeDef_mxJPO,Map<File,String>> evalInstances(final ParameterCache_mxJPO _paramCache,
+                                                                final Set<File> _files)
         throws Exception
     {
-        final Map<File,AbstractObject_mxJPO> instances = new TreeMap<File,AbstractObject_mxJPO>();
+        final Map<TypeDef_mxJPO,Map<File,String>> ret = new HashMap<TypeDef_mxJPO,Map<File,String>>();
         for (final File file : _files)  {
             boolean found = false;
             for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefs())  {
@@ -328,7 +303,10 @@ public class Update_mxJPO
                     final AbstractObject_mxJPO instance = typeDef.newTypeInstance(null);
                     final String mxName = instance.extractMxName(_paramCache, file);
                     if (mxName != null)  {
-                        instances.put(file, typeDef.newTypeInstance(mxName));
+                        if (!ret.containsKey(typeDef))  {
+                            ret.put(typeDef, new HashMap<File,String>());
+                        }
+                        ret.get(typeDef).put(file, mxName);
                         found  = true;
                         break;
                     }
@@ -340,7 +318,10 @@ public class Update_mxJPO
                         final AbstractObject_mxJPO instance = typeDef.newTypeInstance(null);
                         final String mxName = instance.extractMxName(_paramCache, file);
                         if (mxName != null)  {
-                            instances.put(file, typeDef.newTypeInstance(mxName));
+                            if (!ret.containsKey(typeDef))  {
+                                ret.put(typeDef, new HashMap<File,String>());
+                            }
+                            ret.get(typeDef).put(file, mxName);
                             found = true;
                             break;
                         }
@@ -348,28 +329,6 @@ public class Update_mxJPO
                 }
             }
         }
-        return instances;
-    }
-
-    /**
-     * Compile all JPO's.
-     *
-     * @param _paramCache   parameter cache with MX context
-     * @param _instances    instqnces to compile
-     */
-    protected void compile(final ParameterCache_mxJPO _paramCache,
-                           final Map<File,AbstractObject_mxJPO> _instances)
-    {
-        for (final Map.Entry<File,AbstractObject_mxJPO> instanceEntry : _instances.entrySet())  {
-            try  {
-                if (instanceEntry.getValue().compile(_paramCache))  {
-                    _paramCache.logInfo("compiled " + instanceEntry.getValue().getTypeDef().getLogging()
-                            + " '" + instanceEntry.getValue().getName() + "'");
-                }
-            } catch (final Exception e)  {
-                _paramCache.logInfo("compile of " + instanceEntry.getValue().getTypeDef().getLogging()
-                        + " '" + instanceEntry.getValue().getName() + "' failed:\n" + e.toString());
-            }
-        }
+        return ret;
     }
 }

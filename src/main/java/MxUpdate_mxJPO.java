@@ -20,11 +20,9 @@
 
 import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -38,7 +36,6 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.Mode_mxJPO;
 import org.mxupdate.mapping.ParameterDef_mxJPO;
-import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDefGroup_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.mapping.UpdateCheck_mxJPO;
@@ -46,6 +43,7 @@ import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.util.UpdateUtil_mxJPO;
 
 /**
  * <tr>
@@ -121,12 +119,6 @@ public class MxUpdate_mxJPO
      * @see #printHelp(ParameterCache_mxJPO)
      */
     private static final String PARAM_HELP_USAGE = "HelpUsage";
-
-    /**
-     * String of the key within the parameter cache that administration objects
-     * compiled after they are updated.
-     */
-    private static final String PARAM_COMPILE = "Compile";
 
     /**
      * Stored the descriptions of all parameters sorted by the parameters.
@@ -644,138 +636,10 @@ public class MxUpdate_mxJPO
                           final UpdateCheck_mxJPO _versionInfo)
             throws Exception
     {
-        // get all matching files depending on the update classes
-        final Map<TypeDef_mxJPO,Map<File,String>> clazz2names
-                = this.evalMatches(_paramCache, _clazz2matches, _clazz2matchesOpp);
-
-        // evaluate for existing administration objects
-        final Collection<String> wildCardMatch = new HashSet<String>();
-        wildCardMatch.add("*");
-        final Map<TypeDef_mxJPO,Set<String>> existingNames = new HashMap<TypeDef_mxJPO,Set<String>>();
-        for (final TypeDef_mxJPO clazz : clazz2names.keySet())  {
-            if (!existingNames.containsKey(clazz))  {
-                final AbstractObject_mxJPO instance = clazz.newTypeInstance(null);
-                existingNames.put(clazz, instance.getMxNames(_paramCache));
-            }
-        }
-        // create if needed (and not in the list of existing objects
-        for (final TypeDef_mxJPO clazz : _paramCache.getMapping().getAllTypeDefs())  {
-            final Map<File,String> clazzMap = clazz2names.get(clazz);
-            if (clazzMap != null)  {
-                for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
-                    final Set<String> existings = existingNames.get(clazz);
-                    if (!existings.contains(fileEntry.getValue()))  {
-                         final AbstractObject_mxJPO instance = clazz.newTypeInstance(fileEntry.getValue());
-                         _paramCache.logInfo("create "+instance.getTypeDef().getLogging()
-                                 + " '" + fileEntry.getValue() + "'");
-                        instance.create(_paramCache);
-                    }
-                }
-            }
-        }
-        // dimension must be the first one
-        final TypeDef_mxJPO defTypeDef = _paramCache.getMapping().getTypeDef("Dimension");
-        final Collection<TypeDef_mxJPO> tmpClazz = _paramCache.getMapping().getAllTypeDefs();
-        tmpClazz.remove(defTypeDef);
-        final Collection<TypeDef_mxJPO> allClazz = new ArrayList<TypeDef_mxJPO>(tmpClazz.size() + 1);
-        allClazz.add(defTypeDef);
-        allClazz.addAll(tmpClazz);
-
-        // update
-        final List<AbstractObject_mxJPO> compiles = new ArrayList<AbstractObject_mxJPO>();
-        final boolean compile = _paramCache.getValueBoolean(MxUpdate_mxJPO.PARAM_COMPILE);
-        for (final TypeDef_mxJPO clazz : allClazz)  {
-            final Map<File,String> clazzMap = clazz2names.get(clazz);
-            if (clazzMap != null)  {
-                for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
-                    final AbstractObject_mxJPO instance = clazz.newTypeInstance(fileEntry.getValue());
-                    _paramCache.logInfo("check "+instance.getTypeDef().getLogging()
-                            + " '" + fileEntry.getValue() + "'");
-
-                    final boolean update;
-                    final String version = _paramCache.getValueBoolean(ParameterCache_mxJPO.KEY_FILEDATE2VERSION)
-                                     ? Long.toString(fileEntry.getKey().lastModified() / 1000)
-                                     : _paramCache.getValueString(ParameterCache_mxJPO.KEY_VERSION);
-                    if (_versionInfo == UpdateCheck_mxJPO.FILEDATE)  {
-                        final Date fileDate = new Date(fileEntry.getKey().lastModified());
-                        final String instDateString = instance.getPropValue(_paramCache,
-                                                                            PropertyDef_mxJPO.FILEDATE);
-                        Date instDate;
-                        if ((instDateString == null) || "".equals(instDateString))  {
-                            instDate = null;
-                        } else  {
-                            try {
-                                instDate = StringUtil_mxJPO.parseFileDate(_paramCache, instDateString);
-                            } catch (final ParseException e) {
-                                instDate = null;
-                            }
-                        }
-                        if (fileDate.equals(instDate))  {
-                            update = false;
-                        } else  {
-                            update = true;
-                            _paramCache.logDebug("    - update to version from " + fileDate);
-                        }
-                    } else if (_versionInfo == UpdateCheck_mxJPO.VERSION)  {
-                        final String instVersion = instance.getPropValue(_paramCache,
-                                                                         PropertyDef_mxJPO.VERSION);
-                        if (instVersion.equals(version))  {
-                            update = false;
-                        } else  {
-                            update = true;
-                            if (_paramCache.getValueBoolean(ParameterCache_mxJPO.KEY_FILEDATE2VERSION))  {
-                                _paramCache.logDebug("    - update to version from "
-                                        + new Date(fileEntry.getKey().lastModified()));
-                            } else  {
-                                _paramCache.logDebug("    - update to version " + version);
-                            }
-                        }
-                    } else  {
-                        update = true;
-                        _paramCache.logDebug("    - update");
-                    }
-                    // execute update
-                    if (update)  {
-                        boolean commit = false;
-                        final boolean transActive = _paramCache.getContext().isTransactionActive();
-                        try  {
-                            if (!transActive)  {
-                                _paramCache.getContext().start(true);
-                            }
-                            instance.update(_paramCache,
-                                            fileEntry.getKey(),
-                                            version);
-                            if (!transActive)  {
-                                _paramCache.getContext().commit();
-                            }
-                            commit = true;
-                            if (compile)  {
-                                compiles.add(instance);
-                            }
-                        } finally  {
-                            if (!commit && !transActive && _paramCache.getContext().isTransactionActive())  {
-                                _paramCache.getContext().abort();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // compile
-        if (compile)  {
-            for (final AbstractObject_mxJPO instance : compiles)  {
-                try  {
-                    if (instance.compile(_paramCache))  {
-                        _paramCache.logInfo("compile " + instance.getTypeDef().getLogging()
-                                + " '" + instance.getName() + "'");
-                    }
-                } catch (final Exception e)  {
-                    _paramCache.logInfo("compile of " + instance.getTypeDef().getLogging()
-                            + " '" + instance.getName() + "' failed:\n" + e.toString());
-                }
-            }
-        }
+        UpdateUtil_mxJPO.update(
+                _paramCache,
+                this.evalMatches(_paramCache, _clazz2matches, _clazz2matchesOpp),
+                _versionInfo);
     }
 
     /**

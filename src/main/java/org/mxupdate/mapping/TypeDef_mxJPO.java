@@ -38,6 +38,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  */
 public final class TypeDef_mxJPO
         extends AbstractValue_mxJPO
+        implements Comparable<TypeDef_mxJPO>
 {
     /**
      * MQL command to list all MxUpdate JPOs.
@@ -201,6 +202,14 @@ public final class TypeDef_mxJPO
     private static final String PREFIX_TEXT_TITLE = "TextTitle";
 
     /**
+     * Used order number within update.
+     *
+     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
+     * @see #orderNo
+     */
+    private static final String PREFIX_ORDERNO = "OrderNo";
+
+    /**
      * Defines the name of the admin type.
      *
      * @see #getMxAdminName()
@@ -351,6 +360,13 @@ public final class TypeDef_mxJPO
     private Class<? extends AbstractObject_mxJPO> jpoClass;
 
     /**
+     * Order number used within update.
+     *
+     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
+     */
+    private int orderNo = Integer.MAX_VALUE;
+
+    /**
      * Mapping between internal used administration type definitions and the
      * logging string.
      *
@@ -431,6 +447,8 @@ public final class TypeDef_mxJPO
             typeDef.iconPath = _value;
         } else if (key.equals(TypeDef_mxJPO.PREFIX_JPO))  {
             typeDef.defineJPOClass(_paramCache, _mapping, _value);
+        } else if (key.equals(TypeDef_mxJPO.PREFIX_ORDERNO))  {
+            typeDef.orderNo = Integer.parseInt(_value);
         } else if (key.equals(TypeDef_mxJPO.PREFIX_TEXT_LOGGING))  {
             typeDef.textLogging = _value;
         } else if (key.equals(TypeDef_mxJPO.PREFIX_TEXT_TITLE))  {
@@ -751,5 +769,24 @@ public final class TypeDef_mxJPO
     {
         return this.jpoClass.getConstructor(TypeDef_mxJPO.class, String.class)
                             .newInstance(this, _mxName);
+    }
+
+    /**
+     * Compares this type definition with the <code>_other</code> type
+     * definition. First the {@link #orderNo order number} is compared. If the
+     * {@link #orderNo order number} is equal, the {@link #getName() name} is
+     * compared.
+     *
+     * @param _other    other type definition to compare
+     * @return negative integer, zero, or positive integer as this object is
+     *         less than, equal to, or greater than the specified object
+     */
+    public int compareTo(final TypeDef_mxJPO _other)
+    {
+        int ret = Integer.valueOf(this.orderNo).compareTo(_other.orderNo);
+        if (ret == 0)  {
+            ret = this.getName().compareTo(_other.getName());
+        }
+        return ret;
     }
 }
