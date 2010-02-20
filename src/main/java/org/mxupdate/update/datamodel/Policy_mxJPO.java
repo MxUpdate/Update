@@ -420,6 +420,9 @@ public class Policy_mxJPO
         // because the store of a policy could not be removed....
         if ((policy.store != null) && !"".equals(policy.store))  {
             this.calcValueDelta(cmd, "store", policy.store, this.store);
+        // instead store 'ADMINISTRATION' must be assigned
+        } else  {
+            cmd.append(" store ADMINISTRATION");
         }
         cmd.append(";\n");
 

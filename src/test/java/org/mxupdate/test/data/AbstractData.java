@@ -265,15 +265,18 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * Updates current configuration item.
      *
      * @param _params   parameters
+     * @return this data instance
      * @throws Exception if update failed
      */
-    public void update(final String... _params)
+    @SuppressWarnings("unchecked")
+    public DATA update(final String... _params)
         throws Exception
     {
         final Map<?,?> bck = this.getTest().update(this.getCIFileName(), this.ciFile(), _params);
         if (bck.get("exception") != null)  {
             throw (Exception) bck.get("exception");
         }
+        return (DATA) this;
     }
 
     /**
@@ -368,6 +371,23 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
                                        final String _code)
     {
         return new ExportParser(_ci, _code);
+    }
+
+    /**
+     * Checks the exported values.
+     *
+     * @param _params   parameters for the export
+     * @return this instance
+     * @throws Exception if check failed
+     * @see #checkExport(ExportParser)
+     * @see #export(String...)
+     */
+    @SuppressWarnings("unchecked")
+    public DATA checkExport(final String... _params)
+        throws Exception
+    {
+        this.checkExport(this.export(_params));
+        return (DATA) this;
     }
 
     /**

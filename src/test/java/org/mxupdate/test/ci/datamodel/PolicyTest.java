@@ -426,7 +426,7 @@ public class PolicyTest
      */
     @IssueLink("33")
     @Test(description = "export of policy with symbolic name property for state")
-    public void exportNoPropertyDefinitionForStateSymbolicName()
+    public void testExportNoPropertyDefinitionForStateSymbolicName()
         throws Exception
     {
         this.mql("add policy " + PolicyTest.POLICY_NAME
@@ -451,7 +451,7 @@ public class PolicyTest
      */
     @IssueLink("34")
     @Test(description = "export of all symbolic names for states")
-    public void exportAllSymbolicNamesForStatesDefined()
+    public void testExportAllSymbolicNamesForStatesDefined()
         throws Exception
     {
         this.mql("add policy " + PolicyTest.POLICY_NAME
@@ -754,7 +754,7 @@ public class PolicyTest
      */
     @IssueLink("86")
     @Test(description = "update policy with all formats in braces")
-    public void updateFormatAllWithBraces()
+    public void testUpdateFormatAllWithBraces()
         throws Exception
     {
         final String updateCode =
@@ -777,7 +777,7 @@ public class PolicyTest
      */
     @IssueLink("86")
     @Test(description = "update policy with all formats in braces")
-    public void updateFormatAllWithoutBraces()
+    public void testUpdateFormatAllWithoutBraces()
         throws Exception
     {
         final String updateCode =
@@ -800,7 +800,7 @@ public class PolicyTest
      */
     @IssueLink("11")
     @Test(description = "update policy with multiple symbolic names for one state")
-    public void updateMultipleStateSymbolicNames()
+    public void testUpdateMultipleStateSymbolicNames()
         throws Exception
     {
         this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
@@ -832,7 +832,7 @@ public class PolicyTest
      */
     @IssueLink("11")
     @Test(description = "update policy with no properties")
-    public void updateNullProperties()
+    public void testUpdateNullProperties()
         throws Exception
     {
         this.mql("add policy MxUpdate_Test state Pending property \"\" value Test");
@@ -862,7 +862,7 @@ public class PolicyTest
      */
     @IssueLink("11")
     @Test(description = "check update of policy without state symbolic names are updated without property definition for states")
-    public void updateProperties()
+    public void testUpdateProperties()
         throws Exception
     {
         this.update("POLICY_" + PolicyTest.POLICY_NAME + ".tcl",
@@ -1617,7 +1617,7 @@ public class PolicyTest
      */
     @IssueLink("86")
     @Test(description = "update policy with all types in braces")
-    public void updateTypeAllWithBraces()
+    public void testUpdateTypeAllWithBraces()
         throws Exception
     {
         final String updateCode =
@@ -1640,7 +1640,7 @@ public class PolicyTest
      */
     @IssueLink("86")
     @Test(description = "update policy with all types in braces")
-    public void updateTypeAllWithoutBraces()
+    public void testUpdateTypeAllWithoutBraces()
         throws Exception
     {
         final String updateCode =
@@ -1709,5 +1709,17 @@ public class PolicyTest
         // second update with delivered content
         this.update(_policy.getCIFileName(), exportParser.getOrigCode());
         _policy.checkExport(_policy.export());
+    }
+
+    @Test(description = "test that existing store will be removed")
+    public void testRemoveStore()
+        throws Exception
+    {
+        new PolicyData(this, "Test")
+            .setValue("store", "STORE")
+            .create()
+            .setValue("store", "")
+            .update()
+            .checkExport();
     }
 }
