@@ -226,12 +226,10 @@ public class PolicyData
     @Override()
     public String ciFile()
     {
-        final StringBuilder strg = new StringBuilder()
-            .append("#\n")
-            .append("# SYMBOLIC NAME:\n")
-            .append("# ~~~~~~~~~~~~~~\n")
-            .append("# ").append(this.getSymbolicName()).append('\n')
-            .append("updatePolicy \"${NAME}\" {\n")
+        final StringBuilder strg = new StringBuilder();
+        this.append4CIFileHeader(strg);
+
+        strg.append("updatePolicy \"${NAME}\" {\n")
             .append("  hidden \"").append(this.isHidden() != null ? this.isHidden() : false).append("\"\n");
 
         // values

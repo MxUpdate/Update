@@ -180,6 +180,19 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     }
 
     /**
+     * Appends the file header for the CI file.
+     *
+     * @param _cmd  string builder of the CI file content
+     */
+    protected void append4CIFileHeader(final StringBuilder _cmd)
+    {
+        _cmd.append("#\n")
+            .append("# SYMBOLIC NAME:\n")
+            .append("# ~~~~~~~~~~~~~~\n")
+            .append("# ").append(this.getSymbolicName()).append("\n\n");
+    }
+
+    /**
      * Appends the defined {@link #getValues() values} to the TCL code
      * <code>_cmd</code> of the configuration item file.
      *
