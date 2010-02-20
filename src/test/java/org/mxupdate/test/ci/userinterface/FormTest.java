@@ -175,7 +175,7 @@ public class FormTest
         }
 
         // first update with original content
-        this.update(_form);
+        _form.update();
         final ExportParser exportParser = _form.export();
         _form.checkExport(exportParser);
 

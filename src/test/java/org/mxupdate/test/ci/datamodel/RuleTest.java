@@ -169,7 +169,7 @@ public class RuleTest
         }
 
         // first update with original content
-        this.update(_rule);
+        _rule.update();
         final ExportParser exportParser = _rule.export();
         _rule.checkExport(exportParser);
 
@@ -197,7 +197,7 @@ public class RuleTest
             }
         }
         // first update with original content
-        this.update(_rule);
+        _rule.update();
         final ExportParser exportParser = _rule.export();
         _rule.checkExport(exportParser);
 

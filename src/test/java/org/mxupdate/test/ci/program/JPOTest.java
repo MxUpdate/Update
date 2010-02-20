@@ -163,7 +163,7 @@ public class JPOTest
         }
 
         // first update with original content
-        this.update(_jpoProgram);
+        _jpoProgram.update();
 
         // the replace code (removing TCL update commands)
         final StringBuilder cmd = new StringBuilder()

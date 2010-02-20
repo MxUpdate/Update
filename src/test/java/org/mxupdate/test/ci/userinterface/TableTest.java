@@ -181,7 +181,7 @@ public class TableTest
         }
 
         // first update with original content
-        this.update(_table);
+        _table.update();
         final ExportParser exportParser = _table.export();
         _table.checkExport(exportParser);
 

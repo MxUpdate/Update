@@ -109,7 +109,7 @@ public class NotificationTest
         throws Exception
     {
         // first update with original content
-        this.update(_notification);
+        _notification.update();
         final ExportParser exportParser = _notification.export();
         _notification.checkExport(exportParser);
 

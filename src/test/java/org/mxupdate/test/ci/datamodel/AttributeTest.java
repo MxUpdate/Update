@@ -144,7 +144,7 @@ public class AttributeTest
 
         for (final AbstractAttributeData<?> attribute : _data.getAttributes())  {
             // update with non existing attribute
-            this.update(attribute);
+            attribute.update();
 
             // export and check
             final ExportParser exportParser = attribute.export();

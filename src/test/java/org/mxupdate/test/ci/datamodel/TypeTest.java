@@ -140,7 +140,7 @@ public class TypeTest
 
         final TypeData type = _data.getType(_name);
 
-        this.update(type);
+        type.update();
         final ExportParser exportParser = type.export();
         type.checkExport(exportParser);
     }
@@ -159,7 +159,7 @@ public class TypeTest
         final TypeData type = data1.getType("TestType");
         data1.create();
 
-        this.update(type);
+        type.update();
 
         Assert.assertEquals(this.mql("print type '" + type.getName() + "' select method dump"),
                             "",
@@ -184,7 +184,7 @@ public class TypeTest
         this.mql("mod type \"" + AbstractTest.convertMql(type.getName())
                 + "\" add method \"" + AbstractTest.convertMql(method.getName()) + "\"");
 
-        this.update(type);
+        type.update();
 
         Assert.assertEquals(this.mql("print type '" + AbstractTest.convertMql(type.getName()) + "' select method dump"),
                             "",
@@ -207,9 +207,8 @@ public class TypeTest
         final AbstractProgramData<?> method = data1.getMQLProgram("TestProg1");
         data1.create();
         // method must be defined after create (to test the update..)
-        type.addMethod(method);
-
-        this.update(type);
+        type.addMethod(method)
+            .update();
 
         Assert.assertEquals(this.mql("print type '" + AbstractTest.convertMql(type.getName()) + "' select method dump"),
                             AbstractTest.convertMql(method.getName()),

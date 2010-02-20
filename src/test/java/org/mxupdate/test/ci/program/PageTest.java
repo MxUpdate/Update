@@ -129,7 +129,7 @@ public class PageTest
         this.update(_page.getCIFileName(), _page.ciFile());
 
         // first update with original content
-        this.update(_page);
+        _page.update();
         final ExportParser exportParser = _page.export();
         _page.checkExport(exportParser);
 

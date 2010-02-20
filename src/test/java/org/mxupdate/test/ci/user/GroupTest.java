@@ -262,7 +262,7 @@ public class GroupTest
                 .setSite(new SiteData(this, "Test \" Site"));
         group.create();
         group.setSite(null);
-        this.update(group);
+        group.update();
 
         Assert.assertEquals(this.mql("escape print group \"" + AbstractTest.convertMql(group.getName()) + "\" select site dump"),
                             "",
@@ -281,7 +281,7 @@ public class GroupTest
         final GroupData group = new GroupData(this, "hallo \" test").setHidden(true);
         group.create();
         group.setHidden(null);
-        this.update(group);
+        group.update();
         Assert.assertEquals(this.mql("escape print group \"" + AbstractTest.convertMql(group.getName()) + "\" select hidden dump"),
                             "FALSE",
                             "check that group is not hidden");

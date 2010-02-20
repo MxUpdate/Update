@@ -42,7 +42,6 @@ import org.apache.maven.settings.DefaultMavenSettingsBuilder;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Settings;
 import org.mxupdate.test.data.AbstractAdminData;
-import org.mxupdate.test.data.AbstractData;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.testng.Assert;
@@ -571,22 +570,6 @@ public abstract class AbstractTest
          Assert.assertNotNull(ex, "check that action is not allowed");
          Assert.assertTrue(ex.getMessage().indexOf("UpdateError #" + _errorCode.getCode() + ":") >= 0,
                            "check for correct error code #" + _errorCode.getCode());
-    }
-
-    /**
-     * Makes an update for given administration <code>_object</code>
-     * definition.
-     *
-     * @param _object       object if the update definition
-     * @param _params       parameters
-     * @return values from the called dispatcher
-     * @throws Exception  if update failed
-     */
-    protected Map<?,?> update(final AbstractData<?> _object,
-                              final String... _params)
-        throws Exception
-    {
-        return this.update(_object.getCIFileName(), _object.ciFile(), _params);
     }
 
     /**

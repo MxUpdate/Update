@@ -145,7 +145,7 @@ public class CommandTest
         }
 
         // first update with original content
-        this.update(_command);
+        _command.update();
         final ExportParser exportParser = _command.export();
         _command.checkExport(exportParser);
 

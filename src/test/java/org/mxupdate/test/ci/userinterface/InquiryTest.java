@@ -138,7 +138,7 @@ public class InquiryTest
         }
 
         // first update with original content
-        this.update(_inquiry);
+        _inquiry.update();
         final ExportParser exportParser = _inquiry.export();
         _inquiry.checkExport(exportParser);
 

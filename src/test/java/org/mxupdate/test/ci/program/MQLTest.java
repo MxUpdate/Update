@@ -165,7 +165,7 @@ public class MQLTest
         }
 
         // first update with original content
-        this.update(_mqlProgram);
+        _mqlProgram.update();
 
         // the replace code (removing TCL update commands)
         final StringBuilder cmd = new StringBuilder()

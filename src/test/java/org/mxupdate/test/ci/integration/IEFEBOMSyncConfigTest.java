@@ -114,7 +114,7 @@ public class IEFEBOMSyncConfigTest
         _syncConfig.getType().create();
 
         // first update with original content
-        this.update(_syncConfig);
+        _syncConfig.update();
         final ExportParser exportParser = _syncConfig.export();
         _syncConfig.checkExport(exportParser);
 

@@ -134,7 +134,7 @@ public class IEFGlobalConfigTest
         }
 
         // first update with original content
-        this.update(_globalConfig);
+        _globalConfig.update();
         final ExportParser exportParser = _globalConfig.export();
         _globalConfig.checkExport(exportParser);
 

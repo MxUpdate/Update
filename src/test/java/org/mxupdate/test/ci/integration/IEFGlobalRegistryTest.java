@@ -110,7 +110,7 @@ public class IEFGlobalRegistryTest
         throws Exception
     {
         // first update with original content
-        this.update(_globalRegistry);
+        _globalRegistry.update();
         final ExportParser exportParser = _globalRegistry.export();
         _globalRegistry.checkExport(exportParser);
 

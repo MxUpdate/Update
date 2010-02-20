@@ -129,7 +129,7 @@ public class MenuTest
         _menu.createChildren();
 
         // first update with original content
-        this.update(_menu);
+        _menu.update();
         final ExportParser exportParser = _menu.export();
         _menu.checkExport(exportParser);
 

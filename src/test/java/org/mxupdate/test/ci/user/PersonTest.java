@@ -363,7 +363,7 @@ public class PersonTest
                 .setSite(new SiteData(this, "Test \" Site"));
         person.create();
         person.setSite(null);
-        this.update(person);
+        person.update();
 
         Assert.assertEquals(this.mql("escape print person \""
                                     + AbstractTest.convertMql(person.getName())
@@ -384,7 +384,7 @@ public class PersonTest
         final PersonAdminData person = new PersonAdminData(this, "hello \" test").setHidden(true);
         person.create();
         person.setHidden(null);
-        this.update(person);
+        person.update();
 
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select hidden dump"),
                             "FALSE",
@@ -403,7 +403,7 @@ public class PersonTest
         final PersonAdminData person = new PersonAdminData(this, "hello \" test").setPasswordNeverExpires(true);
         person.create();
         person.setPasswordNeverExpires(null);
-        this.update(person);
+        person.update();
 
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select neverexpires dump"),
                             "FALSE",
@@ -423,7 +423,7 @@ public class PersonTest
         final PersonAdminData person = new PersonAdminData(this, "hello \" test").setPasswordNeverExpires(true);
         person.create();
         person.setPasswordNeverExpires(null);
-        this.update(person, "UserPersonIgnorePswdNeverExpires", "*");
+        person.update("UserPersonIgnorePswdNeverExpires", "*");
 
         // check not updated
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select neverexpires dump"),
@@ -447,7 +447,7 @@ public class PersonTest
         final PersonAdminData person = new PersonAdminData(this, "hello \" test").setWantsEmail(true);
         person.create();
         person.setWantsEmail(null);
-        this.update(person);
+        person.update();
 
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select emailenabled dump"),
                             "FALSE",
@@ -467,7 +467,7 @@ public class PersonTest
         final PersonAdminData person = new PersonAdminData(this, "hello \" test").setWantsEmail(true);
         person.create();
         person.setWantsEmail(null);
-        this.update(person, "UserPersonIgnoreWantsEmail", "*");
+        person.update("UserPersonIgnoreWantsEmail", "*");
 
         // check not updated
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select emailenabled dump"),
@@ -493,7 +493,7 @@ public class PersonTest
         final PersonAdminData person = new PersonAdminData(this, "hello \" test").setWantsIconMail(false);
         person.create();
         person.setWantsIconMail(null);
-        this.update(person);
+        person.update();
 
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select iconmailenabled dump"),
                             "TRUE",
@@ -514,7 +514,7 @@ public class PersonTest
         final PersonAdminData person = new PersonAdminData(this, "hello \" test").setWantsIconMail(false);
         person.create();
         person.setWantsIconMail(null);
-        this.update(person, "UserPersonIgnoreWantsIconMail", "*");
+        person.update("UserPersonIgnoreWantsIconMail", "*");
 
         // check not updated
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select iconmailenabled dump"),
