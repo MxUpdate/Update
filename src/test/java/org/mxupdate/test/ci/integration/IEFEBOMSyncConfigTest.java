@@ -106,7 +106,8 @@ public class IEFEBOMSyncConfigTest
      * @param _syncConfig       EBOM Sync configuration to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "busDatas", description = "test update of non existing IEF EBOM sync configurations")
+    @Test(dataProvider = "busDatas",
+          description = "test update of non existing IEF EBOM sync configurations")
     public void simpleUpdate(final String _description,
                              final IEFEBOMSyncConfigData _syncConfig)
         throws Exception
@@ -119,7 +120,7 @@ public class IEFEBOMSyncConfigTest
         _syncConfig.checkExport(exportParser);
 
         // second update with delivered content
-        this.update(_syncConfig.getCIFileName(), exportParser.getOrigCode());
-        _syncConfig.checkExport(_syncConfig.export());
+        _syncConfig.updateWithCode(exportParser.getOrigCode())
+                   .checkExport();
     }
 }

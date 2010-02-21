@@ -150,8 +150,8 @@ public class PortalTest
         _portal.checkExport(exportParser);
 
         // second update with delivered content
-        this.update(_portal.getCIFileName(), exportParser.getOrigCode());
-        _portal.checkExport();
+        _portal.updateWithCode(exportParser.getOrigCode())
+               .checkExport();
     }
 
     /**

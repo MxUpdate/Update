@@ -115,7 +115,7 @@ public class IEFGlobalRegistryTest
         _globalRegistry.checkExport(exportParser);
 
         // second update with delivered content
-        this.update(_globalRegistry.getCIFileName(), exportParser.getOrigCode());
-        _globalRegistry.checkExport(_globalRegistry.export());
+        _globalRegistry.updateWithCode(exportParser.getOrigCode())
+                       .checkExport();
     }
 }

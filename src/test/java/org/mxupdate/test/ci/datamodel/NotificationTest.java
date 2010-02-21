@@ -114,7 +114,7 @@ public class NotificationTest
         _notification.checkExport(exportParser);
 
         // second update with delivered content
-        this.update(_notification.getCIFileName(), exportParser.getOrigCode());
-        _notification.checkExport(_notification.export());
+        _notification.updateWithCode(exportParser.getOrigCode())
+                     .checkExport();
     }
 }

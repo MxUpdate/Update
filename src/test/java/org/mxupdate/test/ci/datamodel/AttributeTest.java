@@ -120,7 +120,7 @@ public class AttributeTest
             attribute.checkExport(exportParser);
 
             // make update with exported CI file and check result again
-            this.update(attribute.getCIFileName(), exportParser.getOrigCode());
+            attribute.updateWithCode(exportParser.getOrigCode());
             final ExportParser exportParser2 = attribute.export();
             attribute.checkExport(exportParser2);
         }
@@ -151,7 +151,7 @@ public class AttributeTest
             attribute.checkExport(exportParser);
 
             // update with exported file and check again
-            this.update(attribute.getCIFileName(), exportParser.getOrigCode());
+            attribute.updateWithCode(exportParser.getOrigCode());
             final ExportParser exportParser2 = attribute.export();
             attribute.checkExport(exportParser2);
         }

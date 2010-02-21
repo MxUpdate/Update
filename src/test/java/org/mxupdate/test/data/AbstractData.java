@@ -268,11 +268,34 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @return this data instance
      * @throws Exception if update failed
      */
-    @SuppressWarnings("unchecked")
     public DATA update(final String... _params)
         throws Exception
     {
-        final Map<?,?> bck = this.getTest().update(this.getCIFileName(), this.ciFile(), _params);
+        return this.updateWithCode(this.ciFile(), _params);
+    }
+
+    /**
+     * Makes an update for given <code>_code</code>.
+     *
+     * @param _code         TCL update code
+     * @param _params       parameters
+     * @return values from the called dispatcher
+     * @throws Exception  if update failed
+     */
+    @SuppressWarnings("unchecked")
+    public DATA updateWithCode(final String _code,
+                               final String... _params)
+        throws Exception
+    {
+        final Map<String,String> files = new HashMap<String,String>();
+        files.put(this.getCIFileName(), _code);
+        final Map<String,String> params = new HashMap<String,String>();
+        if (_params != null)  {
+            for (int idx = 0; idx < _params.length; idx += 2)  {
+                params.put(_params[idx], _params[idx + 1]);
+            }
+        }
+        final Map<?,?> bck = this.getTest().executeEncoded("Update", params, "FileContents", files);
         if (bck.get("exception") != null)  {
             throw (Exception) bck.get("exception");
         }

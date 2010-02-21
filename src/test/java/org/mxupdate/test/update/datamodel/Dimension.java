@@ -20,6 +20,7 @@
 
 package org.mxupdate.test.update.datamodel;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import matrix.util.MatrixException;
@@ -103,6 +104,33 @@ public class Dimension
             + "  }"
             + "}";
 
+    /**
+     * Makes an update for given <code>_code</code>.
+     *
+     * @param _fileName     name of the file to update
+     * @param _code         TCL update code
+     * @param _params       parameters
+     * @return values from the called dispatcher
+     * @throws Exception  if update failed
+     */
+    @Deprecated()
+    public Map<?,?> update(final String _fileName,
+                           final String _code,
+                           final String... _params)
+        throws Exception
+    {
+        final Map<String,String> files = new HashMap<String,String>();
+        files.put(_fileName, _code);
+        final Map<String,String> params = new HashMap<String,String>();
+        if (_params != null)  {
+            for (int idx = 0; idx < _params.length; idx += 2)  {
+                params.put(_params[idx], _params[idx + 1]);
+            }
+        }
+        final Map<?,?> bck = this.executeEncoded("Update", params, "FileContents", files);
+
+        return bck;
+    }
 
     /**
      * Removes the MxUpdate test dimension {@link #DIMENSION_NAME}.

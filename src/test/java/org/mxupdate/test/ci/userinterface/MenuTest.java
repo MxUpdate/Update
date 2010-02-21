@@ -133,8 +133,8 @@ public class MenuTest
         _menu.checkExport(exportParser);
 
         // second update with delivered content
-        this.update(_menu.getCIFileName(), exportParser.getOrigCode());
-        _menu.checkExport(_menu.export());
+        _menu.updateWithCode(exportParser.getOrigCode())
+             .checkExport();
     }
 
     /**

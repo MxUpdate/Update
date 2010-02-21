@@ -257,7 +257,8 @@ public class PersonTest
      * @param _person       person to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "persons", description = "test update of non existing person")
+    @Test(dataProvider = "persons",
+          description = "test update of non existing person")
     public void simpleUpdate(final String _description,
                              final PersonAdminData _person)
         throws Exception
@@ -341,13 +342,13 @@ public class PersonTest
         }
 
         // first update with original content
-        this.update(_person.getCIFileName(), _person.ciFile());
+        _person.update();
         final ExportParser exportParser = _person.export();
         _person.checkExport(exportParser);
 
         // second update with delivered content
-        this.update(_person.getCIFileName(), exportParser.getOrigCode());
-        _person.checkExport(_person.export());
+        _person.updateWithCode(exportParser.getOrigCode())
+               .checkExport();
     }
 
     /**

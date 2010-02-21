@@ -126,16 +126,13 @@ public class PageTest
         throws Exception
     {
         // first update with original content
-        this.update(_page.getCIFileName(), _page.ciFile());
-
-        // first update with original content
         _page.update();
         final ExportParser exportParser = _page.export();
         _page.checkExport(exportParser);
 
         // second update with delivered content
-        this.update(_page.getCIFileName(), exportParser.getOrigCode());
-        _page.checkExport(_page.export());
+        _page.updateWithCode(exportParser.getOrigCode())
+             .checkExport();
 
         // and check that both export code is equal
         Assert.assertEquals(exportParser.getOrigCode(),

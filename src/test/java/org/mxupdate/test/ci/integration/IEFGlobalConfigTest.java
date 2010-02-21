@@ -103,9 +103,10 @@ public class IEFGlobalConfigTest
      * @param _globalConfig     global configuration to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "busDatas", description = "test export of new created integration global configuration objects")
-    public void simpleExport(final String _description,
-                             final IEFGlobalConfigData _globalConfig)
+    @Test(dataProvider = "busDatas",
+          description = "test export of new created integration global configuration objects")
+    public void testExport(final String _description,
+                           final IEFGlobalConfigData _globalConfig)
         throws Exception
     {
         if (_globalConfig.getType() != null)  {
@@ -124,9 +125,10 @@ public class IEFGlobalConfigTest
      * @param _globalConfig   global configuration to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "busDatas", description = "test update of non existing table")
-    public void simpleUpdate(final String _description,
-                             final IEFGlobalConfigData _globalConfig)
+    @Test(dataProvider = "busDatas",
+          description = "test update of non existing table")
+    public void testUpdate(final String _description,
+                           final IEFGlobalConfigData _globalConfig)
         throws Exception
     {
         if (_globalConfig.getType() != null)  {
@@ -139,7 +141,7 @@ public class IEFGlobalConfigTest
         _globalConfig.checkExport(exportParser);
 
         // second update with delivered content
-        this.update(_globalConfig.getCIFileName(), exportParser.getOrigCode());
-        _globalConfig.checkExport(_globalConfig.export());
+        _globalConfig.updateWithCode(exportParser.getOrigCode())
+                     .checkExport();
     }
 }

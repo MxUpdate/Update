@@ -20,6 +20,7 @@
 
 package org.mxupdate.test.ci;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.mxupdate.test.AbstractTest;
@@ -46,7 +47,9 @@ public class Common
     public void updateWrongFileName()
         throws Exception
     {
-        final Map<?,?> bck = this.update("COMMAND_Start@.tcl", "");
+        final Map<String,String> files = new HashMap<String,String>();
+        files.put("COMMAND_Start@.tcl", "");
+        final Map<?,?> bck = this.executeEncoded("Update", null, "FileContents", files);
         final Exception ex = (Exception) bck.get("exception");
         Assert.assertTrue((ex != null), "an matrix exception must be thrown");
         Assert.assertTrue(ex.getMessage().contains("UpdateError #"

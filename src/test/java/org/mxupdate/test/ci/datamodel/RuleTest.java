@@ -174,8 +174,8 @@ public class RuleTest
         _rule.checkExport(exportParser);
 
         // second update with delivered content
-        this.update(_rule.getCIFileName(), exportParser.getOrigCode());
-        _rule.checkExport(_rule.export());
+        _rule.updateWithCode(exportParser.getOrigCode())
+             .checkExport();
     }
 
     /**

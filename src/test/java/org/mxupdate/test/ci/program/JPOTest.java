@@ -180,12 +180,12 @@ public class JPOTest
                 + "\" execute user creator execute immediate !needsbusinessobject !downloadable !pipe !pooled description test !hidden");
 
         // second update with delivered content
-        this.update(_jpoProgram.getCIFileName(), exportParser.getOrigCode());
-        _jpoProgram.checkExport(_jpoProgram.export());
+        _jpoProgram.updateWithCode(exportParser.getOrigCode())
+                   .checkExport();
 
         // third update with delivered content (without changing the code)
-        this.update(_jpoProgram.getCIFileName(), exportParser.getOrigCode());
-        _jpoProgram.checkExport(_jpoProgram.export());
+        _jpoProgram.updateWithCode(exportParser.getOrigCode())
+                   .checkExport();
 
         Assert.assertEquals(exportParser.getOrigCode(),
                             _jpoProgram.export().getOrigCode(),

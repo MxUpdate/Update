@@ -41,9 +41,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.maven.settings.DefaultMavenSettingsBuilder;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Settings;
-import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
-import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -545,68 +543,6 @@ public abstract class AbstractTest
         Assert.assertEquals(ret.getName(), _name, "returned name is equal to given name");
 
         return ret;
-    }
-
-    /**
-     * Makes an update for given administration <code>_object</code>
-     * definition.
-     *
-     * @param _object       object if the update definition
-     * @param _errorCode    expected error code
-     * @throws Exception if update with failure failed
-     */
-    protected void updateFailure(final AbstractAdminData<?> _object,
-                                 final UpdateException_mxJPO.Error _errorCode)
-        throws Exception
-    {
-        this.updateFailure(_object.getCIFileName(), _object.ciFile(), _errorCode);
-    }
-
-    /**
-     * Makes an update for given <code>_fileName</code> and <code>_code</code>.
-     *
-     * @param _fileName     name of the file to update
-     * @param _code         TCL update code
-     * @param _errorCode    expected error code
-     * @throws Exception if update with failure failed
-     */
-    protected void updateFailure(final String _fileName,
-                                 final String _code,
-                                 final UpdateException_mxJPO.Error _errorCode)
-        throws Exception
-    {
-        final Map<?,?> bck = this.update(_fileName, _code);
-        final Exception ex = (Exception) bck.get("exception");
-         Assert.assertNotNull(ex, "check that action is not allowed");
-         Assert.assertTrue(ex.getMessage().indexOf("UpdateError #" + _errorCode.getCode() + ":") >= 0,
-                           "check for correct error code #" + _errorCode.getCode());
-    }
-
-    /**
-     * Makes an update for given <code>_fileName</code> and <code>_code</code>.
-     *
-     * @param _fileName     name of the file to update
-     * @param _code         TCL update code
-     * @param _params       parameters
-     * @return values from the called dispatcher
-     * @throws Exception  if update failed
-     */
-    public Map<?,?> update(final String _fileName,
-                           final String _code,
-                           final String... _params)
-        throws Exception
-    {
-        final Map<String,String> files = new HashMap<String,String>();
-        files.put(_fileName, _code);
-        final Map<String,String> params = new HashMap<String,String>();
-        if (_params != null)  {
-            for (int idx = 0; idx < _params.length; idx += 2)  {
-                params.put(_params[idx], _params[idx + 1]);
-            }
-        }
-        return this.executeEncoded("Update",
-                                   params,
-                                   "FileContents", files);
     }
 
     /**
