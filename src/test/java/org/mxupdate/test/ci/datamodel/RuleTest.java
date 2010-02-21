@@ -42,7 +42,7 @@ public class RuleTest
     /**
      * Creates for given <code>_name</code> a new rule instance.
      *
-     * @param _name     name of the command instance
+     * @param _name     name of the rule instance
      * @return rule instance
      */
     @Override()
@@ -54,7 +54,7 @@ public class RuleTest
     /**
      * Data provider for test rules.
      *
-     * @return object array with all test commands
+     * @return object array with all test rules
      */
     @DataProvider(name = "rules")
     public Object[][] getRules()
@@ -143,14 +143,14 @@ public class RuleTest
                            final RuleData _rule)
         throws Exception
     {
-        _rule.create();
-        _rule.checkExport(_rule.export());
+        _rule.create()
+             .checkExport();
     }
 
 
     /**
-     * Tests an update of non existing command. The result is tested with by
-     * exporting the command and checking the result.
+     * Tests an update of non existing rule. The result is tested with by
+     * exporting the rule and checking the result.
      *
      * @param _description  description of the test case
      * @param _rule         rule to test
@@ -197,13 +197,12 @@ public class RuleTest
             }
         }
         // first update with original content
-        _rule.update();
-        final ExportParser exportParser = _rule.export();
-        _rule.checkExport(exportParser);
+        _rule.update()
+             .checkExport();
 
         // second update with delivered content
-        final RuleData simpleRule = new RuleData(this, _rule.getName().substring(AbstractTest.PREFIX.length()));
-        this.update(_rule.getCIFileName(), simpleRule.ciFile());
-        simpleRule.checkExport(simpleRule.export());
+        new RuleData(this, _rule.getName().substring(AbstractTest.PREFIX.length()))
+                .update()
+                .checkExport();
     }
 }

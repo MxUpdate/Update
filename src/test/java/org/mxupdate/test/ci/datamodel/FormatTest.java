@@ -43,7 +43,7 @@ public class FormatTest
     /**
      * Creates for given <code>_name</code> a new format instance.
      *
-     * @param _name     name of the command instance
+     * @param _name     name of the format instance
      * @return format instance
      */
     @Override()
@@ -136,8 +136,8 @@ public class FormatTest
 
 
     /**
-     * Tests an update of non existing command. The result is tested with by
-     * exporting the command and checking the result.
+     * Tests an update of non existing format. The result is tested with by
+     * exporting the format and checking the result.
      *
      * @param _description  description of the test case
      * @param _format       format to test
@@ -207,9 +207,8 @@ public class FormatTest
         }
 
         // first update with original content
-        _format.update();
-        final ExportParser exportParser = _format.export();
-        _format.checkExport(exportParser);
+        _format.update()
+               .checkExport();
 
         // second update with delivered content
         new FormatData(this, _format.getName().substring(AbstractTest.PREFIX.length()))
