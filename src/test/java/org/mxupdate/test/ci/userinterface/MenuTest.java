@@ -22,7 +22,6 @@ package org.mxupdate.test.ci.userinterface;
 
 import matrix.util.MatrixException;
 
-import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.userinterface.CommandData;
@@ -40,7 +39,7 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 public class MenuTest
-    extends AbstractDataExportUpdate<MenuData>
+    extends AbstractUITest<MenuData>
 {
     /**
      * Creates for given <code>_name</code> a new menu instance.
@@ -64,7 +63,7 @@ public class MenuTest
     {
         return this.prepareData("menu",
                 new Object[]{
-                        "",
+                        "menu with complex configuration",
                         new MenuData(this, "hallo \" test")
                                 .setValue("label", "command label \" \\ ' #")
                                 .setValue("description", "\"\\\\ hallo")
@@ -102,8 +101,8 @@ public class MenuTest
                                      final MenuData _menu)
         throws Exception
     {
-        _menu.create();
-        _menu.checkExport(_menu.export());
+        _menu.create()
+             .checkExport();
     }
 
     /**
@@ -136,5 +135,40 @@ public class MenuTest
         // second update with delivered content
         this.update(_menu.getCIFileName(), exportParser.getOrigCode());
         _menu.checkExport(_menu.export());
+    }
+
+    /**
+     * Test update of existing menu that all parameters are cleaned.
+     *
+     * @param _description  description of the test case
+     * @param _menu         menu to test
+     * @throws Exception if test failed
+     */
+    @Test(dataProvider = "menus",
+          description = "test update of existing menu for cleaning")
+    public void testUpdate4Existing(final String _description,
+                                    final MenuData _menu)
+        throws Exception
+    {
+        // create referenced property value
+        for (final PropertyDef prop : _menu.getProperties())  {
+            if (prop.getTo() != null)  {
+                prop.getTo().create();
+            }
+        }
+        // create child menus / commands
+        _menu.createChildren();
+
+        // first update with original content
+        _menu.update()
+             .checkExport();
+
+        // second update with delivered content
+        new MenuData(this, _menu.getName().substring(AbstractTest.PREFIX.length()))
+                .update()
+                .setValue("description", "")
+                .setValue("label", "")
+                .setValue("href", "")
+                .checkExport();
     }
 }

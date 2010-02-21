@@ -121,7 +121,7 @@ public class Channel_mxJPO
      * <li>command references in {@link #commandRefs}</li>
      * <li>{@link #height}</li>
      * <li>{@link #href}</li>
-     * <li>{@link #label}</li>
+     * <li>{@link #alt} and {@link #label} text</li>
      * </ul>
      *
      * @param _url      URL to parse
@@ -132,26 +132,25 @@ public class Channel_mxJPO
     protected void parse(final String _url,
                          final String _content)
     {
-        if ("/alt".equals(_url))  {
-            this.alt = _content;
+        if (!Channel_mxJPO.IGNORED_URLS.contains(_url))  {
+            if ("/alt".equals(_url))  {
+                this.alt = _content;
+            } else if ("/commandRefList/commandRef".equals(_url))  {
+                this.commandRefs.add(new CommandRef());
+            } else if ("/commandRefList/commandRef/name".equals(_url))  {
+                this.commandRefs.peek().name = _content;
+            } else if ("/commandRefList/commandRef/order".equals(_url))  {
+                this.commandRefs.peek().order = Integer.parseInt(_content);
 
-        } else if ("/commandRefList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/commandRefList/commandRef".equals(_url))  {
-            this.commandRefs.add(new CommandRef());
-        } else if ("/commandRefList/commandRef/name".equals(_url))  {
-            this.commandRefs.peek().name = _content;
-        } else if ("/commandRefList/commandRef/order".equals(_url))  {
-            this.commandRefs.peek().order = Integer.parseInt(_content);
-
-        } else if ("/height".equals(_url))  {
-            this.height = Integer.parseInt(_content);
-        } else if ("/href".equals(_url))  {
-            this.href = _content;
-        } else if ("/label".equals(_url))  {
-            this.label = _content;
-        } else  {
-            super.parse(_url, _content);
+            } else if ("/height".equals(_url))  {
+                this.height = Integer.parseInt(_content);
+            } else if ("/href".equals(_url))  {
+                this.href = _content;
+            } else if ("/label".equals(_url))  {
+                this.label = _content;
+            } else  {
+                super.parse(_url, _content);
+            }
         }
     }
 
@@ -175,8 +174,18 @@ public class Channel_mxJPO
     }
 
     /**
-     * Writes the label, href, alt, height, settings and the referenced
-     * commands as MQL code to the writer instance.
+     * Writes specific information about the cached channel to the given writer
+     * instance. This includes
+     * <ul>
+     * <li>hidden flag (only if hidden)</li>
+     * <li>{@link #label}</li>
+     * <li>{@link #href}</li>
+     * <li>{@link #alt}</li>
+     * <li>{@link #height}</li>
+     * <li>settings defined as properties starting with &quot;%&quot; in
+     *     {@link #getPropertiesMap()}</li>
+     * <li>command references {@link #orderCmds}</li>
+     * </ul>
      *
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
@@ -188,6 +197,9 @@ public class Channel_mxJPO
                                final Appendable _out)
         throws IOException
     {
+        if (this.isHidden())  {
+            _out.append(" \\\n    hidden");
+        }
         _out.append(" \\\n    label \"").append(StringUtil_mxJPO.convertTcl(this.label)).append("\"");
         if (this.href != null)  {
             _out.append(" \\\n    href \"").append(StringUtil_mxJPO.convertTcl(this.href)).append("\"");
@@ -249,7 +261,7 @@ public class Channel_mxJPO
         final StringBuilder preMQLCode = new StringBuilder()
                 .append("escape mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                .append(" href \"\" description \"\" alt \"\" label \"\" height 0");
+                .append(" !hidden href \"\" description \"\" alt \"\" label \"\" height 0");
 
         // reset settings
         for (final AdminProperty_mxJPO prop : this.getPropertiesMap().values())  {

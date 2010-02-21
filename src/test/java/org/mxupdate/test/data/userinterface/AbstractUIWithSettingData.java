@@ -27,17 +27,16 @@ import java.util.Set;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.AbstractAdminData;
 
 /**
- * Handles test data for commands / menus.
+ * Handles user interface test data with settings.
  *
- * @param <T>    related command class
+ * @param <T>    related user interface class
  * @author The MxUpdate Team
  * @version $Id$
  */
 abstract class AbstractUIWithSettingData<T extends AbstractUIWithSettingData<?>>
-    extends AbstractAdminData<T>
+    extends AbstractUIWithHiddenFlagData<T>
 {
     /**
      * All settings of this command.
@@ -101,10 +100,13 @@ abstract class AbstractUIWithSettingData<T extends AbstractUIWithSettingData<?>>
      * @param _cmd      string builder used to append the MQL commands
      * @see #settings
      */
-    protected void append4CIFileSettings(final StringBuilder _cmd)
+    @Override()
+    protected void append4CIFileValues(final StringBuilder _cmd)
     {
+        super.append4CIFileValues(_cmd);
+        // settings
         for (final Map.Entry<String,String> entry : this.settings.entrySet())  {
-            _cmd.append(" add setting \"").append(AbstractTest.convertTcl(entry.getKey())).append("\" \"")
+            _cmd.append(" \\\n  add setting \"").append(AbstractTest.convertTcl(entry.getKey())).append("\" \"")
                 .append(AbstractTest.convertTcl(entry.getValue()))
                 .append('\"');
         }
@@ -138,9 +140,10 @@ abstract class AbstractUIWithSettingData<T extends AbstractUIWithSettingData<?>>
      *                      {@link #settings}
      * @see #settings
      */
-    @Override
+    @Override()
     protected void evalAdds4CheckExport(final Set<String> _needAdds)
     {
+        super.evalAdds4CheckExport(_needAdds);
         for (final Map.Entry<String,String> entry : this.settings.entrySet())
         {
             _needAdds.add("setting \"" + AbstractTest.convertTcl(entry.getKey())

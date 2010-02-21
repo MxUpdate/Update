@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.AbstractAdminData;
 import org.testng.Assert;
 
 /**
@@ -39,7 +38,7 @@ import org.testng.Assert;
  * @version $Id$
  */
 public class InquiryData
-    extends AbstractAdminData<InquiryData>
+    extends AbstractUIWithHiddenFlagData<InquiryData>
 {
     /**
      * Within export the description, pattern, format and file must be defined.
@@ -124,11 +123,12 @@ public class InquiryData
      * @return configuration item update file
      * @see #code
      */
-    @Override
+    @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("mql escape mod inquiry \"${NAME}\" file [file join \"${FILE}\"]");
+        final StringBuilder cmd = new StringBuilder();
+        this.append4CIFileHeader(cmd);
+        cmd.append("mql escape mod inquiry \"${NAME}\" file [file join \"${FILE}\"]");
         this.append4CIFileValues(cmd);
 
         // append embedded inquiry code
@@ -147,8 +147,9 @@ public class InquiryData
      * @return this inquiry instance
      * @throws MatrixException if create failed
      */
-    @Override
-    public InquiryData create() throws MatrixException
+    @Override()
+    public InquiryData create()
+        throws MatrixException
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("escape add inquiry \"" + AbstractTest.convertMql(this.getName()) + "\"");
@@ -158,7 +159,10 @@ public class InquiryData
             cmd.append(" code \"").append(AbstractTest.convertMql(this.code)).append("\"");
         }
 
-        cmd.append(';');
+        cmd.append(";\n")
+           .append("escape add property ").append(this.getSymbolicName())
+           .append(" on program eServiceSchemaVariableMapping.tcl")
+           .append(" to inquiry \"").append(AbstractTest.convertMql(this.getName())).append("\"");
 
         this.getTest().mql(cmd);
 

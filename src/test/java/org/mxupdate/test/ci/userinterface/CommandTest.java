@@ -22,7 +22,6 @@ package org.mxupdate.test.ci.userinterface;
 
 import matrix.util.MatrixException;
 
-import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.user.AbstractUserData;
@@ -42,7 +41,7 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 public class CommandTest
-    extends AbstractDataExportUpdate<CommandData>
+    extends AbstractUITest<CommandData>
 {
     /**
      * Creates for given <code>_name</code> a new command instance.
@@ -65,17 +64,6 @@ public class CommandTest
     public Object[][] getCommands()
     {
         return this.prepareData("command",
-                new Object[]{
-                        "command without anything (to test required fields)",
-                        new CommandData(this, "hello \" test")},
-                new Object[]{
-                        "command with other symbolic name",
-                        new CommandData(this, "hello \" test")
-                                .setSymbolicName("command_Test")},
-                new Object[]{
-                        "command with description",
-                        new CommandData(this, "hello \" test")
-                                .setValue("description", "complex description \"test\"")},
                 new Object[]{
                         "complex command with settings",
                         new CommandData(this, "hello \" test")
@@ -161,5 +149,42 @@ public class CommandTest
         // second update with delivered content
         this.update(_command.getCIFileName(), exportParser.getOrigCode());
         _command.checkExport(_command.export());
+    }
+
+    /**
+     * Test update of existing command that all parameters are cleaned.
+     *
+     * @param _description  description of the test case
+     * @param _command      command to test
+     * @throws Exception if test failed
+     */
+    @Test(dataProvider = "commands",
+          description = "test update of existing command for cleaning")
+    public void testUpdate4Existing(final String _description,
+                                    final CommandData _command)
+        throws Exception
+    {
+        // create referenced property value
+        for (final PropertyDef prop : _command.getProperties())  {
+            if (prop.getTo() != null)  {
+                prop.getTo().create();
+            }
+        }
+        // create assigned users
+        for (final AbstractUserData<?> user : _command.getUsers())  {
+            user.create();
+        }
+
+        // first update with original content
+        _command.update()
+                .checkExport();
+
+        // second update with delivered content
+        new CommandData(this, _command.getName().substring(AbstractTest.PREFIX.length()))
+                .update()
+                .setValue("description", "")
+                .setValue("label", "")
+                .setValue("href", "")
+                .checkExport();
     }
 }

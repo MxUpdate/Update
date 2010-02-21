@@ -96,7 +96,8 @@ public class Inquiry_mxJPO
     }
 
     /**
-     * Parses the code, format and pattern of an inquiry.
+     * Parses the {@link #code}, {@@ink #format} and {@link #pattern} of an
+     * inquiry.
      *
      * @param _url      URL to parse
      * @param _content  related content of the URL to parse
@@ -120,9 +121,14 @@ public class Inquiry_mxJPO
     }
 
     /**
-     * Writes the inquiry specific information to the TCL update write. The
-     * properties are identified as settings if they starts with a
-     * &quot;%&quot;. This settings are also written.
+     * Writes the inquiry specific information to the TCL update write. This
+     * includes
+     * <ul>
+     * <li>hidden flag (only if hidden)</li>
+     * <li>{@link #pattern}</li>
+     * <li>{@link #format}</li>
+     * <li>all arguments (properties starting with &quot;%&quot;)</li>
+     * </ul>
      *
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
@@ -137,6 +143,9 @@ public class Inquiry_mxJPO
                                final Appendable _out)
         throws IOException
     {
+        if (this.isHidden())  {
+            _out.append(" \\\n    hidden");
+        }
         _out.append(" \\\n    pattern \"").append(StringUtil_mxJPO.convertTcl(this.pattern)).append("\"")
             .append(" \\\n    format \"").append(StringUtil_mxJPO.convertTcl(this.format)).append("\"")
             .append(" \\\n    file [file join \"${FILE}\"]");
@@ -180,7 +189,9 @@ public class Inquiry_mxJPO
      * Also the MQL statements to reset this inquiry are appended to the
      * statements in <code>_preMQLCode</code> to:
      * <ul>
-     * <li>reset the description, pattern, format and code</li>
+     * <li>reset the description, {@link #pattern}, {@link #format} and
+     *     {@link #code}</li>
+     * <li>set to not hidden</li>
      * <li>remove all arguments</li>
      * </ul>
      *
@@ -212,7 +223,7 @@ public class Inquiry_mxJPO
         final StringBuilder preMQLCode = new StringBuilder()
                 .append("escape mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                .append(" description \"\" pattern \"\" format \"\" code \"\"");
+                .append(" !hidden description \"\" pattern \"\" format \"\" code \"\"");
 
         // reset arguments
         for (final AdminProperty_mxJPO prop : this.getPropertiesMap().values())  {

@@ -22,7 +22,6 @@ package org.mxupdate.test.ci.userinterface;
 
 import matrix.util.MatrixException;
 
-import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.user.AbstractUserData;
@@ -43,7 +42,7 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 public class FormTest
-    extends AbstractDataExportUpdate<FormData>
+    extends AbstractUITest<FormData>
 {
     /**
      * Creates for given <code>_name</code> a new form instance.
@@ -66,13 +65,6 @@ public class FormTest
     public Object[][] getForms()
     {
         return this.prepareData("form",
-                new Object[]{
-                        "form without anything (to test required fields)",
-                        new FormData(this, "hello \" test")},
-                new Object[]{
-                        "simple form",
-                        new FormData(this, "hello \" test")
-                            .setValue("description", "\"\\\\ hello")},
                 new Object[]{
                         "simple form with two fields",
                         new FormData(this, "hello \" test")
@@ -140,12 +132,12 @@ public class FormTest
      * @throws Exception if test failed
      */
     @Test(dataProvider = "forms", description = "test export of new created form")
-    public void simpleExport(final String _description,
-                             final FormData _form)
+    public void textExport(final String _description,
+                           final FormData _form)
         throws Exception
     {
-        _form.create();
-        _form.checkExport(_form.export());
+        _form.create()
+             .checkExport();
     }
 
     /**
@@ -157,8 +149,8 @@ public class FormTest
      * @throws Exception if test failed
      */
     @Test(dataProvider = "forms", description = "test update of non existing form")
-    public void simpleUpdate(final String _description,
-                             final FormData _form)
+    public void testUpdate(final String _description,
+                           final FormData _form)
         throws Exception
     {
         // create users
@@ -182,5 +174,42 @@ public class FormTest
         // second update with delivered content
         this.update(_form.getCIFileName(), exportParser.getOrigCode());
         _form.checkExport(_form.export());
+    }
+
+    /**
+     * Test update of existing form that all parameters are cleaned.
+     *
+     * @param _description  description of the test case
+     * @param _form         form to test
+     * @throws Exception if test failed
+     */
+    @Test(dataProvider = "forms",
+          description = "test update of existing form for cleaning")
+    public void testUpdate4Existing(final String _description,
+                                    final FormData _form)
+        throws Exception
+    {
+        // create users
+        for (final FieldData<FormData> field : _form.getFields())  {
+            for (final AbstractUserData<?> user : field.getUsers())  {
+                user.create();
+            }
+        }
+        // create referenced property value
+        for (final PropertyDef prop : _form.getProperties())  {
+            if (prop.getTo() != null)  {
+                prop.getTo().create();
+            }
+        }
+
+        // first update with original content
+        _form.update()
+             .checkExport();
+
+        // second update with delivered content
+        new FormData(this, _form.getName().substring(AbstractTest.PREFIX.length()))
+                .update()
+                .setValue("description", "")
+                .checkExport();
     }
 }

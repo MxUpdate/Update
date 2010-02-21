@@ -23,7 +23,7 @@ package org.mxupdate.test.ci.userinterface;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.userinterface.ChannelData;
-import org.mxupdate.test.data.userinterface.CommandData;
+import org.mxupdate.test.data.userinterface.PortalData;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -31,68 +31,64 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test class for channel exports and updates.
+ * Test class for portal exports and updates.
  *
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class ChannelTest
-    extends AbstractUITest<ChannelData>
+public class PortalTest
+    extends AbstractUITest<PortalData>
 {
     /**
-     * Creates for given <code>_name</code> a new channel instance.
+     * Creates for given <code>_name</code> a new portal instance.
      *
-     * @param _name     name of the channel instance
-     * @return channel instance
+     * @param _name     name of the portal instance
+     * @return portal instance
      */
     @Override()
-    protected ChannelData createNewData(final String _name)
+    protected PortalData createNewData(final String _name)
     {
-        return new ChannelData(this, _name);
+        return new PortalData(this, _name);
     }
 
     /**
-     * Data provider for test channels.
+     * Data provider for test portals.
      *
-     * @return object array with all test channels
+     * @return object array with all test portals
      */
-    @DataProvider(name = "channels")
-    public Object[][] getChannels()
+    @DataProvider(name = "portals")
+    public Object[][] getPortals()
     {
-        return this.prepareData("channel",
+        return this.prepareData("portal",
                 new Object[]{
-                        "channel with href",
-                        new ChannelData(this, "hello \" test")
+                        "portal with href",
+                        new PortalData(this, "hello \" test")
                                 .setValue("href", "href \"test\"")},
                 new Object[]{
-                        "channel with alt",
-                        new ChannelData(this, "hello \" test")
+                        "portal with alt",
+                        new PortalData(this, "hello \" test")
                                 .setValue("alt", "alt \"test\"")},
                 new Object[]{
-                        "channel with height",
-                        new ChannelData(this, "hello \" test")
-                                .setValue("height", "100")},
-                new Object[]{
-                        "channel with settings",
-                        new ChannelData(this, "hello \" test")
+                        "portal with settings",
+                        new PortalData(this, "hello \" test")
                                 .setSetting("Setting 1", "Setting Value ' 1")
                                 .setSetting("Setting 2", "Setting Value \"2\"")
                                 .setSetting("Setting 3", "Value3")
                                 .setSetting("Setting \"4\"", "Value 4")},
                 new Object[]{
-                        "channel with one command",
-                        new ChannelData(this, "hello \" test")
-                                .addCommand(new CommandData(this, "Command \"test\""))},
+                        "portal with one command",
+                        new PortalData(this, "hello \" test")
+                                .addChannel(new ChannelData(this, "Command \"test\""))},
                 new Object[]{
-                        "channel with two command",
-                        new ChannelData(this, "hello \" test")
-                                .addCommand(new CommandData(this, "Command \"test 1\""))
-                                .addCommand(new CommandData(this, "Command \"test 2\""))}
+                        "portal with two command",
+                        new PortalData(this, "hello \" test")
+                                .addChannel(new ChannelData(this, "Command \"test 1\""))
+                                .addChannel(new ChannelData(this, "Command \"test 2\""))}
         );
     }
 
     /**
-     * Removes the MxUpdate channels and programs.
+     * Removes the MxUpdate portals and programs.
      *
      * @throws Exception if MQL execution failed
      */
@@ -101,93 +97,93 @@ public class ChannelTest
     public void cleanup()
         throws Exception
     {
+        this.cleanup(CI.UI_PORTAL);
         this.cleanup(CI.UI_CHANNEL);
-        this.cleanup(CI.UI_COMMAND);
     }
 
     /**
-     * Tests a new created channel and the related export.
+     * Tests a new created portal and the related export.
      *
      * @param _description  description of the test case
-     * @param _channel       channel to test
+     * @param _portal       portal to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "channels",
-          description = "test export of new created channels")
+    @Test(dataProvider = "portals",
+          description = "test export of new created portals")
     public void testExport(final String _description,
-                           final ChannelData _channel)
+                           final PortalData _portal)
         throws Exception
     {
-        _channel.create()
-                .checkExport();
+        _portal.create()
+               .checkExport();
     }
 
 
     /**
-     * Tests an update of non existing channel. The result is tested with by
-     * exporting the channel and checking the result.
+     * Tests an update of non existing portal. The result is tested with by
+     * exporting the portal and checking the result.
      *
      * @param _description  description of the test case
-     * @param _channel      channel to test
+     * @param _portal      portal to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "channels",
-          description = "test update of non existing channel")
+    @Test(dataProvider = "portals",
+          description = "test update of non existing portal")
     public void testUpdate(final String _description,
-                           final ChannelData _channel)
+                           final PortalData _portal)
         throws Exception
     {
         // create referenced property value
-        for (final PropertyDef prop : _channel.getProperties())  {
+        for (final PropertyDef prop : _portal.getProperties())  {
             if (prop.getTo() != null)  {
                 prop.getTo().create();
             }
         }
         // create all assigned commands
-        for (final CommandData command : _channel.getCommands())  {
-            command.create();
+        for (final ChannelData channel : _portal.getChannels())  {
+            channel.create();
         }
 
         // first update with original content
-        _channel.update();
-        final ExportParser exportParser = _channel.export();
-        _channel.checkExport(exportParser);
+        _portal.update();
+        final ExportParser exportParser = _portal.export();
+        _portal.checkExport(exportParser);
 
         // second update with delivered content
-        this.update(_channel.getCIFileName(), exportParser.getOrigCode());
-        _channel.checkExport();
+        this.update(_portal.getCIFileName(), exportParser.getOrigCode());
+        _portal.checkExport();
     }
 
     /**
-     * Test update of existing channel that all parameters are cleaned.
+     * Test update of existing portal that all parameters are cleaned.
      *
      * @param _description  description of the test case
-     * @param _channel      channel to test
+     * @param _portal       portal to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "channels",
-          description = "test update of existing channel for cleaning")
+    @Test(dataProvider = "portals",
+          description = "test update of existing portal for cleaning")
     public void testUpdate4Existing(final String _description,
-                                    final ChannelData _channel)
+                                    final PortalData _portal)
         throws Exception
     {
         // create referenced property value
-        for (final PropertyDef prop : _channel.getProperties())  {
+        for (final PropertyDef prop : _portal.getProperties())  {
             if (prop.getTo() != null)  {
                 prop.getTo().create();
             }
         }
         // create all assigned commands
-        for (final CommandData command : _channel.getCommands())  {
+        for (final ChannelData command : _portal.getChannels())  {
             command.create();
         }
 
         // first update with original content
-        _channel.update()
-                .checkExport();
+        _portal.update()
+               .checkExport();
 
         // second update with delivered content
-        new ChannelData(this, _channel.getName().substring(AbstractTest.PREFIX.length()))
+        new PortalData(this, _portal.getName().substring(AbstractTest.PREFIX.length()))
                 .update()
                 .setValue("description", "")
                 .setValue("label", "")

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ public class Table_mxJPO
     /**
      * <p>Parses all table specific URL values. If a derived table is defined
      * and the value from where the table is derived is not <code>null</code>
-     * and error message is shown.
+     * and error message is shown.</p>
      *
      * @param _url      URL to parse
      * @param _content  related content of the URL to parse
@@ -72,7 +72,12 @@ System.err.println("The table is derived from '" + _content + "'! This is curren
     }
 
     /**
-     * Writes each column to the appendable instance.
+     * Writes all columns of the web table to the TCL update file. This
+     * includes
+     * <ul>
+     * <li>hidden flag (only if hidden)</li>
+     * <li>all {@link #getFields() columns}</li>
+     * </ul>
      *
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
@@ -84,6 +89,9 @@ System.err.println("The table is derived from '" + _content + "'! This is curren
                                final Appendable _out)
         throws IOException
     {
+        if (this.isHidden())  {
+            _out.append(" \\\n    hidden");
+        }
         for (final Field column : this.getFields())  {
             _out.append(" \\\n    column");
             column.write(_out);
@@ -97,6 +105,7 @@ System.err.println("The table is derived from '" + _content + "'! This is curren
      * <ul>
      * <li>remove all columns of the web table</li>
      * <li>set to not hidden</li>
+     * <li>remove description</li>
      * </ul>
      *
      * @param _paramCache       parameter cache
@@ -127,7 +136,7 @@ System.err.println("The table is derived from '" + _content + "'! This is curren
                 .append("escape mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
                 .append(' ').append(this.getTypeDef().getMxAdminSuffix())
-                .append(" !hidden");
+                .append(" !hidden description \"\"");
 
         // remove all columns
         for (final Field column : this.getFields())  {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.AbstractAdminData;
 import org.testng.Assert;
 
 /**
@@ -40,7 +39,7 @@ import org.testng.Assert;
  * @version $Id$
  */
 public class FormData
-    extends AbstractAdminData<FormData>
+    extends AbstractUIWithHiddenFlagData<FormData>
 {
     /**
      * Within export the description must be defined.
@@ -107,8 +106,9 @@ public class FormData
     @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("mql escape mod form \"${NAME}\"");
+        final StringBuilder cmd = new StringBuilder();
+        this.append4CIFileHeader(cmd);
+        cmd.append("mql escape mod form \"${NAME}\"");
         this.append4CIFileValues(cmd);
         // and all fields...
         for (final FieldData<FormData> field : this.fields)  {
@@ -127,17 +127,25 @@ public class FormData
     public FormData create()
         throws MatrixException
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("escape add form \"" + AbstractTest.convertMql(this.getName()) + "\" web");
-        this.append4Create(cmd);
-        // append all fields
-        for (final FieldData<FormData> field : this.fields)  {
-            cmd.append(" field");
-            field.append4Create(cmd);
+        if (!this.isCreated())  {
+            this.setCreated(true);
+
+            final StringBuilder cmd = new StringBuilder()
+                    .append("escape add form \"" + AbstractTest.convertMql(this.getName()) + "\" web");
+            this.append4Create(cmd);
+            // append all fields
+            for (final FieldData<FormData> field : this.fields)  {
+                cmd.append(" field");
+                field.append4Create(cmd);
+            }
+
+            cmd.append(";\n")
+               .append("escape add property ").append(this.getSymbolicName())
+               .append(" on program eServiceSchemaVariableMapping.tcl")
+               .append(" to form \"").append(AbstractTest.convertMql(this.getName())).append("\"");
+
+            this.getTest().mql(cmd);
         }
-
-        this.getTest().mql(cmd);
-
         return this;
     }
 

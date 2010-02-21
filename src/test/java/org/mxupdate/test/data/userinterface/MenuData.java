@@ -76,17 +76,17 @@ public class MenuData
      *
      * @return code for the configuration item update file
      */
-    @Override
+    @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("mql escape mod menu \"${NAME}\"");
+        final StringBuilder cmd = new StringBuilder();
+        this.append4CIFileHeader(cmd);
+        cmd.append("mql escape mod menu \"${NAME}\"");
         for (final AbstractCommandData<?> child : this.children)  {
             cmd.append(" add ").append(child.getCI().getMxType())
                .append(" \"").append(AbstractTest.convertTcl(child.getName())).append('\"');
         }
         this.append4CIFileValues(cmd);
-        this.append4CIFileSettings(cmd);
 
         return cmd.toString();
     }
@@ -97,7 +97,7 @@ public class MenuData
      * @return this menu instance
      * @throws MatrixException if create failed
      */
-    @Override
+    @Override()
     public MenuData create()
         throws MatrixException
     {
@@ -117,6 +117,11 @@ public class MenuData
             }
             cmd.append(';');
         }
+
+        cmd.append(";\n")
+           .append("escape add property ").append(this.getSymbolicName())
+           .append(" on program eServiceSchemaVariableMapping.tcl")
+           .append(" to menu \"").append(AbstractTest.convertMql(this.getName())).append("\"");
 
         this.getTest().mql(cmd);
 

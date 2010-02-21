@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.AbstractAdminData;
 import org.testng.Assert;
 
 /**
@@ -40,7 +39,7 @@ import org.testng.Assert;
  * @version $Id$
  */
 public class TableData
-    extends AbstractAdminData<TableData>
+    extends AbstractUIWithHiddenFlagData<TableData>
 {
     /**
      * Within export the description must be defined.
@@ -107,8 +106,9 @@ public class TableData
     @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("mql escape mod table \"${NAME}\" system");
+        final StringBuilder cmd = new StringBuilder();
+        this.append4CIFileHeader(cmd);
+        cmd.append("mql escape mod table \"${NAME}\" system");
         this.append4CIFileValues(cmd);
         // and all fields...
         for (final FieldData<TableData> field : this.fields)  {
@@ -135,6 +135,11 @@ public class TableData
             cmd.append(" column");
             field.append4Create(cmd);
         }
+
+        cmd.append(";\n")
+           .append("escape add property ").append(this.getSymbolicName())
+           .append(" on program eServiceSchemaVariableMapping.tcl")
+           .append(" to table \"").append(AbstractTest.convertMql(this.getName())).append("\" system");
 
         this.getTest().mql(cmd);
 

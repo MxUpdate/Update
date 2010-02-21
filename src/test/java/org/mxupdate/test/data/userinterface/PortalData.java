@@ -33,73 +33,73 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.testng.Assert;
 
 /**
- * Used to define a channel, create them and test the result.
+ * Used to define a portal, create them and test the result.
  *
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class ChannelData
-    extends AbstractUIWithSettingData<ChannelData>
+public class PortalData
+    extends AbstractUIWithSettingData<PortalData>
 {
     /**
      * Within export the description and label must be defined.
      */
     private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(3);
     static  {
-        ChannelData.REQUIRED_EXPORT_VALUES.add("description");
-        ChannelData.REQUIRED_EXPORT_VALUES.add("label");
+        PortalData.REQUIRED_EXPORT_VALUES.add("description");
+        PortalData.REQUIRED_EXPORT_VALUES.add("label");
     }
 
     /**
-     * All commands of the channel.
+     * All channels of the portal.
      *
-     * @see #addCommand(CommandData)
-     * @see #getCommands()
+     * @see #addChannel(ChannelData)
+     * @see #getChannels()
      * @see #create()
      * @see #evalAdds4CheckExport(Set)
      */
-    private final List<CommandData> commands = new ArrayList<CommandData>();
+    private final List<ChannelData> channels = new ArrayList<ChannelData>();
 
     /**
-     * Constructor to initialize this channel.
+     * Constructor to initialize this portal.
      *
-     * @param _test     related test implementation (where this channel is
+     * @param _test     related test implementation (where this portal is
      *                  defined)
-     * @param _name     name of the channel
+     * @param _name     name of the portal
      */
-    public ChannelData(final AbstractTest _test,
+    public PortalData(final AbstractTest _test,
                        final String _name)
     {
-        super(_test, AbstractTest.CI.UI_CHANNEL, _name, ChannelData.REQUIRED_EXPORT_VALUES);
+        super(_test, AbstractTest.CI.UI_PORTAL, _name, PortalData.REQUIRED_EXPORT_VALUES);
     }
 
     /**
-     * Appends a new command to {@link #commands}.
+     * Appends a new channel to {@link #channels}.
      *
-     * @param _command      command to add
+     * @param _channel      channel to add
      * @return this channel instance
-     * @see #commands
+     * @see #channels
      */
-    public ChannelData addCommand(final CommandData _command)
+    public PortalData addChannel(final ChannelData _channel)
     {
-        this.commands.add(_command);
+        this.channels.add(_channel);
         return this;
     }
 
     /**
-     * Returns all assigned {@link #commands} of this channel.
+     * Returns all assigned {@link #channels} of this portal.
      *
-     * @return all assigned commands
-     * @see #commands
+     * @return all assigned channels
+     * @see #channels
      */
-    public List<CommandData> getCommands()
+    public List<ChannelData> getChannels()
     {
-        return this.commands;
+        return this.channels;
     }
 
     /**
      * Prepares the configuration item update file depending on the
-     * configuration of this channel.
+     * configuration of this portal.
      *
      * @return code for the configuration item update file
      */
@@ -108,11 +108,11 @@ public class ChannelData
     {
         final StringBuilder cmd = new StringBuilder();
         this.append4CIFileHeader(cmd);
-        cmd.append("mql escape mod channel \"${NAME}\"");
+        cmd.append("mql escape mod portal \"${NAME}\"");
 
-        // append commands
-        for (final CommandData command : this.commands)  {
-            cmd.append(" \\\n  place \"").append(AbstractTest.convertTcl(command.getName())).append("\" after \"\"");
+        // append channels
+        for (final ChannelData channel : this.channels)  {
+            cmd.append(" \\\n  place \"").append(AbstractTest.convertTcl(channel.getName())).append("\" after \"\"");
         }
 
         this.append4CIFileValues(cmd);
@@ -121,35 +121,35 @@ public class ChannelData
     }
 
     /**
-     * Creates a this channel with all values and settings.
+     * Creates a this portal with all values and settings.
      *
-     * @return this channel instance
+     * @return this portal instance
      * @throws MatrixException if create failed
      */
     @Override
-    public ChannelData create()
+    public PortalData create()
         throws MatrixException
     {
         if (!this.isCreated())  {
             this.setCreated(true);
 
             final StringBuilder cmd = new StringBuilder()
-                    .append("escape add channel \"" + AbstractTest.convertMql(this.getName()) + "\"");
-            // append all commands
-            if (!this.commands.isEmpty())  {
+                    .append("escape add portal \"" + AbstractTest.convertMql(this.getName()) + "\"");
+            // append all channels
+            if (!this.channels.isEmpty())  {
                 final List<String> names = new ArrayList<String>();
-                for (final CommandData command : this.commands)  {
-                    command.create();
-                    names.add(command.getName());
+                for (final ChannelData channel : this.channels)  {
+                    channel.create();
+                    names.add(channel.getName());
                 }
-                cmd.append(" command ").append(StringUtil_mxJPO.joinMql(',', true, names, null));
+                cmd.append(" channel ").append(StringUtil_mxJPO.joinMql(',', true, names, null));
             }
             this.append4Create(cmd);
 
             cmd.append(";\n")
                .append("escape add property ").append(this.getSymbolicName())
                .append(" on program eServiceSchemaVariableMapping.tcl")
-               .append(" to channel \"").append(AbstractTest.convertMql(this.getName())).append("\"");
+               .append(" to portal \"").append(AbstractTest.convertMql(this.getName())).append("\"");
 
             this.getTest().mql(cmd);
         }
@@ -158,17 +158,17 @@ public class ChannelData
 
     /**
      * {@inheritDoc}
-     * Also the commands which are defined as place are checked.
+     * Also the channels which are defined as place are checked.
      */
     @Override()
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
         super.checkExport(_exportParser);
-        // check for commands (they are not add's!)
+        // check for channels (they are not add's!)
         final Set<String> needPlaces = new HashSet<String>();
-        for (final CommandData command : this.commands)  {
-            needPlaces.add("\"" + AbstractTest.convertTcl(command.getName()) + "\" after \"\"");
+        for (final ChannelData channel : this.channels)  {
+            needPlaces.add("\"" + AbstractTest.convertTcl(channel.getName()) + "\" after \"\"");
         }
         final List<String> foundPlaces = _exportParser.getLines("/mql/place/@value");
         Assert.assertEquals(foundPlaces.size(), needPlaces.size(), "all adds defined (found places = " + foundPlaces + "; need places = " + needPlaces + ")");

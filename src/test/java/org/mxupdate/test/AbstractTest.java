@@ -221,6 +221,11 @@ public abstract class AbstractTest
         UI_MENU("menu", null, false, null, null, "Menu", "MENU", "MENU_", "userinterface/menu", true),
 
         /**
+         * Configuration item portal.
+         */
+        UI_PORTAL("portal", null, false, null, null, "Portal", "PORTAL", "PORTAL_", "userinterface/portal", true),
+
+        /**
          * Configuration item table.
          */
         UI_TABLE("table", null, false, null, null, "Table", "TABLE", "TABLE_", "userinterface/table", false),

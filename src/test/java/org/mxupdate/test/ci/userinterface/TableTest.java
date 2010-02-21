@@ -22,7 +22,6 @@ package org.mxupdate.test.ci.userinterface;
 
 import matrix.util.MatrixException;
 
-import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.user.AbstractUserData;
@@ -43,7 +42,7 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 public class TableTest
-    extends AbstractDataExportUpdate<TableData>
+    extends AbstractUITest<TableData>
 {
     /**
      * Creates for given <code>_name</code> a new table instance.
@@ -66,13 +65,6 @@ public class TableTest
     public Object[][] getTables()
     {
         return this.prepareData("table",
-                new Object[]{
-                        "table without anything (to test required fields)",
-                        new TableData(this, "hello \" test")},
-                new Object[]{
-                        "simple table",
-                        new TableData(this, "hallo \" test")
-                            .setValue("description", "\"\\\\ hallo")},
                 new Object[]{
                         "simple table with two fields",
                         new TableData(this, "hallo \" test")
@@ -145,9 +137,10 @@ public class TableTest
      * @param _table        table to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "tables", description = "test export of new created table")
-    public void simpleExport(final String _description,
-                             final TableData _table)
+    @Test(dataProvider = "tables",
+          description = "test export of new created table")
+    public void testExport(final String _description,
+                           final TableData _table)
         throws Exception
     {
         _table.create();
@@ -162,9 +155,10 @@ public class TableTest
      * @param _table        table to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "tables", description = "test update of non existing table")
-    public void simpleUpdate(final String _description,
-                             final TableData _table)
+    @Test(dataProvider = "tables",
+          description = "test update of non existing table")
+    public void testUpdate(final String _description,
+                           final TableData _table)
         throws Exception
     {
         // create users
@@ -188,5 +182,42 @@ public class TableTest
         // second update with delivered content
         this.update(_table.getCIFileName(), exportParser.getOrigCode());
         _table.checkExport(_table.export());
+    }
+
+    /**
+     * Test update of existing table that all parameters are cleaned.
+     *
+     * @param _description  description of the test case
+     * @param _table        table to test
+     * @throws Exception if test failed
+     */
+    @Test(dataProvider = "tables",
+          description = "test update of existing table for cleaning")
+    public void testUpdate4Existing(final String _description,
+                                    final TableData _table)
+        throws Exception
+    {
+        // create users
+        for (final FieldData<TableData> field : _table.getFields())  {
+            for (final AbstractUserData<?> user : field.getUsers())  {
+                user.create();
+            }
+        }
+        // create referenced property value
+        for (final PropertyDef prop : _table.getProperties())  {
+            if (prop.getTo() != null)  {
+                prop.getTo().create();
+            }
+        }
+
+        // first update with original content
+        _table.update()
+              .checkExport();
+
+        // second update with delivered content
+        new TableData(this, _table.getName().substring(AbstractTest.PREFIX.length()))
+                .update()
+                .setValue("description", "")
+                .checkExport();
     }
 }

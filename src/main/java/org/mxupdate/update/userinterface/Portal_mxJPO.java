@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,9 @@ package org.mxupdate.update.userinterface;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
 
@@ -44,6 +46,16 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 public class Portal_mxJPO
     extends AbstractAdminObject_mxJPO
 {
+    /**
+     * Set of all ignored URLs from the XML definition for portals.
+     *
+     * @see #parse(String, String)
+     */
+    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    static  {
+        Portal_mxJPO.IGNORED_URLS.add("/channelRefList");
+    }
+
     /**
      * Alt (label) of the portal.
      *
@@ -104,26 +116,26 @@ public class Portal_mxJPO
     protected void parse(final String _url,
                          final String _content)
     {
-        if ("/alt".equals(_url))  {
-            this.alt = _content;
-        } else if ("/href".equals(_url))  {
-            this.href = _content;
-        } else if ("/label".equals(_url))  {
-            this.label = _content;
+        if (!Portal_mxJPO.IGNORED_URLS.contains(_url))  {
+            if ("/alt".equals(_url))  {
+                this.alt = _content;
+            } else if ("/href".equals(_url))  {
+                this.href = _content;
+            } else if ("/label".equals(_url))  {
+                this.label = _content;
 
-        } else if ("/channelRefList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/channelRefList/channelRef".equals(_url))  {
-            this.channelRefs.add(new ChannelRef());
-        } else if ("/channelRefList/channelRef/name".equals(_url))  {
-            this.channelRefs.peek().name = _content;
-        } else if ("/channelRefList/channelRef/portalRow".equals(_url))  {
-            this.channelRefs.peek().row = Integer.parseInt(_content);
-        } else if ("/channelRefList/channelRef/portalColumn".equals(_url))  {
-            this.channelRefs.peek().column = Integer.parseInt(_content);
+            } else if ("/channelRefList/channelRef".equals(_url))  {
+                this.channelRefs.add(new ChannelRef());
+            } else if ("/channelRefList/channelRef/name".equals(_url))  {
+                this.channelRefs.peek().name = _content;
+            } else if ("/channelRefList/channelRef/portalRow".equals(_url))  {
+                this.channelRefs.peek().row = Integer.parseInt(_content);
+            } else if ("/channelRefList/channelRef/portalColumn".equals(_url))  {
+                this.channelRefs.peek().column = Integer.parseInt(_content);
 
-        } else  {
-            super.parse(_url, _content);
+            } else  {
+                super.parse(_url, _content);
+            }
         }
     }
 
@@ -156,6 +168,7 @@ public class Portal_mxJPO
      * Writes specific information about the cached portal to the given writer
      * instance. This includes
      * <ul>
+     * <li>hidden flag (only if hidden)</li>
      * <li>{@link #label}</li>
      * <li>{@link #href}</li>
      * <li>{@link #alt}</li>
@@ -173,6 +186,9 @@ public class Portal_mxJPO
                                final Appendable _out)
         throws IOException
     {
+        if (this.isHidden())  {
+            _out.append(" \\\n    hidden");
+        }
         _out.append(" \\\n    label \"").append(StringUtil_mxJPO.convertTcl(this.label)).append("\"");
         if (this.href != null)  {
             _out.append(" \\\n    href \"").append(StringUtil_mxJPO.convertTcl(this.href)).append("\"");
@@ -209,7 +225,8 @@ public class Portal_mxJPO
      * in the <code>_preMQLCode</code> to reset this portal. Following steps
      * are done:
      * <ul>
-     * <li>reset HRef, description, alt and label</li>
+     * <li>reset hidden flag, {@link #href}, description, {@link #alt} and
+     *     {@link #label}</li>
      * <li>remove all settings and channels</li>
      * </ul>
      *
@@ -238,23 +255,23 @@ public class Portal_mxJPO
     {
         // HRef, description, alt and label
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append('\"')
-                .append(" href \"\" description \"\" alt \"\" label \"\"");
+                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
+                .append(" !hidden href \"\" description \"\" alt \"\" label \"\"");
 
         // reset settings
         for (final AdminProperty_mxJPO prop : this.getPropertiesMap().values())  {
             if (prop.isSetting())  {
-                preMQLCode.append(" remove setting \"").append(prop.getName().substring(1)).append('\"');
+                preMQLCode.append(" remove setting \"").append(StringUtil_mxJPO.convertMql(prop.getName().substring(1))).append('\"');
             }
         }
         preMQLCode.append(";\n");
 
         // remove channels (each channel must be removed in a single line...)
         for (final ChannelRef channelRef : this.channelRefs)  {
-            preMQLCode.append("mod ").append(this.getTypeDef().getMxAdminName())
-                      .append(" \"").append(this.getName()).append('\"')
-                      .append(" remove channel \"").append(channelRef.name).append("\";\n");
+            preMQLCode.append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                      .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
+                      .append(" remove channel \"").append(StringUtil_mxJPO.convertMql(channelRef.name)).append("\";\n");
         }
 
         // append already existing pre MQL code

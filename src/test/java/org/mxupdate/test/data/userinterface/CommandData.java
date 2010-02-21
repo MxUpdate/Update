@@ -20,7 +20,6 @@
 
 package org.mxupdate.test.data.userinterface;
 
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -102,7 +101,6 @@ public class CommandData
                .append(AbstractTest.convertTcl(user.getName())).append('\"');
         }
         this.append4CIFileValues(cmd);
-        this.append4CIFileSettings(cmd);
 
         return cmd.toString();
     }

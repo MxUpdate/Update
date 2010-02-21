@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,7 +106,11 @@ public class Form_mxJPO
     }
 
     /**
-     * Writes all field of the web form to the TCL update file.
+     * Writes all field of the web form to the TCL update file. This includes
+     * <ul>
+     * <li>hidden flag (only if hidden)</li>
+     * <li>all {@link #getFields() fields}</li>
+     * </ul>
      *
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
@@ -119,6 +123,9 @@ public class Form_mxJPO
                                final Appendable _out)
         throws IOException
     {
+        if (this.isHidden())  {
+            _out.append(" \\\n    hidden");
+        }
         for (final Field field : this.getFields())  {
             _out.append(" \\\n    field");
             field.write(_out);
@@ -203,7 +210,7 @@ public class Form_mxJPO
         final StringBuilder preMQLCode = new StringBuilder()
                 .append("escape mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                .append(" !hidden");
+                .append(" !hidden description \"\" ");
 
         // remove all fields
         for (final Field field : this.getFields())  {

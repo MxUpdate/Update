@@ -22,7 +22,6 @@ package org.mxupdate.test.ci.userinterface;
 
 import matrix.util.MatrixException;
 
-import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.userinterface.InquiryData;
@@ -39,7 +38,7 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 public class InquiryTest
-    extends AbstractDataExportUpdate<InquiryData>
+    extends AbstractUITest<InquiryData>
 {
     /**
      * Creates for given <code>_name</code> a new inquiry instance.
@@ -73,10 +72,6 @@ public class InquiryTest
                              .setArgument("REVISION", "MY_REVISION")
                              .setCode("print bus '${TYPE}' '${NAME}' '${REVISION}' select id dump")},
                 new Object[]{
-                        "simple inquiry only with description",
-                        new InquiryData(this, "Test2")
-                             .setValue("description", "test description")},
-                new Object[]{
                         "complex inquiry with all values and one argument",
                         new InquiryData(this, "Test3 \" test")
                              .setValue("description", "test description \" '")
@@ -108,8 +103,8 @@ public class InquiryTest
      */
     @Test(dataProvider = "inquires",
           description = "test export of new created inquires")
-    public void simpleExport(final String _description,
-                             final InquiryData _inquiry)
+    public void testExport(final String _description,
+                           final InquiryData _inquiry)
         throws Exception
     {
         _inquiry.create();
@@ -126,8 +121,8 @@ public class InquiryTest
      */
     @Test(dataProvider = "inquires",
           description = "test update of non existing inquiry")
-    public void simpleUpdate(final String _description,
-                             final InquiryData _inquiry)
+    public void testUpdate(final String _description,
+                           final InquiryData _inquiry)
         throws Exception
     {
         // create referenced property value
@@ -145,5 +140,38 @@ public class InquiryTest
         // second update with delivered content
         this.update(_inquiry.getCIFileName(), exportParser.getOrigCode());
         _inquiry.checkExport(_inquiry.export());
+    }
+
+    /**
+     * Test update of existing inquiry that all parameters are cleaned.
+     *
+     * @param _description  description of the test case
+     * @param _inquiry         inquiry to test
+     * @throws Exception if test failed
+     */
+    @Test(dataProvider = "inquires",
+          description = "test update of existing inquiry for cleaning")
+    public void testUpdate4Existing(final String _description,
+                                    final InquiryData _inquiry)
+        throws Exception
+    {
+        // create referenced property value
+        for (final PropertyDef prop : _inquiry.getProperties())  {
+            if (prop.getTo() != null)  {
+                prop.getTo().create();
+            }
+        }
+
+        // first update with original content
+        _inquiry.update()
+                .checkExport();
+
+        // second update with delivered content
+        new InquiryData(this, _inquiry.getName().substring(AbstractTest.PREFIX.length()))
+                .update()
+                .setValue("description", "")
+                .setValue("format", "")
+                .setValue("pattern", "")
+                .checkExport();
     }
 }

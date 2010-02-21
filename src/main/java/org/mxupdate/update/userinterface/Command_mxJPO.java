@@ -139,6 +139,9 @@ public class Command_mxJPO
                                final Appendable _out)
         throws IOException
     {
+        if (this.isHidden())  {
+            _out.append(" \\\n    hidden");
+        }
         _out.append(" \\\n    label \"").append(StringUtil_mxJPO.convertTcl(this.label)).append("\"")
             .append(" \\\n    href \"").append(StringUtil_mxJPO.convertTcl(this.href)).append("\"")
             .append(" \\\n    alt \"").append(StringUtil_mxJPO.convertTcl(this.alt)).append("\"");
@@ -191,7 +194,7 @@ public class Command_mxJPO
         final StringBuilder preMQLCode = new StringBuilder()
                 .append("escape mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                .append(" href \"\" description \"\" alt \"\" label \"\"");
+                .append(" !hidden href \"\" description \"\" alt \"\" label \"\"");
 
         // reset settings
         for (final AdminProperty_mxJPO prop : this.getPropertiesMap().values())  {
