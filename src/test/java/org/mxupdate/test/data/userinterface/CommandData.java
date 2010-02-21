@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,11 +91,12 @@ public class CommandData
      *
      * @return code for the configuration item update file
      */
-    @Override
+    @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("mql escape mod command \"${NAME}\"");
+        final StringBuilder cmd = new StringBuilder();
+        this.append4CIFileHeader(cmd);
+        cmd.append("mql escape mod command \"${NAME}\"");
         for (final AbstractUserData<?> user : this.users)  {
             cmd.append(" add user \"")
                .append(AbstractTest.convertTcl(user.getName())).append('\"');
@@ -112,29 +113,37 @@ public class CommandData
      * @return this command instance
      * @throws MatrixException if create failed
      */
-    @Override
+    @Override()
     public CommandData create()
         throws MatrixException
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("escape add command \"" + AbstractTest.convertMql(this.getName()) + "\"");
-        if (!this.users.isEmpty())  {
-            cmd.append(" user ");
-            boolean first = true;
-            for (final AbstractUserData<?> user : this.users)  {
-                user.create();
-                if (first)  {
-                    first = false;
-                } else  {
-                    cmd.append(',');
+        if (!this.isCreated())  {
+            this.setCreated(true);
+
+            final StringBuilder cmd = new StringBuilder()
+                    .append("escape add command \"" + AbstractTest.convertMql(this.getName()) + "\"");
+            if (!this.users.isEmpty())  {
+                cmd.append(" user ");
+                boolean first = true;
+                for (final AbstractUserData<?> user : this.users)  {
+                    user.create();
+                    if (first)  {
+                        first = false;
+                    } else  {
+                        cmd.append(',');
+                    }
+                    cmd.append('\"').append(AbstractTest.convertMql(user.getName())).append('\"');
                 }
-                cmd.append('\"').append(AbstractTest.convertMql(user.getName())).append('\"');
             }
+            this.append4Create(cmd);
+
+            cmd.append(";\n")
+               .append("escape add property ").append(this.getSymbolicName())
+               .append(" on program eServiceSchemaVariableMapping.tcl")
+               .append(" to command \"").append(AbstractTest.convertMql(this.getName())).append("\"");
+
+            this.getTest().mql(cmd);
         }
-        this.append4Create(cmd);
-
-        this.getTest().mql(cmd);
-
         return this;
     }
 

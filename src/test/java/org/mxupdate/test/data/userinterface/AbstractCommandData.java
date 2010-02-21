@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,10 @@
 
 package org.mxupdate.test.data.userinterface;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.AbstractAdminData;
 
 /**
  * Handles test data for commands / menus.
@@ -38,7 +33,7 @@ import org.mxupdate.test.data.AbstractAdminData;
  * @version $Id$
  */
 abstract class AbstractCommandData<T extends AbstractCommandData<?>>
-    extends AbstractAdminData<T>
+    extends AbstractUIWithSettingData<T>
 {
     /**
      * Within export the description, label and href must be defined.
@@ -49,16 +44,6 @@ abstract class AbstractCommandData<T extends AbstractCommandData<?>>
         AbstractCommandData.REQUIRED_EXPORT_VALUES.add("label");
         AbstractCommandData.REQUIRED_EXPORT_VALUES.add("href");
     }
-
-    /**
-     * All settings of this command.
-     *
-     * @see #append4Create(StringBuilder)
-     * @see #getSettings()
-     * @see #setSetting(String, String)
-     * @see #evalAdds4CheckExport(Set)
-     */
-    private final Map<String,String> settings = new HashMap<String,String>();
 
     /**
      *
@@ -72,86 +57,5 @@ abstract class AbstractCommandData<T extends AbstractCommandData<?>>
                         final String _name)
     {
         super(_test, _ci, _name, AbstractCommandData.REQUIRED_EXPORT_VALUES);
-    }
-
-    /**
-     * Defines a new setting for this command.
-     *
-     * @param _key      key of the setting
-     * @param _value    value of the setting
-     * @return this command instance
-     * @see #settings
-     */
-    @SuppressWarnings("unchecked")
-    public T setSetting(final String _key,
-                        final String _value)
-    {
-        this.settings.put(_key, _value);
-        return (T) this;
-    }
-
-    /**
-     * Returns all settings for this command.
-     *
-     * @return settings definitions
-     * @see #settings
-     */
-    protected Map<String,String> getSettings()
-    {
-        return this.settings;
-    }
-
-    /**
-     * Appends to the MQL create commands in <code>_cmd</code> the
-     * {@link #settings}.
-     *
-     * @param _cmd      string builder used to append the MQL commands
-     * @see #settings
-     */
-    protected void append4CIFileSettings(final StringBuilder _cmd)
-    {
-        for (final Map.Entry<String,String> entry : this.settings.entrySet())  {
-            _cmd.append(" add setting \"").append(AbstractTest.convertTcl(entry.getKey())).append("\" \"")
-                .append(AbstractTest.convertTcl(entry.getValue()))
-                .append('\"');
-        }
-    }
-
-    /**
-     * Appends to the MQL create commands in <code>_cmd</code> the
-     * {@link #settings}.
-     *
-     * @param _cmd      string builder used to append the MQL commands
-     * @throws MatrixException if append failed
-     * @see #settings
-     */
-    @Override()
-    protected void append4Create(final StringBuilder _cmd)
-        throws MatrixException
-    {
-        super.append4Create(_cmd);
-        for (final Map.Entry<String,String> entry : this.settings.entrySet())  {
-            _cmd.append(" setting \"").append(AbstractTest.convertMql(entry.getKey())).append("\" \"")
-                .append(AbstractTest.convertMql(entry.getValue()))
-                .append('\"');
-        }
-    }
-
-    /**
-     * Evaluates all 'adds' in the configuration item file (e.g. add
-     * setting, ...).
-     *
-     * @param _needAdds     set with add strings used to append the adds for
-     *                      {@link #settings}
-     * @see #settings
-     */
-    @Override
-    protected void evalAdds4CheckExport(final Set<String> _needAdds)
-    {
-        for (final Map.Entry<String,String> entry : this.settings.entrySet())
-        {
-            _needAdds.add("setting \"" + AbstractTest.convertTcl(entry.getKey())
-                    + "\" \"" + AbstractTest.convertTcl(entry.getValue()) +  "\"");
-        }
     }
 }

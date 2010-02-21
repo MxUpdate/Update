@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,9 @@ package org.mxupdate.update.userinterface;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
 
@@ -35,6 +37,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
+ * The class is used to export and import / update channel configuration items.
  *
  * @author The MxUpdate Team
  * @version $Id$
@@ -42,6 +45,16 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 public class Channel_mxJPO
     extends AbstractAdminObject_mxJPO
 {
+    /**
+     * Set of all ignored URLs from the XML definition for channels.
+     *
+     * @see #parse(String, String)
+     */
+    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    static  {
+        Channel_mxJPO.IGNORED_URLS.add("/commandRefList");
+    }
+
     /**
      * Alt (label) of the channel.
      *
@@ -113,6 +126,7 @@ public class Channel_mxJPO
      *
      * @param _url      URL to parse
      * @param _content  related content of the URL to parse
+     * @see #IGNORED_URLS
      */
     @Override()
     protected void parse(final String _url,
@@ -233,20 +247,20 @@ public class Channel_mxJPO
     {
         // reset HRef, description, alt, label and height
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append('\"')
+                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
                 .append(" href \"\" description \"\" alt \"\" label \"\" height 0");
 
         // reset settings
         for (final AdminProperty_mxJPO prop : this.getPropertiesMap().values())  {
             if (prop.isSetting())  {
-                preMQLCode.append(" remove setting \"").append(prop.getName().substring(1)).append('\"');
+                preMQLCode.append(" remove setting \"").append(StringUtil_mxJPO.convertMql(prop.getName().substring(1))).append('\"');
             }
         }
 
         // remove commands
         for (final CommandRef cmdRef : this.orderCmds.values())  {
-            preMQLCode.append(" remove command \"").append(cmdRef.name).append('\"');
+            preMQLCode.append(" remove command \"").append(StringUtil_mxJPO.convertMql(cmdRef.name)).append('\"');
         }
 
         // append already existing pre MQL code

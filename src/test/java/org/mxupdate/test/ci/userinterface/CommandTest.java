@@ -69,6 +69,14 @@ public class CommandTest
                         "command without anything (to test required fields)",
                         new CommandData(this, "hello \" test")},
                 new Object[]{
+                        "command with other symbolic name",
+                        new CommandData(this, "hello \" test")
+                                .setSymbolicName("command_Test")},
+                new Object[]{
+                        "command with description",
+                        new CommandData(this, "hello \" test")
+                                .setValue("description", "complex description \"test\"")},
+                new Object[]{
                         "complex command with settings",
                         new CommandData(this, "hello \" test")
                                 .setValue("label", "command label \" \\ ' #")
@@ -76,7 +84,8 @@ public class CommandTest
                                 .setValue("href", "${COMMON_DIR}/emxTree.jsp?mode=insert")
                                 .setValue("alt", "${COMMON_DIR}/emxTreeAlt.jsp?mode=insert")
                                 .setSetting("Setting 1", "Setting Value ' 1")
-                                .setSetting("Setting 2", "Value2")},
+                                .setSetting("Setting 2", "Value2")
+                                .setSetting("Setting \"3\"", "Value 3")},
                 new Object[]{
                         "complex command with users",
                         new CommandData(this, "command")

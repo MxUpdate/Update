@@ -293,7 +293,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         final Set<String> needAdds = new HashSet<String>();
         this.evalAdds4CheckExport(needAdds);
         final List<String> foundAdds = _exportParser.getLines("/mql/add/@value");
-        Assert.assertEquals(foundAdds.size(), needAdds.size(), "all adds defined");
+        Assert.assertEquals(foundAdds.size(), needAdds.size(), "all adds defined (found adds = " + foundAdds + "; need adds = " + needAdds + ")");
         for (final String foundAdd : foundAdds)  {
             Assert.assertTrue(needAdds.contains(foundAdd), "check that add '" + foundAdd + "' is defined");
         }

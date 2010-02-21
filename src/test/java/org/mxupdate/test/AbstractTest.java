@@ -196,6 +196,11 @@ public abstract class AbstractTest
         USR_ROLE("role", null, false, null, null, "Role", "ROLE", "ROLE_", "user/role", true),
 
         /**
+         * Configuration item channel.
+         */
+        UI_CHANNEL("channel", null, false, null, null, "Channel", "CHANNEL", "CHANNEL_", "userinterface/channel", true),
+
+        /**
          * Configuration item command.
          */
         UI_COMMAND("command", null, false, null, null, "Command", "COMMAND", "COMMAND_", "userinterface/command", true),

@@ -1,0 +1,181 @@
+/*
+ * Copyright 2008-2010 The MxUpdate Team
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Revision:        $Rev$
+ * Last Changed:    $Date$
+ * Last Changed By: $Author$
+ */
+
+package org.mxupdate.test.data.userinterface;
+
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import matrix.util.MatrixException;
+
+import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ExportParser;
+import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.testng.Assert;
+
+/**
+ * Used to define a channel, create them and test the result.
+ *
+ * @author The MxUpdate Team
+ * @version $Id$
+ */
+public class ChannelData
+    extends AbstractUIWithSettingData<ChannelData>
+{
+    /**
+     * Within export the description and label must be defined.
+     */
+    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(3);
+    static  {
+        ChannelData.REQUIRED_EXPORT_VALUES.add("description");
+        ChannelData.REQUIRED_EXPORT_VALUES.add("label");
+    }
+
+    /**
+     * All commands of the channel.
+     *
+     * @see #addCommand(CommandData)
+     * @see #getCommands()
+     * @see #create()
+     * @see #evalAdds4CheckExport(Set)
+     */
+    private final List<CommandData> commands = new ArrayList<CommandData>();
+
+    /**
+     * Constructor to initialize this channel.
+     *
+     * @param _test     related test implementation (where this channel is
+     *                  defined)
+     * @param _name     name of the channel
+     */
+    public ChannelData(final AbstractTest _test,
+                       final String _name)
+    {
+        super(_test, AbstractTest.CI.UI_CHANNEL, _name, ChannelData.REQUIRED_EXPORT_VALUES);
+    }
+
+    /**
+     * Appends a new command to {@link #commands}.
+     *
+     * @param _command      command to add
+     * @return this channel instance
+     * @see #commands
+     */
+    public ChannelData addCommand(final CommandData _command)
+    {
+        this.commands.add(_command);
+        return this;
+    }
+
+    /**
+     * Returns all assigned {@link #commands} of this channel.
+     *
+     * @return all assigned commands
+     * @see #commands
+     */
+    public List<CommandData> getCommands()
+    {
+        return this.commands;
+    }
+
+    /**
+     * Prepares the configuration item update file depending on the
+     * configuration of this channel.
+     *
+     * @return code for the configuration item update file
+     */
+    @Override
+    public String ciFile()
+    {
+        final StringBuilder cmd = new StringBuilder();
+        this.append4CIFileHeader(cmd);
+        cmd.append("mql escape mod channel \"${NAME}\"");
+
+        // append commands
+        for (final CommandData command : this.commands)  {
+            cmd.append(" \\\n  place \"").append(AbstractTest.convertTcl(command.getName())).append("\" after \"\"");
+        }
+
+        this.append4CIFileValues(cmd);
+        this.append4CIFileSettings(cmd);
+
+        return cmd.toString();
+    }
+
+    /**
+     * Creates a this channel with all values and settings.
+     *
+     * @return this channel instance
+     * @throws MatrixException if create failed
+     */
+    @Override
+    public ChannelData create()
+        throws MatrixException
+    {
+        if (!this.isCreated())  {
+            this.setCreated(true);
+
+            final StringBuilder cmd = new StringBuilder()
+                    .append("escape add channel \"" + AbstractTest.convertMql(this.getName()) + "\"");
+            // append all commands
+            if (!this.commands.isEmpty())  {
+                final List<String> names = new ArrayList<String>();
+                for (final CommandData command : this.commands)  {
+                    command.create();
+                    names.add(command.getName());
+                }
+                cmd.append(" command ").append(StringUtil_mxJPO.joinMql(',', true, names, null));
+            }
+            this.append4Create(cmd);
+
+            cmd.append(";\n")
+               .append("escape add property ").append(this.getSymbolicName())
+               .append(" on program eServiceSchemaVariableMapping.tcl")
+               .append(" to channel \"").append(AbstractTest.convertMql(this.getName())).append("\"");
+
+            this.getTest().mql(cmd);
+        }
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     * Also the commands which are defined as place are checked.
+     */
+    @Override()
+    public void checkExport(final ExportParser _exportParser)
+        throws MatrixException
+    {
+        super.checkExport(_exportParser);
+        // check for commands (they are not add's!)
+        final Set<String> needPlaces = new HashSet<String>();
+        for (final CommandData command : this.commands)  {
+            needPlaces.add("\"" + AbstractTest.convertTcl(command.getName()) + "\" after \"\"");
+        }
+        final List<String> foundPlaces = _exportParser.getLines("/mql/place/@value");
+        Assert.assertEquals(foundPlaces.size(), needPlaces.size(), "all adds defined (found places = " + foundPlaces + "; need places = " + needPlaces + ")");
+        for (final String foundPlace : foundPlaces)  {
+            Assert.assertTrue(needPlaces.contains(foundPlace), "check that place '" + foundPlace + "' is defined");
+        }
+    }
+}
