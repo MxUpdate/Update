@@ -172,8 +172,8 @@ public class FormatTest
         _format.checkExport(exportParser);
 
         // second update with delivered content
-        this.update(_format.getCIFileName(), exportParser.getOrigCode());
-        _format.checkExport();
+        _format.updateWithCode(exportParser.getOrigCode())
+               .checkExport();
     }
 
     /**

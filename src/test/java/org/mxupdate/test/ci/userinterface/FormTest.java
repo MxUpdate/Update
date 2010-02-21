@@ -172,8 +172,8 @@ public class FormTest
         _form.checkExport(exportParser);
 
         // second update with delivered content
-        this.update(_form.getCIFileName(), exportParser.getOrigCode());
-        _form.checkExport(_form.export());
+        _form.updateWithCode(exportParser.getOrigCode())
+             .checkExport();
     }
 
     /**

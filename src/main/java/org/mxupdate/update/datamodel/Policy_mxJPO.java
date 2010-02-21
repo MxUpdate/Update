@@ -447,8 +447,11 @@ public class Policy_mxJPO
         throws Exception
     {
         if (_newPolicy.allState)  {
-            _cmd.append("escape mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName()))
-                .append("\" add allstate allstate");
+            _cmd.append("escape mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"');
+            if (!this.allState)  {
+                _cmd.append(" add allstate");
+            }
+            _cmd.append(" allstate");
             _newPolicy.allStateAccess.calcDelta(_cmd, this.allStateAccess);
             _cmd.append(";\n");
         } else if (this.allState)  {

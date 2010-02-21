@@ -138,8 +138,8 @@ public class InquiryTest
         _inquiry.checkExport(exportParser);
 
         // second update with delivered content
-        this.update(_inquiry.getCIFileName(), exportParser.getOrigCode());
-        _inquiry.checkExport(_inquiry.export());
+        _inquiry.updateWithCode(exportParser.getOrigCode())
+                .checkExport(_inquiry.export());
     }
 
     /**

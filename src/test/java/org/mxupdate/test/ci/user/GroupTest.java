@@ -160,7 +160,8 @@ public class GroupTest
      * @param _group        group to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "groups", description = "test update of non existing group")
+    @Test(dataProvider = "groups",
+          description = "test update of non existing group")
     public void simpleUpdate(final String _description,
                              final GroupData _group)
         throws Exception
@@ -240,13 +241,13 @@ public class GroupTest
         }
 
         // first update with original content
-        this.update(_group.getCIFileName(), _group.ciFile());
+        _group.update();
         final ExportParser exportParser = _group.export();
         _group.checkExport(exportParser);
 
         // second update with delivered content
-        this.update(_group.getCIFileName(), exportParser.getOrigCode());
-        _group.checkExport(_group.export());
+        _group.updateWithCode(exportParser.getOrigCode())
+              .checkExport(_group.export());
     }
 
     /**

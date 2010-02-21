@@ -46,6 +46,7 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * The class is used to export, create, delete and update business objects
@@ -256,6 +257,25 @@ public class BusObject_mxJPO
                 name.append(BusObject_mxJPO.SPLIT_NAME).append(busRevision);
             }
             ret.add(name.toString());
+        }
+        return ret;
+    }
+
+    /**
+     * {@inheritDoc}
+     * If the type definition has derived types and the extracted name does not
+     * include the the type, the business type is added.
+     */
+    @Override()
+    public String extractMxName(final ParameterCache_mxJPO _paramCache,
+                                final File _file)
+        throws UpdateException_mxJPO
+    {
+        String ret = super.extractMxName(_paramCache, _file);
+        if ((ret != null) && this.getTypeDef().hasMxBusTypeDerived() && !ret.contains(BusObject_mxJPO.SPLIT_TYPE))  {
+            ret = new StringBuilder().append(this.getTypeDef().getMxBusType())
+                                     .append(BusObject_mxJPO.SPLIT_TYPE)
+                                     .append(ret).toString();
         }
         return ret;
     }

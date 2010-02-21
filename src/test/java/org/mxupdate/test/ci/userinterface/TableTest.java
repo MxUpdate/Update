@@ -180,8 +180,8 @@ public class TableTest
         _table.checkExport(exportParser);
 
         // second update with delivered content
-        this.update(_table.getCIFileName(), exportParser.getOrigCode());
-        _table.checkExport(_table.export());
+        _table.updateWithCode(exportParser.getOrigCode())
+              .checkExport();
     }
 
     /**

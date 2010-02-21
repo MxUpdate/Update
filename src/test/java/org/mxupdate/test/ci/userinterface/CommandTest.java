@@ -147,8 +147,8 @@ public class CommandTest
         _command.checkExport(exportParser);
 
         // second update with delivered content
-        this.update(_command.getCIFileName(), exportParser.getOrigCode());
-        _command.checkExport(_command.export());
+        _command.updateWithCode(exportParser.getOrigCode())
+                .checkExport(_command.export());
     }
 
     /**

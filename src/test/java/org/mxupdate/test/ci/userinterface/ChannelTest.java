@@ -154,8 +154,8 @@ public class ChannelTest
         _channel.checkExport(exportParser);
 
         // second update with delivered content
-        this.update(_channel.getCIFileName(), exportParser.getOrigCode());
-        _channel.checkExport();
+        _channel.updateWithCode(exportParser.getOrigCode())
+                .checkExport();
     }
 
     /**

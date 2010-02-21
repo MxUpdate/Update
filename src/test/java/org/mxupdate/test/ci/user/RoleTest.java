@@ -241,13 +241,13 @@ public class RoleTest
         }
 
         // first update with original content
-        this.update(_role.getCIFileName(), _role.ciFile());
+        _role.update();
         final ExportParser exportParser = _role.export();
         _role.checkExport(exportParser);
 
         // second update with delivered content
-        this.update(_role.getCIFileName(), exportParser.getOrigCode());
-        _role.checkExport(_role.export());
+        _role.updateWithCode(exportParser.getOrigCode())
+             .checkExport(_role.export());
     }
 
     /**

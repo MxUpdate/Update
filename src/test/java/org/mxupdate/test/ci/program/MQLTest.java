@@ -182,12 +182,12 @@ public class MQLTest
                 + "\" execute user creator execute immediate !needsbusinessobject !downloadable !pipe !pooled description test !hidden");
 
         // second update with delivered content
-        this.update(_mqlProgram.getCIFileName(), exportParser.getOrigCode());
-        _mqlProgram.checkExport(_mqlProgram.export());
+        _mqlProgram.updateWithCode(exportParser.getOrigCode())
+                   .checkExport();
 
         // third update with delivered content (without changing the code)
-        this.update(_mqlProgram.getCIFileName(), exportParser.getOrigCode());
-        _mqlProgram.checkExport(_mqlProgram.export());
+        _mqlProgram.updateWithCode(exportParser.getOrigCode())
+                   .checkExport();
 
         Assert.assertEquals(exportParser.getOrigCode(),
                             _mqlProgram.export().getOrigCode(),

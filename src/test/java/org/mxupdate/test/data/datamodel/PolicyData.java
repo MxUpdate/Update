@@ -146,7 +146,7 @@ public class PolicyData
     }
 
     /**
-     * Returns all {@link #types} of this policy.
+     * Returns all {@link #types} of this policy.
      *
      * @return all assigned types
      * @see #types
@@ -183,7 +183,7 @@ public class PolicyData
     }
 
     /**
-     * Returns all {@link #formats} of this policy.
+     * Returns all {@link #formats} of this policy.
      *
      * @return all assigned formats
      * @see #formats
