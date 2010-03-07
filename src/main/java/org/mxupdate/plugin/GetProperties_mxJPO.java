@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +21,18 @@
 package org.mxupdate.plugin;
 
 import java.io.Writer;
+import java.util.Map;
 
 import matrix.db.Context;
 import matrix.db.MatrixWriter;
 
 import org.mxupdate.update.util.MqlUtil_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 
 /**
- * The JPO class returns the plugin properties stored in MX. To get the
- * properties, following MQL statement must be executed:
- * <pre>
- * exec prog org.mxupdate.plugin.GetProperties
- * </pre>
- * The JPO returns the in MX stored plugin properties as string. The plugin
+ * The JPO class returns the plug-in properties stored in MX.
+ * The JPO returns the in MX stored plug-in properties as string. The plug-in
  * properties was prepared from
  * {@link org.mxupdate.install.InstallDataModel_mxJPO#makePluginProperty(org.mxupdate.update.util.ParameterCache_mxJPO,File)}
  * while the data model was installed.<br/>
@@ -49,11 +47,36 @@ import org.mxupdate.update.util.MqlUtil_mxJPO;
  * [TypeDefName] is the name of the type definition specified in the
  * mapping properties.
  *
- * @author Tim Moxter
+ * @author The MxUpdate Team
  * @version $Id$
  */
 public class GetProperties_mxJPO
+    extends AbstractPlugin_mxJPO
 {
+    /**
+     * MQL statement to print the content of the
+     * <code>org.mxupdate.plugin.plugin.properties</code> program with the
+     * plug-in properties.
+     */
+    private static final String MQL_CMD = "print prog 'org.mxupdate.plugin.plugin.properties' select code dump";
+
+    /**
+     * Returns the prepared content for the plug-in properties. To fetch the
+     * information, a {@link #MQL_CMD MQL statement} is executed.
+     *
+     * @param _paramCache   parameter cache with the MX context
+     * @param _arguments    arguments from the Eclipse Plug-In (not used)
+     * @return prepared return only with the properties content as string
+     * @throws Exception if the evaluate of the properties failed
+     * @see #MQL_CMD
+     */
+    Map<String,?> execute(final ParameterCache_mxJPO _paramCache,
+                          final Map<String,Object> _arguments)
+        throws Exception
+    {
+        return this.prepareReturn(null, null, null, MqlUtil_mxJPO.execMql(_paramCache, GetProperties_mxJPO.MQL_CMD));
+    }
+
     /**
      * This is the main method called from MQL. It writes the plugin properties
      * to the matrix writer (so that it could get via the Java MQL console).
@@ -62,12 +85,12 @@ public class GetProperties_mxJPO
      * @param _args     arguments from MQL console (not used)
      * @throws Exception if the evaluate of the properties failed
      */
+    @Deprecated()
     public void mxMain(final Context _context,
                        final String... _args)
             throws Exception
     {
-        final String prop = MqlUtil_mxJPO.execMql(_context, new StringBuilder()
-                .append("print prog 'org.mxupdate.plugin.plugin.properties' select code dump;"), true);
+        final String prop = MqlUtil_mxJPO.execMql(_context, GetProperties_mxJPO.MQL_CMD, true);
 
         final Writer writer = new MatrixWriter(_context);
         writer.append(prop);

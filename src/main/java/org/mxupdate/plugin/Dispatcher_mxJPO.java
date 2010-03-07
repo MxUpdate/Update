@@ -47,6 +47,16 @@ public class Dispatcher_mxJPO
     private static final String METHOD_EXPORT = "Export";
 
     /**
+     * Name of the &quot;GetProperty&quot; method within the parameters map.
+     */
+    private static final String METHOD_GET_PROPERTY = "GetProperty";
+
+    /**
+     * Name of the &quot;GetVersion&quot; method within the parameters map.
+     */
+    private static final String METHOD_GET_VERSION = "GetVersion";
+
+    /**
      * Name of the &quot;Search&quot; method within the parameters map.
      */
     private static final String METHOD_SEARCH = "Search";
@@ -84,6 +94,10 @@ public class Dispatcher_mxJPO
 
             if (Dispatcher_mxJPO.METHOD_EXPORT.equals(method))  {
                 ret = new Export_mxJPO().execute(paramCache, arguments);
+            } else if (Dispatcher_mxJPO.METHOD_GET_PROPERTY.equals(method))  {
+                ret = new GetProperties_mxJPO().execute(paramCache, arguments);
+            } else if (Dispatcher_mxJPO.METHOD_GET_VERSION.equals(method))  {
+                ret = new GetVersion_mxJPO().execute(paramCache, arguments);
             } else if (Dispatcher_mxJPO.METHOD_SEARCH.equals(method))  {
                 ret = new Search_mxJPO().execute(paramCache, arguments);
             } else if (Dispatcher_mxJPO.METHOD_TYPEDEFTREELIST.equals(method))  {
@@ -100,6 +114,7 @@ public class Dispatcher_mxJPO
         // and write return values to the matrix writer
         final MatrixWriter writer = new MatrixWriter(_context);
         writer.write(this.encode(ret));
+        writer.write(10);
         writer.flush();
         writer.close();
     }

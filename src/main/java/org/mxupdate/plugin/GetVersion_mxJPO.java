@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@
 
 package org.mxupdate.plugin;
 
+import java.util.Map;
+
 import matrix.db.Context;
 import matrix.db.MatrixWriter;
 
@@ -29,16 +31,15 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * The JPO class returns the current installed version of the MxUpdate Update
- * deployment tool stored in MX. To get the version information, following MQL
- * statement must be executed:
- * <pre>
- * exec prog org.mxupdate.plugin.GetVersion
- * </pre>
+ * deployment tool stored in MX. The JPO is used from the
+ * {@link Dispatcher_mxJPO dispatcher class}.
  *
  * @author The MxUpdate Team
  * @version $Id$
+ * @see Dispatcher_mxJPO
  */
 public class GetVersion_mxJPO
+    extends AbstractPlugin_mxJPO
 {
     /**
      * Name of the parameter defining the program name where applications must
@@ -56,6 +57,31 @@ public class GetVersion_mxJPO
     private static final String PARAM_APPLNAME = "RegisterApplicationName";
 
     /**
+     * Returns the current installed MxUpdate Update Tool version. The version
+     * itself is registered on the {@link #PARAM_APPLNAME MX OOTB program} with
+     * the {@link #PARAM_APPLNAME MxUpdate application name}.
+     *
+     * @param _paramCache   parameter cache with the MX context
+     * @param _arguments    arguments from the Eclipse Plug-In (not used)
+     * @return prepared return only with the version as string
+     * @throws Exception if version could not be evaluated
+     */
+    Map<String,?> execute(final ParameterCache_mxJPO _paramCache,
+                          final Map<String,Object> _arguments)
+        throws Exception
+    {
+        final String progName = _paramCache.getValueString(GetVersion_mxJPO.PARAM_PROGAPPL);
+        final String applName = _paramCache.getValueString(GetVersion_mxJPO.PARAM_APPLNAME);
+
+        final String version = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
+                .append("escape print prog \"").append(StringUtil_mxJPO.convertMql(progName)).append("\" ")
+                .append("select property[appVersion").append(StringUtil_mxJPO.convertMql(applName)).append("].value ")
+                .append("dump"));
+
+        return this.prepareReturn(null, null, null, version);
+    }
+
+    /**
      * This is the main method called from MQL. The version is written to the
      * MatrixWriter logger so that an execute of this JPO returns the related
      * version information about the MxUpdate Update deployment tool.
@@ -64,6 +90,7 @@ public class GetVersion_mxJPO
      * @param _args     arguments from MQL console (not used)
      * @throws Exception if the evaluate of the properties failed
      */
+    @Deprecated()
     public void mxMain(final Context _context,
                        final String... _args)
             throws Exception
