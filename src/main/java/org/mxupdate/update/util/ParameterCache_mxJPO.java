@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -291,6 +291,8 @@ public class ParameterCache_mxJPO
             case STRING:
                 this.mapString.put(_paramDef.getName(), _value);
                 break;
+            default:
+                throw new Error("unknown parameter type " + _paramDef.getType());
         }
     }
 
@@ -298,9 +300,8 @@ public class ParameterCache_mxJPO
      * Creates a new parameter caches class used for the clone. The new
      * parameter cache instance holds the new defined cache but all already
      * defined value maps {@link #mapBoolean}, {@link #mapList} and
-     * {@link #mapString}. The {@link #stringWriter} is set always to
-     * <code>null</code>, because the {@link #writer} is used for logging
-     * purpose.
+     * {@link #mapString}. The writer {@link #stringWriter} and {@link #writer}
+     * are reused.
      *
      * @param _context      new matrix context
      * @param _original     original parameter cache class
@@ -323,7 +324,7 @@ public class ParameterCache_mxJPO
         this.mapMap = _original.mapMap;
         this.mapString = _original.mapString;
         this.writer = _original.writer;
-        this.stringWriter = null;
+        this.stringWriter = _original.stringWriter;
     }
 
     /**
@@ -569,55 +570,76 @@ public class ParameterCache_mxJPO
      * Logging in error level.
      *
      * @param _text     error text
-     * @see #writer
+     * @see #log(LogLevel, String)
      */
     public void logError(final String _text)
     {
-        this.writer.append("ERROR! ").append(_text).append('\n').flush();
+        this.log(LogLevel.ERROR, _text);
     }
 
     /**
      * Logging in warning level.
      *
      * @param _text     warning text
-     * @see #writer
+     * @see #log(LogLevel, String)
      */
     public void logWarning(final String _text)
     {
-        this.writer.append("WARNING! ").append(_text).append('\n').flush();
+        this.log(LogLevel.WARNING, _text);
     }
 
     /**
      * Logging in level information.
      *
      * @param _text     info text
-     * @see #writer
+     * @see #log(LogLevel, String)
      */
     public void logInfo(final String _text)
     {
-        this.writer.append(_text).append('\n').flush();
+        this.log(LogLevel.INFO, _text);
     }
 
     /**
      * Logging in debug level.
      *
      * @param _text     trace text
-     * @see #writer
+     * @see #log(LogLevel, String)
      */
     public void logDebug(final String _text)
     {
-        this.writer.append(_text).append('\n').flush();
+        this.log(LogLevel.DEBUG, _text);
     }
 
     /**
      * Logging in trace level.
      *
      * @param _text     trace text
-     * @see #writer
+     * @see #log(LogLevel, String)
      */
     public void logTrace(final String _text)
     {
-        this.writer.append(_text).append('\n').flush();
+        this.log(LogLevel.TRACE, _text);
+    }
+
+    /**
+     * Appends to the log with defined <code>_logLevel</code> the
+     * <code>_text</code>.
+     *
+     * @param _logLevel     level of the log
+     * @param _text         text of the log
+     */
+    private void log(final LogLevel _logLevel,
+                     final String _text)
+    {
+        for (final String line : _text.split("\n"))  {
+            if (this.stringWriter == null)  {
+                this.writer.append(_logLevel.getConsoleLog());
+            } else  {
+                this.writer.append(_logLevel.getPlugInLog());
+            }
+            this.writer.append(line).append('\n');
+        }
+        this.writer.flush();
     }
 
     /**
@@ -631,7 +653,7 @@ public class ParameterCache_mxJPO
      * @see #mapMap
      * @see #mapString
      */
-    @Override
+    @Override()
     public String toString()
     {
         return new StringBuilder()
@@ -642,5 +664,66 @@ public class ParameterCache_mxJPO
                     .append("string = ").append(this.mapString)
                 .append("]")
                 .toString();
+    }
+
+    /**
+     * Enumeration to configure the logging depending on console and plug-in.
+     */
+    private enum LogLevel
+    {
+        /** Log level error. */
+        ERROR() {
+            /**
+             * Overwrites original method because an error tag is prefixed.
+             *
+             * @return always <code>ERROR! </code>
+             */
+            @Override()
+            public String getConsoleLog()
+            {
+                return "ERROR! ";
+            }
+        },
+        /** Log level warning. */
+        WARNING {
+            /**
+             * Overwrites original method because a warning tag is prefixed.
+             *
+             * @return always <code>WARNING! </code>
+             */
+            @Override()
+            public String getConsoleLog()
+            {
+                return "WARNING! ";
+            }
+        },
+        /** Log level for information. */
+        INFO,
+        /** Log level debug. */
+        DEBUG,
+        /** Log level trace. */
+        TRACE;
+
+        /**
+         * Returns the prefix for the console log which is typically an empty
+         * string (means that there is no prefix for the console log).
+         *
+         * @return always zero length empty string
+         */
+        public String getConsoleLog()
+        {
+            return "";
+        }
+
+        /**
+         * Returns the prefix for the plug-in log which is a concatenation of
+         * '<code>[</code>', the name of the enumeration and '<code>]</code>'.
+         *
+         * @return prefix for the plug-in log
+         */
+        public String getPlugInLog()
+        {
+            return new StringBuilder().append('[').append(this.name()).append("] ").toString();
+        }
     }
 }

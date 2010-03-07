@@ -70,11 +70,11 @@ public class GetProperties_mxJPO
      * @throws Exception if the evaluate of the properties failed
      * @see #MQL_CMD
      */
-    Map<String,?> execute(final ParameterCache_mxJPO _paramCache,
-                          final Map<String,Object> _arguments)
+    String execute(final ParameterCache_mxJPO _paramCache,
+                   final Map<String,Object> _arguments)
         throws Exception
     {
-        return this.prepareReturn(null, null, null, MqlUtil_mxJPO.execMql(_paramCache, GetProperties_mxJPO.MQL_CMD));
+        return MqlUtil_mxJPO.execMql(_paramCache, GetProperties_mxJPO.MQL_CMD);
     }
 
     /**

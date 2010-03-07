@@ -60,8 +60,8 @@ class TypeDefTreeList_mxJPO
      * @return type definition tree packed in the map
      * @throws Exception if the encoding of the return value failed
      */
-    Map<String,?> execute(final ParameterCache_mxJPO _paramCache,
-                          final Map<String,Object> _arguments)
+    Map<String,Map<String,?>> execute(final ParameterCache_mxJPO _paramCache,
+                                      final Map<String,Object> _arguments)
         throws Exception
     {
         // prepare map of all trees
@@ -74,6 +74,6 @@ class TypeDefTreeList_mxJPO
             allTrees.put(tree.getName(), treeItem);
         }
 
-        return this.prepareReturn(null, null, null, allTrees);
+        return allTrees;
     }
 }

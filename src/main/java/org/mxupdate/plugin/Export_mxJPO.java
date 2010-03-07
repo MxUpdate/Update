@@ -127,23 +127,36 @@ class Export_mxJPO
      * @param _paramCache   parameter cache with the MX context
      * @param _arguments    map with all search arguments
      * @return packed return values in maps
+     * @throws Exception if export failed
      * @see AbstractPlugin_mxJPO#prepareReturn(String, String, Exception, Object)
      */
-    Map<String,?> execute(final ParameterCache_mxJPO _paramCache,
-                          final Map<String,Object> _arguments)
+    Map<String,String> execute(final ParameterCache_mxJPO _paramCache,
+                               final Map<String,Object> _arguments)
+        throws Exception
     {
-        Map<String,?> packedRet = null;
-        try  {
-            final String fileName = this.getArgument(_arguments, Export_mxJPO.ARGUMENT_KEY_FILENAME, null);
+        final String fileName = this.getArgument(_arguments, Export_mxJPO.ARGUMENT_KEY_FILENAME, null);
 
-            AbstractObject_mxJPO instance = null;
+        AbstractObject_mxJPO instance = null;
 
-            if (fileName != null)  {
-                final File file = new File(fileName);
+        if (fileName != null)  {
+            final File file = new File(fileName);
 
-                // first found related type definition
+            // first found related type definition
+            for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefs())  {
+                if (!typeDef.isFileMatchLast())  {
+                    instance = typeDef.newTypeInstance(null);
+                    final String mxName = instance.extractMxName(_paramCache, file);
+                    if (mxName != null)  {
+                        instance = typeDef.newTypeInstance(mxName);
+                        break;
+                    } else  {
+                        instance = null;
+                    }
+                }
+            }
+            if (instance == null)  {
                 for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefs())  {
-                    if (!typeDef.isFileMatchLast())  {
+                    if (typeDef.isFileMatchLast())  {
                         instance = typeDef.newTypeInstance(null);
                         final String mxName = instance.extractMxName(_paramCache, file);
                         if (mxName != null)  {
@@ -154,56 +167,33 @@ class Export_mxJPO
                         }
                     }
                 }
-                if (instance == null)  {
-                    for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefs())  {
-                        if (typeDef.isFileMatchLast())  {
-                            instance = typeDef.newTypeInstance(null);
-                            final String mxName = instance.extractMxName(_paramCache, file);
-                            if (mxName != null)  {
-                                instance = typeDef.newTypeInstance(mxName);
-                                break;
-                            } else  {
-                                instance = null;
-                            }
-                        }
-                    }
-                }
-            } else  {
-                // initialize arguments
-                final String typeDefName = this.getArgument(_arguments, Export_mxJPO.ARGUMENT_KEY_TYPEDEF, null);
-                final String item = this.getArgument(_arguments, Export_mxJPO.ARGUMENT_KEY_NAME, null);
-
-                // export all objects depending on the type definitions
-                final TypeDef_mxJPO typeDef = _paramCache.getMapping().getTypeDef(typeDefName);
-                instance = typeDef.newTypeInstance(item);
             }
+        } else  {
+            // initialize arguments
+            final String typeDefName = this.getArgument(_arguments, Export_mxJPO.ARGUMENT_KEY_TYPEDEF, null);
+            final String item = this.getArgument(_arguments, Export_mxJPO.ARGUMENT_KEY_NAME, null);
 
-            // export code
-            final Map<String,String> ret;
-            if (instance == null)  {
-                ret = null;
-            } else  {
-                final StringBuilder code = new StringBuilder();
-                instance.export(_paramCache, code);
-
-                ret = new HashMap<String,String>();
-                ret.put(Export_mxJPO.RETURN_KEY_TYPEDEF,    instance.getTypeDef().getName());
-                ret.put(Export_mxJPO.RETURN_KEY_NAME,       instance.getName());
-                ret.put(Export_mxJPO.RETURN_KEY_CODE,       code.toString());
-                ret.put(Export_mxJPO.RETURN_KEY_PATH,       instance.getPath());
-                ret.put(Export_mxJPO.RETURN_KEY_FILENAME,   instance.getFileName());
-            }
-
-            packedRet = this.prepareReturn(_paramCache.getLogString(),
-                                           (String) null,
-                                           (Exception) null,
-                                           ret);
-        } catch (final Exception e)  {
-            packedRet = this.prepareReturn((String) null,
-                                           (String) null,
-                                           e,
-                                           null);
+            // export all objects depending on the type definitions
+            final TypeDef_mxJPO typeDef = _paramCache.getMapping().getTypeDef(typeDefName);
+            instance = typeDef.newTypeInstance(item);
         }
-        return packedRet;
+
+        // export code
+        final Map<String,String> ret;
+        if (instance == null)  {
+            ret = null;
+        } else  {
+            final StringBuilder code = new StringBuilder();
+            instance.export(_paramCache, code);
+
+            ret = new HashMap<String,String>();
+            ret.put(Export_mxJPO.RETURN_KEY_TYPEDEF,    instance.getTypeDef().getName());
+            ret.put(Export_mxJPO.RETURN_KEY_NAME,       instance.getName());
+            ret.put(Export_mxJPO.RETURN_KEY_CODE,       code.toString());
+            ret.put(Export_mxJPO.RETURN_KEY_PATH,       instance.getPath());
+            ret.put(Export_mxJPO.RETURN_KEY_FILENAME,   instance.getFileName());
+        }
+
+        return ret;
     }
 }

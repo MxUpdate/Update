@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,6 +144,33 @@ public abstract class AbstractPropertyObject_mxJPO
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private static final String TEST_EXECUTED = "MxUpdate Executed";
+
+    /**
+     * Defines the TCL procedures for logging purposes which are executed by
+     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)}.
+     *
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
+     */
+    private static final String TCL_LOG_PROCS
+            = "proc puts {_sText}  {\n"
+                + "mql exec prog org.mxupdate.update.util.JPOCaller logDebug ${_sText}\n"
+            + "}\n"
+            + "proc logError {_sText}  {\n"
+                + "mql exec prog org.mxupdate.update.util.JPOCaller logError ${_sText}\n"
+            + "}\n"
+            + "proc logWarning {_sText}  {\n"
+                + "mql exec prog org.mxupdate.update.util.JPOCaller logWarning ${_sText}\n"
+            + "}\n"
+            + "proc logInfo {_sText}  {\n"
+                + "mql exec prog org.mxupdate.update.util.JPOCaller logInfo ${_sText}\n"
+            + "}\n"
+            + "proc logDebug {_sText}  {\n"
+                + "mql exec prog org.mxupdate.update.util.JPOCaller logDebug ${_sText}\n"
+            + "}\n"
+            + "proc logTrace {_sText}  {\n"
+                + "mql exec prog org.mxupdate.update.util.JPOCaller logTrace ${_sText}\n"
+            + "}\n";
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -386,17 +413,32 @@ public abstract class AbstractPropertyObject_mxJPO
 
     /**
      * The method is called from the JPO caller interface. In this abstract
-     * class, the definition is only a stub and not used, because otherwise
-     * the method must be defined everywhere.
+     * class the logging TCL procedures are executed and mapped to the logging
+     * methods defined in <code>_paramCache</code>
      *
      * @param _paramCache   parameter cache
      * @param _args         arguments, not used
      * @throws Exception never, only dummy
+     * @see #TCL_LOG_PROCS
      */
     public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
                                final String... _args)
         throws Exception
     {
+        if ("logDebug".equals(_args[0]))  {
+            _paramCache.logDebug(_args[1]);
+        } else if ("logError".equals(_args[0]))  {
+            _paramCache.logError(_args[1]);
+        } else if ("logInfo".equals(_args[0]))  {
+            _paramCache.logInfo(_args[1]);
+        } else if ("logTrace".equals(_args[0]))  {
+            _paramCache.logTrace(_args[1]);
+        } else if ("logWarning".equals(_args[0]))  {
+            _paramCache.logWarning(_args[1]);
+        } else  {
+            // TODO: internal exception!
+            throw new Exception("unknown jpo call execute " + _args[1]);
+        }
     }
 
     /**
@@ -487,6 +529,7 @@ public abstract class AbstractPropertyObject_mxJPO
      * <ul>
      * <li>pre MQL commands (from parameter <code>_preMQLCode</code>)</li>
      * <li>change to TCL mode</li>
+     * <li>define the {@link #TCL_LOG_PROCS TCL logging procedures}</li>
      * <li>set all required TCL variables (from parameter
      *     <code>_tclVariables</code>)</li>
      * <li>append TCL update code from file (from parameter
@@ -515,6 +558,7 @@ public abstract class AbstractPropertyObject_mxJPO
      * @param _sourceFile       souce file with the TCL code to update; if
      *                          <code>null</code> file is not called (sourced)
      * @throws Exception if update failed
+     * @see #TCL_LOG_PROCS
      */
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
@@ -528,7 +572,9 @@ public abstract class AbstractPropertyObject_mxJPO
 
         // append TCL mode
         cmd.append("tcl;\n")
-           .append("eval  {\n");
+           .append("eval  {\n")
+           .append(AbstractPropertyObject_mxJPO.TCL_LOG_PROCS);
+
 
         // define all TCL variables
         for (final Map.Entry<String, String> entry : _tclVariables.entrySet())  {

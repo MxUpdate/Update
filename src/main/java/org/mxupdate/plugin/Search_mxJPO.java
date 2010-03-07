@@ -100,8 +100,8 @@ class Search_mxJPO
      * @return found configuration items matching <code>_arguments</code>
      * @throws Exception if the search failed
      */
-    Map<String,?> execute(final ParameterCache_mxJPO _paramCache,
-                          final Map<String,Object> _arguments)
+    List<Map<String,String>> execute(final ParameterCache_mxJPO _paramCache,
+                                     final Map<String,Object> _arguments)
         throws Exception
     {
         final Set<String> typeDefList = this.<Set<String>>getArgument(_arguments, Search_mxJPO.ARGUMENT_KEY_TYPEDEFLIST, new HashSet<String>());
@@ -127,6 +127,6 @@ class Search_mxJPO
             }
         }
 
-        return this.prepareReturn(null, null, null, ret);
+        return ret;
     }
 }

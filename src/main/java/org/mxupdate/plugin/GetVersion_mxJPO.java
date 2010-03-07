@@ -66,8 +66,8 @@ public class GetVersion_mxJPO
      * @return prepared return only with the version as string
      * @throws Exception if version could not be evaluated
      */
-    Map<String,?> execute(final ParameterCache_mxJPO _paramCache,
-                          final Map<String,Object> _arguments)
+    String execute(final ParameterCache_mxJPO _paramCache,
+                   final Map<String,Object> _arguments)
         throws Exception
     {
         final String progName = _paramCache.getValueString(GetVersion_mxJPO.PARAM_PROGAPPL);
@@ -78,7 +78,7 @@ public class GetVersion_mxJPO
                 .append("select property[appVersion").append(StringUtil_mxJPO.convertMql(applName)).append("].value ")
                 .append("dump"));
 
-        return this.prepareReturn(null, null, null, version);
+        return version;
     }
 
     /**

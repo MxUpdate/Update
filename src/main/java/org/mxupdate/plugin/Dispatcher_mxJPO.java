@@ -23,13 +23,18 @@ package org.mxupdate.plugin;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import matrix.db.Context;
 import matrix.db.MatrixWriter;
+import matrix.util.MatrixException;
 import matrix.util.Mime64;
 
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * Abstract class which defines common methods to extract called parameters
@@ -41,6 +46,34 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 public class Dispatcher_mxJPO
     extends AbstractPlugin_mxJPO
 {
+    /**
+     * Name of the key in the return map for the log message.
+     *
+     * @see #prepareReturn(String, String, Exception, Object)
+     */
+    private static final String RETURN_KEY_LOG = "log";
+
+    /**
+     * Name of the key in the return map for the error message.
+     *
+     * @see #prepareReturn(String, String, Exception, Object)
+     */
+    private static final String RETURN_KEY_ERROR = "error";
+
+    /**
+     * Name of the key in the return map for the exception.
+     *
+     * @see #prepareReturn(String, String, Exception, Object)
+     */
+    private static final String RETURN_KEY_EXCEPTION = "exception";
+
+    /**
+     * Name of the key in the return map for the values.
+     *
+     * @see #prepareReturn(String, String, Exception, Object)
+     */
+    private static final String RETURN_KEY_VALUES = "values";
+
     /**
      * Name of the &quot;Export&quot; method within the parameters map.
      */
@@ -83,7 +116,9 @@ public class Dispatcher_mxJPO
                        final String... _args)
         throws IOException
     {
-        Map<String,?> ret = null;
+        Map<String,Object> ret = null;
+        final PrintStream orgErr = System.err;
+        final PrintStream orgOut = System.out;
         try {
             final Map<String,String> params     = this.<Map<String,String>>decode(_args, 0, null);
             final String method                 = this.<String>decode(_args, 1, null);
@@ -91,24 +126,69 @@ public class Dispatcher_mxJPO
 
             // initialize mapping
             final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, true, params);
+            // define error stream
+            final StringBuilder textErr = new StringBuilder();
+            System.setErr(new PrintStream(new OutputStream() {
+                @Override()
+                public void write(final int _char)
+                {
+                    if (_char == 10)  {
+                        paramCache.logError(textErr.toString());
+                        textErr.delete(0, textErr.length());
+                    } else  {
+                        textErr.append((char) _char);
+                    }
+                }
+            }));
+            // define output stream
+            final StringBuilder textOut = new StringBuilder();
+            System.setOut(new PrintStream(new OutputStream() {
+                @Override()
+                public void write(final int _char)
+                {
+                    if (_char == 10)  {
+                        paramCache.logInfo(textOut.toString());
+                        textOut.delete(0, textOut.length());
+                    } else  {
+                        textOut.append((char) _char);
+                    }
+                }
+            }));
 
+            final Object bck;
             if (Dispatcher_mxJPO.METHOD_EXPORT.equals(method))  {
-                ret = new Export_mxJPO().execute(paramCache, arguments);
+                bck = new Export_mxJPO().execute(paramCache, arguments);
             } else if (Dispatcher_mxJPO.METHOD_GET_PROPERTY.equals(method))  {
-                ret = new GetProperties_mxJPO().execute(paramCache, arguments);
+                bck = new GetProperties_mxJPO().execute(paramCache, arguments);
             } else if (Dispatcher_mxJPO.METHOD_GET_VERSION.equals(method))  {
-                ret = new GetVersion_mxJPO().execute(paramCache, arguments);
+                bck = new GetVersion_mxJPO().execute(paramCache, arguments);
             } else if (Dispatcher_mxJPO.METHOD_SEARCH.equals(method))  {
-                ret = new Search_mxJPO().execute(paramCache, arguments);
+                bck = new Search_mxJPO().execute(paramCache, arguments);
             } else if (Dispatcher_mxJPO.METHOD_TYPEDEFTREELIST.equals(method))  {
-                ret = new TypeDefTreeList_mxJPO().execute(paramCache, arguments);
+                bck = new TypeDefTreeList_mxJPO().execute(paramCache, arguments);
             } else if (Dispatcher_mxJPO.METHOD_UPDATE.equals(method))  {
-                ret = new Update_mxJPO().execute(paramCache, arguments);
+                bck = new Update_mxJPO().execute(paramCache, arguments);
             } else  {
                 throw new Exception("unknown plug-in method '" + method + "'");
             }
+
+            if (textErr.length() > 0)  {
+                paramCache.logError(textErr.toString());
+            }
+            if (textOut.length() > 0)  {
+                paramCache.logInfo(textOut.toString());
+            }
+
+            ret = this.prepareReturn(paramCache.getLogString(),
+                                     (String) null,
+                                     (Exception) null,
+                                     bck);
+
         } catch (final Exception exception)  {
             ret = this.prepareReturn(null, null, exception, null);
+        } finally  {
+            System.setErr(orgErr);
+            System.setOut(orgOut);
         }
 
         // and write return values to the matrix writer
@@ -117,6 +197,40 @@ public class Dispatcher_mxJPO
         writer.write(10);
         writer.flush();
         writer.close();
+    }
+
+    /**
+     * Packed the values to return in a map.
+     *
+     * @param <T>           defines the Java type of the values
+     * @param _log          log message
+     * @param _error        error message
+     * @param _exception    throws exception
+     * @param _values       values itself
+     * @return arguments packed in a map
+     */
+    protected <T> Map<String, Object> prepareReturn(final String _log,
+                                                    final String _error,
+                                                    final Exception _exception,
+                                                    final T _values)
+    {
+        final Map<String,Object> jpoReturn = new HashMap<String,Object>(4);
+        jpoReturn.put(Dispatcher_mxJPO.RETURN_KEY_LOG,       _log);
+        jpoReturn.put(Dispatcher_mxJPO.RETURN_KEY_ERROR,     _error);
+        // MatrixException could not serialized and must be converted
+        if (_exception instanceof MatrixException)  {
+            final Exception newEx = new Exception(((MatrixException) _exception).toJniFormat());
+            newEx.setStackTrace(_exception.getStackTrace());
+            jpoReturn.put(Dispatcher_mxJPO.RETURN_KEY_EXCEPTION, newEx);
+        } else if (_exception instanceof UpdateException_mxJPO)  {
+            final Exception newEx = new Exception(_exception.getMessage());
+            newEx.setStackTrace(_exception.getStackTrace());
+            jpoReturn.put(Dispatcher_mxJPO.RETURN_KEY_EXCEPTION, newEx);
+        } else  {
+            jpoReturn.put(Dispatcher_mxJPO.RETURN_KEY_EXCEPTION, _exception);
+        }
+        jpoReturn.put(Dispatcher_mxJPO.RETURN_KEY_VALUES,    _values);
+        return jpoReturn;
     }
 
     /**

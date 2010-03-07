@@ -69,15 +69,13 @@ public class Update_mxJPO
      * @return log information from the update / compile
      * @throws Exception if update failed
      */
-    Map<String,?> execute(final ParameterCache_mxJPO _paramCache,
-                          final Map<String,Object> _arguments)
+    Object execute(final ParameterCache_mxJPO _paramCache,
+                   final Map<String,Object> _arguments)
         throws Exception
     {
         final boolean compile = this.getArgument(_arguments, Update_mxJPO.ARGUMENT_KEY_COMPILE, false);
         final Set<String> fileNames = this.getArgument(_arguments, Update_mxJPO.ARGUMENT_KEY_FILENAMES, null);
         final Map<String,String> fileContents = this.getArgument(_arguments, Update_mxJPO.ARGUMENT_KEY_FILECONTENTS, null);
-
-        String ret = null;
 
         // if file with content a temporary directory must be created!
         final File tmpDir;
@@ -117,7 +115,7 @@ public class Update_mxJPO
                 }
             }
 
-            ret = this.updateFiles(_paramCache, updateFiles, compile);
+            this.updateFiles(_paramCache, updateFiles, compile);
         } finally  {
             // at least remove all temporary stuff
             for (final File localFile : localFiles)  {
@@ -128,7 +126,7 @@ public class Update_mxJPO
             }
         }
 
-        return this.prepareReturn(ret, null, null, null);
+        return null;
     }
 
     /**
