@@ -20,12 +20,20 @@
 
 package org.mxupdate.test.ci;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.AbstractBusData;
 import org.mxupdate.update.util.UpdateException_mxJPO.Error;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -38,23 +46,119 @@ public class Common
     extends AbstractTest
 {
     /**
+     * Defines the CI which must be ignored because updates are not ignored.
+     *
+     * @see #testException4CallingJpoCallerMethodWithoutArguments(CI)
+     */
+    private static final Set<AbstractTest.CI> IGNORES = new HashSet<AbstractTest.CI>();
+    static  {
+        Common.IGNORES.add(AbstractTest.CI.PRG_JPO);
+        Common.IGNORES.add(AbstractTest.CI.PRG_MQL_PROGRAM);
+        Common.IGNORES.add(AbstractTest.CI.PRG_PAGE);
+    }
+
+    /**
+     * Data provider to get all configuration item enumerations for which the
+     * JPO caller must be tested.
+     *
+     * @return CI enum's
+     */
+    @DataProvider(name = "cis4jpoCaller")
+    public Object[][] getData4JPOCaller()
+    {
+        final List<Object[]> ret = new ArrayList<Object[]>();
+        for (int i = 0; i < AbstractTest.CI.values().length; i++)  {
+            final AbstractTest.CI ci = AbstractTest.CI.values()[i];
+            if ((ci != AbstractTest.CI.OTHER_SITE) && !Common.IGNORES.contains(ci))  {
+                ret.add(new Object[]{AbstractTest.CI.values()[i]});
+            }
+        }
+        return ret.toArray(new Object[ret.size()][]);
+    }
+
+    /**
+     * Removes the MxUpdate commands used within automatic tests.
+     *
+     * @throws Exception if MQL execution failed
+     */
+    @BeforeMethod()
+    @AfterMethod()
+    public void cleanup()
+        throws Exception
+    {
+        for (final AbstractTest.CI ci : AbstractTest.CI.values())  {
+            this.cleanup(ci);
+        }
+    }
+
+    /**
      * Test that the correct error code is returned if the encoding of the file
      * name for the configuration item failed.
      *
      * @throws Exception    if test failed
      */
     @Test(description = "test file name with not correct encoding")
-    public void updateWrongFileName()
+    public void testException4UpdateWrongFileName()
         throws Exception
     {
         final Map<String,String> files = new HashMap<String,String>();
         files.put("COMMAND_Start@.tcl", "");
         final Map<?,?> bck = this.executeEncoded("Update", null, "FileContents", files);
         final Exception ex = (Exception) bck.get("exception");
-        Assert.assertTrue((ex != null), "an matrix exception must be thrown");
+        Assert.assertTrue((ex != null), "an exception must be thrown");
         Assert.assertTrue(ex.getMessage().contains("UpdateError #"
                                                     + Error.UTIL_STRINGUTIL_CONVERT_FROM_FILENAME.getCode()
                                                     + ":"),
                           "correct error code is returned");
+    }
+
+    /**
+     * Checks if correct exception is thrown if JPO caller is thrown with wrong
+     * method name.
+     *
+     * @param _ci   configuration item to test
+     * @throws Exception if test failed
+     */
+    @Test(dataProvider = "cis4jpoCaller",
+          description = "checks if correct exception is thrown if JPO caller is thrown with wrong method name")
+    public void testException4CallingJpoCallerMethodWithoutArguments(final AbstractTest.CI _ci)
+        throws Exception
+    {
+        final Map<String,String> files = new HashMap<String,String>();
+        files.put(_ci.filePrefix + AbstractTest.PREFIX + "_Test"
+                        + ((_ci == AbstractTest.CI.IEF_EBOMSYNC_CONFIG) ? AbstractBusData.SEPARATOR + "-" : "") + ".tcl",
+                  "mql exec prog org.mxupdate.update.util.JPOCaller");
+        final Map<?,?> bck = this.executeEncoded("Update", null, "FileContents", files);
+        final Exception ex = (Exception) bck.get("exception");
+        Assert.assertTrue((ex != null), "an exception must be thrown");
+        Assert.assertTrue(ex.getMessage().contains("UpdateError #"
+                                                    + Error.ABSTRACT_PROPERTY_JPO_CALL_METHOD_NOT_DEFINED.getCode()
+                                                    + ":"),
+                          "correct error code is returned");
+    }
+
+    /**
+     * Checks if correct exception is thrown if JPO caller is thrown with no
+     * argument.
+     *
+     * @param _ci   configuration item to test
+     * @throws Exception if test failed
+     */
+    @Test(dataProvider = "cis4jpoCaller",
+          description = "checks if correct exception is thrown if JPO caller is thrown with no argument")
+    public void testException4CallingWrongJpoCallerMethod(final AbstractTest.CI _ci)
+        throws Exception
+    {
+        final Map<String,String> files = new HashMap<String,String>();
+        files.put(_ci.filePrefix + AbstractTest.PREFIX + "_Test"
+                        + ((_ci == AbstractTest.CI.IEF_EBOMSYNC_CONFIG) ? AbstractBusData.SEPARATOR + "-" : "") + ".tcl",
+                  "mql exec prog org.mxupdate.update.util.JPOCaller unknownMethod");
+        final Map<?,?> bck = this.executeEncoded("Update", null, "FileContents", files);
+        final Exception ex = (Exception) bck.get("exception");
+        Assert.assertTrue((ex != null), "an exception must be thrown");
+        Assert.assertTrue(ex.getMessage().contains("UpdateError #"
+                                                    + Error.ABSTRACT_PROPERTY_JPO_CALL_METHOD_UNKNOWN.getCode()
+                                                    + ":"),
+                          "correct error code is not returned " + ex.getMessage());
     }
 }

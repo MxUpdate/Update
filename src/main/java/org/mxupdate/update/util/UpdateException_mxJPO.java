@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,11 +40,16 @@ public class UpdateException_mxJPO
      * administration object, following algorithm is used:
      * <ul>
      * <li>the first digit defines data model (1), program (2), user (3) or
-     *     user interface (4)</li>
+     *     user interface (4), integration (5) and abstract (6)</li>
      * <li>depending of the first digit, the second and third digit defines the
      *     kind of configuration item
      *     <ul>
-     *     <li>106: dimension</li>
+     *     <li>106: {@link org.mxupdate.update.datamodel.Dimension_mxJPO dimension}</li>
+     *     <li>109: {@link org.mxupdate.update.datamodel.Interface_mxJPO interface}</li>
+     *     <li>601: {@link org.mxupdate.update.AbstractObject_mxJPO abstract object}</li>
+     *     <li>602: {@link org.mxupdate.update.AbstractAdminObject_mxJPO abstract administration object}</li>
+     *     <li>603: {@link org.mxupdate.update.AbstractPropertyObject_mxJPO abstract property object}</li>
+     *     <li>604: {@link org.mxupdate.update.BusObject_mxJPO business object}</li>
      *     </ul></li>
      * <li>the fourth and fifth digit defines the error itself</li>
      * </ul></p>
@@ -52,12 +57,12 @@ public class UpdateException_mxJPO
      *    org.mxupdate.update.util) starts with 90. The next digit
      *    defines the class where the exception is thrown:
      * <ul>
-     * <li>1: {@link org.mxupdate.update.util.AbstractParser_mxJPO}</li>
-     * <li>2: {@link org.mxupdate.update.util.AdminProperty_mxJPO}</li>
-     * <li>3: {@link org.mxupdate.update.util.JPOCaller_mxJPO}</li>
-     * <li>4: {@link org.mxupdate.update.util.MqlUtil_mxJPO}</li>
-     * <li>5: {@link org.mxupdate.update.util.ParameterCache_mxJPO}</li>
-     * <li>6: {@link org.mxupdate.update.util.StringUtil_mxJPO}</li>
+     * <li>901: {@link org.mxupdate.update.util.AbstractParser_mxJPO}</li>
+     * <li>902: {@link org.mxupdate.update.util.AdminProperty_mxJPO}</li>
+     * <li>903: {@link org.mxupdate.update.util.JPOCaller_mxJPO}</li>
+     * <li>904: {@link org.mxupdate.update.util.MqlUtil_mxJPO}</li>
+     * <li>905: {@link org.mxupdate.update.util.ParameterCache_mxJPO}</li>
+     * <li>906: {@link org.mxupdate.update.util.StringUtil_mxJPO}</li>
      * </ul>
      * </p>
      *
@@ -66,6 +71,22 @@ public class UpdateException_mxJPO
      */
     public enum Error
     {
+        /**
+         * JPO caller method is called without any argument.
+         *
+         * @see org.mxupdate.update.AbstractPropertyObject_mxJPO
+         */
+        ABSTRACT_PROPERTY_JPO_CALL_METHOD_NOT_DEFINED(60301,
+                "jpo call is executed without any arguments"),
+
+        /**
+         * JPO caller method is called with wrong name for the method.
+         *
+         * @see org.mxupdate.update.AbstractPropertyObject_mxJPO
+         */
+        ABSTRACT_PROPERTY_JPO_CALL_METHOD_UNKNOWN(60302,
+                "unknown jpo call execute {0}"),
+
         /**
          * The multiplier of a unit of a dimension is tried to update which
          * means that potentially some data could be loosed.

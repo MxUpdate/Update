@@ -32,6 +32,7 @@ import org.mxupdate.update.util.JPOCaller_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * @author The MxUpdate Team
@@ -425,7 +426,9 @@ public abstract class AbstractPropertyObject_mxJPO
                                final String... _args)
         throws Exception
     {
-        if ("logDebug".equals(_args[0]))  {
+        if (_args.length == 0)  {
+            throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.ABSTRACT_PROPERTY_JPO_CALL_METHOD_NOT_DEFINED);
+        } else if ("logDebug".equals(_args[0]))  {
             _paramCache.logDebug(_args[1]);
         } else if ("logError".equals(_args[0]))  {
             _paramCache.logError(_args[1]);
@@ -436,8 +439,7 @@ public abstract class AbstractPropertyObject_mxJPO
         } else if ("logWarning".equals(_args[0]))  {
             _paramCache.logWarning(_args[1]);
         } else  {
-            // TODO: internal exception!
-            throw new Exception("unknown jpo call execute " + _args[1]);
+            throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.ABSTRACT_PROPERTY_JPO_CALL_METHOD_UNKNOWN, _args[0]);
         }
     }
 

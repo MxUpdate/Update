@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,15 @@ public class Interface_mxJPO
     extends AbstractDMWithAttributes_mxJPO
 {
     /**
+     * Key used to identify the update of an interface within
+     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)}.
+     *
+     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
+     * @see #TCL_PROCEDURE
+     */
+    private static final String JPO_CALLER_KEY = "parents";
+
+    /**
      * Called TCL procedure within the TCL update to assign parent interface to
      * this interface object. The first argument of the JPO caller is
      * &quot;parents&quot; to differ between an update for parent interface or
@@ -56,7 +65,7 @@ public class Interface_mxJPO
     private static final String TCL_PROCEDURE
             = "proc testParents {args}  {\n"
                 + "set iIdx 0\n"
-                + "set lsCmd [list mql exec prog org.mxupdate.update.util.JPOCaller parents]\n"
+                + "set lsCmd [list mql exec prog org.mxupdate.update.util.JPOCaller " + Interface_mxJPO.JPO_CALLER_KEY + "]\n"
                 + "while {$iIdx < [llength $args]}  {\n"
                 +   "lappend lsCmd [lindex $args $iIdx]\n"
                 +   "incr iIdx\n"
@@ -342,7 +351,7 @@ public class Interface_mxJPO
                                final String... _args)
             throws Exception
     {
-        if (!"parents".equals(_args[0]))  {
+        if ((_args.length == 0) || !Interface_mxJPO.JPO_CALLER_KEY.equals(_args[0]))  {
             super.jpoCallExecute(_paramCache, _args);
         } else  {
             // evaluate parameters

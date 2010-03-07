@@ -126,64 +126,69 @@ public class Dispatcher_mxJPO
 
             // initialize mapping
             final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, true, params);
-            // define error stream
-            final StringBuilder textErr = new StringBuilder();
-            System.setErr(new PrintStream(new OutputStream() {
-                @Override()
-                public void write(final int _char)
-                {
-                    if (_char == 10)  {
-                        paramCache.logError(textErr.toString());
-                        textErr.delete(0, textErr.length());
-                    } else  {
-                        textErr.append((char) _char);
+
+            try  {
+                // define error stream
+                final StringBuilder textErr = new StringBuilder();
+                System.setErr(new PrintStream(new OutputStream() {
+                    @Override()
+                    public void write(final int _char)
+                    {
+                        if (_char == 10)  {
+                            paramCache.logError(textErr.toString());
+                            textErr.delete(0, textErr.length());
+                        } else  {
+                            textErr.append((char) _char);
+                        }
                     }
-                }
-            }));
-            // define output stream
-            final StringBuilder textOut = new StringBuilder();
-            System.setOut(new PrintStream(new OutputStream() {
-                @Override()
-                public void write(final int _char)
-                {
-                    if (_char == 10)  {
-                        paramCache.logInfo(textOut.toString());
-                        textOut.delete(0, textOut.length());
-                    } else  {
-                        textOut.append((char) _char);
+                }));
+                // define output stream
+                final StringBuilder textOut = new StringBuilder();
+                System.setOut(new PrintStream(new OutputStream() {
+                    @Override()
+                    public void write(final int _char)
+                    {
+                        if (_char == 10)  {
+                            paramCache.logInfo(textOut.toString());
+                            textOut.delete(0, textOut.length());
+                        } else  {
+                            textOut.append((char) _char);
+                        }
                     }
+                }));
+
+                final Object bck;
+                if (Dispatcher_mxJPO.METHOD_EXPORT.equals(method))  {
+                    bck = new Export_mxJPO().execute(paramCache, arguments);
+                } else if (Dispatcher_mxJPO.METHOD_GET_PROPERTY.equals(method))  {
+                    bck = new GetProperties_mxJPO().execute(paramCache, arguments);
+                } else if (Dispatcher_mxJPO.METHOD_GET_VERSION.equals(method))  {
+                    bck = new GetVersion_mxJPO().execute(paramCache, arguments);
+                } else if (Dispatcher_mxJPO.METHOD_SEARCH.equals(method))  {
+                    bck = new Search_mxJPO().execute(paramCache, arguments);
+                } else if (Dispatcher_mxJPO.METHOD_TYPEDEFTREELIST.equals(method))  {
+                    bck = new TypeDefTreeList_mxJPO().execute(paramCache, arguments);
+                } else if (Dispatcher_mxJPO.METHOD_UPDATE.equals(method))  {
+                    bck = new Update_mxJPO().execute(paramCache, arguments);
+                } else  {
+                    throw new Exception("unknown plug-in method '" + method + "'");
                 }
-            }));
 
-            final Object bck;
-            if (Dispatcher_mxJPO.METHOD_EXPORT.equals(method))  {
-                bck = new Export_mxJPO().execute(paramCache, arguments);
-            } else if (Dispatcher_mxJPO.METHOD_GET_PROPERTY.equals(method))  {
-                bck = new GetProperties_mxJPO().execute(paramCache, arguments);
-            } else if (Dispatcher_mxJPO.METHOD_GET_VERSION.equals(method))  {
-                bck = new GetVersion_mxJPO().execute(paramCache, arguments);
-            } else if (Dispatcher_mxJPO.METHOD_SEARCH.equals(method))  {
-                bck = new Search_mxJPO().execute(paramCache, arguments);
-            } else if (Dispatcher_mxJPO.METHOD_TYPEDEFTREELIST.equals(method))  {
-                bck = new TypeDefTreeList_mxJPO().execute(paramCache, arguments);
-            } else if (Dispatcher_mxJPO.METHOD_UPDATE.equals(method))  {
-                bck = new Update_mxJPO().execute(paramCache, arguments);
-            } else  {
-                throw new Exception("unknown plug-in method '" + method + "'");
+                if (textErr.length() > 0)  {
+                    paramCache.logError(textErr.toString());
+                }
+                if (textOut.length() > 0)  {
+                    paramCache.logInfo(textOut.toString());
+                }
+
+                ret = this.prepareReturn(paramCache.getLogString(),
+                                         (String) null,
+                                         (Exception) null,
+                                         bck);
+            } catch (final Exception exception)  {
+                ret = this.prepareReturn(paramCache.getLogString(), null, exception, null);
             }
-
-            if (textErr.length() > 0)  {
-                paramCache.logError(textErr.toString());
-            }
-            if (textOut.length() > 0)  {
-                paramCache.logInfo(textOut.toString());
-            }
-
-            ret = this.prepareReturn(paramCache.getLogString(),
-                                     (String) null,
-                                     (Exception) null,
-                                     bck);
-
+        // in the case an exception occurred while param cache is initialized
         } catch (final Exception exception)  {
             ret = this.prepareReturn(null, null, exception, null);
         } finally  {

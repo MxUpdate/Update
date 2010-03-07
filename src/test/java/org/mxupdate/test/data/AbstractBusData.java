@@ -43,7 +43,7 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
      * Used to separate type, name and revision of business objects within
      * name of files.
      */
-    private static final String SEPARATOR = "________";
+    public static final String SEPARATOR = "________";
 
     /**
      * Related business type of this business object (if the type has children).

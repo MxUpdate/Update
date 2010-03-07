@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,15 @@ abstract class AbstractAttribute_mxJPO
     private static final String SELECT_ATTRS = "list attribute * select type name dump";
 
     /**
+     * Key used to identify the update of an attribute within
+     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)}.
+     *
+     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
+     * @see #TCL_PROCEDURE
+     */
+    private static final String JPO_CALLER_KEY = "defineAttrDimension";
+
+    /**
      * Called TCL procedure within the TCL update to parse the new policy
      * definition. The TCL procedure calls method
      * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)} with the new
@@ -66,7 +75,7 @@ abstract class AbstractAttribute_mxJPO
      */
     private static final String TCL_PROCEDURE
             = "proc defineAttrDimension {_sName _sDimension}  {\n"
-                + "mql exec prog org.mxupdate.update.util.JPOCaller defineAttrDimension $_sName $_sDimension\n"
+                + "mql exec prog org.mxupdate.update.util.JPOCaller " + AbstractAttribute_mxJPO.JPO_CALLER_KEY + " $_sName $_sDimension\n"
             + "}\n";
 
     /**
@@ -458,7 +467,9 @@ abstract class AbstractAttribute_mxJPO
         throws Exception
     {
         // check if dimension is defined
-        if ("defineAttrDimension".equals(_args[0]))  {
+        if ((_args.length == 0) || !AbstractAttribute_mxJPO.JPO_CALLER_KEY.equals(_args[0]))  {
+            super.jpoCallExecute(_paramCache, _args);
+        } else  {
             // check that attribute names are equal
             if (!this.getName().equals(_args[1]))  {
                 throw new Exception("dimension for wrong attribute '"
@@ -468,8 +479,6 @@ abstract class AbstractAttribute_mxJPO
 
             this.updateDimension(_paramCache, _args[2]);
             this.dimensionUpdated = true;
-        } else  {
-            super.jpoCallExecute(_paramCache, _args);
         }
     }
 

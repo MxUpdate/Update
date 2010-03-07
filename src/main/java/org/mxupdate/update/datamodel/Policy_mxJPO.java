@@ -93,6 +93,15 @@ public class Policy_mxJPO
     }
 
     /**
+     * Key used to identify the update of a policy within
+     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)}.
+     *
+     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
+     * @see #TCL_PROCEDURE
+     */
+    private static final String JPO_CALLER_KEY = "policy";
+
+    /**
      * Called TCL procedure within the TCL update to parse the new policy
      * definition. The TCL procedure calls method
      * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)} with the new
@@ -108,7 +117,7 @@ public class Policy_mxJPO
                 + "regsub -all {\\\"} $sArg {@1@1@} sArg\n"
                 + "regsub -all {\\\\\\[} $sArg {[} sArg\n"
                 + "regsub -all {\\\\\\]} $sArg {]} sArg\n"
-                + "mql exec prog org.mxupdate.update.util.JPOCaller policy $_sPolicy \"${sArg}\"\n"
+                + "mql exec prog org.mxupdate.update.util.JPOCaller " + Policy_mxJPO.JPO_CALLER_KEY + " $_sPolicy \"${sArg}\"\n"
             + "}\n";
 
     /**
@@ -395,41 +404,45 @@ public class Policy_mxJPO
                                final String... _args)
         throws Exception
     {
-        final String code = _args[2].replaceAll("@0@0@", "'")
-                                    .replaceAll("@1@1@", "\\\"");
-
-        final PolicyDefParser_mxJPO parser = new PolicyDefParser_mxJPO(new StringReader(code));
-        final Policy_mxJPO policy = parser.policy(_paramCache, this.getTypeDef(), _args[1]);
-
-        final StringBuilder cmd = new StringBuilder()
-                .append("escape mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ");
-
-        // basic information
-        this.calcValueDelta(cmd, "description", policy.getDescription(), this.getDescription());
-        this.calcListDelta(cmd, "type", policy.types, this.types);
-        this.calcListDelta(cmd, "format", policy.formats, this.formats);
-        this.calcValueDelta(cmd, "defaultformat", policy.defaultFormat, this.defaultFormat);
-        this.calcValueDelta(cmd, "sequence", policy.sequence, this.sequence);
-        // hidden flag, because hidden flag must be set with special syntax
-        if (this.isHidden() != policy.isHidden())  {
-            if (!policy.isHidden())  {
-                cmd.append('!');
-            }
-            cmd.append("hidden ");
-        }
-        // because the store of a policy could not be removed....
-        if ((policy.store != null) && !"".equals(policy.store))  {
-            this.calcValueDelta(cmd, "store", policy.store, this.store);
-        // instead store 'ADMINISTRATION' must be assigned
+        if ((_args.length == 0) || !Policy_mxJPO.JPO_CALLER_KEY.equals(_args[0]))  {
+            super.jpoCallExecute(_paramCache, _args);
         } else  {
-            cmd.append(" store ADMINISTRATION");
+            final String code = _args[2].replaceAll("@0@0@", "'")
+                                        .replaceAll("@1@1@", "\\\"");
+
+            final PolicyDefParser_mxJPO parser = new PolicyDefParser_mxJPO(new StringReader(code));
+            final Policy_mxJPO policy = parser.policy(_paramCache, this.getTypeDef(), _args[1]);
+
+            final StringBuilder cmd = new StringBuilder()
+                    .append("escape mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ");
+
+            // basic information
+            this.calcValueDelta(cmd, "description", policy.getDescription(), this.getDescription());
+            this.calcListDelta(cmd, "type", policy.types, this.types);
+            this.calcListDelta(cmd, "format", policy.formats, this.formats);
+            this.calcValueDelta(cmd, "defaultformat", policy.defaultFormat, this.defaultFormat);
+            this.calcValueDelta(cmd, "sequence", policy.sequence, this.sequence);
+            // hidden flag, because hidden flag must be set with special syntax
+            if (this.isHidden() != policy.isHidden())  {
+                if (!policy.isHidden())  {
+                    cmd.append('!');
+                }
+                cmd.append("hidden ");
+            }
+            // because the store of a policy could not be removed....
+            if ((policy.store != null) && !"".equals(policy.store))  {
+                this.calcValueDelta(cmd, "store", policy.store, this.store);
+            // instead store 'ADMINISTRATION' must be assigned
+            } else  {
+                cmd.append(" store ADMINISTRATION");
+            }
+            cmd.append(";\n");
+
+            this.calcAllStateAccess(_paramCache, cmd, policy);
+            this.calcStatesDelta(_paramCache, cmd, policy);
+
+            MqlUtil_mxJPO.execMql(_paramCache, cmd);
         }
-        cmd.append(";\n");
-
-        this.calcAllStateAccess(_paramCache, cmd, policy);
-        this.calcStatesDelta(_paramCache, cmd, policy);
-
-        MqlUtil_mxJPO.execMql(_paramCache, cmd);
     }
 
     /**
