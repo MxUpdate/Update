@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,46 +81,6 @@ public final class MqlUtil_mxJPO
                     + (_includeMQLCommand ? ("\nMQL command was:\n" + _cmd) : ""));
         }
         return mql.getResult().trim();
-    }
-
-    /**
-     * Checks if the escape is on.
-     *
-     * @param _paramCache       parameter cache
-     * @return <i>true</i> if the escape is on; otherwise <i>false</i>
-     * @throws MatrixException if check failed
-     */
-    @Deprecated()
-    public static boolean isEscapeOn(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
-    {
-        return "Escape processing is on".equals(MqlUtil_mxJPO.execMql(_paramCache, "print escape"));
-    }
-
-    /**
-     * Sets the escape on.
-     *
-     * @param _paramCache       parameter cache
-     * @throws MatrixException if the escape could not be set to on
-     */
-    @Deprecated()
-    public static void setEscapeOn(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
-    {
-        MqlUtil_mxJPO.execMql(_paramCache, "set escape on");
-    }
-
-    /**
-     * Sets the escape off.
-     *
-     * @param _paramCache       parameter cache
-     * @throws MatrixException if the escape could not be set to off
-     */
-    @Deprecated()
-    public static void setEscapeOff(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
-    {
-        MqlUtil_mxJPO.execMql(_paramCache, "set escape off");
     }
 
     /**
