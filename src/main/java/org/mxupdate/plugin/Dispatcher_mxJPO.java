@@ -51,59 +51,64 @@ public class Dispatcher_mxJPO
      *
      * @see #prepareReturn(String, String, Exception, Object)
      */
-    private static final String RETURN_KEY_LOG = "log";
+    private static final String RETURN_KEY_LOG = "log"; //$NON-NLS-1$
 
     /**
      * Name of the key in the return map for the error message.
      *
      * @see #prepareReturn(String, String, Exception, Object)
      */
-    private static final String RETURN_KEY_ERROR = "error";
+    private static final String RETURN_KEY_ERROR = "error"; //$NON-NLS-1$
 
     /**
      * Name of the key in the return map for the exception.
      *
      * @see #prepareReturn(String, String, Exception, Object)
      */
-    private static final String RETURN_KEY_EXCEPTION = "exception";
+    private static final String RETURN_KEY_EXCEPTION = "exception"; //$NON-NLS-1$
 
     /**
      * Name of the key in the return map for the values.
      *
      * @see #prepareReturn(String, String, Exception, Object)
      */
-    private static final String RETURN_KEY_VALUES = "values";
+    private static final String RETURN_KEY_VALUES = "values"; //$NON-NLS-1$
+
+    /**
+     * Name of the &quot;Execute&quot; method within the parameters map.
+     */
+    private static final String METHOD_EXECUTE = "Execute"; //$NON-NLS-1$
 
     /**
      * Name of the &quot;Export&quot; method within the parameters map.
      */
-    private static final String METHOD_EXPORT = "Export";
+    private static final String METHOD_EXPORT = "Export"; //$NON-NLS-1$
 
     /**
      * Name of the &quot;GetProperty&quot; method within the parameters map.
      */
-    private static final String METHOD_GET_PROPERTY = "GetProperty";
+    private static final String METHOD_GET_PROPERTY = "GetProperty"; //$NON-NLS-1$
 
     /**
      * Name of the &quot;GetVersion&quot; method within the parameters map.
      */
-    private static final String METHOD_GET_VERSION = "GetVersion";
+    private static final String METHOD_GET_VERSION = "GetVersion"; //$NON-NLS-1$
 
     /**
      * Name of the &quot;Search&quot; method within the parameters map.
      */
-    private static final String METHOD_SEARCH = "Search";
+    private static final String METHOD_SEARCH = "Search"; //$NON-NLS-1$
 
     /**
      * Name of the &quot;TypeDefTreeList&quot; method within the parameters
      * map.
      */
-    private static final String METHOD_TYPEDEFTREELIST = "TypeDefTreeList";
+    private static final String METHOD_TYPEDEFTREELIST = "TypeDefTreeList"; //$NON-NLS-1$
 
     /**
      * Name of the &quot;Update&quot; method within the parameters map.
      */
-    private static final String METHOD_UPDATE = "Update";
+    private static final String METHOD_UPDATE = "Update"; //$NON-NLS-1$
 
     /**
      * Main method to dispatch between different plug-in methods.
@@ -158,7 +163,9 @@ public class Dispatcher_mxJPO
                 }));
 
                 final Object bck;
-                if (Dispatcher_mxJPO.METHOD_EXPORT.equals(method))  {
+                if (Dispatcher_mxJPO.METHOD_EXECUTE.equals(method))  {
+                    bck = new Execute_mxJPO().execute(paramCache, arguments);
+                } else if (Dispatcher_mxJPO.METHOD_EXPORT.equals(method))  {
                     bck = new Export_mxJPO().execute(paramCache, arguments);
                 } else if (Dispatcher_mxJPO.METHOD_GET_PROPERTY.equals(method))  {
                     bck = new GetProperties_mxJPO().execute(paramCache, arguments);
