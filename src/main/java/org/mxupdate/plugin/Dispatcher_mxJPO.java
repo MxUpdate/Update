@@ -114,7 +114,15 @@ public class Dispatcher_mxJPO
      * Main method to dispatch between different plug-in methods.
      *
      * @param _context  MX context
-     * @param _args     packed arguments
+     * @param _args     packed arguments as string with following meaning in
+     *                  this order:
+     *                  <ul>
+     *                  <li>first argument are parameters defined from
+     *                      {@link org.mxupdate.mapping.ParameterDef_mxJPO}</li>
+     *                  <li>name of the method which must be called from the
+     *                      dispatcher</li>
+     *                  <li>arguments for the called method</li>
+     *                  </ul>
      * @throws IOException if returned values could not be written
      */
     public void mxMain(final Context _context,
