@@ -110,7 +110,7 @@ class Search_mxJPO
         final List<Map<String,String>> ret = new ArrayList<Map<String,String>>();
 
         // first sort the matches depending on the type definition
-        for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefs())  {
+        for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
             if (typeDefList.contains(typeDef.getName()))  {
                 final AbstractObject_mxJPO obj = typeDef.newTypeInstance(null);
                 for (final String name : obj.getMxNames(_paramCache))  {

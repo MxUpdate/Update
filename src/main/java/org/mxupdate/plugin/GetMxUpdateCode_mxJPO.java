@@ -60,7 +60,7 @@ public class GetMxUpdateCode_mxJPO
 
         // first found related type definition
         AbstractObject_mxJPO instance = null;
-        for (final TypeDef_mxJPO typeDef : paramCache.getMapping().getAllTypeDefs())  {
+        for (final TypeDef_mxJPO typeDef : paramCache.getMapping().getAllTypeDefsSorted())  {
             if (!typeDef.isFileMatchLast())  {
                 instance = typeDef.newTypeInstance(null);
                 final String mxName = instance.extractMxName(paramCache, file);
@@ -73,7 +73,7 @@ public class GetMxUpdateCode_mxJPO
             }
         }
         if (instance == null)  {
-            for (final TypeDef_mxJPO typeDef : paramCache.getMapping().getAllTypeDefs())  {
+            for (final TypeDef_mxJPO typeDef : paramCache.getMapping().getAllTypeDefsSorted())  {
                 if (typeDef.isFileMatchLast())  {
                     instance = typeDef.newTypeInstance(null);
                     final String mxName = instance.extractMxName(paramCache, file);

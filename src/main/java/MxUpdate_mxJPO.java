@@ -38,7 +38,6 @@ import org.mxupdate.mapping.Mode_mxJPO;
 import org.mxupdate.mapping.ParameterDef_mxJPO;
 import org.mxupdate.mapping.TypeDefGroup_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.mapping.UpdateCheck_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -168,11 +167,6 @@ public class MxUpdate_mxJPO
             = new HashMap<String,TypeDef_mxJPO>();
 
     /**
-     * Holds all parameters related how the version information is set.
-     */
-    private final Map<String,UpdateCheck_mxJPO> paramsUpdateChecks = new HashMap<String,UpdateCheck_mxJPO>();
-
-    /**
      *
      * @param _paramCache   parameter cache
      * @throws MatrixException
@@ -185,7 +179,6 @@ public class MxUpdate_mxJPO
         this.paramsModes.clear();
         this.paramsParameters.clear();
         this.paramsTypeDefs.clear();
-        this.paramsUpdateChecks.clear();
 
         ////////////////////////////////////////////////////////////////////////
         // parameters
@@ -231,27 +224,11 @@ public class MxUpdate_mxJPO
         }
 
         ////////////////////////////////////////////////////////////////////////
-        // update checks
-
-        for (final UpdateCheck_mxJPO updateCheck : UpdateCheck_mxJPO.values())  {
-            for (final String param : updateCheck.getParameterList(_paramCache))  {
-                if (param.length() == 1)  {
-                    this.paramsUpdateChecks.put("-" + param, updateCheck);
-                } else  {
-                    this.paramsUpdateChecks.put("--" + param, updateCheck);
-                }
-            }
-            this.appendDescription(updateCheck.getParameterDesc(_paramCache),
-                                   updateCheck.getParameterList(_paramCache),
-                                   null);
-        }
-
-        ////////////////////////////////////////////////////////////////////////
         // type definitions
 
         // first create list all type definitions which could be used...
         final Set<TypeDef_mxJPO> all = new HashSet<TypeDef_mxJPO>();
-        for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefs())  {
+        for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
             if (!typeDef.isBusCheckExists() || typeDef.existsBusType(_paramCache))  {
                 all.add(typeDef);
                 if (typeDef.getParameterList() != null)  {
@@ -417,9 +394,6 @@ public class MxUpdate_mxJPO
 
             boolean unknown = false;
 
-            UpdateCheck_mxJPO versionInfo = null;
-
-
             for (int idx = 0; idx < _args.length; idx++)  {
                 final String arg = _args[idx];
                 if (this.paramsTypeDefs.containsKey(arg))  {
@@ -455,8 +429,6 @@ public class MxUpdate_mxJPO
                     idx = paramCache.evalParameter(this.paramsParameters.get(arg),
                                                    _args,
                                                    idx);
-                } else if (this.paramsUpdateChecks.containsKey(arg))  {
-                    versionInfo = this.paramsUpdateChecks.get(arg);
                 } else  {
                     unknown = true;
                     paramCache.logError("unknown pararameter "  + arg);
@@ -468,7 +440,7 @@ public class MxUpdate_mxJPO
             } else if (Mode_mxJPO.EXPORT == mode)  {
                 this.export(paramCache, clazz2matches, clazz2matchesOpp);
             } else if (Mode_mxJPO.IMPORT == mode)  {
-                this.update(paramCache, clazz2matches, clazz2matchesOpp, versionInfo);
+                this.update(paramCache, clazz2matches, clazz2matchesOpp);
             } else if (Mode_mxJPO.DELETE == mode)  {
                 this.delete(paramCache, clazz2matches, clazz2matchesOpp);
             }
@@ -587,7 +559,7 @@ public class MxUpdate_mxJPO
     protected void export(final ParameterCache_mxJPO _paramCache,
                           final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches,
                           final Map<TypeDef_mxJPO,List<String>> _clazz2matchesOpp)
-            throws Exception
+        throws Exception
     {
         final Collection<String> paths = _paramCache.getValueList(MxUpdate_mxJPO.PARAM_PATH);
 
@@ -625,21 +597,17 @@ public class MxUpdate_mxJPO
      * @param _clazz2matchesOpp all classes and the depending matches for the
      *                          files which must be excluded from the matches
      *                          defined in <code>_class2matched</code>
-     * @param _versionInfo      defines how it is checked if an update is
-     *                          required (see {@link UpdateCheck_mxJPO})
      * @throws Exception if update failed
      * @see UpdateCheck_mxJPO
      */
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches,
-                          final Map<TypeDef_mxJPO,List<String>> _clazz2matchesOpp,
-                          final UpdateCheck_mxJPO _versionInfo)
+                          final Map<TypeDef_mxJPO,List<String>> _clazz2matchesOpp)
             throws Exception
     {
         UpdateUtil_mxJPO.update(
                 _paramCache,
-                this.evalMatches(_paramCache, _clazz2matches, _clazz2matchesOpp),
-                _versionInfo);
+                this.evalMatches(_paramCache, _clazz2matches, _clazz2matchesOpp));
     }
 
     /**

@@ -276,7 +276,7 @@ public class Update_mxJPO
                                  final boolean _compile)
         throws Exception
     {
-        UpdateUtil_mxJPO.update(_paramCache, this.evalInstances(_paramCache, _files), null);
+        UpdateUtil_mxJPO.update(_paramCache, this.evalInstances(_paramCache, _files));
         return _paramCache.getLogString();
     }
 
@@ -296,7 +296,7 @@ public class Update_mxJPO
         final Map<TypeDef_mxJPO,Map<File,String>> ret = new HashMap<TypeDef_mxJPO,Map<File,String>>();
         for (final File file : _files)  {
             boolean found = false;
-            for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefs())  {
+            for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
                 if (!typeDef.isFileMatchLast())  {
                     final AbstractObject_mxJPO instance = typeDef.newTypeInstance(null);
                     final String mxName = instance.extractMxName(_paramCache, file);
@@ -311,7 +311,7 @@ public class Update_mxJPO
                 }
             }
             if (!found)  {
-                for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefs())  {
+                for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
                     if (typeDef.isFileMatchLast())  {
                         final AbstractObject_mxJPO instance = typeDef.newTypeInstance(null);
                         final String mxName = instance.extractMxName(_paramCache, file);

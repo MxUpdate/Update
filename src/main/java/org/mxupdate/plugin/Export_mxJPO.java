@@ -142,7 +142,7 @@ class Export_mxJPO
             final File file = new File(fileName);
 
             // first found related type definition
-            for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefs())  {
+            for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
                 if (!typeDef.isFileMatchLast())  {
                     instance = typeDef.newTypeInstance(null);
                     final String mxName = instance.extractMxName(_paramCache, file);
@@ -155,7 +155,7 @@ class Export_mxJPO
                 }
             }
             if (instance == null)  {
-                for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefs())  {
+                for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
                     if (typeDef.isFileMatchLast())  {
                         instance = typeDef.newTypeInstance(null);
                         final String mxName = instance.extractMxName(_paramCache, file);

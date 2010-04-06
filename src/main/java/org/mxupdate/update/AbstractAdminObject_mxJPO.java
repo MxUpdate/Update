@@ -244,6 +244,26 @@ public abstract class AbstractAdminObject_mxJPO
     }
 
     /**
+     * {@inheritDoc}
+     * <p>A print on the property with a key is internally done.</p>
+     */
+    @Override()
+    public String getPropValue(final ParameterCache_mxJPO _paramCache,
+                               final PropertyDef_mxJPO _prop)
+        throws MatrixException
+    {
+        final String tmp = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
+                .append("escape print ").append(this.getTypeDef().getMxAdminName())
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
+                .append(this.getTypeDef().getMxAdminSuffix())
+                .append(" select property[").append(_prop.getPropName(_paramCache)).append("] dump"));
+        final int length = 7 + _prop.getPropName(_paramCache).length();
+        return (tmp.length() >= length)
+                     ? tmp.substring(length)
+                     : "";
+    }
+
+    /**
      * Creates a XML representation of the Object to export, parses them and
      * executes the post preparation {@link #prepare(ParameterCache_mxJPO)}.
      *

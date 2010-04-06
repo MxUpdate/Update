@@ -26,6 +26,7 @@ import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.integration.IEFGlobalConfigData;
+import org.mxupdate.test.util.IssueLink;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -122,7 +123,7 @@ public class IEFGlobalConfigTest
      * result.
      *
      * @param _description      description of the test case
-     * @param _globalConfig   global configuration to test
+     * @param _globalConfig     global configuration to test
      * @throws Exception if test failed
      */
     @Test(dataProvider = "busDatas",
@@ -137,6 +138,36 @@ public class IEFGlobalConfigTest
 
         // first update with original content
         _globalConfig.update();
+        final ExportParser exportParser = _globalConfig.export();
+        _globalConfig.checkExport(exportParser);
+
+        // second update with delivered content
+        _globalConfig.updateWithCode(exportParser.getOrigCode())
+                     .checkExport();
+    }
+
+    /**
+     * Test update of the integration global configuration object where the
+     * file date is checked.
+     *
+     * @param _description      description of the test case
+     * @param _globalConfig     global configuration to test
+     * @throws Exception if test failed
+     */
+    @IssueLink("116")
+    @Test(dataProvider = "busDatas",
+          description = "check if an update of a global object works while checking the file date")
+    public void testUpdateWithCheckFileDate(final String _description,
+                                            final IEFGlobalConfigData _globalConfig)
+        throws Exception
+    {
+        if (_globalConfig.getType() != null)  {
+            _globalConfig.getType().create();
+        }
+
+
+        // first update with original content
+        _globalConfig.update("UpdateCheckFileDate", "true");
         final ExportParser exportParser = _globalConfig.export();
         _globalConfig.checkExport(exportParser);
 

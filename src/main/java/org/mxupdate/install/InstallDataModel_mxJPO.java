@@ -688,7 +688,7 @@ public class InstallDataModel_mxJPO
     protected void updateBusTypes(final ParameterCache_mxJPO _paramCache)
             throws Exception
     {
-        for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefs())  {
+        for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
             if ((typeDef.getMxBusType() != null) && !"".equals(typeDef.getMxBusType())
                     && (typeDef.getMxAdminName() == null)
                     && (!typeDef.isBusCheckExists() || typeDef.existsBusType(_paramCache)))  {
@@ -732,7 +732,7 @@ public class InstallDataModel_mxJPO
     {
         // prepare properties as set
         final Set<String> props = new TreeSet<String>();
-        for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefs())  {
+        for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
             if (typeDef.getIconPath() != null)  {
 
                 final File file = new File(_sourcePath, typeDef.getIconPath());

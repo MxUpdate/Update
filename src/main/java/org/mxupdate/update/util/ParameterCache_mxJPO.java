@@ -71,12 +71,6 @@ public class ParameterCache_mxJPO
     public static final String KEY_DEFAULTINSTALLER = "DefaultInstaller";
 
     /**
-     * String of the key within the parameter cache for the use file date as
-     * version parameter.
-     */
-    public static final String KEY_FILEDATE2VERSION = "FileDate2Version";
-
-    /**
      * String of the key within the parameter cache for the installer
      * parameter.
      */

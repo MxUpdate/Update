@@ -32,7 +32,6 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
@@ -367,45 +366,19 @@ public abstract class AbstractObject_mxJPO
     }
 
     /**
-     * Returns the stored value within Matrix for administration object
-     * with given property name. For performance reason the method uses
+     * <p>Returns the stored value within Matrix for administration object
+     * with given property name. For performance reason the method should use
      * &quot;print&quot; commands, because a complete XML parse including a
-     * complete export takes longer time.
+     * complete export takes longer time.</p>
      *
      * @param _paramCache   parameter cache
      * @param _prop         property for which the value is searched
      * @return value for given property
      * @throws MatrixException if the property value could not be extracted
      */
-    public String getPropValue(final ParameterCache_mxJPO _paramCache,
+    public abstract String getPropValue(final ParameterCache_mxJPO _paramCache,
                                final PropertyDef_mxJPO _prop)
-        throws MatrixException
-    {
-        final String curVersion;
-        // check for existing administration type...
-        if (this.getTypeDef().getMxAdminName() != null)  {
-            final String tmp = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
-                    .append("escape print ").append(this.getTypeDef().getMxAdminName())
-                    .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
-                    .append(this.getTypeDef().getMxAdminSuffix())
-                    .append(" select property[").append(_prop.getPropName(_paramCache)).append("] dump"));
-            final int length = 7 + _prop.getPropName(_paramCache).length();
-            curVersion = (tmp.length() >= length)
-                         ? tmp.substring(length)
-                         : "";
-        // otherwise we have a business object....
-        } else  {
-            final String[] nameRev = this.getName().split("________");
-            curVersion = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
-                    .append("print bus \"")
-                    .append(this.getTypeDef().getMxBusType())
-                    .append("\" \"").append(nameRev[0])
-                    .append("\" \"").append((nameRev.length > 1) ? nameRev[1] : "")
-                    .append("\" select attribute[").append(_prop.getAttrName(_paramCache)).append("] dump"));
-        }
-
-        return curVersion;
-    }
+        throws MatrixException;
 
     /**
      * Getter method for instance variable {@link #mxName}.

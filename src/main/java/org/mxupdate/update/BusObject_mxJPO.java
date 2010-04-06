@@ -303,6 +303,24 @@ public class BusObject_mxJPO
     }
 
     /**
+     * {@inheritDoc}
+     * <p>A <code>print bus</code> is internally made because the property is
+     * defined as attribute on the business object.</p>
+     */
+    @Override()
+    public String getPropValue(final ParameterCache_mxJPO _paramCache,
+                               final PropertyDef_mxJPO _prop)
+        throws MatrixException
+    {
+        return MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
+                .append("escape print bus \"")
+                .append(StringUtil_mxJPO.convertMql(this.getBusType()))
+                .append("\" \"").append(StringUtil_mxJPO.convertMql(this.getBusName()))
+                .append("\" \"").append(StringUtil_mxJPO.convertMql(this.getBusRevision()))
+                .append("\" select attribute[").append(StringUtil_mxJPO.convertMql(_prop.getAttrName(_paramCache))).append("] dump"));
+    }
+
+    /**
      * Parses all information for given administration object.
      * Sorts the attribute values, defines the description for the TCL
      * update script (concatenation of the revision and description).

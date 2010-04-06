@@ -122,11 +122,15 @@ public class Mapping_mxJPO
      *
      * @see TypeDef_mxJPO#defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
      * @see #getTypeDef(String)
-     * @see #getAllTypeDefs()
      * @see #getTypeDefMap()
      */
     private final Map<String,TypeDef_mxJPO> typeDefMap = new HashMap<String,TypeDef_mxJPO>();
 
+    /**
+     * Sorted type definition used to define the order of the update.
+     *
+     * @see #getAllTypeDefsSorted()
+     */
     private final Set<TypeDef_mxJPO> typeDefSorted = new TreeSet<TypeDef_mxJPO>();
 
     /**
@@ -162,16 +166,6 @@ public class Mapping_mxJPO
     private final Map<String,TypeDefTree_mxJPO> typeDefTreeMap = new HashMap<String,TypeDefTree_mxJPO>();
 
     /**
-     * Maps from the update check enumeration item to related instance which
-     * holds the parameter list and description.
-     *
-     * @see UpdateCheck_mxJPO#defineValue(Mapping_mxJPO, String, String)
-     * @see #getUpdateCheckMap()
-     */
-    private final Map<UpdateCheck_mxJPO,AbstractValue_mxJPO> updateCheckMap
-            = new HashMap<UpdateCheck_mxJPO,AbstractValue_mxJPO>();
-
-    /**
      *
      * @param _paramCache   parameter cache
      * @throws MatrixException if the property program {@link #PROP_NAME} could
@@ -199,8 +193,6 @@ public class Mapping_mxJPO
                 TypeDefGroup_mxJPO.defineValue(this, key.substring(13), value);
             } else if (key.startsWith("TypeDefTree."))  {
                 TypeDefTree_mxJPO.defineValue(this, key.substring(12), value);
-            } else if (key.startsWith("UpdateCheck."))  {
-                UpdateCheck_mxJPO.defineValue(this, key.substring(12), value);
             }
         }
         this.typeDefSorted.addAll(this.typeDefMap.values());
@@ -336,7 +328,7 @@ public class Mapping_mxJPO
      * @return list of all sorted type definition instances
      * @see #typeDefSorted
      */
-    public Collection<TypeDef_mxJPO> getAllTypeDefs()
+    public Collection<TypeDef_mxJPO> getAllTypeDefsSorted()
     {
         return this.typeDefSorted;
     }
@@ -439,18 +431,5 @@ public class Mapping_mxJPO
     protected Map<String,TypeDefTree_mxJPO> getTypeDefTreeMap()
     {
         return this.typeDefTreeMap;
-    }
-
-    /**
-     * Returns the mapping between the update check enumeration item to related
-     * instance which holds the parameter list and description.
-     *
-     * @return mapping between type definition group name and the related type
-     *         definition group instance
-     * @see #updateCheckMap
-     */
-    protected Map<UpdateCheck_mxJPO,AbstractValue_mxJPO> getUpdateCheckMap()
-    {
-        return this.updateCheckMap;
     }
 }

@@ -36,6 +36,7 @@ import matrix.db.Context;
 import matrix.util.MatrixException;
 import matrix.util.StringList;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
@@ -50,7 +51,7 @@ import org.xml.sax.SAXException;
  * @version $Id$
  */
 public class Person_mxJPO
-        extends AbstractObject_mxJPO
+    extends AbstractObject_mxJPO
 {
     /**
      * Administration person instance (used to parse the admin part of a
@@ -103,7 +104,7 @@ public class Person_mxJPO
      */
     @Override()
     public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+        throws MatrixException
     {
         final Set<String> persons = this.personBus.getMxNames(_paramCache);
         final Set<String> ret = new TreeSet<String>();
@@ -111,6 +112,19 @@ public class Person_mxJPO
             ret.add(busName.split(BusObject_mxJPO.SPLIT_NAME)[0]);
         }
         return ret;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>The properties are handled on the administration part of the person.
+     * So the property values are evaluated from {@link #personAdmin}.</p>
+     */
+    @Override()
+    public String getPropValue(final ParameterCache_mxJPO _paramCache,
+                               final PropertyDef_mxJPO _prop)
+        throws MatrixException
+    {
+        return this.personAdmin.getPropValue(_paramCache, _prop);
     }
 
     /**

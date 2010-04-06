@@ -31,7 +31,6 @@ import java.util.Set;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.mapping.UpdateCheck_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -45,10 +44,28 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 public final class UpdateUtil_mxJPO
 {
     /**
-     * String of the key within the parameter cache that administration objects
+     * Name of the key within the parameter cache that administration objects
      * compiled after they are updated.
      */
     private static final String PARAM_COMPILE = "Compile";
+
+    /**
+     * Name of the key within the parameter cache to define if for the update a
+     * check of the file date must be done.
+     */
+    private static final String PARAM_CHECK_FILE_DATE = "UpdateCheckFileDate";
+
+    /**
+     * Name of the key within the parameter cache to define if for the update a
+     * check for the version must be done.
+     */
+    private static final String PARAM_CHECK_VERSION = "UpdateCheckVersion";
+
+    /**
+     * String of the key within the parameter cache for the use file date as
+     * version parameter.
+     */
+    public static final String PARAM_FILEDATE2VERSION = "FileDate2Version";
 
     /**
      * The constructor is defined so that no instance of the update utility
@@ -63,14 +80,11 @@ public final class UpdateUtil_mxJPO
      * @param _paramCache       parameter cache
      * @param _clazz2names      depending on the type definition the related
      *                          files with MX name which must be updated
-     * @param _versionInfo      defines how it is checked if an update is
-     *                          required (see {@link UpdateCheck_mxJPO})
      * @throws Exception if update failed
      * @see UpdateCheck_mxJPO
      */
     public static void update(final ParameterCache_mxJPO _paramCache,
-                              final Map<TypeDef_mxJPO,Map<File,String>> _clazz2names,
-                              final UpdateCheck_mxJPO _versionInfo)
+                              final Map<TypeDef_mxJPO,Map<File,String>> _clazz2names)
         throws Exception
     {
         // create if needed (and not in the list of existing objects)
@@ -79,7 +93,7 @@ public final class UpdateUtil_mxJPO
         // update
         final List<AbstractObject_mxJPO> compiles = new ArrayList<AbstractObject_mxJPO>();
         final boolean compile = _paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_COMPILE);
-        for (final TypeDef_mxJPO clazz : _paramCache.getMapping().getAllTypeDefs())  {
+        for (final TypeDef_mxJPO clazz : _paramCache.getMapping().getAllTypeDefsSorted())  {
             final Map<File,String> clazzMap = _clazz2names.get(clazz);
             if (clazzMap != null)  {
                 for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
@@ -88,10 +102,10 @@ public final class UpdateUtil_mxJPO
                            + " '" + fileEntry.getValue() + "'");
 
                     final boolean update;
-                    final String version = _paramCache.getValueBoolean(ParameterCache_mxJPO.KEY_FILEDATE2VERSION)
+                    final String version = _paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_FILEDATE2VERSION)
                                     ? Long.toString(fileEntry.getKey().lastModified() / 1000)
                                     : _paramCache.getValueString(ParameterCache_mxJPO.KEY_VERSION);
-                    if (_versionInfo == UpdateCheck_mxJPO.FILEDATE)  {
+                    if (_paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_CHECK_FILE_DATE))  {
                         final Date fileDate = new Date(fileEntry.getKey().lastModified());
                         final String instDateString = instance.getPropValue(_paramCache,
                                                                             PropertyDef_mxJPO.FILEDATE);
@@ -111,14 +125,14 @@ public final class UpdateUtil_mxJPO
                             update = true;
                             _paramCache.logDebug("    - update to version from " + fileDate);
                         }
-                    } else if (_versionInfo == UpdateCheck_mxJPO.VERSION)  {
+                    } else if (_paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_CHECK_VERSION))  {
                         final String instVersion = instance.getPropValue(_paramCache,
                                                                         PropertyDef_mxJPO.VERSION);
                         if (instVersion.equals(version))  {
                             update = false;
                         } else  {
                             update = true;
-                            if (_paramCache.getValueBoolean(ParameterCache_mxJPO.KEY_FILEDATE2VERSION))  {
+                            if (_paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_FILEDATE2VERSION))  {
                                 _paramCache.logDebug("    - update to version from "
                                        + new Date(fileEntry.getKey().lastModified()));
                             } else  {
@@ -180,7 +194,7 @@ public final class UpdateUtil_mxJPO
         final Map<TypeDef_mxJPO,Set<String>> existingNames = UpdateUtil_mxJPO.getExistingCIs(_paramCache, _clazz2names.keySet());
 
         // create if needed (and not in the list of existing objects)
-        for (final TypeDef_mxJPO clazz : _paramCache.getMapping().getAllTypeDefs())  {
+        for (final TypeDef_mxJPO clazz : _paramCache.getMapping().getAllTypeDefsSorted())  {
             final Map<File,String> clazzMap = _clazz2names.get(clazz);
             if (clazzMap != null)  {
                 for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
