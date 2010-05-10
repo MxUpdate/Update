@@ -142,6 +142,17 @@ public abstract class AbstractDMWithAttributes_mxJPO
             + "}\n";
 
     /**
+     * Set of all ignored URLs from the XML definition for data model objects
+     * with attributes.
+     *
+     * @see #parse(String, String)
+     */
+    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    static  {
+        AbstractDMWithAttributes_mxJPO.IGNORED_URLS.add("/attributeDefRefList");
+    }
+
+    /**
      * List of all attributes for this data model administration object.
      *
      * @see #parse(String, String)
@@ -169,17 +180,18 @@ public abstract class AbstractDMWithAttributes_mxJPO
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
      * @see #attributes
+     * @see #IGNORED_URLS
      */
     @Override()
     protected void parse(final String _url,
                          final String _content)
     {
-        if ("/attributeDefRefList".equals(_url))  {
-            // to be ignored ...
-        } else if ("/attributeDefRefList/attributeDefRef".equals(_url))  {
-            this.attributes.add(_content);
-        } else  {
-            super.parse(_url, _content);
+        if (!AbstractDMWithAttributes_mxJPO.IGNORED_URLS.contains(_url))  {
+            if ("/attributeDefRefList/attributeDefRef".equals(_url))  {
+                this.attributes.add(_content);
+            } else  {
+                super.parse(_url, _content);
+            }
         }
     }
 
