@@ -58,7 +58,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     private String symbolicName;
 
     /**
-     * Is the role hidden?
+     * Is the administration object hidden?
      *
      * @see #setHidden(Boolean)
      * @see #isHidden()
@@ -133,7 +133,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
      *
      * @param _hidden       <i>true</i> if the data instance is hidden;
      *                      otherwise <i>false</i>
-     * @return this role data instance
+     * @return this data instance
      * @see #hidden
      */
     @SuppressWarnings("unchecked")

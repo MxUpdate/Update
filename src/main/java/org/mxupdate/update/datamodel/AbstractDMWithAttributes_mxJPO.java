@@ -32,6 +32,7 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * The class is used to handle the export / import of administration objects
@@ -266,6 +267,8 @@ public abstract class AbstractDMWithAttributes_mxJPO
             String name = null;
             String attrStr = null;
 
+            final Set<String> ignoreAllAttrs = new HashSet<String>();
+            final Set<String> removeAllAttrs = new HashSet<String>();
             final Set<String> ignoreAttrs = new HashSet<String>();
             final Set<String> removeAttrs = new HashSet<String>();
             while (idx < _args.length)  {
@@ -274,121 +277,140 @@ public abstract class AbstractDMWithAttributes_mxJPO
                     attrStr = _args[++idx];
                 } else if ("-ignoreattr".equals(arg))  {
                     ignoreAttrs.add(this.jpoCallExecuteConvert(_args[++idx]));
-                } else if ("-interface".equals(arg))  {
+                } else if ("-interface".equals(arg) && this.getTypeDef().getMxAdminName().equals("interface"))  {
                     name = this.jpoCallExecuteConvert(_args[++idx]);
-                    final Collection<String> tmp1
-                            = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_IGNORE_INTERFACE);
+                    final Collection<String> tmp1 = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_IGNORE_INTERFACE);
                     if (tmp1 != null)  {
-                        ignoreAttrs.addAll(tmp1);
+                        ignoreAllAttrs.addAll(tmp1);
                     }
-                    final Collection<String> tmp2
-                            = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_REMOVE_INTERFACE);
+                    final Collection<String> tmp2 = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_REMOVE_INTERFACE);
                     if (tmp2 != null)  {
-                        removeAttrs.addAll(tmp2);
+                        removeAllAttrs.addAll(tmp2);
                     }
-                } else if ("-relationship".equals(arg))  {
+                } else if ("-relationship".equals(arg) && this.getTypeDef().getMxAdminName().equals("relationship"))  {
                     name = this.jpoCallExecuteConvert(_args[++idx]);
-                    final Collection<String> tmp1
-                            = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_IGNORE_RELATIONSHIP);
+                    final Collection<String> tmp1 = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_IGNORE_RELATIONSHIP);
                     if (tmp1 != null)  {
-                        ignoreAttrs.addAll(tmp1);
+                        ignoreAllAttrs.addAll(tmp1);
                     }
-                    final Collection<String> tmp2
-                            = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_REMOVE_RELATIONSHIP);
+                    final Collection<String> tmp2 = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_REMOVE_RELATIONSHIP);
                     if (tmp2 != null)  {
-                        removeAttrs.addAll(tmp2);
+                        removeAllAttrs.addAll(tmp2);
                     }
                 } else if ("-removeattr".equals(arg))  {
                     removeAttrs.add(this.jpoCallExecuteConvert(_args[++idx]));
-                } else if ("-type".equals(arg))  {
+                } else if ("-type".equals(arg) && this.getTypeDef().getMxAdminName().equals("type"))  {
                     name = this.jpoCallExecuteConvert(_args[++idx]);
-                    final Collection<String> tmp1
-                            = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_IGNORE_TYPE);
+                    final Collection<String> tmp1 = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_IGNORE_TYPE);
                     if (tmp1 != null)  {
-                        ignoreAttrs.addAll(tmp1);
+                        ignoreAllAttrs.addAll(tmp1);
                     }
-                    final Collection<String> tmp2
-                            = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_REMOVE_TYPE);
+                    final Collection<String> tmp2 = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_REMOVE_TYPE);
                     if (tmp2 != null)  {
-                        removeAttrs.addAll(tmp2);
+                        removeAllAttrs.addAll(tmp2);
                     }
                 } else  {
-                    throw new Exception("unknown parameter \"" + arg + "\"");
+                    throw new UpdateException_mxJPO(
+                            UpdateException_mxJPO.Error.DM_ABSTRACTWITHATTRIBUTES_UPDATE_UKNOWN_PARAMETER,
+                            arg);
                 }
                 idx++;
             }
 
             // check for equal administration name
             if (!this.getName().equals(name))  {
-                throw new Exception(this.getTypeDef().getLogging()
-                        + " '" + this.getName() + "' was called to"
-                        + " update via update script, but "
-                        + this.getTypeDef().getLogging() + " '" + name + "' was"
-                        + " called in the procedure...");
+                throw new UpdateException_mxJPO(
+                        UpdateException_mxJPO.Error.DM_ABSTRACTWITHATTRIBUTES_UPDATE_WRONG_OBJECT,
+                        this.getTypeDef().getLogging(),
+                        this.getName(),
+                        name);
             }
 
-            // get all attributes
-// TODO: if a { or } is in an attribute name, the list is not created correctly
-/*            final Pattern pattern = Pattern.compile("(\\{[^\\{\\}]*\\} )|([^ \\{\\}]* )");
-            final Matcher matcher = pattern.matcher(attrStr + " ");
-*/
+            // extract all attributes
             final Set<String> newAttrs = new TreeSet<String>();
-            for (final String attrName : attrStr.split(" "))  {
-                if (!"".equals(attrName))  {
-                    newAttrs.add(this.jpoCallExecuteConvert(attrName));
+            if (attrStr != null)  {
+                for (final String attrName : attrStr.split(" "))  {
+                    if (!"".equals(attrName))  {
+                        newAttrs.add(this.jpoCallExecuteConvert(attrName));
+                    }
                 }
             }
 
-            // now check for not defined but existing attributes
-            for (final String attr : this.attributes)  {
-                if (!newAttrs.contains(attr))  {
-                    boolean ignore = false;
-                    for (final String ignoreAttr : ignoreAttrs)  {
-                        if (StringUtil_mxJPO.match(attr, ignoreAttr))  {
-                            ignore = true;
-                            _paramCache.logDebug("    - attribute '" + attr + "' is not defined but will be ignored");
+            // and update updates
+            ignoreAllAttrs.addAll(ignoreAttrs);
+            removeAllAttrs.addAll(removeAttrs);
+            this.updateAttributes(_paramCache, newAttrs, ignoreAllAttrs, removeAllAttrs);
+        }
+    }
+
+    /**
+     * Updates this administration object with given attributes.
+     *
+     * @param _paramCache   parameter cache
+     * @param _newAttrs     set of attributes which must be assigned
+     * @param _ignoreAttrs  set of attributes which are ignored (if assigned)
+     * @param _removeAttrs  set of attributes which could be removed (if
+     *                      assigned)
+     * @throws Exception if update failed or attribute could not be removed
+     */
+    protected void updateAttributes(final ParameterCache_mxJPO _paramCache,
+                                    final Set<String> _newAttrs,
+                                    final Set<String> _ignoreAttrs,
+                                    final Set<String> _removeAttrs)
+        throws Exception
+    {
+        // now check for not defined but existing attributes
+        for (final String attr : this.attributes)  {
+            if (!_newAttrs.contains(attr))  {
+                boolean ignore = false;
+                for (final String ignoreAttr : _ignoreAttrs)  {
+                    if (StringUtil_mxJPO.match(attr, ignoreAttr))  {
+                        ignore = true;
+                        _paramCache.logDebug("    - attribute '" + attr + "' is not defined but will be ignored");
+                        break;
+                    }
+                }
+                if (!ignore)  {
+                    boolean remove = false;
+                    for (final String removeAttr : _removeAttrs)  {
+                        if (StringUtil_mxJPO.match(attr, removeAttr))  {
+                            remove = true;
+                            _paramCache.logDebug("    - attribute '" + attr + "' is not defined and will be removed");
+                            MqlUtil_mxJPO.execMql(_paramCache,
+                                    new StringBuilder()
+                                        .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                                        .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\"")
+                                        .append(" remove attribute \"")
+                                                .append(StringUtil_mxJPO.convertMql(attr)).append("\""));
                             break;
                         }
                     }
-                    if (!ignore)  {
-                        boolean remove = false;
-                        for (final String removeAttr : removeAttrs)  {
-                            if (StringUtil_mxJPO.match(attr, removeAttr))  {
-                                remove = true;
-                                _paramCache.logDebug("    - attribute '" + attr + "' is not defined and will be removed");
-                                MqlUtil_mxJPO.execMql(_paramCache,
-                                        new StringBuilder()
-                                            .append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                                            .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\"")
-                                            .append(" remove attribute \"")
-                                                    .append(StringUtil_mxJPO.convertMql(attr)).append("\""));
-                                break;
-                            }
-                        }
-                        if (!remove)  {
-                            throw new Exception("Attribute '" + attr + "' is defined to be deleted"
-                                    + " in " + this.getTypeDef().getLogging() + " '"
-                                    + this.getName() + "', but not allowed!");
-                        }
+                    if (!remove)  {
+                        throw new UpdateException_mxJPO(
+                                UpdateException_mxJPO.Error.DM_ABSTRACTWITHATTRIBUTES_UPDATE_ATTRIBUTE_REMOVED,
+                                attr,
+                                this.getTypeDef().getLogging(),
+                                this.getName());
                     }
                 }
             }
+        }
 
-            // and check for not existing attributes but needed
-            for (final String attr : newAttrs)  {
-                if (!this.attributes.contains(attr))  {
-                    _paramCache.logDebug("    - add attribute '" + attr + "'");
-                    MqlUtil_mxJPO.execMql(_paramCache,
-                            new StringBuilder()
-                                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\"")
-                                .append(" add attribute \"").append(StringUtil_mxJPO.convertMql(attr)).append("\""));
-                }
+        // and check for not existing attributes but needed
+        for (final String attr : _newAttrs)  {
+            if (!this.attributes.contains(attr))  {
+                _paramCache.logDebug("    - add attribute '" + attr + "'");
+                MqlUtil_mxJPO.execMql(_paramCache,
+                        new StringBuilder()
+                            .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                            .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\"")
+                            .append(" add attribute \"").append(StringUtil_mxJPO.convertMql(attr)).append("\""));
             }
         }
     }
 
     /**
+     * Converts given string by replacing escaped characters.
      *
      * @param _value    value to convert
      * @return replaced value from the converted value used for the JPO call

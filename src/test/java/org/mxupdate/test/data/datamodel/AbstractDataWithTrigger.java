@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.AbstractTest.CI;
-import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.program.AbstractProgramData;
 
 /**
@@ -39,7 +38,7 @@ import org.mxupdate.test.data.program.AbstractProgramData;
  * @param <T>   defines the class which is derived from this class
  */
 public abstract class AbstractDataWithTrigger<T extends AbstractDataWithTrigger<?>>
-    extends AbstractAdminData<T>
+    extends AbstractDataWithAttribute<T>
 {
     /**
      * Defines all assigned triggers to this administration object.
@@ -82,6 +81,17 @@ public abstract class AbstractDataWithTrigger<T extends AbstractDataWithTrigger<
     }
 
     /**
+     * Returns all assigned {@link #triggers}.
+     *
+     * @return all defined triggers
+     * @see #triggers
+     */
+    public Set<AbstractTrigger<?>> getTriggers()
+    {
+        return this.triggers;
+    }
+
+    /**
      * Appends the MQL commands to define all {@link #triggers} within a
      * create.
      *
@@ -90,7 +100,7 @@ public abstract class AbstractDataWithTrigger<T extends AbstractDataWithTrigger<
      *                         called method in super class
      * @see #triggers
      */
-    @Override
+    @Override()
     protected void append4Create(final StringBuilder _cmd)
         throws MatrixException
     {
@@ -158,6 +168,17 @@ public abstract class AbstractDataWithTrigger<T extends AbstractDataWithTrigger<
             this.eventType = _eventType;
             this.kind = _kind;
             this.program = _program;
+        }
+
+        /**
+         * Returns the defined trigger {@link #program}.
+         *
+         * @return trigger program
+         * @see #program
+         */
+        public AbstractProgramData<?> getProgram()
+        {
+            return this.program;
         }
 
         /**

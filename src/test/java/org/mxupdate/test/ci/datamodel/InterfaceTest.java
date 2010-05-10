@@ -20,22 +20,22 @@
 
 package org.mxupdate.test.ci.datamodel;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.DataCollection;
+import org.mxupdate.test.data.datamodel.AbstractAttributeData;
 import org.mxupdate.test.data.datamodel.AttributeStringData;
 import org.mxupdate.test.data.datamodel.InterfaceData;
 import org.mxupdate.test.data.datamodel.RelationshipData;
 import org.mxupdate.test.data.datamodel.TypeData;
+import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -45,72 +45,74 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 public class InterfaceTest
-    extends AbstractTest
+    extends AbstractDataWithAttributesExportUpdateTest<InterfaceData>
 {
-
     /**
-     * Makes an update for given administration <code>_object</code>
-     * definition.
+     * Creates for given <code>_name</code> a new interface data instance.
      *
-     * @param _object       object if the update definition
-     * @param _errorCode    expected error code
-     * @throws Exception if update with failure failed
+     * @param _name     name of the interface data instance
+     * @return interface data instance
      */
-    @Deprecated()
-    private void updateFailure(final AbstractAdminData<?> _object,
-                               final UpdateException_mxJPO.Error _errorCode)
-        throws Exception
+    @Override()
+    protected InterfaceData createNewData(final String _name)
     {
-        this.updateFailure(_object.getCIFileName(), _object.ciFile(), _errorCode);
+        return new InterfaceData(this, _name);
     }
 
     /**
-     * Makes an update for given <code>_fileName</code> and <code>_code</code>.
+     * Data provider for test interfaces.
      *
-     * @param _fileName     name of the file to update
-     * @param _code         TCL update code
-     * @param _errorCode    expected error code
-     * @throws Exception if update with failure failed
+     * @return object array with all test interfaces
      */
-    @Deprecated()
-    private void updateFailure(final String _fileName,
-                               final String _code,
-                               final UpdateException_mxJPO.Error _errorCode)
-        throws Exception
+    @DataProvider(name = "data")
+    public Object[][] dataInterfaces()
     {
-        final Map<?,?> bck = this.update(_fileName, _code);
-        final Exception ex = (Exception) bck.get("exception");
-         Assert.assertNotNull(ex, "check that action is not allowed");
-         Assert.assertTrue(ex.getMessage().indexOf("UpdateError #" + _errorCode.getCode() + ":") >= 0,
-                           "check for correct error code #" + _errorCode.getCode());
-    }
+        return this.prepareData("interfaces",
+                new Object[]{
+                        "interface without anything",
+                        new InterfaceData(this, "TestInterface")},
+                new Object[]{
+                        "interface with escaped name",
+                        new InterfaceData(this, "TestInterface \" 1")},
 
-    /**
-     * Makes an update for given <code>_code</code>.
-     *
-     * @param _fileName     name of the file to update
-     * @param _code         TCL update code
-     * @param _params       parameters
-     * @return values from the called dispatcher
-     * @throws Exception  if update failed
-     */
-    @Deprecated()
-    private Map<?,?> update(final String _fileName,
-                            final String _code,
-                            final String... _params)
-        throws Exception
-    {
-        final Map<String,String> files = new HashMap<String,String>();
-        files.put(_fileName, _code);
-        final Map<String,String> params = new HashMap<String,String>();
-        if (_params != null)  {
-            for (int idx = 0; idx < _params.length; idx += 2)  {
-                params.put(_params[idx], _params[idx + 1]);
-            }
-        }
-        final Map<?,?> bck = this.executeEncoded("Update", params, "FileContents", files);
+                new Object[]{
+                        "interface with one single parent interface",
+                        new InterfaceData(this, "TestInterface \" 1")
+                                .addParent(new InterfaceData(this, "TestInterfaceParent"))},
+                new Object[]{
+                        "interface with two parent interface",
+                        new InterfaceData(this, "TestInterface \" 1")
+                                .addParent(new InterfaceData(this, "TestInterface Parent \" 1"))
+                                .addParent(new InterfaceData(this, "TestInterface Parent \" 2"))},
 
-        return bck;
+                new Object[]{
+                        "interface with one type",
+                        new InterfaceData(this, "TestInterface \" 1")
+                                .addType(new TypeData(this, "TestType \" 1"))},
+                new Object[]{
+                        "interface with two types",
+                        new InterfaceData(this, "TestInterface \" 1")
+                                .addType(new TypeData(this, "TestType \" 1"))
+                                .addType(new TypeData(this, "TestType \" 2"))},
+                new Object[]{
+                        "interface with all types",
+                        new InterfaceData(this, "TestInterface \" 1")
+                                .addAllTypes()},
+
+                new Object[]{
+                        "interface with one relationship",
+                        new InterfaceData(this, "TestInterface \" 1")
+                                .addRelationship(new RelationshipData(this, "TestRelationship \" 1"))},
+                new Object[]{
+                        "interface with two relationships",
+                        new InterfaceData(this, "TestInterface \" 1")
+                                .addRelationship(new RelationshipData(this, "TestRelationship \" 1"))
+                                .addRelationship(new RelationshipData(this, "TestRelationship \" 2"))},
+                new Object[]{
+                        "interface with all relationships",
+                        new InterfaceData(this, "TestInterface \" 1")
+                                .addAllRelationships()}
+        );
     }
 
     /**
@@ -130,175 +132,50 @@ public class InterfaceTest
     }
 
     /**
-     * Check to export an interface with one single parent interface.
+     * Creates all depending administration objects for given
+     * <code>_interface</code>.
      *
-     * @throws Exception if test failed
+     * @param _interface    interface with depending objects
+     * @throws Exception if create failed
      */
-    @Test(description = "export interface with one parent interface")
-    public void exportWithOneParent()
+    @Override()
+    protected void createDependings(final InterfaceData _interface)
         throws Exception
     {
-        final DataCollection data = new DataCollection(this);
-        final InterfaceData parent = data.getInterface("TestInterfaceParent");
-        final InterfaceData inter = data.getInterface("TestInterface").addParent(parent);
-        data.create();
-
-        inter.checkExport(inter.export());
+        // create referenced property value
+        for (final PropertyDef prop : _interface.getProperties())  {
+            if (prop.getTo() != null)  {
+                prop.getTo().create();
+            }
+        }
+        // create attributes
+        for (final AbstractAttributeData<?> attr : _interface.getAttributes())  {
+            attr.create();
+        }
+        // create parent interfaces
+        for (final InterfaceData inter : _interface.getParents())  {
+            inter.create();
+        }
+        // create assigned types
+        for (final TypeData type : _interface.getTypes())  {
+            type.create();
+        }
+        // create assigned relationships
+        for (final RelationshipData relation : _interface.getRelationships())  {
+            relation.create();
+        }
     }
 
     /**
-     * Check to export an interface with two parent interfaces.
-     *
-     * @throws Exception if test failed
+     * {@inheritDoc}
+     * The original method is overwritten because the parent interfaces could
+     * not be removed.
      */
-    @Test(description = "export interface with two parent interfaces")
-    public void exportWithTwoParents()
-        throws Exception
+    @Override()
+    protected InterfaceData createCleanNewData(final InterfaceData _original)
     {
-        final DataCollection data = new DataCollection(this);
-        final InterfaceData parent1 = data.getInterface("TestInterfaceParent1");
-        final InterfaceData parent2 = data.getInterface("TestInterfaceParent2");
-        final InterfaceData inter = data.getInterface("TestInterface")
-                .addParent(parent1)
-                .addParent(parent2);
-        data.create();
-
-        inter.checkExport(inter.export());
-    }
-
-    /**
-     * Check to export an interface with one single string attribute.
-     *
-     * @throws Exception if test failed
-     */
-    @Test(description = "export interface with one attribute")
-    public void exportWithOneAttribute()
-        throws Exception
-    {
-        final DataCollection data = new DataCollection(this);
-        final AttributeStringData attr = data.getAttributeString("Attribute");
-        final InterfaceData inter = data.getInterface("TestInterface").addAttribute(attr);
-        data.create();
-
-        inter.checkExport(inter.export());
-    }
-
-    /**
-     * Check to export an interface for one single type.
-     *
-     * @throws Exception if test failed
-     */
-    @Test(description = "export interface with one single type")
-    public void exportWithOneType()
-        throws Exception
-    {
-        final DataCollection data = new DataCollection(this);
-        final TypeData type = data.getType("TestType");
-        final InterfaceData inter = data.getInterface("TestInterface").addType(type);
-        data.create();
-
-        inter.checkExport(inter.export());
-    }
-
-    /**
-     * Check to export an interface for two types.
-     *
-     * @throws Exception if test failed
-     */
-    @Test(description = "export interface with two types")
-    public void exportWithTwoTypes()
-        throws Exception
-    {
-        final DataCollection data = new DataCollection(this);
-        final TypeData type1 = data.getType("TestType1");
-        final TypeData type2 = data.getType("TestType2");
-        final InterfaceData inter = data.getInterface("TestInterface")
-                .addType(type1)
-                .addType(type2);
-        data.create();
-
-        inter.checkExport(inter.export());
-    }
-
-    /**
-     * Check to export an interface for all types.
-     *
-     * @throws Exception if test failed
-     */
-    @Test(description = "export interface with all types")
-    public void exportWithAllTypes()
-        throws Exception
-    {
-        final DataCollection data = new DataCollection(this);
-        final InterfaceData inter = data.getInterface("TestInterface").addAllTypes();
-        data.create();
-
-        inter.checkExport(inter.export());
-    }
-
-    /**
-     * Check to export an interface for one single relationship.
-     *
-     * @throws Exception if test failed
-     */
-    @Test(description = "export interface with one single relationship")
-    public void exportWithOneRelationship()
-        throws Exception
-    {
-        final DataCollection data = new DataCollection(this);
-        final RelationshipData rel = data.getRelationship("TestRelationship");
-        final InterfaceData inter = data.getInterface("TestInterface").addRelationship(rel);
-        data.create();
-
-        inter.checkExport(inter.export());
-    }
-
-    /**
-     * Check to export an interface for all relationships.
-     *
-     * @throws Exception if test failed
-     */
-    @Test(description = "export interface with all relationships")
-    public void exportWithAllRelationships()
-        throws Exception
-    {
-        final DataCollection data = new DataCollection(this);
-        final InterfaceData inter = data.getInterface("TestInterface").addAllRelationships();
-        data.create();
-
-        inter.checkExport(inter.export());
-    }
-
-    /**
-     * Check to export an interface with special characters for all cases.
-     *
-     * @throws Exception if test failed
-     */
-    @Test(description = "export interface with special characters")
-    public void exportWithSpecialCharacters()
-        throws Exception
-    {
-        final DataCollection data = new DataCollection(this);
-        final InterfaceData parent1 = data.getInterface("TestInerfaceParent \" 1");
-        final InterfaceData parent2 = data.getInterface("TestInerfaceParent \" 2");
-        final AttributeStringData attr1 = data.getAttributeString("Attribute \" 1");
-        final AttributeStringData attr2 = data.getAttributeString("Attribute \" 2");
-        final TypeData type1 = data.getType("TestType \" 1");
-        final TypeData type2 = data.getType("TestType \" 2");
-        final RelationshipData rel1 = data.getRelationship("TestRel \" 1");
-        final RelationshipData rel2 = data.getRelationship("TestRel \" 2");
-        final InterfaceData inter = data.getInterface("TestInterface \"")
-                .addParent(parent1)
-                .addParent(parent2)
-                .addAttribute(attr1)
-                .addAttribute(attr2)
-                .addType(type1)
-                .addType(type2)
-                .addRelationship(rel1)
-                .addRelationship(rel2);
-        data.create();
-
-        inter.checkExport(inter.export());
+        return super.createCleanNewData(_original)
+                    .addParent(_original.getParents().toArray(new InterfaceData[_original.getParents().size()]));
     }
 
     /**
@@ -663,18 +540,13 @@ public class InterfaceTest
     public void exceptionUpdateRemovingParent()
         throws Exception
     {
-        final DataCollection data = new DataCollection(this);
-        final InterfaceData parent1 = data.getInterface("TestInterfaceParent1");
-        final InterfaceData parent2 = data.getInterface("TestInterfaceParent2");
-        final InterfaceData inter = data.getInterface("TestInterface")
-                .addParent(parent1)
-                .addParent(parent2);
-        data.create();
-
-        inter.removeParents()
-             .addParent(parent1);
-
-        this.updateFailure(inter, UpdateException_mxJPO.Error.DM_INTERFACE_UPDATE_REMOVING_PARENT);
+        new InterfaceData(this, "TestInterface")
+                .addParent(new InterfaceData(this, "TestInterfaceParent1"))
+                .addParent(new InterfaceData(this, "TestInterfaceParent2"))
+                .create()
+                .removeParents()
+                .addParent(new InterfaceData(this, "TestInterfaceParent1"))
+                .failureUpdate(UpdateException_mxJPO.Error.DM_INTERFACE_UPDATE_REMOVING_PARENT);
     }
 
     /**
@@ -687,12 +559,10 @@ public class InterfaceTest
     public void exceptionUpdateWrongName()
         throws Exception
     {
-        final DataCollection data = new DataCollection(this);
-        final InterfaceData inter = data.getInterface("TestInterface");
-        this.updateFailure(inter.getCIFileName(),
-                           "mql mod interface \"${NAME}\"\ntestParents -interface "
-                                        + inter.getName() + "1",
-                           UpdateException_mxJPO.Error.DM_INTERFACE_UPDATE_WRONG_NAME);
+        final InterfaceData inter = new InterfaceData(this, "TestInterface");
+        inter.failedUpdateWithCode(
+                "mql mod interface \"${NAME}\"\ntestParents -interface " + inter.getName() + "1",
+                UpdateException_mxJPO.Error.DM_INTERFACE_UPDATE_WRONG_NAME);
     }
 
     /**
@@ -705,10 +575,8 @@ public class InterfaceTest
     public void exceptionUpdateWrongParentParameter()
         throws Exception
     {
-        final DataCollection data = new DataCollection(this);
-        final InterfaceData inter = data.getInterface("TestInterface");
-        this.updateFailure(inter.getCIFileName(),
-                           "mql mod interface \"${NAME}\"\ntestParents -hallo",
-                           UpdateException_mxJPO.Error.DM_INTERFACE_UPDATE_UKNOWN_PARAMETER);
+        new InterfaceData(this, "TestInterface").failedUpdateWithCode(
+                "mql mod interface \"${NAME}\"\ntestParents -hallo",
+                UpdateException_mxJPO.Error.DM_INTERFACE_UPDATE_UKNOWN_PARAMETER);
     }
 }

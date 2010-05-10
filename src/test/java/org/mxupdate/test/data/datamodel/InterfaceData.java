@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 package org.mxupdate.test.data.datamodel;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,7 +28,6 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.AbstractAdminData;
 import org.testng.Assert;
 
 /**
@@ -37,7 +37,7 @@ import org.testng.Assert;
  * @version $Id$
  */
 public class InterfaceData
-    extends AbstractAdminData<InterfaceData>
+    extends AbstractDataWithAttribute<InterfaceData>
 {
     /**
      * Within export the description and abstract must be defined.
@@ -56,15 +56,6 @@ public class InterfaceData
      * @see #checkExport(ExportParser)
      */
     private final Set<InterfaceData> parents = new HashSet<InterfaceData>();
-
-    /**
-     * All attributes of this interface.
-     *
-     * @see #addAttribute(AbstractAttributeData)
-     * @see #create()
-     * @see #checkExport(ExportParser)
-     */
-    private final Set<AbstractAttributeData<?>> attributes = new HashSet<AbstractAttributeData<?>>();
 
     /**
      * All assigned types for this interface.
@@ -123,13 +114,13 @@ public class InterfaceData
     /**
      * Assigns the <code>_parent</code> interface to this interface.
      *
-     * @param _parent   parent interface to assign
+     * @param _parents  parent interfaces to assign
      * @return this interface data instance
      * @see #parents
      */
-    public InterfaceData addParent(final InterfaceData _parent)
+    public InterfaceData addParent(final InterfaceData... _parents)
     {
-        this.parents.add(_parent);
+        this.parents.addAll(Arrays.asList(_parents));
         return this;
     }
 
@@ -146,16 +137,14 @@ public class InterfaceData
     }
 
     /**
-     * Assigns the <code>_attribute</code> to this interface.
+     * Return all {@link #parents parent interfaces}.
      *
-     * @param _attribute        attribute to assign
-     * @return this interface data instance
-     * @see #attributes
+     * @return all parent interfaces
+     * @see #parents
      */
-    public InterfaceData addAttribute(final AbstractAttributeData<?> _attribute)
+    public Set<InterfaceData> getParents()
     {
-        this.attributes.add(_attribute);
-        return this;
+        return this.parents;
     }
 
     /**
@@ -200,6 +189,17 @@ public class InterfaceData
     }
 
     /**
+     * Return all {@link #types} for this interface.
+     *
+     * @return all assigned types
+     * @see #types
+     */
+    public Set<TypeData> getTypes()
+    {
+        return this.types;
+    }
+
+    /**
      * Assigns <code>_relationship</code> to the
      * {@link #relationships list of assigned relationships} for this
      * interface.
@@ -239,6 +239,17 @@ public class InterfaceData
         this.allRelationships = false;
         this.relationships.clear();
         return this;
+    }
+
+    /**
+     * Return all {@link #relationships} for this interface.
+     *
+     * @return all assigned relationships
+     * @see #relationships
+     */
+    public Set<RelationshipData> getRelationships()
+    {
+        return this.relationships;
     }
 
     /**
@@ -289,11 +300,7 @@ public class InterfaceData
         this.append4CIFileValues(cmd);
 
         // append attributes
-        cmd.append("\n\ntestAttributes -interface \"${NAME}\" -attributes [list \\\n");
-        for (final AbstractAttributeData<?> attribute : this.attributes)  {
-            cmd.append("    \"").append(AbstractTest.convertTcl(attribute.getName())).append("\" \\\n");
-        }
-        cmd.append("]\n");
+        this.append4CIAttributes(cmd);
 
         // append parent interfaces
         cmd.append("\n\ntestParents -interface \"${NAME}\" -parents [list \\\n");
@@ -372,12 +379,6 @@ public class InterfaceData
                 }
             }
 
-            // append attributes
-            for (final AbstractAttributeData<?> attribute : this.attributes)  {
-                attribute.create();
-                cmd.append(" attribute \"").append(AbstractTest.convertMql(attribute.getName())).append("\"");
-            }
-
             this.append4Create(cmd);
 
             this.getTest().mql(cmd);
@@ -407,16 +408,5 @@ public class InterfaceData
         Assert.assertEquals(pars.size(),
                             this.parents.size(),
                             "check all parent interfaces are defined");
-
-        // check attributes
-        final Set<String> attrs = new HashSet<String>(_exportParser.getLines("/testAttributes/"));
-        for (final AbstractAttributeData<?> attribute : this.attributes)  {
-            final String attrName = "\"" + AbstractTest.convertTcl(attribute.getName()) + "\" \\";
-            Assert.assertTrue(attrs.contains(attrName),
-                              "check that attribute '" + attribute.getName() + "' is defined");
-        }
-        Assert.assertEquals(attrs.size(),
-                            this.attributes.size(),
-                            "check all attributes are defined");
     }
 }

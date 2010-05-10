@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.program.AbstractProgramData;
-import org.testng.Assert;
 
 /**
  * Used to define a type, create them and test the result.
@@ -54,11 +53,6 @@ public class TypeData
      * @see #create()
      */
     private final Set<AbstractProgramData<?>> methods = new HashSet<AbstractProgramData<?>>();
-
-    /**
-     * All attributes of this type.
-     */
-    private final Set<AbstractAttributeData<?>> attributes = new HashSet<AbstractAttributeData<?>>();
 
     /**
      * Initialize this type data with given <code>_name</code>.
@@ -88,16 +82,14 @@ public class TypeData
     }
 
     /**
-     * Assigns the <code>_attribute</code> to this type.
+     * Returns all methods for this type data instance.
      *
-     * @param _attribute        attribute to assign
-     * @return this type data instance
-     * @see #attributes
+     * @return all methods of this type data instance
+     * @see #methods
      */
-    public TypeData addAttribute(final AbstractAttributeData<?> _attribute)
+    public Set<AbstractProgramData<?>> getMethods()
     {
-        this.attributes.add(_attribute);
-        return this;
+        return this.methods;
     }
 
     /**
@@ -113,11 +105,7 @@ public class TypeData
         this.append4CIFileValues(cmd);
 
         // append attributes
-        cmd.append("\n\ntestAttributes -type \"${NAME}\" -attributes [list \\\n");
-        for (final AbstractAttributeData<?> attribute : this.attributes)  {
-            cmd.append("    \"").append(AbstractTest.convertTcl(attribute.getName())).append("\" \\\n");
-        }
-        cmd.append("]\n");
+        this.append4CIAttributes(cmd);
 
         return cmd.toString();
     }
@@ -145,12 +133,6 @@ public class TypeData
             for (final AbstractProgramData<?> method : this.methods)  {
                 method.create();
                 cmd.append(" method \"").append(AbstractTest.convertMql(method.getName())).append("\"");
-            }
-
-            // append attributes
-            for (final AbstractAttributeData<?> attribute : this.attributes)  {
-                attribute.create();
-                cmd.append(" attribute \"").append(AbstractTest.convertMql(attribute.getName())).append("\"");
             }
 
             this.append4Create(cmd);
@@ -193,15 +175,5 @@ public class TypeData
     {
         super.checkExport(_exportParser);
 
-        // check attributes
-        final Set<String> attrs = new HashSet<String>(_exportParser.getLines("/testAttributes/"));
-        for (final AbstractAttributeData<?> attribute : this.attributes)  {
-            final String attrName = "\"" + AbstractTest.convertTcl(attribute.getName()) + "\" \\";
-            Assert.assertTrue(attrs.contains(attrName),
-                              "check that attribute '" + attribute.getName() + "' is defined");
-        }
-        Assert.assertEquals(attrs.size(),
-                            this.attributes.size(),
-                            "check all attributes are defined");
     }
 }

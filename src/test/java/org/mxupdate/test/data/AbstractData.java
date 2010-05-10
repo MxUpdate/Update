@@ -29,6 +29,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.testng.Assert;
 
 /**
@@ -275,11 +276,27 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     }
 
     /**
+     * Updates current configuration item and checks that given
+     * <code>_error</code> is thrown.
+     *
+     * @param _error    error code
+     * @param _params   parameters
+     * @return this data instance
+     * @throws Exception if update failed
+     */
+    public DATA failureUpdate(final UpdateException_mxJPO.Error _error,
+                              final String... _params)
+        throws Exception
+    {
+        return this.failedUpdateWithCode(this.ciFile(), _error, _params);
+    }
+
+    /**
      * Makes an update for given <code>_code</code>.
      *
      * @param _code         TCL update code
      * @param _params       parameters
-     * @return values from the called dispatcher
+     * @return this data instance
      * @throws Exception  if update failed
      */
     @SuppressWarnings("unchecked")
@@ -299,6 +316,44 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
         if (bck.get("exception") != null)  {
             throw (Exception) bck.get("exception");
         }
+        return (DATA) this;
+    }
+
+    /**
+     * Makes an update for given <code>_code</code> and checks that given
+     * <code>_error</code> is thrown.
+     *
+     * @param _code         TCL update code
+     * @param _error        error which must be thrown
+     * @param _params       parameters
+     * @return this data instance
+     * @throws Exception  if update failed
+     */
+    @SuppressWarnings("unchecked")
+    public DATA failedUpdateWithCode(final String _code,
+                                     final UpdateException_mxJPO.Error _error,
+                                     final String... _params)
+        throws Exception
+    {
+        final Map<String,String> files = new HashMap<String,String>();
+        files.put(this.getCIFileName(), _code);
+        final Map<String,String> params = new HashMap<String,String>();
+        if (_params != null)  {
+            for (int idx = 0; idx < _params.length; idx += 2)  {
+                params.put(_params[idx], _params[idx + 1]);
+            }
+        }
+        final Map<?,?> bck = this.getTest().executeEncoded("Update", params, "FileContents", files);
+        Assert.assertTrue(
+                bck.containsKey("exception"),
+                "check exception exists");
+        Assert.assertNotNull(
+                bck.get("exception"),
+                "check exception is not null");
+        Assert.assertTrue(
+                ((Exception) bck.get("exception")).getMessage().indexOf("UpdateError #" + _error.getCode() + ":") >= 0,
+                "check for correct error code #" + _error.getCode() + " (have: " + ((Exception) bck.get("exception")).getMessage() + ")");
+
         return (DATA) this;
     }
 

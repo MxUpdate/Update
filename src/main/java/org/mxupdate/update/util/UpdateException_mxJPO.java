@@ -44,6 +44,7 @@ public class UpdateException_mxJPO
      * <li>depending of the first digit, the second and third digit defines the
      *     kind of configuration item
      *     <ul>
+     *     <li>121: {@link org.mxupdate.update.datamodel.AbstractDMWithAttributes_mxJPO data model with attributes}</li>
      *     <li>106: {@link org.mxupdate.update.datamodel.Dimension_mxJPO dimension}</li>
      *     <li>109: {@link org.mxupdate.update.datamodel.Interface_mxJPO interface}</li>
      *     <li>601: {@link org.mxupdate.update.AbstractObject_mxJPO abstract object}</li>
@@ -129,7 +130,57 @@ public class UpdateException_mxJPO
                 "removing an unit from a dimension is not allowed (data will be changed potentially)"),
 
         /**
-         * <p>A wrong parameter was given the the called TCL procedure
+         * <p>The given attribute is not defined anymore but assigned to the
+         * administration object. The attribute is not automatically removed
+         * because otherwise potentially data could be lost.</p>
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>attribute name</li>
+         * <li>MX administration object type (interface, relationship or
+         *     type)</li>
+         * <li>MX administration object name</li>
+         * </ol>
+         * </p>
+         *
+         * @see org.mxupdate.update.datamodel.AbstractDMWithAttributes_mxJPO#jpoCallExecute(ParameterCache_mxJPO, String...)
+         */
+        DM_ABSTRACTWITHATTRIBUTES_UPDATE_ATTRIBUTE_REMOVED(12101,
+                "Attribute ''{0}'' is defined to be deleted in {1} ''{2}'', but not allowed (and this could potentially meant to loose data)!"),
+
+        /**
+         * <p>A wrong parameter was given the called TCL procedure
+         * <code>testAttributes</code> which defines the assigned attributes
+         * for an interface, relationship or type.</p>
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>wrong parameter</li>
+         * </ol>
+         * </p>
+         *
+         * @see org.mxupdate.update.datamodel.AbstractDMWithAttributes_mxJPO#jpoCallExecute(ParameterCache_mxJPO, String...)
+         */
+        DM_ABSTRACTWITHATTRIBUTES_UPDATE_UKNOWN_PARAMETER(12102, "Unknown parameter {0} defined."),
+
+        /**
+         * <p>The name administration object is not the same then defined
+         * through the name of the CI file.</p>
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>MX administration object type (interface, relationship or
+         *     type)</li>
+         * <li>MX administration object name</li>
+         * <li>name defined in the TCL procedure</li>
+         * </ol>
+         * </p>
+         */
+        DM_ABSTRACTWITHATTRIBUTES_UPDATE_WRONG_OBJECT(12103,
+                "The {0} ''{1}'' was called to update via CI update script, but {0} ''{2}'' was called in the procedure..."),
+
+        /**
+         * <p>A wrong parameter was given the called TCL procedure
          * <code>testParents</code> which defines the derived interfaces.</p>
          *
          * <p>Parameters:
