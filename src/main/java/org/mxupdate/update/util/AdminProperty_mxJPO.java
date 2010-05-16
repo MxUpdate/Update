@@ -98,7 +98,7 @@ public class AdminProperty_mxJPO
             if ("/adminRef/adminName".equals(_url))  {
                 this.refAdminName = _content;
             } else if ("/adminRef/adminType".equals(_url))  {
-                this.refAdminType = _content;
+                this.refAdminType = "att".equals(_content) ? "attribute" : _content;
             } else if ("/flags".equals(_url))  {
                 this.flags = _content;
             } else if ("/name".equals(_url))  {
