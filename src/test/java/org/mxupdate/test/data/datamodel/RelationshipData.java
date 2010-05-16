@@ -21,7 +21,9 @@
 package org.mxupdate.test.data.datamodel;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -43,9 +45,9 @@ public class RelationshipData
     /**
      * Within export the description must be defined.
      */
-    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(1);
+    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
     static  {
-        RelationshipData.REQUIRED_EXPORT_VALUES.add("description");
+        RelationshipData.REQUIRED_EXPORT_VALUES.put("description", "");
     }
 
     /**
@@ -166,6 +168,8 @@ public class RelationshipData
         if (!this.isCreated())  {
             this.setCreated(true);
 
+            this.createDependings();
+
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add relationship \"").append(AbstractTest.convertMql(this.getName())).append('\"');
 
@@ -187,6 +191,39 @@ public class RelationshipData
             this.append4Create(cmd);
 
             this.getTest().mql(cmd);
+        }
+
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     * Creates all depending types and relationships.
+     *
+     * @see #from
+     * @see #to
+     */
+    @Override()
+    public RelationshipData createDependings()
+        throws MatrixException
+    {
+        super.createDependings();
+
+        // create from types
+        for (final TypeData type : this.from.getTypes())  {
+            type.create();
+        }
+        // create from relationships
+        for (final RelationshipData relationship : this.from.getRelationships())  {
+            relationship.create();
+        }
+        // create to types
+        for (final TypeData type : this.to.getTypes())  {
+            type.create();
+        }
+        // create to relationships
+        for (final RelationshipData relationship : this.to.getRelationships())  {
+            relationship.create();
         }
 
         return this;
@@ -300,7 +337,7 @@ public class RelationshipData
         /**
          * All types flag for the from side.
          *
-         * @see #addFromAllTypes()
+         * @see #addAllTypes()
          * @see #create()
          * @see #checkExport(ExportParser)
          */
@@ -309,7 +346,7 @@ public class RelationshipData
         /**
          * Defined types on the from side.
          *
-         * @see #addFromType(TypeData...)
+         * @see #addType(TypeData...)
          * @see #create()
          * @see #checkExport(ExportParser)
          */
@@ -318,7 +355,7 @@ public class RelationshipData
         /**
          * All relationship flag for the from side.
          *
-         * @see #addFromAllRelationships()
+         * @see #addAllRelationships()
          * @see #create()
          * @see #checkExport(ExportParser)
          */
@@ -327,7 +364,7 @@ public class RelationshipData
         /**
          * Defined relationships on the from side.
          *
-         * @see #addFromRelationship(RelationshipData...)
+         * @see #addRelationship(RelationshipData...)
          * @see #create()
          * @see #checkExport(ExportParser)
          */
@@ -426,12 +463,12 @@ public class RelationshipData
         }
 
         /**
-         * Assigns <code>_types</code> to the {@link #fromTypes list of from types}
+         * Assigns <code>_types</code> to the {@link #types list of types}
          * for this relationship.
          *
          * @param _types     types to assign
          * @return this relationship data instance
-         * @see #fromTypes
+         * @see #types
          */
         public RelationshipData addType(final TypeData... _types)
         {
@@ -443,7 +480,7 @@ public class RelationshipData
          * Defines that the relationship is assigned to all from types.
          *
          * @return this relationship data instance
-         * @see #fromAllTypes
+         * @see #allTypes
          */
         public RelationshipData addAllTypes()
         {
@@ -452,10 +489,10 @@ public class RelationshipData
         }
 
         /**
-         * Returns all assigned {@link #fromTypes from types}.
+         * Returns all assigned {@link #types types}.
          *
-         * @return all from types
-         * @see #fromTypes
+         * @return all types
+         * @see #types
          */
         public Set<TypeData> getTypes()
         {
@@ -464,12 +501,12 @@ public class RelationshipData
 
         /**
          * Assigns <code>_relationships</code> to the
-         * {@link #fromRelationships list of from relationships} for this
+         * {@link #relationships list of relationships} for this
          * relationship.
          *
          * @param _relationships    relationship to assign
          * @return this relationship data instance
-         * @see #fromRelationships
+         * @see #relationships
          */
         public RelationshipData addRelationship(final RelationshipData... _relationships)
         {
@@ -478,10 +515,10 @@ public class RelationshipData
         }
 
         /**
-         * Defines that the relationship is assigned to all from relationships.
+         * Defines that the relationship is assigned to all relationships.
          *
          * @return this relationship data instance
-         * @see #fromAllTypes
+         * @see #allRelationships
          */
         public RelationshipData addAllRelationships()
         {
@@ -490,10 +527,10 @@ public class RelationshipData
         }
 
         /**
-         * Returns all assigned {@link #fromRelationships from relationships}.
+         * Returns all assigned {@link #relationships relationships}.
          *
          * @return all from types
-         * @see #fromRelationships
+         * @see #relationships
          */
         public Set<RelationshipData> getRelationships()
         {
@@ -621,7 +658,6 @@ public class RelationshipData
                 _cmd.append(" type ");
                 boolean first = true;
                 for (final TypeData type : this.types)  {
-                    type.create();
                     if (first)  {
                         first = false;
                     } else  {
@@ -638,7 +674,6 @@ public class RelationshipData
                 _cmd.append(" relationship ");
                 boolean first = true;
                 for (final RelationshipData relationship : this.relationships)  {
-                    relationship.create();
                     if (first)  {
                         first = false;
                     } else  {

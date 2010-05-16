@@ -28,6 +28,7 @@ import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.program.MQLProgramData;
 import org.mxupdate.test.data.user.AbstractUserData;
+import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.data.user.workspace.CueData;
 import org.mxupdate.test.data.user.workspace.FilterData;
 import org.mxupdate.test.data.user.workspace.QueryData;
@@ -138,7 +139,9 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
                 _logText + " with cue with visible user definition",
                 this.createNewData("hallo \" test")
                         .newCue("my cue \"test\"")
-                                .setVisible("creator","guest","Test Everything")
+                                .setVisible(new PersonAdminData(this, "creator"))
+                                .setVisible(new PersonAdminData(this, "guest"))
+                                .setVisible(new PersonAdminData(this, "Test Everything"))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with not active cue",
@@ -228,7 +231,9 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
                 _logText + " with filter with visible user definition",
                 this.createNewData("hallo \" test")
                         .newFilter("my filter \"test\"")
-                                .setVisible("creator","guest","Test Everything")
+                                .setVisible(new PersonAdminData(this, "creator"))
+                                .setVisible(new PersonAdminData(this, "guest"))
+                                .setVisible(new PersonAdminData(this, "Test Everything"))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with not active filter",
@@ -329,7 +334,9 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
                 _logText + " with query with visible user definition",
                 this.createNewData("hallo \" test")
                         .newQuery("my query \"test\"")
-                                .setVisible("creator","guest","Test Everything")
+                                .setVisible(new PersonAdminData(this, "creator"))
+                                .setVisible(new PersonAdminData(this, "guest"))
+                                .setVisible(new PersonAdminData(this, "Test Everything"))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with not hidden query",
@@ -441,7 +448,9 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
                 _logText + " with table with visible user definition",
                 this.createNewData("hallo \" test")
                         .newTable("my table \"test\"")
-                                .setVisible("creator","guest","Test Everything")
+                                .setVisible(new PersonAdminData(this, "creator"))
+                                .setVisible(new PersonAdminData(this, "guest"))
+                                .setVisible(new PersonAdminData(this, "Test Everything"))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with not active table",
@@ -525,7 +534,9 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
                 _logText + " with tip with visible user definition",
                 this.createNewData("hallo \" test")
                         .newTip("my tip \"test\"")
-                                .setVisible("creator","guest","Test Everything")
+                                .setVisible(new PersonAdminData(this, "creator"))
+                                .setVisible(new PersonAdminData(this, "guest"))
+                                .setVisible(new PersonAdminData(this, "Test Everything"))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with not active tip",
@@ -610,7 +621,9 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
                 _logText + " with tool set with visible user definition",
                 this.createNewData("hallo \" test")
                         .newToolSet("my tool set \"test\"")
-                                .setVisible("creator","guest","Test Everything")
+                                .setVisible(new PersonAdminData(this, "creator"))
+                                .setVisible(new PersonAdminData(this, "guest"))
+                                .setVisible(new PersonAdminData(this, "Test Everything"))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with not active tool set",
@@ -697,7 +710,9 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
                 _logText + " with view with visible user definition",
                 this.createNewData("hello \" test")
                         .newView("my cue \"test\"")
-                                .setVisible("creator","guest","Test Everything")
+                                .setVisible(new PersonAdminData(this, "creator"))
+                                .setVisible(new PersonAdminData(this, "guest"))
+                                .setVisible(new PersonAdminData(this, "Test Everything"))
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with not hidden view",

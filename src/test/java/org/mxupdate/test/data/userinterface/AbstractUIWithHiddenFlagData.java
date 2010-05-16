@@ -20,7 +20,7 @@
 
 package org.mxupdate.test.data.userinterface;
 
-import java.util.Set;
+import java.util.Map;
 
 import matrix.util.MatrixException;
 
@@ -51,7 +51,7 @@ abstract class AbstractUIWithHiddenFlagData<T extends AbstractUIWithHiddenFlagDa
     AbstractUIWithHiddenFlagData(final AbstractTest _test,
                                  final AbstractTest.CI _ci,
                                  final String _name,
-                                 final Set<String> _requiredExportValues)
+                                 final Map<String,String> _requiredExportValues)
     {
         super(_test, _ci, _name, _requiredExportValues);
     }

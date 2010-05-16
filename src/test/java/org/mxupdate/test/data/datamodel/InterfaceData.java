@@ -21,7 +21,9 @@
 package org.mxupdate.test.data.datamodel;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -42,10 +44,10 @@ public class InterfaceData
     /**
      * Within export the description and abstract must be defined.
      */
-    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(2);
+    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
     static  {
-        InterfaceData.REQUIRED_EXPORT_VALUES.add("description");
-        InterfaceData.REQUIRED_EXPORT_VALUES.add("abstract");
+        InterfaceData.REQUIRED_EXPORT_VALUES.put("description", "");
+        InterfaceData.REQUIRED_EXPORT_VALUES.put("abstract", "false");
     }
 
     /**
@@ -297,6 +299,16 @@ public class InterfaceData
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("mql escape mod interface \"${NAME}\"");
+
+        // append hidden flag
+        if (this.isHidden() != null)  {
+            cmd.append(' ');
+            if (!this.isHidden())  {
+                cmd.append('!');
+            }
+            cmd.append("hidden");
+        }
+
         this.append4CIFileValues(cmd);
 
         // append attributes
@@ -327,15 +339,25 @@ public class InterfaceData
         if (!this.isCreated())  {
             this.setCreated(true);
 
+            this.createDependings();
+
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add interface \"").append(AbstractTest.convertMql(this.getName())).append('\"');
+
+            // append hidden flag
+            if (this.isHidden() != null)  {
+                cmd.append(' ');
+                if (!this.isHidden())  {
+                    cmd.append('!');
+                }
+                cmd.append("hidden");
+            }
 
             // add parent interfaces
             if (!this.parents.isEmpty())  {
                 cmd.append(" derived ");
                 boolean first = true;
                 for (final InterfaceData parent : this.parents)  {
-                    parent.create();
                     if (first)  {
                         first = false;
                     } else  {
@@ -352,7 +374,6 @@ public class InterfaceData
                 cmd.append(" type ");
                 boolean first = true;
                 for (final TypeData type : this.types)  {
-                    type.create();
                     if (first)  {
                         first = false;
                     } else  {
@@ -369,7 +390,6 @@ public class InterfaceData
                 cmd.append(" relationship ");
                 boolean first = true;
                 for (final RelationshipData relationship : this.relationships)  {
-                    relationship.create();
                     if (first)  {
                         first = false;
                     } else  {
@@ -383,6 +403,37 @@ public class InterfaceData
 
             this.getTest().mql(cmd);
         }
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     * Creates depending {@link #parents parent interfaces}, {@link #types} and
+     * {@link #relationships}.
+     *
+     * @see #parents
+     * @see #types
+     * @see #relationships
+     */
+    @Override()
+    public InterfaceData createDependings()
+        throws MatrixException
+    {
+        super.createDependings();
+
+        // create parent interfaces
+        for (final InterfaceData inter : this.parents)  {
+            inter.create();
+        }
+        // create assigned types
+        for (final TypeData type : this.types)  {
+            type.create();
+        }
+        // create assigned relationships
+        for (final RelationshipData relation : this.relationships)  {
+            relation.create();
+        }
+
         return this;
     }
 

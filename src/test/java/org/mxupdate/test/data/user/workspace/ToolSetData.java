@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,9 @@
 
 package org.mxupdate.test.data.user.workspace;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -45,7 +47,7 @@ public class ToolSetData<USER extends AbstractUserData<?>>
     /**
      * Within export the description must be defined.
      */
-    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(3);
+    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
     static  {
     }
 
@@ -87,17 +89,6 @@ public class ToolSetData<USER extends AbstractUserData<?>>
     }
 
     /**
-     * Returns the {@link #programs list of all assigned programs}.
-     *
-     * @return all assigned programs
-     * @see #programs
-     */
-    public Set<AbstractProgramData<?>> getPrograms()
-    {
-        return this.programs;
-    }
-
-    /**
      * Returns the part of the CI file to create this tool set of an user.
      *
      * @return part of the CI file to create this tool set of an user
@@ -116,6 +107,25 @@ public class ToolSetData<USER extends AbstractUserData<?>>
     }
 
     /**
+     * {@inheritDoc}
+     * Creates all {@link #programs}.
+     *
+     * @see #programs
+     */
+    @Override()
+    public ToolSetData<USER> createDependings()
+        throws MatrixException
+    {
+        super.createDependings();
+
+        for (final AbstractProgramData<?> prog : this.programs)  {
+            prog.create();
+        }
+
+        return this;
+    }
+
+    /**
      * Appends the MQL commands to define the {@link #programs} within a
      * create.
      *
@@ -130,7 +140,6 @@ public class ToolSetData<USER extends AbstractUserData<?>>
 
         // programs
         for(final AbstractProgramData<?> program : this.programs)  {
-            program.create();
             _cmd.append(" program \"").append(AbstractTest.convertMql(program.getName())).append("\"");
         }
     }

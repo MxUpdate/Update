@@ -20,6 +20,7 @@
 
 package org.mxupdate.test.data;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -69,10 +70,12 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
      * Defines the values which must be defined for exports. They are tested
      * for existence from {@link #checkExport(ExportParser)}. This values must
      * be defined minimum and maximum one time in the configuration item file.
+     * The key is the name of the value, the value of the map the expected
+     * default value.
      *
      * @see #checkExport(ExportParser)
      */
-    private final Set<String> requiredExportValues;
+    private final Map<String,String> requiredExportValues;
 
     /**
      * All properties for this data piece.
@@ -94,13 +97,13 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     protected AbstractAdminData(final AbstractTest _test,
                                 final AbstractTest.CI _ci,
                                 final String _name,
-                                final Set<String> _requiredExportValues)
+                                final Map<String,String> _requiredExportValues)
     {
         super(_test, _ci, _name);
         this.symbolicName = (_ci != null)
                             ? _ci.getMxType() + "_" + this.getName().replaceAll(AbstractAdminData.NOT_ALLOWED_CHARS, "")
                             : null;
-        this.requiredExportValues = _requiredExportValues;
+        this.requiredExportValues = (_requiredExportValues != null) ? _requiredExportValues : new HashMap<String,String>(0);
     }
 
     /**
@@ -177,6 +180,38 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     public Set<PropertyDef> getProperties()
     {
         return this.properties;
+    }
+
+    /**
+     * Returns all {@link #requiredExportValues required export values}.
+     *
+     * @return required export values
+     * @see #requiredExportValues
+     */
+    public Map<String,String> getRequiredExportValues()
+    {
+        return this.requiredExportValues;
+    }
+
+    /**
+     * Creates all depending administration objects for given this instance.
+     * Only the depending {@link #properties} could be created.
+     *
+     * @return this data instance
+     * @throws MatrixException if create failed
+     * @see #properties
+     */
+    @SuppressWarnings("unchecked")
+    public DATA createDependings()
+        throws MatrixException
+    {
+        for (final PropertyDef prop : this.properties)  {
+            if (prop.getTo() != null)  {
+                prop.getTo().create();
+            }
+        }
+
+        return (DATA) this;
     }
 
     /**
@@ -283,7 +318,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         }
         // check for all required values
         if (this.requiredExportValues != null)  {
-            for (final String valueName : this.requiredExportValues)  {
+            for (final String valueName : this.requiredExportValues.keySet())  {
                 Assert.assertEquals(_exportParser.getLines("/mql/" + valueName + "/@value").size(),
                                     1,
                                     "required check that minimum and maximum one " + valueName + " is defined");
@@ -293,9 +328,33 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         final Set<String> needAdds = new HashSet<String>();
         this.evalAdds4CheckExport(needAdds);
         final List<String> foundAdds = _exportParser.getLines("/mql/add/@value");
-        Assert.assertEquals(foundAdds.size(), needAdds.size(), "all adds defined (found adds = " + foundAdds + "; need adds = " + needAdds + ")");
+        Assert.assertEquals(
+                foundAdds.size(),
+                needAdds.size(),
+                "all adds defined (found adds = " + foundAdds + "; need adds = " + needAdds + ")");
         for (final String foundAdd : foundAdds)  {
-            Assert.assertTrue(needAdds.contains(foundAdd), "check that add '" + foundAdd + "' is defined");
+            Assert.assertTrue(needAdds.contains(foundAdd), "check that add '" + foundAdd + "' is defined (required are " + needAdds + ")");
+        }
+
+        // check hidden flag
+        if (this.getCI() != null)  {
+            final Set<String> main = new HashSet<String>(_exportParser.getLines("/mql/"));
+            if ((this.isHidden() != null) && this.isHidden())  {
+                Assert.assertTrue(
+                        main.contains("hidden") || main.contains("hidden \\"),
+                        "check that " + this.getCI().getMxType() + " '" + this.getName() + "' is hidden");
+                Assert.assertTrue(
+                        !main.contains("!hidden") && !main.contains("!hidden \\"),
+                        "check that " + this.getCI().getMxType() + " '" + this.getName() + "' is hidden");
+            } else  {
+                Assert.assertTrue(
+                        !main.contains("hidden") && !main.contains("hidden \\"),
+                        "check that " + this.getCI().getMxType() + " '" + this.getName() + "' is hidden");
+// not required... especially for UI elements..
+//                Assert.assertTrue(
+//                        main.contains("!hidden") || main.contains("!hidden \\"),
+//                        "check that " + this.getCI().getMxType() + " '" + this.getName() + "' is hidden");
+            }
         }
     }
 
@@ -324,7 +383,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
                 final String propDefStr = prop.getCITCLString(this.getCI());
                 Assert.assertTrue(
                         propDefs.contains(propDefStr),
-                        "check that property is defined in ci file (have " + propDefStr + ")");
+                        "check that property is defined in ci file (have " + propDefStr + ", but found " + propDefs + ")");
                 propDefs.remove(propDefStr);
             }
 

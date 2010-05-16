@@ -23,8 +23,8 @@ package org.mxupdate.test.data.user.workspace;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import matrix.util.MatrixException;
 
@@ -57,7 +57,7 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
     /**
      * Defines for which user the workspace object is visible.
      */
-    private final Set<String> visible = new TreeSet<String>();
+    private final Set<AbstractUserData<?>> visible = new HashSet<AbstractUserData<?>>();
 
     /**
      * MX administration type.
@@ -81,7 +81,7 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
                                 final String _mxAdminType,
                                 final USER _user,
                                 final String _name,
-                                final Set<String> _requiredExportValues)
+                                final Map<String,String> _requiredExportValues)
     {
         super(_test, null, _name, _requiredExportValues);
         this.mxAdminType = _mxAdminType;
@@ -118,7 +118,7 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
      * @see #visible
      */
     @SuppressWarnings("unchecked")
-    public DATA setVisible(final String... _users)
+    public DATA setVisible(final AbstractUserData<?>... _users)
     {
         this.visible.addAll(Arrays.asList(_users));
         return (DATA) this;
@@ -136,6 +136,8 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
         throws MatrixException
     {
         if (!this.isCreated())  {
+            this.setCreated(true);
+
             final StringBuilder cmd = new StringBuilder()
                     .append("escape add ").append(this.mxAdminType).append(" \"")
                     .append(AbstractTest.convertMql(this.getName()))
@@ -147,9 +149,28 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
             this.append4Create(cmd);
 
             this.getTest().mql(cmd);
-
-            this.setCreated(true);
         }
+        return (DATA) this;
+    }
+
+    /**
+     * {@inheritDoc}
+     * Creates all {@link #visible users} for which this workspace object is
+     * visible.
+     *
+     * @see #visible
+     */
+    @Override()
+    @SuppressWarnings("unchecked")
+    public DATA createDependings()
+        throws MatrixException
+    {
+        super.createDependings();
+
+        for (final AbstractUserData<?> user : this.visible)  {
+            user.create();
+        }
+
         return (DATA) this;
     }
 
@@ -178,13 +199,13 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
         if (!this.visible.isEmpty())  {
             _cmd.append(" visible ");
             boolean first = true;
-            for (final String user : this.visible)  {
+            for (final AbstractUserData<?> user : this.visible)  {
                 if (first)  {
                     first = false;
                 } else  {
                     _cmd.append(',');
                 }
-                _cmd.append('\"').append(AbstractTest.convertMql(user)).append('\"');
+                _cmd.append('\"').append(AbstractTest.convertMql(user.getName())).append('\"');
             }
         }
     }
@@ -212,9 +233,9 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
 
         // visible users
         if (!this.visible.isEmpty())  {
-            for (final String user : this.visible)  {
+            for (final AbstractUserData<?> user : this.visible)  {
                 cmd.append(" \\\n    visible \"")
-                   .append(AbstractTest.convertTcl(user))
+                   .append(AbstractTest.convertTcl(user.getName()))
                    .append('\"');
             }
         }
@@ -250,8 +271,14 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
         final List<String> foundVisible = _exportParser.getLines("/mql/visible/@value");
         for (final String user : foundVisible)  {
             final String tmpUser = user.replaceAll("^\"", "").replaceAll("\"$", "");
-            Assert.assertTrue(this.visible.contains(tmpUser),
-                              "check that '" + tmpUser + "' was defined visible");
+            boolean found = false;
+            for (final AbstractUserData<?> userAbstr : this.visible)  {
+                if (tmpUser.equals(userAbstr.getName()))  {
+                    found = true;
+                    break;
+                }
+            }
+            Assert.assertTrue(found, "check that '" + tmpUser + "' was defined visible");
         }
         Assert.assertEquals(foundVisible.size(),
                             this.visible.size(),

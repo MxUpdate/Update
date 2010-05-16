@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,9 @@
 
 package org.mxupdate.test.data.user.workspace;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -44,15 +46,15 @@ public class FilterData<USER extends AbstractUserData<?>>
     /**
      * Within export the description must be defined.
      */
-    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(3);
+    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
     static  {
-        FilterData.REQUIRED_EXPORT_VALUES.add("user");
-        FilterData.REQUIRED_EXPORT_VALUES.add("appliesto");
-        FilterData.REQUIRED_EXPORT_VALUES.add("type");
-        FilterData.REQUIRED_EXPORT_VALUES.add("name");
-        FilterData.REQUIRED_EXPORT_VALUES.add("revision");
-        FilterData.REQUIRED_EXPORT_VALUES.add("vault");
-        FilterData.REQUIRED_EXPORT_VALUES.add("owner");
+        FilterData.REQUIRED_EXPORT_VALUES.put("user", "");
+        FilterData.REQUIRED_EXPORT_VALUES.put("appliesto", "");
+        FilterData.REQUIRED_EXPORT_VALUES.put("type", "");
+        FilterData.REQUIRED_EXPORT_VALUES.put("name", "");
+        FilterData.REQUIRED_EXPORT_VALUES.put("revision", "");
+        FilterData.REQUIRED_EXPORT_VALUES.put("vault", "");
+        FilterData.REQUIRED_EXPORT_VALUES.put("owner", "");
     }
 
     /**

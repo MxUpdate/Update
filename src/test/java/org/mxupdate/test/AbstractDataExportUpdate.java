@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,11 @@ package org.mxupdate.test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.util.PropertyDef;
+import org.testng.annotations.Test;
 
 /**
  * Test cases for the export / update of abstract data.
@@ -66,6 +68,20 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
                                 .addProperty(new PropertyDef("my test \"property\" 1"))
                                 .addProperty(new PropertyDef("my test \"property\" 2", "my \"value\""))
                                 .addProperty(new PropertyDef("my test \"property\" 3", this.createNewData("property \" admin " + _logText)))});
+        // hidden flag
+        ret.add(new Object[]{
+                _logText + " with hidden flag true",
+                this.createNewData("hello \" test")
+                        .setHidden(true)});
+        ret.add(new Object[]{
+                _logText + " with hidden flag false",
+                this.createNewData("hello \" test")
+                        .setHidden(false)});
+        ret.add(new Object[]{
+                _logText + " without hidden flag",
+                this.createNewData("hello \" test")
+                        .setHidden(null)});
+
         ret.addAll(Arrays.asList(_datas));
         return ret.toArray(new Object[ret.size()][]);
     }
@@ -78,4 +94,89 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
      */
     protected abstract DATA createNewData(final String _name);
 
+    /**
+     * Tests a new created data and the related export.
+     *
+     * @param _description  description of the test case
+     * @param _data    data to test
+     * @throws Exception if test failed
+     */
+    @Test(dataProvider = "data",
+          description = "test export of new created test data object")
+    public void testExport(final String _description,
+                           final DATA _data)
+        throws Exception
+    {
+        _data.create()
+             .checkExport();
+    }
+
+    /**
+     * Tests an update of non existing data. The result is tested with by
+     * exporting the data and checking the result.
+     *
+     * @param _description  description of the test case
+     * @param _data         data to test
+     * @throws Exception if test failed
+     */
+    @Test(dataProvider = "data",
+          description = "test update of non existing data")
+    public void testUpdateWithExport(final String _description,
+                                     final DATA _data)
+        throws Exception
+    {
+        _data.createDependings();
+
+        // first update with original content
+        _data.update();
+        final ExportParser exportParser = _data.export();
+        _data.checkExport(exportParser);
+
+        // second update with delivered content
+        _data.updateWithCode(exportParser.getOrigCode())
+             .checkExport();
+    }
+
+    /**
+     * Test update of existing data that all parameters are cleaned.
+     *
+     * @param _description  description of the test case
+     * @param _data         data to test
+     * @throws Exception if test failed
+     */
+    @SuppressWarnings("unchecked")
+    @Test(dataProvider = "data",
+          description = "test update of existing data instance for cleaning")
+    public void testUpdateWithClean(final String _description,
+                                    final DATA _data)
+        throws Exception
+    {
+        _data.createDependings();
+
+        // first update with original content
+        _data.update()
+             .checkExport();
+
+        // second update with delivered content
+        final DATA newData = (DATA) this.createCleanNewData(_data).update();
+
+        // define all required values to empty values so that they are checked
+        for (final Map.Entry<String,String> value : _data.getRequiredExportValues().entrySet())  {
+            newData.setValue(value.getKey(), value.getValue());
+        }
+
+        // check export
+        newData.checkExport();
+    }
+
+    /**
+     * Creates a clean data instance used to update an existing data instance.
+     *
+     * @param _original     original data instance
+     * @return new data instance (where all original data is cleaned)
+     */
+    protected DATA createCleanNewData(final DATA _original)
+    {
+        return this.createNewData(_original.getName().substring(AbstractTest.PREFIX.length()));
+    }
 }

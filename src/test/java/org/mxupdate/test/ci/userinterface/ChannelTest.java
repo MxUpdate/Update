@@ -20,11 +20,8 @@
 
 package org.mxupdate.test.ci.userinterface;
 
-import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.userinterface.ChannelData;
 import org.mxupdate.test.data.userinterface.CommandData;
-import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -36,27 +33,16 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
+@Test()
 public class ChannelTest
     extends AbstractUITest<ChannelData>
 {
-    /**
-     * Creates for given <code>_name</code> a new channel instance.
-     *
-     * @param _name     name of the channel instance
-     * @return channel instance
-     */
-    @Override()
-    protected ChannelData createNewData(final String _name)
-    {
-        return new ChannelData(this, _name);
-    }
-
     /**
      * Data provider for test channels.
      *
      * @return object array with all test channels
      */
-    @DataProvider(name = "channels")
+    @DataProvider(name = "data")
     public Object[][] getChannels()
     {
         return this.prepareData("channel",
@@ -106,91 +92,14 @@ public class ChannelTest
     }
 
     /**
-     * Tests a new created channel and the related export.
+     * Creates for given <code>_name</code> a new channel instance.
      *
-     * @param _description  description of the test case
-     * @param _channel       channel to test
-     * @throws Exception if test failed
+     * @param _name     name of the channel instance
+     * @return channel instance
      */
-    @Test(dataProvider = "channels",
-          description = "test export of new created channels")
-    public void testExport(final String _description,
-                           final ChannelData _channel)
-        throws Exception
+    @Override()
+    protected ChannelData createNewData(final String _name)
     {
-        _channel.create()
-                .checkExport();
-    }
-
-
-    /**
-     * Tests an update of non existing channel. The result is tested with by
-     * exporting the channel and checking the result.
-     *
-     * @param _description  description of the test case
-     * @param _channel      channel to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "channels",
-          description = "test update of non existing channel")
-    public void testUpdate(final String _description,
-                           final ChannelData _channel)
-        throws Exception
-    {
-        // create referenced property value
-        for (final PropertyDef prop : _channel.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-        // create all assigned commands
-        for (final CommandData command : _channel.getCommands())  {
-            command.create();
-        }
-
-        // first update with original content
-        _channel.update();
-        final ExportParser exportParser = _channel.export();
-        _channel.checkExport(exportParser);
-
-        // second update with delivered content
-        _channel.updateWithCode(exportParser.getOrigCode())
-                .checkExport();
-    }
-
-    /**
-     * Test update of existing channel that all parameters are cleaned.
-     *
-     * @param _description  description of the test case
-     * @param _channel      channel to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "channels",
-          description = "test update of existing channel for cleaning")
-    public void testUpdate4Existing(final String _description,
-                                    final ChannelData _channel)
-        throws Exception
-    {
-        // create referenced property value
-        for (final PropertyDef prop : _channel.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-        // create all assigned commands
-        for (final CommandData command : _channel.getCommands())  {
-            command.create();
-        }
-
-        // first update with original content
-        _channel.update()
-                .checkExport();
-
-        // second update with delivered content
-        new ChannelData(this, _channel.getName().substring(AbstractTest.PREFIX.length()))
-                .update()
-                .setValue("description", "")
-                .setValue("label", "")
-                .checkExport();
+        return new ChannelData(this, _name);
     }
 }

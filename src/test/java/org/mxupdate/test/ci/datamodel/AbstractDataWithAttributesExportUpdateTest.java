@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.datamodel.AbstractAttributeData;
 import org.mxupdate.test.data.datamodel.AbstractDataWithAttribute;
 import org.mxupdate.test.data.datamodel.AttributeStringData;
@@ -88,81 +87,12 @@ public abstract class AbstractDataWithAttributesExportUpdateTest<DATAWITHATTRIBU
     }
 
     /**
-     * Tests a new created data and the related export.
-     *
-     * @param _description  description of the test case
-     * @param _data    data to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "data",
-          description = "test export of new created interface")
-    public void testExport(final String _description,
-                           final DATAWITHATTRIBUTE _data)
-        throws Exception
-    {
-        _data.create()
-             .checkExport();
-    }
-
-
-    /**
-     * Tests an update of non existing data. The result is tested with by
-     * exporting the data and checking the result.
-     *
-     * @param _description  description of the test case
-     * @param _data         data to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "data",
-          description = "test update of non existing data")
-    public void testUpdate(final String _description,
-                           final DATAWITHATTRIBUTE _data)
-        throws Exception
-    {
-        this.createDependings(_data);
-
-        // first update with original content
-        _data.update();
-        final ExportParser exportParser = _data.export();
-        _data.checkExport(exportParser);
-
-        // second update with delivered content
-        _data.updateWithCode(exportParser.getOrigCode())
-             .checkExport();
-    }
-
-    /**
-     * Test update of existing data that all parameters are cleaned.
-     *
-     * @param _description  description of the test case
-     * @param _data         data to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "data",
-          description = "test update of existing data instance for cleaning")
-    public void testUpdate4Existing(final String _description,
-                                    final DATAWITHATTRIBUTE _data)
-        throws Exception
-    {
-        this.createDependings(_data);
-
-        // first update with original content
-        _data.update()
-             .checkExport();
-
-        // second update with delivered content
-        this.createCleanNewData(_data)
-                .update()
-                .setValue("description", "")
-                .checkExport();
-    }
-
-    /**
      * Creates a clean data instance used to update an existing data instance.
      *
      * @param _original     original data instance
      * @return new data instance (where all original data is cleaned)
      */
+    @Override
     @SuppressWarnings("unchecked")
     protected DATAWITHATTRIBUTE createCleanNewData(final DATAWITHATTRIBUTE _original)
     {
@@ -190,17 +120,6 @@ public abstract class AbstractDataWithAttributesExportUpdateTest<DATAWITHATTRIBU
              .update()
              .checkExport();
     }
-
-    /**
-     * Creates all depending administration objects for given
-     * <code>_data</code> instance.
-     *
-     * @param _data     data instance for which the depending objects must be
-     *                  created
-     * @throws Exception if create failed
-     */
-    protected abstract void createDependings(final DATAWITHATTRIBUTE _data)
-        throws Exception;
 
     /**
      * Test thrown exception of called update with wrong arguments for TCL

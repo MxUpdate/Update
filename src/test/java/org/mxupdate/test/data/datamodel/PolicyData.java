@@ -22,6 +22,7 @@ package org.mxupdate.test.data.datamodel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
+import org.mxupdate.test.data.user.AbstractUserData;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.testng.Assert;
@@ -49,13 +51,13 @@ public class PolicyData
     /**
      * Within export the description must be defined.
      */
-    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(1);
+    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
     static  {
-        PolicyData.REQUIRED_EXPORT_VALUES.add("description");
-        PolicyData.REQUIRED_EXPORT_VALUES.add("defaultformat");
-        PolicyData.REQUIRED_EXPORT_VALUES.add("sequence");
-        PolicyData.REQUIRED_EXPORT_VALUES.add("store");
-        PolicyData.REQUIRED_EXPORT_VALUES.add("hidden");
+        PolicyData.REQUIRED_EXPORT_VALUES.put("description", "");
+        PolicyData.REQUIRED_EXPORT_VALUES.put("defaultformat", "");
+        PolicyData.REQUIRED_EXPORT_VALUES.put("sequence", "");
+        PolicyData.REQUIRED_EXPORT_VALUES.put("store", "");
+        PolicyData.REQUIRED_EXPORT_VALUES.put("hidden", "false");
     }
 
     /**
@@ -290,6 +292,8 @@ public class PolicyData
         if (!this.isCreated())  {
             this.setCreated(true);
 
+            this.createDependings();
+
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add policy \"").append(AbstractTest.convertMql(this.getName())).append('\"');
 
@@ -339,6 +343,37 @@ public class PolicyData
     }
 
     /**
+     * {@inheritDoc}
+     * Creates assigned {@link #types}, {@link #formats} and all assigned users
+     * of {@link #allStateAccess}.
+     *
+     * @see #formats
+     * @see #types
+     * @see #allStateAccess
+     */
+    @Override()
+    public PolicyData createDependings()
+        throws MatrixException
+    {
+        super.createDependings();
+
+        // create assigned types
+        for (final TypeData type : this.types)  {
+            type.create();
+        }
+        // create assigned formats
+        for (final FormatData format : this.formats)  {
+            format.create();
+        }
+        // create assigned users
+        for (final PolicyData.UserAccessFilter userAccess : this.allStateAccess.userAccessFilters)  {
+            userAccess.user.create();
+        }
+
+        return this;
+    }
+
+    /**
      * Checks the export of this data piece if all values are correct defined.
      *
      * @param _exportParser     parsed export
@@ -357,7 +392,7 @@ public class PolicyData
                 "check symbolic name");
 
         // check for all required values
-        for (final String valueName : PolicyData.REQUIRED_EXPORT_VALUES)  {
+        for (final String valueName : PolicyData.REQUIRED_EXPORT_VALUES.keySet())  {
             Assert.assertEquals(_exportParser.getLines("/updatePolicy/" + valueName + "/@value").size(),
                                 1,
                                 "required check that minimum and maximum one " + valueName + " is defined");
@@ -569,7 +604,7 @@ public class PolicyData
         /**
          * Related user of this user access filter.
          */
-        private String user;
+        private AbstractUserData<?> user;
 
         /**
          * Defines the {@link #user} of this user access filter.
@@ -577,7 +612,7 @@ public class PolicyData
          * @param _user     referenced user
          * @return this instance
          */
-        public UserAccessFilter setUser(final String _user)
+        public UserAccessFilter setUser(final AbstractUserData<?> _user)
         {
             this.user = _user;
             return this;
@@ -591,7 +626,7 @@ public class PolicyData
         @Override()
         protected String getCITCLString()
         {
-            return "\"" + StringUtil_mxJPO.convertTcl(this.user) + "\" " + super.getCITCLString();
+            return "\"" + StringUtil_mxJPO.convertTcl(this.user.getName()) + "\" " + super.getCITCLString();
         }
 
         /**
@@ -602,7 +637,7 @@ public class PolicyData
         @Override()
         protected String getMQLCreateString()
         {
-            return "\"" + AbstractTest.convertMql(this.user) + "\" " +super.getMQLCreateString();
+            return "\"" + AbstractTest.convertMql(this.user.getName()) + "\" " +super.getMQLCreateString();
         }
     }
 

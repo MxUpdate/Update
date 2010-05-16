@@ -21,13 +21,11 @@
 package org.mxupdate.test.ci.datamodel;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.datamodel.AbstractAttributeData;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger;
 import org.mxupdate.test.data.datamodel.AttributeStringData;
 import org.mxupdate.test.data.datamodel.RelationshipData;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.program.MQLProgramData;
-import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -321,48 +319,5 @@ public class RelationshipTest
         this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_STRING);
         this.cleanup(AbstractTest.CI.DM_RELATIONSHIP);
         this.cleanup(AbstractTest.CI.DM_TYPE);
-    }
-
-    /**
-     * Creates all depending administration objects for given
-     * <code>_relationship</code>.
-     *
-     * @param _relationship     relationship with depending objects
-     * @throws Exception if create failed
-     */
-    @Override()
-    protected void createDependings(final RelationshipData _relationship)
-        throws Exception
-    {
-        // create referenced property value
-        for (final PropertyDef prop : _relationship.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-        // create attributes
-        for (final AbstractAttributeData<?> attr : _relationship.getAttributes())  {
-            attr.create();
-        }
-        // create programs
-        for (final AbstractDataWithTrigger.AbstractTrigger<?> trig : _relationship.getTriggers())  {
-            trig.getProgram().create();
-        }
-        // create from types
-        for (final TypeData type : _relationship.from().getTypes())  {
-            type.create();
-        }
-        // create from relationships
-        for (final RelationshipData relationship : _relationship.from().getRelationships())  {
-            relationship.create();
-        }
-        // create to types
-        for (final TypeData type : _relationship.to().getTypes())  {
-            type.create();
-        }
-        // create to relationships
-        for (final RelationshipData relationship : _relationship.to().getRelationships())  {
-            relationship.create();
-        }
     }
 }

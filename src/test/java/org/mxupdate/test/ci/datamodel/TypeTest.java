@@ -21,14 +21,10 @@
 package org.mxupdate.test.ci.datamodel;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.DataCollection;
-import org.mxupdate.test.data.datamodel.AbstractAttributeData;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger;
 import org.mxupdate.test.data.datamodel.AttributeStringData;
 import org.mxupdate.test.data.datamodel.TypeData;
-import org.mxupdate.test.data.program.AbstractProgramData;
 import org.mxupdate.test.data.program.MQLProgramData;
-import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.util.IssueLink;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -62,7 +58,7 @@ public class TypeTest
      *
      * @return object array with all test types
      */
-    @IssueLink("36")
+    @IssueLink({"36", "122" })
     @DataProvider(name = "data")
     public Object[][] dataTypes()
     {
@@ -74,17 +70,21 @@ public class TypeTest
                         "type with escaped name",
                         new TypeData(this, "TestType \" 1")},
                 new Object[]{
+                        "issue #122: type which is abstract",
+                        new TypeData(this, "TestType")
+                                .setValue("abstract", "true")},
+                new Object[]{
                         "type with two escaped attributes and trigger program",
                         new TypeData(this, "TestType \" 1")
                                 .addAttribute(new AttributeStringData(this, "String Attribute \" ' Hallo"))
                                 .addAttribute(new AttributeStringData(this, "String Attribute \" { Hallo"))
                                 .addTrigger(new AbstractDataWithTrigger.TriggerAction("modify", new MQLProgramData(this, "Test Program")))},
                 new Object[]{
-                        "type with one MQL program as method",
+                        "issue #36: type with one MQL program as method",
                         new TypeData(this, "TestType \" 1")
                                 .addMethod(new MQLProgramData(this, "Test Program"))},
                 new Object[]{
-                        "type with two MQL programs as method",
+                        "issue #36: type with two MQL programs as method",
                         new TypeData(this, "TestType \" 1")
                                 .addMethod(new MQLProgramData(this, "Test Program 1"))
                                 .addMethod(new MQLProgramData(this, "Test Program 2"))}
@@ -111,36 +111,6 @@ public class TypeTest
     }
 
     /**
-     * Creates all depending administration objects for given
-     * <code>_type</code>.
-     *
-     * @param _type         type with depending objects
-     * @throws Exception if create failed
-     */
-    @Override
-    protected void createDependings(final TypeData _type)
-        throws Exception
-    {
-        // create referenced property value
-        for (final PropertyDef prop : _type.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-        // create attributes
-        for (final AbstractAttributeData<?> attr : _type.getAttributes())  {
-            attr.create();
-        }
-        // create programs
-        for (final AbstractDataWithTrigger.AbstractTrigger<?> trig : _type.getTriggers())  {
-            trig.getProgram().create();
-        }
-        for (final AbstractProgramData<?> prog : _type.getMethods())  {
-            prog.create();
-        }
-    }
-
-    /**
      * Test update for existing type with no method and as target no method.
      *
      * @throws Exception if test failed
@@ -150,11 +120,9 @@ public class TypeTest
     public void updateNoMethod4ExistingTypeWithNoMethod()
         throws Exception
     {
-        final DataCollection data1 = new DataCollection(this);
-        final TypeData type = data1.getType("TestType");
-        data1.create();
-
-        type.update();
+        final TypeData type = new TypeData(this, "TestType")
+                .create()
+                .update();
 
         Assert.assertEquals(this.mql("print type '" + type.getName() + "' select method dump"),
                             "",
@@ -172,18 +140,18 @@ public class TypeTest
     public void updateNoMethod4ExistingTypeWithOneMethod()
         throws Exception
     {
-        final DataCollection data1 = new DataCollection(this);
-        final TypeData type = data1.getType("TestType");
-        final AbstractProgramData<?> method = data1.getMQLProgram("TestProg1");
-        data1.create();
+        final MQLProgramData method = new MQLProgramData(this, "TestProd1").create();
+        final TypeData type = new TypeData(this, "TestType").create();
+
         this.mql("mod type \"" + AbstractTest.convertMql(type.getName())
                 + "\" add method \"" + AbstractTest.convertMql(method.getName()) + "\"");
 
         type.update();
 
-        Assert.assertEquals(this.mql("print type '" + AbstractTest.convertMql(type.getName()) + "' select method dump"),
-                            "",
-                            "check that no method is defined");
+        Assert.assertEquals(
+                this.mql("print type '" + AbstractTest.convertMql(type.getName()) + "' select method dump"),
+                "",
+                "check that no method is defined");
     }
 
     /**
@@ -197,10 +165,9 @@ public class TypeTest
     public void updateOneMethod4ExistingTypeWithNoMethod()
         throws Exception
     {
-        final DataCollection data1 = new DataCollection(this);
-        final TypeData type = data1.getType("TestType");
-        final AbstractProgramData<?> method = data1.getMQLProgram("TestProg1");
-        data1.create();
+        final MQLProgramData method = new MQLProgramData(this, "TestProd1").create();
+        final TypeData type = new TypeData(this, "TestType").create();
+
         // method must be defined after create (to test the update..)
         type.addMethod(method)
             .update();

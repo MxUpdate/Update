@@ -22,7 +22,9 @@ package org.mxupdate.update.datamodel;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import matrix.util.MatrixException;
 
@@ -40,6 +42,18 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 public class Expression_mxJPO
     extends AbstractAdminObject_mxJPO
 {
+    /**
+     * Set of all ignored URLs from the XML definition for expressions.
+     *
+     * @see #parse(String, String)
+     */
+    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    static  {
+        // to be ignored and read from method prepare because
+        // the expression export does not work correctly for XML tags
+        Expression_mxJPO.IGNORED_URLS.add("/expression");
+    }
+
     /**
      * Hold the expression itself.
      *
@@ -65,16 +79,13 @@ public class Expression_mxJPO
      *
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
+     * @see #IGNORED_URLS
      */
     @Override()
     protected void parse(final String _url,
                          final String _content)
     {
-        if (_url.startsWith("/expression"))  {
-            // to be ignored and read from method prepare because
-            // the expression export does not work correctly for XML tags
-
-        } else  {
+        if (!Expression_mxJPO.IGNORED_URLS.contains(_url))  {
             super.parse(_url, _content);
         }
     }
@@ -160,8 +171,8 @@ public class Expression_mxJPO
         throws Exception
     {
         final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append('\"')
+                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
                 .append(" !hidden description \"\" value \"\";\n");
 
         // append already existing pre MQL code

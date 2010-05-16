@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,9 @@ package org.mxupdate.test.data.program;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ExportParser;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * The class is used to define all MQL program objects used to create / update
@@ -31,6 +34,7 @@ import org.mxupdate.test.AbstractTest;
  * @author The MxUpdate Team
  * @version $Id$
  */
+@Test()
 public class MQLProgramData
     extends AbstractProgramData<MQLProgramData>
 {
@@ -130,5 +134,35 @@ public class MQLProgramData
         ciFile.append('\n').append(this.getCode());
 
         return ciFile.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     * The source code of the MQL program is checked. Because it could be that
+     * some properties are defined, the MQL update code within the source code
+     * will be removed for the test.
+     */
+    @Override()
+    public void checkExport(final ExportParser _exportParser)
+        throws MatrixException
+    {
+        super.checkExport(_exportParser);
+
+        // check MQL code
+        final String markEnd;
+        if (this.getName().endsWith(".tcl"))  {
+            final StringBuilder markEndBuilder = new StringBuilder();
+            for (final String line : MQLProgramData.MARK_END.split("\n"))  {
+                markEndBuilder.append('#').append(line).append('\n');
+            }
+            markEnd = markEndBuilder.toString();
+        } else  {
+            markEnd = MQLProgramData.MARK_END;
+        }
+        final int index = _exportParser.getOrigCode().indexOf(markEnd);
+        Assert.assertEquals(
+                (index > 0) ? _exportParser.getOrigCode().substring(index + markEnd.length()).trim() : _exportParser.getOrigCode(),
+                this.getCode(),
+                "checks MQL program code");
     }
 }

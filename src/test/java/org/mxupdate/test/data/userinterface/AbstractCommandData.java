@@ -20,8 +20,8 @@
 
 package org.mxupdate.test.data.userinterface;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.mxupdate.test.AbstractTest;
 
@@ -38,11 +38,11 @@ abstract class AbstractCommandData<T extends AbstractCommandData<?>>
     /**
      * Within export the description, label and href must be defined.
      */
-    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(3);
+    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>(3);
     static  {
-        AbstractCommandData.REQUIRED_EXPORT_VALUES.add("description");
-        AbstractCommandData.REQUIRED_EXPORT_VALUES.add("label");
-        AbstractCommandData.REQUIRED_EXPORT_VALUES.add("href");
+        AbstractCommandData.REQUIRED_EXPORT_VALUES.put("description", "");
+        AbstractCommandData.REQUIRED_EXPORT_VALUES.put("label", "");
+        AbstractCommandData.REQUIRED_EXPORT_VALUES.put("href", "");
     }
 
     /**

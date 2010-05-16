@@ -23,13 +23,9 @@ package org.mxupdate.test.ci.userinterface;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.user.AbstractUserData;
 import org.mxupdate.test.data.user.GroupData;
 import org.mxupdate.test.data.user.RoleData;
-import org.mxupdate.test.data.userinterface.FieldData;
 import org.mxupdate.test.data.userinterface.TableData;
-import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -41,27 +37,16 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
+@Test()
 public class TableTest
     extends AbstractUITest<TableData>
 {
-    /**
-     * Creates for given <code>_name</code> a new table instance.
-     *
-     * @param _name     name of the table instance
-     * @return table instance
-     */
-    @Override()
-    protected TableData createNewData(final String _name)
-    {
-        return new TableData(this, _name);
-    }
-
     /**
      * Data provider for test tables.
      *
      * @return object array with all test tables
      */
-    @DataProvider(name = "tables")
+    @DataProvider(name = "data")
     public Object[][] getTables()
     {
         return this.prepareData("table",
@@ -131,93 +116,14 @@ public class TableTest
     }
 
     /**
-     * Tests a new created table and the related export.
+     * Creates for given <code>_name</code> a new table instance.
      *
-     * @param _description  description of the test case
-     * @param _table        table to test
-     * @throws Exception if test failed
+     * @param _name     name of the table instance
+     * @return table instance
      */
-    @Test(dataProvider = "tables",
-          description = "test export of new created table")
-    public void testExport(final String _description,
-                           final TableData _table)
-        throws Exception
+    @Override()
+    protected TableData createNewData(final String _name)
     {
-        _table.create();
-        _table.checkExport(_table.export());
-    }
-
-    /**
-     * Tests an update of non existing table. The result is tested with by
-     * exporting the table and checking the result.
-     *
-     * @param _description  description of the test case
-     * @param _table        table to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "tables",
-          description = "test update of non existing table")
-    public void testUpdate(final String _description,
-                           final TableData _table)
-        throws Exception
-    {
-        // create users
-        for (final FieldData<TableData> field : _table.getFields())  {
-            for (final AbstractUserData<?> user : field.getUsers())  {
-                user.create();
-            }
-        }
-        // create referenced property value
-        for (final PropertyDef prop : _table.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-
-        // first update with original content
-        _table.update();
-        final ExportParser exportParser = _table.export();
-        _table.checkExport(exportParser);
-
-        // second update with delivered content
-        _table.updateWithCode(exportParser.getOrigCode())
-              .checkExport();
-    }
-
-    /**
-     * Test update of existing table that all parameters are cleaned.
-     *
-     * @param _description  description of the test case
-     * @param _table        table to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "tables",
-          description = "test update of existing table for cleaning")
-    public void testUpdate4Existing(final String _description,
-                                    final TableData _table)
-        throws Exception
-    {
-        // create users
-        for (final FieldData<TableData> field : _table.getFields())  {
-            for (final AbstractUserData<?> user : field.getUsers())  {
-                user.create();
-            }
-        }
-        // create referenced property value
-        for (final PropertyDef prop : _table.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-
-        // first update with original content
-        _table.update()
-              .checkExport();
-
-        // second update with delivered content
-        new TableData(this, _table.getName().substring(AbstractTest.PREFIX.length()))
-                .update()
-                .setValue("description", "")
-                .checkExport();
+        return new TableData(this, _name);
     }
 }

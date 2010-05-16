@@ -21,8 +21,10 @@
 package org.mxupdate.test.data.userinterface;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -44,10 +46,10 @@ public class PortalData
     /**
      * Within export the description and label must be defined.
      */
-    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(3);
+    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>(3);
     static  {
-        PortalData.REQUIRED_EXPORT_VALUES.add("description");
-        PortalData.REQUIRED_EXPORT_VALUES.add("label");
+        PortalData.REQUIRED_EXPORT_VALUES.put("description", "");
+        PortalData.REQUIRED_EXPORT_VALUES.put("label", "");
     }
 
     /**
@@ -103,12 +105,21 @@ public class PortalData
      *
      * @return code for the configuration item update file
      */
-    @Override
+    @Override()
     public String ciFile()
     {
         final StringBuilder cmd = new StringBuilder();
         this.append4CIFileHeader(cmd);
         cmd.append("mql escape mod portal \"${NAME}\"");
+
+        // append hidden flag
+        if (this.isHidden() != null)  {
+            cmd.append(' ');
+            if (!this.isHidden())  {
+                cmd.append('!');
+            }
+            cmd.append("hidden");
+        }
 
         // append channels
         for (final ChannelData channel : this.channels)  {
@@ -126,20 +137,31 @@ public class PortalData
      * @return this portal instance
      * @throws MatrixException if create failed
      */
-    @Override
+    @Override()
     public PortalData create()
         throws MatrixException
     {
         if (!this.isCreated())  {
             this.setCreated(true);
 
+            this.createDependings();
+
             final StringBuilder cmd = new StringBuilder()
                     .append("escape add portal \"" + AbstractTest.convertMql(this.getName()) + "\"");
+
+            // append hidden flag
+            if (this.isHidden() != null)  {
+                cmd.append(' ');
+                if (!this.isHidden())  {
+                    cmd.append('!');
+                }
+                cmd.append("hidden");
+            }
+
             // append all channels
             if (!this.channels.isEmpty())  {
                 final List<String> names = new ArrayList<String>();
                 for (final ChannelData channel : this.channels)  {
-                    channel.create();
                     names.add(channel.getName());
                 }
                 cmd.append(" channel ").append(StringUtil_mxJPO.joinMql(',', true, names, null));
@@ -153,6 +175,26 @@ public class PortalData
 
             this.getTest().mql(cmd);
         }
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     * All assigned channels are created.
+     *
+     * @see #channels
+     */
+    @Override()
+    public PortalData createDependings()
+        throws MatrixException
+    {
+        super.createDependings();
+
+        // create all assigned channels
+        for (final ChannelData channel : this.channels)  {
+            channel.create();
+        }
+
         return this;
     }
 

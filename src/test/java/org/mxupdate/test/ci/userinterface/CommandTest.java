@@ -23,12 +23,9 @@ package org.mxupdate.test.ci.userinterface;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.user.AbstractUserData;
 import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.data.user.RoleData;
 import org.mxupdate.test.data.userinterface.CommandData;
-import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -40,27 +37,16 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
+@Test()
 public class CommandTest
     extends AbstractUITest<CommandData>
 {
-    /**
-     * Creates for given <code>_name</code> a new command instance.
-     *
-     * @param _name     name of the command instance
-     * @return command instance
-     */
-    @Override()
-    protected CommandData createNewData(final String _name)
-    {
-        return new CommandData(this, _name);
-    }
-
     /**
      * Data provider for test commands.
      *
      * @return object array with all test commands
      */
-    @DataProvider(name = "commands")
+    @DataProvider(name = "data")
     public Object[][] getCommands()
     {
         return this.prepareData("command",
@@ -102,89 +88,14 @@ public class CommandTest
     }
 
     /**
-     * Tests a new created command and the related export.
+     * Creates for given <code>_name</code> a new command instance.
      *
-     * @param _description  description of the test case
-     * @param _command      command to test
-     * @throws Exception if test failed
+     * @param _name     name of the command instance
+     * @return command instance
      */
-    @Test(dataProvider = "commands", description = "test export of new created commands")
-    public void testExport(final String _description,
-                           final CommandData _command)
-        throws Exception
+    @Override()
+    protected CommandData createNewData(final String _name)
     {
-        _command.create();
-        _command.checkExport(_command.export());
-    }
-
-    /**
-     * Tests an update of non existing command. The result is tested with by
-     * exporting the command and checking the result.
-     *
-     * @param _description  description of the test case
-     * @param _command      command to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "commands", description = "test update of non existing command")
-    public void testUpdate(final String _description,
-                           final CommandData _command)
-        throws Exception
-    {
-        // create referenced property value
-        for (final PropertyDef prop : _command.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-        // create assigned users
-        for (final AbstractUserData<?> user : _command.getUsers())  {
-            user.create();
-        }
-
-        // first update with original content
-        _command.update();
-        final ExportParser exportParser = _command.export();
-        _command.checkExport(exportParser);
-
-        // second update with delivered content
-        _command.updateWithCode(exportParser.getOrigCode())
-                .checkExport(_command.export());
-    }
-
-    /**
-     * Test update of existing command that all parameters are cleaned.
-     *
-     * @param _description  description of the test case
-     * @param _command      command to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "commands",
-          description = "test update of existing command for cleaning")
-    public void testUpdate4Existing(final String _description,
-                                    final CommandData _command)
-        throws Exception
-    {
-        // create referenced property value
-        for (final PropertyDef prop : _command.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-        // create assigned users
-        for (final AbstractUserData<?> user : _command.getUsers())  {
-            user.create();
-        }
-
-        // first update with original content
-        _command.update()
-                .checkExport();
-
-        // second update with delivered content
-        new CommandData(this, _command.getName().substring(AbstractTest.PREFIX.length()))
-                .update()
-                .setValue("description", "")
-                .setValue("label", "")
-                .setValue("href", "")
-                .checkExport();
+        return new CommandData(this, _name);
     }
 }

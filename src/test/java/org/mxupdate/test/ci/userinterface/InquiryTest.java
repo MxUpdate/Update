@@ -23,9 +23,7 @@ package org.mxupdate.test.ci.userinterface;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.userinterface.InquiryData;
-import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -37,27 +35,16 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
+@Test()
 public class InquiryTest
     extends AbstractUITest<InquiryData>
 {
-    /**
-     * Creates for given <code>_name</code> a new inquiry instance.
-     *
-     * @param _name     name of the inquiry instance
-     * @return inquiry instance
-     */
-    @Override()
-    protected InquiryData createNewData(final String _name)
-    {
-        return new InquiryData(this, _name);
-    }
-
     /**
      * Data provider for test inquiries.
      *
      * @return object array with all test inquiries
      */
-    @DataProvider(name = "inquires")
+    @DataProvider(name = "data")
     public Object[][] getInquiries()
     {
         return this.prepareData("inquiry",
@@ -95,83 +82,14 @@ public class InquiryTest
     }
 
     /**
-     * Tests a new created inquiry and the related export.
+     * Creates for given <code>_name</code> a new inquiry instance.
      *
-     * @param _description  description of the test case
-     * @param _inquiry      inquiry to test
-     * @throws Exception if test failed
+     * @param _name     name of the inquiry instance
+     * @return inquiry instance
      */
-    @Test(dataProvider = "inquires",
-          description = "test export of new created inquires")
-    public void testExport(final String _description,
-                           final InquiryData _inquiry)
-        throws Exception
+    @Override()
+    protected InquiryData createNewData(final String _name)
     {
-        _inquiry.create();
-        _inquiry.checkExport(_inquiry.export());
-    }
-
-    /**
-     * Tests an update of non existing inquiry. The result is tested by
-     * exporting the inquiry and checking the result.
-     *
-     * @param _description  description of the test case
-     * @param _inquiry      inquiry to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "inquires",
-          description = "test update of non existing inquiry")
-    public void testUpdate(final String _description,
-                           final InquiryData _inquiry)
-        throws Exception
-    {
-        // create referenced property value
-        for (final PropertyDef prop : _inquiry.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-
-        // first update with original content
-        _inquiry.update();
-        final ExportParser exportParser = _inquiry.export();
-        _inquiry.checkExport(exportParser);
-
-        // second update with delivered content
-        _inquiry.updateWithCode(exportParser.getOrigCode())
-                .checkExport(_inquiry.export());
-    }
-
-    /**
-     * Test update of existing inquiry that all parameters are cleaned.
-     *
-     * @param _description  description of the test case
-     * @param _inquiry         inquiry to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "inquires",
-          description = "test update of existing inquiry for cleaning")
-    public void testUpdate4Existing(final String _description,
-                                    final InquiryData _inquiry)
-        throws Exception
-    {
-        // create referenced property value
-        for (final PropertyDef prop : _inquiry.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-
-        // first update with original content
-        _inquiry.update()
-                .checkExport();
-
-        // second update with delivered content
-        new InquiryData(this, _inquiry.getName().substring(AbstractTest.PREFIX.length()))
-                .update()
-                .setValue("description", "")
-                .setValue("format", "")
-                .setValue("pattern", "")
-                .checkExport();
+        return new InquiryData(this, _name);
     }
 }

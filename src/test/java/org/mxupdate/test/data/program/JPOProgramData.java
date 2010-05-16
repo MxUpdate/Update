@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ package org.mxupdate.test.data.program;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ExportParser;
+import org.testng.Assert;
 
 /**
  * The class is used to define all JPO program objects used to create / update
@@ -130,5 +132,21 @@ public class JPOProgramData
             this.getTest().mql(cmd);
         }
         return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     * The define Java package within the source code is checked.
+     */
+    @Override()
+    public void checkExport(final ExportParser _exportParser)
+        throws MatrixException
+    {
+        super.checkExport(_exportParser);
+
+        // check if package definition exists / not exists
+        Assert.assertEquals((_exportParser.getOrigCode().indexOf("package") >= 0),
+                            (this.getCode().indexOf("package") >= 0),
+                            "checks that JPO code has correct package definition");
     }
 }

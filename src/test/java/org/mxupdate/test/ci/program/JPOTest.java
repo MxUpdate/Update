@@ -23,10 +23,8 @@ package org.mxupdate.test.ci.program;
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.DataCollection;
 import org.mxupdate.test.data.program.JPOProgramData;
 import org.mxupdate.test.data.user.PersonAdminData;
-import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.util.IssueLink;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -40,6 +38,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
+@Test()
 public class JPOTest
     extends AbstractDataExportUpdate<JPOProgramData>
 {
@@ -56,31 +55,46 @@ public class JPOTest
     }
 
     /**
+     * {@inheritDoc}
+     * The source code is set to an empty class.
+     */
+    @Override()
+    protected JPOProgramData createCleanNewData(final JPOProgramData _original)
+    {
+        final String prgName = _original.getName();
+        final StringBuilder code = new StringBuilder();
+        if (prgName.indexOf('.') > 0)  {
+            code.append("package ").append(prgName.replaceAll("\\.[^.]*$", "")).append(";\n");
+        }
+        code.append("public class ").append(prgName.replaceAll(".*\\.", "")).append("_mxJPO {}");
+
+        return this.createNewData(_original.getName().substring(AbstractTest.PREFIX.length())).setCode(code.toString());
+    }
+
+    /**
      * Data provider for test JPOs.
      *
      * @return object array with all test JPOs
      */
     @IssueLink("26")
-    @DataProvider(name = "jpos")
+    @DataProvider(name = "data")
     public Object[][] getJPOs()
     {
-        final DataCollection data1 = new DataCollection(this);
-        data1.getJPOProgram("Test1")
-             .setCode("public class " + data1.getJPOProgram("Test1").getName() + "_mxJPO {}");
+        final JPOProgramData data1 = new JPOProgramData(this, "Test1");
+        data1.setCode("public class " + data1.getName() + "_mxJPO {}");
 
-        final DataCollection data2 = new DataCollection(this);
-        final String prgName2 = data2.getJPOProgram("test.subtest.Test2").getName();
-        data2.getJPOProgram("test.subtest.Test2")
-             .setCode("package " + prgName2.replaceAll("\\.[^.]*$", "") + ";\n"
+        final JPOProgramData data2 = new JPOProgramData(this, "org.test.Test2");
+        final String prgName2 = data2.getName();
+        data2.setCode("package " + prgName2.replaceAll("\\.[^.]*$", "") + ";\n"
                      + "public class " + prgName2.replaceAll(".*\\.", "") + "_mxJPO {}");
 
         return new Object[][]  {
                 new Object[]{
                         "default package",
-                        data1.getJPOProgram("Test1")},
+                        data1},
                 new Object[]{
                         "with sub package",
-                        data2.getJPOProgram("test.subtest.Test2")},
+                        data2},
                 new Object[]{
                         "with CDATA tag end",
                         new JPOProgramData(this, "Test1").setCode("<]]>")},
@@ -117,28 +131,6 @@ public class JPOTest
     }
 
     /**
-     * Checks that the new created JPO is exported correctly.
-     *
-     * @param _description  description of the test data
-     * @param _jpoProgram   data collection to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "jpos", description = "test export of JPOs")
-    public void simpleExport(final String _description,
-                             final JPOProgramData _jpoProgram)
-        throws Exception
-    {
-        _jpoProgram.create();
-        final ExportParser exportParser = _jpoProgram.export();
-        _jpoProgram.checkExport(exportParser);
-
-        // check if package definition exists / not exists
-        Assert.assertEquals((exportParser.getOrigCode().indexOf("package") >= 0),
-                            (_jpoProgram.getCode().indexOf("package") >= 0),
-                            "checks that JPO code has correct package definition");
-    }
-
-    /**
      * Tests, if the JPO within MX is created and registered with the correct
      * symbolic name.
      *
@@ -146,24 +138,15 @@ public class JPOTest
      * @param _jpoProgram   data collection to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "jpos", description = "test update of non existing JPOs")
+    @Test(dataProvider = "data",
+          description = "test update of non existing JPOs")
     public void simpleUpdate(final String _description,
                              final JPOProgramData _jpoProgram)
         throws Exception
     {
-        // create user
-        if (_jpoProgram.getUser() != null)  {
-            _jpoProgram.getUser().create();
-        }
-        // create referenced property value
-        for (final PropertyDef prop : _jpoProgram.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-
         // first update with original content
-        _jpoProgram.update();
+        _jpoProgram.createDependings()
+                   .update();
 
         // the replace code (removing TCL update commands)
         final StringBuilder cmd = new StringBuilder()

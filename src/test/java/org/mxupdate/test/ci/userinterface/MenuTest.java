@@ -23,10 +23,8 @@ package org.mxupdate.test.ci.userinterface;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.userinterface.CommandData;
 import org.mxupdate.test.data.userinterface.MenuData;
-import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -38,27 +36,16 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
+@Test()
 public class MenuTest
     extends AbstractUITest<MenuData>
 {
-    /**
-     * Creates for given <code>_name</code> a new menu instance.
-     *
-     * @param _name     name of the menu instance
-     * @return menu instance
-     */
-    @Override()
-    protected MenuData createNewData(final String _name)
-    {
-        return new MenuData(this, _name);
-    }
-
     /**
      * Data provider for test menus.
      *
      * @return object array with all test menus
      */
-    @DataProvider(name = "menus")
+    @DataProvider(name = "data")
     public Object[][] getMenus()
     {
         return this.prepareData("menu",
@@ -89,86 +76,14 @@ public class MenuTest
     }
 
     /**
-     * Tests a 'simple' menu but with a quote in name and with one command and
-     * menu.
+     * Creates for given <code>_name</code> a new menu instance.
      *
-     * @param _description  description of the test case
-     * @param _menu         menu to test
-     * @throws Exception if test failed
+     * @param _name     name of the menu instance
+     * @return menu instance
      */
-    @Test(dataProvider = "menus", description = "test export of a single menu")
-    public void testExportSingleMenu(final String _description,
-                                     final MenuData _menu)
-        throws Exception
+    @Override()
+    protected MenuData createNewData(final String _name)
     {
-        _menu.create()
-             .checkExport();
-    }
-
-    /**
-     * Tests an update of non existing command. The result is tested with by
-     * exporting the command and checking the result.
-     *
-     * @param _description  description of the test case
-     * @param _menu         menu to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "menus", description = "test update of non existing menu")
-    public void testUpdate(final String _description,
-                           final MenuData _menu)
-        throws Exception
-    {
-        // create referenced property value
-        for (final PropertyDef prop : _menu.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-        // create child menus / commands
-        _menu.createChildren();
-
-        // first update with original content
-        _menu.update();
-        final ExportParser exportParser = _menu.export();
-        _menu.checkExport(exportParser);
-
-        // second update with delivered content
-        _menu.updateWithCode(exportParser.getOrigCode())
-             .checkExport();
-    }
-
-    /**
-     * Test update of existing menu that all parameters are cleaned.
-     *
-     * @param _description  description of the test case
-     * @param _menu         menu to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "menus",
-          description = "test update of existing menu for cleaning")
-    public void testUpdate4Existing(final String _description,
-                                    final MenuData _menu)
-        throws Exception
-    {
-        // create referenced property value
-        for (final PropertyDef prop : _menu.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-        // create child menus / commands
-        _menu.createChildren();
-
-        // first update with original content
-        _menu.update()
-             .checkExport();
-
-        // second update with delivered content
-        new MenuData(this, _menu.getName().substring(AbstractTest.PREFIX.length()))
-                .update()
-                .setValue("description", "")
-                .setValue("label", "")
-                .setValue("href", "")
-                .checkExport();
+        return new MenuData(this, _name);
     }
 }

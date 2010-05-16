@@ -23,13 +23,9 @@ package org.mxupdate.test.ci.userinterface;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.user.AbstractUserData;
 import org.mxupdate.test.data.user.GroupData;
 import org.mxupdate.test.data.user.RoleData;
-import org.mxupdate.test.data.userinterface.FieldData;
 import org.mxupdate.test.data.userinterface.FormData;
-import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -41,27 +37,16 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
+@Test()
 public class FormTest
     extends AbstractUITest<FormData>
 {
-    /**
-     * Creates for given <code>_name</code> a new form instance.
-     *
-     * @param _name     name of the form instance
-     * @return form instance
-     */
-    @Override()
-    protected FormData createNewData(final String _name)
-    {
-        return new FormData(this, _name);
-    }
-
     /**
      * Data provider for test forms.
      *
      * @return object array with all test forms
      */
-    @DataProvider(name = "forms")
+    @DataProvider(name = "data")
     public Object[][] getForms()
     {
         return this.prepareData("form",
@@ -123,93 +108,15 @@ public class FormTest
         this.cleanup(AbstractTest.CI.USR_GROUP);
     }
 
-
     /**
-     * Tests a new created form and the related export.
+     * Creates for given <code>_name</code> a new form instance.
      *
-     * @param _description  description of the test case
-     * @param _form         form to test
-     * @throws Exception if test failed
+     * @param _name     name of the form instance
+     * @return form instance
      */
-    @Test(dataProvider = "forms", description = "test export of new created form")
-    public void textExport(final String _description,
-                           final FormData _form)
-        throws Exception
+    @Override()
+    protected FormData createNewData(final String _name)
     {
-        _form.create()
-             .checkExport();
-    }
-
-    /**
-     * Tests an update of non existing form. The result is tested with by
-     * exporting the form and checking the result.
-     *
-     * @param _description  description of the test case
-     * @param _form         form to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "forms", description = "test update of non existing form")
-    public void testUpdate(final String _description,
-                           final FormData _form)
-        throws Exception
-    {
-        // create users
-        for (final FieldData<FormData> field : _form.getFields())  {
-            for (final AbstractUserData<?> user : field.getUsers())  {
-                user.create();
-            }
-        }
-        // create referenced property value
-        for (final PropertyDef prop : _form.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-
-        // first update with original content
-        _form.update();
-        final ExportParser exportParser = _form.export();
-        _form.checkExport(exportParser);
-
-        // second update with delivered content
-        _form.updateWithCode(exportParser.getOrigCode())
-             .checkExport();
-    }
-
-    /**
-     * Test update of existing form that all parameters are cleaned.
-     *
-     * @param _description  description of the test case
-     * @param _form         form to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "forms",
-          description = "test update of existing form for cleaning")
-    public void testUpdate4Existing(final String _description,
-                                    final FormData _form)
-        throws Exception
-    {
-        // create users
-        for (final FieldData<FormData> field : _form.getFields())  {
-            for (final AbstractUserData<?> user : field.getUsers())  {
-                user.create();
-            }
-        }
-        // create referenced property value
-        for (final PropertyDef prop : _form.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-
-        // first update with original content
-        _form.update()
-             .checkExport();
-
-        // second update with delivered content
-        new FormData(this, _form.getName().substring(AbstractTest.PREFIX.length()))
-                .update()
-                .setValue("description", "")
-                .checkExport();
+        return new FormData(this, _name);
     }
 }

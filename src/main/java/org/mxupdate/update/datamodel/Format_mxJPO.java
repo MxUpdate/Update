@@ -145,7 +145,7 @@ public class Format_mxJPO
                                final Appendable _out)
         throws IOException
     {
-        _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "nothidden")
+        _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden")
             .append(" \\\n    version \"").append((this.version != null) ? StringUtil_mxJPO.convertTcl(this.version) : "").append('\"')
             .append(" \\\n    suffix \"").append((this.fileSuffix != null) ? StringUtil_mxJPO.convertTcl(this.fileSuffix) : "").append('\"')
             .append(" \\\n    type \"").append((this.fileType != null) ? StringUtil_mxJPO.convertTcl(this.fileType) : "").append('\"')

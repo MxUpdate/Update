@@ -28,18 +28,9 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.other.SiteData;
-import org.mxupdate.test.data.program.AbstractProgramData;
 import org.mxupdate.test.data.user.GroupData;
 import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.data.user.RoleData;
-import org.mxupdate.test.data.user.workspace.CueData;
-import org.mxupdate.test.data.user.workspace.FilterData;
-import org.mxupdate.test.data.user.workspace.QueryData;
-import org.mxupdate.test.data.user.workspace.TableData;
-import org.mxupdate.test.data.user.workspace.TipData;
-import org.mxupdate.test.data.user.workspace.ToolSetData;
-import org.mxupdate.test.data.user.workspace.ViewData;
-import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -53,6 +44,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
+@Test()
 public class PersonTest
     extends AbstractUserTest<PersonAdminData>
 {
@@ -73,7 +65,7 @@ public class PersonTest
      *
      * @return object array with all test persons
      */
-    @DataProvider(name = "persons")
+    @DataProvider(name = "data")
     public Object[][] getPersons()
     {
         return this.prepareData("person",
@@ -231,124 +223,6 @@ public class PersonTest
         this.cleanup(AbstractTest.CI.USR_ROLE);
         this.cleanup(AbstractTest.CI.OTHER_SITE);
         this.cleanup(AbstractTest.CI.PRG_MQL_PROGRAM);
-    }
-
-    /**
-     * Tests a new created person and the related export.
-     *
-     * @param _description  description of the test case
-     * @param _person       person to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "persons", description = "test export of new created person")
-    public void simpleExport(final String _description,
-                             final PersonAdminData _person)
-        throws Exception
-    {
-        _person.create();
-        _person.checkExport(_person.export());
-    }
-
-    /**
-     * Tests an update of non existing person. The result is tested with by
-     * exporting the person and checking the result.
-     *
-     * @param _description  description of the test case
-     * @param _person       person to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "persons",
-          description = "test update of non existing person")
-    public void simpleUpdate(final String _description,
-                             final PersonAdminData _person)
-        throws Exception
-    {
-        // create referenced property value
-        for (final PropertyDef prop : _person.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-        // create site
-        if (_person.getSite() != null)  {
-            _person.getSite().create();
-        }
-        // create assigned roles
-        for (final RoleData role : _person.getRoles())  {
-            role.create();
-        }
-        // create assigned groups
-        for (final GroupData group : _person.getGroups())  {
-            group.create();
-        }
-        // create cue properties
-        for (final CueData<PersonAdminData> cue : _person.getCues())  {
-            for (final PropertyDef prop : cue.getProperties())  {
-                if (prop.getTo() != null)  {
-                    prop.getTo().create();
-                }
-            }
-        }
-        // create filter properties
-        for (final FilterData<PersonAdminData> filter : _person.getFilters())  {
-            for (final PropertyDef prop : filter.getProperties())  {
-                if (prop.getTo() != null)  {
-                    prop.getTo().create();
-                }
-            }
-        }
-        // create query properties
-        for (final QueryData<PersonAdminData> query : _person.getQueries())  {
-            for (final PropertyDef prop : query.getProperties())  {
-                if (prop.getTo() != null)  {
-                    prop.getTo().create();
-                }
-            }
-        }
-        // create table properties
-        for (final TableData<PersonAdminData> table : _person.getTables())  {
-            for (final PropertyDef prop : table.getProperties())  {
-                if (prop.getTo() != null)  {
-                    prop.getTo().create();
-                }
-            }
-        }
-        // create tip properties
-        for (final TipData<PersonAdminData> tip : _person.getTips())  {
-            for (final PropertyDef prop : tip.getProperties())  {
-                if (prop.getTo() != null)  {
-                    prop.getTo().create();
-                }
-            }
-        }
-        // create tool set properties and programs
-        for (final ToolSetData<PersonAdminData> toolSet : _person.getToolSets())  {
-            for (final PropertyDef prop : toolSet.getProperties())  {
-                if (prop.getTo() != null)  {
-                    prop.getTo().create();
-                }
-            }
-            for (final AbstractProgramData<?> prog : toolSet.getPrograms())  {
-                prog.create();
-            }
-        }
-        // create view properties
-        for (final ViewData<PersonAdminData> view : _person.getViews())  {
-            for (final PropertyDef prop : view.getProperties())  {
-                if (prop.getTo() != null)  {
-                    prop.getTo().create();
-                }
-            }
-        }
-
-        // first update with original content
-        _person.update();
-        final ExportParser exportParser = _person.export();
-        _person.checkExport(exportParser);
-
-        // second update with delivered content
-        _person.updateWithCode(exportParser.getOrigCode())
-               .checkExport();
     }
 
     /**

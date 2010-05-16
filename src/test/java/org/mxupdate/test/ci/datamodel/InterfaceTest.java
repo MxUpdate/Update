@@ -24,13 +24,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.DataCollection;
-import org.mxupdate.test.data.datamodel.AbstractAttributeData;
 import org.mxupdate.test.data.datamodel.AttributeStringData;
 import org.mxupdate.test.data.datamodel.InterfaceData;
 import org.mxupdate.test.data.datamodel.RelationshipData;
 import org.mxupdate.test.data.datamodel.TypeData;
-import org.mxupdate.test.data.util.PropertyDef;
+import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -64,6 +62,7 @@ public class InterfaceTest
      *
      * @return object array with all test interfaces
      */
+    @IssueLink("123")
     @DataProvider(name = "data")
     public Object[][] dataInterfaces()
     {
@@ -74,6 +73,11 @@ public class InterfaceTest
                 new Object[]{
                         "interface with escaped name",
                         new InterfaceData(this, "TestInterface \" 1")},
+
+                new Object[]{
+                        "issue #123: interface which is abstract",
+                        new InterfaceData(this, "TestInterface")
+                                .setValue("abstract", "true")},
 
                 new Object[]{
                         "interface with one single parent interface",
@@ -132,41 +136,6 @@ public class InterfaceTest
     }
 
     /**
-     * Creates all depending administration objects for given
-     * <code>_interface</code>.
-     *
-     * @param _interface    interface with depending objects
-     * @throws Exception if create failed
-     */
-    @Override()
-    protected void createDependings(final InterfaceData _interface)
-        throws Exception
-    {
-        // create referenced property value
-        for (final PropertyDef prop : _interface.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-        // create attributes
-        for (final AbstractAttributeData<?> attr : _interface.getAttributes())  {
-            attr.create();
-        }
-        // create parent interfaces
-        for (final InterfaceData inter : _interface.getParents())  {
-            inter.create();
-        }
-        // create assigned types
-        for (final TypeData type : _interface.getTypes())  {
-            type.create();
-        }
-        // create assigned relationships
-        for (final RelationshipData relation : _interface.getRelationships())  {
-            relation.create();
-        }
-    }
-
-    /**
      * {@inheritDoc}
      * The original method is overwritten because the parent interfaces could
      * not be removed.
@@ -187,12 +156,11 @@ public class InterfaceTest
     public void updateOneParent4NonExisting()
         throws Exception
     {
-        final DataCollection data = new DataCollection(this);
-        final InterfaceData parent = data.getInterface("TestInterfaceParent");
-        data.create();
+        final InterfaceData parent = new InterfaceData(this, "TestInterfaceParent").create();
 
-        final InterfaceData inter = data.getInterface("TestInterface").addParent(parent);
-        inter.update();
+        final InterfaceData inter = new InterfaceData(this, "TestInterface")
+                .addParent(parent)
+                .update();
 
         Assert.assertEquals(this.mql("print interface '" + inter.getName() + "' select derived dump"),
                             parent.getName(),
@@ -208,12 +176,10 @@ public class InterfaceTest
     public void updateTwoParent4NonExisting()
         throws Exception
     {
-        final DataCollection data = new DataCollection(this);
-        final InterfaceData parent1 = data.getInterface("TestInerfaceParent1");
-        final InterfaceData parent2 = data.getInterface("TestInerfaceParent2");
-        data.create();
+        final InterfaceData parent1 = new InterfaceData(this, "TestInerfaceParent1").create();
+        final InterfaceData parent2 = new InterfaceData(this, "TestInerfaceParent2").create();
 
-        final InterfaceData inter = data.getInterface("TestInterface")
+        final InterfaceData inter = new InterfaceData(this, "TestInterface")
                 .addParent(parent1)
                 .addParent(parent2);
         inter.update();
@@ -236,12 +202,10 @@ public class InterfaceTest
     public void updateOneAttribute4NonExisting()
         throws Exception
     {
-        final DataCollection data = new DataCollection(this);
-        final AttributeStringData attr = data.getAttributeString("Attribute");
-        data.create();
-
-        final InterfaceData inter = data.getInterface("TestInterface").addAttribute(attr);
-        inter.update();
+        final AttributeStringData attr = new AttributeStringData(this, "Attribute").create();
+        final InterfaceData inter = new InterfaceData(this, "TestInterface")
+                .addAttribute(attr)
+                .create();
 
         Assert.assertEquals(this.mql("print interface '" + inter.getName() + "' select attribute dump"),
                             attr.getName(),
@@ -258,18 +222,18 @@ public class InterfaceTest
     public void updateOneType4ExistingAllTypes()
         throws Exception
     {
-        final DataCollection data = new DataCollection(this);
-        final TypeData type = data.getType("TestType");
-        final InterfaceData inter = data.getInterface("TestInterface").addAllTypes();
-        data.create();
+        final TypeData type = new TypeData(this, "TestType").create();
+        final InterfaceData inter = new InterfaceData(this, "TestInterface")
+                .addAllTypes()
+                .create()
+                .removeTypes()
+                .addType(type)
+                .update();
 
-        inter.removeTypes()
-             .addType(type)
-             .update();
-
-        Assert.assertEquals(this.mql("print interface '" + inter.getName() + "' select type dump"),
-                            type.getName(),
-                            "check that only one type is defined");
+        Assert.assertEquals(
+                this.mql("print interface '" + inter.getName() + "' select type dump"),
+                type.getName(),
+                "check that only one type is defined");
     }
 
     /**
@@ -281,16 +245,15 @@ public class InterfaceTest
     public void updateOneType4NonExisting()
         throws Exception
     {
-        final DataCollection data = new DataCollection(this);
-        final TypeData type = data.getType("TestType");
-        data.create();
+        final TypeData type = new TypeData(this, "TestType").create();
+        final InterfaceData inter = new InterfaceData(this, "TestInterface")
+                .addType(type)
+                .update();
 
-        final InterfaceData inter = data.getInterface("TestInterface").addType(type);
-        inter.update();
-
-        Assert.assertEquals(this.mql("print interface '" + inter.getName() + "' select type dump"),
-                            type.getName(),
-                            "check that only one type is defined");
+        Assert.assertEquals(
+                this.mql("print interface '" + inter.getName() + "' select type dump"),
+                type.getName(),
+                "check that only one type is defined");
     }
 
     /**
@@ -302,15 +265,13 @@ public class InterfaceTest
     public void updateTwoTypes4NonExisting()
         throws Exception
     {
-        final DataCollection data = new DataCollection(this);
-        final TypeData type1 = data.getType("TestType1");
-        final TypeData type2 = data.getType("TestType2");
-        data.create();
+        final TypeData type1 = new TypeData(this, "TestType1").create();
+        final TypeData type2 = new TypeData(this, "TestType2").create();
 
-        final InterfaceData inter = data.getInterface("TestInterface")
+        final InterfaceData inter = new InterfaceData(this, "TestInterface")
                 .addType(type1)
-                .addType(type2);
-        inter.update();
+                .addType(type2)
+                .update();
 
         final Set<String> result = new HashSet<String>();
         result.add(type1.getName());
@@ -330,17 +291,17 @@ public class InterfaceTest
     public void updateAllTypes4ExistingType()
         throws Exception
     {
-        final DataCollection data = new DataCollection(this);
-        final TypeData type = data.getType("TestType");
-        final InterfaceData inter = data.getInterface("TestInterface").addType(type);
-        data.create();
+        final TypeData type = new TypeData(this, "TestType");
+        final InterfaceData inter = new InterfaceData(this, "TestInterface")
+                .addType(type)
+                .create()
+                .addAllTypes()
+                .update();
 
-        inter.addAllTypes()
-             .update();
-
-        Assert.assertEquals(this.mql("print interface '" + inter.getName() + "' select type dump"),
-                            "all",
-                            "check that only all type is defined");
+        Assert.assertEquals(
+                this.mql("print interface '" + inter.getName() + "' select type dump"),
+                "all",
+                "check that only all type is defined");
     }
 
     /**
@@ -353,19 +314,19 @@ public class InterfaceTest
     public void updateOneRelationship4ExistingOneRelationships()
         throws Exception
     {
-        final DataCollection data = new DataCollection(this);
-        final RelationshipData rel1 = data.getRelationship("TestRel1");
-        final RelationshipData rel2 = data.getRelationship("TestRel2");
-        final InterfaceData inter = data.getInterface("TestInterface").addRelationship(rel1);
-        data.create();
+        final RelationshipData rel1 = new RelationshipData(this, "TestRel1").create();
+        final RelationshipData rel2 = new RelationshipData(this, "TestRel2").create();
+        final InterfaceData inter = new InterfaceData(this, "TestInterface")
+                .addRelationship(rel1)
+                .create()
+                .removeRelationships()
+                .addRelationship(rel2)
+                .update();
 
-        inter.removeRelationships()
-             .addRelationship(rel2)
-             .update();
-
-        Assert.assertEquals(this.mql("print interface '" + inter.getName() + "' select relationship dump"),
-                            rel2.getName(),
-                            "check that only second relationship is defined");
+        Assert.assertEquals(
+                this.mql("print interface '" + inter.getName() + "' select relationship dump"),
+                rel2.getName(),
+                "check that only second relationship is defined");
     }
 
     /**
@@ -378,16 +339,15 @@ public class InterfaceTest
     public void updateOneRelationship4NonExisting()
         throws Exception
     {
-        final DataCollection data = new DataCollection(this);
-        final RelationshipData rel = data.getRelationship("TestType");
-        data.create();
+        final RelationshipData rel = new RelationshipData(this, "TestRel").create();
+        final InterfaceData inter = new InterfaceData(this, "TestInterface")
+                .addRelationship(rel)
+                .update();
 
-        final InterfaceData inter = data.getInterface("TestInterface").addRelationship(rel);
-        inter.update();
-
-        Assert.assertEquals(this.mql("print interface '" + inter.getName() + "' select relationship dump"),
-                            rel.getName(),
-                            "check that only one relationship is defined");
+        Assert.assertEquals(
+                this.mql("print interface '" + inter.getName() + "' select relationship dump"),
+                rel.getName(),
+                "check that only one relationship is defined");
     }
 
     /**
@@ -400,18 +360,18 @@ public class InterfaceTest
     public void updateOneRelationship4ExistingAllRelationships()
         throws Exception
     {
-        final DataCollection data = new DataCollection(this);
-        final RelationshipData rel = data.getRelationship("TestRel");
-        final InterfaceData inter = data.getInterface("TestInterface").addAllRelationships();
-        data.create();
+        final RelationshipData rel = new RelationshipData(this, "TestRel").create();
+        final InterfaceData inter = new InterfaceData(this, "TestInterface")
+                .addAllRelationships()
+                .create()
+                .removeRelationships()
+                .addRelationship(rel)
+                .update();
 
-        inter.removeRelationships()
-             .addRelationship(rel)
-             .update();
-
-        Assert.assertEquals(this.mql("print interface '" + inter.getName() + "' select relationship dump"),
-                            rel.getName(),
-                            "check that only one relationship is defined");
+        Assert.assertEquals(
+                this.mql("print interface '" + inter.getName() + "' select relationship dump"),
+                rel.getName(),
+                "check that only one relationship is defined");
     }
 
     /**
@@ -424,13 +384,12 @@ public class InterfaceTest
     public void updateAllRelationships4ExistingRelationship()
         throws Exception
     {
-        final DataCollection data = new DataCollection(this);
-        final RelationshipData rel = data.getRelationship("TestType");
-        final InterfaceData inter = data.getInterface("TestInterface").addRelationship(rel);
-        data.create();
-
-        inter.addAllRelationships()
-             .update();
+        final RelationshipData rel = new RelationshipData(this, "TestRel");
+        final InterfaceData inter = new InterfaceData(this, "TestInterface")
+                .addRelationship(rel)
+                .create()
+                .addAllRelationships()
+                .update();
 
         Assert.assertEquals(this.mql("print interface '" + inter.getName() + "' select relationship dump"),
                             "all",
@@ -449,15 +408,13 @@ public class InterfaceTest
     public void updateNon4ExistingAllTypesRelationships()
         throws Exception
     {
-        final DataCollection data = new DataCollection(this);
-        final InterfaceData inter = data.getInterface("TestInterface")
+        final InterfaceData inter = new InterfaceData(this, "TestInterface")
                 .addAllRelationships()
-                .addAllTypes();
-        data.create();
-
-        inter.removeRelationships()
-             .removeTypes()
-             .update();
+                .addAllTypes()
+                .create()
+                .removeRelationships()
+                .removeTypes()
+                .update();
 
         Assert.assertEquals(this.mql("print interface '" + inter.getName() + "' select type dump"),
                             "",
@@ -477,18 +434,16 @@ public class InterfaceTest
     public void updateWithSpecialCharacters()
         throws Exception
     {
-        final DataCollection data = new DataCollection(this);
-        final InterfaceData parent1 = data.getInterface("TestInterfaceParent \" 1");
-        final InterfaceData parent2 = data.getInterface("TestInterfaceParent \" 2");
-        final AttributeStringData attr1 = data.getAttributeString("Attribute \" 1");
-        final AttributeStringData attr2 = data.getAttributeString("Attribute \" 2");
-        final TypeData type1 = data.getType("TestType \" 1");
-        final TypeData type2 = data.getType("TestType \" 2");
-        final RelationshipData rel1 = data.getRelationship("TestRel \" 1");
-        final RelationshipData rel2 = data.getRelationship("TestRel \" 2");
-        data.create();
+        final InterfaceData parent1 = new InterfaceData(this, "TestInterfaceParent \" 1").create();
+        final InterfaceData parent2 = new InterfaceData(this, "TestInterfaceParent \" 2").create();
+        final AttributeStringData attr1 = new AttributeStringData(this, "Attribute \" 1").create();
+        final AttributeStringData attr2 = new AttributeStringData(this, "Attribute \" 2").create();
+        final TypeData type1 = new TypeData(this, "TestType \" 1").create();
+        final TypeData type2 = new TypeData(this, "TestType \" 2").create();
+        final RelationshipData rel1 = new RelationshipData(this, "TestRel \" 1").create();
+        final RelationshipData rel2 = new RelationshipData(this, "TestRel \" 2").create();
 
-        final InterfaceData inter = data.getInterface("TestInterface \"")
+        final InterfaceData inter = new InterfaceData(this, "TestInterface \"")
                 .addParent(parent1)
                 .addParent(parent2)
                 .addAttribute(attr1)
@@ -496,39 +451,43 @@ public class InterfaceTest
                 .addType(type1)
                 .addType(type2)
                 .addRelationship(rel1)
-                .addRelationship(rel2);
-        inter.update();
+                .addRelationship(rel2)
+                .update();
 
         final Set<String> resultParent = new HashSet<String>();
         resultParent.add(parent1.getName());
         resultParent.add(parent2.getName());
-        Assert.assertEquals(this.mqlAsSet("print interface '" + inter.getName() + "' select derived dump '\n'"),
-                            resultParent,
-                            "check that all parent interfaces are defined");
+        Assert.assertEquals(
+                this.mqlAsSet("print interface '" + inter.getName() + "' select derived dump '\n'"),
+                resultParent,
+                "check that all parent interfaces are defined");
 
         final Set<String> resultAttrs = new HashSet<String>();
         resultAttrs.add(attr1.getName());
         resultAttrs.add(attr2.getName());
-        Assert.assertEquals(this.mqlAsSet("escape print interface \""
+        Assert.assertEquals(
+                this.mqlAsSet("escape print interface \""
                                     + AbstractTest.convertMql(inter.getName()) + "\" select attribute dump '\n'"),
-                            resultAttrs,
-                            "check that all types are defined");
+                resultAttrs,
+                "check that all types are defined");
 
         final Set<String> resultTypes = new HashSet<String>();
         resultTypes.add(type1.getName());
         resultTypes.add(type2.getName());
-        Assert.assertEquals(this.mqlAsSet("escape print interface \""
+        Assert.assertEquals(
+                this.mqlAsSet("escape print interface \""
                                     + AbstractTest.convertMql(inter.getName()) + "\" select type dump '\n'"),
-                            resultTypes,
-                            "check that all types are defined");
+                resultTypes,
+                "check that all types are defined");
 
         final Set<String> resultRels = new HashSet<String>();
         resultRels.add(rel1.getName());
         resultRels.add(rel2.getName());
-        Assert.assertEquals(this.mqlAsSet("escape print interface \""
+        Assert.assertEquals(
+                this.mqlAsSet("escape print interface \""
                                     + AbstractTest.convertMql(inter.getName()) + "\" select relationship dump '\n'"),
-                            resultRels,
-                            "check that all relationships are defined");
+                resultRels,
+                "check that all relationships are defined");
     }
 
     /**

@@ -21,15 +21,16 @@
 package org.mxupdate.test.data.userinterface;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.data.user.AbstractUserData;
 import org.testng.Assert;
 
 /**
@@ -44,9 +45,9 @@ public class FormData
     /**
      * Within export the description must be defined.
      */
-    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(3);
+    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>(3);
     static  {
-        FormData.REQUIRED_EXPORT_VALUES.add("description");
+        FormData.REQUIRED_EXPORT_VALUES.put("description", "");
     }
 
     /**
@@ -109,6 +110,16 @@ public class FormData
         final StringBuilder cmd = new StringBuilder();
         this.append4CIFileHeader(cmd);
         cmd.append("mql escape mod form \"${NAME}\"");
+
+        // append hidden flag
+        if (this.isHidden() != null)  {
+            cmd.append(' ');
+            if (!this.isHidden())  {
+                cmd.append('!');
+            }
+            cmd.append("hidden");
+        }
+
         this.append4CIFileValues(cmd);
         // and all fields...
         for (final FieldData<FormData> field : this.fields)  {
@@ -130,8 +141,20 @@ public class FormData
         if (!this.isCreated())  {
             this.setCreated(true);
 
+            this.createDependings();
+
             final StringBuilder cmd = new StringBuilder()
                     .append("escape add form \"" + AbstractTest.convertMql(this.getName()) + "\" web");
+
+            // append hidden flag
+            if (this.isHidden() != null)  {
+                cmd.append(' ');
+                if (!this.isHidden())  {
+                    cmd.append('!');
+                }
+                cmd.append("hidden");
+            }
+
             this.append4Create(cmd);
             // append all fields
             for (final FieldData<FormData> field : this.fields)  {
@@ -146,6 +169,29 @@ public class FormData
 
             this.getTest().mql(cmd);
         }
+        return this;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * All users defined within {@link #fields} are created.
+     *
+     * @see #fields
+     */
+    @Override()
+    public FormData createDependings()
+        throws MatrixException
+    {
+        super.createDependings();
+
+        // create users
+        for (final FieldData<FormData> field : this.fields)  {
+            for (final AbstractUserData<?> user : field.getUsers())  {
+                user.create();
+            }
+        }
+
         return this;
     }
 

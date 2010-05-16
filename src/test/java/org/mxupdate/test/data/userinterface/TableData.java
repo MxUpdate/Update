@@ -21,15 +21,16 @@
 package org.mxupdate.test.data.userinterface;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.data.user.AbstractUserData;
 import org.testng.Assert;
 
 /**
@@ -44,9 +45,9 @@ public class TableData
     /**
      * Within export the description must be defined.
      */
-    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(3);
+    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
     static  {
-        TableData.REQUIRED_EXPORT_VALUES.add("description");
+        TableData.REQUIRED_EXPORT_VALUES.put("description", "");
     }
 
     /**
@@ -109,6 +110,16 @@ public class TableData
         final StringBuilder cmd = new StringBuilder();
         this.append4CIFileHeader(cmd);
         cmd.append("mql escape mod table \"${NAME}\" system");
+
+        // append hidden flag
+        if (this.isHidden() != null)  {
+            cmd.append(' ');
+            if (!this.isHidden())  {
+                cmd.append('!');
+            }
+            cmd.append("hidden");
+        }
+
         this.append4CIFileValues(cmd);
         // and all fields...
         for (final FieldData<TableData> field : this.fields)  {
@@ -127,21 +138,59 @@ public class TableData
     public TableData create()
         throws MatrixException
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("escape add table \"" + AbstractTest.convertMql(this.getName()) + "\" system");
-        this.append4Create(cmd);
-        // append all fields
-        for (final FieldData<TableData> field : this.fields)  {
-            cmd.append(" column");
-            field.append4Create(cmd);
+        if (!this.isCreated())  {
+            this.setCreated(true);
+
+            this.createDependings();
+
+            final StringBuilder cmd = new StringBuilder()
+                    .append("escape add table \"" + AbstractTest.convertMql(this.getName()) + "\" system");
+
+            // append hidden flag
+            if (this.isHidden() != null)  {
+                cmd.append(' ');
+                if (!this.isHidden())  {
+                    cmd.append('!');
+                }
+                cmd.append("hidden");
+            }
+
+            this.append4Create(cmd);
+            // append all fields
+            for (final FieldData<TableData> field : this.fields)  {
+                cmd.append(" column");
+                field.append4Create(cmd);
+            }
+
+            cmd.append(";\n")
+               .append("escape add property ").append(this.getSymbolicName())
+               .append(" on program eServiceSchemaVariableMapping.tcl")
+               .append(" to table \"").append(AbstractTest.convertMql(this.getName())).append("\" system");
+
+            this.getTest().mql(cmd);
         }
 
-        cmd.append(";\n")
-           .append("escape add property ").append(this.getSymbolicName())
-           .append(" on program eServiceSchemaVariableMapping.tcl")
-           .append(" to table \"").append(AbstractTest.convertMql(this.getName())).append("\" system");
+        return this;
+    }
 
-        this.getTest().mql(cmd);
+    /**
+     * {@inheritDoc}
+     * The used users within the fields are created.
+     *
+     * @see #fields
+     */
+    @Override()
+    public TableData createDependings()
+        throws MatrixException
+    {
+        super.createDependings();
+
+        // create users
+        for (final FieldData<TableData> field : this.fields)  {
+            for (final AbstractUserData<?> user : field.getUsers())  {
+                user.create();
+            }
+        }
 
         return this;
     }

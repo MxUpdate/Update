@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,9 @@
 package org.mxupdate.test.data.user;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -45,9 +47,9 @@ public class PersonAdminData
     /**
      * Within export the description must be defined.
      */
-    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(3);
+    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
     static  {
-        PersonAdminData.REQUIRED_EXPORT_VALUES.add("description");
+        PersonAdminData.REQUIRED_EXPORT_VALUES.put("description", "");
     }
 
     /**
@@ -197,17 +199,6 @@ public class PersonAdminData
     }
 
     /**
-     * Returns all assigned {@link #roles}.
-     *
-     * @return all roles
-     * @see #roles
-     */
-    public Set<RoleData> getRoles()
-    {
-        return this.roles;
-    }
-
-    /**
      * Assigns given <code>_group</code> to this person.
      *
      * @param _group        groups to assign
@@ -218,17 +209,6 @@ public class PersonAdminData
     {
         this.groups.addAll(Arrays.asList(_group));
         return this;
-    }
-
-    /**
-     * Returns all assigned {@link #groups}.
-     *
-     * @return all group
-     * @see #groups
-     */
-    public Set<GroupData> getGroups()
-    {
-        return this.groups;
     }
 
     /**
@@ -327,6 +307,32 @@ public class PersonAdminData
                 .append(this.wantsIconMail ? "enable" : "disable")
                 .append(" iconmail");
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * Creates depending {@link #groups} and {@link #roles}.
+     *
+     * @see #groups
+     * @see #roles
+     */
+    @Override
+    public PersonAdminData createDependings()
+        throws MatrixException
+    {
+        super.createDependings();
+
+        // create depending roles
+        for (final RoleData role : this.roles)  {
+            role.create();
+        }
+
+        // create depending groups
+        for (final GroupData group : this.groups)  {
+            group.create();
+        }
+
+        return this;
     }
 
     /**

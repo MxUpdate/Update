@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,16 +20,16 @@
 
 package org.mxupdate.test.data.datamodel;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
-import matrix.db.AttributeType;
 import matrix.util.MatrixException;
-import matrix.util.StringList;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.ExportParser;
-import org.testng.Assert;
+import org.mxupdate.test.data.program.AbstractProgramData;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * The class is used to define all types of attributes, to create them and test
@@ -45,10 +45,10 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     /**
      * Within export the description and default value must be defined.
      */
-    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(2);
+    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
     static  {
-        AbstractAttributeData.REQUIRED_EXPORT_VALUES.add("description");
-        AbstractAttributeData.REQUIRED_EXPORT_VALUES.add("default");
+        AbstractAttributeData.REQUIRED_EXPORT_VALUES.put("description", "");
+        AbstractAttributeData.REQUIRED_EXPORT_VALUES.put("default", "");
     }
 
     /**
@@ -59,9 +59,9 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     /**
      * Ranges of this attribute.
      *
-     * @see #addRange(Range)
+     * @see #addRange(AbstractRange)
      */
-    private final Set<Range> ranges = new HashSet<Range>();
+    private final Set<AbstractRange> ranges = new HashSet<AbstractRange>();
 
     /**
      *
@@ -87,7 +87,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * @see #ranges
      */
     @SuppressWarnings("unchecked")
-    public T addRange(final Range _range)
+    public T addRange(final AbstractRange _range)
     {
         this.ranges.add(_range);
         return (T) this;
@@ -107,13 +107,24 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         if (!this.isCreated())  {
             this.setCreated(true);
 
+            this.createDependings();
+
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add attribute \"").append(AbstractTest.convertMql(this.getName()))
                .append("\" type ").append(this.attrType);
 
+            // append hidden flag
+            if (this.isHidden() != null)  {
+                cmd.append(' ');
+                if (!this.isHidden())  {
+                    cmd.append('!');
+                }
+                cmd.append("hidden");
+            }
+
             this.append4Create(cmd);
 
-            for (final Range range : this.ranges)  {
+            for (final AbstractRange range : this.ranges)  {
                 range.appendCreate(cmd);
             }
 
@@ -123,32 +134,24 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     }
 
     /**
-     * Checks the export of this data piece if all values are correct defined.
-     *
-     * @param _exportParser     parsed export
-     * @throws MatrixException if check failed
+     * {@inheritDoc}
+     * Creates depending range programs.
      */
     @Override()
     @SuppressWarnings("unchecked")
-    public void checkExport(final ExportParser _exportParser)
+    public T createDependings()
         throws MatrixException
     {
-        super.checkExport(_exportParser);
+        super.createDependings();
 
-        // check range directly fetched from attribute
-        final AttributeType attr = new AttributeType(this.getName());
-        attr.open(this.getTest().getContext());
-        final StringList list = attr.getChoices(this.getTest().getContext());
-        attr.close(this.getTest().getContext());
-        final Set<String> l = new HashSet<String>();
-        if (list != null)  {
-            l.addAll(list);
+        // create range programs
+        for (final AbstractRange range : this.ranges)  {
+            if (range instanceof AbstractAttributeData.RangeProgram)  {
+                ((AbstractAttributeData.RangeProgram) range).program.create();
+            }
         }
-        for (final Range range : this.ranges)  {
-            Assert.assertTrue(l.contains(range.value),
-                              "check that range value " + range.value + " is defined");
-        }
-        Assert.assertEquals(l.size(), this.ranges.size(), "check that all ranges are defined");
+
+        return (T) this;
     }
 
     /**
@@ -162,6 +165,16 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("mql escape mod attribute \"${NAME}\"");
+
+        // append hidden flag
+        if (this.isHidden() != null)  {
+            cmd.append(' ');
+            if (!this.isHidden())  {
+                cmd.append('!');
+            }
+            cmd.append("hidden");
+        }
+
         this.append4CIFileValues(cmd);
 
         return cmd.toString();
@@ -173,11 +186,11 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * @param _needAdds     set with add strings used to append the adds for
      *                      {@link #ranges}
      */
-    @Override
+    @Override()
     protected void evalAdds4CheckExport(final Set<String> _needAdds)
     {
         super.evalAdds4CheckExport(_needAdds);
-        for (final Range range : this.ranges)  {
+        for (final AbstractRange range : this.ranges)  {
             range.evalAdds4CheckExport(_needAdds);
         }
     }
@@ -185,17 +198,17 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     /**
      * Used to define ranges with one value.
      */
-    public static class Range
+    public abstract static class AbstractRange
     {
         /**
          * Comparator of this range.
          */
-        private final String comparator;
+        final String comparator;
 
         /**
          * Value of this range.
          */
-        private final String value;
+        final String value;
 
         /**
          * Initializes the range values.
@@ -203,8 +216,8 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
          * @param _comparator   comparator for the range
          * @param _value        range value itself
          */
-        public Range(final String _comparator,
-                     final String _value)
+        protected AbstractRange(final String _comparator,
+                                final String _value)
         {
             this.comparator = _comparator;
             this.value = _value;
@@ -235,6 +248,301 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
                     .append("range ").append(this.comparator)
                     .append(" \"").append(AbstractTest.convertTclDoubleEscaped(this.value))
                     .append("\"");
+            _needAdds.add(cmd.toString());
+        }
+    }
+
+    /**
+     * Equal range definition.
+     */
+    public static class RangeEqual
+        extends AbstractAttributeData.AbstractRange
+    {
+        /**
+         * Equal range constructor with the value.
+         *
+         * @param _value    value to compare
+         */
+        public RangeEqual(final String _value)
+        {
+            super("=", _value);
+        }
+    }
+
+    /**
+     * Not equal range definition.
+     */
+    public static class RangeNotEqual
+        extends AbstractAttributeData.AbstractRange
+    {
+        /**
+         * Not equal range constructor with the value.
+         *
+         * @param _value    value to compare
+         */
+        public RangeNotEqual(final String _value)
+        {
+            super("!=", _value);
+        }
+    }
+
+    /**
+     * Less than range definition.
+     */
+    public static class RangeLessThan
+        extends AbstractAttributeData.AbstractRange
+    {
+        /**
+         * Less than range constructor with the value.
+         *
+         * @param _value    value to compare
+         */
+        public RangeLessThan(final String _value)
+        {
+            super("<", _value);
+        }
+    }
+
+    /**
+     * Greater than range definition.
+     */
+    public static class RangeGreaterThan
+        extends AbstractAttributeData.AbstractRange
+    {
+        /**
+         * Greater than range constructor with the value.
+         *
+         * @param _value    value to compare
+         */
+        public RangeGreaterThan(final String _value)
+        {
+            super(">", _value);
+        }
+    }
+
+    /**
+     * Less equal than range definition.
+     */
+    public static class RangeLessEqualThan
+        extends AbstractAttributeData.AbstractRange
+    {
+        /**
+         * Less equal than range constructor with the value.
+         *
+         * @param _value    value to compare
+         */
+        public RangeLessEqualThan(final String _value)
+        {
+            super("<", _value);
+        }
+    }
+
+    /**
+     * Greater equal than range definition.
+     */
+    public static class RangeGreaterEqualThan
+        extends AbstractAttributeData.AbstractRange
+    {
+        /**
+         * Greater equal than range constructor with the value.
+         *
+         * @param _value    value to compare
+         */
+        public RangeGreaterEqualThan(final String _value)
+        {
+            super(">=", _value);
+        }
+    }
+
+    /**
+     * SMatch range definition.
+     */
+    public static class RangeSMatch
+        extends AbstractAttributeData.AbstractRange
+    {
+        /**
+         * SMatch range constructor with the value.
+         *
+         * @param _value    value to compare
+         */
+        public RangeSMatch(final String _value)
+        {
+            super("smatch", _value);
+        }
+    }
+
+    /**
+     * Not smatch range definition.
+     */
+    public static class RangeNotSMatch
+        extends AbstractAttributeData.AbstractRange
+    {
+        /**
+         * Not smatch range constructor with the value.
+         *
+         * @param _value    value to compare
+         */
+        public RangeNotSMatch(final String _value)
+        {
+            super("!smatch", _value);
+        }
+    }
+
+    /**
+     * Match range definition.
+     */
+    public static class RangeMatch
+        extends AbstractAttributeData.AbstractRange
+    {
+        /**
+         * Match range constructor with the value.
+         *
+         * @param _value    value to compare
+         */
+        public RangeMatch(final String _value)
+        {
+            super("match", _value);
+        }
+    }
+
+    /**
+     * Not match range definition.
+     */
+    public static class RangeNotMatch
+        extends AbstractAttributeData.AbstractRange
+    {
+        /**
+         * Not match range constructor with the value.
+         *
+         * @param _value    value to compare
+         */
+        public RangeNotMatch(final String _value)
+        {
+            super("!match", _value);
+        }
+    }
+
+    /**
+     * Program range definition.
+     */
+    public static class RangeProgram
+        extends AbstractAttributeData.AbstractRange
+    {
+        /** Related program of the range. */
+        private final AbstractProgramData<?> program;
+
+        /**
+         * Program range constructor with the value.
+         *
+         * @param _program  related program
+         * @param _input    input string
+         */
+        public RangeProgram(final AbstractProgramData<?> _program,
+                            final String _input)
+        {
+            super("program", _input);
+            this.program = _program;
+        }
+
+        /**
+         * Appends this range will so that the range is defined while the
+         * attribute is created.
+         *
+         * @param _cmd  string builder where the MQL commands will be appended
+         */
+        @Override()
+        protected void appendCreate(final StringBuilder _cmd)
+        {
+            _cmd.append(" range ").append(this.comparator)
+                .append(" \"").append(StringUtil_mxJPO.convertMql(this.program.getName()))
+                .append("\" input \"").append(AbstractTest.convertMql(this.value))
+                .append("\"");
+        }
+
+        /**
+         * Appends the add statement in TCL code for this range.
+         *
+         * @param _needAdds     set with add strings used to append the adds
+         *                      for this range
+         */
+        @Override()
+        protected void evalAdds4CheckExport(final Set<String> _needAdds)
+        {
+            final StringBuilder cmd = new StringBuilder()
+                    .append("range ").append(this.comparator)
+                    .append(" \"").append(StringUtil_mxJPO.convertMql(this.program.getName())).append("\"");
+            if ((this.value != null) && !this.value.isEmpty())  {
+                cmd.append(" input \"").append(AbstractTest.convertTclDoubleEscaped(this.value)).append("\"");
+            }
+            _needAdds.add(cmd.toString());
+        }
+    }
+
+    /**
+     * Between range definition.
+     */
+    public static class RangeBetween
+        extends AbstractAttributeData.AbstractRange
+    {
+        /** Inclusive first value? */
+        private final boolean inclusive1;
+
+        /** Second value. */
+        private final String value2;
+
+        /** Inclusive second value? */
+        private final boolean inclusive2;
+
+        /**
+         * Between range constructor.
+         *
+         * @param _value1       first value
+         * @param _inclusive1   inclusive first value?
+         * @param _value2       second value
+         * @param _inclusive2   inclusive second value?
+         */
+        public RangeBetween(final String _value1,
+                            final boolean _inclusive1,
+                            final String _value2,
+                            final boolean _inclusive2)
+        {
+            super("between", _value1);
+            this.inclusive1 = _inclusive1;
+            this.value2 = _value2;
+            this.inclusive2 = _inclusive2;
+        }
+
+        /**
+         * Appends this range will so that the range is defined while the
+         * attribute is created.
+         *
+         * @param _cmd  string builder where the MQL commands will be appended
+         */
+        @Override()
+        protected void appendCreate(final StringBuilder _cmd)
+        {
+            _cmd.append(" range ").append(this.comparator)
+                .append(" \"").append(AbstractTest.convertMql(this.value))
+                .append("\" ").append(this.inclusive1 ? "inclusive" : "exclusive")
+                .append(" \"").append(AbstractTest.convertMql(this.value2))
+                .append("\" ").append(this.inclusive2 ? "inclusive" : "exclusive");
+        }
+
+        /**
+         * Appends the add statement in TCL code for this range.
+         *
+         * @param _needAdds     set with add strings used to append the adds
+         *                      for this range
+         */
+        @Override()
+        protected void evalAdds4CheckExport(final Set<String> _needAdds)
+        {
+            final StringBuilder cmd = new StringBuilder()
+                .append("range ").append(this.comparator)
+                .append(" \"").append(AbstractTest.convertTcl(this.value))
+                .append("\" ").append(this.inclusive1 ? "inclusive" : "exclusive")
+                .append(" \"").append(AbstractTest.convertTcl(this.value2))
+                .append("\" ").append(this.inclusive2 ? "inclusive" : "exclusive");
             _needAdds.add(cmd.toString());
         }
     }

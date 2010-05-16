@@ -20,8 +20,8 @@
 
 package org.mxupdate.test.data.datamodel;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import matrix.util.MatrixException;
 
@@ -42,16 +42,16 @@ public class FormatData
     /**
      * Within export the description must be defined.
      */
-    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(1);
+    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
     static  {
-        FormatData.REQUIRED_EXPORT_VALUES.add("description");
-        FormatData.REQUIRED_EXPORT_VALUES.add("version");
-        FormatData.REQUIRED_EXPORT_VALUES.add("suffix");
-        FormatData.REQUIRED_EXPORT_VALUES.add("mime");
-        FormatData.REQUIRED_EXPORT_VALUES.add("type");
-        FormatData.REQUIRED_EXPORT_VALUES.add("view");
-        FormatData.REQUIRED_EXPORT_VALUES.add("edit");
-        FormatData.REQUIRED_EXPORT_VALUES.add("print");
+        FormatData.REQUIRED_EXPORT_VALUES.put("description", "");
+        FormatData.REQUIRED_EXPORT_VALUES.put("version", "");
+        FormatData.REQUIRED_EXPORT_VALUES.put("suffix", "");
+        FormatData.REQUIRED_EXPORT_VALUES.put("mime", "");
+        FormatData.REQUIRED_EXPORT_VALUES.put("type", "");
+        FormatData.REQUIRED_EXPORT_VALUES.put("view", "");
+        FormatData.REQUIRED_EXPORT_VALUES.put("edit", "");
+        FormatData.REQUIRED_EXPORT_VALUES.put("print", "");
     }
 
     /**
@@ -183,6 +183,15 @@ public class FormatData
             cmd.append(" print \"").append(AbstractTest.convertTcl(this.printProgram.getName())).append('\"');;
         }
 
+        // append hidden flag
+        if (this.isHidden() != null)  {
+            cmd.append(' ');
+            if (!this.isHidden())  {
+                cmd.append('!');
+            }
+            cmd.append("hidden");
+        }
+
         return cmd.toString();
     }
 
@@ -199,27 +208,35 @@ public class FormatData
         if (!this.isCreated())  {
             this.setCreated(true);
 
+            this.createDependings();
+
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add format \"").append(AbstractTest.convertMql(this.getName())).append('\"');
             this.append4Create(cmd);
 
             if (this.viewProgram != null)  {
-                this.viewProgram.create();
                 cmd.append(" view \"").append(AbstractTest.convertMql(this.viewProgram.getName())).append('\"');;
             } else  {
                 cmd.append(" view \"\"");
             }
             if (this.editProgram != null)  {
-                this.editProgram.create();
                 cmd.append(" edit \"").append(AbstractTest.convertMql(this.editProgram.getName())).append('\"');;
             } else  {
                 cmd.append(" edit \"\"");
             }
             if (this.printProgram != null)  {
-                this.printProgram.create();
                 cmd.append(" print \"").append(AbstractTest.convertMql(this.printProgram.getName())).append('\"');;
             } else  {
                 cmd.append(" print \"\"");
+            }
+
+            // append hidden flag
+            if (this.isHidden() != null)  {
+                cmd.append(' ');
+                if (!this.isHidden())  {
+                    cmd.append('!');
+                }
+                cmd.append("hidden");
             }
 
             cmd.append(";\n")
@@ -229,6 +246,35 @@ public class FormatData
 
             this.getTest().mql(cmd);
         }
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     * Create the depending {@link #viewProgram view},
+     * {@link #editProgram edit} and {@link #printProgram print} program.
+     *
+     * @see #viewProgram
+     * @see #editProgram
+     * @see #printProgram
+     */
+    @Override()
+    public FormatData createDependings()
+        throws MatrixException
+    {
+        super.createDependings();
+
+        // create programs
+        if (this.viewProgram != null)  {
+            this.viewProgram.create();
+        }
+        if (this.editProgram != null)  {
+            this.editProgram.create();
+        }
+        if (this.printProgram != null)  {
+            this.printProgram.create();
+        }
+
         return this;
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 
 package org.mxupdate.test.data.user.workspace;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.user.AbstractUserData;
@@ -40,15 +40,15 @@ public class TipData<USER extends AbstractUserData<?>>
     /**
      * Within export the description must be defined.
      */
-    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(3);
+    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
     static  {
-        TipData.REQUIRED_EXPORT_VALUES.add("user");
-        TipData.REQUIRED_EXPORT_VALUES.add("appliesto");
-        TipData.REQUIRED_EXPORT_VALUES.add("type");
-        TipData.REQUIRED_EXPORT_VALUES.add("name");
-        TipData.REQUIRED_EXPORT_VALUES.add("revision");
-        TipData.REQUIRED_EXPORT_VALUES.add("vault");
-        TipData.REQUIRED_EXPORT_VALUES.add("owner");
+        TipData.REQUIRED_EXPORT_VALUES.put("user", "");
+        TipData.REQUIRED_EXPORT_VALUES.put("appliesto", "");
+        TipData.REQUIRED_EXPORT_VALUES.put("type", "");
+        TipData.REQUIRED_EXPORT_VALUES.put("name", "");
+        TipData.REQUIRED_EXPORT_VALUES.put("revision", "");
+        TipData.REQUIRED_EXPORT_VALUES.put("vault", "");
+        TipData.REQUIRED_EXPORT_VALUES.put("owner", "");
     }
 
     /**

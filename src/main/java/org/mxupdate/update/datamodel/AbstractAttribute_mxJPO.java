@@ -22,6 +22,7 @@ package org.mxupdate.update.datamodel;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -87,6 +88,28 @@ abstract class AbstractAttribute_mxJPO
     static  {
         AbstractAttribute_mxJPO.IGNORED_URLS.add("/rangeList");
         AbstractAttribute_mxJPO.IGNORED_URLS.add("/rangeProgram");
+    }
+
+    /**
+     * Mapping between the comparators defined within XML and the comparators
+     * used within MX.
+     *
+     * @see #parse(String, String)
+     */
+    private static final Map<String,String> RANGE_COMP = new HashMap<String,String>();
+    static  {
+        AbstractAttribute_mxJPO.RANGE_COMP.put("equal",             "=");
+        AbstractAttribute_mxJPO.RANGE_COMP.put("greaterthan",       ">");
+        AbstractAttribute_mxJPO.RANGE_COMP.put("greaterthanequal",  ">=");
+        AbstractAttribute_mxJPO.RANGE_COMP.put("lessthan",          "<");
+        AbstractAttribute_mxJPO.RANGE_COMP.put("lessthanequal",     "<=");
+        AbstractAttribute_mxJPO.RANGE_COMP.put("notequal",          "!=");
+        AbstractAttribute_mxJPO.RANGE_COMP.put("match",             "match");
+        AbstractAttribute_mxJPO.RANGE_COMP.put("notmatch",          "!match");
+        AbstractAttribute_mxJPO.RANGE_COMP.put("smatch",            "smatch");
+        AbstractAttribute_mxJPO.RANGE_COMP.put("notsmatch",         "!smatch");
+        AbstractAttribute_mxJPO.RANGE_COMP.put("programRange",      "program");
+        AbstractAttribute_mxJPO.RANGE_COMP.put("between",           "between");
     }
 
     /**
@@ -260,7 +283,10 @@ abstract class AbstractAttribute_mxJPO
             } else if ("/rangeList/range".equals(_url))  {
                 this.ranges.add(new Range());
             } else if ("/rangeList/range/rangeType".equals(_url))  {
-                this.ranges.peek().type = _content;
+                this.ranges.peek().type = AbstractAttribute_mxJPO.RANGE_COMP.get(_content);
+                if (this.ranges.peek().type == null)  {
+                    throw new Error("unknown range comparator " + _content);
+                }
             } else if ("/rangeList/range/rangeValue".equals(_url))  {
                 this.ranges.peek().value1 = _content;
             } else if ("/rangeList/range/includingValue".equals(_url))  {
@@ -561,17 +587,6 @@ abstract class AbstractAttribute_mxJPO
 
         /**
          * Write this range value to the writer instance.
-         * Following range types are converted:
-         * <ul>
-         * <li>&quot;equal&quot; to &quot;=&quot;</li>
-         * <li>&quot;greaterthan&quot; to &quot;&gt;&quot;</li>
-         * <li>&quot;greaterthanequal&quot; to &quot;&gt;=&quot;</li>
-         * <li>&quot;lessthan&quot; to &quot;&lt;&quot;</li>
-         * <li>&quot;lessthanequal&quot; to &quot;&lt;=&quot;</li>
-         * <li>&quot;notequal&quot; to &quot;!=&quot;</li>
-         * <li>&quot;notmatch&quot; to &quot;!match&quot;</li>
-         * <li>&quot;notsmatch&quot; to &quot;!smatch&quot;</li>
-         * </ul>
          * If the range type is a program, the name of the program and the
          * input arguments are defined directly on the attribute in
          * {@link AbstractAttribute_mxJPO#rangeProgramRef} and
@@ -583,10 +598,10 @@ abstract class AbstractAttribute_mxJPO
         private void write(final Appendable _out)
                 throws IOException
         {
-            _out.append(" \\\n    add range ");
+            _out.append(" \\\n    add range ").append(this.type);
             // if the range is a program it is a 'global' attribute info
-            if ("programRange".equals(this.type))  {
-                _out.append("program \"")
+            if ("program".equals(this.type))  {
+                _out.append(" \"")
                     .append(StringUtil_mxJPO.convertTcl(AbstractAttribute_mxJPO.this.rangeProgramRef))
                     .append('\"');
                 if (AbstractAttribute_mxJPO.this.rangeProgramInputArguments != null)  {
@@ -595,33 +610,14 @@ abstract class AbstractAttribute_mxJPO
                         .append('\"');
                 }
             } else  {
-                if ("equal".equals(this.type))  {
-                    _out.append('=');
-                } else if ("greaterthan".equals(this.type))  {
-                    _out.append(">");
-                } else if ("greaterthanequal".equals(this.type))  {
-                    _out.append(">=");
-                } else if ("lessthan".equals(this.type))  {
-                    _out.append("<");
-                } else if ("lessthanequal".equals(this.type))  {
-                    _out.append("<=");
-                } else if ("notequal".equals(this.type))  {
-                    _out.append("!=");
-                } else if ("notmatch".equals(this.type))  {
-                    _out.append("!match");
-                } else if ("notsmatch".equals(this.type))  {
-                    _out.append("!smatch");
-                } else  {
-                    _out.append(this.type);
-                }
-                _out.append(" \"").append(StringUtil_mxJPO.convertTclDoubleEscaped(this.value1)).append("\"");
+                _out.append(" \"").append(StringUtil_mxJPO.convertTcl(this.value1)).append("\"");
                 if ("between".equals(this.type))  {
                     if (this.include1)  {
                         _out.append(" inclusive");
                     } else  {
                         _out.append(" exclusive");
                     }
-                    _out.append(" \"").append(StringUtil_mxJPO.convertTclDoubleEscaped(this.value2)).append("\"");
+                    _out.append(" \"").append(StringUtil_mxJPO.convertTcl(this.value2)).append("\"");
                     if (this.include2)  {
                         _out.append(" inclusive");
                     } else  {

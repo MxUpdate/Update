@@ -21,6 +21,7 @@
 package org.mxupdate.test.data.datamodel;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -35,10 +36,11 @@ import org.mxupdate.test.data.program.AbstractProgramData;
  *
  * @author The MxUpdate Team
  * @version $Id$
- * @param <T>   defines the class which is derived from this class
+ * @param <DATAWITHTRIGGERS>    defines the class which is derived from this
+ *                              class
  */
-public abstract class AbstractDataWithTrigger<T extends AbstractDataWithTrigger<?>>
-    extends AbstractDataWithAttribute<T>
+public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractDataWithTrigger<?>>
+    extends AbstractDataWithAttribute<DATAWITHTRIGGERS>
 {
     /**
      * Defines all assigned triggers to this administration object.
@@ -60,7 +62,7 @@ public abstract class AbstractDataWithTrigger<T extends AbstractDataWithTrigger<
     protected AbstractDataWithTrigger(final AbstractTest _test,
                                       final CI _ci,
                                       final String _name,
-                                      final Set<String> _requiredExportValues)
+                                      final Map<String,String> _requiredExportValues)
     {
         super(_test, _ci, _name, _requiredExportValues);
     }
@@ -74,21 +76,31 @@ public abstract class AbstractDataWithTrigger<T extends AbstractDataWithTrigger<
      * @see #triggers
      */
     @SuppressWarnings("unchecked")
-    public T addTrigger(final AbstractTrigger<?> _trigger)
+    public DATAWITHTRIGGERS addTrigger(final AbstractTrigger<?> _trigger)
     {
         this.triggers.add(_trigger);
-        return (T) this;
+        return (DATAWITHTRIGGERS) this;
     }
 
     /**
-     * Returns all assigned {@link #triggers}.
+     * {@inheritDoc}
+     * Creates all programs from depending {@link #triggers}.
      *
-     * @return all defined triggers
      * @see #triggers
      */
-    public Set<AbstractTrigger<?>> getTriggers()
+    @Override()
+    @SuppressWarnings("unchecked")
+    public DATAWITHTRIGGERS createDependings()
+        throws MatrixException
     {
-        return this.triggers;
+        super.createDependings();
+
+        // create programs
+        for (final AbstractDataWithTrigger.AbstractTrigger<?> trig : this.triggers)  {
+            trig.getProgram().create();
+        }
+
+        return (DATAWITHTRIGGERS) this;
     }
 
     /**

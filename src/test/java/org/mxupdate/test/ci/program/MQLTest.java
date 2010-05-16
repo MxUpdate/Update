@@ -38,6 +38,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
+@Test()
 public class MQLTest
     extends AbstractDataExportUpdate<MQLProgramData>
 {
@@ -58,7 +59,7 @@ public class MQLTest
      *
      * @return object array with all test MQL programs
      */
-    @DataProvider(name = "mqlprograms")
+    @DataProvider(name = "data")
     public Object[][] getMQLPrograms()
     {
         return this.prepareData("mql program",
@@ -118,29 +119,6 @@ public class MQLTest
     }
 
     /**
-     * Checks that the new created MQL progam is exported correctly.
-     *
-     * @param _description  description of the test data
-     * @param _mqlProgram   data collection to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "mqlprograms", description = "test export of MQL programs")
-    public void simpleExport(final String _description,
-                             final MQLProgramData _mqlProgram)
-        throws Exception
-    {
-        _mqlProgram.create();
-        final ExportParser exportParser = _mqlProgram.export();
-        // to be sure the check works correct...
-        _mqlProgram.checkExport(exportParser);
-
-        // check MQL code
-        Assert.assertEquals(this.mql("escape print program \"" + AbstractTest.convertMql(_mqlProgram.getName()) + "\" select code dump"),
-                            _mqlProgram.getCode(),
-                            "checks MQL program code");
-    }
-
-    /**
      * Tests, if the MQL program within MX is created and registered with the
      * correct symbolic name.
      *
@@ -148,7 +126,8 @@ public class MQLTest
      * @param _mqlProgram   data collection to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "mqlprograms", description = "test update of non existing MQL programs")
+    @Test(dataProvider = "data",
+          description = "test update of non existing MQL programs")
     public void simpleUpdate(final String _description,
                              final MQLProgramData _mqlProgram)
         throws Exception

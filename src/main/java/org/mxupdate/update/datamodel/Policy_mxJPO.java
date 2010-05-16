@@ -23,6 +23,7 @@ package org.mxupdate.update.datamodel;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -418,12 +419,38 @@ public class Policy_mxJPO
 
             // basic information
             this.calcValueDelta(cmd, "description", policy.getDescription(), this.getDescription());
-            this.calcListDelta(cmd, "type", policy.types, this.types);
-            this.calcListDelta(cmd, "format", policy.formats, this.formats);
-            this.calcValueDelta(cmd, "defaultformat", policy.defaultFormat, this.defaultFormat);
+
+            // if all types are defined, the compare must be against set with all
+            if (this.allTypes)  {
+                final Set<String> curTypes = new HashSet<String>();
+                curTypes.addAll(this.types);
+                curTypes.addAll(Arrays.asList(new String[]{"all"}));
+                this.calcListDelta(cmd, "type", policy.types, curTypes);
+            } else  {
+                this.calcListDelta(cmd, "type", policy.types, this.types);
+            }
+
+            // if all formats are defined, the compare must be against set with all
+            if (this.allFormats)  {
+                final Set<String> curFormats = new HashSet<String>();
+                curFormats.addAll(this.formats);
+                curFormats.addAll(Arrays.asList(new String[]{"all"}));
+                this.calcListDelta(cmd, "format", policy.formats, curFormats);
+            } else  {
+                this.calcListDelta(cmd, "format", policy.formats, this.formats);
+            }
+
+            // if not default format => ADMINISTRATION must be default format
+            if ((policy.defaultFormat == null) || "".equals(policy.defaultFormat))  {
+                cmd.append(" defaultformat ADMINISTRATION");
+            } else  {
+                this.calcValueDelta(cmd, "defaultformat", policy.defaultFormat, this.defaultFormat);
+            }
+
             this.calcValueDelta(cmd, "sequence", policy.sequence, this.sequence);
             // hidden flag, because hidden flag must be set with special syntax
             if (this.isHidden() != policy.isHidden())  {
+                cmd.append(' ');
                 if (!policy.isHidden())  {
                     cmd.append('!');
                 }
@@ -559,7 +586,7 @@ throw new Exception("some states are not defined anymore!");
         final String newVal = (_newVal == null) ? "" : _newVal;
 
         if (!curVal.equals(newVal))  {
-            _out.append(_kind).append(" \"").append(StringUtil_mxJPO.convertMql(newVal)).append('\"');
+            _out.append(' ').append(_kind).append(" \"").append(StringUtil_mxJPO.convertMql(newVal)).append('\"');
         }
     }
 

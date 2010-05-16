@@ -25,11 +25,10 @@ import java.util.Set;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.datamodel.FormatData;
 import org.mxupdate.test.data.datamodel.PolicyData;
 import org.mxupdate.test.data.datamodel.TypeData;
-import org.mxupdate.test.data.util.PropertyDef;
+import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.util.IssueLink;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -181,8 +180,8 @@ public class PolicyTest
      *
      * @return object array with all test policies
      */
-    @IssueLink({"30", "86", "99"})
-    @DataProvider(name = "policies")
+    @IssueLink({"30", "86", "99", "119", "120", "121"})
+    @DataProvider(name = "data")
     public Object[][] getPolicies()
     {
         return this.prepareData("policy",
@@ -197,7 +196,7 @@ public class PolicyTest
                                 .setValue("description", "\"\\\\ hello")},
 
                 new Object[]{
-                        "policy with default format",
+                        "issue #119: policy with default format",
                         new PolicyData(this, "hello \" test")
                                 .setValue("defaultformat", "generic")},
 
@@ -226,7 +225,7 @@ public class PolicyTest
 
                 // issue 30
                 new Object[]{
-                        "issue #30: policy with all types",
+                        "issue #30, #120: policy with all types",
                         new PolicyData(this, "hello \" test")
                                 .setAllTypes(true)},
 
@@ -242,7 +241,7 @@ public class PolicyTest
                                 .appendTypes(new TypeData(this, "Type \"Test\" 2"))},
 
                 new Object[]{
-                        "issue #86: policy with all formats",
+                        "issue #86, #121: policy with all formats",
                         new PolicyData(this, "hello \" test")
                                 .setAllFormats(true)},
                 new Object[]{
@@ -338,7 +337,7 @@ public class PolicyTest
                                 .setAllState(true)
                                 .getAllStateAccess().addUserAccess(
                                         new PolicyData.UserAccessFilter()
-                                                .setUser("creator")
+                                                .setUser(new PersonAdminData(this, "creator"))
                                                 .addAccess("read", "show"))},
                 new Object[]{
                         "issue #99: policy with user access add filter expression",
@@ -346,7 +345,7 @@ public class PolicyTest
                                 .setAllState(true)
                                 .getAllStateAccess().addUserAccess(
                                         new PolicyData.UserAccessFilter()
-                                                .setUser("creator")
+                                                .setUser(new PersonAdminData(this, "creator"))
                                                 .addAccess("read", "show")
                                                 .setFilter("current==\"hello\""))},
                 new Object[]{
@@ -355,7 +354,7 @@ public class PolicyTest
                                 .setAllState(true)
                                 .getAllStateAccess().addUserAccess(
                                         new PolicyData.UserAccessFilter()
-                                                .setUser("creator")
+                                                .setUser(new PersonAdminData(this, "creator"))
                                                 .addAccess("all"))},
                 new Object[]{
                         "issue #99: policy with two different user access",
@@ -363,11 +362,11 @@ public class PolicyTest
                                 .setAllState(true)
                                 .getAllStateAccess().addUserAccess(
                                         new PolicyData.UserAccessFilter()
-                                                .setUser("creator")
+                                                .setUser(new PersonAdminData(this, "creator"))
                                                 .addAccess("all"))
                                 .getAllStateAccess().addUserAccess(
                                         new PolicyData.UserAccessFilter()
-                                                .setUser("guest")
+                                                .setUser(new PersonAdminData(this, "guest"))
                                                 .addAccess("read", "show"))}
                 );
     }
@@ -415,6 +414,9 @@ public class PolicyTest
         this.cleanup(AbstractTest.CI.DM_POLICY);
         this.cleanup(AbstractTest.CI.DM_TYPE);
         this.cleanup(AbstractTest.CI.DM_FORMAT);
+        this.cleanup(AbstractTest.CI.USR_GROUP);
+        this.cleanup(AbstractTest.CI.USR_PERSONADMIN);
+        this.cleanup(AbstractTest.CI.USR_ROLE);
    }
 
     /**
@@ -1711,62 +1713,6 @@ public class PolicyTest
         Assert.assertTrue(
                 this.mql("print pol " + policy.getName()).contains("\n  type all\n"),
                 "check that all types are defined");
-    }
-
-    /**
-     * Tests a new created policy and the related export.
-     *
-     * @param _description  description of the test case
-     * @param _policy       policy to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "policies",
-          description = "test export of new created policies")
-    public void testExport(final String _description,
-                           final PolicyData _policy)
-        throws Exception
-    {
-        _policy.create()
-               .checkExport(_policy.export());
-    }
-
-    /**
-     * Tests an update of non existing command. The result is tested with by
-     * exporting the command and checking the result.
-     *
-     * @param _description  description of the test case
-     * @param _policy       policy to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "policies",
-          description = "test update of non existing policy")
-    public void testUpdate(final String _description,
-                           final PolicyData _policy)
-        throws Exception
-    {
-        // create referenced property value
-        for (final PropertyDef prop : _policy.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-        // create assigned types
-        for (final TypeData type : _policy.getTypes())  {
-            type.create();
-        }
-        // create assigned formats
-        for (final FormatData format : _policy.getFormats())  {
-            format.create();
-        }
-
-        // first update with original content
-        _policy.update();
-        final ExportParser exportParser = _policy.export();
-        _policy.checkExport(exportParser);
-
-        // second update with delivered content
-        _policy.updateWithCode(exportParser.getOrigCode())
-               .checkExport(_policy.export());
     }
 
     /**

@@ -158,6 +158,7 @@ public class Interface_mxJPO
      * @see #abstractFlag
      * @see #allTypes
      * @see #types
+     * @see #IGNORED_URLS
      */
     @Override()
     protected void parse(final String _url,
@@ -210,7 +211,8 @@ public class Interface_mxJPO
         throws IOException
     {
         // write abstract information
-        _out.append(" \\\n    abstract ").append(Boolean.toString(this.abstractFlag));
+        _out.append(" \\\n    ").append(this.isHidden() ? "" : "!").append("hidden")
+            .append(" \\\n    abstract \"").append(Boolean.toString(this.abstractFlag)).append('\"');
 
         // relationship information
         if (this.allRelationships)  {
@@ -262,7 +264,8 @@ public class Interface_mxJPO
      * in the <code>_preMQLCode</code> to reset this interface and to append
      * the TCL procedure {@link #TCL_PROCEDURE}. This information is reset:
      * <ul>
-     * <li>set not hidden</li>
+     * <li>set to not hidden</li>
+     * <li>set to not abstract</li>
      * <li>reset description</li>
      * <li>remove all types in {@link #allTypes} or {@link #types}</li>
      * <li>remove all relationships in {@link #allRelationships} or
@@ -296,7 +299,7 @@ public class Interface_mxJPO
         final StringBuilder preMQLCode = new StringBuilder()
                 .append("escape mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                .append(" !hidden description \"\"");
+                .append(" !hidden description \"\" abstract false");
 
         // relationship information
         if (this.allRelationships)  {

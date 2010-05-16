@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 package org.mxupdate.test.data.user.workspace;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -66,7 +67,7 @@ abstract class AbstractVisualQueryWorkspaceObjectData<DATA extends AbstractVisua
                                            final String _mxAdminType,
                                            final USER _user,
                                            final String _name,
-                                           final Set<String> _requiredExportValues)
+                                           final Map<String,String> _requiredExportValues)
     {
         super(_test, _mxAdminType, _user, _name, _requiredExportValues);
     }

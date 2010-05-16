@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,9 @@
 
 package org.mxupdate.test.data.user;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -43,17 +45,17 @@ public class AbstractCollectionUserData<DATA extends AbstractCollectionUserData<
     /**
      * Parent collection users to which this collection user is assigned.
      *
-     * @see #assignParent(AbstractCollectionUserData)
+     * @see #assignParents(AbstractCollectionUserData)
      * @see #checkExport(ExportParser)
      */
-    private final Set<DATA> parent = new HashSet<DATA>();
+    private final Set<DATA> parents = new HashSet<DATA>();
 
     /**
      * Within export the description must be defined.
      */
-    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(3);
+    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
     static  {
-        AbstractCollectionUserData.REQUIRED_EXPORT_VALUES.add("description");
+        AbstractCollectionUserData.REQUIRED_EXPORT_VALUES.put("description", "");
     }
 
     /**
@@ -73,35 +75,24 @@ public class AbstractCollectionUserData<DATA extends AbstractCollectionUserData<
 
     /**
      * Assigns <code>_parent</code> to the list of
-     * {@link #parent parent collection users}.
+     * {@link #parents parent collection users}.
      *
      * @param _parent   parent collection user to assign
      * @return this collection user data instance
-     * @see #parent
+     * @see #parents
      */
     @SuppressWarnings("unchecked")
-    public DATA assignParent(final DATA _parent)
+    public DATA assignParents(final DATA _parent)
     {
-        this.parent.add(_parent);
+        this.parents.add(_parent);
         return (DATA) this;
-    }
-
-    /**
-     * Returns all assigned {@link #parent parent collection users}.
-     *
-     * @return all assigned parent collection users
-     * @see #parent
-     */
-    public Set<DATA> getParent()
-    {
-        return this.parent;
     }
 
     /**
      * Prepares the configuration item update file depending on the
      * configuration of this collection user. This includes:
      * <ul>
-     * <li>{@link #parent parent collection users}</li>
+     * <li>{@link #parents parent collection users}</li>
      * </ul>
      *
      * @return code for the configuration item update file
@@ -112,7 +103,7 @@ public class AbstractCollectionUserData<DATA extends AbstractCollectionUserData<
         final StringBuilder cmd = new StringBuilder().append(super.ciFile());
 
         // define parent collection users
-        for (final DATA user : this.parent)  {
+        for (final DATA user : this.parents)  {
             cmd.append("mql escape mod ")
                .append(user.getCI().getMxType()).append(" \"").append(AbstractTest.convertTcl(user.getName()))
                .append("\" child \"${NAME}\";\n");;
@@ -137,7 +128,7 @@ public class AbstractCollectionUserData<DATA extends AbstractCollectionUserData<
 
             // assign parent objects
             final StringBuilder cmd = new StringBuilder();
-            for (final DATA user : this.parent)  {
+            for (final DATA user : this.parents)  {
                 user.create();
                 cmd.append("escape mod ")
                    .append(user.getCI().getMxType()).append(" \"").append(AbstractTest.convertMql(user.getName()))
@@ -149,8 +140,29 @@ public class AbstractCollectionUserData<DATA extends AbstractCollectionUserData<
     }
 
     /**
+     * {@inheritDoc}
+     * Created depending {@link #parents}.
+     *
+     * @see #parents
+     */
+    @Override()
+    @SuppressWarnings("unchecked")
+    public DATA createDependings()
+        throws MatrixException
+    {
+        super.createDependings();
+
+        // create all parent groups
+        for (final DATA parent : this.parents)  {
+            parent.create();
+        }
+
+        return (DATA) this;
+    }
+
+    /**
      * Checks the export of this data piece if all values are correct defined.
-     * The {@link #parent collection users} are checked.
+     * The {@link #parents collection users} are checked.
      *
      * @param _exportParser     parsed export
      * @throws MatrixException if check failed
@@ -164,7 +176,7 @@ public class AbstractCollectionUserData<DATA extends AbstractCollectionUserData<
         // check parent collection users
         final Set<String> pars = new HashSet<String>(_exportParser.getLines("/mql/@value"));
         pars.remove("escape mod " + this.getCI().getMxType() + " \"${NAME}\"");
-        for (final DATA user : this.parent)  {
+        for (final DATA user : this.parents)  {
             pars.remove("escape mod " + user.getCI().getMxType() + " \""
                     + AbstractTest.convertTcl(user.getName()) + "\" child \"${NAME}\"");
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 
 package org.mxupdate.test.data.program;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import matrix.util.MatrixException;
 
@@ -45,10 +45,10 @@ public class PageData
      *
      * @see #PageData(AbstractTest, String)
      */
-    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(2);
+    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
     static  {
-        PageData.REQUIRED_EXPORT_VALUES.add("description");
-        PageData.REQUIRED_EXPORT_VALUES.add("mime");
+        PageData.REQUIRED_EXPORT_VALUES.put("description", "");
+        PageData.REQUIRED_EXPORT_VALUES.put("mime", "");
     }
 
     /**

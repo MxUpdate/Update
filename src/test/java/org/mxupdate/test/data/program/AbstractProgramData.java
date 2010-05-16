@@ -240,6 +240,27 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
     }
 
     /**
+     * {@inheritDoc}
+     * The assigned {@link #user} is created.
+     *
+     * @see #user
+     */
+    @Override()
+    @SuppressWarnings("unchecked")
+    public T createDependings()
+        throws MatrixException
+    {
+        super.createDependings();
+
+        // create user
+        if (this.user != null)  {
+            this.user.create();
+        }
+
+        return (T) this;
+    }
+
+    /**
      * Appends the program related MQL commands to create this program. This
      * includes:
      * <ul>

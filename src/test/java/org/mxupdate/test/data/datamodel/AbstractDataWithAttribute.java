@@ -22,6 +22,7 @@ package org.mxupdate.test.data.datamodel;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -30,7 +31,6 @@ import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.testng.Assert;
 
 /**
  * The class is used to define all administration objects which could have
@@ -79,7 +79,7 @@ public abstract class AbstractDataWithAttribute<DATAWITHATTRIBUTE extends Abstra
     protected AbstractDataWithAttribute(final AbstractTest _test,
                                         final AbstractTest.CI _ci,
                                         final String _name,
-                                        final Set<String> _requiredExportValues)
+                                        final Map<String,String> _requiredExportValues)
     {
         super(_test, _ci, _name, _requiredExportValues);
     }
@@ -135,6 +135,27 @@ public abstract class AbstractDataWithAttribute<DATAWITHATTRIBUTE extends Abstra
     public Set<AbstractAttributeData<?>> getAttributes()
     {
         return this.attributes;
+    }
+
+    /**
+     * {@inheritDoc}
+     * Creates all assigned {@link #attributes}.
+     *
+     * @see #attributes
+     */
+    @Override()
+    @SuppressWarnings("unchecked")
+    public DATAWITHATTRIBUTE createDependings()
+        throws MatrixException
+    {
+        super.createDependings();
+
+        // create attributes
+        for (final AbstractAttributeData<?> attr : this.attributes)  {
+            attr.create();
+        }
+
+        return (DATAWITHATTRIBUTE) this;
     }
 
     /**
@@ -230,30 +251,5 @@ public abstract class AbstractDataWithAttribute<DATAWITHATTRIBUTE extends Abstra
                     .append("\" add attribute \"").append(AbstractTest.convertMql(attribute.getName())).append('\"'));
         }
         return (DATAWITHATTRIBUTE) this;
-    }
-
-    /**
-     * Checks the export of this data piece if all values are correct defined.
-     *
-     * @param _exportParser     parsed export
-     * @throws MatrixException if check failed
-     */
-    @Override()
-    public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
-    {
-        super.checkExport(_exportParser);
-
-        // check attributes
-        final Set<String> attrs = new HashSet<String>(_exportParser.getLines("/testAttributes/"));
-        for (final AbstractAttributeData<?> attribute : this.attributes)  {
-            final String attrName = "\"" + AbstractTest.convertTcl(attribute.getName()) + "\" \\";
-            Assert.assertTrue(attrs.contains(attrName),
-                              "check that attribute '" + attribute.getName() + "' is defined");
-        }
-        Assert.assertEquals(
-                attrs.size(),
-                this.attributes.size() + ((this.ignoreAttributesAppended) ? this.ignoreAttributes.size() : 0),
-                "check all attributes are defined");
     }
 }

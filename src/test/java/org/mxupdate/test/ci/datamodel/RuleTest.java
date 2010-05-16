@@ -21,10 +21,7 @@
 package org.mxupdate.test.ci.datamodel;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
-import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.datamodel.RuleData;
-import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -36,6 +33,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
+@Test()
 public class RuleTest
     extends AbstractDataExportUpdate<RuleData>
 {
@@ -56,7 +54,7 @@ public class RuleTest
      *
      * @return object array with all test rules
      */
-    @DataProvider(name = "rules")
+    @DataProvider(name = "data")
     public Object[][] getRules()
     {
         return this.prepareData("rule",
@@ -129,80 +127,5 @@ public class RuleTest
         throws Exception
     {
         this.cleanup(CI.DM_RULE);
-    }
-
-    /**
-     * Tests a new created rule and the related export.
-     *
-     * @param _description  description of the test case
-     * @param _rule         rule to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "rules", description = "test export of new created rules")
-    public void testExport(final String _description,
-                           final RuleData _rule)
-        throws Exception
-    {
-        _rule.create()
-             .checkExport();
-    }
-
-
-    /**
-     * Tests an update of non existing rule. The result is tested with by
-     * exporting the rule and checking the result.
-     *
-     * @param _description  description of the test case
-     * @param _rule         rule to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "rules", description = "test update of non existing rule")
-    public void testUpdate(final String _description,
-                           final RuleData _rule)
-        throws Exception
-    {
-        // create referenced property value
-        for (final PropertyDef prop : _rule.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-
-        // first update with original content
-        _rule.update();
-        final ExportParser exportParser = _rule.export();
-        _rule.checkExport(exportParser);
-
-        // second update with delivered content
-        _rule.updateWithCode(exportParser.getOrigCode())
-             .checkExport();
-    }
-
-    /**
-     * Test update of existing rule that all parameters are cleaned.
-     *
-     * @param _description  description of the test case
-     * @param _rule         rule to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "rules", description = "test update of existing rule for cleaning")
-    public void testUpdate4Existing(final String _description,
-                                    final RuleData _rule)
-        throws Exception
-    {
-        // create referenced property value
-        for (final PropertyDef prop : _rule.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
-        // first update with original content
-        _rule.update()
-             .checkExport();
-
-        // second update with delivered content
-        new RuleData(this, _rule.getName().substring(AbstractTest.PREFIX.length()))
-                .update()
-                .checkExport();
     }
 }

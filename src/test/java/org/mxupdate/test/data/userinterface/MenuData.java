@@ -82,6 +82,16 @@ public class MenuData
         final StringBuilder cmd = new StringBuilder();
         this.append4CIFileHeader(cmd);
         cmd.append("mql escape mod menu \"${NAME}\"");
+
+        // append hidden flag
+        if (this.isHidden() != null)  {
+            cmd.append(' ');
+            if (!this.isHidden())  {
+                cmd.append('!');
+            }
+            cmd.append("hidden");
+        }
+
         for (final AbstractCommandData<?> child : this.children)  {
             cmd.append(" add ").append(child.getCI().getMxType())
                .append(" \"").append(AbstractTest.convertTcl(child.getName())).append('\"');
@@ -101,43 +111,58 @@ public class MenuData
     public MenuData create()
         throws MatrixException
     {
-        this.createChildren();
+        if (!this.isCreated())  {
+            this.setCreated(true);
 
-        final StringBuilder cmd = new StringBuilder()
-                .append("escape add menu \"" + AbstractTest.convertMql(this.getName()) + "\"");
-        this.append4Create(cmd);
-        cmd.append(';');
+            this.createDependings();
 
-        // append all child command / menus
-        if (!this.children.isEmpty())  {
-            cmd.append("escape mod menu \"" + AbstractTest.convertMql(this.getName()) + "\"");
-            for (final AbstractCommandData<?> child : this.children)  {
-                cmd.append(" add ").append(child.getCI().getMxType())
-                   .append(" \"").append(AbstractTest.convertMql(child.getName())).append('\"');
+            final StringBuilder cmd = new StringBuilder()
+                    .append("escape add menu \"" + AbstractTest.convertMql(this.getName()) + "\"");
+
+            // append hidden flag
+            if (this.isHidden() != null)  {
+                cmd.append(' ');
+                if (!this.isHidden())  {
+                    cmd.append('!');
+                }
+                cmd.append("hidden");
             }
+
+            this.append4Create(cmd);
             cmd.append(';');
+
+            // append all child command / menus
+            if (!this.children.isEmpty())  {
+                cmd.append("escape mod menu \"" + AbstractTest.convertMql(this.getName()) + "\"");
+                for (final AbstractCommandData<?> child : this.children)  {
+                    cmd.append(" add ").append(child.getCI().getMxType())
+                       .append(" \"").append(AbstractTest.convertMql(child.getName())).append('\"');
+                }
+                cmd.append(';');
+            }
+
+            cmd.append(";\n")
+               .append("escape add property ").append(this.getSymbolicName())
+               .append(" on program eServiceSchemaVariableMapping.tcl")
+               .append(" to menu \"").append(AbstractTest.convertMql(this.getName())).append("\"");
+
+            this.getTest().mql(cmd);
         }
-
-        cmd.append(";\n")
-           .append("escape add property ").append(this.getSymbolicName())
-           .append(" on program eServiceSchemaVariableMapping.tcl")
-           .append(" to menu \"").append(AbstractTest.convertMql(this.getName())).append("\"");
-
-        this.getTest().mql(cmd);
-
         return this;
     }
 
     /**
+     * {@inheritDoc}
      * Creates all child commands / menus.
      *
-     * @return this menu instance
-     * @throws MatrixException if child commands / menus could not be created
      * @see #children
      */
-    public MenuData createChildren()
+    @Override()
+    public MenuData createDependings()
         throws MatrixException
     {
+        super.createDependings();
+
         for (final AbstractCommandData<?> child : this.children)  {
             child.create();
         }

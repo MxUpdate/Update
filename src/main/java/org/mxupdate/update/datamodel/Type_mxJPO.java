@@ -143,12 +143,12 @@ public class Type_mxJPO
                                final Appendable _out)
         throws IOException
     {
-        _out.append(" \\\n    derived \"").append(StringUtil_mxJPO.convertTcl(this.derived)).append("\"")
+        _out.append(" \\\n    derived \"").append(StringUtil_mxJPO.convertTcl(this.derived)).append('\"')
             .append(" \\\n    ").append(this.isHidden() ? "" : "!").append("hidden")
-            .append(" \\\n    abstract ").append(Boolean.toString(this.abstractFlag));
+            .append(" \\\n    abstract \"").append(Boolean.toString(this.abstractFlag)).append('\"');
         // methods
         for (final String method : this.methods)  {
-            _out.append(" \\\n    add method \"").append(StringUtil_mxJPO.convertTcl(method)).append("\"");
+            _out.append(" \\\n    add method \"").append(StringUtil_mxJPO.convertTcl(method)).append('\"');
         }
         // triggers
         this.writeTriggers(_out);
@@ -159,7 +159,8 @@ public class Type_mxJPO
      * in the <code>_preMQLCode</code> to reset this type. Following steps are
      * done:
      * <ul>
-     * <li>set not hidden</li>
+     * <li>set to not hidden</li>
+     * <li>set to not abstract</li>
      * <li>reset description</li>
      * <li>remove all {@link #methods}</li>
      * </ul>
@@ -190,7 +191,7 @@ public class Type_mxJPO
         final StringBuilder preMQLCode = new StringBuilder()
                 .append("escape mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                .append(" !hidden description \"\"");
+                .append(" !hidden description \"\" abstract false");
         // remove methods
         for (final String method : this.methods)  {
             preMQLCode.append(" remove method \"")

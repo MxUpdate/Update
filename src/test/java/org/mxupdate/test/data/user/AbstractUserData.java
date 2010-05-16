@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 package org.mxupdate.test.data.user;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -145,7 +146,7 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
     protected AbstractUserData(final AbstractTest _test,
                                final AbstractTest.CI _ci,
                                final String _name,
-                               final Set<String> _requiredExportValues)
+                               final Map<String,String> _requiredExportValues)
     {
         super(_test, _ci, _name, _requiredExportValues);
     }
@@ -451,9 +452,14 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
      */
     @SuppressWarnings("unchecked")
     @Override()
-    public DATA create() throws MatrixException
+    public DATA create()
+        throws MatrixException
     {
         if (!this.isCreated())  {
+            this.setCreated(true);
+
+            this.createDependings();
+
             final StringBuilder cmd = new StringBuilder()
                     .append("escape add ")
                     .append(this.getCI().getMxType())
@@ -473,8 +479,6 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
             this.append4Create(cmd);
             cmd.append(";\n");
             this.getTest().mql(cmd);
-
-            this.setCreated(true);
 
             // cues
             for (final CueData<DATA> cue : this.cues)  {
@@ -515,6 +519,64 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
     }
 
     /**
+     * {@inheritDoc}
+     * Creates depending {@link #site} and properties for {@link #cues},
+     * {@link #filters}, {@link #queries}, {@link #tables}, {@link #tips},
+     * {@link #toolSets} and {@link #views}.
+     *
+     * @see #site
+     * @see #cues
+     * @see #filters
+     * @see #queries
+     * @see #tables
+     * @see #tips
+     * @see #toolSets
+     * @see #views
+     */
+    @Override()
+    @SuppressWarnings("unchecked")
+    public DATA createDependings()
+        throws MatrixException
+    {
+        super.createDependings();
+
+        // create site
+        if (this.site != null)  {
+            this.site.create();
+        }
+        // create cue properties
+        for (final CueData<DATA> cue : this.cues)  {
+            cue.createDependings();
+        }
+        // create filter properties
+        for (final FilterData<DATA> filter : this.filters)  {
+            filter.createDependings();
+        }
+        // create query properties
+        for (final QueryData<DATA> query : this.queries)  {
+            query.createDependings();
+        }
+        // create table properties
+        for (final TableData<DATA> table : this.tables)  {
+            table.createDependings();
+        }
+        // create tip properties
+        for (final TipData<DATA> tip : this.tips)  {
+            tip.createDependings();
+        }
+        // create tool set properties and programs
+        for (final ToolSetData<DATA> toolSet : this.toolSets)  {
+            toolSet.createDependings();
+        }
+        // create view properties
+        for (final ViewData<DATA> view : this.views)  {
+            view.createDependings();
+        }
+
+        return (DATA) this;
+    }
+
+    /**
      * Checks the export of this data piece if all values are correct defined.
      * Following workspace objects for this user are checked that they are
      * defined:
@@ -546,16 +608,6 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                               (this.site != null)
                                       ? "\"" + AbstractTest.convertTcl(this.site.getName()) + "\""
                                       : null);
-
-        // check hidden flag
-        final Set<String> main = new HashSet<String>(_exportParser.getLines("/mql/"));
-        if ((this.isHidden() != null) && this.isHidden())  {
-            Assert.assertTrue(main.contains("hidden") || main.contains("hidden \\"),
-                              "check that " + this.getCI().getMxType() + " '" + this.getName() + "' is hidden");
-        } else  {
-            Assert.assertTrue(main.contains("!hidden") || main.contains("!hidden \\"),
-                              "check that " + this.getCI().getMxType() + " '" + this.getName() + "' is not hidden");
-        }
 
         // all workspace objects
         final Set<CueData<DATA>> tmpCues            = new HashSet<CueData<DATA>>(this.cues);

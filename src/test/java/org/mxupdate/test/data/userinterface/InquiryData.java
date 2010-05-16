@@ -21,7 +21,6 @@
 package org.mxupdate.test.data.userinterface;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,12 +42,11 @@ public class InquiryData
     /**
      * Within export the description, pattern, format and file must be defined.
      */
-    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(3);
+    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>(3);
     static  {
-        InquiryData.REQUIRED_EXPORT_VALUES.add("description");
-        InquiryData.REQUIRED_EXPORT_VALUES.add("pattern");
-        InquiryData.REQUIRED_EXPORT_VALUES.add("format");
-        InquiryData.REQUIRED_EXPORT_VALUES.add("file");
+        InquiryData.REQUIRED_EXPORT_VALUES.put("description", "");
+        InquiryData.REQUIRED_EXPORT_VALUES.put("pattern", "");
+        InquiryData.REQUIRED_EXPORT_VALUES.put("format", "");
     }
 
     /**
@@ -129,6 +127,16 @@ public class InquiryData
         final StringBuilder cmd = new StringBuilder();
         this.append4CIFileHeader(cmd);
         cmd.append("mql escape mod inquiry \"${NAME}\" file [file join \"${FILE}\"]");
+
+        // append hidden flag
+        if (this.isHidden() != null)  {
+            cmd.append(' ');
+            if (!this.isHidden())  {
+                cmd.append('!');
+            }
+            cmd.append("hidden");
+        }
+
         this.append4CIFileValues(cmd);
 
         // append embedded inquiry code
@@ -153,6 +161,16 @@ public class InquiryData
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("escape add inquiry \"" + AbstractTest.convertMql(this.getName()) + "\"");
+
+        // append hidden flag
+        if (this.isHidden() != null)  {
+            cmd.append(' ');
+            if (!this.isHidden())  {
+                cmd.append('!');
+            }
+            cmd.append("hidden");
+        }
+
         this.append4Create(cmd);
 
         if (this.code != null)  {
@@ -202,6 +220,8 @@ public class InquiryData
         throws MatrixException
     {
         super.checkExport(_exportParser);
+
+        this.checkSingleValue(_exportParser, "file", "file", "[file join \"${FILE}\"]");
 
         // check embedded inquiry code
         final InquiryExportParser exportParser = (InquiryExportParser) _exportParser;

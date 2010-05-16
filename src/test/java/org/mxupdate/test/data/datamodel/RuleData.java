@@ -20,7 +20,8 @@
 
 package org.mxupdate.test.data.datamodel;
 
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -96,9 +97,9 @@ public class RuleData
     /**
      * Within export the description and default value must be defined.
      */
-    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(2);
+    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
     static  {
-        RuleData.REQUIRED_EXPORT_VALUES.add("description");
+        RuleData.REQUIRED_EXPORT_VALUES.put("description", "");
     }
 
     /**
@@ -185,6 +186,15 @@ public class RuleData
         final StringBuilder cmd = new StringBuilder()
             .append("mql escape mod rule \"${NAME}\"");
 
+        // append hidden flag
+        if (this.isHidden() != null)  {
+            cmd.append(' ');
+            if (!this.isHidden())  {
+                cmd.append('!');
+            }
+            cmd.append("hidden");
+        }
+
         this.append4CIFileValues(cmd);
 
         return cmd.toString();
@@ -205,6 +215,14 @@ public class RuleData
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add rule \"").append(AbstractTest.convertMql(this.getName()))
                .append("\" ");
+            // append hidden flag
+            if (this.isHidden() != null)  {
+                cmd.append(' ');
+                if (!this.isHidden())  {
+                    cmd.append('!');
+                }
+                cmd.append("hidden");
+            }
             // owner access
             cmd.append(" owner ").append(this.ownerAccess);
             if (this.ownerAccessFilter != null)  {

@@ -20,7 +20,9 @@
 
 package org.mxupdate.test.data.datamodel;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -41,9 +43,10 @@ public class TypeData
     /**
      * Within export the description must be defined.
      */
-    private static final Set<String> REQUIRED_EXPORT_VALUES = new HashSet<String>(1);
+    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>(1);
     static  {
-        TypeData.REQUIRED_EXPORT_VALUES.add("description");
+        TypeData.REQUIRED_EXPORT_VALUES.put("description", "");
+        TypeData.REQUIRED_EXPORT_VALUES.put("abstract", "false");
     }
 
     /**
@@ -102,6 +105,16 @@ public class TypeData
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("mql escape mod type \"${NAME}\"");
+
+        // append hidden flag
+        if (this.isHidden() != null)  {
+            cmd.append(' ');
+            if (!this.isHidden())  {
+                cmd.append('!');
+            }
+            cmd.append("hidden");
+        }
+
         this.append4CIFileValues(cmd);
 
         // append attributes
@@ -126,18 +139,48 @@ public class TypeData
         if (!this.isCreated())  {
             this.setCreated(true);
 
+            this.createDependings();
+
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add type \"").append(AbstractTest.convertMql(this.getName())).append('\"');
 
+            // append hidden flag
+            if (this.isHidden() != null)  {
+                cmd.append(' ');
+                if (!this.isHidden())  {
+                    cmd.append('!');
+                }
+                cmd.append("hidden");
+            }
+
             // append methods
             for (final AbstractProgramData<?> method : this.methods)  {
-                method.create();
                 cmd.append(" method \"").append(AbstractTest.convertMql(method.getName())).append("\"");
             }
 
             this.append4Create(cmd);
 
             this.getTest().mql(cmd);
+        }
+
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     * Creates all programs referenced by {@link #methods}.
+     *
+     * @see #methods
+     */
+    @Override()
+    public TypeData createDependings()
+        throws MatrixException
+    {
+        super.createDependings();
+
+        // create programs
+        for (final AbstractProgramData<?> prog : this.methods)  {
+            prog.create();
         }
 
         return this;
