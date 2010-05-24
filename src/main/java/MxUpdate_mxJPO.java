@@ -88,6 +88,14 @@ public class MxUpdate_mxJPO
     private static final String PARAM_HELP_COPYRIGHT = "HelpCopyright";
 
     /**
+     * String of the key within the parameter cache for the description used
+     * for the help description.
+     *
+     * @see #printHelp(ParameterCache_mxJPO)
+     */
+    private static final String PARAM_HELP_DESCRIPTION = "HelpDescription";
+
+    /**
      * String of the key within the parameter cache for the length of a
      * description line used for the help description.
      *
@@ -167,12 +175,14 @@ public class MxUpdate_mxJPO
             = new HashMap<String,TypeDef_mxJPO>();
 
     /**
+     * Prepares the parameters depending on the <code>_paramCache</code>.
      *
-     * @param _paramCache   parameter cache
-     * @throws MatrixException
+     * @param _paramCache       parameter cache
+     * @throws MatrixException if description or parameters could not be
+     *                         prepared
      */
     private void prepareParams(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+        throws MatrixException
     {
         this.description.clear();
         this.allParams.clear();
@@ -189,11 +199,10 @@ public class MxUpdate_mxJPO
                     final String paramStr = (param.length() > 1)
                                             ? "--" + param
                                             : "-" + param;
-                    this.paramsParameters.put(paramStr, parameter);
+                    this.paramsParameters.put(paramStr.toLowerCase(), parameter);
                 }
                 final StringBuilder desc = new StringBuilder().append(parameter.getParameterDesc());
-                if ((parameter.getDefaultValue() != null)
-                        && (parameter.getType() != ParameterDef_mxJPO.Type.BOOLEAN))  {
+                if ((parameter.getDefaultValue() != null) && (parameter.getType() != ParameterDef_mxJPO.Type.BOOLEAN))  {
                     desc.append('\n').append("(Default '");
                     if (parameter.getType() == ParameterDef_mxJPO.Type.LIST)  {
                         desc.append(parameter.getDefaultValue().replaceAll(",", ", "));
@@ -216,7 +225,7 @@ public class MxUpdate_mxJPO
                 final String paramStr = (param.length() > 1)
                                         ? "--" + param
                                         : "-" + param;
-                this.paramsModes.put(paramStr, mode);
+                this.paramsModes.put(paramStr.toLowerCase(), mode);
             }
             this.appendDescription(mode.getParameterDesc(_paramCache),
                                    mode.getParameterList(_paramCache),
@@ -242,7 +251,7 @@ public class MxUpdate_mxJPO
                         final String paramStr = (param.length() == 1)
                                                 ? "-" + param
                                                 : "--" + param;
-                        this.paramsTypeDefsOpp.put(paramStr, typeDef);
+                        this.paramsTypeDefsOpp.put(paramStr.toLowerCase(), typeDef);
                     }
                     // store description
                     this.appendDescription(typeDef.getParameterDescOpp(),
@@ -304,7 +313,7 @@ public class MxUpdate_mxJPO
             final String paramStr = (param.length() == 1)
                                     ? "-" + param
                                     : "--" + param;
-            this.paramsTypeDefs.put(paramStr, tmp);
+            this.paramsTypeDefs.put(paramStr.toLowerCase(), tmp);
         }
 
         // store description
@@ -395,7 +404,7 @@ public class MxUpdate_mxJPO
             boolean unknown = false;
 
             for (int idx = 0; idx < _args.length; idx++)  {
-                final String arg = _args[idx];
+                final String arg = _args[idx].toLowerCase();
                 if (this.paramsTypeDefs.containsKey(arg))  {
                     final Collection<TypeDef_mxJPO> clazzes = this.paramsTypeDefs.get(arg);
                     final String name = _args[++idx];
@@ -460,7 +469,7 @@ public class MxUpdate_mxJPO
      * @see #description
      */
     private void printHelp(final ParameterCache_mxJPO _paramCache)
-            throws IOException
+        throws IOException
     {
         final String prefix = _paramCache.getValueString(MxUpdate_mxJPO.PARAM_HELP_PREFIX);
         final int lengthLine = _paramCache.getValueInteger(MxUpdate_mxJPO.PARAM_HELP_LENGTHLINE);
@@ -486,7 +495,8 @@ public class MxUpdate_mxJPO
             out.append('-');
             out.append(param);
         }
-        out.append(" | ... \n\n");
+        out.append(" | ... \n")
+           .append(_paramCache.getValueString(MxUpdate_mxJPO.PARAM_HELP_DESCRIPTION));
 
         // print all parameters with description
         for (final Map.Entry<String,String> descLine : this.description.entrySet())  {
