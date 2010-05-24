@@ -406,18 +406,20 @@ public class JPOProgram_mxJPO
 
         // append TCL code of file (first without line prefix, then with)
         final StringBuilder jpoCode = this.getCode(_sourceFile);
-        preTCLCode.append(this.extractTclUpdateCode(_paramCache,
-                                                    exec,
-                                                    jpoCode,
-                                                    markStart,
-                                                    markEnd,
-                                                    null))
-                  .append(this.extractTclUpdateCode(_paramCache,
-                                                    exec,
-                                                    jpoCode,
-                                                    markStartWithPrefix,
-                                                    markEndWithPrefix,
-                                                    JPOProgram_mxJPO.LINE_PREFIX));
+        this.extractTclUpdateCode(_paramCache,
+                                  preTCLCode,
+                                  exec,
+                                  jpoCode,
+                                  markStart,
+                                  markEnd,
+                                  null);
+        this.extractTclUpdateCode(_paramCache,
+                                  preTCLCode,
+                                  exec,
+                                  jpoCode,
+                                  markStartWithPrefix,
+                                  markEndWithPrefix,
+                                  JPOProgram_mxJPO.LINE_PREFIX);
 
         // append already existing pre MQL code
         preMQLCode.append(";\n")

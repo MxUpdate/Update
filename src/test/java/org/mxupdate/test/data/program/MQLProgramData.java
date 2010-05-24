@@ -161,7 +161,7 @@ public class MQLProgramData
         }
         final int index = _exportParser.getOrigCode().indexOf(markEnd);
         Assert.assertEquals(
-                (index > 0) ? _exportParser.getOrigCode().substring(index + markEnd.length()).trim() : _exportParser.getOrigCode(),
+                ((index > 0) ? _exportParser.getOrigCode().substring(index + markEnd.length()).trim() : _exportParser.getOrigCode()).trim(),
                 this.getCode(),
                 "checks MQL program code");
     }

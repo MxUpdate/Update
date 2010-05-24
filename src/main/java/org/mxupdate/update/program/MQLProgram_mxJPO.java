@@ -83,6 +83,14 @@ public class MQLProgram_mxJPO
     private static final String PARAM_NEEDED = "ProgramTclUpdateNeeded";
 
     /**
+     * Defines the parameter to define if the embedded TCL update code within
+     * programs must be executed.
+     *
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private static final String PARAM_REMOVE = "ProgramTclUpdateRemoveInCode";
+
+    /**
      * Defines the parameter which maps from the file extension to the used
      * line prefix.
      *
@@ -235,6 +243,9 @@ public class MQLProgram_mxJPO
      * <li>If the file name includes a '@' the file content is copied to a new
      *     file and updated the new file (because of a bug in MX that a MQL
      *     program could not be updated with @ in file names).</li>
+     * <li>If the code includes embedded TCL update code, the code is written
+     *     in a new file if parameter {@link #PARAM_REMOVE} is
+     *     <i>true</i>.</li>
      * <li>Embedded TCL update code is searched depending on the file extension
      *     and the TCL update needed parameter {@link #PARAM_NEEDED}. If for a
      *     file extension a line prefix is defined, the line prefix is removed
@@ -282,25 +293,40 @@ public class MQLProgram_mxJPO
         final String markStart = this.makeLinePrefix(linePrefix, markStartStr);
         final String markEnd = this.makeLinePrefix(linePrefix, markEndStr);
 
-        //
         File tempFile = null;
         try  {
-            if (_sourceFile.getPath().contains("@"))  {
+            final StringBuilder preMQLCode = new StringBuilder();
+            final StringBuilder preTCLCode = new StringBuilder();
+
+            // append TCL code of file
+            final String code = this.extractTclUpdateCode(_paramCache,
+                                                          preTCLCode,
+                                                          exec,
+                                                          this.getCode(_sourceFile),
+                                                          markStart,
+                                                          markEnd,
+                                                          linePrefix);
+
+            // write new code
+            if (((code != null) && _paramCache.getValueBoolean(MQLProgram_mxJPO.PARAM_REMOVE))
+                    || _sourceFile.getPath().contains("@"))  {
+
                 tempFile = File.createTempFile("MXUPDATE", "TMP");
 
                 FileWriter out = null;
                 try  {
                     out = new FileWriter(tempFile);
-                    out.write(this.getCode());
+                    if ((code != null) && _paramCache.getValueBoolean(MQLProgram_mxJPO.PARAM_REMOVE))  {
+                        out.write(code.trim());
+                    } else  {
+                        out.write(this.getCode().trim());
+                    }
                 } finally  {
                     if (out != null)  {
                         out.close();
                     }
                 }
             }
-
-            final StringBuilder preMQLCode = new StringBuilder();
-            final StringBuilder preTCLCode = new StringBuilder();
 
             // update code; reset execute user
             preMQLCode.append("escape mod prog \"").append(StringUtil_mxJPO.convertMql(this.getName()))
@@ -311,14 +337,6 @@ public class MQLProgram_mxJPO
                 preMQLCode.append(StringUtil_mxJPO.convertMql(_sourceFile.getPath()));
             }
             preMQLCode.append("\";\n");
-
-            // append TCL code of file
-            preTCLCode.append(this.extractTclUpdateCode(_paramCache,
-                                                        exec,
-                                                        this.getCode(_sourceFile),
-                                                        markStart,
-                                                        markEnd,
-                                                        linePrefix));
 
             // append already existing pre MQL code
             preMQLCode.append(";\n")

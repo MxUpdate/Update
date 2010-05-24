@@ -252,21 +252,26 @@ public abstract class AbstractProgram_mxJPO
      * <code>_execute</code> is set, the found TCL code is returned.
      *
      * @param _paramCache   parameter cache
+     * @param _tclCode      TCL code string builder to append the TCL update
+     *                      code which was extracted and if
+     *                      <code>_execute</code> is <i>true</i>
      * @param _execute      <i>true</i> if TCL update code will be executed
      * @param _prgCode      program code
      * @param _markStart    start marker
      * @param _markEnd      end marker
      * @param _linePrefix   line prefix
-     * @return extracted TCL update code from <code>_prgCode</code>
+     * @return source code without TCL update code; <code>null</code> if source
+     *         includes no TCL update code
      */
     protected String extractTclUpdateCode(final ParameterCache_mxJPO _paramCache,
+                                          final StringBuilder _tclCode,
                                           final boolean _execute,
                                           final StringBuilder _prgCode,
                                           final String _markStart,
                                           final String _markEnd,
                                           final String _linePrefix)
     {
-        String ret = "";
+        final String ret;
 
         final int start = _prgCode.indexOf(_markStart);
         final int end = _prgCode.indexOf(_markEnd);
@@ -284,14 +289,21 @@ public abstract class AbstractProgram_mxJPO
                         for (final String line : tclCode.split("\n"))  {
                             tclUpdateCode.append(line.substring(linePrefixLength)).append('\n');
                         }
-                        ret = tclUpdateCode.toString();
+                        _tclCode.append(tclUpdateCode.toString());
                     } else  {
-                        ret = tclCode;
+                        _tclCode.append(tclCode);
                     }
                 } else  {
                     _paramCache.logError("    - Warning! Existing TCL update code is not executed!");
                 }
             }
+            ret = new StringBuilder()
+                    .append(_prgCode.substring(0, start))
+                    .append('\n')
+                    .append(_prgCode.substring(end + _markEnd.length()))
+                    .toString();
+        } else  {
+            ret = null;
         }
         return ret;
     }

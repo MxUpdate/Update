@@ -168,9 +168,10 @@ public class MQLTest
         _mqlProgram.updateWithCode(exportParser.getOrigCode())
                    .checkExport();
 
-        Assert.assertEquals(exportParser.getOrigCode(),
-                            _mqlProgram.export().getOrigCode(),
-                            "check that separators correct removed");
+        Assert.assertEquals(
+                exportParser.getOrigCode(),
+                _mqlProgram.export().getOrigCode(),
+                "check that separators correct removed");
     }
 
     /**
@@ -188,5 +189,55 @@ public class MQLTest
         final String xml = this.mql("export prog " + name + " xml");
         Assert.assertTrue(xml.indexOf("<code><![CDATA[<]Inserted_by_ENOVIA]Inserted_by_ENOVIA>]]></code>") >= 0,
                           "check translation of the CDATA conversion");
+    }
+
+    /**
+     * Check that the code in MX does not include the TCL update code.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "check that the code in MX does not include the TCL update code")
+    public void checkUpdateRemovingUpdateCode()
+        throws Exception
+    {
+        final String code = "tcl;\n\neval  {\n  puts test;\n}";
+        final MQLProgramData mqlProg = new MQLProgramData(this, "Test")
+                .setCode(code)
+                .addProperty(new PropertyDef("testprop", "propvalue"))
+                .update("ProgramTclUpdateRemoveInCode", "true");
+        final String progName =  AbstractTest.convertMql(mqlProg.getName());
+        Assert.assertEquals(
+                this.mql("escape print prog \"" + progName + "\" select property[testprop].value dump"),
+                "propvalue",
+                "check property is set");
+        Assert.assertEquals(
+                this.mql("escape print prog \"" + progName + "\" select code dump"),
+                code,
+                "check the TCL update code is not included in the updated code");
+    }
+
+    /**
+     * Check that the code in MX does include the TCL update code.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "check that the code in MX does include the TCL update code")
+    public void checkUpdateNotRemovingUpdateCode()
+        throws Exception
+    {
+        final String code = "tcl;\n\neval  {\n  puts test;\n}";
+        final MQLProgramData mqlProg = new MQLProgramData(this, "Test")
+                .setCode(code)
+                .addProperty(new PropertyDef("testprop", "propvalue"))
+                .update("ProgramTclUpdateRemoveInCode", "false");
+        final String progName =  AbstractTest.convertMql(mqlProg.getName());
+        Assert.assertEquals(
+                this.mql("escape print prog \"" + progName + "\" select property[testprop].value dump"),
+                "propvalue",
+                "check property is set");
+        Assert.assertEquals(
+                this.mql("escape print prog \"" + progName + "\" select code dump"),
+                mqlProg.ciFile(),
+        "check the TCL update code is not included in the updated code");
     }
 }
