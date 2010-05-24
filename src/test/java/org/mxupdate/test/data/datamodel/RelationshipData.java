@@ -131,6 +131,16 @@ public class RelationshipData
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("mql escape mod relationship \"${NAME}\"");
+
+        // append hidden flag
+        if (this.isHidden() != null)  {
+            cmd.append(' ');
+            if (!this.isHidden())  {
+                cmd.append('!');
+            }
+            cmd.append("hidden");
+        }
+
         this.append4CIFileValues(cmd);
 
         // prevent duplicates
@@ -172,6 +182,15 @@ public class RelationshipData
 
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add relationship \"").append(AbstractTest.convertMql(this.getName())).append('\"');
+
+            // append hidden flag
+            if (this.isHidden() != null)  {
+                cmd.append(' ');
+                if (!this.isHidden())  {
+                    cmd.append('!');
+                }
+                cmd.append("hidden");
+            }
 
             // prevent duplicates
             if (this.preventDuplicates != null)  {

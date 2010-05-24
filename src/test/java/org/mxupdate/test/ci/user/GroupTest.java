@@ -55,21 +55,6 @@ public class GroupTest
                         new GroupData(this, "hallo \" test")
                             .setValue("description", "\"\\\\ hallo")},
                 new Object[]{
-                        "hidden group",
-                        new GroupData(this, "hallo \" test")
-                                .setHidden(true)
-                                .setValue("description", "\"\\\\ hallo")},
-                new Object[]{
-                        "not hidden group",
-                        new GroupData(this, "hallo \" test")
-                                .setHidden(false)
-                                .setValue("description", "\"\\\\ hallo")},
-                new Object[]{
-                        "default hidden group",
-                        new GroupData(this, "hallo \" test")
-                                .setHidden(null)
-                                .setValue("description", "\"\\\\ hallo")},
-                new Object[]{
                         "group with two parent groups",
                         new GroupData(this, "hallo \" test")
                                 .setValue("description", "\"\\\\ hallo")

@@ -257,16 +257,6 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
     {
         super.checkExport(_exportParser);
 
-        // check hidden flag
-        final Set<String> main = new HashSet<String>(_exportParser.getLines("/mql/"));
-        if (this.isHidden())  {
-            Assert.assertTrue(main.contains("hidden") || main.contains("hidden \\"),
-                              "check that " + this.mxAdminType + " '" + this.getName() + "' is hidden");
-        } else  {
-            Assert.assertTrue(main.contains("!hidden") || main.contains("!hidden \\"),
-                              "check that " + this.mxAdminType + " '" + this.getName() + "' is not hidden");
-        }
-
         // check visible users
         final List<String> foundVisible = _exportParser.getLines("/mql/visible/@value");
         for (final String user : foundVisible)  {

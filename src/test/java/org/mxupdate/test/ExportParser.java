@@ -118,6 +118,27 @@ public class ExportParser
         new Line(Arrays.asList(this.code.split("\n")).iterator(), null);
     }
 
+
+    /**
+     * Creates a new export parser used e.g. to check elements within a sub
+     * structure.
+     *
+     * @param _name         name of the administration object
+     * @param _symbolicName symbolic name
+     * @param _rootLines    depending root lines
+     */
+    public ExportParser(final String _name,
+                        final String _symbolicName,
+                        final Line...  _rootLines)
+    {
+        this.origCode = null;
+        this.ci = null;
+        this.symbolicName = _symbolicName;
+        this.name = _name;
+        this.code = null;
+        this.rootLines.addAll(Arrays.asList(_rootLines));
+    }
+
     /**
      * Creates a new export parser used e.g. to check elements within a sub
      * structure.
@@ -128,12 +149,7 @@ public class ExportParser
     public ExportParser(final String _name,
                         final Line...  _rootLines)
     {
-        this.origCode = null;
-        this.ci = null;
-        this.symbolicName = null;
-        this.name = _name;
-        this.code = null;
-        this.rootLines.addAll(Arrays.asList(_rootLines));
+        this(_name, null, _rootLines);
     }
 
     /**

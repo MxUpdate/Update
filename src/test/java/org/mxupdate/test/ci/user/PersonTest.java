@@ -124,21 +124,6 @@ public class PersonTest
                                 .addRole(new RoleData(this, "test \"role\" 2"))},
 
                 new Object[]{
-                        "hidden person",
-                        new PersonAdminData(this, "hello \" test")
-                                .setHidden(true)
-                                .setValue("description", "\"\\\\ hallo")},
-                new Object[]{
-                        "not hidden person",
-                        new PersonAdminData(this, "hello \" test")
-                                .setHidden(false)
-                                .setValue("description", "\"\\\\ hallo")},
-                new Object[]{
-                        "default hidden person",
-                        new PersonAdminData(this, "hello \" test")
-                                .setHidden(null)
-                                .setValue("description", "\"\\\\ hallo")},
-                new Object[]{
                         "person with assigned site",
                         new PersonAdminData(this, "hello \" test")
                                 .setSite(new SiteData(this, "Test \" Site"))},

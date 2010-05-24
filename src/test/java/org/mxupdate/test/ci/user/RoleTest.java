@@ -67,21 +67,6 @@ public class RoleTest
                         new RoleData(this, "hallo \" test")
                             .setValue("description", "\"\\\\ hallo")},
                 new Object[]{
-                        "hidden role",
-                        new RoleData(this, "hallo \" test")
-                                .setHidden(true)
-                                .setValue("description", "\"\\\\ hallo")},
-                new Object[]{
-                        "not hidden role",
-                        new RoleData(this, "hallo \" test")
-                                .setHidden(false)
-                                .setValue("description", "\"\\\\ hallo")},
-                new Object[]{
-                        "default hidden role",
-                        new RoleData(this, "hallo \" test")
-                                .setHidden(null)
-                                .setValue("description", "\"\\\\ hallo")},
-                new Object[]{
                         "role with two parent roles",
                         new RoleData(this, "hallo \" test")
                                 .setValue("description", "\"\\\\ hallo")

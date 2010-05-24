@@ -20,7 +20,9 @@
 
 package org.mxupdate.test.data.user;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -599,8 +601,6 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        super.checkExport(_exportParser);
-
         // site
         this.checkSingleValue(_exportParser,
                               this.getCI().getMxType(),
@@ -618,6 +618,7 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
         final Set<ToolSetData<DATA>> tmpToolSets    = new HashSet<ToolSetData<DATA>>(this.toolSets);
         final Set<ViewData<DATA>> tmpViews          = new HashSet<ViewData<DATA>>(this.views);
 
+        final List<ExportParser.Line> lines = new ArrayList<ExportParser.Line>();
         for (final ExportParser.Line rootLine : _exportParser.getRootLines())  {
             // cues
             if (rootLine.getValue().startsWith("escape add cue "))  {
@@ -632,9 +633,8 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                         break;
                     }
                 }
-            }
             // filters
-            if (rootLine.getValue().startsWith("escape add filter "))  {
+            } else if (rootLine.getValue().startsWith("escape add filter "))  {
                 for (final FilterData<DATA> filter : this.filters)  {
                     final String key = new StringBuilder()
                             .append("escape add filter \"")
@@ -646,9 +646,8 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                         break;
                     }
                 }
-            }
             // queries
-            if (rootLine.getValue().startsWith("escape add query "))  {
+            } else if (rootLine.getValue().startsWith("escape add query "))  {
                 for (final QueryData<DATA> query : this.queries)  {
                     final String key = new StringBuilder()
                             .append("escape add query \"")
@@ -660,9 +659,8 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                         break;
                     }
                 }
-            }
             // tables
-            if (rootLine.getValue().startsWith("escape add table "))  {
+            } else if (rootLine.getValue().startsWith("escape add table "))  {
                 for (final TableData<DATA> table : this.tables)  {
                     final String key = new StringBuilder()
                             .append("escape add table \"")
@@ -674,9 +672,8 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                         break;
                     }
                 }
-            }
             // tips
-            if (rootLine.getValue().startsWith("escape add tip "))  {
+            } else if (rootLine.getValue().startsWith("escape add tip "))  {
                 for (final TipData<DATA> tip : this.tips)  {
                     final String key = new StringBuilder()
                             .append("escape add tip \"")
@@ -688,9 +685,8 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                         break;
                     }
                 }
-            }
             // tool sets
-            if (rootLine.getValue().startsWith("escape add toolset "))  {
+            } else if (rootLine.getValue().startsWith("escape add toolset "))  {
                 for (final ToolSetData<DATA> toolSet : this.toolSets)  {
                     final String key = new StringBuilder()
                             .append("escape add toolset \"")
@@ -702,9 +698,8 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                         break;
                     }
                 }
-            }
             // views
-            if (rootLine.getValue().startsWith("escape add view "))  {
+            } else if (rootLine.getValue().startsWith("escape add view "))  {
                 for (final ViewData<DATA> view : this.views)  {
                     final String key = new StringBuilder()
                             .append("escape add view \"")
@@ -716,8 +711,17 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                         break;
                     }
                 }
+            // all other
+            } else  {
+                lines.add(rootLine);
             }
         }
+
+        // and check all others
+        super.checkExport(new ExportParser(
+                _exportParser.getName(),
+                _exportParser.getSymbolicName(),
+                lines.toArray(new ExportParser.Line[lines.size()])));
 
         Assert.assertTrue(tmpCues.isEmpty(),        "check that all cues are defined in the update file");
         Assert.assertTrue(tmpFilters.isEmpty(),     "check that all filters are defined in the update file");

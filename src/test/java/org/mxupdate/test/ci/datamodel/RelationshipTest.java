@@ -29,6 +29,7 @@ import org.mxupdate.test.data.program.MQLProgramData;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 /**
  * Class is used to test relationship updates.
@@ -36,6 +37,7 @@ import org.testng.annotations.DataProvider;
  * @author The MxUpdate Team
  * @version $Id$
  */
+@Test()
 public class RelationshipTest
     extends AbstractDataWithAttributesExportUpdateTest<RelationshipData>
 {
