@@ -246,7 +246,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         {
             final StringBuilder cmd = new StringBuilder()
                     .append("range ").append(this.comparator)
-                    .append(" \"").append(AbstractTest.convertTclDoubleEscaped(this.value))
+                    .append(" \"").append(AbstractTest.convertTcl(this.value))
                     .append("\"");
             _needAdds.add(cmd.toString());
         }
@@ -472,7 +472,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
                     .append("range ").append(this.comparator)
                     .append(" \"").append(StringUtil_mxJPO.convertMql(this.program.getName())).append("\"");
             if ((this.value != null) && !this.value.isEmpty())  {
-                cmd.append(" input \"").append(AbstractTest.convertTclDoubleEscaped(this.value)).append("\"");
+                cmd.append(" input \"").append(AbstractTest.convertTcl(this.value)).append("\"");
             }
             _needAdds.add(cmd.toString());
         }

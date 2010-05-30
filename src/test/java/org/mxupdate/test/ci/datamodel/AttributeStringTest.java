@@ -66,6 +66,7 @@ public class AttributeStringTest
      *
      * @throws MatrixException if cleanup failed
      */
+    @Override()
     @BeforeMethod()
     @AfterClass()
     public void cleanup()
