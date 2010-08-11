@@ -102,6 +102,12 @@ public class Dimension
             + "    system \"Duration Units\" to unit \"name2\"\n"
             + "    system \"Test\" to unit \"name 3\"\n"
             + "  }"
+            + "  unit \"name 4\" {\n"
+            + "    description \"description4 with negative multiplier and negative offset\"\n"
+            + "    label \"label 4\"\n"
+            + "    multiplier -1.0\n"
+            + "    offset -50.0\n"
+            + "  }"
             + "}";
 
     /**
@@ -473,9 +479,10 @@ public class Dimension
                                             + " select unit dump @")
                                     .replaceAll("name1", "")
                                     .replaceAll("name2", "")
-                                    .replaceAll("name 3", ""),
-                            "@@",
-                            "check that exact three units are defined");
+                                    .replaceAll("name 3", "")
+                                    .replaceAll("name 4", ""),
+                            "@@@",
+                            "check that exact four units are defined");
 
         Assert.assertEquals(this.mql("print dimension " + Dimension.DIMENSION_NAME
                                     + " select unit[name1] dump"),
@@ -541,6 +548,21 @@ public class Dimension
                             "Check that exact two system infos are defined");
         this.checkUnit("name 3", "systemunit[Duration Units]", "name2");
         this.checkUnit("name 3", "systemunit[Test]", "name 3");
+
+        Assert.assertEquals(this.mql("print dimension " + Dimension.DIMENSION_NAME
+                + " select unit[name 4] dump"),
+        "TRUE",
+        "Check that unit 'name 4' exists");
+        this.checkUnit("name 4", "default", "FALSE");
+        this.checkUnit("name 4", "label", "label 4");
+        this.checkUnit("name 4", "description", "description4 with negative multiplier and negative offset");
+        this.checkUnit("name 4", "multiplier", "-1.0");
+        this.checkUnit("name 4", "offset", "-50.0");
+        this.checkUnit("name 4", "property", "");
+        Assert.assertEquals(this.mql("print dimension " + Dimension.DIMENSION_NAME
+                                            + " select 'unit[name 4].systemunit[]' dump @"),
+                            "",
+                            "Check that no system infos are defined for unit 4");
     }
 
     /**

@@ -100,6 +100,44 @@ public class DimensionParserTest
                         + "  offset 20.0\n"
                         + "  system \"Duration Units\" to unit \"name2\"\n"
                         + "}"
+                },
+                new Object[]{
+                        "dimension with unit with negative offset",
+                        "",
+                        "description \"ein test\"\n"
+                        + "hidden \"false\"\n"
+                        + "unit \"name1\" {\n"
+                        + "  default true\n"
+                        + "  description \"description1\"\n"
+                        + "  label \"label1\"\n"
+                        + "  multiplier 1.0\n"
+                        + "  offset 0.0\n"
+                        + "}\n"
+                        + "unit \"name2\" {\n"
+                        + "  description \"description 2\"\n"
+                        + "  label \"label2\"\n"
+                        + "  multiplier 10.0\n"
+                        + "  offset -20.0\n"
+                        + "}"
+                },
+                new Object[]{
+                        "dimension with unit with negative multiplier",
+                        "",
+                        "description \"ein test\"\n"
+                        + "hidden \"false\"\n"
+                        + "unit \"name1\" {\n"
+                        + "  default true\n"
+                        + "  description \"description1\"\n"
+                        + "  label \"label1\"\n"
+                        + "  multiplier 1.0\n"
+                        + "  offset 0.0\n"
+                        + "}\n"
+                        + "unit \"name2\" {\n"
+                        + "  description \"description 2\"\n"
+                        + "  label \"label2\"\n"
+                        + "  multiplier -10.0\n"
+                        + "  offset 20.0\n"
+                        + "}"
                 }
         };
     }

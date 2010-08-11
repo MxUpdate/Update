@@ -64,7 +64,7 @@ TOKEN : /** first level */
 /*************************************************** Boolean for Hidden Value */
 <HIDDEN_EXCPECTED> SKIP :
 {
-  " " | "\t" | "\n" | "\r" 
+  " " | "\t" | "\n" | "\r"
 }
 
 <HIDDEN_EXCPECTED> TOKEN :
@@ -78,7 +78,7 @@ TOKEN : /** first level */
 /***************************************************** String for Description */
 <DESCRIPTION_EXPECTED> SKIP :
 {
-  " " | "\t" | "\n" | "\r" 
+  " " | "\t" | "\n" | "\r"
 }
 
 <DESCRIPTION_EXPECTED> TOKEN :
@@ -92,7 +92,7 @@ TOKEN : /** first level */
 /******************************************************* String for Unit Name */
 <UNITNAME_EXPECTED> SKIP :
 {
-  " " | "\t" | "\n" | "\r" 
+  " " | "\t" | "\n" | "\r"
 }
 
 <UNITNAME_EXPECTED> TOKEN :
@@ -106,7 +106,7 @@ TOKEN : /** first level */
 /********************************************************** Unit Value String */
 <UNITDEF_EXPECTED> SKIP :
 {
-  " " | "\t" | "\n" | "\r" 
+  " " | "\t" | "\n" | "\r"
 }
 
 <UNITDEF_EXPECTED> TOKEN :
@@ -128,7 +128,7 @@ TOKEN : /** first level */
 /************************************************* Boolean for Unit Defnition */
 <UNITDEF_BOOLEAN_EXPECTED> SKIP :
 {
-  " " | "\t" | "\n" | "\r" 
+  " " | "\t" | "\n" | "\r"
 }
 
 <UNITDEF_BOOLEAN_EXPECTED> TOKEN :
@@ -142,7 +142,7 @@ TOKEN : /** first level */
 /************************************************* String for Unit Definition */
 <UNITDEF_STRING_EXPECTED> SKIP :
 {
-  " " | "\t" | "\n" | "\r" 
+  " " | "\t" | "\n" | "\r"
 }
 
 <UNITDEF_STRING_EXPECTED> TOKEN :
@@ -156,7 +156,7 @@ TOKEN : /** first level */
 /******************************************** Two Strings for Unit Definition */
 <UNITDEF_STRINGSTRING_EXPECTED> SKIP :
 {
-  " " | "\t" | "\n" | "\r" 
+  " " | "\t" | "\n" | "\r"
 }
 
 <UNITDEF_STRINGSTRING_EXPECTED> TOKEN :
@@ -170,18 +170,18 @@ TOKEN : /** first level */
 /************************************************* Double for Unit Definition */
 <UNITDEF_DOUBLE_EXPECTED> SKIP :
 {
-  " " | "\t" | "\n" | "\r" 
+  " " | "\t" | "\n" | "\r"
 }
 
 <UNITDEF_DOUBLE_EXPECTED> TOKEN :
 {
-      <UNITDEF_DOUBLE_DOUBLE : ((["0"-"9"])* "." (["0"-"9"])*)> : UNITDEF_EXPECTED
+      <UNITDEF_DOUBLE_DOUBLE : (("-")? (["0"-"9"])* "." (["0"-"9"])*)> : UNITDEF_EXPECTED
 }
 
 /******************************************** System Name for Unit Definition */
 <UNITDEF_SYSTEMNAME_EXPECTED> SKIP :
 {
-  " " | "\t" | "\n" | "\r" 
+  " " | "\t" | "\n" | "\r"
 }
 
 <UNITDEF_SYSTEMNAME_EXPECTED> TOKEN :
@@ -195,7 +195,7 @@ TOKEN : /** first level */
 /*************************************** System Defintion for Unit Definition */
 <UNITDEF_SYSTEMDEF_EXPECTED> SKIP :
 {
-  " " | "\t" | "\n" | "\r" 
+  " " | "\t" | "\n" | "\r"
 }
 
 <UNITDEF_SYSTEMDEF_EXPECTED> TOKEN :
@@ -207,7 +207,7 @@ TOKEN : /** first level */
 /******************************************** System Unit for Unit Definition */
 <UNITDEF_SYSTEMUNIT_EXPECTED> SKIP :
 {
-  " " | "\t" | "\n" | "\r" 
+  " " | "\t" | "\n" | "\r"
 }
 
 <UNITDEF_SYSTEMUNIT_EXPECTED> TOKEN :
@@ -228,7 +228,7 @@ TOKEN : /** first level */
  */
 Dimension_mxJPO dimension(final ParameterCache_mxJPO _paramCache,
                           final TypeDef_mxJPO _typeDef,
-                          final String _mxName) 
+                          final String _mxName)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
 : {
     final Dimension_mxJPO dimension = (Dimension_mxJPO) _typeDef.newTypeInstance(_mxName);
@@ -256,7 +256,7 @@ void unit(final Dimension_mxJPO _dimension) : {
     Token tmpToken;
     String tmpStr;
 }  {
-    <UNIT> 
+    <UNIT>
     (
         (tmpToken = <UNITNAME_STRING>)   {this.setValue(unit, "name", this.getString(tmpToken.image));}
         |
@@ -290,13 +290,13 @@ void unitSetting(final Unit _unit) : {
     Token tmp;
     final String key, value;
 }  {
-    <UNITDEF_SETTING>      
+    <UNITDEF_SETTING>
     (
         (tmp = <UNITDEF_STRINGSTRING_STRING>) {key = this.getString(tmp.image);}
         |
         (tmp = <UNITDEF_STRINGSTRING_SINGLE>) {key = this.getSingle(tmp.image);}
     )
-    (value = uvString()) 
+    (value = uvString())
     {
         final AdminProperty_mxJPO prop = new AdminProperty_mxJPO();
         this.setValue(prop, "name", "%" + key);
@@ -320,14 +320,14 @@ void unitProperty(final Unit _unit) : {
     <UNITDEF_PROPERTY> name = uvString()
     (
           ( <UNITDEF_PROPERTYVAL> value = uvString() )
-        | ( <UNITDEF_PROPERTYTO> 
+        | ( <UNITDEF_PROPERTYTO>
                 (
                     (tmp = <UNITDEF_STRINGSTRING_STRING>) {toType = this.getString(tmp.image);}
                     |
                     (tmp = <UNITDEF_STRINGSTRING_SINGLE>) {toType = this.getSingle(tmp.image);}
                 )
                 toName = uvString() )
-    )* 
+    )*
     {
         final AdminProperty_mxJPO prop = new AdminProperty_mxJPO();
         this.setValue(prop, "name", name);
