@@ -48,6 +48,27 @@ public class PersonAdmin_mxJPO
     extends AbstractUser_mxJPO
 {
     /**
+     * Called TCL procedure within the TCL update to assign current person to
+     * required products. Already assigned products are removed.
+     *
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private static final String TCL_SET_PRODUCTS
+            = "proc setProducts {args}  {\n"
+                + "global NAME;\n"
+                + "set llsCurrent [split [mql list product * select name person\\[${NAME}\\] dump '\\001'] '\\n']\n"
+                + "foreach lsOneProduct ${llsCurrent}  {\n"
+                    + "set lsOneProduct [split ${lsOneProduct} '\\001']\n"
+                    + "if {[lindex ${lsOneProduct} 1] == \"TRUE\"}  {\n"
+                        + "mql mod product [lindex ${lsOneProduct} 0] remove person \"${NAME}\""
+                    + "}\n"
+                + "}\n"
+                + "foreach sOneProduct ${args}  {\n"
+                    + "mql mod product \"${sOneProduct}\" add person \"${NAME}\"\n"
+                + "}\n"
+            + "}";
+
+    /**
      * Set of all ignored URLs from the XML definition for persons.
      *
      * @see #parse(String, String)
@@ -63,6 +84,7 @@ public class PersonAdmin_mxJPO
         PersonAdmin_mxJPO.IGNORED_URLS.add("/password");
         PersonAdmin_mxJPO.IGNORED_URLS.add("/passwordModification");
         PersonAdmin_mxJPO.IGNORED_URLS.add("/passwordModification/datetime");
+        PersonAdmin_mxJPO.IGNORED_URLS.add("/productList");
     }
 
     /**
@@ -265,6 +287,14 @@ public class PersonAdmin_mxJPO
     private boolean passwordNeverExpires = false;
 
     /**
+     * All assigned products of the person.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
+     */
+    private final Set<String> products = new TreeSet<String>();
+
+    /**
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  person type definition
@@ -336,6 +366,7 @@ public class PersonAdmin_mxJPO
      * <li>{@link #vault default vault}</li>
      * <li>{@link #phone phone number}</li>
      * <li>{@link #passwordNeverExpires password never expires flag}</li>
+     * <li>{@link #products assigned products}</li>
      * </ul></p>
      * <p>If an <code>_url</code> is included in {@link #IGNORED_URLS}, this
      * URL is ignored.</p>
@@ -396,6 +427,9 @@ public class PersonAdmin_mxJPO
 
             } else if ("/passwordNeverExpires".equals(_url))  {
                 this.passwordNeverExpires = true;
+
+            } else if ("/productList/productRef".equals(_url))  {
+                this.products.add(_content);
 
             } else  {
                 super.parse(_url, _content);
@@ -496,8 +530,19 @@ public class PersonAdmin_mxJPO
 
     /**
      * Appends at the end of the TCL update file the change of the person
-     * &quot;type&quot;. The person &quot;type&quot; defines, if the person is
-     * e.g. active, or trusted etc..
+     * &quot;type&quot; and others which could not be executed within same
+     * statement of the person properties.
+     * <ul>
+     * <li>type flag if person is {@link #isApplicationUser application user}</li>
+     * <li>type flag if person is {@link #isFullUser full user}</li>
+     * <li>type flag if person is
+     *     {@link #isBusinessAdministrator business administration}</li>
+     * <li>type flag if person is {@link #isInactive inactive}</li>
+     * <li>type flag if person is {@link #isTrusted trusted}</li>
+     * <li>type flag if person is
+     *     {@link #isSystemAdministrator system administrator}</li>
+     * <li>assigned {@link #products}</li>
+     * </ul>
      *
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
@@ -534,6 +579,11 @@ public class PersonAdmin_mxJPO
             _out.append("not");
         }
         _out.append("system");
+
+        // define products
+        _out.append("\nsetProducts")
+            .append((this.products.isEmpty() ? "" : " "))
+            .append(StringUtil_mxJPO.joinTcl(' ', true, this.products, ""));
     }
 
     /**
@@ -551,6 +601,7 @@ public class PersonAdmin_mxJPO
      *     parameter {@link #PARAM_IGNORE_WANTS_EMAIL}</li>
      * <li>enables that the person wants icon mail; depends on
      *     parameter {@link #PARAM_IGNORE_WANTS_ICON_MAIL}</li>
+     * <li>remove all current assigned {@link #products}</li>
      * </ul>
      * The original method of the super class if called surrounded with a
      * history off, because if the update itself is done the modified basic
@@ -586,6 +637,13 @@ public class PersonAdmin_mxJPO
                           final File _sourceFile)
         throws Exception
     {
+        // append TCL procedures
+        final StringBuilder preTCLCode = new StringBuilder()
+                .append(_preTCLCode)
+                .append('\n')
+                .append(PersonAdmin_mxJPO.TCL_SET_PRODUCTS)
+                .append('\n');
+
         // append other pre MQL code
         final StringBuilder preMQLCode = new StringBuilder()
                 .append(_preMQLCode)
@@ -619,7 +677,13 @@ public class PersonAdmin_mxJPO
         }
         preMQLCode.append(";\n");
 
-        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+        // reset products
+        for (final String product : this.products)  {
+            preMQLCode.append("\nescape mod product \"").append(StringUtil_mxJPO.convertMql(product))
+                      .append("\" remove person \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\";");
+        }
+
+        super.update(_paramCache, preMQLCode, _postMQLCode, preTCLCode, _tclVariables, _sourceFile);
     }
 
     /**

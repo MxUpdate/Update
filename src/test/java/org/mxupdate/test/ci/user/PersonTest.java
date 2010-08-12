@@ -32,7 +32,6 @@ import org.mxupdate.test.data.user.GroupData;
 import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.data.user.RoleData;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -170,8 +169,16 @@ public class PersonTest
                 new Object[]{
                         "person with wants icon mail flag to false",
                          new PersonAdminData(this, "hello \" test")
-                                .setWantsIconMail(false)}
+                                .setWantsIconMail(false)},
 
+                new Object[]{
+                        "person with one product",
+                        new PersonAdminData(this, "hello \" test")
+                                .addProduct("CPF")},
+                new Object[]{
+                        "person with two products",
+                        new PersonAdminData(this, "hello \" test")
+                                .addProduct("CPF", "DC2")}
         );
     }
 
@@ -199,7 +206,7 @@ public class PersonTest
      * @throws MatrixException if cleanup failed
      */
     @BeforeMethod()
-    @AfterClass()
+//    @AfterClass()
     public void cleanup()
         throws MatrixException
     {
@@ -386,5 +393,21 @@ public class PersonTest
         final Set<String> disabled = new HashSet<String>(exportParser.getLines("/mql/disable/@value"));
         Assert.assertFalse(enabled.contains("iconmail"), "check icon mail not enabled");
         Assert.assertFalse(disabled.contains("iconmail"), "check icon mail not disabled");
+    }
+
+    /**
+     * Checks that products which are assigned in TCL update file are correct
+     * removed from the 'setProducts' method.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "checks that products which are assigned in TCL update file are correct removed from the 'setProducts' method")
+    public void checkUpdateProduct()
+        throws Exception
+    {
+        final PersonAdminData person = new PersonAdminData(this, "test");
+        person.create();
+        person.updateWithCode("mql mod product CPF add person " + person.getName() + "\nsetProducts");
+        person.checkExport();
     }
 }

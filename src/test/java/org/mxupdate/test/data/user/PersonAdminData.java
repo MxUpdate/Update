@@ -23,6 +23,7 @@ package org.mxupdate.test.data.user;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -100,6 +101,16 @@ public class PersonAdminData
      * @see #checkExport(ExportParser)
      */
     private final Set<GroupData> groups = new HashSet<GroupData>();
+
+    /**
+     * Assigned products for this person.
+     *
+     * @see #addProduct(String...)
+     * @see #ciFile()
+     * @see #create()
+     * @see #checkExport(ExportParser)
+     */
+    private final Set<String> products = new TreeSet<String>();
 
     /**
      * Flag to indicate that the password never expires. If <code>null</code>
@@ -212,6 +223,19 @@ public class PersonAdminData
     }
 
     /**
+     * Assigns given <code>_group</code> to this person.
+     *
+     * @param _product      products to assign
+     * @return this person instance
+     * @see #products
+     */
+    public PersonAdminData addProduct(final String... _product)
+    {
+        this.products.addAll(Arrays.asList(_product));
+        return this;
+    }
+
+    /**
      * Defines if for this administration person the password never expires.
      *
      * @param _passwordNeverExpires     <i>true</i> to define that the password
@@ -251,6 +275,17 @@ public class PersonAdminData
         this.wantsIconMail = _wantsIconMail;
         return this;
     }
+
+    @Override()
+    public String ciFile()
+    {
+        return new StringBuilder()
+                .append(super.ciFile())
+                .append("\nsetProducts ")
+                        .append(StringUtil_mxJPO.joinTcl(' ', true, this.products, ""))
+                .toString();
+    }
+
 
     /**
      * Appends the person specific values to the TCL update code
@@ -316,7 +351,7 @@ public class PersonAdminData
      * @see #groups
      * @see #roles
      */
-    @Override
+    @Override()
     public PersonAdminData createDependings()
         throws MatrixException
     {
@@ -332,6 +367,28 @@ public class PersonAdminData
             group.create();
         }
 
+        return this;
+    }
+
+
+    /**
+     * Appends the {@link #products} to this person instance.
+     *
+     * @return this collection user data instance
+     * @throws MatrixException if create failed
+     * @see #products
+     */
+    @Override()
+    public PersonAdminData create()
+        throws MatrixException
+    {
+        if (!this.isCreated())  {
+            super.create();
+            for (final String product : this.products)  {
+                this.getTest().mql("escape mod product \"" + AbstractTest.convertMql(product)
+                                    + "\" add person \"" + AbstractTest.convertMql(this.getName()) + "\"");
+            }
+        }
         return this;
     }
 
@@ -353,10 +410,12 @@ public class PersonAdminData
      * @throws MatrixException if used object could not be created
      * @see #values
      */
-    @Override
+    @Override()
     protected void append4Create(final StringBuilder _cmd)
         throws MatrixException
     {
+        this.setCreated(true);
+
         super.append4Create(_cmd);
 
         // assign access
@@ -414,6 +473,7 @@ public class PersonAdminData
      *     if set to true</li>
      * <li>{@link #wantsEmail wants email flag} is correct defined</li>
      * <li>{@link #wantsIconMail wants icon mail flag} is correct defined</li>
+     * <li>all {@link #products} are correct defined</li>
      * </ul>
      *
      * @param _exportParser     parsed export
@@ -477,5 +537,17 @@ public class PersonAdminData
             Assert.assertFalse(enabled.contains("iconmail"), "check icon mail not enabled");
             Assert.assertTrue(disabled.contains("iconmail"), "check icon mail disabled");
         }
+
+        // check products
+        final List<String> tclProducts = _exportParser.getLines("/setProducts/@value");
+        Assert.assertEquals(
+                tclProducts.size(),
+                1,
+                "check that exact one line with definition for products exists");
+        final String tclProduct = tclProducts.get(0);
+        Assert.assertEquals(
+                tclProduct,
+                StringUtil_mxJPO.joinTcl(' ', true, this.products, ""),
+                "check that all products are correct defined");
     }
 }
