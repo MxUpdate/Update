@@ -401,13 +401,29 @@ public class PersonTest
      *
      * @throws Exception if test failed
      */
-    @Test(description = "checks that products which are assigned in TCL update file are correct removed from the 'setProducts' method")
+    @Test(description = "checks that products which are assigned in TCL update file are correct removed from the 'setProducts' procedure")
     public void checkUpdateProduct()
         throws Exception
     {
         final PersonAdminData person = new PersonAdminData(this, "test");
         person.create();
         person.updateWithCode("mql mod product CPF add person " + person.getName() + "\nsetProducts");
+        person.checkExport();
+    }
+
+    /**
+     * Checks that products which are remove in TCL update file are correct
+     * set from the 'setProducts' method.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "checks that products which are remove in TCL update file are correct set from 'setProducts' procedure")
+    public void checkUpdateProductOnEmptyAssigned()
+        throws Exception
+    {
+        final PersonAdminData person = new PersonAdminData(this, "test").addProduct("CPF");
+        person.create();
+        person.updateWithCode("mql mod product CPF remove person " + person.getName() + "\nsetProducts \"CPF\"");
         person.checkExport();
     }
 }
