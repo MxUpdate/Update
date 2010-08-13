@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,15 +56,18 @@ public class PersonAdmin_mxJPO
     private static final String TCL_SET_PRODUCTS
             = "proc setProducts {args}  {\n"
                 + "global NAME;\n"
-                + "set llsCurrent [split [mql list product * select name person\\[${NAME}\\] dump '\\001'] '\\n']\n"
-                + "foreach lsOneProduct ${llsCurrent}  {\n"
-                    + "set lsOneProduct [split ${lsOneProduct} '\\001']\n"
-                    + "if {[lindex ${lsOneProduct} 1] == \"TRUE\"}  {\n"
-                        + "mql mod product [lindex ${lsOneProduct} 0] remove person \"${NAME}\""
+                + "set lsCurrent [split [mql print person \"${NAME}\" select product dump '\\n'] '\\n']\n"
+                + "foreach sOneProduct ${lsCurrent}  {\n"
+                    + "if {[lsearch ${args} \"${sOneProduct}\"] < 0}  {\n"
+                        + "mql mod product \"${sOneProduct}\" remove person \"${NAME}\"\n"
+                        + "logDebug \"    - remove product '${sOneProduct}'\"\n"
                     + "}\n"
                 + "}\n"
                 + "foreach sOneProduct ${args}  {\n"
-                    + "mql mod product \"${sOneProduct}\" add person \"${NAME}\"\n"
+                    + "if {[lsearch ${lsCurrent} \"${sOneProduct}\"] < 0}  {\n"
+                      + "mql mod product \"${sOneProduct}\" add person \"${NAME}\"\n"
+                      + "logDebug \"    - assign product '${sOneProduct}'\"\n"
+                    + "}\n"
                 + "}\n"
             + "}";
 
@@ -601,7 +604,6 @@ public class PersonAdmin_mxJPO
      *     parameter {@link #PARAM_IGNORE_WANTS_EMAIL}</li>
      * <li>enables that the person wants icon mail; depends on
      *     parameter {@link #PARAM_IGNORE_WANTS_ICON_MAIL}</li>
-     * <li>remove all current assigned {@link #products}</li>
      * </ul>
      * The original method of the super class if called surrounded with a
      * history off, because if the update itself is done the modified basic
@@ -676,12 +678,6 @@ public class PersonAdmin_mxJPO
             preMQLCode.append(" application \"\"");
         }
         preMQLCode.append(";\n");
-
-        // reset products
-        for (final String product : this.products)  {
-            preMQLCode.append("\nescape mod product \"").append(StringUtil_mxJPO.convertMql(product))
-                      .append("\" remove person \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\";");
-        }
 
         super.update(_paramCache, preMQLCode, _postMQLCode, preTCLCode, _tclVariables, _sourceFile);
     }
