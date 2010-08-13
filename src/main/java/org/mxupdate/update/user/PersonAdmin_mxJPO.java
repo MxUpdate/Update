@@ -72,6 +72,17 @@ public class PersonAdmin_mxJPO
             + "}";
 
     /**
+     * Dummy procedure with logging information that the definition of products
+     * is ignored.
+     *
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private static final String TCL_SET_PRODUCTS_DUMMY
+            = "proc setProducts {args}  {\n"
+                + "logDebug \"    - ignoring definition of products ${args}\""
+            + "}";
+
+    /**
      * Set of all ignored URLs from the XML definition for persons.
      *
      * @see #parse(String, String)
@@ -119,14 +130,23 @@ public class PersonAdmin_mxJPO
     private static final String PARAM_IGNORE_WANTS_EMAIL = "UserPersonIgnoreWantsEmail";
 
     /**
-     * If the parameter is set the 'wants icon mail' - flag for persons is
-     * ignored. This means that the flag is not managed anymore from the
-     * MxUpdate Update tool.
+     * If the parameter is set the 'wants icon mail' - flag for persons
+     * matching given string is ignored. This means that the flag is not
+     * managed anymore from the MxUpdate Update tool.
      *
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private static final String PARAM_IGNORE_WANTS_ICON_MAIL = "UserPersonIgnoreWantsIconMail";
+
+    /**
+     * If the parameter is set, products for persons matching given string are
+     * not updated.
+     *
+     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private static final String PARAM_IGNORE_PRODUCTS = "UserPersonIgnoreProducts";
 
     /**
      * Holds all group assignments of this person.
@@ -584,9 +604,12 @@ public class PersonAdmin_mxJPO
         _out.append("system");
 
         // define products
-        _out.append("\nsetProducts")
-            .append((this.products.isEmpty() ? "" : " "))
-            .append(StringUtil_mxJPO.joinTcl(' ', true, this.products, ""));
+        final Collection<String> matchIgnoreProducts = _paramCache.getValueList(PersonAdmin_mxJPO.PARAM_IGNORE_PRODUCTS);
+        if ((matchIgnoreProducts == null) || !StringUtil_mxJPO.match(this.getName(), matchIgnoreProducts))  {
+            _out.append("\nsetProducts")
+                .append((this.products.isEmpty() ? "" : " "))
+                .append(StringUtil_mxJPO.joinTcl(' ', true, this.products, ""));
+        }
     }
 
     /**
@@ -642,9 +665,15 @@ public class PersonAdmin_mxJPO
         // append TCL procedures
         final StringBuilder preTCLCode = new StringBuilder()
                 .append(_preTCLCode)
-                .append('\n')
-                .append(PersonAdmin_mxJPO.TCL_SET_PRODUCTS)
                 .append('\n');
+
+        // append TCL set products if not ignored
+        final Collection<String> matchIgnoreProducts = _paramCache.getValueList(PersonAdmin_mxJPO.PARAM_IGNORE_PRODUCTS);
+        if ((matchIgnoreProducts == null) || !StringUtil_mxJPO.match(this.getName(), matchIgnoreProducts))  {
+            preTCLCode.append(PersonAdmin_mxJPO.TCL_SET_PRODUCTS).append('\n');
+        } else  {
+            preTCLCode.append(PersonAdmin_mxJPO.TCL_SET_PRODUCTS_DUMMY).append('\n');
+        }
 
         // append other pre MQL code
         final StringBuilder preMQLCode = new StringBuilder()

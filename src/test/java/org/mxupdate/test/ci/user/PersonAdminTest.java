@@ -44,7 +44,7 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 @Test()
-public class PersonTest
+public class PersonAdminTest
     extends AbstractUserTest<PersonAdminData>
 {
     /**
@@ -425,5 +425,26 @@ public class PersonTest
         person.create();
         person.updateWithCode("mql mod product CPF remove person " + person.getName() + "\nsetProducts \"CPF\"");
         person.checkExport();
+    }
+
+    @Test()
+    public void checkWithIgnoreProductsParameter()
+        throws Exception
+    {
+        final PersonAdminData person = new PersonAdminData(this, "test").addProduct("CPF");
+        person.create();
+        person.setWantsIconMail(null);
+        this.mql("escape mod product CPF remove person \"" + AbstractTest.convertMql(person.getName()) + "\"");
+        person.update("UserPersonIgnoreProducts", "*");
+
+        // check not updated
+        Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select product dump"),
+                            "",
+                            "check that no product is assigned");
+        // check not defined within update file
+        final ExportParser exportParser = person.export("UserPersonIgnoreProducts", "*");
+        Assert.assertTrue(
+                exportParser.getLines("/setProducts/@value").isEmpty(),
+                "check that no product definition is in the export file");
     }
 }
