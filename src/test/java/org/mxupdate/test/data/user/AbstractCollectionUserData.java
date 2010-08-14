@@ -67,8 +67,8 @@ public class AbstractCollectionUserData<DATA extends AbstractCollectionUserData<
      * @param _name         name of the collection user
      */
     public AbstractCollectionUserData(final AbstractTest _test,
-                                  final AbstractTest.CI _ci,
-                                  final String _name)
+                                      final AbstractTest.CI _ci,
+                                      final String _name)
     {
         super(_test, _ci, _name, AbstractCollectionUserData.REQUIRED_EXPORT_VALUES);
     }

@@ -55,7 +55,7 @@ public class PersonAdmin_mxJPO
      */
     private static final String TCL_SET_PRODUCTS
             = "proc setProducts {args}  {\n"
-                + "global NAME;\n"
+                + "global NAME\n"
                 + "set lsCurrent [split [mql print person \"${NAME}\" select product dump '\\n'] '\\n']\n"
                 + "foreach sOneProduct ${lsCurrent}  {\n"
                     + "if {([string length \"${sOneProduct}\"] > 0) && ([lsearch ${args} \"${sOneProduct}\"] < 0)}  {\n"
@@ -69,7 +69,7 @@ public class PersonAdmin_mxJPO
                       + "mql mod product \"${sOneProduct}\" add person \"${NAME}\"\n"
                     + "}\n"
                 + "}\n"
-            + "}";
+            + "}\n";
 
     /**
      * Dummy procedure with logging information that the definition of products
@@ -80,7 +80,7 @@ public class PersonAdmin_mxJPO
     private static final String TCL_SET_PRODUCTS_DUMMY
             = "proc setProducts {args}  {\n"
                 + "logDebug \"    - ignoring definition of products ${args}\""
-            + "}";
+            + "}\n";
 
     /**
      * Set of all ignored URLs from the XML definition for persons.
@@ -667,12 +667,12 @@ public class PersonAdmin_mxJPO
                 .append(_preTCLCode)
                 .append('\n');
 
-        // append TCL set products if not ignored
+        // append TCL set products if not ignored (otherwise dummy TCL proc)
         final Collection<String> matchIgnoreProducts = _paramCache.getValueList(PersonAdmin_mxJPO.PARAM_IGNORE_PRODUCTS);
         if ((matchIgnoreProducts == null) || !StringUtil_mxJPO.match(this.getName(), matchIgnoreProducts))  {
-            preTCLCode.append(PersonAdmin_mxJPO.TCL_SET_PRODUCTS).append('\n');
+            preTCLCode.append(PersonAdmin_mxJPO.TCL_SET_PRODUCTS);
         } else  {
-            preTCLCode.append(PersonAdmin_mxJPO.TCL_SET_PRODUCTS_DUMMY).append('\n');
+            preTCLCode.append(PersonAdmin_mxJPO.TCL_SET_PRODUCTS_DUMMY);
         }
 
         // append other pre MQL code

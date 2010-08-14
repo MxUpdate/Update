@@ -87,7 +87,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     {
         this.test = _test;
         this.ci = _ci;
-        if ((_ci != null) && (_ci.getBusType() != null))  {
+        if ((_ci != null) && (_ci.getBusType() != null) && (_ci.getMxType() == null))  {
             this.name = _name;
         } else  {
             this.name = (_name != null) ? AbstractTest.PREFIX + _name : null;

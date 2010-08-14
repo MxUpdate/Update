@@ -54,6 +54,48 @@ public class Person_mxJPO
     extends AbstractObject_mxJPO
 {
     /**
+     * TCL procedure to update the state of a person business object.
+     *
+     * @see PersonAdmin#update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     * @see PersonBus#write(ParameterCache_mxJPO, Appendable)
+     */
+    private static final String TCL_SET_STATE
+            = "proc setState {_newState}  {\n"
+                + "global OBJECTID\n"
+                + "set sCurrent [mql print bus ${OBJECTID} select current dump]\n"
+                + "if {\"${_newState}\" != \"${sCurrent}\"}  {\n"
+                    + "set lsStates [split [mql print bus ${OBJECTID} select policy.state dump '\\n'] '\\n']\n"
+                    + "if {[lsearch ${lsStates} \"${sCurrent}\"] < [lsearch ${lsStates} \"${_newState}\"]}  {\n"
+                        + "mql promote bus ${OBJECTID}\n"
+                        + "logDebug \"    - activate business object\"\n"
+                    + "} else  {\n"
+                        + "mql demote bus ${OBJECTID}\n"
+                        + "logDebug \"    - deactivate business object\"\n"
+                    + "}\n"
+                + "}\n"
+            + "}\n";
+
+    /**
+     * Dummy procedure with logging information that the state update is
+     * ignored.
+     *
+     * @see PersonAdmin#update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private static final String TCL_SET_STATE_DUMMY
+            = "proc setState {_newState}  {\n"
+                + "logDebug \"    - ignoring update of state '${_newState}'\""
+            + "}\n";
+
+    /**
+     * Defines the parameter for the match of persons for which states are not
+     * handled (neither exported nor updated).
+     *
+     * @see PersonAdmin#update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     * @see PersonBus#write(ParameterCache_mxJPO, Appendable)
+     */
+    private static final String PARAM_IGNORE_STATE = "UserPersonIgnoreState";
+
+    /**
      * Administration person instance (used to parse the admin part of a
      * person).
      */
@@ -310,6 +352,18 @@ public class Person_mxJPO
                               final File _sourceFile)
             throws Exception
         {
+            final StringBuilder preTCLCode = new StringBuilder()
+                    .append(_preTCLCode)
+                    .append('\n');
+
+            // append TCL set state if not ignored (otherwise dummy TCL proc)
+            final Collection<String> matchStates = _paramCache.getValueList(Person_mxJPO.PARAM_IGNORE_STATE);
+            if ((matchStates == null) || !StringUtil_mxJPO.match(this.getName(), matchStates))  {
+                preTCLCode.append(Person_mxJPO.TCL_SET_STATE);
+            } else  {
+                preTCLCode.append(Person_mxJPO.TCL_SET_STATE_DUMMY);
+            }
+
             final StringBuilder preMQLCode = new StringBuilder();
 
             // post update MQL statements
@@ -323,7 +377,7 @@ public class Person_mxJPO
             // update must be done with history off (because not required...)
             try  {
                 MqlUtil_mxJPO.setHistoryOff(_paramCache);
-                super.update(_paramCache, preMQLCode, postMQLCode, _preTCLCode, tclVariables, _sourceFile);
+                super.update(_paramCache, preMQLCode, postMQLCode, preTCLCode, tclVariables, _sourceFile);
             } finally  {
                 MqlUtil_mxJPO.setHistoryOn(_paramCache);
             }
@@ -466,7 +520,7 @@ public class Person_mxJPO
                 .append("\n      relationship \"Member\" \\")
                 .append("\n      from Company \"${sCur}\" -")
                 .append("\n}");
-            if (this.memberOf != null)  {
+            if ((this.memberOf != null) && !this.memberOf.isEmpty())  {
                 _out.append("\nputs \"    - assign as member from '").append(StringUtil_mxJPO.convertTcl(this.memberOf)).append("'\"")
                     .append("\nmql connect bus \"${OBJECTID}\" \\")
                     .append("\n    relationship \"Member\" \\")
@@ -487,11 +541,10 @@ public class Person_mxJPO
                 .append(this.writeCons("organization representative",
                                        this.representativeOf,
                                        "Organization Representative"));
-            // state
-            if ("Active".equals(this.status))  {
-                _out.append("\nmql promote bus \"${OBJECTID}\"");
-            } else if ("Create".equals(this.status))  {
-                _out.append("\nmql demote bus \"${OBJECTID}\"");
+            // state (if not ignored)
+            final Collection<String> matchStates = _paramCache.getValueList(Person_mxJPO.PARAM_IGNORE_STATE);
+            if ((matchStates == null) || !StringUtil_mxJPO.match(this.getName(), matchStates))  {
+                _out.append("\nsetState \"").append(this.status).append('\"');
             }
         }
 
@@ -505,7 +558,9 @@ public class Person_mxJPO
                                                 .append(_relationship).append("\\].from.name\" dump \"\\n\"] \"\\n\"]")
                     .append("\nset lsNew [list");
             for (final String repr : _values)  {
+if (!repr.isEmpty())  {
                 ret.append(" \"").append(StringUtil_mxJPO.convertTcl(repr)).append('\"');
+}
             }
             ret.append("]")
                .append("\nforeach sCur ${lsCur}  {")
@@ -528,6 +583,16 @@ public class Person_mxJPO
             return ret;
         }
 
+        /**
+         * Sets the TCL variable <code>OBJECTID</code> to current business
+         * object.
+         *
+         * @param _context          context for this request
+         * @param _preMQLCode       pre MQL code
+         * @param _postMQLCode      post MQL code
+         * @param _tclVariables     map with all TCL variables
+         * @throws MatrixException if update failed
+         */
         protected void prepareUpdate(final Context _context,
                                      final StringBuilder _preMQLCode,
                                      final StringBuilder _postMQLCode,
@@ -540,13 +605,6 @@ public class Person_mxJPO
                                                           this.getBusRevision(),
                                                           this.getBusVault());
             final String objectId = bus.getObjectId(_context);
-
-            // state
-            if ("Active".equals(this.status))  {
-                _preMQLCode.append("demote bus ").append(objectId).append(";\n");
-            } else if ("Create".equals(this.status))  {
-                _preMQLCode.append("promote bus ").append(objectId).append(";\n");
-            }
 
             // prepare map of all TCL variables incl. id of business object
             _tclVariables.put("OBJECTID", objectId);

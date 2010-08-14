@@ -189,6 +189,11 @@ public abstract class AbstractTest
         USR_GROUP("group", null, false, null, null, "Group", "GROUP", "GROUP_", "user/group", true),
 
         /**
+         * Configuration item person.
+         */
+        USR_PERSON("person", "Person", false, "Person", "eService Production", "Person", "PERSON", "PERSON_", "user/person", true),
+
+        /**
          * Configuration item administration person.
          */
         USR_PERSONADMIN("person", null, false, null, null, "PersonAdmin", "PERSONADMIN", "PERSONADMIN_", "user/personadmin", true),
