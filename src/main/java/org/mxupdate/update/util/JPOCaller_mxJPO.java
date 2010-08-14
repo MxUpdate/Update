@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import org.mxupdate.update.AbstractPropertyObject_mxJPO;
  * @author Tim Moxter
  * @version $Id$
  */
-public class JPOCaller_mxJPO
+public final class JPOCaller_mxJPO
 {
     /**
      * Stores the current caller instance depending on the MX session context

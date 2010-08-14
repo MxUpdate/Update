@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009 The MxUpdate Team
+ * Copyright 2008-2010 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,14 @@ class Setting_mxJPO
      */
     String value = null;
 
-    @Override
+    /**
+     * {@inheritDoc}
+     * The string representation includes the {@link #name} and the
+     * {@link #value}.
+     */
+    @Override()
     public String toString()
     {
-        return "[name=" + name + ", value=" + value + "]";
+        return "[name=" + this.name + ", value=" + this.value + "]";
     }
 }
