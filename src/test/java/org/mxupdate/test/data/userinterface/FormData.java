@@ -233,7 +233,7 @@ public class FormData
         while (columnLinesIter.hasNext() && fieldsIter.hasNext())  {
             final FieldData<FormData> field = fieldsIter.next();
             final ExportParser.Line line = columnLinesIter.next();
-            field.checkExport(new ExportParser(field.getName(), "mql", line.getValue(), line.getChildren()));
+            field.checkExport(new ExportParser(field.getName(), _exportParser.getLog(), "mql", line.getValue(), line.getChildren()));
         }
     }
 }

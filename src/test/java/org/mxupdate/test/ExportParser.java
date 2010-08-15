@@ -80,6 +80,13 @@ public class ExportParser
     private final String code;
 
     /**
+     * Logging information.
+     *
+     * @see #getLog();
+     */
+    private final String log;
+
+    /**
      * List of all root lines.
      */
     private final List<Line> rootLines = new ArrayList<Line>();
@@ -88,11 +95,14 @@ public class ExportParser
      *
      * @param _ci       configuration item type
      * @param _code     exported code (configuration item update file)
+     * @param _log      logging information
      */
     public ExportParser(final CI _ci,
-                        final String _code)
+                        final String _code,
+                        final String _log)
     {
         this.origCode =_code;
+        this.log = _log;
         this.ci = _ci;
         // parse symbolic name
         final int posSymbolicName = this.origCode.indexOf(ExportParser.HEADER_SYMBOLIC_NAME);
@@ -125,15 +135,18 @@ public class ExportParser
      *
      * @param _name         name of the administration object
      * @param _symbolicName symbolic name
+     * @param _log          logging information
      * @param _rootLines    depending root lines
      */
     public ExportParser(final String _name,
                         final String _symbolicName,
+                        final String _log,
                         final Line...  _rootLines)
     {
         this.origCode = null;
         this.ci = null;
         this.symbolicName = _symbolicName;
+        this.log = _log;
         this.name = _name;
         this.code = null;
         this.rootLines.addAll(Arrays.asList(_rootLines));
@@ -144,12 +157,14 @@ public class ExportParser
      * structure.
      *
      * @param _name         name of the administration object
+     * @param _log          logging information
      * @param _rootLines    depending root lines
      */
     public ExportParser(final String _name,
+                        final String _log,
                         final Line...  _rootLines)
     {
-        this(_name, null, _rootLines);
+        this(_name, null, _log, _rootLines);
     }
 
     /**
@@ -157,11 +172,13 @@ public class ExportParser
      * tag of the root.
      *
      * @param _name         name of the administration object
+     * @param _log          logging information
      * @param _lineTag      tag of the parsed line
      * @param _lineValue    value of the parsed line
      * @param _children     all child lines of the parsed line
      */
     public ExportParser(final String _name,
+                        final String _log,
                         final String _lineTag,
                         final String _lineValue,
                         final List<Line> _children)
@@ -170,6 +187,7 @@ public class ExportParser
         this.ci = null;
         this.symbolicName = null;
         this.name = _name;
+        this.log = _log;
         this.code = null;
         this.rootLines.add(new Line(_lineTag, _lineValue, _children));
     }
@@ -262,6 +280,17 @@ public class ExportParser
     public String getCode()
     {
         return this.code;
+    }
+
+    /**
+     * Returns the logging text.
+     *
+     * @return log
+     * @see #log
+     */
+    public String getLog()
+    {
+        return this.log;
     }
 
     /**

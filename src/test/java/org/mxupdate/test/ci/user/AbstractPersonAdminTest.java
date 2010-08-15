@@ -215,10 +215,10 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
         throws Exception
     {
         final AbstractPersonAdminData<?> person = this.createNewData("hallo \" test")
-                .setSite(new SiteData(this, "Test \" Site"));
-        person.create();
-        person.setSite(null);
-        person.update();
+                .setSite(new SiteData(this, "Test \" Site"))
+                .create()
+                .setSite(null)
+                .update();
 
         Assert.assertEquals(this.mql("escape print person \""
                                     + AbstractTest.convertMql(person.getName())
@@ -236,10 +236,11 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
     public void checkHiddenFlagRemoveWithinUpdate()
         throws Exception
     {
-        final AbstractPersonAdminData<?> person = this.createNewData("hello \" test").setHidden(true);
-        person.create();
-        person.setHidden(null);
-        person.update();
+        final AbstractPersonAdminData<?> person = this.createNewData("hello \" test")
+                .setHidden(true)
+                .create()
+                .setHidden(null)
+                .update();
 
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select hidden dump"),
                             "FALSE",
@@ -255,10 +256,11 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
     public void checkPasswordNeverExpiresFlagRemoveWithinUpdate()
         throws Exception
     {
-        final AbstractPersonAdminData<?> person = this.createNewData("hello \" test").setPasswordNeverExpires(true);
-        person.create();
-        person.setPasswordNeverExpires(null);
-        person.update();
+        final AbstractPersonAdminData<?> person = this.createNewData("hello \" test")
+                .setPasswordNeverExpires(true)
+                .create()
+                .setPasswordNeverExpires(null)
+                .update();
 
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select neverexpires dump"),
                             "FALSE",
@@ -275,10 +277,11 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
     public void checkWithIgnoreParameterPasswordNeverExpiresFlagIsNotRemoved()
         throws Exception
     {
-        final AbstractPersonAdminData<?> person = this.createNewData("hello \" test").setPasswordNeverExpires(true);
-        person.create();
-        person.setPasswordNeverExpires(null);
-        person.update("UserPersonIgnorePswdNeverExpires", "*");
+        final AbstractPersonAdminData<?> person = this.createNewData("hello \" test")
+                .setPasswordNeverExpires(true)
+                .create()
+                .setPasswordNeverExpires(null)
+                .update("UserPersonIgnorePswdNeverExpires", "*");
 
         // check not updated
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select neverexpires dump"),
@@ -299,10 +302,11 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
     public void checkWantsEmailFlagRemoveWithinUpdate()
         throws Exception
     {
-        final AbstractPersonAdminData<?> person = this.createNewData("hello \" test").setWantsEmail(true);
-        person.create();
-        person.setWantsEmail(null);
-        person.update();
+        final AbstractPersonAdminData<?> person = this.createNewData("hello \" test")
+                .setWantsEmail(true)
+                .create()
+                .setWantsEmail(null)
+                .update();
 
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select emailenabled dump"),
                             "FALSE",
@@ -319,10 +323,11 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
     public void checkWithIgnoreParameterWantsEmailFlag()
         throws Exception
     {
-        final AbstractPersonAdminData<?> person = this.createNewData("hello \" test").setWantsEmail(true);
-        person.create();
-        person.setWantsEmail(null);
-        person.update("UserPersonIgnoreWantsEmail", "*");
+        final AbstractPersonAdminData<?> person = this.createNewData("hello \" test")
+                .setWantsEmail(true)
+                .create()
+                .setWantsEmail(null)
+                .update("UserPersonIgnoreWantsEmail", "*");
 
         // check not updated
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select emailenabled dump"),
@@ -345,16 +350,16 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
     public void checkWantsIconMailFlagSetWithinUpdate()
         throws Exception
     {
-        final AbstractPersonAdminData<?> person = this.createNewData("hello \" test").setWantsIconMail(false);
-        person.create();
-        person.setWantsIconMail(null);
-        person.update();
+        final AbstractPersonAdminData<?> person = this.createNewData("hello \" test")
+                .setWantsIconMail(false)
+                .create()
+                .setWantsIconMail(null)
+                .update();
 
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select iconmailenabled dump"),
                             "TRUE",
                             "check that 'wants icon mail' flag is enabled");
     }
-
 
     /**
      * Checks that 'the wants icon mail' - flag is not reset if the
@@ -366,10 +371,11 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
     public void checkWithIgnoreParameterWantsIconMailFlag()
         throws Exception
     {
-        final AbstractPersonAdminData<?> person = this.createNewData("hello \" test").setWantsIconMail(false);
-        person.create();
-        person.setWantsIconMail(null);
-        person.update("UserPersonIgnoreWantsIconMail", "*");
+        final AbstractPersonAdminData<?> person = this.createNewData("hello \" test")
+                .setWantsIconMail(false)
+                .create()
+                .setWantsIconMail(null)
+                .update("UserPersonIgnoreWantsIconMail", "*");
 
         // check not updated
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select iconmailenabled dump"),
@@ -393,10 +399,10 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
     public void checkUpdateProduct()
         throws Exception
     {
-        final AbstractPersonAdminData<?> person = this.createNewData("test");
-        person.create();
-        person.updateWithCode("mql mod product CPF add person " + person.getName() + "\nsetProducts");
-        person.checkExport();
+        final AbstractPersonAdminData<?> person = this.createNewData("test")
+                .create();
+        person  .updateWithCode("mql mod product CPF add person " + person.getName() + "\nsetProducts")
+                .checkExport();
     }
 
     /**
@@ -409,10 +415,11 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
     public void checkUpdateProductOnEmptyAssigned()
         throws Exception
     {
-        final AbstractPersonAdminData<?> person = this.createNewData("test").addProduct("CPF");
-        person.create();
-        person.updateWithCode("mql mod product CPF remove person " + person.getName() + "\nsetProducts \"CPF\"");
-        person.checkExport();
+        final AbstractPersonAdminData<?> person = this.createNewData("test")
+                .addProduct("CPF")
+                .create();
+        person  .updateWithCode("mql mod product CPF remove person " + person.getName() + "\nsetProducts \"CPF\"")
+                .checkExport();
     }
 
     /**
@@ -425,9 +432,10 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
     public void checkWithIgnoreProductsParameter()
         throws Exception
     {
-        final AbstractPersonAdminData<?> person = this.createNewData("test").addProduct("CPF");
-        person.create();
-        person.setWantsIconMail(null);
+        final AbstractPersonAdminData<?> person = this.createNewData("test")
+                .addProduct("CPF")
+                .create()
+                .setWantsIconMail(null);
         this.mql("escape mod product CPF remove person \"" + AbstractTest.convertMql(person.getName()) + "\"");
         person.update("UserPersonIgnoreProducts", "*");
 
@@ -440,5 +448,23 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
         Assert.assertTrue(
                 exportParser.getLines("/setProducts/@value").isEmpty(),
                 "check that no product definition is in the export file");
+    }
+
+    /**
+     * Check that the password expires flag is ignored.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "check that the password expires flag is ignored")
+    public void checkPasswordExpiresFlagIgnored()
+        throws Exception
+    {
+        final AbstractPersonAdminData<?> person = this.createNewData("hello")
+                .create()
+                .addType("notinactive");
+
+        this.mql("escape mod person \"" + AbstractTest.convertMql(person.getName()) + "\" passwordexpired");
+
+        person.export();
     }
 }

@@ -197,17 +197,16 @@ public class PageData
     }
 
     /**
-     * Returns the parsed export instance.
-     *
-     * @param _ci       related configuration item type
-     * @param _code     code of the exported configuration item
-     * @return parsed export instance
+     * {@inheritDoc}
+     * The original method is overwritten to use a specific export parser
+     * implementation for pages.
      */
     @Override()
     protected ExportParser parseExport(final AbstractTest.CI _ci,
-                                       final String _code)
+                                       final String _code,
+                                       final String _log)
     {
-        return new PageExportParser(_ci, _code);
+        return new PageExportParser(_ci, _code, _log);
     }
 
     /**
@@ -230,11 +229,13 @@ public class PageData
          *
          * @param _ci       type of the configuration item
          * @param _code     exported configuration item update code
+         * @param _log      logging text from the server
          */
         public PageExportParser(final AbstractTest.CI _ci,
-                                   final String _code)
+                                final String _code,
+                                final String _log)
         {
-            super(_ci, _code);
+            super(_ci, _code, _log);
             final int idx = _code.indexOf(PageData.PAGE_CONTENT_SEPARATOR);
             if (idx >= 0)  {
                 this.pageContent = _code.substring(idx + PageData.PAGE_CONTENT_SEPARATOR.length()).trim();

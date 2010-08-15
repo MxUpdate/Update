@@ -407,7 +407,15 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
                             "check correct type definition");
 
         // parse first element
-        final ExportParser ret = this.parseExport(this.ci, (String) values.get("Code"));
+        final ExportParser ret = this.parseExport(
+                this.ci,
+                (String) values.get("Code"),
+                (String) bck.get("log"));
+
+        // check no error occurred in the export
+        Assert.assertFalse(
+                ret.getLog().contains("[ERROR]"),
+                "check that no error occured (have " + ret.getLog() + ")");
 
         // check returned configuration item name
         Assert.assertEquals((String) values.get("Name"),
@@ -443,12 +451,14 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      *
      * @param _ci       related configuration item type
      * @param _code     code of the exported configuration item
+     * @param _log      logging from the server
      * @return parsed export instance
      */
     protected ExportParser parseExport(final AbstractTest.CI _ci,
-                                       final String _code)
+                                       final String _code,
+                                       final String _log)
     {
-        return new ExportParser(_ci, _code);
+        return new ExportParser(_ci, _code, _log);
     }
 
     /**

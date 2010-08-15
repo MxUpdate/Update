@@ -150,6 +150,7 @@ public class PersonData
         final ExportParser adminExportParser = new ExportParser(
                 this.getName(),
                 _exportParser.getSymbolicName(),
+                _exportParser.getLog(),
                 adminLines.toArray(new ExportParser.Line[adminLines.size()]));
         super.checkExport(adminExportParser);
 
@@ -157,6 +158,7 @@ public class PersonData
         final ExportParser busExportParser = new ExportParser(
                 this.getName(),
                 _exportParser.getSymbolicName(),
+                _exportParser.getLog(),
                 busLines.toArray(new ExportParser.Line[busLines.size()]));
         final List<String> lineStates = busExportParser.getLines("/setState/@value");
         Assert.assertEquals(

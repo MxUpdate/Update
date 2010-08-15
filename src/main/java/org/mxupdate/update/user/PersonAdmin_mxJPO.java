@@ -95,7 +95,9 @@ public class PersonAdmin_mxJPO
         PersonAdmin_mxJPO.IGNORED_URLS.add("/adminAccess");
         PersonAdmin_mxJPO.IGNORED_URLS.add("/defaultApplication");
         PersonAdmin_mxJPO.IGNORED_URLS.add("/homeVault");
+        // password settings are completely ignored!
         PersonAdmin_mxJPO.IGNORED_URLS.add("/password");
+        PersonAdmin_mxJPO.IGNORED_URLS.add("/passwordChangeRequired");
         PersonAdmin_mxJPO.IGNORED_URLS.add("/passwordModification");
         PersonAdmin_mxJPO.IGNORED_URLS.add("/passwordModification/datetime");
         PersonAdmin_mxJPO.IGNORED_URLS.add("/productList");

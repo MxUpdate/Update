@@ -256,17 +256,16 @@ public class InquiryData
     }
 
     /**
-     * Returns the parsed export instance.
-     *
-     * @param _ci       related configuration item type
-     * @param _code     code of the exported configuration item
-     * @return parsed export instance
+     * {@inheritDoc}
+     * The original method is overwritten to use a specific export parser
+     * implementation for inquiries.
      */
     @Override()
     protected ExportParser parseExport(final AbstractTest.CI _ci,
-                                       final String _code)
+                                       final String _code,
+                                       final String _log)
     {
-        return new InquiryExportParser(_ci, _code);
+        return new InquiryExportParser(_ci, _code, _log);
     }
 
     /**
@@ -289,11 +288,13 @@ public class InquiryData
          *
          * @param _ci       type of the configuration item
          * @param _code     exported configuration item update code
+         * @param _log      logging text
          */
         public InquiryExportParser(final AbstractTest.CI _ci,
-                                   final String _code)
+                                   final String _code,
+                                   final String _log)
         {
-            super(_ci, _code);
+            super(_ci, _code, _log);
             final int idx = _code.indexOf(InquiryData.INQUIRY_CODE_SEPARATOR);
             if (idx >= 0)  {
                 this.inquiryCode = _code.substring(idx + InquiryData.INQUIRY_CODE_SEPARATOR.length()).trim();

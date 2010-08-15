@@ -43,8 +43,8 @@ import org.testng.Assert;
  * @version $Id$
  * @param <DATA> class derived from abstract administration person
  */
-public class AbstractPersonAdminData<DATA extends AbstractPersonAdminData<?>>
-    extends AbstractUserData<DATA>
+public class AbstractPersonAdminData<PERSONDATA extends AbstractPersonAdminData<?>>
+    extends AbstractUserData<PERSONDATA>
 {
     /**
      * Within export the description must be defined.
@@ -169,10 +169,10 @@ public class AbstractPersonAdminData<DATA extends AbstractPersonAdminData<?>>
      * @see #access
      */
     @SuppressWarnings("unchecked")
-    public DATA addAccess(final String... _access)
+    public PERSONDATA addAccess(final String... _access)
     {
         this.access.addAll(Arrays.asList(_access));
-        return (DATA) this;
+        return (PERSONDATA) this;
     }
 
     /**
@@ -183,10 +183,10 @@ public class AbstractPersonAdminData<DATA extends AbstractPersonAdminData<?>>
      * @see #adminAccess
      */
     @SuppressWarnings("unchecked")
-    public DATA addAdminAccess(final String... _adminAccess)
+    public PERSONDATA addAdminAccess(final String... _adminAccess)
     {
         this.adminAccess.addAll(Arrays.asList(_adminAccess));
-        return (DATA) this;
+        return (PERSONDATA) this;
     }
 
     /**
@@ -197,10 +197,10 @@ public class AbstractPersonAdminData<DATA extends AbstractPersonAdminData<?>>
      * @see #types
      */
     @SuppressWarnings("unchecked")
-    public DATA addType(final String... _type)
+    public PERSONDATA addType(final String... _type)
     {
         this.types.addAll(Arrays.asList(_type));
-        return (DATA) this;
+        return (PERSONDATA) this;
     }
 
     /**
@@ -223,10 +223,10 @@ public class AbstractPersonAdminData<DATA extends AbstractPersonAdminData<?>>
      * @see #roles
      */
     @SuppressWarnings("unchecked")
-    public DATA addRole(final RoleData... _role)
+    public PERSONDATA addRole(final RoleData... _role)
     {
         this.roles.addAll(Arrays.asList(_role));
-        return (DATA) this;
+        return (PERSONDATA) this;
     }
 
     /**
@@ -237,10 +237,10 @@ public class AbstractPersonAdminData<DATA extends AbstractPersonAdminData<?>>
      * @see #groups
      */
     @SuppressWarnings("unchecked")
-    public DATA addGroup(final GroupData... _group)
+    public PERSONDATA addGroup(final GroupData... _group)
     {
         this.groups.addAll(Arrays.asList(_group));
-        return (DATA) this;
+        return (PERSONDATA) this;
     }
 
     /**
@@ -251,10 +251,10 @@ public class AbstractPersonAdminData<DATA extends AbstractPersonAdminData<?>>
      * @see #products
      */
     @SuppressWarnings("unchecked")
-    public AbstractPersonAdminData addProduct(final String... _product)
+    public PERSONDATA addProduct(final String... _product)
     {
         this.products.addAll(Arrays.asList(_product));
-        return this;
+        return (PERSONDATA) this;
     }
 
     /**
@@ -266,10 +266,10 @@ public class AbstractPersonAdminData<DATA extends AbstractPersonAdminData<?>>
      * @see #passwordNeverExpires
      */
     @SuppressWarnings("unchecked")
-    public DATA setPasswordNeverExpires(final Boolean _passwordNeverExpires)
+    public PERSONDATA setPasswordNeverExpires(final Boolean _passwordNeverExpires)
     {
         this.passwordNeverExpires = _passwordNeverExpires;
-        return (DATA) this;
+        return (PERSONDATA) this;
     }
 
     /**
@@ -280,10 +280,10 @@ public class AbstractPersonAdminData<DATA extends AbstractPersonAdminData<?>>
      * @see #wantsEmail
      */
     @SuppressWarnings("unchecked")
-    public DATA setWantsEmail(final Boolean _wantsEmail)
+    public PERSONDATA setWantsEmail(final Boolean _wantsEmail)
     {
         this.wantsEmail = _wantsEmail;
-        return (DATA) this;
+        return (PERSONDATA) this;
     }
 
     /**
@@ -295,10 +295,10 @@ public class AbstractPersonAdminData<DATA extends AbstractPersonAdminData<?>>
      * @see #wantsIconMail
      */
     @SuppressWarnings("unchecked")
-    public DATA setWantsIconMail(final Boolean _wantsIconMail)
+    public PERSONDATA setWantsIconMail(final Boolean _wantsIconMail)
     {
         this.wantsIconMail = _wantsIconMail;
-        return (DATA) this;
+        return (PERSONDATA) this;
     }
 
     /**
@@ -382,7 +382,7 @@ public class AbstractPersonAdminData<DATA extends AbstractPersonAdminData<?>>
      */
     @Override()
     @SuppressWarnings("unchecked")
-    public DATA createDependings()
+    public PERSONDATA createDependings()
         throws MatrixException
     {
         super.createDependings();
@@ -397,7 +397,7 @@ public class AbstractPersonAdminData<DATA extends AbstractPersonAdminData<?>>
             group.create();
         }
 
-        return (DATA) this;
+        return (PERSONDATA) this;
     }
 
     /**
@@ -409,7 +409,7 @@ public class AbstractPersonAdminData<DATA extends AbstractPersonAdminData<?>>
      */
     @Override()
     @SuppressWarnings("unchecked")
-    public DATA create()
+    public PERSONDATA create()
         throws MatrixException
     {
         if (!this.isCreated())  {
@@ -419,7 +419,7 @@ public class AbstractPersonAdminData<DATA extends AbstractPersonAdminData<?>>
                                     + "\" add person \"" + AbstractTest.convertMql(this.getName()) + "\"");
             }
         }
-        return (DATA) this;
+        return (PERSONDATA) this;
     }
 
     /**
