@@ -41,7 +41,7 @@ import org.testng.Assert;
  *
  * @author The MxUpdate Team
  * @version $Id$
- * @param <DATA> class derived from abstract administration person
+ * @param <PERSONDATA> class derived from abstract administration person
  */
 public class AbstractPersonAdminData<PERSONDATA extends AbstractPersonAdminData<?>>
     extends AbstractUserData<PERSONDATA>

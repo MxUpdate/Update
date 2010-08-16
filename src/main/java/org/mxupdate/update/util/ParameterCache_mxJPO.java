@@ -270,7 +270,9 @@ public class ParameterCache_mxJPO
                 break;
             case LIST:
                 this.mapList.put(_paramDef.getName(),
-                                 new ArrayList<String>(Arrays.asList(_value.split(","))));
+                                 _value.isEmpty()
+                                         ? new ArrayList<String>()
+                                         : new ArrayList<String>(Arrays.asList(_value.split(","))));
                 break;
             case MAP:
                 if ((_value != null) && !"".equals(_value))  {

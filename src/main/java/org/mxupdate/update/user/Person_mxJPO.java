@@ -33,6 +33,8 @@ import java.util.TreeSet;
 import matrix.db.BusinessObject;
 import matrix.db.BusinessObjectWithSelect;
 import matrix.db.Context;
+import matrix.db.RelationshipWithSelect;
+import matrix.db.RelationshipWithSelectList;
 import matrix.util.MatrixException;
 import matrix.util.StringList;
 
@@ -57,7 +59,6 @@ public class Person_mxJPO
      * TCL procedure to update the state of a person business object.
      *
      * @see PersonAdmin#update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     * @see PersonBus#write(ParameterCache_mxJPO, Appendable)
      */
     private static final String TCL_SET_STATE
             = "proc setState {_newState}  {\n"
@@ -67,10 +68,10 @@ public class Person_mxJPO
                     + "set lsStates [split [mql print bus ${OBJECTID} select policy.state dump '\\n'] '\\n']\n"
                     + "if {[lsearch ${lsStates} \"${sCurrent}\"] < [lsearch ${lsStates} \"${_newState}\"]}  {\n"
                         + "mql promote bus ${OBJECTID}\n"
-                        + "logDebug \"    - activate business object\"\n"
+                        + "logTrace \"    - activate business object\"\n"
                     + "} else  {\n"
                         + "mql demote bus ${OBJECTID}\n"
-                        + "logDebug \"    - deactivate business object\"\n"
+                        + "logTrace \"    - deactivate business object\"\n"
                     + "}\n"
                 + "}\n"
             + "}\n";
@@ -87,6 +88,232 @@ public class Person_mxJPO
             + "}\n";
 
     /**
+     * Name of the TCL variable holding the name of the relationship
+     * 'Employee'.
+     *
+     * @see PersonBus#prepareUpdate(ParameterCache_mxJPO, StringBuilder, StringBuilder, Map)
+     * @see #TCL_SET_EMPLOYEE_OF
+     */
+    private static final String TCL_VAR_EMPLOYEE_RELATION = "_ATTR_EMPLOYEE_RELATION";
+
+    /**
+     * Name of the TCL variable holding the allowed organizational types of the
+     * relationship 'Employee'.
+     *
+     * @see PersonBus#prepareUpdate(ParameterCache_mxJPO, StringBuilder, StringBuilder, Map)
+     * @see #TCL_SET_EMPLOYEE_OF
+     */
+    private static final String TCL_VAR_EMPLOYEE_TYPES = "_ATTR_EMPLOYEE_TYPES";
+
+    /**
+     * Procedure which handles the update of the employee connection.
+     *
+     * @see PersonAdmin#update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     * @see #TCL_VAR_EMPLOYEE_RELATION
+     * @see #TCL_VAR_EMPLOYEE_TYPES
+     */
+    private static final String TCL_SET_EMPLOYEE_OF
+            = "proc setEmployeeOf {args}  {\n"
+                + "global " + Person_mxJPO.TCL_VAR_EMPLOYEE_RELATION + "\n"
+                + "global " + Person_mxJPO.TCL_VAR_EMPLOYEE_TYPES + "\n"
+                + "_updateConnection \"employee\" \"$" + Person_mxJPO.TCL_VAR_EMPLOYEE_RELATION
+                        + "\" \"$" + Person_mxJPO.TCL_VAR_EMPLOYEE_TYPES
+                        + "\" ${args} [list]\n"
+            + "}\n";
+
+    /**
+     * Dummy procedure with logging information that the employee update
+     * is ignored.
+     *
+     * @see PersonAdmin#update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private static final String TCL_SET_EMPLOYEE_OF_DUMMY
+            = "proc setEmployeeOf {args}  {\n"
+                + "logDebug \"    - ignoring employee update\""
+            + "}\n";
+
+    /**
+     * Name of the TCL variable holding the name of the relationship
+     * 'Organization Representative'.
+     *
+     * @see PersonBus#prepareUpdate(ParameterCache_mxJPO, StringBuilder, StringBuilder, Map)
+     * @see #TCL_SET_REPRESENTATIVE_OF
+     */
+    private static final String TCL_VAR_REPRESENTATIVE_RELATION = "_ATTR_REPRESENTATIVE_RELATION";
+
+    /**
+     * Name of the TCL variable holding the allowed organizational types of the
+     * relationship 'Organization Representative'.
+     *
+     * @see PersonBus#prepareUpdate(ParameterCache_mxJPO, StringBuilder, StringBuilder, Map)
+     * @see #TCL_SET_REPRESENTATIVE_OF
+     */
+    private static final String TCL_VAR_REPRESENTATIVE_TYPES = "_ATTR_REPRESENTATIVE_TYPES";
+
+    /**
+     * Procedure which handles the update of the representative connection.
+     *
+     * @see PersonAdmin#update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     * @see #TCL_VAR_REPRESENTATIVE_RELATION
+     * @see #TCL_VAR_REPRESENTATIVE_TYPES
+     */
+    private static final String TCL_SET_REPRESENTATIVE_OF
+            = "proc setRepresentativeOf {args}  {\n"
+                + "global " + Person_mxJPO.TCL_VAR_REPRESENTATIVE_RELATION + "\n"
+                + "global " + Person_mxJPO.TCL_VAR_REPRESENTATIVE_TYPES + "\n"
+                + "_updateConnection \"representative\" \"$" + Person_mxJPO.TCL_VAR_REPRESENTATIVE_RELATION
+                        + "\" \"$" + Person_mxJPO.TCL_VAR_REPRESENTATIVE_TYPES
+                        + "\" ${args} [list]\n"
+            + "}\n";
+
+    /**
+     * Dummy procedure with logging information that the representative update
+     * is ignored.
+     *
+     * @see PersonAdmin#update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private static final String TCL_SET_REPRESENTATIVE_OF_DUMMY
+            = "proc setRepresentativeOf {args}  {\n"
+                + "logDebug \"    - ignoring representative update\""
+            + "}\n";
+
+    /**
+     * Name of the TCL variable holding the name of the attribute
+     * 'Project Access'.
+     *
+     * @see PersonBus#prepareUpdate(ParameterCache_mxJPO, StringBuilder, StringBuilder, Map)
+     * @see #TCL_SET_MEMBER_OF
+     */
+    private static final String TCL_VAR_MEMBER_ATTR_PROJECT_ACCESS = "_ATTR_MEMBER_ATTR_PROJECT_ACCESS";
+
+    /**
+     * Name of the TCL variable holding the name of the attribute
+     * 'Project Role'.
+     *
+     * @see PersonBus#prepareUpdate(ParameterCache_mxJPO, StringBuilder, StringBuilder, Map)
+     * @see #TCL_SET_MEMBER_OF
+     */
+    private static final String TCL_VAR_MEMBER_ATTR_PROJECT_ROLE = "_ATTR_MEMBER_ATTR_PROJECT_ROLE";
+
+    /**
+     * Name of the TCL variable holding the name of the relationship
+     * 'Member'.
+     *
+     * @see PersonBus#prepareUpdate(ParameterCache_mxJPO, StringBuilder, StringBuilder, Map)
+     * @see #TCL_SET_MEMBER_OF
+     */
+    private static final String TCL_VAR_MEMBER_RELATION = "_ATTR_MEMBER_RELATION";
+
+    /**
+     * Name of the TCL variable holding the allowed organizational types of the
+     * relationship 'Member'.
+     *
+     * @see PersonBus#prepareUpdate(ParameterCache_mxJPO, StringBuilder, StringBuilder, Map)
+     * @see #TCL_SET_MEMBER_OF
+     */
+    private static final String TCL_VAR_MEMBER_TYPES = "_ATTR_MEMBER_TYPES";
+
+    /**
+     * Procedure which handles the update of the member connection.
+     *
+     * @see PersonAdmin#update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     * @see #TCL_VAR_MEMBER_ATTR_PROJECT_ACCESS
+     * @see #TCL_VAR_MEMBER_ATTR_PROJECT_ROLE
+     * @see #TCL_VAR_MEMBER_RELATION
+     * @see #TCL_VAR_MEMBER_TYPES
+     */
+    private static final String TCL_SET_MEMBER_OF
+            = "proc setMemberOf {args}  {\n"
+                + "global " + Person_mxJPO.TCL_VAR_MEMBER_ATTR_PROJECT_ACCESS + "\n"
+                + "global " + Person_mxJPO.TCL_VAR_MEMBER_ATTR_PROJECT_ROLE + "\n"
+                + "global " + Person_mxJPO.TCL_VAR_MEMBER_RELATION + "\n"
+                + "global " + Person_mxJPO.TCL_VAR_MEMBER_TYPES + "\n"
+                + "_updateConnection \"member\" \"$" + Person_mxJPO.TCL_VAR_MEMBER_RELATION
+                        + "\" \"$" + Person_mxJPO.TCL_VAR_MEMBER_TYPES
+                        + "\" ${args} [list \"$" + Person_mxJPO.TCL_VAR_MEMBER_ATTR_PROJECT_ACCESS
+                        + "\" \"$" + Person_mxJPO.TCL_VAR_MEMBER_ATTR_PROJECT_ROLE + "\"]\n"
+            + "}\n";
+
+    /**
+     * Dummy procedure with logging information that the member update
+     * is ignored.
+     *
+     * @see PersonAdmin#update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private static final String TCL_SET_MEMBER_OF_DUMMY
+            = "proc setMemberOf {args}  {\n"
+                + "logDebug \"    - ignoring member update\""
+            + "}\n";
+
+    /**
+     * TCL procedure to update connection.
+     *
+     * @see PersonAdmin#update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private static final String TCL_UPDATE_CONNECTIONS
+            = "proc _updateConnection {_sLog _sRelation _sTypes _llsNews _lsAttrs} {\n"
+                + "global OBJECTID\n"
+                + "set llsNew [list]\n"
+                + "foreach lsOne ${_llsNews}  {\n"
+                    + "set lsLine [list [lindex ${lsOne} 0] [lindex ${lsOne} 1] [lindex ${lsOne} 2]]\n"
+                    + "foreach sOneAttr ${_lsAttrs}  {\n"
+                        + "set iIdx [lsearch ${lsOne} ${sOneAttr}]\n"
+                        + "if {${iIdx} >=0}  {\n"
+                            + "lappend lsLine [lindex ${lsOne} [expr ${iIdx} + 1]]\n"
+                        + "} else  {\n"
+                            + "lappend lsLine \"\"\n"
+                        + "}\n"
+                    + "}\n"
+                    + "lappend llsNew ${lsLine}\n"
+                + "}\n"
+                + "set llsCmd [list mql expand bus ${OBJECTID} "
+                        + "to "
+                        + "relationship \"${_sRelation}\" "
+                        + "type \"${_sTypes}\" "
+                        + "select bus "
+                        + "select rel id]\n"
+                + "foreach sOneAttr ${_lsAttrs}  {\n"
+                    + "lappend llsCmd \"attribute\\[${sOneAttr}\\]\"\n"
+                + "}\n"
+                + "lappend llsCmd dump '' tcl\n"
+                + "set llsExpand [eval ${llsCmd}]\n"
+                + "set llsCur [list]\n"
+                // disconnect obsolete
+                + "foreach lsOne ${llsExpand}  {\n"
+                    + "set lsLine [list [lindex ${lsOne} 3] [lindex ${lsOne} 4] [lindex ${lsOne} 5]]\n"
+                    + "set iIdx 7\n"
+                    + "foreach sOneAttr ${_lsAttrs}  {\n"
+                        + "lappend lsLine [lindex [lindex ${lsOne} ${iIdx}] 0]\n"
+                        + "incr iIdx\n"
+                    + "}\n"
+                    + "if {[lsearch ${llsNew} ${lsLine}] < 0}  {\n"
+                        + "logTrace \"    - remove as ${_sLog} from [string tolower [lindex ${lsOne} 3]] '[lindex ${lsOne} 4]'\"\n"
+                        + "mql disconnect connection [lindex [lindex ${lsOne} 6] 0]\n"
+                    + "}\n"
+                    + "lappend llsCur ${lsLine}\n"
+                + "}\n"
+                // connect new ones
+                + "foreach lsOne ${llsNew}  {\n"
+                    + "set lsLine [list]\n"
+                    + "foreach sOne ${lsOne}  {\n"
+                        + "lappend lsLine ${sOne}\n"
+                    + "}\n"
+                    + "if {[lsearch ${llsCur} ${lsLine}] < 0}  {\n"
+                        + "logTrace \"    - define as ${_sLog} of [string tolower [lindex ${lsOne} 0]] '[lindex ${lsOne} 1]'\"\n"
+                        + "set lsCmd [list mql connect bus ${OBJECTID} "
+                                + "relationship \"${_sRelation}\" "
+                                + "from [lindex ${lsOne} 0] [lindex ${lsOne} 1] [lindex ${lsOne} 2]]\n"
+                        + "set iIdx 3\n"
+                        + "foreach sOneAttr ${_lsAttrs}  {\n"
+                            + "lappend lsCmd ${sOneAttr} [lindex ${lsOne} ${iIdx}] \n"
+                            + "incr iIdx\n"
+                        + "}\n"
+                        + "eval ${lsCmd}\n"
+                    + "}\n"
+                + "}\n"
+            + "}\n";
+
+    /**
      * Defines the parameter for the match of persons for which states are not
      * handled (neither exported nor updated).
      *
@@ -94,6 +321,109 @@ public class Person_mxJPO
      * @see PersonBus#write(ParameterCache_mxJPO, Appendable)
      */
     private static final String PARAM_IGNORE_STATE = "UserPersonIgnoreState";
+
+    /**
+     * Defines the parameter that employee connections are not handled.
+     *
+     * @see PersonAdmin#update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     * @see PersonBus#parse(ParameterCache_mxJPO)
+     * @see PersonBus#write(ParameterCache_mxJPO, Appendable)
+     */
+    private static final String PARAM_EMPLOYEE_IGNORE  = "UserPersonEmployeeIgnore";
+
+    /**
+     * Defines the parameter for the relationship name of 'Employee'.
+     *
+     * @see PersonBus#parse(ParameterCache_mxJPO)
+     * @see PersonBus#prepareUpdate(Context, StringBuilder, StringBuilder, Map)
+     * @see #TCL_SET_MEMBER_OF
+     */
+    private static final String PARAM_EMPLOYEE_RELATION  = "UserPersonEmployeeRelation";
+
+    /**
+     * Defines the parameter for the allowed organizational types for the
+     * employee relationship.
+     *
+     * @see PersonBus#parse(ParameterCache_mxJPO)
+     * @see PersonBus#prepareUpdate(Context, StringBuilder, StringBuilder, Map)
+     * @see #TCL_SET_MEMBER_OF
+     */
+    private static final String PARAM_EMPLOYEE_TYPES  = "UserPersonEmployeeTypes";
+
+    /**
+     * Defines the parameter for the attribute name of 'Project Access'.
+     *
+     * @see PersonBus#parse(ParameterCache_mxJPO)
+     * @see PersonBus#prepareUpdate(Context, StringBuilder, StringBuilder, Map)
+     * @see #TCL_SET_MEMBER_OF
+     */
+    private static final String PARAM_MEMBER_ATTR_PROJECT_ACCESS  = "UserPersonMemberAttrProjAccess";
+
+    /**
+     * Defines the parameter for the attribute name of 'Project Role'.
+     *
+     * @see PersonBus#parse(ParameterCache_mxJPO)
+     * @see PersonBus#prepareUpdate(Context, StringBuilder, StringBuilder, Map)
+     * @see #TCL_SET_MEMBER_OF
+     */
+    private static final String PARAM_MEMBER_ATTR_PROJECT_ROLE  = "UserPersonMemberAttrProjRole";
+
+    /**
+     * Defines the parameter that member connections are not handled.
+     *
+     * @see PersonAdmin#update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     * @see PersonBus#parse(ParameterCache_mxJPO)
+     * @see PersonBus#write(ParameterCache_mxJPO, Appendable)
+     */
+    private static final String PARAM_MEMBER_IGNORE  = "UserPersonMemberIgnore";
+
+    /**
+     * Defines the parameter for the relationship name of 'Member'.
+     *
+     * @see PersonBus#parse(ParameterCache_mxJPO)
+     * @see PersonBus#prepareUpdate(Context, StringBuilder, StringBuilder, Map)
+     * @see #TCL_SET_MEMBER_OF
+     */
+    private static final String PARAM_MEMBER_RELATION  = "UserPersonMemberRelation";
+
+    /**
+     * Defines the parameter for the allowed organizational types for the
+     * member relationship.
+     *
+     * @see PersonBus#parse(ParameterCache_mxJPO)
+     * @see PersonBus#prepareUpdate(Context, StringBuilder, StringBuilder, Map)
+     * @see #TCL_SET_MEMBER_OF
+     */
+    private static final String PARAM_MEMBER_TYPES  = "UserPersonMemberTypes";
+
+    /**
+     * Defines the parameter that representative connections are not handled.
+     *
+     * @see PersonAdmin#update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     * @see PersonBus#parse(ParameterCache_mxJPO)
+     * @see PersonBus#write(ParameterCache_mxJPO, Appendable)
+     */
+    private static final String PARAM_REPRESENTATIVE_IGNORE  = "UserPersonRepresentativeIgnore";
+
+    /**
+     * Defines the parameter for the relationship name of
+     * 'Organization Representative'.
+     *
+     * @see PersonBus#parse(ParameterCache_mxJPO)
+     * @see PersonBus#prepareUpdate(Context, StringBuilder, StringBuilder, Map)
+     * @see #TCL_SET_MEMBER_OF
+     */
+    private static final String PARAM_REPRESENTATIVE_RELATION  = "UserPersonRepresentativeRelation";
+
+    /**
+     * Defines the parameter for the allowed organizational types for the
+     * representative relationship.
+     *
+     * @see PersonBus#parse(ParameterCache_mxJPO)
+     * @see PersonBus#prepareUpdate(Context, StringBuilder, StringBuilder, Map)
+     * @see #TCL_SET_MEMBER_OF
+     */
+    private static final String PARAM_REPRESENTATIVE_TYPES  = "UserPersonRepresentativeTypes";
 
     /**
      * Administration person instance (used to parse the admin part of a
@@ -354,7 +684,8 @@ public class Person_mxJPO
         {
             final StringBuilder preTCLCode = new StringBuilder()
                     .append(_preTCLCode)
-                    .append('\n');
+                    .append('\n')
+                    .append(Person_mxJPO.TCL_UPDATE_CONNECTIONS);
 
             // append TCL set state if not ignored (otherwise dummy TCL proc)
             final Collection<String> matchStates = _paramCache.getValueList(Person_mxJPO.PARAM_IGNORE_STATE);
@@ -364,6 +695,34 @@ public class Person_mxJPO
                 preTCLCode.append(Person_mxJPO.TCL_SET_STATE_DUMMY);
             }
 
+            // append TCL update representative if not ignored
+            // (otherwise dummy TCL proc)
+            final Collection<String> matchEmpl = _paramCache.getValueList(Person_mxJPO.PARAM_EMPLOYEE_IGNORE);
+            if ((matchEmpl == null) || !StringUtil_mxJPO.match(this.getName(), matchEmpl))  {
+                preTCLCode.append(Person_mxJPO.TCL_SET_EMPLOYEE_OF);
+            } else  {
+                preTCLCode.append(Person_mxJPO.TCL_SET_EMPLOYEE_OF_DUMMY);
+            }
+
+            // append TCL update representative if not ignored
+            // (otherwise dummy TCL proc)
+            final Collection<String> matchMemb = _paramCache.getValueList(Person_mxJPO.PARAM_MEMBER_IGNORE);
+            if ((matchMemb == null) || !StringUtil_mxJPO.match(this.getName(), matchMemb))  {
+                preTCLCode.append(Person_mxJPO.TCL_SET_MEMBER_OF);
+            } else  {
+                preTCLCode.append(Person_mxJPO.TCL_SET_MEMBER_OF_DUMMY);
+            }
+
+            // append TCL update representative if not ignored
+            // (otherwise dummy TCL proc)
+            final Collection<String> matchRepr = _paramCache.getValueList(Person_mxJPO.PARAM_REPRESENTATIVE_IGNORE);
+            if ((matchRepr == null) || !StringUtil_mxJPO.match(this.getName(), matchRepr))  {
+                preTCLCode.append(Person_mxJPO.TCL_SET_REPRESENTATIVE_OF);
+            } else  {
+                preTCLCode.append(Person_mxJPO.TCL_SET_REPRESENTATIVE_OF_DUMMY);
+            }
+
+
             final StringBuilder preMQLCode = new StringBuilder();
 
             // post update MQL statements
@@ -371,7 +730,7 @@ public class Person_mxJPO
                     .append(_postMQLCode);
 
             final Map<String,String> tclVariables = new HashMap<String,String>();
-            Person_mxJPO.this.personBus.prepareUpdate(_paramCache.getContext(), preMQLCode, postMQLCode, tclVariables);
+            Person_mxJPO.this.personBus.prepareUpdate(_paramCache, preMQLCode, postMQLCode, tclVariables);
             tclVariables.putAll(_tclVariables);
 
             // update must be done with history off (because not required...)
@@ -397,29 +756,23 @@ public class Person_mxJPO
         private String status;
 
         /**
-         * Person is employee of company.
+         * Person is employee of organizational objects.
+         *
+         * @see #parse(ParameterCache_mxJPO)
          */
-        private String employeeOf;
+        private final Set<Person_mxJPO.ReferencedOrganization> employeeOf = new TreeSet<Person_mxJPO.ReferencedOrganization>();
 
         /**
          * Person is member of company.
          */
-        private String memberOf;
-
-        /**
-         * Person has member access of company.
-         */
-        private String memberAccess;
-
-        /**
-         * Set of all member roles.
-         */
-        private final Set<String> memberRoles = new TreeSet<String>();
+        private final Set<Person_mxJPO.ReferencedOrganization> memberOf = new TreeSet<Person_mxJPO.ReferencedOrganization>();
 
         /**
          * Set of all companies for which the person is company representative.
+         *
+         * @see #parse(ParameterCache_mxJPO)
          */
-        private final Set<String> representativeOf = new TreeSet<String>();
+        private final Set<Person_mxJPO.ReferencedOrganization> representativeOf = new TreeSet<Person_mxJPO.ReferencedOrganization>();
 
         /**
          * Constructor used to initialize the business object instance for
@@ -455,40 +808,106 @@ public class Person_mxJPO
                                                               this.getBusRevision(),
                                                               this.getBusVault());
 
-// TODO: data model check needed... only one company connected? etc.
-                // read current state, employee of, member of information
-                final StringList selects = new StringList(1);
-                selects.addElement("current");
-                selects.addElement("to[Employee].from.name");
-                selects.addElement("to[Member|from.type==Company].from.name");
-                selects.addElement("to[Member|from.type==Company].attribute[Project Access]");
-                selects.addElement("to[Member|from.type==Company].attribute[Project Role]");
-                selects.addElement("to[Organization Representative|from.type==Company].from.name");
+                try  {
+                    bus.open(_paramCache.getContext());
 
-                final BusinessObjectWithSelect s = bus.select(_paramCache.getContext(), selects);
+                    // read current state, employee of, member of information
+                    final StringList selects = new StringList(1);
+                    selects.addElement("current");
 
-                // current state
-                this.status = s.getSelectData("current");
+                    final BusinessObjectWithSelect s = bus.select(_paramCache.getContext(), selects);
 
-                // employee
-                this.employeeOf = s.getSelectData("to[Employee].from.name");
+                    // current state
+                    this.status = s.getSelectData("current");
 
-                // member
-                this.memberOf = s.getSelectData("to[Member].from.name");
-                this.memberAccess = s.getSelectData("to[Member].attribute[Project Access]");
-                for (final String role : s.getSelectData("to[Member].attribute[Project Role]").split("~"))  {
-                    if ((role != null) && !"".equals(role))  {
-                        this.memberRoles.add(role);
+                    // employee
+                    final Collection<String> matchEmpl = _paramCache.getValueList(Person_mxJPO.PARAM_EMPLOYEE_IGNORE);
+                    if ((matchEmpl == null) || !StringUtil_mxJPO.match(this.getName(), matchEmpl))  {
+                        this.parseConnection(_paramCache, bus, this.employeeOf,
+                                _paramCache.getValueString(Person_mxJPO.PARAM_EMPLOYEE_RELATION),
+                                StringUtil_mxJPO.join(',', false, _paramCache.getValueList(Person_mxJPO.PARAM_EMPLOYEE_TYPES), "*"));
                     }
+
+                    // member
+                    final Collection<String> matchMemb = _paramCache.getValueList(Person_mxJPO.PARAM_MEMBER_IGNORE);
+                    if ((matchMemb == null) || !StringUtil_mxJPO.match(this.getName(), matchMemb))  {
+                        this.parseConnection(_paramCache, bus, this.memberOf,
+                                _paramCache.getValueString(Person_mxJPO.PARAM_MEMBER_RELATION),
+                                StringUtil_mxJPO.join(',', false, _paramCache.getValueList(Person_mxJPO.PARAM_MEMBER_TYPES), "*"),
+                                _paramCache.getValueString(Person_mxJPO.PARAM_MEMBER_ATTR_PROJECT_ACCESS),
+                                _paramCache.getValueString(Person_mxJPO.PARAM_MEMBER_ATTR_PROJECT_ROLE));
+                    }
+
+                    // company representatives of
+                    final Collection<String> matchRepr = _paramCache.getValueList(Person_mxJPO.PARAM_REPRESENTATIVE_IGNORE);
+                    if ((matchRepr == null) || !StringUtil_mxJPO.match(this.getName(), matchRepr))  {
+                        this.parseConnection(_paramCache, bus, this.representativeOf,
+                                _paramCache.getValueString(Person_mxJPO.PARAM_REPRESENTATIVE_RELATION),
+                                StringUtil_mxJPO.join(',', false, _paramCache.getValueList(Person_mxJPO.PARAM_REPRESENTATIVE_TYPES), "*"));
+                    }
+                } finally  {
+                    bus.close(_paramCache.getContext());
+                }
+            }
+        }
+
+        protected void parseConnection(final ParameterCache_mxJPO _paramCache,
+                                       final BusinessObject _bus,
+                                       final Set<Person_mxJPO.ReferencedOrganization> _refOrgs,
+                                       final String _relationship,
+                                       final String _types,
+                                       final String... _relAttrs)
+            throws MatrixException
+        {
+            final StringList objectSelects = new StringList();
+            objectSelects.addElement("type");
+            objectSelects.addElement("name");
+            objectSelects.addElement("revision");
+
+            final List<String> relAttrSels = new ArrayList<String>();
+            final StringList relationshipSelects = new StringList();
+            if (_relAttrs != null)  {
+                for (final String relAttr : _relAttrs)  {
+                    final String relAttrSel = new StringBuilder().append("attribute[").append(relAttr).append("]").toString();
+                    relAttrSels.add(relAttrSel);
+                    relationshipSelects.addElement(relAttrSel);
+                }
+            }
+
+            final RelationshipWithSelectList relSelList = _bus.expandSelect(
+                            _paramCache.getContext(),
+                            _relationship,
+                            _types,
+                            objectSelects,
+                            relationshipSelects,
+                            true,
+                            false,
+                            (short) 1,
+                            "",
+                            "",
+                            (short) 0,
+                            true,
+                            false)
+                    .getRelationships();
+
+            for (final Object mapObj : relSelList)
+            {
+                final RelationshipWithSelect   relMap = (RelationshipWithSelect) mapObj;
+                final BusinessObjectWithSelect busMap = relMap.getTarget();
+                // get attribute values from connection
+                final List<String> attrValues = new ArrayList<String>(relAttrSels.size());
+                int idx = 0;
+                for (final String relAttrSel : relAttrSels)  {
+                    attrValues.add(_relAttrs[idx++]);
+                    attrValues.add(relMap.getSelectData(relAttrSel));
                 }
 
-                // company representatives of
-                final StringList companies = s.getSelectDataList("to[Organization Representative].from.name");
-                if (companies != null)  {
-                    for (final Object company : companies)  {
-                        this.representativeOf.add((String) company);
-                    }
-                }
+                _refOrgs.add(
+                        new ReferencedOrganization(
+                                busMap.getSelectData("type"),
+                                busMap.getSelectData("name"),
+                                busMap.getSelectData("revision"),
+                                attrValues));
             }
         }
 
@@ -511,36 +930,30 @@ public class Person_mxJPO
                 _out.append(" \\\n    \"").append(StringUtil_mxJPO.convertTcl(attr.name))
                     .append("\" \"").append(StringUtil_mxJPO.convertTcl(attr.value)).append("\"");
               }
+            // employee of
+            final Collection<String> matchEmpl = _paramCache.getValueList(Person_mxJPO.PARAM_EMPLOYEE_IGNORE);
+            if ((matchEmpl == null) || !StringUtil_mxJPO.match(this.getName(), matchEmpl))  {
+                _out.append("\nsetEmployeeOf");
+                for (final ReferencedOrganization refOrg : this.employeeOf)  {
+                    refOrg.write(_out);
+                }
+            }
             // member of
-            _out.append("\n# member of")
-                .append("\nset lsCur [split [mql print bus \"${OBJECTID}\" select \"to\\[Member|from.type==Company\\].from.name\" dump \"\\n\"] \"\\n\"]")
-                .append("\nforeach sCur ${lsCur}  {")
-                .append("\n  puts \"    - remove as member from '${sCur}'\"")
-                .append("\n  mql disconnect bus \"${OBJECTID}\" \\")
-                .append("\n      relationship \"Member\" \\")
-                .append("\n      from Company \"${sCur}\" -")
-                .append("\n}");
-            if ((this.memberOf != null) && !this.memberOf.isEmpty())  {
-                _out.append("\nputs \"    - assign as member from '").append(StringUtil_mxJPO.convertTcl(this.memberOf)).append("'\"")
-                    .append("\nmql connect bus \"${OBJECTID}\" \\")
-                    .append("\n    relationship \"Member\" \\")
-                    .append("\n    from Company \"").append(StringUtil_mxJPO.convertTcl(this.memberOf)).append("\" - \\")
-                    .append("\n    \"Project Access\" \"").append(StringUtil_mxJPO.convertTcl(this.memberAccess)).append("\" \\")
-                    .append("\n    \"Project Role\" \"")
-                            .append(StringUtil_mxJPO.convertTcl(StringUtil_mxJPO.joinTcl('~', false, this.memberRoles, null))).append("\"");
+            final Collection<String> matchMemb = _paramCache.getValueList(Person_mxJPO.PARAM_MEMBER_IGNORE);
+            if ((matchMemb == null) || !StringUtil_mxJPO.match(this.getName(), matchMemb))  {
+                _out.append("\nsetMemberOf");
+                for (final ReferencedOrganization refOrg : this.memberOf)  {
+                    refOrg.write(_out);
+                }
             }
-            // employees
-            final List<String> employees = new ArrayList<String>();
-            if (this.employeeOf != null)  {
-                employees.add(this.employeeOf);
+            // representative of (if not ignored)
+            final Collection<String> matchRepr = _paramCache.getValueList(Person_mxJPO.PARAM_REPRESENTATIVE_IGNORE);
+            if ((matchRepr == null) || !StringUtil_mxJPO.match(this.getName(), matchRepr))  {
+                _out.append("\nsetRepresentativeOf");
+                for (final ReferencedOrganization refOrg : this.representativeOf)  {
+                    refOrg.write(_out);
+                }
             }
-            _out.append(this.writeCons("employee",
-                                       employees,
-                                       "Employee"))
-            // organization representatives
-                .append(this.writeCons("organization representative",
-                                       this.representativeOf,
-                                       "Organization Representative"));
             // state (if not ignored)
             final Collection<String> matchStates = _paramCache.getValueList(Person_mxJPO.PARAM_IGNORE_STATE);
             if ((matchStates == null) || !StringUtil_mxJPO.match(this.getName(), matchStates))  {
@@ -548,52 +961,17 @@ public class Person_mxJPO
             }
         }
 
-        protected StringBuilder writeCons(final String _title,
-                                          final Collection<String> _values,
-                                          final String _relationship)
-        {
-            final StringBuilder ret = new StringBuilder()
-                    .append("\n# ").append(_title)
-                    .append("\nset lsCur [split [mql print bus \"${OBJECTID}\" select \"to\\[")
-                                                .append(_relationship).append("\\].from.name\" dump \"\\n\"] \"\\n\"]")
-                    .append("\nset lsNew [list");
-            for (final String repr : _values)  {
-if (!repr.isEmpty())  {
-                ret.append(" \"").append(StringUtil_mxJPO.convertTcl(repr)).append('\"');
-}
-            }
-            ret.append("]")
-               .append("\nforeach sCur ${lsCur}  {")
-               .append("\n  if {[lsearch ${lsNew} \"${sCur}\"] < 0}  {")
-               .append("\n    puts \"    - remove as ").append(_title).append(" from '${sCur}'\"")
-               .append("\n    mql disconnect bus \"${OBJECTID}\" \\")
-               .append("\n        relationship \"").append(_relationship).append("\" \\")
-               .append("\n        from Company \"${sCur}\" -")
-               .append("\n  }")
-               .append("\n}")
-               .append("\nforeach sNew ${lsNew}  {")
-               .append("\n  if {[lsearch ${lsCur} \"${sNew}\"] < 0}  {")
-               .append("\n    puts \"    - assign as ").append(_title).append(" from '${sNew}'\"")
-               .append("\n    mql connect bus \"${OBJECTID}\" \\")
-               .append("\n        relationship \"").append(_relationship).append("\" \\")
-               .append("\n        from Company \"${sNew}\" -")
-               .append("\n  }")
-               .append("\n}");
-
-            return ret;
-        }
-
         /**
          * Sets the TCL variable <code>OBJECTID</code> to current business
          * object.
          *
-         * @param _context          context for this request
+         * @param _paramCache       parameter cache
          * @param _preMQLCode       pre MQL code
          * @param _postMQLCode      post MQL code
          * @param _tclVariables     map with all TCL variables
          * @throws MatrixException if update failed
          */
-        protected void prepareUpdate(final Context _context,
+        protected void prepareUpdate(final ParameterCache_mxJPO _paramCache,
                                      final StringBuilder _preMQLCode,
                                      final StringBuilder _postMQLCode,
                                      final Map<String,String> _tclVariables)
@@ -604,10 +982,105 @@ if (!repr.isEmpty())  {
                                                           this.getBusName(),
                                                           this.getBusRevision(),
                                                           this.getBusVault());
-            final String objectId = bus.getObjectId(_context);
+            final String objectId = bus.getObjectId(_paramCache.getContext());
 
             // prepare map of all TCL variables incl. id of business object
             _tclVariables.put("OBJECTID", objectId);
+
+            _tclVariables.put(
+                    Person_mxJPO.TCL_VAR_EMPLOYEE_RELATION,
+                    _paramCache.getValueString(Person_mxJPO.PARAM_EMPLOYEE_RELATION));
+            _tclVariables.put(
+                    Person_mxJPO.TCL_VAR_EMPLOYEE_TYPES,
+                    StringUtil_mxJPO.join(',', false, _paramCache.getValueList(Person_mxJPO.PARAM_EMPLOYEE_TYPES), "*"));
+
+            _tclVariables.put(Person_mxJPO.TCL_VAR_MEMBER_ATTR_PROJECT_ACCESS,  _paramCache.getValueString(Person_mxJPO.PARAM_MEMBER_ATTR_PROJECT_ACCESS));
+            _tclVariables.put(Person_mxJPO.TCL_VAR_MEMBER_ATTR_PROJECT_ROLE,    _paramCache.getValueString(Person_mxJPO.PARAM_MEMBER_ATTR_PROJECT_ROLE));
+            _tclVariables.put(Person_mxJPO.TCL_VAR_MEMBER_RELATION,             _paramCache.getValueString(Person_mxJPO.PARAM_MEMBER_RELATION));
+            _tclVariables.put(
+                    Person_mxJPO.TCL_VAR_MEMBER_TYPES,
+                    StringUtil_mxJPO.join(',', false, _paramCache.getValueList(Person_mxJPO.PARAM_MEMBER_TYPES), "*"));
+
+            _tclVariables.put(
+                    Person_mxJPO.TCL_VAR_REPRESENTATIVE_RELATION,
+                    _paramCache.getValueString(Person_mxJPO.PARAM_REPRESENTATIVE_RELATION));
+            _tclVariables.put(
+                    Person_mxJPO.TCL_VAR_REPRESENTATIVE_TYPES,
+                    StringUtil_mxJPO.join(',', false, _paramCache.getValueList(Person_mxJPO.PARAM_REPRESENTATIVE_TYPES), "*"));
+        }
+    }
+
+    /**
+     * Class to hold the information about referenced organization objects.
+     */
+    private static final class ReferencedOrganization
+        implements Comparable<Person_mxJPO.ReferencedOrganization>
+    {
+        /** Type of the referenced organization. */
+        private final String type;
+
+        /** Name of the referenced organization. */
+        private final String name;
+
+        /** Revision of the referenced organization. */
+        private final String revision;
+
+        /**
+         * All attribute values on the connection to the referenced
+         * organization.
+         */
+        private final List<String> attrValues;
+
+        /**
+         *
+         * @param _type         type of referenced organization
+         * @param _name         name of referenced organization
+         * @param _revision     revision of referenced organization
+         * @param _attrValues   attribute values
+         */
+        public ReferencedOrganization(final String _type,
+                                      final String _name,
+                                      final String _revision,
+                                      final List<String> _attrValues)
+        {
+            this.type = _type;
+            this.name = _name;
+            this.revision = _revision;
+            this.attrValues = _attrValues;
+        }
+
+        /**
+         * Appends the information about this referenced organization to
+         * <code>_out</code>.
+         *
+         * @param _out      appendable instance
+         * @throws IOException if append failed
+         */
+        protected void write(final Appendable _out)
+            throws IOException
+        {
+            _out.append(" \\\n    {\"").append(StringUtil_mxJPO.convertTcl(this.type))
+                .append("\" \"").append(StringUtil_mxJPO.convertTcl(this.name))
+                .append("\" \"").append(StringUtil_mxJPO.convertTcl(this.revision));
+            for (final String attrValue : this.attrValues)  {
+                _out.append("\" \"").append(StringUtil_mxJPO.convertTcl(attrValue));
+            }
+            _out.append("\"}");
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public int compareTo(final ReferencedOrganization _other)
+        {
+            int ret = this.type.compareTo(_other.type);
+            if (ret == 0)  {
+                ret = this.name.compareTo(_other.name);
+            }
+            if (ret == 0)  {
+                ret = this.revision.compareTo(_other.revision);
+            }
+            return ret;
         }
     }
 }

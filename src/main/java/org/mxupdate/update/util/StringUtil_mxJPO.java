@@ -400,6 +400,51 @@ public final class StringUtil_mxJPO
         return fileFormat.parse(_date);
     }
 
+
+    /**
+     * A list of string is joined to one string. Between two string the given
+     * separator is set. If quotes parameter is defined each element of the
+     * list is surrounded with quotes.
+     *
+     * @param _separator    separator between two list items
+     * @param _quotes       surround the elements of the string with quotes
+     * @param _list         list of strings
+     * @param _emptyString  string which is written if the list is empty (or
+     *                      <code>null</code> if no string for empty list is
+     *                      written)
+     * @return joined string of the list items
+     */
+    public static String join(final char _separator,
+                              final boolean _quotes,
+                              final Collection<String> _list,
+                              final String _emptyString)
+    {
+        final StringBuilder ret = new StringBuilder();
+
+        boolean first = true;
+        if (_list.isEmpty())  {
+            if (_emptyString != null)  {
+                ret.append(_emptyString);
+            }
+        } else  {
+            for (final String elem : _list)  {
+                if (!first)  {
+                    ret.append(_separator);
+                } else  {
+                    first = false;
+                }
+                if (_quotes)  {
+                    ret.append('\"');
+                }
+                ret.append(elem);
+                if (_quotes)  {
+                    ret.append('\"');
+                }
+            }
+        }
+        return ret.toString();
+    }
+
     /**
      * A list of string is joined to one string. Between two string the given
      * separator is set. If quotes parameter is defined each element of the

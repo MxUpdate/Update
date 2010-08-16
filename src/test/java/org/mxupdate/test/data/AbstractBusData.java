@@ -107,7 +107,7 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
               _ci,
               ((_type != null)
                       ? (_type.getName() + AbstractBusData.SEPARATOR + AbstractBusData.SEPARATOR)
-                      : (_ci.hasBusTypeDerived()
+                      : (((_ci != null) && _ci.hasBusTypeDerived())
                               ? (_ci.getBusType() + AbstractBusData.SEPARATOR + AbstractBusData.SEPARATOR)
                               : ""))
                             + AbstractTest.PREFIX + _name + AbstractBusData.SEPARATOR
@@ -161,6 +161,28 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
     }
 
     /**
+     * Returns the business object {@link #busName name}.
+     *
+     * @return business object name
+     * @see #busName
+     */
+    public String getBusName()
+    {
+        return this.busName;
+    }
+
+    /**
+     * Returns the business object {@link #busRevision revision}.
+     *
+     * @return business object revision
+     * @see #busRevision
+     */
+    public String getBusRevision()
+    {
+        return this.busRevision;
+    }
+
+    /**
      * Defines the {@link #description} of this business object instance.
      *
      * @param _description  description of the business object
@@ -185,21 +207,24 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
     public DATA create()
         throws MatrixException
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("escape add bus \"")
-                    .append(AbstractTest.convertMql((this.type != null) ? this.type.getName() : this.getCI().getBusType()))
-                .append("\" \"").append(AbstractTest.convertMql(this.busName))
-                .append("\" \"").append(AbstractTest.convertMql((this.busRevision != null) ? this.busRevision : ""))
-                .append("\" description \"").append(AbstractTest.convertMql((this.description != null) ? this.description : ""))
-                .append("\" policy \"").append(AbstractTest.convertMql(this.getCI().getBusPolicy()))
-                .append("\" vault \"").append(AbstractTest.convertMql(this.getCI().getBusVault()))
-                .append('\"');
-        for (final Map.Entry<String,String> value : this.getValues().entrySet())  {
-            cmd.append(" \"").append(AbstractTest.convertMql(value.getKey()))
-               .append("\" \"").append(AbstractTest.convertMql(value.getValue()))
-               .append('\"');
+        if (!this.isCreated())  {
+            this.setCreated(true);
+            final StringBuilder cmd = new StringBuilder()
+                    .append("escape add bus \"")
+                        .append(AbstractTest.convertMql((this.type != null) ? this.type.getName() : this.getCI().getBusType()))
+                    .append("\" \"").append(AbstractTest.convertMql(this.busName))
+                    .append("\" \"").append(AbstractTest.convertMql((this.busRevision != null) ? this.busRevision : ""))
+                    .append("\" description \"").append(AbstractTest.convertMql((this.description != null) ? this.description : ""))
+                    .append("\" policy \"").append(AbstractTest.convertMql(this.getCI().getBusPolicy()))
+                    .append("\" vault \"").append(AbstractTest.convertMql(this.getCI().getBusVault()))
+                    .append('\"');
+            for (final Map.Entry<String,String> value : this.getValues().entrySet())  {
+                cmd.append(" \"").append(AbstractTest.convertMql(value.getKey()))
+                   .append("\" \"").append(AbstractTest.convertMql(value.getValue()))
+                   .append('\"');
+            }
+            this.getTest().mql(cmd);
         }
-        this.getTest().mql(cmd);
         return (DATA) this;
     }
 

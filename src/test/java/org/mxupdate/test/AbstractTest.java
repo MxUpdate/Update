@@ -204,6 +204,26 @@ public abstract class AbstractTest
         USR_ROLE("role", null, false, null, null, "Role", "ROLE", "ROLE_", "user/role", true),
 
         /**
+         * Other definition for business unit.
+         */
+        OTHER_BUSINESSUNIT(null, "Business Unit", false, "Organization", "eService Production", "Business Unit", null, null, null, true),
+
+        /**
+         * Other definition for company.
+         */
+        OTHER_COMPANY(null, "Company", false, "Organization", "eService Production", "Company", null, null, null, true),
+
+        /**
+         * Other definition for department.
+         */
+        OTHER_DEPARTMENT(null, "Department", false, "Organization", "eService Production", "Department", null, null, null, true),
+
+        /**
+         * Other definition for plant.
+         */
+        OTHER_PLANT(null, "Plant", false, "Organization", "eService Production", "Plant", null, null, null, true),
+
+        /**
          * Configuration item channel.
          */
         UI_CHANNEL("channel", null, false, null, null, "Channel", "CHANNEL", "CHANNEL_", "userinterface/channel", true),
