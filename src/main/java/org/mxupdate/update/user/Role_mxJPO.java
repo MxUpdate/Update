@@ -159,7 +159,12 @@ public class Role_mxJPO
 
     /**
      * Writes specific information about the cached role to the given
-     * writer instance.
+     * writer instance. This includes
+     * <ul>
+     * <li>role type (if parameter {@link #PARAM_SUPPORT_ROLE_TYPES} is
+     *     defined)</li>
+     * <li>all parent roles</li>
+     * </ul>
      *
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
@@ -172,17 +177,20 @@ public class Role_mxJPO
     {
         super.writeObject(_paramCache, _out);
 
-        // role type
-        switch (this.roleType)  {
-            case PROJECT:
-                _out.append(" \\\n    asaproject");
-                break;
-            case ORGANIZATION:
-                _out.append(" \\\n    asanorg");
-                break;
-            case ROLE:
-            default:
-                // the role is the default value
+        // role type (only of role types are supported)
+        if (_paramCache.getValueBoolean(Role_mxJPO.PARAM_SUPPORT_ROLE_TYPES))  {
+            switch (this.roleType)  {
+                case PROJECT:
+                    _out.append(" \\\n    asaproject");
+                    break;
+                case ORGANIZATION:
+                    _out.append(" \\\n    asanorg");
+                    break;
+                case ROLE:
+                default:
+                    _out.append(" \\\n    asarole");
+                    break;
+            }
         }
         // parent roles
         for (final String role : this.parentRoles)  {
@@ -199,7 +207,6 @@ public class Role_mxJPO
      * <ul>
      * <li>reset description</li>
      * <li>remove all parent groups</li>
-     * <li>define as &quot;normal&quot; role</li>
      * </ul>
      *
      * @param _paramCache       parameter cache
@@ -231,10 +238,6 @@ public class Role_mxJPO
                 .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
                 .append(" description \"\"")
                 .append(" remove parent all");
-        // define normal role type
-        if (this.roleType != RoleType.ROLE)  {
-            preMQLCode.append(" asarole");
-        }
 
         // append already existing pre MQL code
         preMQLCode.append(";\n")

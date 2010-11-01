@@ -89,6 +89,17 @@ public class AbstractCollectionUserData<DATA extends AbstractCollectionUserData<
     }
 
     /**
+     * Returns all {@link #parents}.
+     *
+     * @return assigned parents of this user
+     * @see #parents
+     */
+    public Set<DATA> getParents()
+    {
+        return this.parents;
+    }
+
+    /**
      * Prepares the configuration item update file depending on the
      * configuration of this collection user. This includes:
      * <ul>

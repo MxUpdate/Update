@@ -23,6 +23,7 @@ package org.mxupdate.test.ci.user;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.other.SiteData;
 import org.mxupdate.test.data.user.RoleData;
 import org.testng.Assert;
@@ -65,6 +66,16 @@ public class RoleTest
                 new Object[]{
                         "simple role",
                         new RoleData(this, "hallo \" test")
+                            .setValue("description", "\"\\\\ hallo")},
+                new Object[]{
+                        "simple organizational role",
+                        new RoleData(this, "hallo \" test")
+                            .setRoleType(RoleData.RoleType.ORGANIZATION)
+                            .setValue("description", "\"\\\\ hallo")},
+                new Object[]{
+                        "simple project role",
+                        new RoleData(this, "hallo \" test")
+                            .setRoleType(RoleData.RoleType.PROJECT)
                             .setValue("description", "\"\\\\ hallo")},
                 new Object[]{
                         "role with two parent roles",
@@ -143,11 +154,36 @@ public class RoleTest
         throws Exception
     {
         final RoleData role = new RoleData(this, "hallo \" test").setHidden(true);
-        role.create();
-        role.setHidden(null);
-        role.update();
+        role.create()
+            .setHidden(null)
+            .update();
         Assert.assertEquals(this.mql("escape print role \"" + AbstractTest.convertMql(role.getName()) + "\" select hidden dump"),
                             "FALSE",
                             "check that role is not hidden");
+    }
+
+    /**
+     * Check that an update of an organizational role with child organizational
+     * role works.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "check that an update of an organizational role with child organizational role works")
+    public void checkOrgRoleWithChildOrgRole()
+        throws Exception
+    {
+        final RoleData parent = new RoleData(this, "parent")
+                .setRoleType(RoleData.RoleType.ORGANIZATION);
+        final RoleData child = new RoleData(this, "child")
+                .setRoleType(RoleData.RoleType.ORGANIZATION)
+                .assignParents(parent);
+        child.create();
+
+        final ExportParser exportParser = parent.export();
+        parent.checkExport(exportParser);
+
+        // second update with delivered content
+        parent.updateWithCode(exportParser.getOrigCode())
+              .checkExport();
     }
 }
