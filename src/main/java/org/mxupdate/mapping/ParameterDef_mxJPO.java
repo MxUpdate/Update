@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,13 @@
  */
 
 package org.mxupdate.mapping;
+
+import java.util.Map;
+
+import matrix.util.MatrixException;
+
+import org.mxupdate.update.util.MqlUtil_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 
 /**
@@ -81,6 +88,22 @@ public final class ParameterDef_mxJPO
     private Type type;
 
     /**
+     * MQL command creating the string which is used to check if a boolean
+     * value is true.
+     *
+     * @see #evalCheck(ParameterCache_mxJPO, Map)
+     */
+    private String checkMQLCommand;
+
+    /**
+     * String which must be contained to be true within the result of the
+     * {@link #checkMQLCommand}.
+     *
+     * @see #evalCheck(ParameterCache_mxJPO, Map)
+     */
+    private String checkResultContains;
+
+    /**
      * The constructor is defined private so that a new instance could only
      * created within this class.
      *
@@ -107,18 +130,43 @@ public final class ParameterDef_mxJPO
         final String enumName = _key.replaceAll("\\..*", "");
         final String key = _key.substring(enumName.length() + 1);
 
-        ParameterDef_mxJPO param = _mapping.getParameterDefJPOsMap().get(enumName);
+        ParameterDef_mxJPO param = _mapping.getParameterDefMap().get(enumName);
         if (param == null)  {
             param = new ParameterDef_mxJPO(enumName);
-            _mapping.getParameterDefJPOsMap().put(enumName, param);
+            _mapping.getParameterDefMap().put(enumName, param);
         }
 
-        if ("Default".equals(key))  {
+        if ("CheckMQLCommand".equals(key))  {
+            param.checkMQLCommand = _value;
+        } else if ("CheckResultContains".equals(key))  {
+            param.checkResultContains = _value;
+        } else if ("Default".equals(key))  {
             param.defaultValue = _value;
         } else if ("Type".equals(key))  {
             param.type = ParameterDef_mxJPO.Type.valueOf(_value.toUpperCase());
         } else  {
             param.defineValues(key, _value);
+        }
+    }
+
+    /**
+     * Evaluated that the string defined in {@link #checkResultContains} is
+     * defined in the result of {@link #checkMQLCommand MQL command}. The
+     * result overwrites the {@link #defaultValue default value}.
+     *
+     * @param _paramCache       parameter cache with the MX context
+     * @param _checkResult      map of already evaluated MQL check commands
+     * @throws MatrixException if execute of the MQL check command failed
+     */
+    protected void evalCheck(final ParameterCache_mxJPO _paramCache,
+                             final Map<String,String> _checkResult)
+        throws MatrixException
+    {
+        if (this.checkMQLCommand != null)  {
+            if (!_checkResult.containsKey(this.checkMQLCommand))  {
+                _checkResult.put(this.checkMQLCommand.trim(), MqlUtil_mxJPO.execMql(_paramCache, this.checkMQLCommand));
+            }
+            this.defaultValue = String.valueOf(_checkResult.get(this.checkMQLCommand).contains(this.checkResultContains));
         }
     }
 
@@ -152,7 +200,7 @@ public final class ParameterDef_mxJPO
      *
      * @return string representation of the parameter definition
      */
-    @Override
+    @Override()
     public String toString()
     {
         return new StringBuilder()

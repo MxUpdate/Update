@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,6 +65,21 @@ public class Mapping_mxJPO
     private static final int LENGTH_PROPERTYDEF = Mapping_mxJPO.PREFIX_PROPERTYDEF.length();
 
     /**
+     * Used prefix of parameter definition within the property file.
+     *
+     * @see #Mapping_mxJPO(ParameterCache_mxJPO)
+     */
+    private static final String PREFIX_PARAMETERDEF = "ParameterDef.";
+
+    /**
+     * Length of the {@link #PREFIX_PARAMETERDEF prefix of parameter definition}
+     * within the property file.
+     *
+     * @see #Mapping_mxJPO(ParameterCache_mxJPO)
+     */
+    private static final int LENGTH_PARAMETERDEF = Mapping_mxJPO.PREFIX_PARAMETERDEF.length();
+
+    /**
      * Properties holding all mapping definitions.
      */
     private final Properties properties = new Properties();
@@ -85,7 +100,7 @@ public class Mapping_mxJPO
      * @see ParameterDef_mxJPO#defineValue(Mapping_mxJPO, String, String)
      * @see #getAllParameterDefs()
      * @see #getParameterDef(String)
-     * @see #getParameterDefJPOsMap()
+     * @see #getParameterDefMap()
      */
     private final Map<String,ParameterDef_mxJPO> parameterDefMap = new HashMap<String,ParameterDef_mxJPO>();
 
@@ -178,13 +193,13 @@ public class Mapping_mxJPO
         this.properties.putAll(this.readProperties(_paramCache));
 
         // map attributes and types
-        for (final Map.Entry<Object, Object> entry : this.properties.entrySet())  {
+        for (final Map.Entry<Object,Object> entry : this.properties.entrySet())  {
             final String key = (String) entry.getKey();
             final String value = (String) entry.getValue();
             if (key.startsWith("Mode."))  {
                 Mode_mxJPO.defineValue(this, key.substring(5), value);
-            } else if (key.startsWith("ParameterDef."))  {
-                ParameterDef_mxJPO.defineValue(this, key.substring(13), value);
+            } else if (key.startsWith(Mapping_mxJPO.PREFIX_PARAMETERDEF))  {
+                ParameterDef_mxJPO.defineValue(this, key.substring(Mapping_mxJPO.LENGTH_PARAMETERDEF), value);
             } else if (key.startsWith(Mapping_mxJPO.PREFIX_PROPERTYDEF))  {
                 PropertyDef_mxJPO.defineValue(this, key.substring(Mapping_mxJPO.LENGTH_PROPERTYDEF), value);
             } else if (key.startsWith("TypeDef."))  {
@@ -195,6 +210,12 @@ public class Mapping_mxJPO
                 TypeDefTree_mxJPO.defineValue(this, key.substring(12), value);
             }
         }
+        // executes the checks for the parameter definitions
+        final Map<String,String> checkResult = new HashMap<String,String>();
+        for (final ParameterDef_mxJPO param : this.parameterDefMap.values())  {
+            param.evalCheck(_paramCache, checkResult);
+        }
+
         this.typeDefSorted.addAll(this.typeDefMap.values());
     }
 
@@ -268,7 +289,7 @@ public class Mapping_mxJPO
      *         instance
      * @see #parameterDefMap
      */
-    protected Map<String,ParameterDef_mxJPO> getParameterDefJPOsMap()
+    protected Map<String,ParameterDef_mxJPO> getParameterDefMap()
     {
         return this.parameterDefMap;
     }
