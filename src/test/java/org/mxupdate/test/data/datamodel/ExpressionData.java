@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ public class ExpressionData
     public ExpressionData(final AbstractTest _test,
                           final String _name)
     {
-        super(_test, AbstractTest.CI.DM_EXPRESSION, _name, ExpressionData.REQUIRED_EXPORT_VALUES);
+        super(_test, AbstractTest.CI.DM_EXPRESSION, _name, ExpressionData.REQUIRED_EXPORT_VALUES, null);
     }
 
     /**
@@ -71,15 +71,6 @@ public class ExpressionData
         this.append4CIFileHeader(cmd);
 
         cmd.append("mql escape mod expression \"${NAME}\"");
-
-        // append hidden flag
-        if (this.isHidden() != null)  {
-            cmd.append(' ');
-            if (!this.isHidden())  {
-                cmd.append('!');
-            }
-            cmd.append("hidden");
-        }
 
         this.append4CIFileValues(cmd);
 
@@ -104,15 +95,6 @@ public class ExpressionData
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add expression \"").append(AbstractTest.convertMql(this.getName())).append('\"');
             this.append4Create(cmd);
-
-            // append hidden flag
-            if (this.isHidden() != null)  {
-                cmd.append(' ');
-                if (!this.isHidden())  {
-                    cmd.append('!');
-                }
-                cmd.append("hidden");
-            }
 
             cmd.append(";\n")
                .append("escape add property ").append(this.getSymbolicName())

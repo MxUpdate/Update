@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,15 +112,6 @@ public class PortalData
         this.append4CIFileHeader(cmd);
         cmd.append("mql escape mod portal \"${NAME}\"");
 
-        // append hidden flag
-        if (this.isHidden() != null)  {
-            cmd.append(' ');
-            if (!this.isHidden())  {
-                cmd.append('!');
-            }
-            cmd.append("hidden");
-        }
-
         // append channels
         for (final ChannelData channel : this.channels)  {
             cmd.append(" \\\n  place \"").append(AbstractTest.convertTcl(channel.getName())).append("\" after \"\"");
@@ -148,15 +139,6 @@ public class PortalData
 
             final StringBuilder cmd = new StringBuilder()
                     .append("escape add portal \"" + AbstractTest.convertMql(this.getName()) + "\"");
-
-            // append hidden flag
-            if (this.isHidden() != null)  {
-                cmd.append(' ');
-                if (!this.isHidden())  {
-                    cmd.append('!');
-                }
-                cmd.append("hidden");
-            }
 
             // append all channels
             if (!this.channels.isEmpty())  {

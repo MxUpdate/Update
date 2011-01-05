@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,8 @@ public class TypeData
                     final String _name)
     {
         super(_test, AbstractTest.CI.DM_TYPE, _name,
-              TypeData.REQUIRED_EXPORT_VALUES);
+              TypeData.REQUIRED_EXPORT_VALUES,
+              null);
     }
 
     /**
@@ -106,15 +107,6 @@ public class TypeData
         final StringBuilder cmd = new StringBuilder()
                 .append("mql escape mod type \"${NAME}\"");
 
-        // append hidden flag
-        if (this.isHidden() != null)  {
-            cmd.append(' ');
-            if (!this.isHidden())  {
-                cmd.append('!');
-            }
-            cmd.append("hidden");
-        }
-
         this.append4CIFileValues(cmd);
 
         // append attributes
@@ -143,15 +135,6 @@ public class TypeData
 
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add type \"").append(AbstractTest.convertMql(this.getName())).append('\"');
-
-            // append hidden flag
-            if (this.isHidden() != null)  {
-                cmd.append(' ');
-                if (!this.isHidden())  {
-                    cmd.append('!');
-                }
-                cmd.append("hidden");
-            }
 
             // append methods
             for (final AbstractProgramData<?> method : this.methods)  {

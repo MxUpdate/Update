@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,15 +83,6 @@ public class MenuData
         this.append4CIFileHeader(cmd);
         cmd.append("mql escape mod menu \"${NAME}\"");
 
-        // append hidden flag
-        if (this.isHidden() != null)  {
-            cmd.append(' ');
-            if (!this.isHidden())  {
-                cmd.append('!');
-            }
-            cmd.append("hidden");
-        }
-
         for (final AbstractCommandData<?> child : this.children)  {
             cmd.append(" add ").append(child.getCI().getMxType())
                .append(" \"").append(AbstractTest.convertTcl(child.getName())).append('\"');
@@ -118,15 +109,6 @@ public class MenuData
 
             final StringBuilder cmd = new StringBuilder()
                     .append("escape add menu \"" + AbstractTest.convertMql(this.getName()) + "\"");
-
-            // append hidden flag
-            if (this.isHidden() != null)  {
-                cmd.append(' ');
-                if (!this.isHidden())  {
-                    cmd.append('!');
-                }
-                cmd.append("hidden");
-            }
 
             this.append4Create(cmd);
             cmd.append(';');

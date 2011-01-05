@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,7 +94,7 @@ public class TableTest
                         "table with one hidden column",
                         new TableData(this, "hallo \" test")
                             .newField("field")
-                                    .setHidden(true)
+                                    .setFlag("hidden", true)
                                     .getFormTable()}
         );
     }

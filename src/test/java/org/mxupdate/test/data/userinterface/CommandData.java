@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,15 +97,6 @@ public class CommandData
         this.append4CIFileHeader(cmd);
         cmd.append("mql escape mod command \"${NAME}\"");
 
-        // append hidden flag
-        if (this.isHidden() != null)  {
-            cmd.append(' ');
-            if (!this.isHidden())  {
-                cmd.append('!');
-            }
-            cmd.append("hidden");
-        }
-
         for (final AbstractUserData<?> user : this.users)  {
             cmd.append(" add user \"")
                .append(AbstractTest.convertTcl(user.getName())).append('\"');
@@ -132,15 +123,6 @@ public class CommandData
 
             final StringBuilder cmd = new StringBuilder()
                     .append("escape add command \"" + AbstractTest.convertMql(this.getName()) + "\"");
-
-            // append hidden flag
-            if (this.isHidden() != null)  {
-                cmd.append(' ');
-                if (!this.isHidden())  {
-                    cmd.append('!');
-                }
-                cmd.append("hidden");
-            }
 
             if (!this.users.isEmpty())  {
                 cmd.append(" user ");

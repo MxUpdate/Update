@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,15 +72,15 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
         ret.add(new Object[]{
                 _logText + " with hidden flag true",
                 this.createNewData("hello \" test")
-                        .setHidden(true)});
+                        .setFlag("hidden", true)});
         ret.add(new Object[]{
                 _logText + " with hidden flag false",
                 this.createNewData("hello \" test")
-                        .setHidden(false)});
+                        .setFlag("hidden", false)});
         ret.add(new Object[]{
                 _logText + " without hidden flag",
                 this.createNewData("hello \" test")
-                        .setHidden(null)});
+                        .setFlag("hidden", null)});
 
         ret.addAll(Arrays.asList(_datas));
         return ret.toArray(new Object[ret.size()][]);

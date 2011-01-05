@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ public class MQLTest
                         new MQLProgramData(this, "Test4.tcl").setValue("description", "description \"test\"").setCode("test")},
                 new Object[]{
                         "with extension and hidden",
-                        new MQLProgramData(this, "Test4.tcl").setHidden(true).setCode("test")},
+                        new MQLProgramData(this, "Test4.tcl").setFlag("hidden", true).setCode("test")},
                 new Object[]{
                         "with extension and deferred flag",
                         new MQLProgramData(this, "Test4.tcl").setDeferred(true).setCode("test")},

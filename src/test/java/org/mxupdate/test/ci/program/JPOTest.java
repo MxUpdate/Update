@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,7 +106,7 @@ public class JPOTest
                         new JPOProgramData(this, "Test1").setCode("test").setValue("description", "Test \"Description\"")},
                 new Object[]{
                         "with hidden flag",
-                        new JPOProgramData(this, "Test1").setCode("test").setHidden(true)},
+                        new JPOProgramData(this, "Test1").setCode("test").setFlag("hidden", true)},
                 new Object[]{
                         "with back slashes",
                         new JPOProgramData(this, "Test1").setCode("public class ${CLASSNAME} { final String str = \"\\\"\";}")},

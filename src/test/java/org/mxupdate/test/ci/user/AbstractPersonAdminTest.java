@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -237,9 +237,9 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
         throws Exception
     {
         final AbstractPersonAdminData<?> person = this.createNewData("hello \" test")
-                .setHidden(true)
+                .setFlag("hidden", true)
                 .create()
-                .setHidden(null)
+                .setFlag("hidden", null)
                 .update();
 
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select hidden dump"),

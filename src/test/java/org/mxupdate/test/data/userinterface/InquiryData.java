@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.data.AbstractAdminData;
 import org.testng.Assert;
 
 /**
@@ -37,7 +38,7 @@ import org.testng.Assert;
  * @version $Id$
  */
 public class InquiryData
-    extends AbstractUIWithHiddenFlagData<InquiryData>
+    extends AbstractAdminData<InquiryData>
 {
     /**
      * Within export the description, pattern, format and file must be defined.
@@ -83,7 +84,7 @@ public class InquiryData
     public InquiryData(final AbstractTest _test,
                        final String _name)
     {
-        super(_test, AbstractTest.CI.UI_INQUIRY, _name, InquiryData.REQUIRED_EXPORT_VALUES);
+        super(_test, AbstractTest.CI.UI_INQUIRY, _name, InquiryData.REQUIRED_EXPORT_VALUES, null);
     }
 
     /**
@@ -128,15 +129,6 @@ public class InquiryData
         this.append4CIFileHeader(cmd);
         cmd.append("mql escape mod inquiry \"${NAME}\" file [file join \"${FILE}\"]");
 
-        // append hidden flag
-        if (this.isHidden() != null)  {
-            cmd.append(' ');
-            if (!this.isHidden())  {
-                cmd.append('!');
-            }
-            cmd.append("hidden");
-        }
-
         this.append4CIFileValues(cmd);
 
         // append embedded inquiry code
@@ -161,15 +153,6 @@ public class InquiryData
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("escape add inquiry \"" + AbstractTest.convertMql(this.getName()) + "\"");
-
-        // append hidden flag
-        if (this.isHidden() != null)  {
-            cmd.append(' ');
-            if (!this.isHidden())  {
-                cmd.append('!');
-            }
-            cmd.append("hidden");
-        }
 
         this.append4Create(cmd);
 

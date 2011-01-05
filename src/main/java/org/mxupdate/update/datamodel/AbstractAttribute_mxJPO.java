@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,26 @@ abstract class AbstractAttribute_mxJPO
     extends AbstractDMWithTriggers_mxJPO
 {
     /**
+     * Name of the parameter to define that the &quot;resetonclone&quot; flag
+     * for attributes from current MX version is supported. The parameter is
+     * needed to support the case that an old MX version is used....
+     *
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private static final String PARAM_SUPPORT_FLAG_RESET_ON_CLONE = "DMAttrSupportsFlagResetOnClone";
+
+    /**
+     * Name of the parameter to define that the &quot;resetonrevision&quot;
+     * flag for attributes from current MX version is supported. The parameter
+     * is needed to support the case that an old MX version is used....
+     *
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
+     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
+    private static final String PARAM_SUPPORT_FLAG_RESET_ON_REVISION = "DMAttrSupportsFlagResetOnRevision";
+
+    /**
      * MQL list statement with select for the attribute type and name used
      * to get the list of all attribute MX names depending on the attribute
      * type.
@@ -86,6 +106,9 @@ abstract class AbstractAttribute_mxJPO
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
+        // max length only valid for string attributes!
+        AbstractAttribute_mxJPO.IGNORED_URLS.add("/maxlength");
+        AbstractAttribute_mxJPO.IGNORED_URLS.add("/primitiveType");
         AbstractAttribute_mxJPO.IGNORED_URLS.add("/rangeList");
         AbstractAttribute_mxJPO.IGNORED_URLS.add("/rangeProgram");
     }
@@ -154,19 +177,9 @@ abstract class AbstractAttribute_mxJPO
     private final Set<Range> rangesSorted = new TreeSet<Range>();
 
     /**
-     * Stores the attribute type of this attribute.
-     */
-    private String type = null;
-
-    /**
      * Default value of the attribute.
      */
     private String defaultValue = null;
-
-    /**
-     * The attribute is a multi line attribute.
-     */
-    private boolean multiline = false;
 
     /**
      * Holds the attribute type used to create a new attribute.
@@ -205,6 +218,24 @@ abstract class AbstractAttribute_mxJPO
     private boolean dimensionUpdated = false;
 
     /**
+     * Flag that the attribute value is reset on clone.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
+     * @see #PARAM_SUPPORT_FLAG_RESET_ON_CLONE
+     */
+    private boolean resetOnClone = false;
+
+    /**
+     * Flag that the attribute value is reset on revision.
+     *
+     * @see #parse(String, String)
+     * @see #writeObject(ParameterCache_mxJPO, Appendable)
+     * @see #PARAM_SUPPORT_FLAG_RESET_ON_REVISION
+     */
+    private boolean resetOnRevision = false;
+
+    /**
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
@@ -239,8 +270,7 @@ abstract class AbstractAttribute_mxJPO
     {
         final Set<String> ret = new TreeSet<String>();
         final int length = this.attrTypeList.length();
-        for (final String name : MqlUtil_mxJPO.execMql(_paramCache,
-                                                       AbstractAttribute_mxJPO.SELECT_ATTRS).split("\n"))  {
+        for (final String name : MqlUtil_mxJPO.execMql(_paramCache, AbstractAttribute_mxJPO.SELECT_ATTRS).split("\n"))  {
             if (!"".equals(name) && name.startsWith(this.attrTypeList))  {
                 ret.add(name.substring(length));
             }
@@ -249,15 +279,15 @@ abstract class AbstractAttribute_mxJPO
     }
 
     /**
-     * The method parses the attribute specific XML urls. This includes
+     * The method parses the attribute specific XML URLs. This includes
      * information about:
      * <ul>
-     * <li>assigned rules (see {@link #rules})</li>
-     * <li>default value (see {@link #defaultValue})</li>
-     * <li>is the attribute multiline (see {@link #multiline})</li>
-     * <li>attribute type (see {@link #type})</li>
-     * <li>defined ranges (see {@link #ranges}, {@link #rangeProgramRef} and
-     *     {@link #rangeProgramInputArguments}</li>
+     * <li>assigned {@link #rules}</li>
+     * <li>{@link #defaultValue default value}</li>
+     * <li>{@link #resetOnClone reset on clone} flag</li>
+     * <li>{@link #resetOnRevision reset on revision} flag</li>
+     * <li>defined {@link #ranges}, {@link #rangeProgramRef program ranges} and
+     *     their {@link #rangeProgramInputArguments input arguments}</li>
      * </ul>
      *
      * @param _url      URL to parse
@@ -275,10 +305,10 @@ abstract class AbstractAttribute_mxJPO
                 this.defaultValue = _content;
             } else if ("/dimensionRef".equals(_url))  {
                 this.dimension = _content;
-            } else if ("/multiline".equals(_url))  {
-                this.multiline = true;
-            } else if ("/primitiveType".equals(_url))  {
-                this.type = _content;
+            } else if ("/resetonclone".equals(_url))  {
+                this.resetOnClone = true;
+            } else if ("/resetonrevision".equals(_url))  {
+                this.resetOnRevision = true;
 
             } else if ("/rangeList/range".equals(_url))  {
                 this.ranges.add(new Range());
@@ -325,22 +355,41 @@ abstract class AbstractAttribute_mxJPO
 
     /**
      * Writes specific information about the cached attribute to the given
-     * writer instance.
+     * writer instance. Following information is written
+     * <ul>
+     * <li>flag &quot;{@link #resetonclone}&quot; (if parameter
+     *     {@link #PARAM_SUPPORT_FLAG_RESET_ON_CLONE} is defined)</li>
+     * <li>flag &quot;{@link #resetOnRevision}&quot; (if parameter
+     *     {@link #PARAM_SUPPORT_FLAG_RESET_ON_REVISION} is defined)</li>
+     * <li>{@link #writeAttributeSpecificValues(ParameterCache_mxJPO, Appendable)
+     *     attribute specific properties and flags}</li>
+     * <li>all assigned {@link #rules}</li>
+     * <li>{@link #defaultValue default value}</li>
+     * <li>{@link #writeTriggers(Appendable) triggers}</li>
+     * <li>{@link #rangesSorted ranges}</li>
+     * </ul>
      *
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
      * @throws IOException if the TCL update code could not be written to the
      *                     writer instance
+     * @see #PARAM_SUPPORT_FLAG_RESET_ON_CLONE
+     * @see #PARAM_SUPPORT_FLAG_RESET_ON_REVISION
+     * @see #writeAttributeSpecificValues(ParameterCache_mxJPO, Appendable)
      */
     @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
         throws IOException
     {
-        _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden");
-        if ("string".equalsIgnoreCase(this.type))  {
-            _out.append(" \\\n    ").append(this.multiline ? "" : "!").append("multiline");
+        _out.append(" \\\n    ").append(this.isHidden() ?        "hidden"          : "!hidden");
+        if (_paramCache.getValueBoolean(AbstractAttribute_mxJPO.PARAM_SUPPORT_FLAG_RESET_ON_CLONE))  {
+            _out.append(" \\\n    ").append(this.resetOnClone ?      "resetonclone"    : "!resetonclone");
         }
+        if (_paramCache.getValueBoolean(AbstractAttribute_mxJPO.PARAM_SUPPORT_FLAG_RESET_ON_REVISION))  {
+            _out.append(" \\\n    ").append(this.resetOnRevision ?   "resetonrevision" : "!resetonrevision");
+        }
+        this.writeAttributeSpecificValues(_paramCache, _out);
         for (final String rule : this.rules)  {
             _out.append(" \\\n    add rule \"").append(StringUtil_mxJPO.convertTcl(rule)).append("\"");
         }
@@ -355,6 +404,20 @@ abstract class AbstractAttribute_mxJPO
         for (final Range range : this.rangesSorted)  {
             range.write(_out);
         }
+    }
+
+    /**
+     * Defines attribute specific values which are written to the CI file.
+     *
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @throws IOException if the TCL update code could not be written to the
+     *                     writer instance
+     */
+    protected void writeAttributeSpecificValues(final ParameterCache_mxJPO _paramCache,
+                                                final Appendable _out)
+        throws IOException
+    {
     }
 
     /**
@@ -405,6 +468,11 @@ abstract class AbstractAttribute_mxJPO
      * in the <code>_preMQLCode</code> to reset this attribute. This includes:
      * <ul>
      * <li>set to not hidden</li>
+     * <li>flag &quot;resetonclone&quot; is disabled (if parameter
+     *     {@link #PARAM_SUPPORT_FLAG_RESET_ON_CLONE} is defined)</li>
+     * <li>flag &quot;resetonrevision&quot; is disabled (if parameter
+     *     {@link #PARAM_SUPPORT_FLAG_RESET_ON_REVISION} is defined)</li>
+     * <li>flag &quot;multiline&quot; is disabled for string attributes</li>
      * <li>reset description and default value</li>
      * <li>remove all ranges</li>
      * <li>define the TCL procedure {@link #TCL_PROCEDURE} to set the
@@ -432,6 +500,8 @@ abstract class AbstractAttribute_mxJPO
      * @see #updateDimension(ParameterCache_mxJPO, String)
      * @see #dimensionUpdated
      * @see #TCL_PROCEDURE
+     * @see #PARAM_SUPPORT_FLAG_RESET_ON_CLONE
+     * @see #PARAM_SUPPORT_FLAG_RESET_ON_REVISION
      */
     @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
@@ -447,6 +517,12 @@ abstract class AbstractAttribute_mxJPO
                 .append("escape mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
                 .append(" !hidden description \"\" default \"\"");
+        if (_paramCache.getValueBoolean(AbstractAttribute_mxJPO.PARAM_SUPPORT_FLAG_RESET_ON_CLONE))  {
+            preMQLCode.append(" !resetonclone");
+        }
+        if (_paramCache.getValueBoolean(AbstractAttribute_mxJPO.PARAM_SUPPORT_FLAG_RESET_ON_REVISION))  {
+            preMQLCode.append(" !resetonrevision");
+        }
         // remove rules
         for (final String rule : this.rules)  {
             preMQLCode.append(" remove rule \"").append(StringUtil_mxJPO.convertMql(rule)).append('\"');

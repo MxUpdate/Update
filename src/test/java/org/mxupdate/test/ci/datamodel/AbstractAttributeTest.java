@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,6 +136,28 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
                 _logText + " with default value",
                 this.createNewData("hello")
                         .setValue("default", _value1)});
+
+        // reset on ? flags
+        ret.add(new Object[]{
+                _logText + " with reset on flag true",
+                this.createNewData("hello")
+                        .setValue("default", _value1)
+                        .setFlag("resetonclone", true)});
+        ret.add(new Object[]{
+                _logText + " with reset on flag false",
+                this.createNewData("hello")
+                        .setValue("default", _value1)
+                        .setFlag("resetonclone", false)});
+        ret.add(new Object[]{
+                _logText + " with reset on revision true",
+                this.createNewData("hello")
+                        .setValue("default", _value1)
+                        .setFlag("resetonrevision", true)});
+        ret.add(new Object[]{
+                _logText + " with reset on revision false",
+                this.createNewData("hello")
+                        .setValue("default", _value1)
+                        .setFlag("resetonrevision", false)});
 
         ret.addAll(Arrays.asList(_datas));
 

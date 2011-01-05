@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,7 +118,7 @@ public class PolicyData
     public PolicyData(final AbstractTest _test,
                       final String _name)
     {
-        super(_test, AbstractTest.CI.DM_POLICY, _name, PolicyData.REQUIRED_EXPORT_VALUES);
+        super(_test, AbstractTest.CI.DM_POLICY, _name, PolicyData.REQUIRED_EXPORT_VALUES, null);
     }
 
     /**
@@ -232,7 +232,7 @@ public class PolicyData
         this.append4CIFileHeader(strg);
 
         strg.append("updatePolicy \"${NAME}\" {\n")
-            .append("  hidden \"").append(this.isHidden() != null ? this.isHidden() : false).append("\"\n");
+            .append("  hidden \"").append(this.getFlag("hidden") != null ? this.getFlag("hidden") : false).append("\"\n");
 
         // values
         for (final Map.Entry<String,String> entry : this.getValues().entrySet())  {
@@ -296,10 +296,6 @@ public class PolicyData
 
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add policy \"").append(AbstractTest.convertMql(this.getName())).append('\"');
-
-            if ((this.isHidden() != null) && this.isHidden())  {
-                cmd.append(" hidden");
-            }
 
             // assign types
             if (this.allTypes)  {
@@ -405,7 +401,7 @@ public class PolicyData
                                   "\"" + AbstractTest.convertTcl(entry.getValue()) + "\"");
         }
         // check for hidden flag
-        if ((this.isHidden() == null) || !this.isHidden())  {
+        if ((this.getFlag("hidden") == null) || !this.getFlag("hidden"))  {
             this.checkSingleValue(_exportParser,
                                   "hidden flag (must be false)",
                                   "hidden",

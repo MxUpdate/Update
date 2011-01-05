@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,8 @@ public class RelationshipData
                             final String _name)
     {
         super(_test, AbstractTest.CI.DM_RELATIONSHIP, _name,
-              RelationshipData.REQUIRED_EXPORT_VALUES);
+              RelationshipData.REQUIRED_EXPORT_VALUES,
+              null);
     }
 
     /**
@@ -132,15 +133,6 @@ public class RelationshipData
         final StringBuilder cmd = new StringBuilder()
                 .append("mql escape mod relationship \"${NAME}\"");
 
-        // append hidden flag
-        if (this.isHidden() != null)  {
-            cmd.append(' ');
-            if (!this.isHidden())  {
-                cmd.append('!');
-            }
-            cmd.append("hidden");
-        }
-
         this.append4CIFileValues(cmd);
 
         // prevent duplicates
@@ -182,15 +174,6 @@ public class RelationshipData
 
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add relationship \"").append(AbstractTest.convertMql(this.getName())).append('\"');
-
-            // append hidden flag
-            if (this.isHidden() != null)  {
-                cmd.append(' ');
-                if (!this.isHidden())  {
-                    cmd.append('!');
-                }
-                cmd.append("hidden");
-            }
 
             // prevent duplicates
             if (this.preventDuplicates != null)  {

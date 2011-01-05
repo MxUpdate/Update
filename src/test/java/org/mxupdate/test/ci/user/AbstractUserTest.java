@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,13 +159,13 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
                 _logText + " with not hidden cue",
                 this.createNewData("hallo \" test")
                         .newCue("my cue \"test\"")
-                                .setHidden(false)
+                                .setFlag("hidden", false)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with hidden cue",
                 this.createNewData("hallo \" test")
                         .newCue("my cue \"test\"")
-                                .setHidden(true)
+                                .setFlag("hidden", true)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with cue with property name",
@@ -251,13 +251,13 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
                 _logText + " with not hidden filter",
                 this.createNewData("hallo \" test")
                         .newFilter("my filter \"test\"")
-                                .setHidden(false)
+                                .setFlag("hidden", false)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with hidden filter",
                 this.createNewData("hallo \" test")
                         .newFilter("my filter \"test\"")
-                                .setHidden(true)
+                                .setFlag("hidden", true)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with filter in the to direction",
@@ -342,13 +342,13 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
                 _logText + " with not hidden query",
                 this.createNewData("hallo \" test")
                         .newQuery("my query \"test\"")
-                                .setHidden(false)
+                                .setFlag("hidden", false)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with hidden query",
                 this.createNewData("hallo \" test")
                         .newQuery("my query \"test\"")
-                                .setHidden(true)
+                                .setFlag("hidden", true)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with query with expand type true",
@@ -468,7 +468,7 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
                 _logText + " with table and hidden field",
                 this.createNewData("hallo \" test")
                         .newTable("my table \"test\"")
-                                .newField("field").setHidden(true).getFormTable()
+                                .newField("field").setFlag("hidden", true).getFormTable()
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with table with property name",
@@ -554,13 +554,13 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
                 _logText + " with not hidden tip",
                 this.createNewData("hallo \" test")
                         .newTip("my tip \"test\"")
-                                .setHidden(false)
+                                .setFlag("hidden", false)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with hidden tip",
                 this.createNewData("hallo \" test")
                         .newTip("my tip \"test\"")
-                                .setHidden(true)
+                                .setFlag("hidden", true)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with tip with expression",
@@ -641,13 +641,13 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
                 _logText + " with not hidden tool set",
                 this.createNewData("hallo \" test")
                         .newToolSet("my tool set \"test\"")
-                                .setHidden(false)
+                                .setFlag("hidden", false)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with hidden tool set",
                 this.createNewData("hallo \" test")
                         .newTip("my tool set \"test\"")
-                                .setHidden(true)
+                                .setFlag("hidden", true)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with tool set with property name",
@@ -718,13 +718,13 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
                 _logText + " with not hidden view",
                 this.createNewData("hello \" test")
                         .newView("my cue \"test\"")
-                                .setHidden(false)
+                                .setFlag("hidden", false)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with hidden view",
                 this.createNewData("hello \" test")
                         .newView("my cue \"test\"")
-                                .setHidden(true)
+                                .setFlag("hidden", true)
                                 .getUser()});
         _ret.add(new Object[]{
                 _logText + " with view with property name",

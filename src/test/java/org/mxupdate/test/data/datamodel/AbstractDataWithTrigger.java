@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,13 +58,16 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
      * @param _requiredExportValues defines the required values of the
      *                              export within the configuration item
      *                              file
+     * @param _requiredExportFlags  defines the required flags of the export
+     *                              within the configuration item file
      */
     protected AbstractDataWithTrigger(final AbstractTest _test,
                                       final CI _ci,
                                       final String _name,
-                                      final Map<String,String> _requiredExportValues)
+                                      final Map<String,String> _requiredExportValues,
+                                      final Map<String,Boolean> _requiredExportFlags)
     {
-        super(_test, _ci, _name, _requiredExportValues);
+        super(_test, _ci, _name, _requiredExportValues, _requiredExportFlags);
     }
 
     /**

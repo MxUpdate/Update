@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,6 @@ public class AttributeDateData
     public AttributeDateData(final AbstractTest _test,
                              final String _name)
     {
-        super(_test, CI.DM_ATTRIBUTE_DATE, _name, "date");
+        super(_test, CI.DM_ATTRIBUTE_DATE, _name, "date", null, null);
     }
 }

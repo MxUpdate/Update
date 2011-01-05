@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,12 +59,24 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     private String symbolicName;
 
     /**
-     * Is the administration object hidden?
+     * Defines flags for this data piece.
      *
-     * @see #setHidden(Boolean)
-     * @see #isHidden()
+     * @see #setFlag(String, String)
+     * @see #getFlag(String)
+     * @see #getFlags()
      */
-    private Boolean hidden = false;
+    private final Map<String,Boolean> flags = new HashMap<String,Boolean>();
+
+    /**
+     * Defines the flags and their default value which must be defined for an
+     * export. They are tested for existence from
+     * {@link #checkExport(ExportParser)}. The values must be defined at
+     * minimum and at maximum once in the configuration item file. The default
+     * value is checked only if in {@link #flags} the value is not defined.
+     *
+     * @see #checkExport(ExportParser)
+     */
+    private final Map<String,Boolean> requiredExportFlags = new HashMap<String,Boolean>();
 
     /**
      * Defines the values which must be defined for exports. They are tested
@@ -75,7 +87,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
      *
      * @see #checkExport(ExportParser)
      */
-    private final Map<String,String> requiredExportValues;
+    private final Map<String,String> requiredExportValues = new HashMap<String,String>();
 
     /**
      * All properties for this data piece.
@@ -93,17 +105,25 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
      * @param _requiredExportValues defines the required values of the
      *                              export within the configuration item
      *                              file
+     * @param _requiredExportFlags  defines the required flags of the export
+     *                              within the configuration item file
      */
     protected AbstractAdminData(final AbstractTest _test,
                                 final AbstractTest.CI _ci,
                                 final String _name,
-                                final Map<String,String> _requiredExportValues)
+                                final Map<String,String> _requiredExportValues,
+                                final Map<String,Boolean> _requiredExportFlags)
     {
         super(_test, _ci, _name);
         this.symbolicName = (_ci != null)
                             ? _ci.getMxType() + "_" + this.getName().replaceAll(AbstractAdminData.NOT_ALLOWED_CHARS, "")
                             : null;
-        this.requiredExportValues = (_requiredExportValues != null) ? _requiredExportValues : new HashMap<String,String>(0);
+        if (_requiredExportValues != null)  {
+            this.requiredExportValues.putAll(_requiredExportValues);
+        }
+        if (_requiredExportFlags != null)  {
+            this.requiredExportFlags.putAll(_requiredExportFlags);
+        }
     }
 
     /**
@@ -132,30 +152,33 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     }
 
     /**
-     * Defines if this data instance must be hidden.
+     * Defines the flag and the value.
      *
-     * @param _hidden       <i>true</i> if the data instance is hidden;
-     *                      otherwise <i>false</i>
+     * @param _key          key (name) of the flag
+     * @param _value        <i>true</i> to activate the flag; otherwise
+     *                      <i>false</i>; to undefine set to <code>null</code>
      * @return this data instance
-     * @see #hidden
+     * @see #flags
      */
     @SuppressWarnings("unchecked")
-    public DATA setHidden(final Boolean _hidden)
+    public DATA setFlag(final String _key,
+                        final Boolean _value)
     {
-        this.hidden = _hidden;
+        this.flags.put(_key, _value);
         return (DATA) this;
     }
 
     /**
-     * Returns <i>true</i> if this data instance is {@link #hidden}.
+     * Returns the value for given flag.
      *
-     * @return <i>true</i> if this data instance is hidden; otherwise
-     *         <i>false</i>
-     * @see #hidden
+     * @param _key      key (name) of searched flag
+     * @return <i>true</i> if the flag is set; <i>false</i> if not set;
+     *         <code>null</code> if flag is not defined
+     * @see #flags
      */
-    public Boolean isHidden()
+    public Boolean getFlag(final String _key)
     {
-        return this.hidden;
+        return this.flags.get(_key);
     }
 
     /**
@@ -237,6 +260,17 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
      */
     protected void append4CIFileValues(final StringBuilder _cmd)
     {
+        // flags
+        for (final Map.Entry<String,Boolean> entry : this.flags.entrySet())  {
+            if (entry.getValue() != null)  {
+                _cmd.append(' ');
+                if (!entry.getValue())  {
+                    _cmd.append('!');
+                }
+                _cmd.append(entry.getKey());
+            }
+        }
+
         // values
         for (final Map.Entry<String,String> entry : this.getValues().entrySet())  {
             _cmd.append(' ').append(entry.getKey()).append(" \"")
@@ -266,16 +300,29 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     }
 
     /**
-     * Appends the MQL commands to define all {@link #values} and
-     * {@link #properties} within a create.
+     * Appends the MQL commands to define all {@link #flags},
+     * {@link #getValues() values} and {@link #properties} within a create.
      *
      * @param _cmd  string builder used to append MQL commands
      * @throws MatrixException if used object could not be created
-     * @see #values
+     * @see #flags
+     * @see #getValues() values
+     * @see #properties
      */
     protected void append4Create(final StringBuilder _cmd)
         throws MatrixException
     {
+        // flags
+        for (final Map.Entry<String,Boolean> entry : this.flags.entrySet())  {
+            if (entry.getValue() != null)  {
+                _cmd.append(' ');
+                if (!entry.getValue())  {
+                    _cmd.append('!');
+                }
+                _cmd.append(entry.getKey());
+            }
+        }
+
         // values
         for (final Map.Entry<String,String> entry : this.getValues().entrySet())  {
             _cmd.append(' ').append(entry.getKey()).append(" \"")
@@ -316,13 +363,28 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         for (final Map.Entry<String,String> entry : this.getValues().entrySet())  {
             this.checkSingleValue(_exportParser, entry.getKey(), entry.getKey(), "\"" + AbstractTest.convertTcl(entry.getValue()) + "\"");
         }
-        // check for all required values
-        if (this.requiredExportValues != null)  {
-            for (final String valueName : this.requiredExportValues.keySet())  {
-                Assert.assertEquals(_exportParser.getLines("/mql/" + valueName + "/@value").size(),
-                                    1,
-                                    "required check that minimum and maximum one " + valueName + " is defined");
+        // check for all required flags
+        if (!this.requiredExportFlags.isEmpty())  {
+            final Set<String> main = new HashSet<String>(_exportParser.getLines("/mql/"));
+            for (final Map.Entry<String,Boolean> flag : this.requiredExportFlags.entrySet())  {
+                final boolean value = this.flags.containsKey(flag.getKey()) && (this.flags.get(flag.getKey()) != null)
+                                      ? this.flags.get(flag.getKey())
+                                      : flag.getValue();
+                Assert.assertEquals(
+                        main.contains(flag.getKey()) || main.contains(flag.getKey() + " \\"),
+                        value,
+                        "check that flag '" + flag.getKey() + "' for " + this.getCI().getMxType() + " '" + this.getName() + "' is defined as " + value);
+                Assert.assertEquals(
+                        main.contains("!" + flag.getKey()) || main.contains("!" + flag.getKey() + " \\"),
+                        !value,
+                        "check that flag '" + flag.getKey() + "' for " + this.getCI().getMxType() + " '" + this.getName() + "' is defined " + value);
             }
+        }
+        // check for all required values
+        for (final String valueName : this.requiredExportValues.keySet())  {
+            Assert.assertEquals(_exportParser.getLines("/mql/" + valueName + "/@value").size(),
+                                1,
+                                "required check that minimum and maximum one " + valueName + " is defined");
         }
         // check for add values
         final Set<String> needAdds = new HashSet<String>();
@@ -339,7 +401,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         // check hidden flag
         if (this.getCI() != null)  {
             final Set<String> main = new HashSet<String>(_exportParser.getLines("/mql/"));
-            if ((this.isHidden() != null) && this.isHidden())  {
+            if ((this.getFlag("hidden") != null) && this.getFlag("hidden"))  {
                 Assert.assertTrue(
                         main.contains("hidden") || main.contains("hidden \\"),
                         "check that " + this.getCI().getMxType() + " '" + this.getName() + "' is hidden");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -213,15 +213,15 @@ public class PolicyTest
                 new Object[]{
                         "policy with default hidden flag",
                         new PolicyData(this, "hello \" test")
-                                .setHidden(null)},
+                                .setFlag("hidden", null)},
                 new Object[]{
                         "policy with hidden flag false",
                         new PolicyData(this, "hello \" test")
-                                .setHidden(false)},
+                                .setFlag("hidden", false)},
                 new Object[]{
                         "policy with hidden flag true",
                         new PolicyData(this, "hello \" test")
-                                .setHidden(true)},
+                                .setFlag("hidden", true)},
 
                 // issue 30
                 new Object[]{

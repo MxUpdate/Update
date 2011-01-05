@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
                                 final String _name,
                                 final Map<String,String> _requiredExportValues)
     {
-        super(_test, null, _name, _requiredExportValues);
+        super(_test, null, _name, _requiredExportValues, null);
         this.mxAdminType = _mxAdminType;
         this.user = _user;
     }
@@ -188,13 +188,6 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
     {
         super.append4Create(_cmd);
 
-        // hidden flag
-        if (this.isHidden())  {
-            _cmd.append(" hidden");
-        } else  {
-            _cmd.append(" !hidden");
-        }
-
         // visible users
         if (!this.visible.isEmpty())  {
             _cmd.append(" visible ");
@@ -223,13 +216,6 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
                 .append("mql escape add ").append(this.mxAdminType).append(" \"")
                 .append(AbstractTest.convertTcl(this.getName()))
                 .append("\" \\\n    user \"${NAME}\"");
-
-        // hidden flag
-        if (this.isHidden())  {
-            cmd.append(" \\\n    hidden");
-        } else  {
-            cmd.append(" \\\n    !hidden");
-        }
 
         // visible users
         if (!this.visible.isEmpty())  {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.user.AbstractUserData;
 import org.testng.Assert;
 
@@ -40,7 +41,7 @@ import org.testng.Assert;
  * @version $Id$
  */
 public class FormData
-    extends AbstractUIWithHiddenFlagData<FormData>
+    extends AbstractAdminData<FormData>
 {
     /**
      * Within export the description must be defined.
@@ -69,7 +70,7 @@ public class FormData
     public FormData(final AbstractTest _test,
                     final String _name)
     {
-        super(_test, AbstractTest.CI.UI_FORM, _name, FormData.REQUIRED_EXPORT_VALUES);
+        super(_test, AbstractTest.CI.UI_FORM, _name, FormData.REQUIRED_EXPORT_VALUES, null);
     }
 
     /**
@@ -111,15 +112,6 @@ public class FormData
         this.append4CIFileHeader(cmd);
         cmd.append("mql escape mod form \"${NAME}\"");
 
-        // append hidden flag
-        if (this.isHidden() != null)  {
-            cmd.append(' ');
-            if (!this.isHidden())  {
-                cmd.append('!');
-            }
-            cmd.append("hidden");
-        }
-
         this.append4CIFileValues(cmd);
         // and all fields...
         for (final FieldData<FormData> field : this.fields)  {
@@ -145,15 +137,6 @@ public class FormData
 
             final StringBuilder cmd = new StringBuilder()
                     .append("escape add form \"" + AbstractTest.convertMql(this.getName()) + "\" web");
-
-            // append hidden flag
-            if (this.isHidden() != null)  {
-                cmd.append(' ');
-                if (!this.isHidden())  {
-                    cmd.append('!');
-                }
-                cmd.append("hidden");
-            }
 
             this.append4Create(cmd);
             // append all fields

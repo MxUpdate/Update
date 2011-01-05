@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,13 +60,13 @@ abstract class AbstractUITest<DATA extends AbstractAdminData<?>>
                 this.createNewData("hello \" test").setValue("description", "complex description \"test\"")});
         ret.add(new Object[]{
                 _logText + " with default hidden flag",
-                this.createNewData("hello \" test").setHidden(null)});
+                this.createNewData("hello \" test").setFlag("hidden", null)});
         ret.add(new Object[]{
                 _logText + " with hidden flag false",
-                this.createNewData("hello \" test").setHidden(false)});
+                this.createNewData("hello \" test").setFlag("hidden", false)});
         ret.add(new Object[]{
                 _logText + " with hidden flag true",
-                this.createNewData("hello \" test").setHidden(true)});
+                this.createNewData("hello \" test").setFlag("hidden", true)});
 
         ret.addAll(Arrays.asList(_datas));
         return super.prepareData(_logText, ret.toArray(new Object[ret.size()][]));

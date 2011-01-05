@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,8 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
-import org.mxupdate.test.data.user.AbstractUserData;
 import org.mxupdate.test.data.user.AbstractPersonAdminData;
+import org.mxupdate.test.data.user.AbstractUserData;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.Assert;
 
@@ -103,7 +103,7 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
                                   final AbstractTest.CI _ci,
                                   final String _name)
     {
-        super(_test, _ci, _name, null);
+        super(_test, _ci, _name, null, null);
     }
 
     /**
@@ -288,7 +288,7 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
             _cmd.append(" execute user \"").append(AbstractTest.convertMql(this.getUser().getName())).append("\"");
         }
         // hidden flag
-        if ((this.isHidden() != null) && this.isHidden())  {
+        if ((this.getFlag("hidden") != null) && this.getFlag("hidden"))  {
             _cmd.append(" hidden");
         }
         // deferred flag
@@ -338,7 +338,7 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
             _cmd.append(" execute user \"").append(AbstractTest.convertTcl(this.getUser().getName())).append("\"");
         }
         // hidden flag
-        if ((this.isHidden() != null) && this.isHidden())  {
+        if ((this.getFlag("hidden") != null) && this.getFlag("hidden"))  {
             _cmd.append(" hidden");
         }
         // deferred flag
@@ -387,7 +387,7 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
         // check hidden
         Assert.assertEquals(Boolean.valueOf(this.getTest().mql("escape print program \""
                                         + AbstractTest.convertMql(this.getName()) + "\" select hidden dump")).booleanValue(),
-                            (this.isHidden() != null) ? this.isHidden().booleanValue() : false,
+                            (this.getFlag("hidden") != null) ? this.getFlag("hidden").booleanValue() : false,
                             "hidden flag correct defined");
         // check description
         Assert.assertEquals(this.getTest().mql("escape print program \"" + AbstractTest.convertMql(this.getName()) + "\" select description dump"),

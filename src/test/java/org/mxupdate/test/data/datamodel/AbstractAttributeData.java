@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.program.AbstractProgramData;
+import org.mxupdate.test.util.MapUtil;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
@@ -49,6 +50,15 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     static  {
         AbstractAttributeData.REQUIRED_EXPORT_VALUES.put("description", "");
         AbstractAttributeData.REQUIRED_EXPORT_VALUES.put("default", "");
+    }
+
+    /**
+     * Within export the resetonclone and resetonrevision flag must be defined.
+     */
+    private static final Map<String,Boolean> REQUIRED_EXPORT_FLAGS = new HashMap<String,Boolean>();
+    static  {
+        AbstractAttributeData.REQUIRED_EXPORT_FLAGS.put("resetonclone", false);
+        AbstractAttributeData.REQUIRED_EXPORT_FLAGS.put("resetonrevision", false);
     }
 
     /**
@@ -73,9 +83,13 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     protected AbstractAttributeData(final AbstractTest _test,
                                     final AbstractTest.CI _ci,
                                     final String _name,
-                                    final String _attrType)
+                                    final String _attrType,
+                                    final Map<String,String> _requiredExportValues,
+                                    final Map<String,Boolean> _requiredExportFlags)
     {
-        super(_test, _ci, _name, AbstractAttributeData.REQUIRED_EXPORT_VALUES);
+        super(_test, _ci, _name,
+              MapUtil.<String,String>combine(AbstractAttributeData.REQUIRED_EXPORT_VALUES, _requiredExportValues),
+              MapUtil.<String,Boolean>combine(AbstractAttributeData.REQUIRED_EXPORT_FLAGS, _requiredExportFlags));
         this.attrType = _attrType;
     }
 
@@ -112,15 +126,6 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add attribute \"").append(AbstractTest.convertMql(this.getName()))
                .append("\" type ").append(this.attrType);
-
-            // append hidden flag
-            if (this.isHidden() != null)  {
-                cmd.append(' ');
-                if (!this.isHidden())  {
-                    cmd.append('!');
-                }
-                cmd.append("hidden");
-            }
 
             this.append4Create(cmd);
 
@@ -160,20 +165,11 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      *
      * @return code for the configuration item update file
      */
-    @Override
+    @Override()
     public String ciFile()
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("mql escape mod attribute \"${NAME}\"");
-
-        // append hidden flag
-        if (this.isHidden() != null)  {
-            cmd.append(' ');
-            if (!this.isHidden())  {
-                cmd.append('!');
-            }
-            cmd.append("hidden");
-        }
 
         this.append4CIFileValues(cmd);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -153,9 +153,9 @@ public class RoleTest
     public void checkHiddenFlagRemoveWithinUpdate()
         throws Exception
     {
-        final RoleData role = new RoleData(this, "hallo \" test").setHidden(true);
+        final RoleData role = new RoleData(this, "hallo \" test").setFlag("hidden", true);
         role.create()
-            .setHidden(null)
+            .setFlag("hidden", null)
             .update();
         Assert.assertEquals(this.mql("escape print role \"" + AbstractTest.convertMql(role.getName()) + "\" select hidden dump"),
                             "FALSE",

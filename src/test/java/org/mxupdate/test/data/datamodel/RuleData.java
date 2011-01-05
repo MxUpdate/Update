@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,7 +112,7 @@ public class RuleData
     public RuleData(final AbstractTest _test,
                     final String _name)
     {
-        super(_test, AbstractTest.CI.DM_RULE, _name, RuleData.REQUIRED_EXPORT_VALUES);
+        super(_test, AbstractTest.CI.DM_RULE, _name, RuleData.REQUIRED_EXPORT_VALUES, null);
     }
 
     /**
@@ -186,15 +186,6 @@ public class RuleData
         final StringBuilder cmd = new StringBuilder()
             .append("mql escape mod rule \"${NAME}\"");
 
-        // append hidden flag
-        if (this.isHidden() != null)  {
-            cmd.append(' ');
-            if (!this.isHidden())  {
-                cmd.append('!');
-            }
-            cmd.append("hidden");
-        }
-
         this.append4CIFileValues(cmd);
 
         return cmd.toString();
@@ -215,14 +206,6 @@ public class RuleData
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add rule \"").append(AbstractTest.convertMql(this.getName()))
                .append("\" ");
-            // append hidden flag
-            if (this.isHidden() != null)  {
-                cmd.append(' ');
-                if (!this.isHidden())  {
-                    cmd.append('!');
-                }
-                cmd.append("hidden");
-            }
             // owner access
             cmd.append(" owner ").append(this.ownerAccess);
             if (this.ownerAccessFilter != null)  {

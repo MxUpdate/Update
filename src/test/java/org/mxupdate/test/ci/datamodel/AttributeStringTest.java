@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,9 @@
  */
 
 package org.mxupdate.test.ci.datamodel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import matrix.util.MatrixException;
 
@@ -58,7 +61,29 @@ public class AttributeStringTest
     @DataProvider(name = "data")
     public Object[][] getAttributes()
     {
-        return this.prepareData("string attribute", "A \" B", "BCD");
+        final List<Object[]> ret = new ArrayList<Object[]>();
+
+        // max length property
+        ret.add(new Object[]{
+                "string attribute with max length 0",
+                this.createNewData("hello")
+                        .setValue("maxlength", "0")});
+        ret.add(new Object[]{
+                "string attribute with max length 5",
+                this.createNewData("hello")
+                        .setValue("maxlength", "5")});
+
+        // multiline flag
+        ret.add(new Object[]{
+                "string attribute with multiline flag true",
+                this.createNewData("hello")
+                        .setFlag("multiline", true)});
+        ret.add(new Object[]{
+                "string attribute with multiline flag false",
+                this.createNewData("hello")
+                        .setFlag("multiline", false)});
+
+        return super.prepareData("string attribute", "A \" B", "BCD", ret.toArray(new Object[ret.size()][]));
     }
 
     /**

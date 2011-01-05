@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import java.util.Set;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.AbstractAdminData;
 
 /**
  * Handles user interface test data with settings.
@@ -36,7 +37,7 @@ import org.mxupdate.test.AbstractTest;
  * @version $Id$
  */
 abstract class AbstractUIWithSettingData<T extends AbstractUIWithSettingData<?>>
-    extends AbstractUIWithHiddenFlagData<T>
+    extends AbstractAdminData<T>
 {
     /**
      * All settings of this command.
@@ -63,7 +64,7 @@ abstract class AbstractUIWithSettingData<T extends AbstractUIWithSettingData<?>>
                               final String _name,
                               final Map<String,String> _requiredExportValues)
     {
-        super(_test, _ci, _name, _requiredExportValues);
+        super(_test, _ci, _name, _requiredExportValues, null);
     }
 
     /**

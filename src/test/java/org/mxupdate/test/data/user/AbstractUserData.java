@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -150,7 +150,7 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                                final String _name,
                                final Map<String,String> _requiredExportValues)
     {
-        super(_test, _ci, _name, _requiredExportValues);
+        super(_test, _ci, _name, _requiredExportValues, null);
     }
 
     /**
@@ -386,14 +386,6 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
     {
         final StringBuilder cmd = new StringBuilder()
                 .append("mql escape mod " + this.getCI().getMxType() + " \"${NAME}\"");
-        // hidden flag
-        if (this.isHidden() != null)  {
-            if (this.isHidden())  {
-                cmd.append(" \\\n    hidden");
-            } else  {
-                cmd.append(" \\\n    !hidden");
-            }
-        }
 
         this.append4CIFileValues(cmd);
 
@@ -466,14 +458,6 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                     .append("escape add ")
                     .append(this.getCI().getMxType())
                     .append(" \"").append(AbstractTest.convertMql(this.getName())).append("\"");
-            // hidden flag
-            if (this.isHidden() != null)  {
-                if (this.isHidden())  {
-                    cmd.append(" hidden");
-                } else  {
-                    cmd.append(" !hidden");
-                }
-            }
             // if site assigned, the site must be created
             if (this.site != null)  {
                 this.site.create();

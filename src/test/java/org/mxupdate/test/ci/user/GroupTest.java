@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,9 +130,9 @@ public class GroupTest
     public void checkHiddenFlagRemoveWithinUpdate()
         throws Exception
     {
-        final GroupData group = new GroupData(this, "hallo \" test").setHidden(true);
+        final GroupData group = new GroupData(this, "hallo \" test").setFlag("hidden", true);
         group.create();
-        group.setHidden(null);
+        group.setFlag("hidden", null);
         group.update();
         Assert.assertEquals(this.mql("escape print group \"" + AbstractTest.convertMql(group.getName()) + "\" select hidden dump"),
                             "FALSE",

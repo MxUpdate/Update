@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -166,7 +166,7 @@ public class FieldData<FORMTABLE extends AbstractAdminData<?>>
                      final FORMTABLE _tableForm,
                      final String _name)
     {
-        super(_test, null, _name, null);
+        super(_test, null, _name, null, null);
         this.tableForm = _tableForm;
     }
 
@@ -331,10 +331,6 @@ public class FieldData<FORMTABLE extends AbstractAdminData<?>>
         if (this.getName() != null)  {
             cmd.append(" name \"").append(AbstractTest.convertTcl(this.getName())).append("\"");
         }
-        // hidden flag
-        if (this.isHidden())  {
-            cmd.append(" hidden");
-        }
         // sort type
         if (this.sortType != null)  {
             cmd.append(" sorttype ").append(this.sortType);
@@ -406,10 +402,6 @@ public class FieldData<FORMTABLE extends AbstractAdminData<?>>
         if (this.getName() != null)  {
             _cmd.append(" name \"").append(AbstractTest.convertMql(this.getName())).append("\"");
         }
-        // hidden flag
-        if (this.isHidden())  {
-            _cmd.append(" hidden");
-        }
         // sort type
         if (this.sortType != null)  {
             _cmd.append(" sorttype ").append(this.sortType);
@@ -468,7 +460,7 @@ public class FieldData<FORMTABLE extends AbstractAdminData<?>>
         this.checkSingleValue(_exportParser, "column / field", "sorttype", ((this.sortType != null) && !this.sortType.equals("none")) ? this.sortType : null);
 
         // hidden flag
-        this.checkValueExists(_exportParser, "column / field", "hidden", this.isHidden());
+        this.checkValueExists(_exportParser, "column / field", "hidden", this.getFlag("hidden") != null ? this.getFlag("hidden") : false);
 
         // size
         this.checkSingleValue(
