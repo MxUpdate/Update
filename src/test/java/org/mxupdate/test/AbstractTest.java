@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -167,6 +167,18 @@ public abstract class AbstractTest
          */
         IEF_GLOBAL_REGISTRY(null, "IEF-GlobalRegistry", false, "MCADInteg-ConfigObjectPolicy", "eService Administration",
                             "IEFGlobalRegistry", "IEFGLOBALREGISTRY", "IEFGLOBALREGISTRY_", "integration/globalregistry", true),
+
+        /**
+         * Configuration item IEF Mass Promote Configuration.
+         */
+        IEF_MASS_PROMOTE_CONFIG(null, "IEF-MassPromoteConfig", true, "MCADInteg-ConfigObjectPolicy", "eService Administration",
+                                "IEFMassPromoteConfig", "IEFMASSPROMOTECONFIG", "IEFMASSPROMOTECONFIG_", "integration/masspromoteconfig", true),
+
+        /**
+         * Configuration item IEF unassigned registry.
+         */
+        IEF_UNASSIGNED_REGISTRY(null, "IEF-UnassignedIntegRegistry", true, "MCADInteg-ConfigObjectPolicy", "eService Administration",
+                                "IEFUnassignedRegistry", "IEFUNASSIGNEDREGISTRY", "IEFUNASSIGNEDREGISTRY_", "integration/unassignedregistry", true),
 
         /**
          * Configuration item JPO program.
@@ -496,8 +508,8 @@ public abstract class AbstractTest
     public void close()
         throws Exception
     {
-        this.context.disconnect();
-        this.context.closeContext();
+        this.context.destroy();
+        this.context.shutdown();
         this.context = null;
     }
 

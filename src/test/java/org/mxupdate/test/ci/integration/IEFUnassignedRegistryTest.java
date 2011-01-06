@@ -24,37 +24,37 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.TypeData;
-import org.mxupdate.test.data.integration.IEFGlobalConfigData;
+import org.mxupdate.test.data.integration.IEFUnassignedRegistryData;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 
 /**
- * Test cases for the export and update of integration global configuration
+ * Test cases for the export and update of integration unassigned registry
  * objects.
  *
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class IEFGlobalConfigTest
-    extends AbstractIEFTest<IEFGlobalConfigData>
+public class IEFUnassignedRegistryTest
+    extends AbstractIEFTest<IEFUnassignedRegistryData>
 {
     /**
      * {@inheritDoc}
-     * Returns new IEF global configuration instance.
+     * Returns new IEF unassigned registry instance.
      */
     @Override()
-    protected IEFGlobalConfigData createNewData(final boolean _subType,
-                                                final String _name)
+    protected IEFUnassignedRegistryData createNewData(final boolean _subType,
+                                                      final String _name)
     {
-        return new IEFGlobalConfigData(
+        return new IEFUnassignedRegistryData(
                 this,
-                _subType ? new TypeData(this, "GlobalConfig").setValue("derived", "MCADInteg-GlobalConfig") : null,
+                _subType ? new TypeData(this, "UnassignedRegistry").setValue("derived", "IEF-UnassignedIntegRegistry") : null,
                 _name,
-                "1");
+                "-");
     }
 
     /**
-     * Cleanup all test integration global configuration objects.
+     * Cleanup all test integration unassigned registry objects.
      *
      * @throws MatrixException if cleanup failed
      */
@@ -63,7 +63,7 @@ public class IEFGlobalConfigTest
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(AbstractTest.CI.IEF_GLOBAL_CONFIG);
+        this.cleanup(AbstractTest.CI.IEF_UNASSIGNED_REGISTRY);
         this.cleanup(AbstractTest.CI.DM_TYPE);
     }
 }

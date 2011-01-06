@@ -25,31 +25,31 @@ import org.mxupdate.test.data.AbstractBusData;
 import org.mxupdate.test.data.datamodel.TypeData;
 
 /**
- * Used to define an integration global configuration, create them and test the
- * result.
+ * Used to define an integration mass promote configuration, create them and
+ * test the result.
  *
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class IEFGlobalConfigData
-    extends AbstractBusData<IEFGlobalConfigData>
+public class IEFMassPromoteConfigData
+    extends AbstractBusData<IEFMassPromoteConfigData>
 {
     /**
-     * Initialize this IEF global configuration object with given
+     * Initialize this IEF mass promote configuration object with given
      * <code>_name</code>.
      *
-     * @param _test     related test implementation (where this IEF global
-     *                  configuration object is defined)
-     * @param _type     derived type from <code>MCADInteg-GlobalConfig</code>;
+     * @param _test     related test implementation (where this IEF mass
+     *                  promote configuration object is defined)
+     * @param _type     derived type from <code>IEF-MassPromoteConfig</code>;
      *                  <code>null</code> if the type is directly used
-     * @param _name     name of the IEF global configuration object
-     * @param _revision revision of the IEF global configuration object
+     * @param _name     name of the IEF mass promote configuration object
+     * @param _revision revision of the IEF mass promote configuration object
      */
-    public IEFGlobalConfigData(final AbstractTest _test,
-                               final TypeData _type,
-                               final String _name,
-                               final String _revision)
+    public IEFMassPromoteConfigData(final AbstractTest _test,
+                                    final TypeData _type,
+                                    final String _name,
+                                    final String _revision)
     {
-        super(_test, AbstractTest.CI.IEF_GLOBAL_CONFIG, _type, _name, _revision);
+        super(_test, AbstractTest.CI.IEF_MASS_PROMOTE_CONFIG, _type, _name, _revision);
     }
 }

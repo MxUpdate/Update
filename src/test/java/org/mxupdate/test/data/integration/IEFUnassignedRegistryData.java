@@ -22,30 +22,35 @@ package org.mxupdate.test.data.integration;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.AbstractBusData;
+import org.mxupdate.test.data.datamodel.TypeData;
 
 /**
- * Used to define an integration global registry, create them and test the
+ * Used to define an integration unassigned registry, create them and test the
  * result.
  *
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class IEFGlobalRegistryData
-    extends AbstractBusData<IEFGlobalRegistryData>
+public class IEFUnassignedRegistryData
+    extends AbstractBusData<IEFUnassignedRegistryData>
 {
     /**
-     * Initialize this IEF global registry object with given
+     * Initialize this IEF unassigned registry object with given
      * <code>_name</code>.
      *
-     * @param _test     related test implementation (where this IEF global
+     * @param _test     related test implementation (where this IEF unassigned
      *                  registry object is defined)
-     * @param _name     name of the IEF global registry object
-     * @param _revision revision of the IEF global registry object
+     * @param _type     derived type from
+     *                  <code>IEF-UnassignedIntegRegistry</code>;
+     *                  <code>null</code> if the type is directly used
+     * @param _name     name of the IEF unassigned registry object
+     * @param _revision revision of the IEF unassigned registry object
      */
-    public IEFGlobalRegistryData(final AbstractTest _test,
-                                 final String _name,
-                                 final String _revision)
+    public IEFUnassignedRegistryData(final AbstractTest _test,
+                                    final TypeData _type,
+                                    final String _name,
+                                    final String _revision)
     {
-        super(_test, AbstractTest.CI.IEF_GLOBAL_REGISTRY, _name, _revision);
+        super(_test, AbstractTest.CI.IEF_UNASSIGNED_REGISTRY, _type, _name, _revision);
     }
 }

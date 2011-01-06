@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,8 @@ public class IEFEBOMSyncConfigData
      *
      * @param _test     related test implementation (where this IEF global
      *                  configuration object is defined)
-     * @param _type     derived type from <code>IEF-EBOMSyncConfig</code>
+     * @param _type     derived type from <code>IEF-EBOMSyncConfig</code>;
+     *                  <code>null</code> if the type is directly used
      * @param _name     name of the IEF EBOM sync configuration object
      * @param _revision revision of the IEF EBOM syncl configuration object
      */

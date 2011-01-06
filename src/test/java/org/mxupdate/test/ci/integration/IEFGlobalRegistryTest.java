@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,9 @@ package org.mxupdate.test.ci.integration;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.integration.IEFGlobalRegistryData;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 
 /**
  * Test cases for the export and update of integration global registry objects.
@@ -37,33 +34,20 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 public class IEFGlobalRegistryTest
-    extends AbstractTest
+    extends AbstractIEFTest<IEFGlobalRegistryData>
 {
     /**
-     * Data provider for test integration global registry objects.
-     *
-     * @return object array with all test objects
+     * {@inheritDoc}
+     * Returns new IEF global registry instance.
      */
-    @DataProvider(name = "busDatas")
-    public Object[][] getData()
+    @Override()
+    protected IEFGlobalRegistryData createNewData(final boolean _subType,
+                                                  final String _name)
     {
-        return new Object[][]  {
-                new Object[]{
-                        "simple object",
-                        new IEFGlobalRegistryData(this, "HelloTest", "1")},
-                new Object[]{
-                        "simple object with description",
-                        new IEFGlobalRegistryData(this, "Hello \"Test\"", "1")
-                                .setDescription("a \"description\"")},
-                new Object[]{
-                        "simple object with description and single apostrophe",
-                        new IEFGlobalRegistryData(this, "Hello \"Test\" 'with single apostrophe'", "1")
-                                .setDescription("a \"description\" with single 'apostrophe'")},
-                new Object[]{
-                        "complex object",
-                        new IEFGlobalRegistryData(this, "HelloTest", "1")
-                                .setValue("IEF-RegistryData", "complex \"data\" 'and single 'apostrophe'")},
-        };
+        return new IEFGlobalRegistryData(
+                this,
+                _name,
+                "1");
     }
 
     /**
@@ -77,45 +61,5 @@ public class IEFGlobalRegistryTest
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.IEF_GLOBAL_REGISTRY);
-    }
-
-    /**
-     * Tests a new created integration global registry objects and the related
-     * export.
-     *
-     * @param _description      description of the test case
-     * @param _globalRegistry   global registry to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "busDatas", description = "test export of new created integration global registry objects")
-    public void simpleExport(final String _description,
-                             final IEFGlobalRegistryData _globalRegistry)
-        throws Exception
-    {
-        _globalRegistry.create();
-        _globalRegistry.checkExport(_globalRegistry.export());
-    }
-
-    /**
-     * Tests an update of non existing table. The result is tested with by
-     * exporting the table and checking the result.
-     *
-     * @param _description      description of the test case
-     * @param _globalRegistry   global registry to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "busDatas", description = "test update of non existing table")
-    public void simpleUpdate(final String _description,
-                             final IEFGlobalRegistryData _globalRegistry)
-        throws Exception
-    {
-        // first update with original content
-        _globalRegistry.update();
-        final ExportParser exportParser = _globalRegistry.export();
-        _globalRegistry.checkExport(exportParser);
-
-        // second update with delivered content
-        _globalRegistry.updateWithCode(exportParser.getOrigCode())
-                       .checkExport();
     }
 }
