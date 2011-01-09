@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ package org.mxupdate.update.user.workspace;
 import java.io.IOException;
 
 import org.mxupdate.update.user.AbstractUser_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
@@ -37,7 +38,7 @@ public class Query_mxJPO
     /**
      * Must the types expand for the query?
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private boolean expandType = false;
 
@@ -57,18 +58,25 @@ public class Query_mxJPO
      * <li>{@link #expandType expand type flag}</li>
      * </ul></p>
      *
+     * @param _paramCache   paramater cache with MX context
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      */
     @Override()
-    public void parse(final String _url,
-                      final String _content)
+    public boolean parse(final ParameterCache_mxJPO _paramCache,
+                         final String _url,
+                         final String _content)
     {
+        final boolean parsed;
         if ("/queryStatement/expandType".equals(_url))  {
             this.expandType = true;
+            parsed = true;
         } else  {
-            super.parse(_url, _content);
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 
     /**

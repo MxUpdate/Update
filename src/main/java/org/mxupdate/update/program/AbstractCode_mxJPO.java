@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ public abstract class AbstractCode_mxJPO
      * Inserted text in the {@link #code} if the program includes a
      * <code>CDATA</code> (two closing squared brackets '&#93;&#93;').
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final String INSERT_TEXT = "Inserted" + "_by_" + "ENO" + "VIA";
 
@@ -87,7 +87,7 @@ public abstract class AbstractCode_mxJPO
     /**
      * Source code of this program.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private String code;
 
@@ -176,25 +176,33 @@ public abstract class AbstractCode_mxJPO
      * <li>{@link #code} (program code or page content)</li>
      * </ul></p>
      *
-     * @param _url      URL to parse
-     * @param _content  content depending on the URL
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL to parse
+     * @param _content      content depending on the URL
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      */
     @Override()
-    protected void parse(final String _url,
-                         final String _content)
+    protected boolean parse(final ParameterCache_mxJPO _paramCache,
+                            final String _url,
+                            final String _content)
     {
+        final boolean parsed;
         // JPO + MQL programs
         if ("/code".equals(_url))  {
             this.code = (_content != null)
                         ? _content.replaceAll(AbstractCode_mxJPO.INSERT_TEXT, "")
                         : "";
+            parsed = true;
         // page programs
         } else if ("/pageContent".equals(_url))  {
             this.code = (_content != null)
                         ? _content.replaceAll(AbstractCode_mxJPO.INSERT_TEXT, "")
                         : "";
+            parsed = true;
         } else  {
-            super.parse(_url, _content);
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 }

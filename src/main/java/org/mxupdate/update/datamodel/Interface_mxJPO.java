@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ public class Interface_mxJPO
     /**
      * Set of all ignored URLs from the XML definition for interfaces.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
@@ -89,7 +89,7 @@ public class Interface_mxJPO
     /**
      * From which interfaces is this interface derived?
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
     private final Set<String> derived = new TreeSet<String>();
@@ -97,7 +97,7 @@ public class Interface_mxJPO
     /**
      * Is the interface abstract?
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private boolean abstractFlag;
@@ -105,7 +105,7 @@ public class Interface_mxJPO
     /**
      * Are all types allowed for this interface?
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
@@ -114,7 +114,7 @@ public class Interface_mxJPO
     /**
      * Information about all allowed types for this interface.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
@@ -123,7 +123,7 @@ public class Interface_mxJPO
     /**
      * Are all relationships allowed for this interface?
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
@@ -132,7 +132,7 @@ public class Interface_mxJPO
     /**
      * Information about all allowed relationships for this interface.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
@@ -153,34 +153,46 @@ public class Interface_mxJPO
     /**
      * Parses the interface specific XML export URL.
      *
-     * @param _url      URL to parse
-     * @param _content  content of the URL to parse
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL to parse
+     * @param _content      content of the URL to parse
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      * @see #abstractFlag
      * @see #allTypes
      * @see #types
      * @see #IGNORED_URLS
      */
     @Override()
-    protected void parse(final String _url,
-                         final String _content)
+    protected boolean parse(final ParameterCache_mxJPO _paramCache,
+                            final String _url,
+                            final String _content)
     {
-        if (!Interface_mxJPO.IGNORED_URLS.contains(_url))  {
-            if ("/abstract".equals(_url))  {
-                this.abstractFlag = true;
-            } else if ("/allowAllRelationships".equals(_url))  {
-                this.allRelationships = true;
-            } else if ("/allowAllTypes".equals(_url))  {
-                this.allTypes = true;
-            } else if ("/derivedFromInterface/interfaceTypeRefList/interfaceTypeRef".equals(_url))  {
-                this.derived.add(_content);
-            } else if ("/relationshipDefRefList/relationshipDefRef".equals(_url))  {
-                this.relationships.add(_content);
-            } else if ("/typeRefList/typeRef".equals(_url))  {
-                this.types.add(_content);
-            } else  {
-                super.parse(_url, _content);
-            }
+        final boolean parsed;
+        if (Interface_mxJPO.IGNORED_URLS.contains(_url))  {
+            parsed = true;
+        } else if ("/abstract".equals(_url))  {
+            this.abstractFlag = true;
+            parsed = true;
+        } else if ("/allowAllRelationships".equals(_url))  {
+            this.allRelationships = true;
+            parsed = true;
+        } else if ("/allowAllTypes".equals(_url))  {
+            this.allTypes = true;
+            parsed = true;
+        } else if ("/derivedFromInterface/interfaceTypeRefList/interfaceTypeRef".equals(_url))  {
+            this.derived.add(_content);
+            parsed = true;
+        } else if ("/relationshipDefRefList/relationshipDefRef".equals(_url))  {
+            this.relationships.add(_content);
+            parsed = true;
+        } else if ("/typeRefList/typeRef".equals(_url))  {
+            this.types.add(_content);
+            parsed = true;
+        } else  {
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 
     /**

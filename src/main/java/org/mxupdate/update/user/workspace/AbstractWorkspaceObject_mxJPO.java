@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ abstract class AbstractWorkspaceObject_mxJPO
      * Set of all ignored URLs from the XML definition for common stuff of
      * users.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
@@ -89,7 +89,7 @@ abstract class AbstractWorkspaceObject_mxJPO
      * in the properties map {@link #propertiesSet} from
      * {@link #prepare(ParameterCache_mxJPO)}.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #prepare(ParameterCache_mxJPO)
      */
     private final Stack<AdminProperty_mxJPO> propertiesStack = new Stack<AdminProperty_mxJPO>();
@@ -160,33 +160,41 @@ abstract class AbstractWorkspaceObject_mxJPO
      * <p>If an <code>_url</code> is included in {@link #IGNORED_URLS}, this
      * URL is ignored.</p>
      *
-     * @param _url      URL to parse
-     * @param _content  content of the URL to parse
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL to parse
+     * @param _content      content of the URL to parse
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      * @see #IGNORED_URLS
      */
-    public void parse(final String _url,
-                      final String _content)
+    public boolean parse(final ParameterCache_mxJPO _paramCache,
+                         final String _url,
+                         final String _content)
     {
-        if (!AbstractWorkspaceObject_mxJPO.IGNORED_URLS.contains(_url))  {
-            if ("/hidden".equals(_url))  {
-                this.hidden = true;
+        final boolean parsed;
+        if (AbstractWorkspaceObject_mxJPO.IGNORED_URLS.contains(_url))  {
+            parsed = true;
+        } else if ("/hidden".equals(_url))  {
+            this.hidden = true;
+            parsed = true;
 
-            } else if ("/name".equals(_url))  {
-                this.name = _content;
+        } else if ("/name".equals(_url))  {
+            this.name = _content;
+            parsed = true;
 
-            } else if ("/propertyList/property".equals(_url))  {
-                this.propertiesStack.add(new AdminProperty_mxJPO());
-            } else if (_url.startsWith("/propertyList/property"))  {
-                if (!this.propertiesStack.peek().parse(_url.substring(22), _content))  {
-                    System.err.println("unknown parsing property url: "+_url+"("+_content+")");
-                }
+        } else if ("/propertyList/property".equals(_url))  {
+            this.propertiesStack.add(new AdminProperty_mxJPO());
+            parsed = true;
+        } else if (_url.startsWith("/propertyList/property"))  {
+            parsed = this.propertiesStack.peek().parse(_paramCache, _url.substring(22), _content);
 
-            } else if ("/visibleUserList/userRef".equals(_url))  {
-                this.visibleFor.add(_content);
-            } else  {
-                System.err.println("unknown workspace object parsing url: "+_url+"("+_content+")");
-            }
+        } else if ("/visibleUserList/userRef".equals(_url))  {
+            this.visibleFor.add(_content);
+            parsed = true;
+        } else  {
+            parsed = false;
         }
+        return parsed;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ public class AdminProperty_mxJPO
     /**
      * Set of all ignored URLs from the XML definition for admin properties.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>(1);
     static  {
@@ -84,30 +84,38 @@ public class AdminProperty_mxJPO
      * <p>If an <code>_url</code> is included in {@link #IGNORED_URLS}, this
      * URL is ignored.</p>
      *
-     * @param _url      URL of the XML elements
-     * @param _content  content within the <code>_url</code> of XML elements
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL of the XML elements
+     * @param _content      content within the <code>_url</code> of XML
+     *                      elements
      * @return <i>true</i> if the <code>_url</code> could be parsed; otherwise
      *         <i>false</i>
      * @see #IGNORED_URLS
      */
-    public boolean parse(final String _url,
+    public boolean parse(final ParameterCache_mxJPO _paramCache,
+                         final String _url,
                          final String _content)
     {
-        boolean parsed = true;
-        if (!AdminProperty_mxJPO.IGNORED_URLS.contains(_url))  {
-            if ("/adminRef/adminName".equals(_url))  {
-                this.refAdminName = _content;
-            } else if ("/adminRef/adminType".equals(_url))  {
-                this.refAdminType = "att".equals(_content) ? "attribute" : _content;
-            } else if ("/flags".equals(_url))  {
-                this.flags = _content;
-            } else if ("/name".equals(_url))  {
-                this.name = _content;
-            } else if ("/value".equals(_url))  {
-                this.value = _content;
-            } else  {
-                parsed = false;
-            }
+        final boolean parsed;
+        if (AdminProperty_mxJPO.IGNORED_URLS.contains(_url))  {
+            parsed = true;
+        } else if ("/adminRef/adminName".equals(_url))  {
+            this.refAdminName = _content;
+            parsed = true;
+        } else if ("/adminRef/adminType".equals(_url))  {
+            this.refAdminType = "att".equals(_content) ? "attribute" : _content;
+            parsed = true;
+        } else if ("/flags".equals(_url))  {
+            this.flags = _content;
+            parsed = true;
+        } else if ("/name".equals(_url))  {
+            this.name = _content;
+            parsed = true;
+        } else if ("/value".equals(_url))  {
+            this.value = _content;
+            parsed = true;
+        } else  {
+            parsed = false;
         }
         return parsed;
     }

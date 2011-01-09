@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ public class Dimension_mxJPO
     /**
      * Set of all ignored URLs from the XML definition for dimensions.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
@@ -120,7 +120,7 @@ public class Dimension_mxJPO
     /**
      * Holds the list of already parsed units of this dimension.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #prepare(ParameterCache_mxJPO)
      */
     private final Set<Dimension_mxJPO.Unit> units = new TreeSet<Dimension_mxJPO.Unit>();
@@ -128,7 +128,7 @@ public class Dimension_mxJPO
     /**
      * Holds current parsed unit.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #prepare(ParameterCache_mxJPO)
      */
     private Unit currentUnit;
@@ -149,44 +149,56 @@ public class Dimension_mxJPO
     /**
      * Parses all dimension specific expression URLs.
      *
-     * @param _url      URL to parse
-     * @param _content  content of the URL to parse
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL to parse
+     * @param _content      content of the URL to parse
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      */
-    @Override
-    protected void parse(final String _url,
-                         final String _content)
+    @Override()
+    protected boolean parse(final ParameterCache_mxJPO _paramCache,
+                            final String _url,
+                            final String _content)
     {
-        if (!Dimension_mxJPO.IGNORED_URLS.contains(_url))  {
-            if ("/unitList/unit".equals(_url))  {
-                if (this.currentUnit != null)  {
-                    this.units.add(this.currentUnit);
-                }
-                this.currentUnit = new Unit();
-            } else if ("/unitList/unit/adminProperties/name".equals(_url))  {
-                this.currentUnit.name = _content;
-            } else if ("/unitList/unit/adminProperties/description".equals(_url))  {
-                this.currentUnit.description = _content;
-            } else if ("/unitList/unit/adminProperties/propertyList/property".equals(_url))  {
-                if (this.currentUnit.currentUnitProperty != null)  {
-                    this.currentUnit.properties.add(this.currentUnit.currentUnitProperty);
-                }
-                this.currentUnit.currentUnitProperty = new AdminProperty_mxJPO();
-            } else if (_url.startsWith("/unitList/unit/adminProperties/propertyList/property"))  {
-                if (!this.currentUnit.currentUnitProperty.parse(_url.substring(52), _content))  {
-                    super.parse(_url, _content);
-                }
-            } else if ("/unitList/unit/unitDefault".equals(_url))  {
-                this.currentUnit.defaultUnit = true;
-            } else if ("/unitList/unit/unitLabel".equals(_url))  {
-                this.currentUnit.label = _content;
-            } else if ("/unitList/unit/unitMultiplier".equals(_url))  {
-                this.currentUnit.multiplier = Double.parseDouble(_content);
-            } else if ("/unitList/unit/unitOffset".equals(_url))  {
-                this.currentUnit.offset = Double.parseDouble(_content);
-            } else  {
-                super.parse(_url, _content);
+        final boolean parsed;
+        if (Dimension_mxJPO.IGNORED_URLS.contains(_url))  {
+            parsed = true;
+        } else if ("/unitList/unit".equals(_url))  {
+            if (this.currentUnit != null)  {
+                this.units.add(this.currentUnit);
             }
+            this.currentUnit = new Unit();
+            parsed = true;
+        } else if ("/unitList/unit/adminProperties/name".equals(_url))  {
+            this.currentUnit.name = _content;
+            parsed = true;
+        } else if ("/unitList/unit/adminProperties/description".equals(_url))  {
+            this.currentUnit.description = _content;
+            parsed = true;
+        } else if ("/unitList/unit/adminProperties/propertyList/property".equals(_url))  {
+            if (this.currentUnit.currentUnitProperty != null)  {
+                this.currentUnit.properties.add(this.currentUnit.currentUnitProperty);
+            }
+            this.currentUnit.currentUnitProperty = new AdminProperty_mxJPO();
+            parsed = true;
+        } else if (_url.startsWith("/unitList/unit/adminProperties/propertyList/property"))  {
+            parsed = this.currentUnit.currentUnitProperty.parse(_paramCache, _url.substring(52), _content);
+        } else if ("/unitList/unit/unitDefault".equals(_url))  {
+            this.currentUnit.defaultUnit = true;
+            parsed = true;
+        } else if ("/unitList/unit/unitLabel".equals(_url))  {
+            this.currentUnit.label = _content;
+            parsed = true;
+        } else if ("/unitList/unit/unitMultiplier".equals(_url))  {
+            this.currentUnit.multiplier = Double.parseDouble(_content);
+            parsed = true;
+        } else if ("/unitList/unit/unitOffset".equals(_url))  {
+            this.currentUnit.offset = Double.parseDouble(_content);
+            parsed = true;
+        } else  {
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 
     /**
@@ -382,7 +394,7 @@ public class Dimension_mxJPO
     @Override
     public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
                                final String... _args)
-            throws Exception
+        throws Exception
     {
         if (!"dimension".equals(_args[0]))  {
             super.jpoCallExecute(_paramCache, _args);
@@ -529,7 +541,7 @@ public class Dimension_mxJPO
         /**
          * Stores current parsed unit property.
          *
-         * @see Dimension_mxJPO#parse(String, String)
+         * @see Dimension_mxJPO#parse(ParameterCache_mxJPO, String, String)
          * @see Dimension_mxJPO#prepare(ParameterCache_mxJPO)
          */
         private AdminProperty_mxJPO currentUnitProperty;
@@ -540,7 +552,7 @@ public class Dimension_mxJPO
          * dimension is parsed the properties holds also the {@link #settings},
          * and {@link #systemInfos}.
          *
-         * @see Dimension_mxJPO#parse(String, String)
+         * @see Dimension_mxJPO#parse(ParameterCache_mxJPO, String, String)
          * @see Dimension_mxJPO#prepare(ParameterCache_mxJPO)
          */
         private final Set<AdminProperty_mxJPO> properties = new TreeSet<AdminProperty_mxJPO>();

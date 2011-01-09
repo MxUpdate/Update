@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public class Tip_mxJPO
     /**
      * Expression of the tip.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #write(ParameterCache_mxJPO, Appendable)
      */
     private String expression;
@@ -59,18 +59,25 @@ public class Tip_mxJPO
      * <li>{@link #expression}</li>
      * </ul></p>
      *
-     * @param _url      URL to parse
-     * @param _content  content of the URL to parse
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL to parse
+     * @param _content      content of the URL to parse
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      */
     @Override()
-    public void parse(final String _url,
-                      final String _content)
+    public boolean parse(final ParameterCache_mxJPO _paramCache,
+                         final String _url,
+                         final String _content)
     {
+        final boolean parsed;
         if ("/expression".equals(_url))  {
             this.expression = _content;
+            parsed = true;
         } else  {
-            super.parse(_url, _content);
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 
     /**

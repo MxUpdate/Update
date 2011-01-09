@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import java.util.TreeSet;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
@@ -46,7 +47,7 @@ public abstract class AbstractUIWithFields_mxJPO
      * Set of all ignored URLs from the XML definition for web forms / web
      * tables.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
@@ -59,7 +60,7 @@ public abstract class AbstractUIWithFields_mxJPO
     /**
      * Stores all fields / columns of this form  / table instance.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see Field
      */
     private final Stack<Field> fields = new Stack<Field>();
@@ -77,33 +78,42 @@ public abstract class AbstractUIWithFields_mxJPO
 
     /**
      * Parses the fields of web forms and / or columns of web tables. To parse
-     * the content of a field / column {@link Field#parse(String, String)} is
-     * called.
+     * the content of a field / column
+     * {@link Field#parse(ParameterCache_mxJPO, String, String)} is called.
      *
-     * @param _url      URL to parse
-     * @param _content  content of the URL to parse
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL to parse
+     * @param _content      content of the URL to parse
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      */
     @Override()
-    protected void parse(final String _url,
-                         final String _content)
+    protected boolean parse(final ParameterCache_mxJPO _paramCache,
+                            final String _url,
+                            final String _content)
     {
-        if (!AbstractUIWithFields_mxJPO.IGNORED_URLS.contains(_url))  {
-            // -------- web table columns
-            if ("/columnList/column".equals(_url))  {
-                this.fields.add(new Field());
-            } else if (_url.startsWith("/columnList/column/"))  {
-                this.fields.peek().parse(_url.substring(18), _content);
+        final boolean parsed;
+        if (AbstractUIWithFields_mxJPO.IGNORED_URLS.contains(_url))  {
+            parsed = true;
 
-            // -------- web form fields
-            } else if ("/fieldList/field".equals(_url))  {
-                this.fields.add(new Field());
-            } else if (_url.startsWith("/fieldList/field/"))  {
-                this.fields.peek().parse(_url.substring(16), _content);
+        // -------- web table columns
+        } else if ("/columnList/column".equals(_url))  {
+            this.fields.add(new Field());
+            parsed = true;
+        } else if (_url.startsWith("/columnList/column/"))  {
+            parsed = this.fields.peek().parse(_paramCache, _url.substring(18), _content);
 
-            } else  {
-                super.parse(_url, _content);
-            }
+        // -------- web form fields
+        } else if ("/fieldList/field".equals(_url))  {
+            this.fields.add(new Field());
+            parsed = true;
+        } else if (_url.startsWith("/fieldList/field/"))  {
+            parsed = this.fields.peek().parse(_paramCache, _url.substring(16), _content);
+
+        } else  {
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 
     /**
@@ -127,7 +137,7 @@ public abstract class AbstractUIWithFields_mxJPO
          * Set of all ignored URLs from the XML definition for columns /
          * fields.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          */
         private static final Set<String> IGNORED_URLS = new HashSet<String>();
         static  {
@@ -142,7 +152,7 @@ public abstract class AbstractUIWithFields_mxJPO
         /**
          * Name of the field / column.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private String name;
@@ -150,7 +160,7 @@ public abstract class AbstractUIWithFields_mxJPO
         /**
          * Label of the field / column.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private String label;
@@ -158,7 +168,7 @@ public abstract class AbstractUIWithFields_mxJPO
         /**
          * HRef of the field / column.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private String href;
@@ -166,7 +176,7 @@ public abstract class AbstractUIWithFields_mxJPO
         /**
          * URL of the range of the field / column.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private String rangeURL;
@@ -174,7 +184,7 @@ public abstract class AbstractUIWithFields_mxJPO
         /**
          * URL of the update of this field / column.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private String updateURL;
@@ -182,7 +192,7 @@ public abstract class AbstractUIWithFields_mxJPO
         /**
          * Alt label of the column / field.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private String alt;
@@ -190,7 +200,7 @@ public abstract class AbstractUIWithFields_mxJPO
         /**
          * Expression of the field / column.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private String expression;
@@ -199,7 +209,7 @@ public abstract class AbstractUIWithFields_mxJPO
          * If set to <i>true</i> the {@link #expression} of the field belongs
          * to business objects.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private boolean isBusinessObject = false;
@@ -208,7 +218,7 @@ public abstract class AbstractUIWithFields_mxJPO
          * If set to <i>true</i> the {@link #expression} of the field belongs
          * to connections.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private boolean isRelationship = false;
@@ -216,7 +226,7 @@ public abstract class AbstractUIWithFields_mxJPO
         /**
          * Defines how the field / column is sorted.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private SortType sortType = SortType.NONE;
@@ -224,7 +234,7 @@ public abstract class AbstractUIWithFields_mxJPO
         /**
          * Defines the sort program of this field / column.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private String sortProgram;
@@ -232,7 +242,7 @@ public abstract class AbstractUIWithFields_mxJPO
         /**
          * All settings of the field / column.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private final Stack<Setting_mxJPO> settings = new Stack<Setting_mxJPO>();
@@ -240,7 +250,7 @@ public abstract class AbstractUIWithFields_mxJPO
         /**
          * Set of all users for this field.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private final Set<String> users = new TreeSet<String>();
@@ -248,7 +258,7 @@ public abstract class AbstractUIWithFields_mxJPO
         /**
          * Scale value for this field.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private Double scale;
@@ -257,7 +267,7 @@ public abstract class AbstractUIWithFields_mxJPO
          * Height of this column / field. If not specified the value is
          * <code>1.0</code>.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private double height = 1.0;
@@ -266,7 +276,7 @@ public abstract class AbstractUIWithFields_mxJPO
          * Width of this column / field. If not specified the value is
          * <code>1.0</code>.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private double width = 1.0;
@@ -274,7 +284,7 @@ public abstract class AbstractUIWithFields_mxJPO
         /**
          * Minimum height of this column / field.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private double minHeight;
@@ -282,7 +292,7 @@ public abstract class AbstractUIWithFields_mxJPO
         /**
          * Minimum width of this column / field.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private double minWidth;
@@ -290,7 +300,7 @@ public abstract class AbstractUIWithFields_mxJPO
         /**
          * Auto height is defined for this field.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private boolean autoHeight = false;
@@ -298,7 +308,7 @@ public abstract class AbstractUIWithFields_mxJPO
         /**
          * Auto width is defined for this field.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private boolean autoWidth = false;
@@ -310,7 +320,7 @@ public abstract class AbstractUIWithFields_mxJPO
          * <p>The flag only belongs to tables. Forms does not known the flag
          * (and ignored because default value is <i>false</i>).</p>
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private boolean editable = false;
@@ -322,7 +332,7 @@ public abstract class AbstractUIWithFields_mxJPO
          * <p>The flag only belongs to tables. Forms does not known the flag
          * (and ignored because default value is <i>false</i>).</p>
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          * @see #write(Appendable)
          */
         private boolean hidden = false;
@@ -353,12 +363,17 @@ public abstract class AbstractUIWithFields_mxJPO
          * <li>{@link #settings}</li>
          * </ul>
          *
-         * @param _url      URL to parse
-         * @param _content  content of the URL to parse
+         * @param _paramCache   parameter cache with MX context
+         * @param _url          URL to parse
+         * @param _content      content of the URL to parse
+         * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+         *         <i>false</i>
          */
-        public void parse(final String _url,
-                          final String _content)
+        public boolean parse(final ParameterCache_mxJPO _paramCache,
+                             final String _url,
+                             final String _content)
         {
+            boolean parsed = true;
             if (!AbstractUIWithFields_mxJPO.Field.IGNORED_URLS.contains(_url))  {
                 if ("/alt".equals(_url))  {
                     this.alt = _content;
@@ -453,9 +468,10 @@ System.err.println("y location is not 0.0 and this is currently not supported");
                     this.hidden = true;
 
                 } else  {
-                    System.err.println("unknown column / field parsing url " + _url + "(" + _content + ")");
+                    parsed = false;
                 }
             }
+            return parsed;
         }
 
         /**
@@ -488,7 +504,7 @@ System.err.println("y location is not 0.0 and this is currently not supported");
          * @throws IOException if the TCL update code could not be written
          */
         public void write(final Appendable _out)
-                throws IOException
+            throws IOException
         {
             _out.append(" \\\n        name \"").append(StringUtil_mxJPO.convertTcl(this.name)).append("\"")
                 .append(" \\\n        label \"")

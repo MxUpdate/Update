@@ -102,7 +102,7 @@ abstract class AbstractAttribute_mxJPO
     /**
      * Set of all ignored URLs from the XML definition for attributes.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
@@ -117,7 +117,7 @@ abstract class AbstractAttribute_mxJPO
      * Mapping between the comparators defined within XML and the comparators
      * used within MX.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final Map<String,String> RANGE_COMP = new HashMap<String,String>();
     static  {
@@ -144,7 +144,7 @@ abstract class AbstractAttribute_mxJPO
      * Stores the ranges of the attribute (used while parsing the XML
      * attribute).
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private final Stack<Range> ranges = new Stack<Range>();
 
@@ -153,7 +153,7 @@ abstract class AbstractAttribute_mxJPO
      * program could be defined at maximum! So the range program is defined as
      * variable directly on the attribute and not as range.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #rangeProgramInputArguments
      * @see Range#write(Appendable)
      */
@@ -162,7 +162,7 @@ abstract class AbstractAttribute_mxJPO
     /**
      * If the range is a program the value are the input arguments.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #rangeProgramRef
      * @see Range#write(Appendable)
      */
@@ -201,7 +201,7 @@ abstract class AbstractAttribute_mxJPO
     /**
      * Stores the reference to the dimension of an attribute.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
     private String dimension;
@@ -220,7 +220,7 @@ abstract class AbstractAttribute_mxJPO
     /**
      * Flag that the attribute value is reset on clone.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      * @see #PARAM_SUPPORT_FLAG_RESET_ON_CLONE
      */
@@ -229,7 +229,7 @@ abstract class AbstractAttribute_mxJPO
     /**
      * Flag that the attribute value is reset on revision.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      * @see #PARAM_SUPPORT_FLAG_RESET_ON_REVISION
      */
@@ -290,51 +290,70 @@ abstract class AbstractAttribute_mxJPO
      *     their {@link #rangeProgramInputArguments input arguments}</li>
      * </ul>
      *
-     * @param _url      URL to parse
-     * @param _content  content of the URL to parse
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL to parse
+     * @param _content      content of the URL to parse
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      * @see #IGNORED_URLS
      */
     @Override()
-    protected void parse(final String _url,
-                         final String _content)
+    protected boolean parse(final ParameterCache_mxJPO _paramCache,
+                            final String _url,
+                            final String _content)
     {
-        if (!AbstractAttribute_mxJPO.IGNORED_URLS.contains(_url))  {
-            if ("/accessRuleRef".equals(_url))  {
-                this.rules.add(_content);
-            } else if ("/defaultValue".equals(_url))  {
-                this.defaultValue = _content;
-            } else if ("/dimensionRef".equals(_url))  {
-                this.dimension = _content;
-            } else if ("/resetonclone".equals(_url))  {
-                this.resetOnClone = true;
-            } else if ("/resetonrevision".equals(_url))  {
-                this.resetOnRevision = true;
+        final boolean parsed;
+        if (AbstractAttribute_mxJPO.IGNORED_URLS.contains(_url))  {
+            parsed = true;
+        } else if ("/accessRuleRef".equals(_url))  {
+            this.rules.add(_content);
+            parsed = true;
+        } else if ("/defaultValue".equals(_url))  {
+            this.defaultValue = _content;
+            parsed = true;
+        } else if ("/dimensionRef".equals(_url))  {
+            this.dimension = _content;
+            parsed = true;
+        } else if ("/resetonclone".equals(_url))  {
+            this.resetOnClone = true;
+            parsed = true;
+        } else if ("/resetonrevision".equals(_url))  {
+            this.resetOnRevision = true;
+            parsed = true;
 
-            } else if ("/rangeList/range".equals(_url))  {
-                this.ranges.add(new Range());
-            } else if ("/rangeList/range/rangeType".equals(_url))  {
-                this.ranges.peek().type = AbstractAttribute_mxJPO.RANGE_COMP.get(_content);
-                if (this.ranges.peek().type == null)  {
-                    throw new Error("unknown range comparator " + _content);
-                }
-            } else if ("/rangeList/range/rangeValue".equals(_url))  {
-                this.ranges.peek().value1 = _content;
-            } else if ("/rangeList/range/includingValue".equals(_url))  {
-                this.ranges.peek().include1 = true;
-            } else if ("/rangeList/range/rangeSecondValue".equals(_url))  {
-                this.ranges.peek().value2 = _content;
-            } else if ("/rangeList/range/includingSecondValue".equals(_url))  {
-                this.ranges.peek().include2 = true;
-
-            } else if ("/rangeProgram/programRef".equals(_url))  {
-                this.rangeProgramRef = _content;
-            } else if ("/rangeProgram/inputArguments".equals(_url))  {
-                this.rangeProgramInputArguments = _content;
-
-            } else  {
-                super.parse(_url, _content);
+        } else if ("/rangeList/range".equals(_url))  {
+            this.ranges.add(new Range());
+            parsed = true;
+        } else if ("/rangeList/range/rangeType".equals(_url))  {
+            this.ranges.peek().type = AbstractAttribute_mxJPO.RANGE_COMP.get(_content);
+            if (this.ranges.peek().type == null)  {
+                throw new Error("unknown range comparator " + _content);
             }
+            parsed = true;
+        } else if ("/rangeList/range/rangeValue".equals(_url))  {
+            this.ranges.peek().value1 = _content;
+            parsed = true;
+        } else if ("/rangeList/range/includingValue".equals(_url))  {
+            this.ranges.peek().include1 = true;
+            parsed = true;
+        } else if ("/rangeList/range/rangeSecondValue".equals(_url))  {
+            this.ranges.peek().value2 = _content;
+            parsed = true;
+        } else if ("/rangeList/range/includingSecondValue".equals(_url))  {
+            this.ranges.peek().include2 = true;
+            parsed = true;
+
+        } else if ("/rangeProgram/programRef".equals(_url))  {
+            this.rangeProgramRef = _content;
+            parsed = true;
+        } else if ("/rangeProgram/inputArguments".equals(_url))  {
+            this.rangeProgramInputArguments = _content;
+            parsed = true;
+
+        } else  {
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 
     /**

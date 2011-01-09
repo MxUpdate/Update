@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public abstract class AbstractProgram_mxJPO
     /**
      * User in which context the MQL program is executed.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeUpdateCode(ParameterCache_mxJPO, Appendable, String, String, String)
      */
     private String user;
@@ -46,7 +46,7 @@ public abstract class AbstractProgram_mxJPO
     /**
      * Execution of the program is deferred.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeUpdateCode(ParameterCache_mxJPO, Appendable, String, String, String)
      */
     private boolean deferred = false;
@@ -54,7 +54,7 @@ public abstract class AbstractProgram_mxJPO
     /**
      * The program needs context of a business object.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeUpdateCode(ParameterCache_mxJPO, Appendable, String, String, String)
      */
     private boolean needsBusinessObjectContext;
@@ -62,7 +62,7 @@ public abstract class AbstractProgram_mxJPO
     /**
      * Program is downloadable.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeUpdateCode(ParameterCache_mxJPO, Appendable, String, String, String)
      */
     private boolean downloadable = false;
@@ -70,7 +70,7 @@ public abstract class AbstractProgram_mxJPO
     /**
      * Program uses pipes.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeUpdateCode(ParameterCache_mxJPO, Appendable, String, String, String)
      */
     private boolean pipe = false;
@@ -78,7 +78,7 @@ public abstract class AbstractProgram_mxJPO
     /**
      * Program is pooled (used for TCL).
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeUpdateCode(ParameterCache_mxJPO, Appendable, String, String, String)
      */
     private boolean pooled = false;
@@ -108,28 +108,40 @@ public abstract class AbstractProgram_mxJPO
      * <li>program is {@link #pooled}</li>
      * </ul></p>
      *
-     * @param _url      URL to parse
-     * @param _content  content depending on the URL
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL to parse
+     * @param _content      content depending on the URL
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      */
     @Override()
-    protected void parse(final String _url,
-                         final String _content)
+    protected boolean parse(final ParameterCache_mxJPO _paramCache,
+                            final String _url,
+                            final String _content)
     {
+        final boolean parsed;
         if ("/deferred".equals(_url))  {
             this.deferred = true;
+            parsed = true;
         } else if ("/downloadable".equals(_url) || "/usesInterface".equals(_url))  {
             this.downloadable = true;
+            parsed = true;
         } else if ("/mqlPipe".equals(_url))  {
             this.pipe = true;
+            parsed = true;
         } else if ("/needsContext".equals(_url))  {
             this.needsBusinessObjectContext = true;
+            parsed = true;
         } else if ("/pooled".equals(_url))  {
             this.pooled = true;
+            parsed = true;
         } else if ("/userRef".equals(_url))  {
             this.user = _content;
+            parsed = true;
         } else  {
-            super.parse(_url, _content);
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ public class PersonAdmin_mxJPO
     /**
      * Set of all ignored URLs from the XML definition for persons.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
@@ -153,7 +153,7 @@ public class PersonAdmin_mxJPO
     /**
      * Holds all group assignments of this person.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private final Set<String> groups = new TreeSet<String>();
@@ -161,7 +161,7 @@ public class PersonAdmin_mxJPO
     /**
      * Holds all role assignments of this person.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private final Set<String> roles = new TreeSet<String>();
@@ -169,7 +169,7 @@ public class PersonAdmin_mxJPO
     /**
      * Full name of the person.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String fullName;
@@ -177,7 +177,7 @@ public class PersonAdmin_mxJPO
     /**
      * Email address of the person.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String email;
@@ -185,7 +185,7 @@ public class PersonAdmin_mxJPO
     /**
      * Address of the person.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String address;
@@ -193,7 +193,7 @@ public class PersonAdmin_mxJPO
     /**
      * Fax number of the person.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String fax;
@@ -201,7 +201,7 @@ public class PersonAdmin_mxJPO
     /**
      * Phone number of the person.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String phone;
@@ -209,7 +209,7 @@ public class PersonAdmin_mxJPO
     /**
      * Default vault of the person.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String vault;
@@ -217,7 +217,7 @@ public class PersonAdmin_mxJPO
     /**
      * Is the person not active?
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
     private boolean isInactive = false;
@@ -225,7 +225,7 @@ public class PersonAdmin_mxJPO
     /**
      * Is the person an application user?
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)s
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
     private boolean isApplicationUser = false;
@@ -233,7 +233,7 @@ public class PersonAdmin_mxJPO
     /**
      * Is the person a full user?
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
     private boolean isFullUser = false;
@@ -241,7 +241,7 @@ public class PersonAdmin_mxJPO
     /**
      * Is the person a business administrator?
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
     private boolean isBusinessAdministrator = false;
@@ -249,7 +249,7 @@ public class PersonAdmin_mxJPO
     /**
      * Is the person a system administrator?
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
     private boolean isSystemAdministrator = false;
@@ -257,7 +257,7 @@ public class PersonAdmin_mxJPO
     /**
      * Is the person a trusted user?
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
     private boolean isTrusted = false;
@@ -265,7 +265,7 @@ public class PersonAdmin_mxJPO
     /**
      * Person wants email?
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private boolean wantsEmail = false;
@@ -273,7 +273,7 @@ public class PersonAdmin_mxJPO
     /**
      * Person wants (internal) icon mail.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private boolean wantsIconMail = false;
@@ -281,7 +281,7 @@ public class PersonAdmin_mxJPO
     /**
      * Set of access for this person.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private final Set<String> access = new TreeSet<String>();
@@ -289,7 +289,7 @@ public class PersonAdmin_mxJPO
     /**
      * Set of administration access for this person.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private final Set<String> adminAccess = new TreeSet<String>();
@@ -297,7 +297,7 @@ public class PersonAdmin_mxJPO
     /**
      * Defines the name of the assigned default application.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
@@ -306,7 +306,7 @@ public class PersonAdmin_mxJPO
     /**
      * The password of the person never expires.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private boolean passwordNeverExpires = false;
@@ -314,7 +314,7 @@ public class PersonAdmin_mxJPO
     /**
      * All assigned products of the person.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private final Set<String> products = new TreeSet<String>();
@@ -396,70 +396,97 @@ public class PersonAdmin_mxJPO
      * <p>If an <code>_url</code> is included in {@link #IGNORED_URLS}, this
      * URL is ignored.</p>
      *
-     * @param _url      URL to parse
-     * @param _content  content depending on the URL
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL to parse
+     * @param _content      content depending on the URL
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      * @see #IGNORED_URLS
      */
     @Override()
-    protected void parse(final String _url,
-                         final String _content)
+    protected boolean parse(final ParameterCache_mxJPO _paramCache,
+                            final String _url,
+                            final String _content)
     {
-        if (!PersonAdmin_mxJPO.IGNORED_URLS.contains(_url))  {
-            if ("/assignmentList/assignment/groupRef".equals(_url))  {
-                this.groups.add(_content);
-            } else if ("/assignmentList/assignment/roleRef".equals(_url))  {
-                this.roles.add(_content);
+        final boolean parsed;
+        if (PersonAdmin_mxJPO.IGNORED_URLS.contains(_url))  {
+            parsed = true;
+        } else if ("/assignmentList/assignment/groupRef".equals(_url))  {
+            this.groups.add(_content);
+            parsed = true;
+        } else if ("/assignmentList/assignment/roleRef".equals(_url))  {
+            this.roles.add(_content);
+            parsed = true;
 
-            } else if (_url.startsWith("/access"))  {
-                this.access.add(_url.substring(8).replaceAll("Access$", ""));
+        } else if (_url.startsWith("/access"))  {
+            this.access.add(_url.substring(8).replaceAll("Access$", ""));
+            parsed = true;
 
-            } else if (_url.startsWith("/adminAccess"))  {
-                this.adminAccess.add(_url.substring(13).replaceAll("Access$", ""));
+        } else if (_url.startsWith("/adminAccess"))  {
+            this.adminAccess.add(_url.substring(13).replaceAll("Access$", ""));
+            parsed = true;
 
-            } else if ("/defaultApplication/applicationRef".equals(_url))  {
-                this.defaultApplication = _content;
+        } else if ("/defaultApplication/applicationRef".equals(_url))  {
+            this.defaultApplication = _content;
+            parsed = true;
 
-            } else if ("/inactive".equals(_url))  {
-                this.isInactive = true;
-            } else if ("/applicationsOnly".equals(_url))  {
-                this.isApplicationUser = true;
-            } else if ("/fullUser".equals(_url))  {
-                this.isFullUser = true;
-            } else if ("/businessAdministrator".equals(_url))  {
-                this.isBusinessAdministrator = true;
-            } else if ("/systemAdministrator".equals(_url))  {
-                this.isSystemAdministrator = true;
-            } else if ("/trusted".equals(_url))  {
-                this.isTrusted = true;
+        } else if ("/inactive".equals(_url))  {
+            this.isInactive = true;
+            parsed = true;
+        } else if ("/applicationsOnly".equals(_url))  {
+            this.isApplicationUser = true;
+            parsed = true;
+        } else if ("/fullUser".equals(_url))  {
+            this.isFullUser = true;
+            parsed = true;
+        } else if ("/businessAdministrator".equals(_url))  {
+            this.isBusinessAdministrator = true;
+            parsed = true;
+        } else if ("/systemAdministrator".equals(_url))  {
+            this.isSystemAdministrator = true;
+            parsed = true;
+        } else if ("/trusted".equals(_url))  {
+            this.isTrusted = true;
+            parsed = true;
 
-            } else if ("/wantsEmail".equals(_url))  {
-                this.wantsEmail = true;
-            } else if ("/wantsIconMail".equals(_url))  {
-                this.wantsIconMail = true;
+        } else if ("/wantsEmail".equals(_url))  {
+            this.wantsEmail = true;
+            parsed = true;
+        } else if ("/wantsIconMail".equals(_url))  {
+            this.wantsIconMail = true;
+            parsed = true;
 
-            } else if ("/address".equals(_url))  {
-                this.address = _content;
-            } else if ("/email".equals(_url))  {
-                this.email = _content;
-            } else if ("/fax".equals(_url))  {
-                this.fax = _content;
-            } else if ("/fullName".equals(_url))  {
-                this.fullName = _content;
-            } else if ("/homeVault/vaultRef".equals(_url))  {
-                this.vault = _content;
-            } else if ("/phone".equals(_url))  {
-                this.phone = _content;
+        } else if ("/address".equals(_url))  {
+            this.address = _content;
+            parsed = true;
+        } else if ("/email".equals(_url))  {
+            this.email = _content;
+            parsed = true;
+        } else if ("/fax".equals(_url))  {
+            this.fax = _content;
+            parsed = true;
+        } else if ("/fullName".equals(_url))  {
+            this.fullName = _content;
+            parsed = true;
+        } else if ("/homeVault/vaultRef".equals(_url))  {
+            this.vault = _content;
+            parsed = true;
+        } else if ("/phone".equals(_url))  {
+            this.phone = _content;
+            parsed = true;
 
-            } else if ("/passwordNeverExpires".equals(_url))  {
-                this.passwordNeverExpires = true;
+        } else if ("/passwordNeverExpires".equals(_url))  {
+            this.passwordNeverExpires = true;
+            parsed = true;
 
-            } else if ("/productList/productRef".equals(_url))  {
-                this.products.add(_content);
+        } else if ("/productList/productRef".equals(_url))  {
+            this.products.add(_content);
+            parsed = true;
 
-            } else  {
-                super.parse(_url, _content);
-            }
+        } else  {
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 
     /**

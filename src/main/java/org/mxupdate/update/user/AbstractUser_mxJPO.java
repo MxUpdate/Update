@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ public abstract class AbstractUser_mxJPO
      * Set of all ignored URLs from the XML definition for common stuff of
      * users.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
@@ -84,7 +84,7 @@ public abstract class AbstractUser_mxJPO
     /**
      * Related site of this group.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String site;
@@ -93,7 +93,7 @@ public abstract class AbstractUser_mxJPO
      * Maps depending on the name of the cue to related cue information. The
      * map is used to sort the cues depending on the name.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #prepare(ParameterCache_mxJPO)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
@@ -103,7 +103,7 @@ public abstract class AbstractUser_mxJPO
     /**
      * Current cue which is read.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private Cue_mxJPO currentCue;
 
@@ -111,7 +111,7 @@ public abstract class AbstractUser_mxJPO
      * Maps depending on the name of the filter to related filter information.
      * The map is used to sort the filters depending on the name.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #prepare(ParameterCache_mxJPO)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
@@ -121,7 +121,7 @@ public abstract class AbstractUser_mxJPO
     /**
      * Current filter which is read.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private Filter_mxJPO currentFilter;
 
@@ -129,7 +129,7 @@ public abstract class AbstractUser_mxJPO
      * Maps depending on the name of the query to related query information.
      * The map is used to sort the queries depending on the name.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #prepare(ParameterCache_mxJPO)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
@@ -139,7 +139,7 @@ public abstract class AbstractUser_mxJPO
     /**
      * Current query which is read.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private Query_mxJPO currentQuery;
 
@@ -147,7 +147,7 @@ public abstract class AbstractUser_mxJPO
      * Maps depending on the name of the table to related table information.
      * The map is used to sort the tables depending on the name.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #prepare(ParameterCache_mxJPO)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
@@ -157,7 +157,7 @@ public abstract class AbstractUser_mxJPO
     /**
      * Current table which is read.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private Table_mxJPO currentTable;
 
@@ -165,7 +165,7 @@ public abstract class AbstractUser_mxJPO
      * Maps depending on the name of the tip to related tip information.
      * The map is used to sort the tips depending on the name.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #prepare(ParameterCache_mxJPO)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
@@ -175,7 +175,7 @@ public abstract class AbstractUser_mxJPO
     /**
      * Current tip which is read.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private Tip_mxJPO currentTip;
 
@@ -184,7 +184,7 @@ public abstract class AbstractUser_mxJPO
      * information. The map is used to sort the tool sets depending on the
      * name.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #prepare(ParameterCache_mxJPO)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
@@ -194,7 +194,7 @@ public abstract class AbstractUser_mxJPO
     /**
      * Current tip which is read.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private ToolSet_mxJPO currentToolSet;
 
@@ -202,7 +202,7 @@ public abstract class AbstractUser_mxJPO
      * Maps depending on the name of the view to related view information. The
      * map is used to sort the tool sets depending on the name.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #prepare(ParameterCache_mxJPO)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
@@ -212,7 +212,7 @@ public abstract class AbstractUser_mxJPO
     /**
      * Current tip which is read.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private View_mxJPO currentView;
 
@@ -244,80 +244,94 @@ public abstract class AbstractUser_mxJPO
      * <p>If an <code>_url</code> is included in {@link #IGNORED_URLS}, this
      * URL is ignored.</p>
      *
-     * @param _url      URL to parse
-     * @param _content  content of the URL to parse
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL to parse
+     * @param _content      content of the URL to parse
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      * @see #IGNORED_URLS
      */
     @Override()
-    protected void parse(final String _url,
-                         final String _content)
+    protected boolean parse(final ParameterCache_mxJPO _paramCache,
+                            final String _url,
+                            final String _content)
     {
-        if (!AbstractUser_mxJPO.IGNORED_URLS.contains(_url))  {
-            if ("/homeSite/siteRef".equals(_url))  {
-                this.site = _content;
+        final boolean parsed;
+        if (AbstractUser_mxJPO.IGNORED_URLS.contains(_url))  {
+            parsed = true;
+        } else if ("/homeSite/siteRef".equals(_url))  {
+            this.site = _content;
+            parsed = true;
 
-            } else if ("/cueList/cue".equals(_url))  {
-                this.currentCue = new Cue_mxJPO(this);
-            } else if ("/cueList/cue/name".equals(_url))  {
-                this.cues.put(_content, this.currentCue);
-                this.currentCue.parse(_url.substring(12), _content);
-            } else if (_url.startsWith("/cueList/cue/"))  {
-                this.currentCue.parse(_url.substring(12), _content);
+        } else if ("/cueList/cue".equals(_url))  {
+            this.currentCue = new Cue_mxJPO(this);
+            parsed = true;
+        } else if ("/cueList/cue/name".equals(_url))  {
+            this.cues.put(_content, this.currentCue);
+            parsed = this.currentCue.parse(_paramCache, _url.substring(12), _content);
+        } else if (_url.startsWith("/cueList/cue/"))  {
+            parsed = this.currentCue.parse(_paramCache, _url.substring(12), _content);
 
-            } else if ("/filterList/filter".equals(_url))  {
-                this.currentFilter = new Filter_mxJPO(this);
-            } else if ("/filterList/filter/name".equals(_url))  {
-                this.filters.put(_content, this.currentFilter);
-                this.currentFilter.parse(_url.substring(18), _content);
-            } else if (_url.startsWith("/filterList/filter/"))  {
-                this.currentFilter.parse(_url.substring(18), _content);
+        } else if ("/filterList/filter".equals(_url))  {
+            this.currentFilter = new Filter_mxJPO(this);
+            parsed = true;
+        } else if ("/filterList/filter/name".equals(_url))  {
+            this.filters.put(_content, this.currentFilter);
+            parsed = this.currentFilter.parse(_paramCache, _url.substring(18), _content);
+        } else if (_url.startsWith("/filterList/filter/"))  {
+            parsed = this.currentFilter.parse(_paramCache, _url.substring(18), _content);
 
-            } else if ("/queryList/query".equals(_url))  {
-                this.currentQuery = new Query_mxJPO(this);
-            } else if ("/queryList/query/name".equals(_url))  {
-                this.queries.put(_content, this.currentQuery);
-                this.currentQuery.parse(_url.substring(16), _content);
-            } else if (_url.startsWith("/queryList/query/"))  {
-                this.currentQuery.parse(_url.substring(16), _content);
+        } else if ("/queryList/query".equals(_url))  {
+            this.currentQuery = new Query_mxJPO(this);
+            parsed = true;
+        } else if ("/queryList/query/name".equals(_url))  {
+            this.queries.put(_content, this.currentQuery);
+            parsed = this.currentQuery.parse(_paramCache, _url.substring(16), _content);
+        } else if (_url.startsWith("/queryList/query/"))  {
+            parsed = this.currentQuery.parse(_paramCache, _url.substring(16), _content);
 
-            } else if ("/tableList/table".equals(_url))  {
-                this.currentTable = new Table_mxJPO(this);
-            } else if ("/tableList/table/adminProperties/name".equals(_url))  {
-                this.tables.put(_content, this.currentTable);
-                this.currentTable.parse(_url.substring(32), _content);
-            } else if (_url.startsWith("/tableList/table/adminProperties/"))  {
-                this.currentTable.parse(_url.substring(32), _content);
-            } else if (_url.startsWith("/tableList/table/"))  {
-                this.currentTable.parse(_url.substring(16), _content);
+        } else if ("/tableList/table".equals(_url))  {
+            this.currentTable = new Table_mxJPO(this);
+            parsed = true;
+        } else if ("/tableList/table/adminProperties/name".equals(_url))  {
+            this.tables.put(_content, this.currentTable);
+            parsed = this.currentTable.parse(_paramCache, _url.substring(32), _content);
+        } else if (_url.startsWith("/tableList/table/adminProperties/"))  {
+            parsed = this.currentTable.parse(_paramCache, _url.substring(32), _content);
+        } else if (_url.startsWith("/tableList/table/"))  {
+            parsed = this.currentTable.parse(_paramCache, _url.substring(16), _content);
 
-            } else if ("/tipList/tip".equals(_url))  {
-                this.currentTip = new Tip_mxJPO(this);
-            } else if ("/tipList/tip/name".equals(_url))  {
-                this.tips.put(_content, this.currentTip);
-                this.currentTip.parse(_url.substring(12), _content);
-            } else if (_url.startsWith("/tipList/tip/"))  {
-                this.currentTip.parse(_url.substring(12), _content);
+        } else if ("/tipList/tip".equals(_url))  {
+            this.currentTip = new Tip_mxJPO(this);
+            parsed = true;
+        } else if ("/tipList/tip/name".equals(_url))  {
+            this.tips.put(_content, this.currentTip);
+            parsed = this.currentTip.parse(_paramCache, _url.substring(12), _content);
+        } else if (_url.startsWith("/tipList/tip/"))  {
+            parsed = this.currentTip.parse(_paramCache, _url.substring(12), _content);
 
-            } else if ("/toolsetList/toolset".equals(_url))  {
-                this.currentToolSet = new ToolSet_mxJPO(this);
-            } else if ("/toolsetList/toolset/name".equals(_url))  {
-                this.toolSets.put(_content, this.currentToolSet);
-                this.currentToolSet.parse(_url.substring(20), _content);
-            } else if (_url.startsWith("/toolsetList/toolset/"))  {
-                this.currentToolSet.parse(_url.substring(20), _content);
+        } else if ("/toolsetList/toolset".equals(_url))  {
+            this.currentToolSet = new ToolSet_mxJPO(this);
+            parsed = true;
+        } else if ("/toolsetList/toolset/name".equals(_url))  {
+            this.toolSets.put(_content, this.currentToolSet);
+            parsed = this.currentToolSet.parse(_paramCache, _url.substring(20), _content);
+        } else if (_url.startsWith("/toolsetList/toolset/"))  {
+            parsed = this.currentToolSet.parse(_paramCache, _url.substring(20), _content);
 
-            } else if ("/viewList/view".equals(_url))  {
-                this.currentView = new View_mxJPO(this);
-            } else if ("/viewList/view/name".equals(_url))  {
-                this.views.put(_content, this.currentView);
-                this.currentView.parse(_url.substring(14), _content);
-            } else if (_url.startsWith("/viewList/view/"))  {
-                this.currentView.parse(_url.substring(14), _content);
+        } else if ("/viewList/view".equals(_url))  {
+            this.currentView = new View_mxJPO(this);
+            parsed = true;
+        } else if ("/viewList/view/name".equals(_url))  {
+            this.views.put(_content, this.currentView);
+            parsed = this.currentView.parse(_paramCache, _url.substring(14), _content);
+        } else if (_url.startsWith("/viewList/view/"))  {
+            parsed = this.currentView.parse(_paramCache, _url.substring(14), _content);
 
-            } else  {
-                super.parse(_url, _content);
-            }
+        } else  {
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 
     /**

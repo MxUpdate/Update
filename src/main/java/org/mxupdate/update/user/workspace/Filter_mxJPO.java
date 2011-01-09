@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public class Filter_mxJPO
      * Direction of the connection to which the filter applies to. The default
      * value is the the filter applies to both (from and to) directions.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #write(ParameterCache_mxJPO, Appendable)
      */
     private Direction direction;
@@ -59,28 +59,36 @@ public class Filter_mxJPO
      * <li>{@link #direction}</li>
      * </ul></p>
      *
-     * @param _url      URL to parse
-     * @param _content  content of the URL to parse
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL to parse
+     * @param _content      content of the URL to parse
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      */
     @Override()
-    public void parse(final String _url,
-                      final String _content)
+    public boolean parse(final ParameterCache_mxJPO _paramCache,
+                         final String _url,
+                         final String _content)
     {
+        final boolean parsed;
         if ("/traverseBackwards".equals(_url))  {
             if ((this.direction != null) && (this.direction == Direction.FROM))  {
                 this.direction = Direction.BOTH;
             } else  {
                 this.direction = Direction.TO;
             }
+            parsed = true;
         } else if ("/traverseForewards".equals(_url))  {
             if ((this.direction != null) && (this.direction == Direction.TO))  {
                 this.direction = Direction.BOTH;
             } else  {
                 this.direction = Direction.FROM;
             }
+            parsed = true;
         } else  {
-            super.parse(_url, _content);
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 
     /**

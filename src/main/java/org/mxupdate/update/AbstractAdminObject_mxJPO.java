@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,9 +68,16 @@ public abstract class AbstractAdminObject_mxJPO
     private static final String PARAM_SYMB_NAME_PROG = "RegisterSymbolicNames";
 
     /**
+     * Name of the parameter to suppress warnings for not parsed URLs.
+     *
+     * @see PadSaxHandler#evaluate()
+     */
+    private static final String PARAM_SUPPRESS_URL_WARNINGS = "SuppressUrlWarnings";
+
+    /**
      * Set of all ignored URLs from the XML definition for all admin objects.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
@@ -97,7 +104,7 @@ public abstract class AbstractAdminObject_mxJPO
      * in the properties map {@link #propertiesMap} from
      * {@link #prepare(ParameterCache_mxJPO)}.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #prepare(ParameterCache_mxJPO)
      */
     private final Stack<AdminProperty_mxJPO> propertiesStack = new Stack<AdminProperty_mxJPO>();
@@ -277,9 +284,8 @@ public abstract class AbstractAdminObject_mxJPO
      * @see #getExportMQL()                 used to get the MQL command to get
      *                                      a XML representation
      * @see PadSaxHandler                   SAX handler to parse the XML file
-     * @see #parse(String, String)          parser called within the SAX
-     *                                      handler
-     * @see #prepare(ParameterCache_mxJPO)  called post preparation method
+     * @see #parse(ParameterCache_mxJPO, String, String)
+     * @see #prepare(ParameterCache_mxJPO)
      */
     @Override()
     protected void parse(final ParameterCache_mxJPO _paramCache)
@@ -288,7 +294,7 @@ public abstract class AbstractAdminObject_mxJPO
         // create XML reader
         final XMLReader reader = XMLReaderFactory.createXMLReader();
         // register Sax Content Handler
-        final PadSaxHandler handler = new PadSaxHandler();
+        final PadSaxHandler handler = new PadSaxHandler(_paramCache);
         reader.setContentHandler(handler);
         reader.setDTDHandler(handler);
         reader.setEntityResolver(handler);
@@ -340,29 +346,36 @@ public abstract class AbstractAdminObject_mxJPO
      * <li>properties</li>
      * </ul>
      *
-     * @param _url      URL within the XML
-     * @param _content  value of the URL
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL within the XML
+     * @param _content      value of the URL
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      * @see #IGNORED_URLS
      */
-    protected void parse(final String _url,
-                         final String _content)
+    protected boolean parse(final ParameterCache_mxJPO _paramCache,
+                            final String _url,
+                            final String _content)
     {
-        if (!AbstractAdminObject_mxJPO.IGNORED_URLS.contains(_url))  {
-            if ("/adminProperties/description".equals(_url))  {
-                this.setDescription(_content);
-            } else if ("/adminProperties/hidden".equals(_url))  {
-                this.hidden = true;
+        final boolean parsed;
+        if (AbstractAdminObject_mxJPO.IGNORED_URLS.contains(_url))  {
+            parsed = true;
+        } else if ("/adminProperties/description".equals(_url))  {
+            this.setDescription(_content);
+            parsed = true;
+        } else if ("/adminProperties/hidden".equals(_url))  {
+            this.hidden = true;
+            parsed = true;
 
-            } else if ("/adminProperties/propertyList/property".equals(_url))  {
-                this.propertiesStack.add(new AdminProperty_mxJPO());
-            } else if (_url.startsWith("/adminProperties/propertyList/property"))  {
-                if (!this.propertiesStack.peek().parse(_url.substring(38), _content))  {
-                    System.err.println("unknown parsing property url: "+_url+"("+_content+")");
-                }
-            } else  {
-                System.err.println("unknown parsing url: "+_url+"("+_content+")");
-            }
+        } else if ("/adminProperties/propertyList/property".equals(_url))  {
+            this.propertiesStack.add(new AdminProperty_mxJPO());
+            parsed = true;
+        } else if (_url.startsWith("/adminProperties/propertyList/property"))  {
+            parsed = this.propertiesStack.peek().parse(_paramCache, _url.substring(38), _content);
+        } else  {
+            parsed = false;
         }
+        return parsed;
     }
 
     /**
@@ -752,6 +765,11 @@ public abstract class AbstractAdminObject_mxJPO
         extends DefaultHandler
     {
         /**
+         * Parameter cache for logging purposed.
+         */
+        private final ParameterCache_mxJPO paramCache;
+
+        /**
          * Holds the current stack (deep) of the tags. If a start element from
          * {@link #startElement(String, String, String, Attributes)} is called
          * a new string is added. If an evaluation of an element is ended from
@@ -783,6 +801,16 @@ public abstract class AbstractAdminObject_mxJPO
          * @see #endElement(String, String, String)
          */
         private boolean evaluated = false;
+
+        /**
+         * Initializes the {@link #paramCache parameter cache}.
+         *
+         * @param _paramCache   parameter cache
+         */
+        PadSaxHandler(final ParameterCache_mxJPO _paramCache)
+        {
+            this.paramCache = _paramCache;
+        }
 
         /**
          * An input source defining the entity &quot;ematrixProductDtd&quot; to
@@ -879,16 +907,18 @@ public abstract class AbstractAdminObject_mxJPO
 
         /**
          * Prepares an URL from current {@link #stack}. The URL is build
-         * starting with third element of the {@link #stack}. The first three
-         * elements are defined only for administration purpose.
+         * starting with element at <code>_startIndex</code> of the
+         * {@link #stack}.
          *
+         * @param _startIndex       index which is used as first element in the
+         *                          URL
          * @return URL made from {@link #stack}
          * @see #stack
          */
-        private String getUrl()
+        private String getUrl(final int _startIndex)
         {
             final StringBuilder ret = new StringBuilder();
-            for (final String tag : this.stack.subList(2, this.stack.size()))  {
+            for (final String tag : this.stack.subList(_startIndex, this.stack.size()))  {
                 ret.append('/').append(tag);
             }
             return ret.toString();
@@ -898,7 +928,7 @@ public abstract class AbstractAdminObject_mxJPO
          * <p>Current XML element is evaluated. The path of the element defined
          * by the {@link #stack} fetched from {@link #getUrl()} is used to
          * identify the XML element. Evaluation of a XML element means to call
-         * {@link AbstractAdminObject_mxJPO#parse(String, String)}.</p>
+         * {@link AbstractAdminObject_mxJPO#parse(ParameterCache_mxJPO, String, String)}.</p>
          * <p>The parser is only called if the deep of a XML element is higher
          * than two, because this XML tags defines the administration element.
          * Deep 0 till 2 is used from MX for administration.</p>
@@ -907,11 +937,15 @@ public abstract class AbstractAdminObject_mxJPO
          */
         private void evaluate()
         {
-            if (this.stack.size() > 2)  {
-                final String tag = this.stack.get(1);
-                if (!"creationProperties".equals(tag))  {
-                    AbstractAdminObject_mxJPO.this.parse(this.getUrl(),
-                                                         (this.content != null) ? this.content.toString() : null);
+            if ((this.stack.size() > 2) && !"creationProperties".equals(this.stack.get(1)))  {
+                final boolean parsed = AbstractAdminObject_mxJPO.this.parse(
+                        this.paramCache,
+                        this.getUrl(2),
+                        (this.content != null) ? this.content.toString() : null);
+                if (!parsed && !this.paramCache.getValueBoolean(AbstractAdminObject_mxJPO.PARAM_SUPPRESS_URL_WARNINGS))  {
+                    this.paramCache.logWarning("Url '" + this.getUrl(1) + "'"
+                            + ((this.content != null) ? (" with value '" + this.content.toString().trim() + "'") : "")
+                            + " unknown and not parsed!");
                 }
             }
         }

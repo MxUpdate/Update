@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ abstract class AbstractVisualWorkspaceObject_mxJPO
     /**
      * Is the visual workspace object active?
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #write(ParameterCache_mxJPO, Appendable)
      */
     private boolean active = false;
@@ -74,18 +74,25 @@ abstract class AbstractVisualWorkspaceObject_mxJPO
      * <li>{@link #active active flag}</li>
      * </ul></p>
      *
-     * @param _url      URL to parse
-     * @param _content  content of the URL to parse
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL to parse
+     * @param _content      content of the URL to parse
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      */
     @Override()
-    public void parse(final String _url,
-                      final String _content)
+    public boolean parse(final ParameterCache_mxJPO _paramCache,
+                         final String _url,
+                         final String _content)
     {
+        final boolean parsed;
         if ("/active".endsWith(_url))  {
             this.active = true;
+            parsed = true;
         } else  {
-            super.parse(_url, _content);
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ public class Table_mxJPO
      * Set of all ignored URLs from the XML definition for user specific
      * tables.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
@@ -75,7 +75,7 @@ public class Table_mxJPO
     /**
      * Stores all columns of this user specific table instance.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private final Stack<Field> fields = new Stack<Field>();
 
@@ -101,23 +101,30 @@ public class Table_mxJPO
      * <p>If an <code>_url</code> is included in {@link #IGNORED_URLS}, this
      * URL is ignored.</p>
      *
-     * @param _url      URL to parse
-     * @param _content  content of the URL to parse
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL to parse
+     * @param _content      content of the URL to parse
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      * @see #IGNORED_URLS
      */
     @Override()
-    public void parse(final String _url,
-                      final String _content)
+    public boolean parse(final ParameterCache_mxJPO _paramCache,
+                         final String _url,
+                         final String _content)
     {
-        if (!Table_mxJPO.IGNORED_URLS.contains(_url))  {
-            if ("/columnList/column".equals(_url))  {
-                this.fields.add(new Field());
-            } else if (_url.startsWith("/columnList/column/"))  {
-                this.fields.peek().parse(_url.substring(18), _content);
-            } else  {
-                super.parse(_url, _content);
-            }
+        final boolean parsed;
+        if (Table_mxJPO.IGNORED_URLS.contains(_url))  {
+            parsed = true;
+        } else if ("/columnList/column".equals(_url))  {
+            this.fields.add(new Field());
+            parsed = true;
+        } else if (_url.startsWith("/columnList/column/"))  {
+            parsed = this.fields.peek().parse(_paramCache, _url.substring(18), _content);
+        } else  {
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 
     /**

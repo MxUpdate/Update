@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public class Rule_mxJPO
     /**
      * Set of all ignored URLs from the XML definition for rules.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
@@ -65,7 +65,7 @@ public class Rule_mxJPO
     /**
      * Set holding the complete owner access.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private final Set<String> ownerAccess = new TreeSet<String>();
@@ -73,7 +73,7 @@ public class Rule_mxJPO
     /**
      * Filter for the owner access.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String ownerAccessFilter;
@@ -81,7 +81,7 @@ public class Rule_mxJPO
     /**
      * Set holding the complete owner revoke.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private final Set<String> ownerRevoke = new TreeSet<String>();
@@ -89,7 +89,7 @@ public class Rule_mxJPO
     /**
      * Filter for the owner revoke.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String ownerRevokeFilter;
@@ -97,7 +97,7 @@ public class Rule_mxJPO
     /**
      * Set holding the complete public access.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private final Set<String> publicAccess = new TreeSet<String>();
@@ -105,7 +105,7 @@ public class Rule_mxJPO
     /**
      * Filter for the public access.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String publicAccessFilter;
@@ -113,7 +113,7 @@ public class Rule_mxJPO
     /**
      * Set holding the complete public revoke.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private final Set<String> publicRevoke = new TreeSet<String>();
@@ -121,7 +121,7 @@ public class Rule_mxJPO
     /**
      * Filter for the public revoke.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String publicRevokeFilter;
@@ -129,7 +129,7 @@ public class Rule_mxJPO
     /**
      * Stack used to hold the user access while parsing.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private final Stack<UserAccess> userAccess = new Stack<UserAccess>();
 
@@ -155,53 +155,71 @@ public class Rule_mxJPO
     /**
      * Parses all rule specific URLs.
      *
-     * @param _url      URL to parse
-     * @param _content  content of the URL to parse
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL to parse
+     * @param _content      content of the URL to parse
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      * @see #IGNORED_URLS
      */
     @Override()
-    protected void parse(final String _url,
-                         final String _content)
+    protected boolean parse(final ParameterCache_mxJPO _paramCache,
+                            final String _url,
+                            final String _content)
     {
-        if (!Rule_mxJPO.IGNORED_URLS.contains(_url))  {
-            if (_url.startsWith("/ownerAccess/access/"))  {
-                this.ownerAccess.add(_url.replaceAll("^/ownerAccess/access/", "")
-                                         .replaceAll("Access$", ""));
-            } else if ("/ownerAccess/expressionFilter".equals(_url))  {
-                this.ownerAccessFilter = _content;
+        final boolean parsed;
+        if (Rule_mxJPO.IGNORED_URLS.contains(_url))  {
+            parsed = true;
+        } else if (_url.startsWith("/ownerAccess/access/"))  {
+            this.ownerAccess.add(_url.replaceAll("^/ownerAccess/access/", "")
+                                     .replaceAll("Access$", ""));
+            parsed = true;
+        } else if ("/ownerAccess/expressionFilter".equals(_url))  {
+            this.ownerAccessFilter = _content;
+            parsed = true;
 
-            } else if (_url.startsWith("/ownerRevoke/access/"))  {
-                this.ownerRevoke.add(_url.replaceAll("^/ownerRevoke/access/", "")
-                                         .replaceAll("Access$", ""));
-            } else if ("/ownerRevoke/expressionFilter".equals(_url))  {
-                this.ownerRevokeFilter = _content;
+        } else if (_url.startsWith("/ownerRevoke/access/"))  {
+            this.ownerRevoke.add(_url.replaceAll("^/ownerRevoke/access/", "")
+                                     .replaceAll("Access$", ""));
+            parsed = true;
+        } else if ("/ownerRevoke/expressionFilter".equals(_url))  {
+            this.ownerRevokeFilter = _content;
+            parsed = true;
 
-            } else if (_url.startsWith("/publicAccess/access/"))  {
-                this.publicAccess.add(_url.replaceAll("^/publicAccess/access/", "")
-                                          .replaceAll("Access$", ""));
-            } else if ("/publicAccess/expressionFilter".equals(_url))  {
-                this.publicAccessFilter = _content;
+        } else if (_url.startsWith("/publicAccess/access/"))  {
+            this.publicAccess.add(_url.replaceAll("^/publicAccess/access/", "")
+                                      .replaceAll("Access$", ""));
+            parsed = true;
+        } else if ("/publicAccess/expressionFilter".equals(_url))  {
+            this.publicAccessFilter = _content;
+            parsed = true;
 
-            } else if (_url.startsWith("/publicRevoke/access/"))  {
-                this.publicRevoke.add(_url.replaceAll("^/publicRevoke/access/", "")
-                                          .replaceAll("Access$", ""));
-            } else if ("/publicRevoke/expressionFilter".equals(_url))  {
-                this.publicRevokeFilter = _content;
+        } else if (_url.startsWith("/publicRevoke/access/"))  {
+            this.publicRevoke.add(_url.replaceAll("^/publicRevoke/access/", "")
+                                      .replaceAll("Access$", ""));
+            parsed = true;
+        } else if ("/publicRevoke/expressionFilter".equals(_url))  {
+            this.publicRevokeFilter = _content;
+            parsed = true;
 
-            } else if ("/userAccessList/userAccess".equals(_url))  {
-                this.userAccess.add(new UserAccess());
-            } else if ("/userAccessList/userAccess/userRef".equals(_url))  {
-                this.userAccess.peek().userRef = _content;
-            } else if (_url.startsWith("/userAccessList/userAccess/access/"))  {
-                this.userAccess.peek().access.add(_url.replaceAll("^/userAccessList/userAccess/access/", "")
-                                                      .replaceAll("Access$", ""));
-            } else if ("/userAccessList/userAccess/expressionFilter".equals(_url))  {
-                this.userAccess.peek().expressionFilter = _content;
+        } else if ("/userAccessList/userAccess".equals(_url))  {
+            this.userAccess.add(new UserAccess());
+            parsed = true;
+        } else if ("/userAccessList/userAccess/userRef".equals(_url))  {
+            this.userAccess.peek().userRef = _content;
+            parsed = true;
+        } else if (_url.startsWith("/userAccessList/userAccess/access/"))  {
+            this.userAccess.peek().access.add(_url.replaceAll("^/userAccessList/userAccess/access/", "")
+                                                  .replaceAll("Access$", ""));
+            parsed = true;
+        } else if ("/userAccessList/userAccess/expressionFilter".equals(_url))  {
+            this.userAccess.peek().expressionFilter = _content;
+            parsed = true;
 
-            } else  {
-                super.parse(_url, _content);
-            }
+        } else  {
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 
     /**

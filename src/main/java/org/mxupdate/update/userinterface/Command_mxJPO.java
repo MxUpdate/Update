@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ public class Command_mxJPO
     /**
      * Set of all ignored URLs from the XML definition for commands.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
@@ -57,7 +57,7 @@ public class Command_mxJPO
     /**
      * Alt label of the command.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String alt;
@@ -65,7 +65,7 @@ public class Command_mxJPO
     /**
      * Label of the command.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String label;
@@ -73,7 +73,7 @@ public class Command_mxJPO
     /**
      * HRef of the command.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private String href;
@@ -81,7 +81,7 @@ public class Command_mxJPO
     /**
      * Sorted list of assigned users of the command.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
     private final Set<String> users = new TreeSet<String>();
@@ -106,26 +106,36 @@ public class Command_mxJPO
      * <li>user references in {@link #users}</li>
      * </ul>
      *
-     * @param _url      URL to parse
-     * @param _content  related content of the URL to parse
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL to parse
+     * @param _content      related content of the URL to parse
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      */
     @Override()
-    protected void parse(final String _url,
-                         final String _content)
+    protected boolean parse(final ParameterCache_mxJPO _paramCache,
+                            final String _url,
+                            final String _content)
     {
-        if (!Command_mxJPO.IGNORED_URLS.contains(_url))  {
-            if ("/alt".equals(_url))  {
-                this.alt = _content;
-            } else if ("/href".equals(_url))  {
-                this.href = _content;
-            } else if ("/label".equals(_url))  {
-                this.label = _content;
-            } else if ("/userRefList/userRef".equals(_url))  {
-                this.users.add(_content);
-            } else  {
-                super.parse(_url, _content);
-            }
+        final boolean parsed;
+        if (Command_mxJPO.IGNORED_URLS.contains(_url))  {
+            parsed = true;
+        } else if ("/alt".equals(_url))  {
+            this.alt = _content;
+            parsed = true;
+        } else if ("/href".equals(_url))  {
+            this.href = _content;
+            parsed = true;
+        } else if ("/label".equals(_url))  {
+            this.label = _content;
+            parsed = true;
+        } else if ("/userRefList/userRef".equals(_url))  {
+            this.users.add(_content);
+            parsed = true;
+        } else  {
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 
     /**

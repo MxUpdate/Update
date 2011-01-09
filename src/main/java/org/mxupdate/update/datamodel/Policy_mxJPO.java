@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ public class Policy_mxJPO
     /**
      * Set of all ignored URLs from the XML definition for policies.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
@@ -149,21 +149,21 @@ public class Policy_mxJPO
     /**
      * Set of all types of this policy.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private final Set<String> types = new TreeSet<String>();
 
     /**
      * Are all types allowed of this policy?
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private boolean allTypes;
 
     /**
      * Are access for all states defined?
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #write(ParameterCache_mxJPO, Appendable)
      */
     private boolean allState = false;
@@ -171,7 +171,7 @@ public class Policy_mxJPO
     /**
      * Access definitions for all states.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private final Access allStateAccess = new Access();
 
@@ -193,53 +193,64 @@ public class Policy_mxJPO
     }
 
     /**
-     * Parses all format specific URLs.
+     * Parses all policy specific URLs.
      *
-     * @param _url      URL to parse
-     * @param _content  content of the URL to parse
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL to parse
+     * @param _content      content of the URL to parse
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      * @see #IGNORED_URLS
      */
     @Override()
-    protected void parse(final String _url,
-                         final String _content)
+    protected boolean parse(final ParameterCache_mxJPO _paramCache,
+                            final String _url,
+                            final String _content)
     {
-        if (!Policy_mxJPO.IGNORED_URLS.contains(_url))  {
-            if ("/defaultFormat/formatRef".equals(_url))  {
-                this.defaultFormat = _content;
-            } else if ("/formatRefList/formatRef".equals(_url))  {
-                this.formats.add(_content);
-            } else if ("/allowAllFormats".equals(_url))  {
-                this.allFormats = true;
+        final boolean parsed;
+        if (Policy_mxJPO.IGNORED_URLS.contains(_url))  {
+            parsed = true;
+        } else if ("/defaultFormat/formatRef".equals(_url))  {
+            this.defaultFormat = _content;
+            parsed = true;
+        } else if ("/formatRefList/formatRef".equals(_url))  {
+            this.formats.add(_content);
+            parsed = true;
+        } else if ("/allowAllFormats".equals(_url))  {
+            this.allFormats = true;
+            parsed = true;
 
-            } else if ("/sequence".equals(_url))  {
-                this.sequence = _content;
+        } else if ("/sequence".equals(_url))  {
+            this.sequence = _content;
+            parsed = true;
 
-            } else if ("/storeRef".equals(_url))  {
-                this.store = _content;
+        } else if ("/storeRef".equals(_url))  {
+            this.store = _content;
+            parsed = true;
 
-            } else if ("/typeRefList/typeRef".equals(_url))  {
-                this.types.add(_content);
-            } else if ("/allowAllTypes".equals(_url))  {
-                this.allTypes = true;
+        } else if ("/typeRefList/typeRef".equals(_url))  {
+            this.types.add(_content);
+            parsed = true;
+        } else if ("/allowAllTypes".equals(_url))  {
+            this.allTypes = true;
+            parsed = true;
 
-            } else if ("/allstateDef".equals(_url))  {
-                this.allState = true;
-            } else if (_url.startsWith("/allstateDef"))  {
-                if (!this.allStateAccess.parse(_url.substring(12), _content))  {
-                    super.parse(_url, _content);
-                }
+        } else if ("/allstateDef".equals(_url))  {
+            this.allState = true;
+            parsed = true;
+        } else if (_url.startsWith("/allstateDef"))  {
+            parsed = this.allStateAccess.parse(_paramCache, _url.substring(12), _content);
 
-            } else if ("/stateDefList/stateDef".equals(_url))  {
-                this.states.add(new State());
-            } else if (_url.startsWith("/stateDefList/stateDef"))  {
-                if (!this.states.peek().parse(_url.substring(22), _content))  {
-                    super.parse(_url, _content);
-                }
+        } else if ("/stateDefList/stateDef".equals(_url))  {
+            this.states.add(new State());
+            parsed = true;
+        } else if (_url.startsWith("/stateDefList/stateDef"))  {
+            parsed = this.states.peek().parse(_paramCache, _url.substring(22), _content);
 
-            } else  {
-                super.parse(_url, _content);
-            }
+        } else  {
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 
     /**
@@ -726,7 +737,7 @@ throw new Exception("some states are not defined anymore!");
         /**
          * Stack used to hold the user access while parsing.
          *
-         * @see #parse(String, String)
+         * @see #parse(ParameterCache_mxJPO, String, String)
          */
         protected final Stack<UserAccessFilter> userAccess = new Stack<UserAccessFilter>();
 
@@ -740,12 +751,14 @@ throw new Exception("some states are not defined anymore!");
         /**
          * Parses given access <code>_url</code>.
          *
-         * @param _url      access URL to parse
-         * @param _content  content of the access URL
+         * @param _paramCache   parameter cache with MX context
+         * @param _url          access URL to parse
+         * @param _content      content of the access URL
          * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
          *         <i>false</i>
          */
-        protected boolean parse(final String _url,
+        protected boolean parse(final ParameterCache_mxJPO _paramCache,
+                                final String _url,
                                 final String _content)
         {
             boolean ret = true;
@@ -977,7 +990,8 @@ throw new Exception("some states are not defined anymore!");
          * {@inheritDoc}
          */
         @Override()
-        protected boolean parse(final String _url,
+        protected boolean parse(final ParameterCache_mxJPO _paramCache,
+                                final String _url,
                                 final String _content)
         {
             boolean ret = true;
@@ -1031,7 +1045,7 @@ throw new Exception("some states are not defined anymore!");
             } else if ("/triggerList/trigger/inputArguments".equals(_url))  {
                 this.triggersStack.peek().arguments = _content;
             } else  {
-                ret = super.parse(_url, _content);
+                ret = super.parse(_paramCache, _url, _content);
             }
             return ret;
         }
@@ -1114,7 +1128,7 @@ throw new Exception("some states are not defined anymore!");
          */
         protected void calcDelta(final Appendable _out,
                                  final State _oldState)
-                throws IOException
+            throws IOException
         {
             // basics
             _out.append(" promote ").append(String.valueOf(this.autoPromotion))

@@ -52,7 +52,7 @@ public class AttributeString_mxJPO
     /**
      * The attribute is a multi line attribute.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeAttributeSpecificValues(ParameterCache_mxJPO, Appendable)
      */
     private boolean multiline = false;
@@ -60,7 +60,7 @@ public class AttributeString_mxJPO
     /**
      * Maximum length of the value for string attributes.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      * @see #PARAM_SUPPORT_PROPERTY_MAX_LENGTH
      */
@@ -87,21 +87,29 @@ public class AttributeString_mxJPO
      * <li>is the attribute {@link #multiline multi line}</li>
      * </ul>
      *
+     * @param _paramCache   parameter cache with MX context
      * @param _url      URL to parse
      * @param _content  content of the URL to parse
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      * @see #IGNORED_URLS
      */
     @Override()
-    protected void parse(final String _url,
-                         final String _content)
+    protected boolean parse(final ParameterCache_mxJPO _paramCache,
+                            final String _url,
+                            final String _content)
     {
+        final boolean parsed;
         if ("/maxlength".equals(_url))  {
             this.maxLength = _content;
+            parsed = true;
         } else if ("/multiline".equals(_url))  {
             this.multiline = true;
+            parsed = true;
         } else  {
-            super.parse(_url, _content);
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ public class Cue_mxJPO
      * Order in which the cue is applied in relation to other cues: before,
      * with or after other cues (-1 / 0 / 1).
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #write(ParameterCache_mxJPO, Appendable)
      */
     private String order;
@@ -47,7 +47,7 @@ public class Cue_mxJPO
     /**
      * Foreground color.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #write(ParameterCache_mxJPO, Appendable)
      */
     private String foregroundColor;
@@ -55,7 +55,7 @@ public class Cue_mxJPO
     /**
      * Highlight color.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #write(ParameterCache_mxJPO, Appendable)
      */
     private String highlightColor;
@@ -63,7 +63,7 @@ public class Cue_mxJPO
     /**
      * Name of the font.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #write(ParameterCache_mxJPO, Appendable)
      */
     private String fontName;
@@ -71,7 +71,7 @@ public class Cue_mxJPO
     /**
      * Line style.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #write(ParameterCache_mxJPO, Appendable)
      */
     private String lineStyle;
@@ -96,26 +96,37 @@ public class Cue_mxJPO
      * <li>{@link #lineStyle line style}</li>
      * </ul></p>
      *
-     * @param _url      URL to parse
-     * @param _content  content of the URL to parse
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL to parse
+     * @param _content      content of the URL to parse
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      */
     @Override()
-    public void parse(final String _url,
-                      final String _content)
+    public boolean parse(final ParameterCache_mxJPO _paramCache,
+                         final String _url,
+                         final String _content)
     {
+        final boolean parsed;
         if ("/zlevel".equals(_url))  {
             this.order = _content;
+            parsed = true;
         } else if ("/foregroundColor".equals(_url))  {
             this.foregroundColor = _content;
+            parsed = true;
         } else if ("/highlightColor".equals(_url))  {
             this.highlightColor = _content;
+            parsed = true;
         } else if ("/fontName".equals(_url))  {
             this.fontName = _content;
+            parsed = true;
         } else if ("/lineStyle".equals(_url))  {
             this.lineStyle = _content;
+            parsed = true;
         } else  {
-            super.parse(_url, _content);
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 
     /**

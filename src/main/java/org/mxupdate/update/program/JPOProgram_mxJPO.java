@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ public class JPOProgram_mxJPO
     /**
      * Set of all ignored URLs from the XML definition for JPO programs.
      *
-     * @see #parse(String, String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
@@ -112,7 +112,7 @@ public class JPOProgram_mxJPO
      * double back slashes must be replaced. In newer MX versions this
      * 'feature' does not exists anymore if an MQL insert was done.
      *
-     * @see #parse(String,String)
+     * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #write(ParameterCache_mxJPO, Appendable)
      */
     private boolean backslashUpgraded = false;
@@ -245,21 +245,28 @@ public class JPOProgram_mxJPO
      * <p>If an <code>_url</code> is included in {@link #IGNORED_URLS}, this
      * URL is ignored.</p>
      *
-     * @param _url      URL to parse
-     * @param _content  content depending on the URL
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL to parse
+     * @param _content      content depending on the URL
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      * @see #IGNORED_URLS
      */
     @Override()
-    protected void parse(final String _url,
-                         final String _content)
+    protected boolean parse(final ParameterCache_mxJPO _paramCache,
+                            final String _url,
+                            final String _content)
     {
-        if (!JPOProgram_mxJPO.IGNORED_URLS.contains(_url))  {
-            if ("/backslashUpgraded".equals(_url))  {
-                this.backslashUpgraded = true;
-            } else  {
-                super.parse(_url, _content);
-            }
+        final boolean parsed;
+        if (JPOProgram_mxJPO.IGNORED_URLS.contains(_url))  {
+            parsed = true;
+        } else if ("/backslashUpgraded".equals(_url))  {
+            this.backslashUpgraded = true;
+            parsed = true;
+        } else  {
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 
 

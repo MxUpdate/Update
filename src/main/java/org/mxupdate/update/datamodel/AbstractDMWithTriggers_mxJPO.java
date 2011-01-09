@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,26 +71,36 @@ public abstract class AbstractDMWithTriggers_mxJPO
     }
 
     /**
-     * @param _url      URL to parse
-     * @param _content  content of the URL to parse
+     * @param _paramCache   parameter cache with MX context
+     * @param _url          URL to parse
+     * @param _content      content of the URL to parse
+     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
+     *         <i>false</i>
      */
     @Override()
-    protected void parse(final String _url,
-                         final String _content)
+    protected boolean parse(final ParameterCache_mxJPO _paramCache,
+                            final String _url,
+                            final String _content)
     {
-        if (!"/triggerList".equals(_url))  {
-            if ("/triggerList/trigger".equals(_url))  {
-                this.triggersStack.add(new Trigger());
-            } else if ("/triggerList/trigger/triggerName".equals(_url))  {
-                this.triggersStack.peek().name = _content;
-            } else if ("/triggerList/trigger/programRef".equals(_url))  {
-                this.triggersStack.peek().program = _content;
-            } else if ("/triggerList/trigger/inputArguments".equals(_url))  {
-                this.triggersStack.peek().arguments = _content;
-            } else  {
-                super.parse(_url, _content);
-            }
+        final boolean parsed;
+        if ("/triggerList".equals(_url))  {
+            parsed = true;
+        } else if ("/triggerList/trigger".equals(_url))  {
+            this.triggersStack.add(new Trigger());
+            parsed = true;
+        } else if ("/triggerList/trigger/triggerName".equals(_url))  {
+            this.triggersStack.peek().name = _content;
+            parsed = true;
+        } else if ("/triggerList/trigger/programRef".equals(_url))  {
+            this.triggersStack.peek().program = _content;
+            parsed = true;
+        } else if ("/triggerList/trigger/inputArguments".equals(_url))  {
+            this.triggersStack.peek().arguments = _content;
+            parsed = true;
+        } else  {
+            parsed = super.parse(_paramCache, _url, _content);
         }
+        return parsed;
     }
 
     /**
