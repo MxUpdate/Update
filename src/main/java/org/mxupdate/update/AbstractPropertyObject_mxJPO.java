@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -205,7 +205,7 @@ public abstract class AbstractPropertyObject_mxJPO
      */
     protected void writeHeader(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
-            throws IOException
+        throws IOException
     {
         final String headerText = this.getTypeDef().getTitle();
         _out.append("################################################################################\n")
@@ -253,7 +253,7 @@ public abstract class AbstractPropertyObject_mxJPO
         // description
         _out.append("#\n# DESCRIPTION:\n")
             .append("# ~~~~~~~~~~~~\n");
-        if ((this.getDescription() != null) && !"".equals(this.getDescription()))  {
+        if ((this.getDescription() != null) && !this.getDescription().isEmpty())  {
             for (final String partDesc : this.getDescription().split("\n"))  {
                 _out.append('#');
                 int length = 0;
@@ -275,7 +275,7 @@ public abstract class AbstractPropertyObject_mxJPO
         // write header
         if (_paramCache.getValueBoolean(AbstractPropertyObject_mxJPO.PARAM_EXPORTAUTHOR))  {
             _out.append('#').append(AbstractPropertyObject_mxJPO.HEADER_AUTHOR);
-            if ((this.getAuthor() != null) && !"".equals(this.getAuthor()))  {
+            if ((this.getAuthor() != null) && !this.getAuthor().isEmpty())  {
                 _out.append(" ").append(this.getAuthor()).append('\n');
             } else {
                 _out.append("\n");
@@ -284,7 +284,7 @@ public abstract class AbstractPropertyObject_mxJPO
         // write installer
         if (_paramCache.getValueBoolean(AbstractPropertyObject_mxJPO.PARAM_EXPORTINSTALLER))  {
             _out.append('#').append(AbstractPropertyObject_mxJPO.HEADER_INSTALLER);
-            if ((this.getInstaller() != null) && !"".equals(this.getInstaller()))  {
+            if ((this.getInstaller() != null) && !this.getInstaller().isEmpty())  {
                 _out.append(" ").append(this.getInstaller()).append('\n');
             } else {
                 _out.append("\n");
@@ -293,7 +293,7 @@ public abstract class AbstractPropertyObject_mxJPO
         // write application
         if (_paramCache.getValueBoolean(AbstractPropertyObject_mxJPO.PARAM_EXPORTAPPLICATION))  {
             _out.append('#').append(AbstractPropertyObject_mxJPO.HEADER_APPLICATION);
-            if ((this.getApplication() != null) && !"".equals(this.getApplication()))  {
+            if ((this.getApplication() != null) && !this.getApplication().isEmpty())  {
                 _out.append(" ").append(this.getApplication()).append('\n');
             } else {
                 _out.append("\n");
@@ -302,7 +302,7 @@ public abstract class AbstractPropertyObject_mxJPO
         // write version
         if (_paramCache.getValueBoolean(AbstractPropertyObject_mxJPO.PARAM_EXPORTVERSION))  {
             _out.append('#').append(AbstractPropertyObject_mxJPO.HEADER_VERSION);
-            if ((this.getVersion() != null) && !"".equals(this.getVersion()))  {
+            if ((this.getVersion() != null) && !this.getVersion().isEmpty())  {
                 _out.append(" ").append(this.getVersion()).append('\n');
             } else {
                 _out.append("\n");

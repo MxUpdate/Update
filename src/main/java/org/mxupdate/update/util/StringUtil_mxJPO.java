@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,6 +91,7 @@ public final class StringUtil_mxJPO
                                  .replaceAll("\\]", "\\\\]")
                : "";
     }
+
     /**
      * Converts given string by escaping all special characters for TCL for
      * escaped MQL commands. In some cases a quote must be converted to
@@ -630,7 +631,7 @@ public final class StringUtil_mxJPO
         final String[] ret;
 
          if ((_text.indexOf("?") == -1) && (_text.indexOf("*") == -1))  {
-             ret = new String[] { _text };
+             ret = new String[] {_text };
          } else  {
              final char[] array = _text.toCharArray();
              final ArrayList<String> list = new ArrayList<String>();

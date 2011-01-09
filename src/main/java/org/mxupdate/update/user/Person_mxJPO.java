@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2010 The MxUpdate Team
+ * Copyright 2008-2011 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -543,6 +543,17 @@ public class Person_mxJPO
         this.personBus.create(_paramCache);
     }
 
+    /**
+     * Parses first the business object representation and then updates the
+     * person using the administration representation.
+     *
+     * @param _paramCache       parameter cache with MX context
+     * @param _file             file used for update
+     * @param _newVersion       new target version
+     * @throws Exception if parse or update failed
+     * @see PersonBus#parse(ParameterCache_mxJPO)
+     * @see PersonAdmin#update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
+     */
     @Override()
     public void update(final ParameterCache_mxJPO _paramCache,
                        final File _file,
@@ -608,8 +619,7 @@ public class Person_mxJPO
          * method must be overwritten and only called. So the original method
          * could be used to parse the business administration part of the
          * person.
-         *
-         * @param _paramCache   parameter cache
+         * {@inheritDoc}
          */
         @Override()
         protected void parse(final ParameterCache_mxJPO _paramCache)

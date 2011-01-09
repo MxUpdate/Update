@@ -160,13 +160,13 @@ public class Format_mxJPO
         throws IOException
     {
         _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden")
-            .append(" \\\n    version \"").append((this.version != null) ? StringUtil_mxJPO.convertTcl(this.version) : "").append('\"')
-            .append(" \\\n    suffix \"").append((this.fileSuffix != null) ? StringUtil_mxJPO.convertTcl(this.fileSuffix) : "").append('\"')
-            .append(" \\\n    type \"").append((this.fileType != null) ? StringUtil_mxJPO.convertTcl(this.fileType) : "").append('\"')
-            .append(" \\\n    mime \"").append((this.mimeType != null) ? StringUtil_mxJPO.convertTcl(this.mimeType) : "").append('\"')
-            .append(" \\\n    view \"").append((this.commandView != null) ? StringUtil_mxJPO.convertTcl(this.commandView) : "").append('\"')
-            .append(" \\\n    edit \"").append((this.commandEdit != null) ? StringUtil_mxJPO.convertTcl(this.commandEdit) : "").append('\"')
-            .append(" \\\n    print \"").append((this.commandPrint != null) ? StringUtil_mxJPO.convertTcl(this.commandPrint) : "").append('\"');
+            .append(" \\\n    version \"").append(StringUtil_mxJPO.convertTcl(this.version)).append('\"')
+            .append(" \\\n    suffix \"").append(StringUtil_mxJPO.convertTcl(this.fileSuffix)).append('\"')
+            .append(" \\\n    type \"").append(StringUtil_mxJPO.convertTcl(this.fileType)).append('\"')
+            .append(" \\\n    mime \"").append(StringUtil_mxJPO.convertTcl(this.mimeType)).append('\"')
+            .append(" \\\n    view \"").append(StringUtil_mxJPO.convertTcl(this.commandView)).append('\"')
+            .append(" \\\n    edit \"").append(StringUtil_mxJPO.convertTcl(this.commandEdit)).append('\"')
+            .append(" \\\n    print \"").append(StringUtil_mxJPO.convertTcl(this.commandPrint)).append('\"');
     }
 
 
