@@ -89,6 +89,13 @@ public abstract class AbstractAdminObject_mxJPO
         // because name is defined within constructor
         AbstractAdminObject_mxJPO.IGNORED_URLS.add("/adminProperties/name");
         AbstractAdminObject_mxJPO.IGNORED_URLS.add("/adminProperties/propertyList");
+        AbstractAdminObject_mxJPO.IGNORED_URLS.add("/adminProperties/historyList");
+        AbstractAdminObject_mxJPO.IGNORED_URLS.add("/adminProperties/historyList/history");
+        AbstractAdminObject_mxJPO.IGNORED_URLS.add("/adminProperties/historyList/history/agent");
+        AbstractAdminObject_mxJPO.IGNORED_URLS.add("/adminProperties/historyList/history/datetime");
+        AbstractAdminObject_mxJPO.IGNORED_URLS.add("/adminProperties/historyList/history/event");
+        AbstractAdminObject_mxJPO.IGNORED_URLS.add("/adminProperties/historyList/history/order");
+        AbstractAdminObject_mxJPO.IGNORED_URLS.add("/adminProperties/historyList/history/string");
     }
 
     /**
