@@ -427,8 +427,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("33")
-    @Test(description = "export of policy with symbolic name property for state")
-    public void testExportNoPropertyDefinitionForStateSymbolicName()
+    @Test(description = "issue #33: export of policy with symbolic name property for state")
+    public void testPositiveExportNoPropertyDefinitionForStateSymbolicName()
         throws Exception
     {
         this.mql("add policy " + PolicyTest.POLICY_NAME
@@ -452,8 +452,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("34")
-    @Test(description = "export of all symbolic names for states")
-    public void testExportAllSymbolicNamesForStatesDefined()
+    @Test(description = "issue #34: export of all symbolic names for states")
+    public void testPositiveExportAllSymbolicNamesForStatesDefined()
         throws Exception
     {
         this.mql("add policy " + PolicyTest.POLICY_NAME
@@ -478,8 +478,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("87")
-    @Test(description = "export with owner access for a state with filter expression")
-    public void exportStateOwnerAccessWithFilterExpression()
+    @Test(description = "issue #87: export with owner access for a state with filter expression")
+    public void testPositiveExportStateOwnerAccessWithFilterExpression()
         throws Exception
     {
         this.mql("add policy " + PolicyTest.POLICY_NAME
@@ -503,8 +503,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("87")
-    @Test(description = "export with owner access for a state without filter expression")
-    public void exportStateOwnerAccessWithoutFilterExpression()
+    @Test(description = "issue #87: export with owner access for a state without filter expression")
+    public void testPositiveExportStateOwnerAccessWithoutFilterExpression()
         throws Exception
     {
         this.mql("add policy " + PolicyTest.POLICY_NAME
@@ -528,8 +528,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("88")
-    @Test(description = "export with owner revoke for a state with filter expression")
-    public void exportStateOwnerRevokeWithFilterExpression()
+    @Test(description = "issue #88: export with owner revoke for a state with filter expression")
+    public void testPositiveExportStateOwnerRevokeWithFilterExpression()
         throws Exception
     {
         this.mql("add policy " + PolicyTest.POLICY_NAME
@@ -553,8 +553,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("88")
-    @Test(description = "export with none owner revoke")
-    public void exportStateOwnerRevokeWithoutDefinition()
+    @Test(description = "issue #88: export with none owner revoke")
+    public void testPositiveExportStateOwnerRevokeWithoutDefinition()
         throws Exception
     {
         this.mql("add policy " + PolicyTest.POLICY_NAME
@@ -578,8 +578,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("88")
-    @Test(description = "export with owner revoke for a state without filter expression")
-    public void exportStateOwnerRevokeWithoutFilterExpression()
+    @Test(description = "issue #88: export with owner revoke for a state without filter expression")
+    public void testPositiveExportStateOwnerRevokeWithoutFilterExpression()
         throws Exception
     {
         this.mql("add policy " + PolicyTest.POLICY_NAME
@@ -604,8 +604,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("87")
-    @Test(description = "export with public access for a state with filter expression")
-    public void exportStatePublicAccessWithFilterExpression()
+    @Test(description = "issue #87: export with public access for a state with filter expression")
+    public void testPositiveExportStatePublicAccessWithFilterExpression()
         throws Exception
     {
         this.mql("add policy " + PolicyTest.POLICY_NAME
@@ -629,8 +629,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("87")
-    @Test(description = "export with public access for a state without filter expression")
-    public void exportStatePublicAccessWithoutFilterExpression()
+    @Test(description = "issue #87: export with public access for a state without filter expression")
+    public void testPositiveExportStatePublicAccessWithoutFilterExpression()
         throws Exception
     {
         this.mql("add policy " + PolicyTest.POLICY_NAME
@@ -655,7 +655,7 @@ public class PolicyTest
      */
     @IssueLink("88")
     @Test(description = "export with none public revoke")
-    public void exportStatePublicRevokeWithoutDefinition()
+    public void testPositiveExportStatePublicRevokeWithoutDefinition()
         throws Exception
     {
         this.mql("add policy " + PolicyTest.POLICY_NAME
@@ -680,8 +680,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("88")
-    @Test(description = "export with public revoke for a state with filter expression")
-    public void exportStatePublicRevokeWithFilterExpression()
+    @Test(description = "issue #88: export with public revoke for a state with filter expression")
+    public void testPositiveExportStatePublicRevokeWithFilterExpression()
         throws Exception
     {
         this.mql("add policy " + PolicyTest.POLICY_NAME
@@ -705,8 +705,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("88")
-    @Test(description = "export with public revoke for a state without filter expression")
-    public void exportStatePublicRevokeWithoutFilterExpression()
+    @Test(description = "issue #88: export with public revoke for a state without filter expression")
+    public void testPositiveExportStatePublicRevokeWithoutFilterExpression()
         throws Exception
     {
         this.mql("add policy " + PolicyTest.POLICY_NAME
@@ -731,8 +731,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("11")
-    @Test(description = "export of state symbolic name export if not defined")
-    public void exportStateSymbolicNameExportedIfNotDefined()
+    @Test(description = "issue #11: export of state symbolic name export if not defined")
+    public void testPositiveExportStateSymbolicNameExportedIfNotDefined()
         throws Exception
     {
         this.mql("add policy " + PolicyTest.POLICY_NAME
@@ -755,8 +755,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("86")
-    @Test(description = "update policy with all formats in braces")
-    public void testUpdateFormatAllWithBraces()
+    @Test(description = "issue #86: update policy with all formats in braces")
+    public void testPositiveUpdateFormatAllWithBraces()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -780,8 +780,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("86")
-    @Test(description = "update policy with all formats in braces")
-    public void testUpdateFormatAllWithoutBraces()
+    @Test(description = "issue #86: update policy with all formats in braces")
+    public void testPositiveUpdateFormatAllWithoutBraces()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -805,8 +805,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("11")
-    @Test(description = "update policy with multiple symbolic names for one state")
-    public void testUpdateMultipleStateSymbolicNames()
+    @Test(description = "issue #11: update policy with multiple symbolic names for one state")
+    public void testPositiveUpdateMultipleStateSymbolicNames()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -839,8 +839,8 @@ public class PolicyTest
      * @throws Exception if MQL execution failed
      */
     @IssueLink("11")
-    @Test(description = "update policy with no properties")
-    public void testUpdateNullProperties()
+    @Test(description = "issue #11: update policy with no properties")
+    public void testPositiveUpdateNullProperties()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -870,8 +870,8 @@ public class PolicyTest
      * @throws Exception if MQL execution failed
      */
     @IssueLink("11")
-    @Test(description = "check update of policy without state symbolic names are updated without property definition for states")
-    public void testUpdateProperties()
+    @Test(description = "issue #11: check update of policy without state symbolic names are updated without property definition for states")
+    public void testPositiveUpdateProperties()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -900,8 +900,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("87")
-    @Test(description = "create owner access with empty owner filter definition")
-    public void updateStateOwnerAccessWithEmptyFilterExpression()
+    @Test(description = "issue #87: create owner access with empty owner filter definition")
+    public void testPositiveUpdateStateOwnerAccessWithEmptyFilterExpression()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -929,8 +929,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("87")
-    @Test(description = "update owner access with empty owner filter definition for existing filter expression")
-    public void updateStateOwnerAccessWithEmptyFilterExpression4Existing()
+    @Test(description = "issue #87: update owner access with empty owner filter definition for existing filter expression")
+    public void testPositiveUpdateStateOwnerAccessWithEmptyFilterExpression4Existing()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -963,8 +963,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("87")
-    @Test(description = "create owner access with filter expression")
-    public void updateStateOwnerAccessWithFilterExpression()
+    @Test(description = "issue #87: create owner access with filter expression")
+    public void testPositiveUpdateStateOwnerAccessWithFilterExpression()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -991,8 +991,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("87")
-    @Test(description = "update owner access with filter expression for existing filter expression")
-    public void updateStateOwnerAccessWithFilterExpression4Existing()
+    @Test(description = "issue #87: update owner access with filter expression for existing filter expression")
+    public void testPositiveUpdateStateOwnerAccessWithFilterExpression4Existing()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1026,8 +1026,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("87")
-    @Test(description = "create owner access without filter expression for non existing state")
-    public void updateStateOwnerAccessWithoutFilterExpression()
+    @Test(description = "issue #87: create owner access without filter expression for non existing state")
+    public void testPositiveUpdateStateOwnerAccessWithoutFilterExpression()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1055,8 +1055,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("87")
-    @Test(description = "update owner access without filter expression for existing state with existing owner filter expression")
-    public void updateStateOwnerAccessWithoutFilterExpression4Existing()
+    @Test(description = "issue #87: update owner access without filter expression for existing state with existing owner filter expression")
+    public void testPositiveUpdateStateOwnerAccessWithoutFilterExpression4Existing()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1090,8 +1090,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("88")
-    @Test(description = "create owner revoke with empty owner filter definition")
-    public void updateStateOwnerRevokeWithEmptyFilterExpression()
+    @Test(description = "issue #88: create owner revoke with empty owner filter definition")
+    public void testPositiveUpdateStateOwnerRevokeWithEmptyFilterExpression()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1119,8 +1119,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("88")
-    @Test(description = "update owner revoke with empty owner filter definition for existing filter expression")
-    public void updateStateOwnerRevokeWithEmptyFilterExpression4Existing()
+    @Test(description = "issue #88: update owner revoke with empty owner filter definition for existing filter expression")
+    public void testPositiveUpdateStateOwnerRevokeWithEmptyFilterExpression4Existing()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1154,8 +1154,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("88")
-    @Test(description = "create owner revoke with filter expression")
-    public void updateStateOwnerRevokeWithFilterExpression()
+    @Test(description = "issue #88: create owner revoke with filter expression")
+    public void testPositiveUpdateStateOwnerRevokeWithFilterExpression()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1183,8 +1183,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("88")
-    @Test(description = "update owner revoke with filter expression for existing filter expression")
-    public void updateStateOwnerRevokeWithFilterExpression4Existing()
+    @Test(description = "issue #88: update owner revoke with filter expression for existing filter expression")
+    public void testPositiveUpdateStateOwnerRevokeWithFilterExpression4Existing()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1219,8 +1219,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("88")
-    @Test(description = "create owner revoke without filter expression for non existing state")
-    public void updateStateOwnerRevokeWithoutFilterExpression()
+    @Test(description = "issue #88: create owner revoke without filter expression for non existing state")
+    public void testPositiveUpdateStateOwnerRevokeWithoutFilterExpression()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1248,8 +1248,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("88")
-    @Test(description = "update owner revoke without filter expression for existing state with existing owner filter expression")
-    public void updateStateOwnerRevokeWithoutFilterExpression4Existing()
+    @Test(description = "issue #88: update owner revoke without filter expression for existing state with existing owner filter expression")
+    public void testPositiveUpdateStateOwnerRevokeWithoutFilterExpression4Existing()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1283,8 +1283,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("87")
-    @Test(description = "create public access with empty public filter definition")
-    public void updateStatePublicAccessWithEmptyFilterExpression()
+    @Test(description = "issue #87: create public access with empty public filter definition")
+    public void testPositiveUpdateStatePublicAccessWithEmptyFilterExpression()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1312,8 +1312,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("87")
-    @Test(description = "update public access with empty public filter definition for existing filter expression")
-    public void updateStatePublicAccessWithEmptyFilterExpression4Existing()
+    @Test(description = "issue #87: update public access with empty public filter definition for existing filter expression")
+    public void testPositiveUpdateStatePublicAccessWithEmptyFilterExpression4Existing()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1347,8 +1347,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("87")
-    @Test(description = "create public access with filter expression")
-    public void updateStatePublicAccessWithFilterExpression()
+    @Test(description = "issue #87: create public access with filter expression")
+    public void testPositiveUpdateStatePublicAccessWithFilterExpression()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1376,8 +1376,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("87")
-    @Test(description = "update public access with filter expression for existing filter expression")
-    public void updateStatePublicAccessWithFilterExpression4Existing()
+    @Test(description = "issue #87: update public access with filter expression for existing filter expression")
+    public void testPositiveUpdateStatePublicAccessWithFilterExpression4Existing()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1412,8 +1412,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("87")
-    @Test(description = "create public access without filter expression for non existing state")
-    public void updateStatePublicAccessWithoutFilterExpression()
+    @Test(description = "issue #87: create public access without filter expression for non existing state")
+    public void testPositiveUpdateStatePublicAccessWithoutFilterExpression()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1441,8 +1441,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("87")
-    @Test(description = "update public access without filter expression for existing state with existing public filter expression")
-    public void updateStatePublicAccessWithoutFilterExpression4Existing()
+    @Test(description = "issue #87: update public access without filter expression for existing state with existing public filter expression")
+    public void testPositiveUpdateStatePublicAccessWithoutFilterExpression4Existing()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1476,8 +1476,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("88")
-    @Test(description = "create public access with empty public filter definition")
-    public void updateStatePublicRevokeWithEmptyFilterExpression()
+    @Test(description = "issue #88: create public access with empty public filter definition")
+    public void testPositiveUpdateStatePublicRevokeWithEmptyFilterExpression()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1505,8 +1505,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("88")
-    @Test(description = "update public access with empty public filter definition for existing filter expression")
-    public void updateStatePublicRevokeWithEmptyFilterExpression4Existing()
+    @Test(description = "issue #88: update public access with empty public filter definition for existing filter expression")
+    public void testPositiveUpdateStatePublicRevokeWithEmptyFilterExpression4Existing()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1540,8 +1540,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("88")
-    @Test(description = "create public access with filter expression")
-    public void updateStatePublicRevokeWithFilterExpression()
+    @Test(description = "issue #88: create public access with filter expression")
+    public void testPositiveUpdateStatePublicRevokeWithFilterExpression()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1569,8 +1569,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("88")
-    @Test(description = "update public access with filter expression for existing filter expression")
-    public void updateStatePublicRevokeWithFilterExpression4Existing()
+    @Test(description = "issue #88: update public access with filter expression for existing filter expression")
+    public void testPositiveUpdateStatePublicRevokeWithFilterExpression4Existing()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1605,8 +1605,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("88")
-    @Test(description = "create public access without filter expression for non existing state")
-    public void updateStatePublicRevokeWithoutFilterExpression()
+    @Test(description = "issue #88: create public access without filter expression for non existing state")
+    public void testPositiveUpdateStatePublicRevokeWithoutFilterExpression()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1634,8 +1634,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("88")
-    @Test(description = "update public access without filter expression for existing state with existing public filter expression")
-    public void updateStatePublicRevokeWithoutFilterExpression4Existing()
+    @Test(description = "issue #88: update public access without filter expression for existing state with existing public filter expression")
+    public void testPositiveUpdateStatePublicRevokeWithoutFilterExpression4Existing()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1671,8 +1671,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("86")
-    @Test(description = "update policy with all types in braces")
-    public void testUpdateTypeAllWithBraces()
+    @Test(description = "issue #86: update policy with all types in braces")
+    public void testPositiveUpdateTypeAllWithBraces()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1696,8 +1696,8 @@ public class PolicyTest
      * @throws Exception if test failed
      */
     @IssueLink("86")
-    @Test(description = "update policy with all types in braces")
-    public void testUpdateTypeAllWithoutBraces()
+    @Test(description = "issue #86: update policy with all types in braces")
+    public void testPositiveUpdateTypeAllWithoutBraces()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
@@ -1722,7 +1722,7 @@ public class PolicyTest
      */
     @IssueLink("100")
     @Test(description = "issue #100: test that existing store will be removed")
-    public void testRemoveStore()
+    public void testPositiveRemoveStore()
         throws Exception
     {
         new PolicyData(this, "Test")
@@ -1741,7 +1741,7 @@ public class PolicyTest
      */
     @IssueLink("99")
     @Test(description = "issue #99: test update of policy with all state and without allstate")
-    public void testUpdateAllState()
+    public void testPositiveUpdateAllState()
         throws Exception
     {
         new PolicyData(this, "Test")
@@ -1757,5 +1757,29 @@ public class PolicyTest
             .update()
             .update()
             .checkExport();
+    }
+
+    /**
+     * Test update state definition for user with no filter (if a filter is
+     * defined).
+     *
+     * @throws Exception if test faild
+     */
+    @IssueLink("151")
+    @Test(description = "issue #151: test update state definition for user with no filter (if a filter is defined)")
+    public void testPositiveUpdateRemoveFilter()
+        throws Exception
+    {
+        final PersonAdminData creator = new PersonAdminData(this, "creator").create();
+        final PolicyData policy = new PolicyData(this, "Test")
+                .addState(new PolicyData.State()
+                        .setName("Test")
+                        .getAccess().addUserAccess(new PolicyData.UserAccessFilter()
+                                .setUser(creator)
+                                .addAccess("read", "show")))
+                .update();
+        this.mql("mod policy '" + policy.getName() + "' state Test user " + creator.getName() + " read,show filter Test");
+        policy.update()
+              .checkExport();
     }
 }

@@ -696,14 +696,14 @@ throw new Exception("some states are not defined anymore!");
         protected String getMQLUpdateString(final AccessFilterDouble _oldAccessFilter)
         {
             final StringBuilder strg = new StringBuilder();
-            strg.append(StringUtil_mxJPO.joinMql(',', false, this.access, "none")).append(' ');
+            strg.append(StringUtil_mxJPO.joinMql(',', false, this.access, "none"))
+                .append(" filter \"");
             if ((this.filter != null) || ((_oldAccessFilter != null) && (_oldAccessFilter.filter != null)))  {
-                strg.append(" filter \"");
                 if (this.filter != null)  {
                     strg.append(StringUtil_mxJPO.convertMql(this.filter));
                 }
-                strg.append('\"');
             }
+            strg.append('\"');
             return strg.toString();
         }
     }
@@ -1193,7 +1193,6 @@ throw new Exception("some states are not defined anymore!");
             }
         }
     }
-
 
     /**
      * Class used to hold the user access for a state.

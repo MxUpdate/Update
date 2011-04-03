@@ -418,14 +418,16 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
                 "check that no error occured (have " + ret.getLog() + ")");
 
         // check returned configuration item name
-        Assert.assertEquals((String) values.get("Name"),
-                            this.name,
-                            "returned name is equal to given name");
+        Assert.assertEquals(
+                (String) values.get("Name"),
+                this.name,
+                "returned name is equal to given name");
         if (this.ci != AbstractTest.CI.PRG_JPO)  {
             // check path of the configuration item update file
-            Assert.assertEquals((String) values.get("FilePath"),
-                                this.getCI().filePath,
-                                "check path where the configuration item update file is located is correct");
+            Assert.assertEquals(
+                    (String) values.get("FilePath"),
+                    this.getCI().filePath,
+                    "check path where the configuration item update file is located is correct");
         } else  {
             // check path for JPOs (because of packages...)
             final String path;
@@ -434,14 +436,16 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
             } else  {
                 path = this.ci.filePath + "/" + this.name.replaceAll("\\.[^.]*$", "").replaceAll("\\.", "/");
             }
-            Assert.assertEquals((String) values.get("FilePath"),
-                                path,
-                                "check path where the configuration item update file is located is correct");
+            Assert.assertEquals(
+                    (String) values.get("FilePath"),
+                    path,
+                    "check path where the configuration item update file is located is correct");
         }
         // check file name of the configuration item update file
-        Assert.assertEquals((String) values.get("FileName"),
-                            this.getCIFileNameFromExport(),
-                            "check that the correct configuration item file name is returned");
+        Assert.assertEquals(
+                (String) values.get("FileName"),
+                this.getCIFileNameFromExport(),
+                "check that the correct configuration item file name is returned");
 
         return ret;
     }
