@@ -1774,11 +1774,19 @@ public class PolicyTest
         final PolicyData policy = new PolicyData(this, "Test")
                 .addState(new PolicyData.State()
                         .setName("Test")
+                        .getAccess().addOwnerAccess("all")
+                        .getAccess().addOwnerRevoke("read")
+                        .getAccess().addPublicAccess("all")
+                        .getAccess().addPublicRevoke("read")
                         .getAccess().addUserAccess(new PolicyData.UserAccessFilter()
                                 .setUser(creator)
                                 .addAccess("read", "show")))
                 .update();
         this.mql("mod policy '" + policy.getName() + "' state Test user " + creator.getName() + " read,show filter Test");
+        this.mql("mod policy '" + policy.getName() + "' state Test owner all filter Test");
+        this.mql("mod policy '" + policy.getName() + "' state Test revoke owner read filter Test");
+        this.mql("mod policy '" + policy.getName() + "' state Test public all filter Test");
+        this.mql("mod policy '" + policy.getName() + "' state Test revoke public read filter Test");
         policy.update()
               .checkExport();
     }

@@ -696,14 +696,14 @@ throw new Exception("some states are not defined anymore!");
         protected String getMQLUpdateString(final AccessFilterDouble _oldAccessFilter)
         {
             final StringBuilder strg = new StringBuilder();
-            strg.append(StringUtil_mxJPO.joinMql(',', false, this.access, "none"))
-                .append(" filter \"");
+            strg.append(StringUtil_mxJPO.joinMql(',', false, this.access, "none")).append(' ');
             if ((this.filter != null) || ((_oldAccessFilter != null) && (_oldAccessFilter.filter != null)))  {
+                strg.append("filter \"");
                 if (this.filter != null)  {
                     strg.append(StringUtil_mxJPO.convertMql(this.filter));
                 }
+                strg.append("\" ");
             }
-            strg.append('\"');
             return strg.toString();
         }
     }
@@ -864,7 +864,7 @@ throw new Exception("some states are not defined anymore!");
             throws IOException
         {
             // owner access
-            _out.append(" owner ").append(this.ownerAccess.getMQLUpdateString((_oldAccess != null) ? _oldAccess.publicAccess : null));
+            _out.append(" owner ").append(this.ownerAccess.getMQLUpdateString((_oldAccess != null) ? _oldAccess.ownerAccess : null));
             // owner revoke
             if (!this.ownerRevoke.isEmpty() || ((_oldAccess != null) && (!_oldAccess.ownerRevoke.isEmpty())))  {
                 _out.append(" revoke owner ").append(this.ownerRevoke.getMQLUpdateString((_oldAccess != null) ? _oldAccess.ownerRevoke : null));
@@ -880,11 +880,11 @@ throw new Exception("some states are not defined anymore!");
             for (final UserAccessFilter userAccess : this.userAccess)  {
                 newUsers.add(userAccess.userRef);
             }
-            final Set<String> oldUser = new HashSet<String>();
+            final Map<String,UserAccessFilter> oldUser = new HashMap<String,UserAccessFilter>();
             if (_oldAccess != null)  {
                 for (final UserAccessFilter userAccess : _oldAccess.userAccess)  {
                     if (newUsers.contains(userAccess.userRef))  {
-                        oldUser.add(userAccess.userRef);
+                        oldUser.put(userAccess.userRef, userAccess);
                     } else  {
                         _out.append(" remove user \"")
                             .append(StringUtil_mxJPO.convertMql(userAccess.userRef))
@@ -893,10 +893,10 @@ throw new Exception("some states are not defined anymore!");
                 }
             }
             for (final UserAccessFilter userAccess : this.userAccess)  {
-                if ((_oldAccess != null) && !oldUser.contains(userAccess.userRef))  {
+                if ((_oldAccess != null) && !oldUser.containsKey(userAccess.userRef))  {
                     _out.append(" add");
                 }
-                _out.append(" user ").append(userAccess.getMQLUpdateString(null));
+                _out.append(" user ").append(userAccess.getMQLUpdateString(oldUser.get(userAccess.userRef)));
             }
         }
     }
