@@ -822,27 +822,30 @@ public class MxUpdate_mxJPO
 
     /**
      *
-     * @param _paramCache       parameter cache
-     * @param _typeDefs
-     * @param _fileMatchLast
+     * @param _paramCache           parameter cache
+     * @param _selectedTypeDefs     selected type definitions from the MxUpdate
+     *                              parameters
+     * @param _fileMatchLast        must be <i>true</i> if the last match is
+     *                              executed; <i>false</i> otherwise
      * @param _clazz2names
-     * @param _allFiles
-     * @param _matchedFiles
+     * @param _matchedFiles         already matched files
      * @param _matches
      * @return ??
      * @throws Exception if the evaluate for the match fails
      */
     private boolean evalMatches(final ParameterCache_mxJPO _paramCache,
-                                final Collection<TypeDef_mxJPO> _typeDefs,
+                                final Collection<TypeDef_mxJPO> _selectedTypeDefs,
                                 final boolean _fileMatchLast,
                                 final Map<TypeDef_mxJPO,Map<File,String>> _clazz2names,
                                 final Set<File> _allFiles,
                                 final Set<File> _matchedFiles,
                                 final Collection<String> _matches)
-            throws Exception
+        throws Exception
     {
         boolean foundOther = false;
-        for (final TypeDef_mxJPO typeDef : _typeDefs)  {
+        // search for all type definitions
+        // (otherwise it could be that files are interpreted as MQL program...)
+        for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
             if (typeDef.isFileMatchLast() != _fileMatchLast)  {
                 foundOther = true;
             } else  {
@@ -853,7 +856,10 @@ public class MxUpdate_mxJPO
                         Map<File,String> tmp = _clazz2names.get(typeDef);
                         if (tmp == null)  {
                             tmp = new TreeMap<File,String>();
-                            _clazz2names.put(typeDef, tmp);
+                            // only if user had selected them
+                            if (_selectedTypeDefs.contains(typeDef))  {
+                                _clazz2names.put(typeDef, tmp);
+                            }
                         }
                         if (_matches == null)
                         {
@@ -943,7 +949,7 @@ public class MxUpdate_mxJPO
     protected Map<TypeDef_mxJPO,Set<String>> getMatching(final ParameterCache_mxJPO _paramCache,
                                                          final Map<Collection<TypeDef_mxJPO>,List<String>> _clazz2matches,
                                                          final Map<TypeDef_mxJPO,List<String>> _clazz2matchesOpp)
-            throws Exception
+        throws Exception
     {
         // first sort the matches depending on the type definition
         final Map<TypeDef_mxJPO,Set<String>> typeDef2Matches = new HashMap<TypeDef_mxJPO,Set<String>>();
