@@ -856,14 +856,14 @@ public class MxUpdate_mxJPO
                         Map<File,String> tmp = _clazz2names.get(typeDef);
                         if (tmp == null)  {
                             tmp = new TreeMap<File,String>();
-                            // only if user had selected them
-                            if (_selectedTypeDefs.contains(typeDef))  {
-                                _clazz2names.put(typeDef, tmp);
-                            }
+                            _clazz2names.put(typeDef, tmp);
                         }
                         if (_matches == null)
                         {
-                            tmp.put(file, mxName);
+                            // only if user had selected them
+                            if (_selectedTypeDefs.contains(typeDef))  {
+                                tmp.put(file, mxName);
+                            }
                             if (_matchedFiles != null)  {
                                 _matchedFiles.add(file);
                             }
@@ -872,7 +872,10 @@ public class MxUpdate_mxJPO
                         {
                             for (final String match : _matches)  {
                                 if (instance.matchMxName(_paramCache, mxName, match))  {
-                                    tmp.put(file, mxName);
+                                    // only if user had selected them
+                                    if (_selectedTypeDefs.contains(typeDef))  {
+                                        tmp.put(file, mxName);
+                                    }
                                     if (_matchedFiles != null)  {
                                         _matchedFiles.add(file);
                                     }
