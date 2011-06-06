@@ -41,7 +41,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class ConfigSearchIndex_mxJPO
+public class ConfigSystemSearchIndex_mxJPO
     extends AbstractObject_mxJPO
 {
     /**
@@ -71,7 +71,7 @@ public class ConfigSearchIndex_mxJPO
      *
      * @see #parse(ParameterCache_mxJPO)
      */
-    private final static int START_KEYWORD_LENGTH = ConfigSearchIndex_mxJPO.START_KEYWORD.length();
+    private final static int START_KEYWORD_LENGTH = ConfigSystemSearchIndex_mxJPO.START_KEYWORD.length();
 
     /**
      * Stores the read search index configuration.
@@ -88,7 +88,7 @@ public class ConfigSearchIndex_mxJPO
      * @param _typeDef      defines the related type definition enumeration
      * @param _mxName       MX name of the page object
      */
-    public ConfigSearchIndex_mxJPO(final TypeDef_mxJPO _typeDef,
+    public ConfigSystemSearchIndex_mxJPO(final TypeDef_mxJPO _typeDef,
                                    final String _mxName)
     {
         super(_typeDef, _mxName);
@@ -106,9 +106,9 @@ public class ConfigSearchIndex_mxJPO
     protected void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
-        final String tmp = MqlUtil_mxJPO.execMql(_paramCache, ConfigSearchIndex_mxJPO.MQL_GET_INDEX);
-        if (tmp.startsWith(ConfigSearchIndex_mxJPO.START_KEYWORD))  {
-            this.searchIndex = tmp.substring(ConfigSearchIndex_mxJPO.START_KEYWORD_LENGTH);
+        final String tmp = MqlUtil_mxJPO.execMql(_paramCache, ConfigSystemSearchIndex_mxJPO.MQL_GET_INDEX);
+        if (tmp.startsWith(ConfigSystemSearchIndex_mxJPO.START_KEYWORD))  {
+            this.searchIndex = tmp.substring(ConfigSystemSearchIndex_mxJPO.START_KEYWORD_LENGTH);
         }
     }
 
@@ -136,7 +136,7 @@ public class ConfigSearchIndex_mxJPO
     public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
     {
         final Set<String> names = new HashSet<String>(1);
-        names.add(ConfigSearchIndex_mxJPO.DEFAULT_NAME);
+        names.add(ConfigSystemSearchIndex_mxJPO.DEFAULT_NAME);
         return names;
     }
 
