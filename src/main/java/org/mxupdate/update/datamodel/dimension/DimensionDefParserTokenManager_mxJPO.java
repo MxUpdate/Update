@@ -1798,7 +1798,11 @@ private int jjMoveNfa_8(int startState, int curPos)
             {
                case 0:
                   if ((0x3ff000000000000L & l) != 0L)
+                  {
+                     if (kind > 76)
+                        kind = 76;
                      jjCheckNAddTwoStates(1, 2);
+                  }
                   else if (curChar == 46)
                   {
                      if (kind > 76)
@@ -1806,11 +1810,18 @@ private int jjMoveNfa_8(int startState, int curPos)
                      jjCheckNAdd(3);
                   }
                   else if (curChar == 45)
+                  {
+                     if (kind > 76)
+                        kind = 76;
                      jjCheckNAddTwoStates(1, 2);
+                  }
                   break;
                case 1:
-                  if ((0x3ff000000000000L & l) != 0L)
-                     jjCheckNAddTwoStates(1, 2);
+                  if ((0x3ff000000000000L & l) == 0L)
+                     break;
+                  if (kind > 76)
+                     kind = 76;
+                  jjCheckNAddTwoStates(1, 2);
                   break;
                case 2:
                   if (curChar != 46)
@@ -1915,6 +1926,10 @@ static final long[] jjtoSkip = {
 protected SimpleCharStream_mxJPO input_stream;
 private final int[] jjrounds = new int[21];
 private final int[] jjstateSet = new int[42];
+private final StringBuilder jjimage = new StringBuilder();
+private StringBuilder image = jjimage;
+private int jjimageLen;
+private int lengthOfMatch;
 protected char curChar;
 /** Constructor. */
 public DimensionDefParserTokenManager_mxJPO(SimpleCharStream_mxJPO stream){
@@ -1969,12 +1984,24 @@ protected Token_mxJPO jjFillToken()
    final int endLine;
    final int beginColumn;
    final int endColumn;
-   String im = jjstrLiteralImages[jjmatchedKind];
-   curTokenImage = (im == null) ? input_stream.GetImage() : im;
-   beginLine = input_stream.getBeginLine();
-   beginColumn = input_stream.getBeginColumn();
-   endLine = input_stream.getEndLine();
-   endColumn = input_stream.getEndColumn();
+   if (jjmatchedPos < 0)
+   {
+      if (image == null)
+         curTokenImage = "";
+      else
+         curTokenImage = image.toString();
+      beginLine = endLine = input_stream.getBeginLine();
+      beginColumn = endColumn = input_stream.getBeginColumn();
+   }
+   else
+   {
+      String im = jjstrLiteralImages[jjmatchedKind];
+      curTokenImage = (im == null) ? input_stream.GetImage() : im;
+      beginLine = input_stream.getBeginLine();
+      beginColumn = input_stream.getBeginColumn();
+      endLine = input_stream.getEndLine();
+      endColumn = input_stream.getEndColumn();
+   }
    t = Token_mxJPO.newToken(jjmatchedKind, curTokenImage);
 
    t.beginLine = beginLine;
@@ -2011,6 +2038,9 @@ public Token_mxJPO getNextToken()
       matchedToken = jjFillToken();
       return matchedToken;
    }
+   image = jjimage;
+   image.setLength(0);
+   jjimageLen = 0;
 
    switch(curLexState)
    {
@@ -2100,8 +2130,9 @@ public Token_mxJPO getNextToken()
              curChar = input_stream.BeginToken();
        }
        catch (java.io.IOException e1) { continue EOFLoop; }
-       jjmatchedKind = 0x7fffffff;
-       jjmatchedPos = 0;
+       jjmatchedKind = 76;
+       jjmatchedPos = -1;
+       curPos = 0;
        curPos = jjMoveStringLiteralDfa0_8();
        break;
      case 9:
@@ -2142,6 +2173,7 @@ public Token_mxJPO getNextToken()
         if ((jjtoToken[jjmatchedKind >> 6] & (1L << (jjmatchedKind & 077))) != 0L)
         {
            matchedToken = jjFillToken();
+           TokenLexicalActions(matchedToken);
        if (jjnewLexState[jjmatchedKind] != -1)
          curLexState = jjnewLexState[jjmatchedKind];
            return matchedToken;
@@ -2176,6 +2208,14 @@ public Token_mxJPO getNextToken()
   }
 }
 
+void TokenLexicalActions(Token_mxJPO matchedToken)
+{
+   switch(jjmatchedKind)
+   {
+      default :
+         break;
+   }
+}
 private void jjCheckNAdd(int state)
 {
    if (jjrounds[state] != jjround)

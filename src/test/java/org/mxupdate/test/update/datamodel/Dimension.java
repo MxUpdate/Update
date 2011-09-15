@@ -44,7 +44,7 @@ public class Dimension
     /**
      * Name of the test dimension.
      */
-    private static final String DIMENSION_NAME = "MxUpdate_Test";
+    private static final String DIMENSION_NAME = AbstractTest.PREFIX + "_Test";
 
     /**
      * Update code of the test dimension.
@@ -143,14 +143,12 @@ public class Dimension
      *
      * @throws Exception if MQL execution failed
      */
-    @BeforeMethod
-    @AfterMethod
+    @BeforeMethod()
+    @AfterMethod()
     public void cleanup()
         throws Exception
     {
-        if (!"".equals(this.mql("list dimension " + Dimension.DIMENSION_NAME)))  {
-            this.mql("delete dimension " + Dimension.DIMENSION_NAME);
-        }
+        this.cleanup(AbstractTest.CI.DM_DIMENSION);
     }
 
     /**

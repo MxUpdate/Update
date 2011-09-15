@@ -23,11 +23,13 @@ package org.mxupdate.test.update.datamodel;
 import java.io.StringReader;
 import java.lang.reflect.Method;
 
-import org.mxupdate.test.util.TestParameterCache;
+import org.mxupdate.test.AbstractTest;
 import org.mxupdate.update.datamodel.Dimension_mxJPO;
 import org.mxupdate.update.datamodel.dimension.DimensionDefParser_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -39,7 +41,13 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 public class DimensionParserTest
+    extends AbstractTest
 {
+    /**
+     * Name of the test dimension.
+     */
+    private static final String DIMENSION_NAME = AbstractTest.PREFIX + "_Test";
+
     /**
      * Start of the command to update the dimension to extract the code.
      */
@@ -51,6 +59,19 @@ public class DimensionParserTest
      * @see #START_INDEX
      */
     private static final int START_INDEX_LENGTH = DimensionParserTest.START_INDEX.length();
+
+    /**
+     * Removes the MxUpdate test dimensions.
+     *
+     * @throws Exception if MQL execution failed
+     */
+    @BeforeMethod()
+    @AfterClass()
+    public void cleanup()
+        throws Exception
+    {
+        this.cleanup(AbstractTest.CI.DM_DIMENSION);
+    }
 
     /**
      * Returns data providers used for testing parses.
@@ -99,7 +120,7 @@ public class DimensionParserTest
                         + "  multiplier 10.0\n"
                         + "  offset 20.0\n"
                         + "  system \"Duration Units\" to unit \"name2\"\n"
-                        + "}"
+                        + "}",
                 },
                 new Object[]{
                         "dimension with unit with negative offset",
@@ -118,7 +139,7 @@ public class DimensionParserTest
                         + "  label \"label2\"\n"
                         + "  multiplier 10.0\n"
                         + "  offset -20.0\n"
-                        + "}"
+                        + "}",
                 },
                 new Object[]{
                         "dimension with unit with negative multiplier",
@@ -137,6 +158,25 @@ public class DimensionParserTest
                         + "  label \"label2\"\n"
                         + "  multiplier -10.0\n"
                         + "  offset 20.0\n"
+                        + "}",
+                },
+                new Object[]{
+                        "dimension with unit with integer number",
+                        "description \"ein test\"\n"
+                        + "hidden \"false\"\n"
+                        + "unit \"name1\" {\n"
+                        + "  default true\n"
+                        + "  description \"\"\n"
+                        + "  label \"\"\n"
+                        + "  multiplier 1.0\n"
+                        + "  offset 0.0\n"
+                        + "}",
+                        "description \"ein test\"\n"
+                        + "hidden \"false\"\n"
+                        + "unit \"name1\" {\n"
+                        + "  default true\n"
+                        + "  multiplier 1\n"
+                        + "  offset 0\n"
                         + "}"
                 }
         };
@@ -156,14 +196,16 @@ public class DimensionParserTest
     public void testDimension(final String _description,
                               final String _toTest,
                               final String _definition)
-            throws Exception
+        throws Exception
     {
-        final ParameterCache_mxJPO paramCache = new TestParameterCache();
+        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
+
+        this.mql("add dimension " + DimensionParserTest.DIMENSION_NAME);
 
         final DimensionDefParser_mxJPO parser = new DimensionDefParser_mxJPO(new StringReader(_definition));
         final Dimension_mxJPO dimension = parser.dimension(paramCache,
                                                            paramCache.getMapping().getTypeDef("Dimension"),
-                                                           "Test");
+                                                           DimensionParserTest.DIMENSION_NAME);
 
         final StringBuilder bck = new StringBuilder();
         final Method write = dimension.getClass()

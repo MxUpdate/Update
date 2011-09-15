@@ -486,24 +486,28 @@ public final class TypeDef_mxJPO
                                 final String _jpoName)
             throws Exception
     {
-        // within tests the context is always null
-        if (_paramCache == null)  {
-            this.jpoClass = (Class<? extends AbstractObject_mxJPO>) Class.forName(_jpoName + "_mxJPO");
-        } else  {
-            if (_mapping.getTypeDefJPOsMap().isEmpty())  {
-                final String tmp = MqlUtil_mxJPO.execMql(_paramCache, TypeDef_mxJPO.MQL_LISTPROG);
-                for (final String line : tmp.split("\n"))  {
-                    final String[] arr = line.split("\t");
-                    if (arr.length > 1)  {
-                        _mapping.getTypeDefJPOsMap().put(arr[0], arr[1]);
-                    }
+        if (_mapping.getTypeDefJPOsMap().isEmpty())  {
+            final String tmp = MqlUtil_mxJPO.execMql(_paramCache, TypeDef_mxJPO.MQL_LISTPROG);
+            for (final String line : tmp.split("\n"))  {
+                final String[] arr = line.split("\t");
+                if (arr.length > 1)  {
+                    _mapping.getTypeDefJPOsMap().put(arr[0], arr[1]);
                 }
             }
-            final String jpoClassName = _mapping.getTypeDefJPOsMap().get(_jpoName);
-            if (jpoClassName == null)  {
-                throw new Exception("unknown jpo class definition for " + _jpoName);
-            }
+        }
+        final String jpoClassName = _mapping.getTypeDefJPOsMap().get(_jpoName);
+        if (jpoClassName == null)  {
+            throw new Exception("unknown jpo class definition for " + _jpoName);
+        }
+        try
+        {
+            // directly in MX
             this.jpoClass = (Class<? extends AbstractObject_mxJPO>) Class.forName(jpoClassName);
+        }
+        catch (final ClassNotFoundException e)
+        {
+            // run separately
+            this.jpoClass = (Class<? extends AbstractObject_mxJPO>) Class.forName(_jpoName + "_mxJPO");
         }
     }
 
@@ -781,6 +785,7 @@ public final class TypeDef_mxJPO
      * @return negative integer, zero, or positive integer as this object is
      *         less than, equal to, or greater than the specified object
      */
+    @Override()
     public int compareTo(final TypeDef_mxJPO _other)
     {
         int ret = Integer.valueOf(this.orderNo).compareTo(_other.orderNo);

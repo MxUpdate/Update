@@ -261,7 +261,7 @@ public class Dimension_mxJPO
      * @throws IOException if the extension could not be written
      * @see #units
      */
-    @Override
+    @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
             throws IOException
@@ -576,7 +576,8 @@ public class Dimension_mxJPO
          * @return &quot;0&quot; if both units are equal; &quot;1&quot; if
          *         greater; otherwise &quot;-1&quot;
          */
-        public int compareTo(final Unit _toCompare)
+        @Override
+		public int compareTo(final Unit _toCompare)
         {
             return (this.name == null)
                     ? (_toCompare.name == null)

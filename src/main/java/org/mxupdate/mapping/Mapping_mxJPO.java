@@ -188,27 +188,13 @@ public class Mapping_mxJPO
      * @throws IOException     if the properties could not be parsed
      */
     public Mapping_mxJPO(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException, IOException, Exception
+        throws MatrixException, IOException, Exception
     {
         this.properties.putAll(this.readProperties(_paramCache));
 
         // map attributes and types
         for (final Map.Entry<Object,Object> entry : this.properties.entrySet())  {
-            final String key = (String) entry.getKey();
-            final String value = (String) entry.getValue();
-            if (key.startsWith("Mode."))  {
-                Mode_mxJPO.defineValue(this, key.substring(5), value);
-            } else if (key.startsWith(Mapping_mxJPO.PREFIX_PARAMETERDEF))  {
-                ParameterDef_mxJPO.defineValue(this, key.substring(Mapping_mxJPO.LENGTH_PARAMETERDEF), value);
-            } else if (key.startsWith(Mapping_mxJPO.PREFIX_PROPERTYDEF))  {
-                PropertyDef_mxJPO.defineValue(this, key.substring(Mapping_mxJPO.LENGTH_PROPERTYDEF), value);
-            } else if (key.startsWith("TypeDef."))  {
-                TypeDef_mxJPO.defineValue(_paramCache, this, key.substring(8), value);
-            } else if (key.startsWith("TypeDefGroup."))  {
-                TypeDefGroup_mxJPO.defineValue(this, key.substring(13), value);
-            } else if (key.startsWith("TypeDefTree."))  {
-                TypeDefTree_mxJPO.defineValue(this, key.substring(12), value);
-            }
+            this.evalKeyValue(_paramCache, (String) entry.getKey(), (String) entry.getValue());
         }
         // executes the checks for the parameter definitions
         final Map<String,String> checkResult = new HashMap<String,String>();
@@ -217,6 +203,34 @@ public class Mapping_mxJPO
         }
 
         this.typeDefSorted.addAll(this.typeDefMap.values());
+    }
+
+    /**
+     * Evaluates the given {@code _key} with {@code _value}.
+     *
+     * @param _paramCache   parameter cache with the MX context
+     * @param _key          key to evaluate
+     * @param _value        value to evaluate
+     * @throws Exception if evaluate failed
+     */
+    protected void evalKeyValue(final ParameterCache_mxJPO _paramCache,
+                                final String _key,
+                                final String _value)
+        throws Exception
+    {
+        if (_key.startsWith("Mode."))  {
+            Mode_mxJPO.defineValue(this, _key.substring(5), _value);
+        } else if (_key.startsWith(Mapping_mxJPO.PREFIX_PARAMETERDEF))  {
+            ParameterDef_mxJPO.defineValue(this, _key.substring(Mapping_mxJPO.LENGTH_PARAMETERDEF), _value);
+        } else if (_key.startsWith(Mapping_mxJPO.PREFIX_PROPERTYDEF))  {
+            PropertyDef_mxJPO.defineValue(this, _key.substring(Mapping_mxJPO.LENGTH_PROPERTYDEF), _value);
+        } else if (_key.startsWith("TypeDef."))  {
+            TypeDef_mxJPO.defineValue(_paramCache, this, _key.substring(8), _value);
+        } else if (_key.startsWith("TypeDefGroup."))  {
+            TypeDefGroup_mxJPO.defineValue(this, _key.substring(13), _value);
+        } else if (_key.startsWith("TypeDefTree."))  {
+            TypeDefTree_mxJPO.defineValue(this, _key.substring(12), _value);
+        }
     }
 
     /**
