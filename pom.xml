@@ -111,10 +111,10 @@
         </dependency>
         <dependency>
             <groupId>ematrix</groupId>
-            <artifactId>fcsclient</artifactId>
+            <artifactId>m1jsystem</artifactId>
             <scope>system</scope>
             <version>ALL</version>
-            <systemPath>${org.mxupdate.mx.jar.fcsclient}</systemPath>
+            <systemPath>${org.mxupdate.mx.jar.m1jsystem}</systemPath>
         </dependency>
         <!-- for Base64 encoding / decoding within automatic tests -->
         <dependency>
