@@ -96,7 +96,7 @@ public class Group_mxJPO
                             final String _content)
     {
         final boolean parsed;
-        if (!Group_mxJPO.IGNORED_URLS.contains(_url))  {
+        if (Group_mxJPO.IGNORED_URLS.contains(_url))  {
             parsed = true;
         } else if ("/parentGroup/groupRef".equals(_url))  {
             this.parentGroups.add(_content);
