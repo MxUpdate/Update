@@ -508,7 +508,6 @@ public abstract class AbstractTest
     public void close()
         throws Exception
     {
-        this.context.destroy();
         this.context.shutdown();
         this.context = null;
     }
