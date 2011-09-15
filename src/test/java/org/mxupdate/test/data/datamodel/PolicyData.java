@@ -902,6 +902,11 @@ public class PolicyData
         private final Access<PolicyData.State> access = new Access<PolicyData.State>(this);
 
         /**
+         * List of all signatures for this state.
+         */
+        private final List<PolicyData.Signature> signatures = new ArrayList<PolicyData.Signature>();
+
+        /**
          * Defines the {@code _name} of the state.
          *
          * @param _name     name of the state
@@ -915,6 +920,19 @@ public class PolicyData
         }
 
         /**
+         * Appends a signature.
+         *
+         * @param _signature    signature to append
+         * @return this state instance
+         * @see #signatures
+         */
+        public PolicyData.State addSignature(final PolicyData.Signature _signature)
+        {
+            this.signatures.add(_signature);
+            return this;
+        }
+
+        /**
          * Appends the MQL statements to create the policy.
          *
          * @param _cmd  string builder where to append the MQL statements
@@ -923,6 +941,10 @@ public class PolicyData
         {
             _cmd.append("    state \"").append(AbstractTest.convertTcl(this.name)).append("\" {\n");
             this.access.append4CIFile("  ", _cmd);
+            for (final PolicyData.Signature signature : this.signatures)
+            {
+                signature.append4CIFile(_cmd);
+            }
             _cmd.append("    }\n");
         }
 
@@ -946,6 +968,125 @@ public class PolicyData
             throws MatrixException
         {
             this.access.checkExport("/updatePolicy/state", _exportParser);
+            boolean found = false;
+            final String value = "\"" + AbstractTest.convertTcl(this.name) + "\"";
+            for (final ExportParser.Line line : _exportParser.getRootLines().get(0).getChildren())  {
+                if ("state".equals(line.getTag()) && line.getValue().startsWith(value))  {
+                    found = true;
+                    for (final PolicyData.Signature signature : this.signatures)  {
+                        signature.checkExport(line);
+                    }
+                }
+            }
+            Assert.assertTrue(found, "check that state '" + this.name + "' is found");
+        }
+    }
+
+    /**
+     * Signature for a state of a policy.
+     */
+    public static class Signature
+    {
+        /** Name of the signature. */
+        private String name;
+
+        /** Filter of the signature. */
+        private String filter;
+
+        /** Branch of the signature. */
+        private String branch;
+
+        /**
+         * Defines the {@code _name} of the signature.
+         *
+         * @param _name     name of the signature
+         * @return this signature instance
+         * @see #name
+         */
+        public PolicyData.Signature setName(final String _name)
+        {
+            this.name = _name;
+            return this;
+        }
+
+        /**
+         * Defines the {@code _filter} of the signature.
+         *
+         * @param _filter     filter of the signature
+         * @return this signature instance
+         * @see #filter
+         */
+        public PolicyData.Signature setFilter(final String _filter)
+        {
+            this.filter = _filter;
+            return this;
+        }
+
+        /**
+         * Defines the {@code _branch} of the signature.
+         *
+         * @param _branch     branch of the signature
+         * @return this signature instance
+         * @see #branch
+         */
+        public PolicyData.Signature setBranch(final String _branch)
+        {
+            this.branch = _branch;
+            return this;
+        }
+
+        /**
+         * Appends the MQL statements to create the policy.
+         *
+         * @param _cmd  string builder where to append the MQL statements
+         */
+        protected void append4CIFile(final StringBuilder _cmd)
+        {
+            _cmd.append("        signature \"").append(AbstractTest.convertTcl(this.name)).append("\" {\n")
+                .append("            branch \"").append(AbstractTest.convertTcl(this.branch)).append("\"\n")
+                .append("            approve {}\n")
+                .append("            ignore {}\n")
+                .append("            reject {}\n")
+                .append("            filter \"").append(AbstractTest.convertTcl(this.filter)).append("\"\n")
+                .append("        }\n");
+        }
+
+        /**
+         * Checks that the export is equal to the definition.
+         *
+         * @param _exportState  parsed line with exported state
+         * @throws MatrixException if information could not be fetched
+         */
+        protected void checkExport(final ExportParser.Line _exportState)
+        {
+            boolean found = false;
+            final String value = "\"" + AbstractTest.convertTcl(this.name) + "\"";
+            for (final ExportParser.Line line : _exportState.getChildren())  {
+                if ("signature".equals(line.getTag()) && line.getValue().startsWith(value))  {
+                    found = true;
+                    Assert.assertEquals(
+                            line.evalSingleValue("branch"),
+                            "\"" + AbstractTest.convertTcl(this.branch) + "\"",
+                            "check for correct branch");
+                    Assert.assertEquals(
+                            line.evalSingleValue("approve"),
+                            "{}",
+                            "check for correct approve user");
+                    Assert.assertEquals(
+                            line.evalSingleValue("ignore"),
+                            "{}",
+                            "check for correct ignore user");
+                    Assert.assertEquals(
+                            line.evalSingleValue("reject"),
+                            "{}",
+                            "check for correct reject user");
+                    Assert.assertEquals(
+                            line.evalSingleValue("filter"),
+                            "\"" + AbstractTest.convertTcl(this.filter) + "\"",
+                            "check for correct filter");
+                }
+            }
+            Assert.assertTrue(found, "check that signature " + this.name + " is found");
         }
     }
 }

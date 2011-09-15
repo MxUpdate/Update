@@ -407,7 +407,7 @@ public class PolicyTest
      * @throws Exception if clean up failed
      */
     @BeforeMethod()
-    @AfterMethod()
+//    @AfterMethod()
     public void cleanup()
         throws Exception
     {
@@ -1789,5 +1789,34 @@ public class PolicyTest
         this.mql("mod policy '" + policy.getName() + "' state Test revoke public read filter Test");
         policy.update()
               .checkExport();
+    }
+
+    /**
+     * Check the the update of a branch for a signature works.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("155")
+    @Test(description = "check the the update of a branch for a signature works")
+    public void testPositiveUpdateSignatureBranch()
+        throws Exception
+    {
+        final PolicyData policy = new PolicyData(this, "Test")
+                .addState(new PolicyData.State()
+                        .setName("Test 1")
+                        .addSignature(new PolicyData.Signature()
+                                .setName("No")
+                                .setBranch("Test 2")))
+                .addState(new PolicyData.State()
+                        .setName("Test 2"))
+                .addState(new PolicyData.State()
+                        .setName("Test 3"))
+                .update();
+        // no change branch to signature 'Test 3'
+        this.mql("mod policy '" + policy.getName() + "' state 'Test 1' signature 'No' add branch 'Test 1'");
+        // update via policy
+        policy.update();
+        // and check expport
+        policy.checkExport();
     }
 }

@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.mxupdate.test.AbstractTest.CI;
+import org.testng.Assert;
 
 /**
  * The class parses informations from an MxUpdate export.
@@ -443,6 +444,24 @@ public class ExportParser
         public List<ExportParser.Line> getChildren()
         {
             return this.children;
+        }
+
+        /**
+         * Returns found value f
+         *
+         * @return found value, if not found {@code null}
+         */
+        public String evalSingleValue(final String _searchedTag)
+        {
+            String ret = null;
+            for (final ExportParser.Line line : this.children)  {
+                if (line.tag.equals(_searchedTag))  {
+                    Assert.assertTrue(line.children.isEmpty(), "check no child exists");
+                    Assert.assertNull(ret, "check is defined only once");
+                    ret = line.getValue();
+                }
+            }
+            return ret;
         }
 
         /**
