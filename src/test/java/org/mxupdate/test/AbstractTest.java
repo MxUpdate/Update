@@ -822,15 +822,20 @@ public abstract class AbstractTest
      */
     public static String convertTcl(final CharSequence _text)
     {
-        return (_text != null)
-               ? _text.toString().replaceAll("\\\\", "\\\\\\\\")
-                                 .replaceAll("\\\"", "\\\\\"")
-                                 .replaceAll("\\$", "\\\\\\$")
-                                 .replaceAll("\\]", "\\\\]")
-                                 .replaceAll("\\[", "\\\\[")
-                                 .replaceAll("\\}", "\\\\}")
-                                 .replaceAll("\\{", "\\\\{")
-               : "";
+        final String text;
+        if (_text == null)  {
+            text = "";
+        } else if (_text.toString().indexOf(' ') >= 0)  {
+            text = _text.toString().replaceAll("\\\\", "\\\\\\\\");
+        } else  {
+            text = _text.toString().replaceAll("\\\\", "\\\\\\\\\\\\\\\\");
+        }
+        return text.replaceAll("\\\"", "\\\\\"")
+                   .replaceAll("\\$", "\\\\\\$")
+                   .replaceAll("\\]", "\\\\]")
+                   .replaceAll("\\[", "\\\\[")
+                   .replaceAll("\\}", "\\\\}")
+                   .replaceAll("\\{", "\\\\{");
     }
 
     /**

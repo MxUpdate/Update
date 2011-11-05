@@ -81,15 +81,20 @@ public final class StringUtil_mxJPO
      */
     public static String convertTcl(final CharSequence _text)
     {
-        return (_text != null)
-               ? _text.toString().replaceAll("\\\\", "\\\\\\\\")
-                                 .replaceAll("\\\"", "\\\\\"")
-                                 .replaceAll("\\" + "$", "\\\\\\" + "$")
-                                 .replaceAll("\\{", "\\\\{")
-                                 .replaceAll("\\}", "\\\\}")
-                                 .replaceAll("\\[", "\\\\[")
-                                 .replaceAll("\\]", "\\\\]")
-               : "";
+        final String text;
+        if (_text == null)  {
+            text = "";
+        } else if (_text.toString().indexOf(' ') >= 0)  {
+            text = _text.toString().replaceAll("\\\\", "\\\\\\\\");
+        } else  {
+            text = _text.toString().replaceAll("\\\\", "\\\\\\\\\\\\\\\\");
+        }
+        return text.replaceAll("\\\"", "\\\\\"")
+                   .replaceAll("\\" + "$", "\\\\\\" + "$")
+                   .replaceAll("\\{", "\\\\{")
+                   .replaceAll("\\}", "\\\\}")
+                   .replaceAll("\\[", "\\\\[")
+                   .replaceAll("\\]", "\\\\]");
     }
 
     /**
@@ -166,15 +171,14 @@ public final class StringUtil_mxJPO
     {
         final char[] charName = _name.toCharArray();
         final StringBuilder fileName = new StringBuilder();
-        for (int idx = 0; idx < charName.length; idx++)  {
-            final char ch = charName[idx];
+        for (final char ch : charName) {
             if (ch == '@')  {
                 fileName.append("@@");
-            } else if ((ch < '(' || ch > ')')
-                    && (ch < '+' || ch > '.')
-                    && (ch < '0' || ch > '9')
-                    && (ch < 'A' || ch > 'Z')
-                    && (ch < 'a' || ch > 'z')
+            } else if (((ch < '(') || (ch > ')'))
+                    && ((ch < '+') || (ch > '.'))
+                    && ((ch < '0') || (ch > '9'))
+                    && ((ch < 'A') || (ch > 'Z'))
+                    && ((ch < 'a') || (ch > 'z'))
                     && (ch != ' ') && (ch != '=') && (ch != '_'))  {
 
                 final String hex = String.valueOf(Integer.toHexString(ch));
@@ -533,7 +537,7 @@ public final class StringUtil_mxJPO
 
         if ((_filename == null) && (_wildcardMatcher == null))  {
             ret = true;
-        } else if (_filename == null || _wildcardMatcher == null) {
+        } else if ((_filename == null) || (_wildcardMatcher == null)) {
             ret = false;
         } else  {
             boolean tmpRet = false;
@@ -569,7 +573,7 @@ public final class StringUtil_mxJPO
                     } else if (wcs[wcsIdx].equals("*")) {
                         // set any chars status
                         anyChars = true;
-                        if (wcsIdx == wcs.length - 1) {
+                        if (wcsIdx == (wcs.length - 1)) {
                             textIdx = _filename.length();
                         }
 

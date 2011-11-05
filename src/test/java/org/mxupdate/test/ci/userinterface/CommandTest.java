@@ -69,7 +69,15 @@ public class CommandTest
                                 .setValue("alt", "${COMMON_DIR}/emxTreeAlt.jsp?mode=insert")
                                 .setSetting("Setting 1", "Setting Value ' 1")
                                 .addUser(new RoleData(this, "assigned \"role\""))
-                                .addUser(new PersonAdminData(this, "assigned \"person\""))});
+                                .addUser(new PersonAdminData(this, "assigned \"person\""))},
+                new Object[]{
+                        "complex command with value with escaped special characters but w/o any space",
+                        new CommandData(this, "command")
+                                .setValue("label", "aa\"bb")
+                                .setValue("description", "desc\"\\\\ription")
+                                .setValue("href", "javascript(\\\"test\\\")")
+                                .setValue("alt", "${COMMON_DIR}/emxTreeAlt.jsp?\"mode=insert")
+                                .setSetting("Setting 1", "SettingValue\"1")});
     }
 
     /**

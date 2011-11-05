@@ -176,15 +176,14 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     {
         final char[] charName = this.name.toCharArray();
         final StringBuilder fileName = new StringBuilder().append(this.getCI().filePrefix);
-        for (int idx = 0; idx < charName.length; idx++)  {
-            final char ch = charName[idx];
+        for (final char ch : charName) {
             if (ch == '@')  {
                 fileName.append("@@");
-            } else if ((ch < '(' || ch > ')')
-                    && (ch < '+' || ch > '.')
-                    && (ch < '0' || ch > '9')
-                    && (ch < 'A' || ch > 'Z')
-                    && (ch < 'a' || ch > 'z')
+            } else if (((ch < '(') || (ch > ')'))
+                    && ((ch < '+') || (ch > '.'))
+                    && ((ch < '0') || (ch > '9'))
+                    && ((ch < 'A') || (ch > 'Z'))
+                    && ((ch < 'a') || (ch > 'z'))
                     && (ch != ' ') && (ch != '=') && (ch != '_'))  {
 
                 final String hex = String.valueOf(Integer.toHexString(ch));
