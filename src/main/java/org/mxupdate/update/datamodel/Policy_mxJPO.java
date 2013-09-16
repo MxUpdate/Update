@@ -121,19 +121,13 @@ public class Policy_mxJPO
                 + "mql exec prog org.mxupdate.update.util.JPOCaller " + Policy_mxJPO.JPO_CALLER_KEY + " $_sPolicy \"${sArg}\"\n"
             + "}\n";
 
-    /**
-     * Default format of this policy.
-     */
+    /** Default format of this policy. */
     private String defaultFormat = null;
 
-    /**
-     * All possible formats of this policy.
-     */
+    /** All possible formats of this policy. */
     private final Set<String> formats = new TreeSet<String>();
 
-    /**
-     * Are all formats allowed of this policy?
-     */
+    /** Are all formats allowed of this policy? */
     private boolean allFormats;
 
     /**
@@ -141,43 +135,22 @@ public class Policy_mxJPO
      */
     private String sequence = null;
 
-    /**
-     * Store of this policy.
-     */
+    /** Store of this policy. */
     private String store;
 
-    /**
-     * Set of all types of this policy.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     */
+    /** Set of all types of this policy. */
     private final Set<String> types = new TreeSet<String>();
 
-    /**
-     * Are all types allowed of this policy?
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     */
+    /** Are all types allowed of this policy? */
     private boolean allTypes;
 
-    /**
-     * Are access for all states defined?
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #write(ParameterCache_mxJPO, Appendable)
-     */
+    /** Are access for all states defined? */
     private boolean allState = false;
 
-    /**
-     * Access definitions for all states.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     */
+    /** Access definitions for all states. */
     private final Access allStateAccess = new Access();
 
-    /**
-     * Stack with all states of this policy.
-     */
+    /** Stack with all states of this policy. */
     private final Stack<State> states = new Stack<State>();
 
     /**
@@ -643,14 +616,9 @@ throw new Exception("some states are not defined anymore!");
      */
     protected static class AccessFilterDouble
     {
-        /**
-         * Set holding the complete access.
-         */
+        /** Set holding the complete access. */
         protected final Set<String> access = new TreeSet<String>();
-
-        /**
-         * String holding the filter expression.
-         */
+        /** String holding the filter expression. */
         protected String filter;
 
         /**
@@ -714,38 +682,19 @@ throw new Exception("some states are not defined anymore!");
      */
     public static class Access
     {
-        /**
-         * Set holding the complete owner access.
-         */
+        /** Set holding the complete owner access. */
         protected final AccessFilterDouble ownerAccess = new AccessFilterDouble();
-
-        /**
-         * Set holding the complete owner revoke.
-         */
+        /** Set holding the complete owner revoke. */
         protected final AccessFilterDouble ownerRevoke = new AccessFilterDouble();
 
-        /**
-         * Set holding the complete public access.
-         */
+        /** Set holding the complete public access. */
         protected final AccessFilterDouble publicAccess = new AccessFilterDouble();
-
-        /**
-         * Set holding the complete public revoke.
-         */
+        /** Set holding the complete public revoke. */
         protected final AccessFilterDouble publicRevoke = new AccessFilterDouble();
 
-        /**
-         * Stack used to hold the user access while parsing.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         */
+        /** Stack used to hold the user access while parsing. */
         protected final Stack<UserAccessFilter> userAccess = new Stack<UserAccessFilter>();
-
-        /**
-         * Sorted set of user access (by name of the user).
-         *
-         * @see #prepare()     method used to sort the user access instances
-         */
+        /** Sorted set of user access (by name of the user). */
         protected final Set<UserAccessFilter> userAccessSorted = new TreeSet<UserAccessFilter>();
 
         /**
@@ -907,44 +856,25 @@ throw new Exception("some states are not defined anymore!");
     public static class State
         extends Policy_mxJPO.Access
     {
-        /**
-         * Name of the state.
-         */
+        /** Name of the state. */
         private String name;
-
-        /**
-         * Symbolic Name of the state.
-         */
+        /** Symbolic Name of the state. */
         private final Set<String> symbolicNames = new TreeSet<String>();
 
-        /**
-         * Called action program for this state.
-         */
+        /** Called action program for this state. */
         private String actionProgram;
-
-        /**
-         * Input arguments for the action program for this state.
-         */
+        /** Input arguments for the action program for this state. */
         private String actionInput;
 
-        /**
-         * Called check program for this state.
-         */
+        /** Called check program for this state. */
         private String checkProgram;
-
-        /**
-         * Input arguments for the check program for this state.
-         */
+        /** Input arguments for the check program for this state. */
         private String checkInput;
 
-        /**
-         * Does the state have an auto promotion?
-         */
+        /** Does the state have an auto promotion? */
         private boolean autoPromotion = false;
 
-        /**
-         * Must a checkout written in the history?
-         */
+        /** Must a checkout written in the history? */
         private boolean checkoutHistory = false;
 
         /**
@@ -952,38 +882,20 @@ throw new Exception("some states are not defined anymore!");
          */
         private boolean revisionable = false;
 
-        /**
-         * Is the business object in this state versionable?
-         */
+        /** Is the business object in this state versionable? */
         private boolean versionable = false;
 
-        /**
-         * Route message of this state.
-         */
+        /** Route message of this state. */
         private String routeMessage;
-
-        /**
-         * Route users of this state.
-         */
+        /** Route users of this state. */
         private final Set<String> routeUsers = new TreeSet<String>();
 
-        /**
-         * Stack with all triggers for this state.
-         */
+        /** Stack with all triggers for this state. */
         private final Stack<Trigger> triggersStack = new Stack<Trigger>();
-
-        /**
-         * Map with all triggers for this state. The key is the name of the
-         * trigger.
-         *
-         * @see #prepare()      method where the map is prepared
-         * @see #triggersStack  stack with trigger from parsing method
-         */
+        /** Map with all triggers for this state. The key is the name of the trigger. */
         private final Map<String,Trigger> triggers = new TreeMap<String,Trigger>();
 
-        /**
-         * Holds the signatures for this state.
-         */
+        /** Holds the signatures for this state. */
         private final Stack<Signature> signatures = new Stack<Signature>();
 
         /**
@@ -1259,34 +1171,19 @@ throw new Exception("some states are not defined anymore!");
      */
     public static class Signature
     {
-        /**
-         * Name of the signature.
-         */
+        /** Name of the signature. */
         private String name;
 
-        /**
-         * Branch to state?
-         */
+        /** Branch to state? */
         private String branch;
-
-        /**
-         * Expression filter of the signature.
-         */
+        /** Expression filter of the signature. */
         private String filter;
 
-        /**
-         * Set of users which could approve the signature.
-         */
+        /** Set of users which could approve the signature. */
         private final Set<String> approverUsers = new TreeSet<String>();
-
-        /**
-         * Set of users which could ignore the signature.
-         */
+        /** Set of users which could ignore the signature. */
         private final Set<String> ignoreUsers = new TreeSet<String>();
-
-        /**
-         * Set of users which could reject the signature.
-         */
+        /** Set of users which could reject the signature. */
         private final Set<String> rejectUsers = new TreeSet<String>();
 
         /**
