@@ -50,37 +50,39 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
                                      final Object[]... _datas)
     {
         final List<Object[]> ret = new ArrayList<Object[]>();
-        ret.add(new Object[]{
-                _logText + " with property name",
-                this.createNewData("hello \" test")
-                                .addProperty(new PropertyDef("my test \"property\""))});
-        ret.add(new Object[]{
-                _logText + " property name and value",
-                this.createNewData("hello \" test")
-                                .addProperty(new PropertyDef("my test \"property\"", "my \"value\""))});
-        ret.add(new Object[]{
-                _logText + " property name, value and referenced admin object",
-                this.createNewData("hello \" test")
-                                .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewData("property \" admin " + _logText)))});
-        ret.add(new Object[]{
-                _logText + " with multiple properties",
-                this.createNewData("hello \" test")
-                                .addProperty(new PropertyDef("my test \"property\" 1"))
-                                .addProperty(new PropertyDef("my test \"property\" 2", "my \"value\""))
-                                .addProperty(new PropertyDef("my test \"property\" 3", this.createNewData("property \" admin " + _logText)))});
-        // hidden flag
-        ret.add(new Object[]{
-                _logText + " with hidden flag true",
-                this.createNewData("hello \" test")
-                        .setFlag("hidden", true)});
-        ret.add(new Object[]{
-                _logText + " with hidden flag false",
-                this.createNewData("hello \" test")
-                        .setFlag("hidden", false)});
-        ret.add(new Object[]{
-                _logText + " without hidden flag",
-                this.createNewData("hello \" test")
-                        .setFlag("hidden", null)});
+        if (_logText != null)  {
+            ret.add(new Object[]{
+                    _logText + " with property name",
+                    this.createNewData("hello \" test")
+                                    .addProperty(new PropertyDef("my test \"property\""))});
+            ret.add(new Object[]{
+                    _logText + " property name and value",
+                    this.createNewData("hello \" test")
+                                    .addProperty(new PropertyDef("my test \"property\"", "my \"value\""))});
+            ret.add(new Object[]{
+                    _logText + " property name, value and referenced admin object",
+                    this.createNewData("hello \" test")
+                                    .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewData("property \" admin " + _logText)))});
+            ret.add(new Object[]{
+                    _logText + " with multiple properties",
+                    this.createNewData("hello \" test")
+                                    .addProperty(new PropertyDef("my test \"property\" 1"))
+                                    .addProperty(new PropertyDef("my test \"property\" 2", "my \"value\""))
+                                    .addProperty(new PropertyDef("my test \"property\" 3", this.createNewData("property \" admin " + _logText)))});
+            // hidden flag
+            ret.add(new Object[]{
+                    _logText + " with hidden flag true",
+                    this.createNewData("hello \" test")
+                            .setFlag("hidden", true)});
+            ret.add(new Object[]{
+                    _logText + " with hidden flag false",
+                    this.createNewData("hello \" test")
+                            .setFlag("hidden", false)});
+            ret.add(new Object[]{
+                    _logText + " without hidden flag",
+                    this.createNewData("hello \" test")
+                            .setFlag("hidden", null)});
+        }
 
         ret.addAll(Arrays.asList(_datas));
         return ret.toArray(new Object[ret.size()][]);

@@ -33,6 +33,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.ExportParser.Line;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.user.AbstractUserData;
 import org.mxupdate.test.data.util.PropertyDef;
@@ -60,60 +61,20 @@ public class PolicyData
         PolicyData.REQUIRED_EXPORT_VALUES.put("hidden", "false");
     }
 
-    /**
-     * Are all types assigned?
-     *
-     * @see #setAllTypes(boolean)
-     */
+    /** Are all types assigned? */
     private boolean allTypes = false;
-
-    /**
-     * All defined types for this policy.
-     *
-     * @see #appendTypes(TypeData...)
-     * @see #getTypes()
-     */
+    /** All defined types for this policy. */
     private final Set<TypeData> types = new HashSet<TypeData>();
 
-    /**
-     * Are all formats assigned?
-     *
-     * @see #setAllFormats(boolean)
-     */
+    /** Are all formats assigned? */
     private boolean allFormats = false;
-
-    /**
-     * All defined formats for this policy.
-     *
-     * @see #appendFormats(TypeData...)
-     * @see #getFormats()
-     */
+    /** All defined formats for this policy. */
     private final Set<FormatData> formats = new HashSet<FormatData>();
 
-    /**
-     * All state flag used to define if an &quot;all state&quot; definition is
-     * done.
-     *
-     * @see #create()
-     * @see #setAllState(boolean)
-     */
-    private Boolean allState = false;
+    /** Access for all states. */
+    private AllState allState;
 
-    /**
-     * Access for all states.
-     *
-     * @see #allState
-     * @see #create()
-     * @see #getAllStateAccess()
-     */
-    private final Access<PolicyData> allStateAccess = new Access<PolicyData>(this);
-
-    /**
-     * All states for this policy.
-     *
-     * @see #create()
-     * @see #addState(State)
-     */
+    /** All states for this policy. */
     private final List<State> states = new ArrayList<State>();
 
     /**
@@ -204,28 +165,15 @@ public class PolicyData
     }
 
     /**
-     * Defines whether the {@link #allState all state flag} must be set (or
-     * not).
+     * Defines whether {@link #allState}.
      *
      * @param _allState     new value
      * @return this policy data instance
-     * @see #allState
      */
-    public PolicyData setAllState(final Boolean _allState)
+    public PolicyData setAllState(final AllState _allState)
     {
         this.allState = _allState;
         return this;
-    }
-
-    /**
-     * Returns the instance for all state access.
-     *
-     * @return all state access instance
-     * @see #allStateAccess
-     */
-    public Access<PolicyData> getAllStateAccess()
-    {
-        return this.allStateAccess;
     }
 
     /**
@@ -284,10 +232,8 @@ public class PolicyData
             strg.append(" format {").append(StringUtil_mxJPO.joinMql(' ', true, formatNames, null)).append("}\n");
         }
 
-        if ((this.allState != null) && this.allState)  {
-            strg.append("  allstate {\n");
-            this.allStateAccess.append4CIFile("", strg);
-            strg.append("  }\n");
+        if (this.allState != null)  {
+            this.allState.append4CIFile(strg);
         }
 
         // append state information
@@ -348,9 +294,8 @@ public class PolicyData
                 cmd.append(" format ").append(StringUtil_mxJPO.joinMql(',', true, formatNames, null));
             }
 
-            if ((this.allState != null) && this.allState)  {
-                cmd.append(" allstate ");
-                this.allStateAccess.append4Create(cmd);
+            if (this.allState != null)  {
+                this.allState.append4Create(cmd);
             }
 
             this.append4Create(cmd);
@@ -395,8 +340,12 @@ public class PolicyData
             format.create();
         }
         // create assigned users
-        for (final PolicyData.UserAccessFilter userAccess : this.allStateAccess.userAccessFilters)  {
-            userAccess.user.create();
+        if (this.allState != null)  {
+            for (final AccessFilter access : this.allState.accessFilters)  {
+                if (access.user != null)  {
+                    access.user.create();
+                }
+            }
         }
 
         return this;
@@ -473,7 +422,7 @@ public class PolicyData
         }
 
         // check for all state flag
-        if ((this.allState == null) || !this.allState)  {
+        if (this.allState == null)  {
             Assert.assertEquals(_exportParser.getLines("/updatePolicy/allstate/@value").size(),
                                 0,
                                 "check that not all state access is defined");
@@ -482,7 +431,7 @@ public class PolicyData
                     _exportParser.getLines("/updatePolicy/allstate/@value").size(),
                     1,
                     "check that all state access is defined");
-            this.allStateAccess.checkExport("/updatePolicy/allstate", _exportParser);
+            this.allState.checkExport(_exportParser);
         }
 
         // check all states
@@ -532,17 +481,54 @@ public class PolicyData
      *
      * @param <AF>  class which is defined from this class
      */
-    protected static class AccessFilterDouble<AF extends PolicyData.AccessFilterDouble<?>>
+    public static class AccessFilter
     {
-        /**
-         * Related access definitions.
-         */
+        /** Prefix. */
+        private String prefix;
+        /** Kind. */
+        private String kind;
+        /** Related user of this user access filter. Empty for owner or public access. */
+        private AbstractUserData<?> user;
+        /** Related access definitions. */
         private final Set<String> access = new TreeSet<String>();
+        /** Related filter expression. */
+        private String filter;
 
         /**
-         * Related filter expression.
+         * Defines the {@link #prefix} of this access filter.
+         *
+         * @param _prefix       new prefix
+         * @return this instance
          */
-        private String filter;
+        public AccessFilter setPrefix(final String _prefix)
+        {
+            this.prefix = _prefix;
+            return this;
+        }
+
+        /**
+         * Defines the {@link #kind} of this access filter.
+         *
+         * @param _user     referenced user
+         * @return this instance
+         */
+        public AccessFilter setKind(final String _kind)
+        {
+            this.kind = _kind;
+            return this;
+        }
+
+        /**
+         * Defines the {@link #user} of this user access filter.
+         *
+         * @param _user     referenced user
+         * @return this instance
+         */
+        public AccessFilter setUser(final AbstractUserData<?> _user)
+        {
+            this.user = _user;
+            return this;
+        }
 
         /**
          * Appends access.
@@ -550,11 +536,10 @@ public class PolicyData
          * @param _access   access to append
          * @return this instance
          */
-        @SuppressWarnings("unchecked")
-        public AF addAccess(final String... _access)
+        public AccessFilter addAccess(final String... _access)
         {
             this.access.addAll(Arrays.asList(_access));
-            return (AF) this;
+            return this;
         }
 
         /**
@@ -563,22 +548,36 @@ public class PolicyData
          * @param _filter   new filter
          * @return this instance
          */
-        @SuppressWarnings("unchecked")
-        public AF setFilter(final String _filter)
+        public AccessFilter setFilter(final String _filter)
         {
             this.filter = _filter;
-            return (AF) this;
+            return this;
         }
 
         /**
-         * Prepares the TCL string which are used within the CI file.
+         * Appends the TCL string which are used within the CI file.
          *
-         * @return TCL string
+         * @param _cmd  string builder where to append the MQL statements
          */
-        protected String getCITCLString()
+        protected void append4CIFile(final StringBuilder _cmd)
         {
-            return "{" + StringUtil_mxJPO.joinTcl(' ', false, this.access, "none") +"}"
-                + ((this.filter != null) ? " filter \"" + StringUtil_mxJPO.convertTcl(this.filter) + "\"" : "");
+            _cmd.append("      ");
+
+            if (this.prefix != null)
+            {
+                _cmd.append(this.prefix).append(' ');
+            }
+
+            _cmd.append(this.kind).append(' ');
+
+            if (this.user != null)
+            {
+                _cmd.append("\"").append(StringUtil_mxJPO.convertTcl(this.user.getName())).append("\" ");
+            }
+
+            _cmd.append("{").append(StringUtil_mxJPO.joinTcl(' ', false, this.access, "none")).append("}")
+                .append(((this.filter != null) ? " filter \"" + StringUtil_mxJPO.convertTcl(this.filter) + "\"" : ""))
+                .append('\n');
         }
 
         /**
@@ -589,6 +588,19 @@ public class PolicyData
         protected String getMQLCreateString()
         {
             final StringBuilder ret = new StringBuilder();
+
+            if (this.prefix != null)
+            {
+                ret.append(this.prefix).append(' ');
+            }
+
+            ret.append(this.kind).append(' ');
+
+            if (this.user != null)
+            {
+                ret .append("\"" + AbstractTest.convertMql(this.user.getName()) + "\" ");
+            }
+
             ret.append(StringUtil_mxJPO.joinMql(',', false, this.access, "none"));
             if (this.filter != null)  {
                 ret.append(" filter \"").append(AbstractTest.convertTcl(this.filter)).append('\"');
@@ -598,304 +610,24 @@ public class PolicyData
     }
 
     /**
-     * Access definition for one user.
+     * Abstract definition of a state.
      */
-    public static class UserAccessFilter
-        extends PolicyData.AccessFilterDouble<PolicyData.UserAccessFilter>
+    public static abstract class AbstractState<AS extends AbstractState<AS>>
     {
-        /**
-         * Related user of this user access filter.
-         */
-        private AbstractUserData<?> user;
+        /** Access filter definition for this state. */
+        public final List<AccessFilter> accessFilters = new ArrayList<AccessFilter>();
 
         /**
-         * Defines the {@link #user} of this user access filter.
+         * Appends a access filter definition.
          *
-         * @param _user     referenced user
-         * @return this instance
+         * @param _accessFilters    access filters to append
+         * @return this state instance
          */
-        public UserAccessFilter setUser(final AbstractUserData<?> _user)
+        @SuppressWarnings("unchecked")
+        public AS addAccessFilter(final AccessFilter... _accessFilters)
         {
-            this.user = _user;
-            return this;
-        }
-
-        /**
-         * Prepares the TCL string which are used within the CI file.
-         *
-         * @return TCL string
-         */
-        @Override()
-        protected String getCITCLString()
-        {
-            return "\"" + StringUtil_mxJPO.convertTcl(this.user.getName()) + "\" " + super.getCITCLString();
-        }
-
-        /**
-         * Returns the MQL string used within create of the policy.
-         *
-         * @return MQL create string
-         */
-        @Override()
-        protected String getMQLCreateString()
-        {
-            return "\"" + AbstractTest.convertMql(this.user.getName()) + "\" " +super.getMQLCreateString();
-        }
-    }
-
-    /**
-     * One access definition for all states or one state.
-     *
-     * @param <PARENT> parent class
-     */
-    public static class Access<PARENT>
-    {
-        /**
-         * Set holding the complete owner access.
-         */
-        private final PolicyData.AccessFilterDouble<?> ownerAccess = new PolicyData.AccessFilterDouble<PolicyData.AccessFilterDouble<?>>();
-
-        /**
-         * Set holding the complete owner revoke.
-         */
-        private final PolicyData.AccessFilterDouble<?> ownerRevoke = new PolicyData.AccessFilterDouble<PolicyData.AccessFilterDouble<?>>();
-
-        /**
-         * Set holding the complete public access.
-         */
-        private final PolicyData.AccessFilterDouble<?> publicAccess = new PolicyData.AccessFilterDouble<PolicyData.AccessFilterDouble<?>>();
-
-        /**
-         * Set holding the complete public revoke.
-         */
-        private final PolicyData.AccessFilterDouble<?> publicRevoke = new PolicyData.AccessFilterDouble<PolicyData.AccessFilterDouble<?>>();
-
-        /**
-         * User access definitions.
-         */
-        private final Set<PolicyData.UserAccessFilter> userAccessFilters = new HashSet<PolicyData.UserAccessFilter>();
-
-        /**
-         * Parent object (needed to return related instance while defining the
-         * access settings).
-         */
-        private final PARENT parent;
-
-        /**
-         * Initializes the {@link #parent} instance.
-         *
-         * @param _parent   parent instance
-         */
-        protected Access(final PARENT _parent)
-        {
-            this.parent = _parent;
-        }
-
-        /**
-         * Appends owner access.
-         *
-         * @param _access   access to append
-         * @return parent instance
-         */
-        public PARENT addOwnerAccess(final String... _access)
-        {
-            this.ownerAccess.addAccess(_access);
-            return this.parent;
-        }
-
-        /**
-         * Defines the filter for owner access.
-         *
-         * @param _ownerAccessFilter    filter for owner access
-         * @return parent instance
-         */
-        public PARENT setOwnerAccessFilter(final String _ownerAccessFilter)
-        {
-            this.ownerAccess.setFilter(_ownerAccessFilter);
-            return this.parent;
-        }
-
-        /**
-         * Appends owner revoke.
-         *
-         * @param _access   access to append
-         * @return parent instance
-         */
-        public PARENT addOwnerRevoke(final String... _access)
-        {
-            this.ownerRevoke.addAccess(_access);
-            return this.parent;
-        }
-
-        /**
-         * Defines the filter for owner revoke.
-         *
-         * @param _ownerRevokeFilter    filter for owner revoke
-         * @return parent instance
-         */
-        public PARENT setOwnerRevokeFilter(final String _ownerRevokeFilter)
-        {
-            this.ownerRevoke.setFilter(_ownerRevokeFilter);
-            return this.parent;
-        }
-
-        /**
-         * Appends public access.
-         *
-         * @param _access   access to append
-         * @return parent instance
-         */
-        public PARENT addPublicAccess(final String... _access)
-        {
-            this.publicAccess.addAccess(_access);
-            return this.parent;
-        }
-
-        /**
-         * Defines the filter for public access.
-         *
-         * @param _publicAccessFilter       filter for public access
-         * @return parent instance
-         */
-        public PARENT setPublicAccessFilter(final String _publicAccessFilter)
-        {
-            this.publicAccess.setFilter(_publicAccessFilter);
-            return this.parent;
-        }
-
-        /**
-         * Appends public revoke.
-         *
-         * @param _access   access to append
-         * @return parent instance
-         */
-        public PARENT addPublicRevoke(final String... _access)
-        {
-            this.publicRevoke.addAccess(_access);
-            return this.parent;
-        }
-
-        /**
-         * Defines the filter for public revoke.
-         *
-         * @param _publicRevokeFilter       filter for public revoke
-         * @return parent instance
-         */
-        public PARENT setPublicRevokeFilter(final String _publicRevokeFilter)
-        {
-            this.publicRevoke.setFilter(_publicRevokeFilter);
-            return this.parent;
-        }
-
-        /**
-         * Appends a new user access statement.
-         *
-         * @param _userAccess   single user access to append
-         * @return parent instance
-         * @see #userAccess
-         */
-        public PARENT addUserAccess(final UserAccessFilter _userAccess)
-        {
-            this.userAccessFilters.add(_userAccess);
-            return this.parent;
-        }
-
-        /**
-         * Appends the TCL statements used within the CI file.
-         *
-         * @param _prefix   prefix with spaces for a line
-         * @param _cmd      string builder where to append the TCL statements
-         */
-        protected void append4CIFile(final String _prefix,
-                                     final StringBuilder _cmd)
-        {
-            _cmd.append(_prefix).append("    owner ").append(this.ownerAccess.getCITCLString()).append('\n')
-                .append(_prefix).append("    revoke owner ").append(this.ownerRevoke.getCITCLString()).append('\n')
-                .append(_prefix).append("    public ").append(this.publicAccess.getCITCLString()).append('\n')
-                .append(_prefix).append("    revoke public ").append(this.publicRevoke.getCITCLString()).append('\n');
-            for (final UserAccessFilter userAccess : this.userAccessFilters)  {
-                _cmd.append(_prefix).append("    user ").append(userAccess.getCITCLString()).append('\n');
-            }
-        }
-
-        /**
-         * Appends the MQL statements to create the policy.
-         *
-         * @param _cmd  string builder where to append the MQL statements
-         */
-        protected void append4Create(final StringBuilder _cmd)
-        {
-            _cmd.append(" owner ").append(this.ownerAccess.getMQLCreateString())
-                .append(" revoke owner ").append(this.ownerRevoke.getMQLCreateString())
-                .append(" public ").append(this.publicAccess.getMQLCreateString())
-                .append(" revoke public ").append(this.publicRevoke.getMQLCreateString());
-            for (final UserAccessFilter userAccess : this.userAccessFilters)  {
-                _cmd.append(" user ").append(userAccess.getMQLCreateString());
-            }
-        }
-
-        /**
-         * Checks the export.
-         *
-         * @param _urlPrefix        URL prefix
-         * @param _exportParser     export parser
-         * @throws MatrixException if information could not be fetched
-         */
-        public void checkExport(final String _urlPrefix,
-                                final ExportParser _exportParser)
-            throws MatrixException
-        {
-            if (!this.ownerAccess.access.isEmpty() || (this.ownerAccess.filter != null))  {
-                Assert.assertEquals(
-                        _exportParser.getLines(_urlPrefix + "/owner/@value").get(0),
-                        this.ownerAccess.getCITCLString(),
-                        "check that all state owner access is defined");
-            } else  {
-                Assert.assertEquals(
-                        _exportParser.getLines(_urlPrefix + "/owner/@value").size(),
-                        0,
-                        "check that no state owner access is defined");
-            }
-            if (!this.publicAccess.access.isEmpty() || (this.publicAccess.filter != null))  {
-                Assert.assertEquals(
-                        _exportParser.getLines(_urlPrefix + "/public/@value").get(0),
-                        this.publicAccess.getCITCLString(),
-                        "check that all state public access is defined");
-            } else  {
-                Assert.assertEquals(
-                        _exportParser.getLines(_urlPrefix + "/public/@value").size(),
-                        0,
-                        "check that no state owner access is defined");
-            }
-            // owner / public revoke
-            final List<String> revokes = _exportParser.getLines(_urlPrefix + "/revoke/@value");
-            int count = 0;
-            if (!this.ownerRevoke.access.isEmpty() || (this.ownerRevoke.filter != null))  {
-                Assert.assertTrue(
-                        revokes.contains("owner " + this.ownerRevoke.getCITCLString()),
-                        "check that owner revoke is defined");
-                count++;
-            }
-            if (!this.publicRevoke.access.isEmpty() || (this.publicRevoke.filter != null))  {
-                Assert.assertTrue(
-                        revokes.contains("public " + this.publicRevoke.getCITCLString()),
-                        "check that public revoke is defined");
-                count++;
-            }
-            Assert.assertEquals(
-                    revokes.size(),
-                    count,
-                    "check that count of revokes is correct (have " + revokes + ")");
-            // user access
-            final Set<String> mustUsers = new HashSet<String>();
-            for (final PolicyData.UserAccessFilter userAccessFilter : this.userAccessFilters)  {
-                mustUsers.add(userAccessFilter.getCITCLString());
-            }
-            for (final String user : _exportParser.getLines(_urlPrefix + "/user/@value"))  {
-                Assert.assertTrue(mustUsers.contains(user), "check that '" + user + "' is original defined");
-                mustUsers.remove(user);
-            }
-            Assert.assertEquals(mustUsers.size(), 0, "check that all users are defined (have " + mustUsers + ")");
+            this.accessFilters.addAll(Arrays.asList(_accessFilters));
+            return (AS) this;
         }
     }
 
@@ -903,21 +635,11 @@ public class PolicyData
      * Represents one state of a policy.
      */
     public static class State
+        extends AbstractState<State>
     {
         /** Name of the state. */
         private String name;
-
-        /**
-         * Access definition for this state.
-         *
-         * @see #append4CIFile(StringBuilder)
-         * @see #getAccess()
-         */
-        private final Access<PolicyData.State> access = new Access<PolicyData.State>(this);
-
-        /**
-         * List of all signatures for this state.
-         */
+        /** List of all signatures for this state. */
         private final List<PolicyData.Signature> signatures = new ArrayList<PolicyData.Signature>();
 
         /**
@@ -925,9 +647,8 @@ public class PolicyData
          *
          * @param _name     name of the state
          * @return this state instance
-         * @see #name
          */
-        public PolicyData.State setName(final String _name)
+        public State setName(final String _name)
         {
             this.name = _name;
             return this;
@@ -953,24 +674,16 @@ public class PolicyData
          */
         protected void append4CIFile(final StringBuilder _cmd)
         {
-            _cmd.append("    state \"").append(AbstractTest.convertTcl(this.name)).append("\" {\n");
-            this.access.append4CIFile("  ", _cmd);
+            _cmd.append("    state \"").append(StringUtil_mxJPO.convertTcl(this.name)).append("\" {\n");
+            for (final AccessFilter accessFilter : this.accessFilters)
+            {
+                accessFilter.append4CIFile(_cmd);
+            }
             for (final PolicyData.Signature signature : this.signatures)
             {
                 signature.append4CIFile(_cmd);
             }
             _cmd.append("    }\n");
-        }
-
-        /**
-         * Returns the instance for the access.
-         *
-         * @return access instance
-         * @see #access
-         */
-        public Access<PolicyData.State> getAccess()
-        {
-            return this.access;
         }
 
         /**
@@ -981,18 +694,113 @@ public class PolicyData
         public void checkExport(final ExportParser _exportParser)
             throws MatrixException
         {
-            this.access.checkExport("/updatePolicy/state", _exportParser);
             boolean found = false;
             final String value = "\"" + AbstractTest.convertTcl(this.name) + "\"";
             for (final ExportParser.Line line : _exportParser.getRootLines().get(0).getChildren())  {
                 if ("state".equals(line.getTag()) && line.getValue().startsWith(value))  {
                     found = true;
+
+                    // prepare export definition
+                    String exportAccess  = "";
+                    for (final Line subLine : line.getChildren())  {
+                        if (subLine.getTag().equals("public")
+                                || subLine.getTag().equals("owner")
+                                || subLine.getTag().equals("user")
+                                || subLine.getTag().equals("revoke"))  {
+
+                            exportAccess += "      " + subLine.getTag() + ' ' + subLine.getValue() + '\n';
+                        }
+                    }
+                    // prepare expected definition
+                    final StringBuilder expAccess = new StringBuilder();
+                    for (final AccessFilter accessFilter : this.accessFilters)  {
+                        accessFilter.append4CIFile(expAccess);
+                    }
+                    Assert.assertEquals(
+                            exportAccess,
+                            expAccess.toString(),
+                            "check access definition for state " + line.getValue());
+
                     for (final PolicyData.Signature signature : this.signatures)  {
                         signature.checkExport(line);
                     }
                 }
             }
             Assert.assertTrue(found, "check that state '" + this.name + "' is found");
+        }
+     }
+
+    /**
+     * All state definition.
+     */
+    public static class AllState
+        extends AbstractState<AllState>
+    {
+        /**
+         * Appends the MQL statements to define the CI file.
+         *
+         * @param _cmd  string builder where to append the TCL statements
+         */
+        protected void append4CIFile(final StringBuilder _cmd)
+        {
+            _cmd.append("    allstate {\n");
+            for (final AccessFilter accessFilter : this.accessFilters)
+            {
+                accessFilter.append4CIFile(_cmd);
+            }
+            _cmd.append("    }\n");
+        }
+
+        /**
+         * Appends the MQL statements to create the policy.
+         *
+         * @param _cmd  string builder where to append the MQL statements
+         */
+        protected void append4Create(final StringBuilder _cmd)
+        {
+            _cmd.append(" allstate public none owner none");
+            for (final AccessFilter accessFilter : this.accessFilters)
+            {
+                _cmd.append(' ').append(accessFilter.getMQLCreateString());
+            }
+        }
+
+        /**
+         *
+         * @param _exportParser     export parsed
+         * @throws MatrixException if information could not be fetched
+         */
+        public void checkExport(final ExportParser _exportParser)
+            throws MatrixException
+        {
+            int found = 0;
+            for (final ExportParser.Line line : _exportParser.getRootLines().get(0).getChildren())  {
+                if ("allstate".equals(line.getTag()))  {
+                    found++;
+
+                    // prepare export definition
+                    String exportAccess  = "";
+                    for (final Line subLine : line.getChildren())  {
+                        if (subLine.getTag().equals("public")
+                                || subLine.getTag().equals("owner")
+                                || subLine.getTag().equals("user")
+                                || subLine.getTag().equals("revoke"))  {
+
+                            exportAccess += "      " + subLine.getTag() + ' ' + subLine.getValue() + '\n';
+                        }
+                    }
+                    // prepare expected definition
+                    final StringBuilder expAccess = new StringBuilder();
+                    for (final AccessFilter accessFilter : this.accessFilters)  {
+                        accessFilter.append4CIFile(expAccess);
+                    }
+                    Assert.assertEquals(
+                            exportAccess,
+                            expAccess.toString(),
+                            "check access definition for allstate " + line.getValue());
+                }
+            }
+            Assert.assertEquals(found, 1, "exact one allstate must be defined");
         }
     }
 
