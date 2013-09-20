@@ -845,14 +845,28 @@ public class PolicyData
                                 final ExportParser _exportParser)
             throws MatrixException
         {
-            Assert.assertEquals(
-                    _exportParser.getLines(_urlPrefix + "/owner/@value").get(0),
-                    this.ownerAccess.getCITCLString(),
-                    "check that all state owner access is defined");
-            Assert.assertEquals(
-                    _exportParser.getLines(_urlPrefix + "/public/@value").get(0),
-                    this.publicAccess.getCITCLString(),
-                    "check that all state public access is defined");
+            if (!this.ownerAccess.access.isEmpty() || (this.ownerAccess.filter != null))  {
+                Assert.assertEquals(
+                        _exportParser.getLines(_urlPrefix + "/owner/@value").get(0),
+                        this.ownerAccess.getCITCLString(),
+                        "check that all state owner access is defined");
+            } else  {
+                Assert.assertEquals(
+                        _exportParser.getLines(_urlPrefix + "/owner/@value").size(),
+                        0,
+                        "check that no state owner access is defined");
+            }
+            if (!this.publicAccess.access.isEmpty() || (this.publicAccess.filter != null))  {
+                Assert.assertEquals(
+                        _exportParser.getLines(_urlPrefix + "/public/@value").get(0),
+                        this.publicAccess.getCITCLString(),
+                        "check that all state public access is defined");
+            } else  {
+                Assert.assertEquals(
+                        _exportParser.getLines(_urlPrefix + "/public/@value").size(),
+                        0,
+                        "check that no state owner access is defined");
+            }
             // owner / public revoke
             final List<String> revokes = _exportParser.getLines(_urlPrefix + "/revoke/@value");
             int count = 0;

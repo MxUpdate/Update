@@ -378,6 +378,7 @@ public class PolicyDefParser_mxJPO
  * @param _access   current parsed access definition of the policy
  */
   final public void stateOwnerAccess(final Policy_mxJPO.Access _access) throws ParseException_mxJPO {
+    final Policy_mxJPO.AccessFilter accessFilter = new Policy_mxJPO.AccessFilter();
     String filter = null;
     Set<String> accessSet;
     jj_consume_token(OWNER);
@@ -390,8 +391,10 @@ public class PolicyDefParser_mxJPO
     default:
       ;
     }
-        this.getField(_access, "ownerAccess", "access").set(accessSet);
-        this.getField(_access, "ownerAccess", "filter").set(filter);
+        this.getField(accessFilter, "kind").set("owner");
+        this.getField(accessFilter, "access").set(accessSet);
+        this.getField(accessFilter, "filter").set(filter);
+        this.getField(_access, "ownerAccess").set(accessFilter);
   }
 
 /**
@@ -400,6 +403,7 @@ public class PolicyDefParser_mxJPO
  * @param _access   current parsed access definition of the policy
  */
   final public void statePublicAccess(final Policy_mxJPO.Access _access) throws ParseException_mxJPO {
+    final Policy_mxJPO.AccessFilter accessFilter = new Policy_mxJPO.AccessFilter();
     String filter = null;
     Set<String> accessSet;
     jj_consume_token(PUBLIC);
@@ -412,8 +416,10 @@ public class PolicyDefParser_mxJPO
     default:
       ;
     }
-        this.getField(_access, "publicAccess", "access").set(accessSet);
-        this.getField(_access, "publicAccess", "filter").set(filter);
+        this.getField(accessFilter, "kind").set("public");
+        this.getField(accessFilter, "access").set(accessSet);
+        this.getField(accessFilter, "filter").set(filter);
+        this.getField(_access, "publicAccess").set(accessFilter);
   }
 
 /**
@@ -422,6 +428,7 @@ public class PolicyDefParser_mxJPO
  * @param _access   current parsed access definition of the policy
  */
   final public void stateOwnerRevoke(final Policy_mxJPO.Access _access) throws ParseException_mxJPO {
+    final Policy_mxJPO.AccessFilter accessFilter = new Policy_mxJPO.AccessFilter();
     String filter = null;
     Set<String> accessSet;
     jj_consume_token(OWNER);
@@ -434,8 +441,11 @@ public class PolicyDefParser_mxJPO
     default:
       ;
     }
-        this.getField(_access, "ownerRevoke", "access").set(accessSet);
-        this.getField(_access, "ownerRevoke", "filter").set(filter);
+        this.getField(accessFilter, "kind").set("owner");
+        this.getField(accessFilter, "revoke").set(true);
+        this.getField(accessFilter, "access").set(accessSet);
+        this.getField(accessFilter, "filter").set(filter);
+        this.getField(_access, "ownerRevoke").set(accessFilter);
   }
 
 /**
@@ -444,6 +454,7 @@ public class PolicyDefParser_mxJPO
  * @param _access   current parsed access definition of the policy
  */
   final public void statePublicRevoke(final Policy_mxJPO.Access _access) throws ParseException_mxJPO {
+    final Policy_mxJPO.AccessFilter accessFilter = new Policy_mxJPO.AccessFilter();
     String filter = null;
     Set<String> accessSet;
     jj_consume_token(PUBLIC);
@@ -456,8 +467,11 @@ public class PolicyDefParser_mxJPO
     default:
       ;
     }
-        this.getField(_access, "publicRevoke", "access").set(accessSet);
-        this.getField(_access, "publicRevoke", "filter").set(filter);
+        this.getField(accessFilter, "kind").set("public");
+        this.getField(accessFilter, "revoke").set(true);
+        this.getField(accessFilter, "access").set(accessSet);
+        this.getField(accessFilter, "filter").set(filter);
+        this.getField(_access, "publicRevoke").set(accessFilter);
   }
 
 /**
@@ -466,7 +480,7 @@ public class PolicyDefParser_mxJPO
  * @param _access   current parsed access definition of the policy
  */
   final public void stateUser(final Policy_mxJPO.Access _access) throws ParseException_mxJPO {
-    final Policy_mxJPO.UserAccessFilter userAccess = new Policy_mxJPO.UserAccessFilter();
+    final Policy_mxJPO.AccessFilter userAccess = new Policy_mxJPO.AccessFilter();
     String user, filter = null;
     Set<String> accessSet;
     jj_consume_token(USER);
@@ -480,6 +494,7 @@ public class PolicyDefParser_mxJPO
     default:
       ;
     }
+        this.getField(userAccess, "kind").set("user");
         this.getField(userAccess, "userRef").set(user);
         this.getField(userAccess, "access").set(accessSet);
         this.getField(userAccess, "filter").set(filter);

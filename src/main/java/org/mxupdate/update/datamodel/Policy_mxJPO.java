@@ -62,24 +62,16 @@ public class Policy_mxJPO
         Policy_mxJPO.IGNORED_URLS.add("/formatRefList");
         Policy_mxJPO.IGNORED_URLS.add("/typeRefList");
         Policy_mxJPO.IGNORED_URLS.add("/allstateDef/name");
-        Policy_mxJPO.IGNORED_URLS.add("/allstateDef/ownerAccess");
         Policy_mxJPO.IGNORED_URLS.add("/allstateDef/ownerAccess/access");
-        Policy_mxJPO.IGNORED_URLS.add("/allstateDef/ownerRevoke");
         Policy_mxJPO.IGNORED_URLS.add("/allstateDef/ownerRevoke/access");
-        Policy_mxJPO.IGNORED_URLS.add("/allstateDef/publicAccess");
         Policy_mxJPO.IGNORED_URLS.add("/allstateDef/publicAccess/access");
-        Policy_mxJPO.IGNORED_URLS.add("/allstateDef/publicRevoke");
         Policy_mxJPO.IGNORED_URLS.add("/allstateDef/publicRevoke/access");
         Policy_mxJPO.IGNORED_URLS.add("/allstateDef/userAccessList");
         Policy_mxJPO.IGNORED_URLS.add("/allstateDef/userAccessList/userAccess/access");
         Policy_mxJPO.IGNORED_URLS.add("/stateDefList");
-        Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/ownerAccess");
         Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/ownerAccess/access");
-        Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/publicAccess");
         Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/publicAccess/access");
-        Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/ownerRevoke");
         Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/ownerRevoke/access");
-        Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/publicRevoke");
         Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/publicRevoke/access");
         Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/userAccessList");
         Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/userAccessList/userAccess/access");
@@ -473,7 +465,7 @@ public class Policy_mxJPO
         if (_newPolicy.allState)  {
             _cmd.append("escape mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"');
             if (!this.allState)  {
-                _cmd.append(" add allstate");
+                _cmd.append(" add allstate public none owner none");
             }
             _cmd.append(" allstate");
             _newPolicy.allStateAccess.calcDelta(_cmd, this.allStateAccess);
@@ -612,90 +604,25 @@ throw new Exception("some states are not defined anymore!");
     }
 
     /**
-     * Class used to define the access and filter double.
-     */
-    protected static class AccessFilterDouble
-    {
-        /** Set holding the complete access. */
-        protected final Set<String> access = new TreeSet<String>();
-        /** String holding the filter expression. */
-        protected String filter;
-
-        /**
-         * Returns <i>true</i> if {@link #access} is empty or contains only
-         * <code>none</code> and {@link #filter} is <code>null</code> or empty
-         * string.
-         *
-         * @return <i>true</i> if empty; otherwise <i>false</i>
-         */
-        protected boolean isEmpty()
-        {
-            return ((this.access.isEmpty() || ((this.access.size() == 1) && this.access.contains("none"))))
-                    && ((this.filter == null) || "".equals(this.filter));
-        }
-
-        /**
-         * Returns the string used within the configuration item.
-         *
-         * @return CI string
-         */
-        protected String getCIString()
-        {
-            final StringBuilder strg = new StringBuilder();
-            strg.append("{")
-                .append(StringUtil_mxJPO.joinTcl(' ', false, this.access, null))
-                .append("}");
-            if ((this.filter != null) && !"".equals(this.filter))  {
-                strg.append(" filter \"")
-                    .append(StringUtil_mxJPO.convertTcl(this.filter))
-                    .append('\"');
-            }
-            return strg.toString();
-        }
-
-        /**
-         * Prepares the MQL update string for this access / filter double.
-         *
-         * @param _oldAccessFilter      old access filter (which is used if
-         *                              there is a filter defined which must be
-         *                              overwritten)
-         * @return MQL update string
-         */
-        protected String getMQLUpdateString(final AccessFilterDouble _oldAccessFilter)
-        {
-            final StringBuilder strg = new StringBuilder();
-            strg.append(StringUtil_mxJPO.joinMql(',', false, this.access, "none")).append(' ');
-            if ((this.filter != null) || ((_oldAccessFilter != null) && (_oldAccessFilter.filter != null)))  {
-                strg.append("filter \"");
-                if (this.filter != null)  {
-                    strg.append(StringUtil_mxJPO.convertMql(this.filter));
-                }
-                strg.append("\" ");
-            }
-            return strg.toString();
-        }
-    }
-
-    /**
      * Access definition for owner / public definitions (depending on one state
      * or for {@link Policy_mxJPO#allStateAccess all states}).
      */
     public static class Access
     {
         /** Set holding the complete owner access. */
-        protected final AccessFilterDouble ownerAccess = new AccessFilterDouble();
+        protected AccessFilter ownerAccess;
         /** Set holding the complete owner revoke. */
-        protected final AccessFilterDouble ownerRevoke = new AccessFilterDouble();
+        protected AccessFilter ownerRevoke;
 
         /** Set holding the complete public access. */
-        protected final AccessFilterDouble publicAccess = new AccessFilterDouble();
+        protected AccessFilter publicAccess;
         /** Set holding the complete public revoke. */
-        protected final AccessFilterDouble publicRevoke = new AccessFilterDouble();
+        protected AccessFilter publicRevoke;
 
         /** Stack used to hold the user access while parsing. */
-        protected final Stack<UserAccessFilter> userAccess = new Stack<UserAccessFilter>();
+        protected final Stack<AccessFilter> userAccess = new Stack<AccessFilter>();
         /** Sorted set of user access (by name of the user). */
-        protected final Set<UserAccessFilter> userAccessSorted = new TreeSet<UserAccessFilter>();
+        protected final Set<AccessFilter> userAccessSorted = new TreeSet<AccessFilter>();
 
         /**
          * Parses given access <code>_url</code>.
@@ -711,28 +638,55 @@ throw new Exception("some states are not defined anymore!");
                                 final String _content)
         {
             boolean ret = true;
-            if (_url.startsWith("/ownerAccess/access"))  {
-                this.ownerAccess.access.add(_url.replaceAll("^/ownerAccess/access/", "").replaceAll("Access$", "").toLowerCase());
+            // obsolete parsing of 'owner'
+            if ("/ownerAccess".equals(_url))  {
+                final AccessFilter accessFilter = new AccessFilter();
+                accessFilter.kind = "owner";
+                this.userAccess.add(accessFilter);
+            } else if (_url.startsWith("/ownerAccess/access"))  {
+                this.userAccess.peek().access.add(_url.replaceAll("^/ownerAccess/access/", "").replaceAll("Access$", "").toLowerCase());
             } else if ("/ownerAccess/expressionFilter".equals(_url))  {
-                this.ownerAccess.filter = _content;
+                this.userAccess.peek().filter = _content;
 
+            // obsolete parsing of 'owner revoke'
+            } else if ("/ownerRevoke".equals(_url))  {
+                final AccessFilter accessFilter = new AccessFilter();
+                accessFilter.kind = "owner";
+                accessFilter.revoke = true;
+                this.userAccess.add(accessFilter);
             } else if (_url.startsWith("/ownerRevoke/access"))  {
-                this.ownerRevoke.access.add(_url.replaceAll("^/ownerRevoke/access/", "").replaceAll("Access$", "").toLowerCase());
+                this.userAccess.peek().access.add(_url.replaceAll("^/ownerRevoke/access/", "").replaceAll("Access$", "").toLowerCase());
             } else if ("/ownerRevoke/expressionFilter".equals(_url))  {
-                this.ownerRevoke.filter = _content;
+                this.userAccess.peek().filter = _content;
 
+            // obsolete parsing of 'public'
+            } else if ("/publicAccess".equals(_url))  {
+                final AccessFilter accessFilter = new AccessFilter();
+                accessFilter.kind = "owner";
+                accessFilter.revoke = true;
+                this.userAccess.add(accessFilter);
             } else if (_url.startsWith("/publicAccess/access"))  {
-                this.publicAccess.access.add(_url.replaceAll("^/publicAccess/access/", "").replaceAll("Access$", "").toLowerCase());
+                this.userAccess.peek().access.add(_url.replaceAll("^/publicAccess/access/", "").replaceAll("Access$", "").toLowerCase());
             } else if ("/publicAccess/expressionFilter".equals(_url))  {
-                this.publicAccess.filter = _content;
+                this.userAccess.peek().filter = _content;
 
+            // obsolete parsing of 'public revoke'
+            } else if ("/publicRevoke".equals(_url))  {
+                final AccessFilter accessFilter = new AccessFilter();
+                accessFilter.kind = "owner";
+                accessFilter.revoke = true;
+                this.userAccess.add(accessFilter);
             } else if (_url.startsWith("/publicRevoke/access"))  {
-                this.publicRevoke.access.add(_url.replaceAll("^/publicRevoke/access/", "").replaceAll("Access$", "").toLowerCase());
+                this.userAccess.peek().access.add(_url.replaceAll("^/publicRevoke/access/", "").replaceAll("Access$", "").toLowerCase());
             } else if ("/publicRevoke/expressionFilter".equals(_url))  {
-                this.publicRevoke.filter = _content;
+                this.userAccess.peek().filter = _content;
 
             } else if ("/userAccessList/userAccess".equals(_url))  {
-                this.userAccess.add(new UserAccessFilter());
+                this.userAccess.add(new AccessFilter());
+            } else if ("/userAccessList/userAccess/userAccessKind".equals(_url))  {
+                this.userAccess.peek().kind = _content;
+            } else if ("/userAccessList/userAccess/userAccessRevoke".equals(_url))  {
+                this.userAccess.peek().revoke = true;
             } else if ("/userAccessList/userAccess/userRef".equals(_url))  {
                 this.userAccess.peek().userRef = _content;
             } else if (_url.startsWith("/userAccessList/userAccess/access"))  {
@@ -746,7 +700,8 @@ throw new Exception("some states are not defined anymore!");
         }
 
         /**
-         * The user access are sorted.
+         * Public and Owner Access definitions are assigned and the rest are
+         * are sorted.
          *
          * @see #userAccess         unsorted list of user access
          * @see #userAccessSorted   sorted list user access (after this method is
@@ -754,7 +709,29 @@ throw new Exception("some states are not defined anymore!");
          */
         protected void prepare()
         {
-            this.userAccessSorted.addAll(this.userAccess);
+            for (final AccessFilter userAccess : this.userAccess)  {
+                if ("public".equals(userAccess.kind))  {
+                    if (userAccess.revoke)
+                    {
+                        this.publicRevoke = userAccess;
+                    }
+                    else
+                    {
+                        this.publicAccess = userAccess;
+                    }
+                } else if ("owner".equals(userAccess.kind))  {
+                    if (userAccess.revoke)
+                    {
+                        this.ownerRevoke = userAccess;
+                    }
+                    else
+                    {
+                        this.ownerAccess = userAccess;
+                    }
+                } else  {
+                    this.userAccessSorted.add(userAccess);
+                }
+            }
         }
 
         /**
@@ -775,26 +752,58 @@ throw new Exception("some states are not defined anymore!");
             throws IOException
         {
             // owner access
-            _out.append("\n    owner ").append(this.ownerAccess.getCIString());
+            this.writeObjectOneAccessFilter(_out, this.ownerAccess);
             // owner revoke
-            if (!this.ownerRevoke.isEmpty())  {
-                _out.append("\n    revoke owner ").append(this.ownerRevoke.getCIString());
-            }
+            this.writeObjectOneAccessFilter(_out, this.ownerRevoke);
             // public access
-            _out.append("\n    public ").append(this.publicAccess.getCIString());
+            this.writeObjectOneAccessFilter(_out, this.publicAccess);
             // public revoke (only written if defined (and not none!)
-            if (!this.publicRevoke.isEmpty())  {
-                _out.append("\n    revoke public ").append(this.publicRevoke.getCIString());
-            }
+            this.writeObjectOneAccessFilter(_out, this.publicRevoke);
             // user access
-            for (final UserAccessFilter userAccess : this.userAccessSorted)  {
-                _out.append("\n    user \"").append(StringUtil_mxJPO.convertTcl(userAccess.userRef)).append("\" {")
-                    .append(StringUtil_mxJPO.joinTcl(' ', false, userAccess.access, null))
-                    .append('}');
-                if (userAccess.filter != null)  {
+            for (final AccessFilter userAccess : this.userAccessSorted)  {
+                this.writeObjectOneAccessFilter(_out, userAccess);
+            }
+        }
+
+
+        /**
+         * Returns the string used within the configuration item.
+         *
+         * @param _out              writer instance
+         * @param _accessFilter     access filter
+         * @throws IOException if the TCL update code could not be written
+         */
+        protected void writeObjectOneAccessFilter(final Appendable _out,
+                                                  final AccessFilter _accessFilter)
+            throws IOException
+        {
+            if ((_accessFilter != null) && !_accessFilter.isEmpty())
+            {
+                _out.append("\n    ");
+
+                // revoke?
+                if (_accessFilter.revoke)  {
+                    _out.append("revoke ");
+                }
+
+                // kind
+                _out.append(_accessFilter.kind).append(' ');
+
+                // append user reference (only if not public / owner definition)
+                if (!"public".equals(_accessFilter.kind) && !"owner".equals(_accessFilter.kind))  {
+                    _out.append('\"').append(StringUtil_mxJPO.convertTcl(_accessFilter.userRef)).append("\" ");
+                }
+
+                // access
+                _out.append("{")
+                    .append(StringUtil_mxJPO.joinTcl(' ', false, _accessFilter.access, null))
+                    .append("}");
+
+                // filter
+                if ((_accessFilter.filter != null) && !"".equals(_accessFilter.filter))  {
                     _out.append(" filter \"")
-                        .append(StringUtil_mxJPO.convertTcl(userAccess.filter))
-                        .append("\"");
+                        .append(StringUtil_mxJPO.convertTcl(_accessFilter.filter))
+                        .append('\"');
                 }
             }
         }
@@ -813,25 +822,21 @@ throw new Exception("some states are not defined anymore!");
             throws IOException
         {
             // owner access
-            _out.append(" owner ").append(this.ownerAccess.getMQLUpdateString((_oldAccess != null) ? _oldAccess.ownerAccess : null));
+            this.calcDeltaOneAccessFilter(_out, this.ownerAccess, (_oldAccess != null) ? _oldAccess.ownerAccess : null);
             // owner revoke
-            if (!this.ownerRevoke.isEmpty() || ((_oldAccess != null) && (!_oldAccess.ownerRevoke.isEmpty())))  {
-                _out.append(" revoke owner ").append(this.ownerRevoke.getMQLUpdateString((_oldAccess != null) ? _oldAccess.ownerRevoke : null));
-            }
+            this.calcDeltaOneAccessFilter(_out, this.ownerRevoke, (_oldAccess != null) ? _oldAccess.ownerRevoke : null);
             // public access
-            _out.append(" public ").append(this.publicAccess.getMQLUpdateString((_oldAccess != null) ? _oldAccess.publicAccess : null));
+            this.calcDeltaOneAccessFilter(_out, this.publicAccess, (_oldAccess != null) ? _oldAccess.publicAccess : null);
             // public revoke
-            if (!this.publicRevoke.isEmpty() || ((_oldAccess != null) && (!_oldAccess.publicRevoke.isEmpty())))  {
-                _out.append(" revoke public ").append(this.publicRevoke.getMQLUpdateString((_oldAccess != null) ? _oldAccess.publicRevoke : null));
-            }
+            this.calcDeltaOneAccessFilter(_out, this.publicRevoke, (_oldAccess != null) ? _oldAccess.publicRevoke : null);
             // user access
             final Set<String> newUsers = new HashSet<String>();
-            for (final UserAccessFilter userAccess : this.userAccess)  {
+            for (final AccessFilter userAccess : this.userAccess)  {
                 newUsers.add(userAccess.userRef);
             }
-            final Map<String,UserAccessFilter> oldUser = new HashMap<String,UserAccessFilter>();
+            final Map<String,AccessFilter> oldUser = new HashMap<String,AccessFilter>();
             if (_oldAccess != null)  {
-                for (final UserAccessFilter userAccess : _oldAccess.userAccess)  {
+                for (final AccessFilter userAccess : _oldAccess.userAccess)  {
                     if (newUsers.contains(userAccess.userRef))  {
                         oldUser.put(userAccess.userRef, userAccess);
                     } else  {
@@ -841,11 +846,80 @@ throw new Exception("some states are not defined anymore!");
                     }
                 }
             }
-            for (final UserAccessFilter userAccess : this.userAccess)  {
+            for (final AccessFilter userAccess : this.userAccess)  {
                 if ((_oldAccess != null) && !oldUser.containsKey(userAccess.userRef))  {
                     _out.append(" add");
                 }
-                _out.append(" user ").append(userAccess.getMQLUpdateString(oldUser.get(userAccess.userRef)));
+                this.calcDeltaOneAccessFilter(_out, userAccess, oldUser.get(userAccess.userRef));
+            }
+        }
+
+        /**
+         * Prepares the MQL update string for this access / filter double.
+         *
+         * @param _out                  writer instance
+         * @param _newAccessFilter      new expected access filter
+         * @param _oldAccessFilter      old access filter (which is used if
+         *                              there is a filter defined which must be
+         *                              overwritten)
+         * @return MQL update string
+         * @throws IOException if write failed
+         */
+        protected void calcDeltaOneAccessFilter(final Appendable _out,
+                                                final AccessFilter _newAccessFilter,
+                                                final AccessFilter _oldAccessFilter)
+            throws IOException
+        {
+            _out.append(' ');
+
+            if (_newAccessFilter != null)
+            {
+                // revoke?
+                if (_newAccessFilter.revoke)  {
+                    _out.append("revoke ");
+                }
+
+                // kind
+                _out.append(_newAccessFilter.kind).append(' ');
+
+                // append user reference (only if not public / owner definition)
+                if (!"public".equals(_newAccessFilter.kind) && !"owner".equals(_newAccessFilter.kind))  {
+                    _out.append('\"').append(StringUtil_mxJPO.convertMql(_newAccessFilter.userRef)).append("\" ");
+                }
+
+                // access
+                _out.append(StringUtil_mxJPO.joinMql(',', false, _newAccessFilter.access, "none")).append(' ');
+
+                // filter
+                if ((_newAccessFilter.filter != null) || ((_oldAccessFilter != null) && (_oldAccessFilter.filter != null)))  {
+                    _out.append("filter \"");
+                    if (_newAccessFilter.filter != null)  {
+                        _out.append(StringUtil_mxJPO.convertMql(_newAccessFilter.filter));
+                    }
+                    _out.append("\" ");
+                }
+            }
+            else if (_oldAccessFilter != null)
+            {
+                // revoke?
+                if (_oldAccessFilter.revoke)  {
+                    _out.append("revoke ");
+                }
+
+                // kind
+                _out.append(_oldAccessFilter.kind).append(' ');
+
+                // append user reference (only if not public / owner definition)
+                if (!"public".equals(_oldAccessFilter.kind) && !"owner".equals(_oldAccessFilter.kind))
+                {
+                    _out.append('\"').append(StringUtil_mxJPO.convertMql(_oldAccessFilter.userRef)).append("\" ");
+                }
+
+                // access
+                _out.append("none ");
+
+                // filter
+                _out.append("filter \"\" ");
             }
         }
     }
@@ -1109,60 +1183,54 @@ throw new Exception("some states are not defined anymore!");
     /**
      * Class used to hold the user access for a state.
      */
-    public static class UserAccessFilter
-        extends Policy_mxJPO.AccessFilterDouble
-        implements Comparable<Policy_mxJPO.UserAccessFilter>
+    public static class AccessFilter
+        implements Comparable<Policy_mxJPO.AccessFilter>
     {
-        /**
-         * Holds the user references of a user access.
-         */
-        private String userRef;
+        /** Access kind. */
+        private String kind = "user";
+        /** Revoke Access filter? */
+        private boolean revoke = false;
+        /** Holds the user references of a user access. */
+        private String userRef = "";
+        /** Set holding the complete access. */
+        protected final Set<String> access = new TreeSet<String>();
+        /** String holding the filter expression. */
+        protected String filter;
 
         /**
          * Compares this user access instance to another user access instance.
-         * Only the user reference {@link #userRef} is used to compare.
+         * The access {@link #kind} and user reference {@link #userRef} is used
+         * to compare.
          *
          * @param _userAccess   user access instance to which this instance
          *                      must be compared to
          * @return a negative integer, zero, or a positive integer as this
-         *         {@link #userRef} is less than, equal to, or greater than the
-         *         specified {@link #userRef} defined with
-         *         <code>_userAccess</code>
+         *         {@link #kind} and {@link #userRef} is less than, equal to,
+         *         or greater than the specified {@link #kind} and
+         *         {@link #userRef} defined with {@code _userAccess}
          */
-        public int compareTo(final UserAccessFilter _userAccess)
+        @Override()
+        public int compareTo(final AccessFilter _userAccess)
         {
-            return this.userRef.compareTo(_userAccess.userRef);
+            int  ret = this.kind.compareTo(_userAccess.kind);
+            if (ret == 0)
+            {
+                ret = this.userRef.compareTo(_userAccess.userRef);
+            }
+            return ret;
         }
 
         /**
-         * The {@link #userRef reference to the user} is prefixed to the access
+         * Returns <i>true</i> if {@link #access} is empty or contains only
+         * <code>none</code> and {@link #filter} is <code>null</code> or empty
          * string.
-         * {@inheritDoc}
-         */
-        @Override()
-        protected String getCIString()
-        {
-            return new StringBuilder()
-                .append('\"').append(StringUtil_mxJPO.convertTcl(this.userRef)).append("\" ")
-                .append(super.getCIString())
-                .toString();
-        }
-
-        /**
-         * Prepares the MQL update string for this access / filter double.
          *
-         * @param _oldAccessFilter      old access filter (which is used if
-         *                              there is a filter defined which must be
-         *                              overwritten)
-         * @return MQL update string
+         * @return <i>true</i> if empty; otherwise <i>false</i>
          */
-        @Override()
-        protected String getMQLUpdateString(final AccessFilterDouble _oldAccessFilter)
+        protected boolean isEmpty()
         {
-            return new StringBuilder()
-                .append('\"').append(StringUtil_mxJPO.convertTcl(this.userRef)).append("\" ")
-                .append(super.getMQLUpdateString(_oldAccessFilter))
-                .toString();
+            return ((this.access.isEmpty() || ((this.access.size() == 1) && this.access.contains("none"))))
+                    && ((this.filter == null) || "".equals(this.filter));
         }
     }
 
