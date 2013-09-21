@@ -41,95 +41,97 @@ interface PolicyDefParserConstants_mxJPO {
   /** RegularExpression Id. */
   int REVOKE = 19;
   /** RegularExpression Id. */
-  int OWNER = 20;
+  int LOGIN = 20;
   /** RegularExpression Id. */
-  int PUBLIC = 21;
+  int OWNER = 21;
   /** RegularExpression Id. */
-  int USER = 22;
+  int PUBLIC = 22;
   /** RegularExpression Id. */
-  int FILTER = 23;
+  int USER = 23;
   /** RegularExpression Id. */
-  int ACTION = 24;
+  int FILTER = 24;
   /** RegularExpression Id. */
-  int CHECK = 25;
+  int ACTION = 25;
   /** RegularExpression Id. */
-  int OVERRIDE = 26;
+  int CHECK = 26;
   /** RegularExpression Id. */
-  int INPUT = 27;
+  int OVERRIDE = 27;
   /** RegularExpression Id. */
-  int TRIGGER = 28;
+  int INPUT = 28;
   /** RegularExpression Id. */
-  int APPROVE = 29;
+  int TRIGGER = 29;
   /** RegularExpression Id. */
-  int IGNORE = 30;
+  int APPROVE = 30;
   /** RegularExpression Id. */
-  int REJECT = 31;
+  int IGNORE = 31;
   /** RegularExpression Id. */
-  int BRANCH = 32;
+  int REJECT = 32;
   /** RegularExpression Id. */
-  int SIGNATURE = 33;
+  int BRANCH = 33;
   /** RegularExpression Id. */
-  int ROUTE = 34;
+  int SIGNATURE = 34;
   /** RegularExpression Id. */
-  int BOOLEAN_TRUE = 39;
+  int ROUTE = 35;
   /** RegularExpression Id. */
-  int BOOLEAN_FALSE = 40;
+  int BOOLEAN_TRUE = 40;
   /** RegularExpression Id. */
-  int BOOLEAN_TRUESTR = 41;
+  int BOOLEAN_FALSE = 41;
   /** RegularExpression Id. */
-  int BOOLEAN_FALSESTR = 42;
+  int BOOLEAN_TRUESTR = 42;
   /** RegularExpression Id. */
-  int LS_CURLY_BRACKET_OPEN = 47;
+  int BOOLEAN_FALSESTR = 43;
   /** RegularExpression Id. */
-  int LS_CURLY_BRACKET_CLOSE = 48;
+  int LS_CURLY_BRACKET_OPEN = 48;
   /** RegularExpression Id. */
-  int LS_STRING = 49;
+  int LS_CURLY_BRACKET_CLOSE = 49;
   /** RegularExpression Id. */
-  int LS_SINGLE_STRING = 50;
+  int LS_STRING = 50;
   /** RegularExpression Id. */
-  int LS_APOSTROPHE = 51;
+  int LS_SINGLE_STRING = 51;
   /** RegularExpression Id. */
-  int LS_CHAR = 52;
+  int LS_APOSTROPHE = 52;
   /** RegularExpression Id. */
-  int SL_STRING = 57;
+  int LS_CHAR = 53;
   /** RegularExpression Id. */
-  int SL_SINGLE_STRING = 58;
+  int SL_STRING = 58;
   /** RegularExpression Id. */
-  int SL_APOSTROPHE = 59;
+  int SL_SINGLE_STRING = 59;
   /** RegularExpression Id. */
-  int SL_CHAR = 60;
+  int SL_APOSTROPHE = 60;
   /** RegularExpression Id. */
-  int S_STRING = 65;
+  int SL_CHAR = 61;
   /** RegularExpression Id. */
-  int S_SINGLE_STRING = 66;
+  int S_STRING = 66;
   /** RegularExpression Id. */
-  int S_APOSTROPHE = 67;
+  int S_SINGLE_STRING = 67;
   /** RegularExpression Id. */
-  int S_CHAR = 68;
+  int S_APOSTROPHE = 68;
   /** RegularExpression Id. */
-  int LALL_CURLY_BRACKET_OPEN = 73;
+  int S_CHAR = 69;
   /** RegularExpression Id. */
-  int LALL_ALL = 74;
+  int LALL_CURLY_BRACKET_OPEN = 74;
   /** RegularExpression Id. */
-  int L_CURLY_BRACKET_OPEN = 79;
+  int LALL_ALL = 75;
   /** RegularExpression Id. */
-  int L_CURLY_BRACKET_CLOSE = 84;
+  int L_CURLY_BRACKET_OPEN = 80;
   /** RegularExpression Id. */
-  int L_STRING = 85;
+  int L_CURLY_BRACKET_CLOSE = 85;
   /** RegularExpression Id. */
-  int L_SINGLE_STRING = 86;
+  int L_STRING = 86;
   /** RegularExpression Id. */
-  int L_APOSTROPHE = 87;
+  int L_SINGLE_STRING = 87;
   /** RegularExpression Id. */
-  int L_CHAR = 88;
+  int L_APOSTROPHE = 88;
   /** RegularExpression Id. */
-  int L2_CURLY_BRACKET_OPEN = 89;
+  int L_CHAR = 89;
   /** RegularExpression Id. */
-  int L3_BRACE_STRING = 90;
+  int L2_CURLY_BRACKET_OPEN = 90;
   /** RegularExpression Id. */
-  int L3_CHAR = 91;
+  int L3_BRACE_STRING = 91;
   /** RegularExpression Id. */
-  int L4_CURLY_BRACKET_CLOSE = 92;
+  int L3_CHAR = 92;
+  /** RegularExpression Id. */
+  int L4_CURLY_BRACKET_CLOSE = 93;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -174,6 +176,7 @@ interface PolicyDefParserConstants_mxJPO {
     "\"promote\"",
     "\"checkouthistory\"",
     "\"revoke\"",
+    "\"login\"",
     "\"owner\"",
     "\"public\"",
     "\"user\"",

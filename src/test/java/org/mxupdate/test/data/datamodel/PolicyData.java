@@ -57,6 +57,7 @@ public class PolicyData
         PolicyData.REQUIRED_EXPORT_VALUES.put("description", "");
         PolicyData.REQUIRED_EXPORT_VALUES.put("defaultformat", "");
         PolicyData.REQUIRED_EXPORT_VALUES.put("sequence", "");
+        PolicyData.REQUIRED_EXPORT_VALUES.put("majorsequence", "");
         PolicyData.REQUIRED_EXPORT_VALUES.put("store", "");
         PolicyData.REQUIRED_EXPORT_VALUES.put("hidden", "false");
     }
@@ -190,6 +191,16 @@ public class PolicyData
     }
 
     /**
+     * Returns all defined {@link #states} of this policy.
+     *
+     * @return defined states
+     */
+    public List<State> getStates()
+    {
+        return this.states;
+    }
+
+    /**
      * Prepares and returns the string of the CI file.
      *
      * @return string of the CI file
@@ -303,7 +314,7 @@ public class PolicyData
             // append state information
             for (final PolicyData.State state : this.states)
             {
-                state.append4CIFile(cmd);
+                state.append4Create(cmd);
             }
 
             cmd.append(";\n")
@@ -342,6 +353,13 @@ public class PolicyData
         // create assigned users
         if (this.allState != null)  {
             for (final AccessFilter access : this.allState.accessFilters)  {
+                if (access.user != null)  {
+                    access.user.create();
+                }
+            }
+        }
+        for (final State state : this.states)  {
+            for (final AccessFilter access : state.accessFilters)  {
                 if (access.user != null)  {
                     access.user.create();
                 }
@@ -655,6 +673,16 @@ public class PolicyData
         }
 
         /**
+         * Returns the {@link #name} of the state.
+         *
+         * @return name
+         */
+        public String getName()
+        {
+            return this.name;
+        }
+
+        /**
          * Appends a signature.
          *
          * @param _signature    signature to append
@@ -687,6 +715,24 @@ public class PolicyData
         }
 
         /**
+         * Appends the MQL statements to create the policy.
+         *
+         * @param _cmd  string builder where to append the MQL statements
+         */
+        protected void append4Create(final StringBuilder _cmd)
+        {
+            _cmd.append("    state \"").append(StringUtil_mxJPO.convertMql(this.name)).append("\" public none owner none");
+            for (final AccessFilter accessFilter : this.accessFilters)
+            {
+                _cmd.append(' ').append(accessFilter.getMQLCreateString());
+            }
+            for (final PolicyData.Signature signature : this.signatures)
+            {
+                signature.append4CIFile(_cmd);
+            }
+        }
+
+        /**
          *
          * @param _exportParser     export parsed
          * @throws MatrixException if information could not be fetched
@@ -706,6 +752,7 @@ public class PolicyData
                         if (subLine.getTag().equals("public")
                                 || subLine.getTag().equals("owner")
                                 || subLine.getTag().equals("user")
+                                || subLine.getTag().equals("login")
                                 || subLine.getTag().equals("revoke"))  {
 
                             exportAccess += "      " + subLine.getTag() + ' ' + subLine.getValue() + '\n';
@@ -784,6 +831,7 @@ public class PolicyData
                         if (subLine.getTag().equals("public")
                                 || subLine.getTag().equals("owner")
                                 || subLine.getTag().equals("user")
+                                || subLine.getTag().equals("login")
                                 || subLine.getTag().equals("revoke"))  {
 
                             exportAccess += "      " + subLine.getTag() + ' ' + subLine.getValue() + '\n';

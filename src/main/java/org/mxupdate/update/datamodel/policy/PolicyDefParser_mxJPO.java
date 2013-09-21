@@ -3,10 +3,14 @@ package org.mxupdate.update.datamodel.policy;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
+import org.mxupdate.update.datamodel.Policy_mxJPO.Access;
+import org.mxupdate.update.datamodel.Policy_mxJPO.AccessPrefix;
+import org.mxupdate.update.datamodel.Policy_mxJPO.AccessFilter;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
@@ -160,11 +164,12 @@ public class PolicyDefParser_mxJPO
   final public void allstate(final Policy_mxJPO _policy) throws ParseException_mxJPO {
     final Policy_mxJPO.Access access = this.getField(_policy, "allStateAccess").<Policy_mxJPO.Access>get();
     jj_consume_token(ALLSTATE);
-    jj_consume_token(93);
+    jj_consume_token(94);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case REVOKE:
+      case LOGIN:
       case OWNER:
       case PUBLIC:
       case USER:
@@ -175,34 +180,54 @@ public class PolicyDefParser_mxJPO
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case OWNER:
-        stateOwnerAccess(access);
+        stateOwnerAccess(AccessPrefix.All, access);
         break;
       case PUBLIC:
-        statePublicAccess(access);
+        statePublicAccess(AccessPrefix.All, access);
+        break;
+      case USER:
+        stateUserAccess(AccessPrefix.All, access);
         break;
       case REVOKE:
         jj_consume_token(REVOKE);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case OWNER:
-          stateOwnerRevoke(access);
+          stateOwnerAccess(AccessPrefix.Revoke, access);
           break;
         case PUBLIC:
-          statePublicRevoke(access);
+          statePublicAccess(AccessPrefix.Revoke, access);
+          break;
+        case USER:
+          stateUserAccess(AccessPrefix.Revoke, access);
           break;
         default:
           jj_consume_token(-1);
           throw new ParseException_mxJPO();
         }
         break;
-      case USER:
-        stateUser(access);
+      case LOGIN:
+        jj_consume_token(LOGIN);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case OWNER:
+          stateOwnerAccess(AccessPrefix.Login,  access);
+          break;
+        case PUBLIC:
+          statePublicAccess(AccessPrefix.Login,  access);
+          break;
+        case USER:
+          stateUserAccess(AccessPrefix.Login,  access);
+          break;
+        default:
+          jj_consume_token(-1);
+          throw new ParseException_mxJPO();
+        }
         break;
       default:
         jj_consume_token(-1);
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(94);
+    jj_consume_token(95);
         this.getField(_policy, "allState").set(true);
   }
 
@@ -218,7 +243,7 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(STATE);
     tmpStr = sString();
                                 this.getField(state, "name").set(tmpStr);
-    jj_consume_token(93);
+    jj_consume_token(94);
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -228,6 +253,7 @@ public class PolicyDefParser_mxJPO
       case PROMOTE:
       case CHECKOUTHISTORY:
       case REVOKE:
+      case LOGIN:
       case OWNER:
       case PUBLIC:
       case USER:
@@ -312,19 +338,42 @@ public class PolicyDefParser_mxJPO
         }
         break;
       case OWNER:
-        stateOwnerAccess(state);
+        stateOwnerAccess(AccessPrefix.All, state);
         break;
       case PUBLIC:
-        statePublicAccess(state);
+        statePublicAccess(AccessPrefix.All, state);
+        break;
+      case USER:
+        stateUserAccess(AccessPrefix.All, state);
         break;
       case REVOKE:
         jj_consume_token(REVOKE);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case OWNER:
-          stateOwnerRevoke(state);
+          stateOwnerAccess(AccessPrefix.Revoke, state);
           break;
         case PUBLIC:
-          statePublicRevoke(state);
+          statePublicAccess(AccessPrefix.Revoke, state);
+          break;
+        case USER:
+          stateUserAccess(AccessPrefix.Revoke, state);
+          break;
+        default:
+          jj_consume_token(-1);
+          throw new ParseException_mxJPO();
+        }
+        break;
+      case LOGIN:
+        jj_consume_token(LOGIN);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case OWNER:
+          stateOwnerAccess(AccessPrefix.Login,  state);
+          break;
+        case PUBLIC:
+          statePublicAccess(AccessPrefix.Login,  state);
+          break;
+        case USER:
+          stateUserAccess(AccessPrefix.Login,  state);
           break;
         default:
           jj_consume_token(-1);
@@ -354,9 +403,6 @@ public class PolicyDefParser_mxJPO
         tmpStr = sString();
                                                      this.getField(state, "routeMessage").set(tmpStr);
         break;
-      case USER:
-        stateUser(state);
-        break;
       case TRIGGER:
         stateTrigger(state);
         break;
@@ -368,17 +414,18 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(94);
+    jj_consume_token(95);
         this.appendValue(_policy, "states", state);
   }
 
 /**
  * Parses the access and filter expression for the owner definition.
  *
+ * @param _prefix   access filter prefix
  * @param _access   current parsed access definition of the policy
  */
-  final public void stateOwnerAccess(final Policy_mxJPO.Access _access) throws ParseException_mxJPO {
-    final Policy_mxJPO.AccessFilter accessFilter = new Policy_mxJPO.AccessFilter();
+  final public void stateOwnerAccess(final AccessPrefix _prefix, final Access _access) throws ParseException_mxJPO {
+    final AccessFilter accessFilter = new AccessFilter();
     String filter = null;
     Set<String> accessSet;
     jj_consume_token(OWNER);
@@ -391,19 +438,21 @@ public class PolicyDefParser_mxJPO
     default:
       ;
     }
+        this.getField(accessFilter, "prefix").set(_prefix);
         this.getField(accessFilter, "kind").set("owner");
         this.getField(accessFilter, "access").set(accessSet);
         this.getField(accessFilter, "filter").set(filter);
-        this.getField(_access, "ownerAccess").set(accessFilter);
+        ((Map<AccessPrefix,AccessFilter>)(this.getValue(_access, "ownerAccess"))).put(_prefix, accessFilter);
   }
 
 /**
  * Parses the access and filter expression for the public definition.
  *
+ * @param _prefix   access filter prefix
  * @param _access   current parsed access definition of the policy
  */
-  final public void statePublicAccess(final Policy_mxJPO.Access _access) throws ParseException_mxJPO {
-    final Policy_mxJPO.AccessFilter accessFilter = new Policy_mxJPO.AccessFilter();
+  final public void statePublicAccess(final AccessPrefix _prefix, final Access _access) throws ParseException_mxJPO {
+    final AccessFilter accessFilter = new AccessFilter();
     String filter = null;
     Set<String> accessSet;
     jj_consume_token(PUBLIC);
@@ -416,71 +465,21 @@ public class PolicyDefParser_mxJPO
     default:
       ;
     }
+        this.getField(accessFilter, "prefix").set(_prefix);
         this.getField(accessFilter, "kind").set("public");
         this.getField(accessFilter, "access").set(accessSet);
         this.getField(accessFilter, "filter").set(filter);
-        this.getField(_access, "publicAccess").set(accessFilter);
-  }
-
-/**
- * Parses the access and filter expression for the owner revoke definition.
- *
- * @param _access   current parsed access definition of the policy
- */
-  final public void stateOwnerRevoke(final Policy_mxJPO.Access _access) throws ParseException_mxJPO {
-    final Policy_mxJPO.AccessFilter accessFilter = new Policy_mxJPO.AccessFilter();
-    String filter = null;
-    Set<String> accessSet;
-    jj_consume_token(OWNER);
-    accessSet = lList();
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case FILTER:
-      jj_consume_token(FILTER);
-      filter = sString();
-      break;
-    default:
-      ;
-    }
-        this.getField(accessFilter, "kind").set("owner");
-        this.getField(accessFilter, "revoke").set(true);
-        this.getField(accessFilter, "access").set(accessSet);
-        this.getField(accessFilter, "filter").set(filter);
-        this.getField(_access, "ownerRevoke").set(accessFilter);
-  }
-
-/**
- * Parses the access and filter expression for the public revoke definition.
- *
- * @param _access   current parsed access definition of the policy
- */
-  final public void statePublicRevoke(final Policy_mxJPO.Access _access) throws ParseException_mxJPO {
-    final Policy_mxJPO.AccessFilter accessFilter = new Policy_mxJPO.AccessFilter();
-    String filter = null;
-    Set<String> accessSet;
-    jj_consume_token(PUBLIC);
-    accessSet = lList();
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case FILTER:
-      jj_consume_token(FILTER);
-      filter = sString();
-      break;
-    default:
-      ;
-    }
-        this.getField(accessFilter, "kind").set("public");
-        this.getField(accessFilter, "revoke").set(true);
-        this.getField(accessFilter, "access").set(accessSet);
-        this.getField(accessFilter, "filter").set(filter);
-        this.getField(_access, "publicRevoke").set(accessFilter);
+        ((Map<AccessPrefix,AccessFilter>)(this.getValue(_access, "publicAccess"))).put(_prefix, accessFilter);
   }
 
 /**
  * Parses the access and filter expression for a user definition.
  *
+ * @param _prefix   access filter prefix
  * @param _access   current parsed access definition of the policy
  */
-  final public void stateUser(final Policy_mxJPO.Access _access) throws ParseException_mxJPO {
-    final Policy_mxJPO.AccessFilter userAccess = new Policy_mxJPO.AccessFilter();
+  final public void stateUserAccess(final AccessPrefix _prefix, final Access _access) throws ParseException_mxJPO {
+    final AccessFilter userAccess = new AccessFilter();
     String user, filter = null;
     Set<String> accessSet;
     jj_consume_token(USER);
@@ -494,11 +493,12 @@ public class PolicyDefParser_mxJPO
     default:
       ;
     }
+        this.getField(userAccess, "prefix").set(_prefix);
         this.getField(userAccess, "kind").set("user");
         this.getField(userAccess, "userRef").set(user);
         this.getField(userAccess, "access").set(accessSet);
         this.getField(userAccess, "filter").set(filter);
-        this.appendValue(_access, "userAccess", userAccess);
+        ((Map<AccessPrefix,Set<AccessFilter>>)(this.getValue(_access, "userAccess"))).get(_prefix).add(userAccess);
   }
 
   final public void stateTrigger(final Policy_mxJPO.State _state) throws ParseException_mxJPO {
@@ -538,7 +538,7 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(SIGNATURE);
     tmpStr = sString();
                                     this.getField(signature, "name").set(tmpStr);
-    jj_consume_token(93);
+    jj_consume_token(94);
     label_4:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -583,7 +583,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(94);
+    jj_consume_token(95);
         this.appendValue(_state, "signatures", signature);
   }
 

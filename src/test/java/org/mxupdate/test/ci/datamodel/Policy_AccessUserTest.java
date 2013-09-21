@@ -1,10 +1,16 @@
 package org.mxupdate.test.ci.datamodel;
 
+import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.PolicyData;
+import org.mxupdate.test.data.datamodel.PolicyData.AccessFilter;
+import org.mxupdate.test.data.datamodel.PolicyData.State;
+import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.util.IssueLink;
+import org.mxupdate.test.util.Version;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
@@ -14,10 +20,138 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 public class Policy_AccessUserTest
-    extends AbstractTest
+    extends AbstractDataExportUpdate<PolicyData>
 {
     /** Name of test policy. */
     private static final String POLICY_NAME = AbstractTest.PREFIX + "Test";
+
+    /**
+     * Creates for given <code>_name</code> a new policy instance.
+     *
+     * @param _name     name of the policy instance
+     * @return policy instance
+     */
+    @Override()
+    protected PolicyData createNewData(final String _name)
+    {
+        return new PolicyData(this, _name);
+    }
+
+
+    /**
+     * Creates a clean data instance used to update an existing data instance.
+     *
+     * @param _original     original data instance
+     * @return new data instance (where all original data is cleaned)
+     */
+    @Override()
+    protected PolicyData createCleanNewData(final PolicyData _original)
+    {
+        final PolicyData ret = this.createNewData(_original.getName().substring(AbstractTest.PREFIX.length()));
+
+        for (final State state : _original.getStates())  {
+            ret.addState(new State().setName(state.getName()));
+        }
+
+        return ret;
+    }
+
+    /**
+     * Data provider for test policies.
+     *
+     * @return object array with all test policies
+     */
+    @IssueLink({"177"})
+    @DataProvider(name = "data")
+    public Object[][] getPolicies()
+    {
+        return this.prepareData((String) null,
+                new Object[]{
+                        "issue #177: policy with state access for login public read/show",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                        .setName("create")
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("login")
+                                                .setKind("public")
+                                                .addAccess("read", "show")))},
+                new Object[]{
+                        "issue #177: policy with state access for login public all",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                        .setName("create")
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("login")
+                                                .setKind("public")
+                                                .addAccess("all")))},
+                new Object[]{
+                        "issue #177: policy with state access for login owner read/show",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                        .setName("create")
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("login")
+                                                .setKind("owner")
+                                                .addAccess("read", "show")))},
+                new Object[]{
+                        "issue #177: policy with state access for login owner all",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                        .setName("create")
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("login")
+                                                .setKind("owner")
+                                                .addAccess("all")))},
+                new Object[]{
+                        "issue #177: policy with state access for login user read/show",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                        .setName("create")
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("login")
+                                                .setKind("user")
+                                                .setUser(new PersonAdminData(this, "creator"))
+                                                .addAccess("read", "show")))},
+                new Object[]{
+                        "issue #177: policy with state access for login user all",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                        .setName("create")
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("login")
+                                                .setKind("user")
+                                                .setUser(new PersonAdminData(this, "creator"))
+                                                .addAccess("all")))},
+                new Object[]{
+                        "issue #177: policy with state access for revoke user creator read/show",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                        .setName("create")
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("revoke")
+                                                .setKind("user")
+                                                .setUser(new PersonAdminData(this, "creator"))
+                                                .addAccess("read", "show")))},
+                new Object[]{
+                        "issue #177: policy with state access for revoke user creator all",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                        .setName("create")
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("revoke")
+                                                .setKind("user")
+                                                .setUser(new PersonAdminData(this, "creator"))
+                                                .addAccess("all")))}
+        );
+    }
 
     /**
      * Deletes all test data model object.

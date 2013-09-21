@@ -34,10 +34,14 @@ package org.mxupdate.update.datamodel.policy;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
+import org.mxupdate.update.datamodel.Policy_mxJPO.Access;
+import org.mxupdate.update.datamodel.Policy_mxJPO.AccessPrefix;
+import org.mxupdate.update.datamodel.Policy_mxJPO.AccessFilter;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
@@ -76,6 +80,7 @@ TOKEN : /** State and depending signature and trigger Tokens */
     | <PROMOTE:         "promote">          : B_EXPECTED
     | <CHECKOUTHISTORY: "checkouthistory">  : B_EXPECTED
     | <REVOKE:          "revoke">           : DEFAULT
+    | <LOGIN:           "login">            : DEFAULT
     | <OWNER:           "owner">            : L_EXPECTED
     | <PUBLIC:          "public">           : L_EXPECTED
     | <USER:            "user">             : SL_EXPECTED
@@ -282,10 +287,11 @@ void allstate(final Policy_mxJPO _policy) : {
     <ALLSTATE>
     "{"
         (
-            stateOwnerAccess(access)
-          | statePublicAccess(access)
-          | ( <REVOKE> ( stateOwnerRevoke(access) | statePublicRevoke(access) ) )
-          | stateUser(access)
+            stateOwnerAccess(AccessPrefix.All, access)
+          | statePublicAccess(AccessPrefix.All, access)
+          | stateUserAccess(AccessPrefix.All, access)
+          | ( <REVOKE> ( stateOwnerAccess(AccessPrefix.Revoke, access) | statePublicAccess(AccessPrefix.Revoke, access) | stateUserAccess(AccessPrefix.Revoke, access) ) )
+          | ( <LOGIN>  ( stateOwnerAccess(AccessPrefix.Login,  access) | statePublicAccess(AccessPrefix.Login,  access) | stateUserAccess(AccessPrefix.Login,  access) ) )
         )*
     "}"
     {
@@ -314,16 +320,17 @@ void state(final Policy_mxJPO _policy) : {
                                 | <BOOLEAN_FALSE>   {this.getField(state, "autoPromotion").set(false);} ) )
         | (<CHECKOUTHISTORY>    ( <BOOLEAN_TRUE>    {this.getField(state, "checkoutHistory").set(true);}
                                 | <BOOLEAN_FALSE>   {this.getField(state, "checkoutHistory").set(false);} ) )
-        | stateOwnerAccess(state)
-        | statePublicAccess(state)
-        | ( <REVOKE> ( stateOwnerRevoke(state) | statePublicRevoke(state) ) )
+        | stateOwnerAccess(AccessPrefix.All, state)
+        | statePublicAccess(AccessPrefix.All, state)
+        | stateUserAccess(AccessPrefix.All, state)
+        | (<REVOKE> ( stateOwnerAccess(AccessPrefix.Revoke, state) | statePublicAccess(AccessPrefix.Revoke, state) | stateUserAccess(AccessPrefix.Revoke, state) ) )
+        | (<LOGIN>  ( stateOwnerAccess(AccessPrefix.Login,  state) | statePublicAccess(AccessPrefix.Login,  state) | stateUserAccess(AccessPrefix.Login,  state) ) )
         | (<ACTION>             tmpStr = sString()  {this.getField(state, "actionProgram").set(tmpStr);}
            <INPUT>              tmpStr = sString()  {this.getField(state, "actionInput").set(tmpStr);})
         | (<CHECK>              tmpStr = sString()  {this.getField(state, "checkProgram").set(tmpStr);}
            <INPUT>              tmpStr = sString()  {this.getField(state, "checkInput").set(tmpStr);})
         | (<ROUTE>              tmpSet = lsList()   {this.getField(state, "routeUsers").set(tmpSet);}
                                 tmpStr = sString()  {this.getField(state, "routeMessage").set(tmpStr);})
-        | stateUser(state)
         | stateTrigger(state)
         | stateSignature(state)
         )*
@@ -336,103 +343,67 @@ void state(final Policy_mxJPO _policy) : {
 /**
  * Parses the access and filter expression for the owner definition.
  *
+ * @param _prefix   access filter prefix
  * @param _access   current parsed access definition of the policy
  */
-void stateOwnerAccess(final Policy_mxJPO.Access _access) : {
-    final Policy_mxJPO.AccessFilter accessFilter = new Policy_mxJPO.AccessFilter();
+void stateOwnerAccess(final AccessPrefix _prefix, final Access _access) : {
+    final AccessFilter accessFilter = new AccessFilter();
     String filter = null;
     Set<String> accessSet;
 }  {
     ( <OWNER> accessSet = lList() )
     ( <FILTER> filter = sString() )?
     {
+        this.getField(accessFilter, "prefix").set(_prefix);
         this.getField(accessFilter, "kind").set("owner");
         this.getField(accessFilter, "access").set(accessSet);
         this.getField(accessFilter, "filter").set(filter);
-        this.getField(_access, "ownerAccess").set(accessFilter);
+        ((Map<AccessPrefix,AccessFilter>)(this.getValue(_access, "ownerAccess"))).put(_prefix, accessFilter);
     }
 }
 
 /**
  * Parses the access and filter expression for the public definition.
  *
+ * @param _prefix   access filter prefix
  * @param _access   current parsed access definition of the policy
  */
-void statePublicAccess(final Policy_mxJPO.Access _access) : {
-    final Policy_mxJPO.AccessFilter accessFilter = new Policy_mxJPO.AccessFilter();
+void statePublicAccess(final AccessPrefix _prefix, final Access _access) : {
+    final AccessFilter accessFilter = new AccessFilter();
     String filter = null;
     Set<String> accessSet;
 }  {
     ( <PUBLIC> accessSet = lList() )
     ( <FILTER> filter = sString() )?
     {
+        this.getField(accessFilter, "prefix").set(_prefix);
         this.getField(accessFilter, "kind").set("public");
         this.getField(accessFilter, "access").set(accessSet);
         this.getField(accessFilter, "filter").set(filter);
-        this.getField(_access, "publicAccess").set(accessFilter);
-    }
-}
-
-/**
- * Parses the access and filter expression for the owner revoke definition.
- *
- * @param _access   current parsed access definition of the policy
- */
-void stateOwnerRevoke(final Policy_mxJPO.Access _access) : {
-    final Policy_mxJPO.AccessFilter accessFilter = new Policy_mxJPO.AccessFilter();
-    String filter = null;
-    Set<String> accessSet;
-}  {
-    ( <OWNER> accessSet = lList() )
-    ( <FILTER> filter = sString() )?
-    {
-        this.getField(accessFilter, "kind").set("owner");
-        this.getField(accessFilter, "revoke").set(true);
-        this.getField(accessFilter, "access").set(accessSet);
-        this.getField(accessFilter, "filter").set(filter);
-        this.getField(_access, "ownerRevoke").set(accessFilter);
-    }
-}
-
-/**
- * Parses the access and filter expression for the public revoke definition.
- *
- * @param _access   current parsed access definition of the policy
- */
-void statePublicRevoke(final Policy_mxJPO.Access _access) : {
-    final Policy_mxJPO.AccessFilter accessFilter = new Policy_mxJPO.AccessFilter();
-    String filter = null;
-    Set<String> accessSet;
-}  {
-    ( <PUBLIC> accessSet = lList() )
-    ( <FILTER> filter = sString() )?
-    {
-        this.getField(accessFilter, "kind").set("public");
-        this.getField(accessFilter, "revoke").set(true);
-        this.getField(accessFilter, "access").set(accessSet);
-        this.getField(accessFilter, "filter").set(filter);
-        this.getField(_access, "publicRevoke").set(accessFilter);
+        ((Map<AccessPrefix,AccessFilter>)(this.getValue(_access, "publicAccess"))).put(_prefix, accessFilter);
     }
 }
 
 /**
  * Parses the access and filter expression for a user definition.
  *
+ * @param _prefix   access filter prefix
  * @param _access   current parsed access definition of the policy
  */
-void stateUser(final Policy_mxJPO.Access _access) : {
-    final Policy_mxJPO.AccessFilter userAccess = new Policy_mxJPO.AccessFilter();
+void stateUserAccess(final AccessPrefix _prefix, final Access _access) : {
+    final AccessFilter userAccess = new AccessFilter();
     String user, filter = null;
     Set<String> accessSet;
 }  {
     <USER> user = slString() accessSet = lList()
     (<FILTER> filter = sString())?
     {
+        this.getField(userAccess, "prefix").set(_prefix);
         this.getField(userAccess, "kind").set("user");
         this.getField(userAccess, "userRef").set(user);
         this.getField(userAccess, "access").set(accessSet);
         this.getField(userAccess, "filter").set(filter);
-        this.appendValue(_access, "userAccess", userAccess);
+        ((Map<AccessPrefix,Set<AccessFilter>>)(this.getValue(_access, "userAccess"))).get(_prefix).add(userAccess);
     }
 }
 

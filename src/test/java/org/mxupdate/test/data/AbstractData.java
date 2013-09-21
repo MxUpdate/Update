@@ -23,12 +23,15 @@ package org.mxupdate.test.data;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.util.Version;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.testng.Assert;
 
@@ -42,37 +45,23 @@ import org.testng.Assert;
  */
 public abstract class AbstractData<DATA extends AbstractData<?>>
 {
-    /**
-     * Related test case where this data piece was created.
-     */
+    /** Related test case where this data piece was created. */
     private final AbstractTest test;
 
-    /**
-     * Related configuration item of this data piece.
-     */
+    /** Related configuration item of this data piece. */
     private final AbstractTest.CI ci;
 
-    /**
-     * Name of the data piece.
-     */
+    /** Name of the data piece. */
     private final String name;
 
-    /**
-     * Values of this data piece.
-     *
-     * @see #setValue(String, String)
-     * @see #getValue(String)
-     * @see #getValues()
-     */
+    /** Values of this data piece. */
     private final Map<String,String> values = new HashMap<String,String>();
 
-    /**
-     * Flag to indicate that this data piece is creatd.
-     *
-     * @see #isCreated()
-     * @see #setCreated(boolean)
-     */
+    /** Flag to indicate that this data piece is created.*/
     private boolean created;
+
+    /** Set of versions where this definition is NOT supported. */
+    private final Set<Version> notSupportedVersions = new HashSet<Version>();
 
     /**
      * Constructor to initialize this data piece.
@@ -251,6 +240,32 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     protected boolean isCreated()
     {
         return this.created;
+    }
+
+    /**
+     * Defines {@link #notSupportedVersions not supported versions}.
+     *
+     * @param _versions     not supported versions
+     * @return this data instance
+     */
+    @SuppressWarnings("unchecked")
+    public DATA notSupported(final Version... _versions)
+    {
+        this.notSupportedVersions.addAll(Arrays.asList(_versions));
+        return (DATA) this;
+    }
+
+    /**
+     * Checks if current MX version supports this data definition.
+     *
+     * @param _version      version to test
+     * @return <i>true</i> if {@code _version} is supported; otherwise
+     *         <i>false</i>
+     * @see #notSupportedVersions
+     */
+    public boolean isSupported(final Version _version)
+    {
+        return !this.notSupportedVersions.contains(_version);
     }
 
     /**

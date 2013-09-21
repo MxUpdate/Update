@@ -41,6 +41,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.maven.settings.DefaultMavenSettingsBuilder;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Settings;
+import org.mxupdate.test.util.Version;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -426,15 +427,14 @@ public abstract class AbstractTest
         }
     }
 
-    /**
-     * MX context.
-     */
+    /** MX context. */
     private Context context;
 
-    /**
-     * Settings for maven.
-     */
+    /** Settings for maven. */
     private Settings settings;
+
+    /** Current MX version. */
+    private Version version;
 
     /**
      * Returns depending on the <code>_key</code> related value within the
@@ -473,11 +473,20 @@ public abstract class AbstractTest
      * Returns the {@link #context} connection to MX.
      *
      * @return MX context
-     * @see #context
      */
     public Context getContext()
     {
         return this.context;
+    }
+
+    /**
+     * Returns the {@link #version} of used MX.
+     *
+     * @return MX version
+     */
+    public Version getVersion()
+    {
+        return this.version;
     }
 
     /**
@@ -502,6 +511,8 @@ public abstract class AbstractTest
         this.context = new Context(url);
         this.context.resetContext(user, password, null);
         this.context.connect();
+
+        this.version = Version.valueOf(this.mql("version").replaceAll("\\..*", ""));
     }
 
     /**

@@ -21,7 +21,6 @@
 package org.mxupdate.test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -84,7 +83,16 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
                             .setFlag("hidden", null)});
         }
 
-        ret.addAll(Arrays.asList(_datas));
+        for (final Object[] data : _datas)
+        {
+            @SuppressWarnings("unchecked")
+            final DATA testData = (DATA) data[1];
+            if (testData.isSupported(this.getVersion()))
+            {
+                ret.add(data);
+            }
+        }
+
         return ret.toArray(new Object[ret.size()][]);
     }
 

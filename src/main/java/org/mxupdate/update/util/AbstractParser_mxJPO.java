@@ -201,6 +201,32 @@ public abstract class AbstractParser_mxJPO
     }
 
     /**
+     * Returns the new value for field {@code _fieldName} of {@code _object}.
+     *
+     * @param _object       object where the field must be updated
+     * @param _fieldName    name of the field to update
+     * @return found value
+     */
+    protected Object getValue(final Object _object,
+                              final String _fieldName)
+    {
+        final Object ret;
+        try  {
+            final Field field = this.getField(_object, _fieldName).field;
+            final boolean accessible = field.isAccessible();
+            try  {
+                field.setAccessible(true);
+                ret = field.get(_object);
+            } finally  {
+                field.setAccessible(accessible);
+            }
+        } catch (final Exception e)  {
+            throw new ParseUpdateError(e);
+        }
+        return ret;
+    }
+
+    /**
      * Searches for given name the field within the object.
      *
      * @param _object       object where the field is searched

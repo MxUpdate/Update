@@ -27,6 +27,7 @@ import org.mxupdate.test.data.datamodel.PolicyData.AccessFilter;
 import org.mxupdate.test.data.datamodel.PolicyData.AllState;
 import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.util.IssueLink;
+import org.mxupdate.test.util.Version;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -57,128 +58,186 @@ public class Policy_AllStateTest
      *
      * @return object array with all test policies
      */
-    @IssueLink({"99"})
+    @IssueLink({"99", "177"})
     @DataProvider(name = "data")
     public Object[][] getPolicies()
     {
         return this.prepareData((String) null,
-                // issue 99
                 new Object[]{
-                        "issue #99: policy with default all state flag",
-                        new PolicyData(this, "hello \" test")
-                                .setAllState(null)},
+                        "issue #99: policy with no all state access",
+                        new PolicyData(this, "test")},
                 new Object[]{
-                        "issue #99: policy with all state flag false",
-                        new PolicyData(this, "hello \" test")},
-                new Object[]{
-                        "issue #99: policy with all state flag true",
-                        new PolicyData(this, "hello \" test")
+                        "issue #99: policy with all state access (empty)",
+                        new PolicyData(this, "test")
                                 .setAllState(new AllState())},
+                // owner
                 new Object[]{
-                        "issue #99: policy with all state flag true and read / show owner access",
-                        new PolicyData(this, "hello \" test")
+                        "issue #99: policy with all state access for owner read/show",
+                        new PolicyData(this, "test")
                                 .setAllState(new AllState()
                                                 .addAccessFilter(new AccessFilter()
                                                         .setKind("owner")
                                                         .addAccess("read", "show")))},
                 new Object[]{
-                        "issue #99: policy with all state flag true and all owner access",
-                        new PolicyData(this, "hello \" test")
+                        "issue #99: policy with aall state access for owner all",
+                        new PolicyData(this, "test")
                                 .setAllState(new AllState()
                                         .addAccessFilter(new AccessFilter()
                                                 .setKind("owner")
                                                 .addAccess("all")))},
                 new Object[]{
-                        "issue #99: policy with all state flag true and read / show owner access and filter expression",
-                        new PolicyData(this, "hello \" test")
+                        "issue #99: policy with all state access for owner read/show owner with filter expression",
+                        new PolicyData(this, "test")
                                 .setAllState(new AllState()
                                         .addAccessFilter(new AccessFilter()
                                                 .setKind("owner")
                                                 .addAccess("read", "show")
                                                 .setFilter("current==\"hello\"")))},
+                // login owner
                 new Object[]{
-                        "issue #99: policy with all state flag true and read / show owner revoke",
-                        new PolicyData(this, "hello \" test")
+                        "issue #177: policy with all state access for login owner read/show",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .setAllState(new AllState()
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("login")
+                                                .setKind("owner")
+                                                .addAccess("read", "show")))},
+                new Object[]{
+                        "issue #177: policy with all state access for login owner all",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .setAllState(new AllState()
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("login")
+                                                .setKind("owner")
+                                                .addAccess("all")))},
+                new Object[]{
+                        "issue #177: policy with all state access for login owner read/show with filter expression",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .setAllState(new AllState()
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("login")
+                                                .setKind("owner")
+                                                .addAccess("read", "show")
+                                                .setFilter("current==\"hello\"")))},
+                // revoke owner
+                new Object[]{
+                        "issue #99: policy with all state access for revoke owner read/show",
+                        new PolicyData(this, "test")
                                 .setAllState(new AllState()
                                         .addAccessFilter(new AccessFilter()
                                                 .setPrefix("revoke")
                                                 .setKind("owner")
                                                 .addAccess("read", "show")))},
                 new Object[]{
-                        "issue #99: policy with all state flag true and all owner revoke",
-                        new PolicyData(this, "hello \" test")
+                        "issue #99: policy with all state access for revoke owner all",
+                        new PolicyData(this, "test")
                                 .setAllState(new AllState()
                                         .addAccessFilter(new AccessFilter()
                                                 .setPrefix("revoke")
                                                 .setKind("owner")
                                                 .addAccess("all")))},
                 new Object[]{
-                        "issue #99: policy with all state flag true and read / show owner revoke and filter expression",
-                        new PolicyData(this, "hello \" test")
+                        "issue #99: policy with all state access for revoke owner read/show with filter expression",
+                        new PolicyData(this, "test")
                                 .setAllState(new AllState()
                                         .addAccessFilter(new AccessFilter()
                                                 .setPrefix("revoke")
                                                 .setKind("owner")
                                                 .addAccess("read", "show")
                                                 .setFilter("current==\"hello\"")))},
+                // public
                 new Object[]{
-                        "issue #99: policy with all state flag true and read / show public access",
-                        new PolicyData(this, "hello \" test")
+                        "issue #99: policy with all state access for public read/show",
+                        new PolicyData(this, "test")
                                 .setAllState(new AllState()
                                         .addAccessFilter(new AccessFilter()
                                                 .setKind("public")
                                                 .addAccess("read", "show")))},
                 new Object[]{
-                        "issue #99: policy with all state flag true and all public access",
-                        new PolicyData(this, "hello \" test")
+                        "issue #99: policy with all state access for public all",
+                        new PolicyData(this, "test")
                                 .setAllState(new AllState()
                                         .addAccessFilter(new AccessFilter()
                                                 .setKind("public")
                                                 .addAccess("all")))},
                 new Object[]{
-                        "issue #99: policy with all state flag true and read / show public access and filter expression",
-                        new PolicyData(this, "hello \" test")
+                        "issue #99: policy with all state access for public read/show with filter expression",
+                        new PolicyData(this, "test")
                                 .setAllState(new AllState()
                                         .addAccessFilter(new AccessFilter()
                                                 .setKind("public")
                                                 .addAccess("read", "show")
                                                 .setFilter("current==\"hello\"")))},
+                // login public
                 new Object[]{
-                        "issue #99: policy with all state flag true and read / show public revoke",
-                        new PolicyData(this, "hello \" test")
+                        "issue #177: policy with all state access for login public read/show",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .setAllState(new AllState()
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("login")
+                                                .setKind("public")
+                                                .addAccess("read", "show")))},
+                new Object[]{
+                        "issue #177: policy with all state access for login public all",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .setAllState(new AllState()
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("login")
+                                                .setKind("public")
+                                                .addAccess("all")))},
+                new Object[]{
+                        "issue #177: policy with all state access for login public read/show and filter expression",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .setAllState(new AllState()
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("login")
+                                                .setKind("public")
+                                                .addAccess("read", "show")
+                                                .setFilter("current==\"hello\"")))},
+                // revoke public
+                new Object[]{
+                        "issue #99: policy with all state access for revoke public read/show",
+                        new PolicyData(this, "test")
                                 .setAllState(new AllState()
                                         .addAccessFilter(new AccessFilter()
                                                 .setPrefix("revoke")
                                                 .setKind("public")
                                                 .addAccess("read", "show")))},
                 new Object[]{
-                        "issue #99: policy with all state flag true and all public revoke",
-                        new PolicyData(this, "hello \" test")
+                        "issue #99: policy with all state access for revoke public all",
+                        new PolicyData(this, "test")
                                 .setAllState(new AllState()
                                         .addAccessFilter(new AccessFilter()
                                                 .setPrefix("revoke")
                                                 .setKind("public")
                                                 .addAccess("all")))},
                 new Object[]{
-                        "issue #99: policy with all state flag true and read / show public revoke and filter expression",
-                        new PolicyData(this, "hello \" test")
+                        "issue #99: policy with all state access for revoke public read/show and filter expression",
+                        new PolicyData(this, "test")
                                 .setAllState(new AllState()
                                         .addAccessFilter(new AccessFilter()
                                                 .setPrefix("revoke")
                                                 .setKind("public")
                                                 .addAccess("read", "show")
                                                 .setFilter("current==\"hello\"")))},
+                // user
                 new Object[]{
-                        "issue #99: policy with user access",
-                        new PolicyData(this, "hello \" test")
+                        "issue #99: policy with all state access for user read/show",
+                        new PolicyData(this, "test")
                                 .setAllState(new AllState()
                                         .addAccessFilter(new AccessFilter()
                                                 .setKind("user")
                                                 .setUser(new PersonAdminData(this, "creator"))
                                                 .addAccess("read", "show")))},
                 new Object[]{
-                        "issue #99: policy with user access add filter expression",
-                        new PolicyData(this, "hello \" test")
+                        "issue #99: policy with all state access for user read/show and filter expression",
+                        new PolicyData(this, "test")
                                 .setAllState(new AllState()
                                         .addAccessFilter(new AccessFilter()
                                                 .setKind("user")
@@ -186,16 +245,16 @@ public class Policy_AllStateTest
                                                 .addAccess("read", "show")
                                                 .setFilter("current==\"hello\"")))},
                 new Object[]{
-                        "issue #99: policy with all user access",
-                        new PolicyData(this, "hello \" test")
+                        "issue #99: policy with all state access for user all",
+                        new PolicyData(this, "test")
                                 .setAllState(new AllState()
                                         .addAccessFilter(new AccessFilter()
                                                 .setKind("user")
                                                 .setUser(new PersonAdminData(this, "creator"))
                                                 .addAccess("all")))},
                 new Object[]{
-                        "issue #99: policy with two different user access",
-                        new PolicyData(this, "hello \" test")
+                        "issue #99: policy with all state access for two different user",
+                        new PolicyData(this, "test")
                                 .setAllState(new AllState()
                                         .addAccessFilter(
                                                 new AccessFilter()
@@ -205,7 +264,71 @@ public class Policy_AllStateTest
                                                 new AccessFilter()
                                                         .setKind("user")
                                                         .setUser(new PersonAdminData(this, "guest"))
-                                                        .addAccess("read", "show")))}
+                                                        .addAccess("read", "show")))},
+                // login user
+                new Object[]{
+                        "issue #177: policy with all state access for login user read/show",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .setAllState(new AllState()
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("login")
+                                                .setKind("user")
+                                                .setUser(new PersonAdminData(this, "creator"))
+                                                .addAccess("read", "show")))},
+                new Object[]{
+                        "issue #177: policy with all state access for login user read/show with filter expression",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .setAllState(new AllState()
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("login")
+                                                .setKind("user")
+                                                .setUser(new PersonAdminData(this, "creator"))
+                                                .addAccess("read", "show")
+                                                .setFilter("current==\"hello\"")))},
+                new Object[]{
+                        "issue #177: policy with all state access for login user all",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .setAllState(new AllState()
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("login")
+                                                .setKind("user")
+                                                .setUser(new PersonAdminData(this, "creator"))
+                                                .addAccess("all")))},
+                // revoke user
+                new Object[]{
+                        "issue #177: policy with all state access for revoke user read/show",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .setAllState(new AllState()
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("revoke")
+                                                .setKind("user")
+                                                .setUser(new PersonAdminData(this, "creator"))
+                                                .addAccess("read", "show")))},
+                new Object[]{
+                        "issue #177: policy with all state access for revoke user read/show with filter expression",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .setAllState(new AllState()
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("revoke")
+                                                .setKind("user")
+                                                .setUser(new PersonAdminData(this, "creator"))
+                                                .addAccess("read", "show")
+                                                .setFilter("current==\"hello\"")))},
+                new Object[]{
+                        "issue #177: policy with all state access for revoke user all",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .setAllState(new AllState()
+                                        .addAccessFilter(new AccessFilter()
+                                                .setPrefix("revoke")
+                                                .setKind("user")
+                                                .setUser(new PersonAdminData(this, "creator"))
+                                                .addAccess("all")))}
                 );
     }
 
