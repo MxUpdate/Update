@@ -441,9 +441,25 @@ public class ExportParser
          * @return all child lines
          * @see #children
          */
-        public List<ExportParser.Line> getChildren()
+        public List<Line> getChildren()
         {
             return this.children;
+        }
+
+        /**
+         * Returns depending on the <code>_path</code> all found lines.
+         *
+         * @param _path     path of the lines
+         * @return list of all found strings
+         */
+        public List<String> getLines(final String _path)
+        {
+            final List<String> ret = new ArrayList<String>();
+            final String[] path = _path.split("/");
+            for (final Line line : this.children)  {
+                line.evalPath(path, 0, ret);
+            }
+            return ret;
         }
 
         /**

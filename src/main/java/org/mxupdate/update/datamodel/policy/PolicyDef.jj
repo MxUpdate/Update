@@ -79,6 +79,8 @@ TOKEN : /** State and depending signature and trigger Tokens */
 {
       <REGISTEREDNAME:  "registeredName">   : S_EXPECTED
     | <REVISION:        "revision">         : B_EXPECTED
+    | <MINORREVISION:   "minorrevision">    : B_EXPECTED
+    | <MAJORREVISION:   "majorrevision">    : B_EXPECTED
     | <VERSION:         "version">          : B_EXPECTED
     | <PROMOTE:         "promote">          : B_EXPECTED
     | <CHECKOUTHISTORY: "checkouthistory">  : B_EXPECTED
@@ -330,8 +332,12 @@ void state(final Policy_mxJPO _policy) : {
     <STATE> tmpStr = sString() {this.getField(state, "name").set(tmpStr);}
     "{"
         ( (<REGISTEREDNAME>     tmpStr = sString()  {this.appendValue(state, "symbolicNames", tmpStr);})
-        | (<REVISION>           ( <BOOLEAN_TRUE>    {this.getField(state, "revisionable").set(true);}
-                                | <BOOLEAN_FALSE>   {this.getField(state, "revisionable").set(false);} ) )
+        | (<REVISION>           ( <BOOLEAN_TRUE>    {this.getField(state, "minorrevisionable").set(true);}
+                                | <BOOLEAN_FALSE>   {this.getField(state, "minorrevisionable").set(false);} ) )
+        | (<MINORREVISION>      ( <BOOLEAN_TRUE>    {this.getField(state, "minorrevisionable").set(true);}
+                                | <BOOLEAN_FALSE>   {this.getField(state, "minorrevisionable").set(false);} ) )
+        | (<MAJORREVISION>      ( <BOOLEAN_TRUE>    {this.getField(state, "majorrevisionable").set(true);}
+                                | <BOOLEAN_FALSE>   {this.getField(state, "majorrevisionable").set(false);} ) )
         | (<VERSION>            ( <BOOLEAN_TRUE>    {this.getField(state, "versionable").set(true);}
                                 | <BOOLEAN_FALSE>   {this.getField(state, "versionable").set(false);} ) )
         | (<PROMOTE>            ( <BOOLEAN_TRUE>    {this.getField(state, "autoPromotion").set(true);}

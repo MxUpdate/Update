@@ -21,6 +21,7 @@
 package org.mxupdate.test.ci.datamodel;
 
 import org.mxupdate.test.data.datamodel.PolicyData;
+import org.mxupdate.test.data.datamodel.PolicyData.State;
 import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.test.util.Version;
 import org.mxupdate.update.util.UpdateException_mxJPO;
@@ -74,7 +75,81 @@ public class Policy_MajorMinorTest
                         new PolicyData(this, "test")
                                 .setValue("delimiter", '.')
                                 .setValue("minorsequence", "A,B,C")
-                                .setValue("majorsequence", "1,2,3")}
+                                .setValue("majorsequence", "1,2,3")},
+                // revisionable (V6R2011x)
+                new Object[]{
+                        "issue #178 (V6R2011x): policy with state revisionable",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2013x)
+                                .addState(new State()
+                                            .setName("create")
+                                            .setValue("revision", "true"))},
+                new Object[]{
+                        "issue #178 (V6R2011x): policy with state not revisionable",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2013x)
+                                .addState(new State()
+                                            .setName("create")
+                                            .setValue("revision", "false"))},
+                new Object[]{
+                        "issue #178 (V6R2011x): policy with state revisionable (defined in new style)",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2013x)
+                                .addState(new State()
+                                            .setName("create")
+                                            .setValue("minorrevision", "true")),
+                        new PolicyData(this, "test")
+                                .addState(new State()
+                                            .setName("create")
+                                            .setValue("revision", "true"))},
+                // major / minor revisionable (V6R2013x)
+                new Object[]{
+                        "issue #178: policy state w/o defined revisionable flag",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                            .setName("create")),
+                        new PolicyData(this, "test")
+                                .addState(new State()
+                                            .setName("create")
+                                            .setValue("majorrevision", "false")
+                                            .setValue("minorrevision", "false"))},
+               new Object[]{
+                        "issue #178: policy state with revisionable (defined in old style)",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                            .setName("create")
+                                            .setValue("revision", "true")),
+                        new PolicyData(this, "test")
+                                .addState(new State()
+                                            .setName("create")
+                                            .setValue("majorrevision", "false")
+                                            .setValue("minorrevision", "true"))},
+                new Object[]{
+                        "issue #178: policy state with revisionable",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                            .setName("create")
+                                            .setValue("majorrevision", "false")
+                                            .setValue("minorrevision", "true"))},
+                new Object[]{
+                        "issue #178: policy state with not minor revisionable",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                            .setName("create")
+                                            .setValue("majorrevision", "false")
+                                            .setValue("minorrevision", "false"))},
+                new Object[]{
+                        "issue #178: policy state with major revisionable",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                            .setName("create")
+                                            .setValue("majorrevision", "true")
+                                            .setValue("minorrevision", "false"))}
         );
     }
 
@@ -88,13 +163,15 @@ public class Policy_MajorMinorTest
     public void negativeTestUpdateDelimiter()
         throws Exception
     {
-        new PolicyData(this, "test")
-                .setValue("delimiter", '.')
-                .setValue("minorsequence", "A,B,C")
-                .setValue("majorsequence", "1,2,3")
-                .update()
-                .checkExport()
-                .setValue("delimiter", '|')
-                .failureUpdate(UpdateException_mxJPO.Error.DM_POLICY_UPDATE_DELIMITER);
+        if (this.getVersion() != Version.V6R2011x)  {
+            new PolicyData(this, "test")
+                    .setValue("delimiter", '.')
+                    .setValue("minorsequence", "A,B,C")
+                    .setValue("majorsequence", "1,2,3")
+                    .update()
+                    .checkExport()
+                    .setValue("delimiter", '|')
+                    .failureUpdate(UpdateException_mxJPO.Error.DM_POLICY_UPDATE_DELIMITER);
+        }
     }
 }

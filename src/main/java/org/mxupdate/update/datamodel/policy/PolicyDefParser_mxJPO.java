@@ -182,7 +182,7 @@ public class PolicyDefParser_mxJPO
   final public void allstate(final Policy_mxJPO _policy) throws ParseException_mxJPO {
     final Policy_mxJPO.Access access = this.getField(_policy, "allStateAccess").<Policy_mxJPO.Access>get();
     jj_consume_token(ALLSTATE);
-    jj_consume_token(103);
+    jj_consume_token(105);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -245,7 +245,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(104);
+    jj_consume_token(106);
         this.getField(_policy, "allState").set(true);
   }
 
@@ -261,12 +261,14 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(STATE);
     tmpStr = sString();
                                 this.getField(state, "name").set(tmpStr);
-    jj_consume_token(103);
+    jj_consume_token(105);
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case REGISTEREDNAME:
       case REVISION:
+      case MINORREVISION:
+      case MAJORREVISION:
       case VERSION:
       case PROMOTE:
       case CHECKOUTHISTORY:
@@ -296,11 +298,43 @@ public class PolicyDefParser_mxJPO
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case BOOLEAN_TRUE:
           jj_consume_token(BOOLEAN_TRUE);
-                                                     this.getField(state, "revisionable").set(true);
+                                                     this.getField(state, "minorrevisionable").set(true);
           break;
         case BOOLEAN_FALSE:
           jj_consume_token(BOOLEAN_FALSE);
-                                                     this.getField(state, "revisionable").set(false);
+                                                     this.getField(state, "minorrevisionable").set(false);
+          break;
+        default:
+          jj_consume_token(-1);
+          throw new ParseException_mxJPO();
+        }
+        break;
+      case MINORREVISION:
+        jj_consume_token(MINORREVISION);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case BOOLEAN_TRUE:
+          jj_consume_token(BOOLEAN_TRUE);
+                                                     this.getField(state, "minorrevisionable").set(true);
+          break;
+        case BOOLEAN_FALSE:
+          jj_consume_token(BOOLEAN_FALSE);
+                                                     this.getField(state, "minorrevisionable").set(false);
+          break;
+        default:
+          jj_consume_token(-1);
+          throw new ParseException_mxJPO();
+        }
+        break;
+      case MAJORREVISION:
+        jj_consume_token(MAJORREVISION);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case BOOLEAN_TRUE:
+          jj_consume_token(BOOLEAN_TRUE);
+                                                     this.getField(state, "majorrevisionable").set(true);
+          break;
+        case BOOLEAN_FALSE:
+          jj_consume_token(BOOLEAN_FALSE);
+                                                     this.getField(state, "majorrevisionable").set(false);
           break;
         default:
           jj_consume_token(-1);
@@ -432,7 +466,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(104);
+    jj_consume_token(106);
         this.appendValue(_policy, "states", state);
   }
 
@@ -556,7 +590,7 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(SIGNATURE);
     tmpStr = sString();
                                     this.getField(signature, "name").set(tmpStr);
-    jj_consume_token(103);
+    jj_consume_token(105);
     label_4:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -601,7 +635,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(104);
+    jj_consume_token(106);
         this.appendValue(_state, "signatures", signature);
   }
 
@@ -754,12 +788,12 @@ public class PolicyDefParser_mxJPO
     catch(LookaheadSuccess ls) { return true; }
   }
 
-  private boolean jj_3_2() {
+  private boolean jj_3_1() {
     if (jj_scan_token(LALL_ALL)) return true;
     return false;
   }
 
-  private boolean jj_3_1() {
+  private boolean jj_3_2() {
     if (jj_scan_token(LALL_ALL)) return true;
     return false;
   }

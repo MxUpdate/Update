@@ -1090,10 +1090,10 @@ throw new Exception("some states are not defined anymore!");
         /** Must a checkout written in the history? */
         private boolean checkoutHistory = false;
 
-        /**
-         * Is the business object in this state revisionable?
-         */
-        private boolean revisionable = false;
+        /** Is the business object in this state (minor) revisionable? */
+        private boolean minorrevisionable = false;
+        /** Is the business object in this state major revisionable? */
+        private boolean majorrevisionable = false;
 
         /** Is the business object in this state versionable? */
         private boolean versionable = false;
@@ -1127,7 +1127,9 @@ throw new Exception("some states are not defined anymore!");
             } else if ("/checkoutHistory".equals(_url))  {
                 this.checkoutHistory = true;
             } else if ("/revisionable".equals(_url))  {
-                this.revisionable = true;
+                this.minorrevisionable = true;
+            } else if ("/majorrevisionable".equals(_url))  {
+                this.majorrevisionable = true;
             } else if ("/versionable".equals(_url))  {
                 this.versionable = true;
 
@@ -1194,7 +1196,7 @@ throw new Exception("some states are not defined anymore!");
          * <ul>
          * <li>{@link #name state name}
          * <li>{@link #symbolicNames symbolic name of the state}
-         * <li>{@link #revisionable minor is revisionable}
+         * <li>{@link #minorrevisionable minor is revisionable}
          * <li>{@link #majorrevisionable major is revisionable}
          * <li>{@link #versionable}
          * <li>{@link #autoPromotion auto promote}
@@ -1223,8 +1225,17 @@ throw new Exception("some states are not defined anymore!");
                         .append('\"');
                 }
             }
-            _out.append("\n    revision \"").append(Boolean.toString(this.revisionable)).append('\"')
-                .append("\n    version \"").append(Boolean.toString(this.versionable)).append('\"')
+
+            // major / minor revision (old / new format)
+            if (_paramCache.getValueBoolean(Policy_mxJPO.PARAM_SUPPORT_MAJOR_MINOR))  {
+                _out.append("\n    majorrevision \"").append(Boolean.toString(this.majorrevisionable)).append('\"')
+                    .append("\n    minorrevision \"").append(Boolean.toString(this.minorrevisionable)).append('\"');
+            } else  {
+                _out.append("\n    revision \"").append(Boolean.toString(this.minorrevisionable)).append('\"');
+            }
+
+            // other basics
+            _out.append("\n    version \"").append(Boolean.toString(this.versionable)).append('\"')
                 .append("\n    promote \"").append(Boolean.toString(this.autoPromotion)).append('\"')
                 .append("\n    checkouthistory \"").append(Boolean.toString(this.checkoutHistory)).append('\"');
             // route
@@ -1263,16 +1274,18 @@ throw new Exception("some states are not defined anymore!");
         {
             // basics
             _out.append(" promote ").append(String.valueOf(this.autoPromotion))
-                .append(" revision ").append(String.valueOf(this.revisionable))
                 .append(" checkouthistory ").append(String.valueOf(this.checkoutHistory))
                 .append(" version ").append(String.valueOf(this.versionable))
                 .append(" action \"").append(StringUtil_mxJPO.convertMql(this.actionProgram)).append('\"')
                 .append(" input \"").append(StringUtil_mxJPO.convertMql(this.actionInput)).append('\"')
                 .append(" check \"").append(StringUtil_mxJPO.convertMql(this.checkProgram)).append('\"')
                 .append(" input \"").append(StringUtil_mxJPO.convertMql(this.checkInput)).append('\"');
-            // major revision (if supported)
+            // minor / major revision (if supported)
             if (_paramCache.getValueBoolean(Policy_mxJPO.PARAM_SUPPORT_MAJOR_MINOR))  {
-                _out.append(" majorrevision ").append(String.valueOf(this.majorrevisionable));
+                _out.append(" majorrevision ").append(String.valueOf(this.majorrevisionable))
+                    .append(" minorrevision ").append(String.valueOf(this.minorrevisionable));
+            } else  {
+                _out.append(" revision ").append(String.valueOf(this.minorrevisionable));
             }
             // route message
             _out.append(" route message \"").append(StringUtil_mxJPO.convertMql(this.routeMessage)).append('\"');

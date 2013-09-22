@@ -469,6 +469,42 @@ public class PolicyData
         }
     }
 
+
+    /**
+     * {@inheritDoc}
+     * The original method is overwritten because for policies another path
+     * exists for the values.
+     *
+     * @param _exportParser     parsed export
+     * @param _kind             kind of the check
+     * @param _tag              tag to check
+     * @param _value            value to check (or <code>null</code> if value
+     *                          is not defined)
+     */
+    public static void checkSingleValue(final Line _parentLine,
+                                        final String _kind,
+                                        final String _tag,
+                                        final String _value)
+    {
+        if (_value != null)  {
+            Assert.assertEquals(
+                    _parentLine.getLines(_tag + "/@value").size(),
+                    1,
+                    "check " + _kind + " that " + _tag + " is defined");
+
+            Assert.assertEquals(
+                    _parentLine.getLines(_tag + "/@value").get(0),
+                    _value,
+                    "check " + _kind + " that " + _tag + " is " + _value);
+
+        } else  {
+            Assert.assertEquals(
+                    _parentLine.getLines(_tag + "/@value").size(),
+                    0,
+                    "check " + _kind + " that no " + _tag + " is defined");
+        }
+    }
+
     /**
      * {@inheritDoc}
      * The original method is overwritten because for policies another path
@@ -644,6 +680,8 @@ public class PolicyData
     {
         /** Access filter definition for this state. */
         public final List<AccessFilter> accessFilters = new ArrayList<AccessFilter>();
+        /** Values of this state. */
+        private final Map<String,Object> values = new HashMap<String,Object>();
 
         /**
          * Appends a access filter definition.
@@ -657,6 +695,31 @@ public class PolicyData
             this.accessFilters.addAll(Arrays.asList(_accessFilters));
             return (AS) this;
         }
+
+        /**
+         * Defines a new value entry which is put into {@link #values}.
+         *
+         * @param _key      key of the value (e.g. &quot;description&quot;)
+         * @param _value    value of the value
+         * @return this state instance
+         */
+        @SuppressWarnings("unchecked")
+        public AS setValue(final String _key,
+                           final Object _value)
+        {
+            this.values.put(_key, _value);
+            return (AS) this;
+        }
+
+        /**
+         * Returns the {@link #values} of this state.
+         *
+         * @return defined values
+         */
+        public Map<String,Object> getValues()
+        {
+            return this.values;
+        }
     }
 
     /**
@@ -668,7 +731,7 @@ public class PolicyData
         /** Name of the state. */
         private String name;
         /** List of all signatures for this state. */
-        private final List<PolicyData.Signature> signatures = new ArrayList<PolicyData.Signature>();
+        private final List<Signature> signatures = new ArrayList<Signature>();
 
         /**
          * Defines the {@code _name} of the state.
@@ -699,7 +762,7 @@ public class PolicyData
          * @return this state instance
          * @see #signatures
          */
-        public PolicyData.State addSignature(final PolicyData.Signature _signature)
+        public PolicyData.State addSignature(final Signature _signature)
         {
             this.signatures.add(_signature);
             return this;
@@ -717,7 +780,11 @@ public class PolicyData
             {
                 accessFilter.append4CIFile(_cmd);
             }
-            for (final PolicyData.Signature signature : this.signatures)
+            for (final Map.Entry<String,Object> value : this.getValues().entrySet())  {
+                _cmd.append("      ").append(value.getKey())
+                    .append(" \"").append(StringUtil_mxJPO.convertTcl(value.getValue().toString())).append("\"\n");
+            }
+            for (final Signature signature : this.signatures)
             {
                 signature.append4CIFile(_cmd);
             }
@@ -736,7 +803,11 @@ public class PolicyData
             {
                 _cmd.append(' ').append(accessFilter.getMQLCreateString());
             }
-            for (final PolicyData.Signature signature : this.signatures)
+            for (final Map.Entry<String,Object> value : this.getValues().entrySet())  {
+                _cmd.append(' ').append(value.getKey())
+                    .append(" \"").append(StringUtil_mxJPO.convertMql(value.getValue().toString())).append('\"');
+            }
+            for (final Signature signature : this.signatures)
             {
                 signature.append4CIFile(_cmd);
             }
@@ -778,14 +849,25 @@ public class PolicyData
                             "check access definition for state " + line.getValue());
 
                     // signature
-                    for (final PolicyData.Signature signature : this.signatures)  {
+                    for (final Signature signature : this.signatures)  {
                         signature.checkExport(line);
+                    }
+
+                    // check for defined values
+                    for (final Map.Entry<String,Object> entry : this.getValues().entrySet())  {
+                        PolicyData.checkSingleValue(
+                                line,
+                                entry.getKey(),
+                                entry.getKey(),
+                                (entry.getValue() instanceof Character)
+                                        ? entry.getValue().toString()
+                                        : "\"" + AbstractTest.convertTcl(entry.getValue().toString()) + "\"");
                     }
                 }
             }
             Assert.assertTrue(found, "check that state '" + this.name + "' is found");
         }
-     }
+    }
 
     /**
      * All state definition.
@@ -883,7 +965,7 @@ public class PolicyData
          * @return this signature instance
          * @see #name
          */
-        public PolicyData.Signature setName(final String _name)
+        public Signature setName(final String _name)
         {
             this.name = _name;
             return this;
@@ -896,7 +978,7 @@ public class PolicyData
          * @return this signature instance
          * @see #filter
          */
-        public PolicyData.Signature setFilter(final String _filter)
+        public Signature setFilter(final String _filter)
         {
             this.filter = _filter;
             return this;
@@ -909,7 +991,7 @@ public class PolicyData
          * @return this signature instance
          * @see #branch
          */
-        public PolicyData.Signature setBranch(final String _branch)
+        public Signature setBranch(final String _branch)
         {
             this.branch = _branch;
             return this;
