@@ -24,6 +24,7 @@ import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.PolicyData;
 import org.mxupdate.test.data.datamodel.PolicyData.State;
+import org.mxupdate.test.util.Version;
 import org.testng.annotations.BeforeMethod;
 
 /**
@@ -88,7 +89,13 @@ public abstract class AbstractPolicyTest
 
         // states can not be removed....
         for (final State state : _original.getStates())  {
-            ret.addState(new State().setName(state.getName()));
+            final State retState = new State().setName(state.getName());
+
+            if (this.getVersion() != Version.V6R2011x)  {
+                retState.setValue("published", "false");
+            }
+
+            ret.addState(retState);
         }
 
         return ret;

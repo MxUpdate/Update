@@ -49,103 +49,105 @@ interface PolicyDefParserConstants_mxJPO {
   /** RegularExpression Id. */
   int CHECKOUTHISTORY = 23;
   /** RegularExpression Id. */
-  int REVOKE = 24;
+  int PUBLISHED = 24;
   /** RegularExpression Id. */
-  int LOGIN = 25;
+  int REVOKE = 25;
   /** RegularExpression Id. */
-  int OWNER = 26;
+  int LOGIN = 26;
   /** RegularExpression Id. */
-  int PUBLIC = 27;
+  int OWNER = 27;
   /** RegularExpression Id. */
-  int USER = 28;
+  int PUBLIC = 28;
   /** RegularExpression Id. */
-  int FILTER = 29;
+  int USER = 29;
   /** RegularExpression Id. */
-  int ACTION = 30;
+  int FILTER = 30;
   /** RegularExpression Id. */
-  int CHECK = 31;
+  int ACTION = 31;
   /** RegularExpression Id. */
-  int OVERRIDE = 32;
+  int CHECK = 32;
   /** RegularExpression Id. */
-  int INPUT = 33;
+  int OVERRIDE = 33;
   /** RegularExpression Id. */
-  int TRIGGER = 34;
+  int INPUT = 34;
   /** RegularExpression Id. */
-  int APPROVE = 35;
+  int TRIGGER = 35;
   /** RegularExpression Id. */
-  int IGNORE = 36;
+  int APPROVE = 36;
   /** RegularExpression Id. */
-  int REJECT = 37;
+  int IGNORE = 37;
   /** RegularExpression Id. */
-  int BRANCH = 38;
+  int REJECT = 38;
   /** RegularExpression Id. */
-  int SIGNATURE = 39;
+  int BRANCH = 39;
   /** RegularExpression Id. */
-  int ROUTE = 40;
+  int SIGNATURE = 40;
   /** RegularExpression Id. */
-  int BOOLEAN_TRUE = 45;
+  int ROUTE = 41;
   /** RegularExpression Id. */
-  int BOOLEAN_FALSE = 46;
+  int BOOLEAN_TRUE = 46;
   /** RegularExpression Id. */
-  int BOOLEAN_TRUESTR = 47;
+  int BOOLEAN_FALSE = 47;
   /** RegularExpression Id. */
-  int BOOLEAN_FALSESTR = 48;
+  int BOOLEAN_TRUESTR = 48;
   /** RegularExpression Id. */
-  int DELIMITER_CHAR = 53;
+  int BOOLEAN_FALSESTR = 49;
   /** RegularExpression Id. */
-  int DELIMITER_CHARSTR = 54;
+  int DELIMITER_CHAR = 54;
   /** RegularExpression Id. */
-  int LS_CURLY_BRACKET_OPEN = 59;
+  int DELIMITER_CHARSTR = 55;
   /** RegularExpression Id. */
-  int LS_CURLY_BRACKET_CLOSE = 60;
+  int LS_CURLY_BRACKET_OPEN = 60;
   /** RegularExpression Id. */
-  int LS_STRING = 61;
+  int LS_CURLY_BRACKET_CLOSE = 61;
   /** RegularExpression Id. */
-  int LS_SINGLE_STRING = 62;
+  int LS_STRING = 62;
   /** RegularExpression Id. */
-  int LS_APOSTROPHE = 63;
+  int LS_SINGLE_STRING = 63;
   /** RegularExpression Id. */
-  int LS_CHAR = 64;
+  int LS_APOSTROPHE = 64;
   /** RegularExpression Id. */
-  int SL_STRING = 69;
+  int LS_CHAR = 65;
   /** RegularExpression Id. */
-  int SL_SINGLE_STRING = 70;
+  int SL_STRING = 70;
   /** RegularExpression Id. */
-  int SL_APOSTROPHE = 71;
+  int SL_SINGLE_STRING = 71;
   /** RegularExpression Id. */
-  int SL_CHAR = 72;
+  int SL_APOSTROPHE = 72;
   /** RegularExpression Id. */
-  int S_STRING = 77;
+  int SL_CHAR = 73;
   /** RegularExpression Id. */
-  int S_SINGLE_STRING = 78;
+  int S_STRING = 78;
   /** RegularExpression Id. */
-  int S_APOSTROPHE = 79;
+  int S_SINGLE_STRING = 79;
   /** RegularExpression Id. */
-  int S_CHAR = 80;
+  int S_APOSTROPHE = 80;
   /** RegularExpression Id. */
-  int LALL_CURLY_BRACKET_OPEN = 85;
+  int S_CHAR = 81;
   /** RegularExpression Id. */
-  int LALL_ALL = 86;
+  int LALL_CURLY_BRACKET_OPEN = 86;
   /** RegularExpression Id. */
-  int L_CURLY_BRACKET_OPEN = 91;
+  int LALL_ALL = 87;
   /** RegularExpression Id. */
-  int L_CURLY_BRACKET_CLOSE = 96;
+  int L_CURLY_BRACKET_OPEN = 92;
   /** RegularExpression Id. */
-  int L_STRING = 97;
+  int L_CURLY_BRACKET_CLOSE = 97;
   /** RegularExpression Id. */
-  int L_SINGLE_STRING = 98;
+  int L_STRING = 98;
   /** RegularExpression Id. */
-  int L_APOSTROPHE = 99;
+  int L_SINGLE_STRING = 99;
   /** RegularExpression Id. */
-  int L_CHAR = 100;
+  int L_APOSTROPHE = 100;
   /** RegularExpression Id. */
-  int L2_CURLY_BRACKET_OPEN = 101;
+  int L_CHAR = 101;
   /** RegularExpression Id. */
-  int L3_BRACE_STRING = 102;
+  int L2_CURLY_BRACKET_OPEN = 102;
   /** RegularExpression Id. */
-  int L3_CHAR = 103;
+  int L3_BRACE_STRING = 103;
   /** RegularExpression Id. */
-  int L4_CURLY_BRACKET_CLOSE = 104;
+  int L3_CHAR = 104;
+  /** RegularExpression Id. */
+  int L4_CURLY_BRACKET_CLOSE = 105;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -196,6 +198,7 @@ interface PolicyDefParserConstants_mxJPO {
     "\"version\"",
     "\"promote\"",
     "\"checkouthistory\"",
+    "\"published\"",
     "\"revoke\"",
     "\"login\"",
     "\"owner\"",

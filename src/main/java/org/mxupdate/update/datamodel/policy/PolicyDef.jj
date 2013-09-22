@@ -84,6 +84,7 @@ TOKEN : /** State and depending signature and trigger Tokens */
     | <VERSION:         "version">          : B_EXPECTED
     | <PROMOTE:         "promote">          : B_EXPECTED
     | <CHECKOUTHISTORY: "checkouthistory">  : B_EXPECTED
+    | <PUBLISHED:       "published">        : B_EXPECTED
     | <REVOKE:          "revoke">           : DEFAULT
     | <LOGIN:           "login">            : DEFAULT
     | <OWNER:           "owner">            : L_EXPECTED
@@ -344,6 +345,8 @@ void state(final Policy_mxJPO _policy) : {
                                 | <BOOLEAN_FALSE>   {this.getField(state, "autoPromotion").set(false);} ) )
         | (<CHECKOUTHISTORY>    ( <BOOLEAN_TRUE>    {this.getField(state, "checkoutHistory").set(true);}
                                 | <BOOLEAN_FALSE>   {this.getField(state, "checkoutHistory").set(false);} ) )
+        | (<PUBLISHED>          ( <BOOLEAN_TRUE>    {this.getField(state, "published").set(true);}
+                                | <BOOLEAN_FALSE>   {this.getField(state, "published").set(false);} ) )
         | stateOwnerAccess(AccessPrefix.All, state)
         | statePublicAccess(AccessPrefix.All, state)
         | stateUserAccess(AccessPrefix.All, state)

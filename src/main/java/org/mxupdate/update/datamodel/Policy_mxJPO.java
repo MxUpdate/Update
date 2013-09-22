@@ -62,6 +62,12 @@ public class Policy_mxJPO
     private static final String PARAM_SUPPORT_MAJOR_MINOR = "DMPolicySupportsMajorMinor";
 
     /**
+     * Name of the parameter to define that the policy states supports the
+     * published property.
+     */
+    private static final String PARAM_SUPPORT_PUBLISHED = "DMPolicyStateSupportsPublished";
+
+    /**
      * Set of all ignored URLs from the XML definition for policies.
      *
      * @see #parse(ParameterCache_mxJPO, String, String)
@@ -1090,6 +1096,9 @@ throw new Exception("some states are not defined anymore!");
         /** Must a checkout written in the history? */
         private boolean checkoutHistory = false;
 
+        /** Published flag? */
+        private boolean published = false;
+
         /** Is the business object in this state (minor) revisionable? */
         private boolean minorrevisionable = false;
         /** Is the business object in this state major revisionable? */
@@ -1126,6 +1135,8 @@ throw new Exception("some states are not defined anymore!");
                 this.autoPromotion = true;
             } else if ("/checkoutHistory".equals(_url))  {
                 this.checkoutHistory = true;
+            } else if ("/published".equals(_url))  {
+                this.published = true;
             } else if ("/revisionable".equals(_url))  {
                 this.minorrevisionable = true;
             } else if ("/majorrevisionable".equals(_url))  {
@@ -1238,6 +1249,10 @@ throw new Exception("some states are not defined anymore!");
             _out.append("\n    version \"").append(Boolean.toString(this.versionable)).append('\"')
                 .append("\n    promote \"").append(Boolean.toString(this.autoPromotion)).append('\"')
                 .append("\n    checkouthistory \"").append(Boolean.toString(this.checkoutHistory)).append('\"');
+            // published flag (if supported)
+            if (_paramCache.getValueBoolean(Policy_mxJPO.PARAM_SUPPORT_PUBLISHED))  {
+                _out.append("\n    published \"").append(Boolean.toString(this.published)).append('\"');
+            }
             // route
             if ((this.routeMessage != null) || !this.routeUsers.isEmpty())  {
                 _out.append("\n    route {")
@@ -1286,6 +1301,10 @@ throw new Exception("some states are not defined anymore!");
                     .append(" minorrevision ").append(String.valueOf(this.minorrevisionable));
             } else  {
                 _out.append(" revision ").append(String.valueOf(this.minorrevisionable));
+            }
+            // published (if supported)
+            if (_paramCache.getValueBoolean(Policy_mxJPO.PARAM_SUPPORT_PUBLISHED))  {
+                _out.append(" published ").append(String.valueOf(this.published));
             }
             // route message
             _out.append(" route message \"").append(StringUtil_mxJPO.convertMql(this.routeMessage)).append('\"');

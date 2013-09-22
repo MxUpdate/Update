@@ -182,7 +182,7 @@ public class PolicyDefParser_mxJPO
   final public void allstate(final Policy_mxJPO _policy) throws ParseException_mxJPO {
     final Policy_mxJPO.Access access = this.getField(_policy, "allStateAccess").<Policy_mxJPO.Access>get();
     jj_consume_token(ALLSTATE);
-    jj_consume_token(105);
+    jj_consume_token(106);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -245,7 +245,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(106);
+    jj_consume_token(107);
         this.getField(_policy, "allState").set(true);
   }
 
@@ -261,7 +261,7 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(STATE);
     tmpStr = sString();
                                 this.getField(state, "name").set(tmpStr);
-    jj_consume_token(105);
+    jj_consume_token(106);
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -272,6 +272,7 @@ public class PolicyDefParser_mxJPO
       case VERSION:
       case PROMOTE:
       case CHECKOUTHISTORY:
+      case PUBLISHED:
       case REVOKE:
       case LOGIN:
       case OWNER:
@@ -389,6 +390,22 @@ public class PolicyDefParser_mxJPO
           throw new ParseException_mxJPO();
         }
         break;
+      case PUBLISHED:
+        jj_consume_token(PUBLISHED);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case BOOLEAN_TRUE:
+          jj_consume_token(BOOLEAN_TRUE);
+                                                     this.getField(state, "published").set(true);
+          break;
+        case BOOLEAN_FALSE:
+          jj_consume_token(BOOLEAN_FALSE);
+                                                     this.getField(state, "published").set(false);
+          break;
+        default:
+          jj_consume_token(-1);
+          throw new ParseException_mxJPO();
+        }
+        break;
       case OWNER:
         stateOwnerAccess(AccessPrefix.All, state);
         break;
@@ -466,7 +483,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(106);
+    jj_consume_token(107);
         this.appendValue(_policy, "states", state);
   }
 
@@ -590,7 +607,7 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(SIGNATURE);
     tmpStr = sString();
                                     this.getField(signature, "name").set(tmpStr);
-    jj_consume_token(105);
+    jj_consume_token(106);
     label_4:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -635,7 +652,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(106);
+    jj_consume_token(107);
         this.appendValue(_state, "signatures", signature);
   }
 

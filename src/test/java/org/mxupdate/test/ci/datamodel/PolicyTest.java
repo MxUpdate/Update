@@ -23,16 +23,16 @@ package org.mxupdate.test.ci.datamodel;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.FormatData;
 import org.mxupdate.test.data.datamodel.PolicyData;
 import org.mxupdate.test.data.datamodel.PolicyData.AccessFilter;
+import org.mxupdate.test.data.datamodel.PolicyData.State;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.util.IssueLink;
+import org.mxupdate.test.util.Version;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -43,7 +43,7 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 public class PolicyTest
-    extends AbstractDataExportUpdate<PolicyData>
+    extends AbstractPolicyTest
 {
     /** Name of test policy. */
     private static final String POLICY_NAME = AbstractTest.PREFIX + "Test";
@@ -155,23 +155,11 @@ public class PolicyTest
             + "}";
 
     /**
-     * Creates for given <code>_name</code> a new policy instance.
-     *
-     * @param _name     name of the policy instance
-     * @return policy instance
-     */
-    @Override()
-    protected PolicyData createNewData(final String _name)
-    {
-        return new PolicyData(this, _name);
-    }
-
-    /**
      * Data provider for test policies.
      *
      * @return object array with all test policies
      */
-    @IssueLink({"30", "86", "119", "120", "121"})
+    @IssueLink({"30", "86", "119", "120", "121", "179"})
     @DataProvider(name = "data")
     public Object[][] getPolicies()
     {
@@ -238,26 +226,34 @@ public class PolicyTest
                         "issue #86: policy with two formats",
                         new PolicyData(this, "hello \" test")
                                 .appendFormats(new FormatData(this, "Type \"Test\" 1"))
-                                .appendFormats(new FormatData(this, "Type \"Test\" 2"))}
-                );
+                                .appendFormats(new FormatData(this, "Type \"Test\" 2"))},
+                // published flag
+                new Object[]{
+                        "issue #179: policy state w/o defined published (and will be false)",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                        .setName("create")),
+                        new PolicyData(this, "test")
+                                .addState(new State()
+                                        .setName("create")
+                                        .setValue("published", "false"))},
+                new Object[]{
+                        "issue #179: policy state with published true",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                        .setName("create")
+                                        .setValue("published", "true"))},
+                new Object[]{
+                        "issue #179: policy state with published false",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                        .setName("create")
+                                        .setValue("published", "false"))}
+        );
     }
-
-    /**
-     * Deletes all test data model object.
-     *
-     * @throws Exception if clean up failed
-     */
-    @BeforeMethod()
-    public void cleanup()
-        throws Exception
-    {
-        this.cleanup(AbstractTest.CI.DM_POLICY);
-        this.cleanup(AbstractTest.CI.DM_TYPE);
-        this.cleanup(AbstractTest.CI.DM_FORMAT);
-        this.cleanup(AbstractTest.CI.USR_GROUP);
-        this.cleanup(AbstractTest.CI.USR_PERSONADMIN);
-        this.cleanup(AbstractTest.CI.USR_ROLE);
-   }
 
     /**
      * Creates a new policy with one state and with one symbolic name. The
