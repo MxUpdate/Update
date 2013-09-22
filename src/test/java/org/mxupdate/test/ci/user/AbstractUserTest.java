@@ -64,13 +64,15 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
         final List<Object[]> ret = new ArrayList<Object[]>();
         ret.addAll(Arrays.asList(_datas));
 
-        this.appendCue(_logText, ret);
-        this.appendFilter(_logText, ret);
-        this.appendQuery(_logText, ret);
-        this.appendTable(_logText, ret);
-        this.appendTip(_logText, ret);
-        this.appendToolSet(_logText, ret);
-        this.appendView(_logText, ret);
+        if (_logText != null)  {
+            this.appendCue(_logText, ret);
+            this.appendFilter(_logText, ret);
+            this.appendQuery(_logText, ret);
+            this.appendTable(_logText, ret);
+            this.appendTip(_logText, ret);
+            this.appendToolSet(_logText, ret);
+            this.appendView(_logText, ret);
+        }
 
         return super.prepareData(_logText, ret.toArray(new Object[ret.size()][]));
     }

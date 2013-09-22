@@ -55,7 +55,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     private final String name;
 
     /** Values of this data piece. */
-    private final Map<String,String> values = new HashMap<String,String>();
+    private final Map<String,Object> values = new HashMap<String,Object>();
 
     /** Flag to indicate that this data piece is created.*/
     private boolean created;
@@ -126,7 +126,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      */
     @SuppressWarnings("unchecked")
     public DATA setValue(final String _key,
-                         final String _value)
+                         final Object _value)
     {
         this.values.put(_key, _value);
         return (DATA) this;
@@ -138,20 +138,18 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @param _key      name of the searched key
      * @return value for related <code>_key</code>; if not found
      *         <code>null</code>
-     * @see #values
      */
-    public String getValue(final String _key)
+    public Object getValue(final String _key)
     {
         return this.values.get(_key);
     }
 
     /**
-     * Returns the description of the abstract data element.
+     * Returns all defined {@link #values}.
      *
-     * @return description of the abstract data element
-     * @see #values
+     * @return defined values
      */
-    public Map<String,String> getValues()
+    public Map<String,Object> getValues()
     {
         return this.values;
     }

@@ -66,7 +66,10 @@ TOKEN : /** first level */
   | <FORMAT:          "format">           : LALL_EXPECTED
   | <STORE:           "store">            : S_EXPECTED
   | <DEFAULTFORMAT:   "defaultformat">    : S_EXPECTED
+  | <DELIMITER:       "delimiter">        : D_EXPECTED
   | <SEQUENCE:        "sequence">         : S_EXPECTED
+  | <MINORSEQUENCE:   "minorsequence">    : S_EXPECTED
+  | <MAJORSEQUENCE:   "majorsequence">    : S_EXPECTED
   | <HIDDEN:          "hidden">           : B_EXPECTED
   | <STATE:           "state">            : S_EXPECTED
   | <ALLSTATE:        "allstate">         : DEFAULT
@@ -110,6 +113,18 @@ TOKEN : /** State and depending signature and trigger Tokens */
     | <BOOLEAN_FALSE : (<BOOLEAN_FALSESTR> | "\"" <BOOLEAN_FALSESTR> "\"")> : DEFAULT
     | <#BOOLEAN_TRUESTR : ["t","T"] ["r","R"] ["u","U"] ["e","E"]>
     | <#BOOLEAN_FALSESTR : ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"]>
+}
+
+/*************************************************** Delimiter Chacter */
+<D_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<D_EXPECTED> TOKEN :
+{
+      <DELIMITER_CHAR : (<DELIMITER_CHARSTR> | "\"" <DELIMITER_CHARSTR> "\"")>  : DEFAULT
+    | <#DELIMITER_CHARSTR : ~["\u0000"-"\u0020","0"-"9","a"-"z","A"-"Z","?","*","'","\"","[","]","(",")"]>
 }
 
 /************************************************************* List -> String */
@@ -223,7 +238,10 @@ Policy_mxJPO policy(final ParameterCache_mxJPO _paramCache,
       | ( format(policy) )
       | ( type(policy) )
       | ( <DEFAULTFORMAT>  tmp = sString()     {this.getField(policy, "defaultFormat").set(tmp);} )
-      | ( <SEQUENCE>       tmp = sString()     {this.getField(policy, "sequence").set(tmp);} )
+      | ( <DELIMITER>      tmp = sString()     {this.getField(policy, "delimiter").set(tmp);} )
+      | ( <SEQUENCE>       tmp = sString()     {this.getField(policy, "minorsequence").set(tmp);} )
+      | ( <MINORSEQUENCE>  tmp = sString()     {this.getField(policy, "minorsequence").set(tmp);} )
+      | ( <MAJORSEQUENCE>  tmp = sString()     {this.getField(policy, "majorsequence").set(tmp);} )
       | ( <STORE>          tmp = sString()     {this.getField(policy, "store").set(tmp);} )
       | ( <HIDDEN>         ( <BOOLEAN_TRUE>    {this.getField(policy, "hidden").set(true);}
                           | <BOOLEAN_FALSE>    {this.getField(policy, "hidden").set(false);} ) )
@@ -510,9 +528,9 @@ String sString() : {
     String ret;
 } {
     (
-        (tmp = <S_STRING>)          {ret = this.getString(tmp.image);}
-        |
-        (tmp = <S_SINGLE_STRING>)   {ret = this.getSingle(tmp.image);}
+          (tmp = <S_STRING>)          {ret = this.getString(tmp.image);}
+        | (tmp = <S_SINGLE_STRING>)   {ret = this.getSingle(tmp.image);}
+        | (tmp = <DELIMITER_CHAR>)    {ret = this.getSingle(tmp.image);}
     )
     {
         return ret;

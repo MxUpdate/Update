@@ -32,7 +32,6 @@ import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.util.IssueLink;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -47,25 +46,18 @@ public class PolicyTest
     extends AbstractDataExportUpdate<PolicyData>
 {
     /** Name of test policy. */
-    private static final String POLICY_NAME = "MxUpdate_Test";
+    private static final String POLICY_NAME = AbstractTest.PREFIX + "Test";
 
-    /**
-     * Name of test type.
-     */
-    private static final String TYPE_NAME = "MxUpdate_TestType";
-
-    /**
-     * TCL update code for the test policy.
-     */
+    /** TCL update code for the test policy. */
     private static final String POLICY_UPDATE_CODE =
               "################################################################################\n"
             + "# POLICY:\n"
             + "# ~~~~~~~\n"
-            + "# " + AbstractTest.PREFIX + PolicyTest.POLICY_NAME + "\n"
+            + "# " + PolicyTest.POLICY_NAME + "\n"
             + "#\n"
             + "# SYMBOLIC NAME:\n"
             + "# ~~~~~~~~~~~~~~\n"
-            + "# policy_" + AbstractTest.PREFIX + PolicyTest.POLICY_NAME + "\n"
+            + "# policy_" + PolicyTest.POLICY_NAME + "\n"
             + "#\n"
             + "# DESCRIPTION:\n"
             + "# ~~~~~~~~~~~~\n"
@@ -200,11 +192,6 @@ public class PolicyTest
                                 .setValue("defaultformat", "generic")},
 
                 new Object[]{
-                        "policy with sequence",
-                        new PolicyData(this, "hello \" test")
-                                .setValue("sequence", "1,2,3,A,B,C")},
-
-                new Object[]{
                         "policy with store",
                         new PolicyData(this, "hello \" test")
                                 .setValue("store", "STORE")},
@@ -256,42 +243,11 @@ public class PolicyTest
     }
 
     /**
-     * Removes the MxUpdate test policy {@link #POLICY_NAME}.
-     *
-     * @throws Exception if MQL execution failed
-     */
-    @BeforeMethod()
-    @AfterMethod()
-    public void removePolicy()
-        throws Exception
-    {
-        if (!"".equals(this.mql("list policy " + PolicyTest.POLICY_NAME)))  {
-            this.mql("delete policy " + PolicyTest.POLICY_NAME);
-        }
-    }
-
-    /**
-     * Removes the MxUpdate test type {@link #TYPE_NAME}.
-     *
-     * @throws Exception if MQL execution failed
-     */
-    @BeforeMethod()
-    @AfterMethod()
-    public void removeType()
-        throws Exception
-    {
-        if (!"".equals(this.mql("list type " + PolicyTest.TYPE_NAME)))  {
-            this.mql("delete type " + PolicyTest.TYPE_NAME);
-        }
-    }
-
-    /**
      * Deletes all test data model object.
      *
      * @throws Exception if clean up failed
      */
     @BeforeMethod()
-//    @AfterMethod()
     public void cleanup()
         throws Exception
     {

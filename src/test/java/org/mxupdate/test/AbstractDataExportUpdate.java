@@ -53,17 +53,27 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
             ret.add(new Object[]{
                     _logText + " with property name",
                     this.createNewData("hello \" test")
+                                    .addProperty(new PropertyDef("my test \"property\"")),
+                    this.createNewData("hello \" test")
                                     .addProperty(new PropertyDef("my test \"property\""))});
             ret.add(new Object[]{
                     _logText + " property name and value",
+                    this.createNewData("hello \" test")
+                                    .addProperty(new PropertyDef("my test \"property\"", "my \"value\"")),
                     this.createNewData("hello \" test")
                                     .addProperty(new PropertyDef("my test \"property\"", "my \"value\""))});
             ret.add(new Object[]{
                     _logText + " property name, value and referenced admin object",
                     this.createNewData("hello \" test")
+                                    .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewData("property \" admin " + _logText))),
+                    this.createNewData("hello \" test")
                                     .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewData("property \" admin " + _logText)))});
             ret.add(new Object[]{
                     _logText + " with multiple properties",
+                    this.createNewData("hello \" test")
+                                    .addProperty(new PropertyDef("my test \"property\" 1"))
+                                    .addProperty(new PropertyDef("my test \"property\" 2", "my \"value\""))
+                                    .addProperty(new PropertyDef("my test \"property\" 3", this.createNewData("property \" admin " + _logText))),
                     this.createNewData("hello \" test")
                                     .addProperty(new PropertyDef("my test \"property\" 1"))
                                     .addProperty(new PropertyDef("my test \"property\" 2", "my \"value\""))
@@ -72,13 +82,19 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
             ret.add(new Object[]{
                     _logText + " with hidden flag true",
                     this.createNewData("hello \" test")
+                            .setFlag("hidden", true),
+                    this.createNewData("hello \" test")
                             .setFlag("hidden", true)});
             ret.add(new Object[]{
                     _logText + " with hidden flag false",
                     this.createNewData("hello \" test")
+                            .setFlag("hidden", false),
+                    this.createNewData("hello \" test")
                             .setFlag("hidden", false)});
             ret.add(new Object[]{
                     _logText + " without hidden flag",
+                    this.createNewData("hello \" test")
+                            .setFlag("hidden", null),
                     this.createNewData("hello \" test")
                             .setFlag("hidden", null)});
         }
@@ -89,7 +105,7 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
             final DATA testData = (DATA) data[1];
             if (testData.isSupported(this.getVersion()))
             {
-                ret.add(data);
+                ret.add(new Object[]{data[0], data[1], (data.length > 2) ? data[2] : data[1]});
             }
         }
 
@@ -108,17 +124,19 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
      * Tests a new created data and the related export.
      *
      * @param _description  description of the test case
-     * @param _data    data to test
+     * @param _orgData      original data creating the CI
+     * @param _expData      CI definition of the export
      * @throws Exception if test failed
      */
     @Test(dataProvider = "data",
           description = "test export of new created test data object")
     public void testExport(final String _description,
-                           final DATA _data)
+                           final DATA _orgData,
+                           final DATA _expData)
         throws Exception
     {
-        _data.create()
-             .checkExport();
+        _expData.create()
+                .checkExport();
     }
 
     /**
@@ -132,18 +150,19 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
     @Test(dataProvider = "data",
           description = "test update of non existing data")
     public void testUpdateWithExport(final String _description,
-                                     final DATA _data)
+                                     final DATA _orgData,
+                                     final DATA _expData)
         throws Exception
     {
-        _data.createDependings();
+        _orgData.createDependings();
 
         // first update with original content
-        _data.update();
-        final ExportParser exportParser = _data.export();
-        _data.checkExport(exportParser);
+        _orgData.update();
+        final ExportParser exportParser = _expData.export();
+        _expData.checkExport(exportParser);
 
         // second update with delivered content
-        _data.updateWithCode(exportParser.getOrigCode())
+        _expData.updateWithCode(exportParser.getOrigCode())
              .checkExport();
     }
 
@@ -158,22 +177,18 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
     @Test(dataProvider = "data",
           description = "test update of existing data instance for cleaning")
     public void testUpdateWithClean(final String _description,
-                                    final DATA _data)
+                                    final DATA _orgData,
+                                    final DATA _expData)
         throws Exception
     {
-        _data.createDependings();
+        _orgData.createDependings();
 
         // first update with original content
-        _data.update()
-             .checkExport();
+        _orgData.update();
+        _expData.checkExport();
 
         // second update with delivered content
-        final DATA newData = (DATA) this.createCleanNewData(_data).update();
-
-        // define all required values to empty values so that they are checked
-        for (final Map.Entry<String,String> value : _data.getRequiredExportValues().entrySet())  {
-            newData.setValue(value.getKey(), value.getValue());
-        }
+        final DATA newData = (DATA) this.createCleanNewData(_expData).update();
 
         // check export
         newData.checkExport();
@@ -187,6 +202,13 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
      */
     protected DATA createCleanNewData(final DATA _original)
     {
-        return this.createNewData(_original.getName().substring(AbstractTest.PREFIX.length()));
+        final DATA ret = this.createNewData(_original.getName().substring(AbstractTest.PREFIX.length()));
+
+        // define all required values to empty values so that they are checked
+        for (final Map.Entry<String,String> value : ret.getRequiredExportValues().entrySet())  {
+            ret.setValue(value.getKey(), value.getValue());
+        }
+
+        return ret;
     }
 }

@@ -41,6 +41,8 @@ import org.mxupdate.update.util.AdminProperty_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.xml.sax.SAXException;
 
 /**
  * The class is used to export and import / update policy configuration items.
@@ -51,6 +53,14 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 public class Policy_mxJPO
     extends AbstractDMWithTriggers_mxJPO
 {
+    /**
+     * Name of the parameter to define that the &quot;majorrevision&quot;
+     * property for policies and &quot;delimited&quot; property for policy
+     * states from current MX version is supported. The parameter is needed to
+     * support the case that an old MX version is used....
+     */
+    private static final String PARAM_SUPPORT_MAJOR_MINOR = "DMPolicySupportsMajorMinor";
+
     /**
      * Set of all ignored URLs from the XML definition for policies.
      *
@@ -113,6 +123,9 @@ public class Policy_mxJPO
                 + "mql exec prog org.mxupdate.update.util.JPOCaller " + Policy_mxJPO.JPO_CALLER_KEY + " $_sPolicy \"${sArg}\"\n"
             + "}\n";
 
+    /** Stores the flag the the update needs a create of the policy. */
+    private boolean updateWithCreate = false;
+
     /** Default format of this policy. */
     private String defaultFormat = null;
 
@@ -122,10 +135,12 @@ public class Policy_mxJPO
     /** Are all formats allowed of this policy? */
     private boolean allFormats;
 
-    /**
-     * Sequence of this policy.
-     */
-    private String sequence = null;
+    /** Delimiter between Major and Minor Revision. */
+    private String delimiter = null;
+    /** Minor Sequence of this policy. */
+    private String minorsequence = null;
+    /** Major Sequence of this policy. */
+    private String majorsequence = null;
 
     /** Store of this policy. */
     private String store;
@@ -158,6 +173,20 @@ public class Policy_mxJPO
     }
 
     /**
+     * {@inheritDoc}
+     * Parsing is only allowed if the update is not done within
+     * {@link #updateWithCreate create}.
+     */
+    @Override()
+    protected void parse(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException, SAXException, IOException
+    {
+        if (!this.updateWithCreate)  {
+            super.parse(_paramCache);
+        }
+    }
+
+    /**
      * Parses all policy specific URLs.
      *
      * @param _paramCache   parameter cache with MX context
@@ -185,8 +214,14 @@ public class Policy_mxJPO
             this.allFormats = true;
             parsed = true;
 
+        } else if ("/delimiter".equals(_url))  {
+            this.delimiter = _content;
+            parsed = true;
         } else if ("/sequence".equals(_url))  {
-            this.sequence = _content;
+            this.minorsequence = _content;
+            parsed = true;
+        } else if ("/majorsequence".equals(_url))  {
+            this.majorsequence = _content;
             parsed = true;
 
         } else if ("/storeRef".equals(_url))  {
@@ -250,6 +285,18 @@ public class Policy_mxJPO
     }
 
     /**
+     * Original method is overridden because policies must be directly created
+     * within update.
+     *
+     * @param _paramCache       not used
+     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
+     */
+    @Override()
+    public void create(final ParameterCache_mxJPO _paramCache)
+    {
+    }
+
+    /**
      * Writes the update script for this policy.
      * The policy specific information are:
      * <ul>
@@ -288,19 +335,28 @@ public class Policy_mxJPO
                 .append(StringUtil_mxJPO.joinTcl(' ', true, this.formats, null))
                 .append("}");
         }
-        _out.append("\n  defaultformat \"").append(StringUtil_mxJPO.convertTcl(this.defaultFormat)).append('\"')
-            .append("\n  sequence \"").append(StringUtil_mxJPO.convertTcl(this.sequence)).append('\"')
-            .append("\n  store \"").append(StringUtil_mxJPO.convertTcl(this.store)).append('\"')
+        _out.append("\n  defaultformat \"").append(StringUtil_mxJPO.convertTcl(this.defaultFormat)).append('\"');
+
+        // major / minor sequence and delimiter
+        if ((this.delimiter != null) && !this.delimiter.isEmpty())  {
+            _out.append("\n  delimiter ").append(StringUtil_mxJPO.convertTcl(this.delimiter))
+                .append("\n  minorsequence \"").append(StringUtil_mxJPO.convertTcl(this.minorsequence)).append('\"')
+                .append("\n  majorsequence \"").append(StringUtil_mxJPO.convertTcl(this.majorsequence)).append('\"');
+        } else  {
+            _out.append("\n  sequence \"").append(StringUtil_mxJPO.convertTcl(this.minorsequence)).append('\"');
+        }
+
+        _out.append("\n  store \"").append(StringUtil_mxJPO.convertTcl(this.store)).append('\"')
             .append("\n  hidden \"").append(Boolean.toString(this.isHidden())).append("\"");
         // all state access
         if (this.allState)  {
             _out.append("\n  allstate {");
-            this.allStateAccess.writeObject(_out);
+            this.allStateAccess.writeObject(_paramCache, _out);
             _out.append("\n  }");
         }
         // all states
         for (final State state : this.states)  {
-            state.writeObject(_out);
+            state.writeObject(_paramCache, _out);
         }
         _out.append("\n}");
         this.writeProperties(_paramCache, _out);
@@ -318,6 +374,20 @@ public class Policy_mxJPO
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
     {
+    }
+
+    /**
+     * The {@code _create} flag is stored in {@link #updateWithCreate}.
+     */
+    @Override()
+    public void update(final ParameterCache_mxJPO _paramCache,
+                       final boolean _create,
+                       final File _file,
+                       final String _newVersion)
+        throws Exception
+    {
+        this.updateWithCreate = _create;
+        super.update(_paramCache, _create, _file, _newVersion);
     }
 
     /**
@@ -390,8 +460,31 @@ public class Policy_mxJPO
             final PolicyDefParser_mxJPO parser = new PolicyDefParser_mxJPO(new StringReader(code));
             final Policy_mxJPO policy = parser.policy(_paramCache, this.getTypeDef(), _args[1]);
 
-            final StringBuilder cmd = new StringBuilder()
-                    .append("escape mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ");
+            final StringBuilder cmd = new StringBuilder();
+
+            // creates policy if done within update
+            if (this.updateWithCreate)  {
+                _paramCache.logDebug("    - create policy");
+                cmd.append("escape add policy \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"');
+                if ((policy.delimiter != null) && !policy.delimiter.isEmpty())  {
+                    cmd.append("delimiter ").append(policy.delimiter).append(" ")
+                        .append("minorsequence \"").append(policy.minorsequence).append("\" ")
+                        .append("majorsequence \"").append(policy.majorsequence).append('\"');
+                }
+                cmd.append(';');
+            // check that delimiter is NOT updated
+            } else if (((this.delimiter == null) && (policy.delimiter != null) && !policy.delimiter.isEmpty())
+                    || ((this.delimiter != null) && !this.delimiter.isEmpty() && (policy.delimiter == null))
+                    || ((this.delimiter != null) && !this.delimiter.equals(policy.delimiter)))  {
+                throw new UpdateException_mxJPO(
+                        UpdateException_mxJPO.Error.DM_POLICY_UPDATE_DELIMITER,
+                        this.getTypeDef().getLogging(),
+                        this.getName(),
+                        this.delimiter,
+                        policy.delimiter);
+            }
+
+            cmd.append("escape mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ");
 
             // basic information
             this.calcValueDelta(cmd, "description", policy.getDescription(), this.getDescription());
@@ -423,7 +516,10 @@ public class Policy_mxJPO
                 this.calcValueDelta(cmd, "defaultformat", policy.defaultFormat, this.defaultFormat);
             }
 
-            this.calcValueDelta(cmd, "sequence", policy.sequence, this.sequence);
+            this.calcValueDelta(cmd, "sequence", policy.minorsequence, this.minorsequence);
+            if (_paramCache.getValueBoolean(Policy_mxJPO.PARAM_SUPPORT_MAJOR_MINOR))  {
+                this.calcValueDelta(cmd, "majorsequence", policy.majorsequence, this.majorsequence);
+            }
             // hidden flag, because hidden flag must be set with special syntax
             if (this.isHidden() != policy.isHidden())  {
                 cmd.append(' ');
@@ -468,7 +564,7 @@ public class Policy_mxJPO
                 _cmd.append(" add allstate public none owner none");
             }
             _cmd.append(" allstate");
-            _newPolicy.allStateAccess.calcDelta(_cmd, this.allStateAccess);
+            _newPolicy.allStateAccess.calcDelta(_paramCache, _cmd, this.allStateAccess);
             _cmd.append(";\n");
         } else if (this.allState)  {
             _cmd.append("escape mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName()))
@@ -529,7 +625,7 @@ throw new Exception("some states are not defined anymore!");
             .append("escape mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"');
         for (final Map.Entry<State, State> entry : stateDeltaMap.entrySet())  {
             _cmd.append(" state \"").append(StringUtil_mxJPO.convertMql(entry.getKey().name)).append('\"');
-            entry.getKey().calcDelta(_cmd, entry.getValue());
+            entry.getKey().calcDelta(_paramCache, _cmd, entry.getValue());
         }
 
         // set symbolic names for all policy states
@@ -725,7 +821,6 @@ throw new Exception("some states are not defined anymore!");
                 this.parsingAccess.peek().access.add(_url.replaceAll("^/userAccessList/userAccess/access/", "").replaceAll("Access$", "").toLowerCase());
             } else if ("/userAccessList/userAccess/expressionFilter".equals(_url))  {
                 this.parsingAccess.peek().filter = _content;
-
             } else  {
                 ret = false;
             }
@@ -764,10 +859,12 @@ throw new Exception("some states are not defined anymore!");
          * <li>{@link #userAccessSorted user access}</li>
          * </ul>
          *
+         * @param _paramCache   parameter cache
          * @param _out      writer instance
          * @throws IOException if the TCL update code could not be written
          */
-        protected void writeObject(final Appendable _out)
+        protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                                   final Appendable _out)
             throws IOException
         {
             // owner access
@@ -841,7 +938,8 @@ throw new Exception("some states are not defined anymore!");
          * @param _oldAccess    current access definition
          * @throws IOException if write failed
          */
-        protected void calcDelta(final Appendable _out,
+        protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                                 final Appendable _out,
                                  final Access _oldAccess)
             throws IOException
         {
@@ -1091,19 +1189,28 @@ throw new Exception("some states are not defined anymore!");
         }
 
         /**
-         * Writes specific information about this state to the given writer
-         * instance.
+         * {@inheritDoc}
+         * Further the complete information about the state is written:
          * <ul>
+         * <li>{@link #name state name}
+         * <li>{@link #symbolicNames symbolic name of the state}
+         * <li>{@link #revisionable minor is revisionable}
+         * <li>{@link #majorrevisionable major is revisionable}
+         * <li>{@link #versionable}
+         * <li>{@link #autoPromotion auto promote}
+         * <li>{@link #checkoutHistory}
+         * <li>branches
+         * <li>events
+         * <li>triggers
+         * <li>signatures
          * </ul>
-         *
-         * @param _out      writer instance
-         * @throws IOException if the TCL update code could not be written
          */
-        @Override
-        protected void writeObject(final Appendable _out)
-                throws IOException
+        @Override()
+        protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                                   final Appendable _out)
+            throws IOException
         {
-            // basics
+            // state name and registered name
             _out.append("\n  state \"").append(StringUtil_mxJPO.convertTcl(this.name)).append("\"  {");
             if (this.symbolicNames.isEmpty())  {
                 _out.append("\n    registeredName \"")
@@ -1128,7 +1235,7 @@ throw new Exception("some states are not defined anymore!");
                     .append(StringUtil_mxJPO.convertTcl(this.routeMessage)).append('\"');
             }
             // write access statements
-            super.writeObject(_out);
+            super.writeObject(_paramCache, _out);
             _out.append("\n    action \"").append(StringUtil_mxJPO.convertTcl(this.actionProgram))
                 .append("\" input \"").append(StringUtil_mxJPO.convertTcl(this.actionInput)).append('\"')
                 .append("\n    check \"").append(StringUtil_mxJPO.convertTcl(this.checkProgram))
@@ -1147,13 +1254,10 @@ throw new Exception("some states are not defined anymore!");
         }
 
         /**
-         *
-         * @param _out      appendable instance where the delta must be append
-         * @param _oldState old state to compare to (or <code>null</code> if
-         *                  this state is new)
-         * @throws IOException if the delta could not appended
+         * {@inheritDoc}
          */
-        protected void calcDelta(final Appendable _out,
+        protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                                 final Appendable _out,
                                  final State _oldState)
             throws IOException
         {
@@ -1166,6 +1270,10 @@ throw new Exception("some states are not defined anymore!");
                 .append(" input \"").append(StringUtil_mxJPO.convertMql(this.actionInput)).append('\"')
                 .append(" check \"").append(StringUtil_mxJPO.convertMql(this.checkProgram)).append('\"')
                 .append(" input \"").append(StringUtil_mxJPO.convertMql(this.checkInput)).append('\"');
+            // major revision (if supported)
+            if (_paramCache.getValueBoolean(Policy_mxJPO.PARAM_SUPPORT_MAJOR_MINOR))  {
+                _out.append(" majorrevision ").append(String.valueOf(this.majorrevisionable));
+            }
             // route message
             _out.append(" route message \"").append(StringUtil_mxJPO.convertMql(this.routeMessage)).append('\"');
             for (final String routeUser : this.routeUsers)  {
@@ -1173,7 +1281,7 @@ throw new Exception("some states are not defined anymore!");
                     _out.append(" add route \"").append(StringUtil_mxJPO.convertMql(routeUser)).append('\"');
                 }
             }
-            super.calcDelta(_out, _oldState);
+            super.calcDelta(_paramCache, _out, _oldState);
             // triggers
             if (_oldState != null)  {
                 for (final Trigger trigger : _oldState.triggers.values())  {

@@ -73,7 +73,6 @@ public class PersonTest
     public Object[][] getPersons()
     {
         final List<Object[]> data = new ArrayList<Object[]>();
-        data.addAll(Arrays.asList(super.getPersons()));
 
         data.add(new Object[]{
                 "person with promote to active",
@@ -126,7 +125,12 @@ public class PersonTest
                         .addMemberOf(new DepartmentData(this, "test 'department'"), "Project Member", "role_Employee")
                         .setState("Active")});
 
-        return data.toArray(new Object[data.size()][]);
+
+        final List<Object[]> ret = new ArrayList<Object[]>();
+        ret.addAll(Arrays.asList(super.getPersons()));
+        ret.addAll(Arrays.asList(super.prepareData((String) null, data.toArray(new Object[data.size()][]))));
+
+        return ret.toArray(new Object[ret.size()][]);
     }
 
     /**

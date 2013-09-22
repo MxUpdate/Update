@@ -56,8 +56,6 @@ public class PolicyData
     static  {
         PolicyData.REQUIRED_EXPORT_VALUES.put("description", "");
         PolicyData.REQUIRED_EXPORT_VALUES.put("defaultformat", "");
-        PolicyData.REQUIRED_EXPORT_VALUES.put("sequence", "");
-        PolicyData.REQUIRED_EXPORT_VALUES.put("majorsequence", "");
         PolicyData.REQUIRED_EXPORT_VALUES.put("store", "");
         PolicyData.REQUIRED_EXPORT_VALUES.put("hidden", "false");
     }
@@ -215,10 +213,14 @@ public class PolicyData
             .append("  hidden \"").append(this.getFlag("hidden") != null ? this.getFlag("hidden") : false).append("\"\n");
 
         // values
-        for (final Map.Entry<String,String> entry : this.getValues().entrySet())  {
-            strg.append(' ').append(entry.getKey()).append(" \"")
-                .append(AbstractTest.convertTcl(entry.getValue()))
-                .append('\"');
+        for (final Map.Entry<String,Object> entry : this.getValues().entrySet())  {
+            if (entry.getValue() instanceof Character)  {
+                strg.append(' ').append(entry.getKey()).append(' ').append(entry.getValue());
+            } else  {
+                strg.append(' ').append(entry.getKey()).append(" \"")
+                    .append(AbstractTest.convertTcl(entry.getValue().toString()))
+                    .append('\"');
+            }
         }
 
         // type definition
@@ -394,12 +396,20 @@ public class PolicyData
                                 "required check that minimum and maximum one " + valueName + " is defined");
         }
         // check for defined values
-        for (final Map.Entry<String,String> entry : this.getValues().entrySet())  {
-            this.checkSingleValue(_exportParser,
-                                  entry.getKey(),
-                                  entry.getKey(),
-                                  "\"" + AbstractTest.convertTcl(entry.getValue()) + "\"");
+        for (final Map.Entry<String,Object> entry : this.getValues().entrySet())  {
+            if (entry.getValue() instanceof Character)  {
+                this.checkSingleValue(_exportParser,
+                        entry.getKey(),
+                        entry.getKey(),
+                        entry.getValue().toString());
+            } else  {
+                this.checkSingleValue(_exportParser,
+                                      entry.getKey(),
+                                      entry.getKey(),
+                                      "\"" + AbstractTest.convertTcl(entry.getValue().toString()) + "\"");
+            }
         }
+
         // check for hidden flag
         if ((this.getFlag("hidden") == null) || !this.getFlag("hidden"))  {
             this.checkSingleValue(_exportParser,
@@ -746,7 +756,7 @@ public class PolicyData
                 if ("state".equals(line.getTag()) && line.getValue().startsWith(value))  {
                     found = true;
 
-                    // prepare export definition
+                    // access filter
                     String exportAccess  = "";
                     for (final Line subLine : line.getChildren())  {
                         if (subLine.getTag().equals("public")
@@ -758,7 +768,6 @@ public class PolicyData
                             exportAccess += "      " + subLine.getTag() + ' ' + subLine.getValue() + '\n';
                         }
                     }
-                    // prepare expected definition
                     final StringBuilder expAccess = new StringBuilder();
                     for (final AccessFilter accessFilter : this.accessFilters)  {
                         accessFilter.append4CIFile(expAccess);
@@ -768,6 +777,7 @@ public class PolicyData
                             expAccess.toString(),
                             "check access definition for state " + line.getValue());
 
+                    // signature
                     for (final PolicyData.Signature signature : this.signatures)  {
                         signature.checkExport(line);
                     }

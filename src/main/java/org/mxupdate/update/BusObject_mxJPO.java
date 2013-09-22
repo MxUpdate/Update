@@ -837,6 +837,7 @@ public class BusObject_mxJPO
          *         attribute name is lexicographically greater than the
          *         compared attribute name
          */
+        @Override()
         public int compareTo(final AttributeValue _attribute)
         {
             final String name1 = this.name.replaceAll(" [0-9]*$", "");
@@ -977,6 +978,7 @@ public class BusObject_mxJPO
          *         connection
          * @see #compareToAttr
          */
+        @Override()
         public int compareTo(final Connection _compare)
         {
             return this.direction.equals(_compare.direction)

@@ -20,15 +20,12 @@
 
 package org.mxupdate.test.ci.datamodel;
 
-import org.mxupdate.test.AbstractDataExportUpdate;
-import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.PolicyData;
 import org.mxupdate.test.data.datamodel.PolicyData.AccessFilter;
 import org.mxupdate.test.data.datamodel.PolicyData.AllState;
 import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.test.util.Version;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -39,20 +36,8 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 public class Policy_AllStateTest
-    extends AbstractDataExportUpdate<PolicyData>
+    extends AbstractPolicyTest
 {
-    /**
-     * Creates for given <code>_name</code> a new policy instance.
-     *
-     * @param _name     name of the policy instance
-     * @return policy instance
-     */
-    @Override()
-    protected PolicyData createNewData(final String _name)
-    {
-        return new PolicyData(this, _name);
-    }
-
     /**
      * Data provider for test policies.
      *
@@ -331,23 +316,6 @@ public class Policy_AllStateTest
                                                 .addAccess("all")))}
                 );
     }
-
-    /**
-     * Deletes all test data model object.
-     *
-     * @throws Exception if clean up failed
-     */
-    @BeforeMethod()
-    public void cleanup()
-        throws Exception
-    {
-        this.cleanup(AbstractTest.CI.DM_POLICY);
-        this.cleanup(AbstractTest.CI.DM_TYPE);
-        this.cleanup(AbstractTest.CI.DM_FORMAT);
-        this.cleanup(AbstractTest.CI.USR_GROUP);
-        this.cleanup(AbstractTest.CI.USR_PERSONADMIN);
-        this.cleanup(AbstractTest.CI.USR_ROLE);
-   }
 
     /**
      * Test update of policy with all state and without allstate.

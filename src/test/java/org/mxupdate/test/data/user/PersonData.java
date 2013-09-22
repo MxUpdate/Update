@@ -294,7 +294,7 @@ public class PersonData
                     .append("escape add bus \"").append(AbstractTest.convertMql(this.getCI().getBusType()))
                     .append("\" \"").append(AbstractTest.convertMql(this.getName()))
                     .append("\" \"-")
-                    .append("\" description \"").append(AbstractTest.convertMql((this.getValue("description") != null) ? this.getValue("description") : ""))
+                    .append("\" description \"").append(AbstractTest.convertMql((this.getValue("description") != null) ? this.getValue("description").toString() : ""))
                     .append("\" policy \"").append(AbstractTest.convertMql(this.getCI().getBusPolicy()))
                     .append("\" vault \"").append(AbstractTest.convertMql(this.getCI().getBusVault()))
                     .append('\"');

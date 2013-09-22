@@ -23,6 +23,7 @@ package org.mxupdate.test.ci.datamodel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
@@ -92,12 +93,19 @@ public abstract class AbstractDataWithAttributesExportUpdateTest<DATAWITHATTRIBU
      * @param _original     original data instance
      * @return new data instance (where all original data is cleaned)
      */
-    @Override
-    @SuppressWarnings("unchecked")
+    @Override()
     protected DATAWITHATTRIBUTE createCleanNewData(final DATAWITHATTRIBUTE _original)
     {
-        return (DATAWITHATTRIBUTE) this.createNewData(_original.getName().substring(AbstractTest.PREFIX.length()))
+        @SuppressWarnings("unchecked")
+        final DATAWITHATTRIBUTE ret = (DATAWITHATTRIBUTE) this.createNewData(_original.getName().substring(AbstractTest.PREFIX.length()))
                                        .addAttribute(_original.getAttributes().toArray(new AbstractAttributeData<?>[_original.getAttributes().size()]));
+
+        // define all required values to empty values so that they are checked
+        for (final Map.Entry<String,String> value : ret.getRequiredExportValues().entrySet())  {
+            ret.setValue(value.getKey(), value.getValue());
+        }
+
+        return ret;
     }
 
     /**
@@ -106,18 +114,21 @@ public abstract class AbstractDataWithAttributesExportUpdateTest<DATAWITHATTRIBU
      *
      * @param _description  description of the test case
      * @param _data         data to test
+     * @param _expData      expected data
      * @throws Exception if test failed
      */
     @Test(dataProvider = "data",
           description = "test update of already created data")
     public void testUpdate4Created(final String _description,
-                                   final DATAWITHATTRIBUTE _data)
+                                   final DATAWITHATTRIBUTE _data,
+                                   final DATAWITHATTRIBUTE _expData)
         throws Exception
     {
         _data.create()
              .appendIgnoredAttributes()
              .appendRemoveAttributes()
-             .update()
+             .update();
+        _expData
              .checkExport();
     }
 

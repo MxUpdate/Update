@@ -272,9 +272,9 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         }
 
         // values
-        for (final Map.Entry<String,String> entry : this.getValues().entrySet())  {
+        for (final Map.Entry<String,Object> entry : this.getValues().entrySet())  {
             _cmd.append(' ').append(entry.getKey()).append(" \"")
-                .append(AbstractTest.convertTcl(entry.getValue()))
+                .append(AbstractTest.convertTcl(entry.getValue().toString()))
                 .append('\"');
         }
         // check for add values
@@ -324,10 +324,14 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         }
 
         // values
-        for (final Map.Entry<String,String> entry : this.getValues().entrySet())  {
-            _cmd.append(' ').append(entry.getKey()).append(" \"")
-                .append(AbstractTest.convertMql(entry.getValue()))
-                .append('\"');
+        for (final Map.Entry<String,Object> entry : this.getValues().entrySet())  {
+            if (entry.getValue() instanceof Character)  {
+                _cmd.append(' ').append(entry.getKey()).append(' ').append(entry.getValue());
+            } else  {
+                _cmd.append(' ').append(entry.getKey()).append(" \"")
+                    .append(AbstractTest.convertMql(entry.getValue().toString()))
+                    .append('\"');
+            }
         }
         // properties
         for (final PropertyDef property : this.properties)  {
@@ -360,8 +364,8 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         this.checkExportProperties(_exportParser);
         Assert.assertEquals(_exportParser.getSymbolicName(), this.getSymbolicName(), "check symbolic name");
         // check for defined values
-        for (final Map.Entry<String,String> entry : this.getValues().entrySet())  {
-            this.checkSingleValue(_exportParser, entry.getKey(), entry.getKey(), "\"" + AbstractTest.convertTcl(entry.getValue()) + "\"");
+        for (final Map.Entry<String,Object> entry : this.getValues().entrySet())  {
+            this.checkSingleValue(_exportParser, entry.getKey(), entry.getKey(), "\"" + AbstractTest.convertTcl(entry.getValue().toString()) + "\"");
         }
         // check for all required flags
         if (!this.requiredExportFlags.isEmpty())  {

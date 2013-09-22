@@ -148,6 +148,12 @@ public class ConfigSystemSearchIndex_mxJPO
 throw new Exception("delete of search index not possible!");
     }
 
+    /**
+     * Deactivated because not possible.
+     *
+     * @param _paramCache   not used
+     * @param _file         file
+     */
     @Override()
     public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
@@ -158,6 +164,7 @@ throw new Exception("create of search index not possible!");
 
     @Override()
     public void update(final ParameterCache_mxJPO _paramCache,
+                       final boolean _create,
                        final File _file,
                        final String _newVersion)
         throws MatrixException

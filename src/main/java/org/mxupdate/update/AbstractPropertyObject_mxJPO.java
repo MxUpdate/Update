@@ -318,11 +318,12 @@ public abstract class AbstractPropertyObject_mxJPO
      * required, the file is read and the object is updated with
      * {@link #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)}.
      *
-     * @param _paramCache       parameter cache
-     * @param _file             file with TCL update code
-     * @param _newVersion       new version which must be set within the update
-     *                          (or <code>null</code> if the version must not
-     *                          be set).
+     * @param _paramCache   parameter cache
+     * @param _create       <i>true</i> if the CI object is new created (and
+     *                      first update is done)
+     * @param _file         file with TCL update code
+     * @param _newVersion   new version which must be set within the update
+     *                      (or {@code null} if the version must not be set).
      * @throws Exception if the update from the derived class failed
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      * @see #extractFromCode(StringBuilder, String, String)
@@ -335,6 +336,7 @@ public abstract class AbstractPropertyObject_mxJPO
      */
     @Override()
     public void update(final ParameterCache_mxJPO _paramCache,
+                       final boolean _create,
                        final File _file,
                        final String _newVersion)
         throws Exception

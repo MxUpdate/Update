@@ -547,21 +547,24 @@ public class Person_mxJPO
      * Parses first the business object representation and then updates the
      * person using the administration representation.
      *
-     * @param _paramCache       parameter cache with MX context
-     * @param _file             file used for update
-     * @param _newVersion       new target version
+     * @param _paramCache   parameter cache with MX context
+     * @param _create       <i>true</i> if the CI object is new created (and
+     *                      first update is done)
+     * @param _file         file used for update
+     * @param _newVersion   new target version
      * @throws Exception if parse or update failed
      * @see PersonBus#parse(ParameterCache_mxJPO)
      * @see PersonAdmin#update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     @Override()
     public void update(final ParameterCache_mxJPO _paramCache,
+                       final boolean _create,
                        final File _file,
                        final String _newVersion)
         throws Exception
     {
         this.personBus.parse(_paramCache);
-        this.personAdmin.update(_paramCache, _file, _newVersion);
+        this.personAdmin.update(_paramCache, _create, _file, _newVersion);
     }
 
     @Override()
@@ -1081,6 +1084,7 @@ public class Person_mxJPO
         /**
          * {@inheritDoc}
          */
+        @Override()
         public int compareTo(final ReferencedOrganization _other)
         {
             int ret = this.type.compareTo(_other.type);

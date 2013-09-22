@@ -87,8 +87,11 @@ public final class UpdateUtil_mxJPO
                               final Map<TypeDef_mxJPO,Map<File,String>> _clazz2names)
         throws Exception
     {
+        // fetch existing CI's
+        final Map<TypeDef_mxJPO,Set<String>> existingNames = UpdateUtil_mxJPO.getExistingCIs(_paramCache, _clazz2names.keySet());
+
         // create if needed (and not in the list of existing objects)
-        UpdateUtil_mxJPO.create(_paramCache, _clazz2names);
+        UpdateUtil_mxJPO.create(_paramCache, existingNames, _clazz2names);
 
         // update
         final List<AbstractObject_mxJPO> compiles = new ArrayList<AbstractObject_mxJPO>();
@@ -96,6 +99,8 @@ public final class UpdateUtil_mxJPO
         for (final TypeDef_mxJPO clazz : _paramCache.getMapping().getAllTypeDefsSorted())  {
             final Map<File,String> clazzMap = _clazz2names.get(clazz);
             if (clazzMap != null)  {
+                final Set<String> existings = existingNames.get(clazz);
+
                 for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
                     final AbstractObject_mxJPO instance = clazz.newTypeInstance(fileEntry.getValue());
                     _paramCache.logInfo("check "+instance.getTypeDef().getLogging()
@@ -107,8 +112,12 @@ public final class UpdateUtil_mxJPO
                                     : _paramCache.getValueString(ParameterCache_mxJPO.KEY_VERSION);
                     if (_paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_CHECK_FILE_DATE))  {
                         final Date fileDate = new Date(fileEntry.getKey().lastModified());
-                        final String instDateString = instance.getPropValue(_paramCache,
-                                                                            PropertyDef_mxJPO.FILEDATE);
+                        final String instDateString;
+                        if (existings.contains(fileEntry.getValue()))  {
+                            instDateString = instance.getPropValue(_paramCache, PropertyDef_mxJPO.FILEDATE);
+                        } else  {
+                            instDateString = null;
+                        }
                         Date instDate;
                         if ((instDateString == null) || "".equals(instDateString))  {
                             instDate = null;
@@ -126,15 +135,18 @@ public final class UpdateUtil_mxJPO
                             _paramCache.logDebug("    - update to version from " + fileDate);
                         }
                     } else if (_paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_CHECK_VERSION))  {
-                        final String instVersion = instance.getPropValue(_paramCache,
-                                                                        PropertyDef_mxJPO.VERSION);
-                        if (instVersion.equals(version))  {
+                        final String instVersion;
+                        if (existings.contains(fileEntry.getValue()))  {
+                            instVersion = instance.getPropValue(_paramCache, PropertyDef_mxJPO.VERSION);
+                        } else  {
+                            instVersion = null;
+                        }
+                        if ((instVersion != null) && instVersion.equals(version))  {
                             update = false;
                         } else  {
                             update = true;
                             if (_paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_FILEDATE2VERSION))  {
-                                _paramCache.logDebug("    - update to version from "
-                                       + new Date(fileEntry.getKey().lastModified()));
+                                _paramCache.logDebug("    - update to version from " + new Date(fileEntry.getKey().lastModified()));
                             } else  {
                                 _paramCache.logDebug("    - update to version " + version);
                             }
@@ -144,7 +156,9 @@ public final class UpdateUtil_mxJPO
                         _paramCache.logDebug("    - update");
                     }
                     // execute update
-                    if (update && UpdateUtil_mxJPO.updateOne(_paramCache, instance, fileEntry.getKey(), version) && compile)  {
+                    if (update
+                            && UpdateUtil_mxJPO.updateOne(_paramCache, !existings.contains(fileEntry.getValue()), instance, fileEntry.getKey(), version)
+                            && compile)  {
                         compiles.add(instance);
                     }
                 }
@@ -182,23 +196,22 @@ public final class UpdateUtil_mxJPO
      * Creates not existing CI's.
      *
      * @param _paramCache       parameter cache (used to get the MX context)
+     * @param _existingNames    already existing names
      * @param _clazz2names      depending on the type definition the related
      *                          files with MX name which must be updated
      * @throws Exception if create failed
      */
     protected static void create(final ParameterCache_mxJPO _paramCache,
+                                 final Map<TypeDef_mxJPO,Set<String>> _existingNames,
                                  final Map<TypeDef_mxJPO,Map<File,String>> _clazz2names)
         throws Exception
     {
-        // evaluate for existing administration objects
-        final Map<TypeDef_mxJPO,Set<String>> existingNames = UpdateUtil_mxJPO.getExistingCIs(_paramCache, _clazz2names.keySet());
-
         // create if needed (and not in the list of existing objects)
         for (final TypeDef_mxJPO clazz : _paramCache.getMapping().getAllTypeDefsSorted())  {
             final Map<File,String> clazzMap = _clazz2names.get(clazz);
             if (clazzMap != null)  {
                 for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
-                    final Set<String> existings = existingNames.get(clazz);
+                    final Set<String> existings = _existingNames.get(clazz);
                     if (!existings.contains(fileEntry.getValue()))  {
                         final AbstractObject_mxJPO instance = clazz.newTypeInstance(fileEntry.getValue());
                         _paramCache.logInfo("create "+instance.getTypeDef().getLogging() + " '" + fileEntry.getValue() + "'");
@@ -213,14 +226,17 @@ public final class UpdateUtil_mxJPO
      * Updates on <code>_file</code> for <code>_instance</code> within a
      * transaction (if a transaction was not already started).
      *
-     * @param _paramCache       parameter cache (used to get the MX context)
-     * @param _instance         instance to update
-     * @param _file             file with target definition
-     * @param _version          version to update
+     * @param _paramCache   parameter cache (used to get the MX context)
+     * @param _create       <i>true</i> if the CI object is new created (and
+     *                      first update is done)
+     * @param _instance     instance to update
+     * @param _file         file with target definition
+     * @param _version      version to update
      * @return <i>true</i> if update was done; otherwise <i>false</i>
      * @throws Exception if update of the instance failed
      */
     protected static boolean updateOne(final ParameterCache_mxJPO _paramCache,
+                                       final boolean _create,
                                        final AbstractObject_mxJPO _instance,
                                        final File _file,
                                        final String _version)
@@ -232,7 +248,7 @@ public final class UpdateUtil_mxJPO
             if (!transActive)  {
                 _paramCache.getContext().start(true);
             }
-            _instance.update(_paramCache, _file, _version);
+            _instance.update(_paramCache, _create, _file, _version);
             if (!transActive)  {
                 _paramCache.getContext().commit();
             }

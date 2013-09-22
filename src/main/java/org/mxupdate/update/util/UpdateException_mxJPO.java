@@ -47,6 +47,7 @@ public class UpdateException_mxJPO
      *     <li>121: {@link org.mxupdate.update.datamodel.AbstractDMWithAttributes_mxJPO data model with attributes}</li>
      *     <li>106: {@link org.mxupdate.update.datamodel.Dimension_mxJPO dimension}</li>
      *     <li>109: {@link org.mxupdate.update.datamodel.Interface_mxJPO interface}</li>
+     *     <li>111: {@link org.mxupdate.update.datamodel.Policy_mxJPO policy}</li>
      *     <li>601: {@link org.mxupdate.update.AbstractObject_mxJPO abstract object}</li>
      *     <li>602: {@link org.mxupdate.update.AbstractAdminObject_mxJPO abstract administration object}</li>
      *     <li>603: {@link org.mxupdate.update.AbstractPropertyObject_mxJPO abstract property object}</li>
@@ -211,6 +212,24 @@ public class UpdateException_mxJPO
          */
         DM_INTERFACE_UPDATE_WRONG_NAME(10902,
                 "{0} ''{1}'' was called to update via update script, but {0} ''{1}'' was called in the TCL procedure."),
+
+        /**
+         * <p>The delimiter of an existing policy is not equal to the new
+         * defined.</p>
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>administration type (should be policy)</li>
+         * <li>name of the policy</li>
+         * <li>current delimiter</li>
+         * <li>new delimiter (from the CI file)</li>
+         * </ol>
+         * </p>
+         *
+         * @see org.mxupdate.update.datamodel.Policy_mxJPO
+         */
+        DM_POLICY_UPDATE_DELIMITER(11101,
+                "The existing delimiter ''{2}'' of {0} ''{1}'' can be not updated to new delimiter ''{3}'' (limitation of MX)."),
 
         /**
          * <p>An interface is already derived from another interface, but

@@ -99,9 +99,9 @@ public class QueryData<USER extends AbstractUserData<?>>
         throws MatrixException
     {
         // cache type, name and revision
-        final String type = this.getValue("type");
-        final String name = this.getValue("name");
-        final String revision = this.getValue("revision");
+        final String type = this.getValue("type").toString();
+        final String name = this.getValue("name").toString();
+        final String revision = this.getValue("revision").toString();
 
         // remove type, name and revision from values
         this.getValues().remove("type");
@@ -140,9 +140,9 @@ public class QueryData<USER extends AbstractUserData<?>>
     protected void append4CIFileValues(final StringBuilder _cmd)
     {
         // cache type, name and revision
-        final String type = this.getValue("type");
-        final String name = this.getValue("name");
-        final String revision = this.getValue("revision");
+        final String type = this.getValue("type").toString();
+        final String name = this.getValue("name").toString();
+        final String revision = this.getValue("revision").toString();
 
         // cache type, name and revision
         this.getValues().remove("type");
@@ -176,14 +176,14 @@ public class QueryData<USER extends AbstractUserData<?>>
      * @param _exportParser     parsed export
      * @throws MatrixException if check failed
      */
-    @Override
+    @Override()
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
         // cache type, name and revision
-        final String type = this.getValue("type");
-        final String name = this.getValue("name");
-        final String revision = this.getValue("revision");
+        final String type = this.getValue("type").toString();
+        final String name = this.getValue("name").toString();
+        final String revision = this.getValue("revision").toString();
 
         // cache type, name and revision
         this.getValues().remove("type");

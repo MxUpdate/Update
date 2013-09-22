@@ -1,6 +1,5 @@
 package org.mxupdate.test.ci.datamodel;
 
-import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.PolicyData;
 import org.mxupdate.test.data.datamodel.PolicyData.AccessFilter;
@@ -9,7 +8,6 @@ import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.test.util.Version;
 import org.testng.Assert;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -20,41 +18,10 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 public class Policy_AccessUserTest
-    extends AbstractDataExportUpdate<PolicyData>
+    extends AbstractPolicyTest
 {
     /** Name of test policy. */
     private static final String POLICY_NAME = AbstractTest.PREFIX + "Test";
-
-    /**
-     * Creates for given <code>_name</code> a new policy instance.
-     *
-     * @param _name     name of the policy instance
-     * @return policy instance
-     */
-    @Override()
-    protected PolicyData createNewData(final String _name)
-    {
-        return new PolicyData(this, _name);
-    }
-
-
-    /**
-     * Creates a clean data instance used to update an existing data instance.
-     *
-     * @param _original     original data instance
-     * @return new data instance (where all original data is cleaned)
-     */
-    @Override()
-    protected PolicyData createCleanNewData(final PolicyData _original)
-    {
-        final PolicyData ret = this.createNewData(_original.getName().substring(AbstractTest.PREFIX.length()));
-
-        for (final State state : _original.getStates())  {
-            ret.addState(new State().setName(state.getName()));
-        }
-
-        return ret;
-    }
 
     /**
      * Data provider for test policies.
@@ -152,23 +119,6 @@ public class Policy_AccessUserTest
                                                 .addAccess("all")))}
         );
     }
-
-    /**
-     * Deletes all test data model object.
-     *
-     * @throws Exception if clean up failed
-     */
-    @BeforeMethod()
-    public void cleanup()
-        throws Exception
-    {
-        this.cleanup(AbstractTest.CI.DM_POLICY);
-        this.cleanup(AbstractTest.CI.DM_TYPE);
-        this.cleanup(AbstractTest.CI.DM_FORMAT);
-        this.cleanup(AbstractTest.CI.USR_GROUP);
-        this.cleanup(AbstractTest.CI.USR_PERSONADMIN);
-        this.cleanup(AbstractTest.CI.USR_ROLE);
-   }
 
     /**
      * Test create owner access with empty owner filter definition.

@@ -779,6 +779,7 @@ abstract class AbstractAttribute_mxJPO
          * @return &quot;0&quot; if both ranges are equal; &quot;1&quot; if
          *         greater; otherwise &quot;-1&quot;
          */
+        @Override()
         public int compareTo(final Range _range)
         {
             int ret = this.type.compareTo(_range.type);

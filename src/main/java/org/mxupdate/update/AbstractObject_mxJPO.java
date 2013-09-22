@@ -315,14 +315,16 @@ public abstract class AbstractObject_mxJPO
     /**
      * Updated this administration (business) object.
      *
-     * @param _paramCache       parameter cache
-     * @param _file             reference to the file to update
-     * @param _newVersion       new version which must be set within the update
-     *                          (or <code>null</code> if the version must not
-     *                          be set).
+     * @param _paramCache   parameter cache
+     * @param _create       <i>true</i> if the CI object is new created (and
+     *                      first update is done)
+     * @param _file         reference to the file to update
+     * @param _newVersion   new version which must be set within the update (or
+     *                      {@code null} if the version must not be set).
      * @throws Exception if update failed
      */
     public abstract void update(final ParameterCache_mxJPO _paramCache,
+                                final boolean _create,
                                 final File _file,
                                 final String _newVersion)
         throws Exception;

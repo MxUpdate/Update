@@ -311,6 +311,8 @@ public abstract class AbstractAdminObject_mxJPO
         reader.parse(inputSource);
         // prepare post preparation
         this.prepare(_paramCache);
+        // reads symbolic names of the administration objects
+        this.readSymbolicNames(_paramCache);
     }
 
     /**
@@ -439,9 +441,6 @@ public abstract class AbstractAdminObject_mxJPO
         if (version != null)  {
             this.setVersion(version.getValue());
         }
-
-        // reads symbolic names of the administration objects
-        this.readSymbolicNames(_paramCache);
     }
 
     /**
@@ -517,7 +516,7 @@ public abstract class AbstractAdminObject_mxJPO
                 if (!"".equals(this.getTypeDef().getMxAdminSuffix()))  {
                     _out.append(' ').append(this.getTypeDef().getMxAdminSuffix());
                 }
-                if ((prop.getRefAdminName()) != null && (prop.getRefAdminType() != null))  {
+                if (((prop.getRefAdminName()) != null) && (prop.getRefAdminType() != null))  {
                     _out.append("  \\\n    to ").append(prop.getRefAdminType())
                         .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getRefAdminName())).append("\"");
                     // if target is a table, a system is required!

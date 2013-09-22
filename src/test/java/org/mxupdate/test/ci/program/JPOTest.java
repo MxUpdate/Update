@@ -88,7 +88,7 @@ public class JPOTest
         data2.setCode("package " + prgName2.replaceAll("\\.[^.]*$", "") + ";\n"
                      + "public class " + prgName2.replaceAll(".*\\.", "") + "_mxJPO {}");
 
-        return new Object[][]  {
+        return this.prepareData((String) null,
                 new Object[]{
                         "default package",
                         data1},
@@ -112,8 +112,8 @@ public class JPOTest
                         new JPOProgramData(this, "Test1").setCode("public class ${CLASSNAME} { final String str = \"\\\"\";}")},
                 new Object[]{
                         "with execution deferred",
-                        new JPOProgramData(this, "Test1").setCode("test").setDeferred(true)},
-        };
+                        new JPOProgramData(this, "Test1").setCode("test").setDeferred(true)}
+        );
     }
 
     /**
@@ -136,12 +136,14 @@ public class JPOTest
      *
      * @param _description  description of the test data
      * @param _jpoProgram   data collection to test
+     * @param _expProgram   expected data collection (not used)
      * @throws Exception if test failed
      */
     @Test(dataProvider = "data",
           description = "test update of non existing JPOs")
     public void simpleUpdate(final String _description,
-                             final JPOProgramData _jpoProgram)
+                             final JPOProgramData _jpoProgram,
+                             final JPOProgramData _expProgram)
         throws Exception
     {
         // first update with original content

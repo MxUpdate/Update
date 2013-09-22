@@ -124,12 +124,14 @@ public class MQLTest
      *
      * @param _description  description of the test data
      * @param _mqlProgram   data collection to test
+     * @param _expProgram   expected data collection (not used)
      * @throws Exception if test failed
      */
     @Test(dataProvider = "data",
           description = "test update of non existing MQL programs")
     public void simpleUpdate(final String _description,
-                             final MQLProgramData _mqlProgram)
+                             final MQLProgramData _mqlProgram,
+                             final MQLProgramData _expProgram)
         throws Exception
     {
         // create user
