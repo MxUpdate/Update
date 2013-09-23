@@ -182,7 +182,7 @@ public class PolicyDefParser_mxJPO
   final public void allstate(final Policy_mxJPO _policy) throws ParseException_mxJPO {
     final Policy_mxJPO.Access access = this.getField(_policy, "allStateAccess").<Policy_mxJPO.Access>get();
     jj_consume_token(ALLSTATE);
-    jj_consume_token(106);
+    jj_consume_token(108);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -245,7 +245,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(107);
+    jj_consume_token(109);
         this.getField(_policy, "allState").set(true);
   }
 
@@ -261,7 +261,7 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(STATE);
     tmpStr = sString();
                                 this.getField(state, "name").set(tmpStr);
-    jj_consume_token(106);
+    jj_consume_token(108);
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -483,7 +483,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(107);
+    jj_consume_token(109);
         this.appendValue(_policy, "states", state);
   }
 
@@ -495,23 +495,11 @@ public class PolicyDefParser_mxJPO
  */
   final public void stateOwnerAccess(final AccessPrefix _prefix, final Access _access) throws ParseException_mxJPO {
     final AccessFilter accessFilter = new AccessFilter();
-    String filter = null;
-    Set<String> accessSet;
     jj_consume_token(OWNER);
-    accessSet = lList();
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case FILTER:
-      jj_consume_token(FILTER);
-      filter = sString();
-      break;
-    default:
-      ;
-    }
+    stateAccessDef(accessFilter);
         this.getField(accessFilter, "prefix").set(_prefix);
         this.getField(accessFilter, "kind").set("owner");
-        this.getField(accessFilter, "access").set(accessSet);
-        this.getField(accessFilter, "filter").set(filter);
-        ((Map<AccessPrefix,AccessFilter>)(this.getValue(_access, "ownerAccess"))).put(_prefix, accessFilter);
+        ((Map<AccessPrefix,Set<AccessFilter>>)(this.getValue(_access, "ownerAccess"))).get(_prefix).add(accessFilter);
   }
 
 /**
@@ -522,23 +510,11 @@ public class PolicyDefParser_mxJPO
  */
   final public void statePublicAccess(final AccessPrefix _prefix, final Access _access) throws ParseException_mxJPO {
     final AccessFilter accessFilter = new AccessFilter();
-    String filter = null;
-    Set<String> accessSet;
     jj_consume_token(PUBLIC);
-    accessSet = lList();
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case FILTER:
-      jj_consume_token(FILTER);
-      filter = sString();
-      break;
-    default:
-      ;
-    }
+    stateAccessDef(accessFilter);
         this.getField(accessFilter, "prefix").set(_prefix);
         this.getField(accessFilter, "kind").set("public");
-        this.getField(accessFilter, "access").set(accessSet);
-        this.getField(accessFilter, "filter").set(filter);
-        ((Map<AccessPrefix,AccessFilter>)(this.getValue(_access, "publicAccess"))).put(_prefix, accessFilter);
+        ((Map<AccessPrefix,Set<AccessFilter>>)(this.getValue(_access, "publicAccess"))).get(_prefix).add(accessFilter);
   }
 
 /**
@@ -548,26 +524,61 @@ public class PolicyDefParser_mxJPO
  * @param _access   current parsed access definition of the policy
  */
   final public void stateUserAccess(final AccessPrefix _prefix, final Access _access) throws ParseException_mxJPO {
-    final AccessFilter userAccess = new AccessFilter();
-    String user, filter = null;
-    Set<String> accessSet;
+    final AccessFilter accessFilter = new AccessFilter();
+    String user;
     jj_consume_token(USER);
-    user = slString();
-    accessSet = lList();
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case FILTER:
-      jj_consume_token(FILTER);
-      filter = sString();
-      break;
-    default:
-      ;
+    user = sString();
+    stateAccessDef(accessFilter);
+        this.getField(accessFilter, "prefix").set(_prefix);
+        this.getField(accessFilter, "kind").set("user");
+        this.getField(accessFilter, "userRef").set(user);
+        ((Map<AccessPrefix,Set<AccessFilter>>)(this.getValue(_access, "userAccess"))).get(_prefix).add(accessFilter);
+  }
+
+  final public void stateAccessDef(final AccessFilter _accessFilter) throws ParseException_mxJPO {
+    String key = null, filter = null;
+    Token_mxJPO access = null;
+    label_4:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case KEY:
+      case FILTER:
+      case ACCESS:
+        ;
+        break;
+      default:
+        break label_4;
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case KEY:
+        jj_consume_token(KEY);
+        key = sString();
+        break;
+      case FILTER:
+        jj_consume_token(FILTER);
+        filter = sString();
+        break;
+      case ACCESS:
+        access = jj_consume_token(ACCESS);
+        break;
+      default:
+        jj_consume_token(-1);
+        throw new ParseException_mxJPO();
+      }
     }
-        this.getField(userAccess, "prefix").set(_prefix);
-        this.getField(userAccess, "kind").set("user");
-        this.getField(userAccess, "userRef").set(user);
-        this.getField(userAccess, "access").set(accessSet);
-        this.getField(userAccess, "filter").set(filter);
-        ((Map<AccessPrefix,Set<AccessFilter>>)(this.getValue(_access, "userAccess"))).get(_prefix).add(userAccess);
+        this.getField(_accessFilter, "key").set(key);
+        this.getField(_accessFilter, "filter").set(filter);
+
+        if (access == null)  {
+            this.getField(_accessFilter, "access").set(new HashSet<String>());
+        } else  {
+            final String tmp = access.image
+                    .replaceFirst("^\u005c\u005c{", "").replaceFirst("\u005c\u005c}$", "")  // remove {}
+                    .replaceAll("(\u005ct)|(\u005cn)", " ")                       // replace tabs, new lines
+                    .replaceAll("( )+", " ")                            // multiple spaces => one space
+                    .trim();                                            // remove trailing spaces
+            this.getField(_accessFilter, "access").set(new HashSet<String>(java.util.Arrays.asList(tmp.split(" "))));
+        }
   }
 
   final public void stateTrigger(final Policy_mxJPO.State _state) throws ParseException_mxJPO {
@@ -607,8 +618,8 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(SIGNATURE);
     tmpStr = sString();
                                     this.getField(signature, "name").set(tmpStr);
-    jj_consume_token(106);
-    label_4:
+    jj_consume_token(108);
+    label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case FILTER:
@@ -619,7 +630,7 @@ public class PolicyDefParser_mxJPO
         ;
         break;
       default:
-        break label_4;
+        break label_5;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case BRANCH:
@@ -652,7 +663,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(107);
+    jj_consume_token(109);
         this.appendValue(_state, "signatures", signature);
   }
 
@@ -660,7 +671,7 @@ public class PolicyDefParser_mxJPO
     Token_mxJPO tmp;
     Set<String> ret = new HashSet<String>();
     jj_consume_token(LS_CURLY_BRACKET_OPEN);
-    label_5:
+    label_6:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case LS_STRING:
@@ -668,7 +679,7 @@ public class PolicyDefParser_mxJPO
         ;
         break;
       default:
-        break label_5;
+        break label_6;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case LS_STRING:
@@ -703,7 +714,7 @@ public class PolicyDefParser_mxJPO
       jj_consume_token(-1);
       throw new ParseException_mxJPO();
     }
-    label_6:
+    label_7:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case L_STRING:
@@ -712,7 +723,7 @@ public class PolicyDefParser_mxJPO
         ;
         break;
       default:
-        break label_6;
+        break label_7;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case L_STRING:

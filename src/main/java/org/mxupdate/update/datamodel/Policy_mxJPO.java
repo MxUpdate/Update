@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -740,12 +741,28 @@ throw new Exception("some states are not defined anymore!");
     public static class Access
     {
         /** Set holding the complete owner access. */
-        protected Map<AccessPrefix,AccessFilter> ownerAccess = new HashMap<AccessPrefix,AccessFilter>();
+        @SuppressWarnings("serial")
+        protected final Map<AccessPrefix,SortedSet<AccessFilter>> ownerAccess = new HashMap<AccessPrefix,SortedSet<AccessFilter>>()
+        {
+            {
+                for (final AccessPrefix prefix : AccessPrefix.values())  {
+                    this.put(prefix, new TreeSet<AccessFilter>());
+                };
+            }
+        };
         /** Set holding the complete public access. */
-        protected Map<AccessPrefix,AccessFilter> publicAccess = new HashMap<AccessPrefix,AccessFilter>();
+        @SuppressWarnings("serial")
+        protected final Map<AccessPrefix,SortedSet<AccessFilter>> publicAccess = new HashMap<AccessPrefix,SortedSet<AccessFilter>>()
+        {
+            {
+                for (final AccessPrefix prefix : AccessPrefix.values())  {
+                    this.put(prefix, new TreeSet<AccessFilter>());
+                };
+            }
+        };
         /** Sorted set of user access (by name of the user). */
         @SuppressWarnings("serial")
-        protected final Map<AccessPrefix,Set<AccessFilter>> userAccess = new HashMap<AccessPrefix,Set<AccessFilter>>()
+        protected final Map<AccessPrefix,SortedSet<AccessFilter>> userAccess = new HashMap<AccessPrefix,SortedSet<AccessFilter>>()
         {
             {
                 for (final AccessPrefix prefix : AccessPrefix.values())  {
@@ -815,6 +832,8 @@ throw new Exception("some states are not defined anymore!");
 
             } else if ("/userAccessList/userAccess".equals(_url))  {
                 this.parsingAccess.add(new AccessFilter());
+            } else if ("/userAccessList/userAccess/userAccessKey".equals(_url))  {
+                this.parsingAccess.peek().key = _content;
             } else if ("/userAccessList/userAccess/userAccessKind".equals(_url))  {
                 this.parsingAccess.peek().kind = _content;
             } else if ("/userAccessList/userAccess/userAccessLoginRole".equals(_url))  {
@@ -845,9 +864,9 @@ throw new Exception("some states are not defined anymore!");
         {
             for (final AccessFilter userAccess : this.parsingAccess)  {
                 if ("public".equals(userAccess.kind))  {
-                    this.publicAccess.put(userAccess.prefix, userAccess);
+                    this.publicAccess.get(userAccess.prefix).add(userAccess);
                 } else if ("owner".equals(userAccess.kind))  {
-                    this.ownerAccess.put(userAccess.prefix, userAccess);
+                    this.ownerAccess.get(userAccess.prefix).add(userAccess);
                 } else  {
                     this.userAccess.get(userAccess.prefix).add(userAccess);
                 }
@@ -874,22 +893,34 @@ throw new Exception("some states are not defined anymore!");
             throws IOException
         {
             // owner access
-            this.writeObjectOneAccessFilter(_out, this.ownerAccess.get(AccessPrefix.All));
-            this.writeObjectOneAccessFilter(_out, this.ownerAccess.get(AccessPrefix.Login));
-            this.writeObjectOneAccessFilter(_out, this.ownerAccess.get(AccessPrefix.Revoke));
+            for (final AccessFilter accessFilter : this.ownerAccess.get(AccessPrefix.All))  {
+                this.writeObjectOneAccessFilter(_out, accessFilter);
+            }
+            for (final AccessFilter accessFilter : this.ownerAccess.get(AccessPrefix.Login))  {
+                this.writeObjectOneAccessFilter(_out, accessFilter);
+            }
+            for (final AccessFilter accessFilter : this.ownerAccess.get(AccessPrefix.Revoke))  {
+                this.writeObjectOneAccessFilter(_out, accessFilter);
+            }
             // public access
-            this.writeObjectOneAccessFilter(_out, this.publicAccess.get(AccessPrefix.All));
-            this.writeObjectOneAccessFilter(_out, this.publicAccess.get(AccessPrefix.Login));
-            this.writeObjectOneAccessFilter(_out, this.publicAccess.get(AccessPrefix.Revoke));
+            for (final AccessFilter accessFilter : this.publicAccess.get(AccessPrefix.All))  {
+                this.writeObjectOneAccessFilter(_out, accessFilter);
+            }
+            for (final AccessFilter accessFilter : this.publicAccess.get(AccessPrefix.Login))  {
+                this.writeObjectOneAccessFilter(_out, accessFilter);
+            }
+            for (final AccessFilter accessFilter : this.publicAccess.get(AccessPrefix.Revoke))  {
+                this.writeObjectOneAccessFilter(_out, accessFilter);
+            }
             // user access
-            for (final AccessFilter userAccess : this.userAccess.get(AccessPrefix.All))  {
-                this.writeObjectOneAccessFilter(_out, userAccess);
+            for (final AccessFilter accessFilter : this.userAccess.get(AccessPrefix.All))  {
+                this.writeObjectOneAccessFilter(_out, accessFilter);
             }
-            for (final AccessFilter userAccess : this.userAccess.get(AccessPrefix.Login))  {
-                this.writeObjectOneAccessFilter(_out, userAccess);
+            for (final AccessFilter accessFilter : this.userAccess.get(AccessPrefix.Login))  {
+                this.writeObjectOneAccessFilter(_out, accessFilter);
             }
-            for (final AccessFilter userAccess : this.userAccess.get(AccessPrefix.Revoke))  {
-                this.writeObjectOneAccessFilter(_out, userAccess);
+            for (final AccessFilter accessFilter : this.userAccess.get(AccessPrefix.Revoke))  {
+                this.writeObjectOneAccessFilter(_out, accessFilter);
             }
         }
 
@@ -921,6 +952,11 @@ throw new Exception("some states are not defined anymore!");
                     _out.append('\"').append(StringUtil_mxJPO.convertTcl(_accessFilter.userRef)).append("\" ");
                 }
 
+                // key
+                if ((_accessFilter.key != null) && !_accessFilter.key.isEmpty())  {
+                    _out.append("key \"").append(StringUtil_mxJPO.convertTcl(_accessFilter.key)).append("\" ");
+                }
+
                 // access
                 _out.append("{")
                     .append(StringUtil_mxJPO.joinTcl(' ', false, _accessFilter.access, null))
@@ -950,52 +986,61 @@ throw new Exception("some states are not defined anymore!");
             throws IOException
         {
             // owner access
-            this.calcDeltaOneAccessFilter(_out, this.ownerAccess.get(AccessPrefix.All),     (_oldAccess != null) ? _oldAccess.ownerAccess.get(AccessPrefix.All)     : null);
-            this.calcDeltaOneAccessFilter(_out, this.ownerAccess.get(AccessPrefix.Login),   (_oldAccess != null) ? _oldAccess.ownerAccess.get(AccessPrefix.Login)   : null);
-            this.calcDeltaOneAccessFilter(_out, this.ownerAccess.get(AccessPrefix.Revoke),  (_oldAccess != null) ? _oldAccess.ownerAccess.get(AccessPrefix.Revoke)  : null);
+            this.calcDeltaAccessFilters(_out, this.ownerAccess.get(AccessPrefix.All),     (_oldAccess != null) ? _oldAccess.ownerAccess.get(AccessPrefix.All)     : null);
+            this.calcDeltaAccessFilters(_out, this.ownerAccess.get(AccessPrefix.Login),   (_oldAccess != null) ? _oldAccess.ownerAccess.get(AccessPrefix.Login)   : null);
+            this.calcDeltaAccessFilters(_out, this.ownerAccess.get(AccessPrefix.Revoke),  (_oldAccess != null) ? _oldAccess.ownerAccess.get(AccessPrefix.Revoke)  : null);
             // public access
-            this.calcDeltaOneAccessFilter(_out, this.publicAccess.get(AccessPrefix.All),    (_oldAccess != null) ? _oldAccess.publicAccess.get(AccessPrefix.All)    : null);
-            this.calcDeltaOneAccessFilter(_out, this.publicAccess.get(AccessPrefix.Login),  (_oldAccess != null) ? _oldAccess.publicAccess.get(AccessPrefix.Login)  : null);
-            this.calcDeltaOneAccessFilter(_out, this.publicAccess.get(AccessPrefix.Revoke), (_oldAccess != null) ? _oldAccess.publicAccess.get(AccessPrefix.Revoke) : null);
+            this.calcDeltaAccessFilters(_out, this.publicAccess.get(AccessPrefix.All),    (_oldAccess != null) ? _oldAccess.publicAccess.get(AccessPrefix.All)    : null);
+            this.calcDeltaAccessFilters(_out, this.publicAccess.get(AccessPrefix.Login),  (_oldAccess != null) ? _oldAccess.publicAccess.get(AccessPrefix.Login)  : null);
+            this.calcDeltaAccessFilters(_out, this.publicAccess.get(AccessPrefix.Revoke), (_oldAccess != null) ? _oldAccess.publicAccess.get(AccessPrefix.Revoke) : null);
             // user access
-            this.calcDeltaUserAccess(AccessPrefix.All,    _out, _oldAccess);
-            this.calcDeltaUserAccess(AccessPrefix.Login,  _out, _oldAccess);
-            this.calcDeltaUserAccess(AccessPrefix.Revoke, _out, _oldAccess);
+            this.calcDeltaAccessFilters(_out, this.userAccess.get(AccessPrefix.All),      (_oldAccess != null) ? _oldAccess.userAccess.get(AccessPrefix.All)      : null);
+            this.calcDeltaAccessFilters(_out, this.userAccess.get(AccessPrefix.Login),    (_oldAccess != null) ? _oldAccess.userAccess.get(AccessPrefix.Login)    : null);
+            this.calcDeltaAccessFilters(_out, this.userAccess.get(AccessPrefix.Revoke),   (_oldAccess != null) ? _oldAccess.userAccess.get(AccessPrefix.Revoke)   : null);
         }
 
         /**
          * Calculates the delta for the user access.
          *
-         * @param _prefix       access prefix
-         * @param _out          writer instance
-         * @param _oldAccess    current access definition
+         * @param _out                  writer instance
+         * @param _newAccessFilters     new expected access filters
+         * @param _oldAccessFilters     current access filters
          * @throws IOException if write failed
          */
-        protected void calcDeltaUserAccess(final AccessPrefix _prefix,
-                                           final Appendable _out,
-                                           final Access _oldAccess)
+        private void calcDeltaAccessFilters(final Appendable _out,
+                                            final SortedSet<AccessFilter> _newAccessFilters,
+                                            final SortedSet<AccessFilter> _oldAccessFilters)
             throws IOException
         {
             final Set<String> newUsers = new HashSet<String>();
-            for (final AccessFilter userAccess : this.userAccess.get(_prefix))  {
-                newUsers.add(userAccess.userRef);
+            for (final AccessFilter newAccessFilter : _newAccessFilters)  {
+                newUsers.add(newAccessFilter.evalCompareString());
             }
             final Map<String,AccessFilter> oldUser = new HashMap<String,AccessFilter>();
-            if (_oldAccess != null)  {
-                for (final AccessFilter userAccess : _oldAccess.userAccess.get(_prefix))  {
-                    if (newUsers.contains(userAccess.userRef))  {
-                        oldUser.put(userAccess.userRef, userAccess);
+            if (_oldAccessFilters != null)  {
+                for (final AccessFilter oldAccessFilter : _oldAccessFilters)  {
+                    final String compareKey = oldAccessFilter.evalCompareString();
+                    if (newUsers.contains(compareKey))  {
+                        oldUser.put(compareKey, oldAccessFilter);
                     } else  {
-                        _out.append(" remove ").append(_prefix.mxValue)
-                            .append(" user \"").append(StringUtil_mxJPO.convertMql(userAccess.userRef)).append("\" all");
+                        _out.append(" remove ").append(oldAccessFilter.prefix.mxValue)
+                            .append(' ').append(oldAccessFilter.kind);
+                        if (!"public".equals(oldAccessFilter.kind) && !"owner".equals(oldAccessFilter.kind))  {
+                            _out.append(" \"").append(StringUtil_mxJPO.convertMql(oldAccessFilter.userRef)).append('\"');
+                        }
+                        if ((oldAccessFilter.key != null) && !oldAccessFilter.key.isEmpty())  {
+                            _out.append(" key \"").append(StringUtil_mxJPO.convertMql(oldAccessFilter.key)).append('\"');
+                        }
+                        _out.append(" all");
                     }
                 }
             }
-            for (final AccessFilter userAccess : this.userAccess.get(_prefix))  {
-                if ((_oldAccess != null) && !oldUser.containsKey(userAccess.userRef))  {
+            for (final AccessFilter newAccessFilter : _newAccessFilters)  {
+                final String compareKey = newAccessFilter.evalCompareString();
+                if ((_oldAccessFilters != null) && !oldUser.containsKey(compareKey))  {
                     _out.append(" add");
                 }
-                this.calcDeltaOneAccessFilter(_out, userAccess, oldUser.get(userAccess.userRef));
+                this.calcDeltaOneAccessFilter(_out, newAccessFilter, oldUser.get(compareKey));
             }
         }
 
@@ -1010,16 +1055,16 @@ throw new Exception("some states are not defined anymore!");
          * @return MQL update string
          * @throws IOException if write failed
          */
-        protected void calcDeltaOneAccessFilter(final Appendable _out,
-                                                final AccessFilter _newAccessFilter,
-                                                final AccessFilter _oldAccessFilter)
+        private void calcDeltaOneAccessFilter(final Appendable _out,
+                                              final AccessFilter _newAccessFilter,
+                                              final AccessFilter _oldAccessFilter)
             throws IOException
         {
             _out.append(' ');
 
             if (_newAccessFilter != null)
             {
-                // revoke?
+                // prefix login / revoke?
                 if (_newAccessFilter.prefix != AccessPrefix.All)  {
                     _out.append(_newAccessFilter.prefix.mxValue).append(' ');
                 }
@@ -1030,6 +1075,11 @@ throw new Exception("some states are not defined anymore!");
                 // append user reference (only if not public / owner definition)
                 if (!"public".equals(_newAccessFilter.kind) && !"owner".equals(_newAccessFilter.kind))  {
                     _out.append('\"').append(StringUtil_mxJPO.convertMql(_newAccessFilter.userRef)).append("\" ");
+                }
+
+                // access filter key
+                if ((_newAccessFilter.key != null) && !_newAccessFilter.key.isEmpty())  {
+                    _out.append(" key \"").append(StringUtil_mxJPO.convertMql(_newAccessFilter.key)).append("\" ");
                 }
 
                 // access
@@ -1373,6 +1423,8 @@ throw new Exception("some states are not defined anymore!");
         private String kind = "user";
         /** Holds the user references of a user access. */
         private String userRef = "";
+        /** Key of the access filter. */
+        private String key;
         /** Set holding the complete access. */
         protected final Set<String> access = new TreeSet<String>();
         /** String holding the filter expression. */
@@ -1393,12 +1445,26 @@ throw new Exception("some states are not defined anymore!");
         @Override()
         public int compareTo(final AccessFilter _userAccess)
         {
-            int  ret = this.kind.compareTo(_userAccess.kind);
-            if (ret == 0)
-            {
-                ret = this.userRef.compareTo(_userAccess.userRef);
+            return this.evalCompareString().compareTo(_userAccess.evalCompareString());
+        }
+
+        /**
+         * Returns a string which can be used to compare depending on the
+         * {@link #userRef referenced user} and the {@link #key}.
+         *
+         * @return string
+         */
+        protected String evalCompareString()
+        {
+            final StringBuilder ret = new StringBuilder();
+            if ((this.userRef != null) && !this.userRef.isEmpty())  {
+                ret.append(this.userRef);
             }
-            return ret;
+            ret.append("@0@0@");
+            if ((this.key != null) && !this.key.isEmpty())  {
+                ret.append(this.key);
+            }
+            return ret.toString();
         }
 
         /**

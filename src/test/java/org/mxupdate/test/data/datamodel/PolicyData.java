@@ -553,6 +553,8 @@ public class PolicyData
         private String kind;
         /** Related user of this user access filter. Empty for owner or public access. */
         private AbstractUserData<?> user;
+        /** Key. */
+        private String key;
         /** Related access definitions. */
         private final Set<String> access = new TreeSet<String>();
         /** Related filter expression. */
@@ -595,6 +597,18 @@ public class PolicyData
         }
 
         /**
+         * Defines the {@link #key} of this access filter.
+         *
+         * @param _key      new key
+         * @return this instance
+         */
+        public AccessFilter setKey(final String _key)
+        {
+            this.key = _key;
+            return this;
+        }
+
+        /**
          * Appends access.
          *
          * @param _access   access to append
@@ -627,16 +641,18 @@ public class PolicyData
         {
             _cmd.append("      ");
 
-            if (this.prefix != null)
-            {
+            if (this.prefix != null)  {
                 _cmd.append(this.prefix).append(' ');
             }
 
             _cmd.append(this.kind).append(' ');
 
-            if (this.user != null)
-            {
+            if (this.user != null)  {
                 _cmd.append("\"").append(StringUtil_mxJPO.convertTcl(this.user.getName())).append("\" ");
+            }
+
+            if (this.key != null)  {
+                _cmd.append("key \"").append(StringUtil_mxJPO.convertTcl(this.key)).append("\" ");
             }
 
             _cmd.append("{").append(StringUtil_mxJPO.joinTcl(' ', false, this.access, "none")).append("}")
@@ -653,16 +669,18 @@ public class PolicyData
         {
             final StringBuilder ret = new StringBuilder();
 
-            if (this.prefix != null)
-            {
+            if (this.prefix != null)  {
                 ret.append(this.prefix).append(' ');
             }
 
             ret.append(this.kind).append(' ');
 
-            if (this.user != null)
-            {
+            if (this.user != null)  {
                 ret .append("\"" + AbstractTest.convertMql(this.user.getName()) + "\" ");
+            }
+
+            if (this.key != null)  {
+                ret.append("key \"").append(AbstractTest.convertMql(this.key)).append("\" ");
             }
 
             ret.append(StringUtil_mxJPO.joinMql(',', false, this.access, "none"));

@@ -35,7 +35,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class Policy_AllStateTest
+public class Policy_AllState_Test
     extends AbstractPolicyTest
 {
     /**

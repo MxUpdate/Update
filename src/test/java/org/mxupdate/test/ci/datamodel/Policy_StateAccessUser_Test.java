@@ -1,3 +1,23 @@
+/*
+ * Copyright 2008-2011 The MxUpdate Team
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Revision:        $Rev$
+ * Last Changed:    $Date$
+ * Last Changed By: $Author$
+ */
+
 package org.mxupdate.test.ci.datamodel;
 
 import org.mxupdate.test.AbstractTest;
@@ -17,7 +37,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @version $Id$
  */
-public class Policy_AccessUserTest
+public class Policy_StateAccessUser_Test
     extends AbstractPolicyTest
 {
     /** Name of test policy. */
@@ -130,7 +150,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStateOwnerAccessWithEmptyFilterExpression()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         final String updateCode =
             "updatePolicy \"${NAME}\" {\n"
@@ -161,7 +181,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStateOwnerAccessWithEmptyFilterExpression4Existing()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
         this.mql("add policy " + policy.getName()
                 + " state create owner read,show filter \"type!=Part\"");
 
@@ -199,7 +219,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStateOwnerAccessWithFilterExpression()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
         final String updateCode =
             "updatePolicy \"${NAME}\" {\n"
             + "  description \"\"\n"
@@ -229,7 +249,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStateOwnerAccessWithFilterExpression4Existing()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
         this.mql("add policy " + policy.getName()
                 + " state create owner read,show filter \"type!=Part\"");
 
@@ -268,7 +288,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStateOwnerAccessWithoutFilterExpression()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         final String updateCode =
             "updatePolicy \"${NAME}\" {\n"
@@ -299,7 +319,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStateOwnerAccessWithoutFilterExpression4Existing()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         this.mql("add policy " + policy.getName()
                 + " state create owner read,show filter \"type==Part\"");
@@ -338,7 +358,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStateOwnerRevokeWithEmptyFilterExpression()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         final String updateCode =
             "updatePolicy \"${NAME}\" {\n"
@@ -369,7 +389,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStateOwnerRevokeWithEmptyFilterExpression4Existing()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         this.mql("add policy " + policy.getName()
                 + " state create revoke owner read,show filter \"type!=Part\"");
@@ -408,7 +428,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStateOwnerRevokeWithFilterExpression()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         final String updateCode =
             "updatePolicy \"${NAME}\" {\n"
@@ -439,7 +459,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStateOwnerRevokeWithFilterExpression4Existing()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         this.mql("add policy " + policy.getName()
                 + " state create revoke owner read,show filter \"type!=Part\"");
@@ -479,7 +499,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStateOwnerRevokeWithoutFilterExpression()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         final String updateCode =
             "updatePolicy \"${NAME}\" {\n"
@@ -510,7 +530,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStateOwnerRevokeWithoutFilterExpression4Existing()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         this.mql("add policy " + policy.getName()
                 + " state create revoke owner read,show filter \"type==Part\"");
@@ -547,7 +567,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStatePublicAccessWithEmptyFilterExpression()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         final String updateCode =
             "updatePolicy \"${NAME}\" {\n"
@@ -578,7 +598,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStatePublicAccessWithEmptyFilterExpression4Existing()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         this.mql("add policy " + policy.getName()
                 + " state create public read,show filter \"type!=Part\"");
@@ -617,7 +637,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStatePublicAccessWithFilterExpression()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         final String updateCode =
             "updatePolicy \"${NAME}\" {\n"
@@ -648,7 +668,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStatePublicAccessWithFilterExpression4Existing()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         this.mql("add policy " + policy.getName()
                 + " state create public read,show filter \"type!=Part\"");
@@ -688,7 +708,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStatePublicAccessWithoutFilterExpression()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         final String updateCode =
             "updatePolicy \"${NAME}\" {\n"
@@ -719,7 +739,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStatePublicAccessWithoutFilterExpression4Existing()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         this.mql("add policy " + policy.getName()
                 + " state create public read,show filter \"type==Part\"");
@@ -758,7 +778,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStatePublicRevokeWithEmptyFilterExpression()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         final String updateCode =
             "updatePolicy \"${NAME}\" {\n"
@@ -789,7 +809,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStatePublicRevokeWithEmptyFilterExpression4Existing()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         this.mql("add policy " + policy.getName()
                 + " state create revoke public read,show filter \"type!=Part\"");
@@ -828,7 +848,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStatePublicRevokeWithFilterExpression()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         final String updateCode =
             "updatePolicy \"${NAME}\" {\n"
@@ -859,7 +879,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStatePublicRevokeWithFilterExpression4Existing()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         this.mql("add policy " + policy.getName()
                 + " state create revoke public read,show filter \"type!=Part\"");
@@ -899,7 +919,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStatePublicRevokeWithoutFilterExpression()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         final String updateCode =
             "updatePolicy \"${NAME}\" {\n"
@@ -930,7 +950,7 @@ public class Policy_AccessUserTest
     public void testPositiveUpdateStatePublicRevokeWithoutFilterExpression4Existing()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
 
         this.mql("add policy " + policy.getName()
                 + " state create revoke public read,show filter \"type==Part\"");
@@ -969,14 +989,14 @@ public class Policy_AccessUserTest
     public void testPositiveExportStateOwnerAccessWithFilterExpression()
         throws Exception
     {
-        this.mql("add policy " + Policy_AccessUserTest.POLICY_NAME
+        this.mql("add policy " + Policy_StateAccessUser_Test.POLICY_NAME
                 + " state create owner read,show filter type==Part");
 
-        final Export export = this.export(CI.DM_POLICY, Policy_AccessUserTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, Policy_StateAccessUser_Test.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + Policy_AccessUserTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + Policy_StateAccessUser_Test.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(
@@ -994,14 +1014,14 @@ public class Policy_AccessUserTest
     public void testPositiveExportStateOwnerAccessWithoutFilterExpression()
         throws Exception
     {
-        this.mql("add policy " + Policy_AccessUserTest.POLICY_NAME
+        this.mql("add policy " + Policy_StateAccessUser_Test.POLICY_NAME
                 + " state create owner read,show filter ''");
 
-        final Export export = this.export(CI.DM_POLICY, Policy_AccessUserTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, Policy_StateAccessUser_Test.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + Policy_AccessUserTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + Policy_StateAccessUser_Test.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(
@@ -1019,14 +1039,14 @@ public class Policy_AccessUserTest
     public void testPositiveExportStateOwnerRevokeWithFilterExpression()
         throws Exception
     {
-        this.mql("add policy " + Policy_AccessUserTest.POLICY_NAME
+        this.mql("add policy " + Policy_StateAccessUser_Test.POLICY_NAME
                 + " state create revoke owner read,show filter type==Part");
 
-        final Export export = this.export(CI.DM_POLICY, Policy_AccessUserTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, Policy_StateAccessUser_Test.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + Policy_AccessUserTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + Policy_StateAccessUser_Test.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(
@@ -1044,14 +1064,14 @@ public class Policy_AccessUserTest
     public void testPositiveExportStateOwnerRevokeWithoutDefinition()
         throws Exception
     {
-        this.mql("add policy " + Policy_AccessUserTest.POLICY_NAME
+        this.mql("add policy " + Policy_StateAccessUser_Test.POLICY_NAME
                 + " state create revoke owner none filter ''");
 
-        final Export export = this.export(CI.DM_POLICY, Policy_AccessUserTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, Policy_StateAccessUser_Test.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + Policy_AccessUserTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + Policy_StateAccessUser_Test.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(
@@ -1069,14 +1089,14 @@ public class Policy_AccessUserTest
     public void testPositiveExportStateOwnerRevokeWithoutFilterExpression()
         throws Exception
     {
-        this.mql("add policy " + Policy_AccessUserTest.POLICY_NAME
+        this.mql("add policy " + Policy_StateAccessUser_Test.POLICY_NAME
                 + " state create revoke owner read,show filter ''");
 
-        final Export export = this.export(CI.DM_POLICY, Policy_AccessUserTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, Policy_StateAccessUser_Test.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + Policy_AccessUserTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + Policy_StateAccessUser_Test.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
 
@@ -1095,14 +1115,14 @@ public class Policy_AccessUserTest
     public void testPositiveExportStatePublicAccessWithFilterExpression()
         throws Exception
     {
-        this.mql("add policy " + Policy_AccessUserTest.POLICY_NAME
+        this.mql("add policy " + Policy_StateAccessUser_Test.POLICY_NAME
                 + " state create public read,show filter type==Part");
 
-        final Export export = this.export(CI.DM_POLICY, Policy_AccessUserTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, Policy_StateAccessUser_Test.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + Policy_AccessUserTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + Policy_StateAccessUser_Test.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(
@@ -1120,14 +1140,14 @@ public class Policy_AccessUserTest
     public void testPositiveExportStatePublicAccessWithoutFilterExpression()
         throws Exception
     {
-        this.mql("add policy " + Policy_AccessUserTest.POLICY_NAME
+        this.mql("add policy " + Policy_StateAccessUser_Test.POLICY_NAME
                 + " state create public read,show filter ''");
 
-        final Export export = this.export(CI.DM_POLICY, Policy_AccessUserTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, Policy_StateAccessUser_Test.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + Policy_AccessUserTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + Policy_StateAccessUser_Test.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(
@@ -1145,14 +1165,14 @@ public class Policy_AccessUserTest
     public void testPositiveExportStatePublicRevokeWithFilterExpression()
         throws Exception
     {
-        this.mql("add policy " + Policy_AccessUserTest.POLICY_NAME
+        this.mql("add policy " + Policy_StateAccessUser_Test.POLICY_NAME
                 + " state create revoke public read,show filter type==Part");
 
-        final Export export = this.export(CI.DM_POLICY, Policy_AccessUserTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, Policy_StateAccessUser_Test.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + Policy_AccessUserTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + Policy_StateAccessUser_Test.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(
@@ -1170,14 +1190,14 @@ public class Policy_AccessUserTest
     public void testPositiveExportStatePublicRevokeWithoutDefinition()
         throws Exception
     {
-        this.mql("add policy " + Policy_AccessUserTest.POLICY_NAME
+        this.mql("add policy " + Policy_StateAccessUser_Test.POLICY_NAME
                 + " state create revoke public none filter ''");
 
-        final Export export = this.export(CI.DM_POLICY, Policy_AccessUserTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, Policy_StateAccessUser_Test.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + Policy_AccessUserTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + Policy_StateAccessUser_Test.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
 
@@ -1196,19 +1216,19 @@ public class Policy_AccessUserTest
     public void testPositiveExportStatePublicRevokeWithoutFilterExpression()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, Policy_AccessUserTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, Policy_StateAccessUser_Test.POLICY_NAME);
         policy.addState(
                 new PolicyData.State()
                         .setName("create"));
 
-        this.mql("add policy " + Policy_AccessUserTest.POLICY_NAME
+        this.mql("add policy " + Policy_StateAccessUser_Test.POLICY_NAME
                 + " state create revoke public read,show filter ''");
 
-        final Export export = this.export(CI.DM_POLICY, Policy_AccessUserTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, Policy_StateAccessUser_Test.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + Policy_AccessUserTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + Policy_StateAccessUser_Test.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(

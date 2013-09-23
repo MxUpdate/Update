@@ -87,9 +87,10 @@ TOKEN : /** State and depending signature and trigger Tokens */
     | <PUBLISHED:       "published">        : B_EXPECTED
     | <REVOKE:          "revoke">           : DEFAULT
     | <LOGIN:           "login">            : DEFAULT
-    | <OWNER:           "owner">            : L_EXPECTED
-    | <PUBLIC:          "public">           : L_EXPECTED
-    | <USER:            "user">             : SL_EXPECTED
+    | <OWNER:           "owner">            : DEFAULT
+    | <PUBLIC:          "public">           : DEFAULT
+    | <USER:            "user">             : S_EXPECTED
+    | <KEY:             "key" >             : S_EXPECTED
     | <FILTER:          "filter">           : S_EXPECTED
     | <ACTION:          "action">           : S_EXPECTED
     | <CHECK:           "check">            : S_EXPECTED
@@ -102,6 +103,7 @@ TOKEN : /** State and depending signature and trigger Tokens */
     | <BRANCH:          "branch">           : S_EXPECTED
     | <SIGNATURE:       "signature">        : S_EXPECTED
     | <ROUTE:           "route">            : LS_EXPECTED
+    | <ACCESS:          "{" ([" ","\t","\n","\r"])* (["a"-"z"]) (["a"-"z"," ","\t","\n","\r"])* "}"> : DEFAULT
 }
 
 /*************************************************** Boolean for Hidden Value */
@@ -375,17 +377,12 @@ void state(final Policy_mxJPO _policy) : {
  */
 void stateOwnerAccess(final AccessPrefix _prefix, final Access _access) : {
     final AccessFilter accessFilter = new AccessFilter();
-    String filter = null;
-    Set<String> accessSet;
 }  {
-    ( <OWNER> accessSet = lList() )
-    ( <FILTER> filter = sString() )?
+    ( <OWNER> stateAccessDef(accessFilter) )
     {
         this.getField(accessFilter, "prefix").set(_prefix);
         this.getField(accessFilter, "kind").set("owner");
-        this.getField(accessFilter, "access").set(accessSet);
-        this.getField(accessFilter, "filter").set(filter);
-        ((Map<AccessPrefix,AccessFilter>)(this.getValue(_access, "ownerAccess"))).put(_prefix, accessFilter);
+        ((Map<AccessPrefix,Set<AccessFilter>>)(this.getValue(_access, "ownerAccess"))).get(_prefix).add(accessFilter);
     }
 }
 
@@ -397,17 +394,12 @@ void stateOwnerAccess(final AccessPrefix _prefix, final Access _access) : {
  */
 void statePublicAccess(final AccessPrefix _prefix, final Access _access) : {
     final AccessFilter accessFilter = new AccessFilter();
-    String filter = null;
-    Set<String> accessSet;
 }  {
-    ( <PUBLIC> accessSet = lList() )
-    ( <FILTER> filter = sString() )?
+    ( <PUBLIC> stateAccessDef(accessFilter) )
     {
         this.getField(accessFilter, "prefix").set(_prefix);
         this.getField(accessFilter, "kind").set("public");
-        this.getField(accessFilter, "access").set(accessSet);
-        this.getField(accessFilter, "filter").set(filter);
-        ((Map<AccessPrefix,AccessFilter>)(this.getValue(_access, "publicAccess"))).put(_prefix, accessFilter);
+        ((Map<AccessPrefix,Set<AccessFilter>>)(this.getValue(_access, "publicAccess"))).get(_prefix).add(accessFilter);
     }
 }
 
@@ -418,19 +410,41 @@ void statePublicAccess(final AccessPrefix _prefix, final Access _access) : {
  * @param _access   current parsed access definition of the policy
  */
 void stateUserAccess(final AccessPrefix _prefix, final Access _access) : {
-    final AccessFilter userAccess = new AccessFilter();
-    String user, filter = null;
-    Set<String> accessSet;
+    final AccessFilter accessFilter = new AccessFilter();
+    String user;
 }  {
-    <USER> user = slString() accessSet = lList()
-    (<FILTER> filter = sString())?
+    ( <USER> user  = sString() stateAccessDef(accessFilter) )
     {
-        this.getField(userAccess, "prefix").set(_prefix);
-        this.getField(userAccess, "kind").set("user");
-        this.getField(userAccess, "userRef").set(user);
-        this.getField(userAccess, "access").set(accessSet);
-        this.getField(userAccess, "filter").set(filter);
-        ((Map<AccessPrefix,Set<AccessFilter>>)(this.getValue(_access, "userAccess"))).get(_prefix).add(userAccess);
+        this.getField(accessFilter, "prefix").set(_prefix);
+        this.getField(accessFilter, "kind").set("user");
+        this.getField(accessFilter, "userRef").set(user);
+        ((Map<AccessPrefix,Set<AccessFilter>>)(this.getValue(_access, "userAccess"))).get(_prefix).add(accessFilter);
+    }
+}
+
+void stateAccessDef(final AccessFilter _accessFilter) : {
+    String key = null, filter = null;
+    Token access = null;
+} {
+    (
+          ( <KEY> key = sString())
+        | ( <FILTER> filter = sString() )
+        | ( access = <ACCESS> )
+    )*
+    {
+        this.getField(_accessFilter, "key").set(key);
+        this.getField(_accessFilter, "filter").set(filter);
+
+        if (access == null)  {
+            this.getField(_accessFilter, "access").set(new HashSet<String>());
+        } else  {
+            final String tmp = access.image
+                    .replaceFirst("^\\{", "").replaceFirst("\\}$", "")  // remove {}
+                    .replaceAll("(\t)|(\n)", " ")                       // replace tabs, new lines
+                    .replaceAll("( )+", " ")                            // multiple spaces => one space
+                    .trim();                                            // remove trailing spaces
+            this.getField(_accessFilter, "access").set(new HashSet<String>(java.util.Arrays.asList(tmp.split(" "))));
+        }
     }
 }
 

@@ -61,93 +61,97 @@ interface PolicyDefParserConstants_mxJPO {
   /** RegularExpression Id. */
   int USER = 29;
   /** RegularExpression Id. */
-  int FILTER = 30;
+  int KEY = 30;
   /** RegularExpression Id. */
-  int ACTION = 31;
+  int FILTER = 31;
   /** RegularExpression Id. */
-  int CHECK = 32;
+  int ACTION = 32;
   /** RegularExpression Id. */
-  int OVERRIDE = 33;
+  int CHECK = 33;
   /** RegularExpression Id. */
-  int INPUT = 34;
+  int OVERRIDE = 34;
   /** RegularExpression Id. */
-  int TRIGGER = 35;
+  int INPUT = 35;
   /** RegularExpression Id. */
-  int APPROVE = 36;
+  int TRIGGER = 36;
   /** RegularExpression Id. */
-  int IGNORE = 37;
+  int APPROVE = 37;
   /** RegularExpression Id. */
-  int REJECT = 38;
+  int IGNORE = 38;
   /** RegularExpression Id. */
-  int BRANCH = 39;
+  int REJECT = 39;
   /** RegularExpression Id. */
-  int SIGNATURE = 40;
+  int BRANCH = 40;
   /** RegularExpression Id. */
-  int ROUTE = 41;
+  int SIGNATURE = 41;
   /** RegularExpression Id. */
-  int BOOLEAN_TRUE = 46;
+  int ROUTE = 42;
   /** RegularExpression Id. */
-  int BOOLEAN_FALSE = 47;
+  int ACCESS = 43;
   /** RegularExpression Id. */
-  int BOOLEAN_TRUESTR = 48;
+  int BOOLEAN_TRUE = 48;
   /** RegularExpression Id. */
-  int BOOLEAN_FALSESTR = 49;
+  int BOOLEAN_FALSE = 49;
   /** RegularExpression Id. */
-  int DELIMITER_CHAR = 54;
+  int BOOLEAN_TRUESTR = 50;
   /** RegularExpression Id. */
-  int DELIMITER_CHARSTR = 55;
+  int BOOLEAN_FALSESTR = 51;
   /** RegularExpression Id. */
-  int LS_CURLY_BRACKET_OPEN = 60;
+  int DELIMITER_CHAR = 56;
   /** RegularExpression Id. */
-  int LS_CURLY_BRACKET_CLOSE = 61;
+  int DELIMITER_CHARSTR = 57;
   /** RegularExpression Id. */
-  int LS_STRING = 62;
+  int LS_CURLY_BRACKET_OPEN = 62;
   /** RegularExpression Id. */
-  int LS_SINGLE_STRING = 63;
+  int LS_CURLY_BRACKET_CLOSE = 63;
   /** RegularExpression Id. */
-  int LS_APOSTROPHE = 64;
+  int LS_STRING = 64;
   /** RegularExpression Id. */
-  int LS_CHAR = 65;
+  int LS_SINGLE_STRING = 65;
   /** RegularExpression Id. */
-  int SL_STRING = 70;
+  int LS_APOSTROPHE = 66;
   /** RegularExpression Id. */
-  int SL_SINGLE_STRING = 71;
+  int LS_CHAR = 67;
   /** RegularExpression Id. */
-  int SL_APOSTROPHE = 72;
+  int SL_STRING = 72;
   /** RegularExpression Id. */
-  int SL_CHAR = 73;
+  int SL_SINGLE_STRING = 73;
   /** RegularExpression Id. */
-  int S_STRING = 78;
+  int SL_APOSTROPHE = 74;
   /** RegularExpression Id. */
-  int S_SINGLE_STRING = 79;
+  int SL_CHAR = 75;
   /** RegularExpression Id. */
-  int S_APOSTROPHE = 80;
+  int S_STRING = 80;
   /** RegularExpression Id. */
-  int S_CHAR = 81;
+  int S_SINGLE_STRING = 81;
   /** RegularExpression Id. */
-  int LALL_CURLY_BRACKET_OPEN = 86;
+  int S_APOSTROPHE = 82;
   /** RegularExpression Id. */
-  int LALL_ALL = 87;
+  int S_CHAR = 83;
   /** RegularExpression Id. */
-  int L_CURLY_BRACKET_OPEN = 92;
+  int LALL_CURLY_BRACKET_OPEN = 88;
   /** RegularExpression Id. */
-  int L_CURLY_BRACKET_CLOSE = 97;
+  int LALL_ALL = 89;
   /** RegularExpression Id. */
-  int L_STRING = 98;
+  int L_CURLY_BRACKET_OPEN = 94;
   /** RegularExpression Id. */
-  int L_SINGLE_STRING = 99;
+  int L_CURLY_BRACKET_CLOSE = 99;
   /** RegularExpression Id. */
-  int L_APOSTROPHE = 100;
+  int L_STRING = 100;
   /** RegularExpression Id. */
-  int L_CHAR = 101;
+  int L_SINGLE_STRING = 101;
   /** RegularExpression Id. */
-  int L2_CURLY_BRACKET_OPEN = 102;
+  int L_APOSTROPHE = 102;
   /** RegularExpression Id. */
-  int L3_BRACE_STRING = 103;
+  int L_CHAR = 103;
   /** RegularExpression Id. */
-  int L3_CHAR = 104;
+  int L2_CURLY_BRACKET_OPEN = 104;
   /** RegularExpression Id. */
-  int L4_CURLY_BRACKET_CLOSE = 105;
+  int L3_BRACE_STRING = 105;
+  /** RegularExpression Id. */
+  int L3_CHAR = 106;
+  /** RegularExpression Id. */
+  int L4_CURLY_BRACKET_CLOSE = 107;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -204,6 +208,7 @@ interface PolicyDefParserConstants_mxJPO {
     "\"owner\"",
     "\"public\"",
     "\"user\"",
+    "\"key\"",
     "\"filter\"",
     "\"action\"",
     "\"check\"",
@@ -216,6 +221,7 @@ interface PolicyDefParserConstants_mxJPO {
     "\"branch\"",
     "\"signature\"",
     "\"route\"",
+    "<ACCESS>",
     "\" \"",
     "\"\\t\"",
     "\"\\n\"",
