@@ -557,6 +557,16 @@ public class PolicyData
         private String key;
         /** Related access definitions. */
         private final Set<String> access = new TreeSet<String>();
+        /** Organization. */
+        private String organization;
+        /** Project. */
+        private String project;
+        /** Owner. */
+        private String owner;
+        /** Reserve. */
+        private String reserve;
+        /** Maturity. */
+        private String maturity;
         /** Related filter expression. */
         private String filter;
 
@@ -621,7 +631,7 @@ public class PolicyData
         }
 
         /**
-         * Defines the filter.
+         * Defines the {@link #filter}.
          *
          * @param _filter   new filter
          * @return this instance
@@ -633,31 +643,110 @@ public class PolicyData
         }
 
         /**
+         * Defines the {@link #organization}.
+         *
+         * @param _organization     organization
+         * @return this instance
+         */
+        public AccessFilter setOrganization(final String _organization)
+        {
+            this.organization = _organization;
+            return this;
+        }
+
+        /**
+         * Defines the {@link #owner}.
+         *
+         * @param _owner    owner
+         * @return this instance
+         */
+        public AccessFilter setOwner(final String _owner)
+        {
+            this.owner = _owner;
+            return this;
+        }
+
+        /**
+         * Defines the {@link #reserve}.
+         *
+         * @param _reserve      reserve
+         * @return this instance
+         */
+        public AccessFilter setReserve(final String _reserve)
+        {
+            this.reserve = _reserve;
+            return this;
+        }
+
+        /**
+         * Defines the {@link #maturity}.
+         *
+         * @param _maturity     maturity
+         * @return this instance
+         */
+        public AccessFilter setMaturity(final String _maturity)
+        {
+            this.maturity = _maturity;
+            return this;
+        }
+
+        /**
+         * Defines the {@link #project}.
+         *
+         * @param _project      project
+         * @return this instance
+         */
+        public AccessFilter setProject(final String _project)
+        {
+            this.project = _project;
+            return this;
+        }
+
+        /**
          * Appends the TCL string which are used within the CI file.
          *
          * @param _cmd  string builder where to append the MQL statements
          */
         protected void append4CIFile(final StringBuilder _cmd)
         {
-            _cmd.append("      ");
+            _cmd.append("     ");
 
             if (this.prefix != null)  {
-                _cmd.append(this.prefix).append(' ');
+                _cmd.append(' ').append(this.prefix);
             }
 
-            _cmd.append(this.kind).append(' ');
+            _cmd.append(' ').append(this.kind);
 
             if (this.user != null)  {
-                _cmd.append("\"").append(StringUtil_mxJPO.convertTcl(this.user.getName())).append("\" ");
+                _cmd.append(" \"").append(StringUtil_mxJPO.convertTcl(this.user.getName())).append('\"');
             }
 
             if (this.key != null)  {
-                _cmd.append("key \"").append(StringUtil_mxJPO.convertTcl(this.key)).append("\" ");
+                _cmd.append(" key \"").append(StringUtil_mxJPO.convertTcl(this.key)).append('\"');
             }
 
-            _cmd.append("{").append(StringUtil_mxJPO.joinTcl(' ', false, this.access, "none")).append("}")
-                .append(((this.filter != null) ? " filter \"" + StringUtil_mxJPO.convertTcl(this.filter) + "\"" : ""))
-                .append('\n');
+            _cmd.append(" {").append(StringUtil_mxJPO.joinTcl(' ', false, this.access, "none")).append("}");
+
+            if (this.organization != null)  {
+                _cmd.append(' ').append(this.organization).append(" organization");
+            }
+            if (this.project != null)  {
+                _cmd.append(' ').append(this.project).append(" project");
+            }
+            if (this.owner != null)  {
+                _cmd.append(' ').append(this.owner).append(" owner");
+            }
+            if (this.reserve != null)  {
+                _cmd.append(' ').append(this.reserve).append(" reserve");
+            }
+            if (this.maturity != null)  {
+                _cmd.append(' ').append(this.maturity).append(" maturity");
+            }
+            if (this.filter != null)  {
+                _cmd.append(" filter \"").append(StringUtil_mxJPO.convertTcl(this.filter)).append('\"');
+            }
+
+            _cmd.append('\n');
         }
 
         /**
@@ -683,9 +772,25 @@ public class PolicyData
                 ret.append("key \"").append(AbstractTest.convertMql(this.key)).append("\" ");
             }
 
-            ret.append(StringUtil_mxJPO.joinMql(',', false, this.access, "none"));
+            ret.append(StringUtil_mxJPO.joinMql(',', false, this.access, "none")).append(' ');
+
+            if (this.organization != null)  {
+                ret.append(this.organization).append(" organization ");
+            }
+            if (this.project != null)  {
+                ret.append(this.project).append(" project ");
+            }
+            if (this.owner != null)  {
+                ret.append(this.owner).append(" owner ");
+            }
+            if (this.reserve != null)  {
+                ret.append(this.reserve).append(" reserve ");
+            }
+            if (this.maturity != null)  {
+                ret.append(this.maturity).append(" maturity ");
+            }
             if (this.filter != null)  {
-                ret.append(" filter \"").append(AbstractTest.convertTcl(this.filter)).append('\"');
+                ret.append("filter \"").append(AbstractTest.convertTcl(this.filter)).append("\" ");
             }
             return ret.toString();
         }

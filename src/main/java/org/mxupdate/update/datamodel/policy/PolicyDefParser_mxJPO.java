@@ -182,7 +182,7 @@ public class PolicyDefParser_mxJPO
   final public void allstate(final Policy_mxJPO _policy) throws ParseException_mxJPO {
     final Policy_mxJPO.Access access = this.getField(_policy, "allStateAccess").<Policy_mxJPO.Access>get();
     jj_consume_token(ALLSTATE);
-    jj_consume_token(108);
+    jj_consume_token(131);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -245,7 +245,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(109);
+    jj_consume_token(132);
         this.getField(_policy, "allState").set(true);
   }
 
@@ -261,7 +261,7 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(STATE);
     tmpStr = sString();
                                 this.getField(state, "name").set(tmpStr);
-    jj_consume_token(108);
+    jj_consume_token(131);
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -483,7 +483,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(109);
+    jj_consume_token(132);
         this.appendValue(_policy, "states", state);
   }
 
@@ -536,7 +536,7 @@ public class PolicyDefParser_mxJPO
   }
 
   final public void stateAccessDef(final AccessFilter _accessFilter) throws ParseException_mxJPO {
-    String key = null, filter = null;
+    String key = null, filter = null, organization = null, project = null, owner = null, reserve = null, maturity = null;
     Token_mxJPO access = null;
     label_4:
     while (true) {
@@ -544,6 +544,29 @@ public class PolicyDefParser_mxJPO
       case KEY:
       case FILTER:
       case ACCESS:
+      case ANY_ORGANIZATION:
+      case SINGLE_ORGANIZATION:
+      case ANCESTOR_ORGANIZATION:
+      case DESCENDANT_ORGANIZATION:
+      case RELATED_ORGANIZATION:
+      case ANY_PROJECT:
+      case SINGLE_PROJECT:
+      case ANCESTOR_PROJECT:
+      case DESCENDANT_PROJECT:
+      case RELATED_PROJECT:
+      case ANY_OWNER:
+      case CONTEXT_OWNER:
+      case ANY_RESERVE:
+      case CONTEXT_RESERVE:
+      case NO_RESERVE:
+      case INCLUSIVE_RESERVE:
+      case ANY_MATURITY:
+      case NO_MATURITY:
+      case PUBLIC_MATURITY:
+      case PROTECTED_MATURITY:
+      case PRIVATE_MATURITY:
+      case NOTPRIVATE_MATURITY:
+      case PPP_MATURITY:
         ;
         break;
       default:
@@ -561,6 +584,98 @@ public class PolicyDefParser_mxJPO
       case ACCESS:
         access = jj_consume_token(ACCESS);
         break;
+      case ANY_ORGANIZATION:
+        jj_consume_token(ANY_ORGANIZATION);
+                                       organization = "any";
+        break;
+      case SINGLE_ORGANIZATION:
+        jj_consume_token(SINGLE_ORGANIZATION);
+                                       organization = "single";
+        break;
+      case ANCESTOR_ORGANIZATION:
+        jj_consume_token(ANCESTOR_ORGANIZATION);
+                                       organization = "ancestor";
+        break;
+      case DESCENDANT_ORGANIZATION:
+        jj_consume_token(DESCENDANT_ORGANIZATION);
+                                       organization = "descendant";
+        break;
+      case RELATED_ORGANIZATION:
+        jj_consume_token(RELATED_ORGANIZATION);
+                                       organization = "related";
+        break;
+      case ANY_PROJECT:
+        jj_consume_token(ANY_PROJECT);
+                                       project      = "any";
+        break;
+      case SINGLE_PROJECT:
+        jj_consume_token(SINGLE_PROJECT);
+                                       project      = "single";
+        break;
+      case ANCESTOR_PROJECT:
+        jj_consume_token(ANCESTOR_PROJECT);
+                                       project      = "ancestor";
+        break;
+      case DESCENDANT_PROJECT:
+        jj_consume_token(DESCENDANT_PROJECT);
+                                       project      = "descendant";
+        break;
+      case RELATED_PROJECT:
+        jj_consume_token(RELATED_PROJECT);
+                                       project      = "related";
+        break;
+      case ANY_OWNER:
+        jj_consume_token(ANY_OWNER);
+                                       owner        = "any";
+        break;
+      case CONTEXT_OWNER:
+        jj_consume_token(CONTEXT_OWNER);
+                                       owner        = "context";
+        break;
+      case ANY_RESERVE:
+        jj_consume_token(ANY_RESERVE);
+                                       reserve      = "any";
+        break;
+      case CONTEXT_RESERVE:
+        jj_consume_token(CONTEXT_RESERVE);
+                                       reserve      = "context";
+        break;
+      case NO_RESERVE:
+        jj_consume_token(NO_RESERVE);
+                                       reserve      = "no";
+        break;
+      case INCLUSIVE_RESERVE:
+        jj_consume_token(INCLUSIVE_RESERVE);
+                                       reserve      = "inclusive";
+        break;
+      case ANY_MATURITY:
+        jj_consume_token(ANY_MATURITY);
+                                       maturity     = "any";
+        break;
+      case NO_MATURITY:
+        jj_consume_token(NO_MATURITY);
+                                       maturity     = "no";
+        break;
+      case PUBLIC_MATURITY:
+        jj_consume_token(PUBLIC_MATURITY);
+                                       maturity     = "public";
+        break;
+      case PROTECTED_MATURITY:
+        jj_consume_token(PROTECTED_MATURITY);
+                                       maturity     = "protected";
+        break;
+      case PRIVATE_MATURITY:
+        jj_consume_token(PRIVATE_MATURITY);
+                                       maturity     = "private";
+        break;
+      case NOTPRIVATE_MATURITY:
+        jj_consume_token(NOTPRIVATE_MATURITY);
+                                       maturity     = "notprivate";
+        break;
+      case PPP_MATURITY:
+        jj_consume_token(PPP_MATURITY);
+                                       maturity     = "ppp";
+        break;
       default:
         jj_consume_token(-1);
         throw new ParseException_mxJPO();
@@ -568,6 +683,11 @@ public class PolicyDefParser_mxJPO
     }
         this.getField(_accessFilter, "key").set(key);
         this.getField(_accessFilter, "filter").set(filter);
+        this.getField(_accessFilter, "organization").set(organization);
+        this.getField(_accessFilter, "project").set(project);
+        this.getField(_accessFilter, "owner").set(owner);
+        this.getField(_accessFilter, "reserve").set(reserve);
+        this.getField(_accessFilter, "maturity").set(maturity);
 
         if (access == null)  {
             this.getField(_accessFilter, "access").set(new HashSet<String>());
@@ -618,7 +738,7 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(SIGNATURE);
     tmpStr = sString();
                                     this.getField(signature, "name").set(tmpStr);
-    jj_consume_token(108);
+    jj_consume_token(131);
     label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -663,7 +783,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(109);
+    jj_consume_token(132);
         this.appendValue(_state, "signatures", signature);
   }
 

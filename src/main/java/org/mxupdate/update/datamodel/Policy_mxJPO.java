@@ -832,6 +832,18 @@ throw new Exception("some states are not defined anymore!");
 
             } else if ("/userAccessList/userAccess".equals(_url))  {
                 this.parsingAccess.add(new AccessFilter());
+            } else if (_url.startsWith("/userAccessList/userAccess/access"))  {
+                this.parsingAccess.peek().access.add(_url.replaceAll("^/userAccessList/userAccess/access/", "").replaceAll("Access$", "").toLowerCase());
+            } else if ("/userAccessList/userAccess/matchMaturity".equals(_url))  {
+                this.parsingAccess.peek().maturity = _content;
+            } else if ("/userAccessList/userAccess/matchOrganization".equals(_url))  {
+                this.parsingAccess.peek().organization = _content;
+            } else if ("/userAccessList/userAccess/matchOwner".equals(_url))  {
+                this.parsingAccess.peek().owner = _content;
+            } else if ("/userAccessList/userAccess/matchProject".equals(_url))  {
+                this.parsingAccess.peek().project = _content;
+            } else if ("/userAccessList/userAccess/matchReserve".equals(_url))  {
+                this.parsingAccess.peek().reserve = _content;
             } else if ("/userAccessList/userAccess/userAccessKey".equals(_url))  {
                 this.parsingAccess.peek().key = _content;
             } else if ("/userAccessList/userAccess/userAccessKind".equals(_url))  {
@@ -842,8 +854,6 @@ throw new Exception("some states are not defined anymore!");
                 this.parsingAccess.peek().prefix = AccessPrefix.Revoke;
             } else if ("/userAccessList/userAccess/userRef".equals(_url))  {
                 this.parsingAccess.peek().userRef = _content;
-            } else if (_url.startsWith("/userAccessList/userAccess/access"))  {
-                this.parsingAccess.peek().access.add(_url.replaceAll("^/userAccessList/userAccess/access/", "").replaceAll("Access$", "").toLowerCase());
             } else if ("/userAccessList/userAccess/expressionFilter".equals(_url))  {
                 this.parsingAccess.peek().filter = _content;
             } else  {
@@ -962,7 +972,22 @@ throw new Exception("some states are not defined anymore!");
                     .append(StringUtil_mxJPO.joinTcl(' ', false, _accessFilter.access, null))
                     .append("}");
 
-                // filter
+                // user items
+                if ((_accessFilter.organization != null) && !_accessFilter.organization.isEmpty() && !"any".equals(_accessFilter.organization))  {
+                    _out.append(' ').append(_accessFilter.organization).append(" organization");
+                }
+                if ((_accessFilter.project != null) && !_accessFilter.project.isEmpty() && !"any".equals(_accessFilter.project))  {
+                    _out.append(' ').append(_accessFilter.project).append(" project");
+                }
+                if ((_accessFilter.owner != null) && !_accessFilter.owner.isEmpty() && !"any".equals(_accessFilter.owner))  {
+                    _out.append(' ').append(_accessFilter.owner).append(" owner");
+                }
+                if ((_accessFilter.reserve != null) && !_accessFilter.reserve.isEmpty() && !"any".equals(_accessFilter.reserve))  {
+                    _out.append(' ').append(_accessFilter.reserve).append(" reserve");
+                }
+                if ((_accessFilter.maturity != null) && !_accessFilter.maturity.isEmpty() && !"any".equals(_accessFilter.maturity))  {
+                    _out.append(' ').append(_accessFilter.maturity).append(" maturity");
+                }
                 if ((_accessFilter.filter != null) && !"".equals(_accessFilter.filter))  {
                     _out.append(" filter \"")
                         .append(StringUtil_mxJPO.convertTcl(_accessFilter.filter))
@@ -1085,7 +1110,22 @@ throw new Exception("some states are not defined anymore!");
                 // access
                 _out.append(StringUtil_mxJPO.joinMql(',', false, _newAccessFilter.access, "none")).append(' ');
 
-                // filter
+                // user items
+                if ((_newAccessFilter.organization != null) && !_newAccessFilter.organization.isEmpty())  {
+                    _out.append(' ').append(_newAccessFilter.organization).append(" organization");
+                }
+                if ((_newAccessFilter.project != null) && !_newAccessFilter.project.isEmpty())  {
+                    _out.append(' ').append(_newAccessFilter.project).append(" project");
+                }
+                if ((_newAccessFilter.owner != null) && !_newAccessFilter.owner.isEmpty())  {
+                    _out.append(' ').append(_newAccessFilter.owner).append(" owner");
+                }
+                if ((_newAccessFilter.reserve != null) && !_newAccessFilter.reserve.isEmpty())  {
+                    _out.append(' ').append(_newAccessFilter.reserve).append(" reserve");
+                }
+                if ((_newAccessFilter.maturity != null) && !_newAccessFilter.maturity.isEmpty())  {
+                    _out.append(' ').append(_newAccessFilter.maturity).append(" maturity");
+                }
                 if ((_newAccessFilter.filter != null) || ((_oldAccessFilter != null) && (_oldAccessFilter.filter != null)))  {
                     _out.append("filter \"");
                     if (_newAccessFilter.filter != null)  {
@@ -1113,7 +1153,22 @@ throw new Exception("some states are not defined anymore!");
                 // access
                 _out.append("none ");
 
-                // filter
+                // user items
+                if ((_oldAccessFilter.organization != null) && !_oldAccessFilter.organization.isEmpty())  {
+                    _out.append(" any organization");
+                }
+                if ((_oldAccessFilter.project != null) && !_oldAccessFilter.project.isEmpty())  {
+                    _out.append(" any project");
+                }
+                if ((_oldAccessFilter.owner != null) && !_oldAccessFilter.owner.isEmpty())  {
+                    _out.append(" any owner");
+                }
+                if ((_oldAccessFilter.reserve != null) && !_oldAccessFilter.reserve.isEmpty())  {
+                    _out.append(" any reserve");
+                }
+                if ((_oldAccessFilter.maturity != null) && !_oldAccessFilter.maturity.isEmpty())  {
+                    _out.append(" any maturity");
+                }
                 _out.append("filter \"\" ");
             }
         }
@@ -1426,9 +1481,19 @@ throw new Exception("some states are not defined anymore!");
         /** Key of the access filter. */
         private String key;
         /** Set holding the complete access. */
-        protected final Set<String> access = new TreeSet<String>();
+        private final Set<String> access = new TreeSet<String>();
+        /** Organization of the access definition. */
+        private String organization;
+        /** Project of the access definition. */
+        private String project;
+        /** Owner of the access definition. */
+        private String owner;
+        /** Reserve of the access definition. */
+        private String reserve;
+        /** Maturity of the access definition. */
+        private String maturity;
         /** String holding the filter expression. */
-        protected String filter;
+        private String filter;
 
         /**
          * Compares this user access instance to another user access instance.

@@ -77,33 +77,56 @@ TOKEN : /** first level */
 
 TOKEN : /** State and depending signature and trigger Tokens */
 {
-      <REGISTEREDNAME:  "registeredName">   : S_EXPECTED
-    | <REVISION:        "revision">         : B_EXPECTED
-    | <MINORREVISION:   "minorrevision">    : B_EXPECTED
-    | <MAJORREVISION:   "majorrevision">    : B_EXPECTED
-    | <VERSION:         "version">          : B_EXPECTED
-    | <PROMOTE:         "promote">          : B_EXPECTED
-    | <CHECKOUTHISTORY: "checkouthistory">  : B_EXPECTED
-    | <PUBLISHED:       "published">        : B_EXPECTED
-    | <REVOKE:          "revoke">           : DEFAULT
-    | <LOGIN:           "login">            : DEFAULT
-    | <OWNER:           "owner">            : DEFAULT
-    | <PUBLIC:          "public">           : DEFAULT
-    | <USER:            "user">             : S_EXPECTED
-    | <KEY:             "key" >             : S_EXPECTED
-    | <FILTER:          "filter">           : S_EXPECTED
-    | <ACTION:          "action">           : S_EXPECTED
-    | <CHECK:           "check">            : S_EXPECTED
-    | <OVERRIDE:        "override">         : S_EXPECTED
-    | <INPUT:           "input">            : S_EXPECTED
-    | <TRIGGER:         "trigger">          : S_EXPECTED
-    | <APPROVE:         "approve">          : L_EXPECTED
-    | <IGNORE:          "ignore">           : L_EXPECTED
-    | <REJECT:          "reject">           : L_EXPECTED
-    | <BRANCH:          "branch">           : S_EXPECTED
-    | <SIGNATURE:       "signature">        : S_EXPECTED
-    | <ROUTE:           "route">            : LS_EXPECTED
-    | <ACCESS:          "{" ([" ","\t","\n","\r"])* (["a"-"z"]) (["a"-"z"," ","\t","\n","\r"])* "}"> : DEFAULT
+      <REGISTEREDNAME:          "registeredName">                                       : S_EXPECTED
+    | <REVISION:                "revision">                                             : B_EXPECTED
+    | <MINORREVISION:           "minorrevision">                                        : B_EXPECTED
+    | <MAJORREVISION:           "majorrevision">                                        : B_EXPECTED
+    | <VERSION:                 "version">                                              : B_EXPECTED
+    | <PROMOTE:                 "promote">                                              : B_EXPECTED
+    | <CHECKOUTHISTORY:         "checkouthistory">                                      : B_EXPECTED
+    | <PUBLISHED:               "published">                                            : B_EXPECTED
+    | <REVOKE:                  "revoke">                                               : DEFAULT
+    | <LOGIN:                   "login">                                                : DEFAULT
+    | <OWNER:                   "owner">                                                : DEFAULT
+    | <PUBLIC:                  "public">                                               : DEFAULT
+    | <USER:                    "user">                                                 : S_EXPECTED
+    | <KEY:                     "key" >                                                 : S_EXPECTED
+    | <FILTER:                  "filter">                                               : S_EXPECTED
+    | <ACTION:                  "action">                                               : S_EXPECTED
+    | <CHECK:                   "check">                                                : S_EXPECTED
+    | <OVERRIDE:                "override">                                             : S_EXPECTED
+    | <INPUT:                   "input">                                                : S_EXPECTED
+    | <TRIGGER:                 "trigger">                                              : S_EXPECTED
+    | <APPROVE:                 "approve">                                              : L_EXPECTED
+    | <IGNORE:                  "ignore">                                               : L_EXPECTED
+    | <REJECT:                  "reject">                                               : L_EXPECTED
+    | <BRANCH:                  "branch">                                               : S_EXPECTED
+    | <SIGNATURE:               "signature">                                            : S_EXPECTED
+    | <ROUTE:                   "route">                                                : LS_EXPECTED
+    | <ACCESS:                  "{" ([" ","\t","\n","\r"])* (["a"-"z"]) (["a"-"z"," ","\t","\n","\r"])* "}"> : DEFAULT
+    | <ANY_ORGANIZATION:        "any"        ([" ","\t","\n","\r"])+ "organization">    : DEFAULT
+    | <SINGLE_ORGANIZATION:     "single"     ([" ","\t","\n","\r"])+ "organization">    : DEFAULT
+    | <ANCESTOR_ORGANIZATION:   "ancestor"   ([" ","\t","\n","\r"])+ "organization">    : DEFAULT
+    | <DESCENDANT_ORGANIZATION: "descendant" ([" ","\t","\n","\r"])+ "organization">    : DEFAULT
+    | <RELATED_ORGANIZATION:    "related"    ([" ","\t","\n","\r"])+ "organization">    : DEFAULT
+    | <ANY_PROJECT:             "any"        ([" ","\t","\n","\r"])+ "project">         : DEFAULT
+    | <SINGLE_PROJECT:          "single"     ([" ","\t","\n","\r"])+ "project">         : DEFAULT
+    | <ANCESTOR_PROJECT:        "ancestor"   ([" ","\t","\n","\r"])+ "project">         : DEFAULT
+    | <DESCENDANT_PROJECT:      "descendant" ([" ","\t","\n","\r"])+ "project">         : DEFAULT
+    | <RELATED_PROJECT:         "related"    ([" ","\t","\n","\r"])+ "project">         : DEFAULT
+    | <ANY_OWNER:               "any"        ([" ","\t","\n","\r"])+ "owner">           : DEFAULT
+    | <CONTEXT_OWNER:           "context"    ([" ","\t","\n","\r"])+ "owner">           : DEFAULT
+    | <ANY_RESERVE:             "any"        ([" ","\t","\n","\r"])+ "reserve">         : DEFAULT
+    | <CONTEXT_RESERVE:         "context"    ([" ","\t","\n","\r"])+ "reserve">         : DEFAULT
+    | <NO_RESERVE:              "no"         ([" ","\t","\n","\r"])+ "reserve">         : DEFAULT
+    | <INCLUSIVE_RESERVE:       "inclusive"  ([" ","\t","\n","\r"])+ "reserve">         : DEFAULT
+    | <ANY_MATURITY:            "any"        ([" ","\t","\n","\r"])+ "maturity">        : DEFAULT
+    | <NO_MATURITY:             "no"         ([" ","\t","\n","\r"])+ "maturity">        : DEFAULT
+    | <PUBLIC_MATURITY:         "public"     ([" ","\t","\n","\r"])+ "maturity">        : DEFAULT
+    | <PROTECTED_MATURITY:      "protected"  ([" ","\t","\n","\r"])+ "maturity">        : DEFAULT
+    | <PRIVATE_MATURITY:        "private"    ([" ","\t","\n","\r"])+ "maturity">        : DEFAULT
+    | <NOTPRIVATE_MATURITY:     "notprivate" ([" ","\t","\n","\r"])+ "maturity">        : DEFAULT
+    | <PPP_MATURITY:            "ppp"        ([" ","\t","\n","\r"])+ "maturity">        : DEFAULT
 }
 
 /*************************************************** Boolean for Hidden Value */
@@ -423,17 +446,45 @@ void stateUserAccess(final AccessPrefix _prefix, final Access _access) : {
 }
 
 void stateAccessDef(final AccessFilter _accessFilter) : {
-    String key = null, filter = null;
+    String key = null, filter = null, organization = null, project = null, owner = null, reserve = null, maturity = null;
     Token access = null;
 } {
     (
           ( <KEY> key = sString())
         | ( <FILTER> filter = sString() )
         | ( access = <ACCESS> )
+        | ( <ANY_ORGANIZATION>        {organization = "any";        } )
+        | ( <SINGLE_ORGANIZATION>     {organization = "single";     } )
+        | ( <ANCESTOR_ORGANIZATION>   {organization = "ancestor";   } )
+        | ( <DESCENDANT_ORGANIZATION> {organization = "descendant"; } )
+        | ( <RELATED_ORGANIZATION>    {organization = "related";    } )
+        | ( <ANY_PROJECT>             {project      = "any";        } )
+        | ( <SINGLE_PROJECT>          {project      = "single";     } )
+        | ( <ANCESTOR_PROJECT>        {project      = "ancestor";   } )
+        | ( <DESCENDANT_PROJECT>      {project      = "descendant"; } )
+        | ( <RELATED_PROJECT>         {project      = "related";    } )
+        | ( <ANY_OWNER>               {owner        = "any";        } )
+        | ( <CONTEXT_OWNER>           {owner        = "context";    } )
+        | ( <ANY_RESERVE>             {reserve      = "any";        } )
+        | ( <CONTEXT_RESERVE>         {reserve      = "context";    } )
+        | ( <NO_RESERVE>              {reserve      = "no";         } )
+        | ( <INCLUSIVE_RESERVE>       {reserve      = "inclusive";  } )
+        | ( <ANY_MATURITY>            {maturity     = "any";        } )
+        | ( <NO_MATURITY>             {maturity     = "no";         } )
+        | ( <PUBLIC_MATURITY>         {maturity     = "public";     } )
+        | ( <PROTECTED_MATURITY>      {maturity     = "protected";  } )
+        | ( <PRIVATE_MATURITY>        {maturity     = "private";    } )
+        | ( <NOTPRIVATE_MATURITY>     {maturity     = "notprivate"; } )
+        | ( <PPP_MATURITY>            {maturity     = "ppp";        } )
     )*
     {
         this.getField(_accessFilter, "key").set(key);
         this.getField(_accessFilter, "filter").set(filter);
+        this.getField(_accessFilter, "organization").set(organization);
+        this.getField(_accessFilter, "project").set(project);
+        this.getField(_accessFilter, "owner").set(owner);
+        this.getField(_accessFilter, "reserve").set(reserve);
+        this.getField(_accessFilter, "maturity").set(maturity);
 
         if (access == null)  {
             this.getField(_accessFilter, "access").set(new HashSet<String>());
