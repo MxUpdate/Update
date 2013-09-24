@@ -38,6 +38,7 @@ public class PolicyDefParser_mxJPO
       case FORMAT:
       case STORE:
       case DEFAULTFORMAT:
+      case ENFORCE:
       case DELIMITER:
       case SEQUENCE:
       case MINORSEQUENCE:
@@ -66,6 +67,22 @@ public class PolicyDefParser_mxJPO
         jj_consume_token(DEFAULTFORMAT);
         tmp = sString();
                                                 this.getField(policy, "defaultFormat").set(tmp);
+        break;
+      case ENFORCE:
+        jj_consume_token(ENFORCE);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case BOOLEAN_TRUE:
+          jj_consume_token(BOOLEAN_TRUE);
+                                                this.getField(policy, "enforce").set(true);
+          break;
+        case BOOLEAN_FALSE:
+          jj_consume_token(BOOLEAN_FALSE);
+                                                this.getField(policy, "enforce").set(false);
+          break;
+        default:
+          jj_consume_token(-1);
+          throw new ParseException_mxJPO();
+        }
         break;
       case DELIMITER:
         jj_consume_token(DELIMITER);
@@ -182,7 +199,7 @@ public class PolicyDefParser_mxJPO
   final public void allstate(final Policy_mxJPO _policy) throws ParseException_mxJPO {
     final Policy_mxJPO.Access access = this.getField(_policy, "allStateAccess").<Policy_mxJPO.Access>get();
     jj_consume_token(ALLSTATE);
-    jj_consume_token(131);
+    jj_consume_token(132);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -245,7 +262,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(132);
+    jj_consume_token(133);
         this.getField(_policy, "allState").set(true);
   }
 
@@ -261,7 +278,7 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(STATE);
     tmpStr = sString();
                                 this.getField(state, "name").set(tmpStr);
-    jj_consume_token(131);
+    jj_consume_token(132);
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -483,7 +500,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(132);
+    jj_consume_token(133);
         this.appendValue(_policy, "states", state);
   }
 
@@ -738,7 +755,7 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(SIGNATURE);
     tmpStr = sString();
                                     this.getField(signature, "name").set(tmpStr);
-    jj_consume_token(131);
+    jj_consume_token(132);
     label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -783,7 +800,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(132);
+    jj_consume_token(133);
         this.appendValue(_state, "signatures", signature);
   }
 

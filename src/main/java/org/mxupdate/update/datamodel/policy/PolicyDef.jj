@@ -66,6 +66,7 @@ TOKEN : /** first level */
   | <FORMAT:          "format">           : LALL_EXPECTED
   | <STORE:           "store">            : S_EXPECTED
   | <DEFAULTFORMAT:   "defaultformat">    : S_EXPECTED
+  | <ENFORCE:         "enforce">          : B_EXPECTED
   | <DELIMITER:       "delimiter">        : D_EXPECTED
   | <SEQUENCE:        "sequence">         : S_EXPECTED
   | <MINORSEQUENCE:   "minorsequence">    : S_EXPECTED
@@ -266,13 +267,15 @@ Policy_mxJPO policy(final ParameterCache_mxJPO _paramCache,
       | ( format(policy) )
       | ( type(policy) )
       | ( <DEFAULTFORMAT>  tmp = sString()     {this.getField(policy, "defaultFormat").set(tmp);} )
+      | ( <ENFORCE>        ( <BOOLEAN_TRUE>    {this.getField(policy, "enforce").set(true);}
+                           | <BOOLEAN_FALSE>   {this.getField(policy, "enforce").set(false);} ) )
       | ( <DELIMITER>      tmp = sString()     {this.getField(policy, "delimiter").set(tmp);} )
       | ( <SEQUENCE>       tmp = sString()     {this.getField(policy, "minorsequence").set(tmp);} )
       | ( <MINORSEQUENCE>  tmp = sString()     {this.getField(policy, "minorsequence").set(tmp);} )
       | ( <MAJORSEQUENCE>  tmp = sString()     {this.getField(policy, "majorsequence").set(tmp);} )
       | ( <STORE>          tmp = sString()     {this.getField(policy, "store").set(tmp);} )
       | ( <HIDDEN>         ( <BOOLEAN_TRUE>    {this.getField(policy, "hidden").set(true);}
-                          | <BOOLEAN_FALSE>    {this.getField(policy, "hidden").set(false);} ) )
+                           | <BOOLEAN_FALSE>   {this.getField(policy, "hidden").set(false);} ) )
       | ( allstate(policy) )
       | ( state(policy) )
     )*

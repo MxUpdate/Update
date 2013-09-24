@@ -135,12 +135,12 @@ public class Policy_mxJPO
 
     /** Default format of this policy. */
     private String defaultFormat = null;
-
     /** All possible formats of this policy. */
     private final Set<String> formats = new TreeSet<String>();
-
     /** Are all formats allowed of this policy? */
     private boolean allFormats;
+    /** Locking enforced? */
+    private boolean enforce;
 
     /** Delimiter between Major and Minor Revision. */
     private String delimiter = null;
@@ -219,6 +219,9 @@ public class Policy_mxJPO
             parsed = true;
         } else if ("/allowAllFormats".equals(_url))  {
             this.allFormats = true;
+            parsed = true;
+        } else if ("/enforceLocking".equals(_url))  {
+            this.enforce = true;
             parsed = true;
 
         } else if ("/delimiter".equals(_url))  {
@@ -334,7 +337,7 @@ public class Policy_mxJPO
                 .append(StringUtil_mxJPO.joinTcl(' ', true, this.types, null))
                 .append("}");
         }
-        // formats
+        // formats and locking enforced
         if (this.allFormats)  {
             _out.append("\n  format all");
         } else  {
@@ -343,6 +346,9 @@ public class Policy_mxJPO
                 .append("}");
         }
         _out.append("\n  defaultformat \"").append(StringUtil_mxJPO.convertTcl(this.defaultFormat)).append('\"');
+        if (this.enforce)  {
+            _out.append("\n  enforce \"true\"");
+        }
 
         // major / minor sequence and delimiter
         if ((this.delimiter != null) && !this.delimiter.isEmpty())  {
@@ -521,6 +527,15 @@ public class Policy_mxJPO
                 cmd.append(" defaultformat ADMINISTRATION");
             } else  {
                 this.calcValueDelta(cmd, "defaultformat", policy.defaultFormat, this.defaultFormat);
+            }
+
+            // enforce only if not equal
+            if (this.enforce != policy.enforce)  {
+                cmd.append(' ');
+                if (!policy.enforce)  {
+                    cmd.append("not");
+                }
+                cmd.append("enforce");
             }
 
             this.calcValueDelta(cmd, "sequence", policy.minorsequence, this.minorsequence);

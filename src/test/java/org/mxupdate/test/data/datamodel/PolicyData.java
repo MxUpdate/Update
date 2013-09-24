@@ -245,6 +245,11 @@ public class PolicyData
             strg.append(" format {").append(StringUtil_mxJPO.joinMql(' ', true, formatNames, null)).append("}\n");
         }
 
+        // enforce
+        if (this.getFlag("enforce") != null)  {
+            strg.append("  enforce \"").append(this.getFlag("enforce")).append("\"\n");
+        }
+
         if (this.allState != null)  {
             this.allState.append4CIFile(strg);
         }
@@ -295,7 +300,7 @@ public class PolicyData
                 cmd.append(" type ").append(StringUtil_mxJPO.joinMql(',', true, typeNames, null));
             }
 
-            // assign formats
+            // assign formats / enforce flag
             if (this.allFormats)  {
                 cmd.append(" format all ");
             } else if (!this.formats.isEmpty()) {
@@ -305,6 +310,13 @@ public class PolicyData
                     format.create();
                 }
                 cmd.append(" format ").append(StringUtil_mxJPO.joinMql(',', true, formatNames, null));
+            }
+            if (this.getFlag("enforce") != null)  {
+                cmd.append(' ');
+                if (!this.getFlag("enforce"))  {
+                    cmd.append("not");
+                }
+                cmd.append("enforce");
             }
 
             if (this.allState != null)  {
@@ -434,6 +446,21 @@ public class PolicyData
             this.checkSingleValue(_exportParser, "types", "type", "{" + StringUtil_mxJPO.joinMql(' ', true, typeNames, null) + "}");
         } else  {
             this.checkSingleValue(_exportParser, "types", "type", "{}");
+        }
+
+        // check for enforce flag
+        if (this.getFlag("enforce") == null)  {
+            this.checkSingleValue(
+                    _exportParser,
+                    "enforce flag must be not defined",
+                    "enforce",
+                    null);
+        } else  {
+            this.checkSingleValue(
+                    _exportParser,
+                    "enforce flag",
+                    "enforce",
+                    "\""+ this.getFlag("enforce") + "\"");
         }
 
         // check for formats

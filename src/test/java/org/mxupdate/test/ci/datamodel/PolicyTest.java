@@ -159,7 +159,7 @@ public class PolicyTest
      *
      * @return object array with all test policies
      */
-    @IssueLink({"30", "86", "119", "120", "121", "179"})
+    @IssueLink({"30", "86", "119", "120", "121", "179", "182"})
     @DataProvider(name = "data")
     public Object[][] getPolicies()
     {
@@ -251,7 +251,19 @@ public class PolicyTest
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .setValue("published", "false"))}
+                                        .setValue("published", "false"))},
+                // locking enforced flag
+                new Object[]{
+                        "issue #182: policy state with enforce true",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .setFlag("enforce", true)},
+                new Object[]{
+                        "issue #182: policy state with enforce false (means that not defined)",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .setFlag("enforce", false),
+                        new PolicyData(this, "test")}
         );
     }
 
