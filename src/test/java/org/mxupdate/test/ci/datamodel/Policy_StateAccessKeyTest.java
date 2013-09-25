@@ -21,8 +21,8 @@
 package org.mxupdate.test.ci.datamodel;
 
 import org.mxupdate.test.data.datamodel.PolicyData;
-import org.mxupdate.test.data.datamodel.PolicyData.Access;
 import org.mxupdate.test.data.datamodel.PolicyData.State;
+import org.mxupdate.test.data.datamodel.helper.Access;
 import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.test.util.Version;
@@ -36,7 +36,7 @@ import org.testng.annotations.Test;
  * @version $Id$
  */
 @Test()
-public class Policy_StateAccessKey_Test
+public class Policy_StateAccessKeyTest
     extends AbstractPolicyTest
 {
     /**
@@ -321,7 +321,7 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State() {
                                     {
-                                        final PersonAdminData user = new PersonAdminData(Policy_StateAccessKey_Test.this, "creator");
+                                        final PersonAdminData user = new PersonAdminData(Policy_StateAccessKeyTest.this, "creator");
                                         this.setName("create")
                                             .addAccess(
                                                     new Access()
@@ -370,7 +370,7 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State() {
                                     {
-                                        final PersonAdminData user = new PersonAdminData(Policy_StateAccessKey_Test.this, "creator");
+                                        final PersonAdminData user = new PersonAdminData(Policy_StateAccessKeyTest.this, "creator");
                                         this.setName("create")
                                             .addAccess(
                                                     new Access()
@@ -422,7 +422,7 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()  {
                                     {
-                                        final PersonAdminData user = new PersonAdminData(Policy_StateAccessKey_Test.this, "creator");
+                                        final PersonAdminData user = new PersonAdminData(Policy_StateAccessKeyTest.this, "creator");
                                         this.setName("create")
                                             .addAccess(
                                                     new Access()

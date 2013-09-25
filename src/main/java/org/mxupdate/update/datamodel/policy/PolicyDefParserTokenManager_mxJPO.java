@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Set;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
-import org.mxupdate.update.datamodel.Policy_mxJPO.Access;
-import org.mxupdate.update.datamodel.Policy_mxJPO.AccessList;
-import org.mxupdate.update.datamodel.Policy_mxJPO.AccessPrefix;
+import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
+import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
+import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Prefix;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 

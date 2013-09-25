@@ -20,7 +20,10 @@
 
 package org.mxupdate.test.data.datamodel;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,6 +31,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.AbstractAdminData;
+import org.mxupdate.test.data.datamodel.helper.Access;
 
 /**
  * Used to define a rule, create them and test the result.
@@ -39,68 +43,15 @@ public class RuleData
     extends AbstractAdminData<RuleData>
 {
     /**
-     * Owner access.
-     *
-     * @see #setOwnerAccess(String, String)
-     */
-    private String ownerAccess = "none";
-
-    /**
-     * Filter expression for owner access.
-     *
-     * @see #setOwnerAccess(String, String)
-     */
-    private String ownerAccessFilter;
-
-    /**
-     * Owner revoke.
-     *
-     * @see #setOwnerRevoke(String, String)
-     */
-    private String ownerRevoke;
-
-    /**
-     * Filter expression for owner revoke.
-     *
-     * @see #setOwnerRevoke(String, String)
-     */
-    private String ownerRevokeFilter;
-
-    /**
-     * Public access.
-     *
-     * @see #setPublicAccess(String, String)
-     */
-    private String publicAccess = "none";
-
-    /**
-     * Filter expression for public access.
-     *
-     * @see #setPublicAccess(String, String)
-     */
-    private String publicAccessFilter;
-
-    /**
-     * Public revoke.
-     *
-     * @see #setPublicRevoke(String, String)
-     */
-    private String publicRevoke;
-
-    /**
-     * Filter expression for public revoke.
-     *
-     * @see #setPublicRevoke(String, String)
-     */
-    private String publicRevokeFilter;
-
-    /**
      * Within export the description and default value must be defined.
      */
     private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
     static  {
         RuleData.REQUIRED_EXPORT_VALUES.put("description", "");
     }
+
+    /** Access definitions for this state. */
+    private final List<Access> accessList = new ArrayList<Access>();
 
     /**
      * Initialize this rule with given <code>_name</code>.
@@ -116,62 +67,14 @@ public class RuleData
     }
 
     /**
-     * Defines the owner access including the filter expression for this rule.
+     * Appends given {@code _accessList}.
      *
-     * @param _access   access for the owner
-     * @param _filter   filter expression
+     * @param _accessList    access list to append
      * @return this rule data instance
      */
-    public RuleData setOwnerAccess(final String _access,
-                                   final String _filter)
+    public RuleData addAccess(final Access... _accessList)
     {
-        this.ownerAccess = _access;
-        this.ownerAccessFilter = _filter;
-        return this;
-    }
-
-    /**
-     * Defines the owner revoke including the filter expression for this rule.
-     *
-     * @param _access   revoke for the owner
-     * @param _filter   filter expression
-     * @return this rule data instance
-     */
-    public RuleData setOwnerRevoke(final String _access,
-                                   final String _filter)
-    {
-        this.ownerRevoke = _access;
-        this.ownerRevokeFilter = _filter;
-        return this;
-    }
-
-    /**
-     * Defines the public access including the filter expression for this rule.
-     *
-     * @param _access   access for the public
-     * @param _filter   filter expression
-     * @return this rule data instance
-     */
-    public RuleData setPublicAccess(final String _access,
-                                    final String _filter)
-    {
-        this.publicAccess = _access;
-        this.publicAccessFilter = _filter;
-        return this;
-    }
-
-    /**
-     * Defines the public revoke including the filter expression for this rule.
-     *
-     * @param _access   revoke for the public
-     * @param _filter   filter expression
-     * @return this rule data instance
-     */
-    public RuleData setPublicRevoke(final String _access,
-                                    final String _filter)
-    {
-        this.publicRevoke = _access;
-        this.publicRevokeFilter = _filter;
+        this.accessList.addAll(Arrays.asList(_accessList));
         return this;
     }
 
@@ -198,42 +101,43 @@ public class RuleData
      * @throws MatrixException if create failed
      */
     @Override()
-    public RuleData create() throws MatrixException
+    public RuleData create()
+        throws MatrixException
     {
         if (!this.isCreated())  {
             this.setCreated(true);
 
+            this.createDependings();
+
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add rule \"").append(AbstractTest.convertMql(this.getName()))
-               .append("\" ");
-            // owner access
-            cmd.append(" owner ").append(this.ownerAccess);
-            if (this.ownerAccessFilter != null)  {
-                cmd.append(" filter \"").append(AbstractTest.convertMql(this.ownerAccessFilter)).append("\" ");
+               .append("\" owner none public none ");
+
+            for (final Access access : this.accessList)  {
+                cmd.append(' ').append(access.getMQLCreateString());
             }
-            // owner revoke
-            if (this.ownerRevoke != null)  {
-                cmd.append(" revoke owner ").append(this.ownerRevoke);
-                if (this.ownerRevokeFilter != null)  {
-                    cmd.append(" filter \"").append(AbstractTest.convertMql(this.ownerRevokeFilter)).append("\" ");
-                }
-            }
-            // public access
-            cmd.append(" public ").append(this.publicAccess);
-            if (this.publicAccessFilter != null)  {
-                cmd.append(" filter \"").append(AbstractTest.convertMql(this.publicAccessFilter)).append("\" ");
-            }
-            // public revoke
-            if (this.publicRevoke != null)  {
-                cmd.append(" revoke public ").append(this.publicRevoke);
-                if (this.publicRevokeFilter != null)  {
-                    cmd.append(" filter \"").append(AbstractTest.convertMql(this.publicRevokeFilter)).append("\" ");
-                }
-            }
+
             this.append4Create(cmd);
 
             this.getTest().mql(cmd);
         }
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     * The defined users in the {@link #accessList access lists} are created.
+     */
+    @Override()
+    public RuleData createDependings()
+        throws MatrixException
+    {
+        for (final Access access : this.accessList)  {
+            access.createDependings();
+        }
+
+        super.createDependings();
+
         return this;
     }
 
@@ -246,37 +150,9 @@ public class RuleData
     protected void evalAdds4CheckExport(final Set<String> _needAdds)
     {
         super.evalAdds4CheckExport(_needAdds);
-        // owner access
-        final StringBuilder ownerAccess = new StringBuilder()
-            .append("owner \"").append(this.ownerAccess).append("\"");
-        if (this.ownerAccessFilter != null)  {
-            ownerAccess.append(" filter \"").append(AbstractTest.convertTcl(this.ownerAccessFilter)).append("\"");
+
+        for (final Access access : this.accessList)  {
+            _needAdds.add(access.getMQLCreateString().trim());
         }
-        _needAdds.add(ownerAccess.toString());
-        // owner revoke
-        if (this.ownerRevoke != null)  {
-            final StringBuilder ownerRevoke = new StringBuilder()
-                .append("revoke owner \"").append(this.ownerRevoke).append("\"");
-            if (this.ownerRevokeFilter != null)  {
-                ownerRevoke.append(" filter \"").append(AbstractTest.convertTcl(this.ownerRevokeFilter)).append("\"");
-            }
-            _needAdds.add(ownerRevoke.toString());
-        }
-        // public access
-        final StringBuilder publicAccess = new StringBuilder()
-            .append("public \"").append(this.publicAccess).append("\"");
-        if (this.publicAccessFilter != null)  {
-            publicAccess.append(" filter \"").append(AbstractTest.convertTcl(this.publicAccessFilter)).append("\"");
-        }
-        // public revoke
-        if (this.publicRevoke != null)  {
-            final StringBuilder publicRevoke = new StringBuilder()
-                .append("revoke public \"").append(this.publicRevoke).append("\"");
-            if (this.publicRevokeFilter != null)  {
-                publicRevoke.append(" filter \"").append(AbstractTest.convertTcl(this.publicRevokeFilter)).append("\"");
-            }
-            _needAdds.add(publicRevoke.toString());
-        }
-        _needAdds.add(publicAccess.toString());
     }
 }

@@ -21,8 +21,8 @@
 package org.mxupdate.test.ci.datamodel;
 
 import org.mxupdate.test.data.datamodel.PolicyData;
-import org.mxupdate.test.data.datamodel.PolicyData.Access;
 import org.mxupdate.test.data.datamodel.PolicyData.State;
+import org.mxupdate.test.data.datamodel.helper.Access;
 import org.testng.annotations.Test;
 
 /**
@@ -39,7 +39,7 @@ public class Policy_StateAccessTest
      * Returns text string &quot;policy with state&quot;.
      */
     @Override()
-    protected String getDescriptionPrefix()
+    public String getDescriptionPrefix()
     {
         return "policy with state";
     }
@@ -49,7 +49,7 @@ public class Policy_StateAccessTest
      * defined.
      */
     @Override()
-    protected PolicyData createNewPolicy4Access(final Access... _accesss)
+    public PolicyData createTestData4Access(final Access... _accesss)
     {
         return new PolicyData(this, "test")
                 .addState(new State()

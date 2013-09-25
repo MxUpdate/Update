@@ -25,17 +25,15 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
-import java.util.TreeSet;
-
-import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
+ * The class is used to export and import / update rule configuration items.
  *
  * @author The MxUpdate Team
  * @version $Id$
@@ -43,102 +41,19 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 public class Rule_mxJPO
     extends AbstractAdminObject_mxJPO
 {
-    /**
-     * Set of all ignored URLs from the XML definition for rules.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     */
+    /** Set of all ignored URLs from the XML definition for rules. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
-        Rule_mxJPO.IGNORED_URLS.add("/ownerAccess");
         Rule_mxJPO.IGNORED_URLS.add("/ownerAccess/access");
-        Rule_mxJPO.IGNORED_URLS.add("/ownerRevoke");
         Rule_mxJPO.IGNORED_URLS.add("/ownerRevoke/access");
-        Rule_mxJPO.IGNORED_URLS.add("/publicAccess");
         Rule_mxJPO.IGNORED_URLS.add("/publicAccess/access");
-        Rule_mxJPO.IGNORED_URLS.add("/publicRevoke");
         Rule_mxJPO.IGNORED_URLS.add("/publicRevoke/access");
         Rule_mxJPO.IGNORED_URLS.add("/userAccessList");
         Rule_mxJPO.IGNORED_URLS.add("/userAccessList/userAccess/access");
     }
 
-    /**
-     * Set holding the complete owner access.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private final Set<String> ownerAccess = new TreeSet<String>();
-
-    /**
-     * Filter for the owner access.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private String ownerAccessFilter;
-
-    /**
-     * Set holding the complete owner revoke.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private final Set<String> ownerRevoke = new TreeSet<String>();
-
-    /**
-     * Filter for the owner revoke.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private String ownerRevokeFilter;
-
-    /**
-     * Set holding the complete public access.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private final Set<String> publicAccess = new TreeSet<String>();
-
-    /**
-     * Filter for the public access.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private String publicAccessFilter;
-
-    /**
-     * Set holding the complete public revoke.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private final Set<String> publicRevoke = new TreeSet<String>();
-
-    /**
-     * Filter for the public revoke.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private String publicRevokeFilter;
-
-    /**
-     * Stack used to hold the user access while parsing.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     */
-    private final Stack<UserAccess> userAccess = new Stack<UserAccess>();
-
-    /**
-     * Sorted set of user access (by name of the user).
-     *
-     * @see #prepare(ParameterCache_mxJPO)
-     */
-    private final Set<UserAccess> userAccessSorted = new TreeSet<UserAccess>();
+    /** Access list. */
+    private final AccessList_mxJPO accessList = new AccessList_mxJPO();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -170,75 +85,12 @@ public class Rule_mxJPO
         final boolean parsed;
         if (Rule_mxJPO.IGNORED_URLS.contains(_url))  {
             parsed = true;
-        } else if (_url.startsWith("/ownerAccess/access/"))  {
-            this.ownerAccess.add(_url.replaceAll("^/ownerAccess/access/", "")
-                                     .replaceAll("Access$", ""));
+        } else if (this.accessList.parse(_paramCache, _url, _content))  {
             parsed = true;
-        } else if ("/ownerAccess/expressionFilter".equals(_url))  {
-            this.ownerAccessFilter = _content;
-            parsed = true;
-
-        } else if (_url.startsWith("/ownerRevoke/access/"))  {
-            this.ownerRevoke.add(_url.replaceAll("^/ownerRevoke/access/", "")
-                                     .replaceAll("Access$", ""));
-            parsed = true;
-        } else if ("/ownerRevoke/expressionFilter".equals(_url))  {
-            this.ownerRevokeFilter = _content;
-            parsed = true;
-
-        } else if (_url.startsWith("/publicAccess/access/"))  {
-            this.publicAccess.add(_url.replaceAll("^/publicAccess/access/", "")
-                                      .replaceAll("Access$", ""));
-            parsed = true;
-        } else if ("/publicAccess/expressionFilter".equals(_url))  {
-            this.publicAccessFilter = _content;
-            parsed = true;
-
-        } else if (_url.startsWith("/publicRevoke/access/"))  {
-            this.publicRevoke.add(_url.replaceAll("^/publicRevoke/access/", "")
-                                      .replaceAll("Access$", ""));
-            parsed = true;
-        } else if ("/publicRevoke/expressionFilter".equals(_url))  {
-            this.publicRevokeFilter = _content;
-            parsed = true;
-
-        } else if ("/userAccessList/userAccess".equals(_url))  {
-            this.userAccess.add(new UserAccess());
-            parsed = true;
-        } else if ("/userAccessList/userAccess/userRef".equals(_url))  {
-            this.userAccess.peek().userRef = _content;
-            parsed = true;
-        } else if (_url.startsWith("/userAccessList/userAccess/access/"))  {
-            this.userAccess.peek().access.add(_url.replaceAll("^/userAccessList/userAccess/access/", "")
-                                                  .replaceAll("Access$", ""));
-            parsed = true;
-        } else if ("/userAccessList/userAccess/expressionFilter".equals(_url))  {
-            this.userAccess.peek().expressionFilter = _content;
-            parsed = true;
-
         } else  {
             parsed = super.parse(_paramCache, _url, _content);
         }
         return parsed;
-    }
-
-    /**
-     * The user access instances are sorted.
-     *
-     * @param _paramCache   parameter cache
-     * @see #userAccess         unsorted list of user access
-     * @see #userAccessSorted   sorted list user access (after this method is
-     *                          called)
-     * @throws MatrixException if the prepare from derived class failed
-     */
-    @Override()
-    protected void prepare(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
-    {
-        for (final UserAccess range : this.userAccess)  {
-            this.userAccessSorted.add(range);
-        }
-        super.prepare(_paramCache);
     }
 
     /**
@@ -258,56 +110,7 @@ public class Rule_mxJPO
         // hidden?
         _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden");
 
-        // owner access
-        _out.append(" \\\n    add owner \"")
-            .append(StringUtil_mxJPO.joinTcl(',', false, this.ownerAccess, null))
-            .append('\"');
-        if ((this.ownerAccessFilter != null) && !"".equals(this.ownerAccessFilter))  {
-            _out.append(" filter \"")
-                .append(StringUtil_mxJPO.convertTcl(this.ownerAccessFilter))
-                .append("\"");
-        }
-        // owner revoke
-        if ((!this.ownerRevoke.isEmpty() && !((this.ownerRevoke.size() == 1) && this.ownerRevoke.contains("none")))
-                || ((this.ownerRevokeFilter != null) && !"".equals(this.ownerRevokeFilter)))  {
-            _out.append(" \\\n    add revoke owner \"")
-                .append(StringUtil_mxJPO.joinTcl(',', false, this.ownerRevoke, null))
-                .append("\"");
-            if ((this.ownerRevokeFilter != null) && !"".equals(this.ownerRevokeFilter))  {
-                _out.append(" filter \"")
-                    .append(StringUtil_mxJPO.convertTcl(this.ownerRevokeFilter))
-                    .append("\"");
-            }
-        }
-        // public access
-        _out.append(" \\\n    add public \"")
-            .append(StringUtil_mxJPO.joinTcl(',', false, this.publicAccess, null))
-            .append('\"');
-        if ((this.publicAccessFilter != null) && !"".equals(this.publicAccessFilter))  {
-            _out.append(" filter \"")
-                .append(StringUtil_mxJPO.convertTcl(this.publicAccessFilter))
-                .append("\"");
-        }
-        // public revoke
-        if ((!this.publicRevoke.isEmpty() && !((this.publicRevoke.size() == 1) && this.publicRevoke.contains("none")))
-                || ((this.publicRevokeFilter != null) && !"".equals(this.publicRevokeFilter)))  {
-            _out.append(" \\\n    add revoke public \"")
-                .append(StringUtil_mxJPO.joinTcl(',', false, this.publicRevoke, null))
-                .append("\"");
-            if ((this.publicRevokeFilter != null) && !"".equals(this.publicRevokeFilter))  {
-                _out.append(" filter \"")
-                    .append(StringUtil_mxJPO.convertTcl(this.publicRevokeFilter))
-                    .append("\"");
-            }
-        }
-        // user access
-        for (final UserAccess userAccess : this.userAccessSorted)  {
-            _out.append(" \\\n    add user \"").append(StringUtil_mxJPO.convertTcl(userAccess.userRef)).append("\" \"")
-                .append(StringUtil_mxJPO.joinTcl(',', false, userAccess.access, null))
-                .append("\" filter \"")
-                .append(StringUtil_mxJPO.convertTcl(userAccess.expressionFilter))
-                .append("\"");
-        }
+        this.accessList.update(" \\\n    add", _out);
     }
 
     /**
@@ -348,64 +151,14 @@ public class Rule_mxJPO
         final StringBuilder preMQLCode = new StringBuilder()
             .append("escape mod ").append(this.getTypeDef().getMxAdminName())
             .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-            .append(" !hidden owner none public none");
-        // owner revoke
-        if (!this.ownerRevoke.isEmpty() || (this.ownerAccessFilter != null))  {
-            preMQLCode.append(" revoke owner none filter \"\"");
-        }
-        // public revoke
-        if (!this.publicRevoke.isEmpty() || (this.publicAccessFilter != null))  {
-            preMQLCode.append(" revoke public none filter \"\"");
-        }
-        // remove user access
-        for (final UserAccess userAccess : this.userAccessSorted)  {
-            preMQLCode.append(" remove user \"")
-                        .append(StringUtil_mxJPO.convertMql(userAccess.userRef))
-                        .append("\" all");
-        }
+            .append(" !hidden ");
+
+        this.accessList.cleanup(preMQLCode);
 
         // append already existing pre MQL code
         preMQLCode.append(";\n")
                   .append(_preMQLCode);
 
         super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
-    }
-
-    /**
-     * Class used to hold the user access.
-     */
-    private class UserAccess
-        implements Comparable<Rule_mxJPO.UserAccess>
-    {
-        /**
-         * Holds the user references of a user access.
-         */
-        String userRef = null;
-
-        /**
-         * Holds the access of the user.
-         */
-        final Set<String> access = new TreeSet<String>();
-
-        /**
-         * Holds the expression filter of a user access.
-         */
-        String expressionFilter = null;
-
-        /**
-         * Compares this user access instance to another user access instance.
-         * Only the user reference {@link #userRef} is used to compare.
-         *
-         * @param _userAccess   user access instance to which this instance
-         *                      must be compared to
-         * @return a negative integer, zero, or a positive integer as this
-         *         object represented by {@link #userRef} is less than, equal
-         *         to, or greater than the specified object represented by
-         *         {@link #userRef}
-         */
-        public int compareTo(final UserAccess _userAccess)
-        {
-            return this.userRef.compareTo(_userAccess.userRef);
-        }
     }
 }

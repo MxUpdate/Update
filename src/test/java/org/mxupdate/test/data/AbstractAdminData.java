@@ -399,7 +399,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
                 needAdds.size(),
                 "all adds defined (found adds = " + foundAdds + "; need adds = " + needAdds + ")");
         for (final String foundAdd : foundAdds)  {
-            Assert.assertTrue(needAdds.contains(foundAdd), "check that add '" + foundAdd + "' is defined (required are " + needAdds + ")");
+            Assert.assertTrue(needAdds.contains(foundAdd), "check that add '" + foundAdd + "' is defined (found adds = " + foundAdds + "; need adds = " + needAdds + ")");
         }
 
         // check hidden flag

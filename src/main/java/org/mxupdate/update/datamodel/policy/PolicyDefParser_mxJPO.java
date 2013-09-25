@@ -10,9 +10,9 @@ import java.util.Set;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
-import org.mxupdate.update.datamodel.Policy_mxJPO.Access;
-import org.mxupdate.update.datamodel.Policy_mxJPO.AccessList;
-import org.mxupdate.update.datamodel.Policy_mxJPO.AccessPrefix;
+import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
+import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
+import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Prefix;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
@@ -199,7 +199,7 @@ public class PolicyDefParser_mxJPO
  * @param _policy   policy for which the all state definition is parsed
  */
   final public void allstate(final Policy_mxJPO _policy) throws ParseException_mxJPO {
-    final AccessList accessList = this.getField(_policy, "allStateAccess").<AccessList>get();
+    final AccessList_mxJPO accessList = this.getField(_policy, "allStateAccess").<AccessList_mxJPO>get();
     jj_consume_token(ALLSTATE);
     jj_consume_token(132);
     label_2:
@@ -217,25 +217,25 @@ public class PolicyDefParser_mxJPO
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case OWNER:
-        stateOwnerAccess(AccessPrefix.All, accessList);
+        stateOwnerAccess(Prefix.All, accessList);
         break;
       case PUBLIC:
-        statePublicAccess(AccessPrefix.All, accessList);
+        statePublicAccess(Prefix.All, accessList);
         break;
       case USER:
-        stateUserAccess(AccessPrefix.All, accessList);
+        stateUserAccess(Prefix.All, accessList);
         break;
       case REVOKE:
         jj_consume_token(REVOKE);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case OWNER:
-          stateOwnerAccess(AccessPrefix.Revoke, accessList);
+          stateOwnerAccess(Prefix.Revoke, accessList);
           break;
         case PUBLIC:
-          statePublicAccess(AccessPrefix.Revoke, accessList);
+          statePublicAccess(Prefix.Revoke, accessList);
           break;
         case USER:
-          stateUserAccess(AccessPrefix.Revoke, accessList);
+          stateUserAccess(Prefix.Revoke, accessList);
           break;
         default:
           jj_consume_token(-1);
@@ -246,13 +246,13 @@ public class PolicyDefParser_mxJPO
         jj_consume_token(LOGIN);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case OWNER:
-          stateOwnerAccess(AccessPrefix.Login,  accessList);
+          stateOwnerAccess(Prefix.Login,  accessList);
           break;
         case PUBLIC:
-          statePublicAccess(AccessPrefix.Login,  accessList);
+          statePublicAccess(Prefix.Login,  accessList);
           break;
         case USER:
-          stateUserAccess(AccessPrefix.Login,  accessList);
+          stateUserAccess(Prefix.Login,  accessList);
           break;
         default:
           jj_consume_token(-1);
@@ -426,25 +426,25 @@ public class PolicyDefParser_mxJPO
         }
         break;
       case OWNER:
-        stateOwnerAccess(AccessPrefix.All, state);
+        stateOwnerAccess(Prefix.All, state);
         break;
       case PUBLIC:
-        statePublicAccess(AccessPrefix.All, state);
+        statePublicAccess(Prefix.All, state);
         break;
       case USER:
-        stateUserAccess(AccessPrefix.All, state);
+        stateUserAccess(Prefix.All, state);
         break;
       case REVOKE:
         jj_consume_token(REVOKE);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case OWNER:
-          stateOwnerAccess(AccessPrefix.Revoke, state);
+          stateOwnerAccess(Prefix.Revoke, state);
           break;
         case PUBLIC:
-          statePublicAccess(AccessPrefix.Revoke, state);
+          statePublicAccess(Prefix.Revoke, state);
           break;
         case USER:
-          stateUserAccess(AccessPrefix.Revoke, state);
+          stateUserAccess(Prefix.Revoke, state);
           break;
         default:
           jj_consume_token(-1);
@@ -455,13 +455,13 @@ public class PolicyDefParser_mxJPO
         jj_consume_token(LOGIN);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case OWNER:
-          stateOwnerAccess(AccessPrefix.Login,  state);
+          stateOwnerAccess(Prefix.Login,  state);
           break;
         case PUBLIC:
-          statePublicAccess(AccessPrefix.Login,  state);
+          statePublicAccess(Prefix.Login,  state);
           break;
         case USER:
-          stateUserAccess(AccessPrefix.Login,  state);
+          stateUserAccess(Prefix.Login,  state);
           break;
         default:
           jj_consume_token(-1);
@@ -512,7 +512,7 @@ public class PolicyDefParser_mxJPO
  * @param _prefix   access filter prefix
  * @param _access   current parsed access definition of the policy
  */
-  final public void stateOwnerAccess(final AccessPrefix _prefix, final AccessList _accessList) throws ParseException_mxJPO {
+  final public void stateOwnerAccess(final Prefix _prefix, final AccessList_mxJPO _accessList) throws ParseException_mxJPO {
     final Access access = new Access();
     jj_consume_token(OWNER);
     stateAccessDef(access);
@@ -527,7 +527,7 @@ public class PolicyDefParser_mxJPO
  * @param _prefix   access filter prefix
  * @param _access   current parsed access definition of the policy
  */
-  final public void statePublicAccess(final AccessPrefix _prefix, final AccessList _accessList) throws ParseException_mxJPO {
+  final public void statePublicAccess(final Prefix _prefix, final AccessList_mxJPO _accessList) throws ParseException_mxJPO {
     final Access access = new Access();
     jj_consume_token(PUBLIC);
     stateAccessDef(access);
@@ -542,7 +542,7 @@ public class PolicyDefParser_mxJPO
  * @param _prefix   access filter prefix
  * @param _access   current parsed access definition of the policy
  */
-  final public void stateUserAccess(final AccessPrefix _prefix, final AccessList _accessList) throws ParseException_mxJPO {
+  final public void stateUserAccess(final Prefix _prefix, final AccessList_mxJPO _accessList) throws ParseException_mxJPO {
     final Access access = new Access();
     String user;
     jj_consume_token(USER);

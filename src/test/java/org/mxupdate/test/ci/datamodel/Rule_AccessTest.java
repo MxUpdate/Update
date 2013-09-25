@@ -21,23 +21,27 @@
 package org.mxupdate.test.ci.datamodel;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
+import org.mxupdate.test.ci.datamodel.AccessTestUtil.IAccessTest;
 import org.mxupdate.test.data.datamodel.RuleData;
+import org.mxupdate.test.data.datamodel.helper.Access;
+import org.mxupdate.test.util.IssueLink;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test class for rule exports and updates.
+ * Test class for rule exports.
  *
  * @author The MxUpdate Team
  * @version $Id$
  */
 @Test()
-public class RuleTest
+public class Rule_AccessTest
     extends AbstractDataExportUpdate<RuleData>
+    implements IAccessTest
 {
     /**
-     * Creates for given <code>_name</code> a new rule instance.
+     * Creates for given {@code _name} a new rule instance.
      *
      * @param _name     name of the rule instance
      * @return rule instance
@@ -46,21 +50,6 @@ public class RuleTest
     protected RuleData createNewData(final String _name)
     {
         return new RuleData(this, _name);
-    }
-
-    /**
-     * Data provider for test rules.
-     *
-     * @return object array with all test rules
-     */
-    @DataProvider(name = "data")
-    public Object[][] getRules()
-    {
-        return this.prepareData("rule",
-                new Object[]{
-                        "rule without anything (to test required fields)",
-                        new RuleData(this, "hello \" test")}
-        );
     }
 
     /**
@@ -73,5 +62,36 @@ public class RuleTest
         throws Exception
     {
         this.cleanup(CI.DM_RULE);
+        this.cleanup(CI.USR_PERSON);
+    }
+
+    /**
+     * Data provider for test policies.
+     *
+     * @return object array with all test policies
+     */
+    @IssueLink({"177", "180", "181"})
+    @DataProvider(name = "data")
+    public Object[][] getRules()
+    {
+        return super.prepareData((String) null, AccessTestUtil.getTestData(this));
+    }
+
+    /**
+     * Returns text string &quot;policy with allstate&quot;.
+     */
+    @Override()
+    public String getDescriptionPrefix()
+    {
+        return "rule";
+    }
+
+    /**
+     * A new policy with allstate for the {@code _accesss} is defined.
+     */
+    @Override()
+    public RuleData createTestData4Access(final Access... _accesss)
+    {
+        return new RuleData(this, "test").addAccess(_accesss);
     }
 }

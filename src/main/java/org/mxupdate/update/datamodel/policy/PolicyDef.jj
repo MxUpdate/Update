@@ -41,9 +41,9 @@ import java.util.Set;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
-import org.mxupdate.update.datamodel.Policy_mxJPO.Access;
-import org.mxupdate.update.datamodel.Policy_mxJPO.AccessList;
-import org.mxupdate.update.datamodel.Policy_mxJPO.AccessPrefix;
+import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
+import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
+import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Prefix;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
@@ -333,16 +333,16 @@ void type(final Policy_mxJPO _policy) :
  * @param _policy   policy for which the all state definition is parsed
  */
 void allstate(final Policy_mxJPO _policy) : {
-    final AccessList accessList = this.getField(_policy, "allStateAccess").<AccessList>get();
+    final AccessList_mxJPO accessList = this.getField(_policy, "allStateAccess").<AccessList_mxJPO>get();
 } {
     <ALLSTATE>
     "{"
         (
-            stateOwnerAccess(AccessPrefix.All, accessList)
-          | statePublicAccess(AccessPrefix.All, accessList)
-          | stateUserAccess(AccessPrefix.All, accessList)
-          | ( <REVOKE> ( stateOwnerAccess(AccessPrefix.Revoke, accessList) | statePublicAccess(AccessPrefix.Revoke, accessList) | stateUserAccess(AccessPrefix.Revoke, accessList) ) )
-          | ( <LOGIN>  ( stateOwnerAccess(AccessPrefix.Login,  accessList) | statePublicAccess(AccessPrefix.Login,  accessList) | stateUserAccess(AccessPrefix.Login,  accessList) ) )
+            stateOwnerAccess(Prefix.All, accessList)
+          | statePublicAccess(Prefix.All, accessList)
+          | stateUserAccess(Prefix.All, accessList)
+          | ( <REVOKE> ( stateOwnerAccess(Prefix.Revoke, accessList) | statePublicAccess(Prefix.Revoke, accessList) | stateUserAccess(Prefix.Revoke, accessList) ) )
+          | ( <LOGIN>  ( stateOwnerAccess(Prefix.Login,  accessList) | statePublicAccess(Prefix.Login,  accessList) | stateUserAccess(Prefix.Login,  accessList) ) )
         )*
     "}"
     {
@@ -377,11 +377,11 @@ void state(final Policy_mxJPO _policy) : {
                                 | <BOOLEAN_FALSE>   {this.getField(state, "checkoutHistory").set(false);} ) )
         | (<PUBLISHED>          ( <BOOLEAN_TRUE>    {this.getField(state, "published").set(true);}
                                 | <BOOLEAN_FALSE>   {this.getField(state, "published").set(false);} ) )
-        | stateOwnerAccess(AccessPrefix.All, state)
-        | statePublicAccess(AccessPrefix.All, state)
-        | stateUserAccess(AccessPrefix.All, state)
-        | (<REVOKE> ( stateOwnerAccess(AccessPrefix.Revoke, state) | statePublicAccess(AccessPrefix.Revoke, state) | stateUserAccess(AccessPrefix.Revoke, state) ) )
-        | (<LOGIN>  ( stateOwnerAccess(AccessPrefix.Login,  state) | statePublicAccess(AccessPrefix.Login,  state) | stateUserAccess(AccessPrefix.Login,  state) ) )
+        | stateOwnerAccess(Prefix.All, state)
+        | statePublicAccess(Prefix.All, state)
+        | stateUserAccess(Prefix.All, state)
+        | (<REVOKE> ( stateOwnerAccess(Prefix.Revoke, state) | statePublicAccess(Prefix.Revoke, state) | stateUserAccess(Prefix.Revoke, state) ) )
+        | (<LOGIN>  ( stateOwnerAccess(Prefix.Login,  state) | statePublicAccess(Prefix.Login,  state) | stateUserAccess(Prefix.Login,  state) ) )
         | (<ACTION>             tmpStr = sString()  {this.getField(state, "actionProgram").set(tmpStr);}
            <INPUT>              tmpStr = sString()  {this.getField(state, "actionInput").set(tmpStr);})
         | (<CHECK>              tmpStr = sString()  {this.getField(state, "checkProgram").set(tmpStr);}
@@ -403,7 +403,7 @@ void state(final Policy_mxJPO _policy) : {
  * @param _prefix   access filter prefix
  * @param _access   current parsed access definition of the policy
  */
-void stateOwnerAccess(final AccessPrefix _prefix, final AccessList _accessList) : {
+void stateOwnerAccess(final Prefix _prefix, final AccessList_mxJPO _accessList) : {
     final Access access = new Access();
 }  {
     ( <OWNER> stateAccessDef(access) )
@@ -420,7 +420,7 @@ void stateOwnerAccess(final AccessPrefix _prefix, final AccessList _accessList) 
  * @param _prefix   access filter prefix
  * @param _access   current parsed access definition of the policy
  */
-void statePublicAccess(final AccessPrefix _prefix, final AccessList _accessList) : {
+void statePublicAccess(final Prefix _prefix, final AccessList_mxJPO _accessList) : {
     final Access access = new Access();
 }  {
     ( <PUBLIC> stateAccessDef(access) )
@@ -437,7 +437,7 @@ void statePublicAccess(final AccessPrefix _prefix, final AccessList _accessList)
  * @param _prefix   access filter prefix
  * @param _access   current parsed access definition of the policy
  */
-void stateUserAccess(final AccessPrefix _prefix, final AccessList _accessList) : {
+void stateUserAccess(final Prefix _prefix, final AccessList_mxJPO _accessList) : {
     final Access access = new Access();
     String user;
 }  {

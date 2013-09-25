@@ -26,9 +26,9 @@ import java.util.Set;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.FormatData;
 import org.mxupdate.test.data.datamodel.PolicyData;
-import org.mxupdate.test.data.datamodel.PolicyData.Access;
 import org.mxupdate.test.data.datamodel.PolicyData.State;
 import org.mxupdate.test.data.datamodel.TypeData;
+import org.mxupdate.test.data.datamodel.helper.Access;
 import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.test.util.Version;
@@ -570,29 +570,53 @@ public class PolicyTest
         throws Exception
     {
         final PersonAdminData creator = new PersonAdminData(this, "creator").create();
+        final State state = new State().setName("Test");
+        if (this.getVersion() == Version.V6R2011x)  {
+            // for 2011x another order of the access definition...
+            state.addAccess(
+                    new Access()
+                            .setKind("owner")
+                            .addAccess("all"),
+                    new Access()
+                            .setPrefix("revoke")
+                            .setKind("owner")
+                            .addAccess("read"),
+                    new Access()
+                            .setKind("public")
+                            .addAccess("all"),
+                    new Access()
+                            .setPrefix("revoke")
+                            .setKind("public")
+                            .addAccess("read"),
+                    new Access()
+                            .setKind("user")
+                            .setUser(creator)
+                            .addAccess("read", "show"));
+        } else  {
+            state.addAccess(
+                    new Access()
+                            .setPrefix("revoke")
+                            .setKind("public")
+                            .addAccess("read"),
+                    new Access()
+                            .setPrefix("revoke")
+                            .setKind("owner")
+                            .addAccess("read"),
+                    new Access()
+                            .setKind("public")
+                            .addAccess("all"),
+                    new Access()
+                            .setKind("owner")
+                            .addAccess("all"),
+                    new Access()
+                            .setKind("user")
+                            .setUser(creator)
+                            .addAccess("read", "show"));
+        }
         final PolicyData policy = new PolicyData(this, "Test")
-                .addState(new PolicyData.State()
-                        .setName("Test")
-                        .addAccess(
-                                new Access()
-                                        .setKind("owner")
-                                        .addAccess("all"),
-                                new Access()
-                                        .setPrefix("revoke")
-                                        .setKind("owner")
-                                        .addAccess("read"),
-                                new Access()
-                                        .setKind("public")
-                                        .addAccess("all"),
-                                new Access()
-                                        .setPrefix("revoke")
-                                        .setKind("public")
-                                        .addAccess("read"),
-                                new Access()
-                                        .setKind("user")
-                                        .setUser(creator)
-                                        .addAccess("read", "show")))
-                .update();
+                .addState(state)
+                .update()
+                .checkExport();
         this.mql("mod policy '" + policy.getName() + "' state Test user " + creator.getName() + " read,show filter Test");
         this.mql("mod policy '" + policy.getName() + "' state Test owner all filter Test");
         this.mql("mod policy '" + policy.getName() + "' state Test revoke owner read filter Test");
