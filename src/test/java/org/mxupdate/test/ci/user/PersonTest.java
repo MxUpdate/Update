@@ -34,6 +34,7 @@ import org.mxupdate.test.data.user.organization.CompanyData;
 import org.mxupdate.test.data.user.organization.DepartmentData;
 import org.mxupdate.test.data.user.organization.PlantData;
 import org.mxupdate.test.data.util.PropertyDef;
+import org.mxupdate.test.util.Version;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -61,6 +62,23 @@ public class PersonTest
     protected PersonData createNewData(final String _name)
     {
         return new PersonData(this, _name);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p><b>Hint:</b> In V6R2011x the icon mail is NOT automatically
+     * deactivated from user agent if the person is disabled.</p>
+     */
+    @Override()
+    protected PersonData createCleanNewData(final PersonData _original)
+    {
+        final PersonData ret = super.createCleanNewData(_original);
+
+        if (this.getVersion() != Version.V6R2011x)  {
+            ret.setWantsIconMail(false);
+        }
+
+        return ret;
     }
 
     /**
