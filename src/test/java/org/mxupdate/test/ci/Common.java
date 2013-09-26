@@ -126,7 +126,7 @@ public class Common
         final Map<String,String> files = new HashMap<String,String>();
         files.put(_ci.filePrefix + AbstractTest.PREFIX + "_Test"
                         + ((_ci == AbstractTest.CI.IEF_EBOMSYNC_CONFIG) ? AbstractBusData.SEPARATOR + "-" : "") + ".tcl",
-                  "mql exec prog org.mxupdate.update.util.JPOCaller");
+                  "mql exec prog org.mxupdate.update.util.JPOCaller;");
         final Map<?,?> bck = this.executeEncoded("Update", null, "FileContents", files);
         final Exception ex = (Exception) bck.get("exception");
         Assert.assertTrue((ex != null), "an exception must be thrown");

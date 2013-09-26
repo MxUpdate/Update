@@ -219,7 +219,7 @@ public class Dimension_mxJPO
      * @param _paramCache   parameter cache
      * @throws MatrixException if preparation failed
      */
-    @Override
+    @Override()
     protected void prepare(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
@@ -330,7 +330,7 @@ public class Dimension_mxJPO
      * @param _out          appendable instance to the TCL update file (not
      *                      used)
      */
-    @Override
+    @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
     {
@@ -355,7 +355,7 @@ public class Dimension_mxJPO
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update from derived class failed
      */
-    @Override
+    @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
@@ -391,12 +391,12 @@ public class Dimension_mxJPO
      *                   changed, a modified or offset of a unit is changed
      * @see #TCL_PROCEDURE
      */
-    @Override
+    @Override()
     public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
                                final String... _args)
         throws Exception
     {
-        if (!"dimension".equals(_args[0]))  {
+        if ((_args.length != 3) || !"dimension".equals(_args[0]))  {
             super.jpoCallExecute(_paramCache, _args);
         } else if (!this.getName().equals(_args[1])) {
             throw new Exception("Dimension '" + _args[1]
@@ -576,8 +576,8 @@ public class Dimension_mxJPO
          * @return &quot;0&quot; if both units are equal; &quot;1&quot; if
          *         greater; otherwise &quot;-1&quot;
          */
-        @Override
-		public int compareTo(final Unit _toCompare)
+        @Override()
+        public int compareTo(final Unit _toCompare)
         {
             return (this.name == null)
                     ? (_toCompare.name == null)
