@@ -67,10 +67,9 @@ public class Common
     public Object[][] getData4JPOCaller()
     {
         final List<Object[]> ret = new ArrayList<Object[]>();
-        for (int i = 0; i < AbstractTest.CI.values().length; i++)  {
-            final AbstractTest.CI ci = AbstractTest.CI.values()[i];
-            if ((ci != AbstractTest.CI.OTHER_SITE) && !Common.IGNORES.contains(ci))  {
-                ret.add(new Object[]{AbstractTest.CI.values()[i]});
+        for (final CI ci : CI.values())  {
+            if (!Common.IGNORES.contains(ci) && (ci.filePath != null))  {
+                ret.add(new Object[]{ci});
             }
         }
         return ret.toArray(new Object[ret.size()][]);
