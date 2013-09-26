@@ -21,7 +21,7 @@
 package org.mxupdate.test.ci.datamodel;
 
 import org.mxupdate.test.data.datamodel.PolicyData;
-import org.mxupdate.test.data.datamodel.PolicyData.AccessFilter;
+import org.mxupdate.test.data.datamodel.PolicyData.Access;
 import org.mxupdate.test.data.datamodel.PolicyData.State;
 import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.util.IssueLink;
@@ -55,7 +55,7 @@ public class Policy_StateAccessKey_Test
                         new PolicyData(this, "test")
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(new AccessFilter()
+                                        .addAccess(new Access()
                                                 .setKind("public")
                                                 .addAccess("all")))},
                 new Object[]{
@@ -64,7 +64,7 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(new AccessFilter()
+                                        .addAccess(new Access()
                                                 .setKind("public")
                                                 .addAccess("all")
                                                 .setKey("abcd 123")))},
@@ -74,15 +74,15 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(
-                                                new AccessFilter()
+                                        .addAccess(
+                                                new Access()
                                                         .setKind("public")
                                                         .addAccess("modify", "show"),
-                                                new AccessFilter()
+                                                new Access()
                                                         .setKind("public")
                                                         .addAccess("read", "show")
                                                         .setKey("abcd 1"),
-                                                new AccessFilter()
+                                                new Access()
                                                         .setKind("public")
                                                         .addAccess("toconnect", "todisconnect")
                                                         .setKey("abcd 2")))},
@@ -93,7 +93,7 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(new AccessFilter()
+                                        .addAccess(new Access()
                                                 .setPrefix("login")
                                                 .setKind("public")
                                                 .addAccess("all")))},
@@ -103,7 +103,7 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(new AccessFilter()
+                                        .addAccess(new Access()
                                                 .setPrefix("login")
                                                 .setKind("public")
                                                 .addAccess("all")
@@ -114,17 +114,17 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(
-                                                new AccessFilter()
+                                        .addAccess(
+                                                new Access()
                                                         .setPrefix("login")
                                                         .setKind("public")
                                                         .addAccess("modify", "show"),
-                                                new AccessFilter()
+                                                new Access()
                                                         .setPrefix("login")
                                                         .setKind("public")
                                                         .addAccess("read", "show")
                                                         .setKey("abcd 1"),
-                                                new AccessFilter()
+                                                new Access()
                                                         .setPrefix("login")
                                                         .setKind("public")
                                                         .addAccess("toconnect", "todisconnect")
@@ -135,7 +135,7 @@ public class Policy_StateAccessKey_Test
                         new PolicyData(this, "test")
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(new AccessFilter()
+                                        .addAccess(new Access()
                                                 .setPrefix("revoke")
                                                 .setKind("public")
                                                 .addAccess("all")))},
@@ -145,7 +145,7 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(new AccessFilter()
+                                        .addAccess(new Access()
                                                 .setPrefix("revoke")
                                                 .setKind("public")
                                                 .addAccess("all")
@@ -156,17 +156,17 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(
-                                                new AccessFilter()
+                                        .addAccess(
+                                                new Access()
                                                         .setPrefix("revoke")
                                                         .setKind("public")
                                                         .addAccess("modify", "show"),
-                                                new AccessFilter()
+                                                new Access()
                                                         .setPrefix("revoke")
                                                         .setKind("public")
                                                         .addAccess("read", "show")
                                                         .setKey("abcd 1"),
-                                                new AccessFilter()
+                                                new Access()
                                                         .setPrefix("revoke")
                                                         .setKind("public")
                                                         .addAccess("toconnect", "todisconnect")
@@ -177,7 +177,7 @@ public class Policy_StateAccessKey_Test
                         new PolicyData(this, "test")
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(new AccessFilter()
+                                        .addAccess(new Access()
                                                 .setKind("owner")
                                                 .addAccess("all")))},
                 new Object[]{
@@ -186,7 +186,7 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(new AccessFilter()
+                                        .addAccess(new Access()
                                                 .setKind("owner")
                                                 .addAccess("all")
                                                 .setKey("abcd 123")))},
@@ -196,15 +196,15 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(
-                                                new AccessFilter()
+                                        .addAccess(
+                                                new Access()
                                                         .setKind("owner")
                                                         .addAccess("modify", "show"),
-                                                new AccessFilter()
+                                                new Access()
                                                         .setKind("owner")
                                                         .addAccess("read", "show")
                                                         .setKey("abcd 1"),
-                                                new AccessFilter()
+                                                new Access()
                                                         .setKind("owner")
                                                         .addAccess("toconnect", "todisconnect")
                                                         .setKey("abcd 2")))},
@@ -215,7 +215,7 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(new AccessFilter()
+                                        .addAccess(new Access()
                                                 .setPrefix("login")
                                                 .setKind("owner")
                                                 .addAccess("all")))},
@@ -225,7 +225,7 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(new AccessFilter()
+                                        .addAccess(new Access()
                                                 .setPrefix("login")
                                                 .setKind("owner")
                                                 .addAccess("all")
@@ -236,17 +236,17 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(
-                                                new AccessFilter()
+                                        .addAccess(
+                                                new Access()
                                                         .setPrefix("login")
                                                         .setKind("owner")
                                                         .addAccess("modify", "show"),
-                                                new AccessFilter()
+                                                new Access()
                                                         .setPrefix("login")
                                                         .setKind("owner")
                                                         .addAccess("read", "show")
                                                         .setKey("abcd 1"),
-                                                new AccessFilter()
+                                                new Access()
                                                         .setPrefix("login")
                                                         .setKind("owner")
                                                         .addAccess("toconnect", "todisconnect")
@@ -258,7 +258,7 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(new AccessFilter()
+                                        .addAccess(new Access()
                                                 .setPrefix("revoke")
                                                 .setKind("owner")
                                                 .addAccess("all")))},
@@ -268,7 +268,7 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(new AccessFilter()
+                                        .addAccess(new Access()
                                                 .setPrefix("revoke")
                                                 .setKind("owner")
                                                 .addAccess("all")
@@ -279,17 +279,17 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(
-                                                new AccessFilter()
+                                        .addAccess(
+                                                new Access()
                                                         .setPrefix("revoke")
                                                         .setKind("owner")
                                                         .addAccess("modify", "show"),
-                                                new AccessFilter()
+                                                new Access()
                                                         .setPrefix("revoke")
                                                         .setKind("owner")
                                                         .addAccess("read", "show")
                                                         .setKey("abcd 1"),
-                                                new AccessFilter()
+                                                new Access()
                                                         .setPrefix("revoke")
                                                         .setKind("owner")
                                                         .addAccess("toconnect", "todisconnect")
@@ -300,7 +300,7 @@ public class Policy_StateAccessKey_Test
                         new PolicyData(this, "test")
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(new AccessFilter()
+                                        .addAccess(new Access()
                                                 .setKind("user")
                                                 .setUser(new PersonAdminData(this, "creator"))
                                                 .addAccess("all")))},
@@ -310,7 +310,7 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(new AccessFilter()
+                                        .addAccess(new Access()
                                                 .setKind("user")
                                                 .setUser(new PersonAdminData(this, "creator"))
                                                 .addAccess("all")
@@ -323,17 +323,17 @@ public class Policy_StateAccessKey_Test
                                     {
                                         final PersonAdminData user = new PersonAdminData(Policy_StateAccessKey_Test.this, "creator");
                                         this.setName("create")
-                                            .addAccessFilter(
-                                                    new AccessFilter()
+                                            .addAccess(
+                                                    new Access()
                                                             .setKind("user")
                                                             .setUser(user)
                                                             .addAccess("modify", "show"),
-                                                    new AccessFilter()
+                                                    new Access()
                                                             .setKind("user")
                                                             .setUser(user)
                                                             .addAccess("read", "show")
                                                             .setKey("abcd 1"),
-                                                    new AccessFilter()
+                                                    new Access()
                                                             .setKind("user")
                                                             .setUser(user)
                                                             .addAccess("toconnect", "todisconnect")
@@ -347,7 +347,7 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(new AccessFilter()
+                                        .addAccess(new Access()
                                                 .setPrefix("login")
                                                 .setKind("user")
                                                 .setUser(new PersonAdminData(this, "creator"))
@@ -358,7 +358,7 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(new AccessFilter()
+                                        .addAccess(new Access()
                                                 .setPrefix("login")
                                                 .setKind("user")
                                                 .setUser(new PersonAdminData(this, "creator"))
@@ -372,19 +372,19 @@ public class Policy_StateAccessKey_Test
                                     {
                                         final PersonAdminData user = new PersonAdminData(Policy_StateAccessKey_Test.this, "creator");
                                         this.setName("create")
-                                            .addAccessFilter(
-                                                    new AccessFilter()
+                                            .addAccess(
+                                                    new Access()
                                                             .setPrefix("login")
                                                             .setKind("user")
                                                             .setUser(user)
                                                             .addAccess("modify", "show"),
-                                                    new AccessFilter()
+                                                    new Access()
                                                             .setPrefix("login")
                                                             .setKind("user")
                                                             .setUser(user)
                                                             .addAccess("read", "show")
                                                             .setKey("abcd 1"),
-                                                    new AccessFilter()
+                                                    new Access()
                                                             .setPrefix("login")
                                                             .setKind("user")
                                                             .setUser(user)
@@ -399,7 +399,7 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(new AccessFilter()
+                                        .addAccess(new Access()
                                                 .setPrefix("revoke")
                                                 .setKind("user")
                                                 .setUser(new PersonAdminData(this, "creator"))
@@ -410,7 +410,7 @@ public class Policy_StateAccessKey_Test
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .addAccessFilter(new AccessFilter()
+                                        .addAccess(new Access()
                                                 .setPrefix("revoke")
                                                 .setKind("user")
                                                 .setUser(new PersonAdminData(this, "creator"))
@@ -424,19 +424,19 @@ public class Policy_StateAccessKey_Test
                                     {
                                         final PersonAdminData user = new PersonAdminData(Policy_StateAccessKey_Test.this, "creator");
                                         this.setName("create")
-                                            .addAccessFilter(
-                                                    new AccessFilter()
+                                            .addAccess(
+                                                    new Access()
                                                             .setPrefix("revoke")
                                                             .setKind("user")
                                                             .setUser(user)
                                                             .addAccess("modify", "show"),
-                                                    new AccessFilter()
+                                                    new Access()
                                                             .setPrefix("revoke")
                                                             .setKind("user")
                                                             .setUser(user)
                                                             .addAccess("read", "show")
                                                             .setKey("abcd 1"),
-                                                    new AccessFilter()
+                                                    new Access()
                                                             .setPrefix("revoke")
                                                             .setKind("user")
                                                             .setUser(user)

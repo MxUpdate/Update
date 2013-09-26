@@ -26,7 +26,7 @@ import java.util.Set;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.FormatData;
 import org.mxupdate.test.data.datamodel.PolicyData;
-import org.mxupdate.test.data.datamodel.PolicyData.AccessFilter;
+import org.mxupdate.test.data.datamodel.PolicyData.Access;
 import org.mxupdate.test.data.datamodel.PolicyData.State;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.user.PersonAdminData;
@@ -573,22 +573,22 @@ public class PolicyTest
         final PolicyData policy = new PolicyData(this, "Test")
                 .addState(new PolicyData.State()
                         .setName("Test")
-                        .addAccessFilter(
-                                new AccessFilter()
+                        .addAccess(
+                                new Access()
                                         .setKind("owner")
                                         .addAccess("all"),
-                                new AccessFilter()
+                                new Access()
                                         .setPrefix("revoke")
                                         .setKind("owner")
                                         .addAccess("read"),
-                                new AccessFilter()
+                                new Access()
                                         .setKind("public")
                                         .addAccess("all"),
-                                new AccessFilter()
+                                new Access()
                                         .setPrefix("revoke")
                                         .setKind("public")
                                         .addAccess("read"),
-                                new AccessFilter()
+                                new Access()
                                         .setKind("user")
                                         .setUser(creator)
                                         .addAccess("read", "show")))

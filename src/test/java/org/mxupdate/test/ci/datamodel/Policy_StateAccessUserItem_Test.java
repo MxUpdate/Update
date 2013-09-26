@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mxupdate.test.data.datamodel.PolicyData;
-import org.mxupdate.test.data.datamodel.PolicyData.AccessFilter;
+import org.mxupdate.test.data.datamodel.PolicyData.Access;
 import org.mxupdate.test.data.datamodel.PolicyData.State;
 import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.test.util.Version;
@@ -58,7 +58,7 @@ public class Policy_StateAccessUserItem_Test
                         .notSupported(Version.V6R2011x)
                         .addState(new State()
                                 .setName("create")
-                                .addAccessFilter(new AccessFilter()
+                                .addAccess(new Access()
                                         .setKind("public")
                                         .addAccess("read", "show")
                                         .setOrganization("any"))),
@@ -66,7 +66,7 @@ public class Policy_StateAccessUserItem_Test
                         .notSupported(Version.V6R2011x)
                         .addState(new State()
                                 .setName("create")
-                                .addAccessFilter(new AccessFilter()
+                                .addAccess(new Access()
                                         .setKind("public")
                                         .addAccess("read", "show")))});
         ret.add(new Object[]{
@@ -75,7 +75,7 @@ public class Policy_StateAccessUserItem_Test
                         .notSupported(Version.V6R2011x)
                         .addState(new State()
                                 .setName("create")
-                                .addAccessFilter(new AccessFilter()
+                                .addAccess(new Access()
                                         .setKind("public")
                                         .addAccess("read", "show")
                                         .setProject("any"))),
@@ -83,7 +83,7 @@ public class Policy_StateAccessUserItem_Test
                         .notSupported(Version.V6R2011x)
                         .addState(new State()
                                 .setName("create")
-                                .addAccessFilter(new AccessFilter()
+                                .addAccess(new Access()
                                         .setKind("public")
                                         .addAccess("read", "show")))});
 
@@ -94,7 +94,7 @@ public class Policy_StateAccessUserItem_Test
                         .notSupported(Version.V6R2011x)
                         .addState(new State()
                                 .setName("create")
-                                .addAccessFilter(new AccessFilter()
+                                .addAccess(new Access()
                                         .setKind("public")
                                         .addAccess("read", "show")
                                         .setOrganization(orgOrProj)))});
@@ -104,7 +104,7 @@ public class Policy_StateAccessUserItem_Test
                             .notSupported(Version.V6R2011x)
                             .addState(new State()
                                     .setName("create")
-                                    .addAccessFilter(new AccessFilter()
+                                    .addAccess(new Access()
                                             .setKind("public")
                                             .addAccess("read", "show")
                                             .setProject(orgOrProj)))});
@@ -114,7 +114,7 @@ public class Policy_StateAccessUserItem_Test
                             .notSupported(Version.V6R2011x)
                             .addState(new State()
                                     .setName("create")
-                                    .addAccessFilter(new AccessFilter()
+                                    .addAccess(new Access()
                                             .setKind("public")
                                             .addAccess("read", "show")
                                             .setOrganization("any")
@@ -123,7 +123,7 @@ public class Policy_StateAccessUserItem_Test
                             .notSupported(Version.V6R2011x)
                             .addState(new State()
                                     .setName("create")
-                                    .addAccessFilter(new AccessFilter()
+                                    .addAccess(new Access()
                                             .setKind("public")
                                             .addAccess("read", "show")
                                             .setProject(orgOrProj)))});
@@ -136,7 +136,7 @@ public class Policy_StateAccessUserItem_Test
                         .notSupported(Version.V6R2011x)
                         .addState(new State()
                                 .setName("create")
-                                .addAccessFilter(new AccessFilter()
+                                .addAccess(new Access()
                                         .setKind("public")
                                         .addAccess("read", "show")
                                         .setOwner("any"))),
@@ -144,7 +144,7 @@ public class Policy_StateAccessUserItem_Test
                         .notSupported(Version.V6R2011x)
                         .addState(new State()
                                 .setName("create")
-                                .addAccessFilter(new AccessFilter()
+                                .addAccess(new Access()
                                         .setKind("public")
                                         .addAccess("read", "show")))});
         ret.add(new Object[]{
@@ -153,7 +153,7 @@ public class Policy_StateAccessUserItem_Test
                         .notSupported(Version.V6R2011x)
                         .addState(new State()
                                 .setName("create")
-                                .addAccessFilter(new AccessFilter()
+                                .addAccess(new Access()
                                         .setKind("public")
                                         .addAccess("read", "show")
                                         .setOwner("context")))});
@@ -165,7 +165,7 @@ public class Policy_StateAccessUserItem_Test
                         .notSupported(Version.V6R2011x)
                         .addState(new State()
                                 .setName("create")
-                                .addAccessFilter(new AccessFilter()
+                                .addAccess(new Access()
                                         .setKind("public")
                                         .addAccess("read", "show")
                                         .setReserve("any"))),
@@ -173,7 +173,7 @@ public class Policy_StateAccessUserItem_Test
                         .notSupported(Version.V6R2011x)
                         .addState(new State()
                                 .setName("create")
-                                .addAccessFilter(new AccessFilter()
+                                .addAccess(new Access()
                                         .setKind("public")
                                         .addAccess("read", "show")))});
         for (final String reserve : new String[]{"no", "context", "inclusive"})  {
@@ -183,7 +183,7 @@ public class Policy_StateAccessUserItem_Test
                         .notSupported(Version.V6R2011x)
                         .addState(new State()
                                 .setName("create")
-                                .addAccessFilter(new AccessFilter()
+                                .addAccess(new Access()
                                         .setKind("public")
                                         .addAccess("read", "show")
                                         .setReserve(reserve)))});
@@ -196,7 +196,7 @@ public class Policy_StateAccessUserItem_Test
                         .notSupported(Version.V6R2011x)
                         .addState(new State()
                                 .setName("create")
-                                .addAccessFilter(new AccessFilter()
+                                .addAccess(new Access()
                                         .setKind("public")
                                         .addAccess("read", "show")
                                         .setMaturity("any"))),
@@ -204,7 +204,7 @@ public class Policy_StateAccessUserItem_Test
                         .notSupported(Version.V6R2011x)
                         .addState(new State()
                                 .setName("create")
-                                .addAccessFilter(new AccessFilter()
+                                .addAccess(new Access()
                                         .setKind("public")
                                         .addAccess("read", "show")))});
         for (final String maturity : new String[]{"no", "public", "protected", "private", "notprivate", "ppp"})  {
@@ -214,7 +214,7 @@ public class Policy_StateAccessUserItem_Test
                         .notSupported(Version.V6R2011x)
                         .addState(new State()
                                 .setName("create")
-                                .addAccessFilter(new AccessFilter()
+                                .addAccess(new Access()
                                         .setKind("public")
                                         .addAccess("read", "show")
                                         .setMaturity(maturity)))});
@@ -231,7 +231,7 @@ public class Policy_StateAccessUserItem_Test
                                         .notSupported(Version.V6R2011x)
                                         .addState(new State()
                                                 .setName("create")
-                                                .addAccessFilter(new AccessFilter()
+                                                .addAccess(new Access()
                                                         .setKind("public")
                                                         .addAccess("read", "show")
                                                         .setOrganization(org)

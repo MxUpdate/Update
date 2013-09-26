@@ -22,11 +22,7 @@ package org.mxupdate.test.ci.datamodel;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.PolicyData;
-import org.mxupdate.test.data.datamodel.PolicyData.AccessFilter;
-import org.mxupdate.test.data.datamodel.PolicyData.State;
-import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.util.IssueLink;
-import org.mxupdate.test.util.Version;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -48,96 +44,10 @@ public class Policy_StateAccessUser_Test
      *
      * @return object array with all test policies
      */
-    @IssueLink({"177"})
     @DataProvider(name = "data")
     public Object[][] getPolicies()
     {
-        return this.prepareData((String) null,
-                new Object[]{
-                        "issue #177: policy with state access for login public read/show",
-                        new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
-                                .addState(new State()
-                                        .setName("create")
-                                        .addAccessFilter(new AccessFilter()
-                                                .setPrefix("login")
-                                                .setKind("public")
-                                                .addAccess("read", "show")))},
-                new Object[]{
-                        "issue #177: policy with state access for login public all",
-                        new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
-                                .addState(new State()
-                                        .setName("create")
-                                        .addAccessFilter(new AccessFilter()
-                                                .setPrefix("login")
-                                                .setKind("public")
-                                                .addAccess("all")))},
-                new Object[]{
-                        "issue #177: policy with state access for login owner read/show",
-                        new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
-                                .addState(new State()
-                                        .setName("create")
-                                        .addAccessFilter(new AccessFilter()
-                                                .setPrefix("login")
-                                                .setKind("owner")
-                                                .addAccess("read", "show")))},
-                new Object[]{
-                        "issue #177: policy with state access for login owner all",
-                        new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
-                                .addState(new State()
-                                        .setName("create")
-                                        .addAccessFilter(new AccessFilter()
-                                                .setPrefix("login")
-                                                .setKind("owner")
-                                                .addAccess("all")))},
-                new Object[]{
-                        "issue #177: policy with state access for login user read/show",
-                        new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
-                                .addState(new State()
-                                        .setName("create")
-                                        .addAccessFilter(new AccessFilter()
-                                                .setPrefix("login")
-                                                .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
-                                                .addAccess("read", "show")))},
-                new Object[]{
-                        "issue #177: policy with state access for login user all",
-                        new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
-                                .addState(new State()
-                                        .setName("create")
-                                        .addAccessFilter(new AccessFilter()
-                                                .setPrefix("login")
-                                                .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
-                                                .addAccess("all")))},
-                new Object[]{
-                        "issue #177: policy with state access for revoke user creator read/show",
-                        new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
-                                .addState(new State()
-                                        .setName("create")
-                                        .addAccessFilter(new AccessFilter()
-                                                .setPrefix("revoke")
-                                                .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
-                                                .addAccess("read", "show")))},
-                new Object[]{
-                        "issue #177: policy with state access for revoke user creator all",
-                        new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
-                                .addState(new State()
-                                        .setName("create")
-                                        .addAccessFilter(new AccessFilter()
-                                                .setPrefix("revoke")
-                                                .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
-                                                .addAccess("all")))}
-        );
+        return new Object[][]{};
     }
 
     /**

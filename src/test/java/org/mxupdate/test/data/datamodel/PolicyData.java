@@ -366,14 +366,14 @@ public class PolicyData
         }
         // create assigned users
         if (this.allState != null)  {
-            for (final AccessFilter access : this.allState.accessFilters)  {
+            for (final Access access : this.allState.access)  {
                 if (access.user != null)  {
                     access.user.create();
                 }
             }
         }
         for (final State state : this.states)  {
-            for (final AccessFilter access : state.accessFilters)  {
+            for (final Access access : state.access)  {
                 if (access.user != null)  {
                     access.user.create();
                 }
@@ -572,7 +572,7 @@ public class PolicyData
      *
      * @param <AF>  class which is defined from this class
      */
-    public static class AccessFilter
+    public static class Access
     {
         /** Prefix. */
         private String prefix;
@@ -603,7 +603,7 @@ public class PolicyData
          * @param _prefix       new prefix
          * @return this instance
          */
-        public AccessFilter setPrefix(final String _prefix)
+        public Access setPrefix(final String _prefix)
         {
             this.prefix = _prefix;
             return this;
@@ -615,7 +615,7 @@ public class PolicyData
          * @param _user     referenced user
          * @return this instance
          */
-        public AccessFilter setKind(final String _kind)
+        public Access setKind(final String _kind)
         {
             this.kind = _kind;
             return this;
@@ -627,7 +627,7 @@ public class PolicyData
          * @param _user     referenced user
          * @return this instance
          */
-        public AccessFilter setUser(final AbstractUserData<?> _user)
+        public Access setUser(final AbstractUserData<?> _user)
         {
             this.user = _user;
             return this;
@@ -639,7 +639,7 @@ public class PolicyData
          * @param _key      new key
          * @return this instance
          */
-        public AccessFilter setKey(final String _key)
+        public Access setKey(final String _key)
         {
             this.key = _key;
             return this;
@@ -651,7 +651,7 @@ public class PolicyData
          * @param _access   access to append
          * @return this instance
          */
-        public AccessFilter addAccess(final String... _access)
+        public Access addAccess(final String... _access)
         {
             this.access.addAll(Arrays.asList(_access));
             return this;
@@ -663,7 +663,7 @@ public class PolicyData
          * @param _filter   new filter
          * @return this instance
          */
-        public AccessFilter setFilter(final String _filter)
+        public Access setFilter(final String _filter)
         {
             this.filter = _filter;
             return this;
@@ -675,7 +675,7 @@ public class PolicyData
          * @param _organization     organization
          * @return this instance
          */
-        public AccessFilter setOrganization(final String _organization)
+        public Access setOrganization(final String _organization)
         {
             this.organization = _organization;
             return this;
@@ -687,7 +687,7 @@ public class PolicyData
          * @param _owner    owner
          * @return this instance
          */
-        public AccessFilter setOwner(final String _owner)
+        public Access setOwner(final String _owner)
         {
             this.owner = _owner;
             return this;
@@ -699,7 +699,7 @@ public class PolicyData
          * @param _reserve      reserve
          * @return this instance
          */
-        public AccessFilter setReserve(final String _reserve)
+        public Access setReserve(final String _reserve)
         {
             this.reserve = _reserve;
             return this;
@@ -711,7 +711,7 @@ public class PolicyData
          * @param _maturity     maturity
          * @return this instance
          */
-        public AccessFilter setMaturity(final String _maturity)
+        public Access setMaturity(final String _maturity)
         {
             this.maturity = _maturity;
             return this;
@@ -723,7 +723,7 @@ public class PolicyData
          * @param _project      project
          * @return this instance
          */
-        public AccessFilter setProject(final String _project)
+        public Access setProject(final String _project)
         {
             this.project = _project;
             return this;
@@ -828,21 +828,21 @@ public class PolicyData
      */
     public static abstract class AbstractState<AS extends AbstractState<AS>>
     {
-        /** Access filter definition for this state. */
-        public final List<AccessFilter> accessFilters = new ArrayList<AccessFilter>();
+        /** Access definitions for this state. */
+        public final List<Access> access = new ArrayList<Access>();
         /** Values of this state. */
         private final Map<String,Object> values = new HashMap<String,Object>();
 
         /**
          * Appends a access filter definition.
          *
-         * @param _accessFilters    access filters to append
+         * @param _access    access filters to append
          * @return this state instance
          */
         @SuppressWarnings("unchecked")
-        public AS addAccessFilter(final AccessFilter... _accessFilters)
+        public AS addAccess(final Access... _access)
         {
-            this.accessFilters.addAll(Arrays.asList(_accessFilters));
+            this.access.addAll(Arrays.asList(_access));
             return (AS) this;
         }
 
@@ -926,8 +926,7 @@ public class PolicyData
         protected void append4CIFile(final StringBuilder _cmd)
         {
             _cmd.append("    state \"").append(StringUtil_mxJPO.convertTcl(this.name)).append("\" {\n");
-            for (final AccessFilter accessFilter : this.accessFilters)
-            {
+            for (final Access accessFilter : this.access)  {
                 accessFilter.append4CIFile(_cmd);
             }
             for (final Map.Entry<String,Object> value : this.getValues().entrySet())  {
@@ -949,8 +948,7 @@ public class PolicyData
         protected void append4Create(final StringBuilder _cmd)
         {
             _cmd.append("    state \"").append(StringUtil_mxJPO.convertMql(this.name)).append("\" public none owner none");
-            for (final AccessFilter accessFilter : this.accessFilters)
-            {
+            for (final Access accessFilter : this.access)  {
                 _cmd.append(' ').append(accessFilter.getMQLCreateString());
             }
             for (final Map.Entry<String,Object> value : this.getValues().entrySet())  {
@@ -990,7 +988,7 @@ public class PolicyData
                         }
                     }
                     final StringBuilder expAccess = new StringBuilder();
-                    for (final AccessFilter accessFilter : this.accessFilters)  {
+                    for (final Access accessFilter : this.access)  {
                         accessFilter.append4CIFile(expAccess);
                     }
                     Assert.assertEquals(
@@ -1033,8 +1031,7 @@ public class PolicyData
         protected void append4CIFile(final StringBuilder _cmd)
         {
             _cmd.append("    allstate {\n");
-            for (final AccessFilter accessFilter : this.accessFilters)
-            {
+            for (final Access accessFilter : this.access)  {
                 accessFilter.append4CIFile(_cmd);
             }
             _cmd.append("    }\n");
@@ -1048,8 +1045,7 @@ public class PolicyData
         protected void append4Create(final StringBuilder _cmd)
         {
             _cmd.append(" allstate public none owner none");
-            for (final AccessFilter accessFilter : this.accessFilters)
-            {
+            for (final Access accessFilter : this.access)  {
                 _cmd.append(' ').append(accessFilter.getMQLCreateString());
             }
         }
@@ -1081,7 +1077,7 @@ public class PolicyData
                     }
                     // prepare expected definition
                     final StringBuilder expAccess = new StringBuilder();
-                    for (final AccessFilter accessFilter : this.accessFilters)  {
+                    for (final Access accessFilter : this.access)  {
                         accessFilter.append4CIFile(expAccess);
                     }
                     Assert.assertEquals(
