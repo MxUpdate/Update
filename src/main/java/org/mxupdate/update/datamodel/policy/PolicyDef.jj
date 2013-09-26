@@ -33,6 +33,8 @@ PARSER_BEGIN(PolicyDefParser)
 package org.mxupdate.update.datamodel.policy;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -40,8 +42,8 @@ import java.util.Set;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO.Access;
+import org.mxupdate.update.datamodel.Policy_mxJPO.AccessList;
 import org.mxupdate.update.datamodel.Policy_mxJPO.AccessPrefix;
-import org.mxupdate.update.datamodel.Policy_mxJPO.AccessFilter;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
@@ -331,16 +333,16 @@ void type(final Policy_mxJPO _policy) :
  * @param _policy   policy for which the all state definition is parsed
  */
 void allstate(final Policy_mxJPO _policy) : {
-    final Policy_mxJPO.Access access = this.getField(_policy, "allStateAccess").<Policy_mxJPO.Access>get();
+    final AccessList accessList = this.getField(_policy, "allStateAccess").<AccessList>get();
 } {
     <ALLSTATE>
     "{"
         (
-            stateOwnerAccess(AccessPrefix.All, access)
-          | statePublicAccess(AccessPrefix.All, access)
-          | stateUserAccess(AccessPrefix.All, access)
-          | ( <REVOKE> ( stateOwnerAccess(AccessPrefix.Revoke, access) | statePublicAccess(AccessPrefix.Revoke, access) | stateUserAccess(AccessPrefix.Revoke, access) ) )
-          | ( <LOGIN>  ( stateOwnerAccess(AccessPrefix.Login,  access) | statePublicAccess(AccessPrefix.Login,  access) | stateUserAccess(AccessPrefix.Login,  access) ) )
+            stateOwnerAccess(AccessPrefix.All, accessList)
+          | statePublicAccess(AccessPrefix.All, accessList)
+          | stateUserAccess(AccessPrefix.All, accessList)
+          | ( <REVOKE> ( stateOwnerAccess(AccessPrefix.Revoke, accessList) | statePublicAccess(AccessPrefix.Revoke, accessList) | stateUserAccess(AccessPrefix.Revoke, accessList) ) )
+          | ( <LOGIN>  ( stateOwnerAccess(AccessPrefix.Login,  accessList) | statePublicAccess(AccessPrefix.Login,  accessList) | stateUserAccess(AccessPrefix.Login,  accessList) ) )
         )*
     "}"
     {
@@ -401,14 +403,14 @@ void state(final Policy_mxJPO _policy) : {
  * @param _prefix   access filter prefix
  * @param _access   current parsed access definition of the policy
  */
-void stateOwnerAccess(final AccessPrefix _prefix, final Access _access) : {
-    final AccessFilter accessFilter = new AccessFilter();
+void stateOwnerAccess(final AccessPrefix _prefix, final AccessList _accessList) : {
+    final Access access = new Access();
 }  {
-    ( <OWNER> stateAccessDef(accessFilter) )
+    ( <OWNER> stateAccessDef(access) )
     {
-        this.getField(accessFilter, "prefix").set(_prefix);
-        this.getField(accessFilter, "kind").set("owner");
-        ((Map<AccessPrefix,Set<AccessFilter>>)(this.getValue(_access, "ownerAccess"))).get(_prefix).add(accessFilter);
+        this.getField(access, "prefix").set(_prefix);
+        this.getField(access, "kind").set("owner");
+        ((Collection<Access>)(this.getValue(_accessList, "accessList"))).add(access);
     }
 }
 
@@ -418,14 +420,14 @@ void stateOwnerAccess(final AccessPrefix _prefix, final Access _access) : {
  * @param _prefix   access filter prefix
  * @param _access   current parsed access definition of the policy
  */
-void statePublicAccess(final AccessPrefix _prefix, final Access _access) : {
-    final AccessFilter accessFilter = new AccessFilter();
+void statePublicAccess(final AccessPrefix _prefix, final AccessList _accessList) : {
+    final Access access = new Access();
 }  {
-    ( <PUBLIC> stateAccessDef(accessFilter) )
+    ( <PUBLIC> stateAccessDef(access) )
     {
-        this.getField(accessFilter, "prefix").set(_prefix);
-        this.getField(accessFilter, "kind").set("public");
-        ((Map<AccessPrefix,Set<AccessFilter>>)(this.getValue(_access, "publicAccess"))).get(_prefix).add(accessFilter);
+        this.getField(access, "prefix").set(_prefix);
+        this.getField(access, "kind").set("public");
+        ((Collection<Access>)(this.getValue(_accessList, "accessList"))).add(access);
     }
 }
 
@@ -435,20 +437,20 @@ void statePublicAccess(final AccessPrefix _prefix, final Access _access) : {
  * @param _prefix   access filter prefix
  * @param _access   current parsed access definition of the policy
  */
-void stateUserAccess(final AccessPrefix _prefix, final Access _access) : {
-    final AccessFilter accessFilter = new AccessFilter();
+void stateUserAccess(final AccessPrefix _prefix, final AccessList _accessList) : {
+    final Access access = new Access();
     String user;
 }  {
-    ( <USER> user  = sString() stateAccessDef(accessFilter) )
+    ( <USER> user  = sString() stateAccessDef(access) )
     {
-        this.getField(accessFilter, "prefix").set(_prefix);
-        this.getField(accessFilter, "kind").set("user");
-        this.getField(accessFilter, "userRef").set(user);
-        ((Map<AccessPrefix,Set<AccessFilter>>)(this.getValue(_access, "userAccess"))).get(_prefix).add(accessFilter);
+        this.getField(access, "prefix").set(_prefix);
+        this.getField(access, "kind").set("user");
+        this.getField(access, "userRef").set(user);
+        ((Collection<Access>)(this.getValue(_accessList, "accessList"))).add(access);
     }
 }
 
-void stateAccessDef(final AccessFilter _accessFilter) : {
+void stateAccessDef(final Access _access) : {
     String key = null, filter = null, organization = null, project = null, owner = null, reserve = null, maturity = null;
     Token access = null;
 } {
@@ -481,23 +483,23 @@ void stateAccessDef(final AccessFilter _accessFilter) : {
         | ( <PPP_MATURITY>            {maturity     = "ppp";        } )
     )*
     {
-        this.getField(_accessFilter, "key").set(key);
-        this.getField(_accessFilter, "filter").set(filter);
-        this.getField(_accessFilter, "organization").set(organization);
-        this.getField(_accessFilter, "project").set(project);
-        this.getField(_accessFilter, "owner").set(owner);
-        this.getField(_accessFilter, "reserve").set(reserve);
-        this.getField(_accessFilter, "maturity").set(maturity);
+        this.getField(_access, "key").set(key);
+        this.getField(_access, "filter").set(filter);
+        this.getField(_access, "organization").set(organization);
+        this.getField(_access, "project").set(project);
+        this.getField(_access, "owner").set(owner);
+        this.getField(_access, "reserve").set(reserve);
+        this.getField(_access, "maturity").set(maturity);
 
         if (access == null)  {
-            this.getField(_accessFilter, "access").set(new HashSet<String>());
+            this.getField(_access, "access").set(new HashSet<String>());
         } else  {
             final String tmp = access.image
                     .replaceFirst("^\\{", "").replaceFirst("\\}$", "")  // remove {}
                     .replaceAll("(\t)|(\n)", " ")                       // replace tabs, new lines
                     .replaceAll("( )+", " ")                            // multiple spaces => one space
                     .trim();                                            // remove trailing spaces
-            this.getField(_accessFilter, "access").set(new HashSet<String>(java.util.Arrays.asList(tmp.split(" "))));
+            this.getField(_access, "access").set(new HashSet<String>(Arrays.asList(tmp.split(" "))));
         }
     }
 }

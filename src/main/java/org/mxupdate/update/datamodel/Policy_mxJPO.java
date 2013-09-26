@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -162,7 +161,7 @@ public class Policy_mxJPO
     private boolean allState = false;
 
     /** Access definitions for all states. */
-    private final Access allStateAccess = new Access();
+    private final AccessList allStateAccess = new AccessList();
 
     /** Stack with all states of this policy. */
     private final Stack<State> states = new Stack<State>();
@@ -277,7 +276,6 @@ public class Policy_mxJPO
     protected void prepare(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
-        this.allStateAccess.prepare();
         for (final State state : this.states)  {
             state.prepare();
         }
@@ -731,9 +729,9 @@ throw new Exception("some states are not defined anymore!");
         /** All prefix. */
         All(""),
         /** Login prefix. */
-        Login("login"),
+        Login("login "),
         /** Revoke prefix. */
-        Revoke("revoke");
+        Revoke("revoke ");
 
         /** Internal used value. */
         private final String mxValue;
@@ -753,41 +751,10 @@ throw new Exception("some states are not defined anymore!");
      * Access definition for owner / public definitions (depending on one state
      * or for {@link Policy_mxJPO#allStateAccess all states}).
      */
-    public static class Access
+    public static class AccessList
     {
-        /** Set holding the complete owner access. */
-        @SuppressWarnings("serial")
-        protected final Map<AccessPrefix,SortedSet<AccessFilter>> ownerAccess = new HashMap<AccessPrefix,SortedSet<AccessFilter>>()
-        {
-            {
-                for (final AccessPrefix prefix : AccessPrefix.values())  {
-                    this.put(prefix, new TreeSet<AccessFilter>());
-                };
-            }
-        };
-        /** Set holding the complete public access. */
-        @SuppressWarnings("serial")
-        protected final Map<AccessPrefix,SortedSet<AccessFilter>> publicAccess = new HashMap<AccessPrefix,SortedSet<AccessFilter>>()
-        {
-            {
-                for (final AccessPrefix prefix : AccessPrefix.values())  {
-                    this.put(prefix, new TreeSet<AccessFilter>());
-                };
-            }
-        };
-        /** Sorted set of user access (by name of the user). */
-        @SuppressWarnings("serial")
-        protected final Map<AccessPrefix,SortedSet<AccessFilter>> userAccess = new HashMap<AccessPrefix,SortedSet<AccessFilter>>()
-        {
-            {
-                for (final AccessPrefix prefix : AccessPrefix.values())  {
-                    this.put(prefix, new TreeSet<AccessFilter>());
-                };
-            }
-        };
-
         /** Stack used to hold the user access while parsing. */
-        protected final Stack<AccessFilter> parsingAccess = new Stack<AccessFilter>();
+        private final Stack<Access> accessList = new Stack<Access>();
 
         /**
          * Parses given access <code>_url</code>.
@@ -805,97 +772,76 @@ throw new Exception("some states are not defined anymore!");
             boolean ret = true;
             // obsolete parsing of 'owner'
             if ("/ownerAccess".equals(_url))  {
-                final AccessFilter accessFilter = new AccessFilter();
+                final Access accessFilter = new Access();
                 accessFilter.kind = "owner";
-                this.parsingAccess.add(accessFilter);
+                this.accessList.add(accessFilter);
             } else if (_url.startsWith("/ownerAccess/access"))  {
-                this.parsingAccess.peek().access.add(_url.replaceAll("^/ownerAccess/access/", "").replaceAll("Access$", "").toLowerCase());
+                this.accessList.peek().access.add(_url.replaceAll("^/ownerAccess/access/", "").replaceAll("Access$", "").toLowerCase());
             } else if ("/ownerAccess/expressionFilter".equals(_url))  {
-                this.parsingAccess.peek().filter = _content;
+                this.accessList.peek().filter = _content;
 
             // obsolete parsing of 'owner revoke'
             } else if ("/ownerRevoke".equals(_url))  {
-                final AccessFilter accessFilter = new AccessFilter();
+                final Access accessFilter = new Access();
                 accessFilter.kind = "owner";
                 accessFilter.prefix = AccessPrefix.Revoke;
-                this.parsingAccess.add(accessFilter);
+                this.accessList.add(accessFilter);
             } else if (_url.startsWith("/ownerRevoke/access"))  {
-                this.parsingAccess.peek().access.add(_url.replaceAll("^/ownerRevoke/access/", "").replaceAll("Access$", "").toLowerCase());
+                this.accessList.peek().access.add(_url.replaceAll("^/ownerRevoke/access/", "").replaceAll("Access$", "").toLowerCase());
             } else if ("/ownerRevoke/expressionFilter".equals(_url))  {
-                this.parsingAccess.peek().filter = _content;
+                this.accessList.peek().filter = _content;
 
             // obsolete parsing of 'public'
             } else if ("/publicAccess".equals(_url))  {
-                final AccessFilter accessFilter = new AccessFilter();
+                final Access accessFilter = new Access();
                 accessFilter.kind = "public";
-                this.parsingAccess.add(accessFilter);
+                this.accessList.add(accessFilter);
             } else if (_url.startsWith("/publicAccess/access"))  {
-                this.parsingAccess.peek().access.add(_url.replaceAll("^/publicAccess/access/", "").replaceAll("Access$", "").toLowerCase());
+                this.accessList.peek().access.add(_url.replaceAll("^/publicAccess/access/", "").replaceAll("Access$", "").toLowerCase());
             } else if ("/publicAccess/expressionFilter".equals(_url))  {
-                this.parsingAccess.peek().filter = _content;
+                this.accessList.peek().filter = _content;
 
             // obsolete parsing of 'public revoke'
             } else if ("/publicRevoke".equals(_url))  {
-                final AccessFilter accessFilter = new AccessFilter();
+                final Access accessFilter = new Access();
                 accessFilter.kind = "public";
                 accessFilter.prefix = AccessPrefix.Revoke;
-                this.parsingAccess.add(accessFilter);
+                this.accessList.add(accessFilter);
             } else if (_url.startsWith("/publicRevoke/access"))  {
-                this.parsingAccess.peek().access.add(_url.replaceAll("^/publicRevoke/access/", "").replaceAll("Access$", "").toLowerCase());
+                this.accessList.peek().access.add(_url.replaceAll("^/publicRevoke/access/", "").replaceAll("Access$", "").toLowerCase());
             } else if ("/publicRevoke/expressionFilter".equals(_url))  {
-                this.parsingAccess.peek().filter = _content;
+                this.accessList.peek().filter = _content;
 
             } else if ("/userAccessList/userAccess".equals(_url))  {
-                this.parsingAccess.add(new AccessFilter());
+                this.accessList.add(new Access());
             } else if (_url.startsWith("/userAccessList/userAccess/access"))  {
-                this.parsingAccess.peek().access.add(_url.replaceAll("^/userAccessList/userAccess/access/", "").replaceAll("Access$", "").toLowerCase());
+                this.accessList.peek().access.add(_url.replaceAll("^/userAccessList/userAccess/access/", "").replaceAll("Access$", "").toLowerCase());
             } else if ("/userAccessList/userAccess/matchMaturity".equals(_url))  {
-                this.parsingAccess.peek().maturity = _content;
+                this.accessList.peek().maturity = _content;
             } else if ("/userAccessList/userAccess/matchOrganization".equals(_url))  {
-                this.parsingAccess.peek().organization = _content;
+                this.accessList.peek().organization = _content;
             } else if ("/userAccessList/userAccess/matchOwner".equals(_url))  {
-                this.parsingAccess.peek().owner = _content;
+                this.accessList.peek().owner = _content;
             } else if ("/userAccessList/userAccess/matchProject".equals(_url))  {
-                this.parsingAccess.peek().project = _content;
+                this.accessList.peek().project = _content;
             } else if ("/userAccessList/userAccess/matchReserve".equals(_url))  {
-                this.parsingAccess.peek().reserve = _content;
+                this.accessList.peek().reserve = _content;
             } else if ("/userAccessList/userAccess/userAccessKey".equals(_url))  {
-                this.parsingAccess.peek().key = _content;
+                this.accessList.peek().key = _content;
             } else if ("/userAccessList/userAccess/userAccessKind".equals(_url))  {
-                this.parsingAccess.peek().kind = _content;
+                this.accessList.peek().kind = _content;
             } else if ("/userAccessList/userAccess/userAccessLoginRole".equals(_url))  {
-                this.parsingAccess.peek().prefix = AccessPrefix.Login;
+                this.accessList.peek().prefix = AccessPrefix.Login;
             } else if ("/userAccessList/userAccess/userAccessRevoke".equals(_url))  {
-                this.parsingAccess.peek().prefix = AccessPrefix.Revoke;
+                this.accessList.peek().prefix = AccessPrefix.Revoke;
             } else if ("/userAccessList/userAccess/userRef".equals(_url))  {
-                this.parsingAccess.peek().userRef = _content;
+                this.accessList.peek().userRef = _content;
             } else if ("/userAccessList/userAccess/expressionFilter".equals(_url))  {
-                this.parsingAccess.peek().filter = _content;
+                this.accessList.peek().filter = _content;
             } else  {
                 ret = false;
             }
             return ret;
-        }
-
-        /**
-         * Public and Owner Access definitions are assigned and the rest are
-         * are sorted.
-         *
-         * @see #userAccess         unsorted list of user access
-         * @see #userAccessSorted   sorted list user access (after this method is
-         *                          called)
-         */
-        protected void prepare()
-        {
-            for (final AccessFilter userAccess : this.parsingAccess)  {
-                if ("public".equals(userAccess.kind))  {
-                    this.publicAccess.get(userAccess.prefix).add(userAccess);
-                } else if ("owner".equals(userAccess.kind))  {
-                    this.ownerAccess.get(userAccess.prefix).add(userAccess);
-                } else  {
-                    this.userAccess.get(userAccess.prefix).add(userAccess);
-                }
-            }
         }
 
         /**
@@ -917,96 +863,52 @@ throw new Exception("some states are not defined anymore!");
                                    final Appendable _out)
             throws IOException
         {
-            // owner access
-            for (final AccessFilter accessFilter : this.ownerAccess.get(AccessPrefix.All))  {
-                this.writeObjectOneAccessFilter(_out, accessFilter);
-            }
-            for (final AccessFilter accessFilter : this.ownerAccess.get(AccessPrefix.Login))  {
-                this.writeObjectOneAccessFilter(_out, accessFilter);
-            }
-            for (final AccessFilter accessFilter : this.ownerAccess.get(AccessPrefix.Revoke))  {
-                this.writeObjectOneAccessFilter(_out, accessFilter);
-            }
-            // public access
-            for (final AccessFilter accessFilter : this.publicAccess.get(AccessPrefix.All))  {
-                this.writeObjectOneAccessFilter(_out, accessFilter);
-            }
-            for (final AccessFilter accessFilter : this.publicAccess.get(AccessPrefix.Login))  {
-                this.writeObjectOneAccessFilter(_out, accessFilter);
-            }
-            for (final AccessFilter accessFilter : this.publicAccess.get(AccessPrefix.Revoke))  {
-                this.writeObjectOneAccessFilter(_out, accessFilter);
-            }
-            // user access
-            for (final AccessFilter accessFilter : this.userAccess.get(AccessPrefix.All))  {
-                this.writeObjectOneAccessFilter(_out, accessFilter);
-            }
-            for (final AccessFilter accessFilter : this.userAccess.get(AccessPrefix.Login))  {
-                this.writeObjectOneAccessFilter(_out, accessFilter);
-            }
-            for (final AccessFilter accessFilter : this.userAccess.get(AccessPrefix.Revoke))  {
-                this.writeObjectOneAccessFilter(_out, accessFilter);
-            }
-        }
+            for (final Access access : this.accessList)  {
+                if (!access.isEmpty())  {
+                    _out.append("\n   ");
 
-        /**
-         * Returns the string used within the configuration item.
-         *
-         * @param _out              writer instance
-         * @param _accessFilter     access filter
-         * @throws IOException if the TCL update code could not be written
-         */
-        protected void writeObjectOneAccessFilter(final Appendable _out,
-                                                  final AccessFilter _accessFilter)
-            throws IOException
-        {
-            if ((_accessFilter != null) && !_accessFilter.isEmpty())
-            {
-                _out.append("\n    ");
+                    // revoke?
+                    if (access.prefix != AccessPrefix.All)  {
+                        _out.append(' ').append(access.prefix.mxValue);
+                    }
 
-                // revoke?
-                if (_accessFilter.prefix != AccessPrefix.All)  {
-                    _out.append(_accessFilter.prefix.mxValue).append(' ');
-                }
+                    // kind
+                    _out.append(' ').append(access.kind);
 
-                // kind
-                _out.append(_accessFilter.kind).append(' ');
+                    // append user reference (only if not public / owner definition)
+                    if (!"public".equals(access.kind) && !"owner".equals(access.kind))  {
+                        _out.append(" \"").append(StringUtil_mxJPO.convertTcl(access.userRef)).append('\"');
+                    }
 
-                // append user reference (only if not public / owner definition)
-                if (!"public".equals(_accessFilter.kind) && !"owner".equals(_accessFilter.kind))  {
-                    _out.append('\"').append(StringUtil_mxJPO.convertTcl(_accessFilter.userRef)).append("\" ");
-                }
+                    // key
+                    if ((access.key != null) && !access.key.isEmpty())  {
+                        _out.append(" key \"").append(StringUtil_mxJPO.convertTcl(access.key)).append('\"');
+                    }
 
-                // key
-                if ((_accessFilter.key != null) && !_accessFilter.key.isEmpty())  {
-                    _out.append("key \"").append(StringUtil_mxJPO.convertTcl(_accessFilter.key)).append("\" ");
-                }
+                    // access
+                    _out.append(" {")
+                        .append(StringUtil_mxJPO.joinTcl(' ', false, access.access, null))
+                        .append('}');
 
-                // access
-                _out.append("{")
-                    .append(StringUtil_mxJPO.joinTcl(' ', false, _accessFilter.access, null))
-                    .append("}");
-
-                // user items
-                if ((_accessFilter.organization != null) && !_accessFilter.organization.isEmpty() && !"any".equals(_accessFilter.organization))  {
-                    _out.append(' ').append(_accessFilter.organization).append(" organization");
-                }
-                if ((_accessFilter.project != null) && !_accessFilter.project.isEmpty() && !"any".equals(_accessFilter.project))  {
-                    _out.append(' ').append(_accessFilter.project).append(" project");
-                }
-                if ((_accessFilter.owner != null) && !_accessFilter.owner.isEmpty() && !"any".equals(_accessFilter.owner))  {
-                    _out.append(' ').append(_accessFilter.owner).append(" owner");
-                }
-                if ((_accessFilter.reserve != null) && !_accessFilter.reserve.isEmpty() && !"any".equals(_accessFilter.reserve))  {
-                    _out.append(' ').append(_accessFilter.reserve).append(" reserve");
-                }
-                if ((_accessFilter.maturity != null) && !_accessFilter.maturity.isEmpty() && !"any".equals(_accessFilter.maturity))  {
-                    _out.append(' ').append(_accessFilter.maturity).append(" maturity");
-                }
-                if ((_accessFilter.filter != null) && !"".equals(_accessFilter.filter))  {
-                    _out.append(" filter \"")
-                        .append(StringUtil_mxJPO.convertTcl(_accessFilter.filter))
-                        .append('\"');
+                    // user items
+                    if ((access.organization != null) && !access.organization.isEmpty() && !"any".equals(access.organization))  {
+                        _out.append(' ').append(access.organization).append(" organization");
+                    }
+                    if ((access.project != null) && !access.project.isEmpty() && !"any".equals(access.project))  {
+                        _out.append(' ').append(access.project).append(" project");
+                    }
+                    if ((access.owner != null) && !access.owner.isEmpty() && !"any".equals(access.owner))  {
+                        _out.append(' ').append(access.owner).append(" owner");
+                    }
+                    if ((access.reserve != null) && !access.reserve.isEmpty() && !"any".equals(access.reserve))  {
+                        _out.append(' ').append(access.reserve).append(" reserve");
+                    }
+                    if ((access.maturity != null) && !access.maturity.isEmpty() && !"any".equals(access.maturity))  {
+                        _out.append(' ').append(access.maturity).append(" maturity");
+                    }
+                    if ((access.filter != null) && !access.filter.isEmpty())  {
+                        _out.append(" filter \"").append(StringUtil_mxJPO.convertTcl(access.filter)).append('\"');
+                    }
                 }
             }
         }
@@ -1016,175 +918,72 @@ throw new Exception("some states are not defined anymore!");
          * current definition <code>_oldAccess</code> within MX. The MQL
          * statements to change are written to <code>_out</code>.
          *
-         * @param _out          writer instance
-         * @param _oldAccess    current access definition
+         * @param _out              writer instance
+         * @param _oldAccessList    current access definitions
          * @throws IOException if write failed
          */
         protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                                  final Appendable _out,
-                                 final Access _oldAccess)
+                                 final AccessList _oldAccessList)
             throws IOException
         {
-            // owner access
-            this.calcDeltaAccessFilters(_out, this.ownerAccess.get(AccessPrefix.All),     (_oldAccess != null) ? _oldAccess.ownerAccess.get(AccessPrefix.All)     : null);
-            this.calcDeltaAccessFilters(_out, this.ownerAccess.get(AccessPrefix.Login),   (_oldAccess != null) ? _oldAccess.ownerAccess.get(AccessPrefix.Login)   : null);
-            this.calcDeltaAccessFilters(_out, this.ownerAccess.get(AccessPrefix.Revoke),  (_oldAccess != null) ? _oldAccess.ownerAccess.get(AccessPrefix.Revoke)  : null);
-            // public access
-            this.calcDeltaAccessFilters(_out, this.publicAccess.get(AccessPrefix.All),    (_oldAccess != null) ? _oldAccess.publicAccess.get(AccessPrefix.All)    : null);
-            this.calcDeltaAccessFilters(_out, this.publicAccess.get(AccessPrefix.Login),  (_oldAccess != null) ? _oldAccess.publicAccess.get(AccessPrefix.Login)  : null);
-            this.calcDeltaAccessFilters(_out, this.publicAccess.get(AccessPrefix.Revoke), (_oldAccess != null) ? _oldAccess.publicAccess.get(AccessPrefix.Revoke) : null);
-            // user access
-            this.calcDeltaAccessFilters(_out, this.userAccess.get(AccessPrefix.All),      (_oldAccess != null) ? _oldAccess.userAccess.get(AccessPrefix.All)      : null);
-            this.calcDeltaAccessFilters(_out, this.userAccess.get(AccessPrefix.Login),    (_oldAccess != null) ? _oldAccess.userAccess.get(AccessPrefix.Login)    : null);
-            this.calcDeltaAccessFilters(_out, this.userAccess.get(AccessPrefix.Revoke),   (_oldAccess != null) ? _oldAccess.userAccess.get(AccessPrefix.Revoke)   : null);
-        }
-
-        /**
-         * Calculates the delta for the user access.
-         *
-         * @param _out                  writer instance
-         * @param _newAccessFilters     new expected access filters
-         * @param _oldAccessFilters     current access filters
-         * @throws IOException if write failed
-         */
-        private void calcDeltaAccessFilters(final Appendable _out,
-                                            final SortedSet<AccessFilter> _newAccessFilters,
-                                            final SortedSet<AccessFilter> _oldAccessFilters)
-            throws IOException
-        {
-            final Set<String> newUsers = new HashSet<String>();
-            for (final AccessFilter newAccessFilter : _newAccessFilters)  {
-                newUsers.add(newAccessFilter.evalCompareString());
-            }
-            final Map<String,AccessFilter> oldUser = new HashMap<String,AccessFilter>();
-            if (_oldAccessFilters != null)  {
-                for (final AccessFilter oldAccessFilter : _oldAccessFilters)  {
-                    final String compareKey = oldAccessFilter.evalCompareString();
-                    if (newUsers.contains(compareKey))  {
-                        oldUser.put(compareKey, oldAccessFilter);
-                    } else  {
-                        _out.append(" remove ").append(oldAccessFilter.prefix.mxValue)
-                            .append(' ').append(oldAccessFilter.kind);
-                        if (!"public".equals(oldAccessFilter.kind) && !"owner".equals(oldAccessFilter.kind))  {
-                            _out.append(" \"").append(StringUtil_mxJPO.convertMql(oldAccessFilter.userRef)).append('\"');
-                        }
-                        if ((oldAccessFilter.key != null) && !oldAccessFilter.key.isEmpty())  {
-                            _out.append(" key \"").append(StringUtil_mxJPO.convertMql(oldAccessFilter.key)).append('\"');
-                        }
-                        _out.append(" all");
+            // remove all current access definitions
+            if (_oldAccessList != null)  {
+                for (final Access access : _oldAccessList.accessList)  {
+                    _out.append(" remove ").append(access.prefix.mxValue).append(access.kind);
+                    if (!"public".equals(access.kind) && !"owner".equals(access.kind))  {
+                        _out.append(" \"").append(StringUtil_mxJPO.convertMql(access.userRef)).append('\"');
                     }
+                    // access filter key
+                    if ((access.key != null) && !access.key.isEmpty())  {
+                        _out.append(" key \"").append(StringUtil_mxJPO.convertMql(access.key)).append('\"');
+                    }
+                    // empty filter
+                    _out.append(" all filter \"\"");
                 }
             }
-            for (final AccessFilter newAccessFilter : _newAccessFilters)  {
-                final String compareKey = newAccessFilter.evalCompareString();
-                if ((_oldAccessFilters != null) && !oldUser.containsKey(compareKey))  {
-                    _out.append(" add");
-                }
-                this.calcDeltaOneAccessFilter(_out, newAccessFilter, oldUser.get(compareKey));
-            }
-        }
 
-        /**
-         * Prepares the MQL update string for this access / filter double.
-         *
-         * @param _out                  writer instance
-         * @param _newAccessFilter      new expected access filter
-         * @param _oldAccessFilter      old access filter (which is used if
-         *                              there is a filter defined which must be
-         *                              overwritten)
-         * @return MQL update string
-         * @throws IOException if write failed
-         */
-        private void calcDeltaOneAccessFilter(final Appendable _out,
-                                              final AccessFilter _newAccessFilter,
-                                              final AccessFilter _oldAccessFilter)
-            throws IOException
-        {
-            _out.append(' ');
-
-            if (_newAccessFilter != null)
-            {
+            // append all new access definitions
+            for (final Access access : this.accessList)  {
                 // prefix login / revoke?
-                if (_newAccessFilter.prefix != AccessPrefix.All)  {
-                    _out.append(_newAccessFilter.prefix.mxValue).append(' ');
+                if (access.prefix != AccessPrefix.All)  {
+                    _out.append(' ').append(access.prefix.mxValue);
                 }
-
                 // kind
-                _out.append(_newAccessFilter.kind).append(' ');
-
+                _out.append(' ').append(access.kind);
                 // append user reference (only if not public / owner definition)
-                if (!"public".equals(_newAccessFilter.kind) && !"owner".equals(_newAccessFilter.kind))  {
-                    _out.append('\"').append(StringUtil_mxJPO.convertMql(_newAccessFilter.userRef)).append("\" ");
+                if (!"public".equals(access.kind) && !"owner".equals(access.kind))  {
+                    _out.append(" \"").append(StringUtil_mxJPO.convertMql(access.userRef)).append('\"');
                 }
-
                 // access filter key
-                if ((_newAccessFilter.key != null) && !_newAccessFilter.key.isEmpty())  {
-                    _out.append(" key \"").append(StringUtil_mxJPO.convertMql(_newAccessFilter.key)).append("\" ");
+                if ((access.key != null) && !access.key.isEmpty())  {
+                    _out.append(" key \"").append(StringUtil_mxJPO.convertMql(access.key)).append('\"');
                 }
-
                 // access
-                _out.append(StringUtil_mxJPO.joinMql(',', false, _newAccessFilter.access, "none")).append(' ');
-
+                _out.append(' ').append(StringUtil_mxJPO.joinMql(',', false, access.access, "none"));
                 // user items
-                if ((_newAccessFilter.organization != null) && !_newAccessFilter.organization.isEmpty())  {
-                    _out.append(' ').append(_newAccessFilter.organization).append(" organization");
+                if ((access.organization != null) && !access.organization.isEmpty())  {
+                    _out.append(' ').append(access.organization).append(" organization");
                 }
-                if ((_newAccessFilter.project != null) && !_newAccessFilter.project.isEmpty())  {
-                    _out.append(' ').append(_newAccessFilter.project).append(" project");
+                if ((access.project != null) && !access.project.isEmpty())  {
+                    _out.append(' ').append(access.project).append(" project");
                 }
-                if ((_newAccessFilter.owner != null) && !_newAccessFilter.owner.isEmpty())  {
-                    _out.append(' ').append(_newAccessFilter.owner).append(" owner");
+                if ((access.owner != null) && !access.owner.isEmpty())  {
+                    _out.append(' ').append(access.owner).append(" owner");
                 }
-                if ((_newAccessFilter.reserve != null) && !_newAccessFilter.reserve.isEmpty())  {
-                    _out.append(' ').append(_newAccessFilter.reserve).append(" reserve");
+                if ((access.reserve != null) && !access.reserve.isEmpty())  {
+                    _out.append(' ').append(access.reserve).append(" reserve");
                 }
-                if ((_newAccessFilter.maturity != null) && !_newAccessFilter.maturity.isEmpty())  {
-                    _out.append(' ').append(_newAccessFilter.maturity).append(" maturity");
+                if ((access.maturity != null) && !access.maturity.isEmpty())  {
+                    _out.append(' ').append(access.maturity).append(" maturity");
                 }
-                if ((_newAccessFilter.filter != null) || ((_oldAccessFilter != null) && (_oldAccessFilter.filter != null)))  {
-                    _out.append("filter \"");
-                    if (_newAccessFilter.filter != null)  {
-                        _out.append(StringUtil_mxJPO.convertMql(_newAccessFilter.filter));
+                if (access.filter != null)  {
+                    _out.append(" filter \"");
+                    if (access.filter != null)  {
+                        _out.append(StringUtil_mxJPO.convertMql(access.filter));
                     }
-                    _out.append("\" ");
+                    _out.append('\"');
                 }
-            }
-            else if (_oldAccessFilter != null)
-            {
-                // revoke?
-                if (_oldAccessFilter.prefix != AccessPrefix.All)  {
-                    _out.append(_oldAccessFilter.prefix.mxValue).append(' ');
-                }
-
-                // kind
-                _out.append(_oldAccessFilter.kind).append(' ');
-
-                // append user reference (only if not public / owner definition)
-                if (!"public".equals(_oldAccessFilter.kind) && !"owner".equals(_oldAccessFilter.kind))
-                {
-                    _out.append('\"').append(StringUtil_mxJPO.convertMql(_oldAccessFilter.userRef)).append("\" ");
-                }
-
-                // access
-                _out.append("none ");
-
-                // user items
-                if ((_oldAccessFilter.organization != null) && !_oldAccessFilter.organization.isEmpty())  {
-                    _out.append(" any organization");
-                }
-                if ((_oldAccessFilter.project != null) && !_oldAccessFilter.project.isEmpty())  {
-                    _out.append(" any project");
-                }
-                if ((_oldAccessFilter.owner != null) && !_oldAccessFilter.owner.isEmpty())  {
-                    _out.append(" any owner");
-                }
-                if ((_oldAccessFilter.reserve != null) && !_oldAccessFilter.reserve.isEmpty())  {
-                    _out.append(" any reserve");
-                }
-                if ((_oldAccessFilter.maturity != null) && !_oldAccessFilter.maturity.isEmpty())  {
-                    _out.append(" any maturity");
-                }
-                _out.append("filter \"\" ");
             }
         }
     }
@@ -1193,7 +992,7 @@ throw new Exception("some states are not defined anymore!");
      * Class defining states of a policy.
      */
     public static class State
-        extends Policy_mxJPO.Access
+        extends AccessList
     {
         /** Name of the state. */
         private String name;
@@ -1309,12 +1108,10 @@ throw new Exception("some states are not defined anymore!");
         }
 
         /**
-         * The user access and trigger instances are sorted.
+         * The trigger instances are sorted.
          */
-        @Override()
         protected void prepare()
         {
-            super.prepare();
             // sort all triggers
             for (final Trigger trigger : this.triggersStack)  {
                 this.triggers.put(trigger.name, trigger);
@@ -1382,6 +1179,7 @@ throw new Exception("some states are not defined anymore!");
             }
             // write access statements
             super.writeObject(_paramCache, _out);
+            // write event statements
             _out.append("\n    action \"").append(StringUtil_mxJPO.convertTcl(this.actionProgram))
                 .append("\" input \"").append(StringUtil_mxJPO.convertTcl(this.actionInput)).append('\"')
                 .append("\n    check \"").append(StringUtil_mxJPO.convertTcl(this.checkProgram))
@@ -1484,8 +1282,8 @@ throw new Exception("some states are not defined anymore!");
     /**
      * Class used to hold the user access for a state.
      */
-    public static class AccessFilter
-        implements Comparable<Policy_mxJPO.AccessFilter>
+    public static class Access
+        implements Comparable<Access>
     {
         /** Prefix for the access kind. */
         private AccessPrefix prefix = AccessPrefix.All;
@@ -1523,7 +1321,7 @@ throw new Exception("some states are not defined anymore!");
          *         {@link #userRef} defined with {@code _userAccess}
          */
         @Override()
-        public int compareTo(final AccessFilter _userAccess)
+        public int compareTo(final Access _userAccess)
         {
             return this.evalCompareString().compareTo(_userAccess.evalCompareString());
         }
