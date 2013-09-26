@@ -20,6 +20,9 @@
 
 package org.mxupdate.test.ci.datamodel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mxupdate.test.data.datamodel.PolicyData;
 import org.mxupdate.test.data.datamodel.PolicyData.Access;
 import org.mxupdate.test.data.user.PersonAdminData;
@@ -42,243 +45,90 @@ public abstract class AbstractPolicy_AccessTest
      *
      * @return object array with all test policies
      */
-    @IssueLink({"99", "177"})
+    @IssueLink({"99", "177", "180"})
     @DataProvider(name = "data")
     public Object[][] getPolicies()
     {
-        return this.prepareData((String) null,
-                // owner
-                new Object[]{
-                        "issue (#99): " + this.getDescriptionPrefix() + " access for owner read/show",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setKind("owner")
-                                                .addAccess("read", "show"))},
-                new Object[]{
-                        "issue (#99): " + this.getDescriptionPrefix() + " state access for owner all",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setKind("owner")
-                                                .addAccess("all"))},
-                new Object[]{
-                        "issue (#99): " + this.getDescriptionPrefix() + " access for owner read/show owner with filter expression",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setKind("owner")
-                                                .addAccess("read", "show")
-                                                .setFilter("current==\"hello\""))},
-                // login owner
-                new Object[]{
-                        "issue #177: " + this.getDescriptionPrefix() + " access for login owner read/show",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setPrefix("login")
-                                                .setKind("owner")
-                                                .addAccess("read", "show"))
-                                .notSupported(Version.V6R2011x)},
-                new Object[]{
-                        "issue #177: " + this.getDescriptionPrefix() + " access for login owner all",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setPrefix("login")
-                                                .setKind("owner")
-                                                .addAccess("all"))
-                                .notSupported(Version.V6R2011x)},
-                new Object[]{
-                        "issue #177: " + this.getDescriptionPrefix() + " access for login owner read/show with filter expression",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setPrefix("login")
-                                                .setKind("owner")
-                                                .addAccess("read", "show")
-                                                .setFilter("current==\"hello\""))
-                                .notSupported(Version.V6R2011x)},
-                // revoke owner
-                new Object[]{
-                        "issue (#99): " + this.getDescriptionPrefix() + " access for revoke owner read/show",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setPrefix("revoke")
-                                                .setKind("owner")
-                                                .addAccess("read", "show"))},
-                new Object[]{
-                        "issue (#99): " + this.getDescriptionPrefix() + " access for revoke owner all",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setPrefix("revoke")
-                                                .setKind("owner")
-                                                .addAccess("all"))},
-                new Object[]{
-                        "issue (#99): " + this.getDescriptionPrefix() + " access for revoke owner read/show with filter expression",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setPrefix("revoke")
-                                                .setKind("owner")
-                                                .addAccess("read", "show")
-                                                .setFilter("current==\"hello\""))},
-                // public
-                new Object[]{
-                        "issue (#99): " + this.getDescriptionPrefix() + " access for public read/show",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setKind("public")
-                                                .addAccess("read", "show"))},
-                new Object[]{
-                        "issue (#99): " + this.getDescriptionPrefix() + " access for public all",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setKind("public")
-                                                .addAccess("all"))},
-                new Object[]{
-                        "issue (#99): " + this.getDescriptionPrefix() + " access for public read/show with filter expression",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setKind("public")
-                                                .addAccess("read", "show")
-                                                .setFilter("current==\"hello\""))},
-                // login public
-                new Object[]{
-                        "issue #177: " + this.getDescriptionPrefix() + " access for login public read/show",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setPrefix("login")
-                                                .setKind("public")
-                                                .addAccess("read", "show"))
-                                .notSupported(Version.V6R2011x)},
-                new Object[]{
-                        "issue #177: " + this.getDescriptionPrefix() + " access for login public all",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setPrefix("login")
-                                                .setKind("public")
-                                                .addAccess("all"))
-                                .notSupported(Version.V6R2011x)},
-                new Object[]{
-                        "issue #177: " + this.getDescriptionPrefix() + " access for login public read/show and filter expression",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setPrefix("login")
-                                                .setKind("public")
-                                                .addAccess("read", "show")
-                                                .setFilter("current==\"hello\""))
-                                .notSupported(Version.V6R2011x)},
-                // revoke public
-                new Object[]{
-                        "issue (#99): " + this.getDescriptionPrefix() + " access for revoke public read/show",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setPrefix("revoke")
-                                                .setKind("public")
-                                                .addAccess("read", "show"))},
-                new Object[]{
-                        "issue (#99): " + this.getDescriptionPrefix() + " access for revoke public all",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setPrefix("revoke")
-                                                .setKind("public")
-                                                .addAccess("all"))},
-                new Object[]{
-                        "issue (#99): " + this.getDescriptionPrefix() + " access for revoke public read/show and filter expression",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setPrefix("revoke")
-                                                .setKind("public")
-                                                .addAccess("read", "show")
-                                                .setFilter("current==\"hello\""))},
-                // user
-                new Object[]{
-                        "issue (#99): " + this.getDescriptionPrefix() + " access for user read/show",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
-                                                .addAccess("read", "show"))},
-                new Object[]{
-                        "issue (#99): " + this.getDescriptionPrefix() + " access for user read/show and filter expression",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
-                                                .addAccess("read", "show")
-                                                .setFilter("current==\"hello\""))},
-                new Object[]{
-                        "issue (#99): " + this.getDescriptionPrefix() + " access for user all",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
-                                                .addAccess("all"))},
-                new Object[]{
-                        "issue (#99): " + this.getDescriptionPrefix() + " access for two different user",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
-                                                .addAccess("all"),
-                                        new Access()
-                                                .setKind("user")
-                                                .setUser(new PersonAdminData(this, "guest"))
-                                                .addAccess("read", "show"))},
-                // login user
-                new Object[]{
-                        "issue #177: " + this.getDescriptionPrefix() + " access for login user read/show",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setPrefix("login")
-                                                .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
-                                                .addAccess("read", "show"))
-                                .notSupported(Version.V6R2011x)},
-                new Object[]{
-                        "issue #177: " + this.getDescriptionPrefix() + " access for login user read/show with filter expression",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setPrefix("login")
-                                                .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
-                                                .addAccess("read", "show")
-                                                .setFilter("current==\"hello\""))
-                                .notSupported(Version.V6R2011x)},
-                new Object[]{
-                        "issue #177: " + this.getDescriptionPrefix() + " access for login user all",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setPrefix("login")
-                                                .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
-                                                .addAccess("all"))
-                                .notSupported(Version.V6R2011x)},
-                // revoke user
-                new Object[]{
-                        "issue #177: " + this.getDescriptionPrefix() + " access for revoke user read/show",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setPrefix("revoke")
-                                                .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
-                                                .addAccess("read", "show"))
-                                .notSupported(Version.V6R2011x)},
-                new Object[]{
-                        "issue #177: " + this.getDescriptionPrefix() + " access for revoke user read/show with filter expression",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setPrefix("revoke")
-                                                .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
-                                                .addAccess("read", "show")
-                                                .setFilter("current==\"hello\""))
-                                .notSupported(Version.V6R2011x)},
-                new Object[]{
-                        "issue #177: " + this.getDescriptionPrefix() + " access for revoke user all",
-                        this.createNewPolicy4Access(
-                                        new Access()
-                                                .setPrefix("revoke")
-                                                .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
-                                                .addAccess("all"))
-                                .notSupported(Version.V6R2011x)}
-        );
-    }
+        final List<Object[]> ret = new ArrayList<Object[]>();
+
+        for (final String kind : new String[]{"owner", "public", "user"})  {
+            for (final String prefix : new String[]{null, "login", "revoke"})  {
+                final String txt = ((prefix != null) ? prefix + " ": "") + kind;
+                ret.add(new Object[]{
+                            this.getDescriptionPrefix() + " access for " + txt + " read/show",
+                            this.createNewPolicy4Access(
+                                            new Access()
+                                                    .setPrefix(prefix)
+                                                    .setKind(kind)
+                                                    .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                    .addAccess("read", "show"))});
+                ret.add(new Object[]{
+                            this.getDescriptionPrefix() + " state access for " + txt + " all",
+                            this.createNewPolicy4Access(
+                                            new Access()
+                                                    .setPrefix(prefix)
+                                                    .setKind(kind)
+                                                    .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                    .addAccess("all"))});
+                ret.add(new Object[]{
+                            this.getDescriptionPrefix() + " access for " + txt + " read all and second different user",
+                            this.createNewPolicy4Access(
+                                            new Access()
+                                                    .setPrefix(prefix)
+                                                    .setKind(kind)
+                                                    .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                    .addAccess("all"),
+                                            new Access()
+                                                    .setKind("user")
+                                                    .setUser(new PersonAdminData(this, "guest"))
+                                                    .addAccess("read", "show"))});
+                ret.add(new Object[]{
+                            this.getDescriptionPrefix() + " access for " + txt + " read/show with filter expression",
+                            this.createNewPolicy4Access(
+                                            new Access()
+                                                    .setPrefix(prefix)
+                                                    .setKind(kind)
+                                                    .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                    .addAccess("read", "show")
+                                                    .setFilter("current==\"hello\""))});
+                ret.add(new Object[]{
+                            this.getDescriptionPrefix() + " access for " + txt + " all for key",
+                            this.createNewPolicy4Access(
+                                            new Access()
+                                                    .setPrefix(prefix)
+                                                    .setKind(kind)
+                                                    .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                    .addAccess("all")
+                                                    .setKey("abcd 123"))
+                                    .notSupported(Version.V6R2011x)});
+
+                final PersonAdminData tmpUser = "user".equals(kind) ? new PersonAdminData(this, "creator") : null;
+                ret.add(new Object[]{
+                            this.getDescriptionPrefix() + " access for three " + txt + " definitions (one w/o key, two with keys)",
+                            this.createNewPolicy4Access(
+                                            new Access()
+                                                    .setPrefix(prefix)
+                                                    .setKind(kind)
+                                                    .setUser(tmpUser)
+                                                    .addAccess("modify", "show"),
+                                            new Access()
+                                                    .setPrefix(prefix)
+                                                    .setKind(kind)
+                                                    .setUser(tmpUser)
+                                                    .addAccess("read", "show")
+                                                    .setKey("abcd 1"),
+                                            new Access()
+                                                    .setPrefix(prefix)
+                                                    .setKind(kind)
+                                                    .setUser(tmpUser)
+                                                    .addAccess("toconnect", "todisconnect")
+                                                    .setKey("abcd 2"))
+                                    .notSupported(Version.V6R2011x)});
+            }
+        }
+
+        return super.prepareData((String) null, ret.toArray(new Object[ret.size()][]));
+     }
 
     /**
      * Returns the used test string for the test case description.
