@@ -45,7 +45,7 @@ public abstract class AbstractPolicy_AccessTest
      *
      * @return object array with all test policies
      */
-    @IssueLink({"99", "177", "180"})
+    @IssueLink({"99", "177", "180", "181"})
     @DataProvider(name = "data")
     public Object[][] getPolicies()
     {
@@ -124,6 +124,186 @@ public abstract class AbstractPolicy_AccessTest
                                                     .addAccess("toconnect", "todisconnect")
                                                     .setKey("abcd 2"))
                                     .notSupported(Version.V6R2011x)});
+                // user item 'organization' / 'project'
+                ret.add(new Object[]{
+                        this.getDescriptionPrefix() + " access for " + txt + " for any organization",
+                        this.createNewPolicy4Access(
+                                        new Access()
+                                                .setPrefix(prefix)
+                                                .setKind(kind)
+                                                .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                .addAccess("read", "show")
+                                                .setOrganization("any"))
+                                .notSupported(Version.V6R2011x),
+                        this.createNewPolicy4Access(
+                                        new Access()
+                                                .setPrefix(prefix)
+                                                .setKind(kind)
+                                                .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                .addAccess("read", "show"))});
+                ret.add(new Object[]{
+                        this.getDescriptionPrefix() + " access for " + txt + " for any project",
+                        this.createNewPolicy4Access(
+                                        new Access()
+                                                .setPrefix(prefix)
+                                                .setKind(kind)
+                                                .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                .addAccess("read", "show")
+                                                .setProject("any"))
+                                .notSupported(Version.V6R2011x),
+                        this.createNewPolicy4Access(
+                                        new Access()
+                                                .setPrefix(prefix)
+                                                .setKind(kind)
+                                                .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                .addAccess("read", "show"))});
+                for (final String orgOrProj : new String[]{"single", "ancestor", "descendant", "related"})  {
+                    ret.add(new Object[]{
+                            this.getDescriptionPrefix() + " access for " + txt + " for " + orgOrProj + " organization",
+                            this.createNewPolicy4Access(
+                                            new Access()
+                                                    .setPrefix(prefix)
+                                                    .setKind(kind)
+                                                    .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                    .addAccess("read", "show")
+                                                    .setOrganization(orgOrProj))
+                                    .notSupported(Version.V6R2011x)});
+                    ret.add(new Object[]{
+                            this.getDescriptionPrefix() + " access for " + txt + " for " + orgOrProj + " project",
+                            this.createNewPolicy4Access(
+                                            new Access()
+                                                    .setPrefix(prefix)
+                                                    .setKind(kind)
+                                                    .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                    .addAccess("read", "show")
+                                                    .setProject(orgOrProj))
+                                    .notSupported(Version.V6R2011x)});
+                    ret.add(new Object[]{
+                            this.getDescriptionPrefix() + " access for " + txt + " for any organization and " + orgOrProj + " project",
+                            this.createNewPolicy4Access(
+                                            new Access()
+                                                    .setPrefix(prefix)
+                                                    .setKind(kind)
+                                                    .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                    .addAccess("read", "show")
+                                                    .setOrganization("any")
+                                                    .setProject(orgOrProj))
+                                    .notSupported(Version.V6R2011x),
+                            this.createNewPolicy4Access(new Access()
+                                                    .setPrefix(prefix)
+                                                    .setKind(kind)
+                                                    .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                    .addAccess("read", "show")
+                                                    .setProject(orgOrProj))});
+                }
+                // user item 'owner'
+                ret.add(new Object[]{
+                        this.getDescriptionPrefix() + " access for " + txt + " for any owner",
+                        this.createNewPolicy4Access(
+                                        new Access()
+                                                .setPrefix(prefix)
+                                                .setKind(kind)
+                                                .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                .addAccess("read", "show")
+                                                .setOwner("any"))
+                                .notSupported(Version.V6R2011x),
+                        this.createNewPolicy4Access(
+                                        new Access()
+                                                .setPrefix(prefix)
+                                                .setKind(kind)
+                                                .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                .addAccess("read", "show"))});
+                ret.add(new Object[]{
+                        this.getDescriptionPrefix() + " access for " + txt + " for context owner",
+                        this.createNewPolicy4Access(
+                                        new Access()
+                                                .setPrefix(prefix)
+                                                .setKind(kind)
+                                                .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                .addAccess("read", "show")
+                                                .setOwner("context"))
+                                .notSupported(Version.V6R2011x)});
+                // user item 'reserve'
+                ret.add(new Object[]{
+                        this.getDescriptionPrefix() + " access for " + txt + " for any reserve",
+                        this.createNewPolicy4Access(
+                                        new Access()
+                                                .setPrefix(prefix)
+                                                .setKind(kind)
+                                                .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                .addAccess("read", "show")
+                                                .setReserve("any"))
+                                .notSupported(Version.V6R2011x),
+                        this.createNewPolicy4Access(
+                                        new Access()
+                                                .setPrefix(prefix)
+                                                .setKind(kind)
+                                                .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                .addAccess("read", "show"))});
+                for (final String reserve : new String[]{"no", "context", "inclusive"})  {
+                    ret.add(new Object[]{
+                            this.getDescriptionPrefix() + " access for " + txt + " for " + reserve + " reserve",
+                            this.createNewPolicy4Access(
+                                            new Access()
+                                                    .setPrefix(prefix)
+                                                    .setKind(kind)
+                                                    .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                    .addAccess("read", "show")
+                                                    .setReserve(reserve))
+                                    .notSupported(Version.V6R2011x)});
+                }
+                // user item 'maturity'
+                ret.add(new Object[]{
+                        this.getDescriptionPrefix() + " access for " + txt + " for any maturity",
+                        this.createNewPolicy4Access(
+                                        new Access()
+                                                .setPrefix(prefix)
+                                                .setKind(kind)
+                                                .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                .addAccess("read", "show")
+                                                .setMaturity("any"))
+                                .notSupported(Version.V6R2011x),
+                        this.createNewPolicy4Access(
+                                        new Access()
+                                                .setPrefix(prefix)
+                                                .setKind(kind)
+                                                .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                .addAccess("read", "show"))});
+                for (final String maturity : new String[]{"no", "public", "protected", "private", "notprivate", "ppp"})  {
+                    ret.add(new Object[]{
+                            this.getDescriptionPrefix() + " access for " + txt + " for " + maturity + " maturity",
+                            this.createNewPolicy4Access(
+                                            new Access()
+                                                    .setPrefix(prefix)
+                                                    .setKind(kind)
+                                                    .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                    .addAccess("read", "show")
+                                                    .setMaturity(maturity))
+                                    .notSupported(Version.V6R2011x)});
+                }
+                // user items with combination of all
+                for (final String org : new String[]{"single", "ancestor", "descendant", "related"})  {
+                    for (final String project : new String[]{"single", "ancestor", "descendant", "related"})  {
+                        for (final String reserve : new String[]{"no", "context", "inclusive"})  {
+                            for (final String maturity : new String[]{"no", "public", "protected", "private", "notprivate", "ppp"})  {
+                                ret.add(new Object[]{
+                                        this.getDescriptionPrefix() + " access for " + txt + " for " + org + " organization, " + project + " project, context owner, " + reserve + " reserve and " + maturity + " maturity",
+                                        this.createNewPolicy4Access(
+                                                        new Access()
+                                                                .setPrefix(prefix)
+                                                                .setKind(kind)
+                                                                .setUser("user".equals(kind) ? new PersonAdminData(this, "creator") : null)
+                                                                .addAccess("read", "show")
+                                                                .setOrganization(org)
+                                                                .setProject(project)
+                                                                .setOwner("context")
+                                                                .setReserve(reserve)
+                                                                .setMaturity(maturity))
+                                                .notSupported(Version.V6R2011x)});
+                            }
+                        }
+                    }
+                }
             }
         }
 
