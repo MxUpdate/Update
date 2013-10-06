@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2011 The MxUpdate Team
+ * Copyright 2008-2014 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Revision:        $Rev$
- * Last Changed:    $Date$
- * Last Changed By: $Author$
  */
 
 package org.mxupdate.update.program;
@@ -30,7 +27,6 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  * Common definition for the code of a program or page object.
  *
  * @author The MxUpdate Team
- * @version $Id$
  */
 public abstract class AbstractCode_mxJPO
     extends AbstractAdminObject_mxJPO

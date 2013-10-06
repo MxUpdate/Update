@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2011 The MxUpdate Team
+ * Copyright 2008-2014 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Revision:        $Rev$
- * Last Changed:    $Date$
- * Last Changed By: $Author$
  */
 
 package org.mxupdate.update.util;
@@ -29,7 +26,6 @@ import java.util.Set;
  * is only used within administration objects (not business objects).
  *
  * @author The MxUpdate Team
- * @version $Id$
  */
 public class AdminProperty_mxJPO
     implements Comparable<AdminProperty_mxJPO>
@@ -200,6 +196,7 @@ public class AdminProperty_mxJPO
      * @return &quot;0&quot; if both administration properties are equal;
      *         &quot;1&quot; if greater; otherwise &quot;-1&quot;
      */
+    @Override()
     public int compareTo(final AdminProperty_mxJPO _toCompare)
     {
         return ((this.refAdminType != null) && (this.refAdminName != null))

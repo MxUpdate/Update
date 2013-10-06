@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2011 The MxUpdate Team
+ * Copyright 2008-2014 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Revision:        $Rev$
- * Last Changed:    $Date$
- * Last Changed By: $Author$
  */
 
 package org.mxupdate.update.user.workspace;
@@ -37,7 +34,6 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * User specific class to store common information of a workspace object.
  *
  * @author The MxUpdate Team
- * @version $Id$
  */
 abstract class AbstractWorkspaceObject_mxJPO
 {
@@ -243,7 +239,7 @@ abstract class AbstractWorkspaceObject_mxJPO
         for (final AdminProperty_mxJPO prop : this.propertiesSet)  {
             if (!prop.isSetting())  {
                 _out.append(" \\\n    property \"").append(StringUtil_mxJPO.convertTcl(prop.getName())).append("\"");
-                if ((prop.getRefAdminName()) != null && (prop.getRefAdminType() != null))  {
+                if ((prop.getRefAdminName() != null) && (prop.getRefAdminType() != null))  {
                     _out.append(" to ").append(prop.getRefAdminType())
                         .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getRefAdminName())).append("\"");
                 }

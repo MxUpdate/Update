@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2011 The MxUpdate Team
+ * Copyright 2008-2014 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Revision:        $Rev$
- * Last Changed:    $Date$
- * Last Changed By: $Author$
  */
 
 package org.mxupdate.plugin;
@@ -32,7 +29,6 @@ import matrix.util.Mime64;
  * from the Eclipse plug-in.
  *
  * @author The MxUpdate Team
- * @version $Id$
  */
 abstract class AbstractPlugin_mxJPO
 {

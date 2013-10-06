@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2011 The MxUpdate Team
+ * Copyright 2008-2014 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Revision:        $Rev$
- * Last Changed:    $Date$
- * Last Changed By: $Author$
  */
 
 package org.mxupdate.test.data.program;
@@ -35,7 +32,6 @@ import org.testng.Assert;
  * to export.
  *
  * @author The MxUpdate Team
- * @version $Id$
  * @param <T>   defines the class which is derived from this class
  */
 public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
@@ -55,7 +51,7 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
      * @see #setUser(AbstractPersonAdminData)
      * @see #getUser()
      */
-    private AbstractPersonAdminData user;
+    private AbstractPersonAdminData<?> user;
 
     /**
      * Execution of the program is deferred.
@@ -151,7 +147,7 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
      * @see #user
      */
     @SuppressWarnings("unchecked")
-    public T setUser(final AbstractPersonAdminData _user)
+    public T setUser(final AbstractPersonAdminData<?> _user)
     {
         this.user = _user;
         return (T) this;
