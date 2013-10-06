@@ -41,7 +41,7 @@
             <outputDirectory>/</outputDirectory>
         </file>
         <file>
-            <source>README.txt</source>
+            <source>INSTALL.txt</source>
             <outputDirectory>/</outputDirectory>
         </file>
     </files>
