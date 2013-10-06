@@ -145,12 +145,70 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
                     <showDeprecation>true</showDeprecation>
                     <showWarnings>true</showWarnings>
                     <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <!--
+                configure JavaDoc
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <configuration>
+                    <use>true</use>
+                    <author>false</author>
+                    <show>private</show>
+                    <source>1.6</source>
+                    <doctitle>&lt;h1&gt;MxUpdate Update JPO V${project.version} API&lt;/h1&gt;</doctitle>
+                    <windowtitle>MxUpdate Update JPO V${project.version} API </windowtitle>
+                    <author/>
+                    <bottom>
+                        &lt;i&gt;
+                        Copyright 2008-2014 The MxUpdate Team&lt;br/&gt;
+                        &lt;br/&gt;
+                        Licensed under the Apache License, Version 2.0 (the "License")
+                        you may not use this file except in compliance with the License.
+                        You may obtain a copy of the License at
+                          &lt;a href="http://www.apache.org/licenses/LICENSE-2.0"&gt;http://www.apache.org/licenses/LICENSE-2.0&lt;/a&gt;.&lt;br/&gt;
+                        Unless required by applicable law or agreed to in writing, software
+                        distributed under the License is distributed on an "AS IS" BASIS,
+                        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+                        See the License for the specific language governing permissions and
+                        limitations under the License.
+                        &lt;/i&gt;
+                    </bottom>
+                    <linksource>true</linksource>
+                    <links>
+                        <link>http://http://docs.oracle.com/javase/6/docs/api/</link>
+                    </links>
+                    <tags>
+                        <tag>
+                            <name>todo</name>
+                            <placement>a</placement>
+                            <head>To do:</head>
+                        </tag>
+                    </tags>
+                </configuration>
+            </plugin>
+            <!--
+                define test ng suite XML file
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.16</version>
+                <configuration>
+                    <argLine>-Xmx1024m</argLine>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>${basedir}/src/test/resources/testng.xml</suiteXmlFile>
+                    </suiteXmlFiles>
                 </configuration>
             </plugin>
         </plugins>
@@ -161,17 +219,6 @@
             <id>test-all</id>
             <build>
                 <plugins>
-                    <!-- define test ng suite XML file -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <argLine>-Xmx1024m</argLine>
-                            <suiteXmlFiles>
-                                <suiteXmlFile>${basedir}/src/test/resources/testng.xml</suiteXmlFile>
-                            </suiteXmlFiles>
-                        </configuration>
-                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -198,21 +245,6 @@
                     <value>true</value>
                 </property>
             </activation>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>repository.riedelcastro.org</id>
-                    <name>Riedelcastro's gcUpload</name>
-                    <url>http://repository.riedelcastro.org/</url>
-                </pluginRepository>
-            </pluginRepositories>
-            <repositories>
-                <!-- needed for gcupload plug-in -->
-                <repository>
-                    <id>repository.riedelcastro.org</id>
-                    <name>Riedelcastro's gcUpload</name>
-                    <url>http://repository.riedelcastro.org/</url>
-                </repository>
-            </repositories>
             <build>
                 <plugins>
                     <!-- pack MxUpdate Update Install code + Javadoc -->
@@ -240,7 +272,6 @@
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <executions>
                             <execution>
-                                <!-- with maven 2.1 this will be 'prepare-package' -->
                                 <phase>process-resources</phase>
                                 <goals>
                                     <goal>javadoc</goal>
@@ -254,46 +285,6 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <skip>true</skip>
-                        </configuration>
-                    </plugin>
-                    <!-- google code upload -->
-                    <plugin>
-                        <groupId>org.riedelcastro</groupId>
-                        <artifactId>gcupload-maven-plugin</artifactId>
-                        <version>0.9</version>
-                        <configuration>
-                            <projectName>mxupdate</projectName>
-                            <allowSnapshots>false</allowSnapshots>
-                            <uploads>
-                                <upload>
-                                    <prefix>mxupdate.V${project.version}</prefix>
-                                    <postfix>javadoc</postfix>
-                                    <extensions>zip</extensions>
-                                    <labels>Featured</labels>
-                                    <summary>MxUpdate Update Deployment Tool V${project.version} JavaDoc</summary>
-                                </upload>
-                                <upload>
-                                    <prefix>mxupdate.V${project.version}</prefix>
-                                    <postfix>install</postfix>
-                                    <extensions>tar.bz2</extensions>
-                                    <labels>Featured</labels>
-                                    <summary>MxUpdate Update Deployment Tool V${project.version} Installation Files as TarBZ2-Container</summary>
-                                </upload>
-                                <upload>
-                                    <prefix>mxupdate.V${project.version}</prefix>
-                                    <postfix>install</postfix>
-                                    <extensions>tar.gz</extensions>
-                                    <labels>Featured</labels>
-                                    <summary>MxUpdate Update Deployment Tool V${project.version} Installation Files as TarGZ-Container</summary>
-                                </upload>
-                                <upload>
-                                    <prefix>mxupdate.V${project.version}</prefix>
-                                    <postfix>install</postfix>
-                                    <extensions>zip</extensions>
-                                    <labels>Featured</labels>
-                                    <summary>MxUpdate Update Deployment Tool V${project.version} Installation Files as Zip-Container</summary>
-                                </upload>
-                            </uploads>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -320,45 +311,6 @@
                         </reports>
                     </reportSet>
                 </reportSets>
-            </plugin>
-            <!-- java doc -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <use>false</use>
-                    <show>private</show>
-                    <source>1.5</source>
-                    <doctitle>&lt;h1&gt;MxUpdate Update JPO V${project.version} API&lt;/h1&gt;</doctitle>
-                    <windowtitle>MxUpdate Update JPO V${project.version} API </windowtitle>
-                    <author/>
-                    <bottom>
-                        &lt;i&gt;
-                        Copyright 2008-2014 The MxUpdate Team&lt;br/&gt;
-                        &lt;br/&gt;
-                        Licensed under the Apache License, Version 2.0 (the "License")
-                        you may not use this file except in compliance with the License.
-                        You may obtain a copy of the License at
-                          &lt;a href="http://www.apache.org/licenses/LICENSE-2.0"&gt;http://www.apache.org/licenses/LICENSE-2.0&lt;/a&gt;.&lt;br/&gt;
-                        Unless required by applicable law or agreed to in writing, software
-                        distributed under the License is distributed on an "AS IS" BASIS,
-                        WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-                        See the License for the specific language governing permissions and
-                        limitations under the License.
-                        &lt;/i&gt;
-                    </bottom>
-                    <!-- linksource>true</linksource -->
-                    <links>
-                        <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
-                    </links>
-                    <tags>
-                        <tag>
-                            <name>todo</name>
-                            <placement>a</placement>
-                            <head>To do:</head>
-                        </tag>
-                    </tags>
-                </configuration>
             </plugin>
             <!-- source code -->
             <plugin>
