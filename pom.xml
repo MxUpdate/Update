@@ -26,9 +26,9 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.mxupdate</groupId>
-    <artifactId>update</artifactId>
-    <packaging>jar</packaging>
-    <version>0.90.0</version>
+    <artifactId>mxupdate</artifactId>
+    <packaging>pom</packaging>
+    <version>0.90.0-SNAPSHOT</version>
     <name>MxUpdate Update</name>
     <url>http://www.mxupdate.org</url>
 
@@ -45,6 +45,13 @@
         </license>
     </licenses>
     <developers>
+        <developer>
+            <id>tim.moxter</id>
+            <name>Tim Moxter</name>
+            <organization>innobix</organization>
+            <organizationUrl>http://www.innobix.com</organizationUrl>
+            <timezone>1</timezone>
+        </developer>
     </developers>
     <inceptionYear>2008</inceptionYear>
     <organization>
@@ -90,28 +97,36 @@
             <name>MxUpdate Update Deployment Tool</name>
              <url>svn:https://mxupdate.googlecode.com/svn/site/mxupdate-update</url>
         </site>
+       <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>Nexus Release Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
     </distributionManagement>
 
     <properties>
         <!-- correct encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <mx.version.eMatrixServletRMI>6.214.0.12262</mx.version.eMatrixServletRMI>
+        <mx.version.m1jsystem>6.214.0.12262</mx.version.m1jsystem>
     </properties>
 
     <dependencies>
         <!-- MX dependency -->
         <dependency>
-            <groupId>ematrix</groupId>
-            <artifactId>ematrix</artifactId>
-            <scope>system</scope>
-            <version>ALL</version>
-            <systemPath>${org.mxupdate.mx.jar.ematrix}</systemPath>
+            <groupId>org.mxupdate.mx</groupId>
+            <artifactId>eMatrixServletRMI</artifactId>
+            <version>${mx.version.eMatrixServletRMI}</version>
         </dependency>
         <dependency>
-            <groupId>ematrix</groupId>
+            <groupId>org.mxupdate.mx</groupId>
             <artifactId>m1jsystem</artifactId>
-            <scope>system</scope>
-            <version>ALL</version>
-            <systemPath>${org.mxupdate.mx.jar.m1jsystem}</systemPath>
+            <version>${mx.version.m1jsystem}</version>
         </dependency>
         <!-- for Base64 encoding / decoding within automatic tests -->
         <dependency>
@@ -137,7 +152,7 @@
     </dependencies>
 
     <build>
-        <defaultGoal>package</defaultGoal>
+        <defaultGoal>deploy</defaultGoal>
         <plugins>
             <!--
                 define Java 6 with UTF-8 encoding
@@ -166,9 +181,10 @@
                     <author>false</author>
                     <show>private</show>
                     <source>1.6</source>
+                    <sourcepath>${basedir}/src/main/java</sourcepath>
                     <doctitle>&lt;h1&gt;MxUpdate Update JPO V${project.version} API&lt;/h1&gt;</doctitle>
                     <windowtitle>MxUpdate Update JPO V${project.version} API </windowtitle>
-                    <author/>
+                    <author />
                     <bottom>
                         &lt;i&gt;
                         Copyright 2008-2014 The MxUpdate Team&lt;br/&gt;
@@ -211,14 +227,26 @@
                     </suiteXmlFiles>
                 </configuration>
             </plugin>
-        </plugins>
+         </plugins>
     </build>
 
     <profiles>
         <profile>
             <id>test-all</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <build>
                 <plugins>
+                    <!-- deploy must be deactivated  -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <version>2.8.1</version>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -234,17 +262,20 @@
                             <skip>true</skip>
                         </configuration>
                     </plugin>
+                    <!-- deploy must be deactivated  -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <version>2.8.1</version>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
         <profile>
-            <id>release-profile</id>
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
+            <id>snapshot</id>
             <build>
                 <plugins>
                     <!-- pack MxUpdate Update Install code + Javadoc -->
@@ -255,7 +286,6 @@
                                 <descriptor>src/assembly/install.xml</descriptor>
                                 <descriptor>src/assembly/javadoc.xml</descriptor>
                             </descriptors>
-                            <finalName>mxupdate.V${project.version}</finalName>
                         </configuration>
                         <executions>
                             <execution>
@@ -274,7 +304,7 @@
                             <execution>
                                 <phase>process-resources</phase>
                                 <goals>
-                                    <goal>javadoc</goal>
+                                    <goal>aggregate</goal>
                                 </goals>
                             </execution>
                         </executions>
@@ -285,6 +315,93 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                    <!-- deploy -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <version>2.8.1</version>
+                        <executions>
+                            <execution>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>deploy</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- release to sonatpye -->
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <!-- pack MxUpdate Update Install code + Javadoc -->
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/assembly/install.xml</descriptor>
+                                <descriptor>src/assembly/javadoc.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!--  create JavaDoc -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>aggregate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- skip tests -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                    <!-- artifacts must be signed -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- and release -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <version>2.4.2</version>
+                        <configuration>
+                            <pushChanges>false</pushChanges>
+                            <tagNameFormat>V@{project.version}</tagNameFormat>
+                            <mavenExecutorId>forked-path</mavenExecutorId>
+                            <goals>deploy</goals>
                         </configuration>
                     </plugin>
                 </plugins>
