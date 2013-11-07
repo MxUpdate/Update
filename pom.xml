@@ -80,9 +80,9 @@
     </mailingLists>
 
     <scm>
-        <connection>scm:svn:http://mxupdate.googlecode.com/svn/mxupdate-update</connection>
-        <developerConnection>scm:svn:https://mxupdate.googlecode.com/svn/mxupdate-update</developerConnection>
-        <url>http://mxupdate.googlecode.com/svn/mxupdate-update</url>
+        <connection>scm:git:https://github.com/MxUpdate/Update.git</connection>
+        <developerConnection>scm:git:https://github.com/MxUpdate/Update.git</developerConnection>
+        <url>https://github.com/MxUpdate/Update</url>
     </scm>
 
     <distributionManagement>
