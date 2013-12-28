@@ -1,17 +1,15 @@
 /*
- * Copyright 2008-2014 The MxUpdate Team
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
  *
  */
 
@@ -23,7 +21,6 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-
 
 /**
  * Holds the definition of all parameters.
