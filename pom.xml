@@ -109,6 +109,21 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mx.version.eMatrixServletRMI>6.214.0.12262</mx.version.eMatrixServletRMI>
         <mx.version.m1jsystem>6.214.0.12262</mx.version.m1jsystem>
+
+        <!-- plug-in version for 'maven-compiler-plugin' -->
+        <mx.version.plugin.compiler>3.1</mx.version.plugin.compiler>
+        <!-- plug-in version for 'maven-javadoc-plugin' -->
+        <mx.version.plugin.javadoc>2.9.1</mx.version.plugin.javadoc>
+        <!-- plug-in version for 'maven-surefire-plugin' and 'maven-surefire-report-plugin' -->
+        <mx.version.plugin.surefire>2.17</mx.version.plugin.surefire>
+        <!-- plug-in version for 'findbugs-maven-plugin' -->
+        <mx.version.plugin.findbugs>2.5.2</mx.version.plugin.findbugs>
+        <!-- plug-in version for 'maven-pmd-plugin' -->
+        <mx.version.plugin.pmd>3.0.1</mx.version.plugin.pmd>
+        <!-- plug-in version for 'maven-project-info-reports-plugin' -->
+        <mx.version.plugin.inforeports>2.7</mx.version.plugin.inforeports>
+        <!-- plug-in version for 'jxr-maven-plugin' -->
+        <mx.version.plugin.jxr>2.0-beta-1</mx.version.plugin.jxr>
     </properties>
 
     <dependencies>
@@ -134,7 +149,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.2</version>
+            <version>6.8.8</version>
             <scope>test</scope>
         </dependency>
         <!-- needed to load settings (URL etc.) from the maven settings file -->
@@ -155,7 +170,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>${mx.version.plugin.compiler}</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
@@ -170,7 +185,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
+                <version>${mx.version.plugin.javadoc}</version>
                 <configuration>
                     <use>true</use>
                     <author>false</author>
@@ -208,20 +223,6 @@
                     </tags>
                 </configuration>
             </plugin>
-            <!--
-                define test ng suite XML file
-            -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.16</version>
-                <configuration>
-                    <argLine>-Xmx1024m</argLine>
-                    <suiteXmlFiles>
-                        <suiteXmlFile>${basedir}/src/test/resources/testng.xml</suiteXmlFile>
-                    </suiteXmlFiles>
-                </configuration>
-            </plugin>
          </plugins>
     </build>
 
@@ -242,6 +243,61 @@
                             <skip>true</skip>
                         </configuration>
                     </plugin>
+                    <!--
+                        define Java 6 with UTF-8 encoding
+                    -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>${mx.version.plugin.compiler}</version>
+                        <!-- executions must be defined because of packagin 'pom' -->
+                        <executions>
+                            <execution>
+                                <id>compile</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>test-compile</id>
+                                <phase>test-compile</phase>
+                                <goals>
+                                    <goal>testCompile</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <source>1.6</source>
+                            <target>1.6</target>
+                            <showDeprecation>true</showDeprecation>
+                            <showWarnings>true</showWarnings>
+                            <encoding>UTF-8</encoding>
+                        </configuration>
+                    </plugin>
+                    <!--
+                        define test ng suite XML file
+                    -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${mx.version.plugin.surefire}</version>
+                        <!-- executions must be defined because of packagin 'pom' -->
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>test</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <argLine>-Xmx1024m</argLine>
+                            <suiteXmlFiles>
+                                <suiteXmlFile>${basedir}/src/test/resources/testng.xml</suiteXmlFile>
+                            </suiteXmlFiles>
+                        </configuration>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -253,6 +309,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${mx.version.plugin.surefire}</version>
                         <configuration>
                             <skip>true</skip>
                         </configuration>
@@ -295,6 +352,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${mx.version.plugin.javadoc}</version>
                         <executions>
                             <execution>
                                 <phase>process-resources</phase>
@@ -308,6 +366,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${mx.version.plugin.surefire}</version>
                         <configuration>
                             <skip>true</skip>
                         </configuration>
@@ -356,6 +415,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>${mx.version.plugin.javadoc}</version>
                         <executions>
                             <execution>
                                 <phase>process-resources</phase>
@@ -369,6 +429,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${mx.version.plugin.surefire}</version>
                         <configuration>
                             <skip>true</skip>
                         </configuration>
@@ -410,6 +471,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>${mx.version.plugin.inforeports}</version>
                 <reportSets>
                     <reportSet>
                         <reports>
@@ -428,6 +490,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jxr-maven-plugin</artifactId>
+                <version>>${mx.version.plugin.jxr}</version>
                 <configuration>
                     <linkJavadoc>true</linkJavadoc>
                     <javadocDir>../apidocs</javadocDir>
@@ -437,6 +500,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>${mx.version.plugin.surefire}</version>
                 <configuration>
                     <skip>true</skip>
                     <skipTests>true</skipTests>
@@ -446,6 +510,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
+                <version>${mx.version.plugin.pmd}</version>
                 <configuration>
                     <linkXref>true</linkXref>
                     <sourceEncoding>utf-8</sourceEncoding>
@@ -460,6 +525,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
+                <version>${mx.version.plugin.findbugs}</version>
                 <configuration>
                     <excludeFilterFile>src/findbugs/findbugs-exclude.xml</excludeFilterFile>
                 </configuration>
