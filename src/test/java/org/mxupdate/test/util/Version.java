@@ -27,5 +27,7 @@ public enum Version
     /** MX version V6R2012x. */
     V6R2012x,
     /** MX version V6R2013x. */
-    V6R2013x;
+    V6R2013x,
+    /** MX version V6R2014x. */
+    V6R2014x;
 }
