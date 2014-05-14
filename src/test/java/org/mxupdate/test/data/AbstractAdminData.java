@@ -363,9 +363,25 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         for (final Map.Entry<String,Object> entry : this.getValues().entrySet())  {
             this.checkSingleValue(_exportParser, entry.getKey(), entry.getKey(), "\"" + AbstractTest.convertTcl(entry.getValue().toString()) + "\"");
         }
+        // check for defined flags
+        final Set<String> main = new HashSet<String>(_exportParser.getLines("/mql/"));
+        for (final Map.Entry<String,Boolean> flag : this.flags.entrySet())  {
+            if (flag.getValue() != null)  {
+                // check flag is defined
+                final String key = flag.getValue() ? flag.getKey() : "!" + flag.getKey();
+                Assert.assertTrue(
+                        main.contains(key) || main.contains(key + " \\"),
+                        "check that " + this.getCI().getMxType() + " '" + this.getName() + "' contains flag " + key);
+                // check that inverted flag is NOT defined
+                final String keyInv = flag.getValue() ? "!" + flag.getKey() : flag.getKey();
+                Assert.assertTrue(
+                        !main.contains(keyInv) && !main.contains(keyInv + " \\"),
+                        "check that " + this.getCI().getMxType() + " '" + this.getName() + "' does not contain flag " + keyInv);
+            }
+        }
+
         // check for all required flags
         if (!this.requiredExportFlags.isEmpty())  {
-            final Set<String> main = new HashSet<String>(_exportParser.getLines("/mql/"));
             for (final Map.Entry<String,Boolean> flag : this.requiredExportFlags.entrySet())  {
                 final boolean value = this.flags.containsKey(flag.getKey()) && (this.flags.get(flag.getKey()) != null)
                                       ? this.flags.get(flag.getKey())
@@ -400,7 +416,6 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
 
         // check hidden flag
         if (this.getCI() != null)  {
-            final Set<String> main = new HashSet<String>(_exportParser.getLines("/mql/"));
             if ((this.getFlag("hidden") != null) && this.getFlag("hidden"))  {
                 Assert.assertTrue(
                         main.contains("hidden") || main.contains("hidden \\"),

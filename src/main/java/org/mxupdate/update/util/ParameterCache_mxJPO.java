@@ -434,6 +434,20 @@ public class ParameterCache_mxJPO
         return this.mapping;
     }
 
+
+    /**
+     * Returns for given key the related boolean value.
+     *
+     * @param _key  key of searched boolean value
+     * @return value of the boolean (or <code>null</code> if for the key no
+     *         boolean value is defined)
+     * @see #mapBoolean
+     */
+    public Boolean getValueBoolean(final Enum<?> _key)
+    {
+        return this.mapBoolean.get(_key.name());
+    }
+
     /**
      * Returns for given key the related boolean value.
      *
@@ -717,5 +731,40 @@ public class ParameterCache_mxJPO
         {
             return new StringBuilder().append('[').append(this.name()).append("] ").toString();
         }
+    }
+
+    public enum ValueKeys
+    {
+        /**
+         * Name of the parameter to define that the &quot;rangevalue&quot;
+         * flag for attributes from current MX version is supported. The
+         * parameter is needed to support the case that an old MX version is
+         * used....
+         */
+        DMAttrSupportsFlagRangeValue,
+
+        /**
+         * Name of the parameter to define that the &quot;resetonclone&quot;
+         * flag for attributes from current MX version is supported. The
+         * parameter is needed to support the case that an old MX version is
+         * used....
+         */
+        DMAttrSupportsFlagResetOnClone,
+
+        /**
+         * Name of the parameter to define that the &quot;resetonrevision&quot;
+         * flag for attributes from current MX version is supported. The
+         * parameter is needed to support the case that an old MX version is
+         * used....
+         */
+        DMAttrSupportsFlagResetOnRevision,
+        /**
+         * Name of the parameter to define that the &quot;maxlength&quot;
+         * property for string attributes from current MX version is supported.
+         * The parameter is needed to support the case that an old MX version
+         * is used....
+         */
+        DMAttrSupportsPropMaxLength;
+
     }
 }

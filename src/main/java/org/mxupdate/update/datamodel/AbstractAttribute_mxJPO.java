@@ -31,6 +31,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
@@ -43,40 +44,15 @@ abstract class AbstractAttribute_mxJPO
     extends AbstractDMWithTriggers_mxJPO
 {
     /**
-     * Name of the parameter to define that the &quot;resetonclone&quot; flag
-     * for attributes from current MX version is supported. The parameter is
-     * needed to support the case that an old MX version is used....
-     *
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     */
-    private static final String PARAM_SUPPORT_FLAG_RESET_ON_CLONE = "DMAttrSupportsFlagResetOnClone";
-
-    /**
-     * Name of the parameter to define that the &quot;resetonrevision&quot;
-     * flag for attributes from current MX version is supported. The parameter
-     * is needed to support the case that an old MX version is used....
-     *
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     */
-    private static final String PARAM_SUPPORT_FLAG_RESET_ON_REVISION = "DMAttrSupportsFlagResetOnRevision";
-
-    /**
      * MQL list statement with select for the attribute type and name used
      * to get the list of all attribute MX names depending on the attribute
      * type.
-     *
-     * @see #getMxNames(ParameterCache_mxJPO)
      */
     private static final String SELECT_ATTRS = "list attribute * select type name dump";
 
     /**
      * Key used to identify the update of an attribute within
      * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)}.
-     *
-     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
-     * @see #TCL_PROCEDURE
      */
     private static final String JPO_CALLER_KEY = "defineAttrDimension";
 
@@ -86,9 +62,6 @@ abstract class AbstractAttribute_mxJPO
      * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)} with the new
      * policy definition. All quot's are replaced by <code>@0@0@</code> and all
      * apostroph's are replaced by <code>@1@1@</code>.
-     *
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
      */
     private static final String TCL_PROCEDURE
             = "proc defineAttrDimension {_sName _sDimension}  {\n"
@@ -97,8 +70,6 @@ abstract class AbstractAttribute_mxJPO
 
     /**
      * Set of all ignored URLs from the XML definition for attributes.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
@@ -112,8 +83,6 @@ abstract class AbstractAttribute_mxJPO
     /**
      * Mapping between the comparators defined within XML and the comparators
      * used within MX.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final Map<String,String> RANGE_COMP = new HashMap<String,String>();
     static  {
@@ -139,8 +108,6 @@ abstract class AbstractAttribute_mxJPO
     /**
      * Stores the ranges of the attribute (used while parsing the XML
      * attribute).
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private final Stack<Range> ranges = new Stack<Range>();
 
@@ -148,27 +115,16 @@ abstract class AbstractAttribute_mxJPO
      * If the range is a program the value references a program. Only one range
      * program could be defined at maximum! So the range program is defined as
      * variable directly on the attribute and not as range.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #rangeProgramInputArguments
-     * @see Range#write(Appendable)
      */
     private String rangeProgramRef;
 
     /**
      * If the range is a program the value are the input arguments.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #rangeProgramRef
-     * @see Range#write(Appendable)
      */
     private String rangeProgramInputArguments;
 
     /**
      * All ranges but sorted after they are prepared.
-     *
-     * @see #ranges
-     * @see #prepare(ParameterCache_mxJPO)
      */
     private final Set<Range> rangesSorted = new TreeSet<Range>();
 
@@ -179,26 +135,17 @@ abstract class AbstractAttribute_mxJPO
 
     /**
      * Holds the attribute type used to create a new attribute.
-     *
-     * @see #create(ParameterCache_mxJPO)
-     * @see #AbstractAttribute_mxJPO(TypeDef_mxJPO, String, String, String)
      */
     private final String attrTypeCreate;
 
     /**
      * Holds the attribute including the &quot;,&quot; returned from the
      * <code>list attribute</code> statement {@link #SELECT_ATTRS}.
-     *
-     * @see #getMxNames(ParameterCache_mxJPO)
-     * @see #SELECT_ATTRS
      */
     private final String attrTypeList;
 
     /**
      * Stores the reference to the dimension of an attribute.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      */
     private String dimension;
 
@@ -206,28 +153,16 @@ abstract class AbstractAttribute_mxJPO
      * The value is needed to hold the information if the update of the
      * dimension is run (because the TCL procedure {@link #TCL_PROCEDURE} must
      * not be called everytime...).
-     *
-     * @see #update(ParameterCache_mxJPO, File, String)
-     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
-     * @see #updateDimension(ParameterCache_mxJPO, String)
      */
     private boolean dimensionUpdated = false;
 
     /**
      * Flag that the attribute value is reset on clone.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     * @see #PARAM_SUPPORT_FLAG_RESET_ON_CLONE
      */
     private boolean resetOnClone = false;
 
     /**
      * Flag that the attribute value is reset on revision.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     * @see #PARAM_SUPPORT_FLAG_RESET_ON_REVISION
      */
     private boolean resetOnRevision = false;
 
@@ -398,10 +333,10 @@ abstract class AbstractAttribute_mxJPO
         throws IOException
     {
         _out.append(" \\\n    ").append(this.isHidden() ?        "hidden"          : "!hidden");
-        if (_paramCache.getValueBoolean(AbstractAttribute_mxJPO.PARAM_SUPPORT_FLAG_RESET_ON_CLONE))  {
+        if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnClone))  {
             _out.append(" \\\n    ").append(this.resetOnClone ?      "resetonclone"    : "!resetonclone");
         }
-        if (_paramCache.getValueBoolean(AbstractAttribute_mxJPO.PARAM_SUPPORT_FLAG_RESET_ON_REVISION))  {
+        if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnRevision))  {
             _out.append(" \\\n    ").append(this.resetOnRevision ?   "resetonrevision" : "!resetonrevision");
         }
         this.writeAttributeSpecificValues(_paramCache, _out);
@@ -532,10 +467,10 @@ abstract class AbstractAttribute_mxJPO
                 .append("escape mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
                 .append(" !hidden description \"\" default \"\"");
-        if (_paramCache.getValueBoolean(AbstractAttribute_mxJPO.PARAM_SUPPORT_FLAG_RESET_ON_CLONE))  {
+        if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnClone))  {
             preMQLCode.append(" !resetonclone");
         }
-        if (_paramCache.getValueBoolean(AbstractAttribute_mxJPO.PARAM_SUPPORT_FLAG_RESET_ON_REVISION))  {
+        if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnRevision))  {
             preMQLCode.append(" !resetonrevision");
         }
         // remove rules
