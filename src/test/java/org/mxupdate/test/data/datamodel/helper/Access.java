@@ -58,6 +58,8 @@ public class Access
     private String category;
     /** Related filter expression. */
     private String filter;
+    /** Related local filter expression. */
+    private String localfilter;
 
     /**
      * Create depending users.
@@ -141,6 +143,18 @@ public class Access
     public Access setFilter(final String _filter)
     {
         this.filter = _filter;
+        return this;
+    }
+
+    /**
+     * Defines the {@link #localfilter}.
+     *
+     * @param _localfilter      new local filter
+     * @return this instance
+     */
+    public Access setLocalFilter(final String _localfilter)
+    {
+        this.localfilter = _localfilter;
         return this;
     }
 
@@ -262,6 +276,9 @@ public class Access
         if (this.filter != null)  {
             _cmd.append(" filter \"").append(StringUtil_mxJPO.convertTcl(this.filter)).append('\"');
         }
+        if (this.localfilter != null)  {
+            _cmd.append(" localfilter \"").append(StringUtil_mxJPO.convertTcl(this.localfilter)).append('\"');
+        }
 
         _cmd.append('\n');
     }
@@ -311,6 +328,9 @@ public class Access
         }
         if (this.filter != null)  {
             ret.append("filter \"").append(AbstractTest.convertTcl(this.filter)).append("\" ");
+        }
+        if (this.localfilter != null)  {
+            ret.append("localfilter \"").append(AbstractTest.convertTcl(this.localfilter)).append("\" ");
         }
         return ret.toString();
     }

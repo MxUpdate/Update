@@ -52,7 +52,7 @@ public final class AccessTestUtil
                         || ("public".equals(kind) && !"login".equals(prefix))
                         || ("user".equals(kind)   && (prefix == null)))  {
                     final String txt = ((prefix != null) ? prefix + " ": "") + kind;
-                    ret.add(new Object[]{
+                    /*ret.add(new Object[]{
                             _test.getDescriptionPrefix() + " access for " + txt + " read/show",
                             _test.createTestData4Access(
                                                 new Access()
@@ -79,7 +79,7 @@ public final class AccessTestUtil
                                                 new Access()
                                                         .setKind("user")
                                                         .setUser(new PersonAdminData(test, "guest"))
-                                                        .addAccess("read", "show"))});
+                                                        .addAccess("read", "show"))});*/
                     ret.add(new Object[]{
                             _test.getDescriptionPrefix() + " access for " + txt + " read/show with filter expression",
                             _test.createTestData4Access(
@@ -89,6 +89,16 @@ public final class AccessTestUtil
                                                         .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
                                                         .addAccess("read", "show")
                                                         .setFilter("current==\"hello\""))});
+                    ret.add(new Object[]{
+                            _test.getDescriptionPrefix() + " access for " + txt + " read/show with local filter expression",
+                            _test.createTestData4Access(
+                                                new Access()
+                                                        .setPrefix(prefix)
+                                                        .setKind(kind)
+                                                        .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
+                                                        .addAccess("read", "show")
+                                                        .setLocalFilter("current==\"hello\""))
+                                        .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)});
                     ret.add(new Object[]{
                             _test.getDescriptionPrefix() + " access for " + txt + " all for key",
                             _test.createTestData4Access(
