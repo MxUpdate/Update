@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
@@ -32,32 +33,10 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 public class AttributeString_mxJPO
     extends AbstractAttribute_mxJPO
 {
-    /**
-     * Name of the parameter to define that the &quot;maxlength&quot;
-     * property for string attributes from current MX version is supported. The
-     * parameter is needed to support the case that an old MX version is
-     * used....
-     *
-     * @see #writeAttributeSpecificValues(ParameterCache_mxJPO, Appendable)
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     */
-    private static final String PARAM_SUPPORT_PROPERTY_MAX_LENGTH = "DMAttrSupportsPropMaxLength";
-
-    /**
-     * The attribute is a multi line attribute.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeAttributeSpecificValues(ParameterCache_mxJPO, Appendable)
-     */
+    /** The attribute is a multi line attribute. */
     private boolean multiline = false;
 
-    /**
-     * Maximum length of the value for string attributes.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     * @see #PARAM_SUPPORT_PROPERTY_MAX_LENGTH
-     */
+    /** Maximum length of the value for string attributes. */
     private String maxLength = "0";
 
     /**
@@ -113,7 +92,7 @@ public class AttributeString_mxJPO
      * <li>{@link #multiline multiple line} flag</li>
      * <li>{@link #maxLength maximum length} (if attribute is from
      *     {@link #type} string and if parameter
-     *     {@link #PARAM_SUPPORT_PROPERTY_MAX_LENGTH} is defined)</li>
+     *     {@link ValueKeys#DMAttrSupportsPropMaxLength} is defined)</li>
      */
     @Override()
     protected void writeAttributeSpecificValues(final ParameterCache_mxJPO _paramCache,
@@ -121,7 +100,7 @@ public class AttributeString_mxJPO
         throws IOException
     {
         _out.append(" \\\n    ").append(this.multiline ? "" : "!").append("multiline");
-        if (_paramCache.getValueBoolean(AttributeString_mxJPO.PARAM_SUPPORT_PROPERTY_MAX_LENGTH))  {
+        if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsPropMaxLength))  {
             _out.append(" \\\n    maxlength \"").append(this.maxLength).append("\"");
         }
     }
@@ -148,7 +127,6 @@ public class AttributeString_mxJPO
      *                          syntax!)
      * @param _sourceFile       souce file with the TCL code to update
      * @throws Exception if the update from derived class failed
-     * @see #PARAM_SUPPORT_PROPERTY_MAX_LENGTH
      */
     @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
@@ -164,7 +142,7 @@ public class AttributeString_mxJPO
                 .append("escape mod ").append(this.getTypeDef().getMxAdminName())
                 .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
                 .append(" !multiline");
-        if (_paramCache.getValueBoolean(AttributeString_mxJPO.PARAM_SUPPORT_PROPERTY_MAX_LENGTH))  {
+        if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsPropMaxLength))  {
             preMQLCode.append(" maxlength 0");
         }
         // append already existing pre MQL code
