@@ -52,6 +52,8 @@ public class Access
     private String reserve;
     /** Maturity. */
     private String maturity;
+    /** Category. */
+    private String category;
     /** Related filter expression. */
     private String filter;
 
@@ -153,6 +155,18 @@ public class Access
     }
 
     /**
+     * Defines the {@link #project}.
+     *
+     * @param _project      project
+     * @return this instance
+     */
+    public Access setProject(final String _project)
+    {
+        this.project = _project;
+        return this;
+    }
+
+    /**
      * Defines the {@link #owner}.
      *
      * @param _owner    owner
@@ -189,14 +203,14 @@ public class Access
     }
 
     /**
-     * Defines the {@link #project}.
+     * Defines the {@link #category}.
      *
-     * @param _project      project
+     * @param _maturity     maturity
      * @return this instance
      */
-    public Access setProject(final String _project)
+    public Access setCategory(final String _category)
     {
-        this.project = _project;
+        this.category = _category;
         return this;
     }
 
@@ -239,6 +253,9 @@ public class Access
         }
         if (this.maturity != null)  {
             _cmd.append(' ').append(this.maturity).append(" maturity");
+        }
+        if (this.category != null)  {
+            _cmd.append(' ').append(this.category).append(" category");
         }
         if (this.filter != null)  {
             _cmd.append(" filter \"").append(StringUtil_mxJPO.convertTcl(this.filter)).append('\"');
@@ -286,6 +303,9 @@ public class Access
         }
         if (this.maturity != null)  {
             ret.append(this.maturity).append(" maturity ");
+        }
+        if (this.category != null)  {
+            ret.append(this.category).append(" category ");
         }
         if (this.filter != null)  {
             ret.append("filter \"").append(AbstractTest.convertTcl(this.filter)).append("\" ");

@@ -91,115 +91,129 @@ interface PolicyDefParserConstants_mxJPO {
   /** RegularExpression Id. */
   int ACCESS = 44;
   /** RegularExpression Id. */
-  int ANY_ORGANIZATION = 45;
+  int ORGANIZATION_ANY = 45;
   /** RegularExpression Id. */
-  int SINGLE_ORGANIZATION = 46;
+  int ORGANIZATION_SINGLE = 46;
   /** RegularExpression Id. */
-  int ANCESTOR_ORGANIZATION = 47;
+  int ORGANIZATION_ANCESTOR = 47;
   /** RegularExpression Id. */
-  int DESCENDANT_ORGANIZATION = 48;
+  int ORGANIZATION_DESCENDANT = 48;
   /** RegularExpression Id. */
-  int RELATED_ORGANIZATION = 49;
+  int ORGANIZATION_RELATED = 49;
   /** RegularExpression Id. */
-  int ANY_PROJECT = 50;
+  int PROJECT_ANY = 50;
   /** RegularExpression Id. */
-  int SINGLE_PROJECT = 51;
+  int PROJECT_SINGLE = 51;
   /** RegularExpression Id. */
-  int ANCESTOR_PROJECT = 52;
+  int PROJECT_ANCESTOR = 52;
   /** RegularExpression Id. */
-  int DESCENDANT_PROJECT = 53;
+  int PROJECT_DESCENDANT = 53;
   /** RegularExpression Id. */
-  int RELATED_PROJECT = 54;
+  int PROJECT_RELATED = 54;
   /** RegularExpression Id. */
-  int ANY_OWNER = 55;
+  int OWNER_ANY = 55;
   /** RegularExpression Id. */
-  int CONTEXT_OWNER = 56;
+  int OWNER_CONTEXT = 56;
   /** RegularExpression Id. */
-  int ANY_RESERVE = 57;
+  int RESERVE_ANY = 57;
   /** RegularExpression Id. */
-  int CONTEXT_RESERVE = 58;
+  int RESERVE_CONTEXT = 58;
   /** RegularExpression Id. */
-  int NO_RESERVE = 59;
+  int RESERVE_NO = 59;
   /** RegularExpression Id. */
-  int INCLUSIVE_RESERVE = 60;
+  int RESERVE_INCLUSIVE = 60;
   /** RegularExpression Id. */
-  int ANY_MATURITY = 61;
+  int MATURITY_ANY = 61;
   /** RegularExpression Id. */
-  int NO_MATURITY = 62;
+  int MATURITY_NO = 62;
   /** RegularExpression Id. */
-  int PUBLIC_MATURITY = 63;
+  int MATURITY_PUBLIC = 63;
   /** RegularExpression Id. */
-  int PROTECTED_MATURITY = 64;
+  int MATURITY_PROTECTED = 64;
   /** RegularExpression Id. */
-  int PRIVATE_MATURITY = 65;
+  int MATURITY_PRIVATE = 65;
   /** RegularExpression Id. */
-  int NOTPRIVATE_MATURITY = 66;
+  int MATURITY_NOTPRIVATE = 66;
   /** RegularExpression Id. */
-  int PPP_MATURITY = 67;
+  int MATURITY_PPP = 67;
   /** RegularExpression Id. */
-  int BOOLEAN_TRUE = 72;
+  int CATEGORY_ANY = 68;
   /** RegularExpression Id. */
-  int BOOLEAN_FALSE = 73;
+  int CATEGORY_OEM = 69;
   /** RegularExpression Id. */
-  int BOOLEAN_TRUESTR = 74;
+  int CATEGORY_GOLDPARTNER = 70;
   /** RegularExpression Id. */
-  int BOOLEAN_FALSESTR = 75;
+  int CATEGORY_PARTNER = 71;
   /** RegularExpression Id. */
-  int DELIMITER_CHAR = 80;
+  int CATEGORY_SUPPLIER = 72;
   /** RegularExpression Id. */
-  int DELIMITER_CHARSTR = 81;
+  int CATEGORY_CUSTOMER = 73;
   /** RegularExpression Id. */
-  int LS_CURLY_BRACKET_OPEN = 86;
+  int CATEGORY_CONTRACTOR = 74;
   /** RegularExpression Id. */
-  int LS_CURLY_BRACKET_CLOSE = 87;
+  int BOOLEAN_TRUE = 79;
   /** RegularExpression Id. */
-  int LS_STRING = 88;
+  int BOOLEAN_FALSE = 80;
   /** RegularExpression Id. */
-  int LS_SINGLE_STRING = 89;
+  int BOOLEAN_TRUESTR = 81;
   /** RegularExpression Id. */
-  int LS_APOSTROPHE = 90;
+  int BOOLEAN_FALSESTR = 82;
   /** RegularExpression Id. */
-  int LS_CHAR = 91;
+  int DELIMITER_CHAR = 87;
   /** RegularExpression Id. */
-  int SL_STRING = 96;
+  int DELIMITER_CHARSTR = 88;
   /** RegularExpression Id. */
-  int SL_SINGLE_STRING = 97;
+  int LS_CURLY_BRACKET_OPEN = 93;
   /** RegularExpression Id. */
-  int SL_APOSTROPHE = 98;
+  int LS_CURLY_BRACKET_CLOSE = 94;
   /** RegularExpression Id. */
-  int SL_CHAR = 99;
+  int LS_STRING = 95;
   /** RegularExpression Id. */
-  int S_STRING = 104;
+  int LS_SINGLE_STRING = 96;
   /** RegularExpression Id. */
-  int S_SINGLE_STRING = 105;
+  int LS_APOSTROPHE = 97;
   /** RegularExpression Id. */
-  int S_APOSTROPHE = 106;
+  int LS_CHAR = 98;
   /** RegularExpression Id. */
-  int S_CHAR = 107;
+  int SL_STRING = 103;
   /** RegularExpression Id. */
-  int LALL_CURLY_BRACKET_OPEN = 112;
+  int SL_SINGLE_STRING = 104;
   /** RegularExpression Id. */
-  int LALL_ALL = 113;
+  int SL_APOSTROPHE = 105;
   /** RegularExpression Id. */
-  int L_CURLY_BRACKET_OPEN = 118;
+  int SL_CHAR = 106;
   /** RegularExpression Id. */
-  int L_CURLY_BRACKET_CLOSE = 123;
+  int S_STRING = 111;
   /** RegularExpression Id. */
-  int L_STRING = 124;
+  int S_SINGLE_STRING = 112;
   /** RegularExpression Id. */
-  int L_SINGLE_STRING = 125;
+  int S_APOSTROPHE = 113;
   /** RegularExpression Id. */
-  int L_APOSTROPHE = 126;
+  int S_CHAR = 114;
   /** RegularExpression Id. */
-  int L_CHAR = 127;
+  int LALL_CURLY_BRACKET_OPEN = 119;
   /** RegularExpression Id. */
-  int L2_CURLY_BRACKET_OPEN = 128;
+  int LALL_ALL = 120;
   /** RegularExpression Id. */
-  int L3_BRACE_STRING = 129;
+  int L_CURLY_BRACKET_OPEN = 125;
   /** RegularExpression Id. */
-  int L3_CHAR = 130;
+  int L_CURLY_BRACKET_CLOSE = 130;
   /** RegularExpression Id. */
-  int L4_CURLY_BRACKET_CLOSE = 131;
+  int L_STRING = 131;
+  /** RegularExpression Id. */
+  int L_SINGLE_STRING = 132;
+  /** RegularExpression Id. */
+  int L_APOSTROPHE = 133;
+  /** RegularExpression Id. */
+  int L_CHAR = 134;
+  /** RegularExpression Id. */
+  int L2_CURLY_BRACKET_OPEN = 135;
+  /** RegularExpression Id. */
+  int L3_BRACE_STRING = 136;
+  /** RegularExpression Id. */
+  int L3_CHAR = 137;
+  /** RegularExpression Id. */
+  int L4_CURLY_BRACKET_CLOSE = 138;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -271,29 +285,36 @@ interface PolicyDefParserConstants_mxJPO {
     "\"signature\"",
     "\"route\"",
     "<ACCESS>",
-    "<ANY_ORGANIZATION>",
-    "<SINGLE_ORGANIZATION>",
-    "<ANCESTOR_ORGANIZATION>",
-    "<DESCENDANT_ORGANIZATION>",
-    "<RELATED_ORGANIZATION>",
-    "<ANY_PROJECT>",
-    "<SINGLE_PROJECT>",
-    "<ANCESTOR_PROJECT>",
-    "<DESCENDANT_PROJECT>",
-    "<RELATED_PROJECT>",
-    "<ANY_OWNER>",
-    "<CONTEXT_OWNER>",
-    "<ANY_RESERVE>",
-    "<CONTEXT_RESERVE>",
-    "<NO_RESERVE>",
-    "<INCLUSIVE_RESERVE>",
-    "<ANY_MATURITY>",
-    "<NO_MATURITY>",
-    "<PUBLIC_MATURITY>",
-    "<PROTECTED_MATURITY>",
-    "<PRIVATE_MATURITY>",
-    "<NOTPRIVATE_MATURITY>",
-    "<PPP_MATURITY>",
+    "<ORGANIZATION_ANY>",
+    "<ORGANIZATION_SINGLE>",
+    "<ORGANIZATION_ANCESTOR>",
+    "<ORGANIZATION_DESCENDANT>",
+    "<ORGANIZATION_RELATED>",
+    "<PROJECT_ANY>",
+    "<PROJECT_SINGLE>",
+    "<PROJECT_ANCESTOR>",
+    "<PROJECT_DESCENDANT>",
+    "<PROJECT_RELATED>",
+    "<OWNER_ANY>",
+    "<OWNER_CONTEXT>",
+    "<RESERVE_ANY>",
+    "<RESERVE_CONTEXT>",
+    "<RESERVE_NO>",
+    "<RESERVE_INCLUSIVE>",
+    "<MATURITY_ANY>",
+    "<MATURITY_NO>",
+    "<MATURITY_PUBLIC>",
+    "<MATURITY_PROTECTED>",
+    "<MATURITY_PRIVATE>",
+    "<MATURITY_NOTPRIVATE>",
+    "<MATURITY_PPP>",
+    "<CATEGORY_ANY>",
+    "<CATEGORY_OEM>",
+    "<CATEGORY_GOLDPARTNER>",
+    "<CATEGORY_PARTNER>",
+    "<CATEGORY_SUPPLIER>",
+    "<CATEGORY_CUSTOMER>",
+    "<CATEGORY_CONTRACTOR>",
     "\" \"",
     "\"\\t\"",
     "\"\\n\"",
