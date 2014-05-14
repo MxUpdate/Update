@@ -57,6 +57,8 @@ public class AccessList_mxJPO
         private String reserve;
         /** Maturity of the access definition. */
         private String maturity;
+        /** Category of the access definition. */
+        private String category;
         /** String holding the filter expression. */
         private String filter;
 
@@ -137,6 +139,8 @@ public class AccessList_mxJPO
             this.accessList.add(new AccessList_mxJPO.Access());
         } else if (_url.startsWith("/userAccessList/userAccess/access"))  {
             this.accessList.peek().access.add(_url.replaceAll("^/userAccessList/userAccess/access/", "").replaceAll("Access$", "").toLowerCase());
+        } else if ("/userAccessList/userAccess/matchCategory".equals(_url))  {
+            this.accessList.peek().category = _content;
         } else if ("/userAccessList/userAccess/matchMaturity".equals(_url))  {
             this.accessList.peek().maturity = _content;
         } else if ("/userAccessList/userAccess/matchOrganization".equals(_url))  {
@@ -220,6 +224,9 @@ public class AccessList_mxJPO
                 }
                 if ((access.maturity != null) && !access.maturity.isEmpty() && !"any".equals(access.maturity))  {
                     _out.append(' ').append(access.maturity).append(" maturity");
+                }
+                if ((access.category != null) && !access.category.isEmpty() && !"any".equals(access.category))  {
+                    _out.append(' ').append(access.category).append(" category");
                 }
                 if ((access.filter != null) && !access.filter.isEmpty())  {
                     _out.append(" filter \"").append(StringUtil_mxJPO.convertTcl(access.filter)).append('\"');
@@ -309,6 +316,9 @@ public class AccessList_mxJPO
                 }
                 if ((access.maturity != null) && !access.maturity.isEmpty() && !"any".equals(access.maturity))  {
                     _out.append(' ').append(access.maturity).append(" maturity");
+                }
+                if ((access.category != null) && !access.category.isEmpty() && !"any".equals(access.category))  {
+                    _out.append(' ').append(access.category).append(" category");
                 }
                 if (access.filter != null)  {
                     _out.append(" filter \"");
