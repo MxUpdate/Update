@@ -57,8 +57,10 @@ public class AccessList_mxJPO
         private String maturity;
         /** Category of the access definition. */
         private String category;
-        /** String holding the filter expression. */
+        /** Filter expression. */
         private String filter;
+        /** Local filter expression. */
+        private String localfilter;
 
         /**
          * Returns <i>true</i> if {@link #access} is empty or contains only
@@ -70,7 +72,8 @@ public class AccessList_mxJPO
         public boolean isEmpty()
         {
             return ((this.access.isEmpty() || ((this.access.size() == 1) && this.access.contains("none"))))
-                    && ((this.filter == null) || "".equals(this.filter));
+                    && ((this.filter == null) || this.filter.isEmpty())
+                    && ((this.localfilter == null) || this.localfilter.isEmpty());
         }
     }
 
@@ -161,6 +164,8 @@ public class AccessList_mxJPO
             this.accessList.peek().userRef = _content;
         } else if ("/userAccessList/userAccess/expressionFilter".equals(_url))  {
             this.accessList.peek().filter = _content;
+        } else if ("/userAccessList/userAccess/localExpressionFilter".equals(_url))  {
+            this.accessList.peek().localfilter = _content;
         } else  {
             ret = false;
         }
@@ -228,6 +233,9 @@ public class AccessList_mxJPO
                 }
                 if ((access.filter != null) && !access.filter.isEmpty())  {
                     _out.append(" filter \"").append(StringUtil_mxJPO.convertTcl(access.filter)).append('\"');
+                }
+                if ((access.localfilter != null) && !access.localfilter.isEmpty())  {
+                    _out.append(" localfilter \"").append(StringUtil_mxJPO.convertTcl(access.localfilter)).append('\"');
                 }
             }
         }
@@ -319,11 +327,10 @@ public class AccessList_mxJPO
                     _out.append(' ').append(access.category).append(" category");
                 }
                 if (access.filter != null)  {
-                    _out.append(" filter \"");
-                    if (access.filter != null)  {
-                        _out.append(StringUtil_mxJPO.convertMql(access.filter));
-                    }
-                    _out.append('\"');
+                    _out.append(" filter \"").append(StringUtil_mxJPO.convertMql(access.filter)).append('\"');
+                }
+                if (access.localfilter != null)  {
+                    _out.append(" localfilter \"").append(StringUtil_mxJPO.convertMql(access.localfilter)).append('\"');
                 }
             }
         }

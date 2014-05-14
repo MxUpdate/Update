@@ -201,7 +201,7 @@ public class PolicyDefParser_mxJPO
   final public void allstate(final Policy_mxJPO _policy) throws ParseException_mxJPO {
     final AccessList_mxJPO accessList = this.getField(_policy, "allStateAccess").<AccessList_mxJPO>get();
     jj_consume_token(ALLSTATE);
-    jj_consume_token(139);
+    jj_consume_token(140);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -264,7 +264,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(140);
+    jj_consume_token(141);
         this.getField(_policy, "allState").set(true);
   }
 
@@ -280,7 +280,7 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(STATE);
     tmpStr = sString();
                                 this.getField(state, "name").set(tmpStr);
-    jj_consume_token(139);
+    jj_consume_token(140);
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -502,7 +502,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(140);
+    jj_consume_token(141);
         this.appendValue(_policy, "states", state);
   }
 
@@ -555,13 +555,14 @@ public class PolicyDefParser_mxJPO
   }
 
   final public void stateAccessDef(final Access _access) throws ParseException_mxJPO {
-    String key = null, filter = null, organization = null, project = null, owner = null, reserve = null, maturity = null, category = null;
+    String key = null, filter = null, localfilter = null, organization = null, project = null, owner = null, reserve = null, maturity = null, category = null;
     Token_mxJPO access = null;
     label_4:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case KEY:
       case FILTER:
+      case LOCALFILTER:
       case ACCESS:
       case ORGANIZATION_ANY:
       case ORGANIZATION_SINGLE:
@@ -606,6 +607,10 @@ public class PolicyDefParser_mxJPO
       case FILTER:
         jj_consume_token(FILTER);
         filter = sString();
+        break;
+      case LOCALFILTER:
+        jj_consume_token(LOCALFILTER);
+        localfilter = sString();
         break;
       case ACCESS:
         access = jj_consume_token(ACCESS);
@@ -737,6 +742,7 @@ public class PolicyDefParser_mxJPO
     }
         this.getField(_access, "key").set(key);
         this.getField(_access, "filter").set(filter);
+        this.getField(_access, "localfilter").set(localfilter);
         this.getField(_access, "organization").set(organization);
         this.getField(_access, "project").set(project);
         this.getField(_access, "owner").set(owner);
@@ -793,7 +799,7 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(SIGNATURE);
     tmpStr = sString();
                                     this.getField(signature, "name").set(tmpStr);
-    jj_consume_token(139);
+    jj_consume_token(140);
     label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -838,7 +844,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(140);
+    jj_consume_token(141);
         this.appendValue(_state, "signatures", signature);
   }
 
