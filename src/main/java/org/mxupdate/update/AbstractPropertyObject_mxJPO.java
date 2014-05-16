@@ -86,6 +86,12 @@ public abstract class AbstractPropertyObject_mxJPO
     private static final String PARAM_EXPORTVERSION = "ExportVersion";
 
     /**
+     * Name of the key within the parameter cache that the update continues
+     * if a error was thrown.
+     */
+    private static final String PARAM_CONTINUEONERROR = "ContinueOnError";
+
+    /**
      * Header string of the application.
      *
      * @see #writeHeader(ParameterCache_mxJPO, Appendable)
@@ -407,7 +413,22 @@ public abstract class AbstractPropertyObject_mxJPO
         tclVariables.put(PropertyDef_mxJPO.FILEDATE.name(),
                          StringUtil_mxJPO.formatFileDate(_paramCache, new Date(_file.lastModified())));
 
-        this.update(_paramCache, "", "", "", tclVariables, _file);
+        try
+        {
+            this.update(_paramCache, "", "", "", tclVariables, _file);
+        }
+        catch (final Exception e)
+        {
+            final boolean continueOnError = _paramCache.getValueBoolean(AbstractPropertyObject_mxJPO.PARAM_CONTINUEONERROR);
+            if (continueOnError)
+            {
+                _paramCache.logError(e.toString());
+            }
+            else
+            {
+                throw e;
+            }
+        }
     }
 
     /**
