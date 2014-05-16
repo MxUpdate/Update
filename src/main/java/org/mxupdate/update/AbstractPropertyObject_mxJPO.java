@@ -26,6 +26,7 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.JPOCaller_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 
@@ -405,7 +406,15 @@ public abstract class AbstractPropertyObject_mxJPO
         tclVariables.put(PropertyDef_mxJPO.FILEDATE.name(),
                          StringUtil_mxJPO.formatFileDate(_paramCache, new Date(_file.lastModified())));
 
-        this.update(_paramCache, "", "", "", tclVariables, _file);
+        try {
+            this.update(_paramCache, "", "", "", tclVariables, _file);
+        } catch (final Exception e) {
+            if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {
+                _paramCache.logError(e.toString());
+            } else {
+                throw e;
+            }
+        }
     }
 
     /**

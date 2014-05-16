@@ -28,6 +28,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.xml.sax.SAXException;
@@ -161,10 +162,10 @@ public abstract class AbstractObject_mxJPO
      * path. The name of the file where is written through is evaluated within
      * this export method.
      *
-     * @param _paramCache   parameter cache
-     * @param _path         path to write through (if required also including
-     *                      depending file path defined from the information
-     *                      annotation)
+     * @param _paramCache       parameter cache
+     * @param _path             path to write through (if required also
+     *                          including depending file path defined from the
+     *                          information annotation)
      * @throws MatrixException  if some MQL statement failed
      * @throws SAXException     if the XML export of the object could not
      *                          parsed (for admin objects)
@@ -174,15 +175,35 @@ public abstract class AbstractObject_mxJPO
                        final File _path)
         throws MatrixException, SAXException, IOException
     {
-        this.parse(_paramCache);
-        final File file = new File(_path, this.getFileName());
-        if (!file.getParentFile().exists())  {
-            file.getParentFile().mkdirs();
+        try  {
+            this.parse(_paramCache);
+            final File file = new File(_path, this.getFileName());
+            if (!file.getParentFile().exists())  {
+                file.getParentFile().mkdirs();
+            }
+            final Writer out = new FileWriter(file);
+            this.write(_paramCache, out);
+            out.flush();
+            out.close();
+        } catch (final MatrixException e)  {
+            if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {
+                _paramCache.logError(e.toString());
+            } else {
+                throw e;
+            }
+        } catch (final SAXException e)  {
+            if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {
+                _paramCache.logError(e.toString());
+            } else {
+                throw e;
+            }
+        } catch (final IOException e)  {
+            if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {
+                _paramCache.logError(e.toString());
+            } else {
+                throw e;
+            }
         }
-        final Writer out = new FileWriter(file);
-        this.write(_paramCache, out);
-        out.flush();
-        out.close();
     }
 
     /**

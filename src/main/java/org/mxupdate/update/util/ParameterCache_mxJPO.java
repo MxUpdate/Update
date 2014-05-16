@@ -778,7 +778,12 @@ public class ParameterCache_mxJPO
          * Name of parameter to check that the policy states supports the
          * published property.
          */
-        DMPolicyStateSupportsEnforceReserveAccess;
+        DMPolicyStateSupportsEnforceReserveAccess,
+        /**
+         * Name of the key within the parameter cache that the update continues
+         * if a error was thrown.
+         */
+        ParamContinueOnError;
     }
 
     /**
