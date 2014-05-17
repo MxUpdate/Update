@@ -42,7 +42,7 @@ public class PortalData
     /**
      * Within export the description and label must be defined.
      */
-    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>(3);
+    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>(3);
     static  {
         PortalData.REQUIRED_EXPORT_VALUES.put("description", "");
         PortalData.REQUIRED_EXPORT_VALUES.put("label", "");

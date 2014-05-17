@@ -51,7 +51,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     private final String name;
 
     /** Values of this data piece. */
-    private final Map<String,Object> values = new HashMap<String,Object>();
+    private final Values values = new Values();
 
     /** Flag to indicate that this data piece is created.*/
     private boolean created;
@@ -145,7 +145,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      *
      * @return defined values
      */
-    public Map<String,Object> getValues()
+    public Values getValues()
     {
         return this.values;
     }
@@ -520,18 +520,37 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
                                  final String _value)
     {
         if (_value != null)  {
-            Assert.assertEquals(_exportParser.getLines("/mql/" + _tag + "/@value").size(),
+            Assert.assertEquals(_exportParser.getLines("/" + this.ci.getUrlTag() + "/" + _tag + "/@value").size(),
                                 1,
                                 "check " + _kind + " for '" + this.getName() + "' that " + _tag + " is defined");
-            Assert.assertEquals(_exportParser.getLines("/mql/" + _tag + "/@value").get(0),
+            Assert.assertEquals(_exportParser.getLines("/" + this.ci.getUrlTag() + "/" + _tag + "/@value").get(0),
                                 _value,
                                 "check " + _kind + " for '" + this.getName() + "' that " + _tag + " is " + _value);
 
         } else  {
-            Assert.assertEquals(_exportParser.getLines("/mql/" + _tag + "/@value").size(),
+            Assert.assertEquals(_exportParser.getLines("/" + this.ci.getUrlTag() + "/" + _tag + "/@value").size(),
                                 0,
                                 "check " + _kind + " '" + this.getName() + "' that no " + _tag + " is defined");
         }
+    }
+
+    /**
+     * Checks in the {@code _exportParser} that given {@code _tag} does not
+     * exits.
+     *
+     * @param _exportParser     parsed export
+     * @param _kind             kind of the check
+     * @param _tag              tag to check
+     * @param _value            value to check (or <code>null</code> if value
+     *                          is not defined)
+     */
+    protected void checkNotExistingSingleValue(final ExportParser _exportParser,
+                                               final String _kind,
+                                               final String _tag)
+    {
+        Assert.assertEquals(_exportParser.getLines("/" + this.ci.getUrlTag() + "/" + _tag + "/@value").size(),
+                            0,
+                            "check " + _kind + " '" + this.getName() + "' that no " + _tag + " is defined");
     }
 
     /**
@@ -549,7 +568,11 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
                                  final String _tag,
                                  final boolean _exists)
     {
-        this.checkSingleValue(_exportParser, _kind, _tag, _exists ? "" : null);
+        if (_exists)  {
+            this.checkSingleValue(_exportParser, _kind, _tag, "");
+        } else  {
+            this.checkNotExistingSingleValue(_exportParser, _kind, _tag);
+        }
     }
 
     /**
@@ -562,5 +585,61 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     public String toString()
     {
         return "[" + this.ci.updateType + " '" + this.name + "']";
+    }
+
+    public class Values
+        extends HashMap<String,Object>
+    {
+        /** Serial Version UID. */
+        private static final long serialVersionUID = -2198651793145001986L;
+
+        /**
+         * Appends the defined flags to the TCL code {@code _cmd} of the
+         * configuration item file.
+         *
+         * @param _prefix   prefix in front of the values
+         * @param _cmd      string builder with the TCL commands of the
+         *                  configuration item file
+         * @param _suffix   suffix after the values
+         */
+        public void append4CIFileValues(final String _prefix,
+                                        final StringBuilder _cmd,
+                                        final String _suffix)
+        {
+            for (final Map.Entry<String,Object> entry : this.entrySet())  {
+                if ((entry.getValue() instanceof Character) || (entry.getValue() instanceof Integer))  {
+                    _cmd.append(_prefix).append(entry.getKey()).append(' ').append(entry.getValue()).append(_suffix);
+                } else  {
+                    _cmd.append(_prefix).append(entry.getKey()).append(" \"")
+                        .append(AbstractTest.convertTcl(entry.getValue().toString()))
+                        .append('\"')
+                        .append(_suffix);
+                }
+            }
+        }
+
+        /**
+         * Checks for all defined values.
+         *
+         * @param _exportParser     parsed export
+         */
+        public void checkExport(final ExportParser _exportParser)
+        {
+            for (final Map.Entry<String,Object> entry : this.entrySet())  {
+                if ((entry.getValue() instanceof Character) || (entry.getValue() instanceof Integer))  {
+                    AbstractData.this.checkSingleValue(
+                            _exportParser,
+                            entry.getKey(),
+                            entry.getKey(),
+                            entry.getValue().toString());
+                } else  {
+                    AbstractData.this.checkSingleValue(
+                            _exportParser,
+                            entry.getKey(),
+                            entry.getKey(),
+                            "\"" + AbstractTest.convertTcl(entry.getValue().toString()) + "\"");
+                }
+            }
+        }
     }
 }

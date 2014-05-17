@@ -39,7 +39,7 @@ public class TypeData
     /**
      * Within export the description must be defined.
      */
-    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>(1);
+    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>(1);
     static  {
         TypeData.REQUIRED_EXPORT_VALUES.put("description", "");
         TypeData.REQUIRED_EXPORT_VALUES.put("abstract", "false");

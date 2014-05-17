@@ -48,7 +48,7 @@ public class PolicyData
     /**
      * Within export the description must be defined.
      */
-    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
+    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
     static  {
         PolicyData.REQUIRED_EXPORT_VALUES.put("description", "");
         PolicyData.REQUIRED_EXPORT_VALUES.put("defaultformat", "");
@@ -206,18 +206,10 @@ public class PolicyData
         this.append4CIFileHeader(strg);
 
         strg.append("updatePolicy \"${NAME}\" {\n")
-            .append("  hidden \"").append(this.getFlag("hidden") != null ? this.getFlag("hidden") : false).append("\"\n");
+            .append("  hidden \"").append(this.getFlags().get("hidden") != null ? this.getFlags().get("hidden") : false).append("\"\n");
 
-        // values
-        for (final Map.Entry<String,Object> entry : this.getValues().entrySet())  {
-            if (entry.getValue() instanceof Character)  {
-                strg.append(' ').append(entry.getKey()).append(' ').append(entry.getValue());
-            } else  {
-                strg.append(' ').append(entry.getKey()).append(" \"")
-                    .append(AbstractTest.convertTcl(entry.getValue().toString()))
-                    .append('\"');
-            }
-        }
+        // append values
+        this.getValues().append4CIFileValues("  ", strg, "\n");
 
         // type definition
         if (this.allTypes)  {
@@ -242,8 +234,8 @@ public class PolicyData
         }
 
         // enforce
-        if (this.getFlag("enforce") != null)  {
-            strg.append("  enforce \"").append(this.getFlag("enforce")).append("\"\n");
+        if (this.getFlags().get("enforce") != null)  {
+            strg.append("  enforce \"").append(this.getFlags().get("enforce")).append("\"\n");
         }
 
         if (this.allState != null)  {
@@ -307,9 +299,9 @@ public class PolicyData
                 }
                 cmd.append(" format ").append(StringUtil_mxJPO.joinMql(',', true, formatNames, null));
             }
-            if (this.getFlag("enforce") != null)  {
+            if (this.getFlags().get("enforce") != null)  {
                 cmd.append(' ');
-                if (!this.getFlag("enforce"))  {
+                if (!this.getFlags().get("enforce"))  {
                     cmd.append("not");
                 }
                 cmd.append("enforce");
@@ -399,23 +391,12 @@ public class PolicyData
                                 1,
                                 "required check that minimum and maximum one " + valueName + " is defined");
         }
+
         // check for defined values
-        for (final Map.Entry<String,Object> entry : this.getValues().entrySet())  {
-            if (entry.getValue() instanceof Character)  {
-                this.checkSingleValue(_exportParser,
-                        entry.getKey(),
-                        entry.getKey(),
-                        entry.getValue().toString());
-            } else  {
-                this.checkSingleValue(_exportParser,
-                                      entry.getKey(),
-                                      entry.getKey(),
-                                      "\"" + AbstractTest.convertTcl(entry.getValue().toString()) + "\"");
-            }
-        }
+        this.getValues().checkExport(_exportParser);
 
         // check for hidden flag
-        if ((this.getFlag("hidden") == null) || !this.getFlag("hidden"))  {
+        if ((this.getFlags().get("hidden") == null) || !this.getFlags().get("hidden"))  {
             this.checkSingleValue(_exportParser,
                                   "hidden flag (must be false)",
                                   "hidden",
@@ -441,7 +422,7 @@ public class PolicyData
         }
 
         // check for enforce flag
-        if (this.getFlag("enforce") == null)  {
+        if (this.getFlags().get("enforce") == null)  {
             this.checkSingleValue(
                     _exportParser,
                     "enforce flag must be not defined",
@@ -452,7 +433,7 @@ public class PolicyData
                     _exportParser,
                     "enforce flag",
                     "enforce",
-                    "\""+ this.getFlag("enforce") + "\"");
+                    "\""+ this.getFlags().get("enforce") + "\"");
         }
 
         // check for formats
@@ -521,41 +502,6 @@ public class PolicyData
                     _parentLine.getLines(_tag + "/@value").size(),
                     0,
                     "check " + _kind + " that no " + _tag + " is defined");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * The original method is overwritten because for policies another path
-     * exists for the values.
-     *
-     * @param _exportParser     parsed export
-     * @param _kind             kind of the check
-     * @param _tag              tag to check
-     * @param _value            value to check (or <code>null</code> if value
-     *                          is not defined)
-     */
-    @Override()
-    public void checkSingleValue(final ExportParser _exportParser,
-                                 final String _kind,
-                                 final String _tag,
-                                 final String _value)
-    {
-        if (_value != null)  {
-            Assert.assertEquals(
-                    _exportParser.getLines("/updatePolicy/" + _tag + "/@value").size(),
-                    1,
-                    "check " + _kind + " for '" + this.getName() + "' that " + _tag + " is defined");
-            Assert.assertEquals(
-                    _exportParser.getLines("/updatePolicy/" + _tag + "/@value").get(0),
-                    _value,
-                    "check " + _kind + " for '" + this.getName() + "' that " + _tag + " is " + _value);
-
-        } else  {
-            Assert.assertEquals(
-                    _exportParser.getLines("/updatePolicy/" + _tag + "/@value").size(),
-                    0,
-                    "check " + _kind + " '" + this.getName() + "' that no " + _tag + " is defined");
         }
     }
 

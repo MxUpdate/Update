@@ -26,6 +26,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.data.datamodel.AbstractAttributeData;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger;
+import org.mxupdate.test.data.datamodel.RuleData;
 import org.mxupdate.test.data.program.MQLProgramData;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -60,6 +61,14 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
         ret.add(new Object[]{
                 _logText + " with escaped name",
                 this.createNewData("hello \" test")});
+
+        // rule
+        ret.add(new Object[]{
+                _logText + " with rule",
+                this.createNewData("hello")
+                        .setRule(new RuleData(this, "Rule"))});
+
+         // triggers
         ret.add(new Object[]{
                 _logText + " with modify action trigger",
                 this.createNewData("hello \" test")
@@ -72,6 +81,12 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
                 _logText + " with modify override trigger",
                 this.createNewData("hello \" test")
                         .addTrigger(new AbstractDataWithTrigger.TriggerOverride("modify", new MQLProgramData(this, "Test \" Program")))});
+        ret.add(new Object[]{
+                _logText + " with modify action, check and override trigger",
+                this.createNewData("hello \" test")
+                        .addTrigger(new AbstractDataWithTrigger.TriggerAction("modify", new MQLProgramData(this, "Test \" Program 1")))
+                        .addTrigger(new AbstractDataWithTrigger.TriggerCheck("modify", new MQLProgramData(this, "Test \" Program 2")))
+                        .addTrigger(new AbstractDataWithTrigger.TriggerOverride("modify", new MQLProgramData(this, "Test \" Program 3")))});
 
         // ranges
         ret.add(new Object[]{
@@ -115,7 +130,17 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
                 this.createNewData("hello")
                         .addRange(new AbstractAttributeData.RangeNotMatch(_value1))});
         ret.add(new Object[]{
-                _logText + " with program range",
+                _logText + " with program range w/o input",
+                this.createNewData("hello")
+                        .addRange(new AbstractAttributeData.RangeProgram(new MQLProgramData(this, "program \" test"), null))});
+        ret.add(new Object[]{
+                _logText + " with program range with empty input (mut be removed)",
+                this.createNewData("hello")
+                        .addRange(new AbstractAttributeData.RangeProgram(new MQLProgramData(this, "program \" test"), "")),
+                this.createNewData("hello")
+                        .addRange(new AbstractAttributeData.RangeProgram(new MQLProgramData(this, "program \" test"), null))});
+        ret.add(new Object[]{
+                _logText + " with program range with input",
                 this.createNewData("hello")
                         .addRange(new AbstractAttributeData.RangeProgram(new MQLProgramData(this, "program \" test"), "test \" input"))});
         ret.add(new Object[]{
@@ -175,6 +200,7 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
         this.cleanup(CI.DM_ATTRIBUTE_INTEGER);
         this.cleanup(CI.DM_ATTRIBUTE_REAL);
         this.cleanup(CI.DM_ATTRIBUTE_STRING);
+        this.cleanup(CI.DM_RULE);
         this.cleanup(CI.PRG_MQL_PROGRAM);
     }
 }

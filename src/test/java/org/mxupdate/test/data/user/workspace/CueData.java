@@ -36,7 +36,7 @@ public class CueData<USER extends AbstractUserData<?>>
     /**
      * Within export the description must be defined.
      */
-    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>(3);
+    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>(3);
     static  {
         CueData.REQUIRED_EXPORT_VALUES.put("user", "");
         CueData.REQUIRED_EXPORT_VALUES.put("appliesto", "");

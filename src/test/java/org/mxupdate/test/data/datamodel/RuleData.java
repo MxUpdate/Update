@@ -41,7 +41,7 @@ public class RuleData
     /**
      * Within export the description and default value must be defined.
      */
-    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
+    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
     static  {
         RuleData.REQUIRED_EXPORT_VALUES.put("description", "");
     }

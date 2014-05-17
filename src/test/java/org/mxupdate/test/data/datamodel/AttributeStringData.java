@@ -34,9 +34,9 @@ public class AttributeStringData
     /**
      * Within export the max length must be defined.
      */
-    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
+    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
     static  {
-        AttributeStringData.REQUIRED_EXPORT_VALUES.put("maxlength", "0");
+        AttributeStringData.REQUIRED_EXPORT_VALUES.put("maxlength", 0);
     }
 
     /**

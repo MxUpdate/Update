@@ -1,0 +1,259 @@
+/*
+ * Copyright 2008-2014 The MxUpdate Team
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+options {
+  JDK_VERSION = "1.5";
+  STATIC = false;
+  ERROR_REPORTING = false;
+  USER_TOKEN_MANAGER = false;
+}
+PARSER_BEGIN(AttributeDefParser)package org.mxupdate.update.datamodel.attribute;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO;
+import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO.Range;
+import org.mxupdate.update.datamodel.AbstractDMWithTriggers_mxJPO.Trigger;
+import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
+
+public class AttributeDefParser
+    extends AbstractParser_mxJPO
+{
+}
+PARSER_END(AttributeDefParser)SKIP :
+{
+    " "
+|   "\r"
+|   "\t"
+|   "\n"
+}
+
+TOKEN : /** first level */
+{
+      <DESCRIPTION:             "description">      : STRING_EXPECTED
+    | <DEFAULTVALUE:            "default">          : STRING_EXPECTED
+    | <HIDDEN_TRUE:             "hidden">
+    | <HIDDEN_FALSE:            "!hidden">
+    | <RESETONCLONE_TRUE:       "resetonclone">
+    | <RESETONCLONE_FALSE:      "!resetonclone">
+    | <RESETONREVISION_TRUE:    "resetonrevision">
+    | <RESETONREVISION_FALSE:   "!resetonrevision">
+    | <RANGEVALUE_TRUE:         "rangevalue">
+    | <RANGEVALUE_FALSE:        "!rangevalue">
+    | <MULTILINE_TRUE:          "multiline">
+    | <MULTILINE_FALSE:         "!multiline">
+    | <MAXLENGTH:               "maxlength">        : MAXLENGTH_EXPECTED
+    | <RULE:                    "rule">             : STRING_EXPECTED
+    | <TRIG_MODIFY_ACTION:      "trigger" ([" ","\t","\n","\r"])+ "modify" ([" ","\t","\n","\r"])+ "action">   : TRIGGERPROGNAME_EXPECTED
+    | <TRIG_MODIFY_CHECK:       "trigger" ([" ","\t","\n","\r"])+ "modify" ([" ","\t","\n","\r"])+ "check">    : TRIGGERPROGNAME_EXPECTED
+    | <TRIG_MODIFY_OVERRIDE:    "trigger" ([" ","\t","\n","\r"])+ "modify" ([" ","\t","\n","\r"])+ "override"> : TRIGGERPROGNAME_EXPECTED
+    | <RANGE_EQUAL:             "range" ([" ","\t","\n","\r"])+ "=">        : STRING_EXPECTED
+    | <RANGE_GREATERTHAN:       "range" ([" ","\t","\n","\r"])+ ">">        : STRING_EXPECTED
+    | <RANGE_GREATERTHANEQUAL:  "range" ([" ","\t","\n","\r"])+ ">=">       : STRING_EXPECTED
+    | <RANGE_LESSTHAN:          "range" ([" ","\t","\n","\r"])+ "< ">       : STRING_EXPECTED
+    | <RANGE_LESSTHANEQUAL:     "range" ([" ","\t","\n","\r"])+ "<=">       : STRING_EXPECTED
+    | <RANGE_NOTEQUAL:          "range" ([" ","\t","\n","\r"])+ "!=">       : STRING_EXPECTED
+    | <RANGE_MATCH:             "range" ([" ","\t","\n","\r"])+ "match">    : STRING_EXPECTED
+    | <RANGE_NOTMATCH:          "range" ([" ","\t","\n","\r"])+ "!match">   : STRING_EXPECTED
+    | <RANGE_SMATCH:            "range" ([" ","\t","\n","\r"])+ "smatch">   : STRING_EXPECTED
+    | <RANGE_NOTSMATCH:         "range" ([" ","\t","\n","\r"])+ "!smatch">  : STRING_EXPECTED
+    | <RANGE_PROGRAM:           "range" ([" ","\t","\n","\r"])+ "program">  : STRING_EXPECTED
+    | <RANGE_BETWEEN:           "range" ([" ","\t","\n","\r"])+ "between">  : BETW1_EXPECTED
+    | <INPUT:                   "input">                                    : STRING_EXPECTED
+}
+
+/***************************************************** String for Description */
+<STRING_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<STRING_EXPECTED> TOKEN :
+{
+      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<APOSTROPHE>)> : DEFAULT
+    | <SINGLE: (<CHAR>)+> : DEFAULT
+    | <#APOSTROPHE: "\"" >
+    | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/****************************************************** Integer for Max Value */
+<MAXLENGTH_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<MAXLENGTH_EXPECTED> TOKEN :
+{
+      <MAXLENGTH_NUMBER : (["\u0030"-"\u0039"])+> : DEFAULT
+}
+
+/******************************************************************* Triggers */
+<TRIGGERPROGNAME_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+<TRIGGERPROGNAME_EXPECTED> TOKEN : /* List of Strings */
+{
+      <TRIGPROG_STRING: (<TRIGGERPROGNAME_APOSTROPHE>(<TRIGGERPROGNAME_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<TRIGGERPROGNAME_APOSTROPHE>)> : TRIGGERINPUT_EXPECTED
+    | <TRIGPROG_SINGLE: (<TRIGGERPROGNAME_CHAR>)+> : TRIGGERINPUT_EXPECTED
+    | <#TRIGGERPROGNAME_APOSTROPHE: "\"" >
+    | <#TRIGGERPROGNAME_CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+<TRIGGERINPUT_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+<TRIGGERINPUT_EXPECTED> TOKEN : /* List of Strings */
+{
+      <TRIGGERINPUT: "input"> : STRING_EXPECTED
+}
+
+/************************************************************** Range Between */
+<BETW1_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+<BETW1_EXPECTED> TOKEN :
+{
+      <BETW1_STRING: (<BETW1_APOSTROPHE>(<BETW1_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<BETW1_APOSTROPHE>)> : BETW2_EXPECTED
+    | <BETW1_SINGLE: (<BETW1_CHAR>)+> : BETW2_EXPECTED
+    | <#BETW1_APOSTROPHE: "\"" >
+    | <#BETW1_CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+<BETW2_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+<BETW2_EXPECTED> TOKEN :
+{
+      <BETW2_INCLUSIVE: "inclusive"> : BETW3_EXPECTED
+    | <BETW2_EXCLUSIVE: "exclusive"> : BETW3_EXPECTED
+}
+
+<BETW3_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+<BETW3_EXPECTED> TOKEN :
+{
+      <BETW3_STRING: (<BETW3_APOSTROPHE>(<BETW3_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<BETW3_APOSTROPHE>)> : BETW4_EXPECTED
+    | <BETW3_SINGLE: (<BETW3_CHAR>)+> : BETW4_EXPECTED
+    | <#BETW3_APOSTROPHE: "\"" >
+    | <#BETW3_CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+<BETW4_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+<BETW4_EXPECTED> TOKEN :
+{
+      <BETW4_INCLUSIVE: "inclusive"> : DEFAULT
+    | <BETW4_EXCLUSIVE: "exclusive"> : DEFAULT
+}
+/**
+ * Parses one complete policy definition.
+ *
+ * @param _paramCache   parameter cache
+ * @param _typeDef      type definition of the policy (to instantiate the
+ *                      policy)
+ * @param _mxName       MX name of the policy
+ */
+AbstractAttribute_mxJPO attribute(final ParameterCache_mxJPO _paramCache,
+                                  final TypeDef_mxJPO _typeDef,
+                                  final String _mxName)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+: {
+    final AbstractAttribute_mxJPO attr = (AbstractAttribute_mxJPO) _typeDef.newTypeInstance(_mxName);
+    Token tmp;
+    Trigger trigger;
+    Range range;
+} {
+    (   (<DESCRIPTION>              ( tmp = <STRING>           {this.setValue(attr, "description", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(attr, "description", this.getSingle(tmp.image));} ) )
+      | (<DEFAULTVALUE>             ( tmp = <STRING>           {this.setValue(attr, "defaultValue", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(attr, "defaultValue", this.getSingle(tmp.image));} ) )
+      | (<HIDDEN_TRUE>                                         {this.setValue(attr, "hidden", true);} )
+      | (<HIDDEN_FALSE>                                        {this.setValue(attr, "hidden", false);} )
+      | (<RESETONCLONE_TRUE>                                   {this.setValue(attr, "resetOnClone", true);} )
+      | (<RESETONCLONE_FALSE>                                  {this.setValue(attr, "resetOnClone", false);} )
+      | (<RESETONREVISION_TRUE>                                {this.setValue(attr, "resetOnRevision", true);} )
+      | (<RESETONREVISION_FALSE>                               {this.setValue(attr, "resetOnRevision", false);} )
+      | (<RANGEVALUE_TRUE>                                     {this.setValue(attr, "rangeValue", true);} )
+      | (<RANGEVALUE_FALSE>                                    {this.setValue(attr, "rangeValue", false);} )
+      | (<MULTILINE_TRUE>                                      {this.setValue(attr, "multiline", true);} )
+      | (<MULTILINE_FALSE>                                     {this.setValue(attr, "multiline", false);} )
+      | (<MAXLENGTH>                ( tmp = <MAXLENGTH_NUMBER> {this.setValue(attr, "maxLength", this.getSingle(tmp.image));} ) )
+      | (<RULE>                     ( tmp = <STRING>           {this.setValue(attr, "rules", Arrays.asList(new String[]{this.getString(tmp.image)}));}
+                                    | tmp = <SINGLE>           {this.setValue(attr, "rules", Arrays.asList(new String[]{this.getSingle(tmp.image)}));} ) )
+      | (<TRIG_MODIFY_ACTION>       ( tmp = <TRIGPROG_STRING>  {trigger = new Trigger();this.setValue(trigger, "name", "ModifyAction");this.setValue(trigger, "program", this.getString(tmp.image));}
+                                    | tmp = <TRIGPROG_SINGLE>  {trigger = new Trigger();this.setValue(trigger, "name", "ModifyAction");this.setValue(trigger, "program", this.getSingle(tmp.image));} )
+                 <TRIGGERINPUT>     ( tmp = <STRING>           {this.setValue(trigger, "arguments", this.getString(tmp.image));this.appendValue(attr, "triggersStack", trigger);}
+                                    | tmp = <SINGLE>           {this.setValue(trigger, "arguments", this.getSingle(tmp.image));this.appendValue(attr, "triggersStack", trigger);} ) )      | (<TRIG_MODIFY_CHECK>        ( tmp = <TRIGPROG_STRING>  {trigger = new Trigger();this.setValue(trigger, "name", "ModifyCheck");this.setValue(trigger, "program", this.getString(tmp.image));}
+                                    | tmp = <TRIGPROG_SINGLE>  {trigger = new Trigger();this.setValue(trigger, "name", "ModifyCheck");this.setValue(trigger, "program", this.getSingle(tmp.image));} )
+                 <TRIGGERINPUT>     ( tmp = <STRING>           {this.setValue(trigger, "arguments", this.getString(tmp.image));this.appendValue(attr, "triggersStack", trigger);}
+                                    | tmp = <SINGLE>           {this.setValue(trigger, "arguments", this.getSingle(tmp.image));this.appendValue(attr, "triggersStack", trigger);} ) )
+      | (<TRIG_MODIFY_OVERRIDE>     ( tmp = <TRIGPROG_STRING>  {trigger = new Trigger();this.setValue(trigger, "name", "ModifyOverride");this.setValue(trigger, "program", this.getString(tmp.image));}
+                                    | tmp = <TRIGPROG_SINGLE>  {trigger = new Trigger();this.setValue(trigger, "name", "ModifyOverride");this.setValue(trigger, "program", this.getSingle(tmp.image));} )
+                 <TRIGGERINPUT>     ( tmp = <STRING>           {this.setValue(trigger, "arguments", this.getString(tmp.image));this.appendValue(attr, "triggersStack", trigger);}
+                                    | tmp = <SINGLE>           {this.setValue(trigger, "arguments", this.getSingle(tmp.image));this.appendValue(attr, "triggersStack", trigger);} ) )
+      | (<RANGE_EQUAL>              ( tmp = <STRING>           {range = new Range();this.setValue(range, "type", "=");      this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(attr, "rangesStack", range);}
+                                    | tmp = <SINGLE>           {range = new Range();this.setValue(range, "type", "=");      this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(attr, "rangesStack", range);} ) )
+      | (<RANGE_GREATERTHAN>        ( tmp = <STRING>           {range = new Range();this.setValue(range, "type", ">");      this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(attr, "rangesStack", range);}
+                                    | tmp = <SINGLE>           {range = new Range();this.setValue(range, "type", ">");      this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(attr, "rangesStack", range);} ) )
+      | (<RANGE_GREATERTHANEQUAL>   ( tmp = <STRING>           {range = new Range();this.setValue(range, "type", ">=");     this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(attr, "rangesStack", range);}
+                                    | tmp = <SINGLE>           {range = new Range();this.setValue(range, "type", ">=");     this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(attr, "rangesStack", range);} ) )
+      | (<RANGE_LESSTHAN>           ( tmp = <STRING>           {range = new Range();this.setValue(range, "type", "<");      this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(attr, "rangesStack", range);}
+                                    | tmp = <SINGLE>           {range = new Range();this.setValue(range, "type", "<");      this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(attr, "rangesStack", range);} ) )
+      | (<RANGE_LESSTHANEQUAL>      ( tmp = <STRING>           {range = new Range();this.setValue(range, "type", "<=");     this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(attr, "rangesStack", range);}
+                                    | tmp = <SINGLE>           {range = new Range();this.setValue(range, "type", "<=");     this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(attr, "rangesStack", range);} ) )
+      | (<RANGE_NOTEQUAL>           ( tmp = <STRING>           {range = new Range();this.setValue(range, "type", "!=");     this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(attr, "rangesStack", range);}
+                                    | tmp = <SINGLE>           {range = new Range();this.setValue(range, "type", "!=");     this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(attr, "rangesStack", range);} ) )
+      | (<RANGE_MATCH>              ( tmp = <STRING>           {range = new Range();this.setValue(range, "type", "match");  this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(attr, "rangesStack", range);}
+                                    | tmp = <SINGLE>           {range = new Range();this.setValue(range, "type", "match");  this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(attr, "rangesStack", range);} ) )
+      | (<RANGE_NOTMATCH>           ( tmp = <STRING>           {range = new Range();this.setValue(range, "type", "!match"); this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(attr, "rangesStack", range);}
+                                    | tmp = <SINGLE>           {range = new Range();this.setValue(range, "type", "!match"); this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(attr, "rangesStack", range);} ) )
+      | (<RANGE_SMATCH>             ( tmp = <STRING>           {range = new Range();this.setValue(range, "type", "smatch"); this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(attr, "rangesStack", range);}
+                                    | tmp = <SINGLE>           {range = new Range();this.setValue(range, "type", "smatch"); this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(attr, "rangesStack", range);} ) )
+      | (<RANGE_NOTSMATCH>          ( tmp = <STRING>           {range = new Range();this.setValue(range, "type", "!smatch");this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(attr, "rangesStack", range);}
+                                    | tmp = <SINGLE>           {range = new Range();this.setValue(range, "type", "!smatch");this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(attr, "rangesStack", range);} ) )
+      | (<RANGE_PROGRAM>            ( tmp = <STRING>           {range = new Range();this.setValue(range, "type", "program");this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(attr, "rangesStack", range);}
+                                    | tmp = <SINGLE>           {range = new Range();this.setValue(range, "type", "program");this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(attr, "rangesStack", range);} )
+                  ( <INPUT>         ( tmp = <STRING>           {this.setValue(range, "value2", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(range, "value2", this.getSingle(tmp.image));} ) )? )
+      | (<RANGE_BETWEEN>                                       {range = new Range();this.setValue(range, "type", "between");this.appendValue(attr, "rangesStack", range);}
+                                    ( tmp = <BETW1_STRING>     {this.setValue(range, "value1", this.getString(tmp.image));}
+                                    | tmp = <BETW1_SINGLE>     {this.setValue(range, "value1", this.getSingle(tmp.image));} )
+                                    ( <BETW2_INCLUSIVE>        {this.setValue(range, "include1", true);}
+                                    | <BETW2_EXCLUSIVE>        {this.setValue(range, "include1", false);})
+                                    ( tmp = <BETW3_STRING>     {this.setValue(range, "value2", this.getString(tmp.image));}
+                                    | tmp = <BETW3_SINGLE>     {this.setValue(range, "value2", this.getSingle(tmp.image));} )
+                                    ( <BETW4_INCLUSIVE>        {this.setValue(range, "include2", true);}
+                                    | <BETW4_EXCLUSIVE>        {this.setValue(range, "include2", false);} ) )
+    )*
+    {
+        this.prepareObject(_paramCache, attr);
+        return attr;
+    }
+}

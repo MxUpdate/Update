@@ -50,7 +50,7 @@ abstract class AbstractQueryWorkspaceObjectData<DATA extends AbstractQueryWorksp
                                      final String _mxAdminType,
                                      final USER _user,
                                      final String _name,
-                                     final Map<String,String> _requiredExportValues)
+                                     final Map<String,Object> _requiredExportValues)
     {
         super(_test, _mxAdminType, _user, _name, _requiredExportValues);
         this.setValue("type", "*");

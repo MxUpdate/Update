@@ -20,6 +20,8 @@ package org.mxupdate.update.datamodel;
 import java.io.IOException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.DeltaUtil_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 
@@ -30,7 +32,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
  * @author The MxUpdate Team
  */
 public class AttributeReal_mxJPO
-    extends AbstractAttribute_mxJPO
+    extends AbstractAttribute_mxJPO<AttributeReal_mxJPO>
 {
     /** Range value flag. */
     private boolean rangeValue;
@@ -89,7 +91,26 @@ public class AttributeReal_mxJPO
         throws IOException
     {
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagRangeValue))  {
-            _out.append(" \\\n    ").append(this.rangeValue ? "" : "!").append("rangevalue");
+            _out.append("  ").append(this.rangeValue ? "" : "!").append("rangevalue\n");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * Appends the integer attribute specific delta values. Following values are
+     * calculated:
+     * <li>{@link #rangeValue range value} flag (if
+     *     {@link ValueKeys#DMAttrSupportsFlagRangeValue} is defined)</li>
+     */
+    @Override()
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MqlBuilder_mxJPO _mql,
+                             final AttributeReal_mxJPO _target)
+    {
+        super.calcDelta(_paramCache, _mql, _target);
+
+        if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagRangeValue))  {
+            DeltaUtil_mxJPO.calcFlagDelta(_mql, "rangevalue", _target.rangeValue, this.rangeValue);
         }
     }
 }

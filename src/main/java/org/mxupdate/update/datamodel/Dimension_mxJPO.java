@@ -33,6 +33,7 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.dimension.DimensionDefParser_mxJPO;
 import org.mxupdate.update.util.AdminProperty_mxJPO;
+import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -409,7 +410,7 @@ public class Dimension_mxJPO
                     .append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ");
 
             // basic information
-            Dimension_mxJPO.calcValueDelta(cmd, "description", dimension.getDescription(), this.getDescription());
+            DeltaUtil_mxJPO.calcValueDelta(cmd, "description", dimension.getDescription(), this.getDescription());
             // hidden flag, because hidden flag must be set with special syntax
             if (this.isHidden() != dimension.isHidden())  {
                 if (!dimension.isHidden())  {
@@ -454,27 +455,6 @@ public class Dimension_mxJPO
 
             cmd.append(postCmd).append(";");
             MqlUtil_mxJPO.execMql(_paramCache, cmd);
-        }
-    }
-    /**
-     * Calculates the delta between the new and the old value. If a delta
-     * exists, the kind with the new delta is added to the string builder.
-     *
-     * @param _out      appendable instance where the delta must be append
-     * @param _kind     kind of the delta
-     * @param _newVal   new target value
-     * @param _curVal   current value in the database
-     */
-    protected static void calcValueDelta(final StringBuilder _out,
-                                         final String _kind,
-                                         final String _newVal,
-                                         final String _curVal)
-    {
-        final String curVal = (_curVal == null) ? "" : _curVal;
-        final String newVal = (_newVal == null) ? "" : _newVal;
-
-        if (!curVal.equals(newVal))  {
-            _out.append(_kind).append(" \"").append(StringUtil_mxJPO.convertMql(newVal)).append("\" ");
         }
     }
 
@@ -640,10 +620,8 @@ public class Dimension_mxJPO
                     _cmd.append("default ");
                 }
             }
-            Dimension_mxJPO.calcValueDelta(_cmd, "unitdescription", this.description,
-                    (_current != null) ? _current.description : null);
-            Dimension_mxJPO.calcValueDelta(_cmd, "label", this.label,
-                    (_current != null) ? _current.label : null);
+            DeltaUtil_mxJPO.calcValueDelta(_cmd, "unitdescription", this.description, (_current != null) ? _current.description : null);
+            DeltaUtil_mxJPO.calcValueDelta(_cmd, "label", this.label, (_current != null) ? _current.label : null);
             // check for to many settings
             if (_current != null)  {
                 for (final String curSetKey : _current.settings.keySet())  {

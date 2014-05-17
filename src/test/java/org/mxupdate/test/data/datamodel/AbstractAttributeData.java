@@ -17,17 +17,22 @@
 
 package org.mxupdate.test.data.datamodel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.program.AbstractProgramData;
+import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.util.MapUtil;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.testng.Assert;
 
 /**
  * The class is used to define all types of attributes, to create them and test
@@ -42,7 +47,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     /**
      * Within export the description and default value must be defined.
      */
-    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
+    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
     static  {
         AbstractAttributeData.REQUIRED_EXPORT_VALUES.put("description", "");
         AbstractAttributeData.REQUIRED_EXPORT_VALUES.put("default", "");
@@ -57,16 +62,13 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         AbstractAttributeData.REQUIRED_EXPORT_FLAGS.put("resetonrevision", false);
     }
 
-    /**
-     * Attribute type of the attribute (string, integer, ....).
-     */
+    /** Attribute type of the attribute (string, integer, ....). */
     private final String attrType;
 
-    /**
-     * Ranges of this attribute.
-     *
-     * @see #addRange(AbstractRange)
-     */
+    /** Rule of this attribute. */
+    private RuleData rule;
+
+    /** Ranges of this attribute. */
     private final Set<AbstractRange> ranges = new HashSet<AbstractRange>();
 
     /**
@@ -80,13 +82,26 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
                                     final AbstractTest.CI _ci,
                                     final String _name,
                                     final String _attrType,
-                                    final Map<String,String> _requiredExportValues,
+                                    final Map<String,Object> _requiredExportValues,
                                     final Map<String,Boolean> _requiredExportFlags)
     {
         super(_test, _ci, _name,
-              MapUtil.<String,String>combine(AbstractAttributeData.REQUIRED_EXPORT_VALUES, _requiredExportValues),
+              MapUtil.<String,Object>combine(AbstractAttributeData.REQUIRED_EXPORT_VALUES, _requiredExportValues),
               MapUtil.<String,Boolean>combine(AbstractAttributeData.REQUIRED_EXPORT_FLAGS, _requiredExportFlags));
         this.attrType = _attrType;
+    }
+
+    /**
+     * Defines given {@code _rule}.
+     *
+     * @param _rule    rule instances to append
+     * @return this instance
+     */
+    @SuppressWarnings("unchecked")
+    public T setRule(final RuleData _rule)
+    {
+        this.rule = _rule;
+        return (T) this;
     }
 
     /**
@@ -125,6 +140,12 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
 
             this.append4Create(cmd);
 
+            // append rules
+            if (this.rule != null)  {
+                cmd.append(" rule \"").append(AbstractTest.convertMql(this.rule.getName())).append("\"");
+            }
+
+            // append ranges
             for (final AbstractRange range : this.ranges)  {
                 range.appendCreate(cmd);
             }
@@ -145,6 +166,11 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     {
         super.createDependings();
 
+        // create rules
+        if (this.rule != null)  {
+            this.rule.create();
+        }
+
         // create range programs
         for (final AbstractRange range : this.ranges)  {
             if (range instanceof AbstractAttributeData.RangeProgram)  {
@@ -164,12 +190,78 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("mql escape mod attribute \"${NAME}\"");
+        final StringBuilder strg = new StringBuilder();
 
-        this.append4CIFileValues(cmd);
+        this.append4CIFileHeader(strg);
 
-        return cmd.toString();
+        strg.append("updateAttribute \"${NAME}\" {\n");
+
+        // append flags
+        this.getFlags().append4CIFileValues("  ", strg, "\n");
+        // append values
+        this.getValues().append4CIFileValues("  ", strg, "\n");
+
+        // append rules
+        if (this.rule != null) {
+            strg.append(" rule \"").append(StringUtil_mxJPO.convertTcl(this.rule.getName())).append("\"\n");
+        }
+
+        // append 'adds' (trigger and ranges)
+        final Set<String> needAdds = new HashSet<String>();
+        this.evalAdds4CheckExport(needAdds);
+        for (final String needAdd : needAdds)  {
+            strg.append("  ").append(needAdd).append('\n');
+        }
+
+        strg.append("}");
+
+        // append properties
+        for (final PropertyDef prop : this.getProperties())  {
+            strg.append('\n').append(prop.getCITCLString(this.getCI()));
+        }
+
+        return strg.toString();
+    }
+
+    /**
+     * Checks the export of this data piece if all values are correct defined.
+     *
+     * @param _exportParser     parsed export
+     * @throws MatrixException if check failed
+     */
+    @Override()
+    public void checkExport(final ExportParser _exportParser)
+        throws MatrixException
+    {
+        this.checkExportProperties(_exportParser);
+        // check for defined values
+        this.getValues().checkExport(_exportParser);
+        // check for defined flags
+        this.getFlags().checkExport(_exportParser);
+        // check for rule
+        if (this.rule == null) {
+            this.checkNotExistingSingleValue(_exportParser, "rule", "rule");
+        } else  {
+            this.checkSingleValue(_exportParser, "rules", "rule", "\"" + StringUtil_mxJPO.convertTcl(this.rule.getName()) + "\"");
+        }
+        // check for add values (triggers and ranges)
+        final Set<String> needAdds = new HashSet<String>();
+        this.evalAdds4CheckExport(needAdds);
+        final List<String> foundAdds = new ArrayList<String>();
+        for (final String trigLine : _exportParser.getLines("/updateAttribute/trigger/@value"))  {
+            foundAdds.add("trigger " + trigLine);
+        }
+        for (final String trigLine : _exportParser.getLines("/updateAttribute/range/@value"))  {
+            foundAdds.add("range " + trigLine);
+        }
+        Assert.assertEquals(
+                foundAdds.size(),
+                needAdds.size(),
+                "all adds defined (found adds = " + foundAdds + "; need adds = " + needAdds + ")");
+        for (final String foundAdd : foundAdds)  {
+            Assert.assertTrue(needAdds.contains(foundAdd), "check that add '" + foundAdd + "' is defined (found adds = " + foundAdds + "; need adds = " + needAdds + ")");
+        }
+
     }
 
     /**
@@ -192,14 +284,9 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      */
     public abstract static class AbstractRange
     {
-        /**
-         * Comparator of this range.
-         */
+        /** Comparator of this range. */
         final String comparator;
-
-        /**
-         * Value of this range.
-         */
+        /** Value of this range. */
         final String value;
 
         /**
