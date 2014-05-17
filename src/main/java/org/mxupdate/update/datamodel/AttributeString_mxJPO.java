@@ -15,14 +15,13 @@
 
 package org.mxupdate.update.datamodel;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.DeltaUtil_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
-import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * The class is used to evaluate information from string attributes within MX
@@ -31,7 +30,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @author The MxUpdate Team
  */
 public class AttributeString_mxJPO
-    extends AbstractAttribute_mxJPO
+    extends AbstractAttribute_mxJPO<AttributeString_mxJPO>
 {
     /** The attribute is a multi line attribute. */
     private boolean multiline = false;
@@ -89,66 +88,43 @@ public class AttributeString_mxJPO
      * {@inheritDoc}
      * Appends the string attribute specific values. Following values are
      * written:
+     * <ul>
      * <li>{@link #multiline multiple line} flag</li>
-     * <li>{@link #maxLength maximum length} (if attribute is from
-     *     {@link #type} string and if parameter
+     * <li>{@link #maxLength maximum length} (if parameter
      *     {@link ValueKeys#DMAttrSupportsPropMaxLength} is defined)</li>
+     * </ul>
      */
     @Override()
     protected void writeAttributeSpecificValues(final ParameterCache_mxJPO _paramCache,
                                                 final Appendable _out)
         throws IOException
     {
-        _out.append(" \\\n    ").append(this.multiline ? "" : "!").append("multiline");
+        _out.append("  ").append(this.multiline ? "" : "!").append("multiline\n");
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsPropMaxLength))  {
-            _out.append(" \\\n    maxlength \"").append(this.maxLength).append("\"");
+            _out.append("  maxlength ").append(this.maxLength).append("\n");
         }
     }
 
     /**
-     * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this string attribute. This
-     * includes:
+     * {@inheritDoc}
+     * The method overwrites the original method to calculate following delta
+     * values:
      * <ul>
-     * <li>flag &quot;multiline&quot; is disabled</li>
-     * <li>maximum length is set to 0</li>
+     * <li>{@link #multiline multiple line} flag</li>
+     * <li>{@link #maxLength maximum length} (if parameter
+     *     {@link ValueKeys#DMAttrSupportsPropMaxLength} is defined)</li>
      * </ul>
-     *
-     * @param _paramCache       parameter cache
-     * @param _preMQLCode       MQL statements which must be called before the
-     *                          TCL code is executed
-     * @param _postMQLCode      MQL statements which must be called after the
-     *                          TCL code is executed
-     * @param _preTCLCode       TCL code which is defined before the source
-     *                          file is sourced
-     * @param _tclVariables     map of all TCL variables where the key is the
-     *                          name and the value is value of the TCL variable
-     *                          (the value is automatically converted to TCL
-     *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update from derived class failed
      */
     @Override()
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final CharSequence _preMQLCode,
-                          final CharSequence _postMQLCode,
-                          final CharSequence _preTCLCode,
-                          final Map<String,String> _tclVariables,
-                          final File _sourceFile)
-        throws Exception
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MqlBuilder_mxJPO _mql,
+                             final AttributeString_mxJPO _target)
     {
-        // remove all properties
-        final StringBuilder preMQLCode = new StringBuilder()
-                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                .append(" !multiline");
-        if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsPropMaxLength))  {
-            preMQLCode.append(" maxlength 0");
-        }
-        // append already existing pre MQL code
-        preMQLCode.append(";\n")
-                  .append(_preMQLCode);
+        super.calcDelta(_paramCache, _mql, _target);
 
-        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+        DeltaUtil_mxJPO.calcFlagDelta(_mql, "multiline", _target.multiline, this.multiline);
+        if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsPropMaxLength))  {
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "maxlength", _target.maxLength, this.maxLength);
+        }
     }
 }

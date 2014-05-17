@@ -40,7 +40,7 @@ public class QueryData<USER extends AbstractUserData<?>>
     /**
      * Within export the description must be defined.
      */
-    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
+    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
     static  {
         QueryData.REQUIRED_EXPORT_VALUES.put("user", "");
         QueryData.REQUIRED_EXPORT_VALUES.put("vault", "");

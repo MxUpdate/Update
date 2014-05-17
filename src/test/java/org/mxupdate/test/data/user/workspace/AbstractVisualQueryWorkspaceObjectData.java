@@ -61,7 +61,7 @@ abstract class AbstractVisualQueryWorkspaceObjectData<DATA extends AbstractVisua
                                            final String _mxAdminType,
                                            final USER _user,
                                            final String _name,
-                                           final Map<String,String> _requiredExportValues)
+                                           final Map<String,Object> _requiredExportValues)
     {
         super(_test, _mxAdminType, _user, _name, _requiredExportValues);
     }

@@ -36,26 +36,13 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 public abstract class AbstractDataWithAttribute<DATAWITHATTRIBUTE extends AbstractDataWithAttribute<?>>
     extends AbstractAdminData<DATAWITHATTRIBUTE>
 {
-    /**
-     * All attributes of this data with attributes instance.
-     */
+    /** All attributes of this data with attributes instance. */
     private final Set<AbstractAttributeData<?>> attributes = new HashSet<AbstractAttributeData<?>>();
 
-    /**
-     * All attributes to ignore of this data with attributes instance.
-     */
+    /** All attributes to ignore of this data with attributes instance. */
     private final Set<AbstractAttributeData<?>> ignoreAttributes = new HashSet<AbstractAttributeData<?>>();
 
-    /**
-     * Flag to store information that the ignore attributes are appended.
-     *
-     * @see #appendIgnoredAttributes()
-     */
-    private boolean ignoreAttributesAppended;
-
-    /**
-     * All attributes to remove of this data with attributes instance.
-     */
+    /** All attributes to remove of this data with attributes instance. */
     private final Set<AbstractAttributeData<?>> removeAttributes = new HashSet<AbstractAttributeData<?>>();
 
     /**
@@ -73,7 +60,7 @@ public abstract class AbstractDataWithAttribute<DATAWITHATTRIBUTE extends Abstra
     protected AbstractDataWithAttribute(final AbstractTest _test,
                                         final AbstractTest.CI _ci,
                                         final String _name,
-                                        final Map<String,String> _requiredExportValues,
+                                        final Map<String,Object> _requiredExportValues,
                                         final Map<String,Boolean> _requiredExportFlags)
     {
         super(_test, _ci, _name, _requiredExportValues, _requiredExportFlags);
@@ -224,7 +211,6 @@ public abstract class AbstractDataWithAttribute<DATAWITHATTRIBUTE extends Abstra
                     .append("escape mod ").append(this.getCI().getMxType()).append(" \"").append(StringUtil_mxJPO.convertMql(this.getName()))
                     .append("\" add attribute \"").append(AbstractTest.convertMql(attribute.getName())).append('\"'));
         }
-        this.ignoreAttributesAppended = true;
         return (DATAWITHATTRIBUTE) this;
     }
 

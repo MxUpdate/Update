@@ -199,7 +199,7 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
         final DATA ret = this.createNewData(_original.getName().substring(AbstractTest.PREFIX.length()));
 
         // define all required values to empty values so that they are checked
-        for (final Map.Entry<String,String> value : ret.getRequiredExportValues().entrySet())  {
+        for (final Map.Entry<String,Object> value : ret.getRequiredExportValues().entrySet())  {
             ret.setValue(value.getKey(), value.getValue());
         }
 

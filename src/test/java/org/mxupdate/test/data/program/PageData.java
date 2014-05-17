@@ -39,7 +39,7 @@ public class PageData
      *
      * @see #PageData(AbstractTest, String)
      */
-    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
+    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
     static  {
         PageData.REQUIRED_EXPORT_VALUES.put("description", "");
         PageData.REQUIRED_EXPORT_VALUES.put("mime", "");

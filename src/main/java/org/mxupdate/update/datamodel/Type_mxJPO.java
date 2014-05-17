@@ -154,7 +154,7 @@ public class Type_mxJPO
             _out.append(" \\\n    add method \"").append(StringUtil_mxJPO.convertTcl(method)).append('\"');
         }
         // triggers
-        this.writeTriggers(_out);
+        this.getTriggers().write(_out, " \\\n    add ", "");
     }
 
     /**

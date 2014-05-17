@@ -142,7 +142,7 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
     protected AbstractUserData(final AbstractTest _test,
                                final AbstractTest.CI _ci,
                                final String _name,
-                               final Map<String,String> _requiredExportValues)
+                               final Map<String,Object> _requiredExportValues)
     {
         super(_test, _ci, _name, _requiredExportValues, null);
     }
@@ -580,12 +580,15 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
         throws MatrixException
     {
         // site
-        this.checkSingleValue(_exportParser,
-                              this.getCI().getMxType(),
-                              "site",
-                              (this.site != null)
-                                      ? "\"" + AbstractTest.convertTcl(this.site.getName()) + "\""
-                                      : null);
+        if (this.site != null)  {
+            this.checkSingleValue(
+                    _exportParser,
+                    this.getCI().getMxType(),
+                    "site",
+                    "\"" + AbstractTest.convertTcl(this.site.getName()) + "\"");
+        } else  {
+            this.checkNotExistingSingleValue(_exportParser,  this.getCI().getMxType(), "site");
+        }
 
         // all workspace objects
         final Set<CueData<DATA>> tmpCues            = new HashSet<CueData<DATA>>(this.cues);

@@ -234,7 +234,7 @@ public class Relationship_mxJPO
             _out.append(" \\\n    add rule \"").append(StringUtil_mxJPO.convertTcl(rule)).append('\"');
         }
         // triggers
-        this.writeTriggers(_out);
+        this.getTriggers().write(_out, " \\\n    add ", "");
 
         this.from.write(_out);
         this.to.write(_out);

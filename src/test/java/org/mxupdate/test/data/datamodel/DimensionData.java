@@ -40,7 +40,7 @@ public class DimensionData
     /**
 //     * Within export the description must be defined.
      */
-    private static final Map<String,String> REQUIRED_EXPORT_VALUES = new HashMap<String,String>();
+    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
     static  {
 //        ExpressionData.REQUIRED_EXPORT_VALUES.put("description", "");
     }
@@ -69,18 +69,10 @@ public class DimensionData
         this.append4CIFileHeader(strg);
 
         strg.append("updateDimension \"${NAME}\" {\n")
-            .append("  hidden \"").append(this.getFlag("hidden") != null ? this.getFlag("hidden") : false).append("\"\n");
+            .append("  hidden \"").append(this.getFlags().get("hidden") != null ? this.getFlags().get("hidden") : false).append("\"\n");
 
-        // values
-        for (final Map.Entry<String,Object> entry : this.getValues().entrySet())  {
-            if (entry.getValue() instanceof Character)  {
-                strg.append(' ').append(entry.getKey()).append(' ').append(entry.getValue());
-            } else  {
-                strg.append(' ').append(entry.getKey()).append(" \"")
-                    .append(AbstractTest.convertTcl(entry.getValue().toString()))
-                    .append('\"');
-            }
-        }
+        // append values
+        this.getValues().append4CIFileValues("  ", strg, "\n");
 
         // append state information
         for (final UnitData unit : this.units)
@@ -152,23 +144,12 @@ public class DimensionData
                                 1,
                                 "required check that minimum and maximum one " + valueName + " is defined");
         }
+
         // check for defined values
-        for (final Map.Entry<String,Object> entry : this.getValues().entrySet())  {
-            if (entry.getValue() instanceof Character)  {
-                this.checkSingleValue(_exportParser,
-                        entry.getKey(),
-                        entry.getKey(),
-                        entry.getValue().toString());
-            } else  {
-                this.checkSingleValue(_exportParser,
-                                      entry.getKey(),
-                                      entry.getKey(),
-                                      "\"" + AbstractTest.convertTcl(entry.getValue().toString()) + "\"");
-            }
-        }
+        this.getValues().checkExport(_exportParser);
 
         // check for hidden flag
-        if ((this.getFlag("hidden") == null) || !this.getFlag("hidden"))  {
+        if ((this.getFlags().get("hidden") == null) || !this.getFlags().get("hidden"))  {
             this.checkSingleValue(_exportParser,
                                   "hidden flag (must be false)",
                                   "hidden",
@@ -184,41 +165,6 @@ public class DimensionData
         for (final UnitData unit : this.units)
         {
             unit.checkExport(_exportParser);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * The original method is overwritten because for dimensions another path
-     * exists for the values.
-     *
-     * @param _exportParser     parsed export
-     * @param _kind             kind of the check
-     * @param _tag              tag to check
-     * @param _value            value to check (or <code>null</code> if value
-     *                          is not defined)
-     */
-    @Override()
-    public void checkSingleValue(final ExportParser _exportParser,
-                                 final String _kind,
-                                 final String _tag,
-                                 final String _value)
-    {
-        if (_value != null)  {
-            Assert.assertEquals(
-                    _exportParser.getLines("/updateDimension/" + _tag + "/@value").size(),
-                    1,
-                    "check " + _kind + " for '" + this.getName() + "' that " + _tag + " is defined");
-            Assert.assertEquals(
-                    _exportParser.getLines("/updateDimension/" + _tag + "/@value").get(0),
-                    _value,
-                    "check " + _kind + " for '" + this.getName() + "' that " + _tag + " is " + _value);
-
-        } else  {
-            Assert.assertEquals(
-                    _exportParser.getLines("/updateDimension/" + _tag + "/@value").size(),
-                    0,
-                    "check " + _kind + " '" + this.getName() + "' that no " + _tag + " is defined");
         }
     }
 

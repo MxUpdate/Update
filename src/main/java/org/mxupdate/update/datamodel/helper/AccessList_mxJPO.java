@@ -245,10 +245,8 @@ public class AccessList_mxJPO
      * Appends the MQL Code to remove all defined access to {@code _out}.
      *
      * @param _out      writer instance
-     * @throws IOException if write failed
      */
-    public void cleanup(final Appendable _out)
-        throws IOException
+    public void cleanup(final StringBuilder _out)
     {
         // to ensure that public / owner filters are removed:
         // define them first with empty filter and remove them afterwards

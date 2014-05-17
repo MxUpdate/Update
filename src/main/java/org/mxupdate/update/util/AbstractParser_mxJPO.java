@@ -40,7 +40,24 @@ public abstract class AbstractParser_mxJPO
                                  final AbstractAdminObject_mxJPO _object)
     {
         try {
-            final Method method = _object.getClass().getDeclaredMethod("prepare", ParameterCache_mxJPO.class);
+            Method method = null;
+            Class<?> clazz = _object.getClass();
+            try  {
+                method = clazz.getDeclaredMethod("prepare", ParameterCache_mxJPO.class);
+            } catch (final NoSuchMethodException e)  {
+            }
+            while ((method == null) && (clazz != null))  {
+                clazz = clazz.getSuperclass();
+                if (clazz != null)  {
+                    try  {
+                        method = clazz.getDeclaredMethod("prepare", ParameterCache_mxJPO.class);
+                    } catch (final NoSuchMethodException e)  {
+                    }
+                }
+            }
+            if (method == null)  {
+                throw new NoSuchMethodException(_object.getClass() + ".prepare()");
+            }
             try  {
                 method.setAccessible(true);
                 method.invoke(_object, _paramCache);

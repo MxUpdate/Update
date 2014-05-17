@@ -75,7 +75,7 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
                                 final String _mxAdminType,
                                 final USER _user,
                                 final String _name,
-                                final Map<String,String> _requiredExportValues)
+                                final Map<String,Object> _requiredExportValues)
     {
         super(_test, null, _name, _requiredExportValues, null);
         this.mxAdminType = _mxAdminType;
