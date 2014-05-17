@@ -23,7 +23,9 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.data.datamodel.AbstractAttributeData;
-import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger;
+import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger.TriggerAction;
+import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger.TriggerCheck;
+import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger.TriggerOverride;
 import org.mxupdate.test.data.datamodel.RuleData;
 import org.mxupdate.test.data.program.MQLProgramData;
 import org.testng.annotations.AfterClass;
@@ -70,21 +72,21 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
         ret.add(new Object[]{
                 _logText + " with modify action trigger",
                 this.createNewData("hello \" test")
-                        .addTrigger(new AbstractDataWithTrigger.TriggerAction("modify", new MQLProgramData(this, "Test \" Program")))});
+                        .addTrigger(new TriggerAction("modify", new MQLProgramData(this, "Test \" Program")))});
         ret.add(new Object[]{
                 _logText + " with modify check trigger",
                 this.createNewData("hello \" test")
-                        .addTrigger(new AbstractDataWithTrigger.TriggerCheck("modify", new MQLProgramData(this, "Test \" Program")))});
+                        .addTrigger(new TriggerCheck("modify", new MQLProgramData(this, "Test \" Program")))});
         ret.add(new Object[]{
                 _logText + " with modify override trigger",
                 this.createNewData("hello \" test")
-                        .addTrigger(new AbstractDataWithTrigger.TriggerOverride("modify", new MQLProgramData(this, "Test \" Program")))});
+                        .addTrigger(new TriggerOverride("modify", new MQLProgramData(this, "Test \" Program")))});
         ret.add(new Object[]{
                 _logText + " with modify action, check and override trigger",
                 this.createNewData("hello \" test")
-                        .addTrigger(new AbstractDataWithTrigger.TriggerAction("modify", new MQLProgramData(this, "Test \" Program 1")))
-                        .addTrigger(new AbstractDataWithTrigger.TriggerCheck("modify", new MQLProgramData(this, "Test \" Program 2")))
-                        .addTrigger(new AbstractDataWithTrigger.TriggerOverride("modify", new MQLProgramData(this, "Test \" Program 3")))});
+                        .addTrigger(new TriggerAction("modify", new MQLProgramData(this, "Test \" Program 1")))
+                        .addTrigger(new TriggerCheck("modify", new MQLProgramData(this, "Test \" Program 2")))
+                        .addTrigger(new TriggerOverride("modify", new MQLProgramData(this, "Test \" Program 3")))});
 
         // ranges
         ret.add(new Object[]{

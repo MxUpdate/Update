@@ -30,7 +30,9 @@ import java.util.TreeSet;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
+import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO;
 import org.mxupdate.update.datamodel.policy.PolicyDefParser_mxJPO;
 import org.mxupdate.update.util.AdminProperty_mxJPO;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
@@ -46,7 +48,7 @@ import org.xml.sax.SAXException;
  * @author The MxUpdate Team
  */
 public class Policy_mxJPO
-    extends AbstractDMWithTriggers_mxJPO
+    extends AbstractAdminObject_mxJPO
 {
     /**
      * Name of the parameter to define that the &quot;majorrevision&quot;
@@ -691,10 +693,8 @@ throw new Exception("some states are not defined anymore!");
         /** Route users of this state. */
         private final Set<String> routeUsers = new TreeSet<String>();
 
-        /** Stack with all triggers for this state. */
-        private final Stack<Trigger> triggersStack = new Stack<Trigger>();
         /** Map with all triggers for this state. The key is the name of the trigger. */
-        private final Triggers triggers = new Triggers();
+        private final TriggerList_mxJPO triggers = new TriggerList_mxJPO();
 
         /** Holds the signatures for this state. */
         private final Stack<Signature> signatures = new Stack<Signature>();
@@ -753,14 +753,9 @@ throw new Exception("some states are not defined anymore!");
             } else if ("/routeUser/userRef".equals(_url))  {
                 this.routeUsers.add(_content);
 
-            } else if ("/triggerList/trigger".equals(_url))  {
-                this.triggersStack.add(new Trigger());
-            } else if ("/triggerList/trigger/triggerName".equals(_url))  {
-                this.triggersStack.peek().name = _content;
-            } else if ("/triggerList/trigger/programRef".equals(_url))  {
-                this.triggersStack.peek().program = _content;
-            } else if ("/triggerList/trigger/inputArguments".equals(_url))  {
-                this.triggersStack.peek().arguments = _content;
+            } else if (_url.startsWith("/triggerList"))  {
+                ret = this.triggers.parse(_paramCache, _url.substring(12), _content);
+
             } else  {
                 ret = super.parse(_paramCache, _url, _content);
             }
@@ -773,9 +768,7 @@ throw new Exception("some states are not defined anymore!");
         protected void prepare()
         {
             // sort all triggers
-            for (final Trigger trigger : this.triggersStack)  {
-                this.triggers.put(trigger.name, trigger);
-            }
+            this.triggers.prepare();
         }
 
         /**

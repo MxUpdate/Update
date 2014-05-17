@@ -7,9 +7,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO;
 import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO.Range;
-import org.mxupdate.update.datamodel.AbstractDMWithTriggers_mxJPO.Trigger;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
@@ -164,14 +164,15 @@ public class AttributeDefParser_mxJPO
         break;
       case TRIG_MODIFY_ACTION:
         jj_consume_token(TRIG_MODIFY_ACTION);
+                                                                trigger = new Trigger();this.appendValue(this.getValue(attr, "triggers"), "triggersStack", trigger);this.setValue(trigger, "eventType", "modify");this.setValue(trigger, "kind", "action");
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case TRIGPROG_STRING:
           tmp = jj_consume_token(TRIGPROG_STRING);
-                                                                trigger = new Trigger();this.setValue(trigger, "name", "ModifyAction");this.setValue(trigger, "program", this.getString(tmp.image));
+                                                                this.setValue(trigger, "program", this.getString(tmp.image));
           break;
         case TRIGPROG_SINGLE:
           tmp = jj_consume_token(TRIGPROG_SINGLE);
-                                                                trigger = new Trigger();this.setValue(trigger, "name", "ModifyAction");this.setValue(trigger, "program", this.getSingle(tmp.image));
+                                                                this.setValue(trigger, "program", this.getSingle(tmp.image));
           break;
         default:
           jj_consume_token(-1);
@@ -181,11 +182,11 @@ public class AttributeDefParser_mxJPO
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case STRING:
           tmp = jj_consume_token(STRING);
-                                                                this.setValue(trigger, "arguments", this.getString(tmp.image));this.appendValue(attr, "triggersStack", trigger);
+                                                                this.setValue(trigger, "arguments", this.getString(tmp.image));
           break;
         case SINGLE:
           tmp = jj_consume_token(SINGLE);
-                                                                this.setValue(trigger, "arguments", this.getSingle(tmp.image));this.appendValue(attr, "triggersStack", trigger);
+                                                                this.setValue(trigger, "arguments", this.getSingle(tmp.image));
           break;
         default:
           jj_consume_token(-1);
@@ -194,14 +195,15 @@ public class AttributeDefParser_mxJPO
         break;
       case TRIG_MODIFY_CHECK:
         jj_consume_token(TRIG_MODIFY_CHECK);
+                                                                trigger = new Trigger();this.appendValue(this.getValue(attr, "triggers"), "triggersStack", trigger);this.setValue(trigger, "eventType", "modify");this.setValue(trigger, "kind", "check");
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case TRIGPROG_STRING:
           tmp = jj_consume_token(TRIGPROG_STRING);
-                                                                trigger = new Trigger();this.setValue(trigger, "name", "ModifyCheck");this.setValue(trigger, "program", this.getString(tmp.image));
+                                                                this.setValue(trigger, "program", this.getString(tmp.image));
           break;
         case TRIGPROG_SINGLE:
           tmp = jj_consume_token(TRIGPROG_SINGLE);
-                                                                trigger = new Trigger();this.setValue(trigger, "name", "ModifyCheck");this.setValue(trigger, "program", this.getSingle(tmp.image));
+                                                                this.setValue(trigger, "program", this.getSingle(tmp.image));
           break;
         default:
           jj_consume_token(-1);
@@ -211,11 +213,11 @@ public class AttributeDefParser_mxJPO
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case STRING:
           tmp = jj_consume_token(STRING);
-                                                                this.setValue(trigger, "arguments", this.getString(tmp.image));this.appendValue(attr, "triggersStack", trigger);
+                                                                this.setValue(trigger, "arguments", this.getString(tmp.image));
           break;
         case SINGLE:
           tmp = jj_consume_token(SINGLE);
-                                                                this.setValue(trigger, "arguments", this.getSingle(tmp.image));this.appendValue(attr, "triggersStack", trigger);
+                                                                this.setValue(trigger, "arguments", this.getSingle(tmp.image));
           break;
         default:
           jj_consume_token(-1);
@@ -224,14 +226,15 @@ public class AttributeDefParser_mxJPO
         break;
       case TRIG_MODIFY_OVERRIDE:
         jj_consume_token(TRIG_MODIFY_OVERRIDE);
+                                                                trigger = new Trigger();this.appendValue(this.getValue(attr, "triggers"), "triggersStack", trigger);this.setValue(trigger, "eventType", "modify");this.setValue(trigger, "kind", "override");
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case TRIGPROG_STRING:
           tmp = jj_consume_token(TRIGPROG_STRING);
-                                                                trigger = new Trigger();this.setValue(trigger, "name", "ModifyOverride");this.setValue(trigger, "program", this.getString(tmp.image));
+                                                                this.setValue(trigger, "program", this.getString(tmp.image));
           break;
         case TRIGPROG_SINGLE:
           tmp = jj_consume_token(TRIGPROG_SINGLE);
-                                                                trigger = new Trigger();this.setValue(trigger, "name", "ModifyOverride");this.setValue(trigger, "program", this.getSingle(tmp.image));
+                                                                this.setValue(trigger, "program", this.getSingle(tmp.image));
           break;
         default:
           jj_consume_token(-1);
@@ -241,11 +244,11 @@ public class AttributeDefParser_mxJPO
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case STRING:
           tmp = jj_consume_token(STRING);
-                                                                this.setValue(trigger, "arguments", this.getString(tmp.image));this.appendValue(attr, "triggersStack", trigger);
+                                                                this.setValue(trigger, "arguments", this.getString(tmp.image));
           break;
         case SINGLE:
           tmp = jj_consume_token(SINGLE);
-                                                                this.setValue(trigger, "arguments", this.getSingle(tmp.image));this.appendValue(attr, "triggersStack", trigger);
+                                                                this.setValue(trigger, "arguments", this.getSingle(tmp.image));
           break;
         default:
           jj_consume_token(-1);

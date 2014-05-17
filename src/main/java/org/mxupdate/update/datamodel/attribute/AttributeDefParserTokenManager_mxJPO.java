@@ -5,9 +5,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO;
 import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO.Range;
-import org.mxupdate.update.datamodel.AbstractDMWithTriggers_mxJPO.Trigger;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
