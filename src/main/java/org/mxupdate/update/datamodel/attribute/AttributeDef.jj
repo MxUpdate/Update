@@ -29,9 +29,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO;
 import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO.Range;
-import org.mxupdate.update.datamodel.AbstractDMWithTriggers_mxJPO.Trigger;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
@@ -207,17 +207,20 @@ AbstractAttribute_mxJPO attribute(final ParameterCache_mxJPO _paramCache,
       | (<MAXLENGTH>                ( tmp = <MAXLENGTH_NUMBER> {this.setValue(attr, "maxLength", this.getSingle(tmp.image));} ) )
       | (<RULE>                     ( tmp = <STRING>           {this.setValue(attr, "rules", Arrays.asList(new String[]{this.getString(tmp.image)}));}
                                     | tmp = <SINGLE>           {this.setValue(attr, "rules", Arrays.asList(new String[]{this.getSingle(tmp.image)}));} ) )
-      | (<TRIG_MODIFY_ACTION>       ( tmp = <TRIGPROG_STRING>  {trigger = new Trigger();this.setValue(trigger, "name", "ModifyAction");this.setValue(trigger, "program", this.getString(tmp.image));}
-                                    | tmp = <TRIGPROG_SINGLE>  {trigger = new Trigger();this.setValue(trigger, "name", "ModifyAction");this.setValue(trigger, "program", this.getSingle(tmp.image));} )
-                 <TRIGGERINPUT>     ( tmp = <STRING>           {this.setValue(trigger, "arguments", this.getString(tmp.image));this.appendValue(attr, "triggersStack", trigger);}
-                                    | tmp = <SINGLE>           {this.setValue(trigger, "arguments", this.getSingle(tmp.image));this.appendValue(attr, "triggersStack", trigger);} ) )      | (<TRIG_MODIFY_CHECK>        ( tmp = <TRIGPROG_STRING>  {trigger = new Trigger();this.setValue(trigger, "name", "ModifyCheck");this.setValue(trigger, "program", this.getString(tmp.image));}
-                                    | tmp = <TRIGPROG_SINGLE>  {trigger = new Trigger();this.setValue(trigger, "name", "ModifyCheck");this.setValue(trigger, "program", this.getSingle(tmp.image));} )
-                 <TRIGGERINPUT>     ( tmp = <STRING>           {this.setValue(trigger, "arguments", this.getString(tmp.image));this.appendValue(attr, "triggersStack", trigger);}
-                                    | tmp = <SINGLE>           {this.setValue(trigger, "arguments", this.getSingle(tmp.image));this.appendValue(attr, "triggersStack", trigger);} ) )
-      | (<TRIG_MODIFY_OVERRIDE>     ( tmp = <TRIGPROG_STRING>  {trigger = new Trigger();this.setValue(trigger, "name", "ModifyOverride");this.setValue(trigger, "program", this.getString(tmp.image));}
-                                    | tmp = <TRIGPROG_SINGLE>  {trigger = new Trigger();this.setValue(trigger, "name", "ModifyOverride");this.setValue(trigger, "program", this.getSingle(tmp.image));} )
-                 <TRIGGERINPUT>     ( tmp = <STRING>           {this.setValue(trigger, "arguments", this.getString(tmp.image));this.appendValue(attr, "triggersStack", trigger);}
-                                    | tmp = <SINGLE>           {this.setValue(trigger, "arguments", this.getSingle(tmp.image));this.appendValue(attr, "triggersStack", trigger);} ) )
+      | (<TRIG_MODIFY_ACTION>                                  {trigger = new Trigger();this.appendValue(this.getValue(attr, "triggers"), "triggersStack", trigger);this.setValue(trigger, "eventType", "modify");this.setValue(trigger, "kind", "action");}
+                                    ( tmp = <TRIGPROG_STRING>  {this.setValue(trigger, "program", this.getString(tmp.image));}
+                                    | tmp = <TRIGPROG_SINGLE>  {this.setValue(trigger, "program", this.getSingle(tmp.image));} )
+                 <TRIGGERINPUT>     ( tmp = <STRING>           {this.setValue(trigger, "arguments", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(trigger, "arguments", this.getSingle(tmp.image));} ) )      | (<TRIG_MODIFY_CHECK>                                   {trigger = new Trigger();this.appendValue(this.getValue(attr, "triggers"), "triggersStack", trigger);this.setValue(trigger, "eventType", "modify");this.setValue(trigger, "kind", "check");}
+                                    ( tmp = <TRIGPROG_STRING>  {this.setValue(trigger, "program", this.getString(tmp.image));}
+                                    | tmp = <TRIGPROG_SINGLE>  {this.setValue(trigger, "program", this.getSingle(tmp.image));} )
+                 <TRIGGERINPUT>     ( tmp = <STRING>           {this.setValue(trigger, "arguments", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(trigger, "arguments", this.getSingle(tmp.image));} ) )
+      | (<TRIG_MODIFY_OVERRIDE>                                {trigger = new Trigger();this.appendValue(this.getValue(attr, "triggers"), "triggersStack", trigger);this.setValue(trigger, "eventType", "modify");this.setValue(trigger, "kind", "override");}
+                                    ( tmp = <TRIGPROG_STRING>  {this.setValue(trigger, "program", this.getString(tmp.image));}
+                                    | tmp = <TRIGPROG_SINGLE>  {this.setValue(trigger, "program", this.getSingle(tmp.image));} )
+                 <TRIGGERINPUT>     ( tmp = <STRING>           {this.setValue(trigger, "arguments", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(trigger, "arguments", this.getSingle(tmp.image));} ) )
       | (<RANGE_EQUAL>              ( tmp = <STRING>           {range = new Range();this.setValue(range, "type", "=");      this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(attr, "rangesStack", range);}
                                     | tmp = <SINGLE>           {range = new Range();this.setValue(range, "type", "=");      this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(attr, "rangesStack", range);} ) )
       | (<RANGE_GREATERTHAN>        ( tmp = <STRING>           {range = new Range();this.setValue(range, "type", ">");      this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(attr, "rangesStack", range);}

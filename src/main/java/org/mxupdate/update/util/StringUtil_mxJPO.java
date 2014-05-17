@@ -70,6 +70,26 @@ public final class StringUtil_mxJPO
     }
 
     /**
+     * Compares the two strings {@code _value1} and {@code _value2}. The
+     * strings can be {@code null}.
+     *
+     * @param _value1   first value; can be {@code null}
+     * @param _value2   second value; can be {@code null}
+     * @return a negative integer, zero, or a positive integer as the first
+     *         string is less than, equal to, or greater than the second.
+
+     */
+    public static int compare(final String _value1,
+                              final String _value2)
+    {
+        return (_value1 != null) && (_value2 != null)
+                ? _value1.compareTo(_value2)
+                : (_value1 == null) && (_value2 == null)
+                        ? 0
+                        : (_value1 == null) ? -1 : 1;
+    }
+
+    /**
      * Converts given string by escaping all special characters for TCL.
      *
      * @param _text     character stream to convert

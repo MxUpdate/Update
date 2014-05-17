@@ -30,7 +30,9 @@ import java.util.TreeSet;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.attribute.AttributeDefParser_mxJPO;
+import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
@@ -45,7 +47,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @author The MxUpdate Team
  */
 public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mxJPO<CLASS>>
-    extends AbstractDMWithTriggers_mxJPO
+    extends AbstractAdminObject_mxJPO
 {
     /**
      * MQL list statement with select for the attribute type and name used
@@ -103,6 +105,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         AbstractAttribute_mxJPO.IGNORED_URLS.add("/primitiveType");
         AbstractAttribute_mxJPO.IGNORED_URLS.add("/rangeList");
         AbstractAttribute_mxJPO.IGNORED_URLS.add("/rangeProgram");
+        AbstractAttribute_mxJPO.IGNORED_URLS.add("/triggerList");
     }
 
     /**
@@ -142,6 +145,9 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     private final Stack<Range> rangesStack = new Stack<Range>();
     /** All ranges but sorted after they are prepared. */
     private final Ranges rangesSorted = new Ranges();
+
+    /** Map with all triggers. The key is the name of the trigger. */
+    private final TriggerList_mxJPO triggers = new TriggerList_mxJPO();
 
     /** Default value of the attribute. */
     private String defaultValue = null;
@@ -285,6 +291,9 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
             this.rangeProgramInputArguments = _content;
             parsed = true;
 
+        } else if (_url.startsWith("/triggerList"))  {
+            parsed = this.triggers.parse(_paramCache, _url.substring(12), _content);
+
         } else  {
             parsed = super.parse(_paramCache, _url, _content);
         }
@@ -304,6 +313,10 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     protected void prepare(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
+        // sort all triggers
+        this.triggers.prepare();
+
+        // sort all ranges
         Range progRange = null;
         for (final Range range : this.rangesStack)  {
             this.rangesSorted.add(range);
@@ -311,6 +324,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
                 progRange = range;
             }
         }
+
         // fix program range
         if (this.rangeProgramRef != null)  {
             if (progRange == null)  {
@@ -379,7 +393,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         _out.append("  default \"").append((this.defaultValue != null) ? StringUtil_mxJPO.convertTcl(this.defaultValue) : "").append("\"\n");
 
         // append triggers
-        this.getTriggers().write(_out, "  ", "\n");
+        this.triggers.write(_out, "  ", "\n");
 
         // append ranges
         this.rangesSorted.write(_out);
@@ -645,7 +659,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         }
         DeltaUtil_mxJPO.calcListDelta(_mql, "rule", target.rules, this.rules);
 
-        target.getTriggers().calcDelta(this.getTriggers(), _mql);
+        target.triggers.calcDelta(this.triggers, _mql);
         target.rangesSorted.calcDelta(this.rangesSorted, _mql);
     }
 
@@ -734,7 +748,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         @Override()
         public int compareTo(final Range _range)
         {
-            int ret = this.type.compareTo(_range.type);
+            int ret = StringUtil_mxJPO.compare(this.type, _range.type);
             if (ret == 0)  {
                 ret = this.include1.compareTo(_range.include1);
             }
@@ -742,16 +756,35 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
                 ret = this.include2.compareTo(_range.include2);
             }
             if (ret == 0)  {
-                ret = (this.value1 != null)
-                      ? ((_range.value1 != null) ? this.value1.compareTo(_range.value1) : 0)
-                      : -1;
+                ret = StringUtil_mxJPO.compare(this.value1, _range.value1);
             }
             if (ret == 0)  {
-                ret = (this.value2 != null)
-                      ? ((_range.value2 != null) ? this.value2.compareTo(_range.value2) : 0)
-                      : 1;
+                ret = StringUtil_mxJPO.compare(this.value2, _range.value2);
             }
             return ret;
+        }
+
+        @Override()
+        public String toString()
+        {
+            final StringBuilder ret = new StringBuilder("[range type=").append(this.type);
+            // if the range is a program it is a 'global' attribute info
+            if ("program".equals(this.type))  {
+                ret.append(", program=").append(StringUtil_mxJPO.convertTcl(this.value1));
+                if (this.value2 != null)  {
+                    ret.append(", input=").append(StringUtil_mxJPO.convertTcl(this.value2));
+                }
+            } else  {
+                if ("between".equals(this.type))  {
+                    ret.append(", value1=").append(StringUtil_mxJPO.convertTcl(this.value1))
+                        .append(' ').append(this.include1 ? "inclusive" : "exclusive")
+                        .append(", value2=").append(StringUtil_mxJPO.convertTcl(this.value2))
+                        .append(' ').append(this.include2 ? "inclusive" : "exclusive");
+                } else  {
+                    ret.append(", value=").append(StringUtil_mxJPO.convertTcl(this.value1));
+                }
+            }
+            return ret.append(']').toString();
         }
     }
 

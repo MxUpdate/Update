@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
@@ -763,33 +764,34 @@ public class PolicyDefParser_mxJPO
   }
 
   final public void stateTrigger(final Policy_mxJPO.State _state) throws ParseException_mxJPO {
-    final Policy_mxJPO.Trigger trigger = new Policy_mxJPO.Trigger();
+    final Trigger trigger = new Trigger();
     String tmp;
     jj_consume_token(TRIGGER);
     tmp = sString();
+                                     this.setValue(trigger, "eventType", tmp);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ACTION:
       jj_consume_token(ACTION);
-                             this.getField(trigger, "name").set(tmp + "Action");
+                                     this.setValue(trigger, "kind", "action");
       break;
     case CHECK:
       jj_consume_token(CHECK);
-                             this.getField(trigger, "name").set(tmp + "Check");
+                                     this.setValue(trigger, "kind", "check");
       break;
     case OVERRIDE:
       jj_consume_token(OVERRIDE);
-                             this.getField(trigger, "name").set(tmp + "Override");
+                                     this.setValue(trigger, "kind", "override");
       break;
     default:
       jj_consume_token(-1);
       throw new ParseException_mxJPO();
     }
     tmp = sString();
-                             this.getField(trigger, "program").set(tmp);
+                                     this.setValue(trigger, "program", tmp);
     jj_consume_token(INPUT);
     tmp = sString();
-                                     this.getField(trigger, "arguments").set(tmp);
-        this.appendValue(_state, "triggersStack", trigger);
+                                     this.setValue(trigger, "arguments", tmp);
+        this.appendValue(this.getValue(_state, "triggers"), "triggersStack", trigger);
   }
 
   final public void stateSignature(final Policy_mxJPO.State _state) throws ParseException_mxJPO {
