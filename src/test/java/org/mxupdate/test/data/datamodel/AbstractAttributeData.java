@@ -65,6 +65,9 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     /** Rule of this attribute. */
     private RuleData rule;
 
+    /** Dimension of this attribute. */
+    private DimensionData dimension;
+
     /** Ranges of this attribute. */
     private final Set<AbstractRange> ranges = new HashSet<AbstractRange>();
 
@@ -99,6 +102,29 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     {
         this.rule = _rule;
         return (T) this;
+    }
+
+    /**
+     * Defines given {@code _dimension}.
+     *
+     * @param _dimension    new dimension instance
+     * @return this instance
+     */
+    @SuppressWarnings("unchecked")
+    public T setDimension(final DimensionData _dimension)
+    {
+        this.dimension = _dimension;
+        return (T) this;
+    }
+
+    /**
+     * Returns the defined {@link #dimension}.
+     *
+     * @return defined dimension
+     */
+    public DimensionData getDimension()
+    {
+        return this.dimension;
     }
 
     /**
@@ -137,9 +163,14 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
 
             this.append4Create(cmd);
 
-            // append rules
+            // append rule
             if (this.rule != null)  {
                 cmd.append(" rule \"").append(AbstractTest.convertMql(this.rule.getName())).append("\"");
+            }
+
+            // append dimension
+            if (this.dimension != null)  {
+                cmd.append(" dimension \"").append(AbstractTest.convertMql(this.dimension.getName())).append("\"");
             }
 
             // append ranges
@@ -166,6 +197,11 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         // create rules
         if (this.rule != null)  {
             this.rule.create();
+        }
+
+        // create dimension
+        if (this.dimension != null)  {
+            this.dimension.create();
         }
 
         // create range programs
@@ -198,9 +234,14 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         // append values
         this.getValues().append4CIFileValues("  ", strg, "\n");
 
-        // append rules
+        // append rule
         if (this.rule != null) {
             strg.append(" rule \"").append(StringUtil_mxJPO.convertTcl(this.rule.getName())).append("\"\n");
+        }
+
+        // append dimension
+        if (this.dimension != null) {
+            strg.append(" dimension \"").append(StringUtil_mxJPO.convertTcl(this.dimension.getName())).append("\"\n");
         }
 
         // append 'adds' (trigger and ranges)
@@ -237,6 +278,12 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
             this.checkNotExistingSingleValue(_exportParser, "rule", "rule");
         } else  {
             this.checkSingleValue(_exportParser, "rules", "rule", "\"" + StringUtil_mxJPO.convertTcl(this.rule.getName()) + "\"");
+        }
+        // check for dimension
+        if (this.dimension == null) {
+            this.checkNotExistingSingleValue(_exportParser, "dimension", "dimension");
+        } else  {
+            this.checkSingleValue(_exportParser, "dimension", "dimension", "\"" + StringUtil_mxJPO.convertTcl(this.dimension.getName()) + "\"");
         }
         // check for add values (triggers and ranges)
         final Set<String> needAdds = new HashSet<String>();

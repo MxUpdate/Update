@@ -19,7 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mxupdate.test.data.datamodel.AttributeIntegerData;
+import org.mxupdate.test.data.datamodel.DimensionData;
+import org.mxupdate.test.data.datamodel.DimensionData.UnitData;
 import org.mxupdate.test.util.Version;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -72,6 +75,42 @@ public class AttributeIntegerTest
                         .setFlag("rangevalue", false)
                         .notSupported(Version.V6R2011x)});
 
+        // dimension
+        ret.add(new Object[]{
+                "integer attribute with defined rangevalue flag 'true'",
+                this.createNewData("hello")
+                        .setDimension(new DimensionData(this, "Test Dimension")
+                                .addUnit(new UnitData("unit")
+                                        .setValueWOQuots("default", "true")
+                                        .setValueWithQuots("description", "\"\\\\ hello")
+                                        .setValueWithQuots("label", "\"\\\\ label")
+                                        .setValueWOQuots("multiplier", "1.0")
+                                        .setValueWOQuots("offset", "0.0")))});
+
         return this.prepareData("integer attribute", "0", "1", ret.toArray(new Object[ret.size()][]));
+    }
+
+    /**
+     * Negative test that update failed for modified dimension.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "negative test that update failed for modified dimension")
+    public void negativeTestUpdateDelimiter()
+        throws Exception
+    {
+        new AttributeIntegerData(this, "test")
+                .setDimension(new DimensionData(this, "Test Dimension")
+                        .addUnit(new UnitData("unit")
+                                .setValueWOQuots("default", "true")
+                                .setValueWithQuots("description", "\"\\\\ hello")
+                                .setValueWithQuots("label", "\"\\\\ label")
+                                .setValueWOQuots("multiplier", "1.0")
+                                .setValueWOQuots("offset", "0.0")))
+                .create()
+                .update()
+                .checkExport()
+                .setDimension((DimensionData) null)
+                .failureUpdate(UpdateException_mxJPO.Error.ABSTRACTATTRIBUTENUMERIC_UPDATE_DIMENSION_UPDATED);
     }
 }

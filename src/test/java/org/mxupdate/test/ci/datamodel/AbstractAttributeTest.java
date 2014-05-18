@@ -200,7 +200,27 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
         this.cleanup(CI.DM_ATTRIBUTE_INTEGER);
         this.cleanup(CI.DM_ATTRIBUTE_REAL);
         this.cleanup(CI.DM_ATTRIBUTE_STRING);
+        this.cleanup(CI.DM_DIMENSION);
         this.cleanup(CI.DM_RULE);
         this.cleanup(CI.PRG_MQL_PROGRAM);
+    }
+
+    /**
+     * Creates a clean data instance used to update an existing data instance.
+     *
+     * @param _original     original data instance
+     * @return new data instance (where all original data is cleaned)
+     */
+    @Override()
+    protected ATTRIBUTEDATA createCleanNewData(final ATTRIBUTEDATA _original)
+    {
+        final ATTRIBUTEDATA ret = super.createCleanNewData(_original);
+
+        // if dimension is defined, must be also defined for new cleaned attribute
+        if (_original.getDimension() != null)  {
+            ret.setDimension(_original.getDimension());
+        }
+
+        return ret;
     }
 }

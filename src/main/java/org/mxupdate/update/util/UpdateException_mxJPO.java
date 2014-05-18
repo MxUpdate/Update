@@ -38,10 +38,11 @@ public class UpdateException_mxJPO
      * <li>depending of the first digit, the second and third digit defines the
      *     kind of configuration item
      *     <ul>
-     *     <li>121: {@link org.mxupdate.update.datamodel.AbstractDMWithAttributes_mxJPO data model with attributes}</li>
      *     <li>106: {@link org.mxupdate.update.datamodel.Dimension_mxJPO dimension}</li>
      *     <li>109: {@link org.mxupdate.update.datamodel.Interface_mxJPO interface}</li>
      *     <li>111: {@link org.mxupdate.update.datamodel.Policy_mxJPO policy}</li>
+     *     <li>120: {@link org.mxupdate.update.datamodel.AbstractAttributeNumeric_mxJPO numeric attributes}</li>
+     *     <li>121: {@link org.mxupdate.update.datamodel.AbstractDMWithAttributes_mxJPO data model with attributes}</li>
      *     <li>601: {@link org.mxupdate.update.AbstractObject_mxJPO abstract object}</li>
      *     <li>602: {@link org.mxupdate.update.AbstractAdminObject_mxJPO abstract administration object}</li>
      *     <li>603: {@link org.mxupdate.update.AbstractPropertyObject_mxJPO abstract property object}</li>
@@ -69,16 +70,12 @@ public class UpdateException_mxJPO
     {
         /**
          * JPO caller method is called without any argument.
-         *
-         * @see org.mxupdate.update.AbstractPropertyObject_mxJPO
          */
         ABSTRACT_PROPERTY_JPO_CALL_METHOD_NOT_DEFINED(60301,
                 "jpo call is executed without any arguments"),
 
         /**
          * JPO caller method is called with wrong name for the method.
-         *
-         * @see org.mxupdate.update.AbstractPropertyObject_mxJPO
          */
         ABSTRACT_PROPERTY_JPO_CALL_METHOD_UNKNOWN(60302,
                 "unknown jpo call execute {0}"),
@@ -86,8 +83,6 @@ public class UpdateException_mxJPO
         /**
          * The multiplier of a unit of a dimension is tried to update which
          * means that potentially some data could be loosed.
-         *
-         * @see org.mxupdate.update.datamodel.Dimension_mxJPO
          */
         DIMENSION_UPDATE_MULTIPLIER(10601,
                 "dimension multiplier could not updated (data will be changed potentially)"),
@@ -95,8 +90,6 @@ public class UpdateException_mxJPO
         /**
          * The offset of a unit of a dimension is tried to update which means
          * that potentially some data could be loosed.
-         *
-         * @see org.mxupdate.update.datamodel.Dimension_mxJPO
          */
         DIMENSION_UPDATE_OFFSET(10602,
                 "dimension offset could not updated (data will be changed potentially)"),
@@ -107,8 +100,6 @@ public class UpdateException_mxJPO
          * tries to prevent this if a default unit is already defined, but it
          * could be that this case does only happens e.g. in non development
          * systems....
-         *
-         * @see org.mxupdate.update.datamodel.Dimension_mxJPO
          */
         DIMENSION_UPDATE_DEFAULTUNIT(10603,
                 "dimension default unit could not updated (data will be changed potentially)"),
@@ -118,11 +109,24 @@ public class UpdateException_mxJPO
          * potentially some data could be loosed. FYI: MX itself also
          * tries to prevent this if a unit is used, but it could be that this
          * case does only happens e.g. in non development systems....
-         *
-         * @see org.mxupdate.update.datamodel.Dimension_mxJPO
          */
         DIMENSION_UPDATE_REMOVEUNIT(10604,
                 "removing an unit from a dimension is not allowed (data will be changed potentially)"),
+
+        /**
+         * <p>The given dimension of the attribute should be changed to new
+         * dimension, but potentially data could be lost.</p>
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>attribute name</li>
+         * <li>existing dimension</li>
+         * <li>new dimension</li>
+         * </ol>
+         * </p>
+         */
+        ABSTRACTATTRIBUTENUMERIC_UPDATE_DIMENSION_UPDATED(12001,
+                "The existing dimension ''{1}'' for Attribute ''{0}'' must be changed to new dimension ''{2}'', but not possible because some information could be lost!"),
 
         /**
          * <p>The given attribute is not defined anymore but assigned to the
@@ -137,8 +141,6 @@ public class UpdateException_mxJPO
          * <li>MX administration object name</li>
          * </ol>
          * </p>
-         *
-         * @see org.mxupdate.update.datamodel.AbstractDMWithAttributes_mxJPO#jpoCallExecute(ParameterCache_mxJPO, String...)
          */
         DM_ABSTRACTWITHATTRIBUTES_UPDATE_ATTRIBUTE_REMOVED(12101,
                 "Attribute ''{0}'' is defined to be deleted in {1} ''{2}'', but not allowed (and this could potentially meant to loose data)!"),
@@ -153,8 +155,6 @@ public class UpdateException_mxJPO
          * <li>wrong parameter</li>
          * </ol>
          * </p>
-         *
-         * @see org.mxupdate.update.datamodel.AbstractDMWithAttributes_mxJPO#jpoCallExecute(ParameterCache_mxJPO, String...)
          */
         DM_ABSTRACTWITHATTRIBUTES_UPDATE_UKNOWN_PARAMETER(12102, "Unknown parameter {0} defined."),
 

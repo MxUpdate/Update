@@ -62,6 +62,7 @@ TOKEN : /** first level */
     | <MULTILINE_FALSE:         "!multiline">
     | <MAXLENGTH:               "maxlength">        : MAXLENGTH_EXPECTED
     | <RULE:                    "rule">             : STRING_EXPECTED
+    | <DIMENSION:               "dimension">        : STRING_EXPECTED
     | <TRIG_MODIFY_ACTION:      "trigger" ([" ","\t","\n","\r"])+ "modify" ([" ","\t","\n","\r"])+ "action">   : TRIGGERPROGNAME_EXPECTED
     | <TRIG_MODIFY_CHECK:       "trigger" ([" ","\t","\n","\r"])+ "modify" ([" ","\t","\n","\r"])+ "check">    : TRIGGERPROGNAME_EXPECTED
     | <TRIG_MODIFY_OVERRIDE:    "trigger" ([" ","\t","\n","\r"])+ "modify" ([" ","\t","\n","\r"])+ "override"> : TRIGGERPROGNAME_EXPECTED
@@ -225,6 +226,8 @@ AbstractAttribute_mxJPO attribute(final ParameterCache_mxJPO _paramCache,
       | (<MAXLENGTH>                ( tmp = <MAXLENGTH_NUMBER> {this.setValue(attr, "maxLength", this.getSingle(tmp.image));} ) )
       | (<RULE>                     ( tmp = <STRING>           {this.setValue(attr, "rules", Arrays.asList(new String[]{this.getString(tmp.image)}));}
                                     | tmp = <SINGLE>           {this.setValue(attr, "rules", Arrays.asList(new String[]{this.getSingle(tmp.image)}));} ) )
+      | (<DIMENSION>                ( tmp = <STRING>           {this.setValue(attr, "dimension", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(attr, "dimension", this.getSingle(tmp.image));} ) )
       | (<TRIG_MODIFY_ACTION>                                  {trigger = new Trigger();this.appendValue(this.getValue(attr, "triggers"), "triggersStack", trigger);this.setValue(trigger, "eventType", "modify");this.setValue(trigger, "kind", "action");}
                                     ( tmp = <TRIGPROG_STRING>  {this.setValue(trigger, "program", this.getString(tmp.image));}
                                     | tmp = <TRIGPROG_SINGLE>  {this.setValue(trigger, "program", this.getSingle(tmp.image));} )

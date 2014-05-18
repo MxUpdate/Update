@@ -37,12 +37,14 @@ import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * The class is used to evaluate information from attributes within MX used to
  * export, delete and update an attribute.
  *
  * @author The MxUpdate Team
+ * @param <CLASS> class defined from this class
  */
 public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mxJPO<CLASS>>
     extends AbstractAdminObject_mxJPO
@@ -53,23 +55,6 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
      * type.
      */
     private static final String SELECT_ATTRS = "list attribute * select type name dump";
-
-    /**
-     * Key used to identify the update of a dimension of an attribute within
-     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)}.
-     */
-    private static final String JPO_CALLER_KEY_DIM = "defineAttrDimension";
-
-    /**
-     * Called TCL procedure within the TCL update to update the dimension of an
-     * attribute. The TCL procedure calls method
-     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)} with the new
-     * attribute definition.
-     */
-    private static final String TCL_PROCEDURE_DIM
-            = "proc defineAttrDimension {_sName _sDimension}  {\n"
-                + "mql exec prog org.mxupdate.update.util.JPOCaller " + AbstractAttribute_mxJPO.JPO_CALLER_KEY_DIM + " $_sName $_sDimension\n"
-            + "}\n";
 
     /**
      * Key used to identify the update of an attribute within
@@ -159,16 +144,6 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
      */
     private final String attrTypeList;
 
-    /** Stores the reference to the dimension of an attribute. */
-    private String dimension;
-
-    /**
-     * The value is needed to hold the information if the update of the
-     * dimension is run (because the TCL procedure {@link #TCL_PROCEDURE} must
-     * not be called everytime...).
-     */
-    private boolean dimensionUpdated = false;
-
     /** Flag that the attribute value is reset on clone. */
     private boolean resetOnClone = false;
     /** Flag that the attribute value is reset on revision. */
@@ -249,9 +224,6 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
             parsed = true;
         } else if ("/defaultValue".equals(_url))  {
             this.defaultValue = _content;
-            parsed = true;
-        } else if ("/dimensionRef".equals(_url))  {
-            this.dimension = _content;
             parsed = true;
         } else if ("/resetonclone".equals(_url))  {
             this.resetOnClone = true;
@@ -431,28 +403,6 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     }
 
     /**
-     * Writes the TCL update code for the dimension of an attribute (if
-     * exists).
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the TCL update code could not be written to the
-     *                     writer instance
-     */
-    @Override()
-    protected void writeEnd(final ParameterCache_mxJPO _paramCache,
-                            final Appendable _out)
-        throws IOException
-    {
-        super.writeEnd(_paramCache, _out);
-        if (this.dimension != null)  {
-            _out.append("\ndefineAttrDimension \"${NAME}\" \"")
-                .append(StringUtil_mxJPO.convertTcl(this.dimension))
-                .append('\"');
-        }
-    }
-
-    /**
      * Creates given attribute from given type with given name. Because the
      * type of the attribute must defined, the original create method must be
      * overwritten.
@@ -524,16 +474,10 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     {
         // add TCL code for the procedure
         final StringBuilder preTCLCode = new StringBuilder()
-                .append(AbstractAttribute_mxJPO.TCL_PROCEDURE_DIM)
                 .append(AbstractAttribute_mxJPO.TCL_PROCEDURE)
                 .append(_preTCLCode);
 
         super.update(_paramCache, _preMQLCode, _postMQLCode, preTCLCode, _tclVariables, _sourceFile);
-
-        // is the dimension already updated?
-        if (!this.dimensionUpdated)  {
-            this.updateDimension(_paramCache, "");
-        }
     }
 
     /**
@@ -566,71 +510,22 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
                         + _args[1] + "' is set to update (currently attribute '" + this.getName()
                         + "' is updated!)");
             }
-            this.updateAttribute(_paramCache, _args[2]);
-        } else if  ((_args.length == 3) && AbstractAttribute_mxJPO.JPO_CALLER_KEY_DIM.equals(_args[0])) {
-            // check that attribute names are equal
-            if (!this.getName().equals(_args[1]))  {
-                throw new Exception("dimension for wrong attribute '"
-                        + _args[1] + "' is set (attribute '" + this.getName()
-                        + "' is updated!)");
-            }
 
-            this.updateDimension(_paramCache, _args[2]);
-            this.dimensionUpdated = true;
+            final String code = _args[2].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
+
+            final AttributeDefParser_mxJPO parser = new AttributeDefParser_mxJPO(new StringReader(code));
+            @SuppressWarnings("unchecked")
+            final CLASS attribute = (CLASS) parser.attribute(_paramCache, this.getTypeDef(), this.getName());
+
+            final MqlBuilder_mxJPO mql = new MqlBuilder_mxJPO(new StringBuilder("escape mod attribute \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\""));
+
+            this.calcDelta(_paramCache, mql, attribute);
+
+            mql.exec(_paramCache);
+
         } else  {
             super.jpoCallExecute(_paramCache, _args);
         }
-    }
-
-    /**
-     * Updates the dimension of this attribute. If a dimension is already
-     * defined for this attribute and it is not the same attribute, an
-     * exception is thrown (because information could be lost).
-     *
-     * @param _paramCache   parameter cache
-     * @param _dimension    new dimension to set
-     * @throws Exception if update failed or the dimension of an update should
-     *                   be changed (and some information could be lost)
-     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     */
-    protected void updateDimension(final ParameterCache_mxJPO _paramCache,
-                                   final String _dimension)
-        throws Exception
-    {
-        if ((this.dimension == null) || "".equals(this.dimension))  {
-            if (!"".equals(_dimension))  {
-                _paramCache.logDebug("    - set dimension '" + _dimension + "'");
-                MqlUtil_mxJPO.execMql(_paramCache,
-                        new StringBuilder().append("escape mod attribute \"")
-                        .append(StringUtil_mxJPO.convertMql(this.getName()))
-                        .append("\" add dimension \"")
-                        .append(StringUtil_mxJPO.convertMql(_dimension))
-                        .append('\"'));
-            }
-        } else if (!this.dimension.equals(_dimension))  {
-            throw new Exception("If dimension '" + this.dimension
-                    + "' is changed to new dimension '" + _dimension
-                    + "' some information could be lost!");
-        }
-    }
-
-    private void updateAttribute(final ParameterCache_mxJPO _paramCache,
-                                 final String _code)
-        throws Exception
-    {
-        final String code = _code.replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
-
-        final AttributeDefParser_mxJPO parser = new AttributeDefParser_mxJPO(new StringReader(code));
-        @SuppressWarnings("unchecked")
-        final CLASS attribute = (CLASS) parser.attribute(_paramCache, this.getTypeDef(), this.getName());
-
-
-        final MqlBuilder_mxJPO mql = new MqlBuilder_mxJPO(new StringBuilder("escape mod attribute \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\""));
-
-        this.calcDelta(_paramCache, mql, attribute);
-
-        mql.exec(_paramCache);
     }
 
     /**
@@ -641,10 +536,13 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
      * @param _paramCache   parameter cache
      * @param _cmd          string builder to append the MQL commands
      * @param _target       target attribute definition
+     * @throws UpdateException_mxJPO if update is not allowed (because data can
+     *                      be lost)
      */
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MqlBuilder_mxJPO _mql,
                              final CLASS _target)
+        throws UpdateException_mxJPO
     {
         final AbstractAttribute_mxJPO<CLASS> target = _target;
 

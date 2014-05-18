@@ -22,6 +22,7 @@ import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * The class is used to evaluate information from date attributes within MX
@@ -88,6 +89,7 @@ public class AttributeDate_mxJPO
                                                 final Appendable _out)
         throws IOException
     {
+        super.writeAttributeSpecificValues(_paramCache, _out);
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagRangeValue))  {
             _out.append("  ").append(this.rangeValue ? "" : "!").append("rangevalue\n");
         }
@@ -104,6 +106,7 @@ public class AttributeDate_mxJPO
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MqlBuilder_mxJPO _mql,
                              final AttributeDate_mxJPO _target)
+        throws UpdateException_mxJPO
     {
         super.calcDelta(_paramCache, _mql, _target);
 
