@@ -39,95 +39,97 @@ public interface AttributeDefParserConstants_mxJPO {
   /** RegularExpression Id. */
   int RULE = 18;
   /** RegularExpression Id. */
-  int TRIG_MODIFY_ACTION = 19;
+  int DIMENSION = 19;
   /** RegularExpression Id. */
-  int TRIG_MODIFY_CHECK = 20;
+  int TRIG_MODIFY_ACTION = 20;
   /** RegularExpression Id. */
-  int TRIG_MODIFY_OVERRIDE = 21;
+  int TRIG_MODIFY_CHECK = 21;
   /** RegularExpression Id. */
-  int RANGE_EQUAL = 22;
+  int TRIG_MODIFY_OVERRIDE = 22;
   /** RegularExpression Id. */
-  int RANGE_GREATERTHAN = 23;
+  int RANGE_EQUAL = 23;
   /** RegularExpression Id. */
-  int RANGE_GREATERTHANEQUAL = 24;
+  int RANGE_GREATERTHAN = 24;
   /** RegularExpression Id. */
-  int RANGE_LESSTHAN = 25;
+  int RANGE_GREATERTHANEQUAL = 25;
   /** RegularExpression Id. */
-  int RANGE_LESSTHANEQUAL = 26;
+  int RANGE_LESSTHAN = 26;
   /** RegularExpression Id. */
-  int RANGE_NOTEQUAL = 27;
+  int RANGE_LESSTHANEQUAL = 27;
   /** RegularExpression Id. */
-  int RANGE_MATCH = 28;
+  int RANGE_NOTEQUAL = 28;
   /** RegularExpression Id. */
-  int RANGE_NOTMATCH = 29;
+  int RANGE_MATCH = 29;
   /** RegularExpression Id. */
-  int RANGE_SMATCH = 30;
+  int RANGE_NOTMATCH = 30;
   /** RegularExpression Id. */
-  int RANGE_NOTSMATCH = 31;
+  int RANGE_SMATCH = 31;
   /** RegularExpression Id. */
-  int RANGE_PROGRAM = 32;
+  int RANGE_NOTSMATCH = 32;
   /** RegularExpression Id. */
-  int RANGE_BETWEEN = 33;
+  int RANGE_PROGRAM = 33;
   /** RegularExpression Id. */
-  int INPUT = 34;
+  int RANGE_BETWEEN = 34;
   /** RegularExpression Id. */
-  int PROPERTY = 35;
+  int INPUT = 35;
   /** RegularExpression Id. */
-  int PROPERTYTO = 36;
+  int PROPERTY = 36;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 37;
+  int PROPERTYTO = 37;
   /** RegularExpression Id. */
-  int STRING = 42;
+  int PROPERTYVAL = 38;
   /** RegularExpression Id. */
-  int SINGLE = 43;
+  int STRING = 43;
   /** RegularExpression Id. */
-  int APOSTROPHE = 44;
+  int SINGLE = 44;
   /** RegularExpression Id. */
-  int CHAR = 45;
+  int APOSTROPHE = 45;
   /** RegularExpression Id. */
-  int MAXLENGTH_NUMBER = 50;
+  int CHAR = 46;
   /** RegularExpression Id. */
-  int TRIGPROG_STRING = 55;
+  int MAXLENGTH_NUMBER = 51;
   /** RegularExpression Id. */
-  int TRIGPROG_SINGLE = 56;
+  int TRIGPROG_STRING = 56;
   /** RegularExpression Id. */
-  int TRIGGERPROGNAME_APOSTROPHE = 57;
+  int TRIGPROG_SINGLE = 57;
   /** RegularExpression Id. */
-  int TRIGGERPROGNAME_CHAR = 58;
+  int TRIGGERPROGNAME_APOSTROPHE = 58;
   /** RegularExpression Id. */
-  int TRIGGERINPUT = 63;
+  int TRIGGERPROGNAME_CHAR = 59;
   /** RegularExpression Id. */
-  int BETW1_STRING = 68;
+  int TRIGGERINPUT = 64;
   /** RegularExpression Id. */
-  int BETW1_SINGLE = 69;
+  int BETW1_STRING = 69;
   /** RegularExpression Id. */
-  int BETW1_APOSTROPHE = 70;
+  int BETW1_SINGLE = 70;
   /** RegularExpression Id. */
-  int BETW1_CHAR = 71;
+  int BETW1_APOSTROPHE = 71;
   /** RegularExpression Id. */
-  int BETW2_INCLUSIVE = 76;
+  int BETW1_CHAR = 72;
   /** RegularExpression Id. */
-  int BETW2_EXCLUSIVE = 77;
+  int BETW2_INCLUSIVE = 77;
   /** RegularExpression Id. */
-  int BETW3_STRING = 82;
+  int BETW2_EXCLUSIVE = 78;
   /** RegularExpression Id. */
-  int BETW3_SINGLE = 83;
+  int BETW3_STRING = 83;
   /** RegularExpression Id. */
-  int BETW3_APOSTROPHE = 84;
+  int BETW3_SINGLE = 84;
   /** RegularExpression Id. */
-  int BETW3_CHAR = 85;
+  int BETW3_APOSTROPHE = 85;
   /** RegularExpression Id. */
-  int BETW4_INCLUSIVE = 90;
+  int BETW3_CHAR = 86;
   /** RegularExpression Id. */
-  int BETW4_EXCLUSIVE = 91;
+  int BETW4_INCLUSIVE = 91;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 96;
+  int BETW4_EXCLUSIVE = 92;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 97;
+  int ADMINTYPE_STRING = 97;
   /** RegularExpression Id. */
-  int ADMINTYPE_APOSTROPHE = 98;
+  int ADMINTYPE_SINGLE = 98;
   /** RegularExpression Id. */
-  int ADMINTYPE_CHAR = 99;
+  int ADMINTYPE_APOSTROPHE = 99;
+  /** RegularExpression Id. */
+  int ADMINTYPE_CHAR = 100;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -171,6 +173,7 @@ public interface AttributeDefParserConstants_mxJPO {
     "\"!multiline\"",
     "\"maxlength\"",
     "\"rule\"",
+    "\"dimension\"",
     "<TRIG_MODIFY_ACTION>",
     "<TRIG_MODIFY_CHECK>",
     "<TRIG_MODIFY_OVERRIDE>",

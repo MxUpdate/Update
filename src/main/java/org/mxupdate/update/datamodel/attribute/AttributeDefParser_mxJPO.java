@@ -50,6 +50,7 @@ public class AttributeDefParser_mxJPO
       case MULTILINE_FALSE:
       case MAXLENGTH:
       case RULE:
+      case DIMENSION:
       case TRIG_MODIFY_ACTION:
       case TRIG_MODIFY_CHECK:
       case TRIG_MODIFY_OVERRIDE:
@@ -159,6 +160,22 @@ public class AttributeDefParser_mxJPO
         case SINGLE:
           tmp = jj_consume_token(SINGLE);
                                                                 this.setValue(attr, "rules", Arrays.asList(new String[]{this.getSingle(tmp.image)}));
+          break;
+        default:
+          jj_consume_token(-1);
+          throw new ParseException_mxJPO();
+        }
+        break;
+      case DIMENSION:
+        jj_consume_token(DIMENSION);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case STRING:
+          tmp = jj_consume_token(STRING);
+                                                                this.setValue(attr, "dimension", this.getString(tmp.image));
+          break;
+        case SINGLE:
+          tmp = jj_consume_token(SINGLE);
+                                                                this.setValue(attr, "dimension", this.getSingle(tmp.image));
           break;
         default:
           jj_consume_token(-1);

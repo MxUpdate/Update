@@ -736,13 +736,19 @@ public class ParameterCache_mxJPO
     public enum ValueKeys
     {
         /**
+         * Name of the parameter to define that the &quot;dimension&quot;
+         * for attributes from current MX version is supported. The
+         * parameter is needed to support the case that an old MX version is
+         * used....
+         */
+        DMAttrSupportsDimension,
+        /**
          * Name of the parameter to define that the &quot;rangevalue&quot;
          * flag for attributes from current MX version is supported. The
          * parameter is needed to support the case that an old MX version is
          * used....
          */
         DMAttrSupportsFlagRangeValue,
-
         /**
          * Name of the parameter to define that the &quot;resetonclone&quot;
          * flag for attributes from current MX version is supported. The
@@ -750,7 +756,6 @@ public class ParameterCache_mxJPO
          * used....
          */
         DMAttrSupportsFlagResetOnClone,
-
         /**
          * Name of the parameter to define that the &quot;resetonrevision&quot;
          * flag for attributes from current MX version is supported. The
