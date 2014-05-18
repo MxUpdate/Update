@@ -54,6 +54,8 @@ TOKEN : /** first level */
     | <DEFAULTVALUE:            "default">          : STRING_EXPECTED
     | <HIDDEN_TRUE:             "hidden">
     | <HIDDEN_FALSE:            "!hidden">
+    | <MULTIVALUE_TRUE:         "multivalue">
+    | <MULTIVALUE_FALSE:        "!multivalue">
     | <RESETONCLONE_TRUE:       "resetonclone">
     | <RESETONCLONE_FALSE:      "!resetonclone">
     | <RESETONREVISION_TRUE:    "resetonrevision">
@@ -217,6 +219,8 @@ AbstractAttribute_mxJPO attribute(final ParameterCache_mxJPO _paramCache,
                                     | tmp = <SINGLE>           {this.setValue(attr, "defaultValue", this.getSingle(tmp.image));} ) )
       | (<HIDDEN_TRUE>                                         {this.setValue(attr, "hidden", true);} )
       | (<HIDDEN_FALSE>                                        {this.setValue(attr, "hidden", false);} )
+      | (<MULTIVALUE_TRUE>                                     {this.setValue(attr, "multiValue", true);} )
+      | (<MULTIVALUE_FALSE>                                    {this.setValue(attr, "multiValue", false);} )
       | (<RESETONCLONE_TRUE>                                   {this.setValue(attr, "resetOnClone", true);} )
       | (<RESETONCLONE_FALSE>                                  {this.setValue(attr, "resetOnClone", false);} )
       | (<RESETONREVISION_TRUE>                                {this.setValue(attr, "resetOnRevision", true);} )

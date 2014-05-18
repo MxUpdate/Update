@@ -40,6 +40,8 @@ public class AttributeDefParser_mxJPO
       case DEFAULTVALUE:
       case HIDDEN_TRUE:
       case HIDDEN_FALSE:
+      case MULTIVALUE_TRUE:
+      case MULTIVALUE_FALSE:
       case RESETONCLONE_TRUE:
       case RESETONCLONE_FALSE:
       case RESETONREVISION_TRUE:
@@ -112,6 +114,14 @@ public class AttributeDefParser_mxJPO
       case HIDDEN_FALSE:
         jj_consume_token(HIDDEN_FALSE);
                                                                 this.setValue(attr, "hidden", false);
+        break;
+      case MULTIVALUE_TRUE:
+        jj_consume_token(MULTIVALUE_TRUE);
+                                                                this.setValue(attr, "multiValue", true);
+        break;
+      case MULTIVALUE_FALSE:
+        jj_consume_token(MULTIVALUE_FALSE);
+                                                                this.setValue(attr, "multiValue", false);
         break;
       case RESETONCLONE_TRUE:
         jj_consume_token(RESETONCLONE_TRUE);

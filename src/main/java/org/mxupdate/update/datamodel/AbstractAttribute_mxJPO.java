@@ -146,6 +146,8 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
      */
     private final String attrTypeList;
 
+    /** Flag that the attribute has multiple values. */
+    private boolean multiValue = false;
     /** Flag that the attribute value is reset on clone. */
     private boolean resetOnClone = false;
     /** Flag that the attribute value is reset on revision. */
@@ -200,9 +202,11 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
      * <ul>
      * <li>assigned {@link #rules}</li>
      * <li>{@link #defaultValue default value}</li>
+     * <li>{@link #multiValue multiple value} flag</li>
      * <li>{@link #resetOnClone reset on clone} flag</li>
      * <li>{@link #resetOnRevision reset on revision} flag</li>
-     * <li>defined {@link #ranges}, {@link #rangeProgramRef program ranges} and
+     * <li>defined {@link #rangesStack ranges},
+     *     {@link #rangeProgramRef program ranges} and
      *     their {@link #rangeProgramInputArguments input arguments}</li>
      * </ul>
      *
@@ -224,6 +228,15 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         } else if ("/accessRuleRef".equals(_url))  {
             this.rules.add(_content);
             parsed = true;
+        } else if ("/attrValueType".equals(_url))  {
+            if ("1".equals(_content))  {
+                this.multiValue = true;
+                parsed = true;
+            } else if ("0".equals(_content))  {
+                parsed = true;
+            } else  {
+                parsed = false;
+            }
         } else if ("/defaultValue".equals(_url))  {
             this.defaultValue = _content;
             parsed = true;
@@ -317,10 +330,12 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
      * must be done in front or otherwise some data is lost. Following
      * information is written
      * <ul>
+     * <li>flag &quot;{@link #multiValue multiple value}&quot; (if parameter
+     *     {@link ValueKeys#DMAttrSupportsFlagMultiValue} is defined)</li>
      * <li>flag &quot;{@link #resetonclone}&quot; (if parameter
-     *     {@link #PARAM_SUPPORT_FLAG_RESET_ON_CLONE} is defined)</li>
+     *     {@link ValueKeys#DMAttrSupportsFlagResetOnClone} is defined)</li>
      * <li>flag &quot;{@link #resetOnRevision}&quot; (if parameter
-     *     {@link #PARAM_SUPPORT_FLAG_RESET_ON_REVISION} is defined)</li>
+     *     {@link ValueKeys#DMAttrSupportsFlagResetOnRevision} is defined)</li>
      * <li>{@link #writeAttributeSpecificValues(ParameterCache_mxJPO, Appendable)
      *     attribute specific properties and flags}</li>
      * <li>all assigned {@link #rules}</li>
@@ -349,6 +364,9 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         _out.append("updateAttribute \"${NAME}\"  {\n")
             .append("  description \"").append(StringUtil_mxJPO.convertTcl(this.getDescription())).append("\"\n")
             .append("  ").append(this.isHidden() ? "" : "!").append("hidden\n");
+        if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagMultiValue))  {
+            _out.append("  ").append(this.multiValue ? "" : "!").append("multivalue\n");
+        }
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnClone))  {
             _out.append("  ").append(this.resetOnClone ? "" : "!").append("resetonclone\n");
         }
@@ -552,6 +570,15 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         DeltaUtil_mxJPO.calcValueDelta(_mql, "default",         target.defaultValue,     this.defaultValue);
         DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",          target.isHidden(),       this.isHidden());
 
+        if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagMultiValue))  {
+            if (!this.multiValue)  {
+                DeltaUtil_mxJPO.calcFlagDelta(_mql, "multivalue", target.multiValue, this.multiValue);
+            } else if (!target.multiValue)  {
+                throw new UpdateException_mxJPO(
+                        UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_MULTIVALUEFLAG_UPDATED,
+                        this.getName());
+            }
+        }
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnClone))  {
             DeltaUtil_mxJPO.calcFlagDelta(_mql,  "resetonclone",    target.resetOnClone,     this.resetOnClone);
         }
