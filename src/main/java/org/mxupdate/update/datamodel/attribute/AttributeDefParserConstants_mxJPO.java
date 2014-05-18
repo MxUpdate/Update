@@ -71,49 +71,63 @@ public interface AttributeDefParserConstants_mxJPO {
   /** RegularExpression Id. */
   int INPUT = 34;
   /** RegularExpression Id. */
-  int STRING = 39;
+  int PROPERTY = 35;
   /** RegularExpression Id. */
-  int SINGLE = 40;
+  int PROPERTYTO = 36;
   /** RegularExpression Id. */
-  int APOSTROPHE = 41;
+  int PROPERTYVAL = 37;
   /** RegularExpression Id. */
-  int CHAR = 42;
+  int STRING = 42;
   /** RegularExpression Id. */
-  int MAXLENGTH_NUMBER = 47;
+  int SINGLE = 43;
   /** RegularExpression Id. */
-  int TRIGPROG_STRING = 52;
+  int APOSTROPHE = 44;
   /** RegularExpression Id. */
-  int TRIGPROG_SINGLE = 53;
+  int CHAR = 45;
   /** RegularExpression Id. */
-  int TRIGGERPROGNAME_APOSTROPHE = 54;
+  int MAXLENGTH_NUMBER = 50;
   /** RegularExpression Id. */
-  int TRIGGERPROGNAME_CHAR = 55;
+  int TRIGPROG_STRING = 55;
   /** RegularExpression Id. */
-  int TRIGGERINPUT = 60;
+  int TRIGPROG_SINGLE = 56;
   /** RegularExpression Id. */
-  int BETW1_STRING = 65;
+  int TRIGGERPROGNAME_APOSTROPHE = 57;
   /** RegularExpression Id. */
-  int BETW1_SINGLE = 66;
+  int TRIGGERPROGNAME_CHAR = 58;
   /** RegularExpression Id. */
-  int BETW1_APOSTROPHE = 67;
+  int TRIGGERINPUT = 63;
   /** RegularExpression Id. */
-  int BETW1_CHAR = 68;
+  int BETW1_STRING = 68;
   /** RegularExpression Id. */
-  int BETW2_INCLUSIVE = 73;
+  int BETW1_SINGLE = 69;
   /** RegularExpression Id. */
-  int BETW2_EXCLUSIVE = 74;
+  int BETW1_APOSTROPHE = 70;
   /** RegularExpression Id. */
-  int BETW3_STRING = 79;
+  int BETW1_CHAR = 71;
   /** RegularExpression Id. */
-  int BETW3_SINGLE = 80;
+  int BETW2_INCLUSIVE = 76;
   /** RegularExpression Id. */
-  int BETW3_APOSTROPHE = 81;
+  int BETW2_EXCLUSIVE = 77;
   /** RegularExpression Id. */
-  int BETW3_CHAR = 82;
+  int BETW3_STRING = 82;
   /** RegularExpression Id. */
-  int BETW4_INCLUSIVE = 87;
+  int BETW3_SINGLE = 83;
   /** RegularExpression Id. */
-  int BETW4_EXCLUSIVE = 88;
+  int BETW3_APOSTROPHE = 84;
+  /** RegularExpression Id. */
+  int BETW3_CHAR = 85;
+  /** RegularExpression Id. */
+  int BETW4_INCLUSIVE = 90;
+  /** RegularExpression Id. */
+  int BETW4_EXCLUSIVE = 91;
+  /** RegularExpression Id. */
+  int ADMINTYPE_STRING = 96;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 97;
+  /** RegularExpression Id. */
+  int ADMINTYPE_APOSTROPHE = 98;
+  /** RegularExpression Id. */
+  int ADMINTYPE_CHAR = 99;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -133,6 +147,8 @@ public interface AttributeDefParserConstants_mxJPO {
   int BETW3_EXPECTED = 7;
   /** Lexical state. */
   int BETW4_EXPECTED = 8;
+  /** Lexical state. */
+  int ADMINREF_EXPECTED = 9;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -171,6 +187,9 @@ public interface AttributeDefParserConstants_mxJPO {
     "<RANGE_PROGRAM>",
     "<RANGE_BETWEEN>",
     "\"input\"",
+    "\"property\"",
+    "\"to\"",
+    "\"value\"",
     "\" \"",
     "\"\\t\"",
     "\"\\n\"",
@@ -225,6 +244,14 @@ public interface AttributeDefParserConstants_mxJPO {
     "\"\\r\"",
     "\"inclusive\"",
     "\"exclusive\"",
+    "\" \"",
+    "\"\\t\"",
+    "\"\\n\"",
+    "\"\\r\"",
+    "<ADMINTYPE_STRING>",
+    "<ADMINTYPE_SINGLE>",
+    "\"\\\"\"",
+    "<ADMINTYPE_CHAR>",
   };
 
 }

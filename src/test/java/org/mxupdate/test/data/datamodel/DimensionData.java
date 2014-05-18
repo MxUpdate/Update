@@ -11,6 +11,7 @@ import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.util.PropertyDef;
+import org.mxupdate.test.data.util.PropertyDefList;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.testng.Assert;
 
@@ -104,6 +105,22 @@ public class DimensionData
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     * Creates for all units depending referenced property admin objects.
+     */
+    @Override()
+    public DimensionData createDependings()
+        throws MatrixException
+    {
+        super.createDependings();
+
+        for (final UnitData unit : this.units)  {
+            unit.properties.createDependings();
+        }
+
+        return this;
+    }
 
     /**
      * Checks the export of this data piece if all values are correct defined.
@@ -115,7 +132,7 @@ public class DimensionData
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        this.checkExportProperties(_exportParser);
+        this.getProperties().checkExportPropertiesAddFormat(_exportParser, this.getCI());
 
         // check symbolic name
         Assert.assertEquals(
@@ -187,6 +204,8 @@ public class DimensionData
         private final Map<String,String> valuesWithQuots = new HashMap<String,String>();
         /** Values w/o quotations of this unit. */
         private final Map<String,String> valuesWOQuots = new HashMap<String,String>();
+        /** List of properties. */
+        private final PropertyDefList properties = new PropertyDefList();
 
         /**
          * Defines a new unit with name.
@@ -257,6 +276,18 @@ public class DimensionData
         }
 
         /**
+         * Assigns {@code _property} to this unit {@link #properties}.
+         *
+         * @param _property     property to add / assign
+         * @return this data piece instance
+         */
+        public UnitData addProperty(final PropertyDef _property)
+        {
+            this.properties.add(_property);
+            return this;
+        }
+
+        /**
          * Appends the MQL statements to create the policy.
          *
          * @param _cmd  string builder where to append the MQL statements
@@ -273,6 +304,8 @@ public class DimensionData
                     .append(" ").append(value.getValue()).append("\n");
             }
 
+            this.properties.appendCIFileUpdateFormat("      ", _cmd);
+
             _cmd.append("  }\n");
         }
 
@@ -280,8 +313,11 @@ public class DimensionData
          * Appends the MQL statements to create the policy.
          *
          * @param _cmd  string builder where to append the MQL statements
+         * @throws MatrixException if create of referenced admin object for
+         *                         properties failed
          */
         protected void append4Create(final StringBuilder _cmd)
+            throws MatrixException
         {
             _cmd.append("  unit \"").append(StringUtil_mxJPO.convertMql(this.name)).append("\"");
             for (final Map.Entry<String,String> value : this.valuesWithQuots.entrySet())  {
@@ -305,6 +341,8 @@ public class DimensionData
                         .append(" ").append(value.getValue());
                 }
             }
+            // append properties
+            this.properties.append4Create(_cmd);
         }
 
         /**
@@ -318,9 +356,13 @@ public class DimensionData
         {
             boolean found = false;
             final String value = "\"" + AbstractTest.convertTcl(this.name) + "\"";
+            List<String> propLines = null;
             for (final ExportParser.Line line : _exportParser.getRootLines().get(0).getChildren())  {
                 if ("unit".equals(line.getTag()) && line.getValue().startsWith(value))  {
                     found = true;
+
+                    // check for property
+                    propLines = line.getLines("property/@value");
 
                     // check for defined values
                     for (final Map.Entry<String,String> entry : this.valuesWithQuots.entrySet())  {
@@ -340,6 +382,8 @@ public class DimensionData
                 }
             }
             Assert.assertTrue(found, "check that state '" + this.name + "' is found");
+            // check properties
+            this.properties.checkExportPropertiesUpdateFormat(propLines);
         }
     }
 }

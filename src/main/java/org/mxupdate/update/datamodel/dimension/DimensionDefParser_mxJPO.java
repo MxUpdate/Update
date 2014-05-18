@@ -10,7 +10,7 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.Dimension_mxJPO;
 import org.mxupdate.update.datamodel.Dimension_mxJPO.Unit;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
-import org.mxupdate.update.util.AdminProperty_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 public class DimensionDefParser_mxJPO
@@ -207,7 +207,7 @@ public class DimensionDefParser_mxJPO
       throw new ParseException_mxJPO();
     }
     value = uvString();
-        final AdminProperty_mxJPO prop = new AdminProperty_mxJPO();
+        final AdminProperty prop = new AdminProperty();
         this.setValue(prop, "name", "%" + key);
         this.setValue(prop, "value", value);
         this.appendValue(_unit, "properties", prop);
@@ -263,7 +263,7 @@ public class DimensionDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-        final AdminProperty_mxJPO prop = new AdminProperty_mxJPO();
+        final AdminProperty prop = new AdminProperty();
         this.setValue(prop, "name", name);
         this.setValue(prop, "value", value);
         this.setValue(prop, "refAdminType", toType);
@@ -311,11 +311,11 @@ public class DimensionDefParser_mxJPO
       jj_consume_token(-1);
       throw new ParseException_mxJPO();
     }
-        final AdminProperty_mxJPO prop = new AdminProperty_mxJPO();
+        final AdminProperty prop = new AdminProperty();
         this.setValue(prop, "name", name);
         this.setValue(prop, "refAdminType", "unit");
         this.setValue(prop, "refAdminName", unit);
-        this.appendValue(_unit, "properties", prop);
+        this.appendValue(this.getValue(_unit, "properties"), "propertiesStack", prop);
   }
 
 /**

@@ -29,7 +29,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.util.AdminProperty_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
@@ -206,7 +206,7 @@ public class Portal_mxJPO
             _out.append(" \\\n    alt \"").append(StringUtil_mxJPO.convertTcl(this.alt)).append("\"");
         }
         // settings
-        for (final AdminProperty_mxJPO prop : this.getPropertiesMap().values())  {
+        for (final AdminProperty prop : this.getProperties())  {
             if (prop.isSetting())  {
                 _out.append(" \\\n    add setting \"")
                     .append(StringUtil_mxJPO.convertTcl(prop.getName().substring(1))).append("\"")
@@ -269,7 +269,7 @@ public class Portal_mxJPO
                 .append(" !hidden href \"\" description \"\" alt \"\" label \"\"");
 
         // reset settings
-        for (final AdminProperty_mxJPO prop : this.getPropertiesMap().values())  {
+        for (final AdminProperty prop : this.getProperties())  {
             if (prop.isSetting())  {
                 preMQLCode.append(" remove setting \"").append(StringUtil_mxJPO.convertMql(prop.getName().substring(1))).append('\"');
             }

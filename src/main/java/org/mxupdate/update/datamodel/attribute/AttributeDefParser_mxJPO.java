@@ -11,6 +11,7 @@ import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO;
 import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO.Range;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 public class AttributeDefParser_mxJPO
@@ -31,6 +32,7 @@ public class AttributeDefParser_mxJPO
     Token_mxJPO tmp;
     Trigger trigger;
     Range range;
+    AdminProperty property;
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -63,6 +65,7 @@ public class AttributeDefParser_mxJPO
       case RANGE_NOTSMATCH:
       case RANGE_PROGRAM:
       case RANGE_BETWEEN:
+      case PROPERTY:
         ;
         break;
       default:
@@ -505,6 +508,84 @@ public class AttributeDefParser_mxJPO
         default:
           jj_consume_token(-1);
           throw new ParseException_mxJPO();
+        }
+        break;
+      case PROPERTY:
+        jj_consume_token(PROPERTY);
+                                                                property = new AdminProperty();this.appendValue(this.getValue(attr, "properties"), "propertiesStack", property);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case STRING:
+          tmp = jj_consume_token(STRING);
+                                                                this.setValue(property, "name", this.getString(tmp.image));
+          break;
+        case SINGLE:
+          tmp = jj_consume_token(SINGLE);
+                                                                this.setValue(property, "name", this.getSingle(tmp.image));
+          break;
+        default:
+          jj_consume_token(-1);
+          throw new ParseException_mxJPO();
+        }
+        label_2:
+        while (true) {
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case PROPERTYTO:
+          case PROPERTYVAL:
+            ;
+            break;
+          default:
+            break label_2;
+          }
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case PROPERTYVAL:
+            jj_consume_token(PROPERTYVAL);
+            switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+            case STRING:
+              tmp = jj_consume_token(STRING);
+                                                                this.setValue(property, "value", this.getString(tmp.image));
+              break;
+            case SINGLE:
+              tmp = jj_consume_token(SINGLE);
+                                                                this.setValue(property, "value", this.getSingle(tmp.image));
+              break;
+            default:
+              jj_consume_token(-1);
+              throw new ParseException_mxJPO();
+            }
+            break;
+          case PROPERTYTO:
+            jj_consume_token(PROPERTYTO);
+            switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+            case ADMINTYPE_STRING:
+              tmp = jj_consume_token(ADMINTYPE_STRING);
+                                                                this.setValue(property, "refAdminType", this.getString(tmp.image));
+              break;
+            case ADMINTYPE_SINGLE:
+              tmp = jj_consume_token(ADMINTYPE_SINGLE);
+                                                                this.setValue(property, "refAdminType", this.getSingle(tmp.image));
+              break;
+            default:
+              jj_consume_token(-1);
+              throw new ParseException_mxJPO();
+            }
+            switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+            case STRING:
+              tmp = jj_consume_token(STRING);
+                                                                this.setValue(property, "refAdminName", this.getString(tmp.image));
+              break;
+            case SINGLE:
+              tmp = jj_consume_token(SINGLE);
+                                                                this.setValue(property, "refAdminName", this.getSingle(tmp.image));
+              break;
+            default:
+              jj_consume_token(-1);
+              throw new ParseException_mxJPO();
+            }
+            break;
+          default:
+            jj_consume_token(-1);
+            throw new ParseException_mxJPO();
+          }
         }
         break;
       default:
