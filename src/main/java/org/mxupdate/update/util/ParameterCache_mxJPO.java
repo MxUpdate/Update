@@ -741,6 +741,13 @@ public class ParameterCache_mxJPO
          */
         DMAttrSupportsDimension,
         /**
+         * Name of the parameter to define that the &quot;multivalue&quot;
+         * flag for attributes from current MX version is supported. The
+         * parameter is needed to support the case that an old MX version is
+         * used....
+         */
+        DMAttrSupportsFlagMultiValue,
+        /**
          * Name of the parameter to define that the &quot;rangevalue&quot;
          * flag for attributes from current MX version is supported. The
          * parameter is needed to support the case that an old MX version is

@@ -26,10 +26,15 @@ import org.mxupdate.test.data.datamodel.AbstractAttributeData;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger.TriggerAction;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger.TriggerCheck;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger.TriggerOverride;
+import org.mxupdate.test.data.datamodel.AttributeRealData;
 import org.mxupdate.test.data.datamodel.RuleData;
 import org.mxupdate.test.data.program.MQLProgramData;
+import org.mxupdate.test.util.IssueLink;
+import org.mxupdate.test.util.Version;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Test cases for the update and export of attributes.
@@ -180,6 +185,24 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
                         .setValue("default", _value1)
                         .setFlag("resetonrevision", false)});
 
+        // multi value flags
+        ret.add(new Object[]{
+                _logText + " with multi value flag true",
+                this.createNewData("hello")
+                        .setFlag("multivalue", true)
+                        .notSupported(Version.V6R2011x)});
+        ret.add(new Object[]{
+                _logText + " with multi value flag false",
+                this.createNewData("hello")
+                        .setFlag("multivalue", false)
+                        .notSupported(Version.V6R2011x)});
+        ret.add(new Object[]{
+                _logText + " without multi value flag (to test default value false in export)",
+                this.createNewData("hello")
+                        .notSupported(Version.V6R2011x),
+                this.createNewData("hello")
+                        .setFlag("multivalue", false)});
+
         ret.addAll(Arrays.asList(_datas));
 
         return super.prepareData(_logText, ret.toArray(new Object[ret.size()][]));
@@ -221,6 +244,35 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
             ret.setDimension(_original.getDimension());
         }
 
+        // if multiple value is defined, must be also defined for new cleaned attribute
+        if (_original.getFlags().containsKey("multivalue") && _original.getFlags().get("multivalue"))  {
+            ret.setFlag("multivalue", true);
+        }
+
+        // if range value is defined, must be also defined for new cleaned attribute
+        if (_original.getFlags().containsKey("rangevalue") && _original.getFlags().get("rangevalue"))  {
+            ret.setFlag("rangevalue", true);
+        }
+
         return ret;
+    }
+
+    /**
+     * Negative test that update failed for modified multiple value flag.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("191")
+    @Test(description = "issue #191: negative test that update failed for modified multiple value flag")
+    public void negativeTestUpdateMultiValueFlag()
+        throws Exception
+    {
+        new AttributeRealData(this, "test")
+                .setFlag("multivalue", true)
+                .create()
+                .update()
+                .checkExport()
+                .setFlag("multivalue", false)
+                .failureUpdate(UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_MULTIVALUEFLAG_UPDATED);
     }
 }

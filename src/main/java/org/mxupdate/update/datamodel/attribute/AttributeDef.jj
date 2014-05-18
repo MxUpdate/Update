@@ -52,6 +52,8 @@ TOKEN : /** first level */
     | <DEFAULTVALUE:            "default">          : STRING_EXPECTED
     | <HIDDEN_TRUE:             "hidden">
     | <HIDDEN_FALSE:            "!hidden">
+    | <MULTIVALUE_TRUE:         "multivalue">
+    | <MULTIVALUE_FALSE:        "!multivalue">
     | <RESETONCLONE_TRUE:       "resetonclone">
     | <RESETONCLONE_FALSE:      "!resetonclone">
     | <RESETONREVISION_TRUE:    "resetonrevision">
@@ -176,7 +178,7 @@ TOKEN : /** first level */
     | <BETW4_EXCLUSIVE: "exclusive"> : DEFAULT
 }
 
-/******************************************** Two Strings for Unit Definition */
+/**************************************** Two Strings for Property Definition */
 <ADMINREF_EXPECTED> SKIP :
 {
   " " | "\t" | "\n" | "\r"
@@ -191,12 +193,12 @@ TOKEN : /** first level */
 }
 
 /**
- * Parses one complete policy definition.
+ * Parses one complete attribute definition.
  *
  * @param _paramCache   parameter cache
- * @param _typeDef      type definition of the policy (to instantiate the
- *                      policy)
- * @param _mxName       MX name of the policy
+ * @param _typeDef      type definition of the attribute (to instantiate the
+ *                      attribute)
+ * @param _mxName       MX name of the attribute
  */
 AbstractAttribute_mxJPO attribute(final ParameterCache_mxJPO _paramCache,
                                   final TypeDef_mxJPO _typeDef,
@@ -215,6 +217,8 @@ AbstractAttribute_mxJPO attribute(final ParameterCache_mxJPO _paramCache,
                                     | tmp = <SINGLE>           {this.setValue(attr, "defaultValue", this.getSingle(tmp.image));} ) )
       | (<HIDDEN_TRUE>                                         {this.setValue(attr, "hidden", true);} )
       | (<HIDDEN_FALSE>                                        {this.setValue(attr, "hidden", false);} )
+      | (<MULTIVALUE_TRUE>                                     {this.setValue(attr, "multiValue", true);} )
+      | (<MULTIVALUE_FALSE>                                    {this.setValue(attr, "multiValue", false);} )
       | (<RESETONCLONE_TRUE>                                   {this.setValue(attr, "resetOnClone", true);} )
       | (<RESETONCLONE_FALSE>                                  {this.setValue(attr, "resetOnClone", false);} )
       | (<RESETONREVISION_TRUE>                                {this.setValue(attr, "resetOnRevision", true);} )

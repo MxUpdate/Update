@@ -142,6 +142,19 @@ public class UpdateException_mxJPO
                 "Attribute ''{0}'' is defined with range values and must be removed, but not possible because some information could be lost!"),
 
         /**
+         * <p>The attribute contains defined multiple value flag which must be
+         * removed, but potentially data could be lost.</p>
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>attribute name</li>
+         * </ol>
+         * </p>
+         */
+        ABSTRACTATTRIBUTE_UPDATE_MULTIVALUEFLAG_UPDATED(12003,
+                "Attribute ''{0}'' is defined with multiple values and must be removed, but not possible because some information could be lost!"),
+
+        /**
          * <p>The given attribute is not defined anymore but assigned to the
          * administration object. The attribute is not automatically removed
          * because otherwise potentially data could be lost.</p>
