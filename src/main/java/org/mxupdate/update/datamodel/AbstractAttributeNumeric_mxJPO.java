@@ -126,6 +126,9 @@ public abstract class AbstractAttributeNumeric_mxJPO<CLASS extends AbstractAttri
      * <li>{@link #dimension} (if
      *     {@link ValueKeys#DMAttrSupportsDimension} is defined)</li>
      * <ul>
+     *
+     * @throws UpdateException_mxJPO if range values flag is removed or
+     *                               existing dimension is updated
      */
     @Override()
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
@@ -138,7 +141,13 @@ public abstract class AbstractAttributeNumeric_mxJPO<CLASS extends AbstractAttri
         final AbstractAttributeNumeric_mxJPO<CLASS> target = _target;
 
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagRangeValue))  {
-            DeltaUtil_mxJPO.calcFlagDelta(_mql, "rangevalue", target.rangeValue, this.rangeValue);
+            if (!this.rangeValue)  {
+                DeltaUtil_mxJPO.calcFlagDelta(_mql, "rangevalue", target.rangeValue, this.rangeValue);
+            } else if (!target.rangeValue)  {
+                throw new UpdateException_mxJPO(
+                        UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_RANGEVALUEFLAG_UPDATED,
+                        this.getName());
+            }
         }
 
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsDimension))  {
@@ -150,7 +159,7 @@ public abstract class AbstractAttributeNumeric_mxJPO<CLASS extends AbstractAttri
                 }
             } else if (!this.dimension.equals(target.dimension))  {
                 throw new UpdateException_mxJPO(
-                        UpdateException_mxJPO.Error.ABSTRACTATTRIBUTENUMERIC_UPDATE_DIMENSION_UPDATED,
+                        UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_DIMENSION_UPDATED,
                         this.getName(),
                         this.dimension,
                         (target.dimension != null) ? target.dimension : "");
