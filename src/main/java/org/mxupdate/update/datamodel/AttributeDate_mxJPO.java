@@ -113,7 +113,13 @@ public class AttributeDate_mxJPO
         super.calcDelta(_paramCache, _mql, _target);
 
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagRangeValue))  {
-            DeltaUtil_mxJPO.calcFlagDelta(_mql, "rangevalue", _target.rangeValue, this.rangeValue);
+            if (!this.rangeValue)  {
+                DeltaUtil_mxJPO.calcFlagDelta(_mql, "rangevalue", _target.rangeValue, this.rangeValue);
+            } else if (!_target.rangeValue)  {
+                throw new UpdateException_mxJPO(
+                        UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_RANGEVALUEFLAG_UPDATED,
+                        this.getName());
+            }
         }
     }
 }

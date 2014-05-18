@@ -43,7 +43,7 @@ public class UpdateException_mxJPO
      *     <li>106: {@link org.mxupdate.update.datamodel.Dimension_mxJPO dimension}</li>
      *     <li>109: {@link org.mxupdate.update.datamodel.Interface_mxJPO interface}</li>
      *     <li>111: {@link org.mxupdate.update.datamodel.Policy_mxJPO policy}</li>
-     *     <li>120: {@link org.mxupdate.update.datamodel.AbstractAttributeNumeric_mxJPO numeric attributes}</li>
+     *     <li>120: {@link org.mxupdate.update.datamodel.AbstractAttribute_mxJPO numeric attributes}</li>
      *     <li>121: {@link org.mxupdate.update.datamodel.AbstractDMWithAttributes_mxJPO data model with attributes}</li>
      *     <li>601: {@link org.mxupdate.update.AbstractObject_mxJPO abstract object}</li>
      *     <li>602: {@link org.mxupdate.update.AbstractAdminObject_mxJPO abstract administration object}</li>
@@ -127,8 +127,21 @@ public class UpdateException_mxJPO
          * </ol>
          * </p>
          */
-        ABSTRACTATTRIBUTENUMERIC_UPDATE_DIMENSION_UPDATED(12001,
+        ABSTRACTATTRIBUTE_UPDATE_DIMENSION_UPDATED(12001,
                 "The existing dimension ''{1}'' for Attribute ''{0}'' must be changed to new dimension ''{2}'', but not possible because some information could be lost!"),
+
+        /**
+         * <p>The attribute contains defined range value flag which must be
+         * removed, but potentially data could be lost.</p>
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>attribute name</li>
+         * </ol>
+         * </p>
+         */
+        ABSTRACTATTRIBUTE_UPDATE_RANGEVALUEFLAG_UPDATED(12002,
+                "Attribute ''{0}'' is defined with range values and must be removed, but not possible because some information could be lost!"),
 
         /**
          * <p>The given attribute is not defined anymore but assigned to the
