@@ -375,7 +375,7 @@ public class PolicyData
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        this.checkExportProperties(_exportParser);
+        this.getProperties().checkExportPropertiesAddFormat(_exportParser, this.getCI());
 
         // check symbolic name
         Assert.assertEquals(

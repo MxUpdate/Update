@@ -396,6 +396,9 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         // append ranges
         this.rangesSorted.write(_out);
 
+        // append properties
+        this.getProperties().writeUpdateFormat(_paramCache, _out, "  ");
+
         _out.append("}");
     }
 
@@ -659,6 +662,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
 
         target.triggers.calcDelta(this.triggers, _mql);
         target.rangesSorted.calcDelta(this.rangesSorted, _mql);
+        target.getProperties().calcDelta(this.getProperties(), _mql);
     }
 
     /**

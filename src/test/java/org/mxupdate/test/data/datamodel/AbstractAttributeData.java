@@ -27,7 +27,6 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.program.AbstractProgramData;
-import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.util.MapUtil;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.testng.Assert;
@@ -211,12 +210,10 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
             strg.append("  ").append(needAdd).append('\n');
         }
 
-        strg.append("}");
-
         // append properties
-        for (final PropertyDef prop : this.getProperties())  {
-            strg.append('\n').append(prop.getCITCLString(this.getCI()));
-        }
+        this.getProperties().appendCIFileUpdateFormat("  ", strg);
+
+        strg.append("}");
 
         return strg.toString();
     }
@@ -231,7 +228,6 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        this.checkExportProperties(_exportParser);
         // check for defined values
         this.getValues().checkExport(_exportParser);
         // check for defined flags
@@ -259,7 +255,8 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         for (final String foundAdd : foundAdds)  {
             Assert.assertTrue(needAdds.contains(foundAdd), "check that add '" + foundAdd + "' is defined (found adds = " + foundAdds + "; need adds = " + needAdds + ")");
         }
-
+        // check for properties
+        this.getProperties().checkExportPropertiesUpdateFormat(_exportParser.getLines("/updateAttribute/property/@value"));
     }
 
     /**

@@ -29,52 +29,22 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 public abstract class AbstractProgram_mxJPO
     extends AbstractCode_mxJPO
 {
-    /**
-     * User in which context the MQL program is executed.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeUpdateCode(ParameterCache_mxJPO, Appendable, String, String, String)
-     */
+    /** User in which context the MQL program is executed. */
     private String user;
 
-    /**
-     * Execution of the program is deferred.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeUpdateCode(ParameterCache_mxJPO, Appendable, String, String, String)
-     */
+    /** Execution of the program is deferred. */
     private boolean deferred = false;
 
-    /**
-     * The program needs context of a business object.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeUpdateCode(ParameterCache_mxJPO, Appendable, String, String, String)
-     */
+    /** The program needs context of a business object. */
     private boolean needsBusinessObjectContext;
 
-    /**
-     * Program is downloadable.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeUpdateCode(ParameterCache_mxJPO, Appendable, String, String, String)
-     */
+    /** Program is downloadable. */
     private boolean downloadable = false;
 
-    /**
-     * Program uses pipes.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeUpdateCode(ParameterCache_mxJPO, Appendable, String, String, String)
-     */
+    /** Program uses pipes. */
     private boolean pipe = false;
 
-    /**
-     * Program is pooled (used for TCL).
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeUpdateCode(ParameterCache_mxJPO, Appendable, String, String, String)
-     */
+    /** Program is pooled (used for TCL). */
     private boolean pooled = false;
 
     /**
@@ -214,7 +184,7 @@ public abstract class AbstractProgram_mxJPO
             }
         }
 
-        this.writeProperties(_paramCache, cmd);
+        this.getProperties().writeAddFormat(_paramCache, _out, this.getTypeDef());
 
         if (!"".equals(cmd.toString()))  {
             _out.append(_markStart.trim()).append('\n')

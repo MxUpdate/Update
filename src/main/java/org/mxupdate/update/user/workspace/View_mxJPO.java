@@ -18,7 +18,7 @@ package org.mxupdate.update.user.workspace;
 import java.io.IOException;
 
 import org.mxupdate.update.user.AbstractUser_mxJPO;
-import org.mxupdate.update.util.AdminProperty_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
@@ -60,7 +60,7 @@ public class View_mxJPO
         super.write(_paramCache, _out);
 
         // methods
-        for (final AdminProperty_mxJPO prop : this.getProperties())  {
+        for (final AdminProperty prop : this.getProperties())  {
             if (prop.isSetting() && "%Member".equals(prop.getName()))  {
                 _out.append(" \\\n    ");
                 if ("4".equals(prop.getFlags()))  {

@@ -26,6 +26,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.util.PropertyDef;
+import org.mxupdate.test.data.util.PropertyDefList;
 import org.testng.Assert;
 
 /**
@@ -75,12 +76,8 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
      */
     private final Map<String,Object> requiredExportValues = new HashMap<String,Object>();
 
-    /**
-     * All properties for this data piece.
-     *
-     * @see #addProperty(PropertyDef)
-     */
-    private final Set<PropertyDef> properties = new HashSet<PropertyDef>();
+    /** All properties for this data piece. */
+    private final PropertyDefList properties = new PropertyDefList();
 
     /**
      * Constructor to initialize this data piece.
@@ -183,7 +180,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
      *
      * @return all defined properties
      */
-    public Set<PropertyDef> getProperties()
+    public PropertyDefList getProperties()
     {
         return this.properties;
     }
@@ -211,11 +208,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     public DATA createDependings()
         throws MatrixException
     {
-        for (final PropertyDef prop : this.properties)  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
+        this.properties.createDependings();
 
         return (DATA) this;
     }
@@ -305,20 +298,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
             }
         }
         // properties
-        for (final PropertyDef property : this.properties)  {
-            _cmd.append(" property \"").append(AbstractTest.convertMql(property.getName())).append("\"");
-            if (property.getTo() != null)  {
-                property.getTo().create();
-                _cmd.append(" to ").append(property.getTo().getCI().getMxType()).append(" \"")
-                    .append(AbstractTest.convertMql(property.getTo().getName())).append("\"");
-                if (property.getTo().getCI() == AbstractTest.CI.UI_TABLE)  {
-                    _cmd.append(" system");
-                }
-            }
-            if (property.getValue() != null)  {
-                _cmd.append(" value \"").append(AbstractTest.convertMql(property.getValue())).append("\"");
-            }
-        }
+        this.properties.append4Create(_cmd);
     }
 
     /**
@@ -332,7 +312,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         throws MatrixException
     {
         super.checkExport(_exportParser);
-        this.checkExportProperties(_exportParser);
+        this.properties.checkExportPropertiesAddFormat(_exportParser, this.getCI());
         Assert.assertEquals(_exportParser.getSymbolicName(), this.getSymbolicName(), "check symbolic name");
 
         // check for defined values
@@ -395,39 +375,6 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
 //                        main.contains("!hidden") || main.contains("!hidden \\"),
 //                        "check that " + this.getCI().getMxType() + " '" + this.getName() + "' is hidden");
             }
-        }
-    }
-
-    /**
-     * Checks that all properties within the export file are correct defined
-     * and equal to the defined properties of this CI file.
-     *
-     * @param _exportParser     parsed export
-     */
-    protected void checkExportProperties(final ExportParser _exportParser)
-    {
-        // only if this instance is a configuration item the check is done..
-        if (this.getCI() != null)  {
-            final Set<String> propDefs = new HashSet<String>();
-            for (final ExportParser.Line rootLine : _exportParser.getRootLines())  {
-                if (rootLine.getValue().startsWith("escape add property"))  {
-                    final StringBuilder propDef = new StringBuilder().append("mql ").append(rootLine.getValue());
-                    for (final ExportParser.Line childLine : rootLine.getChildren())  {
-                        propDef.append(' ').append(childLine.getTag()).append(' ')
-                               .append(childLine.getValue());
-                    }
-                    propDefs.add(propDef.toString());
-                }
-            }
-            for (final PropertyDef prop : this.properties)  {
-                final String propDefStr = prop.getCITCLString(this.getCI());
-                Assert.assertTrue(
-                        propDefs.contains(propDefStr),
-                        "check that property is defined in ci file (have " + propDefStr + ", but found " + propDefs + ")");
-                propDefs.remove(propDefStr);
-            }
-
-            Assert.assertEquals(propDefs.size(), 0, "check that not too much properties are defined (have " + propDefs + ")");
         }
     }
 

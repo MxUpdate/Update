@@ -18,6 +18,7 @@ package org.mxupdate.test.ci.datamodel;
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.data.datamodel.DimensionData;
 import org.mxupdate.test.data.datamodel.DimensionData.UnitData;
+import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -73,6 +74,44 @@ public class DimensionTest
                                         .setValueWithQuots("label", "\"\\\\ label")
                                         .setValueWOQuots("multiplier", "1.0")
                                         .setValueWOQuots("offset", "0.0"))},
+                new Object[]{
+                        "dimension with unit and defined unit property w/o value",
+                        new DimensionData(this, "test")
+                                .addUnit(new UnitData("unit")
+                                        .setValueWOQuots("default", "true")
+                                        .setValueWithQuots("label", "\"\\\\ label")
+                                        .setValueWOQuots("multiplier", "1.0")
+                                        .setValueWOQuots("offset", "0.0")
+                                        .addProperty(new PropertyDef("my test \"property\"")))},
+                new Object[]{
+                        "dimension with unit and defined unit property with value",
+                        new DimensionData(this, "test")
+                                .addUnit(new UnitData("unit")
+                                        .setValueWOQuots("default", "true")
+                                        .setValueWithQuots("label", "\"\\\\ label")
+                                        .setValueWOQuots("multiplier", "1.0")
+                                        .setValueWOQuots("offset", "0.0")
+                                        .addProperty(new PropertyDef("my test \"property\"", "my \"value\"")))},
+                new Object[]{
+                        "dimension with unit and defined unit property with referenced admin object",
+                        new DimensionData(this, "test")
+                                .addUnit(new UnitData("unit")
+                                        .setValueWOQuots("default", "true")
+                                        .setValueWithQuots("label", "\"\\\\ label")
+                                        .setValueWOQuots("multiplier", "1.0")
+                                        .setValueWOQuots("offset", "0.0")
+                                        .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewData("property \" admin dimension"))))},
+                new Object[]{
+                        "dimension with unit and defined multiple unit properties",
+                        new DimensionData(this, "test")
+                                .addUnit(new UnitData("unit")
+                                        .setValueWOQuots("default", "true")
+                                        .setValueWithQuots("label", "\"\\\\ label")
+                                        .setValueWOQuots("multiplier", "1.0")
+                                        .setValueWOQuots("offset", "0.0")
+                                        .addProperty(new PropertyDef("my test \"property\" 1"))
+                                        .addProperty(new PropertyDef("my test \"property\" 2", "my \"value\""))
+                                        .addProperty(new PropertyDef("my test \"property\" 3", "my \"value\"", this.createNewData("property \" admin dimension"))))},
                 new Object[]{
                         "dimension with unit (and multiplier 1.0E9)",
                         new DimensionData(this, "test")

@@ -18,13 +18,13 @@ package org.mxupdate.update.user.workspace;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Stack;
 import java.util.TreeSet;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.update.user.AbstractUser_mxJPO;
-import org.mxupdate.update.util.AdminProperty_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
@@ -51,50 +51,23 @@ abstract class AbstractWorkspaceObject_mxJPO
         AbstractWorkspaceObject_mxJPO.IGNORED_URLS.add("/visibleUserList");
     }
 
-    /**
-     * Related user of this workspace object.
-     */
+    /** Related user of this workspace object. */
     private final AbstractUser_mxJPO user;
 
-    /**
-     * MX administration type.
-     */
+    /** MX administration type. */
     private final String mxAdminType;
 
-    /**
-     * Name of the cue.
-     */
+    /** Name of the cue. */
     private String name;
 
-    /**
-     * Is the workspace object hidden?
-     */
+    /** Is the workspace object hidden? */
     private boolean hidden = false;
 
-    /**
-     * Specifies other existing users who can read the workspace item with
-     * MQL list, print  and evaluate commands.
-     */
+    /** Specifies other existing users who can read the workspace item with MQL list, print  and evaluate commands. */
     private final Set<String> visibleFor = new TreeSet<String>();
 
-    /**
-     * Stack of the properties used while parsing the XML definition of the
-     * workspace object. After the properties are parsed, they are stored
-     * in the properties map {@link #propertiesSet} from
-     * {@link #prepare(ParameterCache_mxJPO)}.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #prepare(ParameterCache_mxJPO)
-     */
-    private final Stack<AdminProperty_mxJPO> propertiesStack = new Stack<AdminProperty_mxJPO>();
-
-    /**
-     * Holds the sorted property values. The map is sorted and is set after
-     * parsing from {@link #prepare(ParameterCache_mxJPO)}.
-     *
-     * @see #prepare(ParameterCache_mxJPO)
-     */
-    private final Set<AdminProperty_mxJPO> propertiesSet = new TreeSet<AdminProperty_mxJPO>();
+    /** Admin Properties. */
+    private final AdminPropertyList_mxJPO properties = new AdminPropertyList_mxJPO();
 
     /**
      * Default constructor to initialize the
@@ -131,15 +104,13 @@ abstract class AbstractWorkspaceObject_mxJPO
     }
 
     /**
-     * Returns all defined {@link #propertiesSet properties} of this workspace
-     * object.
+     * Returns all defined {@link #properties} of this workspace object.
      *
      * @return defined properties
-     * @see #propertiesSet
      */
-    protected Set<AdminProperty_mxJPO> getProperties()
+    protected AdminPropertyList_mxJPO getProperties()
     {
-        return this.propertiesSet;
+        return this.properties;
     }
 
     /**
@@ -176,11 +147,8 @@ abstract class AbstractWorkspaceObject_mxJPO
             this.name = _content;
             parsed = true;
 
-        } else if ("/propertyList/property".equals(_url))  {
-            this.propertiesStack.add(new AdminProperty_mxJPO());
-            parsed = true;
-        } else if (_url.startsWith("/propertyList/property"))  {
-            parsed = this.propertiesStack.peek().parse(_paramCache, _url.substring(22), _content);
+        } else if (_url.startsWith("/propertyList"))  {
+            parsed = this.properties.parse(_paramCache, _url.substring(13), _content);
 
         } else if ("/visibleUserList/userRef".equals(_url))  {
             this.visibleFor.add(_content);
@@ -202,7 +170,7 @@ abstract class AbstractWorkspaceObject_mxJPO
     public void prepare(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
-        this.propertiesSet.addAll(this.propertiesStack);
+        this.properties.prepare();
     }
 
     /**
@@ -234,7 +202,7 @@ abstract class AbstractWorkspaceObject_mxJPO
         for (final String user : this.visibleFor)  {
             _out.append(" \\\n    visible \"").append(StringUtil_mxJPO.convertTcl(user)).append("\"");
         }
-        for (final AdminProperty_mxJPO prop : this.propertiesSet)  {
+        for (final AdminProperty prop : this.properties)  {
             if (!prop.isSetting())  {
                 _out.append(" \\\n    property \"").append(StringUtil_mxJPO.convertTcl(prop.getName())).append("\"");
                 if ((prop.getRefAdminName() != null) && (prop.getRefAdminType() != null))  {

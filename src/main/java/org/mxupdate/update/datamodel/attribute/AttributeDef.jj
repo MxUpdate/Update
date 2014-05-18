@@ -31,6 +31,7 @@ import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO;
 import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO.Range;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 public class AttributeDefParser
@@ -77,6 +78,9 @@ TOKEN : /** first level */
     | <RANGE_PROGRAM:           "range" ([" ","\t","\n","\r"])+ "program">  : STRING_EXPECTED
     | <RANGE_BETWEEN:           "range" ([" ","\t","\n","\r"])+ "between">  : BETW1_EXPECTED
     | <INPUT:                   "input">                                    : STRING_EXPECTED
+    | <PROPERTY:                "property">                                 : STRING_EXPECTED
+    | <PROPERTYTO:              "to">                                       : ADMINREF_EXPECTED
+    | <PROPERTYVAL:             "value">                                    : STRING_EXPECTED
 }
 
 /***************************************************** String for Description */
@@ -170,6 +174,21 @@ TOKEN : /** first level */
       <BETW4_INCLUSIVE: "inclusive"> : DEFAULT
     | <BETW4_EXCLUSIVE: "exclusive"> : DEFAULT
 }
+
+/******************************************** Two Strings for Unit Definition */
+<ADMINREF_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<ADMINREF_EXPECTED> TOKEN :
+{
+      <ADMINTYPE_STRING : (<ADMINTYPE_APOSTROPHE>(<ADMINTYPE_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<ADMINTYPE_APOSTROPHE>)> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE : (<ADMINTYPE_CHAR>)+> : STRING_EXPECTED
+    | <#ADMINTYPE_APOSTROPHE : "\"" >
+    | <#ADMINTYPE_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
 /**
  * Parses one complete policy definition.
  *
@@ -187,6 +206,7 @@ AbstractAttribute_mxJPO attribute(final ParameterCache_mxJPO _paramCache,
     Token tmp;
     Trigger trigger;
     Range range;
+    AdminProperty property;
 } {
     (   (<DESCRIPTION>              ( tmp = <STRING>           {this.setValue(attr, "description", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(attr, "description", this.getSingle(tmp.image));} ) )
@@ -252,6 +272,15 @@ AbstractAttribute_mxJPO attribute(final ParameterCache_mxJPO _paramCache,
                                     | tmp = <BETW3_SINGLE>     {this.setValue(range, "value2", this.getSingle(tmp.image));} )
                                     ( <BETW4_INCLUSIVE>        {this.setValue(range, "include2", true);}
                                     | <BETW4_EXCLUSIVE>        {this.setValue(range, "include2", false);} ) )
+      | (<PROPERTY>                                            {property = new AdminProperty();this.appendValue(this.getValue(attr, "properties"), "propertiesStack", property);}
+                                    ( tmp = <STRING>           {this.setValue(property, "name", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(property, "name", this.getSingle(tmp.image));} )
+              (   ( <PROPERTYVAL>   ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING> {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <ADMINTYPE_SINGLE> {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                    ( tmp = <STRING>           {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
     )*
     {
         this.prepareObject(_paramCache, attr);

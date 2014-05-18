@@ -34,7 +34,7 @@ import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO;
 import org.mxupdate.update.datamodel.policy.PolicyDefParser_mxJPO;
-import org.mxupdate.update.util.AdminProperty_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -273,12 +273,12 @@ public class Policy_mxJPO
             state.prepare();
         }
         super.prepare(_paramCache);
-        for (final AdminProperty_mxJPO property : new HashSet<AdminProperty_mxJPO>(this.getPropertiesMap().values()))  {
+        for (final AdminProperty property : new HashSet<AdminProperty>(this.getProperties()))  {
             if ((property.getName() != null) && property.getName().startsWith("state_"))  {
                 for (final State state : this.states)  {
                     if (state.name.equals(property.getValue()))  {
                         state.symbolicNames.add(property.getName());
-                        this.getPropertiesMap().remove(property.getName());
+                        this.getProperties().remove(property);
                     }
                 }
             }
@@ -363,7 +363,8 @@ public class Policy_mxJPO
             state.writeObject(_paramCache, _out);
         }
         _out.append("\n}");
-        this.writeProperties(_paramCache, _out);
+
+        this.getProperties().writeAddFormat(_paramCache, _out, this.getTypeDef());
     }
 
     /**
@@ -396,7 +397,7 @@ public class Policy_mxJPO
 
     /**
      * The method overwrites the original method to add the TCL procedure
-     * {@link #TCL_PROCEDURE} so that the dimension could be updated with
+     * {@link #TCL_PROCEDURE} so that the policy could be updated with
      * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)}.
      *
      * @param _paramCache       parameter cache
