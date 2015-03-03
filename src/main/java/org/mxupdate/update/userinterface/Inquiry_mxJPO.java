@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.util.AdminProperty_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
@@ -154,7 +154,7 @@ public class Inquiry_mxJPO
         _out.append(" \\\n    pattern \"").append(StringUtil_mxJPO.convertTcl(this.pattern)).append("\"")
             .append(" \\\n    format \"").append(StringUtil_mxJPO.convertTcl(this.format)).append("\"")
             .append(" \\\n    file [file join \"${FILE}\"]");
-        for (final AdminProperty_mxJPO prop : this.getPropertiesMap().values())  {
+        for (final AdminProperty prop : this.getProperties())  {
             if (prop.isSetting())  {
                 _out.append(" \\\n    add argument \"")
                     .append(StringUtil_mxJPO.convertTcl(prop.getName().substring(1))).append("\"")
@@ -231,10 +231,9 @@ public class Inquiry_mxJPO
                 .append(" !hidden description \"\" pattern \"\" format \"\" code \"\"");
 
         // reset arguments
-        for (final AdminProperty_mxJPO prop : this.getPropertiesMap().values())  {
+        for (final AdminProperty prop : this.getProperties())  {
             if (prop.isSetting())  {
-                preMQLCode.append(" remove argument \"")
-                          .append(StringUtil_mxJPO.convertMql(prop.getName().substring(1))).append('\"');
+                preMQLCode.append(" remove argument \"").append(StringUtil_mxJPO.convertMql(prop.getName().substring(1))).append('\"');
             }
         }
 

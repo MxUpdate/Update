@@ -260,6 +260,7 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
                               "description",
                               "description",
                               "\"" + AbstractTest.convertTcl((this.description != null) ? this.description : "") + "\"");
+        // check for defined values
         for (final Map.Entry<String,Object> entry : this.getValues().entrySet())  {
             this.checkSingleValue(_exportParser,
                                   entry.getKey(),

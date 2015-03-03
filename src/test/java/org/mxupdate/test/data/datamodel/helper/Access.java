@@ -54,8 +54,12 @@ public class Access
     private String reserve;
     /** Maturity. */
     private String maturity;
+    /** Category. */
+    private String category;
     /** Related filter expression. */
     private String filter;
+    /** Related local filter expression. */
+    private String localfilter;
 
     /**
      * Create depending users.
@@ -143,6 +147,18 @@ public class Access
     }
 
     /**
+     * Defines the {@link #localfilter}.
+     *
+     * @param _localfilter      new local filter
+     * @return this instance
+     */
+    public Access setLocalFilter(final String _localfilter)
+    {
+        this.localfilter = _localfilter;
+        return this;
+    }
+
+    /**
      * Defines the {@link #organization}.
      *
      * @param _organization     organization
@@ -151,6 +167,18 @@ public class Access
     public Access setOrganization(final String _organization)
     {
         this.organization = _organization;
+        return this;
+    }
+
+    /**
+     * Defines the {@link #project}.
+     *
+     * @param _project      project
+     * @return this instance
+     */
+    public Access setProject(final String _project)
+    {
+        this.project = _project;
         return this;
     }
 
@@ -191,14 +219,14 @@ public class Access
     }
 
     /**
-     * Defines the {@link #project}.
+     * Defines the {@link #category}.
      *
-     * @param _project      project
+     * @param _maturity     maturity
      * @return this instance
      */
-    public Access setProject(final String _project)
+    public Access setCategory(final String _category)
     {
-        this.project = _project;
+        this.category = _category;
         return this;
     }
 
@@ -242,8 +270,14 @@ public class Access
         if (this.maturity != null)  {
             _cmd.append(' ').append(this.maturity).append(" maturity");
         }
+        if (this.category != null)  {
+            _cmd.append(' ').append(this.category).append(" category");
+        }
         if (this.filter != null)  {
             _cmd.append(" filter \"").append(StringUtil_mxJPO.convertTcl(this.filter)).append('\"');
+        }
+        if (this.localfilter != null)  {
+            _cmd.append(" localfilter \"").append(StringUtil_mxJPO.convertTcl(this.localfilter)).append('\"');
         }
 
         _cmd.append('\n');
@@ -289,8 +323,14 @@ public class Access
         if (this.maturity != null)  {
             ret.append(this.maturity).append(" maturity ");
         }
+        if (this.category != null)  {
+            ret.append(this.category).append(" category ");
+        }
         if (this.filter != null)  {
             ret.append("filter \"").append(AbstractTest.convertTcl(this.filter)).append("\" ");
+        }
+        if (this.localfilter != null)  {
+            ret.append("localfilter \"").append(AbstractTest.convertTcl(this.localfilter)).append("\" ");
         }
         return ret.toString();
     }

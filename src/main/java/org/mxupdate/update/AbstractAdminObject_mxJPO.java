@@ -26,14 +26,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.util.AdminProperty_mxJPO;
+import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -94,39 +95,14 @@ public abstract class AbstractAdminObject_mxJPO
         AbstractAdminObject_mxJPO.IGNORED_URLS.add("/adminProperties/historyList/history/string");
     }
 
-    /**
-     * Is the MX object hidden?
-     *
-     * @see #isHidden()
-     */
+    /** Is the MX object hidden? */
     private boolean hidden = false;
 
-    /**
-     * Stack of the properties used while parsing the XML definition of the
-     * administration object. After the properties are parsed, they are stored
-     * in the properties map {@link #propertiesMap} from
-     * {@link #prepare(ParameterCache_mxJPO)}.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #prepare(ParameterCache_mxJPO)
-     */
-    private final Stack<AdminProperty_mxJPO> propertiesStack = new Stack<AdminProperty_mxJPO>();
-
-    /**
-     * Holds the property values depending on the property name. The map is
-     * sorted and is set after parsing from
-     * {@link #prepare(ParameterCache_mxJPO)}.
-     *
-     * @see #prepare(ParameterCache_mxJPO)
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     */
-    private final Map<String,AdminProperty_mxJPO> propertiesMap = new TreeMap<String,AdminProperty_mxJPO>();
-
-    /**
-     * All current defined symbolic names for MX administration objects are
-     * stored.
-     */
+    /** All current defined symbolic names for MX administration objects are stored. */
     private final Set<String> symbolicNames = new TreeSet<String>();
+
+    /** List of all properties. */
+    private final AdminPropertyList_mxJPO properties = new AdminPropertyList_mxJPO();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -372,11 +348,8 @@ public abstract class AbstractAdminObject_mxJPO
             this.hidden = true;
             parsed = true;
 
-        } else if ("/adminProperties/propertyList/property".equals(_url))  {
-            this.propertiesStack.add(new AdminProperty_mxJPO());
-            parsed = true;
-        } else if (_url.startsWith("/adminProperties/propertyList/property"))  {
-            parsed = this.propertiesStack.peek().parse(_paramCache, _url.substring(38), _content);
+        } else if (_url.startsWith("/adminProperties/propertyList"))  {
+            parsed = this.properties.parse(_paramCache, _url.substring(29), _content);
         } else  {
             parsed = false;
         }
@@ -389,51 +362,54 @@ public abstract class AbstractAdminObject_mxJPO
      *
      * @param _paramCache   parameter cache
      * @throws MatrixException if the symbolic names could not be extracted
-     * @see #propertiesStack
-     * @see #propertiesMap
      */
     protected void prepare(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
         // sort the properties
-        for (final AdminProperty_mxJPO property : this.propertiesStack)  {
-            final StringBuilder key = new StringBuilder().append(property.getName());
-            if ((property.getRefAdminName() != null) && (property.getRefAdminType() != null))  {
-                key.append("::").append(property.getRefAdminType())
-                   .append("::").append(property.getRefAdminName());
+        this.properties.prepare();
+
+        // fetch all required properties
+        AdminProperty author = null, appl = null, installationDate = null, installer = null, origName = null, version = null;
+        for (final AdminProperty prop : this.properties)  {
+            if ((prop.getRefAdminName() == null) && (prop.getRefAdminType() == null))  {
+                if (PropertyDef_mxJPO.AUTHOR.equals(prop.getName()))  {
+                    author = prop;
+                } else if (PropertyDef_mxJPO.APPLICATION.equals(prop.getName()))  {
+                    appl = prop;
+                } else if (PropertyDef_mxJPO.INSTALLEDDATE.equals(prop.getName()))  {
+                    installationDate = prop;
+                } else if (PropertyDef_mxJPO.INSTALLER.equals(prop.getName()))  {
+                    installer = prop;
+                } else if (PropertyDef_mxJPO.ORIGINALNAME.equals(prop.getName()))  {
+                    origName = prop;
+                } else if (PropertyDef_mxJPO.VERSION.equals(prop.getName()))  {
+                    version = prop;
+                }
             }
-            this.propertiesMap.put(key.toString(), property);
         }
+
         // set author depending on the properties
-        final AdminProperty_mxJPO author = this.propertiesMap.get(PropertyDef_mxJPO.AUTHOR.getPropName(_paramCache));
         if (author != null)  {
             this.setAuthor(author.getValue());
         }
         // set application depending on the properties
-        final AdminProperty_mxJPO appl = this.propertiesMap.get(PropertyDef_mxJPO.APPLICATION.getPropName(_paramCache));
         if (appl != null)  {
             this.setApplication(appl.getValue());
         }
         // sets the installation date depending on the properties
-        final AdminProperty_mxJPO installationDate
-                = this.propertiesMap.get(PropertyDef_mxJPO.INSTALLEDDATE.getPropName(_paramCache));
         if (installationDate != null)  {
             this.setInstallationDate(installationDate.getValue());
         }
         // sets the installer depending on the properties
-        final AdminProperty_mxJPO installer
-                = this.propertiesMap.get(PropertyDef_mxJPO.INSTALLER.getPropName(_paramCache));
         if (installer != null)  {
             this.setInstaller(installer.getValue());
         }
         // sets the original name depending on the properties
-        final AdminProperty_mxJPO origName
-                = this.propertiesMap.get(PropertyDef_mxJPO.ORIGINALNAME.getPropName(_paramCache));
         if (origName != null)  {
             this.setOriginalName(origName.getValue());
         }
         // sets the version depending on the properties
-        final AdminProperty_mxJPO version = this.propertiesMap.get(PropertyDef_mxJPO.VERSION.getPropName(_paramCache));
         if (version != null)  {
             this.setVersion(version.getValue());
         }
@@ -461,7 +437,7 @@ public abstract class AbstractAdminObject_mxJPO
         }
         _out.append(" \\\n    description \"").append(StringUtil_mxJPO.convertTcl(this.getDescription())).append("\"");
         this.writeObject(_paramCache, _out);
-        this.writeProperties(_paramCache, _out);
+        this.getProperties().writeAddFormat(_paramCache, _out, this.getTypeDef());
         this.writeEnd(_paramCache, _out);
     }
 
@@ -489,42 +465,6 @@ public abstract class AbstractAdminObject_mxJPO
                             final Appendable _out)
         throws IOException
     {
-    }
-
-    /**
-     * Writes the MQL code to add all none standard
-     * {@link #propertiesMap properties} to the TCL update file.
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the write to the TCL update file failed
-     */
-    protected void writeProperties(final ParameterCache_mxJPO _paramCache,
-                                   final Appendable _out)
-        throws IOException
-    {
-        for (final AdminProperty_mxJPO prop : this.propertiesMap.values())  {
-            if ((PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null) && !prop.isSetting())  {
-                _out.append("\nmql escape add property \"").append(StringUtil_mxJPO.convertTcl(prop.getName())).append("\"")
-                    .append(" \\\n    on ")
-                    .append(this.getTypeDef().getMxAdminName())
-                    .append(" \"${NAME}\"");
-                if (!"".equals(this.getTypeDef().getMxAdminSuffix()))  {
-                    _out.append(' ').append(this.getTypeDef().getMxAdminSuffix());
-                }
-                if (((prop.getRefAdminName()) != null) && (prop.getRefAdminType() != null))  {
-                    _out.append("  \\\n    to ").append(prop.getRefAdminType())
-                        .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getRefAdminName())).append("\"");
-                    // if target is a table, a system is required!
-                    if ("table".equals(prop.getRefAdminType()))  {
-                        _out.append(" system");
-                    }
-                }
-                if (prop.getValue() != null)  {
-                    _out.append(" \\\n    value \"").append(StringUtil_mxJPO.convertTcl(prop.getValue())).append("\"");
-                }
-            }
-        }
     }
 
     /**
@@ -604,29 +544,33 @@ public abstract class AbstractAdminObject_mxJPO
                           final File _sourceFile)
         throws Exception
     {
-        // remove all properties
         final StringBuilder preMQLCode = new StringBuilder();
-        for (final AdminProperty_mxJPO prop : this.propertiesMap.values())  {
-            // % must be ignored because this means settings
-            if ((PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null) && !prop.isSetting())  {
-                // must be done via modify because of properties without names
-                preMQLCode.append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                          .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
-                          .append(this.getTypeDef().getMxAdminSuffix())
-                          .append(" remove property \"");
-                if (prop.getName() != null)  {
-                    preMQLCode.append(StringUtil_mxJPO.convertMql(prop.getName()));
-                }
-                preMQLCode.append('\"');
-                if ((prop.getRefAdminName() != null) && (prop.getRefAdminType() != null))  {
-                    preMQLCode.append(" to ").append(prop.getRefAdminType())
-                              .append(" \"").append(StringUtil_mxJPO.convertMql(prop.getRefAdminName())).append('\"');
-                    // if target is a table, a system is required!
-                    if ("table".equals(prop.getRefAdminType()))  {
-                        preMQLCode.append(" system");
+
+        // remove all properties
+        // (only if not attribute, because attributes uses calulated deltas)
+        if (!(this instanceof AbstractAttribute_mxJPO))  {
+            for (final AdminProperty prop : this.properties)  {
+                // % must be ignored because this means settings
+                if ((PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null) && !prop.isSetting())  {
+                    // must be done via modify because of properties without names
+                    preMQLCode.append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                              .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
+                              .append(this.getTypeDef().getMxAdminSuffix())
+                              .append(" remove property \"");
+                    if (prop.getName() != null)  {
+                        preMQLCode.append(StringUtil_mxJPO.convertMql(prop.getName()));
                     }
+                    preMQLCode.append('\"');
+                    if ((prop.getRefAdminName() != null) && (prop.getRefAdminType() != null))  {
+                        preMQLCode.append(" to ").append(prop.getRefAdminType())
+                                  .append(" \"").append(StringUtil_mxJPO.convertMql(prop.getRefAdminName())).append('\"');
+                        // if target is a table, a system is required!
+                        if ("table".equals(prop.getRefAdminType()))  {
+                            preMQLCode.append(" system");
+                        }
+                    }
+                    preMQLCode.append(";\n");
                 }
-                preMQLCode.append(";\n");
             }
         }
 
@@ -726,13 +670,13 @@ public abstract class AbstractAdminObject_mxJPO
     }
 
     /**
-     * Getter method for instance variable {@link #propertiesMap}.
+     * Getter method for instance variable {@link #properties}.
      *
-     * @return value of instance variable {@link #propertiesMap}.
+     * @return value of instance variable {@link #properties}.
      */
-    protected Map<String,AdminProperty_mxJPO>  getPropertiesMap()
+    protected AdminPropertyList_mxJPO getProperties()
     {
-        return this.propertiesMap;
+        return this.properties;
     }
 
     /**

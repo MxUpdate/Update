@@ -17,7 +17,15 @@
 
 package org.mxupdate.test.ci.datamodel;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.mxupdate.test.data.datamodel.AttributeRealData;
+import org.mxupdate.test.data.datamodel.DimensionData;
+import org.mxupdate.test.data.datamodel.DimensionData.UnitData;
+import org.mxupdate.test.util.IssueLink;
+import org.mxupdate.test.util.Version;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -50,6 +58,81 @@ public class AttributeRealTest
     @DataProvider(name = "data")
     public Object[][] getAttributes()
     {
-        return this.prepareData("real attribute", "1.234567", "9.876543");
+        final List<Object[]> ret = new ArrayList<Object[]>();
+
+        // range value flag
+        ret.add(new Object[]{
+                "real attribute with defined rangevalue flag 'true'",
+                this.createNewData("hello")
+                        .setFlag("rangevalue", true)
+                        .notSupported(Version.V6R2011x)});
+        ret.add(new Object[]{
+                "real attribute with defined rangevalue flag 'false'",
+                this.createNewData("hello")
+                        .setFlag("rangevalue", false)
+                        .notSupported(Version.V6R2011x)});
+        ret.add(new Object[]{
+                "real attribute with no defined rangevalue flag 'false' (to check default value)",
+                this.createNewData("hello"),
+                this.createNewData("hello")
+                        .setFlag("rangevalue", false)
+                        .notSupported(Version.V6R2011x)});
+
+        // dimension
+        ret.add(new Object[]{
+                "real attribute with defined rangevalue flag 'true'",
+                this.createNewData("hello")
+                        .setDimension(new DimensionData(this, "Test Dimension")
+                                .addUnit(new UnitData("unit")
+                                        .setValueWOQuots("default", "true")
+                                        .setValueWithQuots("description", "\"\\\\ hello")
+                                        .setValueWithQuots("label", "\"\\\\ label")
+                                        .setValueWOQuots("multiplier", "1.0")
+                                        .setValueWOQuots("offset", "0.0")))});
+
+        return this.prepareData("real attribute", "1.234567", "9.876543", ret.toArray(new Object[ret.size()][]));
+    }
+
+    /**
+     * Negative test that update failed for modified range value flag.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("192")
+    @Test(description = "issue #192: negative test that update failed for modified range value flag")
+    public void negativeTestUpdateRangeValueFlag()
+        throws Exception
+    {
+        new AttributeRealData(this, "test")
+                .setFlag("rangevalue", true)
+                .create()
+                .update()
+                .checkExport()
+                .setFlag("rangevalue", false)
+                .failureUpdate(UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_RANGEVALUEFLAG_UPDATED);
+    }
+
+    /**
+     * Negative test that update failed for modified dimension.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "negative test that update failed for modified dimension")
+    public void negativeTestUpdateDelimiter()
+        throws Exception
+    {
+        new AttributeRealData(this, "test")
+                .setDimension(new DimensionData(this, "Test Dimension")
+                        .addUnit(new UnitData("unit")
+                                .setValueWOQuots("default", "true")
+                                .setValueWithQuots("description", "\"\\\\ hello")
+                                .setValueWithQuots("label", "\"\\\\ label")
+                                .setValueWOQuots("multiplier", "1.0")
+                                .setValueWOQuots("offset", "0.0")))
+                .create()
+                .update()
+                .checkExport()
+                .setDimension((DimensionData) null)
+                .failureUpdate(UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_DIMENSION_UPDATED);
     }
 }

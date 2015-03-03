@@ -18,17 +18,15 @@
 package org.mxupdate.update.datamodel;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Stack;
-import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Set;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
@@ -40,19 +38,14 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 public abstract class AbstractDMWithTriggers_mxJPO
     extends AbstractAdminObject_mxJPO
 {
-    /**
-     * Stack with all triggers for this type.
-     */
-    private final Stack<Trigger> triggersStack = new Stack<Trigger>();
+    /** Set of all ignored URLs from the XML definition for policies. */
+    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    static  {
+        AbstractDMWithTriggers_mxJPO.IGNORED_URLS.add("/triggerList");
+    }
 
-    /**
-     * Map with all triggers for this type. The key is the name of the trigger.
-     *
-     * @see #prepare(ParameterCache_mxJPO)
-     * @see #triggersStack              stack with trigger from parsing method
-     * @see #writeTriggers(Appendable)
-     */
-    private final Map<String,Trigger> triggers = new TreeMap<String,Trigger>();
+    /** Map with all triggers. The key is the name of the trigger. */
+    private final TriggerList_mxJPO triggers = new TriggerList_mxJPO();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -64,6 +57,16 @@ public abstract class AbstractDMWithTriggers_mxJPO
                                         final String _mxName)
     {
         super(_typeDef, _mxName);
+    }
+
+    /**
+     * Returns all defined {@link #triggers} sorted.
+     *
+     * @return all defined triggers
+     */
+    protected TriggerList_mxJPO getTriggers()
+    {
+        return this.triggers;
     }
 
     /**
@@ -79,20 +82,10 @@ public abstract class AbstractDMWithTriggers_mxJPO
                             final String _content)
     {
         final boolean parsed;
-        if ("/triggerList".equals(_url))  {
+        if (AbstractDMWithTriggers_mxJPO.IGNORED_URLS.contains(_url))  {
             parsed = true;
-        } else if ("/triggerList/trigger".equals(_url))  {
-            this.triggersStack.add(new Trigger());
-            parsed = true;
-        } else if ("/triggerList/trigger/triggerName".equals(_url))  {
-            this.triggersStack.peek().name = _content;
-            parsed = true;
-        } else if ("/triggerList/trigger/programRef".equals(_url))  {
-            this.triggersStack.peek().program = _content;
-            parsed = true;
-        } else if ("/triggerList/trigger/inputArguments".equals(_url))  {
-            this.triggersStack.peek().arguments = _content;
-            parsed = true;
+        } else if (_url.startsWith("/triggerList"))  {
+            parsed = this.triggers.parse(_paramCache, _url.substring(12), _content);
         } else  {
             parsed = super.parse(_paramCache, _url, _content);
         }
@@ -111,27 +104,9 @@ public abstract class AbstractDMWithTriggers_mxJPO
         throws MatrixException
     {
         // sort all triggers
-        for (final Trigger trigger : this.triggersStack)  {
-            this.triggers.put(trigger.name, trigger);
-        }
+        this.triggers.prepare();
 
         super.prepare(_paramCache);
-    }
-
-    /**
-     * Writes the trigger information to the writer instance.
-     *
-     * @param _out      writer instance
-     * @throws IOException if write failed
-     * @see #triggers
-     */
-    protected void writeTriggers(final Appendable _out)
-        throws IOException
-    {
-        // output of triggers, but sorted!
-        for (final Trigger trigger : this.triggers.values())  {
-            trigger.write(_out);
-        }
     }
 
     /**
@@ -168,9 +143,9 @@ public abstract class AbstractDMWithTriggers_mxJPO
             preMQLCode.append("escape mod ").append(this.getTypeDef().getMxAdminName())
                       .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
                       .append(this.getTypeDef().getMxAdminSuffix());
-            for (final Trigger trigger : this.triggers.values())  {
-                trigger.appendResetMQLStatement(preMQLCode);
-            }
+
+            this.triggers.appendResetMQLStatement(preMQLCode);
+
             preMQLCode.append(";\n");
         }
 
@@ -178,98 +153,5 @@ public abstract class AbstractDMWithTriggers_mxJPO
         preMQLCode.append(_preMQLCode);
 
         super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
-    }
-
-    /**
-     * Class used to store informations about triggers.
-     */
-    public static class Trigger
-    {
-        /**
-         * Used to parse the event type of the trigger from the {@link #name}.
-         *
-         * @see #getEventType()
-         */
-        private static final Pattern PATTERN_EVENTTYPE = Pattern.compile("^.*(?=((action)|(check)|(override))$)");
-
-        /**
-         * Used to parse the event kind (&quot;Action&quot;, &quot;Check&quot;
-         * or &quot;Override&quot;).
-         *
-         * @see #getKind()
-         */
-        private static final Pattern PATTERN_KIND = Pattern.compile("((action)|(check)|(override))$");
-
-        /**
-         * Name of the trigger (like ChangeVaultAction etc...).
-         */
-        String name;
-
-        /**
-         * Name of the referenced program.
-         */
-        String program;
-
-        /**
-         * Arguments of the called program.
-         */
-        String arguments = "";
-
-        /**
-         * Evaluates from the {@link #name} the related event type of the
-         * trigger.
-         *
-         * @return event type of the trigger  (always in lower case)
-         * @see #name
-         * @see #PATTERN_EVENTTYPE
-         */
-        protected String getEventType()
-        {
-            final Matcher matchEventType
-                    = AbstractDMWithTriggers_mxJPO.Trigger.PATTERN_EVENTTYPE.matcher(this.name.toLowerCase());
-            matchEventType.find();
-            return matchEventType.group();
-        }
-
-        /**
-         * Evaluates from the {@link #name} the related king of the trigger.
-         *
-         * @return kind of the trigger (always in lower case)
-         * @see #name
-         * @see #PATTERN_KIND
-         */
-        protected String getKind()
-        {
-            final Matcher matchKind
-                    = AbstractDMWithTriggers_mxJPO.Trigger.PATTERN_KIND.matcher(this.name.toLowerCase());
-            matchKind.find();
-            return matchKind.group();
-        }
-
-        /**
-         * Writes this trigger TCL source code. The trigger event type and kind
-         * is parsed by using regular expression {@link #PATTERN_EVENTTYPE} and
-         * {@link #PATTERN_KIND} to extract the event type and kind.
-         *
-         * @param _out  writer instance
-         * @throws IOException if write failed
-         */
-        protected void write(final Appendable _out)
-                throws IOException
-        {
-            _out.append(" \\\n    add trigger ").append(this.getEventType()).append(' ').append(this.getKind())
-                .append(" \"").append(StringUtil_mxJPO.convertTcl(this.program)).append("\"")
-                .append(" input \"").append(StringUtil_mxJPO.convertTcl(this.arguments)).append("\"");
-        }
-
-        /**
-         * Appends the MQL statement to remove all triggers.
-         *
-         * @param _cmd          string builder with current MQL statement
-         */
-        protected void appendResetMQLStatement(final StringBuilder _cmd)
-        {
-            _cmd.append(" remove trigger ").append(this.getEventType()).append(' ').append(this.getKind());
-        }
     }
 }

@@ -27,24 +27,9 @@ import org.mxupdate.test.data.AbstractAdminData;
  */
 public class PropertyDef
 {
-    /**
-     * Name of this property.
-     *
-     * @see #PropertyDef(String)
-     * @see #PropertyDef(String, AbstractAdminData)
-     * @see #PropertyDef(String, String)
-     * @see #PropertyDef(String, String, AbstractAdminData)
-     * @see #getName()
-     */
+    /** Name of this property. */
     private final String name;
-
-    /**
-     * Value of the property.
-     *
-     * @see #PropertyDef(String, String)
-     * @see #PropertyDef(String, String, AbstractAdminData)
-     * @see #getValue()
-     */
+    /** Value of the property. */
     private final String value;
 
     /**
@@ -155,9 +140,9 @@ public class PropertyDef
     public String getCITCLString(final AbstractTest.CI _ci)
     {
         final StringBuilder propDef = new StringBuilder()
-        .append("mql escape add property \"").append(AbstractTest.convertTcl(this.name))
-        .append("\" on ").append(_ci.getMxType())
-        .append(" \"${NAME}\"");
+            .append("mql escape add property \"").append(AbstractTest.convertTcl(this.name))
+            .append("\" on ").append(_ci.getMxType())
+            .append(" \"${NAME}\"");
         if (_ci == AbstractTest.CI.UI_TABLE)  {
             propDef.append(" system");
         }
@@ -167,6 +152,25 @@ public class PropertyDef
             if (this.to.getCI() == AbstractTest.CI.UI_TABLE)  {
                 propDef.append(" system");
             }
+        }
+        if (this.value != null)  {
+            propDef.append(" value \"").append(AbstractTest.convertTcl(this.value)).append('\"');
+        }
+        return propDef.toString();
+    }
+
+    /**
+     * Returns the CI string in update format.
+     *
+     * @return CI string in update format
+     */
+    String getCIUpdateFormat()
+    {
+        final StringBuilder propDef = new StringBuilder()
+                .append('\"').append(AbstractTest.convertTcl(this.name)).append('\"');
+        if (this.to != null)  {
+            propDef.append(" to ").append(this.to.getCI().getMxType())
+                   .append(" \"").append(AbstractTest.convertTcl(this.to.getName())).append('\"');
         }
         if (this.value != null)  {
             propDef.append(" value \"").append(AbstractTest.convertTcl(this.value)).append('\"');

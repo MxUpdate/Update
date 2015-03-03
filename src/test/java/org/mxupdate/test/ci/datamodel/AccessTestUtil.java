@@ -51,9 +51,8 @@ public final class AccessTestUtil
                         || ("owner".equals(kind)  && !"login".equals(prefix))
                         || ("public".equals(kind) && !"login".equals(prefix))
                         || ("user".equals(kind)   && (prefix == null)))  {
-
                     final String txt = ((prefix != null) ? prefix + " ": "") + kind;
-                    ret.add(new Object[]{
+                    /*ret.add(new Object[]{
                             _test.getDescriptionPrefix() + " access for " + txt + " read/show",
                             _test.createTestData4Access(
                                                 new Access()
@@ -80,7 +79,7 @@ public final class AccessTestUtil
                                                 new Access()
                                                         .setKind("user")
                                                         .setUser(new PersonAdminData(test, "guest"))
-                                                        .addAccess("read", "show"))});
+                                                        .addAccess("read", "show"))});*/
                     ret.add(new Object[]{
                             _test.getDescriptionPrefix() + " access for " + txt + " read/show with filter expression",
                             _test.createTestData4Access(
@@ -90,6 +89,16 @@ public final class AccessTestUtil
                                                         .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
                                                         .addAccess("read", "show")
                                                         .setFilter("current==\"hello\""))});
+                    ret.add(new Object[]{
+                            _test.getDescriptionPrefix() + " access for " + txt + " read/show with local filter expression",
+                            _test.createTestData4Access(
+                                                new Access()
+                                                        .setPrefix(prefix)
+                                                        .setKind(kind)
+                                                        .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
+                                                        .addAccess("read", "show")
+                                                        .setLocalFilter("current==\"hello\""))
+                                        .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)});
                     ret.add(new Object[]{
                             _test.getDescriptionPrefix() + " access for " + txt + " all for key",
                             _test.createTestData4Access(
@@ -280,25 +289,61 @@ public final class AccessTestUtil
                                                         .setMaturity(maturity))
                                         .notSupported(Version.V6R2011x)});
                     }
+                    // user item 'category'
+                    ret.add(new Object[]{
+                            _test.getDescriptionPrefix() + " access for " + txt + " for any category",
+                            _test.createTestData4Access(
+                                            new Access()
+                                                    .setPrefix(prefix)
+                                                    .setKind(kind)
+                                                    .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
+                                                    .addAccess("read", "show")
+                                                    .setCategory("any"))
+                                    .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x),
+                            _test.createTestData4Access(
+                                            new Access()
+                                                    .setPrefix(prefix)
+                                                    .setKind(kind)
+                                                    .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
+                                                    .addAccess("read", "show"))});
+                    for (final String category : new String[]{"oem", "goldpartner", "partner", "supplier", "customer", "contractor"})  {
+                        ret.add(new Object[]{
+                                _test.getDescriptionPrefix() + " access for " + txt + " for " + category + " category",
+                                _test.createTestData4Access(
+                                                new Access()
+                                                        .setPrefix(prefix)
+                                                        .setKind(kind)
+                                                        .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
+                                                        .addAccess("read", "show")
+                                                        .setCategory(category))
+                                        .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)});
+                    }
                     // user items with combination of all
-                    for (final String org : new String[]{"single", "ancestor", "descendant", "related"})  {
-                        for (final String project : new String[]{"single", "ancestor", "descendant", "related"})  {
-                            for (final String reserve : new String[]{"no", "context", "inclusive"})  {
-                                for (final String maturity : new String[]{"no", "public", "protected", "private", "notprivate", "ppp"})  {
-                                    ret.add(new Object[]{
-                                            _test.getDescriptionPrefix() + " access for " + txt + " for " + org + " organization, " + project + " project, context owner, " + reserve + " reserve and " + maturity + " maturity",
-                                            _test.createTestData4Access(
-                                                            new Access()
-                                                                    .setPrefix(prefix)
-                                                                    .setKind(kind)
-                                                                    .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
-                                                                    .addAccess("read", "show")
-                                                                    .setOrganization(org)
-                                                                    .setProject(project)
-                                                                    .setOwner("context")
-                                                                    .setReserve(reserve)
-                                                                    .setMaturity(maturity))
-                                                    .notSupported(Version.V6R2011x)});
+                    for (final String org : new String[]{null, "single", "ancestor", "descendant", "related"})  {
+                        for (final String project : new String[]{null, "single", "ancestor", "descendant", "related"})  {
+                            for (final String reserve : new String[]{null, "no", "context", "inclusive"})  {
+                                for (final String maturity : new String[]{null, "no", "public", "protected", "private", "notprivate", "ppp"})  {
+                                    for (final String category : new String[]{null, "oem", "goldpartner", "partner", "supplier", "customer", "contractor"})  {
+                                        ret.add(new Object[]{
+                                                _test.getDescriptionPrefix() + " access for " + txt + " for " + (org == null ? "any" : org) + " organization, "
+                                                                                                              + (project == null ? "any" : project) + " project, context owner, "
+                                                                                                              + (reserve == null ? "any" : reserve) + " reserve, "
+                                                                                                              + (maturity == null ? "any" : maturity) + " maturity and "
+                                                                                                              + (category == null ? "any" : category) + " category",
+                                                _test.createTestData4Access(
+                                                                new Access()
+                                                                        .setPrefix(prefix)
+                                                                        .setKind(kind)
+                                                                        .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
+                                                                        .addAccess("read", "show")
+                                                                        .setOrganization(org)
+                                                                        .setProject(project)
+                                                                        .setOwner("context")
+                                                                        .setReserve(reserve)
+                                                                        .setMaturity(maturity)
+                                                                        .setCategory(category))
+                                                        .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)});
+                                    }
                                 }
                             }
                         }

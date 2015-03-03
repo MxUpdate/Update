@@ -453,42 +453,66 @@ public class FieldData<FORMTABLE extends AbstractAdminData<?>>
         super.checkExport(_exportParser);
 
         // sort type (default value is none and must be ignored...)
-        this.checkSingleValue(_exportParser, "column / field", "sorttype", ((this.sortType != null) && !this.sortType.equals("none")) ? this.sortType : null);
+        if ((this.sortType != null) && !this.sortType.equals("none"))  {
+            this.checkSingleValue(_exportParser, "column / field", "sorttype", this.sortType);
+        } else  {
+            this.checkNotExistingSingleValue(_exportParser, "column / field", "sorttype");
+        }
 
         // hidden flag
-        this.checkValueExists(_exportParser, "column / field", "hidden", this.getFlag("hidden") != null ? this.getFlag("hidden") : false);
+        this.checkValueExists(_exportParser, "column / field", "hidden", this.getFlags().get("hidden") != null ? this.getFlags().get("hidden") : false);
 
         // size
-        this.checkSingleValue(
-                _exportParser,
-                "column / field",
-                "size",
-                ((this.width != null) && (this.height != null)
-                                && ((this.width.doubleValue() != 1.0) || (this.height.doubleValue() != 1.0)))
-                        ? String.valueOf(this.width.doubleValue()) + " " + String.valueOf(this.height.doubleValue())
-                        : null);
+        if ((this.width != null) && (this.height != null)
+                && ((this.width.doubleValue() != 1.0) || (this.height.doubleValue() != 1.0)))  {
+            this.checkSingleValue(
+                    _exportParser,
+                    "column / field",
+                    "size",
+                    String.valueOf(this.width.doubleValue()) + " " + String.valueOf(this.height.doubleValue()));
+        } else  {
+            this.checkNotExistingSingleValue(_exportParser, "column / field", "size");
+        }
 
         // minimum size
-        this.checkSingleValue(
-                _exportParser,
-                "column / field",
-                "minsize",
-                ((this.minWidth != null) && (this.minHeight != null)
-                                && ((this.minWidth.doubleValue() != 0.0) || (this.minHeight.doubleValue() != 0.0)))
-                        ? String.valueOf(this.minWidth.doubleValue()) + " " + String.valueOf(this.minHeight.doubleValue())
-                        : null);
+        if ((this.minWidth != null) && (this.minHeight != null)
+                && ((this.minWidth.doubleValue() != 0.0) || (this.minHeight.doubleValue() != 0.0)))  {
+            this.checkSingleValue(
+                    _exportParser,
+                    "column / field",
+                    "minsize",
+                    String.valueOf(this.minWidth.doubleValue()) + " " + String.valueOf(this.minHeight.doubleValue()));
+        } else  {
+            this.checkNotExistingSingleValue(_exportParser, "column / field", "minsize");
+        }
 
         // auto height
-        this.checkSingleValue(_exportParser, "column / field", "autoheight", ((this.autoHeight != null) && this.autoHeight) ? "true" : null);
+        if ((this.autoHeight != null) && this.autoHeight)  {
+            this.checkSingleValue(_exportParser, "column / field", "autoheight", "true");
+        } else  {
+            this.checkNotExistingSingleValue(_exportParser, "column / field", "autoheight");
+        }
 
         // auto width
-        this.checkSingleValue(_exportParser, "column / field", "autowidth", ((this.autoWidth != null) && this.autoWidth) ? "true" : null);
+        if ((this.autoWidth != null) && this.autoWidth)  {
+            this.checkSingleValue(_exportParser, "column / field", "autowidth", "true");
+        } else  {
+            this.checkNotExistingSingleValue(_exportParser, "column / field", "autowidth");
+        }
 
         // scale
-        this.checkSingleValue(_exportParser, "column / field", "scale", (this.scale != null) ? String.valueOf(this.scale.longValue()) : null);
+        if (this.scale != null)  {
+            this.checkSingleValue(_exportParser, "column / field", "scale", String.valueOf(this.scale.longValue()));
+        } else  {
+            this.checkNotExistingSingleValue(_exportParser, "column / field", "scale");
+        }
 
         // editable flag
-        this.checkSingleValue(_exportParser, "column / field", "edit", ((this.editable != null) && this.editable)? "true" : null);
+        if ((this.editable != null) && this.editable)  {
+            this.checkSingleValue(_exportParser, "column / field", "edit", "true");
+        } else  {
+            this.checkNotExistingSingleValue(_exportParser, "column / field", "edit");
+        }
 
         // settings
         final Set<String> curSettings = new HashSet<String>(_exportParser.getLines("/mql/setting/@value"));

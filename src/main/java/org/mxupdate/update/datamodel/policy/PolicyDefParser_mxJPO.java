@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
@@ -201,7 +202,7 @@ public class PolicyDefParser_mxJPO
   final public void allstate(final Policy_mxJPO _policy) throws ParseException_mxJPO {
     final AccessList_mxJPO accessList = this.getField(_policy, "allStateAccess").<AccessList_mxJPO>get();
     jj_consume_token(ALLSTATE);
-    jj_consume_token(132);
+    jj_consume_token(140);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -264,7 +265,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(133);
+    jj_consume_token(141);
         this.getField(_policy, "allState").set(true);
   }
 
@@ -280,7 +281,7 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(STATE);
     tmpStr = sString();
                                 this.getField(state, "name").set(tmpStr);
-    jj_consume_token(132);
+    jj_consume_token(140);
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -502,7 +503,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(133);
+    jj_consume_token(141);
         this.appendValue(_policy, "states", state);
   }
 
@@ -555,37 +556,45 @@ public class PolicyDefParser_mxJPO
   }
 
   final public void stateAccessDef(final Access _access) throws ParseException_mxJPO {
-    String key = null, filter = null, organization = null, project = null, owner = null, reserve = null, maturity = null;
+    String key = null, filter = null, localfilter = null, organization = null, project = null, owner = null, reserve = null, maturity = null, category = null;
     Token_mxJPO access = null;
     label_4:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case KEY:
       case FILTER:
+      case LOCALFILTER:
       case ACCESS:
-      case ANY_ORGANIZATION:
-      case SINGLE_ORGANIZATION:
-      case ANCESTOR_ORGANIZATION:
-      case DESCENDANT_ORGANIZATION:
-      case RELATED_ORGANIZATION:
-      case ANY_PROJECT:
-      case SINGLE_PROJECT:
-      case ANCESTOR_PROJECT:
-      case DESCENDANT_PROJECT:
-      case RELATED_PROJECT:
-      case ANY_OWNER:
-      case CONTEXT_OWNER:
-      case ANY_RESERVE:
-      case CONTEXT_RESERVE:
-      case NO_RESERVE:
-      case INCLUSIVE_RESERVE:
-      case ANY_MATURITY:
-      case NO_MATURITY:
-      case PUBLIC_MATURITY:
-      case PROTECTED_MATURITY:
-      case PRIVATE_MATURITY:
-      case NOTPRIVATE_MATURITY:
-      case PPP_MATURITY:
+      case ORGANIZATION_ANY:
+      case ORGANIZATION_SINGLE:
+      case ORGANIZATION_ANCESTOR:
+      case ORGANIZATION_DESCENDANT:
+      case ORGANIZATION_RELATED:
+      case PROJECT_ANY:
+      case PROJECT_SINGLE:
+      case PROJECT_ANCESTOR:
+      case PROJECT_DESCENDANT:
+      case PROJECT_RELATED:
+      case OWNER_ANY:
+      case OWNER_CONTEXT:
+      case RESERVE_ANY:
+      case RESERVE_CONTEXT:
+      case RESERVE_NO:
+      case RESERVE_INCLUSIVE:
+      case MATURITY_ANY:
+      case MATURITY_NO:
+      case MATURITY_PUBLIC:
+      case MATURITY_PROTECTED:
+      case MATURITY_PRIVATE:
+      case MATURITY_NOTPRIVATE:
+      case MATURITY_PPP:
+      case CATEGORY_ANY:
+      case CATEGORY_OEM:
+      case CATEGORY_GOLDPARTNER:
+      case CATEGORY_PARTNER:
+      case CATEGORY_SUPPLIER:
+      case CATEGORY_CUSTOMER:
+      case CATEGORY_CONTRACTOR:
         ;
         break;
       default:
@@ -600,100 +609,132 @@ public class PolicyDefParser_mxJPO
         jj_consume_token(FILTER);
         filter = sString();
         break;
+      case LOCALFILTER:
+        jj_consume_token(LOCALFILTER);
+        localfilter = sString();
+        break;
       case ACCESS:
         access = jj_consume_token(ACCESS);
         break;
-      case ANY_ORGANIZATION:
-        jj_consume_token(ANY_ORGANIZATION);
+      case ORGANIZATION_ANY:
+        jj_consume_token(ORGANIZATION_ANY);
                                        organization = "any";
         break;
-      case SINGLE_ORGANIZATION:
-        jj_consume_token(SINGLE_ORGANIZATION);
+      case ORGANIZATION_SINGLE:
+        jj_consume_token(ORGANIZATION_SINGLE);
                                        organization = "single";
         break;
-      case ANCESTOR_ORGANIZATION:
-        jj_consume_token(ANCESTOR_ORGANIZATION);
+      case ORGANIZATION_ANCESTOR:
+        jj_consume_token(ORGANIZATION_ANCESTOR);
                                        organization = "ancestor";
         break;
-      case DESCENDANT_ORGANIZATION:
-        jj_consume_token(DESCENDANT_ORGANIZATION);
+      case ORGANIZATION_DESCENDANT:
+        jj_consume_token(ORGANIZATION_DESCENDANT);
                                        organization = "descendant";
         break;
-      case RELATED_ORGANIZATION:
-        jj_consume_token(RELATED_ORGANIZATION);
+      case ORGANIZATION_RELATED:
+        jj_consume_token(ORGANIZATION_RELATED);
                                        organization = "related";
         break;
-      case ANY_PROJECT:
-        jj_consume_token(ANY_PROJECT);
+      case PROJECT_ANY:
+        jj_consume_token(PROJECT_ANY);
                                        project      = "any";
         break;
-      case SINGLE_PROJECT:
-        jj_consume_token(SINGLE_PROJECT);
+      case PROJECT_SINGLE:
+        jj_consume_token(PROJECT_SINGLE);
                                        project      = "single";
         break;
-      case ANCESTOR_PROJECT:
-        jj_consume_token(ANCESTOR_PROJECT);
+      case PROJECT_ANCESTOR:
+        jj_consume_token(PROJECT_ANCESTOR);
                                        project      = "ancestor";
         break;
-      case DESCENDANT_PROJECT:
-        jj_consume_token(DESCENDANT_PROJECT);
+      case PROJECT_DESCENDANT:
+        jj_consume_token(PROJECT_DESCENDANT);
                                        project      = "descendant";
         break;
-      case RELATED_PROJECT:
-        jj_consume_token(RELATED_PROJECT);
+      case PROJECT_RELATED:
+        jj_consume_token(PROJECT_RELATED);
                                        project      = "related";
         break;
-      case ANY_OWNER:
-        jj_consume_token(ANY_OWNER);
+      case OWNER_ANY:
+        jj_consume_token(OWNER_ANY);
                                        owner        = "any";
         break;
-      case CONTEXT_OWNER:
-        jj_consume_token(CONTEXT_OWNER);
+      case OWNER_CONTEXT:
+        jj_consume_token(OWNER_CONTEXT);
                                        owner        = "context";
         break;
-      case ANY_RESERVE:
-        jj_consume_token(ANY_RESERVE);
+      case RESERVE_ANY:
+        jj_consume_token(RESERVE_ANY);
                                        reserve      = "any";
         break;
-      case CONTEXT_RESERVE:
-        jj_consume_token(CONTEXT_RESERVE);
+      case RESERVE_CONTEXT:
+        jj_consume_token(RESERVE_CONTEXT);
                                        reserve      = "context";
         break;
-      case NO_RESERVE:
-        jj_consume_token(NO_RESERVE);
+      case RESERVE_NO:
+        jj_consume_token(RESERVE_NO);
                                        reserve      = "no";
         break;
-      case INCLUSIVE_RESERVE:
-        jj_consume_token(INCLUSIVE_RESERVE);
+      case RESERVE_INCLUSIVE:
+        jj_consume_token(RESERVE_INCLUSIVE);
                                        reserve      = "inclusive";
         break;
-      case ANY_MATURITY:
-        jj_consume_token(ANY_MATURITY);
+      case MATURITY_ANY:
+        jj_consume_token(MATURITY_ANY);
                                        maturity     = "any";
         break;
-      case NO_MATURITY:
-        jj_consume_token(NO_MATURITY);
+      case MATURITY_NO:
+        jj_consume_token(MATURITY_NO);
                                        maturity     = "no";
         break;
-      case PUBLIC_MATURITY:
-        jj_consume_token(PUBLIC_MATURITY);
+      case MATURITY_PUBLIC:
+        jj_consume_token(MATURITY_PUBLIC);
                                        maturity     = "public";
         break;
-      case PROTECTED_MATURITY:
-        jj_consume_token(PROTECTED_MATURITY);
+      case MATURITY_PROTECTED:
+        jj_consume_token(MATURITY_PROTECTED);
                                        maturity     = "protected";
         break;
-      case PRIVATE_MATURITY:
-        jj_consume_token(PRIVATE_MATURITY);
+      case MATURITY_PRIVATE:
+        jj_consume_token(MATURITY_PRIVATE);
                                        maturity     = "private";
         break;
-      case NOTPRIVATE_MATURITY:
-        jj_consume_token(NOTPRIVATE_MATURITY);
+      case MATURITY_NOTPRIVATE:
+        jj_consume_token(MATURITY_NOTPRIVATE);
                                        maturity     = "notprivate";
         break;
-      case PPP_MATURITY:
-        jj_consume_token(PPP_MATURITY);
+      case MATURITY_PPP:
+        jj_consume_token(MATURITY_PPP);
                                        maturity     = "ppp";
+        break;
+      case CATEGORY_ANY:
+        jj_consume_token(CATEGORY_ANY);
+                                       category     = "any";
+        break;
+      case CATEGORY_OEM:
+        jj_consume_token(CATEGORY_OEM);
+                                       category     = "oem";
+        break;
+      case CATEGORY_GOLDPARTNER:
+        jj_consume_token(CATEGORY_GOLDPARTNER);
+                                       category     = "goldpartner";
+        break;
+      case CATEGORY_PARTNER:
+        jj_consume_token(CATEGORY_PARTNER);
+                                       category     = "partner";
+        break;
+      case CATEGORY_SUPPLIER:
+        jj_consume_token(CATEGORY_SUPPLIER);
+                                       category     = "supplier";
+        break;
+      case CATEGORY_CUSTOMER:
+        jj_consume_token(CATEGORY_CUSTOMER);
+                                       category     = "customer";
+        break;
+      case CATEGORY_CONTRACTOR:
+        jj_consume_token(CATEGORY_CONTRACTOR);
+                                       category     = "contractor";
         break;
       default:
         jj_consume_token(-1);
@@ -702,11 +743,13 @@ public class PolicyDefParser_mxJPO
     }
         this.getField(_access, "key").set(key);
         this.getField(_access, "filter").set(filter);
+        this.getField(_access, "localfilter").set(localfilter);
         this.getField(_access, "organization").set(organization);
         this.getField(_access, "project").set(project);
         this.getField(_access, "owner").set(owner);
         this.getField(_access, "reserve").set(reserve);
         this.getField(_access, "maturity").set(maturity);
+        this.getField(_access, "category").set(category);
 
         if (access == null)  {
             this.getField(_access, "access").set(new HashSet<String>());
@@ -721,33 +764,34 @@ public class PolicyDefParser_mxJPO
   }
 
   final public void stateTrigger(final Policy_mxJPO.State _state) throws ParseException_mxJPO {
-    final Policy_mxJPO.Trigger trigger = new Policy_mxJPO.Trigger();
+    final Trigger trigger = new Trigger();
     String tmp;
     jj_consume_token(TRIGGER);
     tmp = sString();
+                                     this.setValue(trigger, "eventType", tmp);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ACTION:
       jj_consume_token(ACTION);
-                             this.getField(trigger, "name").set(tmp + "Action");
+                                     this.setValue(trigger, "kind", "action");
       break;
     case CHECK:
       jj_consume_token(CHECK);
-                             this.getField(trigger, "name").set(tmp + "Check");
+                                     this.setValue(trigger, "kind", "check");
       break;
     case OVERRIDE:
       jj_consume_token(OVERRIDE);
-                             this.getField(trigger, "name").set(tmp + "Override");
+                                     this.setValue(trigger, "kind", "override");
       break;
     default:
       jj_consume_token(-1);
       throw new ParseException_mxJPO();
     }
     tmp = sString();
-                             this.getField(trigger, "program").set(tmp);
+                                     this.setValue(trigger, "program", tmp);
     jj_consume_token(INPUT);
     tmp = sString();
-                                     this.getField(trigger, "arguments").set(tmp);
-        this.appendValue(_state, "triggersStack", trigger);
+                                     this.setValue(trigger, "arguments", tmp);
+        this.appendValue(this.getValue(_state, "triggers"), "triggersStack", trigger);
   }
 
   final public void stateSignature(final Policy_mxJPO.State _state) throws ParseException_mxJPO {
@@ -757,7 +801,7 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(SIGNATURE);
     tmpStr = sString();
                                     this.getField(signature, "name").set(tmpStr);
-    jj_consume_token(132);
+    jj_consume_token(140);
     label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -802,7 +846,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(133);
+    jj_consume_token(141);
         this.appendValue(_state, "signatures", signature);
   }
 
@@ -955,12 +999,12 @@ public class PolicyDefParser_mxJPO
     catch(LookaheadSuccess ls) { return true; }
   }
 
-  private boolean jj_3_2() {
+  private boolean jj_3_1() {
     if (jj_scan_token(LALL_ALL)) return true;
     return false;
   }
 
-  private boolean jj_3_1() {
+  private boolean jj_3_2() {
     if (jj_scan_token(LALL_ALL)) return true;
     return false;
   }

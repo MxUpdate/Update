@@ -27,15 +27,17 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
+import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO;
 import org.mxupdate.update.datamodel.policy.PolicyDefParser_mxJPO;
-import org.mxupdate.update.util.AdminProperty_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -48,7 +50,7 @@ import org.xml.sax.SAXException;
  * @author The MxUpdate Team
  */
 public class Policy_mxJPO
-    extends AbstractDMWithTriggers_mxJPO
+    extends AbstractAdminObject_mxJPO
 {
     /**
      * Name of the parameter to define that the &quot;majorrevision&quot;
@@ -273,12 +275,12 @@ public class Policy_mxJPO
             state.prepare();
         }
         super.prepare(_paramCache);
-        for (final AdminProperty_mxJPO property : new HashSet<AdminProperty_mxJPO>(this.getPropertiesMap().values()))  {
+        for (final AdminProperty property : new HashSet<AdminProperty>(this.getProperties()))  {
             if ((property.getName() != null) && property.getName().startsWith("state_"))  {
                 for (final State state : this.states)  {
                     if (state.name.equals(property.getValue()))  {
                         state.symbolicNames.add(property.getName());
-                        this.getPropertiesMap().remove(property.getName());
+                        this.getProperties().remove(property);
                     }
                 }
             }
@@ -363,7 +365,8 @@ public class Policy_mxJPO
             state.writeObject(_paramCache, _out);
         }
         _out.append("\n}");
-        this.writeProperties(_paramCache, _out);
+
+        this.getProperties().writeAddFormat(_paramCache, _out, this.getTypeDef());
     }
 
     /**
@@ -491,16 +494,16 @@ public class Policy_mxJPO
             cmd.append("escape mod policy \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ");
 
             // basic information
-            this.calcValueDelta(cmd, "description", policy.getDescription(), this.getDescription());
+            DeltaUtil_mxJPO.calcValueDelta(cmd, "description", policy.getDescription(), this.getDescription());
 
             // if all types are defined, the compare must be against set with all
             if (this.allTypes)  {
                 final Set<String> curTypes = new HashSet<String>();
                 curTypes.addAll(this.types);
                 curTypes.addAll(Arrays.asList(new String[]{"all"}));
-                this.calcListDelta(cmd, "type", policy.types, curTypes);
+                DeltaUtil_mxJPO.calcListDelta(cmd, "type", policy.types, curTypes);
             } else  {
-                this.calcListDelta(cmd, "type", policy.types, this.types);
+                DeltaUtil_mxJPO.calcListDelta(cmd, "type", policy.types, this.types);
             }
 
             // if all formats are defined, the compare must be against set with all
@@ -508,16 +511,16 @@ public class Policy_mxJPO
                 final Set<String> curFormats = new HashSet<String>();
                 curFormats.addAll(this.formats);
                 curFormats.addAll(Arrays.asList(new String[]{"all"}));
-                this.calcListDelta(cmd, "format", policy.formats, curFormats);
+                DeltaUtil_mxJPO.calcListDelta(cmd, "format", policy.formats, curFormats);
             } else  {
-                this.calcListDelta(cmd, "format", policy.formats, this.formats);
+                DeltaUtil_mxJPO.calcListDelta(cmd, "format", policy.formats, this.formats);
             }
 
             // if not default format => ADMINISTRATION must be default format
             if ((policy.defaultFormat == null) || "".equals(policy.defaultFormat))  {
                 cmd.append(" defaultformat ADMINISTRATION");
             } else  {
-                this.calcValueDelta(cmd, "defaultformat", policy.defaultFormat, this.defaultFormat);
+                DeltaUtil_mxJPO.calcValueDelta(cmd, "defaultformat", policy.defaultFormat, this.defaultFormat);
             }
 
             // enforce only if not equal
@@ -529,21 +532,15 @@ public class Policy_mxJPO
                 cmd.append("enforce");
             }
 
-            this.calcValueDelta(cmd, "sequence", policy.minorsequence, this.minorsequence);
+            DeltaUtil_mxJPO.calcValueDelta(cmd, "sequence", policy.minorsequence, this.minorsequence);
             if (_paramCache.getValueBoolean(Policy_mxJPO.PARAM_SUPPORT_MAJOR_MINOR))  {
-                this.calcValueDelta(cmd, "majorsequence", policy.majorsequence, this.majorsequence);
+                DeltaUtil_mxJPO.calcValueDelta(cmd, "majorsequence", policy.majorsequence, this.majorsequence);
             }
             // hidden flag, because hidden flag must be set with special syntax
-            if (this.isHidden() != policy.isHidden())  {
-                cmd.append(' ');
-                if (!policy.isHidden())  {
-                    cmd.append('!');
-                }
-                cmd.append("hidden ");
-            }
+            DeltaUtil_mxJPO.calcFlagDelta(cmd, "hidden", policy.isHidden(), this.isHidden());
             // because the store of a policy could not be removed....
             if ((policy.store != null) && !"".equals(policy.store))  {
-                this.calcValueDelta(cmd, "store", policy.store, this.store);
+                DeltaUtil_mxJPO.calcValueDelta(cmd, "store", policy.store, this.store);
             // instead store 'ADMINISTRATION' must be assigned
             } else  {
                 cmd.append(" store ADMINISTRATION");
@@ -657,67 +654,6 @@ throw new Exception("some states are not defined anymore!");
     }
 
     /**
-     * Calculates the delta between the new and the old value. If a delta
-     * exists, the kind with the new delta is added to the string builder.
-     *
-     * @param _out      appendable instance where the delta must be append
-     * @param _kind     kind of the delta
-     * @param _newVal   new target value
-     * @param _curVal   current value in the database
-     * @throws IOException if the delta could not appended
-     */
-    protected void calcValueDelta(final Appendable _out,
-                                  final String _kind,
-                                  final String _newVal,
-                                  final String _curVal)
-            throws IOException
-    {
-        final String curVal = (_curVal == null) ? "" : _curVal;
-        final String newVal = (_newVal == null) ? "" : _newVal;
-
-        if (!curVal.equals(newVal))  {
-            _out.append(' ').append(_kind).append(" \"").append(StringUtil_mxJPO.convertMql(newVal)).append('\"');
-        }
-    }
-
-    /**
-     *
-     * @param _out      appendable instance where the delta must be append
-     * @param _kind     kind of the delta
-     * @param _new      new target values
-     * @param _current  current values in MX
-     * @throws IOException if the delta could not appended
-     */
-    protected void calcListDelta(final Appendable _out,
-                                 final String _kind,
-                                 final Set<String> _new,
-                                 final Set<String> _current)
-            throws IOException
-    {
-        boolean equal = (_current.size() == _new.size());
-        if (equal)  {
-            for (final String format : _current)  {
-                if (!_new.contains(format))  {
-                    equal = false;
-                    break;
-                }
-            }
-        }
-        if (!equal)  {
-            for (final String curValue : _current)  {
-                if (!_new.contains(curValue))  {
-                    _out.append(" remove ").append(_kind).append(" \"").append(StringUtil_mxJPO.convertMql(curValue)).append('\"');
-                }
-            }
-            for (final String newValue : _new)  {
-                if (!_current.contains(newValue))  {
-                    _out.append(" add ").append(_kind).append(" \"").append(StringUtil_mxJPO.convertMql(newValue)).append('\"');
-                }
-            }
-        }
-    }
-
-    /**
      * Class defining states of a policy.
      */
     public static class State
@@ -760,10 +696,8 @@ throw new Exception("some states are not defined anymore!");
         /** Route users of this state. */
         private final Set<String> routeUsers = new TreeSet<String>();
 
-        /** Stack with all triggers for this state. */
-        private final Stack<Trigger> triggersStack = new Stack<Trigger>();
         /** Map with all triggers for this state. The key is the name of the trigger. */
-        private final Map<String,Trigger> triggers = new TreeMap<String,Trigger>();
+        private final TriggerList_mxJPO triggers = new TriggerList_mxJPO();
 
         /** Holds the signatures for this state. */
         private final Stack<Signature> signatures = new Stack<Signature>();
@@ -822,14 +756,9 @@ throw new Exception("some states are not defined anymore!");
             } else if ("/routeUser/userRef".equals(_url))  {
                 this.routeUsers.add(_content);
 
-            } else if ("/triggerList/trigger".equals(_url))  {
-                this.triggersStack.add(new Trigger());
-            } else if ("/triggerList/trigger/triggerName".equals(_url))  {
-                this.triggersStack.peek().name = _content;
-            } else if ("/triggerList/trigger/programRef".equals(_url))  {
-                this.triggersStack.peek().program = _content;
-            } else if ("/triggerList/trigger/inputArguments".equals(_url))  {
-                this.triggersStack.peek().arguments = _content;
+            } else if (_url.startsWith("/triggerList"))  {
+                ret = this.triggers.parse(_paramCache, _url.substring(12), _content);
+
             } else  {
                 ret = super.parse(_paramCache, _url, _content);
             }
@@ -842,9 +771,7 @@ throw new Exception("some states are not defined anymore!");
         protected void prepare()
         {
             // sort all triggers
-            for (final Trigger trigger : this.triggersStack)  {
-                this.triggers.put(trigger.name, trigger);
-            }
+            this.triggers.prepare();
         }
 
         /**
@@ -914,11 +841,7 @@ throw new Exception("some states are not defined anymore!");
                 .append("\n    check \"").append(StringUtil_mxJPO.convertTcl(this.checkProgram))
                 .append("\" input \"").append(StringUtil_mxJPO.convertTcl(this.checkInput)).append('\"');
             // output of triggers, but sorted!
-            for (final Trigger trigger : this.triggers.values())  {
-                _out.append("\n    trigger ").append(trigger.getEventType()).append(' ').append(trigger.getKind())
-                    .append(" \"").append(StringUtil_mxJPO.convertTcl(trigger.program)).append("\"")
-                    .append(" input \"").append(StringUtil_mxJPO.convertTcl(trigger.arguments)).append("\"");
-            }
+            this.triggers.write(_out, "\n    ", "");
             // signatures
             for (final Signature signature : this.signatures)  {
                 signature.writeObject(_out);
@@ -927,15 +850,22 @@ throw new Exception("some states are not defined anymore!");
         }
 
         /**
-         * {@inheritDoc}
+         * Calculates the delta between this target state and current
+         * {@code _oldState}.
+         *
+         * @param _paramCache   parameter cache (used for logging purposes)
+         * @param _cmd          string builder for the MQL commands
+         * @param _oldState     old state to update ({@code null} if no old
+         *                      state exists).
+         * @throws IOException if write failed
          */
         protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                                 final Appendable _out,
+                                 final StringBuilder _cmd,
                                  final State _oldState)
             throws IOException
         {
             // basics
-            _out.append(" promote ").append(String.valueOf(this.autoPromotion))
+            _cmd.append(" promote ").append(String.valueOf(this.autoPromotion))
                 .append(" checkouthistory ").append(String.valueOf(this.checkoutHistory))
                 .append(" version ").append(String.valueOf(this.versionable))
                 .append(" action \"").append(StringUtil_mxJPO.convertMql(this.actionProgram)).append('\"')
@@ -944,45 +874,31 @@ throw new Exception("some states are not defined anymore!");
                 .append(" input \"").append(StringUtil_mxJPO.convertMql(this.checkInput)).append('\"');
             // minor / major revision (if supported)
             if (_paramCache.getValueBoolean(Policy_mxJPO.PARAM_SUPPORT_MAJOR_MINOR))  {
-                _out.append(" majorrevision ").append(String.valueOf(this.majorrevisionable))
+                _cmd.append(" majorrevision ").append(String.valueOf(this.majorrevisionable))
                     .append(" minorrevision ").append(String.valueOf(this.minorrevisionable));
             } else  {
-                _out.append(" revision ").append(String.valueOf(this.minorrevisionable));
+                _cmd.append(" revision ").append(String.valueOf(this.minorrevisionable));
             }
             // published (if supported)
             if (_paramCache.getValueBoolean(Policy_mxJPO.PARAM_SUPPORT_PUBLISHED))  {
-                _out.append(" published ").append(String.valueOf(this.published));
+                _cmd.append(" published ").append(String.valueOf(this.published));
             }
             // route message
-            _out.append(" route message \"").append(StringUtil_mxJPO.convertMql(this.routeMessage)).append('\"');
+            _cmd.append(" route message \"").append(StringUtil_mxJPO.convertMql(this.routeMessage)).append('\"');
             for (final String routeUser : this.routeUsers)  {
                 if ((_oldState == null) || !_oldState.routeUsers.contains(routeUser))  {
-                    _out.append(" add route \"").append(StringUtil_mxJPO.convertMql(routeUser)).append('\"');
+                    _cmd.append(" add route \"").append(StringUtil_mxJPO.convertMql(routeUser)).append('\"');
                 }
             }
 
             // access list
             if (_oldState != null)  {
-                _oldState.cleanup(_out);
+                _oldState.cleanup(_cmd);
             }
-            this.update("", _out);
+            this.update("", _cmd);
 
             // triggers
-            if (_oldState != null)  {
-                for (final Trigger trigger : _oldState.triggers.values())  {
-                    if (!this.triggers.containsKey(trigger.name))  {
-                        _out.append(" remove trigger ")
-                            .append(trigger.getEventType())
-                            .append(' ')
-                            .append(trigger.getKind());
-                    }
-                }
-            }
-            for (final Trigger trigger : this.triggers.values())  {
-                _out.append(" add trigger ").append(trigger.getEventType()).append(' ').append(trigger.getKind())
-                    .append(" \"").append(StringUtil_mxJPO.convertMql(trigger.program)).append("\"")
-                    .append(" input \"").append(StringUtil_mxJPO.convertMql(trigger.arguments)).append('\"');
-            }
+            this.triggers.calcDelta((_oldState != null) ? _oldState.triggers : null, _cmd);
             // signatures
             final Set<String> newSigs = new HashSet<String>();
             for (final Signature signature : this.signatures)  {
@@ -994,7 +910,7 @@ throw new Exception("some states are not defined anymore!");
                     if (newSigs.contains(signature.name))  {
                         oldSigs.put(signature.name, signature);
                     } else  {
-                        _out.append(" remove signature \"")
+                        _cmd.append(" remove signature \"")
                             .append(StringUtil_mxJPO.convertMql(signature.name))
                             .append('\"');
                     }
@@ -1003,13 +919,13 @@ throw new Exception("some states are not defined anymore!");
             for (final Signature signature : this.signatures)  {
                 final Signature oldSig;
                 if ((_oldState != null) && !oldSigs.containsKey(signature.name))  {
-                    _out.append(" add ");
+                    _cmd.append(" add ");
                     oldSig = null;
                 } else  {
                     oldSig = oldSigs.get(signature.name);
                 }
-                _out.append(" signature \"").append(StringUtil_mxJPO.convertMql(signature.name)).append('\"');
-                signature.calcDelta(_out, oldSig);
+                _cmd.append(" signature \"").append(StringUtil_mxJPO.convertMql(signature.name)).append('\"');
+                signature.calcDelta(_cmd, oldSig);
             }
         }
     }

@@ -97,7 +97,7 @@ public abstract class AbstractDataWithAttributesExportUpdateTest<DATAWITHATTRIBU
                                        .addAttribute(_original.getAttributes().toArray(new AbstractAttributeData<?>[_original.getAttributes().size()]));
 
         // define all required values to empty values so that they are checked
-        for (final Map.Entry<String,String> value : ret.getRequiredExportValues().entrySet())  {
+        for (final Map.Entry<String,Object> value : ret.getRequiredExportValues().entrySet())  {
             ret.setValue(value.getKey(), value.getValue());
         }
 

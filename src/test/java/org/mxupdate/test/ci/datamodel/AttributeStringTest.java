@@ -20,11 +20,7 @@ package org.mxupdate.test.ci.datamodel;
 import java.util.ArrayList;
 import java.util.List;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.data.datamodel.AttributeStringData;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -63,11 +59,11 @@ public class AttributeStringTest
         ret.add(new Object[]{
                 "string attribute with max length 0",
                 this.createNewData("hello")
-                        .setValue("maxlength", "0")});
+                        .setValue("maxlength", 0)});
         ret.add(new Object[]{
                 "string attribute with max length 5",
                 this.createNewData("hello")
-                        .setValue("maxlength", "5")});
+                        .setValue("maxlength", 5)});
 
         // multiline flag
         ret.add(new Object[]{
@@ -80,24 +76,5 @@ public class AttributeStringTest
                         .setFlag("multiline", false)});
 
         return super.prepareData("string attribute", "A \" B", "BCD", ret.toArray(new Object[ret.size()][]));
-    }
-
-    /**
-     * Cleanup all test attributes.
-     *
-     * @throws MatrixException if cleanup failed
-     */
-    @Override()
-    @BeforeMethod()
-    @AfterClass()
-    public void cleanup()
-        throws MatrixException
-    {
-        this.cleanup(CI.DM_ATTRIBUTE_BOOLEAN);
-        this.cleanup(CI.DM_ATTRIBUTE_DATE);
-        this.cleanup(CI.DM_ATTRIBUTE_INTEGER);
-        this.cleanup(CI.DM_ATTRIBUTE_REAL);
-        this.cleanup(CI.DM_ATTRIBUTE_STRING);
-        this.cleanup(CI.PRG_MQL_PROGRAM);
     }
 }

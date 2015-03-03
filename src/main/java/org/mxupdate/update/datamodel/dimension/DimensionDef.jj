@@ -34,7 +34,7 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.Dimension_mxJPO;
 import org.mxupdate.update.datamodel.Dimension_mxJPO.Unit;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
-import org.mxupdate.update.util.AdminProperty_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 public class DimensionDefParser
@@ -172,7 +172,7 @@ TOKEN : /** first level */
 
 <UNITDEF_DOUBLE_EXPECTED> TOKEN :
 {
-      <UNITDEF_DOUBLE_DOUBLE : (("-")? (["0"-"9"])* ("." (["0"-"9"])*)?)> : UNITDEF_EXPECTED
+      <UNITDEF_DOUBLE_DOUBLE : (("-")? (["0"-"9"])* ("." (["0"-"9"])*)? ("E" (["0"-"9"])*)?)> : UNITDEF_EXPECTED
 }
 
 /******************************************** System Name for Unit Definition */
@@ -295,7 +295,7 @@ void unitSetting(final Unit _unit) : {
     )
     (value = uvString())
     {
-        final AdminProperty_mxJPO prop = new AdminProperty_mxJPO();
+        final AdminProperty prop = new AdminProperty();
         this.setValue(prop, "name", "%" + key);
         this.setValue(prop, "value", value);
         this.appendValue(_unit, "properties", prop);
@@ -326,7 +326,7 @@ void unitProperty(final Unit _unit) : {
                 toName = uvString() )
     )*
     {
-        final AdminProperty_mxJPO prop = new AdminProperty_mxJPO();
+        final AdminProperty prop = new AdminProperty();
         this.setValue(prop, "name", name);
         this.setValue(prop, "value", value);
         this.setValue(prop, "refAdminType", toType);
@@ -361,11 +361,11 @@ void unitSystem(final Unit _unit) : {
         (tmp = <UNITDEF_SYSTEMUNIT_SINGLE>) {unit = this.getSingle(tmp.image);}
     )
     {
-        final AdminProperty_mxJPO prop = new AdminProperty_mxJPO();
+        final AdminProperty prop = new AdminProperty();
         this.setValue(prop, "name", name);
         this.setValue(prop, "refAdminType", "unit");
         this.setValue(prop, "refAdminName", unit);
-        this.appendValue(_unit, "properties", prop);
+        this.appendValue(this.getValue(_unit, "properties"), "propertiesStack", prop);
     }
 }
 

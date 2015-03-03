@@ -38,12 +38,8 @@ import org.mxupdate.test.data.program.AbstractProgramData;
 public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractDataWithTrigger<?>>
     extends AbstractDataWithAttribute<DATAWITHTRIGGERS>
 {
-    /**
-     * Defines all assigned triggers to this administration object.
-     *
-     * @see #addTrigger(AbstractTrigger)
-     */
-    private final Set<AbstractTrigger<?>> triggers = new HashSet<AbstractTrigger<?>>();
+    /** Defines all assigned triggers to this administration object. */
+    private final Triggers triggers = new Triggers();
 
     /**
      * Initialize the values for administration objects with triggers.
@@ -60,7 +56,7 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
     protected AbstractDataWithTrigger(final AbstractTest _test,
                                       final CI _ci,
                                       final String _name,
-                                      final Map<String,String> _requiredExportValues,
+                                      final Map<String,Object> _requiredExportValues,
                                       final Map<String,Boolean> _requiredExportFlags)
     {
         super(_test, _ci, _name, _requiredExportValues, _requiredExportFlags);
@@ -79,6 +75,16 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
     {
         this.triggers.add(_trigger);
         return (DATAWITHTRIGGERS) this;
+    }
+
+    /**
+     * Returns all assigned triggers.
+     *
+     * @return all assigned triggers
+     */
+    public Triggers getTriggers()
+    {
+        return this.triggers;
     }
 
     /**
@@ -116,9 +122,7 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
         throws MatrixException
     {
         super.append4Create(_cmd);
-        for (final AbstractTrigger<?> trigger : this.triggers)  {
-            trigger.append4Create(_cmd);
-        }
+        this.triggers.append4Create(_cmd);
     }
 
     /**
@@ -131,9 +135,7 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
     protected void evalAdds4CheckExport(final Set<String> _needAdds)
     {
         super.evalAdds4CheckExport(_needAdds);
-        for (final AbstractTrigger<?> trigger : this.triggers)  {
-            trigger.evalAdds4CheckExport(_needAdds);
-        }
+        this.triggers.evalAdds4CheckExport(_needAdds);
     }
 
     /**
@@ -143,26 +145,13 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
      */
     public abstract static class AbstractTrigger<T extends AbstractDataWithTrigger.AbstractTrigger<?>>
     {
-        /**
-         * Event type of this trigger.
-         */
+        /** Event type of this trigger. */
         private final String eventType;
-
-        /**
-         * Kind of this trigger (action, check, overrider).
-         */
+        /** Kind of this trigger (action, check, overrider). */
         private final String kind;
-
-        /**
-         * Called program of this trigger.
-         */
+        /** Called program of this trigger. */
         private final AbstractProgramData<?> program;
-
-        /**
-         * Input value of this trigger.
-         *
-         * @see #setInput(String)
-         */
+        /** Input value of this trigger. */
         private String input;
 
         /**
@@ -185,7 +174,6 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
          * Returns the defined trigger {@link #program}.
          *
          * @return trigger program
-         * @see #program
          */
         public AbstractProgramData<?> getProgram()
         {
@@ -304,6 +292,45 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
                                final AbstractProgramData<?> _program)
         {
             super(_eventType, "override", _program);
+        }
+    }
+
+    /**
+     * Handles set of defined triggers.
+     */
+    public class Triggers
+        extends HashSet<AbstractTrigger<?>>
+    {
+        /** Serial Version UID. */
+        private static final long serialVersionUID = 2134980869707730431L;
+
+        /**
+         * Appends the MQL commands to define all {@link #triggers} within a
+         * create.
+         *
+         * @param _cmd  string builder used to append MQL commands
+         * @throws MatrixException if programs could not be created or thrown from
+         *                         called method in super class
+         */
+        void append4Create(final StringBuilder _cmd)
+            throws MatrixException
+        {
+            for (final AbstractTrigger<?> trigger : this)  {
+                trigger.append4Create(_cmd);
+            }
+        }
+
+        /**
+         * Evaluates all 'adds' for triggers in the configuration item file.
+         *
+         * @param _needAdds     set with add strings used to append the adds for
+         *                      {@link #triggers}
+         */
+        void evalAdds4CheckExport(final Set<String> _needAdds)
+        {
+            for (final AbstractTrigger<?> trigger : this)  {
+                trigger.evalAdds4CheckExport(_needAdds);
+            }
         }
     }
 }

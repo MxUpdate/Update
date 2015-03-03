@@ -25,10 +25,18 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.data.datamodel.AbstractAttributeData;
-import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger;
+import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger.TriggerAction;
+import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger.TriggerCheck;
+import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger.TriggerOverride;
+import org.mxupdate.test.data.datamodel.AttributeRealData;
+import org.mxupdate.test.data.datamodel.RuleData;
 import org.mxupdate.test.data.program.MQLProgramData;
+import org.mxupdate.test.util.IssueLink;
+import org.mxupdate.test.util.Version;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Test cases for the update and export of attributes.
@@ -60,18 +68,32 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
         ret.add(new Object[]{
                 _logText + " with escaped name",
                 this.createNewData("hello \" test")});
+
+        // rule
+        ret.add(new Object[]{
+                _logText + " with rule",
+                this.createNewData("hello")
+                        .setRule(new RuleData(this, "Rule"))});
+
+         // triggers
         ret.add(new Object[]{
                 _logText + " with modify action trigger",
                 this.createNewData("hello \" test")
-                        .addTrigger(new AbstractDataWithTrigger.TriggerAction("modify", new MQLProgramData(this, "Test \" Program")))});
+                        .addTrigger(new TriggerAction("modify", new MQLProgramData(this, "Test \" Program")))});
         ret.add(new Object[]{
                 _logText + " with modify check trigger",
                 this.createNewData("hello \" test")
-                        .addTrigger(new AbstractDataWithTrigger.TriggerCheck("modify", new MQLProgramData(this, "Test \" Program")))});
+                        .addTrigger(new TriggerCheck("modify", new MQLProgramData(this, "Test \" Program")))});
         ret.add(new Object[]{
                 _logText + " with modify override trigger",
                 this.createNewData("hello \" test")
-                        .addTrigger(new AbstractDataWithTrigger.TriggerOverride("modify", new MQLProgramData(this, "Test \" Program")))});
+                        .addTrigger(new TriggerOverride("modify", new MQLProgramData(this, "Test \" Program")))});
+        ret.add(new Object[]{
+                _logText + " with modify action, check and override trigger",
+                this.createNewData("hello \" test")
+                        .addTrigger(new TriggerAction("modify", new MQLProgramData(this, "Test \" Program 1")))
+                        .addTrigger(new TriggerCheck("modify", new MQLProgramData(this, "Test \" Program 2")))
+                        .addTrigger(new TriggerOverride("modify", new MQLProgramData(this, "Test \" Program 3")))});
 
         // ranges
         ret.add(new Object[]{
@@ -115,7 +137,17 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
                 this.createNewData("hello")
                         .addRange(new AbstractAttributeData.RangeNotMatch(_value1))});
         ret.add(new Object[]{
-                _logText + " with program range",
+                _logText + " with program range w/o input",
+                this.createNewData("hello")
+                        .addRange(new AbstractAttributeData.RangeProgram(new MQLProgramData(this, "program \" test"), null))});
+        ret.add(new Object[]{
+                _logText + " with program range with empty input (mut be removed)",
+                this.createNewData("hello")
+                        .addRange(new AbstractAttributeData.RangeProgram(new MQLProgramData(this, "program \" test"), "")),
+                this.createNewData("hello")
+                        .addRange(new AbstractAttributeData.RangeProgram(new MQLProgramData(this, "program \" test"), null))});
+        ret.add(new Object[]{
+                _logText + " with program range with input",
                 this.createNewData("hello")
                         .addRange(new AbstractAttributeData.RangeProgram(new MQLProgramData(this, "program \" test"), "test \" input"))});
         ret.add(new Object[]{
@@ -155,6 +187,24 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
                         .setValue("default", _value1)
                         .setFlag("resetonrevision", false)});
 
+        // multi value flags
+        ret.add(new Object[]{
+                _logText + " with multi value flag true",
+                this.createNewData("hello")
+                        .setFlag("multivalue", true)
+                        .notSupported(Version.V6R2011x)});
+        ret.add(new Object[]{
+                _logText + " with multi value flag false",
+                this.createNewData("hello")
+                        .setFlag("multivalue", false)
+                        .notSupported(Version.V6R2011x)});
+        ret.add(new Object[]{
+                _logText + " without multi value flag (to test default value false in export)",
+                this.createNewData("hello")
+                        .notSupported(Version.V6R2011x),
+                this.createNewData("hello")
+                        .setFlag("multivalue", false)});
+
         ret.addAll(Arrays.asList(_datas));
 
         return super.prepareData(_logText, ret.toArray(new Object[ret.size()][]));
@@ -175,6 +225,56 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
         this.cleanup(CI.DM_ATTRIBUTE_INTEGER);
         this.cleanup(CI.DM_ATTRIBUTE_REAL);
         this.cleanup(CI.DM_ATTRIBUTE_STRING);
+        this.cleanup(CI.DM_DIMENSION);
+        this.cleanup(CI.DM_RULE);
         this.cleanup(CI.PRG_MQL_PROGRAM);
+    }
+
+    /**
+     * Creates a clean data instance used to update an existing data instance.
+     *
+     * @param _original     original data instance
+     * @return new data instance (where all original data is cleaned)
+     */
+    @Override()
+    protected ATTRIBUTEDATA createCleanNewData(final ATTRIBUTEDATA _original)
+    {
+        final ATTRIBUTEDATA ret = super.createCleanNewData(_original);
+
+        // if dimension is defined, must be also defined for new cleaned attribute
+        if (_original.getDimension() != null)  {
+            ret.setDimension(_original.getDimension());
+        }
+
+        // if multiple value is defined, must be also defined for new cleaned attribute
+        if (_original.getFlags().containsKey("multivalue") && _original.getFlags().get("multivalue"))  {
+            ret.setFlag("multivalue", true);
+        }
+
+        // if range value is defined, must be also defined for new cleaned attribute
+        if (_original.getFlags().containsKey("rangevalue") && _original.getFlags().get("rangevalue"))  {
+            ret.setFlag("rangevalue", true);
+        }
+
+        return ret;
+    }
+
+    /**
+     * Negative test that update failed for modified multiple value flag.
+     *
+     * @throws Exception if test failed
+     */
+    @IssueLink("191")
+    @Test(description = "issue #191: negative test that update failed for modified multiple value flag")
+    public void negativeTestUpdateRangeValueFlag()
+        throws Exception
+    {
+        new AttributeRealData(this, "test")
+                .setFlag("multivalue", true)
+                .create()
+                .update()
+                .checkExport()
+                .setFlag("multivalue", false)
+                .failureUpdate(UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_MULTIVALUEFLAG_UPDATED);
     }
 }

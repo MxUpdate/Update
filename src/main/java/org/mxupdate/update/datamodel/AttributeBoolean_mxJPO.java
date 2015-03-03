@@ -26,7 +26,7 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
  * @author The MxUpdate Team
  */
 public class AttributeBoolean_mxJPO
-    extends AbstractAttribute_mxJPO
+    extends AbstractAttribute_mxJPO<AttributeBoolean_mxJPO>
 {
     /**
      * Constructor used to initialize the boolean attribute instance with

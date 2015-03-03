@@ -32,7 +32,9 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.dimension.DimensionDefParser_mxJPO;
-import org.mxupdate.update.util.AdminProperty_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -171,14 +173,8 @@ public class Dimension_mxJPO
         } else if ("/unitList/unit/adminProperties/description".equals(_url))  {
             this.currentUnit.description = _content;
             parsed = true;
-        } else if ("/unitList/unit/adminProperties/propertyList/property".equals(_url))  {
-            if (this.currentUnit.currentUnitProperty != null)  {
-                this.currentUnit.properties.add(this.currentUnit.currentUnitProperty);
-            }
-            this.currentUnit.currentUnitProperty = new AdminProperty_mxJPO();
-            parsed = true;
-        } else if (_url.startsWith("/unitList/unit/adminProperties/propertyList/property"))  {
-            parsed = this.currentUnit.currentUnitProperty.parse(_paramCache, _url.substring(52), _content);
+        } else if (_url.startsWith("/unitList/unit/adminProperties/propertyList"))  {
+            parsed = this.currentUnit.properties.parse(_paramCache, _url.substring(43), _content);
         } else if ("/unitList/unit/unitDefault".equals(_url))  {
             this.currentUnit.defaultUnit = true;
             parsed = true;
@@ -224,11 +220,8 @@ public class Dimension_mxJPO
             this.currentUnit = null;
         }
         for (final Unit unit : this.units)  {
-            if (unit.currentUnitProperty != null)  {
-                unit.properties.add(unit.currentUnitProperty);
-                unit.currentUnitProperty = null;
-            }
-            for (final AdminProperty_mxJPO prop : new HashSet<AdminProperty_mxJPO>(unit.properties))  {
+            unit.properties.prepare();
+            for (final AdminProperty prop : new HashSet<AdminProperty>(unit.properties))  {
                 // extract settings
                 if (prop.isSetting())  {
                     unit.settings.put(prop.getName().substring(1), prop.getValue());
@@ -294,7 +287,7 @@ public class Dimension_mxJPO
                     .append("\"\n");
             }
             // properties
-            for (final AdminProperty_mxJPO prop : unit.properties)  {
+            for (final AdminProperty prop : unit.properties)  {
                 _out.append("    property \"").append(StringUtil_mxJPO.convertTcl(prop.getName()))
                     .append("\"");
                 if ((prop.getRefAdminName() != null) && (prop.getRefAdminType() != null))  {
@@ -315,7 +308,7 @@ public class Dimension_mxJPO
         _out.append("}");
 
         // append properties
-        this.writeProperties(_paramCache, _out);
+        this.getProperties().writeAddFormat(_paramCache, _out, this.getTypeDef());
     }
 
     /**
@@ -409,7 +402,7 @@ public class Dimension_mxJPO
                     .append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ");
 
             // basic information
-            Dimension_mxJPO.calcValueDelta(cmd, "description", dimension.getDescription(), this.getDescription());
+            DeltaUtil_mxJPO.calcValueDelta(cmd, "description", dimension.getDescription(), this.getDescription());
             // hidden flag, because hidden flag must be set with special syntax
             if (this.isHidden() != dimension.isHidden())  {
                 if (!dimension.isHidden())  {
@@ -454,27 +447,6 @@ public class Dimension_mxJPO
 
             cmd.append(postCmd).append(";");
             MqlUtil_mxJPO.execMql(_paramCache, cmd);
-        }
-    }
-    /**
-     * Calculates the delta between the new and the old value. If a delta
-     * exists, the kind with the new delta is added to the string builder.
-     *
-     * @param _out      appendable instance where the delta must be append
-     * @param _kind     kind of the delta
-     * @param _newVal   new target value
-     * @param _curVal   current value in the database
-     */
-    protected static void calcValueDelta(final StringBuilder _out,
-                                         final String _kind,
-                                         final String _newVal,
-                                         final String _curVal)
-    {
-        final String curVal = (_curVal == null) ? "" : _curVal;
-        final String newVal = (_newVal == null) ? "" : _newVal;
-
-        if (!curVal.equals(newVal))  {
-            _out.append(_kind).append(" \"").append(StringUtil_mxJPO.convertMql(newVal)).append("\" ");
         }
     }
 
@@ -535,23 +507,12 @@ public class Dimension_mxJPO
         private final Map<String,String> settings = new TreeMap<String,String>();
 
         /**
-         * Stores current parsed unit property.
-         *
-         * @see Dimension_mxJPO#parse(ParameterCache_mxJPO, String, String)
-         * @see Dimension_mxJPO#prepare(ParameterCache_mxJPO)
-         */
-        private AdminProperty_mxJPO currentUnitProperty;
-
-        /**
          * Holds all unit specific properties for a single unit. The properties
          * includes settings and the link to the system property. While the
          * dimension is parsed the properties holds also the {@link #settings},
          * and {@link #systemInfos}.
-         *
-         * @see Dimension_mxJPO#parse(ParameterCache_mxJPO, String, String)
-         * @see Dimension_mxJPO#prepare(ParameterCache_mxJPO)
          */
-        private final Set<AdminProperty_mxJPO> properties = new TreeSet<AdminProperty_mxJPO>();
+        private final AdminPropertyList_mxJPO properties = new AdminPropertyList_mxJPO();
 
         /**
          * Compares this dimension with <code>_toCompare</code> dimension. The
@@ -640,10 +601,8 @@ public class Dimension_mxJPO
                     _cmd.append("default ");
                 }
             }
-            Dimension_mxJPO.calcValueDelta(_cmd, "unitdescription", this.description,
-                    (_current != null) ? _current.description : null);
-            Dimension_mxJPO.calcValueDelta(_cmd, "label", this.label,
-                    (_current != null) ? _current.label : null);
+            DeltaUtil_mxJPO.calcValueDelta(_cmd, "unitdescription", this.description, (_current != null) ? _current.description : null);
+            DeltaUtil_mxJPO.calcValueDelta(_cmd, "label", this.label, (_current != null) ? _current.label : null);
             // check for to many settings
             if (_current != null)  {
                 for (final String curSetKey : _current.settings.keySet())  {
@@ -718,65 +677,8 @@ public class Dimension_mxJPO
                     }
                 }
             }
-            // check properties to remove
-            if (_current != null)  {
-                for (final AdminProperty_mxJPO curProp : _current.properties)  {
-                    boolean found = false;
-                    for (final AdminProperty_mxJPO tarProp : this.properties)  {
-                        if (tarProp.compareTo(curProp) == 0)  {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found)  {
-                        _cmd.append(modUnitCmd)
-                            .append("remove property \"");
-                        if (curProp.getName() != null)  {
-                            _cmd.append(StringUtil_mxJPO.convertMql(curProp.getName()));
-                        }
-                        _cmd.append("\" ");
-                        if ((curProp.getRefAdminName() != null) && (curProp.getRefAdminType() != null))  {
-                            _cmd.append(" to \"")
-                            .append(StringUtil_mxJPO.convertMql(curProp.getRefAdminType()))
-                            .append("\" \"")
-                            .append(StringUtil_mxJPO.convertMql(curProp.getRefAdminName()))
-                            .append("\" ");
-                        }
-                    }
-                }
-            }
-            // check properties to add
-            for (final AdminProperty_mxJPO tarProp : this.properties)  {
-                boolean found = false;
-                if (_current != null)  {
-                    for (final AdminProperty_mxJPO curProp : _current.properties)  {
-                        if (tarProp.compareTo(curProp) == 0)  {
-                            found = true;
-                            break;
-                        }
-                    }
-                }
-                if (!found)  {
-                    _cmd.append(modUnitCmd)
-                        .append("property \"");
-                    if (tarProp.getName() != null)  {
-                        _cmd.append(StringUtil_mxJPO.convertMql(tarProp.getName()));
-                    }
-                    _cmd.append("\" ");
-                    if ((tarProp.getRefAdminName() != null) && (tarProp.getRefAdminType() != null))  {
-                        _cmd.append(" to \"")
-                        .append(StringUtil_mxJPO.convertMql(tarProp.getRefAdminType()))
-                        .append("\" \"")
-                        .append(StringUtil_mxJPO.convertMql(tarProp.getRefAdminName()))
-                        .append("\" ");
-                    }
-                    if (tarProp.getValue() != null)  {
-                        _cmd.append(" value \"")
-                            .append(StringUtil_mxJPO.convertMql(tarProp.getValue()))
-                            .append("\" ");
-                    }
-                }
-            }
+            // delta for properties
+            this.properties.calcDelta((_current != null) ? _current.properties : null, modUnitCmd, _cmd);
         }
 
         /**
