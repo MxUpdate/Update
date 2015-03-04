@@ -186,7 +186,7 @@ public abstract class AbstractProgram_mxJPO
             }
         }
 
-        this.getProperties().writeAddFormat(_paramCache, _out, this.getTypeDef());
+        this.getProperties().writeAddFormat(_paramCache, cmd, this.getTypeDef());
 
         if (!"".equals(cmd.toString()))  {
             _out.append(_markStart.trim()).append('\n')
