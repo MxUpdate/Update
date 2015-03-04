@@ -46,6 +46,7 @@ public class Type_mxJPO
         Type_mxJPO.IGNORED_URLS.add("/derivedFrom");
         Type_mxJPO.IGNORED_URLS.add("/derivedFrom/typeRefList");
         Type_mxJPO.IGNORED_URLS.add("/methodList");
+        Type_mxJPO.IGNORED_URLS.add("/typeKind");
     }
 
     /**
@@ -62,7 +63,7 @@ public class Type_mxJPO
      * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #writeObject(ParameterCache_mxJPO, Appendable)
      */
-    private String derived = "ADMINISTRATION";
+    private String derived = "";
 
     /**
      * Defines all methods of this type.
@@ -148,8 +149,10 @@ public class Type_mxJPO
                                final Appendable _out)
         throws IOException
     {
-        _out.append(" \\\n    derived \"").append(StringUtil_mxJPO.convertTcl(this.derived)).append('\"')
-            .append(" \\\n    ").append(this.isHidden() ? "" : "!").append("hidden")
+		if(this.derived != null && !"".equals(this.derived)) {
+			_out.append(" \\\n    derived \"").append(StringUtil_mxJPO.convertTcl(this.derived)).append('\"');
+		}
+		_out.append(" \\\n    ").append(this.isHidden() ? "" : "!").append("hidden")
             .append(" \\\n    abstract \"").append(Boolean.toString(this.abstractFlag)).append('\"');
         // methods
         for (final String method : this.methods)  {
