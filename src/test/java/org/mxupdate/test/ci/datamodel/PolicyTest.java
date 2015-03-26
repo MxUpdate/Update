@@ -357,7 +357,7 @@ public class PolicyTest
             + "  format {all}\n"
             + "}";
 
-        policy.updateWithCode(updateCode);
+        policy.updateWithCode(updateCode, (String) null);
 
         Assert.assertTrue(
                 this.mql("print pol " + policy.getName() + " ").contains("\n  format all\n"),
@@ -382,7 +382,7 @@ public class PolicyTest
             + "  format all\n"
             + "}";
 
-        policy.updateWithCode(updateCode);
+        policy.updateWithCode(updateCode, (String) null);
 
         Assert.assertTrue(
                 this.mql("print pol " + policy.getName() + " ").contains("\n  format all\n"),
@@ -407,7 +407,8 @@ public class PolicyTest
                     + "    registeredName \"state_Exists\""
                     + "    registeredName \"state_Pending\""
                     + "  }"
-                    + "}");
+                    + "}",
+                    (String) null);
 
         Assert.assertEquals(this.mql("print policy " + policy.getName()
                                 + " select property[state_Exists].value dump"),
@@ -437,7 +438,7 @@ public class PolicyTest
 
         this.mql("add policy " + policy.getName() + " state Pending property \"\" value Test");
 
-        policy.updateWithCode(PolicyTest.POLICY_UPDATE_CODE);
+        policy.updateWithCode(PolicyTest.POLICY_UPDATE_CODE, (String) null);
 
         // check that only 11 properties are defined....
         // 4 state properties + installer + installed date + original name +
@@ -466,7 +467,7 @@ public class PolicyTest
     {
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
 
-        policy.updateWithCode(PolicyTest.POLICY_UPDATE_CODE);
+        policy.updateWithCode(PolicyTest.POLICY_UPDATE_CODE, (String) null);
 
         Assert.assertTrue(!"".equals(this.mql("list policy " + policy.getName())),
                           "policy was not created!");
@@ -502,7 +503,7 @@ public class PolicyTest
             + "  type {all}\n"
             + "}";
 
-        policy.updateWithCode(updateCode);
+        policy.updateWithCode(updateCode, (String) null);
 
         Assert.assertTrue(
                 this.mql("print pol " + policy.getName()).contains("\n  type all\n"),
@@ -527,7 +528,7 @@ public class PolicyTest
             + "  type all\n"
             + "}";
 
-        policy.updateWithCode(updateCode);
+        policy.updateWithCode(updateCode, (String) null);
 
         Assert.assertTrue(
                 this.mql("print pol " + policy.getName()).contains("\n  type all\n"),
@@ -548,7 +549,7 @@ public class PolicyTest
             .setValue("store", "STORE")
             .create()
             .setValue("store", "")
-            .update()
+            .update((String) null)
             .checkExport();
     }
 
@@ -609,14 +610,14 @@ public class PolicyTest
         }
         final PolicyData policy = new PolicyData(this, "Test")
                 .addState(state)
-                .update()
+                .update((String) null)
                 .checkExport();
         this.mql("mod policy '" + policy.getName() + "' state Test user " + creator.getName() + " read,show filter Test");
         this.mql("mod policy '" + policy.getName() + "' state Test owner all filter Test");
         this.mql("mod policy '" + policy.getName() + "' state Test revoke owner read filter Test");
         this.mql("mod policy '" + policy.getName() + "' state Test public all filter Test");
         this.mql("mod policy '" + policy.getName() + "' state Test revoke public read filter Test");
-        policy.update()
+        policy.update((String) null)
               .checkExport();
     }
 
@@ -640,11 +641,11 @@ public class PolicyTest
                         .setName("Test 2"))
                 .addState(new PolicyData.State()
                         .setName("Test 3"))
-                .update();
+                .update((String) null);
         // no change branch to signature 'Test 3'
         this.mql("mod policy '" + policy.getName() + "' state 'Test 1' signature 'No' add branch 'Test 1'");
         // update via policy
-        policy.update();
+        policy.update((String) null);
         // and check expport
         policy.checkExport();
     }

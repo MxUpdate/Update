@@ -275,10 +275,11 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @return this data instance
      * @throws Exception if update failed
      */
-    public DATA update(final String... _params)
+    public DATA update(final String _expLogText,
+                       final String... _params)
         throws Exception
     {
-        return this.updateWithCode(this.ciFile(), _params);
+        return this.updateWithCode(this.ciFile(), _expLogText, _params);
     }
 
     /**
@@ -298,15 +299,18 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     }
 
     /**
-     * Makes an update for given <code>_code</code>.
+     * Makes an update for given {@code _code} and checks if the log contains
+     * {@code _expLogText}.
      *
      * @param _code         TCL update code
+     * @param _expLogText   log contains expected text (if not null)
      * @param _params       parameters
      * @return this data instance
      * @throws Exception  if update failed
      */
     @SuppressWarnings("unchecked")
     public DATA updateWithCode(final String _code,
+                               final String _expLogText,
                                final String... _params)
         throws Exception
     {
@@ -319,6 +323,11 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
             }
         }
         final Map<?,?> bck = this.getTest().executeEncoded("Update", params, "FileContents", files);
+
+        if (_expLogText != null)  {
+            Assert.assertTrue(((String) bck.get("log")).contains(_expLogText), "Log message not contained: " + _expLogText + ", have log " + (String) bck.get("log"));
+        }
+
         if (bck.get("exception") != null)  {
             throw (Exception) bck.get("exception");
         }

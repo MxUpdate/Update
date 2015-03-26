@@ -65,7 +65,7 @@ public class Policy_StateAccessPublicTest
                                         .setKind("public")
                                         .addAccess("read")))
                 .create()
-                .update()
+                .update((String) null)
                 .checkExport();
 
         // now with specific role access
@@ -77,7 +77,7 @@ public class Policy_StateAccessPublicTest
                                         .setKind("user")
                                         .setUser(new RoleData(this, "New Role").create())
                                         .addAccess("read")))
-                .update()
+                .update((String) null)
                 .checkExport();
     }
 }

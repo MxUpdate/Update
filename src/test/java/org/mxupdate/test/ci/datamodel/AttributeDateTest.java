@@ -90,7 +90,7 @@ public class AttributeDateTest
         new AttributeDateData(this, "test")
                 .setFlag("rangevalue", true)
                 .create()
-                .update()
+                .update((String) null)
                 .checkExport()
                 .setFlag("rangevalue", false)
                 .failureUpdate(UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_RANGEVALUEFLAG_UPDATED);

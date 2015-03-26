@@ -91,7 +91,8 @@ public class FormatTest
                         new FormatData(this, "hello \" test")
                                 .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)
                                 .setViewProgram(new MQLProgramData(this, "ViewProgram")),
-                        new FormatData(this, "hello \" test")},
+                        new FormatData(this, "hello \" test"),
+                        "[INFO]     - view program MXUPDATE_ViewProgram ignored (not supported anymore!)"},
                 new Object[]{
                         "issue ##212: format with edit program",
                         new FormatData(this, "hello \" test")
@@ -102,7 +103,8 @@ public class FormatTest
                         new FormatData(this, "hello \" test")
                                 .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)
                                 .setEditProgram(new MQLProgramData(this, "EditProgram")),
-                        new FormatData(this, "hello \" test")},
+                        new FormatData(this, "hello \" test"),
+                        "[INFO]     - edit program MXUPDATE_EditProgram ignored (not supported anymore!)"},
                 new Object[]{
                         "issue ##212: format with print program",
                         new FormatData(this, "hello \" test")
@@ -113,7 +115,8 @@ public class FormatTest
                         new FormatData(this, "hello \" test")
                                 .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)
                                 .setPrintProgram(new MQLProgramData(this, "PrintProgram")),
-                        new FormatData(this, "hello \" test")}
+                        new FormatData(this, "hello \" test"),
+                        "[INFO]     - print program MXUPDATE_PrintProgram ignored (not supported anymore!)"}
         );
     }
 

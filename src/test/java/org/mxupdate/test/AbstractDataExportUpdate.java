@@ -16,6 +16,7 @@
 package org.mxupdate.test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -42,64 +43,50 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
     protected Object[][] prepareData(final String _logText,
                                      final Object[]... _datas)
     {
-        final List<Object[]> ret = new ArrayList<Object[]>();
+        final List<Object[]> tmp = new ArrayList<Object[]>();
+        tmp.addAll(Arrays.asList(_datas));
         if (_logText != null)  {
-            ret.add(new Object[]{
+            tmp.add(new Object[]{
                     _logText + " with property name",
                     this.createNewData("hello \" test")
-                                    .addProperty(new PropertyDef("my test \"property\"")),
-                    this.createNewData("hello \" test")
                                     .addProperty(new PropertyDef("my test \"property\""))});
-            ret.add(new Object[]{
+            tmp.add(new Object[]{
                     _logText + " property name and value",
                     this.createNewData("hello \" test")
-                                    .addProperty(new PropertyDef("my test \"property\"", "my \"value\"")),
-                    this.createNewData("hello \" test")
                                     .addProperty(new PropertyDef("my test \"property\"", "my \"value\""))});
-            ret.add(new Object[]{
+            tmp.add(new Object[]{
                     _logText + " property name, value and referenced admin object",
                     this.createNewData("hello \" test")
-                                    .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewData("property \" admin " + _logText))),
-                    this.createNewData("hello \" test")
                                     .addProperty(new PropertyDef("my test \"property\"", "my \"value\"", this.createNewData("property \" admin " + _logText)))});
-            ret.add(new Object[]{
+            tmp.add(new Object[]{
                     _logText + " with multiple properties",
-                    this.createNewData("hello \" test")
-                                    .addProperty(new PropertyDef("my test \"property\" 1"))
-                                    .addProperty(new PropertyDef("my test \"property\" 2", "my \"value\""))
-                                    .addProperty(new PropertyDef("my test \"property\" 3", this.createNewData("property \" admin " + _logText))),
                     this.createNewData("hello \" test")
                                     .addProperty(new PropertyDef("my test \"property\" 1"))
                                     .addProperty(new PropertyDef("my test \"property\" 2", "my \"value\""))
                                     .addProperty(new PropertyDef("my test \"property\" 3", this.createNewData("property \" admin " + _logText)))});
             // hidden flag
-            ret.add(new Object[]{
+            tmp.add(new Object[]{
                     _logText + " with hidden flag true",
                     this.createNewData("hello \" test")
-                            .setFlag("hidden", true),
-                    this.createNewData("hello \" test")
                             .setFlag("hidden", true)});
-            ret.add(new Object[]{
+            tmp.add(new Object[]{
                     _logText + " with hidden flag false",
                     this.createNewData("hello \" test")
-                            .setFlag("hidden", false),
-                    this.createNewData("hello \" test")
                             .setFlag("hidden", false)});
-            ret.add(new Object[]{
+            tmp.add(new Object[]{
                     _logText + " without hidden flag",
-                    this.createNewData("hello \" test")
-                            .setFlag("hidden", null),
                     this.createNewData("hello \" test")
                             .setFlag("hidden", null)});
         }
 
-        for (final Object[] data : _datas)
+        final List<Object[]> ret = new ArrayList<Object[]>();
+        for (final Object[] data : tmp)
         {
             @SuppressWarnings("unchecked")
             final DATA testData = (DATA) data[1];
             if (testData.isSupported(this.getVersion()))
             {
-                ret.add(new Object[]{data[0], data[1], (data.length > 2) ? data[2] : data[1]});
+                ret.add(new Object[]{data[0], data[1], (data.length > 2) ? data[2] : data[1], (data.length > 3) ? data[3] : null});
             }
         }
 
@@ -120,13 +107,15 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
      * @param _description  description of the test case
      * @param _orgData      original data creating the CI
      * @param _expData      CI definition of the export
+     * @param _expUpdateLog expected text in the log for the update (not used)
      * @throws Exception if test failed
      */
     @Test(dataProvider = "data",
           description = "test export of new created test data object")
     public void testExport(final String _description,
                            final DATA _orgData,
-                           final DATA _expData)
+                           final DATA _expData,
+                           final String _expUpdateLog)
         throws Exception
     {
         _expData.create()
@@ -139,24 +128,26 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
      *
      * @param _description  description of the test case
      * @param _data         data to test
+     * @param _expUpdateLog expected text in the log for the update
      * @throws Exception if test failed
      */
     @Test(dataProvider = "data",
           description = "test update of non existing data")
     public void testUpdateWithExport(final String _description,
                                      final DATA _orgData,
-                                     final DATA _expData)
+                                     final DATA _expData,
+                                     final String _expUpdateLog)
         throws Exception
     {
         _orgData.createDependings();
 
         // first update with original content
-        _orgData.update();
+        _orgData.update(_expUpdateLog);
         final ExportParser exportParser = _expData.export();
         _expData.checkExport(exportParser);
 
         // second update with delivered content
-        _expData.updateWithCode(exportParser.getOrigCode())
+        _expData.updateWithCode(exportParser.getOrigCode(), (String) null)
              .checkExport();
     }
 
@@ -165,6 +156,7 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
      *
      * @param _description  description of the test case
      * @param _data         data to test
+     * @param _expUpdateLog expected text in the log for the update
      * @throws Exception if test failed
      */
     @SuppressWarnings("unchecked")
@@ -172,17 +164,18 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
           description = "test update of existing data instance for cleaning")
     public void testUpdateWithClean(final String _description,
                                     final DATA _orgData,
-                                    final DATA _expData)
+                                    final DATA _expData,
+                                    final String _expUpdateLog)
         throws Exception
     {
         _orgData.createDependings();
 
         // first update with original content
-        _orgData.update();
+        _orgData.update(_expUpdateLog);
         _expData.checkExport();
 
         // second update with delivered content
-        final DATA newData = (DATA) this.createCleanNewData(_expData).update();
+        final DATA newData = (DATA) this.createCleanNewData(_expData).update((String) null);
 
         // check export
         newData.checkExport();

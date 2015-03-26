@@ -116,7 +116,7 @@ public class TypeTest
     {
         final TypeData type = new TypeData(this, "TestType")
                 .create()
-                .update();
+                .update((String) null);
 
         Assert.assertEquals(this.mql("print type '" + type.getName() + "' select method dump"),
                             "",
@@ -140,7 +140,7 @@ public class TypeTest
         this.mql("mod type \"" + AbstractTest.convertMql(type.getName())
                 + "\" add method \"" + AbstractTest.convertMql(method.getName()) + "\"");
 
-        type.update();
+        type.update((String) null);
 
         Assert.assertEquals(
                 this.mql("print type '" + AbstractTest.convertMql(type.getName()) + "' select method dump"),
@@ -164,7 +164,7 @@ public class TypeTest
 
         // method must be defined after create (to test the update..)
         type.addMethod(method)
-            .update();
+                .update((String) null);
 
         Assert.assertEquals(this.mql("print type '" + AbstractTest.convertMql(type.getName()) + "' select method dump"),
                             AbstractTest.convertMql(method.getName()),

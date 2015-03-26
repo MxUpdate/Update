@@ -103,12 +103,12 @@ public class NotificationTest
         throws Exception
     {
         // first update with original content
-        _notification.update();
+        _notification.update((String) null);
         final ExportParser exportParser = _notification.export();
         _notification.checkExport(exportParser);
 
         // second update with delivered content
-        _notification.updateWithCode(exportParser.getOrigCode())
+        _notification.updateWithCode(exportParser.getOrigCode(), (String) null)
                      .checkExport();
     }
 }

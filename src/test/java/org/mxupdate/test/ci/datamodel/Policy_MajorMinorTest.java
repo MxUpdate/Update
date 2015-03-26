@@ -162,7 +162,7 @@ public class Policy_MajorMinorTest
                     .setValue("delimiter", '.')
                     .setValue("minorsequence", "A,B,C")
                     .setValue("majorsequence", "1,2,3")
-                    .update()
+                    .update((String) null)
                     .checkExport()
                     .setValue("delimiter", '|')
                     .failureUpdate(UpdateException_mxJPO.Error.DM_POLICY_UPDATE_DELIMITER);

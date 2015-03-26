@@ -133,12 +133,12 @@ public abstract class AbstractIEFTest<IEFCLASS extends AbstractBusData<IEFCLASS>
         }
 
         // first update with original content
-        _ief.update();
+        _ief.update((String) null);
         final ExportParser exportParser = _ief.export();
         _ief.checkExport(exportParser);
 
         // second update with delivered content
-        _ief.updateWithCode(exportParser.getOrigCode())
+        _ief.updateWithCode(exportParser.getOrigCode(), (String) null)
             .checkExport();
     }
 
@@ -161,12 +161,12 @@ public abstract class AbstractIEFTest<IEFCLASS extends AbstractBusData<IEFCLASS>
         }
 
         // first update with original content
-        _ief.update("UpdateCheckFileDate", "true");
+        _ief.update((String) null, "UpdateCheckFileDate", "true");
         final ExportParser exportParser = _ief.export();
         _ief.checkExport(exportParser);
 
         // second update with delivered content
-        _ief.updateWithCode(exportParser.getOrigCode())
+        _ief.updateWithCode(exportParser.getOrigCode(), (String) null)
             .checkExport();
     }
 }

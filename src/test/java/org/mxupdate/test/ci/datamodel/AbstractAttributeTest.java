@@ -270,7 +270,7 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
         new AttributeRealData(this, "test")
                 .setFlag("multivalue", true)
                 .create()
-                .update()
+                .update((String) null)
                 .checkExport()
                 .setFlag("multivalue", false)
                 .failureUpdate(UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_MULTIVALUEFLAG_UPDATED);

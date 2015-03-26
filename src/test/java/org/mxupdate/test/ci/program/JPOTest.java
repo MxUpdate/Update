@@ -142,7 +142,7 @@ public class JPOTest
     {
         // first update with original content
         _jpoProgram.createDependings()
-                   .update();
+                   .update((String) null);
 
         // the replace code (removing TCL update commands)
         final StringBuilder cmd = new StringBuilder()
@@ -159,11 +159,11 @@ public class JPOTest
                 + "\" execute user creator execute immediate !needsbusinessobject !downloadable !pipe !pooled description test !hidden");
 
         // second update with delivered content
-        _jpoProgram.updateWithCode(exportParser.getOrigCode())
+        _jpoProgram.updateWithCode(exportParser.getOrigCode(), (String) null)
                    .checkExport();
 
         // third update with delivered content (without changing the code)
-        _jpoProgram.updateWithCode(exportParser.getOrigCode())
+        _jpoProgram.updateWithCode(exportParser.getOrigCode(), (String) null)
                    .checkExport();
 
         Assert.assertEquals(exportParser.getOrigCode(),

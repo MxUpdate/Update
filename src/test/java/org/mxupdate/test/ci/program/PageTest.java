@@ -120,12 +120,12 @@ public class PageTest
         throws Exception
     {
         // first update with original content
-        _page.update();
+        _page.update((String) null);
         final ExportParser exportParser = _page.export();
         _page.checkExport(exportParser);
 
         // second update with delivered content
-        _page.updateWithCode(exportParser.getOrigCode())
+        _page.updateWithCode(exportParser.getOrigCode(), (String) null)
              .checkExport();
 
         // and check that both export code is equal

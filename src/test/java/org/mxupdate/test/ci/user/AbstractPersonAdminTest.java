@@ -212,7 +212,7 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
                 .setSite(new SiteData(this, "Test \" Site"))
                 .create()
                 .setSite(null)
-                .update();
+                .update((String) null);
 
         Assert.assertEquals(this.mql("escape print person \""
                                     + AbstractTest.convertMql(person.getName())
@@ -234,7 +234,7 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
                 .setFlag("hidden", true)
                 .create()
                 .setFlag("hidden", null)
-                .update();
+                .update((String) null);
 
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select hidden dump"),
                             "FALSE",
@@ -254,7 +254,7 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
                 .setPasswordNeverExpires(true)
                 .create()
                 .setPasswordNeverExpires(null)
-                .update();
+                .update((String) null);
 
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select neverexpires dump"),
                             "FALSE",
@@ -275,7 +275,7 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
                 .setPasswordNeverExpires(true)
                 .create()
                 .setPasswordNeverExpires(null)
-                .update("UserPersonIgnorePswdNeverExpires", "*");
+                .update((String) null, "UserPersonIgnorePswdNeverExpires", "*");
 
         // check not updated
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select neverexpires dump"),
@@ -300,7 +300,7 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
                 .setWantsEmail(true)
                 .create()
                 .setWantsEmail(null)
-                .update();
+                .update((String) null);
 
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select emailenabled dump"),
                             "FALSE",
@@ -321,7 +321,7 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
                 .setWantsEmail(true)
                 .create()
                 .setWantsEmail(null)
-                .update("UserPersonIgnoreWantsEmail", "*");
+                .update((String) null, "UserPersonIgnoreWantsEmail", "*");
 
         // check not updated
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select emailenabled dump"),
@@ -348,7 +348,7 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
                 .setWantsIconMail(false)
                 .create()
                 .setWantsIconMail(null)
-                .update();
+                .update((String) null);
 
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select iconmailenabled dump"),
                             "TRUE",
@@ -369,7 +369,7 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
                 .setWantsIconMail(false)
                 .create()
                 .setWantsIconMail(null)
-                .update("UserPersonIgnoreWantsIconMail", "*");
+                .update((String) null, "UserPersonIgnoreWantsIconMail", "*");
 
         // check not updated
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select iconmailenabled dump"),
@@ -395,7 +395,7 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
     {
         final AbstractPersonAdminData<?> person = this.createNewData("test")
                 .create();
-        person  .updateWithCode("mql mod product CPF add person " + person.getName() + "\nsetProducts")
+        person  .updateWithCode("mql mod product CPF add person " + person.getName() + "\nsetProducts", (String) null)
                 .checkExport();
     }
 
@@ -412,7 +412,7 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
         final AbstractPersonAdminData<?> person = this.createNewData("test")
                 .addProduct("CPF")
                 .create();
-        person  .updateWithCode("mql mod product CPF remove person " + person.getName() + "\nsetProducts \"CPF\"")
+        person  .updateWithCode("mql mod product CPF remove person " + person.getName() + "\nsetProducts \"CPF\"", (String) null)
                 .checkExport();
     }
 
@@ -431,7 +431,7 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
                 .create()
                 .setWantsIconMail(null);
         this.mql("escape mod product CPF remove person \"" + AbstractTest.convertMql(person.getName()) + "\"");
-        person.update("UserPersonIgnoreProducts", "*");
+        person.update((String) null, "UserPersonIgnoreProducts", "*");
 
         // check not updated
         Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select product dump"),

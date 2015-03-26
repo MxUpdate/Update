@@ -62,16 +62,16 @@ public class Policy_AllState_Test
     {
         new PolicyData(this, "Test")
             .setAllState(new AllState())
-            .update()
-            .update()
+            .update((String) null)
+            .update((String) null)
             .checkExport()
             .setAllState((AllState) null)
-            .update()
-            .update()
+            .update((String) null)
+            .update((String) null)
             .checkExport()
             .setAllState(new AllState())
-            .update()
-            .update()
+            .update((String) null)
+            .update((String) null)
             .checkExport();
     }
 }

@@ -181,7 +181,7 @@ public class PersonTest
                 .setState("Active")
                 .create()
                 .setState("Inactive")
-                .update("UserPersonIgnoreState", "*")
+                .update((String) null, "UserPersonIgnoreState", "*")
                 .setState("Active")
                 .checkExport();
     }
@@ -221,7 +221,7 @@ public class PersonTest
                 .addEmployeeOf(company)
                 .create()
                 .removeEmployeeOf(company)
-                .update("UserPersonEmployeeIgnore", "*")
+                .update((String) null, "UserPersonEmployeeIgnore", "*")
                 .addEmployeeOf(company)
                 .checkExport();
     }
@@ -263,7 +263,7 @@ public class PersonTest
                 .addMemberOf(company, "Project Member", "")
                 .create()
                 .removeMemberOf(company)
-                .update("UserPersonMemberIgnore", "*")
+                .update((String) null, "UserPersonMemberIgnore", "*")
                 .addMemberOf(company, "Project Member", "")
                 .checkExport();
     }
@@ -304,7 +304,7 @@ public class PersonTest
                 .addRepresentativeOf(company)
                 .create()
                 .removeRepresentativeOf(company)
-                .update("UserPersonRepresentativeIgnore", "*")
+                .update((String) null, "UserPersonRepresentativeIgnore", "*")
                 .addRepresentativeOf(company)
                 .checkExport();
     }
