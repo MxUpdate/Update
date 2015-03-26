@@ -18,15 +18,18 @@ package org.mxupdate.test.ci.datamodel;
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.data.datamodel.FormatData;
 import org.mxupdate.test.data.program.MQLProgramData;
+import org.mxupdate.test.util.Version;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 /**
  * Test class for format exports and updates.
  *
  * @author The MxUpdate Team
  */
+@Test()
 public class FormatTest
     extends AbstractDataExportUpdate<FormatData>
 {
@@ -79,17 +82,38 @@ public class FormatTest
                         new FormatData(this, "hello \" test")
                                 .setValue("type", "type \"test\"")},
                 new Object[]{
-                        "format with view program",
+                        "issue ##212: format with view program",
                         new FormatData(this, "hello \" test")
+                                .notSupported(Version.V6R2014x)
                                 .setViewProgram(new MQLProgramData(this, "ViewProgram"))},
                 new Object[]{
-                        "format with edit program",
+                        "issue ##212: format with view program",
                         new FormatData(this, "hello \" test")
+                                .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)
+                                .setViewProgram(new MQLProgramData(this, "ViewProgram")),
+                        new FormatData(this, "hello \" test")},
+                new Object[]{
+                        "issue ##212: format with edit program",
+                        new FormatData(this, "hello \" test")
+                                .notSupported(Version.V6R2014x)
                                 .setEditProgram(new MQLProgramData(this, "EditProgram"))},
                 new Object[]{
-                        "format with print program",
+                        "issue ##212: format with edit program",
                         new FormatData(this, "hello \" test")
-                                .setPrintProgram(new MQLProgramData(this, "PrintProgram"))}
+                                .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)
+                                .setEditProgram(new MQLProgramData(this, "EditProgram")),
+                        new FormatData(this, "hello \" test")},
+                new Object[]{
+                        "issue ##212: format with print program",
+                        new FormatData(this, "hello \" test")
+                                .notSupported(Version.V6R2014x)
+                                .setPrintProgram(new MQLProgramData(this, "PrintProgram"))},
+                new Object[]{
+                        "issue ##212: format with print program",
+                        new FormatData(this, "hello \" test")
+                                .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)
+                                .setPrintProgram(new MQLProgramData(this, "PrintProgram")),
+                        new FormatData(this, "hello \" test")}
         );
     }
 

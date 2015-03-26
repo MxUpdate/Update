@@ -1,0 +1,139 @@
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
+options {
+  JDK_VERSION = "1.6";
+  STATIC = false;
+  ERROR_REPORTING = false;
+  USER_TOKEN_MANAGER = false;
+}
+PARSER_BEGIN(FormatDefParser)
+package org.mxupdate.update.datamodel.format;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+
+import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.datamodel.Format_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
+
+public class FormatDefParser
+    extends AbstractParser_mxJPO
+{
+}
+PARSER_END(FormatDefParser)SKIP :
+{
+    " "
+|   "\r"
+|   "\t"
+|   "\n"
+}
+
+TOKEN : /** first level */
+{
+      <DESCRIPTION:             "description">      : STRING_EXPECTED
+    | <HIDDEN_TRUE:             "hidden">
+    | <HIDDEN_FALSE:            "!hidden">
+    | <MIME:                    "mime">             : STRING_EXPECTED
+    | <SUFFIX:                  "suffix">           : STRING_EXPECTED
+    | <TYPE:                    "type">             : STRING_EXPECTED
+    | <VERSION:                 "version">          : STRING_EXPECTED
+    | <VIEW:                    "view">             : STRING_EXPECTED
+    | <EDIT:                    "edit">             : STRING_EXPECTED
+    | <PRINT:                   "print">            : STRING_EXPECTED
+    | <PROPERTY:                "property">                                 : STRING_EXPECTED
+    | <PROPERTYTO:              "to">                                       : ADMINREF_EXPECTED
+    | <PROPERTYVAL:             "value">                                    : STRING_EXPECTED
+}
+
+/***************************************************** String for Description */
+<STRING_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<STRING_EXPECTED> TOKEN :
+{
+      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<APOSTROPHE>)> : DEFAULT
+    | <SINGLE: (<CHAR>)+> : DEFAULT
+    | <#APOSTROPHE: "\"" >
+    | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/**************************************** Two Strings for Property Definition */
+<ADMINREF_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<ADMINREF_EXPECTED> TOKEN :
+{
+      <ADMINTYPE_STRING : (<ADMINTYPE_APOSTROPHE>(<ADMINTYPE_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<ADMINTYPE_APOSTROPHE>)> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE : (<ADMINTYPE_CHAR>)+> : STRING_EXPECTED
+    | <#ADMINTYPE_APOSTROPHE : "\"" >
+    | <#ADMINTYPE_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+/**
+ * Parses one complete format definition.
+ *
+ * @param _paramCache   parameter cache
+ * @param _typeDef      type definition of the format (to instantiate the
+ *                      format)
+ * @param _mxName       MX name of the format
+ */
+Format_mxJPO format(final ParameterCache_mxJPO _paramCache,
+                    final TypeDef_mxJPO _typeDef,
+                    final String _mxName)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+: {
+    final Format_mxJPO attr = (Format_mxJPO) _typeDef.newTypeInstance(_mxName);
+    Token tmp;
+    AdminProperty property;
+} {
+    (   (<DESCRIPTION>              ( tmp = <STRING>           {this.setValue(attr, "description", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(attr, "description", this.getSingle(tmp.image));} ) )
+      | (<HIDDEN_TRUE>                                         {this.setValue(attr, "hidden",       true);} )
+      | (<HIDDEN_FALSE>                                        {this.setValue(attr, "hidden",       false);} )
+      | (<MIME>                     ( tmp = <STRING>           {this.setValue(attr, "mimeType",     this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(attr, "mimeType",     this.getSingle(tmp.image));} ) )
+      | (<SUFFIX>                   ( tmp = <STRING>           {this.setValue(attr, "fileSuffix",   this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(attr, "fileSuffix",   this.getSingle(tmp.image));} ) )
+      | (<TYPE>                     ( tmp = <STRING>           {this.setValue(attr, "type",         this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(attr, "type",         this.getSingle(tmp.image));} ) )
+      | (<VERSION>                  ( tmp = <STRING>           {this.setValue(attr, "version",      this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(attr, "version",      this.getSingle(tmp.image));} ) )
+      | (<VIEW>                     ( tmp = <STRING>           {this.setValue(attr, "commandView",  this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(attr, "commandView",  this.getSingle(tmp.image));} ) )
+      | (<EDIT>                     ( tmp = <STRING>           {this.setValue(attr, "commandEdit",  this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(attr, "commandEdit",  this.getSingle(tmp.image));} ) )
+      | (<PRINT>                    ( tmp = <STRING>           {this.setValue(attr, "commandPrint", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(attr, "commandPrint", this.getSingle(tmp.image));} ) )
+      | (<PROPERTY>                                            {property = new AdminProperty();this.appendValue(this.getValue(attr, "properties"), "propertiesStack", property);}
+                                    ( tmp = <STRING>           {this.setValue(property, "name", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(property, "name", this.getSingle(tmp.image));} )
+              (   ( <PROPERTYVAL>   ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING> {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <ADMINTYPE_SINGLE> {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                    ( tmp = <STRING>           {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+    )*
+    {
+        this.prepareObject(_paramCache, attr);
+        return attr;
+    }
+}

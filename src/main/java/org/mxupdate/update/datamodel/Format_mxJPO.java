@@ -17,14 +17,20 @@ package org.mxupdate.update.datamodel;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.datamodel.format.FormatDefParser_mxJPO;
+import org.mxupdate.update.util.DeltaUtil_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * Handles the export and the update of the format configuration item.
@@ -46,38 +52,43 @@ public class Format_mxJPO
     }
 
     /**
-     * Reference to the edit program.
+     * Key used to identify the update of an attribute within
+     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)}.
      */
+    private static final String JPO_CALLER_KEY = "updateFormat";
+
+    /**
+     * Called TCL procedure within the TCL update to parse the new policy
+     * definition. The TCL procedure calls method
+     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)} with the new
+     * policy definition. All quot's are replaced by <code>@0@0@</code> and all
+     * apostroph's are replaced by <code>@1@1@</code>.
+     */
+    private static final String TCL_PROCEDURE
+            = "proc updateFormat {_sName _lsArgs}  {\n"
+                + "regsub -all {'} $_lsArgs {@0@0@} sArg\n"
+                + "regsub -all {\\\"} $sArg {@1@1@} sArg\n"
+                + "regsub -all {\\\\\\[} $sArg {[} sArg\n"
+                + "regsub -all {\\\\\\]} $sArg {]} sArg\n"
+                + "mql exec prog org.mxupdate.update.util.JPOCaller " + Format_mxJPO.JPO_CALLER_KEY + " ${_sName} \"${sArg}\"\n"
+            + "}\n";
+
+    /** Reference to the edit program. */
     private String commandEdit = null;
-
-    /**
-     * Reference to the print program.
-     */
+    /** Reference to the print program. */
     private String commandPrint = null;
-
-    /**
-     * Reference to the view program.
-     */
+    /** Reference to the view program. */
     private String commandView = null;
 
-    /**
-     * File suffix of the format.
-     */
+    /** Mime type of the format. */
+    private String mimeType = null;
+    /** File suffix of the format. */
     private String fileSuffix = null;
 
-    /**
-     * File type of the format.
-     */
-    private String fileType = null;
+    /** Type and creator of the format (used only for MacOS). */
+    private String type = null;
 
-    /**
-     * Mime type of the format.
-     */
-    private String mimeType = null;
-
-    /**
-     * Version of the format.
-     */
+    /** Version of the format. */
     private String version = null;
 
     /**
@@ -123,7 +134,7 @@ public class Format_mxJPO
             this.fileSuffix = _content;
             parsed = true;
         } else if ("/fileType".equals(_url))  {
-            this.fileType = _content;
+            this.type = _content;
             parsed = true;
         } else if ("/mimeType".equals(_url))  {
             this.mimeType = _content;
@@ -140,39 +151,64 @@ public class Format_mxJPO
     }
 
     /**
-     * Writes specific information about the cached format to the given
-     * writer instance.
+     * Writes the TCL update file for this attribute. The original method is
+     * overwritten because am attribute could not be only updated. A compare
+     * must be done in front or otherwise some data is lost. >
      *
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the TCL update code for the format could not be
-     *                     written
+     * @throws IOException if the TCL update code could not be written to the
+     *                     writer instance
+     * @see #PARAM_SUPPORT_FLAG_RESET_ON_CLONE
+     * @see #PARAM_SUPPORT_FLAG_RESET_ON_REVISION
+     */
+    @Override()
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Appendable _out)
+        throws IOException
+    {
+        // write header
+        this.writeHeader(_paramCache, _out);
+
+        // write attribute
+        _out.append("updateFormat \"${NAME}\"  {\n")
+            .append("  description \"").append(StringUtil_mxJPO.convertTcl(this.getDescription())).append("\"\n")
+            .append("  ").append(this.isHidden() ? "" : "!").append("hidden\n")
+            .append("  mime \"").append(StringUtil_mxJPO.convertTcl(this.mimeType)).append("\"\n")
+            .append("  suffix \"").append(StringUtil_mxJPO.convertTcl(this.fileSuffix)).append("\"\n")
+            .append("  type \"").append(StringUtil_mxJPO.convertTcl(this.type)).append("\"\n")
+            .append("  version \"").append(StringUtil_mxJPO.convertTcl(this.version)).append("\"\n");
+        if (_paramCache.getValueBoolean(ValueKeys.DMFormatSupportsPrograms))  {
+            _out.append("  view \"").append(StringUtil_mxJPO.convertTcl(this.commandView)).append("\"\n")
+                .append("  edit \"").append(StringUtil_mxJPO.convertTcl(this.commandEdit)).append("\"\n")
+                .append("  print \"").append(StringUtil_mxJPO.convertTcl(this.commandPrint)).append("\"\n");
+        }
+
+        // append properties
+        this.getProperties().writeUpdateFormat(_paramCache, _out, "  ");
+
+        _out.append("}");
+    }
+
+    /**
+     * Only implemented as stub because
+     * {@link #write(ParameterCache_mxJPO, Appendable)} is new implemented.
+     *
+     * @param _paramCache   parameter cache (not used)
+     * @param _out          appendable instance to the TCL update file (not
+     *                      used)
      */
     @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
         throws IOException
     {
-        _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden")
-            .append(" \\\n    version \"").append(StringUtil_mxJPO.convertTcl(this.version)).append('\"')
-            .append(" \\\n    suffix \"").append(StringUtil_mxJPO.convertTcl(this.fileSuffix)).append('\"')
-            .append(" \\\n    type \"").append(StringUtil_mxJPO.convertTcl(this.fileType)).append('\"')
-            .append(" \\\n    mime \"").append(StringUtil_mxJPO.convertTcl(this.mimeType)).append('\"')
-            .append(" \\\n    view \"").append(StringUtil_mxJPO.convertTcl(this.commandView)).append('\"')
-            .append(" \\\n    edit \"").append(StringUtil_mxJPO.convertTcl(this.commandEdit)).append('\"')
-            .append(" \\\n    print \"").append(StringUtil_mxJPO.convertTcl(this.commandPrint)).append('\"');
     }
 
-
     /**
-     * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this format. Following
-     * steps are done:
-     * <ul>
-     * <li>set to not hidden</li>
-     * <li>reset description, version, suffix, mime type, file type</li>
-     * <li>remove view / edit / print program</li>
-     * </ul>
+     * The method overwrites the original method to add the TCL procedure
+     * {@link #TCL_PROCEDURE} so that the format could be updated with
+     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)}.
      *
      * @param _paramCache       parameter cache
      * @param _preMQLCode       MQL statements which must be called before the
@@ -197,14 +233,97 @@ public class Format_mxJPO
                           final File _sourceFile)
         throws Exception
     {
-        final StringBuilder preMQLCode = new StringBuilder()
-                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                .append(" !hidden description \"\" version \"\" suffix \"\" mime \"\" type \"\" view \"\" edit \"\" print \"\";\n");
+        // add TCL code for the procedure
+        final StringBuilder preTCLCode = new StringBuilder()
+                .append(Format_mxJPO.TCL_PROCEDURE)
+                .append(_preTCLCode);
 
-        // append already existing pre MQL code
-        preMQLCode.append(_preMQLCode);
+        super.update(_paramCache, _preMQLCode, _postMQLCode, preTCLCode, _tclVariables, _sourceFile);
+    }
 
-        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+    /**
+     * The method is called from the TCL update code to define the this
+     * attribute. If the correct use case is defined method
+     * {@link #updateDimension(ParameterCache_mxJPO, String)} is called.
+     *
+     * @param _paramCache   parameter cache
+     * @param _args         first index defines the use case (must be
+     *                      &quot;updateAttribute&quot; that the attribute
+     *                      is updated); second index the name of the attribute
+     *                      to update
+     * @throws Exception if the update of the dimension failed or for all other
+     *                   use cases from super JPO call
+     */
+    @Override()
+    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
+                               final String... _args)
+        throws Exception
+    {
+        // check if dimension is defined
+        if ((_args.length == 3) && Format_mxJPO.JPO_CALLER_KEY.equals(_args[0])) {
+// TODO: Exception Handling
+            // check that attribute names are equal
+            if (!this.getName().equals(_args[1]))  {
+                throw new Exception("wrong format '"
+                        + _args[1] + "' is set to update (currently format '" + this.getName()
+                        + "' is updated!)");
+            }
+
+            final String code = _args[2].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
+
+            final FormatDefParser_mxJPO parser = new FormatDefParser_mxJPO(new StringReader(code));
+            final Format_mxJPO format = parser.format(_paramCache, this.getTypeDef(), this.getName());
+
+            final MqlBuilder_mxJPO mql = new MqlBuilder_mxJPO(new StringBuilder("escape mod format \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\""));
+
+            this.calcDelta(_paramCache, mql, format);
+
+            mql.exec(_paramCache);
+
+        } else  {
+            super.jpoCallExecute(_paramCache, _args);
+        }
+    }
+
+    /**
+     * Calculates the delta between this current format definition and the
+     * {@code _target} format definition and appends the MQL append commands
+     * to {@code _cmd}.
+     *
+     * @param _paramCache   parameter cache
+     * @param _cmd          string builder to append the MQL commands
+     * @param _target       target format definition
+     * @throws UpdateException_mxJPO if update is not allowed (because data can
+     *                      be lost)
+     */
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MqlBuilder_mxJPO _mql,
+                             final Format_mxJPO _target)
+        throws UpdateException_mxJPO
+    {
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "description",     _target.getDescription(), this.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",          _target.isHidden(),       this.isHidden());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "mime",            _target.mimeType,         this.mimeType);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "suffix",          _target.fileSuffix,       this.fileSuffix);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "type",            _target.type,             this.type);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "version",         _target.version,          this.version);
+
+        if (_paramCache.getValueBoolean(ValueKeys.DMFormatSupportsPrograms))  {
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "view", _target.commandView, this.commandView);
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "edit", _target.commandEdit, this.commandEdit);
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "print", _target.commandPrint, this.commandPrint);
+        } else  {
+            if (_target.commandView != null)  {
+                _paramCache.logInfo("    - view program " + _target.commandView + " ignored (not supported anymore!)");
+            }
+            if (_target.commandEdit != null)  {
+                _paramCache.logInfo("    - edit program " + _target.commandEdit + " ignored (not supported anymore!)");
+            }
+            if (_target.commandPrint != null)  {
+                _paramCache.logInfo("    - print program " + _target.commandPrint + " ignored (not supported anymore!)");
+            }
+        }
+
+        _target.getProperties().calcDelta(this.getProperties(), _mql);
     }
 }

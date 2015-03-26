@@ -23,11 +23,48 @@ package org.mxupdate.test.util;
 public enum Version
 {
     /** MX version V6R2011x. */
-    V6R2011x,
+    V6R2011x(1),
     /** MX version V6R2012x. */
-    V6R2012x,
+    V6R2012x(2),
     /** MX version V6R2013x. */
-    V6R2013x,
+    V6R2013x(3),
     /** MX version V6R2014x. */
-    V6R2014x;
+    V6R2014x(4);
+
+    /** Index. */
+    private final int idx;
+
+    /**
+     * Constructor.
+     *
+     * @param _idx  index
+     */
+    private Version(final int _idx)
+    {
+        this.idx = _idx;
+    }
+
+    /**
+     * Checks if this version has maximum {@code _version}.
+     *
+     * @param _version  maximum version
+     * @return <i>true</i> if this version is greater or equal;
+     *         otherwise <i>false</i>
+     */
+    public boolean max(final Version _version)
+    {
+        return (this.idx <= _version.idx);
+    }
+
+    /**
+     * Checks if this version has minimum {@code _version}.
+     *
+     * @param _version  minimum version
+     * @return <i>true</i> if this version is less or equal;
+     *         otherwise <i>false</i>
+     */
+    public boolean min(final Version _version)
+    {
+        return (this.idx >= _version.idx);
+    }
 }

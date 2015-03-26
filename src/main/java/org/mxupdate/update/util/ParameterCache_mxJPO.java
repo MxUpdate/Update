@@ -774,7 +774,14 @@ public class ParameterCache_mxJPO
          * The parameter is needed to support the case that an old MX version
          * is used....
          */
-        DMAttrSupportsPropMaxLength;
-
+        DMAttrSupportsPropMaxLength,
+        /**
+         * Name of the parameter to define that the &quot;view&quot;,
+         * &quot;edit&quot; and &quot;print&quot; program
+         * property for formats from current MX version is supported.
+         * The parameter is needed to support the case that a new MX version
+         * is used (where the view program is not working anymore).
+         */
+        DMFormatSupportsPrograms;
     }
 }

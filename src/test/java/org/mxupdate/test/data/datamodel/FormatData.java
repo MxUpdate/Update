@@ -16,7 +16,6 @@
 package org.mxupdate.test.data.datamodel;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import matrix.util.MatrixException;
 
@@ -24,6 +23,7 @@ import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.program.MQLProgramData;
+import org.mxupdate.test.util.Version;
 
 /**
  * Used to define a format, create them and test the result.
@@ -33,40 +33,11 @@ import org.mxupdate.test.data.program.MQLProgramData;
 public class FormatData
     extends AbstractAdminData<FormatData>
 {
-    /**
-     * Within export the description must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
-    static  {
-        FormatData.REQUIRED_EXPORT_VALUES.put("description", "");
-        FormatData.REQUIRED_EXPORT_VALUES.put("version", "");
-        FormatData.REQUIRED_EXPORT_VALUES.put("suffix", "");
-        FormatData.REQUIRED_EXPORT_VALUES.put("mime", "");
-        FormatData.REQUIRED_EXPORT_VALUES.put("type", "");
-        FormatData.REQUIRED_EXPORT_VALUES.put("view", "");
-        FormatData.REQUIRED_EXPORT_VALUES.put("edit", "");
-        FormatData.REQUIRED_EXPORT_VALUES.put("print", "");
-    }
-
-    /**
-     * Related view program.
-     *
-     * @see #setViewProgram(MQLProgramData)
-     */
+    /** Related view program (in pre-{@link org.mxupdate.test.util.Version#V6R2014x}). */
     private MQLProgramData viewProgram;
-
-    /**
-     * Related edit program.
-     *
-     * @see #setEditProgram(MQLProgramData)
-     */
+    /** Related edit program (in pre-{@link org.mxupdate.test.util.Version#V6R2014x}). */
     private MQLProgramData editProgram;
-
-    /**
-     * Related print program.
-     *
-     * @see #setPrintProgram(MQLProgramData)
-     */
+    /** Related print program (in pre-{@link org.mxupdate.test.util.Version#V6R2014x}). */
     private MQLProgramData printProgram;
 
     /**
@@ -79,7 +50,23 @@ public class FormatData
     public FormatData(final AbstractTest _test,
                       final String _name)
     {
-        super(_test, AbstractTest.CI.DM_FORMAT, _name, FormatData.REQUIRED_EXPORT_VALUES, null);
+        super(_test, AbstractTest.CI.DM_FORMAT, _name,
+                new HashMap<String,Object>() {
+                    private static final long serialVersionUID = 1L;
+                    {
+                        this.put("description", "");
+                        this.put("version", "");
+                        this.put("suffix", "");
+                        this.put("mime", "");
+                        this.put("type", "");
+                        if (_test.getVersion().max(Version.V6R2013x))  {
+                            this.put("view", "");
+                            this.put("edit", "");
+                            this.put("print", "");
+                        }
+                    }
+                },
+                null);
     }
 
     /**
@@ -159,25 +146,33 @@ public class FormatData
     @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder();
+        final StringBuilder strg = new StringBuilder();
 
-        this.append4CIFileHeader(cmd);
+        this.append4CIFileHeader(strg);
 
-        cmd.append("mql escape mod format \"${NAME}\"");
+        strg.append("updateFormat \"${NAME}\" {\n");
 
-        this.append4CIFileValues(cmd);
+        // append flags
+        this.getFlags().append4CIFileValues("  ", strg, "\n");
+        // append values
+        this.getValues().append4CIFileValues("  ", strg, "\n");
 
         if (this.viewProgram != null)  {
-            cmd.append(" view \"").append(AbstractTest.convertTcl(this.viewProgram.getName())).append('\"');;
+            strg.append(" view \"").append(AbstractTest.convertTcl(this.viewProgram.getName())).append("\"\n");
         }
         if (this.editProgram != null)  {
-            cmd.append(" edit \"").append(AbstractTest.convertTcl(this.editProgram.getName())).append('\"');;
+            strg.append(" edit \"").append(AbstractTest.convertTcl(this.editProgram.getName())).append("\"\n");
         }
         if (this.printProgram != null)  {
-            cmd.append(" print \"").append(AbstractTest.convertTcl(this.printProgram.getName())).append('\"');;
+            strg.append(" print \"").append(AbstractTest.convertTcl(this.printProgram.getName())).append("\"\n");
         }
 
-        return cmd.toString();
+        // append properties
+        this.getProperties().appendCIFileUpdateFormat("  ", strg);
+
+        strg.append("}");
+
+        return strg.toString();
     }
 
     /**
@@ -201,18 +196,12 @@ public class FormatData
 
             if (this.viewProgram != null)  {
                 cmd.append(" view \"").append(AbstractTest.convertMql(this.viewProgram.getName())).append('\"');;
-            } else  {
-                cmd.append(" view \"\"");
             }
             if (this.editProgram != null)  {
                 cmd.append(" edit \"").append(AbstractTest.convertMql(this.editProgram.getName())).append('\"');;
-            } else  {
-                cmd.append(" edit \"\"");
             }
             if (this.printProgram != null)  {
                 cmd.append(" print \"").append(AbstractTest.convertMql(this.printProgram.getName())).append('\"');;
-            } else  {
-                cmd.append(" print \"\"");
             }
 
             cmd.append(";\n")
@@ -263,13 +252,20 @@ public class FormatData
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        super.checkExport(_exportParser);
+        // check for defined values
+        this.getValues().checkExport(_exportParser);
+        // check for defined flags
+        this.getFlags().checkExport(_exportParser);
+        // check for properties
+        this.getProperties().checkExportPropertiesUpdateFormat(_exportParser.getLines("/updateFormat/property/@value"));
 
-        this.checkSingleValue(_exportParser, "view program", "view",
-                (this.viewProgram != null) ? "\"" + AbstractTest.convertTcl(this.viewProgram.getName()) + "\"" : "\"\"");
-        this.checkSingleValue(_exportParser, "edit program", "edit",
-                (this.editProgram != null) ? "\"" + AbstractTest.convertTcl(this.editProgram.getName()) + "\"" : "\"\"");
-        this.checkSingleValue(_exportParser, "print program", "print",
-                (this.printProgram != null) ? "\"" + AbstractTest.convertTcl(this.printProgram.getName()) + "\"" : "\"\"");
+        if (this.getTest().getVersion().max(Version.V6R2013x))  {
+            this.checkSingleValue(_exportParser, "view program", "view",
+                    (this.viewProgram != null) ? "\"" + AbstractTest.convertTcl(this.viewProgram.getName()) + "\"" : "\"\"");
+            this.checkSingleValue(_exportParser, "edit program", "edit",
+                    (this.editProgram != null) ? "\"" + AbstractTest.convertTcl(this.editProgram.getName()) + "\"" : "\"\"");
+            this.checkSingleValue(_exportParser, "print program", "print",
+                    (this.printProgram != null) ? "\"" + AbstractTest.convertTcl(this.printProgram.getName()) + "\"" : "\"\"");
+        }
     }
 }

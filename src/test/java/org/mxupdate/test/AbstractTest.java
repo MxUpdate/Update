@@ -97,7 +97,7 @@ public abstract class AbstractTest
         DM_EXPRESSION("expression", null, false, null, null, "Expression", "EXPRESSION", "EXPRESSION_", "datamodel/expression", true, "mql"),
 
         /** Configuration item Data Model Format. */
-        DM_FORMAT("format", null, false, null, null, "Format", "FORMAT", "FORMAT_", "datamodel/format", true, "mql"),
+        DM_FORMAT("format", null, false, null, null, "Format", "FORMAT", "FORMAT_", "datamodel/format", true, "updateFormat"),
 
         /** Configuration item Data Model Interface. */
         DM_INTERFACE("interface", null, false, null, null, "Interface", "INTERFACE", "INTERFACE_", "datamodel/interface", true, "mql"),

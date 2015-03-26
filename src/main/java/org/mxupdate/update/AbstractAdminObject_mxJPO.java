@@ -31,6 +31,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO;
+import org.mxupdate.update.datamodel.Format_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
@@ -545,8 +546,10 @@ public abstract class AbstractAdminObject_mxJPO
         final StringBuilder preMQLCode = new StringBuilder();
 
         // remove all properties
-        // (only if not attribute, because attributes uses calulated deltas)
-        if (!(this instanceof AbstractAttribute_mxJPO))  {
+        // (only if not attribute, because attributes and formats uses calulated deltas)
+        if (!(this instanceof AbstractAttribute_mxJPO)
+                && !(this instanceof Format_mxJPO))  {
+
             for (final AdminProperty prop : this.properties)  {
                 // % must be ignored because this means settings
                 if ((PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null) && !prop.isSetting())  {
