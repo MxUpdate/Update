@@ -398,7 +398,7 @@ public abstract class AbstractTest
         this.context.resetContext(user, password, null);
         this.context.connect();
 
-        this.version = Version.valueOf(this.mql("version").replaceAll("\\..*", ""));
+        this.version = Version.valueOf(this.mql("version").replaceAll("\\..*", "").replaceAll("^3DEXPERIENCE ", "").replaceAll("^R", "V6R"));
     }
 
     /**

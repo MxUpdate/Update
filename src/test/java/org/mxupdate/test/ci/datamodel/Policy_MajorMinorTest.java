@@ -74,21 +74,21 @@ public class Policy_MajorMinorTest
                 new Object[]{
                         "issue #178 (V6R2011x): policy with state revisionable",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2013x, Version.V6R2014x)
+                                .notSupported(Version.V6R2013x, Version.V6R2014x, Version.V6R2015x)
                                 .addState(new State()
                                             .setName("create")
                                             .setValue("revision", "true"))},
                 new Object[]{
                         "issue #178 (V6R2011x): policy with state not revisionable",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2013x, Version.V6R2014x)
+                                .notSupported(Version.V6R2013x, Version.V6R2014x, Version.V6R2015x)
                                 .addState(new State()
                                             .setName("create")
                                             .setValue("revision", "false"))},
                 new Object[]{
                         "issue #178 (V6R2011x): policy with state revisionable (defined in new style)",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2013x, Version.V6R2014x)
+                                .notSupported(Version.V6R2013x, Version.V6R2014x, Version.V6R2015x)
                                 .addState(new State()
                                             .setName("create")
                                             .setValue("minorrevision", "true")),

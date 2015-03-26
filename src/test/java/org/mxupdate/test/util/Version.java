@@ -29,7 +29,9 @@ public enum Version
     /** MX version V6R2013x. */
     V6R2013x(3),
     /** MX version V6R2014x. */
-    V6R2014x(4);
+    V6R2014x(4),
+    /** MX version V6R2015x. */
+    V6R2015x(5);
 
     /** Index. */
     private final int idx;
