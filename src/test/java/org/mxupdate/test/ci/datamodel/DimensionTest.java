@@ -113,7 +113,7 @@ public class DimensionTest
                                         .addProperty(new PropertyDef("my test \"property\" 2", "my \"value\""))
                                         .addProperty(new PropertyDef("my test \"property\" 3", "my \"value\"", this.createNewData("property \" admin dimension"))))},
                 new Object[]{
-                        "dimension with unit (and multiplier 1.0E9)",
+                        "issue #197: dimension with unit (and multiplier 1.0E9)",
                         new DimensionData(this, "test")
                                 .addUnit(new UnitData("unit1")
                                         .setValueWOQuots("default", "true")
@@ -127,7 +127,7 @@ public class DimensionTest
                                         .setValueWOQuots("multiplier", "1.0E9")
                                         .setValueWOQuots("offset", "0.0"))},
                 new Object[]{
-                        "dimension with unit (and offset 1.0E10)",
+                        "issue #197: dimension with unit (and offset 1.0E10)",
                         new DimensionData(this, "test")
                                 .addUnit(new UnitData("unit1")
                                         .setValueWOQuots("default", "true")
@@ -139,8 +139,36 @@ public class DimensionTest
                                         .setValueWithQuots("description", "hello 2")
                                         .setValueWithQuots("label", "label 2")
                                         .setValueWOQuots("multiplier", "1.0")
-                                        .setValueWOQuots("offset", "1.0E10"))}
-        );
+                                        .setValueWOQuots("offset", "1.0E10"))},
+                new Object[]{
+                        "issue #206: dimension with offset 1.0E-10)",
+                        new DimensionData(this, "test")
+                                .addUnit(new UnitData("unit1")
+                                        .setValueWOQuots("default", "true")
+                                        .setValueWithQuots("description", "hello 1")
+                                        .setValueWithQuots("label", "label 1")
+                                        .setValueWOQuots("multiplier", "1.0")
+                                        .setValueWOQuots("offset", "0.0"))
+                                .addUnit(new UnitData("unit2")
+                                        .setValueWithQuots("description", "hello 2")
+                                        .setValueWithQuots("label", "label 2")
+                                        .setValueWOQuots("multiplier", "1.0")
+                                        .setValueWOQuots("offset", "1.0E-10"))},
+                new Object[]{
+                        "issue #206: dimension with multiplier 1.0E-10)",
+                        new DimensionData(this, "test")
+                                .addUnit(new UnitData("unit1")
+                                        .setValueWOQuots("default", "true")
+                                        .setValueWithQuots("description", "hello 1")
+                                        .setValueWithQuots("label", "label 1")
+                                        .setValueWOQuots("multiplier", "1.0")
+                                        .setValueWOQuots("offset", "0.0"))
+                                .addUnit(new UnitData("unit2")
+                                        .setValueWithQuots("description", "hello 2")
+                                        .setValueWithQuots("label", "label 2")
+                                        .setValueWOQuots("multiplier", "1.0E-10")
+                                        .setValueWOQuots("offset", "1.0"))}
+       );
     }
 
     /**
