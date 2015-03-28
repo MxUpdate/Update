@@ -14,13 +14,15 @@
  */
 
 options {
-  JDK_VERSION = "1.5";
-  STATIC = false;
-  ERROR_REPORTING = false;
-  USER_TOKEN_MANAGER = false;
+    JDK_VERSION = "1.6";
+    STATIC = false;
+    ERROR_REPORTING = true;
+    USER_TOKEN_MANAGER = false;
 //  USER_CHAR_STREAM = true;
 //  OPTIMIZE_TOKEN_MANAGER = true;
-  SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
+    SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
+    LOOKAHEAD = 1;
+//    DEBUG_PARSER = true;
 }
 
 PARSER_BEGIN(PolicyDefParser)
@@ -49,7 +51,7 @@ public class PolicyDefParser
 }
 PARSER_END(PolicyDefParser)
 
-SKIP :
+<DEFAULT> SKIP :
 {
   " "
 | "\t"
@@ -57,7 +59,7 @@ SKIP :
 | "\r"
 }
 
-TOKEN : /** first level */
+<DEFAULT> TOKEN : /** first level */
 {
     <DESCRIPTION:     "description">      : S_EXPECTED
   | <TYPE:            "type">             : LALL_EXPECTED
@@ -74,66 +76,105 @@ TOKEN : /** first level */
   | <ALLSTATE:        "allstate">         : DEFAULT
 }
 
-TOKEN : /** State and depending signature and trigger Tokens */
+<DEFAULT> TOKEN : /** State and depending signature and trigger Tokens */
 {
-      <REGISTEREDNAME:          "registeredName">                                       : S_EXPECTED
-    | <REVISION:                "revision">                                             : B_EXPECTED
-    | <MINORREVISION:           "minorrevision">                                        : B_EXPECTED
-    | <MAJORREVISION:           "majorrevision">                                        : B_EXPECTED
-    | <VERSION:                 "version">                                              : B_EXPECTED
-    | <PROMOTE:                 "promote">                                              : B_EXPECTED
-    | <CHECKOUTHISTORY:         "checkouthistory">                                      : B_EXPECTED
-    | <PUBLISHED:               "published">                                            : B_EXPECTED
-    | <REVOKE:                  "revoke">                                               : DEFAULT
-    | <LOGIN:                   "login">                                                : DEFAULT
-    | <OWNER:                   "owner">                                                : DEFAULT
-    | <PUBLIC:                  "public">                                               : DEFAULT
-    | <USER:                    "user">                                                 : S_EXPECTED
-    | <KEY:                     "key" >                                                 : S_EXPECTED
-    | <FILTER:                  "filter">                                               : S_EXPECTED
-    | <LOCALFILTER:             "localfilter">                                          : S_EXPECTED
-    | <ACTION:                  "action">                                               : S_EXPECTED
-    | <CHECK:                   "check">                                                : S_EXPECTED
-    | <OVERRIDE:                "override">                                             : S_EXPECTED
-    | <INPUT:                   "input">                                                : S_EXPECTED
-    | <TRIGGER:                 "trigger">                                              : S_EXPECTED
-    | <APPROVE:                 "approve">                                              : L_EXPECTED
-    | <IGNORE:                  "ignore">                                               : L_EXPECTED
-    | <REJECT:                  "reject">                                               : L_EXPECTED
-    | <BRANCH:                  "branch">                                               : S_EXPECTED
-    | <SIGNATURE:               "signature">                                            : S_EXPECTED
-    | <ROUTE:                   "route">                                                : LS_EXPECTED
-    | <ACCESS:                  "{" ([" ","\t","\n","\r"])* (["a"-"z"]) (["a"-"z"," ","\t","\n","\r"])* "}"> : DEFAULT
-    | <ORGANIZATION_ANY:        "any"         ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
-    | <ORGANIZATION_SINGLE:     "single"      ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
-    | <ORGANIZATION_ANCESTOR:   "ancestor"    ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
-    | <ORGANIZATION_DESCENDANT: "descendant"  ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
-    | <ORGANIZATION_RELATED:    "related"     ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
-    | <PROJECT_ANY:             "any"         ([" ","\t","\n","\r"])+ "project">        : DEFAULT
-    | <PROJECT_SINGLE:          "single"      ([" ","\t","\n","\r"])+ "project">        : DEFAULT
-    | <PROJECT_ANCESTOR:        "ancestor"    ([" ","\t","\n","\r"])+ "project">        : DEFAULT
-    | <PROJECT_DESCENDANT:      "descendant"  ([" ","\t","\n","\r"])+ "project">        : DEFAULT
-    | <PROJECT_RELATED:         "related"     ([" ","\t","\n","\r"])+ "project">        : DEFAULT
-    | <OWNER_ANY:               "any"         ([" ","\t","\n","\r"])+ "owner">          : DEFAULT
-    | <OWNER_CONTEXT:           "context"     ([" ","\t","\n","\r"])+ "owner">          : DEFAULT
-    | <RESERVE_ANY:             "any"         ([" ","\t","\n","\r"])+ "reserve">        : DEFAULT
-    | <RESERVE_CONTEXT:         "context"     ([" ","\t","\n","\r"])+ "reserve">        : DEFAULT
-    | <RESERVE_NO:              "no"          ([" ","\t","\n","\r"])+ "reserve">        : DEFAULT
-    | <RESERVE_INCLUSIVE:       "inclusive"   ([" ","\t","\n","\r"])+ "reserve">        : DEFAULT
-    | <MATURITY_ANY:            "any"         ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
-    | <MATURITY_NO:             "no"          ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
-    | <MATURITY_PUBLIC:         "public"      ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
-    | <MATURITY_PROTECTED:      "protected"   ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
-    | <MATURITY_PRIVATE:        "private"     ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
-    | <MATURITY_NOTPRIVATE:     "notprivate"  ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
-    | <MATURITY_PPP:            "ppp"         ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
-    | <CATEGORY_ANY:            "any"         ([" ","\t","\n","\r"])+ "category">       : DEFAULT
-    | <CATEGORY_OEM:            "oem"         ([" ","\t","\n","\r"])+ "category">       : DEFAULT
-    | <CATEGORY_GOLDPARTNER:    "goldpartner" ([" ","\t","\n","\r"])+ "category">       : DEFAULT
-    | <CATEGORY_PARTNER:        "partner"     ([" ","\t","\n","\r"])+ "category">       : DEFAULT
-    | <CATEGORY_SUPPLIER:       "supplier"    ([" ","\t","\n","\r"])+ "category">       : DEFAULT
-    | <CATEGORY_CUSTOMER:       "customer"    ([" ","\t","\n","\r"])+ "category">       : DEFAULT
-    | <CATEGORY_CONTRACTOR:     "contractor"  ([" ","\t","\n","\r"])+ "category">       : DEFAULT
+      <REGISTEREDNAME:                      "registeredName">                                       : S_EXPECTED
+    | <REVISION:                            "revision">                                             : B_EXPECTED
+    | <MINORREVISION:                       "minorrevision">                                        : B_EXPECTED
+    | <MAJORREVISION:                       "majorrevision">                                        : B_EXPECTED
+    | <VERSION:                             "version">                                              : B_EXPECTED
+    | <PROMOTE:                             "promote">                                              : B_EXPECTED
+    | <CHECKOUTHISTORY:                     "checkouthistory">                                      : B_EXPECTED
+    | <ENFORCERESERVEACCESS:                "enforcereserveaccess">                                 : DEFAULT
+    | <ENFORCERESERVEACCESS_TRUE:           "enforcereserveaccess" ([" ","\t","\n","\r"])+ (["t","T"] ["r","R"] ["u","U"] ["e","E"] | "\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"")>
+                                                                                                    : DEFAULT
+    | <ENFORCERESERVEACCESS_NOT:            "notenforcereserveaccess">                              : DEFAULT
+    | <ENFORCERESERVEACCESS_EXCLAMATION:    "!enforcereserveaccess">                                : DEFAULT
+    | <ENFORCERESERVEACCESS_FALSE:          "enforcereserveaccess" ([" ","\t","\n","\r"])+ (["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] | "\"" ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] "\"")>
+                                                                                                    : DEFAULT
+    | <PUBLISHED:                           "published">                                            : B_EXPECTED
+    | <REVOKE:                              "revoke">                                               : DEFAULT
+    | <LOGIN:                               "login">                                                : DEFAULT
+    | <OWNER:                               "owner">                                                : STATEACCESS_EXPECTED
+    | <PUBLIC:                              "public">                                               : STATEACCESS_EXPECTED
+    | <USER:                                "user">                                                 : STATEACCESS_STRING_EXPECTED
+    | <ACTION:                              "action">                                               : S_EXPECTED
+    | <CHECK:                               "check">                                                : S_EXPECTED
+    | <OVERRIDE:                            "override">                                             : S_EXPECTED
+    | <INPUT:                               "input">                                                : S_EXPECTED
+    | <TRIGGER:                             "trigger">                                              : S_EXPECTED
+    | <APPROVE:                             "approve">                                              : L_EXPECTED
+    | <IGNORE:                              "ignore">                                               : L_EXPECTED
+    | <REJECT:                              "reject">                                               : L_EXPECTED
+    | <BRANCH:                              "branch">                                               : S_EXPECTED
+    | <SIGNATURE:                           "signature">                                            : S_EXPECTED
+    | <ROUTE:                               "route">                                                : LS_EXPECTED
+}
+
+/************************************************************** State Access */
+<STATEACCESS_EXPECTED> SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+
+<STATEACCESS_EXPECTED> TOKEN:
+{
+      <KEY:                                 "key" >                                                 : STATEACCESS_STRING_EXPECTED
+    | <ACCESS:                              "{" ([" ","\t","\n","\r"])* (["a"-"z"]) (["a"-"z"," ","\t","\n","\r"])* "}">
+                                                                                                    : DEFAULT
+}
+/** String within State Access */
+<STATEACCESS_STRING_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<STATEACCESS_STRING_EXPECTED> TOKEN :
+{
+      <STATEACCESS_STRING : (<STATEACCESS_STRING_APOSTROPHE>(<STATEACCESS_STRING_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<STATEACCESS_STRING_APOSTROPHE>)>
+                                                                                                    : STATEACCESS_EXPECTED
+    | <STATEACCESS_SINGLE_STRING : (<STATEACCESS_STRING_CHAR>)+>                                    : STATEACCESS_EXPECTED
+    | <#STATEACCESS_STRING_APOSTROPHE: "\"" >
+    | <#STATEACCESS_STRING_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/** After access definition back to default */
+<DEFAULT> TOKEN:
+{      <FILTER:                              "filter">                                               : S_EXPECTED
+    | <LOCALFILTER:                         "localfilter">                                          : S_EXPECTED
+    | <ORGANIZATION_ANY:                    "any"         ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
+    | <ORGANIZATION_SINGLE:                 "single"      ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
+    | <ORGANIZATION_ANCESTOR:               "ancestor"    ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
+    | <ORGANIZATION_DESCENDANT:             "descendant"  ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
+    | <ORGANIZATION_RELATED:                "related"     ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
+    | <PROJECT_ANY:                         "any"         ([" ","\t","\n","\r"])+ "project">        : DEFAULT
+    | <PROJECT_SINGLE:                      "single"      ([" ","\t","\n","\r"])+ "project">        : DEFAULT
+    | <PROJECT_ANCESTOR:                    "ancestor"    ([" ","\t","\n","\r"])+ "project">        : DEFAULT
+    | <PROJECT_DESCENDANT:                  "descendant"  ([" ","\t","\n","\r"])+ "project">        : DEFAULT
+    | <PROJECT_RELATED:                     "related"     ([" ","\t","\n","\r"])+ "project">        : DEFAULT
+    | <OWNER_ANY:                           "any"         ([" ","\t","\n","\r"])+ "owner">          : DEFAULT
+    | <OWNER_CONTEXT:                       "context"     ([" ","\t","\n","\r"])+ "owner">          : DEFAULT
+    | <RESERVE_ANY:                         "any"         ([" ","\t","\n","\r"])+ "reserve">        : DEFAULT
+    | <RESERVE_CONTEXT:                     "context"     ([" ","\t","\n","\r"])+ "reserve">        : DEFAULT
+    | <RESERVE_NO:                          "no"          ([" ","\t","\n","\r"])+ "reserve">        : DEFAULT
+    | <RESERVE_INCLUSIVE:                   "inclusive"   ([" ","\t","\n","\r"])+ "reserve">        : DEFAULT
+    | <MATURITY_ANY:                        "any"         ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
+    | <MATURITY_NO:                         "no"          ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
+    | <MATURITY_PUBLIC:                     "public"      ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
+    | <MATURITY_PROTECTED:                  "protected"   ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
+    | <MATURITY_PRIVATE:                    "private"     ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
+    | <MATURITY_NOTPRIVATE:                 "notprivate"  ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
+    | <MATURITY_PPP:                        "ppp"         ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
+    | <CATEGORY_ANY:                        "any"         ([" ","\t","\n","\r"])+ "category">       : DEFAULT
+    | <CATEGORY_OEM:                        "oem"         ([" ","\t","\n","\r"])+ "category">       : DEFAULT
+    | <CATEGORY_GOLDPARTNER:                "goldpartner" ([" ","\t","\n","\r"])+ "category">       : DEFAULT
+    | <CATEGORY_PARTNER:                    "partner"     ([" ","\t","\n","\r"])+ "category">       : DEFAULT
+    | <CATEGORY_SUPPLIER:                   "supplier"    ([" ","\t","\n","\r"])+ "category">       : DEFAULT
+    | <CATEGORY_CUSTOMER:                   "customer"    ([" ","\t","\n","\r"])+ "category">       : DEFAULT
+    | <CATEGORY_CONTRACTOR:                 "contractor"  ([" ","\t","\n","\r"])+ "category">       : DEFAULT
 }
 
 /*************************************************** Boolean for Hidden Value */
@@ -366,34 +407,38 @@ void state(final Policy_mxJPO _policy) : {
 } {
     <STATE> tmpStr = sString() {this.getField(state, "name").set(tmpStr);}
     "{"
-        ( (<REGISTEREDNAME>     tmpStr = sString()  {this.appendValue(state, "symbolicNames", tmpStr);})
-        | (<REVISION>           ( <BOOLEAN_TRUE>    {this.getField(state, "minorrevisionable").set(true);}
-                                | <BOOLEAN_FALSE>   {this.getField(state, "minorrevisionable").set(false);} ) )
-        | (<MINORREVISION>      ( <BOOLEAN_TRUE>    {this.getField(state, "minorrevisionable").set(true);}
-                                | <BOOLEAN_FALSE>   {this.getField(state, "minorrevisionable").set(false);} ) )
-        | (<MAJORREVISION>      ( <BOOLEAN_TRUE>    {this.getField(state, "majorrevisionable").set(true);}
-                                | <BOOLEAN_FALSE>   {this.getField(state, "majorrevisionable").set(false);} ) )
-        | (<VERSION>            ( <BOOLEAN_TRUE>    {this.getField(state, "versionable").set(true);}
-                                | <BOOLEAN_FALSE>   {this.getField(state, "versionable").set(false);} ) )
-        | (<PROMOTE>            ( <BOOLEAN_TRUE>    {this.getField(state, "autoPromotion").set(true);}
-                                | <BOOLEAN_FALSE>   {this.getField(state, "autoPromotion").set(false);} ) )
-        | (<CHECKOUTHISTORY>    ( <BOOLEAN_TRUE>    {this.getField(state, "checkoutHistory").set(true);}
-                                | <BOOLEAN_FALSE>   {this.getField(state, "checkoutHistory").set(false);} ) )
-        | (<PUBLISHED>          ( <BOOLEAN_TRUE>    {this.getField(state, "published").set(true);}
-                                | <BOOLEAN_FALSE>   {this.getField(state, "published").set(false);} ) )
-        | stateOwnerAccess(Prefix.All, state)
-        | statePublicAccess(Prefix.All, state)
-        | stateUserAccess(Prefix.All, state)
-        | (<REVOKE> ( stateOwnerAccess(Prefix.Revoke, state) | statePublicAccess(Prefix.Revoke, state) | stateUserAccess(Prefix.Revoke, state) ) )
-        | (<LOGIN>  ( stateOwnerAccess(Prefix.Login,  state) | statePublicAccess(Prefix.Login,  state) | stateUserAccess(Prefix.Login,  state) ) )
-        | (<ACTION>             tmpStr = sString()  {this.getField(state, "actionProgram").set(tmpStr);}
-           <INPUT>              tmpStr = sString()  {this.getField(state, "actionInput").set(tmpStr);})
-        | (<CHECK>              tmpStr = sString()  {this.getField(state, "checkProgram").set(tmpStr);}
-           <INPUT>              tmpStr = sString()  {this.getField(state, "checkInput").set(tmpStr);})
-        | (<ROUTE>              tmpSet = lsList()   {this.getField(state, "routeUsers").set(tmpSet);}
-                                tmpStr = sString()  {this.getField(state, "routeMessage").set(tmpStr);})
-        | stateTrigger(state)
-        | stateSignature(state)
+        (              (<REGISTEREDNAME>     tmpStr = sString()  {this.appendValue(state, "symbolicNames", tmpStr);})
+            | (<REVISION>           ( <BOOLEAN_TRUE>    {this.getField(state, "minorrevisionable").set(true);}
+                                    | <BOOLEAN_FALSE>   {this.getField(state, "minorrevisionable").set(false);} ) )
+            | (<MINORREVISION>      ( <BOOLEAN_TRUE>    {this.getField(state, "minorrevisionable").set(true);}
+                                    | <BOOLEAN_FALSE>   {this.getField(state, "minorrevisionable").set(false);} ) )
+            | (<MAJORREVISION>      ( <BOOLEAN_TRUE>    {this.getField(state, "majorrevisionable").set(true);}
+                                    | <BOOLEAN_FALSE>   {this.getField(state, "majorrevisionable").set(false);} ) )
+            | (<VERSION>            ( <BOOLEAN_TRUE>    {this.getField(state, "versionable").set(true);}
+                                    | <BOOLEAN_FALSE>   {this.getField(state, "versionable").set(false);} ) )
+            | (<PROMOTE>            ( <BOOLEAN_TRUE>    {this.getField(state, "autoPromotion").set(true);}
+                                    | <BOOLEAN_FALSE>   {this.getField(state, "autoPromotion").set(false);} ) )
+            | (<CHECKOUTHISTORY>    ( <BOOLEAN_TRUE>    {this.getField(state, "checkoutHistory").set(true);}
+                                    | <BOOLEAN_FALSE>   {this.getField(state, "checkoutHistory").set(false);} ) )
+            | ((<ENFORCERESERVEACCESS> | <ENFORCERESERVEACCESS_TRUE>)
+                                                        {this.getField(state, "enforcereserveaccess").set(true);} )
+            | ((<ENFORCERESERVEACCESS_NOT> | <ENFORCERESERVEACCESS_EXCLAMATION> | <ENFORCERESERVEACCESS_FALSE>)
+                                                        {this.getField(state, "enforcereserveaccess").set(false);} )
+            | (<PUBLISHED>          ( <BOOLEAN_TRUE>    {this.getField(state, "published").set(true);}
+                                    | <BOOLEAN_FALSE>   {this.getField(state, "published").set(false);} ) )
+            | stateOwnerAccess(Prefix.All, state)
+            | statePublicAccess(Prefix.All, state)
+            | stateUserAccess(Prefix.All, state)
+            | (<REVOKE> ( stateOwnerAccess(Prefix.Revoke, state) | statePublicAccess(Prefix.Revoke, state) | stateUserAccess(Prefix.Revoke, state) ) )
+            | (<LOGIN>  ( stateOwnerAccess(Prefix.Login,  state) | statePublicAccess(Prefix.Login,  state) | stateUserAccess(Prefix.Login,  state) ) )
+            | (<ACTION>             tmpStr = sString()  {this.getField(state, "actionProgram").set(tmpStr);}
+               <INPUT>              tmpStr = sString()  {this.getField(state, "actionInput").set(tmpStr);})
+            | (<CHECK>              tmpStr = sString()  {this.getField(state, "checkProgram").set(tmpStr);}
+               <INPUT>              tmpStr = sString()  {this.getField(state, "checkInput").set(tmpStr);})
+            | (<ROUTE>              tmpSet = lsList()   {this.getField(state, "routeUsers").set(tmpSet);}
+                                    tmpStr = sString()  {this.getField(state, "routeMessage").set(tmpStr);})
+            | stateTrigger(state)
+            | stateSignature(state)
         )*
     "}"
     {
@@ -445,7 +490,7 @@ void stateUserAccess(final Prefix _prefix, final AccessList_mxJPO _accessList) :
     final Access access = new Access();
     String user;
 }  {
-    ( <USER> user  = sString() stateAccessDef(access) )
+    ( <USER> user  = stateAccessString() stateAccessDef(access) )
     {
         this.getField(access, "prefix").set(_prefix);
         this.getField(access, "kind").set("user");
@@ -459,8 +504,8 @@ void stateAccessDef(final Access _access) : {
     Token access = null;
 } {
     (
-          ( <KEY> key = sString())
-        | ( <FILTER> filter = sString() )
+          ( <KEY> key = stateAccessString())
+        | ( <FILTER> filter = sString())
         | ( <LOCALFILTER> localfilter = sString() )
         | ( access = <ACCESS> )
         | ( <ORGANIZATION_ANY>        {organization = "any";        } )
@@ -515,6 +560,25 @@ void stateAccessDef(final Access _access) : {
                     .trim();                                            // remove trailing spaces
             this.getField(_access, "access").set(new HashSet<String>(Arrays.asList(tmp.split(" "))));
         }
+    }
+}
+
+/**
+ * Evaluates a simple string where the state access definition must follow.
+ *
+ * @return evaluated simple string
+ */
+String stateAccessString() : {
+    Token tmp;
+    String ret;
+} {
+    (
+        (tmp = <STATEACCESS_STRING>)         {ret = this.getString(tmp.image);}
+        |
+        (tmp = <STATEACCESS_SINGLE_STRING>)  {ret = this.getSingle(tmp.image);}
+    )
+    {
+        return ret;
     }
 }
 

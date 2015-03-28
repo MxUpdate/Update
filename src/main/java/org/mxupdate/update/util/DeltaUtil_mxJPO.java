@@ -88,9 +88,9 @@ public final class DeltaUtil_mxJPO
     public static void calcFlagDelta(final MqlBuilder_mxJPO _mql,
                                      final String _kind,
                                      final boolean _newVal,
-                                     final boolean _curVal)
+                                     final Boolean _curVal)
     {
-        if (_curVal != _newVal)  {
+        if ((_curVal == null) || (_curVal != _newVal))  {
             _mql.newLine();
             if (!_newVal)  {
                 _mql.lastLine().append('!');
@@ -111,9 +111,9 @@ public final class DeltaUtil_mxJPO
     public static void calcFlagDelta(final StringBuilder _out,
                                      final String _kind,
                                      final boolean _newVal,
-                                     final boolean _curVal)
+                                     final Boolean _curVal)
     {
-        if (_curVal != _newVal)  {
+        if ((_curVal == null) || (_curVal != _newVal))  {
             _out.append(' ');
             if (!_newVal)  {
                 _out.append('!');

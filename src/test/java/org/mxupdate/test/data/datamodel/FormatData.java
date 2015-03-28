@@ -255,7 +255,7 @@ public class FormatData
         // check for defined values
         this.getValues().checkExport(_exportParser);
         // check for defined flags
-        this.getFlags().checkExport(_exportParser);
+        this.getFlags().checkExport(_exportParser, "/" + this.getCI().getUrlTag() + "/", this.getCI().getMxType() + " " + this.getName());
         // check for properties
         this.getProperties().checkExportPropertiesUpdateFormat(_exportParser.getLines("/updateFormat/property/@value"));
 

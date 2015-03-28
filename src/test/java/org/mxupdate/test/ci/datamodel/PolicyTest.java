@@ -153,7 +153,7 @@ public class PolicyTest
      *
      * @return object array with all test policies
      */
-    @IssueLink({"30", "86", "119", "120", "121", "179", "182"})
+    @IssueLink({"30", "86", "119", "120", "121", "179", "182", "216"})
     @DataProvider(name = "data")
     public Object[][] getPolicies()
     {
@@ -257,8 +257,68 @@ public class PolicyTest
                         new PolicyData(this, "test")
                                 .notSupported(Version.V6R2011x)
                                 .setFlag("enforce", false),
-                        new PolicyData(this, "test")}
-        );
+                        new PolicyData(this, "test")},
+                // enforcereserveaccess state flag
+                new Object[] {
+                        "issue #216: policy state with enforcereserveaccess true",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                        .setName("create")
+                                        .setFlag("enforcereserveaccess", true))},
+                new Object[] {
+                        "issue #216: policy state with enforcereserveaccess false",
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                        .setName("create")
+                                        .setFlag("enforcereserveaccess", false))},
+                new Object[] {
+                        "issue #216: policy state with no enforcereserveaccess defined (within export must be defined)",
+                        new PolicyData(this, "test").notSupported(
+                                Version.V6R2011x).addState(
+                                new State().setName("create")),
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                        .setName("create")
+                                        .setFlag("enforcereserveaccess", false))},
+            new Object[] {
+                    "issue #216: policy state with notenforcereserveaccess defined",
+                    new PolicyData(this, "test").notSupported(
+                            Version.V6R2011x).addState(
+                            new State()
+                                    .setName("create")
+                                    .setFlag("notenforcereserveaccess", true)),
+                    new PolicyData(this, "test")
+                            .notSupported(Version.V6R2011x)
+                            .addState(new State()
+                                    .setName("create")
+                                    .setFlag("enforcereserveaccess", false))},
+               new Object[] {
+                        "issue #216: policy state with enforcereserveaccess value false defined",
+                        new PolicyData(this, "test").notSupported(
+                                Version.V6R2011x).addState(
+                                new State()
+                                        .setName("create")
+                                        .setValue("enforcereserveaccess", "false")),
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                        .setName("create")
+                                        .setFlag("enforcereserveaccess", false))},
+                new Object[] {
+                        "issue #216: policy state with enforcereserveaccess value true defined",
+                        new PolicyData(this, "test").notSupported(
+                                Version.V6R2011x).addState(
+                                new State()
+                                        .setName("create")
+                                        .setValue("enforcereserveaccess", "true")),
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
+                                        .setName("create")
+                                        .setFlag("enforcereserveaccess", true))});
     }
 
     /**

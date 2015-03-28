@@ -58,11 +58,11 @@ public class Policy_mxJPO
      */
     private static final String PARAM_SUPPORT_MAJOR_MINOR = "DMPolicySupportsMajorMinor";
 
-    /**
-     * Name of the parameter to define that the policy states supports the
-     * published property.
-     */
+    /** Name of parameter to check that the policy states supports the published property. */
     private static final String PARAM_SUPPORT_PUBLISHED = "DMPolicyStateSupportsPublished";
+
+    /** Name of parameter to check that the policy states supports the published property. */
+    private static final String PARAM_SUPPORT_ENOFORCE_RESERVE_ACCESS = "DMPolicyStateSupportsEnforceReserveAccess";
 
     /** Set of all ignored URLs from the XML definition for policies. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
@@ -681,6 +681,9 @@ throw new Exception("some states are not defined anymore!");
         /** Published flag? */
         private boolean published = false;
 
+        /** Enoforcereserveaccess flag */
+        private boolean enforcereserveaccess = false;
+
         /** Is the business object in this state (minor) revisionable? */
         private boolean minorrevisionable = false;
         /** Is the business object in this state major revisionable? */
@@ -711,10 +714,13 @@ throw new Exception("some states are not defined anymore!");
             boolean ret = true;
             if ("/name".equals(_url))  {
                 this.name = _content;
+
             } else if ("/autoPromotion".equals(_url))  {
                 this.autoPromotion = true;
             } else if ("/checkoutHistory".equals(_url))  {
                 this.checkoutHistory = true;
+            } else if ("/enforceReserveAccess".equals(_url))  {
+                this.enforcereserveaccess = true;
             } else if ("/published".equals(_url))  {
                 this.published = true;
             } else if ("/revisionable".equals(_url))  {
@@ -807,7 +813,10 @@ throw new Exception("some states are not defined anymore!");
                         .append('\"');
                 }
             }
-
+            // enforcereserveaccess flag (if supported)
+            if (_paramCache.getValueBoolean(Policy_mxJPO.PARAM_SUPPORT_ENOFORCE_RESERVE_ACCESS))  {
+                _out.append("\n    ").append((this.enforcereserveaccess) ? "" : "!").append("enforcereserveaccess");
+            }
             // major / minor revision (old / new format)
             if (_paramCache.getValueBoolean(Policy_mxJPO.PARAM_SUPPORT_MAJOR_MINOR))  {
                 _out.append("\n    majorrevision \"").append(Boolean.toString(this.majorrevisionable)).append('\"')
@@ -862,6 +871,10 @@ throw new Exception("some states are not defined anymore!");
                                  final State _oldState)
             throws IOException
         {
+            // enforcereserveaccess flag (if supported)
+            if (_paramCache.getValueBoolean(Policy_mxJPO.PARAM_SUPPORT_ENOFORCE_RESERVE_ACCESS))  {
+                DeltaUtil_mxJPO.calcFlagDelta(_cmd, "enforcereserveaccess", this.enforcereserveaccess, (_oldState != null) ? _oldState.enforcereserveaccess : null);
+            }
             // basics
             _cmd.append(" promote ").append(String.valueOf(this.autoPromotion))
                 .append(" checkouthistory ").append(String.valueOf(this.checkoutHistory))

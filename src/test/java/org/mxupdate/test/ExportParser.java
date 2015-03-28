@@ -320,36 +320,17 @@ public class ExportParser
      */
     public final class Line
     {
-        /**
-         * Complete text of this line.
-         */
+        /** Complete text of this line. */
         private final String line;
-
-        /**
-         * First characters before a space of the trimmed line.
-         */
+        /** First characters before a space of the trimmed line. */
         private final String tag;
-
-        /**
-         * Rest of the line after the tag.
-         */
+        /** Rest of the line after the tag. */
         private final String value;
-
-        /**
-         * Parent line (where the {@link #shifting} is lower than the
-         * {@link #shifting} of this line).
-         */
+        /** Parent line (where the {@link #shifting} is lower than the {@link #shifting} of this line). */
         private final Line parent;
-
-        /**
-         * Children lines (where the {@link #shifting} is greater than the
-         * {@link #shifting} of this line).
-         */
+        /** Children lines (where the {@link #shifting} is greater than the {@link #shifting} of this line). */
         private final List<ExportParser.Line> children = new ArrayList<ExportParser.Line>();
-
-        /**
-         * Count of spaces before first character of the line.
-         */
+        /** Count of spaces before first character of the line. */
         private final int shifting;
 
         /**
@@ -486,7 +467,6 @@ public class ExportParser
         {
             final String searchedTag = _path[_index];
             if (this.tag.equals(searchedTag))  {
-
                 if (_index < (_path.length - 2))  {
                     for (final Line child : this.children)  {
                         child.evalPath(_path, _index + 1, _ret);
@@ -495,6 +475,8 @@ public class ExportParser
                     for (final Line child : this.children)  {
                         _ret.add(child.line.trim());
                     }
+                } else if ("@name".equals(_path[_index + 1]))  {
+                    _ret.add(this.tag);
                 } else if ("@value".equals(_path[_index + 1]))  {
                     _ret.add(this.value);
                 }

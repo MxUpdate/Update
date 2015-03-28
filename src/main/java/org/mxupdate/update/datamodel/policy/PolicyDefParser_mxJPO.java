@@ -52,6 +52,7 @@ public class PolicyDefParser_mxJPO
         ;
         break;
       default:
+        jj_la1[0] = jj_gen;
         break label_1;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -83,6 +84,7 @@ public class PolicyDefParser_mxJPO
                                                 this.getField(policy, "enforce").set(false);
           break;
         default:
+          jj_la1[1] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException_mxJPO();
         }
@@ -124,6 +126,7 @@ public class PolicyDefParser_mxJPO
                                                 this.getField(policy, "hidden").set(false);
           break;
         default:
+          jj_la1[2] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException_mxJPO();
         }
@@ -135,6 +138,7 @@ public class PolicyDefParser_mxJPO
         state(policy);
         break;
       default:
+        jj_la1[3] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException_mxJPO();
       }
@@ -162,6 +166,7 @@ public class PolicyDefParser_mxJPO
         set = lList();
         break;
       default:
+        jj_la1[4] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException_mxJPO();
       }
@@ -187,6 +192,7 @@ public class PolicyDefParser_mxJPO
         set = lList();
         break;
       default:
+        jj_la1[5] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException_mxJPO();
       }
@@ -202,7 +208,7 @@ public class PolicyDefParser_mxJPO
   final public void allstate(final Policy_mxJPO _policy) throws ParseException_mxJPO {
     final AccessList_mxJPO accessList = this.getField(_policy, "allStateAccess").<AccessList_mxJPO>get();
     jj_consume_token(ALLSTATE);
-    jj_consume_token(140);
+    jj_consume_token(157);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -214,6 +220,7 @@ public class PolicyDefParser_mxJPO
         ;
         break;
       default:
+        jj_la1[6] = jj_gen;
         break label_2;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -239,6 +246,7 @@ public class PolicyDefParser_mxJPO
           stateUserAccess(Prefix.Revoke, accessList);
           break;
         default:
+          jj_la1[7] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException_mxJPO();
         }
@@ -256,16 +264,18 @@ public class PolicyDefParser_mxJPO
           stateUserAccess(Prefix.Login,  accessList);
           break;
         default:
+          jj_la1[8] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException_mxJPO();
         }
         break;
       default:
+        jj_la1[9] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(141);
+    jj_consume_token(158);
         this.getField(_policy, "allState").set(true);
   }
 
@@ -281,7 +291,7 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(STATE);
     tmpStr = sString();
                                 this.getField(state, "name").set(tmpStr);
-    jj_consume_token(140);
+    jj_consume_token(157);
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -292,6 +302,11 @@ public class PolicyDefParser_mxJPO
       case VERSION:
       case PROMOTE:
       case CHECKOUTHISTORY:
+      case ENFORCERESERVEACCESS:
+      case ENFORCERESERVEACCESS_TRUE:
+      case ENFORCERESERVEACCESS_NOT:
+      case ENFORCERESERVEACCESS_EXCLAMATION:
+      case ENFORCERESERVEACCESS_FALSE:
       case PUBLISHED:
       case REVOKE:
       case LOGIN:
@@ -306,26 +321,28 @@ public class PolicyDefParser_mxJPO
         ;
         break;
       default:
+        jj_la1[10] = jj_gen;
         break label_3;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case REGISTEREDNAME:
         jj_consume_token(REGISTEREDNAME);
         tmpStr = sString();
-                                                     this.appendValue(state, "symbolicNames", tmpStr);
+                                                         this.appendValue(state, "symbolicNames", tmpStr);
         break;
       case REVISION:
         jj_consume_token(REVISION);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case BOOLEAN_TRUE:
           jj_consume_token(BOOLEAN_TRUE);
-                                                     this.getField(state, "minorrevisionable").set(true);
+                                                         this.getField(state, "minorrevisionable").set(true);
           break;
         case BOOLEAN_FALSE:
           jj_consume_token(BOOLEAN_FALSE);
-                                                     this.getField(state, "minorrevisionable").set(false);
+                                                         this.getField(state, "minorrevisionable").set(false);
           break;
         default:
+          jj_la1[11] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException_mxJPO();
         }
@@ -335,13 +352,14 @@ public class PolicyDefParser_mxJPO
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case BOOLEAN_TRUE:
           jj_consume_token(BOOLEAN_TRUE);
-                                                     this.getField(state, "minorrevisionable").set(true);
+                                                         this.getField(state, "minorrevisionable").set(true);
           break;
         case BOOLEAN_FALSE:
           jj_consume_token(BOOLEAN_FALSE);
-                                                     this.getField(state, "minorrevisionable").set(false);
+                                                         this.getField(state, "minorrevisionable").set(false);
           break;
         default:
+          jj_la1[12] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException_mxJPO();
         }
@@ -351,13 +369,14 @@ public class PolicyDefParser_mxJPO
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case BOOLEAN_TRUE:
           jj_consume_token(BOOLEAN_TRUE);
-                                                     this.getField(state, "majorrevisionable").set(true);
+                                                         this.getField(state, "majorrevisionable").set(true);
           break;
         case BOOLEAN_FALSE:
           jj_consume_token(BOOLEAN_FALSE);
-                                                     this.getField(state, "majorrevisionable").set(false);
+                                                         this.getField(state, "majorrevisionable").set(false);
           break;
         default:
+          jj_la1[13] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException_mxJPO();
         }
@@ -367,13 +386,14 @@ public class PolicyDefParser_mxJPO
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case BOOLEAN_TRUE:
           jj_consume_token(BOOLEAN_TRUE);
-                                                     this.getField(state, "versionable").set(true);
+                                                         this.getField(state, "versionable").set(true);
           break;
         case BOOLEAN_FALSE:
           jj_consume_token(BOOLEAN_FALSE);
-                                                     this.getField(state, "versionable").set(false);
+                                                         this.getField(state, "versionable").set(false);
           break;
         default:
+          jj_la1[14] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException_mxJPO();
         }
@@ -383,13 +403,14 @@ public class PolicyDefParser_mxJPO
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case BOOLEAN_TRUE:
           jj_consume_token(BOOLEAN_TRUE);
-                                                     this.getField(state, "autoPromotion").set(true);
+                                                         this.getField(state, "autoPromotion").set(true);
           break;
         case BOOLEAN_FALSE:
           jj_consume_token(BOOLEAN_FALSE);
-                                                     this.getField(state, "autoPromotion").set(false);
+                                                         this.getField(state, "autoPromotion").set(false);
           break;
         default:
+          jj_la1[15] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException_mxJPO();
         }
@@ -399,29 +420,67 @@ public class PolicyDefParser_mxJPO
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case BOOLEAN_TRUE:
           jj_consume_token(BOOLEAN_TRUE);
-                                                     this.getField(state, "checkoutHistory").set(true);
+                                                         this.getField(state, "checkoutHistory").set(true);
           break;
         case BOOLEAN_FALSE:
           jj_consume_token(BOOLEAN_FALSE);
-                                                     this.getField(state, "checkoutHistory").set(false);
+                                                         this.getField(state, "checkoutHistory").set(false);
           break;
         default:
+          jj_la1[16] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException_mxJPO();
         }
+        break;
+      case ENFORCERESERVEACCESS:
+      case ENFORCERESERVEACCESS_TRUE:
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case ENFORCERESERVEACCESS:
+          jj_consume_token(ENFORCERESERVEACCESS);
+          break;
+        case ENFORCERESERVEACCESS_TRUE:
+          jj_consume_token(ENFORCERESERVEACCESS_TRUE);
+          break;
+        default:
+          jj_la1[17] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException_mxJPO();
+        }
+                                                         this.getField(state, "enforcereserveaccess").set(true);
+        break;
+      case ENFORCERESERVEACCESS_NOT:
+      case ENFORCERESERVEACCESS_EXCLAMATION:
+      case ENFORCERESERVEACCESS_FALSE:
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case ENFORCERESERVEACCESS_NOT:
+          jj_consume_token(ENFORCERESERVEACCESS_NOT);
+          break;
+        case ENFORCERESERVEACCESS_EXCLAMATION:
+          jj_consume_token(ENFORCERESERVEACCESS_EXCLAMATION);
+          break;
+        case ENFORCERESERVEACCESS_FALSE:
+          jj_consume_token(ENFORCERESERVEACCESS_FALSE);
+          break;
+        default:
+          jj_la1[18] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException_mxJPO();
+        }
+                                                         this.getField(state, "enforcereserveaccess").set(false);
         break;
       case PUBLISHED:
         jj_consume_token(PUBLISHED);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case BOOLEAN_TRUE:
           jj_consume_token(BOOLEAN_TRUE);
-                                                     this.getField(state, "published").set(true);
+                                                         this.getField(state, "published").set(true);
           break;
         case BOOLEAN_FALSE:
           jj_consume_token(BOOLEAN_FALSE);
-                                                     this.getField(state, "published").set(false);
+                                                         this.getField(state, "published").set(false);
           break;
         default:
+          jj_la1[19] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException_mxJPO();
         }
@@ -448,6 +507,7 @@ public class PolicyDefParser_mxJPO
           stateUserAccess(Prefix.Revoke, state);
           break;
         default:
+          jj_la1[20] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException_mxJPO();
         }
@@ -465,6 +525,7 @@ public class PolicyDefParser_mxJPO
           stateUserAccess(Prefix.Login,  state);
           break;
         default:
+          jj_la1[21] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException_mxJPO();
         }
@@ -472,25 +533,25 @@ public class PolicyDefParser_mxJPO
       case ACTION:
         jj_consume_token(ACTION);
         tmpStr = sString();
-                                                     this.getField(state, "actionProgram").set(tmpStr);
+                                                         this.getField(state, "actionProgram").set(tmpStr);
         jj_consume_token(INPUT);
         tmpStr = sString();
-                                                     this.getField(state, "actionInput").set(tmpStr);
+                                                         this.getField(state, "actionInput").set(tmpStr);
         break;
       case CHECK:
         jj_consume_token(CHECK);
         tmpStr = sString();
-                                                     this.getField(state, "checkProgram").set(tmpStr);
+                                                         this.getField(state, "checkProgram").set(tmpStr);
         jj_consume_token(INPUT);
         tmpStr = sString();
-                                                     this.getField(state, "checkInput").set(tmpStr);
+                                                         this.getField(state, "checkInput").set(tmpStr);
         break;
       case ROUTE:
         jj_consume_token(ROUTE);
         tmpSet = lsList();
-                                                     this.getField(state, "routeUsers").set(tmpSet);
+                                                         this.getField(state, "routeUsers").set(tmpSet);
         tmpStr = sString();
-                                                     this.getField(state, "routeMessage").set(tmpStr);
+                                                         this.getField(state, "routeMessage").set(tmpStr);
         break;
       case TRIGGER:
         stateTrigger(state);
@@ -499,11 +560,12 @@ public class PolicyDefParser_mxJPO
         stateSignature(state);
         break;
       default:
+        jj_la1[22] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(141);
+    jj_consume_token(158);
         this.appendValue(_policy, "states", state);
   }
 
@@ -547,7 +609,7 @@ public class PolicyDefParser_mxJPO
     final Access access = new Access();
     String user;
     jj_consume_token(USER);
-    user = sString();
+    user = stateAccessString();
     stateAccessDef(access);
         this.getField(access, "prefix").set(_prefix);
         this.getField(access, "kind").set("user");
@@ -562,9 +624,9 @@ public class PolicyDefParser_mxJPO
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case KEY:
+      case ACCESS:
       case FILTER:
       case LOCALFILTER:
-      case ACCESS:
       case ORGANIZATION_ANY:
       case ORGANIZATION_SINGLE:
       case ORGANIZATION_ANCESTOR:
@@ -598,12 +660,13 @@ public class PolicyDefParser_mxJPO
         ;
         break;
       default:
+        jj_la1[23] = jj_gen;
         break label_4;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case KEY:
         jj_consume_token(KEY);
-        key = sString();
+        key = stateAccessString();
         break;
       case FILTER:
         jj_consume_token(FILTER);
@@ -737,6 +800,7 @@ public class PolicyDefParser_mxJPO
                                        category     = "contractor";
         break;
       default:
+        jj_la1[24] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException_mxJPO();
       }
@@ -763,6 +827,32 @@ public class PolicyDefParser_mxJPO
         }
   }
 
+/**
+ * Evaluates a simple string where the state access definition must follow.
+ *
+ * @return evaluated simple string
+ */
+  final public String stateAccessString() throws ParseException_mxJPO {
+    Token_mxJPO tmp;
+    String ret;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case STATEACCESS_STRING:
+      tmp = jj_consume_token(STATEACCESS_STRING);
+                                              ret = this.getString(tmp.image);
+      break;
+    case STATEACCESS_SINGLE_STRING:
+      tmp = jj_consume_token(STATEACCESS_SINGLE_STRING);
+                                              ret = this.getSingle(tmp.image);
+      break;
+    default:
+      jj_la1[25] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException_mxJPO();
+    }
+        {if (true) return ret;}
+    throw new Error("Missing return statement in function");
+  }
+
   final public void stateTrigger(final Policy_mxJPO.State _state) throws ParseException_mxJPO {
     final Trigger trigger = new Trigger();
     String tmp;
@@ -783,6 +873,7 @@ public class PolicyDefParser_mxJPO
                                      this.setValue(trigger, "kind", "override");
       break;
     default:
+      jj_la1[26] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException_mxJPO();
     }
@@ -801,18 +892,19 @@ public class PolicyDefParser_mxJPO
     jj_consume_token(SIGNATURE);
     tmpStr = sString();
                                     this.getField(signature, "name").set(tmpStr);
-    jj_consume_token(140);
+    jj_consume_token(157);
     label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case FILTER:
       case APPROVE:
       case IGNORE:
       case REJECT:
       case BRANCH:
+      case FILTER:
         ;
         break;
       default:
+        jj_la1[27] = jj_gen;
         break label_5;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -842,11 +934,12 @@ public class PolicyDefParser_mxJPO
                                          this.getField(signature, "filter").set(tmpStr);
         break;
       default:
+        jj_la1[28] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(141);
+    jj_consume_token(158);
         this.appendValue(_state, "signatures", signature);
   }
 
@@ -862,6 +955,7 @@ public class PolicyDefParser_mxJPO
         ;
         break;
       default:
+        jj_la1[29] = jj_gen;
         break label_6;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -874,6 +968,7 @@ public class PolicyDefParser_mxJPO
                                              ret.add(this.getSingle(tmp.image));
         break;
       default:
+        jj_la1[30] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException_mxJPO();
       }
@@ -894,6 +989,7 @@ public class PolicyDefParser_mxJPO
       jj_consume_token(LALL_CURLY_BRACKET_OPEN);
       break;
     default:
+      jj_la1[31] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException_mxJPO();
     }
@@ -906,6 +1002,7 @@ public class PolicyDefParser_mxJPO
         ;
         break;
       default:
+        jj_la1[32] = jj_gen;
         break label_7;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -924,6 +1021,7 @@ public class PolicyDefParser_mxJPO
         jj_consume_token(L4_CURLY_BRACKET_CLOSE);
         break;
       default:
+        jj_la1[33] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException_mxJPO();
       }
@@ -951,6 +1049,7 @@ public class PolicyDefParser_mxJPO
                                      ret = this.getSingle(tmp.image);
       break;
     default:
+      jj_la1[34] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException_mxJPO();
     }
@@ -980,6 +1079,7 @@ public class PolicyDefParser_mxJPO
                                        ret = this.getSingle(tmp.image);
       break;
     default:
+      jj_la1[35] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException_mxJPO();
     }
@@ -991,12 +1091,14 @@ public class PolicyDefParser_mxJPO
     jj_la = xla; jj_lastpos = jj_scanpos = token;
     try { return !jj_3_1(); }
     catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(0, xla); }
   }
 
   private boolean jj_2_2(int xla) {
     jj_la = xla; jj_lastpos = jj_scanpos = token;
     try { return !jj_3_2(); }
     catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(1, xla); }
   }
 
   private boolean jj_3_1() {
@@ -1019,6 +1121,38 @@ public class PolicyDefParser_mxJPO
   private int jj_ntk;
   private Token_mxJPO jj_scanpos, jj_lastpos;
   private int jj_la;
+  private int jj_gen;
+  final private int[] jj_la1 = new int[36];
+  static private int[] jj_la1_0;
+  static private int[] jj_la1_1;
+  static private int[] jj_la1_2;
+  static private int[] jj_la1_3;
+  static private int[] jj_la1_4;
+  static {
+      jj_la1_init_0();
+      jj_la1_init_1();
+      jj_la1_init_2();
+      jj_la1_init_3();
+      jj_la1_init_4();
+   }
+   private static void jj_la1_init_0() {
+      jj_la1_0 = new int[] {0x3ffe0,0x0,0x0,0x3ffe0,0x0,0x0,0x80000000,0x0,0x0,0x80000000,0xfffc0000,0x0,0x0,0x0,0x0,0x0,0x0,0x6000000,0x38000000,0x0,0x0,0x0,0xfffc0000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+   }
+   private static void jj_la1_init_1() {
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0xf,0xe,0xe,0xf,0x613f,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xe,0xe,0x613f,0xe0180000,0xe0180000,0x6000000,0x70,0x20001e00,0x20001e00,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+   }
+   private static void jj_la1_init_2() {
+      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1fffffff,0x1fffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+   }
+   private static void jj_la1_init_3() {
+      jj_la1_3 = new int[] {0x0,0x6,0x6,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x6,0x6,0x6,0x6,0x6,0x6,0x0,0x0,0x6,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x60000,0x60000,0x0,0x0,0x0,0x6000000,0x200,};
+   }
+   private static void jj_la1_init_4() {
+      jj_la1_4 = new int[] {0x0,0x0,0x0,0x0,0x8200,0x8200,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x8200,0x2600000,0x2600000,0x0,0x6,};
+   }
+  final private JJCalls[] jj_2_rtns = new JJCalls[2];
+  private boolean jj_rescan = false;
+  private int jj_gc = 0;
 
   /** Constructor with InputStream. */
   public PolicyDefParser_mxJPO(java.io.InputStream stream) {
@@ -1030,6 +1164,9 @@ public class PolicyDefParser_mxJPO
     token_source = new PolicyDefParserTokenManager_mxJPO(jj_input_stream);
     token = new Token_mxJPO();
     jj_ntk = -1;
+    jj_gen = 0;
+    for (int i = 0; i < 36; i++) jj_la1[i] = -1;
+    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   /** Reinitialise. */
@@ -1042,6 +1179,9 @@ public class PolicyDefParser_mxJPO
     token_source.ReInit(jj_input_stream);
     token = new Token_mxJPO();
     jj_ntk = -1;
+    jj_gen = 0;
+    for (int i = 0; i < 36; i++) jj_la1[i] = -1;
+    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   /** Constructor. */
@@ -1050,6 +1190,9 @@ public class PolicyDefParser_mxJPO
     token_source = new PolicyDefParserTokenManager_mxJPO(jj_input_stream);
     token = new Token_mxJPO();
     jj_ntk = -1;
+    jj_gen = 0;
+    for (int i = 0; i < 36; i++) jj_la1[i] = -1;
+    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   /** Reinitialise. */
@@ -1058,6 +1201,9 @@ public class PolicyDefParser_mxJPO
     token_source.ReInit(jj_input_stream);
     token = new Token_mxJPO();
     jj_ntk = -1;
+    jj_gen = 0;
+    for (int i = 0; i < 36; i++) jj_la1[i] = -1;
+    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   /** Constructor with generated Token Manager. */
@@ -1065,6 +1211,9 @@ public class PolicyDefParser_mxJPO
     token_source = tm;
     token = new Token_mxJPO();
     jj_ntk = -1;
+    jj_gen = 0;
+    for (int i = 0; i < 36; i++) jj_la1[i] = -1;
+    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   /** Reinitialise. */
@@ -1072,6 +1221,9 @@ public class PolicyDefParser_mxJPO
     token_source = tm;
     token = new Token_mxJPO();
     jj_ntk = -1;
+    jj_gen = 0;
+    for (int i = 0; i < 36; i++) jj_la1[i] = -1;
+    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   private Token_mxJPO jj_consume_token(int kind) throws ParseException_mxJPO {
@@ -1080,9 +1232,21 @@ public class PolicyDefParser_mxJPO
     else token = token.next = token_source.getNextToken();
     jj_ntk = -1;
     if (token.kind == kind) {
+      jj_gen++;
+      if (++jj_gc > 100) {
+        jj_gc = 0;
+        for (int i = 0; i < jj_2_rtns.length; i++) {
+          JJCalls c = jj_2_rtns[i];
+          while (c != null) {
+            if (c.gen < jj_gen) c.first = null;
+            c = c.next;
+          }
+        }
+      }
       return token;
     }
     token = oldToken;
+    jj_kind = kind;
     throw generateParseException();
   }
 
@@ -1099,6 +1263,11 @@ public class PolicyDefParser_mxJPO
     } else {
       jj_scanpos = jj_scanpos.next;
     }
+    if (jj_rescan) {
+      int i = 0; Token_mxJPO tok = token;
+      while (tok != null && tok != jj_scanpos) { i++; tok = tok.next; }
+      if (tok != null) jj_add_error_token(kind, i);
+    }
     if (jj_scanpos.kind != kind) return true;
     if (jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;
     return false;
@@ -1110,6 +1279,7 @@ public class PolicyDefParser_mxJPO
     if (token.next != null) token = token.next;
     else token = token.next = token_source.getNextToken();
     jj_ntk = -1;
+    jj_gen++;
     return token;
   }
 
@@ -1130,12 +1300,81 @@ public class PolicyDefParser_mxJPO
       return (jj_ntk = jj_nt.kind);
   }
 
+  private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
+  private int[] jj_expentry;
+  private int jj_kind = -1;
+  private int[] jj_lasttokens = new int[100];
+  private int jj_endpos;
+
+  private void jj_add_error_token(int kind, int pos) {
+    if (pos >= 100) return;
+    if (pos == jj_endpos + 1) {
+      jj_lasttokens[jj_endpos++] = kind;
+    } else if (jj_endpos != 0) {
+      jj_expentry = new int[jj_endpos];
+      for (int i = 0; i < jj_endpos; i++) {
+        jj_expentry[i] = jj_lasttokens[i];
+      }
+      jj_entries_loop: for (java.util.Iterator<?> it = jj_expentries.iterator(); it.hasNext();) {
+        int[] oldentry = (int[])(it.next());
+        if (oldentry.length == jj_expentry.length) {
+          for (int i = 0; i < jj_expentry.length; i++) {
+            if (oldentry[i] != jj_expentry[i]) {
+              continue jj_entries_loop;
+            }
+          }
+          jj_expentries.add(jj_expentry);
+          break jj_entries_loop;
+        }
+      }
+      if (pos != 0) jj_lasttokens[(jj_endpos = pos) - 1] = kind;
+    }
+  }
+
   /** Generate ParseException. */
   public ParseException_mxJPO generateParseException() {
-    Token_mxJPO errortok = token.next;
-    int line = errortok.beginLine, column = errortok.beginColumn;
-    String mess = (errortok.kind == 0) ? tokenImage[0] : errortok.image;
-    return new ParseException_mxJPO("Parse error at line " + line + ", column " + column + ".  Encountered: " + mess);
+    jj_expentries.clear();
+    boolean[] la1tokens = new boolean[159];
+    if (jj_kind >= 0) {
+      la1tokens[jj_kind] = true;
+      jj_kind = -1;
+    }
+    for (int i = 0; i < 36; i++) {
+      if (jj_la1[i] == jj_gen) {
+        for (int j = 0; j < 32; j++) {
+          if ((jj_la1_0[i] & (1<<j)) != 0) {
+            la1tokens[j] = true;
+          }
+          if ((jj_la1_1[i] & (1<<j)) != 0) {
+            la1tokens[32+j] = true;
+          }
+          if ((jj_la1_2[i] & (1<<j)) != 0) {
+            la1tokens[64+j] = true;
+          }
+          if ((jj_la1_3[i] & (1<<j)) != 0) {
+            la1tokens[96+j] = true;
+          }
+          if ((jj_la1_4[i] & (1<<j)) != 0) {
+            la1tokens[128+j] = true;
+          }
+        }
+      }
+    }
+    for (int i = 0; i < 159; i++) {
+      if (la1tokens[i]) {
+        jj_expentry = new int[1];
+        jj_expentry[0] = i;
+        jj_expentries.add(jj_expentry);
+      }
+    }
+    jj_endpos = 0;
+    jj_rescan_token();
+    jj_add_error_token(0, 0);
+    int[][] exptokseq = new int[jj_expentries.size()][];
+    for (int i = 0; i < jj_expentries.size(); i++) {
+      exptokseq[i] = jj_expentries.get(i);
+    }
+    return new ParseException_mxJPO(token, exptokseq, tokenImage);
   }
 
   /** Enable tracing. */
@@ -1144,6 +1383,42 @@ public class PolicyDefParser_mxJPO
 
   /** Disable tracing. */
   final public void disable_tracing() {
+  }
+
+  private void jj_rescan_token() {
+    jj_rescan = true;
+    for (int i = 0; i < 2; i++) {
+    try {
+      JJCalls p = jj_2_rtns[i];
+      do {
+        if (p.gen > jj_gen) {
+          jj_la = p.arg; jj_lastpos = jj_scanpos = p.first;
+          switch (i) {
+            case 0: jj_3_1(); break;
+            case 1: jj_3_2(); break;
+          }
+        }
+        p = p.next;
+      } while (p != null);
+      } catch(LookaheadSuccess ls) { }
+    }
+    jj_rescan = false;
+  }
+
+  private void jj_save(int index, int xla) {
+    JJCalls p = jj_2_rtns[index];
+    while (p.gen > jj_gen) {
+      if (p.next == null) { p = p.next = new JJCalls(); break; }
+      p = p.next;
+    }
+    p.gen = jj_gen + xla - jj_la; p.first = token; p.arg = xla;
+  }
+
+  static final class JJCalls {
+    int gen;
+    Token_mxJPO first;
+    int arg;
+    JJCalls next;
   }
 
 }
