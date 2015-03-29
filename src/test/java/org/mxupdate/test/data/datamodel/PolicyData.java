@@ -32,6 +32,7 @@ import org.mxupdate.test.ExportParser.Line;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.datamodel.helper.Access;
 import org.mxupdate.test.data.util.PropertyDef;
+import org.mxupdate.test.data.util.PropertyDefList;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.testng.Assert;
 
@@ -357,6 +358,7 @@ public class PolicyData
             }
         }
         for (final State state : this.states)  {
+            state.properties.createDependings();
             for (final Access access : state.access)  {
                 access.createDependings();
             }
@@ -591,6 +593,8 @@ public class PolicyData
         private String name;
         /** List of all signatures for this state. */
         private final List<Signature> signatures = new ArrayList<Signature>();
+        /** All properties for this state. */
+        private final PropertyDefList properties = new PropertyDefList();
 
         /**
          * Defines the {@code _name} of the state.
@@ -634,20 +638,21 @@ public class PolicyData
          */
         protected void append4CIFile(final StringBuilder _cmd)
         {
-            _cmd.append("    state \"").append(StringUtil_mxJPO.convertTcl(this.name)).append("\" {\n");
+            _cmd.append("  state \"").append(StringUtil_mxJPO.convertTcl(this.name)).append("\" {\n");
             for (final Access accessFilter : this.access)  {
                 accessFilter.append4CIFile(_cmd);
             }
             this.getFlags().append4CIFileValues("      ", _cmd, "\n");
             for (final Map.Entry<String,Object> value : this.getValues().entrySet())  {
-                _cmd.append("      ").append(value.getKey())
+                _cmd.append("    ").append(value.getKey())
                     .append(" \"").append(StringUtil_mxJPO.convertTcl(value.getValue().toString())).append("\"\n");
             }
             for (final Signature signature : this.signatures)
             {
                 signature.append4CIFile(_cmd);
             }
-            _cmd.append("    }\n");
+            this.properties.appendCIFileUpdateFormat("    ", _cmd);
+            _cmd.append("  }\n");
         }
 
         /**
@@ -670,6 +675,7 @@ public class PolicyData
             {
                 signature.append4CIFile(_cmd);
             }
+            this.properties.appendCIFileUpdateFormat(" state", _cmd);
         }
 
         /**
@@ -724,9 +730,32 @@ public class PolicyData
                     }
 
                     this.getFlags().checkExport(line, "state " + this.name);
+                    this.properties.checkExportPropertiesUpdateFormat(line.getLines("property/@value"));
                 }
             }
             Assert.assertTrue(found, "check that state '" + this.name + "' is found");
+        }
+
+        /**
+         * Assigns {@code _property} to this state.
+         *
+         * @param _property     property to add / assign
+         * @return this data piece instance
+         */
+        public State addProperty(final PropertyDef _property)
+        {
+            this.properties.add(_property);
+            return this;
+        }
+
+        /**
+         * Returns all assigned {@link #properties} from this data piece.
+         *
+         * @return all defined properties
+         */
+        public PropertyDefList getProperties()
+        {
+            return this.properties;
         }
     }
 

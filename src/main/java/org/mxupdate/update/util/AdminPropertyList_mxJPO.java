@@ -179,10 +179,13 @@ public class AdminPropertyList_mxJPO
      * Calculates the delta between current properties definition and this
      * properties definitions.
      *
-     * @param _current  current properties
-     * @param _mql      MQL builder to append the delta
+     * @param _propPrefix   prefix before the property command (e.g. to define
+     *                      state properties)
+     * @param _current      current properties
+     * @param _mql          MQL builder to append the delta
      */
-    public void calcDelta(final AdminPropertyList_mxJPO _currents,
+    public void calcDelta(final String _propPrefix,
+                          final AdminPropertyList_mxJPO _currents,
                           final MqlBuilder_mxJPO _mql)
     {
         // check properties to remove
@@ -197,7 +200,7 @@ public class AdminPropertyList_mxJPO
                 }
                 if (!found)  {
                     _mql.newLine()
-                        .cmd("remove property ").arg(curProp.getName());
+                        .cmd("remove ").cmd(_propPrefix).cmd("property ").arg(curProp.getName());
                     if ((curProp.getRefAdminName() != null) && (curProp.getRefAdminType() != null))  {
                         _mql.cmd(" to ").cmd(curProp.getRefAdminType()).cmd(" ").arg(curProp.getRefAdminName());
                         // if target is a table, a system is required!
@@ -221,7 +224,7 @@ public class AdminPropertyList_mxJPO
             }
             if (!found)  {
                 _mql.newLine()
-                    .cmd("add property ").arg(tarProp.getName());
+                    .cmd("add ").cmd(_propPrefix).cmd("property ").arg(tarProp.getName());
                 if ((tarProp.getRefAdminName() != null) && (tarProp.getRefAdminType() != null))  {
                     _mql.cmd(" to ").cmd(tarProp.getRefAdminType()).cmd(" ").arg(tarProp.getRefAdminName());
                     // if target is a table, a system is required!

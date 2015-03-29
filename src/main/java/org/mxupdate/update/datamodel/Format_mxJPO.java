@@ -324,6 +324,6 @@ public class Format_mxJPO
             }
         }
 
-        _target.getProperties().calcDelta(this.getProperties(), _mql);
+        _target.getProperties().calcDelta("", this.getProperties(), _mql);
     }
 }

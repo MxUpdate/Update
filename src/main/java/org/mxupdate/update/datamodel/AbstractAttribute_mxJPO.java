@@ -568,7 +568,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
 
         target.triggers.calcDelta(this.triggers, _mql);
         target.rangesSorted.calcDelta(this.rangesSorted, _mql);
-        target.getProperties().calcDelta(this.getProperties(), _mql);
+        target.getProperties().calcDelta("", this.getProperties(), _mql);
     }
 
     /**

@@ -39,10 +39,12 @@ import java.util.Set;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
+import org.mxupdate.update.datamodel.Policy_mxJPO.State;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Prefix;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 public class PolicyDefParser
@@ -176,6 +178,25 @@ PARSER_END(PolicyDefParser)
     | <CATEGORY_CUSTOMER:                   "customer"    ([" ","\t","\n","\r"])+ "category">       : DEFAULT
     | <CATEGORY_CONTRACTOR:                 "contractor"  ([" ","\t","\n","\r"])+ "category">       : DEFAULT
 }
+
+/************************************************************* State Property */
+<DEFAULT> TOKEN :
+{      <STATE_PROPERTY:                      "property">                                             : S_EXPECTED
+    | <STATE_PROPERTYVAL:                   "value">                                                : S_EXPECTED
+    | <STATE_PROPERTYTO:                    "to">                                                   : STATE_PROPERTYTO_EXPECTED
+}
+
+<STATE_PROPERTYTO_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<STATE_PROPERTYTO_EXPECTED> TOKEN :
+{
+      <STATE_PROPERTYTOTYPE : (<SS_CHAR>)+> : S_EXPECTED
+    | <#SS_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
 
 /*************************************************** Boolean for Hidden Value */
 <B_EXPECTED> SKIP :
@@ -401,7 +422,7 @@ void allstate(final Policy_mxJPO _policy) : {
  * @param _policy   policy for which the all state definition is parsed
  */
 void state(final Policy_mxJPO _policy) : {
-    final Policy_mxJPO.State state = new Policy_mxJPO.State();
+    final State state = new State();
     String tmpStr;
     Set<String> tmpSet;
 } {
@@ -439,6 +460,7 @@ void state(final Policy_mxJPO _policy) : {
                                     tmpStr = sString()  {this.getField(state, "routeMessage").set(tmpStr);})
             | stateTrigger(state)
             | stateSignature(state)
+            | stateProperty(state)
         )*
     "}"
     {
@@ -582,7 +604,7 @@ String stateAccessString() : {
     }
 }
 
-void stateTrigger(final Policy_mxJPO.State _state) : {
+void stateTrigger(final State _state) : {
     final Trigger trigger = new Trigger();
     String tmp;
 } {
@@ -597,7 +619,7 @@ void stateTrigger(final Policy_mxJPO.State _state) : {
     }
 }
 
-void stateSignature(final Policy_mxJPO.State _state) : {
+void stateSignature(final State _state) : {
     final Policy_mxJPO.Signature signature = new Policy_mxJPO.Signature();
     String tmpStr;
     Set<String> tmpSet;
@@ -614,6 +636,38 @@ void stateSignature(final Policy_mxJPO.State _state) : {
         this.appendValue(_state, "signatures", signature);
     }
 }
+
+
+/**
+ * Parses one property for a state.
+ *
+ * @param _state    state to append the property
+ */
+void stateProperty(final State _state) : {
+    Token tmp;
+    String name = null;
+    String value = null;
+    String toType = null;
+    String toName = null;
+}  {
+    <STATE_PROPERTY> name = sString()
+    (
+          ( <STATE_PROPERTYVAL> value = sString() )
+        | ( <STATE_PROPERTYTO>
+                ((tmp = <STATE_PROPERTYTOTYPE>) {toType = this.getSingle(tmp.image);})
+                toName = sString() )
+    )*
+    {
+        final AdminProperty prop = new AdminProperty();
+        this.setValue(prop, "name", name);
+        this.setValue(prop, "value", value);
+        this.setValue(prop, "refAdminType", toType);
+        this.setValue(prop, "refAdminName", toName);
+        this.appendValue(_state, "properties", prop);
+    }
+}
+
+/******************************************************************************/
 
 Set<String> lsList() :  {
     Token tmp;

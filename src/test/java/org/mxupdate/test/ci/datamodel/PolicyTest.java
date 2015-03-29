@@ -25,6 +25,7 @@ import org.mxupdate.test.data.datamodel.PolicyData.State;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.datamodel.helper.Access;
 import org.mxupdate.test.data.user.PersonAdminData;
+import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.test.util.Version;
 import org.testng.Assert;
@@ -318,7 +319,36 @@ public class PolicyTest
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .setFlag("enforcereserveaccess", true))});
+                                        .setFlag("enforcereserveaccess", true))},
+                new Object[] {
+                        "issue #216: policy state with property and no value",
+                        new PolicyData(this, "test").notSupported(
+                                Version.V6R2011x).addState(
+                                new State()
+                                        .setName("create")
+                                        .addProperty(new PropertyDef("Property")))},
+                new Object[] {
+                        "issue #216: policy state with property and value",
+                        new PolicyData(this, "test").notSupported(
+                                Version.V6R2011x).addState(
+                                new State()
+                                        .setName("create")
+                                        .addProperty(new PropertyDef("Property", "Value 1")))},
+                new Object[] {
+                        "issue #216: policy state with property and link to policy",
+                        new PolicyData(this, "test").notSupported(
+                                Version.V6R2011x).addState(
+                                new State()
+                                        .setName("create")
+                                        .addProperty(new PropertyDef("Property", new PolicyData(this, "test 2"))))},
+                new Object[] {
+                        "issue #216: policy state with property, link and value",
+                        new PolicyData(this, "test").notSupported(
+                                Version.V6R2011x).addState(
+                                new State()
+                                        .setName("create")
+                                        .addProperty(new PropertyDef("Property", "Value 1", new PolicyData(this, "test 2"))))}
+        );
     }
 
     /**

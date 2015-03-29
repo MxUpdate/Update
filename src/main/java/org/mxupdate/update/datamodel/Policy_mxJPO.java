@@ -34,6 +34,7 @@ import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO;
 import org.mxupdate.update.datamodel.policy.PolicyDefParser_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
@@ -77,6 +78,7 @@ public class Policy_mxJPO
         Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/signatureDefList/signatureDef/rejectUserList");
         Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/actionProgram");
         Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/checkProgram");
+        Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/propertyList");
         Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/routeUser");
         Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/triggerList");
     }
@@ -674,6 +676,9 @@ throw new Exception("some states are not defined anymore!");
         /** Route users of this state. */
         private final Set<String> routeUsers = new TreeSet<String>();
 
+        /** Handles the state depending properties. */
+        private final AdminPropertyList_mxJPO properties = new AdminPropertyList_mxJPO();
+
         /** Map with all triggers for this state. The key is the name of the trigger. */
         private final TriggerList_mxJPO triggers = new TriggerList_mxJPO();
 
@@ -737,6 +742,9 @@ throw new Exception("some states are not defined anymore!");
             } else if ("/routeUser/userRef".equals(_url))  {
                 this.routeUsers.add(_content);
 
+            } else if (_url.startsWith("/propertyList"))  {
+                ret = this.properties.parse(_paramCache, _url.substring(13), _content);
+
             } else if (_url.startsWith("/triggerList"))  {
                 ret = this.triggers.parse(_paramCache, _url.substring(12), _content);
 
@@ -747,12 +755,14 @@ throw new Exception("some states are not defined anymore!");
         }
 
         /**
-         * The trigger instances are sorted.
+         * The trigger and property instances are sorted.
          */
         protected void prepare()
         {
             // sort all triggers
             this.triggers.prepare();
+            // sort the properties
+            this.properties.prepare();
         }
 
         /**
@@ -830,7 +840,13 @@ throw new Exception("some states are not defined anymore!");
             for (final Signature signature : this.signatures)  {
                 signature.writeObject(_out);
             }
-            _out.append("\n  }");
+
+            // write properties
+            // (properties are first written with text and then new line flag)
+            _out.append("\n");
+            this.properties.writeUpdateFormat(_paramCache, _out, "    ");
+
+            _out.append("  }");
         }
 
         /**
@@ -892,6 +908,7 @@ throw new Exception("some states are not defined anymore!");
 
             // triggers
             this.triggers.calcDelta((_oldState != null) ? _oldState.triggers : null, _mql);
+
             // signatures
             final Set<String> newSigs = new HashSet<String>();
             for (final Signature signature : this.signatures)  {
@@ -920,6 +937,9 @@ throw new Exception("some states are not defined anymore!");
                 _mql.cmd("signature ").arg(signature.name);
                 signature.calcDelta(_mql, oldSig);
             }
+
+            // properties
+            this.properties.calcDelta("state", (_oldState != null) ? _oldState.properties : null, _mql);
         }
     }
 

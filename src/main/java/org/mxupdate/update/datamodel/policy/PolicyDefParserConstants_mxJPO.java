@@ -171,69 +171,79 @@ interface PolicyDefParserConstants_mxJPO {
   /** RegularExpression Id. */
   int CATEGORY_CONTRACTOR = 92;
   /** RegularExpression Id. */
-  int BOOLEAN_TRUE = 97;
+  int STATE_PROPERTY = 93;
   /** RegularExpression Id. */
-  int BOOLEAN_FALSE = 98;
+  int STATE_PROPERTYVAL = 94;
   /** RegularExpression Id. */
-  int BOOLEAN_TRUESTR = 99;
+  int STATE_PROPERTYTO = 95;
   /** RegularExpression Id. */
-  int BOOLEAN_FALSESTR = 100;
+  int STATE_PROPERTYTOTYPE = 100;
   /** RegularExpression Id. */
-  int DELIMITER_CHAR = 105;
+  int SS_CHAR = 101;
   /** RegularExpression Id. */
-  int DELIMITER_CHARSTR = 106;
+  int BOOLEAN_TRUE = 106;
   /** RegularExpression Id. */
-  int LS_CURLY_BRACKET_OPEN = 111;
+  int BOOLEAN_FALSE = 107;
   /** RegularExpression Id. */
-  int LS_CURLY_BRACKET_CLOSE = 112;
+  int BOOLEAN_TRUESTR = 108;
   /** RegularExpression Id. */
-  int LS_STRING = 113;
+  int BOOLEAN_FALSESTR = 109;
   /** RegularExpression Id. */
-  int LS_SINGLE_STRING = 114;
+  int DELIMITER_CHAR = 114;
   /** RegularExpression Id. */
-  int LS_APOSTROPHE = 115;
+  int DELIMITER_CHARSTR = 115;
   /** RegularExpression Id. */
-  int LS_CHAR = 116;
+  int LS_CURLY_BRACKET_OPEN = 120;
   /** RegularExpression Id. */
-  int SL_STRING = 121;
+  int LS_CURLY_BRACKET_CLOSE = 121;
   /** RegularExpression Id. */
-  int SL_SINGLE_STRING = 122;
+  int LS_STRING = 122;
   /** RegularExpression Id. */
-  int SL_APOSTROPHE = 123;
+  int LS_SINGLE_STRING = 123;
   /** RegularExpression Id. */
-  int SL_CHAR = 124;
+  int LS_APOSTROPHE = 124;
   /** RegularExpression Id. */
-  int S_STRING = 129;
+  int LS_CHAR = 125;
   /** RegularExpression Id. */
-  int S_SINGLE_STRING = 130;
+  int SL_STRING = 130;
   /** RegularExpression Id. */
-  int S_APOSTROPHE = 131;
+  int SL_SINGLE_STRING = 131;
   /** RegularExpression Id. */
-  int S_CHAR = 132;
+  int SL_APOSTROPHE = 132;
   /** RegularExpression Id. */
-  int LALL_CURLY_BRACKET_OPEN = 137;
+  int SL_CHAR = 133;
   /** RegularExpression Id. */
-  int LALL_ALL = 138;
+  int S_STRING = 138;
   /** RegularExpression Id. */
-  int L_CURLY_BRACKET_OPEN = 143;
+  int S_SINGLE_STRING = 139;
   /** RegularExpression Id. */
-  int L_CURLY_BRACKET_CLOSE = 148;
+  int S_APOSTROPHE = 140;
   /** RegularExpression Id. */
-  int L_STRING = 149;
+  int S_CHAR = 141;
   /** RegularExpression Id. */
-  int L_SINGLE_STRING = 150;
+  int LALL_CURLY_BRACKET_OPEN = 146;
   /** RegularExpression Id. */
-  int L_APOSTROPHE = 151;
+  int LALL_ALL = 147;
   /** RegularExpression Id. */
-  int L_CHAR = 152;
+  int L_CURLY_BRACKET_OPEN = 152;
   /** RegularExpression Id. */
-  int L2_CURLY_BRACKET_OPEN = 153;
+  int L_CURLY_BRACKET_CLOSE = 157;
   /** RegularExpression Id. */
-  int L3_BRACE_STRING = 154;
+  int L_STRING = 158;
   /** RegularExpression Id. */
-  int L3_CHAR = 155;
+  int L_SINGLE_STRING = 159;
   /** RegularExpression Id. */
-  int L4_CURLY_BRACKET_CLOSE = 156;
+  int L_APOSTROPHE = 160;
+  /** RegularExpression Id. */
+  int L_CHAR = 161;
+  /** RegularExpression Id. */
+  int L2_CURLY_BRACKET_OPEN = 162;
+  /** RegularExpression Id. */
+  int L3_BRACE_STRING = 163;
+  /** RegularExpression Id. */
+  int L3_CHAR = 164;
+  /** RegularExpression Id. */
+  int L4_CURLY_BRACKET_CLOSE = 165;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -242,25 +252,27 @@ interface PolicyDefParserConstants_mxJPO {
   /** Lexical state. */
   int STATEACCESS_STRING_EXPECTED = 2;
   /** Lexical state. */
-  int B_EXPECTED = 3;
+  int STATE_PROPERTYTO_EXPECTED = 3;
   /** Lexical state. */
-  int D_EXPECTED = 4;
+  int B_EXPECTED = 4;
   /** Lexical state. */
-  int LS_EXPECTED = 5;
+  int D_EXPECTED = 5;
   /** Lexical state. */
-  int SL_EXPECTED = 6;
+  int LS_EXPECTED = 6;
   /** Lexical state. */
-  int S_EXPECTED = 7;
+  int SL_EXPECTED = 7;
   /** Lexical state. */
-  int LALL_EXPECTED = 8;
+  int S_EXPECTED = 8;
   /** Lexical state. */
-  int L_EXPECTED = 9;
+  int LALL_EXPECTED = 9;
   /** Lexical state. */
-  int L2_EXPECTED = 10;
+  int L_EXPECTED = 10;
   /** Lexical state. */
-  int L3_EXPECTED = 11;
+  int L2_EXPECTED = 11;
   /** Lexical state. */
-  int L4_EXPECTED = 12;
+  int L3_EXPECTED = 12;
+  /** Lexical state. */
+  int L4_EXPECTED = 13;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -357,6 +369,15 @@ interface PolicyDefParserConstants_mxJPO {
     "<CATEGORY_SUPPLIER>",
     "<CATEGORY_CUSTOMER>",
     "<CATEGORY_CONTRACTOR>",
+    "\"property\"",
+    "\"value\"",
+    "\"to\"",
+    "\" \"",
+    "\"\\t\"",
+    "\"\\n\"",
+    "\"\\r\"",
+    "<STATE_PROPERTYTOTYPE>",
+    "<SS_CHAR>",
     "\" \"",
     "\"\\t\"",
     "\"\\n\"",

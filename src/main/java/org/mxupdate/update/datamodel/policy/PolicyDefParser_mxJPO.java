@@ -11,10 +11,12 @@ import java.util.Set;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
+import org.mxupdate.update.datamodel.Policy_mxJPO.State;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Prefix;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 public class PolicyDefParser_mxJPO
@@ -208,7 +210,7 @@ public class PolicyDefParser_mxJPO
   final public void allstate(final Policy_mxJPO _policy) throws ParseException_mxJPO {
     final AccessList_mxJPO accessList = this.getField(_policy, "allStateAccess").<AccessList_mxJPO>get();
     jj_consume_token(ALLSTATE);
-    jj_consume_token(157);
+    jj_consume_token(166);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -275,7 +277,7 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(158);
+    jj_consume_token(167);
         this.getField(_policy, "allState").set(true);
   }
 
@@ -285,13 +287,13 @@ public class PolicyDefParser_mxJPO
  * @param _policy   policy for which the all state definition is parsed
  */
   final public void state(final Policy_mxJPO _policy) throws ParseException_mxJPO {
-    final Policy_mxJPO.State state = new Policy_mxJPO.State();
+    final State state = new State();
     String tmpStr;
     Set<String> tmpSet;
     jj_consume_token(STATE);
     tmpStr = sString();
                                 this.getField(state, "name").set(tmpStr);
-    jj_consume_token(157);
+    jj_consume_token(166);
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -318,6 +320,7 @@ public class PolicyDefParser_mxJPO
       case TRIGGER:
       case SIGNATURE:
       case ROUTE:
+      case STATE_PROPERTY:
         ;
         break;
       default:
@@ -559,13 +562,16 @@ public class PolicyDefParser_mxJPO
       case SIGNATURE:
         stateSignature(state);
         break;
+      case STATE_PROPERTY:
+        stateProperty(state);
+        break;
       default:
         jj_la1[22] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(158);
+    jj_consume_token(167);
         this.appendValue(_policy, "states", state);
   }
 
@@ -853,7 +859,7 @@ public class PolicyDefParser_mxJPO
     throw new Error("Missing return statement in function");
   }
 
-  final public void stateTrigger(final Policy_mxJPO.State _state) throws ParseException_mxJPO {
+  final public void stateTrigger(final State _state) throws ParseException_mxJPO {
     final Trigger trigger = new Trigger();
     String tmp;
     jj_consume_token(TRIGGER);
@@ -885,14 +891,14 @@ public class PolicyDefParser_mxJPO
         this.appendValue(this.getValue(_state, "triggers"), "triggersStack", trigger);
   }
 
-  final public void stateSignature(final Policy_mxJPO.State _state) throws ParseException_mxJPO {
+  final public void stateSignature(final State _state) throws ParseException_mxJPO {
     final Policy_mxJPO.Signature signature = new Policy_mxJPO.Signature();
     String tmpStr;
     Set<String> tmpSet;
     jj_consume_token(SIGNATURE);
     tmpStr = sString();
                                     this.getField(signature, "name").set(tmpStr);
-    jj_consume_token(157);
+    jj_consume_token(166);
     label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -939,15 +945,65 @@ public class PolicyDefParser_mxJPO
         throw new ParseException_mxJPO();
       }
     }
-    jj_consume_token(158);
+    jj_consume_token(167);
         this.appendValue(_state, "signatures", signature);
   }
 
+/**
+ * Parses one property for a state.
+ *
+ * @param _state    state to append the property
+ */
+  final public void stateProperty(final State _state) throws ParseException_mxJPO {
+    Token_mxJPO tmp;
+    String name = null;
+    String value = null;
+    String toType = null;
+    String toName = null;
+    jj_consume_token(STATE_PROPERTY);
+    name = sString();
+    label_6:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case STATE_PROPERTYVAL:
+      case STATE_PROPERTYTO:
+        ;
+        break;
+      default:
+        jj_la1[29] = jj_gen;
+        break label_6;
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case STATE_PROPERTYVAL:
+        jj_consume_token(STATE_PROPERTYVAL);
+        value = sString();
+        break;
+      case STATE_PROPERTYTO:
+        jj_consume_token(STATE_PROPERTYTO);
+        tmp = jj_consume_token(STATE_PROPERTYTOTYPE);
+                                                 toType = this.getSingle(tmp.image);
+        toName = sString();
+        break;
+      default:
+        jj_la1[30] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException_mxJPO();
+      }
+    }
+        final AdminProperty prop = new AdminProperty();
+        this.setValue(prop, "name", name);
+        this.setValue(prop, "value", value);
+        this.setValue(prop, "refAdminType", toType);
+        this.setValue(prop, "refAdminName", toName);
+        this.appendValue(_state, "properties", prop);
+  }
+
+/******************************************************************************/
   final public Set<String> lsList() throws ParseException_mxJPO {
     Token_mxJPO tmp;
     Set<String> ret = new HashSet<String>();
     jj_consume_token(LS_CURLY_BRACKET_OPEN);
-    label_6:
+    label_7:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case LS_STRING:
@@ -955,8 +1011,8 @@ public class PolicyDefParser_mxJPO
         ;
         break;
       default:
-        jj_la1[29] = jj_gen;
-        break label_6;
+        jj_la1[31] = jj_gen;
+        break label_7;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case LS_STRING:
@@ -968,7 +1024,7 @@ public class PolicyDefParser_mxJPO
                                              ret.add(this.getSingle(tmp.image));
         break;
       default:
-        jj_la1[30] = jj_gen;
+        jj_la1[32] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException_mxJPO();
       }
@@ -989,11 +1045,11 @@ public class PolicyDefParser_mxJPO
       jj_consume_token(LALL_CURLY_BRACKET_OPEN);
       break;
     default:
-      jj_la1[31] = jj_gen;
+      jj_la1[33] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException_mxJPO();
     }
-    label_7:
+    label_8:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case L_STRING:
@@ -1002,8 +1058,8 @@ public class PolicyDefParser_mxJPO
         ;
         break;
       default:
-        jj_la1[32] = jj_gen;
-        break label_7;
+        jj_la1[34] = jj_gen;
+        break label_8;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case L_STRING:
@@ -1021,7 +1077,7 @@ public class PolicyDefParser_mxJPO
         jj_consume_token(L4_CURLY_BRACKET_CLOSE);
         break;
       default:
-        jj_la1[33] = jj_gen;
+        jj_la1[35] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException_mxJPO();
       }
@@ -1049,7 +1105,7 @@ public class PolicyDefParser_mxJPO
                                      ret = this.getSingle(tmp.image);
       break;
     default:
-      jj_la1[34] = jj_gen;
+      jj_la1[36] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException_mxJPO();
     }
@@ -1079,7 +1135,7 @@ public class PolicyDefParser_mxJPO
                                        ret = this.getSingle(tmp.image);
       break;
     default:
-      jj_la1[35] = jj_gen;
+      jj_la1[37] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException_mxJPO();
     }
@@ -1122,33 +1178,38 @@ public class PolicyDefParser_mxJPO
   private Token_mxJPO jj_scanpos, jj_lastpos;
   private int jj_la;
   private int jj_gen;
-  final private int[] jj_la1 = new int[36];
+  final private int[] jj_la1 = new int[38];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
   static private int[] jj_la1_3;
   static private int[] jj_la1_4;
+  static private int[] jj_la1_5;
   static {
       jj_la1_init_0();
       jj_la1_init_1();
       jj_la1_init_2();
       jj_la1_init_3();
       jj_la1_init_4();
+      jj_la1_init_5();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x3ffe0,0x0,0x0,0x3ffe0,0x0,0x0,0x80000000,0x0,0x0,0x80000000,0xfffc0000,0x0,0x0,0x0,0x0,0x0,0x0,0x6000000,0x38000000,0x0,0x0,0x0,0xfffc0000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_0 = new int[] {0x3ffe0,0x0,0x0,0x3ffe0,0x0,0x0,0x80000000,0x0,0x0,0x80000000,0xfffc0000,0x0,0x0,0x0,0x0,0x0,0x0,0x6000000,0x38000000,0x0,0x0,0x0,0xfffc0000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0xf,0xe,0xe,0xf,0x613f,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xe,0xe,0x613f,0xe0180000,0xe0180000,0x6000000,0x70,0x20001e00,0x20001e00,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0xf,0xe,0xe,0xf,0x613f,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xe,0xe,0x613f,0xe0180000,0xe0180000,0x6000000,0x70,0x20001e00,0x20001e00,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1fffffff,0x1fffffff,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x20000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x20000000,0x1fffffff,0x1fffffff,0x0,0x0,0x0,0x0,0xc0000000,0xc0000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_3() {
-      jj_la1_3 = new int[] {0x0,0x6,0x6,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x6,0x6,0x6,0x6,0x6,0x6,0x0,0x0,0x6,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x60000,0x60000,0x0,0x0,0x0,0x6000000,0x200,};
+      jj_la1_3 = new int[] {0x0,0xc00,0xc00,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xc00,0xc00,0xc00,0xc00,0xc00,0xc00,0x0,0x0,0xc00,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xc000000,0xc000000,0x0,0x0,0x0,0x0,0x40000,};
    }
    private static void jj_la1_init_4() {
-      jj_la1_4 = new int[] {0x0,0x0,0x0,0x0,0x8200,0x8200,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x8200,0x2600000,0x2600000,0x0,0x6,};
+      jj_la1_4 = new int[] {0x0,0x0,0x0,0x0,0x1040000,0x1040000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1040000,0xc0000000,0xc0000000,0xc,0xc00,};
+   }
+   private static void jj_la1_init_5() {
+      jj_la1_5 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x4,0x4,0x0,0x0,};
    }
   final private JJCalls[] jj_2_rtns = new JJCalls[2];
   private boolean jj_rescan = false;
@@ -1165,7 +1226,7 @@ public class PolicyDefParser_mxJPO
     token = new Token_mxJPO();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 36; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1180,7 +1241,7 @@ public class PolicyDefParser_mxJPO
     token = new Token_mxJPO();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 36; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1191,7 +1252,7 @@ public class PolicyDefParser_mxJPO
     token = new Token_mxJPO();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 36; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1202,7 +1263,7 @@ public class PolicyDefParser_mxJPO
     token = new Token_mxJPO();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 36; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1212,7 +1273,7 @@ public class PolicyDefParser_mxJPO
     token = new Token_mxJPO();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 36; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1222,7 +1283,7 @@ public class PolicyDefParser_mxJPO
     token = new Token_mxJPO();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 36; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 38; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
@@ -1334,12 +1395,12 @@ public class PolicyDefParser_mxJPO
   /** Generate ParseException. */
   public ParseException_mxJPO generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[159];
+    boolean[] la1tokens = new boolean[168];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 36; i++) {
+    for (int i = 0; i < 38; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -1357,10 +1418,13 @@ public class PolicyDefParser_mxJPO
           if ((jj_la1_4[i] & (1<<j)) != 0) {
             la1tokens[128+j] = true;
           }
+          if ((jj_la1_5[i] & (1<<j)) != 0) {
+            la1tokens[160+j] = true;
+          }
         }
       }
     }
-    for (int i = 0; i < 159; i++) {
+    for (int i = 0; i < 168; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
