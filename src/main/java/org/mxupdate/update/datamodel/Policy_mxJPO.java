@@ -38,6 +38,7 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.xml.sax.SAXException;
@@ -50,20 +51,6 @@ import org.xml.sax.SAXException;
 public class Policy_mxJPO
     extends AbstractAdminObject_mxJPO
 {
-    /**
-     * Name of the parameter to define that the &quot;majorrevision&quot;
-     * property for policies and &quot;delimited&quot; property for policy
-     * states from current MX version is supported. The parameter is needed to
-     * support the case that an old MX version is used....
-     */
-    private static final String PARAM_SUPPORT_MAJOR_MINOR = "DMPolicySupportsMajorMinor";
-
-    /** Name of parameter to check that the policy states supports the published property. */
-    private static final String PARAM_SUPPORT_PUBLISHED = "DMPolicyStateSupportsPublished";
-
-    /** Name of parameter to check that the policy states supports the published property. */
-    private static final String PARAM_SUPPORT_ENOFORCE_RESERVE_ACCESS = "DMPolicyStateSupportsEnforceReserveAccess";
-
     /** Set of all ignored URLs from the XML definition for policies. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
@@ -529,7 +516,7 @@ public class Policy_mxJPO
             }
 
             DeltaUtil_mxJPO.calcValueDelta(mql, "sequence", policy.minorsequence, this.minorsequence);
-            if (_paramCache.getValueBoolean(Policy_mxJPO.PARAM_SUPPORT_MAJOR_MINOR))  {
+            if (_paramCache.getValueBoolean(ValueKeys.DMPolicySupportsMajorMinor))  {
                 DeltaUtil_mxJPO.calcValueDelta(mql, "majorsequence", policy.majorsequence, this.majorsequence);
             }
 
@@ -804,11 +791,11 @@ throw new Exception("some states are not defined anymore!");
                 }
             }
             // enforcereserveaccess flag (if supported)
-            if (_paramCache.getValueBoolean(Policy_mxJPO.PARAM_SUPPORT_ENOFORCE_RESERVE_ACCESS))  {
+            if (_paramCache.getValueBoolean(ValueKeys.DMPolicyStateSupportsEnforceReserveAccess))  {
                 _out.append("\n    ").append((this.enforcereserveaccess) ? "" : "!").append("enforcereserveaccess");
             }
             // major / minor revision (old / new format)
-            if (_paramCache.getValueBoolean(Policy_mxJPO.PARAM_SUPPORT_MAJOR_MINOR))  {
+            if (_paramCache.getValueBoolean(ValueKeys.DMPolicySupportsMajorMinor))  {
                 _out.append("\n    majorrevision \"").append(Boolean.toString(this.majorrevisionable)).append('\"')
                     .append("\n    minorrevision \"").append(Boolean.toString(this.minorrevisionable)).append('\"');
             } else  {
@@ -820,7 +807,7 @@ throw new Exception("some states are not defined anymore!");
                 .append("\n    promote \"").append(Boolean.toString(this.autoPromotion)).append('\"')
                 .append("\n    checkouthistory \"").append(Boolean.toString(this.checkoutHistory)).append('\"');
             // published flag (if supported)
-            if (_paramCache.getValueBoolean(Policy_mxJPO.PARAM_SUPPORT_PUBLISHED))  {
+            if (_paramCache.getValueBoolean(ValueKeys.DMPolicyStateSupportsPublished))  {
                 _out.append("\n    published \"").append(Boolean.toString(this.published)).append('\"');
             }
             // route
@@ -862,7 +849,7 @@ throw new Exception("some states are not defined anymore!");
             throws IOException
         {
             // enforcereserveaccess flag (if supported)
-            if (_paramCache.getValueBoolean(Policy_mxJPO.PARAM_SUPPORT_ENOFORCE_RESERVE_ACCESS))  {
+            if (_paramCache.getValueBoolean(ValueKeys.DMPolicyStateSupportsEnforceReserveAccess))  {
                 DeltaUtil_mxJPO.calcFlagDelta(_mql, "enforcereserveaccess", this.enforcereserveaccess, (_oldState != null) ? _oldState.enforcereserveaccess : null);
             }
             // basics
@@ -878,14 +865,14 @@ throw new Exception("some states are not defined anymore!");
                     .cmd("check ").arg(this.checkProgram).cmd(" input ").arg(this.checkInput);
             }
             // minor / major revision (if supported)
-            if (_paramCache.getValueBoolean(Policy_mxJPO.PARAM_SUPPORT_MAJOR_MINOR))  {
+            if (_paramCache.getValueBoolean(ValueKeys.DMPolicySupportsMajorMinor))  {
                 DeltaUtil_mxJPO.calcValueDelta(_mql, "majorrevision", String.valueOf(this.majorrevisionable), (_oldState == null) ? null : String.valueOf(_oldState.majorrevisionable));
                 DeltaUtil_mxJPO.calcValueDelta(_mql, "minorrevision", String.valueOf(this.minorrevisionable), (_oldState == null) ? null : String.valueOf(_oldState.minorrevisionable));
             } else  {
                 DeltaUtil_mxJPO.calcValueDelta(_mql, "revision", String.valueOf(this.minorrevisionable), (_oldState == null) ? null : String.valueOf(_oldState.minorrevisionable));
             }
             // published (if supported)
-            if (_paramCache.getValueBoolean(Policy_mxJPO.PARAM_SUPPORT_PUBLISHED))  {
+            if (_paramCache.getValueBoolean(ValueKeys.DMPolicyStateSupportsPublished))  {
                 DeltaUtil_mxJPO.calcValueDelta(_mql, "published", String.valueOf(this.published), (_oldState == null) ? null : String.valueOf(_oldState.published));
             }
             // route message
