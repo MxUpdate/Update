@@ -138,7 +138,9 @@ public final class StringUtil_mxJPO
      *
      * @param _text     character stream to convert
      * @return converted string
+     * @deprecated use {@link MqlBuilder_mxJPO}
      */
+    @Deprecated()
     public static String convertMql(final CharSequence _text)
     {
         return (_text != null)

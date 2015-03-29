@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 The MxUpdate Team
+ * Copyright 2008-2015 The MxUpdate Team
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,7 +155,7 @@ public abstract class AbstractAttributeNumeric_mxJPO<CLASS extends AbstractAttri
                 if ((target.dimension != null) && !target.dimension.isEmpty())  {
                     _paramCache.logDebug("    - set dimension '" + target.dimension + "'");
                     _mql.newLine()
-                        .append("dimension \"").append(StringUtil_mxJPO.convertMql(target.dimension)).append('\"');
+                        .cmd("dimension ").arg(target.dimension);
                 }
             } else if (!this.dimension.equals(target.dimension))  {
                 throw new UpdateException_mxJPO(

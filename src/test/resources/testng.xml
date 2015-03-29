@@ -32,6 +32,7 @@
             <package name="org.mxupdate.test.ci.program"/>
             <package name="org.mxupdate.test.ci.user"/>
             <package name="org.mxupdate.test.ci.userinterface"/>
+            <package name="org.mxupdate.test.test.update.util"/>
         </packages>
     </test>
 

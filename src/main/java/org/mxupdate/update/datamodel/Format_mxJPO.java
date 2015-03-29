@@ -274,7 +274,7 @@ public class Format_mxJPO
             final FormatDefParser_mxJPO parser = new FormatDefParser_mxJPO(new StringReader(code));
             final Format_mxJPO format = parser.format(_paramCache, this.getTypeDef(), this.getName());
 
-            final MqlBuilder_mxJPO mql = new MqlBuilder_mxJPO(new StringBuilder("escape mod format \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\""));
+            final MqlBuilder_mxJPO mql = MqlBuilder_mxJPO.init("escape mod format $1", this.getName());
 
             this.calcDelta(_paramCache, mql, format);
 

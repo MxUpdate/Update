@@ -187,7 +187,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         final Set<String> ret = new TreeSet<String>();
         final int length = this.attrTypeList.length();
         for (final String name : MqlUtil_mxJPO.execMql(_paramCache, AbstractAttribute_mxJPO.SELECT_ATTRS).split("\n"))  {
-            if (!"".equals(name) && name.startsWith(this.attrTypeList))  {
+            if (!name.isEmpty() && name.startsWith(this.attrTypeList))  {
                 ret.add(name.substring(length));
             }
         }
@@ -434,11 +434,10 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("escape add ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
-                .append(" type ").append(this.attrTypeCreate);
-        MqlUtil_mxJPO.execMql(_paramCache, cmd);
+        MqlBuilder_mxJPO.init()
+                .newLine()
+                .cmd("escape add ").cmd(this.getTypeDef().getMxAdminName()).cmd(" ").arg(this.getName()).cmd(" type ").cmd(this.attrTypeCreate)
+                .exec(_paramCache);
     }
 
     /**
@@ -517,7 +516,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
             @SuppressWarnings("unchecked")
             final CLASS attribute = (CLASS) parser.attribute(_paramCache, this.getTypeDef(), this.getName());
 
-            final MqlBuilder_mxJPO mql = new MqlBuilder_mxJPO(new StringBuilder("escape mod attribute \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\""));
+            final MqlBuilder_mxJPO mql = MqlBuilder_mxJPO.init("escape mod attribute $1", this.getName());
 
             this.calcDelta(_paramCache, mql, attribute);
 
@@ -741,20 +740,10 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
                 }
                 if (!found)  {
                     _mql.newLine()
-                        .append("remove range ");
-                    if ("programRange".equals(current.type))  {
-                        _mql.lastLine()
-                            .append("program \"").append(StringUtil_mxJPO.convertMql(current.value1)).append('\"');
-                    } else  {
-                        _mql.lastLine()
-                            .append(current.type)
-                            .append(" \"").append(StringUtil_mxJPO.convertMql(current.value1)).append('\"');
-                        if ("between".equals(current.type))  {
-                            _mql.lastLine()
-                                .append(' ').append(current.include1 ? "inclusive" : "exclusive")
-                                .append(" \"").append(StringUtil_mxJPO.convertMql(current.value2)).append("\"")
-                                .append(' ').append(current.include2 ? "inclusive" : "exclusive");
-                        }
+                        .cmd("remove range ").cmd(current.type).cmd(" ").arg(current.value1);
+                    if ("between".equals(current.type))  {
+                        _mql.cmd(" ").cmd(current.include1 ? "inclusive" : "exclusive")
+                            .cmd(" ").arg(current.value2).cmd(" ").cmd(current.include2 ? "inclusive" : "exclusive");
                     }
                 }
             }
@@ -769,24 +758,12 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
                 }
                 if (!found)  {
                     _mql.newLine()
-                        .append("add range ").append(target.type);
-                    // if the range is a program it is a 'global' attribute info
-                    if ("program".equals(target.type))  {
-                        _mql.lastLine()
-                            .append(" \"").append(StringUtil_mxJPO.convertMql(target.value1)).append('\"');
-                        if (target.value2 != null)  {
-                            _mql.lastLine()
-                                .append(" input \"").append(StringUtil_mxJPO.convertMql(target.value2)).append('\"');
-                        }
-                    } else  {
-                        _mql.lastLine()
-                            .append(" \"").append(StringUtil_mxJPO.convertMql(target.value1)).append("\"");
-                        if ("between".equals(target.type))  {
-                            _mql.lastLine()
-                                .append(' ').append(target.include1 ? "inclusive" : "exclusive")
-                                .append(" \"").append(StringUtil_mxJPO.convertMql(target.value2)).append("\"")
-                                .append(' ').append(target.include2 ? "inclusive" : "exclusive");
-                        }
+                        .cmd("add range ").cmd(target.type).cmd(" ").arg(target.value1);
+                    if ("between".equals(target.type))  {
+                        _mql.cmd(" ").cmd(target.include1 ? "inclusive" : "exclusive")
+                            .cmd(" ").arg(target.value2).cmd(" ").cmd(target.include2 ? "inclusive" : "exclusive");
+                    } else if ("program".equals(target.type))  {
+                        _mql.cmd(" input ").arg(target.value2);
                     }
                 }
             }

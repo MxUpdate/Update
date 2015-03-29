@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 
+import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
@@ -246,6 +247,7 @@ public class AccessList_mxJPO
      *
      * @param _out      writer instance
      */
+    @Deprecated()
     public void cleanup(final StringBuilder _out)
     {
         // to ensure that public / owner filters are removed:
@@ -272,6 +274,112 @@ public class AccessList_mxJPO
     }
 
     /**
+     * Appends the MQL Code to remove all defined access to {@code _out}.
+     *
+     * @param _mql  MQL builder
+     */
+    public void cleanup(final MqlBuilder_mxJPO _mql)
+    {
+        // to ensure that public / owner filters are removed:
+        // define them first with empty filter and remove them afterwards
+        // (not possible via 'remove all' for all MX versions)
+        _mql.newLine()
+            .cmd("revoke public none filter ").arg("").cmd(" remove revoke public all ")
+            .cmd("revoke owner none filter ").arg("").cmd(" remove revoke owner all ")
+            .cmd("public none filter ").arg("").cmd(" remove public all ")
+            .cmd("owner none filter ").arg("").cmd(" remove owner all");
+        for (final AccessList_mxJPO.Access access : this.accessList)  {
+            _mql.cmd(" remove");
+            if (access.prefix != Prefix.All)  {
+                _mql.cmd(" ").cmd(access.prefix.mxValue);
+            }
+            _mql.cmd(" ").cmd(access.kind);
+            if (!"public".equals(access.kind) && !"owner".equals(access.kind))  {
+                _mql.cmd(" ").arg(access.userRef);
+            }
+            if ((access.key != null) && !access.key.isEmpty())  {
+                _mql.cmd(" key ").arg(access.key);
+            }
+            _mql.cmd(" all filter ").arg("");
+        }
+    }
+
+    /**
+     * Appends all access items to the {@code _out}. Each line is prefixed
+     * with {@code _linePrefix}.
+     *
+     * @param _mql              mql builder
+     * @throws IOException if write failed
+     */
+    public void update(final MqlBuilder_mxJPO _mql)
+        throws IOException
+    {
+        // append all new access definitions
+        for (final AccessList_mxJPO.Access access : this.accessList)  {
+
+            if (!access.isEmpty())  {
+
+                _mql.newLine();
+
+                // prefix login / revoke?
+                if (access.prefix != Prefix.All)  {
+                    _mql.cmd(" ").cmd(access.prefix.mxValue);
+                }
+                // kind
+                _mql.cmd(" ").cmd(access.kind);
+                // append user reference (only if not public / owner definition)
+                if (!"public".equals(access.kind) && !"owner".equals(access.kind))  {
+                    _mql.cmd(" ").arg(access.userRef);
+                }
+                // access filter key
+                if ((access.key != null) && !access.key.isEmpty())  {
+                    _mql.cmd(" key ").arg(access.key);
+                }
+                // access (each access statement must be defined as argument!)
+                _mql.cmd(" ");
+                if (access.access.isEmpty())  {
+                    _mql.arg("none");
+                } else  {
+                    boolean first = true;
+                    for (final String oneAccess : access.access)  {
+                        if (first)  {
+                            first = false;
+                        } else  {
+                            _mql.cmd(",");
+                        }
+                        _mql.arg(oneAccess);
+                    }
+                }
+                // user items
+                if ((access.organization != null) && !access.organization.isEmpty() && !"any".equals(access.organization))  {
+                    _mql.cmd(" ").cmd(access.organization).cmd(" organization");
+                }
+                if ((access.project != null) && !access.project.isEmpty() && !"any".equals(access.project))  {
+                    _mql.cmd(" ").cmd(access.project).cmd(" project");
+                }
+                if ((access.owner != null) && !access.owner.isEmpty() && !"any".equals(access.owner))  {
+                    _mql.cmd(" ").cmd(access.owner).cmd(" owner");
+                }
+                if ((access.reserve != null) && !access.reserve.isEmpty() && !"any".equals(access.reserve))  {
+                    _mql.cmd(" ").cmd(access.reserve).cmd(" reserve");
+                }
+                if ((access.maturity != null) && !access.maturity.isEmpty() && !"any".equals(access.maturity))  {
+                    _mql.cmd(" ").cmd(access.maturity).cmd(" maturity");
+                }
+                if ((access.category != null) && !access.category.isEmpty() && !"any".equals(access.category))  {
+                    _mql.cmd(" ").cmd(access.category).cmd(" category");
+                }
+                if (access.filter != null)  {
+                    _mql.cmd(" filter ").arg(access.filter);
+                }
+                if (access.localfilter != null)  {
+                    _mql.cmd(" localfilter ").arg(access.localfilter);
+                }
+            }
+        }
+    }
+
+    /**
      * Appends all access items to the {@code _out}. Each line is prefixed
      * with {@code _linePrefix}.
      *
@@ -279,6 +387,7 @@ public class AccessList_mxJPO
      * @param _out              writer instance
      * @throws IOException if write failed
      */
+    @Deprecated()
     public void update(final String _linePrefix,
                        final Appendable _out)
         throws IOException

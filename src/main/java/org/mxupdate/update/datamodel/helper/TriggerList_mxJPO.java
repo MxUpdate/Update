@@ -151,7 +151,7 @@ public class TriggerList_mxJPO
                 }
                 if (!found)  {
                     _mql.newLine()
-                        .append("remove trigger ").append(current.eventType).append(' ').append(current.kind);
+                        .cmd("remove trigger ").cmd(current.eventType).cmd(" ").cmd(current.kind);
                 }
             }
         }
@@ -168,33 +168,8 @@ public class TriggerList_mxJPO
             }
             if (!found)  {
                 _mql.newLine()
-                    .append("add trigger ").append(target.eventType).append(' ').append(target.kind)
-                    .append(" \"").append(StringUtil_mxJPO.convertMql(target.program)).append("\"")
-                    .append(" input \"").append(StringUtil_mxJPO.convertMql(target.arguments)).append('\"');
+                    .cmd("add trigger ").cmd(target.eventType).cmd(" ").cmd(target.kind).cmd(" ").arg(target.program).cmd(" input ").arg(target.arguments);
             }
-        }
-    }
-
-    /**
-     * Calculates the delta between current trigger definition and this
-     * target trigger definitions.
-     *
-     * @param _current  current triggers
-     * @param _cmd      MQL string builder to append the delta
-     */
-    @Deprecated()
-    public void calcDelta(final TriggerList_mxJPO _current,
-                          final StringBuilder _cmd)
-    {
-        if (_current != null)  {
-            for (final Trigger trigger : _current)  {
-                _cmd.append(" remove trigger ").append(trigger.eventType).append(' ').append(trigger.kind);
-            }
-        }
-        for (final Trigger trigger : this)  {
-            _cmd.append(" add trigger ").append(trigger.eventType).append(' ').append(trigger.kind)
-                .append(" \"").append(StringUtil_mxJPO.convertMql(trigger.program)).append("\"")
-                .append(" input \"").append(StringUtil_mxJPO.convertMql(trigger.arguments)).append('\"');
         }
     }
 

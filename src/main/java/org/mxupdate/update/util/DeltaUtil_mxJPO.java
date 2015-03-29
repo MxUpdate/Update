@@ -49,8 +49,9 @@ public final class DeltaUtil_mxJPO
         final String curVal = (_curVal == null) ? "" : _curVal;
         final String newVal = (_newVal == null) ? "" : _newVal;
 
-        if (!curVal.equals(newVal))  {
-            _mql.newLine().append(_kind).append(" \"").append(StringUtil_mxJPO.convertMql(newVal)).append('\"');
+        if ((_curVal == null) || !curVal.equals(newVal))  {
+            _mql.newLine()
+                .cmd(_kind).cmd(" ").arg(newVal);
         }
     }
 
@@ -63,6 +64,7 @@ public final class DeltaUtil_mxJPO
      * @param _newVal   new target value
      * @param _curVal   current value in the database
      */
+    @Deprecated()
     public static void calcValueDelta(final StringBuilder _out,
                                       final String _kind,
                                       final String _newVal,
@@ -93,9 +95,9 @@ public final class DeltaUtil_mxJPO
         if ((_curVal == null) || (_curVal != _newVal))  {
             _mql.newLine();
             if (!_newVal)  {
-                _mql.lastLine().append('!');
+                _mql.cmd("!");
             }
-            _mql.lastLine().append(_kind).append(' ');
+            _mql.cmd(_kind);
         }
     }
 
@@ -148,49 +150,14 @@ public final class DeltaUtil_mxJPO
         if (!equal)  {
             for (final String curValue : _current)  {
                 if (!_new.contains(curValue))  {
-                    _mql.newLine().append("remove ").append(_kind).append(" \"").append(StringUtil_mxJPO.convertMql(curValue)).append('\"');
+                    _mql.newLine()
+                        .cmd("remove ").cmd(_kind).cmd(" ").arg(curValue);
                 }
             }
             for (final String newValue : _new)  {
                 if (!_current.contains(newValue))  {
-                    _mql.newLine().append("add ").append(_kind).append(" \"").append(StringUtil_mxJPO.convertMql(newValue)).append('\"');
-                }
-            }
-        }
-    }
-
-    /**
-     * Calculates the delta between the new and the old list set. If a delta
-     * exists, the different elements are added or removed.
-     *
-     * @param _out      appendable instance where the delta must be append
-     * @param _kind     kind of the delta
-     * @param _new      new target values
-     * @param _current  current values in MX
-     */
-    public static void calcListDelta(final StringBuilder _out,
-                                     final String _kind,
-                                     final Set<String> _new,
-                                     final Set<String> _current)
-    {
-        boolean equal = (_current.size() == _new.size());
-        if (equal)  {
-            for (final String format : _current)  {
-                if (!_new.contains(format))  {
-                    equal = false;
-                    break;
-                }
-            }
-        }
-        if (!equal)  {
-            for (final String curValue : _current)  {
-                if (!_new.contains(curValue))  {
-                    _out.append(" remove ").append(_kind).append(" \"").append(StringUtil_mxJPO.convertMql(curValue)).append('\"');
-                }
-            }
-            for (final String newValue : _new)  {
-                if (!_current.contains(newValue))  {
-                    _out.append(" add ").append(_kind).append(" \"").append(StringUtil_mxJPO.convertMql(newValue)).append('\"');
+                    _mql.newLine()
+                        .cmd("add ").cmd(_kind).cmd(" ").arg(newValue);
                 }
             }
         }
