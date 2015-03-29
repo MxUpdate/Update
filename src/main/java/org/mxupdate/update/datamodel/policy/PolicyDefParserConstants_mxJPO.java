@@ -171,13 +171,13 @@ interface PolicyDefParserConstants_mxJPO {
   /** RegularExpression Id. */
   int CATEGORY_CONTRACTOR = 92;
   /** RegularExpression Id. */
-  int STATE_PROPERTY = 93;
+  int PROPERTY = 93;
   /** RegularExpression Id. */
-  int STATE_PROPERTYVAL = 94;
+  int PROPERTYVAL = 94;
   /** RegularExpression Id. */
-  int STATE_PROPERTYTO = 95;
+  int PROPERTYTO = 95;
   /** RegularExpression Id. */
-  int STATE_PROPERTYTOTYPE = 100;
+  int PROPERTYTOTYPE = 100;
   /** RegularExpression Id. */
   int SS_CHAR = 101;
   /** RegularExpression Id. */
@@ -252,7 +252,7 @@ interface PolicyDefParserConstants_mxJPO {
   /** Lexical state. */
   int STATEACCESS_STRING_EXPECTED = 2;
   /** Lexical state. */
-  int STATE_PROPERTYTO_EXPECTED = 3;
+  int PROPERTYTO_EXPECTED = 3;
   /** Lexical state. */
   int B_EXPECTED = 4;
   /** Lexical state. */
@@ -376,7 +376,7 @@ interface PolicyDefParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "\"\\r\"",
-    "<STATE_PROPERTYTOTYPE>",
+    "<PROPERTYTOTYPE>",
     "<SS_CHAR>",
     "\" \"",
     "\"\\t\"",

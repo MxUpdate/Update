@@ -247,12 +247,10 @@ public class PolicyData
             state.append4CIFile(strg);
         }
 
-        strg.append("}");
-
         // append properties
-        for (final PropertyDef prop : this.getProperties())  {
-            strg.append('\n').append(prop.getCITCLString(this.getCI()));
-        }
+        this.getProperties().appendCIFileUpdateFormat("  ", strg);
+
+        strg.append("}");
 
         return strg.toString();
     }
@@ -377,8 +375,6 @@ public class PolicyData
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        this.getProperties().checkExportPropertiesAddFormat(_exportParser, this.getCI());
-
         // check symbolic name
         Assert.assertEquals(
                 _exportParser.getSymbolicName(),
@@ -467,6 +463,9 @@ public class PolicyData
         {
             state.checkExport(_exportParser);
         }
+
+        // check for properties
+        this.getProperties().checkExportPropertiesUpdateFormat(_exportParser.getLines("/updatePolicy/property/@value"));
     }
 
 

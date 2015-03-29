@@ -179,24 +179,23 @@ PARSER_END(PolicyDefParser)
     | <CATEGORY_CONTRACTOR:                 "contractor"  ([" ","\t","\n","\r"])+ "category">       : DEFAULT
 }
 
-/************************************************************* State Property */
+/*********************************************** Property and State Property */
 <DEFAULT> TOKEN :
-{      <STATE_PROPERTY:                      "property">                                             : S_EXPECTED
-    | <STATE_PROPERTYVAL:                   "value">                                                : S_EXPECTED
-    | <STATE_PROPERTYTO:                    "to">                                                   : STATE_PROPERTYTO_EXPECTED
+{      <PROPERTY:                            "property">                                             : S_EXPECTED
+    | <PROPERTYVAL:                         "value">                                                : S_EXPECTED
+    | <PROPERTYTO:                          "to">                                                   : PROPERTYTO_EXPECTED
 }
 
-<STATE_PROPERTYTO_EXPECTED> SKIP :
+<PROPERTYTO_EXPECTED> SKIP :
 {
   " " | "\t" | "\n" | "\r"
 }
 
-<STATE_PROPERTYTO_EXPECTED> TOKEN :
+<PROPERTYTO_EXPECTED> TOKEN :
 {
-      <STATE_PROPERTYTOTYPE : (<SS_CHAR>)+> : S_EXPECTED
+      <PROPERTYTOTYPE : (<SS_CHAR>)+> : S_EXPECTED
     | <#SS_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
 }
-
 
 /*************************************************** Boolean for Hidden Value */
 <B_EXPECTED> SKIP :
@@ -328,24 +327,29 @@ Policy_mxJPO policy(final ParameterCache_mxJPO _paramCache,
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
 : {
     final Policy_mxJPO policy = (Policy_mxJPO) _typeDef.newTypeInstance(_mxName);
-    String tmp;
+    String tmpStr;
+    Token tmpToken;
+    AdminProperty tmpProp;
 } {
     (
-        ( <DESCRIPTION>    tmp = sString()     {this.getField(policy, "description").set(tmp);} )
+        ( <DESCRIPTION>    tmpStr = sString()                       {this.getField(policy, "description").set(tmpStr);} )
       | ( format(policy) )
       | ( type(policy) )
-      | ( <DEFAULTFORMAT>  tmp = sString()     {this.getField(policy, "defaultFormat").set(tmp);} )
-      | ( <ENFORCE>        ( <BOOLEAN_TRUE>    {this.getField(policy, "enforce").set(true);}
-                           | <BOOLEAN_FALSE>   {this.getField(policy, "enforce").set(false);} ) )
-      | ( <DELIMITER>      tmp = sString()     {this.getField(policy, "delimiter").set(tmp);} )
-      | ( <SEQUENCE>       tmp = sString()     {this.getField(policy, "minorsequence").set(tmp);} )
-      | ( <MINORSEQUENCE>  tmp = sString()     {this.getField(policy, "minorsequence").set(tmp);} )
-      | ( <MAJORSEQUENCE>  tmp = sString()     {this.getField(policy, "majorsequence").set(tmp);} )
-      | ( <STORE>          tmp = sString()     {this.getField(policy, "store").set(tmp);} )
-      | ( <HIDDEN>         ( <BOOLEAN_TRUE>    {this.getField(policy, "hidden").set(true);}
-                           | <BOOLEAN_FALSE>   {this.getField(policy, "hidden").set(false);} ) )
+      | ( <DEFAULTFORMAT>  tmpStr = sString()                       {this.getField(policy, "defaultFormat").set(tmpStr);} )
+      | ( <ENFORCE>        ( <BOOLEAN_TRUE>                         {this.getField(policy, "enforce").set(true);}
+                           | <BOOLEAN_FALSE>                        {this.getField(policy, "enforce").set(false);} ) )
+      | ( <DELIMITER>      tmpStr = sString()                       {this.getField(policy, "delimiter").set(tmpStr);} )
+      | ( <SEQUENCE>       tmpStr = sString()                       {this.getField(policy, "minorsequence").set(tmpStr);} )
+      | ( <MINORSEQUENCE>  tmpStr = sString()                       {this.getField(policy, "minorsequence").set(tmpStr);} )
+      | ( <MAJORSEQUENCE>  tmpStr = sString()                       {this.getField(policy, "majorsequence").set(tmpStr);} )
+      | ( <STORE>          tmpStr = sString()                       {this.getField(policy, "store").set(tmpStr);} )
+      | ( <HIDDEN>         ( <BOOLEAN_TRUE>                         {this.getField(policy, "hidden").set(true);}
+                           | <BOOLEAN_FALSE>                        {this.getField(policy, "hidden").set(false);} ) )
       | ( allstate(policy) )
       | ( state(policy) )
+      | (<PROPERTY>  tmpStr = sString()                             {tmpProp = new AdminProperty();this.appendValue(this.getValue(policy, "properties"), "propertiesStack", tmpProp);this.setValue(tmpProp, "name", tmpStr);}
+              (   ( <PROPERTYTO>  tmpToken = <PROPERTYTOTYPE>       {this.setValue(tmpProp, "refAdminType", this.getString(tmpToken.image));}                                  tmpStr = sString()                {this.setValue(tmpProp, "refAdminName", tmpStr);} )
+                | ( <PROPERTYVAL> tmpStr = sString()                {this.setValue(tmpProp, "value", tmpStr);} ) )* )
     )*
     {
         this.prepareObject(_paramCache, policy);
@@ -425,42 +429,46 @@ void state(final Policy_mxJPO _policy) : {
     final State state = new State();
     String tmpStr;
     Set<String> tmpSet;
+    Token tmpToken;
+    AdminProperty tmpProp;
 } {
     <STATE> tmpStr = sString() {this.getField(state, "name").set(tmpStr);}
     "{"
-        (              (<REGISTEREDNAME>     tmpStr = sString()  {this.appendValue(state, "symbolicNames", tmpStr);})
-            | (<REVISION>           ( <BOOLEAN_TRUE>    {this.getField(state, "minorrevisionable").set(true);}
-                                    | <BOOLEAN_FALSE>   {this.getField(state, "minorrevisionable").set(false);} ) )
-            | (<MINORREVISION>      ( <BOOLEAN_TRUE>    {this.getField(state, "minorrevisionable").set(true);}
-                                    | <BOOLEAN_FALSE>   {this.getField(state, "minorrevisionable").set(false);} ) )
-            | (<MAJORREVISION>      ( <BOOLEAN_TRUE>    {this.getField(state, "majorrevisionable").set(true);}
-                                    | <BOOLEAN_FALSE>   {this.getField(state, "majorrevisionable").set(false);} ) )
-            | (<VERSION>            ( <BOOLEAN_TRUE>    {this.getField(state, "versionable").set(true);}
-                                    | <BOOLEAN_FALSE>   {this.getField(state, "versionable").set(false);} ) )
-            | (<PROMOTE>            ( <BOOLEAN_TRUE>    {this.getField(state, "autoPromotion").set(true);}
-                                    | <BOOLEAN_FALSE>   {this.getField(state, "autoPromotion").set(false);} ) )
-            | (<CHECKOUTHISTORY>    ( <BOOLEAN_TRUE>    {this.getField(state, "checkoutHistory").set(true);}
-                                    | <BOOLEAN_FALSE>   {this.getField(state, "checkoutHistory").set(false);} ) )
-            | ((<ENFORCERESERVEACCESS> | <ENFORCERESERVEACCESS_TRUE>)
-                                                        {this.getField(state, "enforcereserveaccess").set(true);} )
+        (              (<REGISTEREDNAME>     tmpStr = sString()                          {this.appendValue(state, "symbolicNames", tmpStr);})
+            | (<REVISION>           ( <BOOLEAN_TRUE>                            {this.getField(state, "minorrevisionable").set(true);}
+                                    | <BOOLEAN_FALSE>                           {this.getField(state, "minorrevisionable").set(false);} ) )
+            | (<MINORREVISION>      ( <BOOLEAN_TRUE>                            {this.getField(state, "minorrevisionable").set(true);}
+                                    | <BOOLEAN_FALSE>                           {this.getField(state, "minorrevisionable").set(false);} ) )
+            | (<MAJORREVISION>      ( <BOOLEAN_TRUE>                            {this.getField(state, "majorrevisionable").set(true);}
+                                    | <BOOLEAN_FALSE>                           {this.getField(state, "majorrevisionable").set(false);} ) )
+            | (<VERSION>            ( <BOOLEAN_TRUE>                            {this.getField(state, "versionable").set(true);}
+                                    | <BOOLEAN_FALSE>                           {this.getField(state, "versionable").set(false);} ) )
+            | (<PROMOTE>            ( <BOOLEAN_TRUE>                            {this.getField(state, "autoPromotion").set(true);}
+                                    | <BOOLEAN_FALSE>                           {this.getField(state, "autoPromotion").set(false);} ) )
+            | (<CHECKOUTHISTORY>    ( <BOOLEAN_TRUE>                            {this.getField(state, "checkoutHistory").set(true);}
+                                    | <BOOLEAN_FALSE>                           {this.getField(state, "checkoutHistory").set(false);} ) )
+            | ((<ENFORCERESERVEACCESS> | <ENFORCERESERVEACCESS_TRUE>)           {this.getField(state, "enforcereserveaccess").set(true);} )
             | ((<ENFORCERESERVEACCESS_NOT> | <ENFORCERESERVEACCESS_EXCLAMATION> | <ENFORCERESERVEACCESS_FALSE>)
-                                                        {this.getField(state, "enforcereserveaccess").set(false);} )
-            | (<PUBLISHED>          ( <BOOLEAN_TRUE>    {this.getField(state, "published").set(true);}
-                                    | <BOOLEAN_FALSE>   {this.getField(state, "published").set(false);} ) )
+                                                                                {this.getField(state, "enforcereserveaccess").set(false);} )
+            | (<PUBLISHED>          ( <BOOLEAN_TRUE>                            {this.getField(state, "published").set(true);}
+                                    | <BOOLEAN_FALSE>                           {this.getField(state, "published").set(false);} ) )
             | stateOwnerAccess(Prefix.All, state)
             | statePublicAccess(Prefix.All, state)
             | stateUserAccess(Prefix.All, state)
             | (<REVOKE> ( stateOwnerAccess(Prefix.Revoke, state) | statePublicAccess(Prefix.Revoke, state) | stateUserAccess(Prefix.Revoke, state) ) )
             | (<LOGIN>  ( stateOwnerAccess(Prefix.Login,  state) | statePublicAccess(Prefix.Login,  state) | stateUserAccess(Prefix.Login,  state) ) )
-            | (<ACTION>             tmpStr = sString()  {this.getField(state, "actionProgram").set(tmpStr);}
-               <INPUT>              tmpStr = sString()  {this.getField(state, "actionInput").set(tmpStr);})
-            | (<CHECK>              tmpStr = sString()  {this.getField(state, "checkProgram").set(tmpStr);}
-               <INPUT>              tmpStr = sString()  {this.getField(state, "checkInput").set(tmpStr);})
-            | (<ROUTE>              tmpSet = lsList()   {this.getField(state, "routeUsers").set(tmpSet);}
-                                    tmpStr = sString()  {this.getField(state, "routeMessage").set(tmpStr);})
+            | (<ACTION>             tmpStr = sString()                          {this.getField(state, "actionProgram").set(tmpStr);}
+               <INPUT>              tmpStr = sString()                          {this.getField(state, "actionInput").set(tmpStr);})
+            | (<CHECK>              tmpStr = sString()                          {this.getField(state, "checkProgram").set(tmpStr);}
+               <INPUT>              tmpStr = sString()                          {this.getField(state, "checkInput").set(tmpStr);})
+            | (<ROUTE>              tmpSet = lsList()                           {this.getField(state, "routeUsers").set(tmpSet);}
+                                    tmpStr = sString()                          {this.getField(state, "routeMessage").set(tmpStr);})
             | stateTrigger(state)
             | stateSignature(state)
-            | stateProperty(state)
+            | (<PROPERTY>  tmpStr = sString()                                   {tmpProp = new AdminProperty();this.appendValue(this.getValue(state, "properties"), "propertiesStack", tmpProp);this.setValue(tmpProp, "name", tmpStr);}
+                      (   ( <PROPERTYTO>  tmpToken = <PROPERTYTOTYPE>           {this.setValue(tmpProp, "refAdminType", this.getString(tmpToken.image));}
+                                          tmpStr = sString()                    {this.setValue(tmpProp, "refAdminName", tmpStr);} )
+                        | ( <PROPERTYVAL> tmpStr = sString()                    {this.setValue(tmpProp, "value", tmpStr);} ) )* )
         )*
     "}"
     {
@@ -634,36 +642,6 @@ void stateSignature(final State _state) : {
     "}"
     {
         this.appendValue(_state, "signatures", signature);
-    }
-}
-
-
-/**
- * Parses one property for a state.
- *
- * @param _state    state to append the property
- */
-void stateProperty(final State _state) : {
-    Token tmp;
-    String name = null;
-    String value = null;
-    String toType = null;
-    String toName = null;
-}  {
-    <STATE_PROPERTY> name = sString()
-    (
-          ( <STATE_PROPERTYVAL> value = sString() )
-        | ( <STATE_PROPERTYTO>
-                ((tmp = <STATE_PROPERTYTOTYPE>) {toType = this.getSingle(tmp.image);})
-                toName = sString() )
-    )*
-    {
-        final AdminProperty prop = new AdminProperty();
-        this.setValue(prop, "name", name);
-        this.setValue(prop, "value", value);
-        this.setValue(prop, "refAdminType", toType);
-        this.setValue(prop, "refAdminName", toName);
-        this.appendValue(_state, "properties", prop);
     }
 }
 

@@ -32,6 +32,7 @@ import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO;
 import org.mxupdate.update.datamodel.Format_mxJPO;
+import org.mxupdate.update.datamodel.Policy_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
@@ -548,7 +549,8 @@ public abstract class AbstractAdminObject_mxJPO
         // remove all properties
         // (only if not attribute, because attributes and formats uses calulated deltas)
         if (!(this instanceof AbstractAttribute_mxJPO)
-                && !(this instanceof Format_mxJPO))  {
+                && !(this instanceof Format_mxJPO)
+                && !(this instanceof Policy_mxJPO))  {
 
             for (final AdminProperty prop : this.properties)  {
                 // % must be ignored because this means settings
