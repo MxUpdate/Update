@@ -32,7 +32,7 @@ import org.testng.annotations.Test;
  */
 @Test()
 public class AttributeDateTest
-    extends AbstractAttributeTest<AttributeDateData>
+    extends AbstractAttributeWithRangesAndMultiValuesTest<AttributeDateData>
 {
     /**
      * Creates for given <code>_name</code> a new date attribute instance.

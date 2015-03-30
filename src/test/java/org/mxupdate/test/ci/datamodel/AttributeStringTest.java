@@ -29,7 +29,7 @@ import org.testng.annotations.Test;
  */
 @Test()
 public class AttributeStringTest
-    extends AbstractAttributeTest<AttributeStringData>
+    extends AbstractAttributeWithRangesAndMultiValuesTest<AttributeStringData>
 {
     /**
      * Creates for given <code>_name</code> a new string attribute instance.

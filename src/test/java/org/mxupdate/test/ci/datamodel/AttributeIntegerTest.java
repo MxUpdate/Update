@@ -34,7 +34,7 @@ import org.testng.annotations.Test;
  */
 @Test()
 public class AttributeIntegerTest
-    extends AbstractAttributeTest<AttributeIntegerData>
+    extends AbstractAttributeWithRangesAndMultiValuesTest<AttributeIntegerData>
 {
     /**
      * Creates for given <code>_name</code> a new integer attribute instance.

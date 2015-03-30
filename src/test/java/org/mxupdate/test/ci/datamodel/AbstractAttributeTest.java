@@ -30,7 +30,6 @@ import org.mxupdate.test.data.datamodel.AttributeRealData;
 import org.mxupdate.test.data.datamodel.RuleData;
 import org.mxupdate.test.data.program.MQLProgramData;
 import org.mxupdate.test.util.IssueLink;
-import org.mxupdate.test.util.Version;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -93,70 +92,6 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
                         .addTrigger(new TriggerCheck("modify", new MQLProgramData(this, "Test \" Program 2")))
                         .addTrigger(new TriggerOverride("modify", new MQLProgramData(this, "Test \" Program 3")))});
 
-        // ranges
-        ret.add(new Object[]{
-                _logText + " with = range",
-                this.createNewData("hello")
-                        .addRange(new AbstractAttributeData.RangeEqual(_value1))});
-        ret.add(new Object[]{
-                _logText + " with != range",
-                this.createNewData("hello")
-                        .addRange(new AbstractAttributeData.RangeNotEqual(_value1))});
-        ret.add(new Object[]{
-                _logText + " with < range",
-                this.createNewData("hello")
-                        .addRange(new AbstractAttributeData.RangeLessThan(_value1))});
-        ret.add(new Object[]{
-                _logText + " with > range",
-                this.createNewData("hello")
-                        .addRange(new AbstractAttributeData.RangeGreaterThan(_value1))});
-        ret.add(new Object[]{
-                _logText + " with <= range",
-                this.createNewData("hello")
-                        .addRange(new AbstractAttributeData.RangeLessEqualThan(_value1))});
-        ret.add(new Object[]{
-                _logText + " with >= range",
-                this.createNewData("hello")
-                        .addRange(new AbstractAttributeData.RangeGreaterEqualThan(_value1))});
-        ret.add(new Object[]{
-                _logText + " with smatch range",
-                this.createNewData("hello")
-                        .addRange(new AbstractAttributeData.RangeSMatch(_value1))});
-        ret.add(new Object[]{
-                _logText + " with !smatch range",
-                this.createNewData("hello")
-                        .addRange(new AbstractAttributeData.RangeNotSMatch(_value1))});
-        ret.add(new Object[]{
-                _logText + " with match range",
-                this.createNewData("hello")
-                        .addRange(new AbstractAttributeData.RangeMatch(_value1))});
-        ret.add(new Object[]{
-                _logText + " with !match range",
-                this.createNewData("hello")
-                        .addRange(new AbstractAttributeData.RangeNotMatch(_value1))});
-        ret.add(new Object[]{
-                _logText + " with program range w/o input",
-                this.createNewData("hello")
-                        .addRange(new AbstractAttributeData.RangeProgram(new MQLProgramData(this, "program \" test"), null))});
-        ret.add(new Object[]{
-                _logText + " with program range with empty input (mut be removed)",
-                this.createNewData("hello")
-                        .addRange(new AbstractAttributeData.RangeProgram(new MQLProgramData(this, "program \" test"), "")),
-                this.createNewData("hello")
-                        .addRange(new AbstractAttributeData.RangeProgram(new MQLProgramData(this, "program \" test"), null))});
-        ret.add(new Object[]{
-                _logText + " with program range with input",
-                this.createNewData("hello")
-                        .addRange(new AbstractAttributeData.RangeProgram(new MQLProgramData(this, "program \" test"), "test \" input"))});
-        ret.add(new Object[]{
-                _logText + " with between range inclusive",
-                this.createNewData("hello")
-                        .addRange(new AbstractAttributeData.RangeBetween(_value1, true, _value2, true))});
-        ret.add(new Object[]{
-                _logText + " with between range exclusive",
-                this.createNewData("hello")
-                        .addRange(new AbstractAttributeData.RangeBetween(_value1, false, _value2, false))});
-
         // default value
         ret.add(new Object[]{
                 _logText + " with default value",
@@ -184,24 +119,6 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
                 this.createNewData("hello")
                         .setValue("default", _value1)
                         .setFlag("resetonrevision", false)});
-
-        // multi value flags
-        ret.add(new Object[]{
-                _logText + " with multi value flag true",
-                this.createNewData("hello")
-                        .setFlag("multivalue", true)
-                        .notSupported(Version.V6R2011x)});
-        ret.add(new Object[]{
-                _logText + " with multi value flag false",
-                this.createNewData("hello")
-                        .setFlag("multivalue", false)
-                        .notSupported(Version.V6R2011x)});
-        ret.add(new Object[]{
-                _logText + " without multi value flag (to test default value false in export)",
-                this.createNewData("hello")
-                        .notSupported(Version.V6R2011x),
-                this.createNewData("hello")
-                        .setFlag("multivalue", false)});
 
         ret.addAll(Arrays.asList(_datas));
 

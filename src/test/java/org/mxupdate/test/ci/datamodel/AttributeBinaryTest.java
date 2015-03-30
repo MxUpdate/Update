@@ -15,39 +15,39 @@
 
 package org.mxupdate.test.ci.datamodel;
 
-import org.mxupdate.test.data.datamodel.AttributeBooleanData;
+import org.mxupdate.test.data.datamodel.AttributeBinaryData;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test cases for the update and export of boolean attributes.
+ * Test cases for the update and export of binary attributes.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class AttributeBooleanTest
-    extends AbstractAttributeWithRangesAndMultiValuesTest<AttributeBooleanData>
+public class AttributeBinaryTest
+    extends AbstractAttributeTest<AttributeBinaryData>
 {
     /**
-     * Creates for given <code>_name</code> a new boolean attribute instance.
+     * Creates for given {@code _name} a new binary attribute instance.
      *
      * @param _name     name of the attribute instance
      * @return attribute instance
      */
     @Override()
-    protected AttributeBooleanData createNewData(final String _name)
+    protected AttributeBinaryData createNewData(final String _name)
     {
-        return new AttributeBooleanData(this, _name);
+        return new AttributeBinaryData(this, _name);
     }
 
     /**
-     * Data provider for test boolean attributes.
+     * Data provider for test binary attributes.
      *
-     * @return object array with all test boolean attributes
+     * @return object array with all test binary attributes
      */
     @DataProvider(name = "data")
     public Object[][] getAttributes()
     {
-        return this.prepareData("boolean attribute", "TRUE", "FALSE");
+        return this.prepareData("binary attribute", "TRUE", "FALSE");
     }
 }

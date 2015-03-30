@@ -34,7 +34,7 @@ import org.testng.annotations.Test;
  */
 @Test()
 public class AttributeRealTest
-    extends AbstractAttributeTest<AttributeRealData>
+    extends AbstractAttributeWithRangesAndMultiValuesTest<AttributeRealData>
 {
     /**
      * Creates for given <code>_name</code> a new real attribute instance.
