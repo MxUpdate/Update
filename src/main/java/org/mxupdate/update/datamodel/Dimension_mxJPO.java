@@ -33,7 +33,7 @@ import org.mxupdate.update.datamodel.dimension.DimensionDefParser_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
-import org.mxupdate.update.util.MqlUtil_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
@@ -303,10 +303,11 @@ public class Dimension_mxJPO
             }
             _out.append("  }\n");
         }
-        _out.append("}");
 
         // append properties
-        this.getProperties().writeAddFormat(_paramCache, _out, this.getTypeDef());
+        this.getProperties().writeUpdateFormat(_paramCache, _out, "  ");
+
+        _out.append("}");
     }
 
     /**
@@ -395,19 +396,12 @@ public class Dimension_mxJPO
             final DimensionDefParser_mxJPO parser = new DimensionDefParser_mxJPO(new StringReader(code));
             final Dimension_mxJPO dimension = parser.dimension(_paramCache, this.getTypeDef(), this.getName());
 
-            final StringBuilder cmd = new StringBuilder()
-                    .append("escape mod dimension \"")
-                    .append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ");
+            final MqlBuilder_mxJPO mql = MqlBuilder_mxJPO.init("escape mod dimension $1", this.getName());
 
             // basic information
-            DeltaUtil_mxJPO.calcValueDelta(cmd, "description", dimension.getDescription(), this.getDescription());
-            // hidden flag, because hidden flag must be set with special syntax
-            if (this.isHidden() != dimension.isHidden())  {
-                if (!dimension.isHidden())  {
-                    cmd.append('!');
-                }
-                cmd.append("hidden ");
-            }
+            DeltaUtil_mxJPO.calcValueDelta(mql, "description", dimension.getDescription(), this.getDescription());
+            // hidden flag
+            DeltaUtil_mxJPO.calcFlagDelta(mql, "hidden", dimension.isHidden(), this.isHidden());
 
             // prepare maps of units depending on the unit name (as key)
             final Map<String,Unit> curUnits = new HashMap<String,Unit>();
@@ -425,26 +419,31 @@ public class Dimension_mxJPO
                     if (!_paramCache.getValueBoolean(Dimension_mxJPO.PARAM_ALLOW_REMOVE_UNIT))  {
                         throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.DIMENSION_UPDATE_REMOVEUNIT);
                     }
-                    cmd.append("remove unit \"").append(StringUtil_mxJPO.convertMql(curUnit.getKey())).append("\" ");
+                    mql.newLine().cmd("remove unit ").arg(curUnit.getKey());
                 }
             }
 
-            final StringBuilder postCmd = new StringBuilder();
+            // create non-existing units
             for (final Map.Entry<String,Unit> tarUnit : tarUnits.entrySet())  {
                 if (!curUnits.containsKey(tarUnit.getKey()))  {
                     _paramCache.logDebug("    add unit " + tarUnit.getKey());
-                    tarUnit.getValue().appendDelta(_paramCache, null, cmd, postCmd);
+                    mql.newLine()
+                        .cmd("add unit ").arg(tarUnit.getValue().name).cmd(" ")
+                        .cmd(tarUnit.getValue().defaultUnit ? "" : "!").cmd("default ")
+                        .cmd("multiplier ").arg(String.valueOf(tarUnit.getValue().multiplier)).cmd(" ")
+                        .cmd("offset ").arg(String.valueOf(tarUnit.getValue().offset));
                 }
             }
 
+            // update units
             for (final Unit tarUnit : tarUnits.values())  {
-                if (curUnits.containsKey(tarUnit.name))  {
-                    tarUnit.appendDelta(_paramCache, curUnits.get(tarUnit.name), cmd, postCmd);
-                }
+                tarUnit.calcDelta(_paramCache, curUnits.get(tarUnit.name), mql);
             }
 
-            cmd.append(postCmd).append(";");
-            MqlUtil_mxJPO.execMql(_paramCache, cmd);
+            // properties
+            dimension.getProperties().calcDelta("", this.getProperties(), mql);
+
+            mql.exec(_paramCache);
         }
     }
 
@@ -545,68 +544,55 @@ public class Dimension_mxJPO
 
         /**
          * <p>Appends the MQL delta commands to updated current unit definition
-         * <code>_current</code> to this new target unit definition.
-         * <p> FYI: For each setting which is modified a <code>modify
-         * unit</code> must be defined as prefix or otherwise only the last
-         * setting is correct (issue in MX kernel).</p>
+         * <{@code _current} to this new target unit definition.
+         * <p> FYI: For each setting which is modified a {@code modify unit}
+         * must be defined as prefix or otherwise only the last setting is
+         * correct (issue in MX kernel).</p>
          *
          * @param _paramCache   parameter cache
          * @param _current      current unit definition in MX (or
-         *                      <code>null</code> if currently not existing)
-         * @param _cmd          string builder used to append MQL commands
-         * @param _postCmd      string builder used to append the system
-         *                      information (should be defined at least)
+         *                      {@code null} if currently not existing)
+         * @param _mql          MQL builder used to append MQL commands
          * @throws UpdateException_mxJPO if the multiplier or offset is changed
          */
-        protected void appendDelta(final ParameterCache_mxJPO _paramCache,
-                                   final Unit _current,
-                                   final StringBuilder _cmd,
-                                   final StringBuilder _postCmd)
+        protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                                 final Unit _current,
+                                 final MqlBuilder_mxJPO _mql)
             throws UpdateException_mxJPO
         {
-            final StringBuilder modUnitCmd = new StringBuilder()
-                    .append("modify unit \"").append(StringUtil_mxJPO.convertMql(this.name)).append("\" ");
-            if (_current == null)  {
-                _cmd.append("add unit \"").append(StringUtil_mxJPO.convertMql(this.name))
-                    .append("\" ");
-                if (!this.defaultUnit)  {
-                    _cmd.append('!');
-                }
-                _cmd.append("default ")
-                    .append("multiplier ").append(this.multiplier).append(' ')
-                    .append("offset ").append(this.offset).append(' ');
-            } else  {
-                _cmd.append(modUnitCmd);
+            _mql.pushPrefixByAppending("modify unit $2", this.name);
+
+            if (_current != null)  {
                 if (this.multiplier != _current.multiplier)  {
                     if (!_paramCache.getValueBoolean(Dimension_mxJPO.PARAM_ALLOW_UPDATE_UNIT_MULTIPLIER))  {
                         throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.DIMENSION_UPDATE_MULTIPLIER);
                     }
-                    _cmd.append("multiplier ").append(this.multiplier).append(' ');
+                    _mql.newLine().cmd("multiplier ").arg(String.valueOf(this.multiplier)).arg(" ");
                 }
                 if (this.offset != _current.offset)  {
                     if (!_paramCache.getValueBoolean(Dimension_mxJPO.PARAM_ALLOW_UPDATE_UNIT_OFFSET))  {
                         throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.DIMENSION_UPDATE_OFFSET);
                     }
-                    _cmd.append("offset ").append(this.offset).append(' ');
+                    _mql.newLine().cmd("offset ").arg(String.valueOf(this.offset)).cmd(" ");
                 }
                 if (this.defaultUnit != _current.defaultUnit)  {
                     if (!_paramCache.getValueBoolean(Dimension_mxJPO.PARAM_ALLOW_UPDATE_DEFAULT_UNIT))  {
                         throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.DIMENSION_UPDATE_DEFAULTUNIT);
                     }
+                    _mql.newLine();
                     if (!this.defaultUnit)  {
-                        _cmd.append('!');
+                        _mql.cmd("!");
                     }
-                    _cmd.append("default ");
+                    _mql.cmd("default");
                 }
             }
-            DeltaUtil_mxJPO.calcValueDelta(_cmd, "unitdescription", this.description, (_current != null) ? _current.description : null);
-            DeltaUtil_mxJPO.calcValueDelta(_cmd, "label", this.label, (_current != null) ? _current.label : null);
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "unitdescription", this.description, (_current != null) ? _current.description : null);
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "label", this.label, (_current != null) ? _current.label : null);
             // check for to many settings
             if (_current != null)  {
                 for (final String curSetKey : _current.settings.keySet())  {
                     if (!this.settings.containsKey(curSetKey))  {
-                        _cmd.append(modUnitCmd)
-                            .append("remove setting \"").append(StringUtil_mxJPO.convertMql(curSetKey)).append("\" ");
+                        _mql.newLine().cmd("remove setting ").arg(curSetKey);
                     }
                 }
             }
@@ -618,10 +604,7 @@ public class Dimension_mxJPO
                                         : "";
                 if ((_current == null)
                         || !_current.settings.containsKey(setting.getKey()) || !thisValue.equals(curValue))  {
-                    _cmd.append(modUnitCmd)
-                        .append("setting \"").append(StringUtil_mxJPO.convertMql(setting.getKey()))
-                        .append("\" \"").append(StringUtil_mxJPO.convertMql(setting.getValue()))
-                        .append("\" ");
+                    _mql.newLine().cmd("setting ").arg(setting.getKey()).cmd(" ").arg(setting.getValue());
                 }
             }
             // check system information to delete
@@ -629,12 +612,7 @@ public class Dimension_mxJPO
                 for (final Map.Entry<String,Set<String>> systemInfo : _current.systemInfos.entrySet())  {
                     if (!this.systemInfos.containsKey(systemInfo.getKey()))  {
                         for (final String unitName : systemInfo.getValue())  {
-                            _cmd.append(modUnitCmd)
-                                .append("remove system \"")
-                                .append(StringUtil_mxJPO.convertMql(systemInfo.getKey()))
-                                .append("\" to unit \"")
-                                .append(StringUtil_mxJPO.convertMql(unitName))
-                                .append("\" ");
+                            _mql.newLine().cmd("remove system ").arg(systemInfo.getKey()).cmd(" to unit ").arg(unitName);
                         }
                     }
                 }
@@ -644,39 +622,27 @@ public class Dimension_mxJPO
             for (final Map.Entry<String,Set<String>> systemInfo : this.systemInfos.entrySet())  {
                 if ((_current == null) || !_current.systemInfos.containsKey(systemInfo.getKey()))  {
                     for (final String unitName : systemInfo.getValue())  {
-                        _postCmd.append(modUnitCmd)
-                                .append("system \"")
-                                .append(StringUtil_mxJPO.convertMql(systemInfo.getKey()))
-                                .append("\" to unit \"")
-                                .append(StringUtil_mxJPO.convertMql(unitName))
-                                .append("\" ");
+                        _mql.newLine().cmd("system ").arg(systemInfo.getKey()).cmd(" to unit ").arg(unitName);
                     }
                 } else  {
                     final Set<String> curUnits = _current.systemInfos.get(systemInfo.getKey());
                     for (final String curUnitName : curUnits)  {
                         if (!systemInfo.getValue().contains(curUnitName))  {
-                            _postCmd.append(modUnitCmd)
-                                    .append("remove system \"")
-                                    .append(StringUtil_mxJPO.convertMql(systemInfo.getKey()))
-                                    .append("\" to unit \"")
-                                    .append(StringUtil_mxJPO.convertMql(curUnitName))
-                                    .append("\" ");
+                            _mql.newLine().cmd("remove system ").arg(systemInfo.getKey()).cmd(" to unit ").arg(curUnitName);
                         }
                     }
                     for (final String tarUnitName : systemInfo.getValue())  {
                         if (!curUnits.contains(tarUnitName))  {
-                            _postCmd.append(modUnitCmd)
-                                    .append("system \"")
-                                    .append(StringUtil_mxJPO.convertMql(systemInfo.getKey()))
-                                    .append("\" to unit \"")
-                                    .append(StringUtil_mxJPO.convertMql(tarUnitName))
-                                    .append("\" ");
+                            _mql.newLine().cmd("system ").arg(systemInfo.getKey()).cmd(" to unit ").arg(tarUnitName);
                         }
                     }
                 }
             }
+
             // delta for properties
-            this.properties.calcDelta((_current != null) ? _current.properties : null, modUnitCmd, _cmd);
+            this.properties.calcDelta("", (_current != null) ? _current.properties : null, _mql);
+
+            _mql.popPrefix();
         }
 
         /**

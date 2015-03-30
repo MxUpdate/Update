@@ -14,10 +14,10 @@
  */
 
 options {
-  JDK_VERSION = "1.5";
-  STATIC = false;
-  ERROR_REPORTING = false;
-  USER_TOKEN_MANAGER = false;
+    JDK_VERSION = "1.6";
+    STATIC = false;
+    ERROR_REPORTING = true;
+    USER_TOKEN_MANAGER = false;
 }
 
 PARSER_BEGIN(DimensionDefParser)
@@ -51,9 +51,41 @@ SKIP :
 
 TOKEN : /** first level */
 {
-      <DESCRIPTION:     "description">      : DESCRIPTION_EXPECTED
-    | <HIDDEN:          "hidden">           : HIDDEN_EXCPECTED
-    | <UNIT:            "unit">             : UNITNAME_EXPECTED
+      <DESCRIPTION:                         "description">                                          : DESCRIPTION_EXPECTED
+    | <HIDDEN:                              "hidden">                                               : HIDDEN_EXCPECTED
+    | <UNIT:                                "unit">                                                 : UNITNAME_EXPECTED
+}
+
+/******************************************************************* Property */
+<DEFAULT> TOKEN :
+{
+      <PROPERTY:                            "property">                                             : PROPERTY_STRING_EXPECTED
+    | <PROPERTYVAL:                         "value">                                                : PROPERTY_STRING_EXPECTED
+    | <PROPERTYTO:                          "to">                                                   : PROPERTYTO_EXPECTED
+}
+
+<PROPERTYTO_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<PROPERTYTO_EXPECTED> TOKEN :
+{
+      <PROPERTYTOTYPE : (<PROPERTYTO_CHAR>)+> : PROPERTY_STRING_EXPECTED
+    | <#PROPERTYTO_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+<PROPERTY_STRING_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<PROPERTY_STRING_EXPECTED> TOKEN :
+{
+      <PROPERTY_STRING_STRING : (<PROPERTY_STRING_APOSTROPHE>(<PROPERTY_STRING_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<PROPERTY_STRING_APOSTROPHE>)> : DEFAULT
+    | <PROPERTY_STRING_SINGLE : (<PROPERTY_STRING_CHAR>)+> : DEFAULT
+    | <#PROPERTY_STRING_APOSTROPHE : "\"" >
+    | <#PROPERTY_STRING_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
 }
 
 /*************************************************** Boolean for Hidden Value */
@@ -227,14 +259,25 @@ Dimension_mxJPO dimension(final ParameterCache_mxJPO _paramCache,
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
 : {
     final Dimension_mxJPO dimension = (Dimension_mxJPO) _typeDef.newTypeInstance(_mxName);
-    Token tmp;
+    String tmpStr;
+    Token tmpToken;
     Set<String> set;
+    AdminProperty tmpProp;
 } {
-    ( (<DESCRIPTION>    ( tmp = <DESCRIPTION_STRING>    {this.setValue(dimension, "description", this.getString(tmp.image));}
-                        | tmp = <DESCRIPTION_SINGLE>    {this.setValue(dimension, "description", this.getSingle(tmp.image));} ) )
-    | (<HIDDEN>         ( <HIDDEN_BOOLEAN_TRUE>         {this.setValue(dimension, "hidden", true);}
-                        | <HIDDEN_BOOLEAN_FALSE>        {this.setValue(dimension, "hidden", false);} ) )
-    | (unit(dimension)) )*
+    (   (<DESCRIPTION>  ( tmpToken = <DESCRIPTION_STRING>                       {this.setValue(dimension, "description", this.getString(tmpToken.image));}
+                        | tmpToken = <DESCRIPTION_SINGLE>                       {this.setValue(dimension, "description", this.getSingle(tmpToken.image));} ) )
+      | (<HIDDEN>       ( <HIDDEN_BOOLEAN_TRUE>                                 {this.setValue(dimension, "hidden", true);}
+                        | <HIDDEN_BOOLEAN_FALSE>                                {this.setValue(dimension, "hidden", false);} ) )
+      | (unit(dimension))
+      | (<PROPERTY>                                                             {tmpProp = new AdminProperty();this.appendValue(this.getValue(dimension, "properties"), "propertiesStack", tmpProp);}
+                ( tmpToken = <PROPERTY_STRING_STRING>                           {this.setValue(tmpProp, "name", this.getString(tmpToken.image));}
+                | tmpToken = <PROPERTY_STRING_SINGLE>                           {this.setValue(tmpProp, "name", this.getSingle(tmpToken.image));} )
+              (   ( <PROPERTYTO>   tmpToken = <PROPERTYTOTYPE>                  {this.setValue(tmpProp, "refAdminType", this.getSingle(tmpToken.image));}
+                                  ( ( tmpToken = <PROPERTY_STRING_STRING>       {this.setValue(tmpProp, "refAdminName", this.getString(tmpToken.image));} )
+                                  | ( tmpToken = <PROPERTY_STRING_SINGLE>       {this.setValue(tmpProp, "refAdminName", this.getSingle(tmpToken.image));} ) ) )
+                | ( <PROPERTYVAL> ( ( tmpToken = <PROPERTY_STRING_STRING>       {this.setValue(tmpProp, "value", this.getString(tmpToken.image));} )
+                                  | ( tmpToken = <PROPERTY_STRING_SINGLE>       {this.setValue(tmpProp, "value", this.getSingle(tmpToken.image));} ) ) ) )* )
+    )*
     {
         this.prepareObject(_paramCache, dimension);
         return dimension;

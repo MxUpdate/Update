@@ -28,17 +28,21 @@ public class DimensionDefParser_mxJPO
                           final TypeDef_mxJPO _typeDef,
                           final String _mxName) throws ParseException_mxJPO, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
     final Dimension_mxJPO dimension = (Dimension_mxJPO) _typeDef.newTypeInstance(_mxName);
-    Token_mxJPO tmp;
+    String tmpStr;
+    Token_mxJPO tmpToken;
     Set<String> set;
+    AdminProperty tmpProp;
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case DESCRIPTION:
       case HIDDEN:
       case UNIT:
+      case PROPERTY:
         ;
         break;
       default:
+        jj_la1[0] = jj_gen;
         break label_1;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -46,14 +50,15 @@ public class DimensionDefParser_mxJPO
         jj_consume_token(DESCRIPTION);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case DESCRIPTION_STRING:
-          tmp = jj_consume_token(DESCRIPTION_STRING);
-                                                         this.setValue(dimension, "description", this.getString(tmp.image));
+          tmpToken = jj_consume_token(DESCRIPTION_STRING);
+                                                                                 this.setValue(dimension, "description", this.getString(tmpToken.image));
           break;
         case DESCRIPTION_SINGLE:
-          tmp = jj_consume_token(DESCRIPTION_SINGLE);
-                                                         this.setValue(dimension, "description", this.getSingle(tmp.image));
+          tmpToken = jj_consume_token(DESCRIPTION_SINGLE);
+                                                                                 this.setValue(dimension, "description", this.getSingle(tmpToken.image));
           break;
         default:
+          jj_la1[1] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException_mxJPO();
         }
@@ -63,13 +68,14 @@ public class DimensionDefParser_mxJPO
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case HIDDEN_BOOLEAN_TRUE:
           jj_consume_token(HIDDEN_BOOLEAN_TRUE);
-                                                         this.setValue(dimension, "hidden", true);
+                                                                                 this.setValue(dimension, "hidden", true);
           break;
         case HIDDEN_BOOLEAN_FALSE:
           jj_consume_token(HIDDEN_BOOLEAN_FALSE);
-                                                         this.setValue(dimension, "hidden", false);
+                                                                                 this.setValue(dimension, "hidden", false);
           break;
         default:
+          jj_la1[2] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException_mxJPO();
         }
@@ -77,7 +83,80 @@ public class DimensionDefParser_mxJPO
       case UNIT:
         unit(dimension);
         break;
+      case PROPERTY:
+        jj_consume_token(PROPERTY);
+                                                                                 tmpProp = new AdminProperty();this.appendValue(this.getValue(dimension, "properties"), "propertiesStack", tmpProp);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case PROPERTY_STRING_STRING:
+          tmpToken = jj_consume_token(PROPERTY_STRING_STRING);
+                                                                                 this.setValue(tmpProp, "name", this.getString(tmpToken.image));
+          break;
+        case PROPERTY_STRING_SINGLE:
+          tmpToken = jj_consume_token(PROPERTY_STRING_SINGLE);
+                                                                                 this.setValue(tmpProp, "name", this.getSingle(tmpToken.image));
+          break;
+        default:
+          jj_la1[3] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException_mxJPO();
+        }
+        label_2:
+        while (true) {
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case PROPERTYVAL:
+          case PROPERTYTO:
+            ;
+            break;
+          default:
+            jj_la1[4] = jj_gen;
+            break label_2;
+          }
+          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+          case PROPERTYTO:
+            jj_consume_token(PROPERTYTO);
+            tmpToken = jj_consume_token(PROPERTYTOTYPE);
+                                                                                 this.setValue(tmpProp, "refAdminType", this.getSingle(tmpToken.image));
+            switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+            case PROPERTY_STRING_STRING:
+              tmpToken = jj_consume_token(PROPERTY_STRING_STRING);
+                                                                                 this.setValue(tmpProp, "refAdminName", this.getString(tmpToken.image));
+              break;
+            case PROPERTY_STRING_SINGLE:
+              tmpToken = jj_consume_token(PROPERTY_STRING_SINGLE);
+                                                                                 this.setValue(tmpProp, "refAdminName", this.getSingle(tmpToken.image));
+              break;
+            default:
+              jj_la1[5] = jj_gen;
+              jj_consume_token(-1);
+              throw new ParseException_mxJPO();
+            }
+            break;
+          case PROPERTYVAL:
+            jj_consume_token(PROPERTYVAL);
+            switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+            case PROPERTY_STRING_STRING:
+              tmpToken = jj_consume_token(PROPERTY_STRING_STRING);
+                                                                                 this.setValue(tmpProp, "value", this.getString(tmpToken.image));
+              break;
+            case PROPERTY_STRING_SINGLE:
+              tmpToken = jj_consume_token(PROPERTY_STRING_SINGLE);
+                                                                                 this.setValue(tmpProp, "value", this.getSingle(tmpToken.image));
+              break;
+            default:
+              jj_la1[6] = jj_gen;
+              jj_consume_token(-1);
+              throw new ParseException_mxJPO();
+            }
+            break;
+          default:
+            jj_la1[7] = jj_gen;
+            jj_consume_token(-1);
+            throw new ParseException_mxJPO();
+          }
+        }
+        break;
       default:
+        jj_la1[8] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException_mxJPO();
       }
@@ -107,11 +186,12 @@ public class DimensionDefParser_mxJPO
                                           this.setValue(unit, "name", this.getSingle(tmpToken.image));
       break;
     default:
+      jj_la1[9] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException_mxJPO();
     }
     jj_consume_token(UNITDEF_START);
-    label_2:
+    label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case UNITDEF_DEFAULT:
@@ -125,7 +205,8 @@ public class DimensionDefParser_mxJPO
         ;
         break;
       default:
-        break label_2;
+        jj_la1[10] = jj_gen;
+        break label_3;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case UNITDEF_DEFAULT:
@@ -140,6 +221,7 @@ public class DimensionDefParser_mxJPO
                                                                          this.setValue(unit, "defaultUnit", false);
           break;
         default:
+          jj_la1[11] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException_mxJPO();
         }
@@ -174,6 +256,7 @@ public class DimensionDefParser_mxJPO
         unitSystem(unit);
         break;
       default:
+        jj_la1[12] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException_mxJPO();
       }
@@ -203,6 +286,7 @@ public class DimensionDefParser_mxJPO
                                                key = this.getSingle(tmp.image);
       break;
     default:
+      jj_la1[13] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException_mxJPO();
     }
@@ -226,7 +310,7 @@ public class DimensionDefParser_mxJPO
     String toName = null;
     jj_consume_token(UNITDEF_PROPERTY);
     name = uvString();
-    label_3:
+    label_4:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case UNITDEF_PROPERTYVAL:
@@ -234,7 +318,8 @@ public class DimensionDefParser_mxJPO
         ;
         break;
       default:
-        break label_3;
+        jj_la1[14] = jj_gen;
+        break label_4;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case UNITDEF_PROPERTYVAL:
@@ -253,12 +338,14 @@ public class DimensionDefParser_mxJPO
                                                            toType = this.getSingle(tmp.image);
           break;
         default:
+          jj_la1[15] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException_mxJPO();
         }
         toName = uvString();
         break;
       default:
+        jj_la1[16] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException_mxJPO();
       }
@@ -293,6 +380,7 @@ public class DimensionDefParser_mxJPO
                                              name = this.getSingle(tmp.image);
       break;
     default:
+      jj_la1[17] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException_mxJPO();
     }
@@ -308,6 +396,7 @@ public class DimensionDefParser_mxJPO
                                              unit = this.getSingle(tmp.image);
       break;
     default:
+      jj_la1[18] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException_mxJPO();
     }
@@ -336,6 +425,7 @@ public class DimensionDefParser_mxJPO
                                          ret = this.getSingle(tmp.image);
       break;
     default:
+      jj_la1[19] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException_mxJPO();
     }
@@ -351,6 +441,30 @@ public class DimensionDefParser_mxJPO
   /** Next token. */
   public Token_mxJPO jj_nt;
   private int jj_ntk;
+  private int jj_gen;
+  final private int[] jj_la1 = new int[20];
+  static private int[] jj_la1_0;
+  static private int[] jj_la1_1;
+  static private int[] jj_la1_2;
+  static private int[] jj_la1_3;
+  static {
+      jj_la1_init_0();
+      jj_la1_init_1();
+      jj_la1_init_2();
+      jj_la1_init_3();
+   }
+   private static void jj_la1_init_0() {
+      jj_la1_0 = new int[] {0x1e0,0x0,0x60000000,0x600000,0x600,0x600000,0x600000,0x600,0x1e0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+   }
+   private static void jj_la1_init_1() {
+      jj_la1_1 = new int[] {0x0,0x60,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x6000,0x3f800000,0x0,0x3f800000,0x0,0xc0000000,0x0,0xc0000000,0x0,0x0,0x0,};
+   }
+   private static void jj_la1_init_2() {
+      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1,0x60,0x1,0x600000,0x0,0x600000,0x0,0x0,0x0,0x6000,};
+   }
+   private static void jj_la1_init_3() {
+      jj_la1_3 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xc,0x30000,0x0,};
+   }
 
   /** Constructor with InputStream. */
   public DimensionDefParser_mxJPO(java.io.InputStream stream) {
@@ -362,6 +476,8 @@ public class DimensionDefParser_mxJPO
     token_source = new DimensionDefParserTokenManager_mxJPO(jj_input_stream);
     token = new Token_mxJPO();
     jj_ntk = -1;
+    jj_gen = 0;
+    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -374,6 +490,8 @@ public class DimensionDefParser_mxJPO
     token_source.ReInit(jj_input_stream);
     token = new Token_mxJPO();
     jj_ntk = -1;
+    jj_gen = 0;
+    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -382,6 +500,8 @@ public class DimensionDefParser_mxJPO
     token_source = new DimensionDefParserTokenManager_mxJPO(jj_input_stream);
     token = new Token_mxJPO();
     jj_ntk = -1;
+    jj_gen = 0;
+    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -390,6 +510,8 @@ public class DimensionDefParser_mxJPO
     token_source.ReInit(jj_input_stream);
     token = new Token_mxJPO();
     jj_ntk = -1;
+    jj_gen = 0;
+    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -397,6 +519,8 @@ public class DimensionDefParser_mxJPO
     token_source = tm;
     token = new Token_mxJPO();
     jj_ntk = -1;
+    jj_gen = 0;
+    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -404,6 +528,8 @@ public class DimensionDefParser_mxJPO
     token_source = tm;
     token = new Token_mxJPO();
     jj_ntk = -1;
+    jj_gen = 0;
+    for (int i = 0; i < 20; i++) jj_la1[i] = -1;
   }
 
   private Token_mxJPO jj_consume_token(int kind) throws ParseException_mxJPO {
@@ -412,9 +538,11 @@ public class DimensionDefParser_mxJPO
     else token = token.next = token_source.getNextToken();
     jj_ntk = -1;
     if (token.kind == kind) {
+      jj_gen++;
       return token;
     }
     token = oldToken;
+    jj_kind = kind;
     throw generateParseException();
   }
 
@@ -424,6 +552,7 @@ public class DimensionDefParser_mxJPO
     if (token.next != null) token = token.next;
     else token = token.next = token_source.getNextToken();
     jj_ntk = -1;
+    jj_gen++;
     return token;
   }
 
@@ -444,12 +573,48 @@ public class DimensionDefParser_mxJPO
       return (jj_ntk = jj_nt.kind);
   }
 
+  private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
+  private int[] jj_expentry;
+  private int jj_kind = -1;
+
   /** Generate ParseException. */
   public ParseException_mxJPO generateParseException() {
-    Token_mxJPO errortok = token.next;
-    int line = errortok.beginLine, column = errortok.beginColumn;
-    String mess = (errortok.kind == 0) ? tokenImage[0] : errortok.image;
-    return new ParseException_mxJPO("Parse error at line " + line + ", column " + column + ".  Encountered: " + mess);
+    jj_expentries.clear();
+    boolean[] la1tokens = new boolean[116];
+    if (jj_kind >= 0) {
+      la1tokens[jj_kind] = true;
+      jj_kind = -1;
+    }
+    for (int i = 0; i < 20; i++) {
+      if (jj_la1[i] == jj_gen) {
+        for (int j = 0; j < 32; j++) {
+          if ((jj_la1_0[i] & (1<<j)) != 0) {
+            la1tokens[j] = true;
+          }
+          if ((jj_la1_1[i] & (1<<j)) != 0) {
+            la1tokens[32+j] = true;
+          }
+          if ((jj_la1_2[i] & (1<<j)) != 0) {
+            la1tokens[64+j] = true;
+          }
+          if ((jj_la1_3[i] & (1<<j)) != 0) {
+            la1tokens[96+j] = true;
+          }
+        }
+      }
+    }
+    for (int i = 0; i < 116; i++) {
+      if (la1tokens[i]) {
+        jj_expentry = new int[1];
+        jj_expentry[0] = i;
+        jj_expentries.add(jj_expentry);
+      }
+    }
+    int[][] exptokseq = new int[jj_expentries.size()][];
+    for (int i = 0; i < jj_expentries.size(); i++) {
+      exptokseq[i] = jj_expentries.get(i);
+    }
+    return new ParseException_mxJPO(token, exptokseq, tokenImage);
   }
 
   /** Enable tracing. */

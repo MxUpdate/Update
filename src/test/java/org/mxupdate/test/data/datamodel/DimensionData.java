@@ -81,12 +81,10 @@ public class DimensionData
             unit.append4CIFile(strg);
         }
 
-        strg.append("}");
-
         // append properties
-        for (final PropertyDef prop : this.getProperties())  {
-            strg.append('\n').append(prop.getCITCLString(this.getCI()));
-        }
+        this.getProperties().appendCIFileUpdateFormat("  ", strg);
+
+        strg.append("}");
 
         return strg.toString();
     }
@@ -147,8 +145,6 @@ public class DimensionData
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        this.getProperties().checkExportPropertiesAddFormat(_exportParser, this.getCI());
-
         // check symbolic name
         Assert.assertEquals(
                 _exportParser.getSymbolicName(),
@@ -178,11 +174,14 @@ public class DimensionData
                                   "\"true\"");
         }
 
-        // check all states
+        // check all units
         for (final UnitData unit : this.units)
         {
             unit.checkExport(_exportParser);
         }
+
+        // check for properties
+        this.getProperties().checkExportPropertiesUpdateFormat(_exportParser.getLines("/updateDimension/property/@value"));
     }
 
     /**
@@ -397,6 +396,7 @@ public class DimensionData
                 }
             }
             Assert.assertTrue(found, "check that state '" + this.name + "' is found");
+
             // check properties
             this.properties.checkExportPropertiesUpdateFormat(propLines);
         }

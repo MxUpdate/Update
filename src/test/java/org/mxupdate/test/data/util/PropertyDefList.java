@@ -86,7 +86,9 @@ public class PropertyDefList
      * and equal to the defined properties of this CI file.
      *
      * @param _exportParser     parsed export
+     * @deprecated replaced by new format embedded in delta description
      */
+    @Deprecated()
     public void checkExportPropertiesAddFormat(final ExportParser _exportParser,
                                                final CI _ci)
     {
