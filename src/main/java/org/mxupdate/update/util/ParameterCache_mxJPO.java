@@ -779,6 +779,25 @@ public class ParameterCache_mxJPO
          */
         DMAttrSupportsPropMaxLength,
         /**
+         * Name of the parameter to define that units are allowed to remove.
+         */
+        DMDimAllowRemoveUnit,
+        /**
+         * Name of the parameter to define that a change of the default unit is
+         * allowed.
+         */
+        DMDimAllowUpdateDefUnit,
+        /**
+         * Name of the parameter to define that the multiplier of an unit is
+         * allowed to change.
+         */
+        DMDimAllowUpdateUnitMult,
+        /**
+         * Name of the parameter to define that the offset of an unit is allowed
+         * to change.
+         */
+        DMDimAllowUpdateUnitOffs,
+        /**
          * Name of the parameter to define that the &quot;view&quot;,
          * &quot;edit&quot; and &quot;print&quot; program
          * property for formats from current MX version is supported.

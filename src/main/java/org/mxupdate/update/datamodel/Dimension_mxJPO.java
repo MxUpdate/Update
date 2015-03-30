@@ -35,6 +35,7 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 
@@ -82,51 +83,9 @@ public class Dimension_mxJPO
         Dimension_mxJPO.IGNORED_URLS.add("/unitList/unit/adminProperties/propertyList");
     }
 
-    /**
-     * Name of the parameter to define that units are allowed to remove.
-     *
-     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
-     */
-    private static final String PARAM_ALLOW_REMOVE_UNIT = "DMDimAllowRemoveUnit";
-
-    /**
-     * Name of the parameter to define that a change of the default unit is
-     * allowed.
-     *
-     * @see Dimension_mxJPO.Unit#appendDelta
-     */
-    private static final String PARAM_ALLOW_UPDATE_DEFAULT_UNIT = "DMDimAllowUpdateDefUnit";
-
-    /**
-     * Name of the parameter to define that the multiplier of an unit is
-     * allowed to change.
-     *
-     * @see Dimension_mxJPO.Unit#appendDelta
-     */
-    private static final String PARAM_ALLOW_UPDATE_UNIT_MULTIPLIER = "DMDimAllowUpdateUnitMult";
-
-    /**
-     * Name of the parameter to define that the offset of an unit is allowed to
-     * change.
-     *
-     * @see Dimension_mxJPO.Unit#appendDelta
-     */
-    private static final String PARAM_ALLOW_UPDATE_UNIT_OFFSET = "DMDimAllowUpdateUnitOffs";
-
-    /**
-     * Holds the list of already parsed units of this dimension.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #prepare(ParameterCache_mxJPO)
-     */
+    /** Holds the list of already parsed units of this dimension. */
     private final Set<Dimension_mxJPO.Unit> units = new TreeSet<Dimension_mxJPO.Unit>();
-
-    /**
-     * Holds current parsed unit.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #prepare(ParameterCache_mxJPO)
-     */
+    /** Holds current parsed unit. */
     private Unit currentUnit;
 
     /**
@@ -416,7 +375,7 @@ public class Dimension_mxJPO
             // remove units which not needed anymore (or throw exception)
             for (final Map.Entry<String,Unit> curUnit : curUnits.entrySet())  {
                 if (!tarUnits.containsKey(curUnit.getKey()))  {
-                    if (!_paramCache.getValueBoolean(Dimension_mxJPO.PARAM_ALLOW_REMOVE_UNIT))  {
+                    if (!_paramCache.getValueBoolean(ValueKeys.DMDimAllowRemoveUnit))  {
                         throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.DIMENSION_UPDATE_REMOVEUNIT);
                     }
                     mql.newLine().cmd("remove unit ").arg(curUnit.getKey());
@@ -564,19 +523,19 @@ public class Dimension_mxJPO
 
             if (_current != null)  {
                 if (this.multiplier != _current.multiplier)  {
-                    if (!_paramCache.getValueBoolean(Dimension_mxJPO.PARAM_ALLOW_UPDATE_UNIT_MULTIPLIER))  {
+                    if (!_paramCache.getValueBoolean(ValueKeys.DMDimAllowUpdateUnitMult))  {
                         throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.DIMENSION_UPDATE_MULTIPLIER);
                     }
                     _mql.newLine().cmd("multiplier ").arg(String.valueOf(this.multiplier)).arg(" ");
                 }
                 if (this.offset != _current.offset)  {
-                    if (!_paramCache.getValueBoolean(Dimension_mxJPO.PARAM_ALLOW_UPDATE_UNIT_OFFSET))  {
+                    if (!_paramCache.getValueBoolean(ValueKeys.DMDimAllowUpdateUnitOffs))  {
                         throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.DIMENSION_UPDATE_OFFSET);
                     }
                     _mql.newLine().cmd("offset ").arg(String.valueOf(this.offset)).cmd(" ");
                 }
                 if (this.defaultUnit != _current.defaultUnit)  {
-                    if (!_paramCache.getValueBoolean(Dimension_mxJPO.PARAM_ALLOW_UPDATE_DEFAULT_UNIT))  {
+                    if (!_paramCache.getValueBoolean(ValueKeys.DMDimAllowUpdateDefUnit))  {
                         throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.DIMENSION_UPDATE_DEFAULTUNIT);
                     }
                     _mql.newLine();
