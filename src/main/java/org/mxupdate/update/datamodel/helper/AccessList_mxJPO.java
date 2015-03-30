@@ -16,6 +16,7 @@
 package org.mxupdate.update.datamodel.helper;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
@@ -64,6 +65,56 @@ public class AccessList_mxJPO
         private String localfilter;
 
         /**
+         * Returns the {@link #kind} of this access.
+         *
+         * @return kind
+         */
+        public String getKind()
+        {
+            return this.kind;
+        }
+
+        /**
+         * Returns the {@link #userRef} of this access.
+         *
+         * @return user reference
+         */
+        public String getUserRef()
+        {
+            return this.userRef;
+        }
+
+        /**
+         * Returns the {@link #key} of this access.
+         *
+         * @return key
+         */
+        public String getKey()
+        {
+            return this.key;
+        }
+
+        /**
+         * Returns the {@link #access} of this access.
+         *
+         * @return access
+         */
+        public Set<String> getAccess()
+        {
+            return this.access;
+        }
+
+        /**
+         * Returns the {@link #filter} of this access.
+         *
+         * @return filter
+         */
+        public String getFilter()
+        {
+            return this.filter;
+        }
+
+        /**
          * Returns <i>true</i> if {@link #access} is empty or contains only
          * <code>none</code> and {@link #filter} is <code>null</code> or empty
          * string.
@@ -79,7 +130,7 @@ public class AccessList_mxJPO
     }
 
     /** Stack used to hold the user access while parsing. */
-    private final Stack<AccessList_mxJPO.Access> accessList = new Stack<AccessList_mxJPO.Access>();
+    private final Stack<Access> accessList = new Stack<Access>();
 
     /**
      * Parses given access <code>_url</code>.
@@ -97,7 +148,7 @@ public class AccessList_mxJPO
         boolean ret = true;
         // obsolete parsing of 'owner'
         if ("/ownerAccess".equals(_url))  {
-            final AccessList_mxJPO.Access accessFilter = new AccessList_mxJPO.Access();
+            final Access accessFilter = new Access();
             accessFilter.kind = "owner";
             this.accessList.add(accessFilter);
         } else if (_url.startsWith("/ownerAccess/access"))  {
@@ -107,7 +158,7 @@ public class AccessList_mxJPO
 
         // obsolete parsing of 'owner revoke'
         } else if ("/ownerRevoke".equals(_url))  {
-            final AccessList_mxJPO.Access accessFilter = new AccessList_mxJPO.Access();
+            final Access accessFilter = new Access();
             accessFilter.kind = "owner";
             accessFilter.prefix = Prefix.Revoke;
             this.accessList.add(accessFilter);
@@ -118,7 +169,7 @@ public class AccessList_mxJPO
 
         // obsolete parsing of 'public'
         } else if ("/publicAccess".equals(_url))  {
-            final AccessList_mxJPO.Access accessFilter = new AccessList_mxJPO.Access();
+            final Access accessFilter = new Access();
             accessFilter.kind = "public";
             this.accessList.add(accessFilter);
         } else if (_url.startsWith("/publicAccess/access"))  {
@@ -128,7 +179,7 @@ public class AccessList_mxJPO
 
         // obsolete parsing of 'public revoke'
         } else if ("/publicRevoke".equals(_url))  {
-            final AccessList_mxJPO.Access accessFilter = new AccessList_mxJPO.Access();
+            final Access accessFilter = new Access();
             accessFilter.kind = "public";
             accessFilter.prefix = Prefix.Revoke;
             this.accessList.add(accessFilter);
@@ -138,7 +189,7 @@ public class AccessList_mxJPO
             this.accessList.peek().filter = _content;
 
         } else if ("/userAccessList/userAccess".equals(_url))  {
-            this.accessList.add(new AccessList_mxJPO.Access());
+            this.accessList.add(new Access());
         } else if (_url.startsWith("/userAccessList/userAccess/access"))  {
             this.accessList.peek().access.add(_url.replaceAll("^/userAccessList/userAccess/access/", "").replaceAll("Access$", "").toLowerCase());
         } else if ("/userAccessList/userAccess/matchCategory".equals(_url))  {
@@ -173,6 +224,10 @@ public class AccessList_mxJPO
         return ret;
     }
 
+    protected Collection<Access> getAccessList()
+    {
+        return this.accessList;
+    }
 
     /**
      * Writes specific information about all defined access definition to the

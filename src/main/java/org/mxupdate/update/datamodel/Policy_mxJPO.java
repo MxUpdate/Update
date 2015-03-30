@@ -18,10 +18,12 @@ package org.mxupdate.update.datamodel;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -765,14 +767,86 @@ throw new Exception("some states are not defined anymore!");
         }
 
         /**
-         * The trigger and property instances are sorted.
+         * <p>The trigger and property instances are sorted and the signatures
+         * are fixed.</p>
+         * <p><b>Hint for higher MX versions:</b>
+         * <ul>
+         * <li>filters are defined as filter from public none access with
+         *     signature name as key</li>
+         * <li>approve / ignore / reject users are defines as user access with
+         *     approve / ignore / reject access and the signature name as
+         *     key</li>
+         * </ul></p>
          */
         protected void prepare()
         {
             // sort all triggers
             this.triggers.prepare();
+
             // sort the properties
             this.properties.prepare();
+
+            // fix filters of signature
+            if (!this.signatures.isEmpty())  {
+                // map between keys and access (key must be also equal signature)
+                final Map<String,Access> filterMap = new HashMap<String,Access>();
+                final Map<String,List<Access>> approveMap = new HashMap<String,List<Access>>();
+                final Map<String,List<Access>> ignoreMap = new HashMap<String,List<Access>>();
+                final Map<String,List<Access>> rejectMap = new HashMap<String,List<Access>>();
+                for (final Access access : this.getAccessList())  {
+                    if ((access.getKey() != null) && !access.getKey().isEmpty() && access.getAccess().size() == 1)  {
+                        final String accessStr = access.getAccess().iterator().next();
+                        if ("public".equals(access.getKind()) && "none".equals(accessStr))  {
+                            filterMap.put(access.getKey(), access);
+                        } else if ("user".equals(access.getKind()) && "approve".equals(accessStr))  {
+                            if (!approveMap.containsKey(access.getKey()))  {
+                                approveMap.put(access.getKey(), new ArrayList<Access>());
+                            }
+                            approveMap.get(access.getKey()).add(access);
+                        } else if ("user".equals(access.getKind()) && "ignore".equals(accessStr))  {
+                            if (!ignoreMap.containsKey(access.getKey()))  {
+                                ignoreMap.put(access.getKey(), new ArrayList<Access>());
+                            }
+                            ignoreMap.get(access.getKey()).add(access);
+                        } else if ("user".equals(access.getKind()) && "reject".equals(accessStr))  {
+                            if (!rejectMap.containsKey(access.getKey()))  {
+                                rejectMap.put(access.getKey(), new ArrayList<Access>());
+                            }
+                            rejectMap.get(access.getKey()).add(access);
+                        }
+                    }
+                }
+                // signature filters are defined for public none filter
+                for (final Signature signature : this.signatures)  {
+                    // approve
+                    if (approveMap.containsKey(signature.name))  {
+                        for (final Access access : approveMap.get(signature.name))  {
+                            signature.approverUsers.add(access.getUserRef());
+                            this.getAccessList().remove(access);
+                        }
+                    }
+                    // ignore
+                    if (ignoreMap.containsKey(signature.name))  {
+                        for (final Access access : ignoreMap.get(signature.name))  {
+                            signature.ignoreUsers.add(access.getUserRef());
+                            this.getAccessList().remove(access);
+                        }
+                    }
+                    // reject
+                    if (rejectMap.containsKey(signature.name))  {
+                        for (final Access access : rejectMap.get(signature.name))  {
+                            signature.rejectUsers.add(access.getUserRef());
+                            this.getAccessList().remove(access);
+                        }
+                    }
+                    // filter
+                    if (filterMap.containsKey(signature.name))  {
+                        final Access access = filterMap.get(signature.name);
+                        signature.filter = access.getFilter();
+                        this.getAccessList().remove(access);
+                    }
+                }
+            }
         }
 
         /**

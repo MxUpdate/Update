@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import matrix.util.MatrixException;
@@ -31,6 +32,7 @@ import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.ExportParser.Line;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.datamodel.helper.Access;
+import org.mxupdate.test.data.user.AbstractUserData;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.data.util.PropertyDefList;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -311,7 +313,7 @@ public class PolicyData
             this.append4Create(cmd);
 
             // append state information
-            for (final PolicyData.State state : this.states)
+            for (final State state : this.states)
             {
                 state.append4Create(cmd);
             }
@@ -359,6 +361,9 @@ public class PolicyData
             state.properties.createDependings();
             for (final Access access : state.access)  {
                 access.createDependings();
+            }
+            for (final Signature signature : state.signatures)  {
+                signature.createDependings();
             }
         }
 
@@ -457,7 +462,6 @@ public class PolicyData
                     "check that all state access is defined");
             this.allState.checkExport(_exportParser);
         }
-
         // check all states
         for (final State state : this.states)
         {
@@ -672,7 +676,49 @@ public class PolicyData
             this.getFlags().append4CIFileValues(" ", _cmd, " ");
             for (final Signature signature : this.signatures)
             {
-                signature.append4CIFile(_cmd);
+                _cmd.append(" signature \"").append(StringUtil_mxJPO.convertMql(signature.name)).append('\"');
+                if ((signature.branch != null) && !signature.branch.isEmpty())  {
+                    _cmd.append(" branch \"").append(StringUtil_mxJPO.convertMql(signature.branch)).append('\"');
+                }
+                if ((signature.filter != null) && !signature.filter.isEmpty())  {
+                    _cmd.append(" filter \"").append(StringUtil_mxJPO.convertMql(signature.filter)).append('\"');
+                }
+                if (!signature.approve.isEmpty())  {
+                    _cmd.append(" approve ");
+                    boolean first = true;
+                    for (final AbstractUserData<?> user : signature.approve)  {
+                        if (first)  {
+                            first = false;
+                        } else  {
+                            _cmd.append(",");
+                        }
+                        _cmd.append("\"").append(StringUtil_mxJPO.convertMql(user.getName())).append("\"");
+                    }
+                }
+                if (!signature.ignore.isEmpty())  {
+                    _cmd.append(" ignore ");
+                    boolean first = true;
+                    for (final AbstractUserData<?> user : signature.ignore)  {
+                        if (first)  {
+                            first = false;
+                        } else  {
+                            _cmd.append(",");
+                        }
+                        _cmd.append("\"").append(StringUtil_mxJPO.convertMql(user.getName())).append("\"");
+                    }
+                }
+                if (!signature.reject.isEmpty())  {
+                    _cmd.append(" reject ");
+                    boolean first = true;
+                    for (final AbstractUserData<?> user : signature.reject)  {
+                        if (first)  {
+                            first = false;
+                        } else  {
+                            _cmd.append(",");
+                        }
+                        _cmd.append("\"").append(StringUtil_mxJPO.convertMql(user.getName())).append("\"");
+                    }
+                }
             }
             this.properties.appendCIFileUpdateFormat(" state", _cmd);
         }
@@ -838,10 +884,14 @@ public class PolicyData
     {
         /** Name of the signature. */
         private String name;
-
+        /** Approve users of the signature. */
+        private final List<AbstractUserData<?>> approve = new ArrayList<AbstractUserData<?>>();
+        /** Ignore users of the signature. */
+        private final List<AbstractUserData<?>> ignore = new ArrayList<AbstractUserData<?>>();
+        /** Reject users of the signature. */
+        private final List<AbstractUserData<?>> reject = new ArrayList<AbstractUserData<?>>();
         /** Filter of the signature. */
         private String filter;
-
         /** Branch of the signature. */
         private String branch;
 
@@ -855,6 +905,42 @@ public class PolicyData
         public Signature setName(final String _name)
         {
             this.name = _name;
+            return this;
+        }
+
+        /**
+         * Appends {@link #approver} users.
+         *
+         * @param _users    users
+         * @return this signature
+         */
+        public Signature addApprover(final AbstractUserData<?>... _users)
+        {
+            this.approve.addAll(Arrays.asList(_users));
+            return this;
+        }
+
+        /**
+         * Appends {@link ignore} users.
+         *
+         * @param _users    users
+         * @return this signature
+         */
+        public Signature addIgnore(final AbstractUserData<?>... _users)
+        {
+            this.ignore.addAll(Arrays.asList(_users));
+            return this;
+        }
+
+        /**
+         * Appends {@link #reject} users.
+         *
+         * @param _users    users
+         * @return this signature
+         */
+        public Signature addReject(final AbstractUserData<?>... _users)
+        {
+            this.reject.addAll(Arrays.asList(_users));
             return this;
         }
 
@@ -885,17 +971,49 @@ public class PolicyData
         }
 
         /**
+         * Create depending users.
+         *
+         * @throws MatrixException if create failed
+         */
+        public void createDependings()
+            throws MatrixException
+        {
+            for (final AbstractUserData<?> user : this.approve)  {
+                user.create();
+            }
+            for (final AbstractUserData<?> user : this.ignore)  {
+                user.create();
+            }
+            for (final AbstractUserData<?> user : this.reject)  {
+                user.create();
+            }
+        }
+
+        /**
          * Appends the MQL statements to create the policy.
          *
          * @param _cmd  string builder where to append the MQL statements
          */
         protected void append4CIFile(final StringBuilder _cmd)
         {
+            final SortedSet<String> approveSet = new TreeSet<String>();
+            for (final AbstractUserData<?> user : this.approve)  {
+                approveSet.add(user.getName());
+            }
+            final SortedSet<String> ignoreSet = new TreeSet<String>();
+            for (final AbstractUserData<?> user : this.ignore)  {
+                ignoreSet.add(user.getName());
+            }
+            final SortedSet<String> rejectSet = new TreeSet<String>();
+            for (final AbstractUserData<?> user : this.reject)  {
+                rejectSet.add(user.getName());
+            }
+
             _cmd.append("        signature \"").append(AbstractTest.convertTcl(this.name)).append("\" {\n")
                 .append("            branch \"").append(AbstractTest.convertTcl(this.branch)).append("\"\n")
-                .append("            approve {}\n")
-                .append("            ignore {}\n")
-                .append("            reject {}\n")
+                .append("            approve {").append(StringUtil_mxJPO.joinTcl(' ', true, new ArrayList<String>(approveSet), "")).append("}\n")
+                .append("            ignore {").append(StringUtil_mxJPO.joinTcl(' ', true, new ArrayList<String>(ignoreSet), "")).append("}\n")
+                .append("            reject {").append(StringUtil_mxJPO.joinTcl(' ', true, new ArrayList<String>(rejectSet), "")).append("}\n")
                 .append("            filter \"").append(AbstractTest.convertTcl(this.filter)).append("\"\n")
                 .append("        }\n");
         }
@@ -908,6 +1026,19 @@ public class PolicyData
          */
         protected void checkExport(final ExportParser.Line _exportState)
         {
+            final SortedSet<String> approveSet = new TreeSet<String>();
+            for (final AbstractUserData<?> user : this.approve)  {
+                approveSet.add(user.getName());
+            }
+            final SortedSet<String> ignoreSet = new TreeSet<String>();
+            for (final AbstractUserData<?> user : this.ignore)  {
+                ignoreSet.add(user.getName());
+            }
+            final SortedSet<String> rejectSet = new TreeSet<String>();
+            for (final AbstractUserData<?> user : this.reject)  {
+                rejectSet.add(user.getName());
+            }
+
             boolean found = false;
             final String value = "\"" + AbstractTest.convertTcl(this.name) + "\"";
             for (final ExportParser.Line line : _exportState.getChildren())  {
@@ -919,15 +1050,15 @@ public class PolicyData
                             "check for correct branch");
                     Assert.assertEquals(
                             line.evalSingleValue("approve"),
-                            "{}",
+                            "{" + StringUtil_mxJPO.joinTcl(' ', true, new ArrayList<String>(approveSet), "") + "}",
                             "check for correct approve user");
                     Assert.assertEquals(
                             line.evalSingleValue("ignore"),
-                            "{}",
+                            "{" + StringUtil_mxJPO.joinTcl(' ', true, new ArrayList<String>(ignoreSet), "") + "}",
                             "check for correct ignore user");
                     Assert.assertEquals(
                             line.evalSingleValue("reject"),
-                            "{}",
+                            "{" + StringUtil_mxJPO.joinTcl(' ', true, new ArrayList<String>(rejectSet), "") + "}",
                             "check for correct reject user");
                     Assert.assertEquals(
                             line.evalSingleValue("filter"),

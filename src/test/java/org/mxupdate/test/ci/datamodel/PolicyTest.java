@@ -21,6 +21,7 @@ import java.util.Set;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.FormatData;
 import org.mxupdate.test.data.datamodel.PolicyData;
+import org.mxupdate.test.data.datamodel.PolicyData.Signature;
 import org.mxupdate.test.data.datamodel.PolicyData.State;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.datamodel.helper.Access;
@@ -286,9 +287,9 @@ public class PolicyTest
                                         .setFlag("enforcereserveaccess", false))},
             new Object[] {
                     "issue #216: policy state with notenforcereserveaccess defined",
-                    new PolicyData(this, "test").notSupported(
-                            Version.V6R2011x).addState(
-                            new State()
+                    new PolicyData(this, "test")
+                            .notSupported(Version.V6R2011x)
+                            .addState(new State()
                                     .setName("create")
                                     .setFlag("notenforcereserveaccess", true)),
                     new PolicyData(this, "test")
@@ -298,9 +299,9 @@ public class PolicyTest
                                     .setFlag("enforcereserveaccess", false))},
                new Object[] {
                         "issue #216: policy state with enforcereserveaccess value false defined",
-                        new PolicyData(this, "test").notSupported(
-                                Version.V6R2011x).addState(
-                                new State()
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
                                         .setName("create")
                                         .setValue("enforcereserveaccess", "false")),
                         new PolicyData(this, "test")
@@ -310,9 +311,9 @@ public class PolicyTest
                                         .setFlag("enforcereserveaccess", false))},
                 new Object[] {
                         "issue #216: policy state with enforcereserveaccess value true defined",
-                        new PolicyData(this, "test").notSupported(
-                                Version.V6R2011x).addState(
-                                new State()
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
                                         .setName("create")
                                         .setValue("enforcereserveaccess", "true")),
                         new PolicyData(this, "test")
@@ -322,32 +323,76 @@ public class PolicyTest
                                         .setFlag("enforcereserveaccess", true))},
                 new Object[] {
                         "issue #216: policy state with property and no value",
-                        new PolicyData(this, "test").notSupported(
-                                Version.V6R2011x).addState(
-                                new State()
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
                                         .setName("create")
                                         .addProperty(new PropertyDef("Property")))},
                 new Object[] {
                         "issue #216: policy state with property and value",
-                        new PolicyData(this, "test").notSupported(
-                                Version.V6R2011x).addState(
-                                new State()
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
                                         .setName("create")
                                         .addProperty(new PropertyDef("Property", "Value 1")))},
                 new Object[] {
                         "issue #216: policy state with property and link to policy",
-                        new PolicyData(this, "test").notSupported(
-                                Version.V6R2011x).addState(
-                                new State()
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
                                         .setName("create")
                                         .addProperty(new PropertyDef("Property", new PolicyData(this, "test 2"))))},
                 new Object[] {
                         "issue #216: policy state with property, link and value",
-                        new PolicyData(this, "test").notSupported(
-                                Version.V6R2011x).addState(
-                                new State()
+                        new PolicyData(this, "test")
+                                .notSupported(Version.V6R2011x)
+                                .addState(new State()
                                         .setName("create")
-                                        .addProperty(new PropertyDef("Property", "Value 1", new PolicyData(this, "test 2"))))}
+                                        .addProperty(new PropertyDef("Property", "Value 1", new PolicyData(this, "test 2"))))},
+                new Object[] {
+                        "issue #203: policy state with signature ww/o user /o defined filter",
+                        new PolicyData(this, "test")
+                                .addState(new State()
+                                        .setName("create")
+                                        .addSignature(new Signature()
+                                                .setName("Test")
+                                                .setBranch("create")))},
+                new Object[] {
+                        "issue #203: policy state with signature with approver",
+                        new PolicyData(this, "test")
+                                .addState(new State()
+                                        .setName("create")
+                                        .addSignature(new Signature()
+                                                .setName("Test")
+                                                .addApprover(new PersonAdminData(this, "User 1"), new PersonAdminData(this, "User 2"))
+                                                .setBranch("create")))},
+                new Object[] {
+                        "issue #203: policy state with signature with ignore",
+                        new PolicyData(this, "test")
+                                .addState(new State()
+                                        .setName("create")
+                                        .addSignature(new Signature()
+                                                .setName("Test")
+                                                .addIgnore(new PersonAdminData(this, "User 1"), new PersonAdminData(this, "User 2"))
+                                                .setBranch("create")))},
+                new Object[] {
+                        "issue #203: policy state with signature with reject",
+                        new PolicyData(this, "test")
+                                .addState(new State()
+                                        .setName("create")
+                                        .addSignature(new Signature()
+                                                .setName("Test")
+                                                .addReject(new PersonAdminData(this, "User 1"), new PersonAdminData(this, "User 2"))
+                                                .setBranch("create")))},
+                new Object[] {
+                        "issue #203: policy state with signature with defined filter",
+                        new PolicyData(this, "test")
+                                .addState(new State()
+                                        .setName("create")
+                                        .addSignature(new Signature()
+                                                .setName("Test")
+                                                .setBranch("create")
+                                                .setFilter("this is a \"filter\"")))}
         );
     }
 
