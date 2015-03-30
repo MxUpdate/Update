@@ -35,6 +35,7 @@ import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
@@ -49,12 +50,12 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
 public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mxJPO<CLASS>>
     extends AbstractAdminObject_mxJPO
 {
-    /**
-     * MQL list statement with select for the attribute type and name used
-     * to get the list of all attribute MX names depending on the attribute
-     * type.
-     */
-    private static final String SELECT_ATTRS = "list attribute * select type name dump";
+    /** Key used for the select statement. */
+    private static final String SELECT_KEY = "@@@2@@@2@@@";
+    /** MQL statement to list all attributes with type, owner and name- */
+    private static final String SELECT_ATTRS_WITH_OWNER = "escape list attribute * select type owner name dump \"" + AbstractAttribute_mxJPO.SELECT_KEY + "\"";
+    /** MQL statement to list all attributes with type and name- */
+    private static final String SELECT_ATTRS_WO_OWNER = "escape list attribute * select type name dump \"" + AbstractAttribute_mxJPO.SELECT_KEY + "\"";
 
     /**
      * Key used to identify the update of an attribute within
@@ -177,21 +178,50 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
      * @return set of MX names of all attributes of attribute type
      *         {@link #attrTypeList}
      * @throws MatrixException if the query for attribute objects failed
-     * @see #SELECT_ATTRS
-     * @see #attrTypeList
      */
     @Override()
     public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
-        final Set<String> ret = new TreeSet<String>();
-        final int length = this.attrTypeList.length();
-        for (final String name : MqlUtil_mxJPO.execMql(_paramCache, AbstractAttribute_mxJPO.SELECT_ATTRS).split("\n"))  {
-            if (!name.isEmpty() && name.startsWith(this.attrTypeList))  {
-                ret.add(name.substring(length));
+        @SuppressWarnings("unchecked")
+        Map<String,Set<String>> attrs = (Map<String,Set<String>>) _paramCache.getCache(CacheKey.Attributes);
+
+        if (attrs == null)  {
+            attrs = new HashMap<String,Set<String>>();
+            _paramCache.setCache(CacheKey.Attributes, attrs);
+
+            // attribute supports owner...
+            if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsOwner))  {
+                for (final String typeOwnerNameStr : MqlUtil_mxJPO.execMql(_paramCache, AbstractAttribute_mxJPO.SELECT_ATTRS_WITH_OWNER).split("\n"))  {
+                    final String[] typeOwnerNameArr = typeOwnerNameStr.split(AbstractAttribute_mxJPO.SELECT_KEY);
+                    if (!attrs.containsKey(typeOwnerNameArr[0]))  {
+                        attrs.put(typeOwnerNameArr[0], new HashSet<String>());
+                    }
+                    if (typeOwnerNameArr[1].isEmpty())  {
+                        attrs.get(typeOwnerNameArr[0]).add(typeOwnerNameArr[2]);
+                    } else  {
+                        // existing owner must be prefixed to attribute name
+                        attrs.get(typeOwnerNameArr[0]).add(typeOwnerNameArr[1] + "." + typeOwnerNameArr[2]);
+                    }
+                }
+            // old enovia version w/o support for owners...
+            } else  {
+                for (final String typeOwnerNameStr : MqlUtil_mxJPO.execMql(_paramCache, AbstractAttribute_mxJPO.SELECT_ATTRS_WO_OWNER).split("\n"))  {
+                    final String[] typeOwnerNameArr = typeOwnerNameStr.split(AbstractAttribute_mxJPO.SELECT_KEY);
+                    if (!attrs.containsKey(typeOwnerNameArr[0]))  {
+                        attrs.put(typeOwnerNameArr[0], new HashSet<String>());
+                    }
+                    attrs.get(typeOwnerNameArr[0]).add(typeOwnerNameArr[1]);
+                }
             }
         }
-        return ret;
+
+        // check that attribute type exists..
+        if (!attrs.containsKey(this.attrTypeList))  {
+            attrs.put(this.attrTypeList, new HashSet<String>());
+        }
+
+        return attrs.get(this.attrTypeList);
     }
 
     /**

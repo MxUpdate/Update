@@ -27,6 +27,7 @@ import matrix.db.Context;
 
 import org.mxupdate.mapping.Mapping_mxJPO;
 import org.mxupdate.mapping.ParameterDef_mxJPO;
+import org.mxupdate.mapping.ParameterDef_mxJPO.Type;
 
 /**
  * The class is used to stored the defined parameters from the console.
@@ -75,90 +76,31 @@ public class ParameterCache_mxJPO
      */
     public static final String KEY_VERSION = "Version";
 
-    /**
-     * Mapping between parameter definition and the related boolean value.
-     *
-     * @see #ParameterCache_mxJPO(Context,boolean)
-     * @see #ParameterCache_mxJPO(Context,ParameterCache_mxJPO)
-     * @see #evalParameter(ParameterDef_mxJPO, String[], int)
-     * @see #getValueBoolean(String)
-     * @see #defineValueBoolean(String, Boolean)
-     */
+    /** Mapping between parameter definition and the related boolean value. */
     private final Map<String,Boolean> mapBoolean;
-
-    /**
-     * Mapping between parameter definition and the related integer value.
-     *
-     * @see #ParameterCache_mxJPO(Context,boolean)
-     * @see #ParameterCache_mxJPO(Context,ParameterCache_mxJPO)
-     * @see #evalParameter(ParameterDef_mxJPO, String[], int)
-     * @see #getValueInteger(String)
-     * @see #defineValueInteger(String, Integer)
-     */
+    /** Mapping between parameter definition and the related integer value. */
     private final Map<String,Integer> mapInteger;
-
-    /**
-     * Mapping between parameter definition and the related list of string
-     * values.
-     *
-     * @see #ParameterCache_mxJPO(Context,boolean)
-     * @see #ParameterCache_mxJPO(Context,ParameterCache_mxJPO)
-     * @see #evalParameter(ParameterDef_mxJPO, String[], int)
-     */
+    /** Mapping between parameter definition and the related list of string values. */
     private final Map<String,Collection<String>> mapList;
-
-    /**
-     * Mapping between parameter definition and the related map of string
-     * values.
-     *
-     * @see #ParameterCache_mxJPO(Context,boolean)
-     * @see #ParameterCache_mxJPO(Context,ParameterCache_mxJPO)
-     * @see #evalParameter(ParameterDef_mxJPO, String[], int)
-     */
+    /** Mapping between parameter definition and the related map of string values. */
     private final Map<String,Map<String,?>> mapMap;
-
-    /**
-     * Mapping between the enumeration name of the parameter and the string
-     * value.
-     *
-     * @see #ParameterCache_mxJPO(Context,boolean)
-     * @see #ParameterCache_mxJPO(Context,ParameterCache_mxJPO)
-     * @see #evalParameter(ParameterDef_mxJPO, String[], int)
-     */
+    /** Mapping between the enumeration name of the parameter and the string value. */
     private final Map<String,String> mapString;
 
-    /**
-     * Stores as parameter the related MX context.
-     *
-     * @see #getContext()
-     */
+    /** Stores as parameter the related MX context. */
     private final Context context;
 
-    /**
-     * Stores the used writer instance for the logging instances.
-     *
-     * @see #logDebug(String)
-     * @see #logError(String)
-     * @see #logInfo(String)
-     * @see #logTrace(String)
-     * @see #logWarning(String)
-     */
+    /** Stores the used writer instance for the logging instances. */
     private final PrintWriter writer;
 
-    /**
-     * Stores the writer of the logging string.
-     *
-     * @see #getLogString()
-     */
+    /** Stores the writer of the logging string. */
     private final StringWriter stringWriter;
 
-    /**
-     * Stores the used mapping from this parameter cache instance.
-     *
-     * @see #ParameterCache_mxJPO(Context, boolean)
-     * @see #getMapping()
-     */
+    /** Stores the used mapping from this parameter cache instance. */
     private final Mapping_mxJPO mapping;
+
+    /** Session Cache. */
+    private final Map<CacheKey,Object> cache = new HashMap<CacheKey,Object>();
 
     /**
      * Creates a new instance of the parameter cache. All default values from
@@ -373,18 +315,18 @@ public class ParameterCache_mxJPO
     {
         int index = _index;
 
-        if (_paramDef.getType() == ParameterDef_mxJPO.Type.BOOLEAN)  {
+        if (_paramDef.getType() == Type.BOOLEAN)  {
             this.mapBoolean.put(_paramDef.getName(),
                                 !Boolean.parseBoolean(_paramDef.getDefaultValue()));
-        } else if (_paramDef.getType() == ParameterDef_mxJPO.Type.INTEGER)  {
+        } else if (_paramDef.getType() == Type.INTEGER)  {
             this.mapInteger.put(_paramDef.getName(),
                                 Integer.parseInt(_args[++index]));
-        } else if (_paramDef.getType() == ParameterDef_mxJPO.Type.LIST)  {
+        } else if (_paramDef.getType() == Type.LIST)  {
             if (!this.mapList.containsKey(_paramDef.getName()))  {
                 this.mapList.put(_paramDef.getName(), new ArrayList<String>());
             }
             this.mapList.get(_paramDef.getName()).add(_args[++index]);
-        } else if (_paramDef.getType() == ParameterDef_mxJPO.Type.STRING)  {
+        } else if (_paramDef.getType() == Type.STRING)  {
             this.mapString.put(_paramDef.getName(), _args[++index]);
         }
 
@@ -431,7 +373,6 @@ public class ParameterCache_mxJPO
     {
         return this.mapping;
     }
-
 
     /**
      * Returns for given key the related boolean value.
@@ -646,6 +587,17 @@ public class ParameterCache_mxJPO
         this.writer.flush();
     }
 
+    public Object getCache(final CacheKey _key)
+    {
+        return this.cache.get(_key);
+    }
+
+    public void setCache(final CacheKey _key, final Object _value)
+    {
+        this.cache.put(_key, _value);
+    }
+
+
     /**
      * Returns the string representation of the parameter cache. The string
      * representation includes all boolean values, list values and string
@@ -779,6 +731,11 @@ public class ParameterCache_mxJPO
          */
         DMAttrSupportsPropMaxLength,
         /**
+         * Name of the parameter to define that owners are allowed for
+         * attributes.
+         */
+        DMAttrSupportsOwner,
+        /**
          * Name of the parameter to define that units are allowed to remove.
          */
         DMDimAllowRemoveUnit,
@@ -822,5 +779,14 @@ public class ParameterCache_mxJPO
          * published property.
          */
         DMPolicyStateSupportsEnforceReserveAccess;
+    }
+
+    /**
+     * Enumeration of keys to access the cached values.
+     */
+    public enum CacheKey
+    {
+        /** List of attributes which are cached for easy reuse. */
+        Attributes;
     }
 }

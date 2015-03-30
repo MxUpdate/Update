@@ -36,6 +36,6 @@ public class AttributeBoolean_mxJPO
     public AttributeBoolean_mxJPO(final TypeDef_mxJPO _typeDef,
                                   final String _mxName)
     {
-        super(_typeDef, _mxName, "boolean", "boolean,");
+        super(_typeDef, _mxName, "boolean", "boolean");
     }
 }

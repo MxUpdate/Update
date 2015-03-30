@@ -36,6 +36,6 @@ public class AttributeInteger_mxJPO
     public AttributeInteger_mxJPO(final TypeDef_mxJPO _typeDef,
                                   final String _mxName)
     {
-        super(_typeDef, _mxName, "integer", "integer,");
+        super(_typeDef, _mxName, "integer", "integer");
     }
 }

@@ -49,7 +49,7 @@ public class AttributeString_mxJPO
     public AttributeString_mxJPO(final TypeDef_mxJPO _typeDef,
                                  final String _mxName)
     {
-        super(_typeDef, _mxName, "string", "string,");
+        super(_typeDef, _mxName, "string", "string");
     }
 
     /**
