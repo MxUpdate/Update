@@ -412,11 +412,6 @@ public class DimensionCI_3UpdateTest
                                     + " select description dump"),
                             "a simple description",
                             "Check that description is set");
-        Assert.assertEquals(this.mql("list property to dimension " + DimensionCI_3UpdateTest.DIMENSION_NAME),
-                            "dimension_" + DimensionCI_3UpdateTest.DIMENSION_NAME
-                                    + " on program eServiceSchemaVariableMapping.tcl to dimension "
-                                    + DimensionCI_3UpdateTest.DIMENSION_NAME,
-                            "Check for symbolic name registration.");
 
         Assert.assertEquals(this.mql("print dimension " + DimensionCI_3UpdateTest.DIMENSION_NAME
                                             + " select unit dump @")

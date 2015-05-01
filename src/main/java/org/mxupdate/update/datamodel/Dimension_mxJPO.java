@@ -270,19 +270,19 @@ public class Dimension_mxJPO
         private String name;
 
         /** Description of the unit. */
-        private String description;
+        private String description = "";
 
         /** Label of the unit. */
         private String label;
 
         /** Multiplier of the unit. */
-        private double multiplier;
+        private double multiplier = 0.0;
 
         /** Offset of the unit. */
-        private double offset;
+        private double offset = 0.0;
 
         /** Is the unit the default unit? */
-        private boolean defaultUnit;
+        private boolean defaultUnit = false;
 
         /**
          * System information of the unit. Internally the system information
