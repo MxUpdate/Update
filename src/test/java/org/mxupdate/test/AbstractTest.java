@@ -165,7 +165,7 @@ public abstract class AbstractTest
         OTHER_PLANT(null, "Plant", false, "Organization", "eService Production", "Plant", null, null, null, true, "mql"),
 
         /** Configuration item channel. */
-        UI_CHANNEL("channel", null, false, null, null, "Channel", "CHANNEL", "CHANNEL_", "userinterface/channel", true, "mql"),
+        UI_CHANNEL("channel", null, false, null, null, "Channel", "CHANNEL", "CHANNEL_", "userinterface/channel", true, "mxUpdate"),
         /** Configuration item command. */
         UI_COMMAND("command", null, false, null, null, "Command", "COMMAND", "COMMAND_", "userinterface/command", true, "mxUpdate"),
         /** Configuration item form. */

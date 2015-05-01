@@ -17,16 +17,14 @@ package org.mxupdate.update.userinterface;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
-import java.util.TreeMap;
+
+import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO;
+import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.WriteAppendChildSyntax;
 import org.mxupdate.update.userinterface.menu.MenuDefParser_mxJPO;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
@@ -53,10 +51,8 @@ public class Menu_mxJPO
 
     /** Flag to store the information that the menu is a type tree menu. */
     private boolean treeMenu = false;
-    /** Holds all children of this menu instance. */
-    private final Stack<MenuChild> children = new Stack<MenuChild>();
-    /** Holds all children of this menu instance correct sorted. */
-    private final List<MenuChild> childrenSorted = new ArrayList<MenuChild>();
+    /** All referenced children. */
+    private final ChildRefList_mxJPO children = new ChildRefList_mxJPO();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -106,30 +102,10 @@ public class Menu_mxJPO
         final boolean parsed;
         if (Menu_mxJPO.IGNORED_URLS.contains(_url))  {
             parsed = true;
-        } else if ("/commandRefList/commandRef".equals(_url))  {
-            final MenuChild child = new MenuChild();
-            child.type = "command";
-            this.children.add(child);
-            parsed = true;
-        } else if ("/commandRefList/commandRef/name".equals(_url))  {
-            this.children.peek().name = _content;
-            parsed = true;
-        } else if ("/commandRefList/commandRef/order".equals(_url))  {
-            this.children.peek().order = Integer.parseInt(_content);
-            parsed = true;
-
-        } else if ("/menuRefList/menuRef".equals(_url))  {
-            final MenuChild child = new MenuChild();
-            child.type = "menu";
-            this.children.add(child);
-            parsed = true;
-        } else if ("/menuRefList/menuRef/name".equals(_url))  {
-            this.children.peek().name = _content;
-            parsed = true;
-        } else if ("/menuRefList/menuRef/order".equals(_url))  {
-            this.children.peek().order = Integer.parseInt(_content);
-            parsed = true;
-
+        } else if (_url.startsWith("/commandRefList"))  {
+            parsed = this.children.parse(_url.substring(15), _content);
+        } else if (_url.startsWith("/menuRefList"))  {
+            parsed = this.children.parse(_url.substring(12), _content);
         } else  {
             parsed = super.parse(_paramCache, _url, _content);
         }
@@ -146,14 +122,9 @@ public class Menu_mxJPO
     protected void prepare(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
-        super.prepare(_paramCache);
+        this.children.prepare();
 
-        // order childs
-        final Map<Integer,MenuChild> tmpChilds = new TreeMap<Integer,MenuChild>();
-        for (final MenuChild child : this.children)  {
-            tmpChilds.put(child.order, child);
-        }
-        this.childrenSorted.addAll(tmpChilds.values());
+        super.prepare(_paramCache);
     }
 
     /**
@@ -195,10 +166,7 @@ public class Menu_mxJPO
             .append("    alt \"").append(StringUtil_mxJPO.convertUpdate(this.getAlt())).append("\"\n");
         this.getProperties().writeSettings(_paramCache, _out, "    ");
 
-        // output childs
-        for (final MenuChild child : this.childrenSorted)  {
-            _out.append("    ").append(child.type).append(" \"").append(StringUtil_mxJPO.convertUpdate(child.name)).append("\"\n");
-        }
+        this.children.write(_out);
 
         this.getProperties().writeProperties(_paramCache, _out, "    ");
 
@@ -268,6 +236,8 @@ public class Menu_mxJPO
         DeltaUtil_mxJPO.calcValueDelta(_mql, "href",        _target.getHref(),          this.getHref());
         DeltaUtil_mxJPO.calcValueDelta(_mql, "label",       _target.getLabel(),         this.getLabel());
 
+        _target.children.calcDelta(_mql, WriteAppendChildSyntax.Add, this.children);
+
         // type tree menu
         if (this.treeMenu != _target.treeMenu)  {
             _mql.pushPrefix("");
@@ -279,85 +249,6 @@ public class Menu_mxJPO
             _mql.popPrefix();
         }
 
-        // children commands and menus
-        final Iterator<MenuChild> iterThis   = this.childrenSorted.iterator();
-        final Iterator<MenuChild> iterTarget = _target.childrenSorted.iterator();
-        MenuChild childThis   = null;
-        MenuChild childTarget = null;
-        boolean equal = true;
-        while (iterThis.hasNext() && iterTarget.hasNext())  {
-            childThis   = iterThis.next();
-            childTarget = iterTarget.next();
-            if (!childThis.equals(childTarget))  {
-                equal = false;
-                break;
-            }
-        }
-        // remove this childs if needed
-        if (!equal)  {
-            _mql.newLine().cmd("remove ").cmd(childThis.type).cmd(" ").arg(childThis.name);
-        }
-        while (iterThis.hasNext())  {
-            childThis   = iterThis.next();
-            _mql.newLine().cmd("remove ").cmd(childThis.type).cmd(" ").arg(childThis.name);
-        }
-        // assign targets if needed
-        if (!equal)  {
-            _mql.newLine().cmd("add ").cmd(childTarget.type).cmd(" ").arg(childTarget.name);
-        }
-        while (iterTarget.hasNext())  {
-            childTarget = iterTarget.next();
-            _mql.newLine().cmd("add ").cmd(childTarget.type).cmd(" ").arg(childTarget.name);
-        }
-
         _target.getProperties().calcDelta(_mql, "", this.getProperties());
-    }
-
-    /**
-     * Stores a reference to a child of a menu.
-     */
-    public static final class MenuChild
-    {
-        /** Type of the menu child. */
-        private String type;
-        /** Name of the menu child. */
-        private String name;
-        /** Order index of the menu child. */
-        private Integer order;
-
-        /**
-         * Constructor.
-         *
-         * @param _type     type of menu child
-         * @param _name     name of menu child
-         * @param _order    order of menu child
-         */
-        public MenuChild(final String _type,
-                         final String _name,
-                         final int _order)
-        {
-            this.type  = _type;
-            this.name  = _name;
-            this.order = _order;
-        }
-
-        /**
-         * Private constructor so that an instance could only be created within
-         * the Menu_mxJPO class.
-         */
-        private MenuChild()
-        {
-        }
-
-        /**
-         * Checks if this child menu and the given {@code _toCompare} is equal.
-         *
-         * @param _toCompare    compare child menu
-         * @return <i>true</i> if equal; otherwise <i>false</i>
-         */
-        boolean equals(final MenuChild _toCompare)
-        {
-            return (_toCompare != null) && this.type.equals(_toCompare.type) && this.name.equals(_toCompare.name);
-        }
     }
 }

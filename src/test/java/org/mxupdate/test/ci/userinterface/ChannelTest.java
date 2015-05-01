@@ -51,7 +51,12 @@ public class ChannelTest
                 new Object[]{
                         "channel with height",
                         new ChannelData(this, "hello \" test")
-                                .setValue("height", "100")},
+                                .setValue("height", 100)},
+               new Object[]{
+                        "channel with default height",
+                        new ChannelData(this, "hello \" test"),
+                        new ChannelData(this, "hello \" test")
+                                .setValue("height", 0)},
                 new Object[]{
                         "channel with settings",
                         new ChannelData(this, "hello \" test")
@@ -69,6 +74,32 @@ public class ChannelTest
                                 .addCommand(new CommandData(this, "Command \"test 1\""))
                                 .addCommand(new CommandData(this, "Command \"test 2\""))}
         );
+    }
+
+    /**
+     * Positive test to change the order of children's.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "positive test to change the order of children's")
+    public void positiveTestChangeOrderChilds()
+        throws Exception
+    {
+        new ChannelData(this, "test")
+                .addCommand(new CommandData(this, "child command 0"))
+                .addCommand(new CommandData(this, "child command 1"))
+                .addCommand(new CommandData(this, "child command 2"))
+                .addCommand(new CommandData(this, "child command 3"))
+                .create()
+                .checkExport();
+
+        new ChannelData(this, "test")
+                .addCommand(new CommandData(this, "child command 0"))
+                .addCommand(new CommandData(this, "child command 3"))
+                .addCommand(new CommandData(this, "child command 2"))
+                .addCommand(new CommandData(this, "child command 1"))
+                .update("")
+                .checkExport();
     }
 
     /**

@@ -17,10 +17,8 @@ package org.mxupdate.test.data.userinterface;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import matrix.util.MatrixException;
 
@@ -46,14 +44,7 @@ public class ChannelData
         ChannelData.REQUIRED_EXPORT_VALUES.put("label", "");
     }
 
-    /**
-     * All commands of the channel.
-     *
-     * @see #addCommand(CommandData)
-     * @see #getCommands()
-     * @see #create()
-     * @see #evalAdds4CheckExport(Set)
-     */
+    /** All commands of the channel. */
     private final List<CommandData> commands = new ArrayList<CommandData>();
 
     /**
@@ -102,18 +93,22 @@ public class ChannelData
     @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder();
-        this.append4CIFileHeader(cmd);
-        cmd.append("mql escape mod channel \"${NAME}\"");
-
-        // append commands
-        for (final CommandData command : this.commands)  {
-            cmd.append(" \\\n  place \"").append(AbstractTest.convertTcl(command.getName())).append("\" after \"\"");
+        final StringBuilder strg = new StringBuilder();
+        this.append4CIFileHeader(strg);
+        strg.append("mxUpdate channel \"${NAME}\" {\n");
+        this.getFlags().append4CIFileValues("    ", strg, "\n");
+        this.getValues().appendUpdate("    ", strg, "\n");
+        this.getSettings().appendUpdate("    ", strg, "\n");
+        this.getProperties().appendCIFileUpdateFormat("    ", strg);
+        for (final String ciLine : this.getCILines())  {
+            strg.append("    ").append(ciLine).append('\n');
         }
+        for (final CommandData child : this.commands)  {
+            strg.append("    command \"").append(AbstractTest.convertUpdate(child.getName())).append("\"\n");
+        }
+        strg.append("}");
 
-        this.append4CIFileValues(cmd);
-
-        return cmd.toString();
+        return strg.toString();
     }
 
     /**
@@ -182,16 +177,25 @@ public class ChannelData
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        super.checkExport(_exportParser);
-        // check for commands (they are not add's!)
-        final Set<String> needPlaces = new HashSet<String>();
-        for (final CommandData command : this.commands)  {
-            needPlaces.add("\"" + AbstractTest.convertTcl(command.getName()) + "\" after \"\"");
+        // check symbolic name
+        Assert.assertEquals(
+               _exportParser.getSymbolicName(),
+                this.getSymbolicName(),
+                "check symbolic name");
+
+        this.getFlags().checkExport(_exportParser.getRootLines().get(0), "");
+        this.getValues().checkExport(_exportParser);
+        this.getSettings().checkExport(_exportParser.getLines("/mxUpdate/setting/@value"));
+        this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
+
+        // check for commands (in correct order!)
+        final List<String> childDefs = new ArrayList<String>(_exportParser.getLines("/mxUpdate/command/@value"));
+        // fetch child from this definition
+        final List<String> thisDefs = new ArrayList<String>();
+        for (final CommandData  command : this.commands)  {
+            thisDefs.add("\"" + AbstractTest.convertUpdate(command.getName()) + "\"");
         }
-        final List<String> foundPlaces = _exportParser.getLines("/mql/place/@value");
-        Assert.assertEquals(foundPlaces.size(), needPlaces.size(), "all adds defined (found places = " + foundPlaces + "; need places = " + needPlaces + ")");
-        for (final String foundPlace : foundPlaces)  {
-            Assert.assertTrue(needPlaces.contains(foundPlace), "check that place '" + foundPlace + "' is defined");
-        }
+        // and compare
+        Assert.assertEquals(childDefs, thisDefs, "check child of menu");
     }
 }

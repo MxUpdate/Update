@@ -74,7 +74,7 @@ public class MenuTest
     public void positiveTestChangeOrderChilds()
         throws Exception
     {
-        new MenuData(this, "hallo")
+        new MenuData(this, "test")
                 .addChild(new MenuData(this, "child menu 1"))
                 .addChild(new CommandData(this, "child command 1"))
                 .addChild(new CommandData(this, "child command 2"))
@@ -82,7 +82,7 @@ public class MenuTest
                 .create()
                 .checkExport();
 
-        new MenuData(this, "hallo")
+        new MenuData(this, "test")
                 .addChild(new MenuData(this, "child menu 1"))
                 .addChild(new CommandData(this, "child command 3"))
                 .addChild(new CommandData(this, "child command 2"))

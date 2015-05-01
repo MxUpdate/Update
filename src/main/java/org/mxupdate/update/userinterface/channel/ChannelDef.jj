@@ -21,17 +21,15 @@ options {
     GENERATE_BOILERPLATE = false;
 }
 
-PARSER_BEGIN(MenuDefParser)
-package org.mxupdate.update.userinterface.menu;
+PARSER_BEGIN(ChannelDefParser)
+package org.mxupdate.update.userinterface.channel;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.userinterface.Menu_mxJPO;
-import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.AbstractRef;
+import org.mxupdate.update.userinterface.Channel_mxJPO;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.CommandRef;
-import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.MenuRef;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
@@ -40,12 +38,12 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
-public class MenuDefParser
-    extends AbstractParser_mxJPO<Menu_mxJPO>
+public class ChannelDefParser
+    extends AbstractParser_mxJPO<Channel_mxJPO>
 {
 }
 
-PARSER_END(MenuDefParser)
+PARSER_END(ChannelDefParser)
 
 SKIP :
 {
@@ -60,20 +58,17 @@ TOKEN : /** first level */
       <DESCRIPTION:             "description">                                  : STRING_EXPECTED
     | <HIDDEN_TRUE:             "hidden">
     | <HIDDEN_FALSE:            "!hidden">
-    | <TREEMENU_TRUE:           "treemenu">
-    | <TREEMENU_FALSE:          "!treemenu">
+    | <LABEL:                   "label">                                        : STRING_EXPECTED
     | <ALT:                     "alt">                                          : STRING_EXPECTED
     | <HREF:                    "href">                                         : STRING_EXPECTED
-    | <LABEL:                   "label">                                        : STRING_EXPECTED
+    | <HEIGHT:                  "height">                                       : INTEGER_EXPECTED
     | <SETTING:                 ("add" ([" ","\t","\n","\r"])+ )? "setting">    : SETTING_EXPECTED
     | <COMMAND:                 ("add" ([" ","\t","\n","\r"])+ )? "command">    : STRING_EXPECTED
-    | <MENU:                    ("add" ([" ","\t","\n","\r"])+ )? "menu">       : STRING_EXPECTED
     | <PROPERTY:                "property">                                     : STRING_EXPECTED
     | <PROPERTYTO:              "to">                                           : ADMINREF_EXPECTED
     | <PROPERTYVAL:             "value">                                        : STRING_EXPECTED
 }
 
-//Token treemenu() : {Token t ; } { t = "treemenu" {return t;} }
 /************************************************************** Common String */
 <STRING_EXPECTED> SKIP :
 {
@@ -86,6 +81,17 @@ TOKEN : /** first level */
     | <SINGLE: (<CHAR>)+> : DEFAULT
     | <#APOSTROPHE: "\"" >
     | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/************************************************************* Common Integer */
+<INTEGER_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<INTEGER_EXPECTED> TOKEN :
+{
+      <INTEGER: (("0") | (["1"-"9"](["0"-"9"])*))> : DEFAULT
 }
 
 /********************************************************* Setting Key String */
@@ -121,35 +127,31 @@ TOKEN : /** first level */
  *
  * @param _menu     target menu to update with parsed values
  */
-void parse(Menu_mxJPO _menu)
+void parse(Channel_mxJPO _menu)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
 : {
     Token tmp;
     AdminProperty property;
-    AbstractRef ref;
+    CommandRef ref;
     int refIdx = 0;
 } {
     (   (<DESCRIPTION>              ( tmp = <STRING>           {this.setValue(_menu, "description", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(_menu, "description", this.getSingle(tmp.image));} ) )
       | (<HIDDEN_TRUE>                                         {this.setValue(_menu, "hidden", true);} )
       | (<HIDDEN_FALSE>                                        {this.setValue(_menu, "hidden", false);} )
-      | (<TREEMENU_TRUE>                                       {this.setValue(_menu, "treeMenu", true);} )
-      | (<TREEMENU_FALSE>                                      {this.setValue(_menu, "treeMenu", false);} )
+      | (<LABEL>                    ( tmp = <STRING>           {this.setValue(_menu, "label", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(_menu, "label", this.getSingle(tmp.image));} ) )
       | (<ALT>                      ( tmp = <STRING>           {this.setValue(_menu, "alt", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(_menu, "alt", this.getSingle(tmp.image));} ) )
       | (<HREF>                     ( tmp = <STRING>           {this.setValue(_menu, "href", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(_menu, "href", this.getSingle(tmp.image));} ) )
-      | (<LABEL>                    ( tmp = <STRING>           {this.setValue(_menu, "label", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(_menu, "label", this.getSingle(tmp.image));} ) )
+      | (<HEIGHT>                   tmp = <INTEGER>            {this.setValue(_menu, "height", Integer.valueOf(tmp.image));} )
       | (<SETTING>                                             {property = new AdminProperty();this.appendValue(this.getValue(_menu, "properties"), "propertiesStack", property);}
                                     ( tmp = <SETTING_STRING>   {this.setValue(property, "name", "%" + this.getString(tmp.image));}
                                     | tmp = <SETTING_SINGLE>   {this.setValue(property, "name", "%" + this.getSingle(tmp.image));})
                                     ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
       | (<COMMAND>                                             {ref = new CommandRef();this.setValue(ref, "order", refIdx++);this.appendValue(this.getValue(_menu, "children"), "childrenStack", ref);}
-                                    ( tmp = <STRING>           {this.setValue(ref, "name", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(ref, "name", this.getString(tmp.image));} ) )
-      | (<MENU>                                                {ref = new MenuRef();this.setValue(ref, "order", refIdx++);this.appendValue(this.getValue(_menu, "children"), "childrenStack", ref);}
                                     ( tmp = <STRING>           {this.setValue(ref, "name", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(ref, "name", this.getString(tmp.image));} ) )
       | (<PROPERTY>                                            {property = new AdminProperty();this.appendValue(this.getValue(_menu, "properties"), "propertiesStack", property);}

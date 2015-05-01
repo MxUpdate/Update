@@ -132,59 +132,7 @@ public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_
      */
     protected void setValue(final Object _object,
                             final String _fieldName,
-                            final String _value)
-    {
-        try  {
-            final Field field = this.getField(_object, _fieldName).field;
-            final boolean accessible = field.isAccessible();
-            try  {
-                field.setAccessible(true);
-                field.set(_object, _value);
-            } finally  {
-                field.setAccessible(accessible);
-            }
-        } catch (final Exception e)  {
-            throw new ParseUpdateError(e);
-        }
-    }
-
-    /**
-     * Sets the new <code>_value</code> for field <code>_fieldName</code> of
-     * <code>_object</code>.
-     *
-     * @param _object       object where the field must be updated
-     * @param _fieldName    name of the field to update
-     * @param _value        new value
-     */
-    protected void setValue(final Object _object,
-                            final String _fieldName,
-                            final Double _value)
-    {
-        try  {
-            final Field field = this.getField(_object, _fieldName).field;
-            final boolean accessible = field.isAccessible();
-            try  {
-                field.setAccessible(true);
-                field.set(_object, _value);
-            } finally  {
-                field.setAccessible(accessible);
-            }
-        } catch (final Exception e)  {
-            throw new ParseUpdateError(e);
-        }
-    }
-
-    /**
-     * Sets the new <code>_value</code> for field <code>_fieldName</code> of
-     * <code>_object</code>.
-     *
-     * @param _object       object where the field must be updated
-     * @param _fieldName    name of the field to update
-     * @param _value        new value
-     */
-    protected void setValue(final Object _object,
-                            final String _fieldName,
-                            final Boolean _value)
+                            final Object _value)
     {
         try  {
             final Field field = this.getField(_object, _fieldName).field;

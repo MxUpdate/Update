@@ -15,21 +15,23 @@
 
 package org.mxupdate.update.userinterface;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
-import java.util.TreeMap;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+import org.mxupdate.update.userinterface.channel.ChannelDefParser_mxJPO;
+import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO;
+import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.WriteAppendChildSyntax;
+import org.mxupdate.update.util.DeltaUtil_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * The class is used to export and import / update channel configuration items.
@@ -37,65 +39,19 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @author The MxUpdate Team
  */
 public class Channel_mxJPO
-    extends AbstractAdminObject_mxJPO
+    extends AbstractCommand_mxJPO
 {
-    /**
-     * Set of all ignored URLs from the XML definition for channels.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     */
+    /** Set of all ignored URLs from the XML definition for channels. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
         Channel_mxJPO.IGNORED_URLS.add("/commandRefList");
     }
 
-    /**
-     * Alt (label) of the channel.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private String alt;
+    /** Height of the channel. */
+    private int height;
 
-    /**
-     * Height of the channel.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private Integer height;
-
-    /**
-     * Href of the channel.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private String href;
-
-    /**
-     * Label of the channel.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private String label;
-
-    /**
-     * Stack with all referenced commands (used while parsing the channel).
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #prepare(ParameterCache_mxJPO)
-     */
-    private final Stack<CommandRef> commandRefs = new Stack<CommandRef>();
-
-    /**
-     * Ordered map of referenced commands.
-     *
-     * @see #prepare(ParameterCache_mxJPO)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    final Map<Integer,CommandRef> orderCmds = new TreeMap<Integer,CommandRef>();
+    /** All referenced children. */
+    private final ChildRefList_mxJPO children = new ChildRefList_mxJPO();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -114,8 +70,6 @@ public class Channel_mxJPO
      * <ul>
      * <li>command references in {@link #commandRefs}</li>
      * <li>{@link #height}</li>
-     * <li>{@link #href}</li>
-     * <li>{@link #alt} and {@link #label} text</li>
      * </ul>
      *
      * @param _paramCache   parameter cache with MX context
@@ -133,27 +87,11 @@ public class Channel_mxJPO
         final boolean parsed;
         if (Channel_mxJPO.IGNORED_URLS.contains(_url))  {
             parsed = true;
-        } else if ("/alt".equals(_url))  {
-            this.alt = _content;
-            parsed = true;
-        } else if ("/commandRefList/commandRef".equals(_url))  {
-            this.commandRefs.add(new CommandRef());
-            parsed = true;
-        } else if ("/commandRefList/commandRef/name".equals(_url))  {
-            this.commandRefs.peek().name = _content;
-            parsed = true;
-        } else if ("/commandRefList/commandRef/order".equals(_url))  {
-            this.commandRefs.peek().order = Integer.parseInt(_content);
-            parsed = true;
+        } else if (_url.startsWith("/commandRefList"))  {
+            parsed = this.children.parse(_url.substring(15), _content);
 
         } else if ("/height".equals(_url))  {
             this.height = Integer.parseInt(_content);
-            parsed = true;
-        } else if ("/href".equals(_url))  {
-            this.href = _content;
-            parsed = true;
-        } else if ("/label".equals(_url))  {
-            this.label = _content;
             parsed = true;
         } else  {
             parsed = super.parse(_paramCache, _url, _content);
@@ -173,10 +111,8 @@ public class Channel_mxJPO
     protected void prepare(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
-        // order referenced commands
-        for (final CommandRef cmdRef : this.commandRefs)  {
-            this.orderCmds.put(cmdRef.order, cmdRef);
-        }
+        this.children.prepare();
+
         super.prepare(_paramCache);
     }
 
@@ -191,7 +127,7 @@ public class Channel_mxJPO
      * <li>{@link #height}</li>
      * <li>settings defined as properties starting with &quot;%&quot; in
      *     {@link #getPropertiesMap()}</li>
-     * <li>command references {@link #orderCmds}</li>
+     * <li>command references {@link #children}</li>
      * </ul>
      *
      * @param _paramCache   parameter cache
@@ -200,108 +136,100 @@ public class Channel_mxJPO
      *                     written
      */
     @Override()
-    protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Appendable _out)
         throws IOException
     {
+        this.writeHeader(_paramCache, _out);
+
+        _out.append("mxUpdate channel \"${NAME}\"  {\n")
+            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n");
         if (this.isHidden())  {
-            _out.append(" \\\n    hidden");
+            _out.append("    hidden\n");
         }
-        _out.append(" \\\n    label \"").append(StringUtil_mxJPO.convertTcl(this.label)).append("\"");
-        if (this.href != null)  {
-            _out.append(" \\\n    href \"").append(StringUtil_mxJPO.convertTcl(this.href)).append("\"");
+        _out.append("    label \"").append(StringUtil_mxJPO.convertUpdate(this.getLabel())).append("\"\n")
+            .append("    alt \"").append(StringUtil_mxJPO.convertUpdate(this.getAlt())).append("\"\n");
+        if ((this.getHref() != null) && !this.getHref().isEmpty())  {
+            _out.append("    href \"").append(StringUtil_mxJPO.convertUpdate(this.getHref())).append("\"\n");
         }
-        if (this.alt != null)  {
-            _out.append(" \\\n    alt \"").append(StringUtil_mxJPO.convertTcl(this.alt)).append("\"");
-        }
-        if (this.height != null)  {
-            _out.append(" \\\n    height \"").append(this.height.toString()).append("\"");
-        }
-        // settings
-        for (final AdminProperty prop : this.getProperties())  {
-            if (prop.isSetting())  {
-                _out.append(" \\\n    add setting \"")
-                    .append(StringUtil_mxJPO.convertTcl(prop.getName().substring(1))).append("\"")
-                    .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getValue())).append("\"");
-            }
-        }
-        // referenced commands
-        for (final CommandRef cmdRef : this.orderCmds.values())  {
-            _out.append(" \\\n    place \"").append(StringUtil_mxJPO.convertTcl(cmdRef.name)).append("\" after \"\"");
-        }
+        _out.append("    height ").append(String.valueOf(this.height)).append("\n");
+
+        this.getProperties().writeSettings(_paramCache, _out, "    ");
+
+        this.children.write(_out);
+
+        this.getProperties().writeProperties(_paramCache, _out, "    ");
+
+        _out.append("}");
     }
 
     /**
-     * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this channel. Following steps
-     * are done:
-     * <ul>
-     * <li>reset HRef, description, alt and label</li>
-     * <li>set height to 0</li>
-     * <li>remove all settings and commands</li>
-     * </ul>
+     * The method is called from the TCL update code to define the this
+     * menu.
      *
-     * @param _paramCache       parameter cache
-     * @param _preMQLCode       MQL statements which must be called before the
-     *                          TCL code is executed
-     * @param _postMQLCode      MQL statements which must be called after the
-     *                          TCL code is executed
-     * @param _preTCLCode       TCL code which is defined before the source
-     *                          file is sourced
-     * @param _tclVariables     map of all TCL variables where the key is the
-     *                          name and the value is value of the TCL variable
-     *                          (the value is automatically converted to TCL
-     *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update from derived class failed
+     * @param _paramCache   parameter cache
+     * @param _args         first index defines the use case (must be
+     *                      &quot;updateAttribute&quot; that the attribute
+     *                      is updated); second index the name of the attribute
+     *                      to update
+     * @throws Exception if the update of the dimension failed or for all other
+     *                   use cases from super JPO call
      */
     @Override()
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final CharSequence _preMQLCode,
-                          final CharSequence _postMQLCode,
-                          final CharSequence _preTCLCode,
-                          final Map<String,String> _tclVariables,
-                          final File _sourceFile)
+    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
+                               final String... _args)
         throws Exception
     {
-        // reset HRef, description, alt, label and height
-        final StringBuilder preMQLCode = new StringBuilder()
-                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                .append(" !hidden href \"\" description \"\" alt \"\" label \"\" height 0");
-
-        // reset settings
-        for (final AdminProperty prop : this.getProperties())  {
-            if (prop.isSetting())  {
-                preMQLCode.append(" remove setting \"").append(StringUtil_mxJPO.convertMql(prop.getName().substring(1))).append('\"');
+        // check if dimension is defined
+        if ((_args.length == 4) && "mxUpdate".equals(_args[0]) && "channel".equals(_args[1])) {
+// TODO: Exception Handling
+            // check that command names are equal
+            if (!this.getName().equals(_args[2]))  {
+                throw new Exception("wrong channel '" + _args[1] + "' is set to update (currently channel '" + this.getName() + "' is updated!)");
             }
+
+            final String code = _args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
+
+            final ChannelDefParser_mxJPO parser = new ChannelDefParser_mxJPO(new StringReader(code));
+            final Channel_mxJPO menu = parser.parse(_paramCache, this.getTypeDef(), this.getName());
+
+            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod channel $1", this.getName());
+
+            this.calcDelta(_paramCache, mql, menu);
+
+            mql.exec(_paramCache);
+
+        } else  {
+            super.jpoCallExecute(_paramCache, _args);
         }
-
-        // remove commands
-        for (final CommandRef cmdRef : this.orderCmds.values())  {
-            preMQLCode.append(" remove command \"").append(StringUtil_mxJPO.convertMql(cmdRef.name)).append('\"');
-        }
-
-        // append already existing pre MQL code
-        preMQLCode.append(";\n")
-                  .append(_preMQLCode);
-
-        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
     }
 
-    /**
-     * Stores information about the command reference of channels.
-     */
-    private class CommandRef
-    {
-        /**
-         * Order of the command reference within a channel.
-         */
-        Integer order;
 
-        /**
-         * Name of the referenced command.
-         */
-        String name;
+    /**
+     * Calculates the delta between this current menu definition and the
+     * {@code _target} menu definition and appends the MQL append commands
+     * to {@code _cmd}.
+     *
+     * @param _paramCache   parameter cache
+     * @param _cmd          string builder to append the MQL commands
+     * @param _target       target format definition
+     * @throws UpdateException_mxJPO if update is not allowed (because data can
+     *                      be lost)
+     */
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MultiLineMqlBuilder _mql,
+                             final Channel_mxJPO _target)
+        throws UpdateException_mxJPO
+    {
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "description", _target.getDescription(),       this.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      _target.isHidden(),             this.isHidden());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "label",       _target.getLabel(),             this.getLabel());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "alt",         _target.getAlt(),               this.getAlt());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "href",        _target.getHref(),              this.getHref());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "height",      String.valueOf(_target.height), String.valueOf(this.height));
+
+        _target.children.calcDelta(_mql, WriteAppendChildSyntax.Place, this.children);
+
+        _target.getProperties().calcDelta(_mql, "", this.getProperties());
     }
 }

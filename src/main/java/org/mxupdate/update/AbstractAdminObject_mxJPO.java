@@ -34,6 +34,7 @@ import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO;
 import org.mxupdate.update.datamodel.Dimension_mxJPO;
 import org.mxupdate.update.datamodel.Format_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
+import org.mxupdate.update.userinterface.Channel_mxJPO;
 import org.mxupdate.update.userinterface.Command_mxJPO;
 import org.mxupdate.update.userinterface.Menu_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
@@ -555,6 +556,7 @@ public abstract class AbstractAdminObject_mxJPO
                 && !(this instanceof Format_mxJPO)
                 && !(this instanceof Dimension_mxJPO)
                 && !(this instanceof Policy_mxJPO)
+                && !(this instanceof Channel_mxJPO)
                 && !(this instanceof Command_mxJPO)
                 && !(this instanceof Menu_mxJPO))  {
 

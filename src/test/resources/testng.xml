@@ -22,6 +22,7 @@
         <packages>
             <package name="org.mxupdate.test.update.datamodel"/>
             <package name="org.mxupdate.test.update.userinterface"/>
+            <package name="org.mxupdate.test.update.userinterface.helper"/>
         </packages>
     </test>
 
