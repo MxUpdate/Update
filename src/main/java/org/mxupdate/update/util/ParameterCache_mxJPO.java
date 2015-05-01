@@ -60,18 +60,6 @@ public class ParameterCache_mxJPO
     public static final String KEY_DEFAULTAUTHOR = "DefaultAuthor";
 
     /**
-     * String of the key within the parameter cache for the default installer
-     * parameter.
-     */
-    public static final String KEY_DEFAULTINSTALLER = "DefaultInstaller";
-
-    /**
-     * String of the key within the parameter cache for the installer
-     * parameter.
-     */
-    public static final String KEY_INSTALLER = "Installer";
-
-    /**
      * String of the key within the parameter cache for the version parameter.
      */
     public static final String KEY_VERSION = "Version";
@@ -334,6 +322,28 @@ public class ParameterCache_mxJPO
     }
 
     /**
+     * Evaluated if given key is defined in one of the value maps
+     * ({@link #mapBoolean}, {@link #mapInteger}, {@link #mapList},
+     * {@link #mapMap}, {@link #mapString}).
+     *
+     * @param _key      searched key
+     * @return <i>true</i> if the given key is defined; otherwise <i>false</i>
+     *         is returned
+     * @see #mapBoolean
+     * @see #mapList
+     * @see #mapMap
+     * @see #mapString
+     */
+    public boolean contains(final ValueKeys _key)
+    {
+        return    this.mapBoolean.containsKey(_key.name())
+               || this.mapList   .containsKey(_key.name())
+               || this.mapInteger.containsKey(_key.name())
+               || this.mapMap    .containsKey(_key.name())
+               || this.mapString .containsKey(_key.name());
+    }
+
+    /**
      * Evaluated if given key is defined in the value maps.
      *
      * @param _key      searched key
@@ -344,10 +354,12 @@ public class ParameterCache_mxJPO
      * @see #mapMap
      * @see #mapString
      */
+    @Deprecated()
     public boolean contains(final String _key)
     {
         return this.mapBoolean.containsKey(_key)
                || this.mapList.containsKey(_key)
+               || this.mapInteger.containsKey(_key)
                || this.mapMap.containsKey(_key)
                || this.mapString.containsKey(_key);
     }
@@ -502,6 +514,20 @@ public class ParameterCache_mxJPO
      *         value is defined)
      * @see #mapString
      */
+    public String getValueString(final ValueKeys _key)
+    {
+        return this.mapString.get(_key.name());
+    }
+
+    /**
+     * Returns for given key the related string value.
+     *
+     * @param _key  key of searched string value
+     * @return string value for related key (or <code>null</code> if no string
+     *         value is defined)
+     * @see #mapString
+     */
+    @Deprecated()
     public String getValueString(final String _key)
     {
         return this.mapString.get(_key);
@@ -697,6 +723,11 @@ public class ParameterCache_mxJPO
      */
     public enum ValueKeys
     {
+        /** Used default installer in the properties if not defined. */
+        DefaultInstaller,
+        /** Installer from the command line. */
+        Installer,
+
         /**
          * Name of the parameter to define that the &quot;dimension&quot;
          * for attributes from current MX version is supported. The

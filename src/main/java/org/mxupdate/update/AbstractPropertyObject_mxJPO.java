@@ -43,96 +43,60 @@ public abstract class AbstractPropertyObject_mxJPO
     /**
      * String of the key within the parmater cache to define that symbolic
      * names must be always calculated.
-     *
-     * @see #extractSymbolicNameFromCode(ParameterCache_mxJPO, StringBuilder)
      */
     private static final String PARAM_CALCSYMBOLICNAMES = "CalcSymbolicNames";
 
     /**
      * String of the key within the parameter cache for the export application
      * parameter.
-     *
-     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
      */
     private static final String PARAM_EXPORTAPPLICATION = "ExportApplication";
 
     /**
      * String of the key within the parameter cache for the export author
      * parameter.
-     *
-     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
      */
     private static final String PARAM_EXPORTAUTHOR = "ExportAuthor";
 
     /**
-     * String of the key within the parameter cache for the export installer
-     * parameter.
-     *
-     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
-     */
-    private static final String PARAM_EXPORTINSTALLER = "ExportInstaller";
-
-    /**
      * String of the key within the parameter cache for the export original
      * name parameter.
-     *
-     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
      */
     private static final String PARAM_EXPORTORIGINALNAME = "ExportOriginalName";
 
     /**
      * String of the key within the parameter cache for the export version
      * parameter.
-     *
-     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
      */
     private static final String PARAM_EXPORTVERSION = "ExportVersion";
 
     /**
      * Header string of the application.
-     *
-     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
-     * @see #update(ParameterCache_mxJPO, File, String)
      */
     private static final String HEADER_APPLICATION = "\n# APPLICATION:\n# ~~~~~~~~~~~~\n#";
 
     /**
      * Header string of the author.
-     *
-     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
-     * @see #update(ParameterCache_mxJPO, File, String)
      */
     private static final String HEADER_AUTHOR = "\n# AUTHOR:\n# ~~~~~~~\n#";
 
     /**
      * Header string of the installer name.
-     *
-     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
-     * @see #update(ParameterCache_mxJPO, File, String)
      */
     private static final String HEADER_INSTALLER = "\n# INSTALLER:\n# ~~~~~~~~~~\n#";
 
     /**
      * Header string of the original name.
-     *
-     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
-     * @see #update(ParameterCache_mxJPO, File, String)
      */
     private static final String HEADER_ORIGINALNAME = "\n# ORIGINAL NAME:\n# ~~~~~~~~~~~~~~\n#";
 
     /**
      * Header string of the symbolic name.
-     *
-     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
-     * @see #extractSymbolicNameFromCode(ParameterCache_mxJPO, StringBuilder)
      */
     private static final String HEADER_SYMBOLIC_NAME = "\n# SYMBOLIC NAME:\n# ~~~~~~~~~~~~~~\n#";
 
     /**
      * Header string of the version.
-     *
-     * @see #writeHeader(ParameterCache_mxJPO, Appendable)
-     * @see #update(ParameterCache_mxJPO, File, String)
      */
     private static final String HEADER_VERSION = "\n# VERSION:\n# ~~~~~~~~\n#";
 
@@ -140,8 +104,6 @@ public abstract class AbstractPropertyObject_mxJPO
      * Test string used as output to test that the update runs correctly
      * (because it could be that no exception was thrown while an error happens
      * and the result is a rolled back transaction).
-     *
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
     private static final String TEST_EXECUTED = "MxUpdate Executed";
 
@@ -153,9 +115,6 @@ public abstract class AbstractPropertyObject_mxJPO
      * To get the complete definition, all quot's are replaced by {@code @0@0@}
      * and all apostroph's are replaced by {@code @1@1@}.
      * </p>
-     *
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
      */
     private static final String TCL_PROCEDURES
             = "proc puts {_sText}  {\n"
@@ -177,13 +136,13 @@ public abstract class AbstractPropertyObject_mxJPO
                 + "mql exec prog org.mxupdate.update.util.JPOCaller logTrace ${_sText}\n"
             + "}\n"
             + "proc mxUpdate {_sKind _sName _lsArgs}  {\n"
-                + "global APPLICATION AUTHOR FILEDATE FILENAME INSTALLEDDATE INSTALLER ORIGINALNAME VERSION\n"
+                + "global APPLICATION AUTHOR FILEDATE FILENAME ORIGINALNAME VERSION\n"
                 + "regsub -all {\\\\} $_lsArgs {@0@0@} sArg\n"
                 + "regsub -all {'}    $sArg    {@1@1@} sArg\n"
                 + "regsub -all {\\\"} $sArg    {@2@2@} sArg\n"
                 + "regsub -all {\\\\\\[} $sArg {[} sArg\n"
                 + "regsub -all {\\\\\\]} $sArg {]} sArg\n"
-                + "mql exec prog org.mxupdate.update.util.JPOCaller mxUpdate $_sKind $_sName \"${sArg}\" \"$APPLICATION\" \"$AUTHOR\" \"$FILEDATE\" \"$FILENAME\" \"$INSTALLEDDATE\" \"$INSTALLER\" \"$ORIGINALNAME\" \"$VERSION\" \"END\"\n"
+                + "mql exec prog org.mxupdate.update.util.JPOCaller mxUpdate $_sKind $_sName \"${sArg}\" \"$APPLICATION\" \"$AUTHOR\" \"$FILEDATE\" \"$FILENAME\" \"$ORIGINALNAME\" \"$VERSION\" \"END\"\n"
             + "}\n";
 
     /**
@@ -294,15 +253,6 @@ public abstract class AbstractPropertyObject_mxJPO
                 _out.append("\n");
             }
         }
-        // write installer
-        if (_paramCache.getValueBoolean(AbstractPropertyObject_mxJPO.PARAM_EXPORTINSTALLER))  {
-            _out.append('#').append(AbstractPropertyObject_mxJPO.HEADER_INSTALLER);
-            if ((this.getInstaller() != null) && !this.getInstaller().isEmpty())  {
-                _out.append(" ").append(this.getInstaller()).append('\n');
-            } else {
-                _out.append("\n");
-            }
-        }
         // write application
         if (_paramCache.getValueBoolean(AbstractPropertyObject_mxJPO.PARAM_EXPORTAPPLICATION))  {
             _out.append('#').append(AbstractPropertyObject_mxJPO.HEADER_APPLICATION);
@@ -396,12 +346,12 @@ public abstract class AbstractPropertyObject_mxJPO
 
         // define installer
         final String installer;
-        if (_paramCache.contains(ParameterCache_mxJPO.KEY_INSTALLER))  {
-            installer = _paramCache.getValueString(ParameterCache_mxJPO.KEY_INSTALLER);
+        if (_paramCache.contains(ValueKeys.Installer))  {
+            installer = _paramCache.getValueString(ValueKeys.Installer);
         } else  {
             installer = this.extractFromCode(code,
                                              AbstractPropertyObject_mxJPO.HEADER_INSTALLER,
-                                             _paramCache.getValueString(ParameterCache_mxJPO.KEY_DEFAULTINSTALLER));
+                                             _paramCache.getValueString(ValueKeys.DefaultInstaller));
         }
         tclVariables.put(PropertyDef_mxJPO.INSTALLER.name(), installer);
 
@@ -422,9 +372,6 @@ public abstract class AbstractPropertyObject_mxJPO
         // define file date
         tclVariables.put(PropertyDef_mxJPO.FILEDATE.name(),
                          StringUtil_mxJPO.formatFileDate(_paramCache, new Date(_file.lastModified())));
-
-        // define installation date
-        tclVariables.put(PropertyDef_mxJPO.INSTALLEDDATE.name(), StringUtil_mxJPO.formatInstalledDate(_paramCache, new Date()));
 
         // define file name
         tclVariables.put("FILENAME", _file.toString().replaceAll("\\\\", "/"));

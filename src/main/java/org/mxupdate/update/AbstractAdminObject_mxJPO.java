@@ -40,6 +40,7 @@ import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.xml.sax.Attributes;
@@ -708,11 +709,12 @@ final Object tmp = this;
                                final String... _args)
         throws Exception
     {
-        if ((_args.length == 13) && "mxUpdate".equals(_args[0]) && this.getTypeDef().getMxAdminName().equals(_args[1])) {
+        if ((_args.length == 11) && "mxUpdate".equals(_args[0]) && this.getTypeDef().getMxAdminName().equals(_args[1])) {
 
             final CLASS clazz = (CLASS) this.getTypeDef().newTypeInstance(_args[2]);
 
             // TODO: hard coded properties...
+            // will be handled as standard property
             clazz.getProperties().parse(_paramCache, "/property", "");
             clazz.getProperties().parse(_paramCache, "/property/name", "application");
             clazz.getProperties().parse(_paramCache, "/property/value", _args[4]);
@@ -723,21 +725,41 @@ final Object tmp = this;
             clazz.getProperties().parse(_paramCache, "/property/name", "file date");
             clazz.getProperties().parse(_paramCache, "/property/value", _args[6]);
             clazz.getProperties().parse(_paramCache, "/property", "");
-            clazz.getProperties().parse(_paramCache, "/property/name", "installed date");
+            clazz.getProperties().parse(_paramCache, "/property/name", "original name");
             clazz.getProperties().parse(_paramCache, "/property/value", _args[8]);
             clazz.getProperties().parse(_paramCache, "/property", "");
-            clazz.getProperties().parse(_paramCache, "/property/name", "installer");
-            clazz.getProperties().parse(_paramCache, "/property/value", _args[9]);
-            clazz.getProperties().parse(_paramCache, "/property", "");
-            clazz.getProperties().parse(_paramCache, "/property/name", "original name");
-            clazz.getProperties().parse(_paramCache, "/property/value", _args[10]);
-            clazz.getProperties().parse(_paramCache, "/property", "");
             clazz.getProperties().parse(_paramCache, "/property/name", "version");
-            clazz.getProperties().parse(_paramCache, "/property/value", _args[11]);
+            clazz.getProperties().parse(_paramCache, "/property/value", _args[9]);
 
             clazz.parseUpdate(_args[3].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\"));
 
-            clazz.getProperties().setValue4KeyValue(_paramCache, PropertyDef_mxJPO.SUBPATH, FileHandlingUtil_mxJPO.extraceSubPath(_args[7], this.getTypeDef().getFilePath()));
+
+            // installed date => reuse if already defined, new is not
+            final String curInstalledDate = this.getProperties().getValue4KeyValue(_paramCache, PropertyDef_mxJPO.INSTALLEDDATE);
+            clazz.getProperties().setValue4KeyValue(
+                    _paramCache,
+                    PropertyDef_mxJPO.INSTALLEDDATE,
+                    ((curInstalledDate != null) && !curInstalledDate.isEmpty()) ? curInstalledDate : StringUtil_mxJPO.formatInstalledDate(_paramCache, new Date()));
+
+            // installer
+            // => check if already defined
+            // => check if installed via parameter
+            // => use default installer
+            final String curInstaller = this.getProperties().getValue4KeyValue(_paramCache, PropertyDef_mxJPO.INSTALLER);
+            clazz.getProperties().setValue4KeyValue(
+                    _paramCache,
+                    PropertyDef_mxJPO.INSTALLER,
+                    _paramCache.contains(ValueKeys.Installer)
+                            ? _paramCache.getValueString(ValueKeys.Installer)
+                            : ((curInstaller != null) && !curInstaller.isEmpty())
+                                    ? curInstaller
+                                    : _paramCache.getValueString(ValueKeys.DefaultInstaller));
+
+            // calc sub path always
+            clazz.getProperties().setValue4KeyValue(
+                    _paramCache,
+                    PropertyDef_mxJPO.SUBPATH,
+                    FileHandlingUtil_mxJPO.extraceSubPath(_args[7], this.getTypeDef().getFilePath()));
 
             // initialize MQL builder (with or w/o suffix!)
             final MultiLineMqlBuilder mql;
