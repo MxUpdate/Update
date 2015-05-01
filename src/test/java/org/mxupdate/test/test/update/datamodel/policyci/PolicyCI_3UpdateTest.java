@@ -403,7 +403,7 @@ public class PolicyCI_3UpdateTest
      */
     @IssueLink("33")
     @Test(description = "issue #33: export of policy with symbolic name property for state")
-    public void testPositiveExportNoPropertyDefinitionForStateSymbolicName()
+    public void positiveTestExportNoPropertyDefinitionForStateSymbolicName()
         throws Exception
     {
         this.mql("add policy " + PolicyCI_3UpdateTest.POLICY_NAME
@@ -413,7 +413,7 @@ public class PolicyCI_3UpdateTest
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyCI_3UpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyCI_3UpdateTest.POLICY_NAME + ".mxu",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(code.indexOf("mql add property \"state_create\"") < 0,
@@ -428,7 +428,7 @@ public class PolicyCI_3UpdateTest
      */
     @IssueLink("34")
     @Test(description = "issue #34: export of all symbolic names for states")
-    public void testPositiveExportAllSymbolicNamesForStatesDefined()
+    public void positiveTestExportAllSymbolicNamesForStatesDefined()
         throws Exception
     {
         this.mql("add policy " + PolicyCI_3UpdateTest.POLICY_NAME
@@ -438,12 +438,12 @@ public class PolicyCI_3UpdateTest
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyCI_3UpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyCI_3UpdateTest.POLICY_NAME + ".mxu",
                             "check that the correct file name is returned");
         final String code = export.getCode();
-        Assert.assertTrue(code.indexOf("registeredName \"state_create\"") >= 0,
+        Assert.assertTrue(code.indexOf("registeredname \"state_create\"") >= 0,
                           "check that symbolic name 'state_create' exists");
-        Assert.assertTrue(code.indexOf("registeredName \"state_exists\"") >= 0,
+        Assert.assertTrue(code.indexOf("registeredname \"state_exists\"") >= 0,
                           "check that symbolic name 'state_exists' exists");
     }
 
@@ -455,7 +455,7 @@ public class PolicyCI_3UpdateTest
      */
     @IssueLink("11")
     @Test(description = "issue #11: export of state symbolic name export if not defined")
-    public void testPositiveExportStateSymbolicNameExportedIfNotDefined()
+    public void positiveTestExportStateSymbolicNameExportedIfNotDefined()
         throws Exception
     {
         this.mql("add policy " + PolicyCI_3UpdateTest.POLICY_NAME
@@ -465,10 +465,10 @@ public class PolicyCI_3UpdateTest
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyCI_3UpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyCI_3UpdateTest.POLICY_NAME + ".mxu",
                             "check that the correct file name is returned");
         final String code = export.getCode();
-        Assert.assertTrue(code.indexOf("registeredName \"state_create\"") >= 0,
+        Assert.assertTrue(code.indexOf("registeredname \"state_create\"") >= 0,
                           "check that symbolic name 'state_create' exists");
     }
 
@@ -479,7 +479,7 @@ public class PolicyCI_3UpdateTest
      */
     @IssueLink("86")
     @Test(description = "issue #86: update policy with all formats in braces")
-    public void testPositiveUpdateFormatAllWithBraces()
+    public void positiveTestUpdateFormatAllWithBraces()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
@@ -504,7 +504,7 @@ public class PolicyCI_3UpdateTest
      */
     @IssueLink("86")
     @Test(description = "issue #86: update policy with all formats in braces")
-    public void testPositiveUpdateFormatAllWithoutBraces()
+    public void positiveTestUpdateFormatAllWithoutBraces()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
@@ -529,7 +529,7 @@ public class PolicyCI_3UpdateTest
      */
     @IssueLink("11")
     @Test(description = "issue #11: update policy with multiple symbolic names for one state")
-    public void testPositiveUpdateMultipleStateSymbolicNames()
+    public void positiveTestUpdateMultipleStateSymbolicNames()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
@@ -564,7 +564,7 @@ public class PolicyCI_3UpdateTest
      */
     @IssueLink("11")
     @Test(description = "issue #11: update policy with no properties")
-    public void testPositiveUpdateNullProperties()
+    public void positiveTestUpdateNullProperties()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
@@ -595,7 +595,7 @@ public class PolicyCI_3UpdateTest
      */
     @IssueLink("11")
     @Test(description = "issue #11: check update of policy without state symbolic names are updated without property definition for states")
-    public void testPositiveUpdateProperties()
+    public void positiveTestUpdateProperties()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
@@ -606,14 +606,14 @@ public class PolicyCI_3UpdateTest
                           "policy was not created!");
 
         // check that only 11 properties are defined....
-        // 4 state properties + installer + installed date + original name +
-        // file date + author + version + application
+        // 4 state properties + installer + installed date
+        //      + MxUpdate File Date + MxUpdate Sub Path
         final Set<String> propNames = new HashSet<String>();
         final String propNamesStr = this.mql("print policy " + policy.getName() +" select property.name dump '\n'");
         for (final String propName : propNamesStr.split("\n"))  {
             propNames.add(propName);
         }
-        Assert.assertTrue(propNames.size() == 11, "check that all properties are defined");
+        Assert.assertTrue(propNames.size() == 8, "check that all properties are defined, found " + propNames);
         Assert.assertTrue(this.mql("print policy " + policy.getName()).indexOf("property  value ") < 0,
                           "Update did set an empty property!");
     }
@@ -625,7 +625,7 @@ public class PolicyCI_3UpdateTest
      */
     @IssueLink("86")
     @Test(description = "issue #86: update policy with all types in braces")
-    public void testPositiveUpdateTypeAllWithBraces()
+    public void positiveTestUpdateTypeAllWithBraces()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
@@ -650,7 +650,7 @@ public class PolicyCI_3UpdateTest
      */
     @IssueLink("86")
     @Test(description = "issue #86: update policy with all types in braces")
-    public void testPositiveUpdateTypeAllWithoutBraces()
+    public void positiveTestUpdateTypeAllWithoutBraces()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
@@ -675,7 +675,7 @@ public class PolicyCI_3UpdateTest
      */
     @IssueLink("100")
     @Test(description = "issue #100: test that existing store will be removed")
-    public void testPositiveRemoveStore()
+    public void positiveTestRemoveStore()
         throws Exception
     {
         new PolicyData(this, "Test")
@@ -695,7 +695,7 @@ public class PolicyCI_3UpdateTest
      */
     @IssueLink("151")
     @Test(description = "issue #151: test update state definition for user with no filter (if a filter is defined)")
-    public void testPositiveUpdateRemoveFilter()
+    public void positiveTestUpdateRemoveFilter()
         throws Exception
     {
         final PersonAdminData creator = new PersonAdminData(this, "creator").create();
@@ -726,7 +726,7 @@ public class PolicyCI_3UpdateTest
      */
     @IssueLink("155")
     @Test(description = "check the the update of a branch for a signature works")
-    public void testPositiveUpdateSignatureBranch()
+    public void positiveTestUpdateSignatureBranch()
         throws Exception
     {
         final PolicyData policy = new PolicyData(this, "Test")
