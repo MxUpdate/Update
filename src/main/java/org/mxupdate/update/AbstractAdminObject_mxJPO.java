@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.StringReader;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.Stack;
@@ -259,45 +258,6 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     }
 
     /**
-     * The method overwrites the original method append MQL code to
-     * <ul>
-     * <li>remove all existing {@link #propertiesMap properties}</li>
-     * <li>define the TCL variable for the name</li>
-     * <li>define property &quot;version&quot;</li>
-     * <li>define property &quot;file date&quot;</li>
-     * <li>define &quot;installed&quot; date property if not defined</li>
-     * <li>define &quot;installer&quot; property if not defined</li>
-     * <li>define &quot;original name&quot; property if not defined</li>
-     * <li>define &quot;application&quot; property if not set or not equal to
-     *     defined value from user</li>
-     * <li>define &quot;author&quot; property if not set or not equal to value
-     *     from TCL update code (or to default value if not defined in TCL
-     *     update code)</li>
-     * <li>register administration object (if not already done) and remove all
-     *     symbolic names which are not correct</li>
-     * </ul>
-     * Then the update method of the super class is called.
-     *
-     * @param _paramCache       parameter cache
-     * @param _tclVariables     map of all TCL variables where the key is the
-     *                          name and the value is value of the TCL variable
-     *                          (the value is automatically converted to TCL
-     *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update from the derived class failed
-     */
-    @Override()
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final Map<String,String> _tclVariables,
-                          final File _sourceFile)
-        throws Exception
-    {
-        _tclVariables.put("NAME", this.getName());
-        _tclVariables.putAll(_tclVariables);
-        super.update(_paramCache, _tclVariables, _sourceFile);
-    }
-
-    /**
      * The method is called within the update of an administration object. The
      * method is called directly within the update.
      * <ul>
@@ -319,12 +279,13 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
                                final String _file,
                                final String _fileDate,
-                               final String _name,
-                               final String _revision,
-                               final String _code)
+                               final String _code,
+                               final boolean _create)
         throws Exception
     {
-        final CLASS clazz = (CLASS) this.getTypeDef().newTypeInstance(_name);
+        this.parse(_paramCache);
+
+        final CLASS clazz = (CLASS) this.getTypeDef().newTypeInstance(this.getName());
         clazz.parseUpdate(_code);
 
         // MxUpdate File Date => must be always overwritten if newer!

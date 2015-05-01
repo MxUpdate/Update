@@ -15,6 +15,8 @@
 
 package org.mxupdate.test.test.update.userinterface;
 
+import java.io.File;
+
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
@@ -89,7 +91,7 @@ public class TableCI_2DeltaDefaultTest
                 .setValue("select", "")
                 .getFormTable());
 
-        final MultiLineMqlBuilder mql = currentWrapper.calcDelta(paramCache, previousWrapper);
+        final MultiLineMqlBuilder mql = currentWrapper.calcDelta(paramCache, (File) null, previousWrapper);
 
         Assert.assertFalse(mql.hasNewLines(), "no MQL update needed, but found:\n" + mql);
     }

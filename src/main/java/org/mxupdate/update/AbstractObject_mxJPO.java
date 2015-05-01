@@ -108,17 +108,20 @@ public abstract class AbstractObject_mxJPO
         throws Exception;
 
     /**
-     * Updated this administration (business) object.
+     * The method is called from the JPO caller interface.
      *
      * @param _paramCache   parameter cache
-     * @param _create       <i>true</i> if the CI object is new created (and
-     *                      first update is done)
-     * @param _file         reference to the file to update
-     * @throws Exception if update failed
+     * @param _file         file
+     * @param _fileDate     date of file
+     * @param _code         code to update
+     * @param _create       first created
+     * @throws Exception never, only dummy
      */
-    public abstract void update(final ParameterCache_mxJPO _paramCache,
-                                final boolean _create,
-                                final File _file)
+    abstract public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
+                                        final String _file,
+                                        final String _fileDate,
+                                        final String _code,
+                                        final boolean _create)
         throws Exception;
 
     /**

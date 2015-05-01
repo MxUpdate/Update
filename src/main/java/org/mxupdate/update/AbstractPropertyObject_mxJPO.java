@@ -15,24 +15,15 @@
 
 package org.mxupdate.update;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import matrix.util.MatrixException;
 
-import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
-import org.mxupdate.update.util.JPOCaller_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
-import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
-import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 
@@ -45,83 +36,6 @@ public abstract class AbstractPropertyObject_mxJPO<CLASS extends AbstractPropert
     extends AbstractObject_mxJPO
 {
     /**
-     * Test string used as output to test that the update runs correctly
-     * (because it could be that no exception was thrown while an error happens
-     * and the result is a rolled back transaction).
-     */
-    private static final String TEST_EXECUTED = "MxUpdate Executed";
-
-    /**
-     * <p>Defines the TCL procedures for updates and for logging purposes which
-     * are executed by {@link #jpoCallExecute(ParameterCache_mxJPO, String...)}.
-     * </p>
-     * <p><b>Hint:</b><br/>
-     * To get the complete definition, all quot's are replaced by {@code @0@0@}
-     * and all apostroph's are replaced by {@code @1@1@}.
-     * </p>
-     */
-    private static final String TCL_PROCEDURES
-            = "proc puts {_sText}  {\n"
-                + "mql exec prog org.mxupdate.update.util.JPOCaller logDebug ${_sText}\n"
-            + "}\n"
-            + "proc logError {_sText}  {\n"
-                + "mql exec prog org.mxupdate.update.util.JPOCaller logError ${_sText}\n"
-            + "}\n"
-            + "proc logWarning {_sText}  {\n"
-                + "mql exec prog org.mxupdate.update.util.JPOCaller logWarning ${_sText}\n"
-            + "}\n"
-            + "proc logInfo {_sText}  {\n"
-                + "mql exec prog org.mxupdate.update.util.JPOCaller logInfo ${_sText}\n"
-            + "}\n"
-            + "proc logDebug {_sText}  {\n"
-                + "mql exec prog org.mxupdate.update.util.JPOCaller logDebug ${_sText}\n"
-            + "}\n"
-            + "proc logTrace {_sText}  {\n"
-                + "mql exec prog org.mxupdate.update.util.JPOCaller logTrace ${_sText}\n"
-            + "}\n"
-            + "proc mxUpdate {_sKind _sName _sReviLsArg {_lsArgs 0}}  {\n"
-                + "global FILEDATE FILENAME\n"
-                + "if {$_lsArgs == 0}  {\n"
-                        + "set sCode $_sReviLsArg\n"
-                        + "set sRevi \"\""
-                + "} else  {\n"
-                        + "set sCode $_lsArgs\n"
-                        + "set sRevi $_sReviLsArg"
-                + "}\n"
-                // file name
-                + "regsub -all {\\\\} $FILENAME     {@0@0@} sFileName;"
-                + "regsub -all {'}    $sFileName    {@1@1@} sFileName;"
-                + "regsub -all {\\\"} $sFileName    {@2@2@} sFileName;"
-                + "regsub -all {\\\\\\[} $sFileName {[} sFileName;"
-                + "regsub -all {\\\\\\]} $sFileName {]} sFileName\n"
-                // file date
-                + "regsub -all {\\\\} $FILEDATE     {@0@0@} sFileDate;"
-                + "regsub -all {'}    $sFileDate    {@1@1@} sFileDate;"
-                + "regsub -all {\\\"} $sFileDate    {@2@2@} sFileDate;"
-                + "regsub -all {\\\\\\[} $sFileDate {[} sFileDate;"
-                + "regsub -all {\\\\\\]} $sFileDate {]} sFileDate\n"
-                // name
-                + "regsub -all {\\\\} $_sName       {@0@0@} sName;"
-                + "regsub -all {'}    $sName        {@1@1@} sName;"
-                + "regsub -all {\\\"} $sName        {@2@2@} sName;"
-                + "regsub -all {\\\\\\[} $sName     {[} sName;"
-                + "regsub -all {\\\\\\]} $sName     {]} sName\n"
-                // revision
-                + "regsub -all {\\\\} $sRevi        {@0@0@} sRevi;"
-                + "regsub -all {'}    $sRevi        {@1@1@} sRevi;"
-                + "regsub -all {\\\"} $sRevi        {@2@2@} sRevi;"
-                + "regsub -all {\\\\\\[} $sRevi     {[} sRevi;"
-                + "regsub -all {\\\\\\]} $sRevi     {]} sRevi\n"
-                // code
-                + "regsub -all {\\\\} $sCode        {@0@0@} sCode;"
-                + "regsub -all {'}    $sCode        {@1@1@} sCode;"
-                + "regsub -all {\\\"} $sCode        {@2@2@} sCode;"
-                + "regsub -all {\\\\\\[} $sCode     {[} sCode;"
-                + "regsub -all {\\\\\\]} $sCode     {]} sCode\n"
-                + "mql exec prog org.mxupdate.update.util.JPOCaller mxUpdate $_sKind $sFileName $sFileDate $sName $sRevi $sCode END\n"
-            + "}\n";
-
-    /**
      * Constructor used to initialize the type definition enumeration.
      *
      * @param _typeDef  defines the related type definition enumeration
@@ -131,129 +45,6 @@ public abstract class AbstractPropertyObject_mxJPO<CLASS extends AbstractPropert
                                            final String _mxName)
     {
         super(_typeDef, _mxName);
-    }
-
-    /**
-     * Updates this administration (business) object if the stored information
-     * about the version is not the same as the file date. If an update is
-     * required, the file is read and the object is updated with
-     * {@link #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)}.
-     *
-     * @param _paramCache   parameter cache
-     * @param _create       <i>true</i> if the CI object is new created (and
-     *                      first update is done)
-     * @param _file         file with TCL update code
-     * @throws Exception if the update from the derived class failed
-     */
-    @Override()
-    public void update(final ParameterCache_mxJPO _paramCache,
-                       final boolean _create,
-                       final File _file)
-        throws Exception
-    {
-        // parse objects
-        this.parse(_paramCache);
-
-        final Map<String,String> tclVariables = new HashMap<String,String>();
-
-        // define file date
-        tclVariables.put(PropertyDef_mxJPO.FILEDATE.name(), StringUtil_mxJPO.formatFileDate(_paramCache, new Date(_file.lastModified())));
-
-        // define file name
-        tclVariables.put("FILENAME", _file.toString().replaceAll("\\\\", "/"));
-
-        try {
-            this.update(_paramCache, tclVariables, _file);
-        } catch (final Exception e) {
-            if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {
-                _paramCache.logError(e.toString());
-            } else {
-                throw e;
-            }
-        }
-    }
-
-    /**
-     * The method is called from the JPO caller interface.
-     *
-     * @param _paramCache   parameter cache
-     * @param _args         arguments, not used
-     * @throws Exception never, only dummy
-     */
-    abstract public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
-                                        final String _file,
-                                        final String _fileDate,
-                                        final String _name,
-                                        final String _revision,
-                                        final String _code)
-        throws Exception;
-
-    /**
-     * The method updates this administration (business) object. First all MQL
-     * commands are concatenated:
-     * <ul>
-     * <li>pre MQL commands (from parameter <code>_preMQLCode</code>)</li>
-     * <li>change to TCL mode</li>
-     * <li>define the {@link #TCL_LOG_PROCS TCL logging procedures}</li>
-     * <li>set all required TCL variables (from parameter
-     *     <code>_tclVariables</code>)</li>
-     * <li>append TCL update code from file (from parameter
-     *     <code>_tclCode</code>)</li>
-     * <li>change back to MQL mode</li>
-     * <li>append post MQL statements (from parameter
-     *     <code>_postMQLCode</code>)</li>
-     * </ul>
-     * At the end of the MQL statements, {@link #TEST_EXECUTED} is printed via
-     * MQL command &quot;<code>output</code> so that this output is returned
-     * from the MQL execution. The return of the MQL execution is tested if
-     * this output is returned. If not an exception is thrown because the
-     * update failed.
-     *
-     * @param _paramCache       parameter cache
-     * @param _tclVariables     map of all TCL variables where the key is the
-     *                          name and the value is value of the TCL variable
-     *                          (the value is automatically converted to TCL
-     *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update; if
-     *                          <code>null</code> file is not called (sourced)
-     * @throws Exception if update failed
-     * @see #TCL_LOG_PROCS
-     */
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final Map<String,String> _tclVariables,
-                          final File _sourceFile)
-        throws Exception
-    {
-        final StringBuilder cmd = new StringBuilder();
-
-        // append TCL mode
-        cmd.append("tcl;\n")
-           .append("eval  {\n")
-           .append(AbstractPropertyObject_mxJPO.TCL_PROCEDURES);
-
-
-        // define all TCL variables
-        for (final Map.Entry<String, String> entry : _tclVariables.entrySet())  {
-            cmd.append("set ").append(entry.getKey()).append(" \"").append(StringUtil_mxJPO.convertTcl(entry.getValue())).append("\"\n");
-        }
-        // append TCL code, end of TCL mode and post MQL statements
-        // (source with the file must be replace for windows ...)
-        if (_sourceFile != null)  {
-            cmd.append("\nsource \"").append(_sourceFile.toString().replaceAll("\\\\", "/")).append("\"");
-        }
-        cmd.append("\n}\nexit;\n")
-           .append("output '';output '").append(AbstractPropertyObject_mxJPO.TEST_EXECUTED).append("';");
-
-        // execute update
-        JPOCaller_mxJPO.defineInstance(_paramCache, this);
-        try  {
-            final String[] ret = MqlUtil_mxJPO.execMql(_paramCache, cmd).split("\n");
-            if (!AbstractPropertyObject_mxJPO.TEST_EXECUTED.equals(ret[ret.length - 1]))  {
-                throw new Exception("Execution of the update was not complete! Update Failed!");
-            }
-        } finally  {
-            JPOCaller_mxJPO.undefineInstance(_paramCache);
-        }
     }
 
     /**

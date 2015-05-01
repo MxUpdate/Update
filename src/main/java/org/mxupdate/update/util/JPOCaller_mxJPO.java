@@ -23,7 +23,10 @@ import java.util.Map;
 import matrix.db.Context;
 import matrix.util.MatrixException;
 
+import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.AbstractPropertyObject_mxJPO;
+import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 
 /**
@@ -41,7 +44,7 @@ public final class JPOCaller_mxJPO
      * Stores the current caller instance depending on the MX session context
      * id.
      */
-    private static final Map<String,AbstractPropertyObject_mxJPO<?>> CALLER_INSTANCE = new HashMap<String,AbstractPropertyObject_mxJPO<?>>();
+    private static final Map<String,TypeDef_mxJPO> CALLER_INSTANCE = new HashMap<String,TypeDef_mxJPO>();
 
     /**
      * Stores the current caller instance depending on the MX session context
@@ -80,12 +83,12 @@ public final class JPOCaller_mxJPO
      * @see #mxMain(Context, String[])
      */
     public static void defineInstance(final ParameterCache_mxJPO _paramCache,
-                                      final AbstractPropertyObject_mxJPO<?> _instance)
+                                      final TypeDef_mxJPO _typeDef)
             throws MatrixException
     {
         final String sessionId = _paramCache.getContext().getSession().getSessionId();
         JPOCaller_mxJPO.PARAM_CACHE.put(sessionId, _paramCache);
-        JPOCaller_mxJPO.CALLER_INSTANCE.put(sessionId, _instance);
+        JPOCaller_mxJPO.CALLER_INSTANCE.put(sessionId, _typeDef);
         MqlUtil_mxJPO.execMql(_paramCache,
                 new StringBuilder()
                     .append("escape set env global \"")
@@ -166,23 +169,27 @@ public final class JPOCaller_mxJPO
 
                 if (_args.length == 0)  {
                     throw new UpdateException_mxJPO(ErrorKey.JPOCALLER_JPO_CALL_METHOD_NOT_DEFINED);
-                } else if ("mxUpdate".equals(_args[0]) && (_args.length == 8))  {
-                    final AbstractPropertyObject_mxJPO<?> instance = JPOCaller_mxJPO.CALLER_INSTANCE.get(sessionId);
-                    if (instance == null)  {
-                        throw new Error("JPO Caller instance is not defined for session " + sessionId + "!");
+                } else if ("mxUpdate".equals(_args[0]) && (_args.length == 9))  {
+                    final TypeDef_mxJPO typeDef = JPOCaller_mxJPO.CALLER_INSTANCE.get(sessionId);
+                    if (typeDef == null)  {
+                        throw new Error("JPO Caller type definition is not defined for session " + sessionId + "!");
                     }
+
+                    final String name   = _args[4].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\");
+                    final String revi   = _args[5].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\");
+
+                    final AbstractObject_mxJPO instance = typeDef.newTypeInstance((typeDef.getMxAdminName() != null) ? name : name + BusObject_mxJPO.SPLIT_NAME + revi);
+
                     instance.jpoCallExecute(
                             paramCache.clone(_context),
                             // file
                             _args[2].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\"),
                             // file date
                             _args[3].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\"),
-                            // name
-                            _args[4].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\"),
-                            // revision
-                            _args[5].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\"),
                             // code
-                            _args[6].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\"));
+                            _args[6].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\"),
+                            // create
+                            Boolean.valueOf(_args[7].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\")));
                 } else if ("logDebug".equals(_args[0]) && (_args.length == 2))  {
                     paramCache.logDebug(_args[1]);
                 } else if ("logError".equals(_args[0]) && (_args.length == 2))  {

@@ -34,6 +34,7 @@ import org.mxupdate.mapping.Mapping_mxJPO;
 import org.mxupdate.typedef.export.IExport_mxJPO;
 import org.mxupdate.typedef.filenames.IMatcherFileNames_mxJPO;
 import org.mxupdate.typedef.mxnames.IMatcherMxNames_mxJPO;
+import org.mxupdate.typedef.update.IUpdate_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
@@ -97,7 +98,8 @@ public final class TypeDef_mxJPO
     private Class<? extends IMatcherFileNames_mxJPO> jpoMatchFileNames;
     /** JPO implementing the Fetch-Mx-Names interface. */
     private Class<? extends IMatcherMxNames_mxJPO> jpoMatchMxNames;
-
+    /** JPO implementing the Update interface. */
+    private Class<? extends IUpdate_mxJPO> jpoUpdate;
 
     /** Order number used within update. */
     private int orderNo = Integer.MAX_VALUE;
@@ -175,6 +177,7 @@ public final class TypeDef_mxJPO
                 case JpoExport:             typeDef.jpoExport           = (Class<? extends IExport_mxJPO>)           TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
                 case JpoMatchFileNames:     typeDef.jpoMatchFileNames   = (Class<? extends IMatcherFileNames_mxJPO>) TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
                 case JpoMatchMxNames:       typeDef.jpoMatchMxNames     = (Class<? extends IMatcherMxNames_mxJPO>)   TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
+                case JpoUpdate:             typeDef.jpoUpdate           = (Class<? extends IUpdate_mxJPO>)           TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
 
                 case OrderNo:               typeDef.orderNo = Integer.parseInt(_value);break;
 
@@ -610,6 +613,24 @@ public final class TypeDef_mxJPO
     }
 
     /**
+     * Updates given CI object with defined file.
+     *
+     * @param _paramCache   parameter cache
+     * @param _create       first run and the object is new created
+     * @param _mxName       MX name
+     * @param _file         file to update
+     * @throws Exception if update failed
+     */
+    public void update(final ParameterCache_mxJPO _paramCache,
+                       final boolean _create,
+                       final String _mxName,
+                       final File _file)
+       throws Exception
+    {
+        this.jpoUpdate.getConstructor().newInstance().update(_paramCache, this, _create, _mxName, _file);
+    }
+
+    /**
      * Compares this type definition with the <code>_other</code> type
      * definition. First the {@link #orderNo order number} is compared. If the
      * {@link #orderNo order number} is equal, the {@link #getName() name} is
@@ -677,10 +698,12 @@ public final class TypeDef_mxJPO
         JPO,
         /** Used prefix of the JPO names to export as file. */
         JpoExport,
-        /** Used prefix of the JPO names to fetch MX names. */
-        JpoMatchMxNames,
         /** Used prefix of the JPO names to match file names. */
         JpoMatchFileNames,
+        /** Used prefix of the JPO names to fetch MX names. */
+        JpoMatchMxNames,
+        /** Used prefix of the JPO name to update. */
+        JpoUpdate,
 
         /** Used logging text of type definitions within the property file. */
         TextLogging,

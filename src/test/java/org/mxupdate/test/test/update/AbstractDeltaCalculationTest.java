@@ -15,6 +15,8 @@
 
 package org.mxupdate.test.test.update;
 
+import java.io.File;
+
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
@@ -99,7 +101,7 @@ public abstract class AbstractDeltaCalculationTest<DATA extends AbstractProperty
             currentWrapper.parseUpdate(_currentData);
             final WrapperCIInstance<DATA> tmp = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()));
             tmp.parse(paramCache);
-            currentWrapper.calcDelta(paramCache,  tmp).exec(paramCache);
+            currentWrapper.calcDelta(paramCache,  (File) null, tmp).exec(paramCache);
             _currentData.checkExport(new ExportParser(_currentData.getCI(), currentWrapper.write(paramCache), ""));
 
             // prepare the target form
@@ -109,7 +111,7 @@ public abstract class AbstractDeltaCalculationTest<DATA extends AbstractProperty
             // delta between current and target
             final WrapperCIInstance<DATA> tmp2 = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _targetData.getName()));
             tmp2.parse(paramCache);
-            targetWrapper.calcDelta(paramCache, tmp2).exec(paramCache);
+            targetWrapper.calcDelta(paramCache, (File) null, tmp2).exec(paramCache);
 
             // check result from MX defined from calculated delta
             final WrapperCIInstance<DATA> resultWrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _targetData.getName()));

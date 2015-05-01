@@ -13,7 +13,7 @@
  *
  */
 
-package org.mxupdate.test.test.update.program;
+package org.mxupdate.test.test.typedef.update;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +24,8 @@ import matrix.util.MatrixException;
 import org.apache.commons.io.FileUtils;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.test.update.WrapperCIInstance;
+import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.typedef.update.UpdateAdminProgramJPO_mxJPO;
 import org.mxupdate.update.program.JPOProgram_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.Assert;
@@ -37,7 +39,7 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-public class JPOProgramCI_5UpdateTest
+public class UpdateAdminProgramJPOTest
     extends AbstractTest
 {
     /** Original files. */
@@ -46,7 +48,7 @@ public class JPOProgramCI_5UpdateTest
     /**
      * Initialize the file handlers.
      */
-    public JPOProgramCI_5UpdateTest()
+    public UpdateAdminProgramJPOTest()
     {
         this.origDir         = new File(this.getResourcesDir(), "program/jpo");
         this.origJPO         = new File(this.origDir, "MXUPDATE_Test_mxJPO.java");
@@ -90,25 +92,27 @@ public class JPOProgramCI_5UpdateTest
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
 
         this.mql("add prog '" + _name + "' java");
-        new JPOProgram_mxJPO(paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _name) {
+        new UpdateAdminProgramJPO_mxJPO() {
 
             boolean updateCalled = false;
 
             {
-                this.update(paramCache, true, _file);
+                this.update(paramCache, paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), false, _name, _file);
 
                 Assert.assertEquals(this.updateCalled, _expUpdateCalled, "update called?");
             }
+
             @Override()
-            protected void update(final ParameterCache_mxJPO _paramCache,
-                                  final Map<String,String> _tclVariables,
-                                  final File _sourceFile)
+            protected void executeUpdate(final ParameterCache_mxJPO _paramCache,
+                                         final TypeDef_mxJPO _typeDef,
+                                         final Map<String,String> _tclVariables,
+                                         final File _file)
                 throws Exception
             {
                 this.updateCalled = true;
 
-                final WrapperCIInstance<JPOProgram_mxJPO> wrapper = new WrapperCIInstance<JPOProgram_mxJPO>(this);
-                wrapper.parseUpdate(FileUtils.readFileToString(_sourceFile));
+                final WrapperCIInstance<JPOProgram_mxJPO> wrapper = new WrapperCIInstance<JPOProgram_mxJPO>((JPOProgram_mxJPO) _typeDef.newTypeInstance(_name));
+                wrapper.parseUpdate(FileUtils.readFileToString(_file));
                 wrapper.store(_file, _paramCache);
             }
         };
@@ -122,7 +126,7 @@ public class JPOProgramCI_5UpdateTest
         Assert.assertEquals(
                 !this.mql("print prog '" + _name + "' select description dump").isEmpty(),
                 _expUpdateCalled,
-                "code defined");
+                "description defined");
     }
 
     @BeforeMethod()

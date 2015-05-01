@@ -160,11 +160,12 @@ public class WrapperCIInstance<DATA extends AbstractPropertyObject_mxJPO<?>>
      * Calculates the delta.
      *
      * @param _paramCache   parameter cache
-     * @param _mql          MQL builder
+     * @param _file         file to update
      * @param _current      current instance
      * @throws Exception if calculation failed
      */
     public MultiLineMqlBuilder calcDelta(final ParameterCache_mxJPO _paramCache,
+                                         final File _file,
                                          final WrapperCIInstance<DATA> _current)
         throws Exception
     {
@@ -172,12 +173,12 @@ public class WrapperCIInstance<DATA extends AbstractPropertyObject_mxJPO<?>>
 
         // initialize MQL builder depending on the type
         if ((this.getTypeDef().getMxAdminSuffix()) != null && !this.getTypeDef().getMxAdminSuffix().isEmpty())  {
-            ret = MqlBuilder_mxJPO.multiLine((File) null, "escape mod " + this.data.getTypeDef().getMxAdminName() + " $1 " + this.data.getTypeDef().getMxAdminSuffix(), _current.data.getName());
+            ret = MqlBuilder_mxJPO.multiLine(_file, "escape mod " + this.data.getTypeDef().getMxAdminName() + " $1 " + this.data.getTypeDef().getMxAdminSuffix(), _current.data.getName());
         } else if (this.getTypeDef().getMxAdminName() != null) {
-            ret = MqlBuilder_mxJPO.multiLine((File) null, "escape mod " + this.data.getTypeDef().getMxAdminName() + " $1", this.data.getName());
+            ret = MqlBuilder_mxJPO.multiLine(_file, "escape mod " + this.data.getTypeDef().getMxAdminName() + " $1", this.data.getName());
         } else  {
             final BusObject_mxJPO bus = (BusObject_mxJPO) this.data;
-            ret = MqlBuilder_mxJPO.multiLine((File) null, "escape mod bus $1 $2 $3", bus.getBusType(), bus.getBusName(), bus.getBusRevision());
+            ret = MqlBuilder_mxJPO.multiLine(_file, "escape mod bus $1 $2 $3", bus.getBusType(), bus.getBusName(), bus.getBusRevision());
         }
 
         Method write = this.evalMethod("calcDelta", ParameterCache_mxJPO.class, MultiLineMqlBuilder.class, this.data.getClass());
@@ -211,7 +212,7 @@ public class WrapperCIInstance<DATA extends AbstractPropertyObject_mxJPO<?>>
     {
         final WrapperCIInstance<DATA> newInstance = this.newInstance();
         newInstance.parse(_paramCache);
-        this.calcDelta(_paramCache, newInstance).exec(_paramCache);
+        this.calcDelta(_paramCache, _file, newInstance).exec(_paramCache);
     }
 
     /**

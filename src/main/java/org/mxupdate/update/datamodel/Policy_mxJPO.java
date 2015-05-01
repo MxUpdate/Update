@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.datamodel;
 
-import java.io.File;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -322,13 +321,15 @@ public class Policy_mxJPO
      * The {@code _create} flag is stored in {@link #updateWithCreate}.
      */
     @Override()
-    public void update(final ParameterCache_mxJPO _paramCache,
-                       final boolean _create,
-                       final File _file)
+    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
+                               final String _file,
+                               final String _fileDate,
+                               final String _code,
+                               final boolean _create)
         throws Exception
     {
         this.updateWithCreate = _create;
-        super.update(_paramCache, _create, _file);
+        super.jpoCallExecute(_paramCache, _file, _fileDate, _code, _create);
     }
 
     @Override()

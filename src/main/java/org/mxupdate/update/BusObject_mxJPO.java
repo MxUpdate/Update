@@ -321,29 +321,6 @@ public class BusObject_mxJPO
     }
 
     /**
-     * The method overwrites the original method to define TCL variables for the
-     * business object name and revision.
-     *
-     * @param _paramCache       parameter cache
-     * @param _tclVariables     map of all TCL variables where the key is the
-     *                          name and the value is value of the TCL variable
-     *                          (the value is automatically converted to TCL
-     *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update executed within derived class failed
-     */
-    @Override()
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final Map<String,String> _tclVariables,
-                          final File _sourceFile)
-        throws Exception
-    {
-        _tclVariables.put("NAME",this.busName);
-        _tclVariables.put("REVISION",this.busRevision);
-        super.update(_paramCache, _tclVariables, _sourceFile);
-    }
-
-    /**
      * Returns the business type of this business object instance.
      *
      * @return business type
@@ -446,14 +423,15 @@ public class BusObject_mxJPO
     public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
                                final String _file,
                                final String _fileDate,
-                               final String _name,
-                               final String _revision,
-                               final String _code)
+                               final String _code,
+                               final boolean _create)
         throws Exception
     {
-        final BusObject_mxJPO clazz = (BusObject_mxJPO) this.getTypeDef().newTypeInstance(_name + BusObject_mxJPO.SPLIT_NAME + _revision);
-        clazz.busType = this.busType;
+        final BusObject_mxJPO clazz = (BusObject_mxJPO) this.getTypeDef().newTypeInstance(this.busName + BusObject_mxJPO.SPLIT_NAME + this.busRevision);
         clazz.parseUpdate(_code);
+
+        this.busType = clazz.busType;
+        this.parse(_paramCache);
 
         // MxUpdate File Date => must be always overwritten if newer!
         final String attrFileDate = PropertyDef_mxJPO.FILEDATE.getAttrName(_paramCache);

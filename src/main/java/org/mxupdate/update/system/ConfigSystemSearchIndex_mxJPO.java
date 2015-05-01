@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.system;
 
-import java.io.File;
 import java.io.IOException;
 
 import matrix.util.MatrixException;
@@ -25,7 +24,6 @@ import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * Handles the export and update of the &quot;searchindex&quot; system
@@ -118,36 +116,14 @@ public class ConfigSystemSearchIndex_mxJPO
     public void delete(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        // TODO Auto-generated method stub
 throw new Exception("delete of search index not possible!");
     }
 
-    /**
-     * Deactivated because not possible.
-     *
-     * @param _paramCache   not used
-     * @param _file         file
-     */
     @Override()
     public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        // TODO Auto-generated method stub
 throw new Exception("create of search index not possible!");
-    }
-
-    @Override()
-    public void update(final ParameterCache_mxJPO _paramCache,
-                       final boolean _create,
-                       final File _file)
-        throws MatrixException
-    {
-// TODO: use formatted strings...
-        MqlUtil_mxJPO.execMql(
-                _paramCache,
-                new StringBuilder()
-                        .append("escape set system searchindex file \"")
-                        .append(StringUtil_mxJPO.convertMql(_file.toString())));
     }
 
     /**
@@ -162,5 +138,14 @@ throw new Exception("create of search index not possible!");
                                final PropertyDef_mxJPO _prop)
     {
         return null;
+    }
+
+    @Override()
+    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
+                               final String _file,
+                               final String _fileDate, final String _code, final boolean _create)
+        throws Exception
+    {
+throw new Exception("update of search index not possible!");
     }
 }

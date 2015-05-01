@@ -547,7 +547,7 @@ public class Person_mxJPO
      * @see PersonBus#parse(ParameterCache_mxJPO)
      * @see PersonAdmin#update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
-    @Override()
+/*    @Override()
     public void update(final ParameterCache_mxJPO _paramCache,
                        final boolean _create,
                        final File _file)
@@ -555,7 +555,7 @@ public class Person_mxJPO
     {
         this.personBus.parse(_paramCache);
         this.personAdmin.update(_paramCache, _create, _file);
-    }
+    }*/
 
     @Override()
     public void write(final ParameterCache_mxJPO _paramCache,
@@ -1087,5 +1087,13 @@ public class Person_mxJPO
             }
             return ret;
         }
+    }
+
+    @Override
+    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache, final String _file,
+            final String _fileDate, final String _code, final boolean _create) throws Exception
+    {
+        // TODO Auto-generated method stub
+
     }
 }

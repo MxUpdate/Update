@@ -15,6 +15,8 @@
 
 package org.mxupdate.test.test.update;
 
+import java.io.File;
+
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
@@ -92,7 +94,7 @@ public abstract class AbstractDeltaNoChangeTest<DATA extends AbstractAdminObject
             final WrapperCIInstance<DATA> currentWrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()));
             currentWrapper.create(paramCache);
             currentWrapper.parseUpdate(_currentData);
-            currentWrapper.calcDelta(paramCache, new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()))).exec(paramCache);
+            currentWrapper.calcDelta(paramCache, (File) null, new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()))).exec(paramCache);
 
             // read from MX
             final WrapperCIInstance<DATA> currentWrapper2Mx = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()));
@@ -101,7 +103,7 @@ public abstract class AbstractDeltaNoChangeTest<DATA extends AbstractAdminObject
             final WrapperCIInstance<DATA> currentWrapper2Update = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()));
             currentWrapper2Update.parseUpdate(_currentData);
             // calculate delta between MX and new parsed
-            final MultiLineMqlBuilder mql = currentWrapper2Update.calcDelta(paramCache, currentWrapper2Mx);
+            final MultiLineMqlBuilder mql = currentWrapper2Update.calcDelta(paramCache, (File) null, currentWrapper2Mx);
 
             Assert.assertFalse(mql.hasNewLines(), "no MQL update needed, but found:\n" + mql);
         }
@@ -123,7 +125,7 @@ public abstract class AbstractDeltaNoChangeTest<DATA extends AbstractAdminObject
 
         final WrapperCIInstance<DATA> currentWrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, AbstractTest.PREFIX + "Test"));
         currentWrapper.create(paramCache);
-        final MultiLineMqlBuilder mql = currentWrapper.calcDelta(paramCache, new WrapperCIInstance<DATA>(this.createNewData(paramCache, AbstractTest.PREFIX + "Test")));
+        final MultiLineMqlBuilder mql = currentWrapper.calcDelta(paramCache, (File) null, new WrapperCIInstance<DATA>(this.createNewData(paramCache, AbstractTest.PREFIX + "Test")));
 
         Assert.assertFalse(mql.hasNewLines(), "no MQL update needed, but found:\n" + mql);
     }

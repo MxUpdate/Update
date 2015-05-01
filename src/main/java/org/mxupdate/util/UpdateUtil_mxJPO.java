@@ -79,14 +79,14 @@ public final class UpdateUtil_mxJPO
         // update
         final List<AbstractObject_mxJPO> compiles = new ArrayList<AbstractObject_mxJPO>();
         final boolean compile = _paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_COMPILE);
-        for (final TypeDef_mxJPO clazz : _paramCache.getMapping().getAllTypeDefsSorted())  {
-            final Map<String,File> clazzMap = _clazz2names.get(clazz);
+        for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
+            final Map<String,File> clazzMap = _clazz2names.get(typeDef);
             if (clazzMap != null)  {
-                final Set<String> existings = existingNames.get(clazz);
+                final Set<String> existings = existingNames.get(typeDef);
 
                 for (final Entry<String,File> fileEntry : clazzMap.entrySet())  {
-                    final AbstractObject_mxJPO instance = clazz.newTypeInstance(fileEntry.getKey());
-                    _paramCache.logInfo("check " + clazz.getLogging() + " '" + fileEntry.getKey() + "'");
+                    final AbstractObject_mxJPO instance = typeDef.newTypeInstance(fileEntry.getKey());
+                    _paramCache.logInfo("check " + typeDef.getLogging() + " '" + fileEntry.getKey() + "'");
 
                     final boolean update;
                     if (_paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_CHECK_FILE_DATE))  {
@@ -118,9 +118,28 @@ public final class UpdateUtil_mxJPO
                         _paramCache.logDebug("    - update");
                     }
                     // execute update
-                    if (update && UpdateUtil_mxJPO.updateOne(_paramCache, !existings.contains(fileEntry.getKey()), instance, fileEntry.getValue()) && compile)  {
-                        compiles.add(instance);
+                    if (update)  {
+                        boolean commit = false;
+                        final boolean transActive = _paramCache.getContext().isTransactionActive();
+                        try  {
+                            if (!transActive)  {
+                                _paramCache.getContext().start(true);
+                            }
+                            typeDef.update(_paramCache, !existings.contains(fileEntry.getKey()), fileEntry.getKey(), fileEntry.getValue());
+                            if (!transActive)  {
+                                _paramCache.getContext().commit();
+                            }
+                            commit = true;
+                            if (compile)  {
+                                compiles.add(instance);
+                            }
+                        } finally  {
+                            if (!commit && !transActive && _paramCache.getContext().isTransactionActive())  {
+                                _paramCache.getContext().abort();
+                            }
+                        }
                     }
+
                 }
             }
         }
@@ -177,43 +196,6 @@ public final class UpdateUtil_mxJPO
                 }
             }
         }
-    }
-
-    /**
-     * Updates on <code>_file</code> for <code>_instance</code> within a
-     * transaction (if a transaction was not already started).
-     *
-     * @param _paramCache   parameter cache (used to get the MX context)
-     * @param _create       <i>true</i> if the CI object is new created (and
-     *                      first update is done)
-     * @param _instance     instance to update
-     * @param _file         file with target definition
-     * @return <i>true</i> if update was done; otherwise <i>false</i>
-     * @throws Exception if update of the instance failed
-     */
-    protected static boolean updateOne(final ParameterCache_mxJPO _paramCache,
-                                       final boolean _create,
-                                       final AbstractObject_mxJPO _instance,
-                                       final File _file)
-        throws Exception
-    {
-        boolean commit = false;
-        final boolean transActive = _paramCache.getContext().isTransactionActive();
-        try  {
-            if (!transActive)  {
-                _paramCache.getContext().start(true);
-            }
-            _instance.update(_paramCache, _create, _file);
-            if (!transActive)  {
-                _paramCache.getContext().commit();
-            }
-            commit = true;
-        } finally  {
-            if (!commit && !transActive && _paramCache.getContext().isTransactionActive())  {
-                _paramCache.getContext().abort();
-            }
-        }
-        return commit;
     }
 
     /**
