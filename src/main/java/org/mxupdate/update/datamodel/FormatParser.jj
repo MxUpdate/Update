@@ -20,78 +20,75 @@ options {
     USER_TOKEN_MANAGER = false;
     GENERATE_BOILERPLATE = false;
 }
-PARSER_BEGIN(FormatDefParser)
-package org.mxupdate.update.datamodel.format;
+PARSER_BEGIN(FormatParser)
+package org.mxupdate.update.datamodel;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.datamodel.Format_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
-import org.mxupdate.update.util.ParameterCache_mxJPO;
 
-public class FormatDefParser
+/**
+ * Parses the update format for {@link Format_mxJPO}.
+ */
+@SuppressWarnings("unused")
+class FormatParser
     extends AbstractParser_mxJPO<Format_mxJPO>
 {
 }
-PARSER_END(FormatDefParser)SKIP :
+PARSER_END(FormatParser)<*> SKIP :
 {
-    " "
-|   "\r"
-|   "\t"
-|   "\n"
+  " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
 TOKEN : /** first level */
 {
-      <DESCRIPTION:             "description">      : STRING_EXPECTED
-    | <HIDDEN_TRUE:             "hidden">
-    | <HIDDEN_FALSE:            "!hidden">
-    | <MIME:                    "mime">             : STRING_EXPECTED
-    | <SUFFIX:                  "suffix">           : STRING_EXPECTED
-    | <TYPE:                    "type">             : STRING_EXPECTED
-    | <VERSION:                 "version">          : STRING_EXPECTED
-    | <VIEW:                    "view">             : STRING_EXPECTED
-    | <EDIT:                    "edit">             : STRING_EXPECTED
-    | <PRINT:                   "print">            : STRING_EXPECTED
-    | <PROPERTY:                "property">         : STRING_EXPECTED
-    | <PROPERTYTO:              "to">               : ADMINREF_EXPECTED
-    | <PROPERTYVAL:             "value">            : STRING_EXPECTED
+      <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+    | <HIDDEN_TRUE:                         "hidden">
+    | <HIDDEN_FALSE:                        "!hidden">
+    | <MIME:                                "mime">                                         : STRING_EXPECTED
+    | <SUFFIX:                              "suffix">                                       : STRING_EXPECTED
+    | <TYPE:                                "type">                                         : STRING_EXPECTED
+    | <VERSION:                             "version">                                      : STRING_EXPECTED
+    | <VIEW:                                "view">                                         : STRING_EXPECTED
+    | <EDIT:                                "edit">                                         : STRING_EXPECTED
+    | <PRINT:                               "print">                                        : STRING_EXPECTED
 }
 
-/***************************************************** String for Description */
-<STRING_EXPECTED> SKIP :
-{
-  " " | "\t" | "\n" | "\r"
-}
-
+/************************************************************** Common String */
 <STRING_EXPECTED> TOKEN :
 {
-      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<APOSTROPHE>)> : DEFAULT
-    | <SINGLE: (<CHAR>)+> : DEFAULT
-    | <#APOSTROPHE: "\"" >
-    | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
+    | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
 }
 
-/**************************************** Two Strings for Property Definition */
-<ADMINREF_EXPECTED> SKIP :
+/*************************************************** Common Multi-Line-String */
+<MULTILINESTRING_EXPECTED> TOKEN :
 {
-  " " | "\t" | "\n" | "\r"
+      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
+    | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/******************************************************************* Property */
+<DEFAULT> TOKEN :
+{
+      <PROPERTY:                            "property">                                     : STRING_EXPECTED
+    | <PROPERTYTO:                          "to">                                           : ADMINREF_EXPECTED
+    | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
 }
 
 <ADMINREF_EXPECTED> TOKEN :
 {
-      <ADMINTYPE_STRING : (<ADMINTYPE_APOSTROPHE>(<ADMINTYPE_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<ADMINTYPE_APOSTROPHE>)> : STRING_EXPECTED
-    | <ADMINTYPE_SINGLE : (<ADMINTYPE_CHAR>)+> : STRING_EXPECTED
-    | <#ADMINTYPE_APOSTROPHE : "\"" >
-    | <#ADMINTYPE_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <ADMINTYPE_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
 }
+
+/**************************************************************************** */
 /**
  * Parses one complete format definition.
  *
@@ -103,32 +100,39 @@ void parse(final Format_mxJPO _format)
     Token tmp;
     AdminProperty property;
 } {
-    (   (<DESCRIPTION>              ( tmp = <STRING>           {this.setValue(_format, "description", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(_format, "description", this.getSingle(tmp.image));} ) )
-      | (<HIDDEN_TRUE>                                         {this.setValue(_format, "hidden",       true);} )
-      | (<HIDDEN_FALSE>                                        {this.setValue(_format, "hidden",       false);} )
-      | (<MIME>                     ( tmp = <STRING>           {this.setValue(_format, "mimeType",     this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(_format, "mimeType",     this.getSingle(tmp.image));} ) )
-      | (<SUFFIX>                   ( tmp = <STRING>           {this.setValue(_format, "fileSuffix",   this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(_format, "fileSuffix",   this.getSingle(tmp.image));} ) )
-      | (<TYPE>                     ( tmp = <STRING>           {this.setValue(_format, "type",         this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(_format, "type",         this.getSingle(tmp.image));} ) )
-      | (<VERSION>                  ( tmp = <STRING>           {this.setValue(_format, "version",      this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(_format, "version",      this.getSingle(tmp.image));} ) )
-      | (<VIEW>                     ( tmp = <STRING>           {this.setValue(_format, "commandView",  this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(_format, "commandView",  this.getSingle(tmp.image));} ) )
-      | (<EDIT>                     ( tmp = <STRING>           {this.setValue(_format, "commandEdit",  this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(_format, "commandEdit",  this.getSingle(tmp.image));} ) )
-      | (<PRINT>                    ( tmp = <STRING>           {this.setValue(_format, "commandPrint", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(_format, "commandPrint", this.getSingle(tmp.image));} ) )
-      | (<PROPERTY>                                            {property = new AdminProperty();this.appendValue(this.getValue(_format, "properties"), "propertiesStack", property);}
-                                    ( tmp = <STRING>           {this.setValue(property, "name", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(property, "name", this.getSingle(tmp.image));} )
-              (   ( <PROPERTYVAL>   ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
-                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING> {this.setValue(property, "refAdminType", this.getString(tmp.image));}
-                                    | tmp = <ADMINTYPE_SINGLE> {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
-                                    ( tmp = <STRING>           {this.setValue(property, "refAdminName", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+    (   (<DESCRIPTION>              ( tmp = <MULTILINESTRING>               {this.setValue(_format, "description", this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>               {this.setValue(_format, "description", this.getSingle(tmp.image));} ) )
+
+      | (<HIDDEN_TRUE>                                                      {this.setValue(_format, "hidden",       true);} )
+      | (<HIDDEN_FALSE>                                                     {this.setValue(_format, "hidden",       false);} )
+
+      | (<MIME>                     ( tmp = <STRING>                        {this.setValue(_format, "mimeType",     this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_format, "mimeType",     this.getSingle(tmp.image));} ) )
+
+      | (<SUFFIX>                   ( tmp = <STRING>                        {this.setValue(_format, "fileSuffix",   this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_format, "fileSuffix",   this.getSingle(tmp.image));} ) )
+
+      | (<TYPE>                     ( tmp = <STRING>                        {this.setValue(_format, "type",         this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_format, "type",         this.getSingle(tmp.image));} ) )
+
+      | (<VERSION>                  ( tmp = <STRING>                        {this.setValue(_format, "version",      this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_format, "version",      this.getSingle(tmp.image));} ) )
+
+      | (<VIEW>                     ( tmp = <STRING>                        {this.setValue(_format, "commandView",  this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_format, "commandView",  this.getSingle(tmp.image));} ) )
+      | (<EDIT>                     ( tmp = <STRING>                        {this.setValue(_format, "commandEdit",  this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_format, "commandEdit",  this.getSingle(tmp.image));} ) )
+      | (<PRINT>                    ( tmp = <STRING>                        {this.setValue(_format, "commandPrint", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_format, "commandPrint", this.getSingle(tmp.image));} ) )
+
+      | (<PROPERTY>                                                         {property = new AdminProperty();this.appendValue(_format, "properties", "propertiesStack", property);}
+                                    ( tmp = <STRING>                        {this.setValue(property, "name", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "name", this.getSingle(tmp.image));} )
+              (   ( <PROPERTYVAL>   ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <ADMINTYPE_SINGLE>              {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                    ( tmp = <STRING>                        {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
     )*
 }

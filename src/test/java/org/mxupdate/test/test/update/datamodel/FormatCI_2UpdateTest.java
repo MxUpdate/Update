@@ -13,38 +13,27 @@
  *
  */
 
-package org.mxupdate.test.ci.datamodel;
+package org.mxupdate.test.test.update.datamodel;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.data.datamodel.FormatData;
 import org.mxupdate.test.data.program.MQLProgramData;
 import org.mxupdate.test.util.Version;
-import org.testng.annotations.AfterMethod;
+import org.mxupdate.update.datamodel.Format_mxJPO;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test class for format exports and updates.
+ * Tests the {@link Format_mxJPO format CI} export / update.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class FormatTest
+public class FormatCI_2UpdateTest
     extends AbstractDataExportUpdate<FormatData>
 {
-    /**
-     * Creates for given <code>_name</code> a new format instance.
-     *
-     * @param _name     name of the format instance
-     * @return format instance
-     */
-    @Override()
-    protected FormatData createNewData(final String _name)
-    {
-        return new FormatData(this, _name);
-    }
-
     /**
      * Data provider for test formats.
      *
@@ -82,36 +71,36 @@ public class FormatTest
                         new FormatData(this, "hello \" test")
                                 .setValue("type", "type \"test\"")},
                 new Object[]{
-                        "issue ##212: format with view program",
+                        "issue #212: format with view program",
                         new FormatData(this, "hello \" test")
                                 .notSupported(Version.V6R2014x, Version.V6R2015x)
                                 .setViewProgram(new MQLProgramData(this, "ViewProgram"))},
                 new Object[]{
-                        "issue ##212: format with view program",
+                        "issue #212: format with view program",
                         new FormatData(this, "hello \" test")
                                 .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)
                                 .setViewProgram(new MQLProgramData(this, "ViewProgram")),
                         new FormatData(this, "hello \" test"),
                         "[INFO]     - view program MXUPDATE_ViewProgram ignored (not supported anymore!)"},
                 new Object[]{
-                        "issue ##212: format with edit program",
+                        "issue #212: format with edit program",
                         new FormatData(this, "hello \" test")
                                 .notSupported(Version.V6R2014x, Version.V6R2015x)
                                 .setEditProgram(new MQLProgramData(this, "EditProgram"))},
                 new Object[]{
-                        "issue ##212: format with edit program",
+                        "issue #212: format with edit program",
                         new FormatData(this, "hello \" test")
                                 .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)
                                 .setEditProgram(new MQLProgramData(this, "EditProgram")),
                         new FormatData(this, "hello \" test"),
                         "[INFO]     - edit program MXUPDATE_EditProgram ignored (not supported anymore!)"},
                 new Object[]{
-                        "issue ##212: format with print program",
+                        "issue #212: format with print program",
                         new FormatData(this, "hello \" test")
                                 .notSupported(Version.V6R2014x, Version.V6R2015x)
                                 .setPrintProgram(new MQLProgramData(this, "PrintProgram"))},
                 new Object[]{
-                        "issue ##212: format with print program",
+                        "issue #212: format with print program",
                         new FormatData(this, "hello \" test")
                                 .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)
                                 .setPrintProgram(new MQLProgramData(this, "PrintProgram")),
@@ -120,17 +109,18 @@ public class FormatTest
         );
     }
 
-    /**
-     * Removes the MxUpdate formats and programs.
-     *
-     * @throws Exception if MQL execution failed
-     */
     @BeforeMethod()
-    @AfterMethod()
+    @AfterClass(groups = "close" )
     public void cleanup()
         throws Exception
     {
         this.cleanup(CI.DM_FORMAT);
         this.cleanup(CI.PRG_MQL_PROGRAM);
+    }
+
+    @Override()
+    protected FormatData createNewData(final String _name)
+    {
+        return new FormatData(this, _name);
     }
 }

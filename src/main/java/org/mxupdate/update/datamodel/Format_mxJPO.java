@@ -28,22 +28,33 @@ import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
-import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * Handles the export and the update of the format configuration item.
+ * The handled properties are:
+ * <ul>
+ * <li>description</li>
+ * <li>hidden flag</li>
+ * <li>{@link #mimeType mime type}</li>
+ * <li>{@link #fileSuffix file suffix}</li>
+ * <li>{@link #type}</li>
+ * <li>{@link #version}</li>
+ * <li>{@link #commandView view command} (legacy, only if parameter
+ *     {@link ValueKeys#DMFormatSupportsPrograms} is true)</li>
+ * <li>{@link #commandEdit edit command} (legacy, only if parameter
+ *     {@link ValueKeys#DMFormatSupportsPrograms} is true)</li>
+ * <li>{@link #commandPrint print command} (legacy, only if parameter
+ *     {@link ValueKeys#DMFormatSupportsPrograms} is true)</li>
+ * </ul>
  *
  * @author The MxUpdate Team
  */
 public class Format_mxJPO
     extends AbstractAdminObject_mxJPO<Format_mxJPO>
 {
-    /**
-     * Set of all ignored URLs from the XML definition for formats.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     */
+    /** Set of all ignored URLs from the XML definition for formats. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
         // to be ignored, because identically to fileType
@@ -62,7 +73,7 @@ public class Format_mxJPO
     /** File suffix of the format. */
     private String fileSuffix = null;
 
-    /** Type and creator of the format (used only for MacOS). */
+    /** Type and creator of the format (used only for MacOS, creator is always equal type!). */
     private String type = null;
 
     /** Version of the format. */
@@ -135,16 +146,6 @@ public class Format_mxJPO
         return parsed;
     }
 
-    /**
-     * Writes the TCL update file for this format. The original method is
-     * overwritten because a format could not be only updated. A compare
-     * must be done in front or otherwise some data is lost. >
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the TCL update code could not be written to the
-     *                     writer instance
-     */
     @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
@@ -152,22 +153,26 @@ public class Format_mxJPO
     {
         this.writeHeader(_paramCache, _out);
 
-        _out.append("mxUpdate format \"${NAME}\"  {\n")
-            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n")
-            .append("    ").append(this.isHidden() ? "" : "!").append("hidden\n")
-            .append("    mime \"").append(StringUtil_mxJPO.convertUpdate(this.mimeType)).append("\"\n")
-            .append("    suffix \"").append(StringUtil_mxJPO.convertUpdate(this.fileSuffix)).append("\"\n")
-            .append("    type \"").append(StringUtil_mxJPO.convertUpdate(this.type)).append("\"\n")
-            .append("    version \"").append(StringUtil_mxJPO.convertUpdate(this.version)).append("\"\n");
-        if (_paramCache.getValueBoolean(ValueKeys.DMFormatSupportsPrograms))  {
-            _out.append("    view \"").append(StringUtil_mxJPO.convertUpdate(this.commandView)).append("\"\n")
-                .append("    edit \"").append(StringUtil_mxJPO.convertUpdate(this.commandEdit)).append("\"\n")
-                .append("    print \"").append(StringUtil_mxJPO.convertUpdate(this.commandPrint)).append("\"\n");
-        }
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
 
-        this.getProperties().writeProperties(_paramCache, _out, "    ");
+        this.writeHeader(_paramCache, updateBuilder.getStrg());
 
-        _out.append("}");
+        updateBuilder
+                .start("format")
+                //              tag             | default | value                              | write?
+                .string(        "description",              this.getDescription())
+                .flag(          "hidden",           false,  this.isHidden())
+                .string(        "mime",                     this.mimeType)
+                .string(        "suffix",                   this.fileSuffix)
+                .string(        "type",                     this.type)
+                .string(        "version",                  this.version)
+                .stringIfTrue(  "view",                     this.commandView,                   _paramCache.getValueBoolean(ValueKeys.DMFormatSupportsPrograms))
+                .stringIfTrue(  "edit",                     this.commandEdit,                   _paramCache.getValueBoolean(ValueKeys.DMFormatSupportsPrograms))
+                .stringIfTrue(  "print",                    this.commandPrint,                  _paramCache.getValueBoolean(ValueKeys.DMFormatSupportsPrograms))
+                .properties(this.getProperties())
+                .end();
+
+        _out.append(updateBuilder.toString());
     }
 
     @Override()
