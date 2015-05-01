@@ -46,9 +46,7 @@ import org.testng.Assert;
 public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
     extends AbstractAdminData<DATA>
 {
-    /**
-     * Assigned site for this user.
-     */
+    /** Assigned site for this user. */
     private SiteData site;
 
     /**

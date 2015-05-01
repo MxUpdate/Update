@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeSet;
 
@@ -89,7 +90,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     }
 
     /** Set holding all rules referencing this attribute. */
-    private final  Set<String> rules = new TreeSet<String>();
+    private final  SortedSet<String> rules = new TreeSet<String>();
 
 
     /**

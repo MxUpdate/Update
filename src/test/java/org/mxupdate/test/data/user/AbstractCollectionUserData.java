@@ -15,15 +15,11 @@
 
 package org.mxupdate.test.data.user;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.data.util.DataList;
 import org.testng.Assert;
 
 /**
@@ -36,21 +32,9 @@ import org.testng.Assert;
 public class AbstractCollectionUserData<DATA extends AbstractCollectionUserData<?>>
     extends AbstractUserData<DATA>
 {
-    /**
-     * Parent collection users to which this collection user is assigned.
-     *
-     * @see #assignParents(AbstractCollectionUserData)
-     * @see #checkExport(ExportParser)
-     */
-    private final Set<DATA> parents = new HashSet<DATA>();
+    /** Parent collection users to which this collection user is assigned. */
+    private final DataList<DATA> parents = new DataList<DATA>("parent ", "parent ", false);
 
-    /**
-     * Within export the description must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
-    static  {
-        AbstractCollectionUserData.REQUIRED_EXPORT_VALUES.put("description", "");
-    }
 
     /**
      * Constructor to initialize this collection user.
@@ -64,7 +48,7 @@ public class AbstractCollectionUserData<DATA extends AbstractCollectionUserData<
                                       final AbstractTest.CI _ci,
                                       final String _name)
     {
-        super(_test, _ci, _name, AbstractCollectionUserData.REQUIRED_EXPORT_VALUES);
+        super(_test, _ci, _name, null);
     }
 
     /**
@@ -82,74 +66,33 @@ public class AbstractCollectionUserData<DATA extends AbstractCollectionUserData<
         return (DATA) this;
     }
 
-    /**
-     * Returns all {@link #parents}.
-     *
-     * @return assigned parents of this user
-     * @see #parents
-     */
-    public Set<DATA> getParents()
-    {
-        return this.parents;
-    }
-
-    /**
-     * Prepares the configuration item update file depending on the
-     * configuration of this collection user. This includes:
-     * <ul>
-     * <li>{@link #parents parent collection users}</li>
-     * </ul>
-     *
-     * @return code for the configuration item update file
-     */
     @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder().append(super.ciFile());
+        final StringBuilder strg = new StringBuilder();
+        this.append4CIFileHeader(strg);
+        strg.append("mxUpdate ").append(this.getCI().getMxType()).append(" \"${NAME}\" {\n");
 
-        // define parent collection users
-        for (final DATA user : this.parents)  {
-            cmd.append("mql escape mod ")
-               .append(user.getCI().getMxType()).append(" \"").append(AbstractTest.convertTcl(user.getName()))
-               .append("\" child \"${NAME}\";\n");;
-        }
+        this.getFlags()     .appendUpdate("    ", strg);
+        this.getValues()    .appendUpdate("    ", strg);
+        this.getSingles()   .appendUpdate("    ", strg);
+        this.getProperties().appendUpdate("    ", strg);
+        this.parents        .appendUpdate("    ", strg);
 
-        return cmd.toString();
-    }
+        strg.append("}");
 
-    /**
-     * Creates this collection user.
-     *
-     * @return this collection user data instance
-     * @throws MatrixException if create failed
-     */
-    @SuppressWarnings("unchecked")
+        return strg.toString();
+   }
+
     @Override()
-    public DATA create()
-        throws MatrixException
+    protected void append4Create(final StringBuilder _cmd)
+            throws MatrixException
     {
-        if (!this.isCreated())  {
-            super.create();
+        super.append4Create(_cmd);
 
-            // assign parent objects
-            final StringBuilder cmd = new StringBuilder();
-            for (final DATA user : this.parents)  {
-                user.create();
-                cmd.append("escape mod ")
-                   .append(user.getCI().getMxType()).append(" \"").append(AbstractTest.convertMql(user.getName()))
-                   .append("\" child \"").append(AbstractTest.convertMql(this.getName())).append("\";\n");;
-            }
-            this.getTest().mql(cmd);
-        }
-        return (DATA) this;
+        this.parents.append4Create(_cmd);
     }
 
-    /**
-     * {@inheritDoc}
-     * Created depending {@link #parents}.
-     *
-     * @see #parents
-     */
     @Override()
     @SuppressWarnings("unchecked")
     public DATA createDependings()
@@ -157,40 +100,25 @@ public class AbstractCollectionUserData<DATA extends AbstractCollectionUserData<
     {
         super.createDependings();
 
-        // create all parent groups
-        for (final DATA parent : this.parents)  {
-            parent.create();
-        }
+        this.parents.createDependings();
 
         return (DATA) this;
     }
 
-    /**
-     * Checks the export of this data piece if all values are correct defined.
-     * The {@link #parents collection users} are checked.
-     *
-     * @param _exportParser     parsed export
-     * @throws MatrixException if check failed
-     */
     @Override()
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        super.checkExport(_exportParser);
+        // check symbolic name
+        Assert.assertEquals(
+                _exportParser.getSymbolicName(),
+                this.getSymbolicName(),
+                "check symbolic name");
 
-        // check parent collection users
-        final Set<String> pars = new HashSet<String>(_exportParser.getLines("/mql/@value"));
-        pars.remove("escape mod " + this.getCI().getMxType() + " \"${NAME}\"");
-        for (final DATA user : this.parents)  {
-            pars.remove("escape mod " + user.getCI().getMxType() + " \""
-                    + AbstractTest.convertTcl(user.getName()) + "\" child \"${NAME}\"");
-        }
-        for (final String par : new HashSet<String>(pars))  {
-            if (par.startsWith("escape add"))  {
-                pars.remove(par);
-            }
-        }
-        Assert.assertTrue(pars.isEmpty(),
-                          "check that all parent " + this.getCI().getMxType() + "s are correct defined " + pars);
+        this.getFlags()     .checkExport(_exportParser, "");
+        this.getValues()    .checkExport(_exportParser, "");
+        this.getSingles()   .checkExport(_exportParser, "");
+        this.parents        .checkExport(_exportParser, "");
+        this.getProperties().checkExport(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/property/@value"));
     }
 }

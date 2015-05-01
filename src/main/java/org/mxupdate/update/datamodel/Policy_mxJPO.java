@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeSet;
 
@@ -95,7 +96,7 @@ public class Policy_mxJPO
     /** Default format of this policy. */
     private String defaultFormat = null;
     /** All possible formats of this policy. */
-    private final Set<String> formats = new TreeSet<String>();
+    private final SortedSet<String> formats = new TreeSet<String>();
     /** Are all formats allowed of this policy? */
     private boolean allFormats;
     /** Locking enforced? */
@@ -112,7 +113,7 @@ public class Policy_mxJPO
     private String store;
 
     /** Set of all types of this policy. */
-    private final Set<String> types = new TreeSet<String>();
+    private final SortedSet<String> types = new TreeSet<String>();
 
     /** Are all types allowed of this policy? */
     private boolean allTypes;
@@ -404,7 +405,7 @@ public class Policy_mxJPO
 
         // if all types are defined, the compare must be against set with all
         if (_current.allTypes)  {
-            final Set<String> curTypes = new HashSet<String>();
+            final SortedSet<String> curTypes = new TreeSet<String>();
             curTypes.addAll(_current.types);
             curTypes.addAll(Arrays.asList(new String[]{"all"}));
             DeltaUtil_mxJPO.calcListDelta(_mql, "type", this.types, curTypes);
@@ -414,7 +415,7 @@ public class Policy_mxJPO
 
         // if all formats are defined, the compare must be against set with all
         if (_current.allFormats)  {
-            final Set<String> curFormats = new HashSet<String>();
+            final SortedSet<String> curFormats = new TreeSet<String>();
             curFormats.addAll(_current.formats);
             curFormats.addAll(Arrays.asList(new String[]{"all"}));
             DeltaUtil_mxJPO.calcListDelta(_mql, "format", this.formats, curFormats);

@@ -1,0 +1,139 @@
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
+options {
+    JDK_VERSION = "1.6";
+    STATIC = false;
+    ERROR_REPORTING = true;
+    USER_TOKEN_MANAGER = false;
+    GENERATE_BOILERPLATE = false;
+    SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
+}
+
+PARSER_BEGIN(GroupParser)
+package org.mxupdate.update.user;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+
+import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
+import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
+import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+
+@SuppressWarnings("unused")
+class GroupParser
+    extends AbstractParser_mxJPO<Group_mxJPO>
+{
+}
+
+PARSER_END(GroupParser)
+
+<DEFAULT> SKIP :
+{
+    " "
+|   "\r"
+|   "\t"
+|   "\n"
+}
+
+<DEFAULT> TOKEN : /** first level */
+{
+      <DESCRIPTION:                         "description">                                  : STRING_EXPECTED
+
+    | <HIDDEN_TRUE:                         "hidden">
+    | <HIDDEN_FALSE:                        "!hidden">
+
+    | <PARENT:                              "parent">                                       : STRING_EXPECTED
+
+    | <SITE:                                "site">                                         : STRING_EXPECTED
+}
+
+/************************************************************** Common String */
+<STRING_EXPECTED> SKIP :
+{
+    " " | "\t" | "\n" | "\r"
+}
+
+<STRING_EXPECTED> TOKEN :
+{
+      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "{" | "}" | " ")*<APOSTROPHE>)> : DEFAULT
+    | <SINGLE: (<CHAR>)+> : DEFAULT
+    | <#APOSTROPHE: "\"" >
+    | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/******************************************************************* Property */
+<DEFAULT> TOKEN :
+{
+      <PROPERTY:                            "property">                                     : STRING_EXPECTED
+    | <PROPERTYTO:                          "to">                                           : ADMINREF_EXPECTED
+    | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
+}
+
+<ADMINREF_EXPECTED> SKIP :
+{
+    " " | "\t" | "\n" | "\r"
+}
+
+<ADMINREF_EXPECTED> TOKEN :
+{
+      <ADMINTYPE_STRING : (<ADMINTYPE_APOSTROPHE>(<ADMINTYPE_CHAR> | "\\\"" | "{" | "}" | " ")*<ADMINTYPE_APOSTROPHE>)> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE : (<ADMINTYPE_CHAR>)+> : STRING_EXPECTED
+    | <#ADMINTYPE_APOSTROPHE : "\"" >
+    | <#ADMINTYPE_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/**************************************************************************** */
+
+/**
+ * Parses one complete group definition.
+ *
+ * @param _group    target group to update with parsed values
+ */
+void parse(final Group_mxJPO _group)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+: {
+    Token tmp;
+    AdminProperty property;
+} {
+    (   ( <DESCRIPTION>             ( tmp = <STRING>                        {this.setValue(_group, "description",                           this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_group, "description",                           this.getSingle(tmp.image));} ) )
+
+      | ( <HIDDEN_TRUE>                                                     {this.setValue(_group, "hidden",                                true);} )
+      | ( <HIDDEN_FALSE>                                                    {this.setValue(_group, "hidden",                                false);} )
+
+      | ( <SITE>                    ( tmp = <STRING>                        {this.setValue(_group, "site",                                  this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_group, "site",                                  this.getSingle(tmp.image));} ) )
+
+      | ( <PARENT>                  ( tmp = <STRING>                        {this.appendValue(_group, "parentGroups",                       this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_group, "parentGroups",                       this.getSingle(tmp.image));} ) )
+
+      | ( <PROPERTY>                                                        {property = new AdminProperty();this.appendValue(_group, "properties", "propertiesStack", property);}
+                                    ( tmp = <STRING>                        {this.setValue(property, "name", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "name", this.getSingle(tmp.image));} )
+              (   ( <PROPERTYVAL>   ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <ADMINTYPE_SINGLE>              {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                    ( tmp = <STRING>                        {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+    )*
+}

@@ -58,7 +58,7 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
         final List<Object[]> ret = new ArrayList<Object[]>();
         ret.addAll(Arrays.asList(_datas));
 
-        if (_logText != null)  {
+        /*if (_logText != null)  {
             this.appendCue(_logText, ret);
             this.appendFilter(_logText, ret);
             this.appendQuery(_logText, ret);
@@ -66,7 +66,7 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
             this.appendTip(_logText, ret);
             this.appendToolSet(_logText, ret);
             this.appendView(_logText, ret);
-        }
+        }*/
 
         return super.prepareData(_logText, ret.toArray(new Object[ret.size()][]));
     }
@@ -844,7 +844,7 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
      * @param _ignored      is the user ignored?
      * @throws Exception if check failed
      */
-    @Test(dataProvider = "wsoParameters", description = "check that cue the workspace objects are (not) removed")
+    @Test(enabled=false,dataProvider = "wsoParameters", description = "check that cue the workspace objects are (not) removed")
     public void checkWSOCueNotRemoved(final String _paramName,
                                       final boolean _ignored)
         throws Exception
@@ -867,7 +867,7 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
      * @param _ignored      is the user ignored?
      * @throws Exception if check failed
      */
-    @Test(dataProvider = "wsoParameters", description = "check that the filter workspace objects are (not) removed")
+    @Test(enabled=false,dataProvider = "wsoParameters", description = "check that the filter workspace objects are (not) removed")
     public void checkWSOFilterNotRemoved(final String _paramName,
                                          final boolean _ignored)
         throws Exception
@@ -890,7 +890,7 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
      * @param _ignored      is the user ignored?
      * @throws Exception if check failed
      */
-    @Test(dataProvider = "wsoParameters", description = "check that the query workspace objects are (not) removed")
+    @Test(enabled=false,dataProvider = "wsoParameters", description = "check that the query workspace objects are (not) removed")
     public void checkWSOQueryNotRemoved(final String _paramName,
                                         final boolean _ignored)
         throws Exception
@@ -913,7 +913,7 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
      * @param _ignored      is the user ignored?
      * @throws Exception if check failed
      */
-    @Test(dataProvider = "wsoParameters", description = "check that the table workspace objects are (not) removed")
+    @Test(enabled=false,dataProvider = "wsoParameters", description = "check that the table workspace objects are (not) removed")
     public void checkWSOTableNotRemoved(final String _paramName,
                                         final boolean _ignored)
         throws Exception
@@ -936,7 +936,7 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
      * @param _ignored      is the user ignored?
      * @throws Exception if check failed
      */
-    @Test(dataProvider = "wsoParameters", description = "check that the tip workspace objects are (not) removed")
+    @Test(enabled=false,dataProvider = "wsoParameters", description = "check that the tip workspace objects are (not) removed")
     public void checkWSOTipNotRemoved(final String _paramName,
                                       final boolean _ignored)
         throws Exception
@@ -959,7 +959,7 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
      * @param _ignored      is the user ignored?
      * @throws Exception if check failed
      */
-    @Test(dataProvider = "wsoParameters", description = "check that the tool set workspace objects are (not) removed")
+    @Test(enabled=false,dataProvider = "wsoParameters", description = "check that the tool set workspace objects are (not) removed")
     public void checkWSOToolSetNotRemoved(final String _paramName,
                                           final boolean _ignored)
         throws Exception
@@ -982,7 +982,7 @@ public abstract class AbstractUserTest<USER extends AbstractUserData<USER>>
      * @param _ignored      is the user ignored?
      * @throws Exception if check failed
      */
-    @Test(dataProvider = "wsoParameters", description = "check that the view workspace objects are (not) removed")
+    @Test(enabled=false,dataProvider = "wsoParameters", description = "check that the view workspace objects are (not) removed")
     public void checkWSOViewNotRemoved(final String _paramName,
                                        final boolean _ignored)
         throws Exception

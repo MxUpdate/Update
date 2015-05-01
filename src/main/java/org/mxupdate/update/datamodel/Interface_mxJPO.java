@@ -20,6 +20,7 @@ import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
@@ -73,20 +74,20 @@ public class Interface_mxJPO
     /** Is the interface abstract? */
     private Boolean abstractFlag;
     /** From which interfaces is this interface derived? */
-    private final Set<String> derived = new TreeSet<String>();
+    private final SortedSet<String> derived = new TreeSet<String>();
 
     /** Attribute list. */
-    private final Set<String> attributes = new TreeSet<String>();
+    private final SortedSet<String> attributes = new TreeSet<String>();
 
     /** Are all types allowed for this interface? */
     private boolean typeAll;
     /** Information about all allowed types for this interface. */
-    private final Set<String> types = new TreeSet<String>();
+    private final SortedSet<String> types = new TreeSet<String>();
 
     /** Are all relationships allowed for this interface? */
     private boolean relationAll;
     /** Information about all allowed relationships for this interface. */
-    private final Set<String> relations = new TreeSet<String>();
+    private final SortedSet<String> relations = new TreeSet<String>();
 
     /**
      * Constructor used to initialize the interface class instance.

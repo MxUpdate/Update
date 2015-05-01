@@ -20,6 +20,7 @@ import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
@@ -72,10 +73,10 @@ public class Type_mxJPO
     private String derived;
 
     /** Defines all methods of this type. */
-    private final Set<String> methods = new TreeSet<String>();
+    private final SortedSet<String> methods = new TreeSet<String>();
 
     /** Attribute list. */
-    private final Set<String> attributes = new TreeSet<String>();
+    private final SortedSet<String> attributes = new TreeSet<String>();
 
     /**
      * Constructor used to initialize the type definition enumeration.

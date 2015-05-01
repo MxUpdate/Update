@@ -145,8 +145,8 @@ public final class DeltaUtil_mxJPO
      */
     public static void calcListDelta(final MultiLineMqlBuilder _mql,
                                      final String _kind,
-                                     final Set<String> _new,
-                                     final Set<String> _current)
+                                     final SortedSet<String> _new,
+                                     final SortedSet<String> _current)
     {
         boolean equal = (_current.size() == _new.size());
         if (equal)  {
@@ -175,6 +175,48 @@ public final class DeltaUtil_mxJPO
 
 
     /**
+     * Calculates the delta between given {@code _current} list definition and
+     * the {@code _new} target list definition and appends one MQL append with
+     * complete new list.
+     *
+     * @param _mql          builder to append the MQL commands
+     * @param _kind         kind of the delta
+     * @param _new          new target list definition
+     * @param _current      current list definition
+     */
+    public static void calcLstOneCallDelta(final MultiLineMqlBuilder _mql,
+                                           final String _kind,
+                                           final SortedSet<String> _new,
+                                           final SortedSet<String> _current)
+    {
+        boolean equal = (_new.size() == _current.size());
+        if (equal)  {
+            for (final String attribute : _current)  {
+                if (!_new.contains(attribute))  {
+                    equal = false;
+                    break;
+                }
+            }
+        }
+        if (!equal)  {
+            if (_new.isEmpty())  {
+                _mql.newLine().cmd("remove ").cmd(_kind);
+            } else  {
+                _mql.newLine().cmd(_kind).cmd(" ");
+                boolean first = true;
+                for (final String elem : _new)  {
+                    if (first)  {
+                        first = false;
+                    } else  {
+                        _mql.cmd(",");
+                    }
+                    _mql.arg(elem);
+                }
+            }
+        }
+    }
+
+    /**
      * Calculates the delta between the new and the old list set and if all is
      * defined. If a delta exists, the different elements are added or removed.
      *
@@ -188,9 +230,9 @@ public final class DeltaUtil_mxJPO
     public static void calcListDelta(final MultiLineMqlBuilder _mql,
                                      final String _kind,
                                      final boolean _newAll,
-                                     final Set<String> _new,
+                                     final SortedSet<String> _new,
                                      final boolean _currentAll,
-                                     final Set<String> _current)
+                                     final SortedSet<String> _current)
     {
         if (_newAll)  {
             DeltaUtil_mxJPO.calcListDelta( _mql, _kind, new TreeSet<String>(), _current);
@@ -212,8 +254,13 @@ public final class DeltaUtil_mxJPO
      *
      * @param _paramCache   parameter cache
      * @param _mql          builder to append the MQL commands
+     * @param _kind         kind of the delta
+     * @param _errorKey     error key
      * @param _parentName   name of parent name (needed for exception handling)
-     * @param _current      current attribute list definition
+     * @param _keyIgnore    parameter key to ignore
+     * @param _keyRemove    parameter key to remove
+     * @param _new          new target list definition
+     * @param _current      current list definition
      * @throws UpdateException_mxJPO if update is not allowed (because data can
      *                      be lost)
      */
@@ -224,8 +271,8 @@ public final class DeltaUtil_mxJPO
                                      final String _parentName,
                                      final ValueKeys _keyIgnore,
                                      final ValueKeys _keyRemove,
-                                     final Set<String> _new,
-                                     final Set<String> _current)
+                                     final SortedSet<String> _new,
+                                     final SortedSet<String> _current)
         throws UpdateException_mxJPO
     {
         final Set<String> ignoreElems = new HashSet<String>();
@@ -304,8 +351,8 @@ public final class DeltaUtil_mxJPO
                                            final String _parentName,
                                            final ValueKeys _keyIgnore,
                                            final ValueKeys _keyRemove,
-                                           final Set<String> _new,
-                                           final Set<String> _current)
+                                           final SortedSet<String> _new,
+                                           final SortedSet<String> _current)
         throws UpdateException_mxJPO
     {
         final Set<String> ignoreElems = new HashSet<String>();

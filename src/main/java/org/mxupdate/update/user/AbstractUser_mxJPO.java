@@ -76,12 +76,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
      */
     private static final String PARAM_IGNORE_WSO_USERS = "UserIgnoreWSO4Users";
 
-    /**
-     * Related site of this group.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
+    /** Related site of this group. */
     private String site;
 
     /**
@@ -222,6 +217,16 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
                                  final String _mxName)
     {
         super(_typeDef, _mxName);
+    }
+
+    /**
+     * Returns current defined {@link #site}.
+     *
+     * @return site name
+     */
+    protected String getSite()
+    {
+        return this.site;
     }
 
     /**
@@ -515,6 +520,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
     {
         final StringBuilder preMQLCode = new StringBuilder();
 
+if (!(this instanceof Group_mxJPO))  {
         // remove hidden flag
         if (this.isHidden())  {
             preMQLCode.append("escape mod ").append(this.getTypeDef().getMxAdminName())
@@ -569,7 +575,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
 
         // append already existing pre MQL code
         preMQLCode.append(_preMQLCode);
-
+}
         super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
     }
 

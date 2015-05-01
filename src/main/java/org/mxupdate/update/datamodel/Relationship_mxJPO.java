@@ -105,7 +105,7 @@ public class Relationship_mxJPO
     /** To side information. */
     private final Side to = new Side("to");
     /** Attribute list. */
-    private final Set<String> attributes = new TreeSet<String>();
+    private final SortedSet<String> attributes = new TreeSet<String>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -300,11 +300,11 @@ public class Relationship_mxJPO
                 ValueKeys.DMRelationAttrIgnore, ValueKeys.DMRelationAttrRemove,         this.attributes,        _current.attributes);
 
         // only one rule can exists maximum, but they must be technically handled like as list
-        final Set<String> thisRules = new HashSet<String>(1);
+        final SortedSet<String> thisRules = new TreeSet<String>();
         if ((this.rule != null) && !this.rule.isEmpty())  {
             thisRules.add(this.rule);
         }
-        final Set<String> currentRules = new HashSet<String>();
+        final SortedSet<String> currentRules = new TreeSet<String>();
         if ((_current.rule != null) && !_current.rule.isEmpty())  {
             currentRules.add(_current.rule);
         }

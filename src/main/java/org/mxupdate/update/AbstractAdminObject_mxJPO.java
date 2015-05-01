@@ -31,7 +31,6 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.user.Group_mxJPO;
 import org.mxupdate.update.user.PersonAdmin_mxJPO;
 import org.mxupdate.update.user.Role_mxJPO;
 import org.mxupdate.update.userinterface.Form_mxJPO;
@@ -572,8 +571,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
 
         // remove all properties
         // (only if not attribute, because attributes and formats uses calulated deltas)
-        if ((this instanceof Group_mxJPO)
-                || (this instanceof PersonAdmin_mxJPO)
+        if ((this instanceof PersonAdmin_mxJPO)
                 || (this instanceof Role_mxJPO)
                 || (this instanceof Form_mxJPO)
                 || (this instanceof Inquiry_mxJPO)

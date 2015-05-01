@@ -20,7 +20,6 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.other.SiteData;
 import org.mxupdate.test.data.user.GroupData;
-import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -45,18 +44,27 @@ public class GroupTest
     {
         return this.prepareData("group",
                 new Object[]{
-                        "simple group",
+                        "0a) group without anything",
+                        new GroupData(this, "Test")},
+                new Object[]{
+                        "0b) group without anything (to test required fields)",
+                        new GroupData(this, "Test")
+                                .setValue("description", "")
+                                .setFlag("hidden", false),
+                        new GroupData(this, "Test")},
+                new Object[]{
+                        "0c) group with escaped name",
                         new GroupData(this, "hallo \" test")
                             .setValue("description", "\"\\\\ hallo")},
                 new Object[]{
-                        "group with two parent groups",
-                        new GroupData(this, "hallo \" test")
+                        "1) group with two parent groups",
+                        new GroupData(this, "test")
                                 .setValue("description", "\"\\\\ hallo")
                                 .assignParents(new GroupData(this, "hallo parent1 \" test"))
                                 .assignParents(new GroupData(this, "hallo parent2 \" test"))},
                 new Object[]{
-                        "group with assigned site",
-                        new GroupData(this, "hallo \" test")
+                        "2) group with assigned site",
+                        new GroupData(this, "test")
                                 .setSite(new SiteData(this, "Test \" Site"))});
     }
 
@@ -79,13 +87,8 @@ public class GroupTest
         };
     }
 
-    /**
-     * Cleanup all test persons.
-     *
-     * @throws MatrixException if cleanup failed
-     */
     @BeforeMethod()
-    @AfterClass()
+    @AfterClass(groups = "close")
     public void cleanup()
         throws MatrixException
     {
@@ -93,44 +96,6 @@ public class GroupTest
         this.cleanup(AbstractTest.CI.USR_PERSONADMIN);
         this.cleanup(AbstractTest.CI.OTHER_SITE);
         this.cleanup(AbstractTest.CI.PRG_MQL_PROGRAM);
-    }
-
-    /**
-     * Test an update of a group where the site is removed.
-     *
-     * @throws Exception if test failed
-     */
-    @Test(description = "update existing existing group with site by removing site")
-    public void checkExistingSiteRemovedWithinUpdate()
-        throws Exception
-    {
-        final GroupData group = new GroupData(this, "hallo \" test")
-                .setSite(new SiteData(this, "Test \" Site"));
-        group.create();
-        group.setSite(null);
-        group.update((String) null);
-
-        Assert.assertEquals(this.mql("escape print group \"" + AbstractTest.convertMql(group.getName()) + "\" select site dump"),
-                            "",
-                            "check that no site is defined");
-    }
-
-    /**
-     * Check that the hidden flag is removed within update.
-     *
-     * @throws Exception if test failed
-     */
-    @Test(description = "check that the hidden flag is removed within update")
-    public void checkHiddenFlagRemoveWithinUpdate()
-        throws Exception
-    {
-        final GroupData group = new GroupData(this, "hallo \" test").setFlag("hidden", true);
-        group.create();
-        group.setFlag("hidden", null);
-        group.update((String) null);
-        Assert.assertEquals(this.mql("escape print group \"" + AbstractTest.convertMql(group.getName()) + "\" select hidden dump"),
-                            "FALSE",
-                            "check that group is not hidden");
     }
 
     /**
