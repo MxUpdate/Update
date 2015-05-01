@@ -33,11 +33,11 @@ import org.mxupdate.test.util.Version;
 public class FormatData
     extends AbstractAdminData<FormatData>
 {
-    /** Related view program (in pre-{@link org.mxupdate.test.util.Version#V6R2014x}). */
+    /** Related view program (in pre-{@link Version#V6R2014x}). */
     private MQLProgramData viewProgram;
-    /** Related edit program (in pre-{@link org.mxupdate.test.util.Version#V6R2014x}). */
+    /** Related edit program (in pre-{@link Version#V6R2014x}). */
     private MQLProgramData editProgram;
-    /** Related print program (in pre-{@link org.mxupdate.test.util.Version#V6R2014x}). */
+    /** Related print program (in pre-{@link Version#V6R2014x}). */
     private MQLProgramData printProgram;
 
     /**
@@ -150,7 +150,7 @@ public class FormatData
 
         this.append4CIFileHeader(strg);
 
-        strg.append("updateFormat \"${NAME}\" {\n");
+        strg.append("mxUpdate format \"${NAME}\" {\n");
 
         // append flags
         this.getFlags().append4CIFileValues("  ", strg, "\n");
@@ -158,13 +158,13 @@ public class FormatData
         this.getValues().appendUpdate("  ", strg, "\n");
 
         if (this.viewProgram != null)  {
-            strg.append(" view \"").append(AbstractTest.convertTcl(this.viewProgram.getName())).append("\"\n");
+            strg.append(" view \"").append(AbstractTest.convertUpdate(this.viewProgram.getName())).append("\"\n");
         }
         if (this.editProgram != null)  {
-            strg.append(" edit \"").append(AbstractTest.convertTcl(this.editProgram.getName())).append("\"\n");
+            strg.append(" edit \"").append(AbstractTest.convertUpdate(this.editProgram.getName())).append("\"\n");
         }
         if (this.printProgram != null)  {
-            strg.append(" print \"").append(AbstractTest.convertTcl(this.printProgram.getName())).append("\"\n");
+            strg.append(" print \"").append(AbstractTest.convertUpdate(this.printProgram.getName())).append("\"\n");
         }
 
         // append properties
@@ -255,17 +255,17 @@ public class FormatData
         // check for defined values
         this.getValues().checkExport(_exportParser);
         // check for defined flags
-        this.getFlags().checkExport(_exportParser, "/" + this.getCI().getUrlTag() + "/", this.getCI().getMxType() + " " + this.getName());
+        this.getFlags().checkExport(_exportParser.getRootLines().get(0), "");
         // check for properties
-        this.getProperties().checkExport(_exportParser.getLines("/updateFormat/property/@value"));
+        this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
 
         if (this.getTest().getVersion().max(Version.V6R2013x))  {
             this.checkSingleValue(_exportParser, "view program", "view",
-                    (this.viewProgram != null) ? "\"" + AbstractTest.convertTcl(this.viewProgram.getName()) + "\"" : "\"\"");
+                    (this.viewProgram != null) ? "\"" + AbstractTest.convertUpdate(this.viewProgram.getName()) + "\"" : "\"\"");
             this.checkSingleValue(_exportParser, "edit program", "edit",
-                    (this.editProgram != null) ? "\"" + AbstractTest.convertTcl(this.editProgram.getName()) + "\"" : "\"\"");
+                    (this.editProgram != null) ? "\"" + AbstractTest.convertUpdate(this.editProgram.getName()) + "\"" : "\"\"");
             this.checkSingleValue(_exportParser, "print program", "print",
-                    (this.printProgram != null) ? "\"" + AbstractTest.convertTcl(this.printProgram.getName()) + "\"" : "\"\"");
+                    (this.printProgram != null) ? "\"" + AbstractTest.convertUpdate(this.printProgram.getName()) + "\"" : "\"\"");
         }
     }
 }

@@ -15,11 +15,9 @@
 
 package org.mxupdate.update.datamodel;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
@@ -51,28 +49,6 @@ public class Format_mxJPO
         // to be ignored, because identically to fileType
         Format_mxJPO.IGNORED_URLS.add("/fileCreator");
     }
-
-    /**
-     * Key used to identify the update of an attribute within
-     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)}.
-     */
-    private static final String JPO_CALLER_KEY = "updateFormat";
-
-    /**
-     * Called TCL procedure within the TCL update to parse the new policy
-     * definition. The TCL procedure calls method
-     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)} with the new
-     * policy definition. All quot's are replaced by <code>@0@0@</code> and all
-     * apostroph's are replaced by <code>@1@1@</code>.
-     */
-    private static final String TCL_PROCEDURE
-            = "proc updateFormat {_sName _lsArgs}  {\n"
-                + "regsub -all {'} $_lsArgs {@0@0@} sArg\n"
-                + "regsub -all {\\\"} $sArg {@1@1@} sArg\n"
-                + "regsub -all {\\\\\\[} $sArg {[} sArg\n"
-                + "regsub -all {\\\\\\]} $sArg {]} sArg\n"
-                + "mql exec prog org.mxupdate.update.util.JPOCaller " + Format_mxJPO.JPO_CALLER_KEY + " ${_sName} \"${sArg}\"\n"
-            + "}\n";
 
     /** Reference to the edit program. */
     private String commandEdit = null;
@@ -152,41 +128,36 @@ public class Format_mxJPO
     }
 
     /**
-     * Writes the TCL update file for this attribute. The original method is
-     * overwritten because am attribute could not be only updated. A compare
+     * Writes the TCL update file for this format. The original method is
+     * overwritten because a format could not be only updated. A compare
      * must be done in front or otherwise some data is lost. >
      *
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
      * @throws IOException if the TCL update code could not be written to the
      *                     writer instance
-     * @see #PARAM_SUPPORT_FLAG_RESET_ON_CLONE
-     * @see #PARAM_SUPPORT_FLAG_RESET_ON_REVISION
      */
     @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
         throws IOException
     {
-        // write header
         this.writeHeader(_paramCache, _out);
 
-        // write attribute
-        _out.append("updateFormat \"${NAME}\"  {\n")
-            .append("  description \"").append(StringUtil_mxJPO.convertTcl(this.getDescription())).append("\"\n")
-            .append("  ").append(this.isHidden() ? "" : "!").append("hidden\n")
-            .append("  mime \"").append(StringUtil_mxJPO.convertTcl(this.mimeType)).append("\"\n")
-            .append("  suffix \"").append(StringUtil_mxJPO.convertTcl(this.fileSuffix)).append("\"\n")
-            .append("  type \"").append(StringUtil_mxJPO.convertTcl(this.type)).append("\"\n")
-            .append("  version \"").append(StringUtil_mxJPO.convertTcl(this.version)).append("\"\n");
+        _out.append("mxUpdate format \"${NAME}\"  {\n")
+            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n")
+            .append("    ").append(this.isHidden() ? "" : "!").append("hidden\n")
+            .append("    mime \"").append(StringUtil_mxJPO.convertUpdate(this.mimeType)).append("\"\n")
+            .append("    suffix \"").append(StringUtil_mxJPO.convertUpdate(this.fileSuffix)).append("\"\n")
+            .append("    type \"").append(StringUtil_mxJPO.convertUpdate(this.type)).append("\"\n")
+            .append("    version \"").append(StringUtil_mxJPO.convertUpdate(this.version)).append("\"\n");
         if (_paramCache.getValueBoolean(ValueKeys.DMFormatSupportsPrograms))  {
-            _out.append("  view \"").append(StringUtil_mxJPO.convertTcl(this.commandView)).append("\"\n")
-                .append("  edit \"").append(StringUtil_mxJPO.convertTcl(this.commandEdit)).append("\"\n")
-                .append("  print \"").append(StringUtil_mxJPO.convertTcl(this.commandPrint)).append("\"\n");
+            _out.append("    view \"").append(StringUtil_mxJPO.convertUpdate(this.commandView)).append("\"\n")
+                .append("    edit \"").append(StringUtil_mxJPO.convertUpdate(this.commandEdit)).append("\"\n")
+                .append("    print \"").append(StringUtil_mxJPO.convertUpdate(this.commandPrint)).append("\"\n");
         }
 
-        // append properties
-        this.getProperties().writeProperties(_paramCache, _out, "  ");
+        this.getProperties().writeProperties(_paramCache, _out, "    ");
 
         _out.append("}");
     }
@@ -207,50 +178,14 @@ public class Format_mxJPO
     }
 
     /**
-     * The method overwrites the original method to add the TCL procedure
-     * {@link #TCL_PROCEDURE} so that the format could be updated with
-     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)}.
-     *
-     * @param _paramCache       parameter cache
-     * @param _preMQLCode       MQL statements which must be called before the
-     *                          TCL code is executed
-     * @param _postMQLCode      MQL statements which must be called after the
-     *                          TCL code is executed
-     * @param _preTCLCode       TCL code which is defined before the source
-     *                          file is sourced
-     * @param _tclVariables     map of all TCL variables where the key is the
-     *                          name and the value is value of the TCL variable
-     *                          (the value is automatically converted to TCL
-     *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update from derived class failed
-     */
-    @Override()
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final CharSequence _preMQLCode,
-                          final CharSequence _postMQLCode,
-                          final CharSequence _preTCLCode,
-                          final Map<String,String> _tclVariables,
-                          final File _sourceFile)
-        throws Exception
-    {
-        // add TCL code for the procedure
-        final StringBuilder preTCLCode = new StringBuilder()
-                .append(Format_mxJPO.TCL_PROCEDURE)
-                .append(_preTCLCode);
-
-        super.update(_paramCache, _preMQLCode, _postMQLCode, preTCLCode, _tclVariables, _sourceFile);
-    }
-
-    /**
      * The method is called from the TCL update code to define the this
-     * attribute. If the correct use case is defined method
+     * format. If the correct use case is defined method
      * {@link #updateDimension(ParameterCache_mxJPO, String)} is called.
      *
      * @param _paramCache   parameter cache
      * @param _args         first index defines the use case (must be
-     *                      &quot;updateAttribute&quot; that the attribute
-     *                      is updated); second index the name of the attribute
+     *                      &quot;updateAttribute&quot; that the format
+     *                      is updated); second index the name of the format
      *                      to update
      * @throws Exception if the update of the dimension failed or for all other
      *                   use cases from super JPO call
@@ -261,16 +196,14 @@ public class Format_mxJPO
         throws Exception
     {
         // check if dimension is defined
-        if ((_args.length == 3) && Format_mxJPO.JPO_CALLER_KEY.equals(_args[0])) {
+        if ((_args.length == 4) && "mxUpdate".equals(_args[0]) && "format".equals(_args[1])) {
 // TODO: Exception Handling
-            // check that attribute names are equal
-            if (!this.getName().equals(_args[1]))  {
-                throw new Exception("wrong format '"
-                        + _args[1] + "' is set to update (currently format '" + this.getName()
-                        + "' is updated!)");
+            // check that format names are equal
+            if (!this.getName().equals(_args[2]))  {
+                throw new Exception("wrong format '" + _args[2] + "' is set to update (currently format '" + this.getName() + "' is updated!)");
             }
 
-            final String code = _args[2].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
+            final String code = _args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
 
             final FormatDefParser_mxJPO parser = new FormatDefParser_mxJPO(new StringReader(code));
             final Format_mxJPO format = parser.parse(_paramCache, this.getTypeDef(), this.getName());
@@ -289,7 +222,7 @@ public class Format_mxJPO
     /**
      * Calculates the delta between this current format definition and the
      * {@code _target} format definition and appends the MQL append commands
-     * to {@code _cmd}.
+     * to {@code _mql}.
      *
      * @param _paramCache   parameter cache
      * @param _cmd          string builder to append the MQL commands
