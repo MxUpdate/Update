@@ -27,10 +27,22 @@ public class UpdateBuilder_mxJPO
     /** Four spaces are used as prefix characters. */
     private final static int PREFIX_CHARS = 4;
 
+    /** Parameter cache. */
+    private final ParameterCache_mxJPO paramCache;
+    /** Current needed amount of prefix'. */
     private int prefixAmount = 1;
-
     /** Generated string. */
     private final StringBuilder strg = new StringBuilder();
+
+    /**
+     * Initializes the update builder.
+     *
+     * @param _paramCache   parameter cache
+     */
+    public UpdateBuilder_mxJPO(final ParameterCache_mxJPO _paramCache)
+    {
+        this.paramCache = _paramCache;
+    }
 
     /**
      * Starts the update builder.
@@ -65,8 +77,7 @@ public class UpdateBuilder_mxJPO
     public UpdateBuilder_mxJPO string(final String _tag,
                                       final String _value)
     {
-        this.strg.append(this.prefix()).append(_tag).append(" \"").append(StringUtil_mxJPO.convertUpdate(_value)).append("\"\n");
-        return this;
+        return this.stepStartNewLine().stepCmd(_tag).stepSpace().stepString(_value).stepEndLine();
     }
 
     /**
@@ -78,10 +89,10 @@ public class UpdateBuilder_mxJPO
      * @return this update builder instance
      */
     public UpdateBuilder_mxJPO stringIfNotEmpty(final String _tag,
-                                               final String _value)
+                                                final String _value)
     {
         if ((_value != null) && !_value.isEmpty())  {
-            this.strg.append(this.prefix()).append(_tag).append(" \"").append(StringUtil_mxJPO.convertUpdate(_value)).append("\"\n");
+            this.string(_tag, _value);
         }
         return this;
     }
@@ -96,8 +107,7 @@ public class UpdateBuilder_mxJPO
     public UpdateBuilder_mxJPO single(final String _tag,
                                       final String _value)
     {
-        this.strg.append(this.prefix()).append(_tag).append(' ').append(_value).append('\n');
-        return this;
+        return this.stepStartNewLine().stepCmd(_tag).stepSpace().stepString(_value).stepEndLine();
     }
 
     /**
@@ -115,9 +125,7 @@ public class UpdateBuilder_mxJPO
     {
         final boolean value = (_value != null) ? _value : _defaultValue;
 
-        this.strg.append(this.prefix()).append(value ? "" : '!').append(_tag).append('\n');
-
-        return this;
+        return this.stepStartNewLine().stepCmd(value ? "" : "!").stepCmd(_tag).stepEndLine();
     }
 
     /**
@@ -136,7 +144,7 @@ public class UpdateBuilder_mxJPO
         final boolean value = (_value != null) ? _value : _defaultValue;
 
         if (value)  {
-            this.strg.append(this.prefix()).append(_tag).append('\n');
+            this.stepStartNewLine().stepCmd(value ? "" : "!").stepCmd(_tag).stepEndLine();
         }
 
         return this;
@@ -152,10 +160,49 @@ public class UpdateBuilder_mxJPO
     public UpdateBuilder_mxJPO list(final String _tag,
                                     final Collection<String> _list)
     {
-        for (final String value : _list)  {
-            this.string(_tag, value);
+        for (final Object value : _list)  {
+            this.string(_tag, (String) value);
+        }
+        return this;
+    }
+
+    /**
+     * Appends {@code _list} for {@code _tag}.
+     *
+     * @param _tag      tag
+     * @param _list     list to append
+     * @return this update builder instance
+     */
+    public UpdateBuilder_mxJPO list(final Collection<? extends UpdateLine> _list)
+    {
+        for (final UpdateLine value : _list)  {
+            value.write(this);
         }
 
+        return this;
+    }
+
+    /**
+     * Appends all properties.
+     *
+     * @param _propList property list
+     * @return this update builder instance
+     */
+    public UpdateBuilder_mxJPO properties(final AdminPropertyList_mxJPO _propList)
+    {
+        _propList.writeProperties(this.paramCache, this);
+        return this;
+    }
+
+    /**
+     * Appends all settings.
+     *
+     * @param _propList property list
+     * @return this update builder instance
+     */
+    public UpdateBuilder_mxJPO settings(final AdminPropertyList_mxJPO _propList)
+    {
+        _propList.writeProperties(this.paramCache, this);
         return this;
     }
 
@@ -196,6 +243,43 @@ public class UpdateBuilder_mxJPO
         return this;
     }
 
+    public UpdateBuilder_mxJPO stepStartNewLine()
+    {
+        this.strg.append(this.prefix());
+        return this;
+    }
+
+    public UpdateBuilder_mxJPO stepString(final String _value)
+    {
+        this.strg.append('\"').append(StringUtil_mxJPO.convertUpdate(_value)).append('\"');
+        return this;
+    }
+
+    public UpdateBuilder_mxJPO stepCmd(final String _value)
+    {
+        this.strg.append(_value);
+        return this;
+    }
+
+    public UpdateBuilder_mxJPO stepSpace()
+    {
+        this.strg.append(' ');
+        return this;
+    }
+
+    public UpdateBuilder_mxJPO stepEndLine()
+    {
+        this.strg.append('\n');
+        return this;
+    }
+
+    /**
+     * Returns for legacy cases the {@link #strg string builder}.
+     *
+     * @return string builder
+     * @deprecated must not be used directly, needed only for legacy code
+     */
+    @Deprecated()
     public StringBuilder getStrg()
     {
         return this.strg;
@@ -205,7 +289,9 @@ public class UpdateBuilder_mxJPO
      * Returns current used prefix string.
      *
      * @return current used prefix string
+     * @deprecated must not be used directly, needed only for legacy code
      */
+    @Deprecated()
     public String prefix()
     {
       return String.format("%" + (this.prefixAmount * UpdateBuilder_mxJPO.PREFIX_CHARS) + "s", "");
@@ -220,5 +306,10 @@ public class UpdateBuilder_mxJPO
     public String toString()
     {
         return this.strg.toString();
+    }
+
+    public interface UpdateLine
+    {
+        void write(final UpdateBuilder_mxJPO _updateBuilder);
     }
 }

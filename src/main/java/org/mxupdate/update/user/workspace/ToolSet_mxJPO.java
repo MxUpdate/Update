@@ -60,8 +60,8 @@ public class ToolSet_mxJPO
         super.write(_paramCache, _out);
 
         // methods
-        for (final AdminProperty prop : this.getProperties())  {
-            if (prop.isSetting() && "%Member".equals(prop.getName()))  {
+        for (final AdminProperty prop : this.getProperties().getSettings())  {
+            if ("%Member".equals(prop.getName()))  {
                 _out.append(" \\\n    program \"").append(StringUtil_mxJPO.convertTcl(prop.getRefAdminName())).append("\"");
             }
         }

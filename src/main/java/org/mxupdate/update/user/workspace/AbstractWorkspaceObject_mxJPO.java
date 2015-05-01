@@ -194,16 +194,14 @@ abstract class AbstractWorkspaceObject_mxJPO
         for (final String user : this.visibleFor)  {
             _out.append(" \\\n    visible \"").append(StringUtil_mxJPO.convertTcl(user)).append("\"");
         }
-        for (final AdminProperty prop : this.properties)  {
-            if (!prop.isSetting())  {
-                _out.append(" \\\n    property \"").append(StringUtil_mxJPO.convertTcl(prop.getName())).append("\"");
-                if ((prop.getRefAdminName() != null) && (prop.getRefAdminType() != null))  {
-                    _out.append(" to ").append(prop.getRefAdminType())
-                        .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getRefAdminName())).append("\"");
-                }
-                if (prop.getValue() != null)  {
-                    _out.append(" value \"").append(StringUtil_mxJPO.convertTcl(prop.getValue())).append("\"");
-                }
+        for (final AdminProperty prop : this.properties.getProperties())  {
+            _out.append(" \\\n    property \"").append(StringUtil_mxJPO.convertTcl(prop.getName())).append("\"");
+            if ((prop.getRefAdminName() != null) && (prop.getRefAdminType() != null))  {
+                _out.append(" to ").append(prop.getRefAdminType())
+                    .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getRefAdminName())).append("\"");
+            }
+            if (prop.getValue() != null)  {
+                _out.append(" value \"").append(StringUtil_mxJPO.convertTcl(prop.getValue())).append("\"");
             }
         }
     }

@@ -264,12 +264,13 @@ public class Policy_mxJPO
             state.prepare();
         }
         super.prepare();
-        for (final AdminProperty property : new HashSet<AdminProperty>(this.getProperties()))  {
+        // extract state symbolic names from properties
+        for (final AdminProperty property : new HashSet<AdminProperty>(this.getProperties().getProperties()))  {
             if ((property.getName() != null) && property.getName().startsWith("state_"))  {
                 for (final State state : this.states)  {
                     if (state.name.equals(property.getValue()))  {
                         state.symbolicNames.add(property.getName());
-                        this.getProperties().remove(property);
+                        this.getProperties().getProperties().remove(property);
                     }
                 }
             }

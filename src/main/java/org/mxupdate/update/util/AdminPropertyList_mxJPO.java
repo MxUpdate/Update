@@ -18,12 +18,12 @@ package org.mxupdate.update.util;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeSet;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 
 /**
@@ -32,11 +32,7 @@ import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
  * @author The MxUpdate Team
  */
 public class AdminPropertyList_mxJPO
-    extends TreeSet<AdminProperty>
 {
-    /** Serial Version UID. */
-    private static final long serialVersionUID = -2115416705338825616L;
-
     /** Set of all ignored URLs from the XML definition for admin properties.*/
     private static final Set<String> IGNORED_URLS = new HashSet<String>(1);
     static  {
@@ -50,6 +46,11 @@ public class AdminPropertyList_mxJPO
      * {@link #prepare(ParameterCache_mxJPO)}.
      */
     private final Stack<AdminProperty> propertiesStack = new Stack<AdminProperty>();
+
+    /** Properties. */
+    private final SortedSet<AdminProperty> properties = new TreeSet<AdminProperty>();
+    /** Settings. */
+    private final SortedSet<AdminProperty> settings = new TreeSet<AdminProperty>();
 
     /**
      * Parsed administration object related XML tags. This includes:
@@ -98,11 +99,66 @@ public class AdminPropertyList_mxJPO
     }
 
     /**
-     * Prepares the properties by sorting all properties.
+     * Prepares the properties by differ between settings and properties and
+     * sorting them.
      */
     public void prepare()
     {
-        this.addAll(this.propertiesStack);
+        for (final AdminProperty prop : this.propertiesStack)  {
+            if (prop.isSetting())  {
+                this.settings.add(prop);
+            } else  {
+                this.properties.add(prop);
+            }
+        }
+    }
+
+    /**
+     * Returns all {@link #properties}.
+     *
+     * @return all properties
+     * @deprecated needed for legacy code
+     */
+    @Deprecated()
+    public SortedSet<AdminProperty> getProperties()
+    {
+        return this.properties;
+    }
+
+    /**
+     * Returns all {@link #settings}.
+     *
+     * @return all settings
+     * @deprecated needed for legacy code
+     */
+    @Deprecated()
+    public SortedSet<AdminProperty> getSettings()
+    {
+        return this.settings;
+    }
+
+    /**
+     * Writes the MQL code to add all none standard properties to the TCL
+     * update file.
+     *
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     */
+    public void writeProperties(final ParameterCache_mxJPO _paramCache,
+                                final UpdateBuilder_mxJPO _updateBuilder)
+    {
+        for (final AdminProperty prop : this.properties)  {
+            if (PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null)  {
+                _updateBuilder.stepStartNewLine().stepCmd("property").stepSpace().stepString(prop.getName());
+                if (((prop.getRefAdminName()) != null) && (prop.getRefAdminType() != null))  {
+                    _updateBuilder.stepSpace().stepCmd("to").stepSpace().stepCmd(prop.getRefAdminType()).stepSpace().stepString(prop.getRefAdminName());
+                }
+                if (prop.getValue() != null)  {
+                    _updateBuilder.stepSpace().stepCmd("value").stepSpace().stepString(prop.getValue());
+                }
+                _updateBuilder.stepEndLine();
+            }
+        }
     }
 
     /**
@@ -113,14 +169,16 @@ public class AdminPropertyList_mxJPO
      * @param _out          appendable instance to the TCL update file
      * @param _typeDef      type definition
      * @throws IOException if the write to the TCL update file failed
+     * @deprecated replaced by {@link #writeProperties(ParameterCache_mxJPO, UpdateBuilder_mxJPO)}
      */
+    @Deprecated()
     public void writeProperties(final ParameterCache_mxJPO _paramCache,
                                 final Appendable _out,
                                 final String _prefix)
         throws IOException
     {
-        for (final AdminProperty prop : this)  {
-            if ((PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null) && !prop.isSetting())  {
+        for (final AdminProperty prop : this.properties)  {
+            if (PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null)  {
                 _out.append(_prefix)
                     .append("property \"").append(StringUtil_mxJPO.convertUpdate(prop.getName())).append("\"");
                 if (((prop.getRefAdminName()) != null) && (prop.getRefAdminType() != null))  {
@@ -141,21 +199,41 @@ public class AdminPropertyList_mxJPO
      *
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
+     */
+    public void writeSettings(final ParameterCache_mxJPO _paramCache,
+                              final UpdateBuilder_mxJPO _updateBuilder)
+    {
+        for (final AdminProperty prop : this.properties)  {
+            _updateBuilder
+                    .stepStartNewLine()
+                    .stepCmd("setting").stepSpace()
+                    .stepString(prop.getSettingName()).stepSpace()
+                    .stepString(prop.getValue())
+                    .stepEndLine();
+        }
+    }
+
+    /**
+     * Writes the MQL code to add all none standard properties to the TCL
+     * update file.
+     *
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
      * @param _typeDef      type definition
      * @throws IOException if the write to the TCL update file failed
+     * @deprecated replaced by {@link #writeSettings(ParameterCache_mxJPO, UpdateBuilder_mxJPO)}
      */
+    @Deprecated()
     public void writeSettings(final ParameterCache_mxJPO _paramCache,
                               final Appendable _out,
                               final String _prefix)
         throws IOException
     {
-        for (final AdminProperty prop : this)  {
-            if (prop.isSetting())  {
-                _out.append(_prefix)
-                    .append("setting \"").append(StringUtil_mxJPO.convertUpdate(prop.getSettingName())).append("\"")
-                    .append(" \"").append(StringUtil_mxJPO.convertUpdate(prop.getValue())).append('\"')
-                    .append('\n');
-            }
+        for (final AdminProperty prop : this.settings)  {
+            _out.append(_prefix)
+                .append("setting \"").append(StringUtil_mxJPO.convertUpdate(prop.getSettingName())).append("\"")
+                .append(" \"").append(StringUtil_mxJPO.convertUpdate(prop.getValue())).append('\"')
+                .append('\n');
         }
     }
 
@@ -175,8 +253,8 @@ public class AdminPropertyList_mxJPO
                                final TypeDef_mxJPO _typeDef)
         throws IOException
     {
-        for (final AdminProperty prop : this)  {
-            if ((PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null) && !prop.isSetting())  {
+        for (final AdminProperty prop : this.properties)  {
+            if (PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null)  {
                 _out.append("\nmql escape add property \"").append(StringUtil_mxJPO.convertTcl(prop.getName())).append("\"")
                     .append(" \\\n    on ")
                     .append(_typeDef.getMxAdminName())
@@ -212,11 +290,14 @@ public class AdminPropertyList_mxJPO
                           final String _propPrefix,
                           final AdminPropertyList_mxJPO _currents)
     {
+        final SortedSet<AdminProperty> thisProps = new TreeSet<AdminProperty>(this.propertiesStack);
+        final SortedSet<AdminProperty> currProps = new TreeSet<AdminProperty>(_currents.propertiesStack);
+
         // check properties to remove
         if (_currents != null)  {
-            for (final AdminProperty curProp : _currents)  {
+            for (final AdminProperty curProp : currProps)  {
                 boolean found = false;
-                for (final AdminProperty tarProp : this)  {
+                for (final AdminProperty tarProp : thisProps)  {
                     if (tarProp.compareTo(curProp) == 0)  {
                         found = true;
                         break;
@@ -241,10 +322,10 @@ public class AdminPropertyList_mxJPO
             }
         }
         // check properties to add
-        for (final AdminProperty tarProp : this)  {
+        for (final AdminProperty tarProp : thisProps)  {
             boolean found = false;
             if (_currents != null)  {
-                for (final AdminProperty curProp : _currents)  {
+                for (final AdminProperty curProp : currProps)  {
                     if (tarProp.compareTo(curProp) == 0)  {
                         found = true;
                         break;
@@ -391,16 +472,11 @@ public class AdminPropertyList_mxJPO
         @Override()
         public int compareTo(final AdminProperty _toCompare)
         {
-            int ret = StringUtil_mxJPO.compare(this.name, _toCompare.name);
-            if (ret == 0)  {
-                ret = StringUtil_mxJPO.compare(this.refAdminType, _toCompare.refAdminType);
-            }
-            if (ret == 0)  {
-                ret = StringUtil_mxJPO.compare(this.refAdminName, _toCompare.refAdminName);
-            }
-            if (ret == 0)  {
-                ret = StringUtil_mxJPO.compare(this.value, _toCompare.value);
-            }
+            int ret = 0;
+            ret = CompareToUtil_mxJPO.compare(ret, this.name,         _toCompare.name);
+            ret = CompareToUtil_mxJPO.compare(ret, this.refAdminType, _toCompare.refAdminType);
+            ret = CompareToUtil_mxJPO.compare(ret, this.refAdminName, _toCompare.refAdminName);
+            ret = CompareToUtil_mxJPO.compare(ret, this.value,        _toCompare.value);
             return ret;
         }
 

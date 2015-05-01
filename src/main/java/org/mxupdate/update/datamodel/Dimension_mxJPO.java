@@ -158,19 +158,21 @@ public class Dimension_mxJPO
         }
         for (final Unit unit : this.units)  {
             unit.properties.prepare();
-            for (final AdminProperty prop : new HashSet<AdminProperty>(unit.properties))  {
-                // extract settings
-                if (prop.isSetting())  {
-                    unit.settings.put(prop.getName().substring(1), prop.getValue());
-                    unit.properties.remove(prop);
-                } else if ("unit".equals(prop.getRefAdminType()))  {
+            // extract settings
+            for (final AdminProperty prop : new HashSet<AdminProperty>(unit.properties.getSettings()))  {
+                unit.settings.put(prop.getName().substring(1), prop.getValue());
+                unit.properties.getSettings().remove(prop);
+            }
+            // extract system information
+            for (final AdminProperty prop : new HashSet<AdminProperty>(unit.properties.getProperties()))  {
+                if ("unit".equals(prop.getRefAdminType()))  {
                     Set<String> units = unit.systemInfos.get(prop.getName());
                     if (units == null)  {
                         units = new TreeSet<String>();
                         unit.systemInfos.put(prop.getName(), units);
                     }
                     units.add(prop.getRefAdminName());
-                    unit.properties.remove(prop);
+                    unit.properties.getProperties().remove(prop);
                 }
             }
         }
@@ -223,7 +225,7 @@ public class Dimension_mxJPO
                     .append("\" \"").append(StringUtil_mxJPO.convertUpdate(setting.getValue())).append("\"\n");
             }
             // properties
-            for (final AdminProperty prop : unit.properties)  {
+            for (final AdminProperty prop : unit.properties.getProperties())  {
                 _out.append("        property \"").append(StringUtil_mxJPO.convertUpdate(prop.getName())).append("\"");
                 if ((prop.getRefAdminName() != null) && (prop.getRefAdminType() != null))  {
                     _out.append(" to ").append(prop.getRefAdminType()).append(" \"").append(StringUtil_mxJPO.convertUpdate(prop.getRefAdminName())).append("\"");

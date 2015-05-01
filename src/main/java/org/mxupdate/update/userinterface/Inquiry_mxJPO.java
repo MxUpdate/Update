@@ -164,12 +164,10 @@ public class Inquiry_mxJPO
         _out.append(" \\\n    pattern \"").append(StringUtil_mxJPO.convertTcl(this.pattern)).append("\"")
             .append(" \\\n    format \"").append(StringUtil_mxJPO.convertTcl(this.format)).append("\"")
             .append(" \\\n    file [file join \"${FILE}\"]");
-        for (final AdminProperty prop : this.getProperties())  {
-            if (prop.isSetting())  {
-                _out.append(" \\\n    add argument \"")
-                    .append(StringUtil_mxJPO.convertTcl(prop.getName().substring(1))).append("\"")
-                    .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getValue())).append("\"");
-            }
+        for (final AdminProperty prop : this.getProperties().getSettings())  {
+            _out.append(" \\\n    add argument \"")
+                .append(StringUtil_mxJPO.convertTcl(prop.getName().substring(1))).append("\"")
+                .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getValue())).append("\"");
         }
     }
 
@@ -241,10 +239,8 @@ public class Inquiry_mxJPO
                 .append(" !hidden description \"\" pattern \"\" format \"\" code \"\"");
 
         // reset arguments
-        for (final AdminProperty prop : this.getProperties())  {
-            if (prop.isSetting())  {
-                preMQLCode.append(" remove argument \"").append(StringUtil_mxJPO.convertMql(prop.getName().substring(1))).append('\"');
-            }
+        for (final AdminProperty prop : this.getProperties().getSettings())  {
+            preMQLCode.append(" remove argument \"").append(StringUtil_mxJPO.convertMql(prop.getName().substring(1))).append('\"');
         }
 
         // append already existing pre MQL code

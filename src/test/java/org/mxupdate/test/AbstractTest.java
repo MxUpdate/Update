@@ -139,10 +139,8 @@ public abstract class AbstractTest
 
         /** Configuration item JPO program. */
         PRG_JPO("program", null, false, null, null, "JPO", null, "", "program/jpo", true, "mql"),
-
         /** Configuration item MQL program. */
         PRG_MQL_PROGRAM("program", null, false, null, null, "Program", null, "", "program/mql", true, "mql"),
-
         /** Configuration item page program. */
         PRG_PAGE("page", null, false, null, null, "Page", "PAGE", "PAGE_", "program/page", true, "mql"),
 
@@ -164,6 +162,9 @@ public abstract class AbstractTest
         OTHER_DEPARTMENT(null, "Department", false, "Organization", "eService Production", "Department", null, null, null, true, "mql"),
         /** Other definition for plant. */
         OTHER_PLANT(null, "Plant", false, "Organization", "eService Production", "Plant", null, null, null, true, "mql"),
+
+        /** Configuration item system package. */
+        SYS_PACKAGE("package", null, false, null, null, "SystemPackage", "PACKAGE", "PACKAGE_", "system/package", true, "mql"),
 
         /** Configuration item channel. */
         UI_CHANNEL("channel", null, false, null, null, "Channel", "CHANNEL", "CHANNEL_", "userinterface/channel", true, "mxUpdate"),

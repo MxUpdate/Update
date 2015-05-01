@@ -31,16 +31,14 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO;
-import org.mxupdate.update.datamodel.Dimension_mxJPO;
-import org.mxupdate.update.datamodel.Expression_mxJPO;
-import org.mxupdate.update.datamodel.Format_mxJPO;
-import org.mxupdate.update.datamodel.Policy_mxJPO;
-import org.mxupdate.update.datamodel.Rule_mxJPO;
-import org.mxupdate.update.userinterface.Channel_mxJPO;
-import org.mxupdate.update.userinterface.Command_mxJPO;
-import org.mxupdate.update.userinterface.Menu_mxJPO;
-import org.mxupdate.update.userinterface.Portal_mxJPO;
+import org.mxupdate.update.datamodel.Interface_mxJPO;
+import org.mxupdate.update.datamodel.Type_mxJPO;
+import org.mxupdate.update.user.Group_mxJPO;
+import org.mxupdate.update.user.PersonAdmin_mxJPO;
+import org.mxupdate.update.user.Role_mxJPO;
+import org.mxupdate.update.userinterface.Form_mxJPO;
+import org.mxupdate.update.userinterface.Inquiry_mxJPO;
+import org.mxupdate.update.userinterface.Table_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
@@ -397,7 +395,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
 
         // fetch all required properties
         AdminProperty author = null, appl = null, installationDate = null, installer = null, origName = null, version = null;
-        for (final AdminProperty prop : this.properties)  {
+        for (final AdminProperty prop : this.properties.getProperties())  {
             if ((prop.getRefAdminName() == null) && (prop.getRefAdminType() == null))  {
                 if (PropertyDef_mxJPO.AUTHOR.equals(prop.getName()))  {
                     author = prop;
@@ -576,20 +574,17 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
 
         // remove all properties
         // (only if not attribute, because attributes and formats uses calulated deltas)
-        if (!(this instanceof AbstractAttribute_mxJPO)
-                && !(this instanceof Dimension_mxJPO)
-                && !(this instanceof Expression_mxJPO)
-                && !(this instanceof Format_mxJPO)
-                && !(this instanceof Policy_mxJPO)
-                && !(this instanceof Rule_mxJPO)
-                && !(this instanceof Channel_mxJPO)
-                && !(this instanceof Command_mxJPO)
-                && !(this instanceof Menu_mxJPO)
-                && !(this instanceof Portal_mxJPO))  {
+        if ((this instanceof Interface_mxJPO)
+                || (this instanceof Type_mxJPO)
+                || (this instanceof Group_mxJPO)
+                || (this instanceof PersonAdmin_mxJPO)
+                || (this instanceof Role_mxJPO)
+                || (this instanceof Form_mxJPO)
+                || (this instanceof Inquiry_mxJPO)
+                || (this instanceof Table_mxJPO))  {
 
-            for (final AdminProperty prop : this.properties)  {
-                // % must be ignored because this means settings
-                if ((PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null) && !prop.isSetting())  {
+            for (final AdminProperty prop : this.properties.getProperties())  {
+                if (PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null)  {
                     // must be done via modify because of properties without names
                     preMQLCode.append("escape mod ").append(this.getTypeDef().getMxAdminName())
                               .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")

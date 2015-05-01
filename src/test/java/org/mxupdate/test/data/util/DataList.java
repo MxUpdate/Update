@@ -27,6 +27,7 @@ import matrix.util.MatrixException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractData;
 
 /**
@@ -40,6 +41,31 @@ public class DataList<DATA extends AbstractData<?>>
 {
     /** Dummy serial UID. */
     private static final long serialVersionUID = 1L;
+    /** Prefix used for update. */
+    private final String prefix4Update;
+    /** Prefix used for create. */
+    private final String prefix4Create;
+
+    /**
+     * Default data list w/o any prefixes.
+     */
+    public DataList()
+    {
+        this("", "");
+    }
+
+    /**
+     * Data list with prefixes.
+     *
+     * @param _prefix4Update    prefix used for update failed
+     * @param _prefix4Create    prefix used for create
+     */
+    public DataList(final String _prefix4Update,
+                    final String _prefix4Create)
+    {
+        this.prefix4Update = _prefix4Update;
+        this.prefix4Create = _prefix4Create;
+    }
 
     /**
      * Appends all elements from this list.
@@ -51,7 +77,7 @@ public class DataList<DATA extends AbstractData<?>>
                              final StringBuilder _cmd)
     {
         for (final DATA data : this)  {
-            _cmd.append("        ").append(data.getCI().getMxType()).append(" \"").append(AbstractTest.convertUpdate(data.getName())).append("\"\n");
+            _cmd.append(_prefix).append(this.prefix4Update).append(data.getCI().getMxType()).append(" \"").append(AbstractTest.convertUpdate(data.getName())).append("\"\n");
         }
     }
 
@@ -74,7 +100,7 @@ public class DataList<DATA extends AbstractData<?>>
 
             // append all elements
             for (final Entry<String,Set<String>> dataElem : dataElems.entrySet())  {
-                _cmd.append(' ').append(dataElem.getKey()).append(' ').append(StringUtils.join(dataElem.getValue(), ","));
+                _cmd.append(' ').append(this.prefix4Create).append(dataElem.getKey()).append(' ').append(StringUtils.join(dataElem.getValue(), ","));
             }
         }
     }
@@ -87,7 +113,7 @@ public class DataList<DATA extends AbstractData<?>>
     public void append4CreateViaAdd(final StringBuilder _cmd)
     {
         for (final DATA data : this)  {
-            _cmd.append(" add ").append(data.getCI().getMxType()).append(" \"").append(data.getName()).append('\"');
+            _cmd.append(" add ").append(this.prefix4Create).append(data.getCI().getMxType()).append(" \"").append(data.getName()).append('\"');
         }
     }
 
@@ -116,5 +142,35 @@ public class DataList<DATA extends AbstractData<?>>
             ret.add("\"" + AbstractTest.convertUpdate(data.getName()) + "\"");
         }
         return ret;
+    }
+
+    /**
+     * Checks for all defined flags.
+     *
+     * @param _parentLine   parent line where the flags must be defined
+     * @param _errorLabel   label used for shown error
+     */
+    public void checkExport(final ExportParser _exportParser,
+                            final String _path)
+    {
+        final StringBuilder ciFile = new StringBuilder();
+        this.appendUpdate("", ciFile);
+
+        if (!ciFile.toString().trim().isEmpty())  {
+            final Map<String,Set<String>> allChecks = new HashMap<String,Set<String>>();
+            for (final String line : ciFile.toString().split("\n"))  {
+                final int idx = line.indexOf(' ');
+                final String key   = line.substring(0, idx).trim();
+                final String value = line.substring(idx).trim();
+                if (!allChecks.containsKey(key))  {
+                    allChecks.put(key, new HashSet<String>());
+                }
+                allChecks.get(key).add(value);
+            }
+
+            for (final Entry<String,Set<String>> checks : allChecks.entrySet())  {
+                _exportParser.checkList((_path.isEmpty() ? "" : _path + "/") + checks.getKey(), checks.getValue());
+            }
+        }
     }
 }

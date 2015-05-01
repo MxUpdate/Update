@@ -226,10 +226,8 @@ public class RelationshipData
         this.getSingles().checkExport(_exportParser, "");
         this.from        .checkExport(_exportParser);
         this.to          .checkExport(_exportParser);
-
-        _exportParser
-                .checkList("attribute", this.attributes.toUpdateStringList())
-                .checkList("rule",      this.rules.toUpdateStringList());
+        this.attributes  .checkExport(_exportParser, "");
+        this.rules       .checkExport(_exportParser, "");
     }
 
     /**

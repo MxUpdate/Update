@@ -263,7 +263,7 @@ public class Relationship_mxJPO
                          final Appendable _out)
         throws IOException
     {
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO();
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
 
         this.writeHeader(_paramCache, updateBuilder.getStrg());
 
