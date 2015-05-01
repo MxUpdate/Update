@@ -21,6 +21,7 @@
     <test name="1 - Test Updates" annotations="JDK">
         <packages>
             <package name="org.mxupdate.test.update.datamodel"/>
+            <package name="org.mxupdate.test.update.userinterface"/>
         </packages>
     </test>
 

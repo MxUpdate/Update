@@ -173,7 +173,7 @@ public abstract class AbstractTest
         /** Configuration item inquiry. */
         UI_INQUIRY("inquiry", null, false, null, null, "Inquiry", "INQUIRY", "INQUIRY_", "userinterface/inquiry", true, "mql"),
         /** Configuration item menu. */
-        UI_MENU("menu", null, false, null, null, "Menu", "MENU", "MENU_", "userinterface/menu", true, "mql"),
+        UI_MENU("menu", null, false, null, null, "Menu", "MENU", "MENU_", "userinterface/menu", true, "mxUpdate"),
         /** Configuration item portal. */
         UI_PORTAL("portal", null, false, null, null, "Portal", "PORTAL", "PORTAL_", "userinterface/portal", true, "mql"),
         /** Configuration item table.*/

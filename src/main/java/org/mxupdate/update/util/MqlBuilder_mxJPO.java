@@ -272,6 +272,18 @@ public final class MqlBuilder_mxJPO
         /**
          * Executes given MQL command.
          *
+         * @param _paramCache       parameter cache with the context
+         * @throws MatrixException if execute failed
+         */
+        public String exec(final ParameterCache_mxJPO _paramCache)
+            throws MatrixException
+        {
+            return this.exec(_paramCache.getContext());
+        }
+
+        /**
+         * Executes given MQL command.
+         *
          * @param _context              MX context for this request
          * @return trimmed result of the MQL execution
          * @throws MatrixException if MQL execution failed

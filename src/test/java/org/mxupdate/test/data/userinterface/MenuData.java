@@ -17,11 +17,13 @@ package org.mxupdate.test.data.userinterface;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.ExportParser.Line;
+import org.testng.Assert;
 
 /**
  * Used to define a menu, create them and test the result.
@@ -31,12 +33,10 @@ import org.mxupdate.test.AbstractTest;
 public class MenuData
     extends AbstractCommandData<MenuData>
 {
-    /**
-     * List of all children commands / menus.
-     *
-     * @see #addChild(AbstractCommandData)
-     */
+    /** List of all children commands / menus. */
     private final List<AbstractCommandData<?>> children = new ArrayList<AbstractCommandData<?>>();
+    /** Tree menu. */
+    private Boolean treeMenu;
 
     /**
      * Constructor to initialize this menu.
@@ -56,11 +56,21 @@ public class MenuData
      *
      * @param _child    child to append
      * @return this menu instance
-     * @see #children
      */
     public MenuData addChild(final AbstractCommandData<?> _child)
     {
         this.children.add(_child);
+        return this;
+    }
+
+    /**
+     * Defines that this menu is a {@link #treeMenu tree menu}.
+     *
+     * @return this menu instance
+     */
+    public MenuData setTreeMenu(final Boolean _treeMenu)
+    {
+        this.treeMenu = _treeMenu;
         return this;
     }
 
@@ -73,17 +83,25 @@ public class MenuData
     @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder();
-        this.append4CIFileHeader(cmd);
-        cmd.append("mql escape mod menu \"${NAME}\"");
-
-        for (final AbstractCommandData<?> child : this.children)  {
-            cmd.append(" add ").append(child.getCI().getMxType())
-               .append(" \"").append(AbstractTest.convertTcl(child.getName())).append('\"');
+        final StringBuilder strg = new StringBuilder();
+        this.append4CIFileHeader(strg);
+        strg.append("mxUpdate menu \"${NAME}\" {\n");
+        if (this.treeMenu != null)  {
+            strg.append("    ").append(this.treeMenu ? "" : "!").append("treemenu\n");
         }
-        this.append4CIFileValues(cmd);
+        this.getFlags().append4CIFileValues("    ", strg, "\n");
+        this.getValues().appendUpdate("    ", strg, "\n");
+        this.getSettings().appendUpdate("    ", strg, "\n");
+        this.getProperties().appendCIFileUpdateFormat("    ", strg);
+        for (final String ciLine : this.getCILines())  {
+            strg.append("    ").append(ciLine).append('\n');
+        }
+        for (final AbstractCommandData<?> child : this.children)  {
+            strg.append("    ").append(child.getCI().getMxType()).append(" \"").append(AbstractTest.convertUpdate(child.getName())).append("\"\n");
+        }
+        strg.append("}");
 
-        return cmd.toString();
+        return strg.toString();
     }
 
     /**
@@ -120,7 +138,11 @@ public class MenuData
             cmd.append(";\n")
                .append("escape add property ").append(this.getSymbolicName())
                .append(" on program eServiceSchemaVariableMapping.tcl")
-               .append(" to menu \"").append(AbstractTest.convertMql(this.getName())).append("\"");
+               .append(" to menu \"").append(AbstractTest.convertMql(this.getName())).append("\";");
+
+            if ((this.treeMenu != null) && this.treeMenu)  {
+                cmd.append("escape mod menu Tree add menu \"").append(AbstractTest.convertMql(this.getName())).append("\";");
+            }
 
             this.getTest().mql(cmd);
         }
@@ -146,19 +168,45 @@ public class MenuData
     }
 
     /**
-     * Evaluates all 'adds' in the configuration item file (e.g. add user, add
-     * setting, ...).
+     * Checks the export of this data piece if all values are correct defined.
      *
-     * @param _needAdds     set with add strings used to append the adds for
-     *                      {@link #children}
-     * @see #children
+     * @param _exportParser     parsed export
+     * @throws MatrixException if check failed
      */
     @Override()
-    protected void evalAdds4CheckExport(final Set<String> _needAdds)
+    public void checkExport(final ExportParser _exportParser)
+        throws MatrixException
     {
-        super.evalAdds4CheckExport(_needAdds);
-        for (final AbstractCommandData<?> child : this.children)  {
-            _needAdds.add(child.getCI().getMxType() + " \"" + AbstractTest.convertTcl(child.getName()) + "\"");
+        // check symbolic name
+        Assert.assertEquals(
+                _exportParser.getSymbolicName(),
+                this.getSymbolicName(),
+                "check symbolic name");
+
+        if ((this.treeMenu != null) && this.treeMenu)  {
+            this.checkValueExists(_exportParser, "treemenu", "treemenu", true);
+        } else  {
+            this.checkNotExistingSingleValue(_exportParser, "treemenu", "treemenu");
         }
+
+        this.getFlags().checkExport(_exportParser.getRootLines().get(0), "");
+        this.getValues().checkExport(_exportParser);
+        this.getSettings().checkExport(_exportParser.getLines("/mxUpdate/setting/@value"));
+        this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
+
+        // fetch child from export file
+        final List<String> childDefs = new ArrayList<String>();
+        for (final Line line : _exportParser.getRootLines().get(0).getChildren())  {
+            if ("menu".equals(line.getTag()) || "command".equals(line.getTag()))  {
+                childDefs.add(line.getTag() + " " + line.getValue());
+            }
+        }
+        // fetch child from this definition
+        final List<String> thisDefs = new ArrayList<String>();
+        for (final AbstractCommandData<?> child : this.children)  {
+            thisDefs.add(child.getCI().getMxType() + " \"" + AbstractTest.convertUpdate(child.getName()) + "\"");
+        }
+        // and compare
+        Assert.assertEquals(childDefs, thisDefs, "check child of menu");
     }
 }

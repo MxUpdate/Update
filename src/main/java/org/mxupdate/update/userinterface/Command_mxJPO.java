@@ -23,7 +23,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.userinterface.command.CommandDefParser_mxJPO;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
@@ -38,7 +37,7 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
  * @author The MxUpdate Team
  */
 public class Command_mxJPO
-    extends AbstractAdminObject_mxJPO
+    extends AbstractCommand_mxJPO
 {
     /**
      * Set of all ignored URLs from the XML definition for commands.
@@ -47,16 +46,9 @@ public class Command_mxJPO
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
-        Command_mxJPO.IGNORED_URLS.add("/input");
         Command_mxJPO.IGNORED_URLS.add("/userRefList");
     }
 
-    /** Alt label of the command. */
-    private String alt;
-    /** Label of the command. */
-    private String label;
-    /** HRef of the command. */
-    private String href;
     /** Sorted list of assigned users of the command. */
     private final SortedSet<String> users = new TreeSet<String>();
     /** Code of the command. */
@@ -77,10 +69,7 @@ public class Command_mxJPO
     /**
      * Parses all command specific values. This includes:
      * <ul>
-     * <li>{@link #alt}</li>
      * <li>{@link #code}</li>
-     * <li>{@link #href}</li>
-     * <li>{@link #label}</li>
      * <li>user references in {@link #users}</li>
      * </ul>
      *
@@ -98,17 +87,8 @@ public class Command_mxJPO
         final boolean parsed;
         if (Command_mxJPO.IGNORED_URLS.contains(_url))  {
             parsed = true;
-        } else if ("/alt".equals(_url))  {
-            this.alt = _content;
-            parsed = true;
         } else if ("/code".equals(_url))  {
             this.code = _content;
-            parsed = true;
-        } else if ("/href".equals(_url))  {
-            this.href = _content;
-            parsed = true;
-        } else if ("/label".equals(_url))  {
-            this.label = _content;
             parsed = true;
         } else if ("/userRefList/userRef".equals(_url))  {
             this.users.add(_content);
@@ -120,10 +100,18 @@ public class Command_mxJPO
     }
 
     /**
-     * Writes the update script for this policy.
-     * The policy specific information are:
+     * Writes the update script for this command.
+     * The command specific information are:
      * <ul>
-     * <li>{@link #allState all state access flag}</li>
+     * <li>description</li>
+     * <li>hidden flag (only if <i>true</i>)</li>
+     * <li>label</li>
+     * <li>href</li>
+     * <li>alt label</li>
+     * <li>user</li>
+     * <li>settings</li>
+     * <li>properties</li>
+     * <li>code</li>
      * </ul>
      *
      * @param _paramCache   parameter cache
@@ -142,9 +130,9 @@ public class Command_mxJPO
         if (this.isHidden())  {
             _out.append("    hidden\n");
         }
-        _out.append("    label \"").append(StringUtil_mxJPO.convertUpdate(this.label)).append("\"\n")
-            .append("    href \"").append(StringUtil_mxJPO.convertUpdate(this.href)).append("\"\n")
-            .append("    alt \"").append(StringUtil_mxJPO.convertUpdate(this.alt)).append("\"\n");
+        _out.append("    label \"").append(StringUtil_mxJPO.convertUpdate(this.getLabel())).append("\"\n")
+            .append("    href \"").append(StringUtil_mxJPO.convertUpdate(this.getHref())).append("\"\n")
+            .append("    alt \"").append(StringUtil_mxJPO.convertUpdate(this.getAlt())).append("\"\n");
         // users
         for (final String user : this.users)  {
             _out.append("    user \"").append(StringUtil_mxJPO.convertUpdate(user)).append("\"\n");
@@ -161,25 +149,8 @@ public class Command_mxJPO
     }
 
     /**
-     * Only implemented as stub because
-     * {@link #write(ParameterCache_mxJPO, Appendable)} is new implemented.
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the TCL update code for the command could not be
-     *                     written
-     */
-    @Override()
-    protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
-        throws IOException
-    {
-    }
-
-    /**
      * The method is called from the TCL update code to define the this
-     * attribute. If the correct use case is defined method
-     * {@link #updateDimension(ParameterCache_mxJPO, String)} is called.
+     * command.
      *
      * @param _paramCache   parameter cache
      * @param _args         first index defines the use case (must be
@@ -236,9 +207,9 @@ public class Command_mxJPO
     {
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description", _target.getDescription(),                           this.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      _target.isHidden(),                                 this.isHidden());
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "alt",         _target.alt,                                        this.alt);
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "href",        _target.href,                                       this.href);
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "label",       _target.label,                                      this.label);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "alt",         _target.getAlt(),                                   this.getAlt());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "href",        _target.getHref(),                                  this.getHref());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "label",       _target.getLabel(),                                 this.getLabel());
         DeltaUtil_mxJPO.calcListDelta(_mql,  "user",        _target.users,                                      this.users);
         DeltaUtil_mxJPO.calcValueDelta(_mql, "code",        (_target.code == null) ? "" :_target.code.trim(),   this.code);
 

@@ -15,20 +15,26 @@
 
 package org.mxupdate.update.userinterface;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.util.MqlUtil_mxJPO;
+import org.mxupdate.update.userinterface.menu.MenuDefParser_mxJPO;
+import org.mxupdate.update.util.DeltaUtil_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.xml.sax.SAXException;
 
 /**
  * The class is used to export and import / update menu configuration items.
@@ -36,34 +42,21 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @author The MxUpdate Team
  */
 public class Menu_mxJPO
-    extends Command_mxJPO
+    extends AbstractCommand_mxJPO
 {
-    /**
-     * Set of all ignored URLs from the XML definition for menus.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     */
+    /** Set of all ignored URLs from the XML definition for menus. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
         Menu_mxJPO.IGNORED_URLS.add("/commandRefList");
         Menu_mxJPO.IGNORED_URLS.add("/menuRefList");
     }
 
-    /**
-     * Flag to store the information that the menu is a tree menu.
-     *
-     * @see #prepare(ParameterCache_mxJPO)
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
-     */
+    /** Flag to store the information that the menu is a type tree menu. */
     private boolean treeMenu = false;
-
-    /**
-     * Holds all children of this menu instance.
-     *
-     * @see MenuChild
-     */
+    /** Holds all children of this menu instance. */
     private final Stack<MenuChild> children = new Stack<MenuChild>();
+    /** Holds all children of this menu instance correct sorted. */
+    private final List<MenuChild> childrenSorted = new ArrayList<MenuChild>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -75,6 +68,24 @@ public class Menu_mxJPO
                       final String _mxName)
     {
         super(_typeDef, _mxName);
+    }
+
+    /**
+     * {@inheritDoc}
+     * Also it is checked if the menu is assigned to the tree menu.
+     */
+    @Override()
+    protected void parse(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException, SAXException, IOException
+    {
+        super.parse(_paramCache);
+
+        final String isMenuTreeStr = MqlBuilder_mxJPO.mql()
+                .cmd("escape print menu ").arg(this.getName()).cmd(" select ").arg("parent[Tree]").cmd(" dump")
+                .exec(_paramCache);
+        if ("TRUE".equalsIgnoreCase(isMenuTreeStr))  {
+            this.treeMenu = true;
+        }
     }
 
     /**
@@ -126,144 +137,209 @@ public class Menu_mxJPO
     }
 
     /**
+     * Sorts the child objects as defined.
+     *
      * @param _paramCache   parameter cache
-     * @throws MatrixException if the preparation from derived class failed or
-     *                         the check for tree menu used in
-     *                         {@link #treeMenu} failed
-     * @see #treeMenu
+     * @throws MatrixException if the preparation from derived class failed
      */
     @Override()
     protected void prepare(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("escape print menu \"")
-                .append(StringUtil_mxJPO.convertMql(this.getName()))
-                .append("\" select parent[Tree] dump");
-        if ("TRUE".equalsIgnoreCase(MqlUtil_mxJPO.execMql(_paramCache, cmd)))  {
-            this.treeMenu = true;
-        }
         super.prepare(_paramCache);
-    }
-
-    /**
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the TCL update code could not be written
-     */
-    @Override()
-    protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
-        throws IOException
-    {
-        super.writeObject(_paramCache, _out);
 
         // order childs
         final Map<Integer,MenuChild> tmpChilds = new TreeMap<Integer,MenuChild>();
         for (final MenuChild child : this.children)  {
             tmpChilds.put(child.order, child);
         }
-
-        // output childs
-        for (final MenuChild child : tmpChilds.values())  {
-            _out.append(" \\\n    add ").append(child.type).append(" \"")
-                .append(StringUtil_mxJPO.convertTcl(child.name)).append("\"");
-        }
-
+        this.childrenSorted.addAll(tmpChilds.values());
     }
 
     /**
+     * Writes the update script for this menu.
+     * The command specific information are:
+     * <ul>
+     * <li>description</li>
+     * <li>hidden flag (only if <i>true</i>)</li>
+     * <li>label</li>
+     * <li>href</li>
+     * <li>alt label</li>
+     * <li>settings</li>
+     * <li>properties</li>
+     * <li>sub commands and menus</li>
+     * </ul>
+     * </ul>
+     *
      * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
+     * @param _out          writer instance
      * @throws IOException if the TCL update code could not be written
      */
     @Override()
-    protected void writeEnd(final ParameterCache_mxJPO _paramCache,
-                            final Appendable _out)
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Appendable _out)
         throws IOException
     {
+        this.writeHeader(_paramCache, _out);
+
+        _out.append("mxUpdate menu \"${NAME}\"  {\n")
+            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n");
+        if (this.isHidden())  {
+            _out.append("    hidden\n");
+        }
         if (this.treeMenu)  {
-            _out.append("\n\nmql mod menu \"Tree\" \\\n    add menu \"${NAME}\"");
+            _out.append("    treemenu\n");
+        }
+        _out.append("    label \"").append(StringUtil_mxJPO.convertUpdate(this.getLabel())).append("\"\n")
+            .append("    href \"").append(StringUtil_mxJPO.convertUpdate(this.getHref())).append("\"\n")
+            .append("    alt \"").append(StringUtil_mxJPO.convertUpdate(this.getAlt())).append("\"\n");
+        this.getProperties().writeSettings(_paramCache, _out, "    ");
+
+        // output childs
+        for (final MenuChild child : this.childrenSorted)  {
+            _out.append("    ").append(child.type).append(" \"").append(StringUtil_mxJPO.convertUpdate(child.name)).append("\"\n");
+        }
+
+        this.getProperties().writeProperties(_paramCache, _out, "    ");
+
+        _out.append("}");
+    }
+
+    /**
+     * The method is called from the TCL update code to define the this
+     * menu.
+     *
+     * @param _paramCache   parameter cache
+     * @param _args         first index defines the use case (must be
+     *                      &quot;updateAttribute&quot; that the attribute
+     *                      is updated); second index the name of the attribute
+     *                      to update
+     * @throws Exception if the update of the dimension failed or for all other
+     *                   use cases from super JPO call
+     */
+    @Override()
+    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
+                               final String... _args)
+        throws Exception
+    {
+        // check if dimension is defined
+        if ((_args.length == 4) && "mxUpdate".equals(_args[0]) && "menu".equals(_args[1])) {
+// TODO: Exception Handling
+            // check that command names are equal
+            if (!this.getName().equals(_args[2]))  {
+                throw new Exception("wrong menu '" + _args[1] + "' is set to update (currently menu '" + this.getName() + "' is updated!)");
+            }
+
+            final String code = _args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
+
+            final MenuDefParser_mxJPO parser = new MenuDefParser_mxJPO(new StringReader(code));
+            final Menu_mxJPO menu = parser.parse(_paramCache, this.getTypeDef(), this.getName());
+
+            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod menu $1", this.getName());
+
+            this.calcDelta(_paramCache, mql, menu);
+
+            mql.exec(_paramCache);
+
+        } else  {
+            super.jpoCallExecute(_paramCache, _args);
         }
     }
 
     /**
-     * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this menu. Following steps are
-     * done:
-     * <ul>
-     * <li>remove all child commands / menus</li>
-     * <li>remove definition as tree menu</li>
-     * </ul>
-     * The description etc. is reseted in the command super class.
+     * Calculates the delta between this current menu definition and the
+     * {@code _target} menu definition and appends the MQL append commands
+     * to {@code _cmd}.
      *
-     * @param _paramCache       parameter cache
-     * @param _preMQLCode       MQL statements which must be called before the
-     *                          TCL code is executed
-     * @param _postMQLCode      MQL statements which must be called after the
-     *                          TCL code is executed
-     * @param _preTCLCode       TCL code which is defined before the source
-     *                          file is sourced
-     * @param _tclVariables     map of all TCL variables where the key is the
-     *                          name and the value is value of the TCL variable
-     *                          (the value is automatically converted to TCL
-     *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update from derived class failed
+     * @param _paramCache   parameter cache
+     * @param _cmd          string builder to append the MQL commands
+     * @param _target       target format definition
+     * @throws UpdateException_mxJPO if update is not allowed (because data can
+     *                      be lost)
      */
-    @Override()
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final CharSequence _preMQLCode,
-                          final CharSequence _postMQLCode,
-                          final CharSequence _preTCLCode,
-                          final Map<String,String> _tclVariables,
-                          final File _sourceFile)
-        throws Exception
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MultiLineMqlBuilder _mql,
+                             final Menu_mxJPO _target)
+        throws UpdateException_mxJPO
     {
-        // remove child commands / menus
-        final StringBuilder preMQLCode = new StringBuilder()
-                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                        .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"');
-        for (final MenuChild child : this.children)  {
-            preMQLCode.append(" remove ").append(child.type)
-                      .append(" \"").append(StringUtil_mxJPO.convertMql(child.name)).append("\"");
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "description", _target.getDescription(),   this.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      _target.isHidden(),         this.isHidden());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "alt",         _target.getAlt(),           this.getAlt());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "href",        _target.getHref(),          this.getHref());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "label",       _target.getLabel(),         this.getLabel());
+
+        // type tree menu
+        if (this.treeMenu != _target.treeMenu)  {
+            _mql.pushPrefix("");
+            if (_target.treeMenu)  {
+                _mql.newLine().cmd("escape mod menu ").arg("Tree").cmd(" add menu ").arg(this.getName());
+            } else  {
+                _mql.newLine().cmd("escape mod menu ").arg("Tree").cmd(" remove menu ").arg(this.getName());
+            }
+            _mql.popPrefix();
         }
-        preMQLCode.append(";\n");
 
-        // remove information about tree menu...
-        if (this.treeMenu)  {
-            preMQLCode.append("escape mod menu Tree remove menu \"")
-                      .append(StringUtil_mxJPO.convertMql(this.getName()))
-                      .append("\";\n");
+        // children commands and menus
+        final Iterator<MenuChild> iterThis   = this.childrenSorted.iterator();
+        final Iterator<MenuChild> iterTarget = _target.childrenSorted.iterator();
+        MenuChild childThis   = null;
+        MenuChild childTarget = null;
+        boolean equal = true;
+        while (iterThis.hasNext() && iterTarget.hasNext())  {
+            childThis   = iterThis.next();
+            childTarget = iterTarget.next();
+            if (!childThis.equals(childTarget))  {
+                equal = false;
+                break;
+            }
+        }
+        // remove this childs if needed
+        if (!equal)  {
+            _mql.newLine().cmd("remove ").cmd(childThis.type).cmd(" ").arg(childThis.name);
+        }
+        while (iterThis.hasNext())  {
+            childThis   = iterThis.next();
+            _mql.newLine().cmd("remove ").cmd(childThis.type).cmd(" ").arg(childThis.name);
+        }
+        // assign targets if needed
+        if (!equal)  {
+            _mql.newLine().cmd("add ").cmd(childTarget.type).cmd(" ").arg(childTarget.name);
+        }
+        while (iterTarget.hasNext())  {
+            childTarget = iterTarget.next();
+            _mql.newLine().cmd("add ").cmd(childTarget.type).cmd(" ").arg(childTarget.name);
         }
 
-        // append already existing pre MQL code
-        preMQLCode.append(_preMQLCode);
-
-        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+        _target.getProperties().calcDelta(_mql, "", this.getProperties());
     }
 
     /**
      * Stores a reference to a child of a menu.
-     *
-     * @see Menu_mxJPO#children
      */
-    private static final class MenuChild
+    public static final class MenuChild
     {
-        /**
-         * Type of the menu child.
-         */
+        /** Type of the menu child. */
         private String type;
-
-        /**
-         * Name of the menu child.
-         */
+        /** Name of the menu child. */
         private String name;
+        /** Order index of the menu child. */
+        private Integer order;
 
         /**
-         * Order index of the menu child.
+         * Constructor.
+         *
+         * @param _type     type of menu child
+         * @param _name     name of menu child
+         * @param _order    order of menu child
          */
-        private Integer order;
+        public MenuChild(final String _type,
+                         final String _name,
+                         final int _order)
+        {
+            this.type  = _type;
+            this.name  = _name;
+            this.order = _order;
+        }
 
         /**
          * Private constructor so that an instance could only be created within
@@ -271,6 +347,17 @@ public class Menu_mxJPO
          */
         private MenuChild()
         {
+        }
+
+        /**
+         * Checks if this child menu and the given {@code _toCompare} is equal.
+         *
+         * @param _toCompare    compare child menu
+         * @return <i>true</i> if equal; otherwise <i>false</i>
+         */
+        boolean equals(final MenuChild _toCompare)
+        {
+            return (_toCompare != null) && this.type.equals(_toCompare.type) && this.name.equals(_toCompare.name);
         }
     }
 }

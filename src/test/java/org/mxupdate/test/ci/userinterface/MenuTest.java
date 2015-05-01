@@ -52,7 +52,43 @@ public class MenuTest
                                 .setValue("alt", "${COMMON_DIR}/emxTreeAlt.jsp?mode=insert")
                                 .setSetting("Setting 1", "Setting Value ' 1")
                                 .addChild(new MenuData(this, "child menu 1"))
-                                .addChild(new CommandData(this, "child command 1"))});
+                                .addChild(new CommandData(this, "child command 1"))
+                                .addChild(new CommandData(this, "child command 2"))
+                                .addChild(new CommandData(this, "child command 3"))},
+                new Object[]{
+                        "menu defined as type tree menu",
+                        new MenuData(this, "hallo \" test")
+                                .setTreeMenu(true)},
+                new Object[]{
+                        "menu not defined as type tree menu (with !treemenu)",
+                        new MenuData(this, "hallo \" test")
+                                .setTreeMenu(false)});
+    }
+
+    /**
+     * Positive test to change the order of children's.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "positive test to change the order of children's")
+    public void positiveTestChangeOrderChilds()
+        throws Exception
+    {
+        new MenuData(this, "hallo")
+                .addChild(new MenuData(this, "child menu 1"))
+                .addChild(new CommandData(this, "child command 1"))
+                .addChild(new CommandData(this, "child command 2"))
+                .addChild(new CommandData(this, "child command 3"))
+                .create()
+                .checkExport();
+
+        new MenuData(this, "hallo")
+                .addChild(new MenuData(this, "child menu 1"))
+                .addChild(new CommandData(this, "child command 3"))
+                .addChild(new CommandData(this, "child command 2"))
+                .addChild(new CommandData(this, "child command 1"))
+                .update("")
+                .checkExport();
     }
 
     /**

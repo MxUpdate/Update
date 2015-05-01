@@ -1,0 +1,174 @@
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
+options {
+  JDK_VERSION = "1.6";
+  STATIC = false;
+  ERROR_REPORTING = true;
+  USER_TOKEN_MANAGER = false;
+}
+
+PARSER_BEGIN(MenuDefParser)
+package org.mxupdate.update.userinterface.menu;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+
+import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.userinterface.Menu_mxJPO;
+import org.mxupdate.update.userinterface.Menu_mxJPO.MenuChild;
+import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
+
+public class MenuDefParser
+    extends AbstractParser_mxJPO
+{
+    /**
+     * Parses one complete menu definition.
+     *
+     * @param _paramCache   parameter cache
+     * @param _typeDef      type definition of the menu (to instantiate the menu)
+     * @param _mxName       MX name of the menu
+     */
+    public Menu_mxJPO parse(final ParameterCache_mxJPO _paramCache,
+                            final TypeDef_mxJPO _typeDef,
+                            final String _mxName)
+        throws ParseException, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+    {
+        final Menu_mxJPO menu = (Menu_mxJPO) _typeDef.newTypeInstance(_mxName);
+        this.parse(menu);
+        this.prepareObject(_paramCache, menu);
+        return menu;
+    }
+}
+
+PARSER_END(MenuDefParser)
+
+SKIP :
+{
+    " "
+|   "\r"
+|   "\t"
+|   "\n"
+}
+
+TOKEN : /** first level */
+{
+      <DESCRIPTION:             "description">                                  : STRING_EXPECTED
+    | <HIDDEN_TRUE:             "hidden">
+    | <HIDDEN_FALSE:            "!hidden">
+    | <TREEMENU_TRUE:           "treemenu">
+    | <TREEMENU_FALSE:          "!treemenu">
+    | <ALT:                     "alt">                                          : STRING_EXPECTED
+    | <HREF:                    "href">                                         : STRING_EXPECTED
+    | <LABEL:                   "label">                                        : STRING_EXPECTED
+    | <SETTING:                 ("add" ([" ","\t","\n","\r"])+ )? "setting">    : SETTING_EXPECTED
+    | <COMMAND:                 ("add" ([" ","\t","\n","\r"])+ )? "command">    : STRING_EXPECTED
+    | <MENU:                    ("add" ([" ","\t","\n","\r"])+ )? "menu">       : STRING_EXPECTED
+    | <PROPERTY:                "property">                                     : STRING_EXPECTED
+    | <PROPERTYTO:              "to">                                           : ADMINREF_EXPECTED
+    | <PROPERTYVAL:             "value">                                        : STRING_EXPECTED
+    | <#MENUSTR:                "menu">
+}
+
+//Token treemenu() : {Token t ; } { t = "treemenu" {return t;} }
+/************************************************************** Common String */
+<STRING_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<STRING_EXPECTED> TOKEN :
+{
+      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "{" | "}" | " " | "\n")*<APOSTROPHE>)> : DEFAULT
+    | <SINGLE: (<CHAR>)+> : DEFAULT
+    | <#APOSTROPHE: "\"" >
+    | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/********************************************************* Setting Key String */
+<SETTING_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<SETTING_EXPECTED> TOKEN :
+{
+      <SETTING_STRING: (<SETTING_APOSTROPHE>(<SETTING_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<SETTING_APOSTROPHE>)> : STRING_EXPECTED
+    | <SETTING_SINGLE: (<SETTING_CHAR>)+> : DEFAULT
+    | <#SETTING_APOSTROPHE: "\"" >
+    | <#SETTING_CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/**************************************** Two Strings for Property Definition */
+<ADMINREF_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<ADMINREF_EXPECTED> TOKEN :
+{
+      <ADMINTYPE_STRING : (<ADMINTYPE_APOSTROPHE>(<ADMINTYPE_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<ADMINTYPE_APOSTROPHE>)> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE : (<ADMINTYPE_CHAR>)+> : STRING_EXPECTED
+    | <#ADMINTYPE_APOSTROPHE : "\"" >
+    | <#ADMINTYPE_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/**
+ * Parses one complete menu definition.
+ *
+ * @param _menu     target menu to update with parsed values
+ */
+void parse(Menu_mxJPO _menu)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+: {
+    Token tmp;
+    AdminProperty property;
+    int childIdx = 0;
+} {
+    (
+        (<DESCRIPTION>              ( tmp = <STRING>           {this.setValue(_menu, "description", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(_menu, "description", this.getSingle(tmp.image));} ) )
+      | (<HIDDEN_TRUE>                                         {this.setValue(_menu, "hidden", true);} )
+      | (<HIDDEN_FALSE>                                        {this.setValue(_menu, "hidden", false);} )
+      | (<TREEMENU_TRUE>                                       {this.setValue(_menu, "treeMenu", true);} )
+      | (<TREEMENU_FALSE>                                      {this.setValue(_menu, "treeMenu", false);} )
+      | (<ALT>                      ( tmp = <STRING>           {this.setValue(_menu, "alt", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(_menu, "alt", this.getSingle(tmp.image));} ) )
+      | (<HREF>                     ( tmp = <STRING>           {this.setValue(_menu, "href", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(_menu, "href", this.getSingle(tmp.image));} ) )
+      | (<LABEL>                    ( tmp = <STRING>           {this.setValue(_menu, "label", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(_menu, "label", this.getSingle(tmp.image));} ) )
+      | (<SETTING>                                             {property = new AdminProperty();this.appendValue(this.getValue(_menu, "properties"), "propertiesStack", property);}
+                                    ( tmp = <SETTING_STRING>   {this.setValue(property, "name", "%" + this.getString(tmp.image));}
+                                    | tmp = <SETTING_SINGLE>   {this.setValue(property, "name", "%" + this.getSingle(tmp.image));})
+                                    ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+      | (<COMMAND>                  ( tmp = <STRING>           {this.appendValue(_menu, "children", new MenuChild("command", this.getString(tmp.image), childIdx++));}
+                                    | tmp = <SINGLE>           {this.appendValue(_menu, "children", new MenuChild("command", this.getSingle(tmp.image), childIdx++));} ) )
+      | (<MENU>                     ( tmp = <STRING>           {this.appendValue(_menu, "children", new MenuChild("menu",    this.getString(tmp.image), childIdx++));}
+                                    | tmp = <SINGLE>           {this.appendValue(_menu, "children", new MenuChild("menu",    this.getSingle(tmp.image), childIdx++));} ) )
+      | (<PROPERTY>                                            {property = new AdminProperty();this.appendValue(this.getValue(_menu, "properties"), "propertiesStack", property);}
+                                    ( tmp = <STRING>           {this.setValue(property, "name", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(property, "name", this.getSingle(tmp.image));} )
+              (   ( <PROPERTYVAL>   ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING> {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <ADMINTYPE_SINGLE> {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                    ( tmp = <STRING>           {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+    )*
+}
