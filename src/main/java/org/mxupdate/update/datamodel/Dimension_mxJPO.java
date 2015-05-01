@@ -17,6 +17,7 @@ package org.mxupdate.update.datamodel;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -27,10 +28,10 @@ import java.util.TreeSet;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.dimension.DimensionDefParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
@@ -44,7 +45,7 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
  * @author The MxUpdate Team
  */
 public class Dimension_mxJPO
-    extends AbstractAdminObject_mxJPO
+    extends AbstractAdminObject_mxJPO<Dimension_mxJPO>
 {
     /** Set of all ignored URLs from the XML definition for dimensions. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
@@ -74,6 +75,14 @@ public class Dimension_mxJPO
                            final String _mxName)
     {
         super(_typeDef, _mxName);
+    }
+
+    @Override()
+    public void parseUpdate(final String _code)
+        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
+    {
+        new DimensionDefParser_mxJPO(new StringReader(_code)).parse(this);
+        this.prepare();
     }
 
     /**
@@ -233,74 +242,22 @@ public class Dimension_mxJPO
         _out.append("}");
     }
 
-    /**
-     * The method is called within the update of an administration object. The
-     * method is called directly within the update.
-     * <ul>
-     * <li>All <code>@0@0@</code> are replaced by quot's and all
-     *     <code>@1@1@</code> are replaced by apostroph's.</li>
-     * <li>The new dimension definition is parsed.</li>
-     * <li>A delta MQL script generated to update the dimension to the new
-     *     target definition.</li>
-     * <li>The created delta MQL script is executed.</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @param _args         arguments from the TCL procedure
-     * @throws Exception if update failed, {@link UpdateException_mxJPO} if
-     *                   a unit could not be removed, a default unit is
-     *                   changed, a modified or offset of a unit is changed
-     * @see #TCL_PROCEDURE
-     */
     @Override()
-    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
-                               final String... _args)
-        throws Exception
-    {
-        if ((_args.length == 4) && "mxUpdate".equals(_args[0]) && "command".equals(_args[1])) {
-            super.jpoCallExecute(_paramCache, _args);
-        } else if (!this.getName().equals(_args[2])) {
-            throw new Exception("Wrong dimenion '" + _args[2] + "' is set to update (currently command '" + this.getName() + "' is updated!)");
-        } else  {
-            final String code = _args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
-
-            final DimensionDefParser_mxJPO parser = new DimensionDefParser_mxJPO(new StringReader(code));
-            final Dimension_mxJPO dimension = parser.parse(_paramCache, this.getTypeDef(), this.getName());
-
-            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod dimension $1", this.getName());
-
-            this.calcDelta(_paramCache, mql, dimension);
-
-            mql.exec(_paramCache);
-        }
-    }
-
-    /**
-     * Calculates the delta between this current dimension definition and the
-     * {@code _target} dimension definition and appends the MQL append commands
-     * to {@code _mql}.
-     *
-     * @param _paramCache   parameter cache
-     * @param _mql          builder to append the MQL commands
-     * @param _target       target format definition
-     * @throws UpdateException_mxJPO if update is not allowed (because data can
-     *                      be lost)
-     */
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,
-                             final Dimension_mxJPO _target)
+                             final Dimension_mxJPO _current)
         throws UpdateException_mxJPO
     {
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "description", _target.getDescription(),                           this.getDescription());
-        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      _target.isHidden(),                                 this.isHidden());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "description",         this.getDescription(),   _current.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false,  this.isHidden(),         _current.isHidden());
 
         // prepare maps of units depending on the unit name (as key)
         final Map<String,Unit> curUnits = new HashMap<String,Unit>();
-        for (final Unit unit : this.units)  {
+        for (final Unit unit : _current.units)  {
             curUnits.put(unit.name, unit);
         }
         final Map<String,Unit> tarUnits = new HashMap<String,Unit>();
-        for (final Unit unit : _target.units)  {
+        for (final Unit unit : this.units)  {
             tarUnits.put(unit.name, unit);
         }
 
@@ -332,7 +289,7 @@ public class Dimension_mxJPO
         }
 
         // properties
-        _target.getProperties().calcDelta(_mql, "", this.getProperties());
+        this.getProperties().calcDelta(_mql, "", _current.getProperties());
     }
 
     /**

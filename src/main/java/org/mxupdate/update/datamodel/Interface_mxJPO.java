@@ -17,6 +17,7 @@ package org.mxupdate.update.datamodel;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +26,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -36,7 +39,7 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
  * @author The MxUpdate Team
  */
 public class Interface_mxJPO
-    extends AbstractDMWithAttributes_mxJPO
+    extends AbstractDMWithAttributes_mxJPO<Interface_mxJPO>
 {
     /**
      * Key used to identify the update of an interface within
@@ -142,6 +145,14 @@ public class Interface_mxJPO
                            final String _mxName)
     {
         super(_typeDef, _mxName);
+    }
+
+    @Override()
+    public void parseUpdate(final String _code)
+        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
+    {
+//        new InterfaceDefParser_mxJPO(new StringReader(_code)).parse(this);
+//        this.prepare();
     }
 
     /**
@@ -434,5 +445,13 @@ public class Interface_mxJPO
                 MqlUtil_mxJPO.execMql(_paramCache, cmd);
             }
         }
+    }
+
+    @Override()
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MultiLineMqlBuilder _mql,
+                             final Interface_mxJPO _current)
+        throws UpdateException_mxJPO
+    {
     }
 }

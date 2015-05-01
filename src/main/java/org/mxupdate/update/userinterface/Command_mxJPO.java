@@ -17,6 +17,7 @@ package org.mxupdate.update.userinterface;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
@@ -24,8 +25,8 @@ import java.util.TreeSet;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.userinterface.command.CommandDefParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -37,7 +38,7 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
  * @author The MxUpdate Team
  */
 public class Command_mxJPO
-    extends AbstractCommand_mxJPO
+    extends AbstractCommand_mxJPO<Command_mxJPO>
 {
     /**
      * Set of all ignored URLs from the XML definition for commands.
@@ -64,6 +65,14 @@ public class Command_mxJPO
                          final String _mxName)
     {
         super(_typeDef, _mxName);
+    }
+
+    @Override()
+    public void parseUpdate(final String _code)
+        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
+    {
+        new CommandDefParser_mxJPO(new StringReader(_code)).parse(this);
+        this.prepare();
     }
 
     /**
@@ -148,71 +157,20 @@ public class Command_mxJPO
         _out.append("}");
     }
 
-    /**
-     * The method is called from the TCL update code to define the this
-     * command.
-     *
-     * @param _paramCache   parameter cache
-     * @param _args         first index defines the use case (must be
-     *                      &quot;updateAttribute&quot; that the attribute
-     *                      is updated); second index the name of the attribute
-     *                      to update
-     * @throws Exception if the update of the dimension failed or for all other
-     *                   use cases from super JPO call
-     */
     @Override()
-    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
-                               final String... _args)
-        throws Exception
-    {
-        // check if dimension is defined
-        if ((_args.length == 4) && "mxUpdate".equals(_args[0]) && "command".equals(_args[1])) {
-// TODO: Exception Handling
-            // check that command names are equal
-            if (!this.getName().equals(_args[2]))  {
-                throw new Exception("wrong command '" + _args[1] + "' is set to update (currently command '" + this.getName() + "' is updated!)");
-            }
-
-            final String code = _args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
-
-            final CommandDefParser_mxJPO parser = new CommandDefParser_mxJPO(new StringReader(code));
-            final Command_mxJPO command = parser.parse(_paramCache, this.getTypeDef(), this.getName());
-
-            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod command $1", this.getName());
-
-            this.calcDelta(_paramCache, mql, command);
-
-            mql.exec(_paramCache);
-
-        } else  {
-            super.jpoCallExecute(_paramCache, _args);
-        }
-    }
-
-    /**
-     * Calculates the delta between this current command definition and the
-     * {@code _target} command definition and appends the MQL append commands
-     * to {@code _cmd}.
-     *
-     * @param _paramCache   parameter cache
-     * @param _cmd          string builder to append the MQL commands
-     * @param _target       target format definition
-     * @throws UpdateException_mxJPO if update is not allowed (because data can
-     *                      be lost)
-     */
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,
-                             final Command_mxJPO _target)
+                             final Command_mxJPO _current)
         throws UpdateException_mxJPO
     {
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "description", _target.getDescription(),                           this.getDescription());
-        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      _target.isHidden(),                                 this.isHidden());
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "alt",         _target.getAlt(),                                   this.getAlt());
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "href",        _target.getHref(),                                  this.getHref());
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "label",       _target.getLabel(),                                 this.getLabel());
-        DeltaUtil_mxJPO.calcListDelta(_mql,  "user",        _target.users,                                      this.users);
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "code",        (_target.code == null) ? "" :_target.code.trim(),   this.code);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "description",         this.getDescription(),                      _current.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false,  this.isHidden(),                            _current.isHidden());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "alt",                 this.getAlt(),                              _current.getAlt());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "href",                this.getHref(),                             _current.getHref());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "label",               this.getLabel(),                            _current.getLabel());
+        DeltaUtil_mxJPO.calcListDelta(_mql,  "user",                this.users,                                 _current.users);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "code",                (this.code == null) ? "" :this.code.trim(), _current.code);
 
-        _target.getProperties().calcDelta(_mql, "", this.getProperties());
+        this.getProperties().calcDelta(_mql, "", _current.getProperties());
     }
 }

@@ -112,7 +112,7 @@ public abstract class AbstractAttributeNumeric_mxJPO<CLASS extends AbstractAttri
             _out.append("  ").append(this.rangeValue ? "" : "!").append("rangevalue\n");
         }
         if ((this.dimension != null) && _paramCache.getValueBoolean(ValueKeys.DMAttrSupportsDimension))  {
-            _out.append("  dimension \"").append(StringUtil_mxJPO.convertTcl(this.dimension)).append("\"\n");
+            _out.append("  dimension \"").append(StringUtil_mxJPO.convertUpdate(this.dimension)).append("\"\n");
         }
     }
 
@@ -126,24 +126,21 @@ public abstract class AbstractAttributeNumeric_mxJPO<CLASS extends AbstractAttri
      * <li>{@link #dimension} (if
      *     {@link ValueKeys#DMAttrSupportsDimension} is defined)</li>
      * <ul>
-     *
-     * @throws UpdateException_mxJPO if range values flag is removed or
-     *                               existing dimension is updated
      */
     @Override()
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,
-                             final CLASS _target)
+                             final CLASS _current)
         throws UpdateException_mxJPO
     {
-        super.calcDelta(_paramCache, _mql, _target);
+        super.calcDelta(_paramCache, _mql, _current);
 
-        final AbstractAttributeNumeric_mxJPO<CLASS> target = _target;
+        final AbstractAttributeNumeric_mxJPO<CLASS> current = _current;
 
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagRangeValue))  {
             if (!this.rangeValue)  {
-                DeltaUtil_mxJPO.calcFlagDelta(_mql, "rangevalue", target.rangeValue, this.rangeValue);
-            } else if (!target.rangeValue)  {
+                DeltaUtil_mxJPO.calcFlagDelta(_mql, "rangevalue", this.rangeValue, current.rangeValue);
+            } else if (!this.rangeValue)  {
                 throw new UpdateException_mxJPO(
                         UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_RANGEVALUEFLAG_UPDATED,
                         this.getName());
@@ -151,18 +148,17 @@ public abstract class AbstractAttributeNumeric_mxJPO<CLASS extends AbstractAttri
         }
 
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsDimension))  {
-            if ((this.dimension == null) || this.dimension.isEmpty()) {
-                if ((target.dimension != null) && !target.dimension.isEmpty())  {
-                    _paramCache.logDebug("    - set dimension '" + target.dimension + "'");
-                    _mql.newLine()
-                        .cmd("dimension ").arg(target.dimension);
+            if ((current.dimension == null) || current.dimension.isEmpty()) {
+                if ((this.dimension != null) && !this.dimension.isEmpty())  {
+                    _paramCache.logDebug("    - set dimension '" + this.dimension + "'");
+                    _mql.newLine().cmd("dimension ").arg(this.dimension);
                 }
-            } else if (!this.dimension.equals(target.dimension))  {
+            } else if (!current.dimension.equals(this.dimension))  {
                 throw new UpdateException_mxJPO(
                         UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_DIMENSION_UPDATED,
                         this.getName(),
-                        this.dimension,
-                        (target.dimension != null) ? target.dimension : "");
+                        current.dimension,
+                        (this.dimension != null) ? this.dimension : "");
             }
         }
     }

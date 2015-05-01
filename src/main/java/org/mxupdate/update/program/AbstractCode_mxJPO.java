@@ -19,6 +19,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
@@ -27,7 +28,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  * @author The MxUpdate Team
  */
 public abstract class AbstractCode_mxJPO
-    extends AbstractAdminObject_mxJPO
+    extends AbstractAdminObject_mxJPO<AbstractCode_mxJPO>
 {
     /**
      * Defines the parameter for old MX versions which has the encoding problem
@@ -96,6 +97,15 @@ public abstract class AbstractCode_mxJPO
                                  final String _mxName)
     {
         super(_typeDef, _mxName);
+    }
+
+    /**
+     * Dummy implementation because not used.
+     */
+    @Override()
+    public void parseUpdate(final String _code)
+    {
+        throw new Error("not supported");
     }
 
     /**
@@ -198,5 +208,16 @@ public abstract class AbstractCode_mxJPO
             parsed = super.parse(_paramCache, _url, _content);
         }
         return parsed;
+    }
+
+    /**
+     * Dummy implementation because not used.
+     */
+    @Override()
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MultiLineMqlBuilder _mql,
+                             final AbstractCode_mxJPO _current)
+    {
+        throw new Error("not supported");
     }
 }

@@ -17,6 +17,7 @@ package org.mxupdate.update.datamodel;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,8 +27,8 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
 import org.mxupdate.update.datamodel.rule.RuleDefParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
@@ -40,7 +41,7 @@ import org.xml.sax.SAXException;
  * @author The MxUpdate Team
  */
 public class Rule_mxJPO
-    extends AbstractAdminObject_mxJPO
+    extends AbstractAdminObject_mxJPO<Rule_mxJPO>
 {
     /** Set of all ignored URLs from the XML definition for rules. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
@@ -68,6 +69,14 @@ public class Rule_mxJPO
                       final String _mxName)
     {
         super(_typeDef, _mxName);
+    }
+
+    @Override()
+    public void parseUpdate(final String _code)
+        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
+    {
+        new RuleDefParser_mxJPO(new StringReader(_code)).parse(this);
+        this.prepare();
     }
 
     /**
@@ -159,70 +168,19 @@ public class Rule_mxJPO
     {
     }
 
-
-    /**
-     * The method is called from the TCL update code to define the this
-     * rule.
-     *
-     * @param _paramCache   parameter cache
-     * @param _args         first index defines the use case (must be
-     *                      &quot;updateAttribute&quot; that the attribute
-     *                      is updated); second index the name of the attribute
-     *                      to update
-     * @throws Exception if the update of the dimension failed or for all other
-     *                   use cases from super JPO call
-     */
     @Override()
-    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
-                               final String... _args)
-        throws Exception
-    {
-        // check if dimension is defined
-        if ((_args.length == 4) && "mxUpdate".equals(_args[0]) && "rule".equals(_args[1])) {
-// TODO: Exception Handling
-            // check that rule names are equal
-            if (!this.getName().equals(_args[2]))  {
-                throw new Exception("wrong rule '" + _args[1] + "' is set to update (currently rule '" + this.getName() + "' is updated!)");
-            }
-
-            final String code = _args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
-
-            final RuleDefParser_mxJPO parser = new RuleDefParser_mxJPO(new StringReader(code));
-            final Rule_mxJPO rule = parser.parse(_paramCache, this.getTypeDef(), this.getName());
-
-            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod rule $1", this.getName());
-
-            this.calcDelta(_paramCache, mql, rule);
-
-            mql.exec(_paramCache);
-
-        } else  {
-            super.jpoCallExecute(_paramCache, _args);
-        }
-    }
-
-    /**
-     * Calculates the delta between this current rule definition and the
-     * {@code _target} rule definition and appends the MQL append rules
-     * to {@code _mql}.
-     *
-     * @param _paramCache   parameter cache
-     * @param _mql          builder to append the MQL rules
-     * @param _target       target format definition
-     */
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,
-                             final Rule_mxJPO _target)
+                             final Rule_mxJPO _current)
     {
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "description", _target.getDescription(),   this.getDescription());
-        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      _target.isHidden(),         this.isHidden());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "description",        this.getDescription(),   _current.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false, this.isHidden(),         _current.isHidden());
         if (_paramCache.getValueBoolean(ValueKeys.DMRuleSupportsEnforceReserveAccess))  {
-            DeltaUtil_mxJPO.calcFlagDelta(_mql, "enforcereserveaccess", _target.enforcereserveaccess, this.enforcereserveaccess);
+            DeltaUtil_mxJPO.calcFlagDelta(_mql, "enforcereserveaccess", this.enforcereserveaccess, _current.enforcereserveaccess);
         }
 
-        _target.accessList.cleanup(_mql);
-        _target.accessList.update(_mql);
-
-        _target.getProperties().calcDelta(_mql, "", this.getProperties());
+        this.accessList     .cleanup(_mql);
+        this.accessList     .update(_mql);
+        this.getProperties().calcDelta(_mql, "", _current.getProperties());
     }
 }

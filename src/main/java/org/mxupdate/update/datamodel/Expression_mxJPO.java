@@ -17,6 +17,7 @@ package org.mxupdate.update.datamodel;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,6 +26,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.expression.ExpressionDefParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
@@ -39,7 +41,7 @@ import org.xml.sax.SAXException;
  * @author The MxUpdate Team
  */
 public class Expression_mxJPO
-    extends AbstractAdminObject_mxJPO
+    extends AbstractAdminObject_mxJPO<Expression_mxJPO>
 {
     /**
      * Set of all ignored URLs from the XML definition for expressions.
@@ -66,6 +68,14 @@ public class Expression_mxJPO
                             final String _mxName)
     {
         super(_typeDef, _mxName);
+    }
+
+    @Override()
+    public void parseUpdate(final String _code)
+        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
+    {
+        new ExpressionDefParser_mxJPO(new StringReader(_code)).parse(this);
+        this.prepare();
     }
 
     /**
@@ -133,67 +143,16 @@ public class Expression_mxJPO
         _out.append("}");
     }
 
-    /**
-     * The method is called from the TCL update code to define the this
-     * expression.
-     *
-     * @param _paramCache   parameter cache
-     * @param _args         first index defines the use case (must be
-     *                      &quot;updateAttribute&quot; that the expression
-     *                      is updated); second index the name of the expression
-     *                      to update
-     * @throws Exception if the update of the dimension failed or for all other
-     *                   use cases from super JPO call
-     */
     @Override()
-    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
-                               final String... _args)
-        throws Exception
-    {
-        // check if dimension is defined
-        if ((_args.length == 4) && "mxUpdate".equals(_args[0]) && "expression".equals(_args[1])) {
-// TODO: Exception Handling
-            // check that expression names are equal
-            if (!this.getName().equals(_args[2]))  {
-                throw new Exception("wrong expression '" + _args[2] + "' is set to update (currently expression '" + this.getName() + "' is updated!)");
-            }
-
-            final String code = _args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
-
-            final ExpressionDefParser_mxJPO parser = new ExpressionDefParser_mxJPO(new StringReader(code));
-            final Expression_mxJPO expression = parser.parse(_paramCache, this.getTypeDef(), this.getName());
-
-            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod expression $1", this.getName());
-
-            this.calcDelta(_paramCache, mql, expression);
-
-            mql.exec(_paramCache);
-
-        } else  {
-            super.jpoCallExecute(_paramCache, _args);
-        }
-    }
-
-    /**
-     * Calculates the delta between this current expression definition and the
-     * {@code _target} expression definition and appends the MQL append commands
-     * to {@code _mql}.
-     *
-     * @param _paramCache   parameter cache
-     * @param _cmd          string builder to append the MQL commands
-     * @param _target       target expression definition
-     * @throws UpdateException_mxJPO if update is not allowed (because data can
-     *                      be lost)
-     */
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,
-                             final Expression_mxJPO _target)
+                             final Expression_mxJPO _current)
         throws UpdateException_mxJPO
     {
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "description", _target.getDescription(),   this.getDescription());
-        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      _target.isHidden(),         this.isHidden());
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "value",       _target.value,              this.value);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "description",         this.getDescription(),   _current.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false,  this.isHidden(),         _current.isHidden());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "value",               this.value,              _current.value);
 
-        _target.getProperties().calcDelta(_mql, "", this.getProperties());
+        this.getProperties().calcDelta(_mql, "", _current.getProperties());
     }
 }

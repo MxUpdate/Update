@@ -43,9 +43,10 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * objects.
  *
  * @author The MxUpdate Team
+ * @param <CLASS> derived from this class
  */
-public abstract class AbstractUser_mxJPO
-    extends AbstractAdminObject_mxJPO
+public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO<CLASS>>
+    extends AbstractAdminObject_mxJPO<CLASS>
 {
     /**
      * Set of all ignored URLs from the XML definition for common stuff of

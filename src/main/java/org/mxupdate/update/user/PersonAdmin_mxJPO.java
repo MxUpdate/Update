@@ -17,6 +17,7 @@ package org.mxupdate.update.user;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,8 +31,11 @@ import matrix.util.MatrixException;
 import matrix.util.StringList;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * The class is used to handle administration persons.
@@ -39,7 +43,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @author The MxUpdate Team
  */
 public class PersonAdmin_mxJPO
-    extends AbstractUser_mxJPO
+    extends AbstractUser_mxJPO<PersonAdmin_mxJPO>
 {
     /**
      * Called TCL procedure within the TCL update to assign current person to
@@ -358,6 +362,12 @@ public class PersonAdmin_mxJPO
         }
 
         return persons;
+    }
+
+    @Override()
+    public void parseUpdate(final String _code)
+        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
+    {
     }
 
     /**
@@ -756,5 +766,13 @@ public class PersonAdmin_mxJPO
             }
         }
         return ignore;
+    }
+
+    @Override()
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MultiLineMqlBuilder _mql,
+                             final PersonAdmin_mxJPO _current)
+        throws UpdateException_mxJPO
+    {
     }
 }

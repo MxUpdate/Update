@@ -120,14 +120,14 @@ public class AttributeString_mxJPO
     @Override()
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,
-                             final AttributeString_mxJPO _target)
+                             final AttributeString_mxJPO _current)
         throws UpdateException_mxJPO
     {
-        super.calcDelta(_paramCache, _mql, _target);
+        super.calcDelta(_paramCache, _mql, _current);
 
-        DeltaUtil_mxJPO.calcFlagDelta(_mql, "multiline", _target.multiline, this.multiline);
+        DeltaUtil_mxJPO.calcFlagDelta(_mql, "multiline", this.multiline, _current.multiline);
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsPropMaxLength))  {
-            DeltaUtil_mxJPO.calcValueDelta(_mql, "maxlength", _target.maxLength, this.maxLength);
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "maxlength", this.maxLength, _current.maxLength);
         }
     }
 }

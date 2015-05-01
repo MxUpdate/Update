@@ -44,7 +44,7 @@ import org.xml.sax.SAXException;
  * @author The MxUpdate Team
  */
 public class Relationship_mxJPO
-    extends AbstractDMWithTriggers_mxJPO
+    extends AbstractDMWithTriggers_mxJPO<Relationship_mxJPO>
 {
     /**
      * Set of all ignored URLs from the XML definition for relationships.
@@ -131,6 +131,7 @@ public class Relationship_mxJPO
      * @throws InvocationTargetException
      * @throws ParseException
      */
+    @Override
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
@@ -293,57 +294,7 @@ public class Relationship_mxJPO
         _out.append(updateBuilder.toString());
     }
 
-    /**
-     * The method is called within the update of an administration object. The
-     * method is called directly within the update.
-     * <ul>
-     * <li>All <code>@0@0@</code> are replaced by quot's and all
-     *     <code>@1@1@</code> are replaced by apostroph's.</li>
-     * <li>The new policy definition is parsed.</li>
-     * <li>A delta MQL script generated to update the policy to the new target
-     *     definition.</li>
-     * <li>All symbolic names for states are defined (as property on the
-     *     policy).</li>
-     * <li>The delta MQL script is executed.</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @param _args         arguments from the TCL procedure
-     * @throws Exception if a state is not defined anymore or the policy could
-     *                   not be updated
-     * @see #TCL_PROCEDURE
-     */
     @Override()
-    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
-                               final String... _args)
-        throws Exception
-    {
-        if ((_args.length == 4) && "mxUpdate".equals(_args[0]) && this.getTypeDef().getMxAdminName().equals(_args[1])) {
-
-            final Relationship_mxJPO relationship = (Relationship_mxJPO) this.getTypeDef().newTypeInstance(_args[2]);
-            relationship.parseUpdate(_args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\""));
-
-            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod relationship $1", this.getName());
-
-            relationship.calcDelta(_paramCache, mql, this);
-
-            mql.exec(_paramCache);
-        } else  {
-            super.jpoCallExecute(_paramCache, _args);
-        }
-    }
-
-    /**
-     * Calculates the delta between given {@code _current} relationship
-     * definition and this target relationship definition and appends the MQL
-     * append commands to {@code _mql}.
-     *
-     * @param _paramCache   parameter cache
-     * @param _mql          builder to append the MQL commands
-     * @param _current      current relationship definition
-     * @throws UpdateException_mxJPO if update is not allowed (because data can
-     *                      be lost)
-     */
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,
                              final Relationship_mxJPO _current)

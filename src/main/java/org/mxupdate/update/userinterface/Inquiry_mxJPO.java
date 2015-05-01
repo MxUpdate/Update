@@ -19,14 +19,18 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * The class is used to export and import / update inquiry configuration items.
@@ -34,7 +38,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @author The MxUpdate Team
  */
 public class Inquiry_mxJPO
-    extends AbstractAdminObject_mxJPO
+    extends AbstractAdminObject_mxJPO<Inquiry_mxJPO>
 {
     /**
      * Defines the parameter for the comment in front of the separator between
@@ -87,6 +91,14 @@ public class Inquiry_mxJPO
                          final String _mxName)
     {
         super(_typeDef, _mxName);
+    }
+
+    @Override()
+    public void parseUpdate(final String _code)
+        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
+    {
+//        new InquiryDefParser_mxJPO(new StringReader(_code)).parse(this);
+//        this.prepare();
     }
 
     /**
@@ -284,5 +296,13 @@ public class Inquiry_mxJPO
         } finally  {
             tmpTclFile.delete();
         }
+    }
+
+    @Override()
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MultiLineMqlBuilder _mql,
+                             final Inquiry_mxJPO _current)
+        throws UpdateException_mxJPO
+    {
     }
 }

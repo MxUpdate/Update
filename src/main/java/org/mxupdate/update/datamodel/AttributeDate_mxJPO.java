@@ -105,15 +105,15 @@ public class AttributeDate_mxJPO
     @Override()
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,
-                             final AttributeDate_mxJPO _target)
+                             final AttributeDate_mxJPO _current)
         throws UpdateException_mxJPO
     {
-        super.calcDelta(_paramCache, _mql, _target);
+        super.calcDelta(_paramCache, _mql, _current);
 
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagRangeValue))  {
             if (!this.rangeValue)  {
-                DeltaUtil_mxJPO.calcFlagDelta(_mql, "rangevalue", _target.rangeValue, this.rangeValue);
-            } else if (!_target.rangeValue)  {
+                DeltaUtil_mxJPO.calcFlagDelta(_mql, "rangevalue", this.rangeValue, _current.rangeValue);
+            } else if (!this.rangeValue)  {
                 throw new UpdateException_mxJPO(
                         UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_RANGEVALUEFLAG_UPDATED,
                         this.getName());

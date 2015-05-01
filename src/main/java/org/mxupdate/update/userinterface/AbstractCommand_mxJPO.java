@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.userinterface;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,9 +26,10 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  * The class is used to export and import / update command configuration items.
  *
  * @author The MxUpdate Team
+ * @param <CLASS> derived from this class
  */
-abstract class AbstractCommand_mxJPO
-    extends AbstractAdminObject_mxJPO
+abstract class AbstractCommand_mxJPO<CLASS extends AbstractAdminObject_mxJPO<CLASS>>
+    extends AbstractAdminObject_mxJPO<CLASS>
 {
     /** Set of all ignored URLs from the XML definition for commands. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
@@ -91,22 +91,6 @@ abstract class AbstractCommand_mxJPO
             parsed = super.parse(_paramCache, _url, _content);
         }
         return parsed;
-    }
-
-    /**
-     * Only implemented as stub because
-     * {@link #write(ParameterCache_mxJPO, Appendable)} is new implemented.
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the TCL update code for the command could not be
-     *                     written
-     */
-    @Override()
-    protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
-        throws IOException
-    {
     }
 
     /**

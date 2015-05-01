@@ -18,6 +18,7 @@ package org.mxupdate.update;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,11 +41,15 @@ import org.mxupdate.update.userinterface.Channel_mxJPO;
 import org.mxupdate.update.userinterface.Command_mxJPO;
 import org.mxupdate.update.userinterface.Menu_mxJPO;
 import org.mxupdate.update.userinterface.Portal_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+import org.mxupdate.update.util.MqlBuilder_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -57,8 +62,9 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * objects within MX.
  *
  * @author The MxUpdate Team
+ * @param <CLASS> derived from this class
  */
-public abstract class AbstractAdminObject_mxJPO
+public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObject_mxJPO<CLASS>>
     extends AbstractPropertyObject_mxJPO
 {
     /**
@@ -255,6 +261,21 @@ public abstract class AbstractAdminObject_mxJPO
                      ? tmp.substring(length)
                      : "";
     }
+
+    /**
+     * Parses the given {@code _code} and updates this data instance.
+     *
+     * @param _code     code to parse
+     * @throws SecurityException
+     * @throws IllegalArgumentException
+     * @throws NoSuchMethodException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws ParseException
+     */
+    public abstract void parseUpdate(final String _code)
+        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException;
 
     /**
      * Creates a XML representation of the Object to export, parses them and
@@ -675,6 +696,63 @@ public abstract class AbstractAdminObject_mxJPO
 
         super.update(_paramCache, preMQLCode, postMQLCode, _preTCLCode, tclVariables, _sourceFile);
     }
+
+    /**
+     * The method is called within the update of an administration object. The
+     * method is called directly within the update.
+     * <ul>
+     * <li>All <code>@0@0@</code> are replaced by quot's and all
+     *     <code>@1@1@</code> are replaced by apostroph's.</li>
+     * <li>The new policy definition is parsed.</li>
+     * <li>A delta MQL script generated to update the policy to the new target
+     *     definition.</li>
+     * <li>All symbolic names for states are defined (as property on the
+     *     policy).</li>
+     * <li>The delta MQL script is executed.</li>
+     * </ul>
+     *
+     * @param _paramCache   parameter cache
+     * @param _args         arguments from the TCL procedure
+     * @throws Exception if a state is not defined anymore or the policy could
+     *                   not be updated
+     * @see #TCL_PROCEDURE
+     */
+    @Override()
+    @SuppressWarnings("unchecked")
+    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
+                               final String... _args)
+        throws Exception
+    {
+        if ((_args.length == 4) && "mxUpdate".equals(_args[0]) && this.getTypeDef().getMxAdminName().equals(_args[1])) {
+
+            final CLASS clazz = (CLASS) this.getTypeDef().newTypeInstance(_args[2]);
+            clazz.parseUpdate(_args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\""));
+
+            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod " + this.getTypeDef().getMxAdminName() + " $1", this.getName());
+
+            clazz.calcDelta(_paramCache, mql, (CLASS) this);
+
+            mql.exec(_paramCache);
+        } else  {
+            super.jpoCallExecute(_paramCache, _args);
+        }
+    }
+
+    /**
+     * Calculates the delta between given {@code _current} admin object
+     * definition and this target admin object definition and appends the MQL
+     * append commands to {@code _mql}.
+     *
+     * @param _paramCache   parameter cache
+     * @param _mql          builder to append the MQL commands
+     * @param _current      current admin object definition
+     * @throws UpdateException_mxJPO if update is not allowed (e.g. if data can
+     *                      be potentially lost)
+     */
+    protected abstract void calcDelta(final ParameterCache_mxJPO _paramCache,
+                                      final MultiLineMqlBuilder _mql,
+                                      final CLASS _current)
+        throws UpdateException_mxJPO;
 
     /**
      * Getter method for instance variable {@link #hidden}.

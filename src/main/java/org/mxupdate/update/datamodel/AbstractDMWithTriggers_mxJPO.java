@@ -30,9 +30,10 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * Abstract class for all data model administration objects with triggers.
  *
  * @author The MxUpdate Team
+ * @param <CLASS> derived from this class
  */
-public abstract class AbstractDMWithTriggers_mxJPO
-    extends AbstractAdminObject_mxJPO
+public abstract class AbstractDMWithTriggers_mxJPO<CLASS extends AbstractDMWithTriggers_mxJPO<CLASS>>
+    extends AbstractAdminObject_mxJPO<CLASS>
 {
     /** Set of all ignored URLs from the XML definition for policies. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();

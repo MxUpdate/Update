@@ -17,14 +17,18 @@ package org.mxupdate.update.datamodel;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * Data model type class.
@@ -32,7 +36,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @author The MxUpdate Team
  */
 public class Type_mxJPO
-    extends AbstractDMWithAttributes_mxJPO
+    extends AbstractDMWithAttributes_mxJPO<Type_mxJPO>
 {
     /**
      * Set of all ignored URLs from the XML definition for types.
@@ -81,6 +85,14 @@ public class Type_mxJPO
                       final String _mxName)
     {
         super(_typeDef, _mxName);
+    }
+
+    @Override()
+    public void parseUpdate(final String _code)
+        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
+    {
+//        new TypeDefParser_mxJPO(new StringReader(_code)).parse(this);
+//        this.prepare();
     }
 
     /**
@@ -207,5 +219,13 @@ public class Type_mxJPO
                   .append(_preMQLCode);
 
         super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+    }
+
+    @Override()
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MultiLineMqlBuilder _mql,
+                             final Type_mxJPO _current)
+        throws UpdateException_mxJPO
+    {
     }
 }

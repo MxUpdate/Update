@@ -17,14 +17,18 @@ package org.mxupdate.update.userinterface;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * The class is used to export, create, delete and update forms within MX.
@@ -32,7 +36,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @author The MxUpdate Team
  */
 public class Form_mxJPO
-    extends AbstractUIWithFields_mxJPO
+    extends AbstractUIWithFields_mxJPO<Form_mxJPO>
 {
     /**
      * TCL procedure used to order fields of form, because Matrix has a bug
@@ -78,6 +82,14 @@ public class Form_mxJPO
                       final String _mxName)
     {
         super(_typeDef, _mxName);
+    }
+
+    @Override()
+    public void parseUpdate(final String _code)
+        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
+    {
+//        new FormdDefParser_mxJPO(new StringReader(_code)).parse(this);
+//        this.prepare();
     }
 
     /**
@@ -230,5 +242,13 @@ public class Form_mxJPO
                 .append(_preTCLCode);
 
         super.update(_paramCache, preMQLCode, _postMQLCode, tclCode, _tclVariables, _sourceFile);
+    }
+
+    @Override()
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MultiLineMqlBuilder _mql,
+                             final Form_mxJPO _current)
+        throws UpdateException_mxJPO
+    {
     }
 }

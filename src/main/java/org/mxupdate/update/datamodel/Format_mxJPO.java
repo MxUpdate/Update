@@ -17,14 +17,15 @@ package org.mxupdate.update.datamodel;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.format.FormatDefParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
@@ -37,7 +38,7 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
  * @author The MxUpdate Team
  */
 public class Format_mxJPO
-    extends AbstractAdminObject_mxJPO
+    extends AbstractAdminObject_mxJPO<Format_mxJPO>
 {
     /**
      * Set of all ignored URLs from the XML definition for formats.
@@ -78,6 +79,14 @@ public class Format_mxJPO
                         final String _mxName)
     {
         super(_typeDef, _mxName);
+    }
+
+    @Override()
+    public void parseUpdate(final String _code)
+        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
+    {
+        new FormatDefParser_mxJPO(new StringReader(_code)).parse(this);
+        this.prepare();
     }
 
     /**
@@ -162,102 +171,35 @@ public class Format_mxJPO
         _out.append("}");
     }
 
-    /**
-     * Only implemented as stub because
-     * {@link #write(ParameterCache_mxJPO, Appendable)} is new implemented.
-     *
-     * @param _paramCache   parameter cache (not used)
-     * @param _out          appendable instance to the TCL update file (not
-     *                      used)
-     */
     @Override()
-    protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
-        throws IOException
-    {
-    }
-
-    /**
-     * The method is called from the TCL update code to define the this
-     * format. If the correct use case is defined method
-     * {@link #updateDimension(ParameterCache_mxJPO, String)} is called.
-     *
-     * @param _paramCache   parameter cache
-     * @param _args         first index defines the use case (must be
-     *                      &quot;updateAttribute&quot; that the format
-     *                      is updated); second index the name of the format
-     *                      to update
-     * @throws Exception if the update of the dimension failed or for all other
-     *                   use cases from super JPO call
-     */
-    @Override()
-    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
-                               final String... _args)
-        throws Exception
-    {
-        // check if dimension is defined
-        if ((_args.length == 4) && "mxUpdate".equals(_args[0]) && "format".equals(_args[1])) {
-// TODO: Exception Handling
-            // check that format names are equal
-            if (!this.getName().equals(_args[2]))  {
-                throw new Exception("wrong format '" + _args[2] + "' is set to update (currently format '" + this.getName() + "' is updated!)");
-            }
-
-            final String code = _args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
-
-            final FormatDefParser_mxJPO parser = new FormatDefParser_mxJPO(new StringReader(code));
-            final Format_mxJPO format = parser.parse(_paramCache, this.getTypeDef(), this.getName());
-
-            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod format $1", this.getName());
-
-            this.calcDelta(_paramCache, mql, format);
-
-            mql.exec(_paramCache);
-
-        } else  {
-            super.jpoCallExecute(_paramCache, _args);
-        }
-    }
-
-    /**
-     * Calculates the delta between this current format definition and the
-     * {@code _target} format definition and appends the MQL append commands
-     * to {@code _mql}.
-     *
-     * @param _paramCache   parameter cache
-     * @param _cmd          string builder to append the MQL commands
-     * @param _target       target format definition
-     * @throws UpdateException_mxJPO if update is not allowed (because data can
-     *                      be lost)
-     */
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,
-                             final Format_mxJPO _target)
+                             final Format_mxJPO _current)
         throws UpdateException_mxJPO
     {
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "description",     _target.getDescription(), this.getDescription());
-        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",          _target.isHidden(),       this.isHidden());
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "mime",            _target.mimeType,         this.mimeType);
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "suffix",          _target.fileSuffix,       this.fileSuffix);
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "type",            _target.type,             this.type);
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "version",         _target.version,          this.version);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "description",             this.getDescription(), _current.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",          false,  this.isHidden(),       _current.isHidden());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "mime",                    this.mimeType,         _current.mimeType);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "suffix",                  this.fileSuffix,       _current.fileSuffix);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "type",                    this.type,             _current.type);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "version",                 this.version,          _current.version);
 
         if (_paramCache.getValueBoolean(ValueKeys.DMFormatSupportsPrograms))  {
-            DeltaUtil_mxJPO.calcValueDelta(_mql, "view", _target.commandView, this.commandView);
-            DeltaUtil_mxJPO.calcValueDelta(_mql, "edit", _target.commandEdit, this.commandEdit);
-            DeltaUtil_mxJPO.calcValueDelta(_mql, "print", _target.commandPrint, this.commandPrint);
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "view", this.commandView, _current.commandView);
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "edit", this.commandEdit, _current.commandEdit);
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "print", this.commandPrint, _current.commandPrint);
         } else  {
-            if (_target.commandView != null)  {
-                _paramCache.logInfo("    - view program " + _target.commandView + " ignored (not supported anymore!)");
+            if (this.commandView != null)  {
+                _paramCache.logInfo("    - view program " + this.commandView + " ignored (not supported anymore!)");
             }
-            if (_target.commandEdit != null)  {
-                _paramCache.logInfo("    - edit program " + _target.commandEdit + " ignored (not supported anymore!)");
+            if (this.commandEdit != null)  {
+                _paramCache.logInfo("    - edit program " + this.commandEdit + " ignored (not supported anymore!)");
             }
-            if (_target.commandPrint != null)  {
-                _paramCache.logInfo("    - print program " + _target.commandPrint + " ignored (not supported anymore!)");
+            if (this.commandPrint != null)  {
+                _paramCache.logInfo("    - print program " + this.commandPrint + " ignored (not supported anymore!)");
             }
         }
 
-        _target.getProperties().calcDelta(_mql, "", this.getProperties());
+        this.getProperties().calcDelta(_mql, "", _current.getProperties());
     }
 }

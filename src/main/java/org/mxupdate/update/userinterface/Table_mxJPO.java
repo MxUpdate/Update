@@ -17,11 +17,15 @@ package org.mxupdate.update.userinterface;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * The class is used to export, create, delete and update tables within MX.
@@ -29,7 +33,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @author The MxUpdate Team
  */
 public class Table_mxJPO
-    extends AbstractUIWithFields_mxJPO
+    extends AbstractUIWithFields_mxJPO<Table_mxJPO>
 {
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -70,6 +74,14 @@ System.err.println("The table is derived from '" + _content + "'! This is curren
             parsed = super.parse(_paramCache, _url, _content);
         }
         return parsed;
+    }
+
+    @Override()
+    public void parseUpdate(final String _code)
+        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
+    {
+//        new TableDefParser_mxJPO(new StringReader(_code)).parse(this);
+//        this.prepare();
     }
 
     /**
@@ -149,5 +161,13 @@ System.err.println("The table is derived from '" + _content + "'! This is curren
                   .append(_preMQLCode);
 
         super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+    }
+
+    @Override()
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MultiLineMqlBuilder _mql,
+                             final Table_mxJPO _current)
+        throws UpdateException_mxJPO
+    {
     }
 }

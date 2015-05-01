@@ -42,7 +42,6 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
@@ -56,7 +55,7 @@ import org.xml.sax.SAXException;
  * @author The MxUpdate Team
  */
 public class Policy_mxJPO
-    extends AbstractAdminObject_mxJPO
+    extends AbstractAdminObject_mxJPO<Policy_mxJPO>
 {
     /** Set of all ignored URLs from the XML definition for policies. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
@@ -150,6 +149,7 @@ public class Policy_mxJPO
      * @throws InvocationTargetException
      * @throws ParseException
      */
+    @Override
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
@@ -281,7 +281,6 @@ public class Policy_mxJPO
      * within update.
      *
      * @param _paramCache       not used
-     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
      */
     @Override()
     public void create(final ParameterCache_mxJPO _paramCache)
@@ -370,61 +369,11 @@ public class Policy_mxJPO
         super.update(_paramCache, _create, _file, _newVersion);
     }
 
-    /**
-     * The method is called within the update of an administration object. The
-     * method is called directly within the update.
-     * <ul>
-     * <li>All <code>@0@0@</code> are replaced by quot's and all
-     *     <code>@1@1@</code> are replaced by apostroph's.</li>
-     * <li>The new policy definition is parsed.</li>
-     * <li>A delta MQL script generated to update the policy to the new target
-     *     definition.</li>
-     * <li>All symbolic names for states are defined (as property on the
-     *     policy).</li>
-     * <li>The delta MQL script is executed.</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @param _args         arguments from the TCL procedure
-     * @throws Exception if a state is not defined anymore or the policy could
-     *                   not be updated
-     * @see #TCL_PROCEDURE
-     */
     @Override()
-    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
-                               final String... _args)
-        throws Exception
-    {
-        if ((_args.length == 4) && "mxUpdate".equals(_args[0]) && this.getTypeDef().getMxAdminName().equals(_args[1])) {
-
-            final Policy_mxJPO policy = (Policy_mxJPO) this.getTypeDef().newTypeInstance(_args[2]);
-            policy.parseUpdate(_args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\""));
-
-            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod policy $1", this.getName());
-
-            policy.calcDelta(_paramCache, mql, this);
-
-            mql.exec(_paramCache);
-        } else  {
-            super.jpoCallExecute(_paramCache, _args);
-        }
-    }
-
-    /**
-     * Calculates the delta between given {@code _current} policy definition and
-     * the this target format definition and appends the MQL append commands
-     * to {@code _mql}.
-     *
-     * @param _paramCache   parameter cache
-     * @param _mql          builder to append the MQL commands
-     * @param _current      current format definition
-     * @throws Exception if update is not allowed (because data can
-     *                      be lost)
-     */
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,
                              final Policy_mxJPO _current)
-        throws Exception
+        throws UpdateException_mxJPO
     {
         // creates policy if done within update
         if (_current.updateWithCreate)  {
@@ -493,7 +442,7 @@ public class Policy_mxJPO
         }
 
         // hidden flag, because hidden flag must be set with special syntax
-        DeltaUtil_mxJPO.calcFlagDelta(_mql, "hidden", this.isHidden(), _current.isHidden());
+        DeltaUtil_mxJPO.calcFlagDelta(_mql, "hidden", false, this.isHidden(), _current.isHidden());
 
         // because the store of a policy could not be removed....
         if ((this.store != null) && !this.store.isEmpty())  {
@@ -545,12 +494,12 @@ public class Policy_mxJPO
      * @param _paramCache   parameter cache (used for logging purposes)
      * @param _mql          MQL builder for the MQL commands
      * @param _newPolicy    new target policy definition
-     * @throws Exception if calculation of the delta failed
+     * @throws UpdateException_mxJPO if calculation of the delta failed
      */
     private void calcStatesDelta(final ParameterCache_mxJPO _paramCache,
                                  final MultiLineMqlBuilder _mql,
                                  final Policy_mxJPO _newPolicy)
-        throws Exception
+        throws UpdateException_mxJPO
     {
         // states....
         // (first add new states because of references in branches)
@@ -580,7 +529,7 @@ public class Policy_mxJPO
         }
         // check for already existing state, but not defined anymore!
         if (curStateIter.hasNext())  {
-throw new Exception("some states are not defined anymore!");
+throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
         }
 
         // now update state information itself
@@ -892,12 +841,10 @@ throw new Exception("some states are not defined anymore!");
          * @param _mql          MQL builder for the MQL commands
          * @param _oldState     old state to update ({@code null} if no old
          *                      state exists).
-         * @throws IOException if write failed
          */
         protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                                  final MultiLineMqlBuilder _mql,
                                  final State _oldState)
-            throws IOException
         {
             // enforcereserveaccess flag (if supported)
             if (_paramCache.getValueBoolean(ValueKeys.DMPolicyStateSupportsEnforceReserveAccess))  {
@@ -1025,11 +972,9 @@ throw new Exception("some states are not defined anymore!");
          * @param _mql          appendable instance where the delta must be
          *                      append
          * @param _oldSignature old signature to compare
-         * @throws IOException if the delta could not appended
          */
         protected void calcDelta(final MultiLineMqlBuilder _mql,
                                  final Signature _oldSignature)
-            throws IOException
         {
             if (this.branch.isEmpty())  {
                 if ((_oldSignature != null) && (_oldSignature.branch != null) && !"".equals(_oldSignature.branch))  {

@@ -17,6 +17,7 @@ package org.mxupdate.update.user;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import matrix.util.MatrixException;
@@ -24,16 +25,21 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
+ * The class is used to export and import / update association configuration
+ * items.
  *
  * @author The MxUpdate Team
  */
 public class Association_mxJPO
-    extends AbstractAdminObject_mxJPO
+    extends AbstractAdminObject_mxJPO<Association_mxJPO>
 {
     /**
      * Stores the definition of this association instance.
@@ -50,6 +56,12 @@ public class Association_mxJPO
                              final String _mxName)
     {
         super(_typeDef, _mxName);
+    }
+
+    @Override()
+    public void parseUpdate(final String _code)
+        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
+    {
     }
 
     /**
@@ -173,5 +185,13 @@ public class Association_mxJPO
         }
 
         return value;
+    }
+
+    @Override()
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MultiLineMqlBuilder _mql,
+                             final Association_mxJPO _current)
+        throws UpdateException_mxJPO
+    {
     }
 }

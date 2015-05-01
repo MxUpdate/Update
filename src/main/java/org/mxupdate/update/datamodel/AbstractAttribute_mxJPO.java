@@ -17,6 +17,7 @@ package org.mxupdate.update.datamodel;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,6 +31,7 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.attribute.AttributeDefParser_mxJPO;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MqlBuilder;
@@ -48,7 +50,7 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
  * @param <CLASS> class defined from this class
  */
 public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mxJPO<CLASS>>
-    extends AbstractAdminObject_mxJPO
+    extends AbstractAdminObject_mxJPO<CLASS>
 {
     /** Key used for the select statement. */
     private static final String SELECT_KEY = "@@@2@@@2@@@";
@@ -197,6 +199,14 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         }
 
         return attrs.get(this.attrTypeList);
+    }
+
+    @Override()
+    public void parseUpdate(final String _code)
+        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
+    {
+        new AttributeDefParser_mxJPO(new StringReader(_code)).parse(this);
+        this.prepare();
     }
 
     /**
@@ -427,91 +437,38 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
                 .exec(_paramCache);
     }
 
-    /**
-     * The method is called from the TCL update code to define the this
-     * attribute. If the correct use case is defined method
-     * {@link #updateDimension(ParameterCache_mxJPO, String)} is called.
-     *
-     * @param _paramCache   parameter cache
-     * @param _args         first index defines the use case (must be
-     *                      &quot;updateAttribute&quot; that the attribute
-     *                      is updated); second index the name of the attribute
-     *                      to update
-     * @throws Exception if the update of the dimension failed or for all other
-     *                   use cases from super JPO call
-     */
     @Override()
-    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
-                               final String... _args)
-        throws Exception
-    {
-        // check if dimension is defined
-        if ((_args.length == 4) && "mxUpdate".equals(_args[0]) && "attribute".equals(_args[1])) {
-// TODO: Exception Handling
-            // check that attribute names are equal
-            if (!this.getName().equals(_args[2]))  {
-                throw new Exception("wrong attribute '" + _args[1] + "' is set to update (currently attribute '" + this.getName() + "' is updated!)");
-            }
-
-            final String code = _args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
-
-            final AttributeDefParser_mxJPO parser = new AttributeDefParser_mxJPO(new StringReader(code));
-            @SuppressWarnings("unchecked")
-            final CLASS attribute = (CLASS) parser.parse(_paramCache, this.getTypeDef(), this.getName());
-
-            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod attribute $1", this.getName());
-
-            this.calcDelta(_paramCache, mql, attribute);
-
-            mql.exec(_paramCache);
-
-        } else  {
-            super.jpoCallExecute(_paramCache, _args);
-        }
-    }
-
-    /**
-     * Calculates the delta between this current attribute definition and the
-     * {@code _target} attribute definition and appends the MQL append commands
-     * to {@code _cmd}.
-     *
-     * @param _paramCache   parameter cache
-     * @param _cmd          string builder to append the MQL commands
-     * @param _target       target attribute definition
-     * @throws UpdateException_mxJPO if update is not allowed (because data can
-     *                      be lost)
-     */
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,
-                             final CLASS _target)
+                             final CLASS _current)
         throws UpdateException_mxJPO
     {
-        final AbstractAttribute_mxJPO<CLASS> target = _target;
+        final AbstractAttribute_mxJPO<CLASS> current = _current;
 
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "description",     target.getDescription(), this.getDescription());
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "default",         target.defaultValue,     this.defaultValue);
-        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",          target.isHidden(),       this.isHidden());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "description",         this.getDescription(), current.getDescription());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "default",             this.defaultValue,     current.defaultValue);
+        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false,  this.isHidden(),       current.isHidden());
 
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagMultiValue))  {
-            if (!this.multiValue)  {
-                DeltaUtil_mxJPO.calcFlagDelta(_mql, "multivalue", target.multiValue, this.multiValue);
-            } else if (!target.multiValue)  {
+            if (!current.multiValue)  {
+                DeltaUtil_mxJPO.calcFlagDelta(_mql, "multivalue", this.multiValue, current.multiValue);
+            } else if (!this.multiValue)  {
                 throw new UpdateException_mxJPO(
                         UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_MULTIVALUEFLAG_UPDATED,
-                        this.getName());
+                        _current.getName());
             }
         }
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnClone))  {
-            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "resetonclone",    target.resetOnClone,     this.resetOnClone);
+            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "resetonclone",    this.resetOnClone,     current.resetOnClone);
         }
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnRevision))  {
-            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "resetonrevision", target.resetOnRevision,  this.resetOnRevision);
+            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "resetonrevision", this.resetOnRevision,  current.resetOnRevision);
         }
-        DeltaUtil_mxJPO.calcListDelta(_mql, "rule", target.rules, this.rules);
+        DeltaUtil_mxJPO.calcListDelta(_mql, "rule", this.rules, current.rules);
 
-        target.triggers.calcDelta(_mql, this.triggers);
-        target.rangesSorted.calcDelta(_mql, this.rangesSorted);
-        target.getProperties().calcDelta(_mql, "", this.getProperties());
+        this.triggers       .calcDelta(_mql, current.triggers);
+        this.rangesSorted   .calcDelta(_mql, current.rangesSorted);
+        this.getProperties().calcDelta(_mql, "", _current.getProperties());
     }
 
     /**

@@ -34,10 +34,11 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
  * depending on attributes.
  *
  * @author The MxUpdate Team
+ * @param <CLASS> derived from this class
  */
 @Deprecated()
-public abstract class AbstractDMWithAttributes_mxJPO
-    extends AbstractDMWithTriggers_mxJPO
+public abstract class AbstractDMWithAttributes_mxJPO<CLASS extends AbstractDMWithTriggers_mxJPO<CLASS>>
+    extends AbstractDMWithTriggers_mxJPO<CLASS>
 {
     /**
      * Name of parameter to define ignored attributes within the test
