@@ -284,8 +284,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
     }
   }
 
-  final public void stateAccessDef(final Access _access) throws ParseException {String key = null, access = null, filter = null, localfilter = null, organization = null, project = null, owner = null, reserve = null, maturity = null, category = null;
-    Token tmp;
+  final public void stateAccessDef(final Access _access) throws ParseException {Token tmp;
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -336,12 +335,12 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case ACCESS_STRING:{
           tmp = jj_consume_token(ACCESS_STRING);
-key = this.getString(tmp.image);
+this.setValue(_access, "key",              this.getString(tmp.image));
           break;
           }
         case ACCESS_SINGLE_STRING:{
           tmp = jj_consume_token(ACCESS_SINGLE_STRING);
-key = this.getSingle(tmp.image);
+this.setValue(_access, "key",              this.getSingle(tmp.image));
           break;
           }
         default:
@@ -354,14 +353,14 @@ key = this.getSingle(tmp.image);
       case FILTER:{
         jj_consume_token(FILTER);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case STRING:{
-          tmp = jj_consume_token(STRING);
-filter       = this.getString(tmp.image);
+        case MULTILINESTRING:{
+          tmp = jj_consume_token(MULTILINESTRING);
+this.setValue(_access, "filter",           this.getString(tmp.image));
           break;
           }
-        case SINGLE:{
-          tmp = jj_consume_token(SINGLE);
-filter       = this.getSingle(tmp.image);
+        case MULTILINESINGLE:{
+          tmp = jj_consume_token(MULTILINESINGLE);
+this.setValue(_access, "filter",           this.getSingle(tmp.image));
           break;
           }
         default:
@@ -374,14 +373,14 @@ filter       = this.getSingle(tmp.image);
       case LOCALFILTER:{
         jj_consume_token(LOCALFILTER);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case STRING:{
-          tmp = jj_consume_token(STRING);
-localfilter  = this.getString(tmp.image);
+        case MULTILINESTRING:{
+          tmp = jj_consume_token(MULTILINESTRING);
+this.setValue(_access, "localfilter",      this.getString(tmp.image));
           break;
           }
-        case SINGLE:{
-          tmp = jj_consume_token(SINGLE);
-localfilter  = this.getSingle(tmp.image);
+        case MULTILINESINGLE:{
+          tmp = jj_consume_token(MULTILINESINGLE);
+this.setValue(_access, "localfilter",      this.getSingle(tmp.image));
           break;
           }
         default:
@@ -393,161 +392,162 @@ localfilter  = this.getSingle(tmp.image);
         }
       case ACCESS:{
         tmp = jj_consume_token(ACCESS);
-access       = tmp.image
-                                                                                       .replaceFirst("^\\{", "").replaceFirst("\\}$", "")  // remove {}
-                                                                                       .replaceAll("(\t)|(\n)", " ")                       // replace tabs, new lines
-                                                                                       .replaceAll("( )+", " ")                            // multiple spaces => one space
-                                                                                       .trim();
+this.appendValues(_access, "access",       Arrays.asList(
+                                                                                                                    tmp.image.replaceFirst("^\\{", "").replaceFirst("\\}$", "")  // remove {}
+                                                                                                                             .replaceAll("(\t)|(\n)", " ")                       // replace tabs, new lines
+                                                                                                                             .replaceAll("( )+", " ")                            // multiple spaces => one space
+                                                                                                                             .trim()                                             // remove trailing spaces
+                                                                                                                             .split(" ")));
         break;
         }
       case ORGANIZATION_ANY:{
         jj_consume_token(ORGANIZATION_ANY);
-organization = "any";
+this.setValue(_access, "organization",     "any");
         break;
         }
       case ORGANIZATION_SINGLE:{
         jj_consume_token(ORGANIZATION_SINGLE);
-organization = "single";
+this.setValue(_access, "organization",     "single");
         break;
         }
       case ORGANIZATION_ANCESTOR:{
         jj_consume_token(ORGANIZATION_ANCESTOR);
-organization = "ancestor";
+this.setValue(_access, "organization",     "ancestor");
         break;
         }
       case ORGANIZATION_DESCENDANT:{
         jj_consume_token(ORGANIZATION_DESCENDANT);
-organization = "descendant";
+this.setValue(_access, "organization",     "descendant");
         break;
         }
       case ORGANIZATION_RELATED:{
         jj_consume_token(ORGANIZATION_RELATED);
-organization = "related";
+this.setValue(_access, "organization",     "related");
         break;
         }
       case PROJECT_ANY:{
         jj_consume_token(PROJECT_ANY);
-project      = "any";
+this.setValue(_access, "project",          "any");
         break;
         }
       case PROJECT_SINGLE:{
         jj_consume_token(PROJECT_SINGLE);
-project      = "single";
+this.setValue(_access, "project",          "single");
         break;
         }
       case PROJECT_ANCESTOR:{
         jj_consume_token(PROJECT_ANCESTOR);
-project      = "ancestor";
+this.setValue(_access, "project",          "ancestor");
         break;
         }
       case PROJECT_DESCENDANT:{
         jj_consume_token(PROJECT_DESCENDANT);
-project      = "descendant";
+this.setValue(_access, "project",          "descendant");
         break;
         }
       case PROJECT_RELATED:{
         jj_consume_token(PROJECT_RELATED);
-project      = "related";
+this.setValue(_access, "project",          "related");
         break;
         }
       case OWNER_ANY:{
         jj_consume_token(OWNER_ANY);
-owner        = "any";
+this.setValue(_access, "owner",            "any");
         break;
         }
       case OWNER_CONTEXT:{
         jj_consume_token(OWNER_CONTEXT);
-owner        = "context";
+this.setValue(_access, "owner",            "context");
         break;
         }
       case RESERVE_ANY:{
         jj_consume_token(RESERVE_ANY);
-reserve      = "any";
+this.setValue(_access, "reserve",          "any");
         break;
         }
       case RESERVE_CONTEXT:{
         jj_consume_token(RESERVE_CONTEXT);
-reserve      = "context";
+this.setValue(_access, "reserve",          "context");
         break;
         }
       case RESERVE_NO:{
         jj_consume_token(RESERVE_NO);
-reserve      = "no";
+this.setValue(_access, "reserve",          "no");
         break;
         }
       case RESERVE_INCLUSIVE:{
         jj_consume_token(RESERVE_INCLUSIVE);
-reserve      = "inclusive";
+this.setValue(_access, "reserve",          "inclusive");
         break;
         }
       case MATURITY_ANY:{
         jj_consume_token(MATURITY_ANY);
-maturity     = "any";
+this.setValue(_access, "maturity",         "any");
         break;
         }
       case MATURITY_NO:{
         jj_consume_token(MATURITY_NO);
-maturity     = "no";
+this.setValue(_access, "maturity",         "no");
         break;
         }
       case MATURITY_PUBLIC:{
         jj_consume_token(MATURITY_PUBLIC);
-maturity     = "public";
+this.setValue(_access, "maturity",         "public");
         break;
         }
       case MATURITY_PROTECTED:{
         jj_consume_token(MATURITY_PROTECTED);
-maturity     = "protected";
+this.setValue(_access, "maturity",         "protected");
         break;
         }
       case MATURITY_PRIVATE:{
         jj_consume_token(MATURITY_PRIVATE);
-maturity     = "private";
+this.setValue(_access, "maturity",         "private");
         break;
         }
       case MATURITY_NOTPRIVATE:{
         jj_consume_token(MATURITY_NOTPRIVATE);
-maturity     = "notprivate";
+this.setValue(_access, "maturity",         "notprivate");
         break;
         }
       case MATURITY_PPP:{
         jj_consume_token(MATURITY_PPP);
-maturity     = "ppp";
+this.setValue(_access, "maturity",         "ppp");
         break;
         }
       case CATEGORY_ANY:{
         jj_consume_token(CATEGORY_ANY);
-category     = "any";
+this.setValue(_access, "category",         "any");
         break;
         }
       case CATEGORY_OEM:{
         jj_consume_token(CATEGORY_OEM);
-category     = "oem";
+this.setValue(_access, "category",         "oem");
         break;
         }
       case CATEGORY_GOLDPARTNER:{
         jj_consume_token(CATEGORY_GOLDPARTNER);
-category     = "goldpartner";
+this.setValue(_access, "category",         "goldpartner");
         break;
         }
       case CATEGORY_PARTNER:{
         jj_consume_token(CATEGORY_PARTNER);
-category     = "partner";
+this.setValue(_access, "category",         "partner");
         break;
         }
       case CATEGORY_SUPPLIER:{
         jj_consume_token(CATEGORY_SUPPLIER);
-category     = "supplier";
+this.setValue(_access, "category",         "supplier");
         break;
         }
       case CATEGORY_CUSTOMER:{
         jj_consume_token(CATEGORY_CUSTOMER);
-category     = "customer";
+this.setValue(_access, "category",         "customer");
         break;
         }
       case CATEGORY_CONTRACTOR:{
         jj_consume_token(CATEGORY_CONTRACTOR);
-category     = "contractor";
+this.setValue(_access, "category",         "contractor");
         break;
         }
       default:
@@ -556,18 +556,6 @@ category     = "contractor";
         throw new ParseException();
       }
     }
-this.setValue(_access, "key", key);
-        this.setValue(_access, "filter", filter);
-        this.setValue(_access, "localfilter", localfilter);
-        this.setValue(_access, "organization", organization);
-        this.setValue(_access, "project", project);
-        this.setValue(_access, "owner", owner);
-        this.setValue(_access, "reserve", reserve);
-        this.setValue(_access, "maturity", maturity);
-        this.setValue(_access, "category", category);
-        if (access != null)  {
-            this.appendValues(_access, "access", Arrays.asList(access.split(" ")));
-        }
   }
 
   /** Generated Token Manager. */
@@ -587,7 +575,7 @@ this.setValue(_access, "key", key);
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0xf87e0,0x1800,0x6000,0x8000,0x10000,0xc00000,0xe0000,0x1800,0x0,0x1800,0x0,0x1800,0x0,0xf87e0,0xff300000,0xc00000,0x1800,0x1800,0xff300000,};
+      jj_la1_0 = new int[] {0xf87e0,0x1800,0x6000,0x8000,0x10000,0xc00000,0xe0000,0x1800,0x0,0x1800,0x0,0x1800,0x0,0xf87e0,0xff300000,0xc00000,0x6000,0x6000,0xff300000,};
    }
    private static void jj_la1_init_1() {
       jj_la1_1 = new int[] {0x1000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x6000000,0x0,0x18000000,0x0,0x6000000,0x1000000,0xffffff,0x0,0x0,0x0,0xffffff,};

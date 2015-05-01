@@ -102,8 +102,8 @@ class RuleParser
 /** After access definition back to default */
 <DEFAULT> TOKEN:
 {
-      <FILTER:                              "filter">                                               : STRING_EXPECTED
-    | <LOCALFILTER:                         "localfilter">                                          : STRING_EXPECTED
+      <FILTER:                              "filter">                                               : MULTILINESTRING_EXPECTED
+    | <LOCALFILTER:                         "localfilter">                                          : MULTILINESTRING_EXPECTED
     | <ORGANIZATION_ANY:                    "any"         ([" ","\t","\n"])+ "organization">        : DEFAULT
     | <ORGANIZATION_SINGLE:                 "single"      ([" ","\t","\n"])+ "organization">        : DEFAULT
     | <ORGANIZATION_ANCESTOR:               "ancestor"    ([" ","\t","\n"])+ "organization">        : DEFAULT
@@ -197,69 +197,59 @@ void parse(final Rule_mxJPO _rule)
 }
 
 void stateAccessDef(final Access _access) : {
-    String key = null, access = null, filter = null, localfilter = null, organization = null, project = null, owner = null, reserve = null, maturity = null, category = null;
     Token tmp;
 } {
     (
-          ( <KEY>                   ( tmp = <ACCESS_STRING>         {key = this.getString(tmp.image);}
-                                    | tmp = <ACCESS_SINGLE_STRING>  {key = this.getSingle(tmp.image);} ) )
-        | ( <FILTER>                ( tmp = <STRING>                {filter       = this.getString(tmp.image);}
-                                    | tmp = <SINGLE>                {filter       = this.getSingle(tmp.image);} ) )
-        | ( <LOCALFILTER>           ( tmp = <STRING>                {localfilter  = this.getString(tmp.image);}
-                                    | tmp = <SINGLE>                {localfilter  = this.getSingle(tmp.image);} ) )
-        | ( tmp = <ACCESS>                                          {access       = tmp.image
-                                                                                       .replaceFirst("^\\{", "").replaceFirst("\\}$", "")  // remove {}
-                                                                                       .replaceAll("(\t)|(\n)", " ")                       // replace tabs, new lines
-                                                                                       .replaceAll("( )+", " ")                            // multiple spaces => one space
-                                                                                       .trim();} )                                         // remove trailing spaces
+          ( <KEY>                   ( tmp = <ACCESS_STRING>         {this.setValue(_access, "key",              this.getString(tmp.image));}
+                                    | tmp = <ACCESS_SINGLE_STRING>  {this.setValue(_access, "key",              this.getSingle(tmp.image));} ) )
 
-        | ( <ORGANIZATION_ANY>                                      {organization = "any";        } )
-        | ( <ORGANIZATION_SINGLE>                                   {organization = "single";     } )
-        | ( <ORGANIZATION_ANCESTOR>                                 {organization = "ancestor";   } )
-        | ( <ORGANIZATION_DESCENDANT>                               {organization = "descendant"; } )
-        | ( <ORGANIZATION_RELATED>                                  {organization = "related";    } )
+        | ( <FILTER>                ( tmp = <MULTILINESTRING>       {this.setValue(_access, "filter",           this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>       {this.setValue(_access, "filter",           this.getSingle(tmp.image));} ) )
 
-        | ( <PROJECT_ANY>                                           {project      = "any";        } )
-        | ( <PROJECT_SINGLE>                                        {project      = "single";     } )
-        | ( <PROJECT_ANCESTOR>                                      {project      = "ancestor";   } )
-        | ( <PROJECT_DESCENDANT>                                    {project      = "descendant"; } )
-        | ( <PROJECT_RELATED>                                       {project      = "related";    } )
+        | ( <LOCALFILTER>           ( tmp = <MULTILINESTRING>       {this.setValue(_access, "localfilter",      this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>       {this.setValue(_access, "localfilter",      this.getSingle(tmp.image));} ) )
 
-        | ( <OWNER_ANY>                                             {owner        = "any";        } )
-        | ( <OWNER_CONTEXT>                                         {owner        = "context";    } )
+        | ( tmp = <ACCESS>                                          {this.appendValues(_access, "access",       Arrays.asList(
+                                                                                                                    tmp.image.replaceFirst("^\\{", "").replaceFirst("\\}$", "")  // remove {}
+                                                                                                                             .replaceAll("(\t)|(\n)", " ")                       // replace tabs, new lines
+                                                                                                                             .replaceAll("( )+", " ")                            // multiple spaces => one space
+                                                                                                                             .trim()                                             // remove trailing spaces
+                                                                                                                             .split(" ")));} )                                   // split
 
-        | ( <RESERVE_ANY>                                           {reserve      = "any";        } )
-        | ( <RESERVE_CONTEXT>                                       {reserve      = "context";    } )
-        | ( <RESERVE_NO>                                            {reserve      = "no";         } )
-        | ( <RESERVE_INCLUSIVE>                                     {reserve      = "inclusive";  } )
+        | ( <ORGANIZATION_ANY>                                      {this.setValue(_access, "organization",     "any");         } )
+        | ( <ORGANIZATION_SINGLE>                                   {this.setValue(_access, "organization",     "single");      } )
+        | ( <ORGANIZATION_ANCESTOR>                                 {this.setValue(_access, "organization",     "ancestor");    } )
+        | ( <ORGANIZATION_DESCENDANT>                               {this.setValue(_access, "organization",     "descendant");  } )
+        | ( <ORGANIZATION_RELATED>                                  {this.setValue(_access, "organization",     "related");     } )
 
-        | ( <MATURITY_ANY>                                          {maturity     = "any";        } )
-        | ( <MATURITY_NO>                                           {maturity     = "no";         } )
-        | ( <MATURITY_PUBLIC>                                       {maturity     = "public";     } )
-        | ( <MATURITY_PROTECTED>                                    {maturity     = "protected";  } )
-        | ( <MATURITY_PRIVATE>                                      {maturity     = "private";    } )
-        | ( <MATURITY_NOTPRIVATE>                                   {maturity     = "notprivate"; } )
-        | ( <MATURITY_PPP>                                          {maturity     = "ppp";        } )
+        | ( <PROJECT_ANY>                                           {this.setValue(_access, "project",          "any");         } )
+        | ( <PROJECT_SINGLE>                                        {this.setValue(_access, "project",          "single");      } )
+        | ( <PROJECT_ANCESTOR>                                      {this.setValue(_access, "project",          "ancestor");    } )
+        | ( <PROJECT_DESCENDANT>                                    {this.setValue(_access, "project",          "descendant");  } )
+        | ( <PROJECT_RELATED>                                       {this.setValue(_access, "project",          "related");     } )
 
-        | ( <CATEGORY_ANY>                                          {category     = "any";         } )
-        | ( <CATEGORY_OEM>                                          {category     = "oem";         } )
-        | ( <CATEGORY_GOLDPARTNER>                                  {category     = "goldpartner"; } )
-        | ( <CATEGORY_PARTNER>                                      {category     = "partner";     } )
-        | ( <CATEGORY_SUPPLIER>                                     {category     = "supplier";    } )
-        | ( <CATEGORY_CUSTOMER>                                     {category     = "customer";    } )
-        | ( <CATEGORY_CONTRACTOR>                                   {category     = "contractor";  } )
+        | ( <OWNER_ANY>                                             {this.setValue(_access, "owner",            "any");         } )
+        | ( <OWNER_CONTEXT>                                         {this.setValue(_access, "owner",            "context");     } )
+
+        | ( <RESERVE_ANY>                                           {this.setValue(_access, "reserve",          "any");         } )
+        | ( <RESERVE_CONTEXT>                                       {this.setValue(_access, "reserve",          "context");     } )
+        | ( <RESERVE_NO>                                            {this.setValue(_access, "reserve",          "no");          } )
+        | ( <RESERVE_INCLUSIVE>                                     {this.setValue(_access, "reserve",          "inclusive");   } )
+
+        | ( <MATURITY_ANY>                                          {this.setValue(_access, "maturity",         "any");         } )
+        | ( <MATURITY_NO>                                           {this.setValue(_access, "maturity",         "no");          } )
+        | ( <MATURITY_PUBLIC>                                       {this.setValue(_access, "maturity",         "public");      } )
+        | ( <MATURITY_PROTECTED>                                    {this.setValue(_access, "maturity",         "protected");   } )
+        | ( <MATURITY_PRIVATE>                                      {this.setValue(_access, "maturity",         "private");     } )
+        | ( <MATURITY_NOTPRIVATE>                                   {this.setValue(_access, "maturity",         "notprivate");  } )
+        | ( <MATURITY_PPP>                                          {this.setValue(_access, "maturity",         "ppp");         } )
+
+        | ( <CATEGORY_ANY>                                          {this.setValue(_access, "category",         "any");         } )
+        | ( <CATEGORY_OEM>                                          {this.setValue(_access, "category",         "oem");         } )
+        | ( <CATEGORY_GOLDPARTNER>                                  {this.setValue(_access, "category",         "goldpartner"); } )
+        | ( <CATEGORY_PARTNER>                                      {this.setValue(_access, "category",         "partner");     } )
+        | ( <CATEGORY_SUPPLIER>                                     {this.setValue(_access, "category",         "supplier");    } )
+        | ( <CATEGORY_CUSTOMER>                                     {this.setValue(_access, "category",         "customer");    } )
+        | ( <CATEGORY_CONTRACTOR>                                   {this.setValue(_access, "category",         "contractor");  } )
     )*
-    {
-        this.setValue(_access, "key", key);
-        this.setValue(_access, "filter", filter);
-        this.setValue(_access, "localfilter", localfilter);
-        this.setValue(_access, "organization", organization);
-        this.setValue(_access, "project", project);
-        this.setValue(_access, "owner", owner);
-        this.setValue(_access, "reserve", reserve);
-        this.setValue(_access, "maturity", maturity);
-        this.setValue(_access, "category", category);
-        if (access != null)  {            this.appendValues(_access, "access", Arrays.asList(access.split(" ")));
-        }
-    }
 }
