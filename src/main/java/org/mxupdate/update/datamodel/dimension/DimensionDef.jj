@@ -134,32 +134,23 @@ PARSER_END(DimensionDefParser)
 
 <UNITDEF_EXPECTED> TOKEN :
 {
-      <UNITDEF_START :      "{">            : UNITDEF_EXPECTED
-    | <UNITDEF_END :        "}">            : DEFAULT
-    | <UNITDEF_DEFAULT:     "default">      : UNITDEF_BOOLEAN_EXPECTED
-    | <UNITDEF_DESCRIPTION: "description">  : UNITDEF_STRING_EXPECTED
-    | <UNITDEF_LABEL:       "label">        : UNITDEF_STRING_EXPECTED
-    | <UNITDEF_MULTIPLIER:  "multiplier">   : UNITDEF_DOUBLE_EXPECTED
-    | <UNITDEF_OFFSET:      "offset">       : UNITDEF_DOUBLE_EXPECTED
-    | <UNITDEF_SETTING:     "setting">      : UNITDEF_STRINGSTRING_EXPECTED
-    | <UNITDEF_PROPERTY:    "property">     : UNITDEF_STRING_EXPECTED
-    | <UNITDEF_PROPERTYVAL: "value">        : UNITDEF_STRING_EXPECTED
-    | <UNITDEF_PROPERTYTO:  "to">           : UNITDEF_STRINGSTRING_EXPECTED
-    | <UNITDEF_SYSTEM:      "system">       : UNITDEF_SYSTEMNAME_EXPECTED
-}
-
-/************************************************* Boolean for Unit Defnition */
-<UNITDEF_BOOLEAN_EXPECTED> SKIP :
-{
-  " " | "\t" | "\n" | "\r"
-}
-
-<UNITDEF_BOOLEAN_EXPECTED> TOKEN :
-{
-      <UNITDEF_BOOLEAN_TRUE : (<UNITDEF_BOOLEAN_TRUESTR> | "\"" <UNITDEF_BOOLEAN_TRUESTR> "\"")> : UNITDEF_EXPECTED
-    | <UNITDEF_BOOLEAN_FALSE : (<UNITDEF_BOOLEAN_FALSESTR> | "\"" <UNITDEF_BOOLEAN_FALSESTR> "\"")> : UNITDEF_EXPECTED
-    | <#UNITDEF_BOOLEAN_TRUESTR : ["t","T"] ["r","R"] ["u","U"] ["e","E"]>
-    | <#UNITDEF_BOOLEAN_FALSESTR : ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"]>
+      <UNITDEF_START :                              "{">                                                                                            : UNITDEF_EXPECTED
+    | <UNITDEF_END :                                "}">                                                                                            : DEFAULT
+    | <UNITDEF_DEFAULT_TRUE:                        "default">                                                                                      : UNITDEF_EXPECTED
+    | <UNITDEF_DEFAULT_TRUE_VIA_VALUE:              "default" ([" ","\t","\n","\r"])+ ["t","T"] ["r","R"] ["u","U"] ["e","E"]>                      : UNITDEF_EXPECTED
+    | <UNITDEF_DEFAULT_TRUE_VIA_VALUE_APOSTROPHE:   "default" ([" ","\t","\n","\r"])+ "\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"">            : UNITDEF_EXPECTED
+    | <UNITDEF_DEFAULT_FALSE:                       "!default">                                                                                     : UNITDEF_EXPECTED
+    | <UNITDEF_DEFAULT_FALSE_VIA_VALUE:             "default" ([" ","\t","\n","\r"])+ ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"]>            : UNITDEF_EXPECTED
+    | <UNITDEF_DEFAULT_FALSE_VIA_VALUE_APOSTROPHE:  "default" ([" ","\t","\n","\r"])+ "\"" ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] "\"">  : UNITDEF_EXPECTED
+    | <UNITDEF_DESCRIPTION:                         "description">                                                                                  : UNITDEF_STRING_EXPECTED
+    | <UNITDEF_LABEL:                               "label">                                                                                        : UNITDEF_STRING_EXPECTED
+    | <UNITDEF_MULTIPLIER:                          "multiplier">                                                                                   : UNITDEF_DOUBLE_EXPECTED
+    | <UNITDEF_OFFSET:                              "offset">                                                                                       : UNITDEF_DOUBLE_EXPECTED
+    | <UNITDEF_SETTING:                             "setting">                                                                                      : UNITDEF_STRINGSTRING_EXPECTED
+    | <UNITDEF_PROPERTY:                            "property">                                                                                     : UNITDEF_STRING_EXPECTED
+    | <UNITDEF_PROPERTYVAL:                         "value">                                                                                        : UNITDEF_STRING_EXPECTED
+    | <UNITDEF_PROPERTYTO:                          "to">                                                                                           : UNITDEF_STRINGSTRING_EXPECTED
+    | <UNITDEF_SYSTEM:                              "system">                                                                                       : UNITDEF_SYSTEMNAME_EXPECTED
 }
 
 /************************************************* String for Unit Definition */
@@ -284,15 +275,15 @@ void unit(final Dimension_mxJPO _dimension) : {
     Token tmpToken;
     String tmpStr;
 }  {
-    <UNIT>
-    (
-        (tmpToken = <UNITNAME_STRING>)   {this.setValue(unit, "name", this.getString(tmpToken.image));}
-        |
-        (tmpToken = <UNITNAME_SINGLE>)   {this.setValue(unit, "name", this.getSingle(tmpToken.image));}
-    )
+    <UNIT>                          ( tmpToken = <UNITNAME_STRING>      {this.setValue(unit, "name", this.getString(tmpToken.image));}
+                                    | tmpToken = <UNITNAME_SINGLE>      {this.setValue(unit, "name", this.getSingle(tmpToken.image));} )
     <UNITDEF_START>
-        ( ( <UNITDEF_DEFAULT>   ( <UNITDEF_BOOLEAN_TRUE>                {this.setValue(unit, "defaultUnit", true);}
-                                | <UNITDEF_BOOLEAN_FALSE>               {this.setValue(unit, "defaultUnit", false);} ) )
+        ( ( ( <UNITDEF_DEFAULT_TRUE>
+            | <UNITDEF_DEFAULT_TRUE_VIA_VALUE>
+            | <UNITDEF_DEFAULT_TRUE_VIA_VALUE_APOSTROPHE> )             {this.setValue(unit, "defaultUnit", true);} )
+        | ( ( <UNITDEF_DEFAULT_FALSE>
+            | <UNITDEF_DEFAULT_FALSE_VIA_VALUE>
+            | <UNITDEF_DEFAULT_FALSE_VIA_VALUE_APOSTROPHE> )            {this.setValue(unit, "defaultUnit", false);} )
         | ( <UNITDEF_DESCRIPTION>   tmpStr = uvString()                 {this.setValue(unit, "description", tmpStr);} )
         | ( <UNITDEF_LABEL>         tmpStr = uvString()                 {this.setValue(unit, "label", tmpStr);} )
         | ( <UNITDEF_MULTIPLIER>    tmpToken = <UNITDEF_DOUBLE_DOUBLE>  {this.setValue(unit, "multiplier", Double.parseDouble(tmpToken.image));} )

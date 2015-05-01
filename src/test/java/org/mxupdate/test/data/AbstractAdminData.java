@@ -26,6 +26,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.ExportParser.Line;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.data.util.PropertyDefList;
 import org.testng.Assert;
@@ -265,7 +266,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     protected void append4CIFileValues(final StringBuilder _cmd)
     {
         // append flags
-        this.getFlags().append4CIFileValues("    ", _cmd, "\n");
+        this.flags.append4CIFileValues("    ", _cmd, "\n");
         // append values
         this.getValues().appendUpdate("    ", _cmd, "\n");
 
@@ -305,15 +306,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         throws MatrixException
     {
         // flags
-        for (final Map.Entry<String,Boolean> entry : this.flags.entrySet())  {
-            if (entry.getValue() != null)  {
-                _cmd.append(' ');
-                if (!entry.getValue())  {
-                    _cmd.append('!');
-                }
-                _cmd.append(entry.getKey());
-            }
-        }
+        this.flags.append4Create(_cmd);
 
         // values
         for (final Map.Entry<String,Object> entry : this.getValues().entrySet())  {
@@ -452,6 +445,26 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         }
 
         /**
+         * Appends the MQL commands to define all flags.
+         *
+         * @param _cmd  string builder used to append MQL commands
+         * @throws MatrixException if used object could not be created
+         */
+        public void append4Create(final StringBuilder _cmd)
+            throws MatrixException
+        {
+            for (final Map.Entry<String,Boolean> entry : this.entrySet())  {
+                if (entry.getValue() != null)  {
+                    _cmd.append(' ');
+                    if (!entry.getValue())  {
+                        _cmd.append('!');
+                    }
+                    _cmd.append(entry.getKey());
+                }
+            }
+        }
+
+        /**
          * Checks for all defined flags.
          *
          * @param _exportParser parsed export
@@ -486,7 +499,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
          * @param _parentLine   parent line where the flags must be defined
          * @param _errorLabel   label used for shown error
          */
-        public void checkExport(final ExportParser.Line _parentLine,
+        public void checkExport(final Line _parentLine,
                                 final String _errorLabel)
         {
             for (final Map.Entry<String,Boolean> flag : this.entrySet())  {

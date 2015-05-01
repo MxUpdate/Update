@@ -199,7 +199,7 @@ public class Dimension_mxJPO
         for (final Unit unit : this.units)  {
             _out.append("    unit \"").append(StringUtil_mxJPO.convertUpdate(unit.name)).append("\" {\n");
             if (unit.defaultUnit)  {
-                _out.append("        default true\n");
+                _out.append("        default\n");
             }
             _out.append("        description \"")
                             .append(StringUtil_mxJPO.convertUpdate(unit.description)).append("\"\n")

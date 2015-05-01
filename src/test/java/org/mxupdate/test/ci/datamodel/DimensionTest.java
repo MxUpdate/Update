@@ -69,7 +69,7 @@ public class DimensionTest
                         "dimension with unit",
                         new DimensionData(this, "test")
                                 .addUnit(new UnitData("unit")
-                                        .setValueWOQuots("default", "true")
+                                        .setFlag("default", true)
                                         .setValueWithQuots("description", "\"\\\\ hello")
                                         .setValueWithQuots("label", "\"\\\\ label")
                                         .setValueWOQuots("multiplier", "1.0")
@@ -78,7 +78,7 @@ public class DimensionTest
                         "dimension with unit and defined unit property w/o value",
                         new DimensionData(this, "test")
                                 .addUnit(new UnitData("unit")
-                                        .setValueWOQuots("default", "true")
+                                        .setFlag("default", true)
                                         .setValueWithQuots("label", "\"\\\\ label")
                                         .setValueWOQuots("multiplier", "1.0")
                                         .setValueWOQuots("offset", "0.0")
@@ -87,7 +87,7 @@ public class DimensionTest
                         "dimension with unit and defined unit property with value",
                         new DimensionData(this, "test")
                                 .addUnit(new UnitData("unit")
-                                        .setValueWOQuots("default", "true")
+                                        .setFlag("default", true)
                                         .setValueWithQuots("label", "\"\\\\ label")
                                         .setValueWOQuots("multiplier", "1.0")
                                         .setValueWOQuots("offset", "0.0")
@@ -96,7 +96,7 @@ public class DimensionTest
                         "dimension with unit and defined unit property with referenced admin object",
                         new DimensionData(this, "test")
                                 .addUnit(new UnitData("unit")
-                                        .setValueWOQuots("default", "true")
+                                        .setFlag("default", true)
                                         .setValueWithQuots("label", "\"\\\\ label")
                                         .setValueWOQuots("multiplier", "1.0")
                                         .setValueWOQuots("offset", "0.0")
@@ -105,7 +105,7 @@ public class DimensionTest
                         "dimension with unit and defined multiple unit properties",
                         new DimensionData(this, "test")
                                 .addUnit(new UnitData("unit")
-                                        .setValueWOQuots("default", "true")
+                                        .setFlag("default", true)
                                         .setValueWithQuots("label", "\"\\\\ label")
                                         .setValueWOQuots("multiplier", "1.0")
                                         .setValueWOQuots("offset", "0.0")
@@ -116,7 +116,7 @@ public class DimensionTest
                         "issue #197: dimension with unit (and multiplier 1.0E9)",
                         new DimensionData(this, "test")
                                 .addUnit(new UnitData("unit1")
-                                        .setValueWOQuots("default", "true")
+                                        .setFlag("default", true)
                                         .setValueWithQuots("description", "hello 1")
                                         .setValueWithQuots("label", "label 1")
                                         .setValueWOQuots("multiplier", "1.0")
@@ -130,7 +130,7 @@ public class DimensionTest
                         "issue #197: dimension with unit (and offset 1.0E10)",
                         new DimensionData(this, "test")
                                 .addUnit(new UnitData("unit1")
-                                        .setValueWOQuots("default", "true")
+                                        .setFlag("default", true)
                                         .setValueWithQuots("description", "hello 1")
                                         .setValueWithQuots("label", "label 1")
                                         .setValueWOQuots("multiplier", "1.0")
@@ -144,7 +144,7 @@ public class DimensionTest
                         "issue #206: dimension with offset 1.0E-10)",
                         new DimensionData(this, "test")
                                 .addUnit(new UnitData("unit1")
-                                        .setValueWOQuots("default", "true")
+                                        .setFlag("default", true)
                                         .setValueWithQuots("description", "hello 1")
                                         .setValueWithQuots("label", "label 1")
                                         .setValueWOQuots("multiplier", "1.0")
@@ -158,7 +158,7 @@ public class DimensionTest
                         "issue #206: dimension with multiplier 1.0E-10)",
                         new DimensionData(this, "test")
                                 .addUnit(new UnitData("unit1")
-                                        .setValueWOQuots("default", "true")
+                                        .setFlag("default", true)
                                         .setValueWithQuots("description", "hello 1")
                                         .setValueWithQuots("label", "label 1")
                                         .setValueWOQuots("multiplier", "1.0")

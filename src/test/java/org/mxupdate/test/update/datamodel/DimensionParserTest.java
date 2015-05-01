@@ -72,36 +72,223 @@ public class DimensionParserTest
                         "",
                         "description \"\" hidden"},
                 new Object[]{
-                        "2) simple not hidden dimension",
+                        "2a) simple not hidden dimension",
                         "",
                         "description \"\" !hidden"},
                 new Object[]{
-                        "3) simple not hidden dimension definition defined as value w/o apostrophe",
+                        "2b) simple not hidden dimension definition defined as value w/o apostrophe",
                         "description \"\" !hidden",
                         "description \"\" hidden FALSE"},
                 new Object[]{
-                        "4) simple not hidden dimension definition defined as value with apostrophe",
+                        "2c) simple not hidden dimension definition defined as value with apostrophe",
                         "description \"\" !hidden",
                         "description \"\" hidden \"false\""},
                 new Object[]{
-                        "5) simple hidden dimension definition",
+                        "2d) simple hidden dimension definition",
                         "",
                         "description \"\" hidden"},
                 new Object[]{
-                        "6) simple hidden dimension definition defined as value w/o apostrophe",
+                        "2e) simple hidden dimension definition defined as value w/o apostrophe",
                         "description \"\" hidden",
                         "description \"\" hidden TRUE"},
                 new Object[]{
-                        "7) simple hidden dimension definition defined as value with apostrophe",
+                        "2f) simple hidden dimension definition defined as value with apostrophe",
                         "description \"\" hidden",
                         "description \"\" hidden \"True\""},
                 new Object[]{
-                        "8) complex dimension definition",
+                          "3a) dimension with simple default unit",
+                          "",
+                          "description \"\"\n"
+                        + "!hidden\n"
+                        + "unit \"name1\" {\n"
+                        + "  default\n"
+                        + "  description \"\"\n"
+                        + "  label \"\"\n"
+                        + "  multiplier 1.0\n"
+                        + "  offset 0.0\n"
+                        + "}\n"
+                        + "unit \"name2\" {\n"
+                        + "  description \"\"\n"
+                        + "  label \"\"\n"
+                        + "  multiplier -10.0\n"
+                        + "  offset 20.0\n"
+                        + "}",
+                },
+                new Object[]{
+                        "3b) dimension with simple default unit defined as value w/o apostrophe",
+                        "description \"\"\n"
+                      + "!hidden\n"
+                      + "unit \"name1\" {\n"
+                      + "  default\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier 1.0\n"
+                      + "  offset 0.0\n"
+                      + "}\n"
+                      + "unit \"name2\" {\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier -10.0\n"
+                      + "  offset 20.0\n"
+                      + "}",
+                        "description \"\"\n"
+                      + "!hidden\n"
+                      + "unit \"name1\" {\n"
+                      + "  default true\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier 1.0\n"
+                      + "  offset 0.0\n"
+                      + "}\n"
+                      + "unit \"name2\" {\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier -10.0\n"
+                      + "  offset 20.0\n"
+                      + "}",
+                },
+                new Object[]{
+                        "3c) dimension with simple default unit defined as value with apostrophe",
+                        "description \"\"\n"
+                      + "!hidden\n"
+                      + "unit \"name1\" {\n"
+                      + "  default\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier 1.0\n"
+                      + "  offset 0.0\n"
+                      + "}\n"
+                      + "unit \"name2\" {\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier -10.0\n"
+                      + "  offset 20.0\n"
+                      + "}",
+                        "description \"\"\n"
+                      + "!hidden\n"
+                      + "unit \"name1\" {\n"
+                      + "  default \"TRUE\"\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier 1.0\n"
+                      + "  offset 0.0\n"
+                      + "}\n"
+                      + "unit \"name2\" {\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier -10.0\n"
+                      + "  offset 20.0\n"
+                      + "}",
+                },
+                new Object[]{
+                        "3d) dimension with simple default unit and not default",
+                        "description \"\"\n"
+                      + "!hidden\n"
+                      + "unit \"name1\" {\n"
+                      + "  default\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier 1.0\n"
+                      + "  offset 0.0\n"
+                      + "}\n"
+                      + "unit \"name2\" {\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier -10.0\n"
+                      + "  offset 20.0\n"
+                      + "}",
+                        "description \"\"\n"
+                      + "!hidden\n"
+                      + "unit \"name1\" {\n"
+                      + "  default\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier 1.0\n"
+                      + "  offset 0.0\n"
+                      + "}\n"
+                      + "unit \"name2\" {\n"
+                      + "  !default\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier -10.0\n"
+                      + "  offset 20.0\n"
+                      + "}",
+                },
+                new Object[]{
+                        "3e) dimension with simple default unit and not default as value w/o apostrophe",
+                        "description \"\"\n"
+                      + "!hidden\n"
+                      + "unit \"name1\" {\n"
+                      + "  default\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier 1.0\n"
+                      + "  offset 0.0\n"
+                      + "}\n"
+                      + "unit \"name2\" {\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier -10.0\n"
+                      + "  offset 20.0\n"
+                      + "}",
+                        "description \"\"\n"
+                      + "!hidden\n"
+                      + "unit \"name1\" {\n"
+                      + "  default\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier 1.0\n"
+                      + "  offset 0.0\n"
+                      + "}\n"
+                      + "unit \"name2\" {\n"
+                      + "  default FALSE\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier -10.0\n"
+                      + "  offset 20.0\n"
+                      + "}",
+                },
+                new Object[]{
+                        "3f) dimension with simple default unit and not default as value with apostrophe",
+                        "description \"\"\n"
+                      + "!hidden\n"
+                      + "unit \"name1\" {\n"
+                      + "  default\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier 1.0\n"
+                      + "  offset 0.0\n"
+                      + "}\n"
+                      + "unit \"name2\" {\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier -10.0\n"
+                      + "  offset 20.0\n"
+                      + "}",
+                        "description \"\"\n"
+                      + "!hidden\n"
+                      + "unit \"name1\" {\n"
+                      + "  default\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier 1.0\n"
+                      + "  offset 0.0\n"
+                      + "}\n"
+                      + "unit \"name2\" {\n"
+                      + "  default \"false\"\n"
+                      + "  description \"\"\n"
+                      + "  label \"\"\n"
+                      + "  multiplier -10.0\n"
+                      + "  offset 20.0\n"
+                      + "}",
+                },
+                new Object[]{
+                        "4) complex dimension definition",
                         "",
                           "description \"ein test\"\n"
                         + "!hidden\n"
                         + "unit \"name1\" {\n"
-                        + "  default true\n"
+                        + "  default\n"
                         + "  description \"description1\"\n"
                         + "  label \"label1\"\n"
                         + "  multiplier 1.0\n"
@@ -124,12 +311,12 @@ public class DimensionParserTest
                         + "}",
                 },
                 new Object[]{
-                        "9) dimension with unit with negative offset",
+                        "5) dimension with unit with negative offset",
                         "",
                         "description \"ein test\"\n"
                         + "!hidden\n"
                         + "unit \"name1\" {\n"
-                        + "  default true\n"
+                        + "  default\n"
                         + "  description \"description1\"\n"
                         + "  label \"label1\"\n"
                         + "  multiplier 1.0\n"
@@ -143,12 +330,12 @@ public class DimensionParserTest
                         + "}",
                 },
                 new Object[]{
-                        "10) dimension with unit with negative multiplier",
+                        "6) dimension with unit with negative multiplier",
                         "",
                         "description \"ein test\"\n"
                         + "!hidden\n"
                         + "unit \"name1\" {\n"
-                        + "  default true\n"
+                        + "  default\n"
                         + "  description \"description1\"\n"
                         + "  label \"label1\"\n"
                         + "  multiplier 1.0\n"
@@ -162,11 +349,11 @@ public class DimensionParserTest
                         + "}",
                 },
                 new Object[]{
-                        "11) dimension with unit with integer number",
+                        "7) dimension with unit with integer number",
                         "description \"ein test\"\n"
                         + "!hidden\n"
                         + "unit \"name1\" {\n"
-                        + "  default true\n"
+                        + "  default\n"
                         + "  description \"\"\n"
                         + "  label \"\"\n"
                         + "  multiplier 1.0\n"
@@ -175,7 +362,7 @@ public class DimensionParserTest
                         "description \"ein test\"\n"
                         + "!hidden\n"
                         + "unit \"name1\" {\n"
-                        + "  default true\n"
+                        + "  default\n"
                         + "  multiplier 1\n"
                         + "  offset 0\n"
                         + "}"

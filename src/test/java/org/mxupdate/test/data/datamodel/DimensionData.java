@@ -198,6 +198,8 @@ public class DimensionData
     {
         /** Name of the unit. */
         private final String name;
+        /** Flags of the unit data. */
+        private final Flags flags = new Flags();
         /** Values with quotations of this unit. */
         private final Map<String,String> valuesWithQuots = new HashMap<String,String>();
         /** Values w/o quotations of this unit. */
@@ -226,7 +228,22 @@ public class DimensionData
         }
 
         /**
-         * Defines a new value entry which is put into {@link #values}.
+         * Defines a new flag entry which is put into {@link #flags}.
+         *
+         * @param _key      key of the value (e.g. &quot;description&quot;)
+         * @param _value    value
+         * @return this unit instance
+         */
+        public UnitData setFlag(final String _key,
+                                final boolean _value)
+        {
+            this.flags.put(_key, _value);
+            return this;
+        }
+
+        /**
+         * Defines a new value entry which is put into
+         * {@link #valuesWithQuots values with quotes}.
          *
          * @param _key      key of the value (e.g. &quot;description&quot;)
          * @param _value    value of the value
@@ -297,7 +314,7 @@ public class DimensionData
                 _cmd.append("        ").append(value.getKey()).append(" \"").append(AbstractTest.convertUpdate(value.getValue())).append("\"\n");
             }
             for (final Map.Entry<String,String> value : this.valuesWOQuots.entrySet())  {
-                _cmd.append("        ").append(value.getKey()).append(" ").append(value.getValue()).append("\n");
+                _cmd.append("        ").append(value.getKey()).append(" ").append(AbstractTest.convertUpdate(value.getValue())).append("\n");
             }
 
             this.properties.appendCIFileUpdateFormat("        ", _cmd);
@@ -316,6 +333,7 @@ public class DimensionData
             throws MatrixException
         {
             _cmd.append("  unit \"").append(AbstractTest.convertMql(this.name)).append("\"");
+            this.flags.append4Create(_cmd);
             for (final Map.Entry<String,String> value : this.valuesWithQuots.entrySet())  {
                 _cmd.append(' ');
                 if ("description".equals(value.getKey()))  {
@@ -326,16 +344,7 @@ public class DimensionData
                 _cmd.append(" \"").append(AbstractTest.convertMql(value.getValue())).append('\"');
             }
             for (final Map.Entry<String,String> value : this.valuesWOQuots.entrySet())  {
-                _cmd.append(' ');
-                if ("default".equals(value.getKey()))  {
-                    if (!"true".equalsIgnoreCase(value.getValue().toString()))  {
-                        _cmd.append("!");
-                    }
-                    _cmd.append("default");
-                } else  {
-                    _cmd.append(value.getKey())
-                        .append(" ").append(value.getValue());
-                }
+                _cmd.append(' ').append(value.getKey()).append(" ").append(value.getValue());
             }
             // append properties
             this.properties.append4Create(_cmd);

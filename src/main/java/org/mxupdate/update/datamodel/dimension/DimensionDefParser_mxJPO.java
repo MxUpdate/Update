@@ -241,7 +241,12 @@ this.setValue(unit, "name", this.getSingle(tmpToken.image));
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case UNITDEF_DEFAULT:
+      case UNITDEF_DEFAULT_TRUE:
+      case UNITDEF_DEFAULT_TRUE_VIA_VALUE:
+      case UNITDEF_DEFAULT_TRUE_VIA_VALUE_APOSTROPHE:
+      case UNITDEF_DEFAULT_FALSE:
+      case UNITDEF_DEFAULT_FALSE_VIA_VALUE:
+      case UNITDEF_DEFAULT_FALSE_VIA_VALUE_APOSTROPHE:
       case UNITDEF_DESCRIPTION:
       case UNITDEF_LABEL:
       case UNITDEF_MULTIPLIER:
@@ -257,17 +262,20 @@ this.setValue(unit, "name", this.getSingle(tmpToken.image));
         break label_3;
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-      case UNITDEF_DEFAULT:{
-        jj_consume_token(UNITDEF_DEFAULT);
+      case UNITDEF_DEFAULT_TRUE:
+      case UNITDEF_DEFAULT_TRUE_VIA_VALUE:
+      case UNITDEF_DEFAULT_TRUE_VIA_VALUE_APOSTROPHE:{
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case UNITDEF_BOOLEAN_TRUE:{
-          jj_consume_token(UNITDEF_BOOLEAN_TRUE);
-this.setValue(unit, "defaultUnit", true);
+        case UNITDEF_DEFAULT_TRUE:{
+          jj_consume_token(UNITDEF_DEFAULT_TRUE);
           break;
           }
-        case UNITDEF_BOOLEAN_FALSE:{
-          jj_consume_token(UNITDEF_BOOLEAN_FALSE);
-this.setValue(unit, "defaultUnit", false);
+        case UNITDEF_DEFAULT_TRUE_VIA_VALUE:{
+          jj_consume_token(UNITDEF_DEFAULT_TRUE_VIA_VALUE);
+          break;
+          }
+        case UNITDEF_DEFAULT_TRUE_VIA_VALUE_APOSTROPHE:{
+          jj_consume_token(UNITDEF_DEFAULT_TRUE_VIA_VALUE_APOSTROPHE);
           break;
           }
         default:
@@ -275,6 +283,31 @@ this.setValue(unit, "defaultUnit", false);
           jj_consume_token(-1);
           throw new ParseException();
         }
+this.setValue(unit, "defaultUnit", true);
+        break;
+        }
+      case UNITDEF_DEFAULT_FALSE:
+      case UNITDEF_DEFAULT_FALSE_VIA_VALUE:
+      case UNITDEF_DEFAULT_FALSE_VIA_VALUE_APOSTROPHE:{
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case UNITDEF_DEFAULT_FALSE:{
+          jj_consume_token(UNITDEF_DEFAULT_FALSE);
+          break;
+          }
+        case UNITDEF_DEFAULT_FALSE_VIA_VALUE:{
+          jj_consume_token(UNITDEF_DEFAULT_FALSE_VIA_VALUE);
+          break;
+          }
+        case UNITDEF_DEFAULT_FALSE_VIA_VALUE_APOSTROPHE:{
+          jj_consume_token(UNITDEF_DEFAULT_FALSE_VIA_VALUE_APOSTROPHE);
+          break;
+          }
+        default:
+          jj_la1[13] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+this.setValue(unit, "defaultUnit", false);
         break;
         }
       case UNITDEF_DESCRIPTION:{
@@ -314,7 +347,7 @@ this.setValue(unit, "offset", Double.parseDouble(tmpToken.image));
         break;
         }
       default:
-        jj_la1[13] = jj_gen;
+        jj_la1[14] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -345,7 +378,7 @@ key = this.getSingle(tmp.image);
       break;
       }
     default:
-      jj_la1[14] = jj_gen;
+      jj_la1[15] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -377,7 +410,7 @@ final AdminProperty prop = new AdminProperty();
         break;
         }
       default:
-        jj_la1[15] = jj_gen;
+        jj_la1[16] = jj_gen;
         break label_4;
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -400,7 +433,7 @@ toType = this.getSingle(tmp.image);
           break;
           }
         default:
-          jj_la1[16] = jj_gen;
+          jj_la1[17] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -408,7 +441,7 @@ toType = this.getSingle(tmp.image);
         break;
         }
       default:
-        jj_la1[17] = jj_gen;
+        jj_la1[18] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -444,7 +477,7 @@ name = this.getSingle(tmp.image);
       break;
       }
     default:
-      jj_la1[18] = jj_gen;
+      jj_la1[19] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -462,7 +495,7 @@ unit = this.getSingle(tmp.image);
       break;
       }
     default:
-      jj_la1[19] = jj_gen;
+      jj_la1[20] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -492,7 +525,7 @@ ret = this.getSingle(tmp.image);
       break;
       }
     default:
-      jj_la1[20] = jj_gen;
+      jj_la1[21] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -509,7 +542,7 @@ ret = this.getSingle(tmp.image);
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[21];
+  final private int[] jj_la1 = new int[22];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
@@ -521,16 +554,16 @@ ret = this.getSingle(tmp.image);
       jj_la1_init_3();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x3fe0,0x0,0x1c0,0xe00,0xc000000,0xc000,0xc000000,0xc000000,0xc000,0x3fe0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
+      jj_la1_0 = new int[] {0x3fe0,0x0,0x1c0,0xe00,0xc000000,0xc000,0xc000000,0xc000000,0xc000,0x3fe0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0xc,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xc00,0x27f00000,0x0,0x27f00000,0x0,0x18000000,0x0,0x18000000,0x0,0x0,0x0,};
+      jj_la1_1 = new int[] {0x0,0xc,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xc00,0xfff00000,0x700000,0x3800000,0xfff00000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xc,0x0,0xc0000,0x0,0xc0000,0x0,0x80000000,0x0,0xc00,};
+      jj_la1_2 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x4,0x0,0x0,0x4,0x18000,0x3,0x18000,0x3,0x30000000,0x0,0x180,};
    }
    private static void jj_la1_init_3() {
-      jj_la1_3 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1,0x6000,0x0,};
+      jj_la1_3 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xc00,0x0,};
    }
 
   /** Constructor with InputStream. */
@@ -544,7 +577,7 @@ ret = this.getSingle(tmp.image);
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 21; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 22; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -558,7 +591,7 @@ ret = this.getSingle(tmp.image);
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 21; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 22; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -568,7 +601,7 @@ ret = this.getSingle(tmp.image);
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 21; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 22; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -586,7 +619,7 @@ ret = this.getSingle(tmp.image);
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 21; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 22; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -595,7 +628,7 @@ ret = this.getSingle(tmp.image);
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 21; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 22; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -604,7 +637,7 @@ ret = this.getSingle(tmp.image);
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 21; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 22; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -655,12 +688,12 @@ ret = this.getSingle(tmp.image);
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[113];
+    boolean[] la1tokens = new boolean[110];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 21; i++) {
+    for (int i = 0; i < 22; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -678,7 +711,7 @@ ret = this.getSingle(tmp.image);
         }
       }
     }
-    for (int i = 0; i < 113; i++) {
+    for (int i = 0; i < 110; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
