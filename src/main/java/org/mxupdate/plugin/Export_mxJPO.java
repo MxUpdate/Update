@@ -137,29 +137,13 @@ class Export_mxJPO
 
             // first found related type definition
             for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
-                if (!typeDef.isFileMatchLast())  {
-                    instance = typeDef.newTypeInstance(null);
-                    final String mxName = instance.extractMxName(_paramCache, file);
-                    if (mxName != null)  {
-                        instance = typeDef.newTypeInstance(mxName);
-                        break;
-                    } else  {
-                        instance = null;
-                    }
-                }
-            }
-            if (instance == null)  {
-                for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
-                    if (typeDef.isFileMatchLast())  {
-                        instance = typeDef.newTypeInstance(null);
-                        final String mxName = instance.extractMxName(_paramCache, file);
-                        if (mxName != null)  {
-                            instance = typeDef.newTypeInstance(mxName);
-                            break;
-                        } else  {
-                            instance = null;
-                        }
-                    }
+                instance = typeDef.newTypeInstance(null);
+                final String mxName = instance.extractMxName(_paramCache, file);
+                if (mxName != null)  {
+                    instance = typeDef.newTypeInstance(mxName);
+                    break;
+                } else  {
+                    instance = null;
                 }
             }
         } else  {

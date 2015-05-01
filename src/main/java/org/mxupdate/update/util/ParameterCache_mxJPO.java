@@ -430,11 +430,10 @@ public class ParameterCache_mxJPO
      * @param _key  key of searched integer value
      * @return value of the integer (or <code>null</code> if for the key no
      *         integer value is defined)
-     * @see #mapInteger
      */
-    public Integer getValueInteger(final String _key)
+    public Integer getValueInteger(final ValueKeys _key)
     {
-        return this.mapInteger.get(_key);
+        return this.mapInteger.get(_key.name());
     }
 
     /**
@@ -727,6 +726,26 @@ public class ParameterCache_mxJPO
         DefaultInstaller,
         /** Installer from the command line used within create / update. */
         Installer,
+
+        /** Path parameter. */
+        Path,
+        /** Path parameter for ignored files. */
+        PathIgnoreFile,
+        /** Path parameter for ignored paths. */
+        PathIgnorePath,
+
+        /** Parameter for copyright used for the help description. */
+        HelpCopyright,
+        /** Parameter for the description used for the help description. */
+        HelpDescription,
+        /** Parameter for the length of a description line used for the help description. */
+        HelpLengthLine,
+        /** Parameter for the length of the parameter line used for the help description. */
+        HelpLengthParams,
+        /** Parameter for the prefix used for the help description. */
+        HelpPrefix,
+        /** Parameter for the help usage used for the help description. */
+        HelpUsage,
 
         /** Header used for file exports. */
         ExportFileHeader,

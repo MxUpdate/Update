@@ -23,9 +23,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import matrix.db.Context;
-import matrix.db.MatrixWriter;
-
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -37,22 +34,16 @@ import org.mxupdate.util.UpdateUtil_mxJPO;
  *
  * @author The MxUpdate Team
  */
-public class Update_mxJPO
+class Update_mxJPO
     extends AbstractPlugin_mxJPO
 {
-    /**
-     * Argument key for the compile flag.
-     */
+    /** Argument key for the compile flag. */
     private static final String ARGUMENT_KEY_COMPILE = "Compile"; //$NON-NLS-1$
 
-    /**
-     * Argument key for the file names.
-     */
+    /** Argument key for the file names. */
     private static final String ARGUMENT_KEY_FILENAMES = "FileNames"; //$NON-NLS-1$
 
-    /**
-     * Argument key for the files with content.
-     */
+    /** Argument key for the files with content. */
     private static final String ARGUMENT_KEY_FILECONTENTS = "FileContents"; //$NON-NLS-1$
 
     /**
@@ -124,137 +115,6 @@ public class Update_mxJPO
     }
 
     /**
-     * Depreciated because only used from old Eclipse plug-in.
-     *
-     * @param _context  MX context for this request
-     * @param _args     first index of the arguments defined the file to update
-     * @throws Exception if the update failed
-     * @deprecated
-     */
-    @Deprecated()
-    public void mxMain(final Context _context,
-                       final String... _args)
-        throws Exception
-    {
-        final Set<File> files = new HashSet<File>();
-        files.add(new File(_args[0]));
-        final MatrixWriter writer = new MatrixWriter(_context);
-        writer.write(this.updateFiles(new ParameterCache_mxJPO(_context, true, null), files, false));
-        writer.flush();
-        writer.close();
-    }
-
-    /**
-     * Updates MX Update files depending on file names. The method is used from
-     * the MX Update Eclipse Plug-In if the MxUpdate Update Deployment tool has
-     * access to the files from the Eclipse Plug-In.
-     *
-     * @param _context  MX context for this request
-     * @param _args     encoded arguments from the Eclipse plug-in:
-     *                  <ul>
-     *                  <li><b>{@link Set}&lt;{@link String}&gt;</b><br/>set of
-     *                      file names which must be updated</li>
-     *                  <li><b>{@link Boolean}</b><br/> if set to <i>true</i>
-     *                      all included JPOs are compiled; otherwise no JPOs
-     *                      are compiled. Default is not to compile
-     *                      (<i>false</i>)</li>
-     *                  </ul>
-     * @return logging information from the update
-     * @throws Exception if the update failed
-     * @see #updateFiles(ParameterCache_mxJPO, Set, boolean)
-     * @deprecated
-     */
-    @Deprecated()
-    public String updateByName(final Context _context,
-                               final String[] _args)
-        throws Exception
-    {
-        // initialize mapping
-        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, true, null);
-
-        final Set<String> fileNames = this.<Set<String>>decode(_args, 0);
-        final boolean compile = this.<Boolean>decode(_args, 1, false);
-
-        final Set<File> files = new HashSet<File>();
-        for (final String fileName : fileNames)  {
-            files.add(new File(fileName));
-        }
-
-        final String ret = this.updateFiles(paramCache, files, compile);
-
-
-        return ret;
-    }
-
-    /**
-     * Updates the files depending on the file name with related file content.
-     * The method is used from the MX Update Eclipse Plug-In if the MxUpdate
-     * Update Deployment tool has <b>NO</b> access to the files from the
-     * Eclipse Plug-In (e.g. if a virtual machine is used, or MX is located on
-     * a server).
-     *
-     * @param _context  MX context for this request
-     * @param _args     encoded arguments from the Eclipse plug-in:
-     *                  <ul>
-     *                  <li><b>{@link Map}&lt;{@link String},{@link String}&gt;
-     *                      </b><br/>map of the file name and the related file
-     *                      content which must be updated</li>
-     *                  <li><b>{@link Boolean}</b><br/> if set to <i>true</i>
-     *                      all included JPOs are compiled; otherwise no JPOs
-     *                      are compiled. Default is not to compile
-     *                      (<i>false</i>)</li>
-     *                  </ul>
-     * @return logging information from the update
-     * @throws Exception if the update failed
-     * @see #updateFiles(ParameterCache_mxJPO, Set, boolean)
-     * @deprecated
-     */
-    @Deprecated()
-    public String updateByContent(final Context _context,
-                                  final String[] _args)
-        throws Exception
-    {
-        // initialize mapping
-        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, true, null);
-
-        String ret = "";
-
-        final Map<String,String> files = this.<Map<String,String>>decode(_args, 0);
-        final boolean compile = this.<Boolean>decode(_args, 1, false);
-
-        // create temporary directory
-        final File tmpDir = File.createTempFile("Update", "tmp");
-        tmpDir.delete();
-        tmpDir.mkdir();
-
-        final Set<File> localFiles = new HashSet<File>();
-        try  {
-            // store all files in temporary directory
-            for (final Map.Entry<String,String> fileEntry : files.entrySet())  {
-                final String fileName = (new File(fileEntry.getKey())).getName();
-
-                final File localFile = new File(tmpDir, fileName);
-                final Writer writer = new FileWriter(localFile);
-                writer.write(fileEntry.getValue());
-                writer.close();
-
-                localFiles.add(localFile);
-            }
-
-            // and call update
-            ret = this.updateFiles(paramCache, localFiles, compile);
-        } finally  {
-            // at least remove all temporary stuff
-            for (final File localFile : localFiles)  {
-                localFile.delete();
-            }
-            tmpDir.delete();
-        }
-
-        return ret;
-    }
-
-    /**
      * Updates all configurations items specified through given set of MX
      * update files.
      *
@@ -289,35 +149,15 @@ public class Update_mxJPO
     {
         final Map<TypeDef_mxJPO,Map<File,String>> ret = new HashMap<TypeDef_mxJPO,Map<File,String>>();
         for (final File file : _files)  {
-            boolean found = false;
             for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
-                if (!typeDef.isFileMatchLast())  {
-                    final AbstractObject_mxJPO instance = typeDef.newTypeInstance(null);
-                    final String mxName = instance.extractMxName(_paramCache, file);
-                    if (mxName != null)  {
-                        if (!ret.containsKey(typeDef))  {
-                            ret.put(typeDef, new HashMap<File,String>());
-                        }
-                        ret.get(typeDef).put(file, mxName);
-                        found  = true;
-                        break;
+                final AbstractObject_mxJPO instance = typeDef.newTypeInstance(null);
+                final String mxName = instance.extractMxName(_paramCache, file);
+                if (mxName != null)  {
+                    if (!ret.containsKey(typeDef))  {
+                        ret.put(typeDef, new HashMap<File,String>());
                     }
-                }
-            }
-            if (!found)  {
-                for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
-                    if (typeDef.isFileMatchLast())  {
-                        final AbstractObject_mxJPO instance = typeDef.newTypeInstance(null);
-                        final String mxName = instance.extractMxName(_paramCache, file);
-                        if (mxName != null)  {
-                            if (!ret.containsKey(typeDef))  {
-                                ret.put(typeDef, new HashMap<File,String>());
-                            }
-                            ret.get(typeDef).put(file, mxName);
-                            found = true;
-                            break;
-                        }
-                    }
+                    ret.get(typeDef).put(file, mxName);
+                    break;
                 }
             }
         }

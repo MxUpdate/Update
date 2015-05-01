@@ -41,166 +41,49 @@ public final class TypeDef_mxJPO
      */
     private static final String MQL_LISTPROG = "list prog org.mxupdate.* select name classname dump '\t'";
 
-    /**
-     * Used prefix of admin type suffix.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #adminSuffix
-     */
+    /** Used prefix of admin type suffix. */
     private static final String PREFIX_ADMIN_SUFFIX = "AdminSuffix";
-
-    /**
-     * Used prefix of the admin type name.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #adminType
-     */
+    /** Used prefix of the admin type name. */
     private static final String PREFIX_ADMIN_TYPE = "AdminType";
 
-    /**
-     * Used prefix of ignored attributes for business objects within the
-     * property file.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #busIgnoredAttributes
-     */
+    /** Used prefix of ignored attributes for business objects within the property file. */
     private static final String PREFIX_BUS_IGNOREATTRIBUTES = "BusIgnoreAttributes";
-
-    /**
-     * Used prefix of check exists definitions within the property file.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #busCheckExists
-     */
+    /** Used prefix of check exists definitions within the property file. */
     private static final String PREFIX_BUS_CHECKEXISTS = "BusCheckExists";
-
-    /**
-     * Used prefix of policy definitions within the property file.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #busPolicy
-     */
+    /** Used prefix of policy definitions within the property file. */
     private static final String PREFIX_BUS_POLICY = "BusPolicy";
-
-    /**
-     * Used prefix of both relationship definitions within the property file.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #busRelsBoth
-     */
+    /** Used prefix of both relationship definitions within the property file. */
     private static final String PREFIX_BUS_RELSBOTH = "BusRelsBoth";
-
-    /**
-     * Used prefix of from relationship definitions within the property file.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #busRelsFrom
-     */
+    /** Used prefix of from relationship definitions within the property file. */
     private static final String PREFIX_BUS_RELSFROM = "BusRelsFrom";
-
-    /**
-     * Used prefix of to relationship definitions within the property file.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #busRelsTo
-     */
+    /** Used prefix of to relationship definitions within the property file. */
     private static final String PREFIX_BUS_RELSTO = "BusRelsTo";
-
-    /**
-     * Used prefix of business type definitions within the property file.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #busType
-     */
+    /** Used prefix of business type definitions within the property file. */
     private static final String PREFIX_BUS_TYPE = "BusType";
-
-    /**
-     * Used prefix of business type derived definitions within the property
-     * file.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #busTypeDerived
-     */
+    /** Used prefix of business type derived definitions within the property file. */
     private static final String PREFIX_BUS_TYPE_DERIVED = "BusTypeDerived";
-
-    /**
-     * Used prefix of vault definitions within the property file.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #busVault
-     */
+    /** Used prefix of vault definitions within the property file. */
     private static final String PREFIX_BUS_VAULT = "BusVault";
 
-    /**
-     * Used prefix of type definitions within the property file.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #filePath
-     */
+    /** Used prefix of type definitions within the property file. */
     private static final String PREFIX_FILE_PATH = "FilePath";
-
-    /**
-     * Used prefix of file last matching definitions within the property file.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #fileMatchLast
-     */
-    private static final String PREFIX_FILE_MATCHLAST = "FileMatchLast";
-
-    /**
-     * Used prefix of file prefix definitions within the property file.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #filePrefix
-     */
+    /** Used prefix of file prefix definitions within the property file. */
     private static final String PREFIX_FILE_PREFIX = "FilePrefix";
-
-    /**
-     * Used file suffix of file suffix definitions within the property file.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #fileSuffix
-     */
+    /** Used file suffix of file suffix definitions within the property file. */
     private static final String PREFIX_FILE_SUFFIX = "FileSuffix";
 
-    /**
-     * Used file suffix of icon path definitions within the property file.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #iconPath
-     */
+    /** Used file suffix of icon path definitions within the property file. */
     private static final String PREFIX_ICONPATH = "Icon";
 
-    /**
-     * Used prefix of the JPO name.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #jpoClass
-     */
+    /** Used prefix of the JPO name. */
     private static final String PREFIX_JPO = "JPO";
 
-    /**
-     * Used logging text of type definitions within the property file.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #textLogging
-     */
+    /** Used logging text of type definitions within the property file. */
     private static final String PREFIX_TEXT_LOGGING = "TextLogging";
-
-    /**
-     * Used title of type definitions within the property file.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #textTitle
-     */
+    /** Used title of type definitions within the property file. */
     private static final String PREFIX_TEXT_TITLE = "TextTitle";
 
-    /**
-     * Used order number within update.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #orderNo
-     */
+    /** Used order number within update. */
     private static final String PREFIX_ORDERNO = "OrderNo";
 
     /** Defines the name of the admin type. */
@@ -208,163 +91,45 @@ public final class TypeDef_mxJPO
     /** Defines the suffix of the admin type. */
     private String adminSuffix = "";
 
-    /**
-     * Must be checked if the business type exists?
-     *
-     * @see #isBusCheckExists
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     */
+    /** Must be checked if the business type exists? */
     private boolean busCheckExists = false;
-
-    /**
-     * Defines the list of attributes which are automatically ignored
-     * within the update.
-     *
-     * @see #getMxBusIgnoredAttributes()
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     */
+    /** Defines the list of attributes which are automatically ignored within the update. */
     private Collection<String> busIgnoredAttributes;
-
-    /**
-     * Mapping between internal used type definitions and the MX policy
-     * names.
-     *
-     * @see #getMxBusPolicy()
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     */
+    /** Mapping between internal used type definitions and the MX policy names. */
     private String busPolicy;
-
-    /**
-     * Defines the list of both relationships which must be evaluated to write
-     * and run of update script.
-     *
-     * @see #getMxBusRelsBoth()
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     */
+    /** Defines the list of both relationships which must be evaluated to write and run of update script. */
     private Collection<String> busRelsBoth;
-
-    /**
-     * Defines the list of from relationships which must be evaluated to write
-     * and run of update script.
-     *
-     * @see #getMxBusRelsFrom()
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     */
+    /** Defines the list of from relationships which must be evaluated to write and run of update script. */
     private Collection<String> busRelsFrom;
-
-    /**
-     * Defines the list of to relationships which must be evaluated to write
-     * and run of update script.
-     *
-     * @see #getMxBusRelsTo()
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     */
+    /** Defines the list of to relationships which must be evaluated to write and run of update script. */
     private Collection<String> busRelsTo;
-
-    /**
-     * Mapping between internal used type definitions and the MX type
-     * names.
-     *
-     * @see #getMxBusType()
-     * @see #existsBusType(ParameterCache_mxJPO)
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     */
+    /** Mapping between internal used type definitions and the MX type names. */
     private String busType;
-
-    /**
-     * If set to <i>true</i> business objects are using types which are derived
-     * from the defined {@link #busType business type}.
-     *
-     * @see #busType
-     * @see #hasMxBusTypeDerived()
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     */
+    /** If set to <i>true</i> business objects are using types which are derived from the defined {@link #busType business type}. */
     private boolean busTypeDerived = false;
-
-    /**
-     * Mapping between internal used type definitions and the MX vault
-     * names.
-     *
-     * @see #getMxBusVault()
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     */
+    /** Mapping between internal used type definitions and the MX vault names. */
     private String busVault;
 
-    /**
-     * Must the matching files matched on last positions? E.g. required if no
-     * {@link #filePrefix} and no {@link #fileSuffix} are defined.
-     *
-     * @see #isFileMatchLast()
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     */
-    private boolean fileMatchLast = false;
-
-    /**
-     * Mapping between internal used type definitions and the file paths.
-     *
-     * @see #getFilePath()
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     */
+    /** Mapping between internal used type definitions and the file paths. */
     private String filePath;
-
-    /**
-     * Mapping between internal used administration type definitions and the
-     * file prefixes.
-     *
-     * @see #getFilePrefix()
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     */
+    /** Mapping between internal used administration type definitions and the file prefixes. */
     private String filePrefix;
-
-    /**
-     * Mapping between internal used administration type definitions and the
-     * file suffixes.
-     *
-     * @see #getFileSuffix()
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     */
+    /** Mapping between internal used administration type definitions and the file suffixes. */
     private String fileSuffix;
 
-    /**
-     * Stores the path to the icon for the type definition.
-     *
-     * @see #getIconPath()
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #PREFIX_ICONPATH
-     */
+    /** Stores the path to the icon for the type definition. */
     private String iconPath;
 
-    /**
-     * Stores the class implementing the MxUpdate functionality.
-     *
-     * @see #newTypeInstance(String)
-     * @see #defineJPOClass(ParameterCache_mxJPO, Mapping_mxJPO, String)
-     */
+    /** Stores the class implementing the MxUpdate functionality. */
     private Class<? extends AbstractObject_mxJPO> jpoClass;
 
-    /**
-     * Order number used within update.
-     *
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     */
+    /** Order number used within update. */
     private int orderNo = Integer.MAX_VALUE;
 
-    /**
-     * Mapping between internal used administration type definitions and the
-     * logging string.
-     *
-     * @see #getLogging()
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     */
+    /** Mapping between internal used administration type definitions and the logging string. */
     private String textLogging;
 
-    /**
-     * Mapping between internal used administration type definitions and the
-     * titles.
-     *
-     * @see #getTitle()
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     */
+    /** Mapping between internal used administration type definitions and the titles. */
     private String textTitle;
 
     /**
@@ -418,8 +183,6 @@ public final class TypeDef_mxJPO
             typeDef.busTypeDerived = Boolean.valueOf(_value);
         } else if (key.equals(TypeDef_mxJPO.PREFIX_BUS_VAULT))  {
             typeDef.busVault = _value;
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_FILE_MATCHLAST))  {
-            typeDef.fileMatchLast = _value.equalsIgnoreCase("true");
         } else if (key.equals(TypeDef_mxJPO.PREFIX_FILE_PATH))  {
             typeDef.filePath = _value;
         } else if (key.equals(TypeDef_mxJPO.PREFIX_FILE_PREFIX))  {
@@ -644,22 +407,6 @@ public final class TypeDef_mxJPO
     public String getMxBusVault()
     {
         return this.busVault;
-    }
-
-    /**
-     * Return <i>true</i> if matching files must be checked on last position
-     * after file name checks for all other types. Only if a file before does
-     * not match, this files could be checked against this type. If this
-     * behavior for matching files is not required, a <i>false</i> is returned.
-     * The parameter is only evaluated it the path parameter is defined!
-     *
-     * @return <i>true</i> if matching files must be checked at last (after all
-     *         other types are checked); otherwise <i>false</i>
-     * @see #fileMatchLast
-     */
-    public boolean isFileMatchLast()
-    {
-        return this.fileMatchLast;
     }
 
     /**
