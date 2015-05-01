@@ -31,12 +31,23 @@ import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.xml.sax.SAXException;
 
 /**
  * The class is used to export and import / update menu configuration items.
+ * The handled properties are:
+ * <ul>
+ * <li>description</li>
+ * <li>hidden flag (only if <i>true</i>)</li>
+ * <li>label</li>
+ * <li>href</li>
+ * <li>alt label</li>
+ * <li>settings</li>
+ * <li>properties</li>
+ * <li>sub commands and menus</li>
+ * </ul>
  *
  * @author The MxUpdate Team
  */
@@ -65,13 +76,14 @@ public class Menu_mxJPO
                       final String _mxName)
     {
         super(_typeDef, _mxName);
+        this.getProperties().setOtherPropTag("setting");
     }
 
     @Override()
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
-        new MenuDefParser_mxJPO(new StringReader(_code)).parse(this);
+        new MenuParser_mxJPO(new StringReader(_code)).parse(this);
         this.prepare();
     }
 
@@ -132,25 +144,6 @@ public class Menu_mxJPO
         super.prepare();
     }
 
-    /**
-     * Writes the update script for this menu.
-     * The command specific information are:
-     * <ul>
-     * <li>description</li>
-     * <li>hidden flag (only if <i>true</i>)</li>
-     * <li>label</li>
-     * <li>href</li>
-     * <li>alt label</li>
-     * <li>settings</li>
-     * <li>properties</li>
-     * <li>sub commands and menus</li>
-     * </ul>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          writer instance
-     * @throws IOException if the TCL update code could not be written
-     */
     @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
@@ -158,27 +151,28 @@ public class Menu_mxJPO
     {
         this.writeHeader(_paramCache, _out);
 
-        _out.append("mxUpdate menu \"${NAME}\"  {\n")
-            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n");
-        if (this.isHidden())  {
-            _out.append("    hidden\n");
-        }
-        if (this.treeMenu)  {
-            _out.append("    treemenu\n");
-        }
-        _out.append("    label \"").append(StringUtil_mxJPO.convertUpdate(this.getLabel())).append("\"\n")
-            .append("    href \"").append(StringUtil_mxJPO.convertUpdate(this.getHref())).append("\"\n")
-            .append("    alt \"").append(StringUtil_mxJPO.convertUpdate(this.getAlt())).append("\"\n");
-        this.getProperties().writeSettings(_paramCache, _out, "    ");
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
 
-        this.children.write(_out);
+        this.writeHeader(_paramCache, updateBuilder.getStrg());
 
-        this.getProperties().writeProperties(_paramCache, _out, "    ");
+        updateBuilder
+                .start("menu")
+                //              tag             | default | value                              | write?
+                .string(        "description",              this.getDescription())
+                .flagIfTrue(    "hidden",           false,  this.isHidden(),                     this.isHidden())
+                .flagIfTrue(    "treemenu",         false,  this.treeMenu,                       this.treeMenu)
+                .string(        "label",                    this.getLabel())
+                .string(        "href",                     this.getHref())
+                .string(        "alt",                      this.getAlt())
+                .otherProps(this.getProperties())
+                .write(this.children)
+                .properties(this.getProperties())
+                .end();
 
-        _out.append("}");
+        _out.append(updateBuilder.toString());
     }
 
-    @Override
+    @Override()
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,
                              final Menu_mxJPO _current)
@@ -196,9 +190,9 @@ public class Menu_mxJPO
         if (_current.treeMenu != this.treeMenu)  {
             _mql.pushPrefix("");
             if (this.treeMenu)  {
-                _mql.newLine().cmd("escape mod menu ").arg("Tree").cmd(" add menu ").arg(_current.getName());
+                _mql.newLine().cmd("escape mod menu ").arg("Tree").cmd(" add menu ").arg(this.getName());
             } else  {
-                _mql.newLine().cmd("escape mod menu ").arg("Tree").cmd(" remove menu ").arg(_current.getName());
+                _mql.newLine().cmd("escape mod menu ").arg("Tree").cmd(" remove menu ").arg(this.getName());
             }
             _mql.popPrefix();
         }

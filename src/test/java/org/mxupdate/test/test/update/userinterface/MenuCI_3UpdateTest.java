@@ -13,11 +13,12 @@
  *
  */
 
-package org.mxupdate.test.ci.userinterface;
+package org.mxupdate.test.test.update.userinterface;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ci.userinterface.AbstractUITest;
 import org.mxupdate.test.data.userinterface.CommandData;
 import org.mxupdate.test.data.userinterface.MenuData;
 import org.testng.annotations.AfterMethod;
@@ -31,7 +32,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class MenuTest
+public class MenuCI_3UpdateTest
     extends AbstractUITest<MenuData>
 {
     /**

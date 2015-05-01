@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -580,7 +579,9 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @param _tag              tag to check
      * @param _value            value to check (or <code>null</code> if value
      *                          is not defined)
+     * @deprecated use methods from export parser
      */
+    @Deprecated()
     protected void checkNotExistingSingleValue(final ExportParser _exportParser,
                                                final String _kind,
                                                final String _tag)

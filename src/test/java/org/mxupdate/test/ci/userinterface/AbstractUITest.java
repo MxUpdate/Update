@@ -28,7 +28,7 @@ import org.mxupdate.test.data.AbstractAdminData;
  * @author The MxUpdate Team
  * @param <DATA> class of the data
  */
-abstract class AbstractUITest<DATA extends AbstractAdminData<?>>
+public abstract class AbstractUITest<DATA extends AbstractAdminData<?>>
     extends AbstractDataExportUpdate<DATA>
 {
     /**

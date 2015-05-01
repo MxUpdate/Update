@@ -22,6 +22,8 @@ import java.util.TreeSet;
 
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateList;
 
 /**
  * List of referenced objects.
@@ -30,6 +32,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  */
 public class ChildRefList_mxJPO
     extends TreeSet<ChildRefList_mxJPO.AbstractRef>
+    implements UpdateList
 {
     /** Because not needed, the default serialize version ID is defined. */
     private static final long serialVersionUID = 1L;
@@ -101,6 +104,7 @@ public class ChildRefList_mxJPO
      * @param _out      appendable instance to the TCL update file
      * @throws IOException if the write to the TCL update file failed
      */
+    @Deprecated()
     public void write(final Appendable _out)
         throws IOException
     {
@@ -115,6 +119,28 @@ public class ChildRefList_mxJPO
             }
         }
     }
+
+    /**
+     * Writes all referenced children to the {@code _updateBuilder}. In the case
+     * of different rows (for portals) the key newrow is written.
+     *
+     * @param _updateBuilder    update builder
+     */
+    @Override()
+    public void write(final UpdateBuilder_mxJPO _updateBuilder)
+    {
+        if (!this.isEmpty())  {
+            int row = this.first().row;
+            for (final AbstractRef ref : this)  {
+                if (row != ref.row)  {
+                    _updateBuilder.stepStartNewLine().stepSingle("newrow").stepEndLine();
+                    row = ref.row;
+                }
+                _updateBuilder.string(ref.kind(), ref.name);
+
+            }
+        }
+     }
 
     /**
      * Calculates the delta between this current child references and the

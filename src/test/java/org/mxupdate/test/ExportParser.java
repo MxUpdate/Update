@@ -185,6 +185,19 @@ public class ExportParser
     }
 
     /**
+     * Checks that no value for given {@code _path} exits.
+     *
+     * @param _path     path to check
+     * @return this export parser instance
+     */
+    public ExportParser checkNotExistingValue(final String _path)
+    {
+        final List<String> valueLines = this.getRootLines().get(0).getLines(_path + "/@name");
+        Assert.assertEquals(valueLines.size(), 0, "no line for path '" + _path + "' must be found");
+        return this;
+    }
+
+    /**
      * Checks that given {@code _value} is defined for given {@code _path}.
      *
      * @param _path     path to check

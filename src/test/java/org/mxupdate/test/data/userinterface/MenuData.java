@@ -177,22 +177,13 @@ public class MenuData
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        // check symbolic name
-        Assert.assertEquals(
-                _exportParser.getSymbolicName(),
-                this.getSymbolicName(),
-                "check symbolic name");
+        super.checkExport(_exportParser);
 
         if ((this.treeMenu != null) && this.treeMenu)  {
-            this.checkValueExists(_exportParser, "treemenu", "treemenu", true);
+            _exportParser.checkFlag("treemenu", true);
         } else  {
-            this.checkNotExistingSingleValue(_exportParser, "treemenu", "treemenu");
+            _exportParser.checkNotExistingValue("treemenu");
         }
-
-        this.getFlags()     .check4Export(_exportParser, "");
-        this.getValues()    .check4Export(_exportParser, "");
-        this.getKeyValues( ).check4Export(_exportParser, "");
-        this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
 
         // fetch child from export file
         final List<String> childDefs = new ArrayList<String>();
