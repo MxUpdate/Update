@@ -54,28 +54,36 @@ public class Relationship_mxJPO
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
         Relationship_mxJPO.IGNORED_URLS.add("/attributeDefRefList");
+        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes");
+        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList");
+        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef");
+        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties");
+        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/creationInfo");
+        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/creationInfo/datetime");
+        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/modificationInfo");
+        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/modificationInfo/datetime");
+        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList");
+        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history");
+        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/agent");
+        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/datetime");
+        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/event");
+        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/order");
+        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/string");
+        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/propertyList");
         Relationship_mxJPO.IGNORED_URLS.add("/fromSide");
-        // to be ignored, because read within prepare method
-        Relationship_mxJPO.IGNORED_URLS.add("/fromSide/allowAllRelationships");
-        // to be ignored, because read within prepare method
-        Relationship_mxJPO.IGNORED_URLS.add("/fromSide/allowAllTypes");
+        Relationship_mxJPO.IGNORED_URLS.add("/fromSide/allowAllRelationships");                     // to be ignored, because read within parse method
+        Relationship_mxJPO.IGNORED_URLS.add("/fromSide/allowAllTypes");                             // to be ignored, because read within parse method
         Relationship_mxJPO.IGNORED_URLS.add("/fromSide/relationshipDefRefList");
-        // to be ignored, because read within prepare method
-        Relationship_mxJPO.IGNORED_URLS.add("/fromSide/relationshipDefRefList/relationshipDefRef");
+        Relationship_mxJPO.IGNORED_URLS.add("/fromSide/relationshipDefRefList/relationshipDefRef"); // to be ignored, because read within parse method
         Relationship_mxJPO.IGNORED_URLS.add("/fromSide/typeRefList");
-        // to be ignored, because read within prepare method
-        Relationship_mxJPO.IGNORED_URLS.add("/fromSide/typeRefList/typeRef");
+        Relationship_mxJPO.IGNORED_URLS.add("/fromSide/typeRefList/typeRef");                       // to be ignored, because read within parse method
         Relationship_mxJPO.IGNORED_URLS.add("/toSide");
-        // to be ignored, because read within prepare method
-        Relationship_mxJPO.IGNORED_URLS.add("/toSide/allowAllRelationships");
-        // to be ignored, because read within prepare method
-        Relationship_mxJPO.IGNORED_URLS.add("/toSide/allowAllTypes");
+        Relationship_mxJPO.IGNORED_URLS.add("/toSide/allowAllRelationships");                       // to be ignored, because read within parse method
+        Relationship_mxJPO.IGNORED_URLS.add("/toSide/allowAllTypes");                               // to be ignored, because read within prepare method
         Relationship_mxJPO.IGNORED_URLS.add("/toSide/relationshipDefRefList");
-        // to be ignored, because read within prepare method
-        Relationship_mxJPO.IGNORED_URLS.add("/toSide/relationshipDefRefList/relationshipDefRef");
+        Relationship_mxJPO.IGNORED_URLS.add("/toSide/relationshipDefRefList/relationshipDefRef");   // to be ignored, because read within prepare method
         Relationship_mxJPO.IGNORED_URLS.add("/toSide/typeRefList");
-        // to be ignored, because read within prepare method
-        Relationship_mxJPO.IGNORED_URLS.add("/toSide/typeRefList/typeRef");
+        Relationship_mxJPO.IGNORED_URLS.add("/toSide/typeRefList/typeRef");                         // to be ignored, because read within prepare method
     }
 
     /** Set holding rule referencing this relationship. */
