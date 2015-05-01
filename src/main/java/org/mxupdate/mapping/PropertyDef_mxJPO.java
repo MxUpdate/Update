@@ -24,22 +24,14 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  */
 public enum PropertyDef_mxJPO
 {
-    /** Admin property to store the name of the application. */
-    APPLICATION,
-    /** Admin property to store the author. */
-    AUTHOR,
     /** Admin property to store the last modified date of the file. */
     FILEDATE,
     /** Admin property to store the installation date. */
     INSTALLEDDATE,
     /** Admin property to store the installer. */
     INSTALLER,
-    /** Admin property to store the original name. */
-    ORIGINALNAME,
     /** Property to store the sub path. */
-    SUBPATH,
-    /** Admin property to store the version. */
-    VERSION;
+    SUBPATH;
 
     /**
      * Used property name within the property file.

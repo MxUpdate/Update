@@ -51,12 +51,6 @@ public final class UpdateUtil_mxJPO
     private static final String PARAM_CHECK_FILE_DATE = "UpdateCheckFileDate";
 
     /**
-     * Name of the key within the parameter cache to define if for the update a
-     * check for the version must be done.
-     */
-    private static final String PARAM_CHECK_VERSION = "UpdateCheckVersion";
-
-    /**
      * String of the key within the parameter cache for the use file date as
      * version parameter.
      */
@@ -127,23 +121,6 @@ public final class UpdateUtil_mxJPO
                         } else  {
                             update = true;
                             _paramCache.logDebug("    - update to version from " + fileDate);
-                        }
-                    } else if (_paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_CHECK_VERSION))  {
-                        final String instVersion;
-                        if (existings.contains(fileEntry.getKey()))  {
-                            instVersion = instance.getPropValue(_paramCache, PropertyDef_mxJPO.VERSION);
-                        } else  {
-                            instVersion = null;
-                        }
-                        if ((instVersion != null) && instVersion.equals(version))  {
-                            update = false;
-                        } else  {
-                            update = true;
-                            if (_paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_FILEDATE2VERSION))  {
-                                _paramCache.logDebug("    - update to version from " + new Date(fileEntry.getValue().lastModified()));
-                            } else  {
-                                _paramCache.logDebug("    - update to version " + version);
-                            }
                         }
                     } else  {
                         update = true;
