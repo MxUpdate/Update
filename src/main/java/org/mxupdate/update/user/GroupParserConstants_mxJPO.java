@@ -23,67 +23,55 @@ interface GroupParserConstants_mxJPO {
   /** RegularExpression Id. */
   int SITE = 10;
   /** RegularExpression Id. */
-  int STRING = 15;
+  int STRING = 11;
   /** RegularExpression Id. */
-  int SINGLE = 16;
+  int SINGLE = 12;
   /** RegularExpression Id. */
-  int APOSTROPHE = 17;
+  int MULTILINESTRING = 13;
   /** RegularExpression Id. */
-  int CHAR = 18;
+  int MULTILINESINGLE = 14;
   /** RegularExpression Id. */
-  int PROPERTY = 19;
+  int PROPERTY = 15;
   /** RegularExpression Id. */
-  int PROPERTYTO = 20;
+  int PROPERTYTO = 16;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 21;
+  int PROPERTYVAL = 17;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 26;
+  int ADMINTYPE_STRING = 18;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 27;
-  /** RegularExpression Id. */
-  int ADMINTYPE_APOSTROPHE = 28;
-  /** RegularExpression Id. */
-  int ADMINTYPE_CHAR = 29;
+  int ADMINTYPE_SINGLE = 19;
 
   /** Lexical state. */
-  int DEFAULT = 0;
+  int ADMINREF_EXPECTED = 0;
   /** Lexical state. */
-  int STRING_EXPECTED = 1;
+  int MULTILINESTRING_EXPECTED = 1;
   /** Lexical state. */
-  int ADMINREF_EXPECTED = 2;
+  int STRING_EXPECTED = 2;
+  /** Lexical state. */
+  int DEFAULT = 3;
 
   /** Literal token values. */
   String[] tokenImage = {
     "<EOF>",
     "\" \"",
-    "\"\\r\"",
     "\"\\t\"",
     "\"\\n\"",
+    "<token of kind 4>",
     "\"symbolicname\"",
     "\"description\"",
     "\"hidden\"",
     "\"!hidden\"",
     "\"parent\"",
     "\"site\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<STRING>",
     "<SINGLE>",
-    "\"\\\"\"",
-    "<CHAR>",
+    "<MULTILINESTRING>",
+    "<MULTILINESINGLE>",
     "\"property\"",
     "\"to\"",
     "\"value\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<ADMINTYPE_STRING>",
     "<ADMINTYPE_SINGLE>",
-    "\"\\\"\"",
-    "<ADMINTYPE_CHAR>",
   };
 
 }

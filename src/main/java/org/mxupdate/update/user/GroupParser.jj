@@ -26,11 +26,7 @@ PARSER_BEGIN(GroupParser)
 package org.mxupdate.update.user;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
@@ -46,18 +42,16 @@ class GroupParser
 
 PARSER_END(GroupParser)
 
-<DEFAULT> SKIP :
+<*> SKIP :
 {
-    " "
-|   "\r"
-|   "\t"
-|   "\n"
+  " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
 <DEFAULT> TOKEN : /** first level */
 {
       <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
-    | <DESCRIPTION:                         "description">                                  : STRING_EXPECTED
+
+    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
     | <HIDDEN_TRUE:                         "hidden">
     | <HIDDEN_FALSE:                        "!hidden">
@@ -68,17 +62,17 @@ PARSER_END(GroupParser)
 }
 
 /************************************************************** Common String */
-<STRING_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
-
 <STRING_EXPECTED> TOKEN :
 {
-      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "{" | "}" | " ")*<APOSTROPHE>)> : DEFAULT
-    | <SINGLE: (<CHAR>)+> : DEFAULT
-    | <#APOSTROPHE: "\"" >
-    | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
+    | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/*************************************************** Common Multi-Line-String */
+<MULTILINESTRING_EXPECTED> TOKEN :
+{
+      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
+    | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
 }
 
 /******************************************************************* Property */
@@ -89,17 +83,10 @@ PARSER_END(GroupParser)
     | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
 }
 
-<ADMINREF_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
-
 <ADMINREF_EXPECTED> TOKEN :
 {
-      <ADMINTYPE_STRING : (<ADMINTYPE_APOSTROPHE>(<ADMINTYPE_CHAR> | "\\\"" | "{" | "}" | " ")*<ADMINTYPE_APOSTROPHE>)> : STRING_EXPECTED
-    | <ADMINTYPE_SINGLE : (<ADMINTYPE_CHAR>)+> : STRING_EXPECTED
-    | <#ADMINTYPE_APOSTROPHE : "\"" >
-    | <#ADMINTYPE_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <ADMINTYPE_STRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
 }
 
 /**************************************************************************** */
@@ -115,11 +102,11 @@ void parse(final Group_mxJPO _group)
     Token tmp;
     AdminProperty property;
 } {
-    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_group, "symbolicNames", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.appendValue(_group, "symbolicNames", this.getSingle(tmp.image));} ) )
+    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_group, "symbolicNames",                      this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_group, "symbolicNames",                      this.getSingle(tmp.image));} ) )
 
-      | ( <DESCRIPTION>             ( tmp = <STRING>                        {this.setValue(_group, "description",                           this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_group, "description",                           this.getSingle(tmp.image));} ) )
+      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_group, "description",                           this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>               {this.setValue(_group, "description",                           this.getSingle(tmp.image));} ) )
 
       | ( <HIDDEN_TRUE>                                                     {this.setValue(_group, "hidden",                                true);} )
       | ( <HIDDEN_FALSE>                                                    {this.setValue(_group, "hidden",                                false);} )

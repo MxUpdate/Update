@@ -53,6 +53,9 @@ public class GroupCI_1ParserTest
             {"2b) description not defined",
                     "description \"\" !hidden",
                     "!hidden"},
+            {"2c) multi-line description",
+                    "",
+                    "description \"abc\ndef\" !hidden"},
             // hidden flag
             {"3a) hidden",
                     "",
