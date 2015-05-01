@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.datamodel;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
@@ -164,15 +163,9 @@ public class Type_mxJPO
     }
 
     @Override()
-    protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Appendable _out)
-        throws IOException
+    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
-
-        this.writeHeader(_paramCache, updateBuilder.getStrg());
-
-        updateBuilder.start("type")
+        _updateBuilder
                 //              tag             | default | value                              | write?
                 .string(        "description",              this.getDescription())
                 .singleIfTrue(  "kind",                     this.kind.name().toLowerCase(),     (this.kind == Kind.Composed))
@@ -182,10 +175,7 @@ public class Type_mxJPO
                 .write(this.getTriggers())
                 .list(          "method",                   this.methods)
                 .list(          "attribute",                this.attributes)
-                .properties(this.getProperties())
-                .end();
-
-        _out.append(updateBuilder.toString());
+                .properties(this.getProperties());
     }
 
     @Override()

@@ -288,7 +288,7 @@ public class JPOProgram_mxJPO
     @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
-        throws IOException, MatrixException
+        throws IOException
     {
         final String markStart = this.makeLinePrefix(JPOProgram_mxJPO.LINE_PREFIX, _paramCache.getValueString(JPOProgram_mxJPO.PARAM_MARKSTART).trim());
         final String markEnd = this.makeLinePrefix(JPOProgram_mxJPO.LINE_PREFIX, _paramCache.getValueString(JPOProgram_mxJPO.PARAM_MARKEND).trim());

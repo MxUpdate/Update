@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.userinterface;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
@@ -129,18 +128,9 @@ public class Channel_mxJPO
     }
 
     @Override()
-    protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Appendable _out)
-        throws IOException
+    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
-        this.writeHeader(_paramCache, _out);
-
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
-
-        this.writeHeader(_paramCache, updateBuilder.getStrg());
-
-        updateBuilder
-                .start("channel")
+        _updateBuilder
                 //              tag             | default | value                              | write?
                 .string(        "description",              this.getDescription())
                 .flagIfTrue(    "hidden",           false,  this.isHidden(),                     this.isHidden())
@@ -150,10 +140,7 @@ public class Channel_mxJPO
                 .single(        "height",                   String.valueOf(this.height))
                 .otherProps(this.getProperties())
                 .write(this.children)
-                .properties(this.getProperties())
-                .end();
-
-        _out.append(updateBuilder.toString());
+                .properties(this.getProperties());
     }
 
     @Override()

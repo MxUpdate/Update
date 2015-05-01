@@ -240,15 +240,9 @@ public class Relationship_mxJPO
     }
 
     @Override()
-    protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Appendable _out)
-        throws IOException
+    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
-
-        this.writeHeader(_paramCache, updateBuilder.getStrg());
-
-        updateBuilder.start("relationship")
+        _updateBuilder
                 //              tag             | default | value                              | write?
                 .string(        "description",              this.getDescription())
                 .singleIfTrue(  "kind",                     this.kind.name().toLowerCase(),     (this.kind != Kind.Basic))
@@ -261,10 +255,7 @@ public class Relationship_mxJPO
                 .write(this.from)
                 .write(this.to)
                 .list(          "attribute",                this.attributes)
-                .properties(this.getProperties())
-                .end();
-
-        _out.append(updateBuilder.toString());
+                .properties(this.getProperties());
     }
 
     @Override()

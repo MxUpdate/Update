@@ -307,42 +307,34 @@ public class PersonAdmin_mxJPO
     }
 
     @Override()
-    protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Appendable _out)
-        throws IOException
+    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
-
-        this.writeHeader(_paramCache, updateBuilder.getStrg());
-
-        updateBuilder.start("person")
-            //                  tag             | default | value                              | write?
-            .single(                 "kind",                 "admin")
-            .string(                 "comment",              this.getDescription())
-            .flag(                   "active",        false, this.active)
-            .flag(                   "trusted",       false, this.trusted)
-            .flag(                   "hidden",        false, this.isHidden())
-            .singleIfTrue(           "access",               "all",                    this.access.size() == 1 && this.access.iterator().next().equals("all"))
-            .listOneLineSingleIfTrue("access",               this.access,              !(this.access.size() == 1 && this.access.iterator().next().equals("all")))
-            .singleIfTrue(           "admin",                "all",                    this.admin.size() == 1 && this.admin.iterator().next().equals("all"))
-            .listOneLineSingleIfTrue("admin",                this.admin,               !(this.admin.size() == 1 && this.admin.iterator().next().equals("all")))
-            .flag(                   "email",         false, this.email)
-            .flag(                   "iconmail",      false, this.iconmail)
-            .string(                 "address",              this.address)
-            .string(                 "emailaddress",         this.emailAddress)
-            .string(                 "fax",                  this.fax)
-            .string(                 "fullname",             this.fullName)
-            .string(                 "phone",                this.phone)
-            .listOneLineSingle(      "product",              this.products)
-            .listOneLineSingleIfTrue("type",                 this.getTypes(),          !this.types.isEmpty())
-            .stringIfTrue(           "vault",                this.vault,               this.vault != null && !this.vault.isEmpty())
-            .stringIfTrue(           "application",          this.application,         this.application != null && !this.application.isEmpty())
-            .stringIfTrue(           "site",                 this.getSite(),           this.getSite() != null && !this.getSite().isEmpty())
-            .listIfTrue(             "group",                this.groups,              this.groups != null && !this.groups.isEmpty())
-            .listIfTrue(             "role",                 this.roles,               this.roles != null && !this.roles.isEmpty())
-            .properties(this.getProperties())
-            .end();
-        _out.append(updateBuilder.toString());
+        _updateBuilder
+                //                  tag             | default | value                              | write?
+                .single(                 "kind",                 "admin")
+                .string(                 "comment",              this.getDescription())
+                .flag(                   "active",        false, this.active)
+                .flag(                   "trusted",       false, this.trusted)
+                .flag(                   "hidden",        false, this.isHidden())
+                .singleIfTrue(           "access",               "all",                    this.access.size() == 1 && this.access.iterator().next().equals("all"))
+                .listOneLineSingleIfTrue("access",               this.access,              !(this.access.size() == 1 && this.access.iterator().next().equals("all")))
+                .singleIfTrue(           "admin",                "all",                    this.admin.size() == 1 && this.admin.iterator().next().equals("all"))
+                .listOneLineSingleIfTrue("admin",                this.admin,               !(this.admin.size() == 1 && this.admin.iterator().next().equals("all")))
+                .flag(                   "email",         false, this.email)
+                .flag(                   "iconmail",      false, this.iconmail)
+                .string(                 "address",              this.address)
+                .string(                 "emailaddress",         this.emailAddress)
+                .string(                 "fax",                  this.fax)
+                .string(                 "fullname",             this.fullName)
+                .string(                 "phone",                this.phone)
+                .listOneLineSingle(      "product",              this.products)
+                .listOneLineSingleIfTrue("type",                 this.getTypes(),          !this.types.isEmpty())
+                .stringIfTrue(           "vault",                this.vault,               this.vault != null && !this.vault.isEmpty())
+                .stringIfTrue(           "application",          this.application,         this.application != null && !this.application.isEmpty())
+                .stringIfTrue(           "site",                 this.getSite(),           this.getSite() != null && !this.getSite().isEmpty())
+                .listIfTrue(             "group",                this.groups,              this.groups != null && !this.groups.isEmpty())
+                .listIfTrue(             "role",                 this.roles,               this.roles != null && !this.roles.isEmpty())
+                .properties(this.getProperties());
     }
 
     /**

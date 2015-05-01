@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.datamodel;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
@@ -147,18 +146,9 @@ public class Format_mxJPO
     }
 
     @Override()
-    protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Appendable _out)
-        throws IOException
+    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
-        this.writeHeader(_paramCache, _out);
-
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
-
-        this.writeHeader(_paramCache, updateBuilder.getStrg());
-
-        updateBuilder
-                .start("format")
+        _updateBuilder
                 //              tag             | default | value                              | write?
                 .string(        "description",              this.getDescription())
                 .flag(          "hidden",           false,  this.isHidden())
@@ -166,13 +156,10 @@ public class Format_mxJPO
                 .string(        "suffix",                   this.fileSuffix)
                 .string(        "type",                     this.type)
                 .string(        "version",                  this.version)
-                .stringIfTrue(  "view",                     this.commandView,                   _paramCache.getValueBoolean(ValueKeys.DMFormatSupportsPrograms))
-                .stringIfTrue(  "edit",                     this.commandEdit,                   _paramCache.getValueBoolean(ValueKeys.DMFormatSupportsPrograms))
-                .stringIfTrue(  "print",                    this.commandPrint,                  _paramCache.getValueBoolean(ValueKeys.DMFormatSupportsPrograms))
-                .properties(this.getProperties())
-                .end();
-
-        _out.append(updateBuilder.toString());
+                .stringIfTrue(  "view",                     this.commandView,                   _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMFormatSupportsPrograms))
+                .stringIfTrue(  "edit",                     this.commandEdit,                   _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMFormatSupportsPrograms))
+                .stringIfTrue(  "print",                    this.commandPrint,                  _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMFormatSupportsPrograms))
+                .properties(this.getProperties());
     }
 
     @Override()

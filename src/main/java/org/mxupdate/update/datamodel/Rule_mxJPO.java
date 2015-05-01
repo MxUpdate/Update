@@ -129,34 +129,16 @@ public class Rule_mxJPO
         this.accessList.sort();
     }
 
-    /**
-     * Writes specific information about the cached rule to the given
-     * writer instance.
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the TCL update code for the rule could not be
-     *                     written
-     */
     @Override()
-    protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Appendable _out)
-        throws IOException
+    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
-        this.writeHeader(_paramCache, updateBuilder.getStrg());
-
-        updateBuilder
-                .start("rule")
+        _updateBuilder
                 //              tag                 | default | value                              | write?
                 .string(        "description",                  this.getDescription())
                 .flag(          "hidden",               false,  this.isHidden())
-                .flagIfTrue(    "enforcereserveaccess", false,  this.enforcereserveaccess,          _paramCache.getValueBoolean(ValueKeys.DMRuleSupportsEnforceReserveAccess))
+                .flagIfTrue(    "enforcereserveaccess", false,  this.enforcereserveaccess,          _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMRuleSupportsEnforceReserveAccess))
                 .write(this.accessList)
-                .properties(this.getProperties())
-                .end();
-
-        _out.append(updateBuilder.toString());
+                .properties(this.getProperties());
     }
 
     @Override()

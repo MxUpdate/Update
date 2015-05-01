@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.userinterface;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
@@ -121,16 +120,9 @@ public class Command_mxJPO
     }
 
     @Override()
-    protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Appendable _out)
-        throws IOException
+    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
-
-        this.writeHeader(_paramCache, updateBuilder.getStrg());
-
-        updateBuilder
-                .start("command")
+        _updateBuilder
                 //              tag             | default | value                              | write?
                 .string(        "description",             this.getDescription())
                 .flagIfTrue(    "hidden",           false, this.isHidden(),                     this.isHidden())
@@ -140,10 +132,7 @@ public class Command_mxJPO
                 .list(          "user",                    this.users)
                 .otherProps(this.getProperties())
                 .properties(this.getProperties())
-                .stringIfTrue(   "code",                    "\n" + ((this.code != null) ? this.code : "") + "\n", (this.code != null) && !this.code.isEmpty())
-                .end();
-
-        _out.append(updateBuilder.toString());
+                .stringIfTrue(   "code",                    "\n" + ((this.code != null) ? this.code : "") + "\n", (this.code != null) && !this.code.isEmpty());
     }
 
     @Override()

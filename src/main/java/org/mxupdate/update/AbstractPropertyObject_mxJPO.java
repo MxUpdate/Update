@@ -16,7 +16,6 @@
 package org.mxupdate.update;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,55 +39,6 @@ import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 public abstract class AbstractPropertyObject_mxJPO
     extends AbstractObject_mxJPO
 {
-    /**
-     * String of the key within the parameter cache for the export application
-     * parameter.
-     */
-    private static final String PARAM_EXPORTAPPLICATION = "ExportApplication";
-
-    /**
-     * String of the key within the parameter cache for the export author
-     * parameter.
-     */
-    private static final String PARAM_EXPORTAUTHOR = "ExportAuthor";
-
-    /**
-     * String of the key within the parameter cache for the export original
-     * name parameter.
-     */
-    private static final String PARAM_EXPORTORIGINALNAME = "ExportOriginalName";
-
-    /**
-     * String of the key within the parameter cache for the export version
-     * parameter.
-     */
-    private static final String PARAM_EXPORTVERSION = "ExportVersion";
-
-    /**
-     * Header string of the application.
-     */
-    private static final String HEADER_APPLICATION = "\n# APPLICATION:\n# ~~~~~~~~~~~~\n#";
-
-    /**
-     * Header string of the author.
-     */
-    private static final String HEADER_AUTHOR = "\n# AUTHOR:\n# ~~~~~~~\n#";
-
-    /**
-     * Header string of the installer name.
-     */
-    private static final String HEADER_INSTALLER = "\n# INSTALLER:\n# ~~~~~~~~~~\n#";
-
-    /**
-     * Header string of the original name.
-     */
-    private static final String HEADER_ORIGINALNAME = "\n# ORIGINAL NAME:\n# ~~~~~~~~~~~~~~\n#";
-
-    /**
-     * Header string of the version.
-     */
-    private static final String HEADER_VERSION = "\n# VERSION:\n# ~~~~~~~~\n#";
-
     /**
      * Test string used as output to test that the update runs correctly
      * (because it could be that no exception was thrown while an error happens
@@ -147,78 +97,6 @@ public abstract class AbstractPropertyObject_mxJPO
     }
 
     /**
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          writer instance
-     * @throws IOException if the header could not be written to the TCL update
-     *                     file
-     * @see #HEADER_APPLICATION
-     * @see #HEADER_AUTHOR
-     * @see #HEADER_INSTALLER
-     * @see #HEADER_ORIGINALNAME
-     * @see #HEADER_SYMBOLIC_NAME
-     * @see #HEADER_VERSION
-     * @see #PARAM_EXPORTAPPLICATION
-     * @see #PARAM_EXPORTAUTHOR
-     * @see #PARAM_EXPORTINSTALLER
-     * @see #PARAM_EXPORTORIGINALNAME
-     * @see #PARAM_EXPORTVERSION
-     */
-    protected void writeHeader(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
-        throws IOException
-    {
-        final String headerText = this.getTypeDef().getTitle();
-        _out.append("################################################################################\n")
-            .append("# ").append(headerText).append(":\n")
-            .append("# ~");
-        for (int i = 0; i < headerText.length(); i++)  {
-            _out.append("~");
-        }
-        _out.append("\n")
-            .append("# ").append(this.getName()).append("\n");
-        // original name
-        // (only if an administration type and related parameter is defined)
-        if ((this.getTypeDef().getMxAdminName() != null)
-                && _paramCache.getValueBoolean(AbstractPropertyObject_mxJPO.PARAM_EXPORTORIGINALNAME))  {
-            _out.append('#').append(AbstractPropertyObject_mxJPO.HEADER_ORIGINALNAME);
-            if ((this.getOriginalName() != null) && !"".equals(this.getOriginalName()))  {
-                _out.append(" ").append(this.getOriginalName()).append('\n');
-            } else {
-                _out.append("\n");
-            }
-        }
-        // write header
-        if (_paramCache.getValueBoolean(AbstractPropertyObject_mxJPO.PARAM_EXPORTAUTHOR))  {
-            _out.append('#').append(AbstractPropertyObject_mxJPO.HEADER_AUTHOR);
-            if ((this.getAuthor() != null) && !this.getAuthor().isEmpty())  {
-                _out.append(" ").append(this.getAuthor()).append('\n');
-            } else {
-                _out.append("\n");
-            }
-        }
-        // write application
-        if (_paramCache.getValueBoolean(AbstractPropertyObject_mxJPO.PARAM_EXPORTAPPLICATION))  {
-            _out.append('#').append(AbstractPropertyObject_mxJPO.HEADER_APPLICATION);
-            if ((this.getApplication() != null) && !this.getApplication().isEmpty())  {
-                _out.append(" ").append(this.getApplication()).append('\n');
-            } else {
-                _out.append("\n");
-            }
-        }
-        // write version
-        if (_paramCache.getValueBoolean(AbstractPropertyObject_mxJPO.PARAM_EXPORTVERSION))  {
-            _out.append('#').append(AbstractPropertyObject_mxJPO.HEADER_VERSION);
-            if ((this.getVersion() != null) && !this.getVersion().isEmpty())  {
-                _out.append(" ").append(this.getVersion()).append('\n');
-            } else {
-                _out.append("\n");
-            }
-        }
-        _out.append("################################################################################\n\n");
-    }
-
-    /**
      * Updates this administration (business) object if the stored information
      * about the version is not the same as the file date. If an update is
      * required, the file is read and the object is updated with
@@ -231,14 +109,6 @@ public abstract class AbstractPropertyObject_mxJPO
      * @param _newVersion   new version which must be set within the update
      *                      (or {@code null} if the version must not be set).
      * @throws Exception if the update from the derived class failed
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     * @see #extractFromCode(StringBuilder, String, String)
-     * @see #extractSymbolicNameFromCode(ParameterCache_mxJPO,StringBuilder)
-     * @see #HEADER_APPLICATION
-     * @see #HEADER_AUTHOR
-     * @see #HEADER_INSTALLER
-     * @see #HEADER_ORIGINALNAME
-     * @see #HEADER_VERSION
      */
     @Override()
     public void update(final ParameterCache_mxJPO _paramCache,
@@ -250,69 +120,10 @@ public abstract class AbstractPropertyObject_mxJPO
         // parse objects
         this.parse(_paramCache);
 
-        // read code
-        final StringBuilder code = this.getCode(_file);
-
-        // defines the version in the TCL variables
         final Map<String,String> tclVariables = new HashMap<String,String>();
-        if (_newVersion == null)  {
-            tclVariables.put(PropertyDef_mxJPO.VERSION.name(),
-                              this.extractFromCode(code, AbstractPropertyObject_mxJPO.HEADER_VERSION, ""));
-        } else  {
-            tclVariables.put(PropertyDef_mxJPO.VERSION.name(), _newVersion);
-        }
-
-        // define author
-        final String author;
-        if (_paramCache.contains(ParameterCache_mxJPO.KEY_AUTHOR))  {
-            author = _paramCache.getValueString(ParameterCache_mxJPO.KEY_AUTHOR);
-        } else  {
-            author = this.extractFromCode(code,
-                                          AbstractPropertyObject_mxJPO.HEADER_AUTHOR,
-                                          _paramCache.getValueString(ParameterCache_mxJPO.KEY_DEFAULTAUTHOR));
-        }
-        tclVariables.put(PropertyDef_mxJPO.AUTHOR.name(), author);
-
-        // define application
-        String appl = null;
-        if (_paramCache.contains(ParameterCache_mxJPO.KEY_APPLICATION))  {
-            appl = _paramCache.getValueString(ParameterCache_mxJPO.KEY_APPLICATION);
-        }
-        if ((appl == null) || "".equals(appl))  {
-            appl = this.extractFromCode(code,
-                                        AbstractPropertyObject_mxJPO.HEADER_APPLICATION,
-                                        _paramCache.getValueString(ParameterCache_mxJPO.KEY_DEFAULTAPPLICATION));
-        }
-        if (appl == null)  {
-            appl = "";
-        }
-        tclVariables.put(PropertyDef_mxJPO.APPLICATION.name(), appl);
-
-        // define installer
-        final String installer;
-        if (_paramCache.contains(ValueKeys.Installer))  {
-            installer = _paramCache.getValueString(ValueKeys.Installer);
-        } else  {
-            installer = this.extractFromCode(code,
-                                             AbstractPropertyObject_mxJPO.HEADER_INSTALLER,
-                                             _paramCache.getValueString(ValueKeys.DefaultInstaller));
-        }
-        tclVariables.put(PropertyDef_mxJPO.INSTALLER.name(), installer);
-
-        if (this.getTypeDef().getMxAdminName() != null)  {
-            // define original name
-            final String origName;
-            if ((this.getOriginalName() != null) && !"".equals(this.getOriginalName()))  {
-                origName = this.getOriginalName();
-            } else  {
-                origName = this.getName();
-            }
-            tclVariables.put(PropertyDef_mxJPO.ORIGINALNAME.name(), origName);
-        }
 
         // define file date
-        tclVariables.put(PropertyDef_mxJPO.FILEDATE.name(),
-                         StringUtil_mxJPO.formatFileDate(_paramCache, new Date(_file.lastModified())));
+        tclVariables.put(PropertyDef_mxJPO.FILEDATE.name(), StringUtil_mxJPO.formatFileDate(_paramCache, new Date(_file.lastModified())));
 
         // define file name
         tclVariables.put("FILENAME", _file.toString().replaceAll("\\\\", "/"));
@@ -449,8 +260,7 @@ public abstract class AbstractPropertyObject_mxJPO
 
         // define all TCL variables
         for (final Map.Entry<String, String> entry : _tclVariables.entrySet())  {
-            cmd.append("set ").append(entry.getKey())
-               .append(" \"").append(StringUtil_mxJPO.convertTcl(entry.getValue())).append("\"\n");
+            cmd.append("set ").append(entry.getKey()).append(" \"").append(StringUtil_mxJPO.convertTcl(entry.getValue())).append("\"\n");
         }
         // append TCL code, end of TCL mode and post MQL statements
         // (source with the file must be replace for windows ...)

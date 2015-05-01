@@ -636,7 +636,6 @@ public class Person_mxJPO
                           final Appendable _out)
             throws IOException
         {
-            this.writeHeader(_paramCache, _out);
             _out.append("mql mod ")
                 .append(this.getTypeDef().getMxAdminName())
                 .append(" \"${NAME}\"");

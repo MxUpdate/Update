@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.userinterface;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 
@@ -98,16 +97,9 @@ public class Inquiry_mxJPO
     }
 
     @Override()
-    protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Appendable _out)
-        throws IOException
+    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
-
-        this.writeHeader(_paramCache, updateBuilder.getStrg());
-
-        updateBuilder
-                .start("inquiry")
+        _updateBuilder
                 //              tag             | default | value                              | write?
                 .string(        "description",             this.getDescription())
                 .flagIfTrue(    "hidden",           false, this.isHidden(),                     this.isHidden())
@@ -115,10 +107,7 @@ public class Inquiry_mxJPO
                 .string(        "format",                  this.format)
                 .otherProps(this.getProperties())
                 .properties(this.getProperties())
-                .string(        "code",                    "\n" + ((this.code != null) ? this.code : "") + "\n")
-                .end();
-
-        _out.append(updateBuilder.toString());
+                .string(        "code",                    "\n" + ((this.code != null) ? this.code : "") + "\n");
     }
 
     @Override()

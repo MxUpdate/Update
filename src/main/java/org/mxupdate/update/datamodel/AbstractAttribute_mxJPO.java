@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.datamodel;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -354,32 +353,24 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     }
 
     @Override()
-    protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Appendable _out)
-        throws IOException
+    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
-        this.writeHeader(_paramCache, updateBuilder.getStrg());
-
-        updateBuilder.start("attribute")
+        _updateBuilder
                 //              tag             | default | value                              | write?
                 .string(        "description",              this.getDescription())
                 .flag(          "hidden",                   false, this.isHidden())
-                .flagIfTrue(    "multivalue",        false, this.multiValue,                    _paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagMultiValue))
-                .flagIfTrue(    "resetonclone",      false, this.resetOnClone,                  _paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnClone))
-                .flagIfTrue(    "resetonrevision",   false, this.resetOnRevision,               _paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnRevision))
+                .flagIfTrue(    "multivalue",        false, this.multiValue,                    _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMAttrSupportsFlagMultiValue))
+                .flagIfTrue(    "resetonclone",      false, this.resetOnClone,                  _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnClone))
+                .flagIfTrue(    "resetonrevision",   false, this.resetOnRevision,               _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnRevision))
                 .flagIfTrue(    "multiline",         false, this.multiline,                     (this.kind == Kind.String))
-                .singleIfTrue(  "maxlength",                this.maxLength,                     ((this.kind == Kind.String) && _paramCache.getValueBoolean(ValueKeys.DMAttrSupportsPropMaxLength)))
-                .flagIfTrue(    "rangevalue",        false, this.rangeValue,                    (((this.kind == Kind.Date) || (this.kind == Kind.Integer) || (this.kind == Kind.Real)) && _paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagRangeValue)))
-                .stringIfTrue(  "dimension",                this.dimension,                     ((this.dimension != null) && !this.dimension.isEmpty() && ((this.kind == Kind.Integer) || (this.kind == Kind.Real)) && _paramCache.getValueBoolean(ValueKeys.DMAttrSupportsDimension)))
+                .singleIfTrue(  "maxlength",                this.maxLength,                     ((this.kind == Kind.String) && _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMAttrSupportsPropMaxLength)))
+                .flagIfTrue(    "rangevalue",        false, this.rangeValue,                    (((this.kind == Kind.Date) || (this.kind == Kind.Integer) || (this.kind == Kind.Real)) && _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMAttrSupportsFlagRangeValue)))
+                .stringIfTrue(  "dimension",                this.dimension,                     ((this.dimension != null) && !this.dimension.isEmpty() && ((this.kind == Kind.Integer) || (this.kind == Kind.Real)) && _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMAttrSupportsDimension)))
                 .listIfTrue(    "rule",                     this.rules,                         (this.rules.size() == 1))
                 .string(        "default",                  this.defaultValue)
                 .write(this.triggers)
                 .write(this.rangesSorted)
-                .properties(this.getProperties())
-                .end();
-
-        _out.append(updateBuilder.toString());
+                .properties(this.getProperties());
     }
 
     /**

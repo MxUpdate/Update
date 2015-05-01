@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.datamodel;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -171,33 +170,16 @@ public class Dimension_mxJPO
         super.prepare();
     }
 
-    /**
-     * Writes the TCL update files for dimensions. The original method is
-     * overwritten because a dimension could not be only updated. A compare
-     * must be done in front or otherwise some data is lost.
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the extension could not be written
-     * @see #units
-     */
     @Override()
-    protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Appendable _out)
-            throws IOException
+    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
-
-        this.writeHeader(_paramCache, updateBuilder.getStrg());
-
-        updateBuilder
-                .start("dimension")
+        _updateBuilder
                 //              tag             | default | value                              | write?
                 .string(        "description",             this.getDescription())
                 .flag(          "hidden",           false, this.isHidden());
 
         for (final Unit unit : this.units)  {
-            updateBuilder
+            _updateBuilder
                     .childStart("unit", unit.name)
                     //              tag             | default | value                              | write?
                     .flagIfTrue("default",              false, unit.defaultUnit,                    unit.defaultUnit)
@@ -208,24 +190,21 @@ public class Dimension_mxJPO
             // system information
             for (final Map.Entry<String, Set<String>> systemInfo : unit.systemInfos.entrySet())  {
                 for (final String unitName : systemInfo.getValue())  {
-                    updateBuilder.stepStartNewLine().stepSingle("system").stepString(systemInfo.getKey()).stepSingle("to").stepSingle("unit").stepString(unitName).stepEndLine();
+                    _updateBuilder.stepStartNewLine().stepSingle("system").stepString(systemInfo.getKey()).stepSingle("to").stepSingle("unit").stepString(unitName).stepEndLine();
                 }
             }
             // settings
             for (final Map.Entry<String, String> setting : unit.settings.entrySet())  {
-                updateBuilder.stepStartNewLine().stepSingle("setting").stepString(setting.getKey()).stepString(setting.getValue()).stepEndLine();
+                _updateBuilder.stepStartNewLine().stepSingle("setting").stepString(setting.getKey()).stepString(setting.getValue()).stepEndLine();
             }
 
-            updateBuilder
+            _updateBuilder
                     .properties(unit.properties)
                     .childEnd();
         }
 
-        updateBuilder
-                .properties(this.getProperties())
-                .end();
-
-        _out.append(updateBuilder.toString());
+        _updateBuilder
+                .properties(this.getProperties());
     }
 
     @Override()

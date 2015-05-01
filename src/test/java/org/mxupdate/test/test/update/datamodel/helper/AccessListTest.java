@@ -194,7 +194,7 @@ public class AccessListTest
 
         list.sort();
 
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(null);
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO("", null);
         list.write(updateBuilder);
 
         Assert.assertEquals(updateBuilder.toString(), _expected);

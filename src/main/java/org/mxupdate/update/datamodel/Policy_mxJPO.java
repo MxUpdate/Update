@@ -276,27 +276,10 @@ public class Policy_mxJPO
     {
     }
 
-    /**
-     * Writes the update script for this policy.
-     * The policy specific information are:
-     * <ul>
-     * <li>{@link #allState all state access flag}</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          writer instance
-     * @throws IOException if the TCL update code could not be written
-     */
     @Override()
-    protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Appendable _out)
-        throws IOException
+    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
-
-        this.writeHeader(_paramCache, updateBuilder.getStrg());
-
-        updateBuilder.start("policy")
+        _updateBuilder
                 //                  tag             | default | value                                                                 | write?
                 .string(            "description",              this.getDescription())
                 .flag(              "hidden",            false, this.isHidden())
@@ -314,21 +297,18 @@ public class Policy_mxJPO
 
         // all state access
         if (this.allState)  {
-            updateBuilder.childStart("allstate");
-            this.allStateAccess.write(updateBuilder);
-            updateBuilder.childEnd();
+            _updateBuilder.childStart("allstate");
+            this.allStateAccess.write(_updateBuilder);
+            _updateBuilder.childEnd();
         }
 
         // all states
         for (final State state : this.states)  {
-            state.write(_paramCache, updateBuilder);
+            state.write(_updateBuilder);
         }
 
-        updateBuilder
-                .properties(this.getProperties())
-                .end();
-
-        _out.append(updateBuilder.toString());
+        _updateBuilder
+                .properties(this.getProperties());
     }
 
     /**
@@ -714,8 +694,7 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
          * <li>signatures
          * </ul>
          */
-        public void write(final ParameterCache_mxJPO _paramCache,
-                          final UpdateBuilder_mxJPO _updateBuilder)
+        public void write(final UpdateBuilder_mxJPO _updateBuilder)
         {
 //            if (this.symbolicNames.isEmpty())  {
    //             _out.append("        registeredName \"").append("state_").append(StringUtil_mxJPO.convertUpdate(this.name.replaceAll(" ", "_"))).append("\"\n");
@@ -723,14 +702,14 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
             _updateBuilder
                     .childStart("state \""+ StringUtil_mxJPO.convertUpdate(this.name) + "\"")
                     .list(          "registeredName",              this.symbolicNames)
-                    .flagIfTrue(    "enforcereserveaccess", false, this.enforcereserveaccess,    _paramCache.getValueBoolean(ValueKeys.DMPolicyStateSupportsEnforceReserveAccess))
-                    .flagIfTrue(    "majorrevision",        false, this.majorrevisionable,       _paramCache.getValueBoolean(ValueKeys.DMPolicySupportsMajorMinor))
-                    .flagIfTrue(    "minorrevision",        false, this.minorrevisionable,       _paramCache.getValueBoolean(ValueKeys.DMPolicySupportsMajorMinor))
-                    .flagIfTrue(    "revision",             false, this.minorrevisionable,       !_paramCache.getValueBoolean(ValueKeys.DMPolicySupportsMajorMinor))
+                    .flagIfTrue(    "enforcereserveaccess", false, this.enforcereserveaccess,       _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMPolicyStateSupportsEnforceReserveAccess))
+                    .flagIfTrue(    "majorrevision",        false, this.majorrevisionable,          _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMPolicySupportsMajorMinor))
+                    .flagIfTrue(    "minorrevision",        false, this.minorrevisionable,          _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMPolicySupportsMajorMinor))
+                    .flagIfTrue(    "revision",             false, this.minorrevisionable,          !_updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMPolicySupportsMajorMinor))
                     .flag(          "version",              false, this.versionable)
                     .flag(          "promote",              false, this.autoPromotion)
                     .flag(          "checkouthistory",      false, this.checkoutHistory)
-                    .flagIfTrue(    "published",            false, this.published,          _paramCache.getValueBoolean(ValueKeys.DMPolicyStateSupportsPublished));
+                    .flagIfTrue(    "published",            false, this.published,                  _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMPolicyStateSupportsPublished));
             // route
             if (((this.routeMessage != null) && !this.routeMessage.isEmpty()) || !this.routeUsers.isEmpty())  {
                 _updateBuilder.stepStartNewLine().stepSingle("route {" + StringUtil_mxJPO.convertUpdate(true, this.routeUsers, null) + "}").stepString(this.routeMessage).stepEndLine();

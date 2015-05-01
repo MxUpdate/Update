@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.datamodel;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
@@ -158,16 +157,9 @@ public class Interface_mxJPO
     }
 
     @Override()
-    protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Appendable _out)
-        throws IOException
+    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
-
-        this.writeHeader(_paramCache, updateBuilder.getStrg());
-
-        updateBuilder
-                .start("interface")
+        _updateBuilder
                 .string(        "description",              this.getDescription())
                 .flagIfTrue(    "abstract",         false,  this.abstractFlag,      (this.abstractFlag != null) && this.abstractFlag)
                 .list(          "derived",                  this.derived)
@@ -177,10 +169,7 @@ public class Interface_mxJPO
                 .listIfTrue(    "for relationship",         this.relations,         !this.relationAll)
                 .singleIfTrue(  "for type",                 "all",                  this.typeAll)
                 .listIfTrue(    "for type",                 this.types,             !this.typeAll)
-                .properties(this.getProperties())
-                .end();
-
-        _out.append(updateBuilder.toString());
+                .properties(this.getProperties());
     }
 
     @Override()

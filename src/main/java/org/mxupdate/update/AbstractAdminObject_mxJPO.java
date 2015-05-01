@@ -296,11 +296,9 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
-        throws IOException, MatrixException
+        throws IOException
     {
-        this.writeHeader(_paramCache, _out);
-
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(this.getFileName(), _paramCache);
 
         updateBuilder.start(this.getTypeDef().getMxAdminName());
 
@@ -308,7 +306,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
 
         updateBuilder.end();
 
-        _out.append(updateBuilder.getStrg());
+        _out.append(updateBuilder.toString());
     }
 
     /**

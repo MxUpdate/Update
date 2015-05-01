@@ -63,7 +63,6 @@ public class NumberGenerator_mxJPO
                          final Appendable _out)
         throws IOException
     {
-        this.writeHeader(_paramCache, _out);
         _out.append("mql mod bus \"${OBJECTID}\"")
             .append(" \\\n    description \"").append(StringUtil_mxJPO.convertTcl(this.getDescription())).append("\"");
         String nextNumber = null;

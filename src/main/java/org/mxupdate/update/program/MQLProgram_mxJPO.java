@@ -178,7 +178,7 @@ public class MQLProgram_mxJPO
     @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
-        throws IOException, MatrixException
+        throws IOException
     {
         final String markStartStr = _paramCache.getValueString(MQLProgram_mxJPO.PARAM_MARKSTART).trim();
         final String markEndStr = _paramCache.getValueString(MQLProgram_mxJPO.PARAM_MARKEND).trim();

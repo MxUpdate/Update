@@ -15,7 +15,10 @@
 
 package org.mxupdate.update.util;
 
+import java.text.MessageFormat;
 import java.util.Collection;
+
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 
 /**
  * Builder used to generated update files.
@@ -39,9 +42,13 @@ public class UpdateBuilder_mxJPO
      *
      * @param _paramCache   parameter cache
      */
-    public UpdateBuilder_mxJPO(final ParameterCache_mxJPO _paramCache)
+    public UpdateBuilder_mxJPO(final String _fileName,
+                               final ParameterCache_mxJPO _paramCache)
     {
         this.paramCache = _paramCache;
+        if (_paramCache != null)  {
+            this.strg.append(MessageFormat.format(_paramCache.getValueString(ValueKeys.ExportFileHeader), _fileName));
+        }
     }
 
     /**
@@ -414,27 +421,23 @@ public class UpdateBuilder_mxJPO
     }
 
     /**
-     * Returns for legacy cases the {@link #strg string builder}.
-     *
-     * @return string builder
-     * @deprecated must not be used directly, needed only for legacy code
-     */
-    @Deprecated()
-    public StringBuilder getStrg()
-    {
-        return this.strg;
-    }
-
-    /**
      * Returns current used prefix string.
      *
      * @return current used prefix string
-     * @deprecated must not be used directly, needed only for legacy code
      */
-    @Deprecated()
-    public String prefix()
+    private String prefix()
     {
       return String.format("%" + (this.prefixAmount * UpdateBuilder_mxJPO.PREFIX_CHARS) + "s", "");
+    }
+
+    /**
+     * Returns the {@link #paramCache parameter cache}.
+     *
+     * @return parameter cache
+     */
+    public ParameterCache_mxJPO getParamCache()
+    {
+        return this.paramCache;
     }
 
     /**

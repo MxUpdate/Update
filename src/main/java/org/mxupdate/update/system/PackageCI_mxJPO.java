@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.system;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
@@ -134,25 +133,15 @@ public class PackageCI_mxJPO
     }
 
     @Override()
-    protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Appendable _out)
-        throws IOException
+    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
-
-        this.writeHeader(_paramCache, updateBuilder.getStrg());
-
-        updateBuilder
-                .start("package")
+        _updateBuilder
                 .string("description", this.getDescription())
                 .flag("hidden", false, this.isHidden())
                 .flag("custom", false, this.custom)
                 .list("usespackage", this.usesPackages)
                 .list(this.members)
-                .properties(this.getProperties())
-                .end();
-
-        _out.append(updateBuilder.toString());
+                .properties(this.getProperties());
     }
 
     @Override()

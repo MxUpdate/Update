@@ -482,7 +482,6 @@ public class BusObject_mxJPO
                          final Appendable _out)
         throws IOException
     {
-        this.writeHeader(_paramCache, _out);
         _out.append("mql escape mod bus \"${OBJECTID}\"")
             .append(" \\\n    description \"")
             .append(StringUtil_mxJPO.convertTcl(this.busDescription))

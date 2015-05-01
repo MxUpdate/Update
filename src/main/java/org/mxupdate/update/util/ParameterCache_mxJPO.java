@@ -728,6 +728,8 @@ public class ParameterCache_mxJPO
         /** Installer from the command line used within create / update. */
         Installer,
 
+        /** Header used for file exports. */
+        ExportFileHeader,
         /** List of property names used as information in front of the list of properties. */
         ExportInfoPropsList,
         /** End text for the information properties. */

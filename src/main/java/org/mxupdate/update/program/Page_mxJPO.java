@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.program;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 
@@ -95,25 +94,15 @@ public class Page_mxJPO
 
 
     @Override()
-    protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Appendable _out)
-        throws IOException
+    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
-
-        this.writeHeader(_paramCache, updateBuilder.getStrg());
-
-        updateBuilder
-                .start("page")
+        _updateBuilder
                 //              tag             | default | value                              | write?
                 .string(        "description",             this.getDescription())
                 .flagIfTrue(    "hidden",           false, this.isHidden(),                     this.isHidden())
                 .string(        "mime",                    this.mimeType)
                 .properties(this.getProperties())
-                .stringIfTrue(  "content",                 "\n" + ((this.getCode() != null) ? this.getCode() : "") + "\n", (this.getCode() != null) && !this.getCode().isEmpty())
-                .end();
-
-        _out.append(updateBuilder.toString());
+                .stringIfTrue(  "content",                 "\n" + ((this.getCode() != null) ? this.getCode() : "") + "\n", (this.getCode() != null) && !this.getCode().isEmpty());
     }
 
     @Override()
