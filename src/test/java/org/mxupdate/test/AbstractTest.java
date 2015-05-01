@@ -409,7 +409,7 @@ public abstract class AbstractTest
      *
      * @throws Exception if disconnect failed
      */
-    @AfterClass()
+    @AfterClass(dependsOnGroups = "close")
     public void close()
         throws Exception
     {

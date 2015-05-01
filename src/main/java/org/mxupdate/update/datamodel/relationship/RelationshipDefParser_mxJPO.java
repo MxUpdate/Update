@@ -9,6 +9,7 @@ import java.util.HashSet;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.Relationship_mxJPO;
+import org.mxupdate.update.datamodel.Relationship_mxJPO.Kind;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -41,6 +42,7 @@ public class RelationshipDefParser_mxJPO
       case PREVENTDUPLICATES_FALSE:
       case ATTRIBUTE:
       case RULE:
+      case KIND:
       case TRIGGER:
       case START_FROM:
       case START_TO:
@@ -68,6 +70,26 @@ this.setValue(_relationship, "description",                    this.getSingle(tm
           }
         default:
           jj_la1[1] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+        break;
+        }
+      case KIND:{
+        jj_consume_token(KIND);
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case BASIC:{
+          jj_consume_token(BASIC);
+this.setValue(_relationship, "kind",                           Kind.Basic);
+          break;
+          }
+        case COMPOSITIONAL:{
+          jj_consume_token(COMPOSITIONAL);
+this.setValue(_relationship, "kind",                           Kind.Compositional);
+          break;
+          }
+        default:
+          jj_la1[2] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -107,7 +129,7 @@ this.setValue(_relationship, "rule",                           this.getSingle(tm
           break;
           }
         default:
-          jj_la1[2] = jj_gen;
+          jj_la1[3] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -135,7 +157,7 @@ this.setValue(trigger, "kind",                                 "override");
           break;
           }
         default:
-          jj_la1[3] = jj_gen;
+          jj_la1[4] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -151,7 +173,7 @@ this.setValue(trigger, "program",                              this.getSingle(tm
           break;
           }
         default:
-          jj_la1[4] = jj_gen;
+          jj_la1[5] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -170,14 +192,14 @@ this.setValue(trigger, "arguments",                            this.getSingle(tm
             break;
             }
           default:
-            jj_la1[5] = jj_gen;
+            jj_la1[6] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
           break;
           }
         default:
-          jj_la1[6] = jj_gen;
+          jj_la1[7] = jj_gen;
           ;
         }
         break;
@@ -196,7 +218,7 @@ fromTo = "to";
           break;
           }
         default:
-          jj_la1[7] = jj_gen;
+          jj_la1[8] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -224,7 +246,7 @@ fromTo = "to";
             break;
             }
           default:
-            jj_la1[8] = jj_gen;
+            jj_la1[9] = jj_gen;
             break label_2;
           }
           switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -262,7 +284,7 @@ this.setValue(_relationship, fromTo, "meaning",                this.getSingle(tm
               break;
               }
             default:
-              jj_la1[9] = jj_gen;
+              jj_la1[10] = jj_gen;
               jj_consume_token(-1);
               throw new ParseException();
             }
@@ -322,7 +344,7 @@ this.appendValue(_relationship, fromTo, "types",               this.getSingle(tm
               break;
               }
             default:
-              jj_la1[10] = jj_gen;
+              jj_la1[11] = jj_gen;
               jj_consume_token(-1);
               throw new ParseException();
             }
@@ -347,7 +369,7 @@ this.appendValue(_relationship, fromTo, "relations",           this.getSingle(tm
               break;
               }
             default:
-              jj_la1[11] = jj_gen;
+              jj_la1[12] = jj_gen;
               jj_consume_token(-1);
               throw new ParseException();
             }
@@ -359,7 +381,7 @@ this.setValue(_relationship, fromTo, "relationAll",            true);
             break;
             }
           default:
-            jj_la1[12] = jj_gen;
+            jj_la1[13] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
@@ -381,7 +403,7 @@ this.appendValue(_relationship, "attributeList", "attributes", this.getSingle(tm
           break;
           }
         default:
-          jj_la1[13] = jj_gen;
+          jj_la1[14] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -402,7 +424,7 @@ this.setValue(property, "name", this.getSingle(tmp.image));
           break;
           }
         default:
-          jj_la1[14] = jj_gen;
+          jj_la1[15] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -415,7 +437,7 @@ this.setValue(property, "name", this.getSingle(tmp.image));
             break;
             }
           default:
-            jj_la1[15] = jj_gen;
+            jj_la1[16] = jj_gen;
             break label_3;
           }
           switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -433,7 +455,7 @@ this.setValue(property, "value", this.getSingle(tmp.image));
               break;
               }
             default:
-              jj_la1[16] = jj_gen;
+              jj_la1[17] = jj_gen;
               jj_consume_token(-1);
               throw new ParseException();
             }
@@ -453,7 +475,7 @@ this.setValue(property, "refAdminType", this.getSingle(tmp.image));
               break;
               }
             default:
-              jj_la1[17] = jj_gen;
+              jj_la1[18] = jj_gen;
               jj_consume_token(-1);
               throw new ParseException();
             }
@@ -469,14 +491,14 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
               break;
               }
             default:
-              jj_la1[18] = jj_gen;
+              jj_la1[19] = jj_gen;
               jj_consume_token(-1);
               throw new ParseException();
             }
             break;
             }
           default:
-            jj_la1[19] = jj_gen;
+            jj_la1[20] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
@@ -484,7 +506,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
         break;
         }
       default:
-        jj_la1[20] = jj_gen;
+        jj_la1[21] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -500,7 +522,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[21];
+  final private int[] jj_la1 = new int[22];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static private int[] jj_la1_2;
@@ -510,13 +532,13 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
       jj_la1_init_2();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x100fe0,0x30000,0x30000,0x80000000,0x30000,0x30000,0x200000,0x0,0x0,0x0,0x0,0x0,0x0,0x30000,0x30000,0x0,0x30000,0x0,0x30000,0x0,0x100fe0,};
+      jj_la1_0 = new int[] {0x8100fe0,0x30000,0x6000000,0x30000,0x0,0x30000,0x30000,0x10000000,0x0,0x0,0x0,0x0,0x0,0x0,0x30000,0x30000,0x0,0x30000,0x0,0x30000,0x0,0x8100fe0,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0xc,0x0,0x0,0x3,0x0,0x0,0x0,0xc,0x1ffff00,0xc0000000,0xc0000000,0xc0000000,0x1ffff00,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xc,};
+      jj_la1_1 = new int[] {0x600,0x0,0x0,0x0,0x1c0,0x0,0x0,0x0,0x600,0xffff8000,0x0,0x0,0x0,0xffff8000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x600,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x4,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x18,0x0,0x600,0x0,0x18,0x4,};
+      jj_la1_2 = new int[] {0x200,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x60,0x60,0x60,0x0,0x0,0x0,0xc00,0x0,0x30000,0x0,0xc00,0x200,};
    }
 
   /** Constructor with InputStream. */
@@ -530,7 +552,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 21; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 22; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -544,7 +566,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 21; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 22; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -554,7 +576,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 21; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 22; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -572,7 +594,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 21; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 22; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -581,7 +603,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 21; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 22; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -590,7 +612,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 21; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 22; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -641,12 +663,12 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[77];
+    boolean[] la1tokens = new boolean[84];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 21; i++) {
+    for (int i = 0; i < 22; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -661,7 +683,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
         }
       }
     }
-    for (int i = 0; i < 77; i++) {
+    for (int i = 0; i < 84; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

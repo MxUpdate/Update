@@ -41,6 +41,7 @@ public class UpdateException_mxJPO
      *     <li>106: {@link org.mxupdate.update.datamodel.Dimension_mxJPO dimension}</li>
      *     <li>109: {@link org.mxupdate.update.datamodel.Interface_mxJPO interface}</li>
      *     <li>111: {@link org.mxupdate.update.datamodel.Policy_mxJPO policy}</li>
+     *     <li>114: {@link org.mxupdate.update.datamodel.Relationship_mxJPO relationship}</li>
      *     <li>120: {@link org.mxupdate.update.datamodel.AbstractAttribute_mxJPO numeric attributes}</li>
      *     <li>121: {@link org.mxupdate.update.datamodel.AbstractDMWithAttributes_mxJPO data model with attributes}</li>
      *     <li>601: {@link org.mxupdate.update.AbstractObject_mxJPO abstract object}</li>
@@ -252,6 +253,22 @@ public class UpdateException_mxJPO
                 "The existing delimiter ''{2}'' of {0} ''{1}'' can be not updated to new delimiter ''{3}'' (limitation of MX)."),
 
         /**
+         * Kind of a relationship can not be changed if the current kind is not
+         * basic.
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>administration type (should be relationship)</li>
+         * <li>name of the relationship</li>
+         * <li>current kind</li>
+         * <li>new kind (from the CI file)</li>
+         * </ol>
+         * </p>
+         */
+        DM_RELATIONSHIP_NOT_BASIC_KIND(11401,
+                "The new kind ''{3}' can not be set for {0} ''{1}'', because kind ''{2}'' is already set. Kinds of relationship can be only set for ''basic'' relationships."),
+
+        /**
          * <p>An interface is already derived from another interface, but
          * within the update this derived interface must be removed. This could
          * end in potentially losing data and so this action is not allowed.</p>
@@ -279,14 +296,9 @@ public class UpdateException_mxJPO
         UTIL_STRINGUTIL_CONVERT_FROM_FILENAME(90602,
                 "the file name is not correct defined and could not be converted back to a configuration item name");
 
-        /**
-         * Error code of this error enumeration.
-         */
+        /** Error code of this error enumeration. */
         private final int code;
-
-        /**
-         * Default English error message for this error enumeration.
-         */
+        /** Default English error message for this error enumeration. */
         private final String text;
 
         /**

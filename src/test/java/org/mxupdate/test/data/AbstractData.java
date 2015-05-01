@@ -48,8 +48,11 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     /** Name of the data piece. */
     private final String name;
 
+    /** Single values of this data piece. */
+    private final SingleValues singles = new SingleValues();
     /** Values of this data piece. */
-    private final Values values = new Values();
+    private final StringValues values = new StringValues();
+
 
     /** Flag to indicate that this data piece is created.*/
     private boolean created;
@@ -143,9 +146,34 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      *
      * @return defined values
      */
-    public Values getValues()
+    public StringValues getValues()
     {
         return this.values;
+    }
+
+    /**
+     * Defines a new value entry which is put into {@link #singles}.
+     *
+     * @param _key      key of the value (e.g. &quot;description&quot;)
+     * @param _value    value of the value
+     * @return this original data instance
+     */
+    @SuppressWarnings("unchecked")
+    public DATA setSingle(final String _key,
+                          final String _value)
+    {
+        this.singles.put(_key, _value);
+        return (DATA) this;
+    }
+
+    /**
+     * Returns all defined {@link #values}.
+     *
+     * @return defined values
+     */
+    public SingleValues getSingles()
+    {
+        return this.singles;
     }
 
     /**
@@ -594,11 +622,14 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
         return "[" + this.ci.updateType + " '" + this.name + "']";
     }
 
-    public class Values
-        extends HashMap<String,Object>
+    /**
+     * Single values w/o apostrophe.
+     */
+    public class SingleValues
+        extends HashMap<String,String>
     {
-        /** Serial Version UID. */
-        private static final long serialVersionUID = -2198651793145001986L;
+        /** Dummy serial Version UID. */
+        private static final long serialVersionUID = -1;
 
         /**
          * Appends the defined flags to the TCL code {@code _cmd} of the
@@ -611,13 +642,73 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
         public void appendUpdate(final String _prefix,
                                  final StringBuilder _cmd)
         {
-            for (final Map.Entry<String,Object> entry : this.entrySet())  {
+            for (final Entry<String,String> entry : this.entrySet())  {
+                _cmd.append(_prefix).append(entry.getKey()).append(" ")
+                    .append(AbstractTest.convertUpdate(entry.getValue().toString()))
+                    .append('\n');
+            }
+        }
+
+        /**
+         * Checks for all defined values.
+         *
+         * @param _exportParser     parsed export
+         * @param _path             sub path
+         */
+        public void checkExport(final ExportParser _exportParser,
+                                final String _path)
+        {
+            for (final Entry<String,String> single : this.entrySet())  {
+                _exportParser.checkValue((_path.isEmpty() ? "" : _path + "/") + single.getKey(), single.getValue());
+            }
+        }
+    }
+
+    /**
+     * String values.
+     */
+    public class StringValues
+        extends HashMap<String,Object>
+    {
+        /** Dummy serial Version UID. */
+        private static final long serialVersionUID = 1;
+
+        /**
+         * Appends the defined flags to the TCL code {@code _cmd} of the
+         * configuration item file.
+         *
+         * @param _prefix   prefix in front of the values
+         * @param _cmd      string builder with the TCL commands of the
+         *                  configuration item file
+         */
+        public void appendUpdate(final String _prefix,
+                                 final StringBuilder _cmd)
+        {
+            for (final Entry<String,Object> entry : this.entrySet())  {
                 if ((entry.getValue() instanceof Character) || (entry.getValue() instanceof Integer))  {
                     _cmd.append(_prefix).append(entry.getKey()).append(' ').append(entry.getValue()).append('\n');
                 } else  {
                     _cmd.append(_prefix).append(entry.getKey()).append(" ")
                         .append("\"").append(AbstractTest.convertUpdate(entry.getValue().toString())).append('\"')
                         .append('\n');
+                }
+            }
+        }
+
+        /**
+         * Checks for all defined values.
+         *
+         * @param _exportParser     parsed export
+         * @param _path             sub path
+         */
+        public void checkExport(final ExportParser _exportParser,
+                                final String _path)
+        {
+            for (final Entry<String,Object> entry : this.entrySet())  {
+                if ((entry.getValue() instanceof Character) || (entry.getValue() instanceof Integer))  {
+                    _exportParser.checkValue((_path.isEmpty() ? "" : _path + "/") + entry.getKey(), entry.getValue().toString());
+                } else  {
+                    _exportParser.checkValue((_path.isEmpty() ? "" : _path + "/") + entry.getKey(), "\"" + AbstractTest.convertUpdate(entry.getValue().toString()) + "\"");
                 }
             }
         }

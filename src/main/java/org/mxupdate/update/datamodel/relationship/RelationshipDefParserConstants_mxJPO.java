@@ -33,94 +33,102 @@ public interface RelationshipDefParserConstants_mxJPO {
   /** RegularExpression Id. */
   int CHAR = 19;
   /** RegularExpression Id. */
-  int TRIGGER = 20;
+  int KIND = 20;
   /** RegularExpression Id. */
-  int INPUT = 21;
+  int BASIC = 25;
   /** RegularExpression Id. */
-  int TRIGEVENT = 26;
+  int COMPOSITIONAL = 26;
   /** RegularExpression Id. */
-  int ACTION = 31;
+  int TRIGGER = 27;
   /** RegularExpression Id. */
-  int CHECK = 32;
+  int INPUT = 28;
   /** RegularExpression Id. */
-  int OVERRIDE = 33;
+  int TRIGEVENT = 33;
   /** RegularExpression Id. */
-  int START_FROM = 34;
+  int ACTION = 38;
   /** RegularExpression Id. */
-  int START_TO = 35;
+  int CHECK = 39;
   /** RegularExpression Id. */
-  int FROMTO_PROPAGATEMODIFY_TRUE = 40;
+  int OVERRIDE = 40;
   /** RegularExpression Id. */
-  int FROMTO_PROPAGATEMODIFY_FALSE = 41;
+  int START_FROM = 41;
   /** RegularExpression Id. */
-  int FROMTO_PROPAGATECONNECTION_TRUE = 42;
+  int START_TO = 42;
   /** RegularExpression Id. */
-  int FROMTO_PROPAGATECONNECTION_FALSE = 43;
+  int FROMTO_PROPAGATEMODIFY_TRUE = 47;
   /** RegularExpression Id. */
-  int FROMTO_MEANING = 44;
+  int FROMTO_PROPAGATEMODIFY_FALSE = 48;
   /** RegularExpression Id. */
-  int FROMTO_REVISION_NONE = 45;
+  int FROMTO_PROPAGATECONNECTION_TRUE = 49;
   /** RegularExpression Id. */
-  int FROMTO_REVISION_FLOAT = 46;
+  int FROMTO_PROPAGATECONNECTION_FALSE = 50;
   /** RegularExpression Id. */
-  int FROMTO_REVISION_REPLICATE = 47;
+  int FROMTO_MEANING = 51;
   /** RegularExpression Id. */
-  int FROMTO_CLONE_NONE = 48;
+  int FROMTO_REVISION_NONE = 52;
   /** RegularExpression Id. */
-  int FROMTO_CLONE_FLOAT = 49;
+  int FROMTO_REVISION_FLOAT = 53;
   /** RegularExpression Id. */
-  int FROMTO_CLONE_REPLICATE = 50;
+  int FROMTO_REVISION_REPLICATE = 54;
   /** RegularExpression Id. */
-  int FROMTO_CARDINALITY_ONE = 51;
+  int FROMTO_CLONE_NONE = 55;
   /** RegularExpression Id. */
-  int FROMTO_CARDINALITY_MANY = 52;
+  int FROMTO_CLONE_FLOAT = 56;
   /** RegularExpression Id. */
-  int FROMTO_TYPE_ALL = 53;
+  int FROMTO_CLONE_REPLICATE = 57;
   /** RegularExpression Id. */
-  int FROMTO_TYPE = 54;
+  int FROMTO_CARDINALITY_ONE = 58;
   /** RegularExpression Id. */
-  int FROMTO_RELATIONSHIP_ALL = 55;
+  int FROMTO_CARDINALITY_MANY = 59;
   /** RegularExpression Id. */
-  int FROMTO_RELATIONSHIP = 56;
+  int FROMTO_TYPE_ALL = 60;
   /** RegularExpression Id. */
-  int FROMTO_END = 57;
+  int FROMTO_TYPE = 61;
   /** RegularExpression Id. */
-  int FROMTO_STRING = 62;
+  int FROMTO_RELATIONSHIP_ALL = 62;
   /** RegularExpression Id. */
-  int FROMTO_SINGLE = 63;
+  int FROMTO_RELATIONSHIP = 63;
   /** RegularExpression Id. */
-  int FROMTO_APOSTROPHE = 64;
+  int FROMTO_END = 64;
   /** RegularExpression Id. */
-  int FROMTO_CHAR = 65;
+  int FROMTO_STRING = 69;
   /** RegularExpression Id. */
-  int PROPERTY = 66;
+  int FROMTO_SINGLE = 70;
   /** RegularExpression Id. */
-  int PROPERTYTO = 67;
+  int FROMTO_APOSTROPHE = 71;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 68;
+  int FROMTO_CHAR = 72;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 73;
+  int PROPERTY = 73;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 74;
+  int PROPERTYTO = 74;
   /** RegularExpression Id. */
-  int ADMINTYPE_APOSTROPHE = 75;
+  int PROPERTYVAL = 75;
   /** RegularExpression Id. */
-  int ADMINTYPE_CHAR = 76;
+  int ADMINTYPE_STRING = 80;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 81;
+  /** RegularExpression Id. */
+  int ADMINTYPE_APOSTROPHE = 82;
+  /** RegularExpression Id. */
+  int ADMINTYPE_CHAR = 83;
 
   /** Lexical state. */
   int DEFAULT = 0;
   /** Lexical state. */
   int STRING_EXPECTED = 1;
   /** Lexical state. */
-  int TRIGEVENT_EXPECTED = 2;
+  int KIND_EXPECTED = 2;
   /** Lexical state. */
-  int TRIGKIND_EXPECTED = 3;
+  int TRIGEVENT_EXPECTED = 3;
   /** Lexical state. */
-  int FROMTO_EXPECTED = 4;
+  int TRIGKIND_EXPECTED = 4;
   /** Lexical state. */
-  int FROMTO_STRING_EXPECTED = 5;
+  int FROMTO_EXPECTED = 5;
   /** Lexical state. */
-  int ADMINREF_EXPECTED = 6;
+  int FROMTO_STRING_EXPECTED = 6;
+  /** Lexical state. */
+  int ADMINREF_EXPECTED = 7;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -144,6 +152,13 @@ public interface RelationshipDefParserConstants_mxJPO {
     "<SINGLE>",
     "\"\\\"\"",
     "<CHAR>",
+    "\"kind\"",
+    "\" \"",
+    "\"\\t\"",
+    "\"\\n\"",
+    "\"\\r\"",
+    "\"basic\"",
+    "\"compositional\"",
     "\"trigger\"",
     "\"input\"",
     "\" \"",

@@ -86,6 +86,9 @@ public class Relationship_mxJPO
         Relationship_mxJPO.IGNORED_URLS.add("/toSide/typeRefList/typeRef");                         // to be ignored, because read within prepare method
     }
 
+    /** Kind of relationship. */
+    private Kind kind = Kind.Basic;
+
     /** Set holding rule referencing this relationship. */
     private String rule;
     /** Prevent duplicates for this relationship. */
@@ -191,6 +194,16 @@ public class Relationship_mxJPO
         } else if ("/preventDuplicates".equals(_url))  {
             this.preventDuplicates = true;
             parsed = true;
+        } else if ("/relationshipKind".equals(_url))  {
+            if ("0".equals(_content))  {
+                this.kind = Kind.Basic;
+                parsed = true;
+            } else if ("1".equals(_content))  {
+                this.kind = Kind.Compositional;
+                parsed = true;
+            } else  {
+                parsed = false;
+            }
 
         } else if ("/toSide/cardinality".equals(_url))  {
             this.to.cardinality = _content.equalsIgnoreCase("1") ? "one" : _content.equalsIgnoreCase("N") ? "many" : _content;
@@ -240,7 +253,13 @@ public class Relationship_mxJPO
         this.writeHeader(_paramCache, updateBuilder.getStrg());
 
         updateBuilder.start("relationship")
-                .string("description", this.getDescription())
+                .string("description", this.getDescription());
+
+        if (this.kind != Kind.Basic)  {
+            updateBuilder.single("kind", this.kind.name().toLowerCase());
+        }
+
+        updateBuilder
                 .flag("hidden", false, this.isHidden())
                 .flag("preventduplicates", false, this.preventDuplicates)
                 .stringIfNotNull("rule", this.rule);
@@ -333,6 +352,30 @@ public class Relationship_mxJPO
         this.to             .calcDelta(_paramCache, _mql, _current.to);
         this.attributeList  .calcDelta(_paramCache, _mql, _current.attributeList);
         this.getProperties().calcDelta(_mql, "", _current.getProperties());
+
+        // kind at least to ensure all properties are set
+        if (this.kind != _current.kind)  {
+            if (_current.kind != Kind.Basic)  {
+                throw new UpdateException_mxJPO(
+                        UpdateException_mxJPO.Error.DM_RELATIONSHIP_NOT_BASIC_KIND,
+                        this.getTypeDef().getLogging(),
+                        this.getName(),
+                        _current.kind,
+                        this.kind);
+            }
+            _mql.newLine().cmd(this.kind.name().toLowerCase());
+        }
+    }
+
+    /**
+     * Kind of relationship.
+     */
+    public enum Kind
+    {
+        /** Standard relationship. */
+        Basic,
+        /** Compositional relationship. */
+        Compositional;
     }
 
     /**

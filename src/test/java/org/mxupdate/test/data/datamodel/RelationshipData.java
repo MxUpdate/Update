@@ -130,6 +130,7 @@ public class RelationshipData
 
         this.getFlags()     .appendUpdate("    ", strg);
         this.getValues()    .appendUpdate("    ", strg);
+        this.getSingles()   .appendUpdate("    ", strg);
         this.rules          .appendUpdate("    ", strg);
         this.from           .appendUpdate(strg);
         this.to             .appendUpdate(strg);
@@ -219,9 +220,11 @@ public class RelationshipData
                 this.getSymbolicName(),
                 "check symbolic name");
 
-        this.getFlags().checkExport(_exportParser, "");
-        this.from.checkExport(_exportParser);
-        this.to.checkExport(_exportParser);
+        this.getFlags()  .checkExport(_exportParser, "");
+        this.getValues() .checkExport(_exportParser, "");
+        this.getSingles().checkExport(_exportParser, "");
+        this.from        .checkExport(_exportParser);
+        this.to          .checkExport(_exportParser);
 
         _exportParser
                 .checkList("attribute", this.attributes.toUpdateStringList())

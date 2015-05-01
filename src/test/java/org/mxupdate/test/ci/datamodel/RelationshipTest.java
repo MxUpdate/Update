@@ -27,7 +27,7 @@ import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.program.MQLProgramData;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.UpdateException_mxJPO;
-import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -37,7 +37,6 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
 public class RelationshipTest
     extends AbstractDataExportUpdate<RelationshipData>
 {
@@ -414,11 +413,11 @@ public class RelationshipTest
         throws Exception
     {
         this.createNewData("Test")
-            .addAttribute(new AttributeStringData(this, "Test Attribute"))
-            .create()
-            .checkExport()
-            .update("")
-            .checkExport();
+                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .create()
+                .checkExport()
+                .update("")
+                .checkExport();
     }
 
     /**
@@ -431,12 +430,12 @@ public class RelationshipTest
         throws Exception
     {
         this.createNewData("Test")
-            .addAttribute(new AttributeStringData(this, "Test Attribute 1"))
-            .create()
-            .addAttribute(new AttributeStringData(this, "Test Attribute 2"))
-            .createDependings()
-            .update("")
-            .checkExport();
+                .addAttribute(new AttributeStringData(this, "Test Attribute 1"))
+                .create()
+                .addAttribute(new AttributeStringData(this, "Test Attribute 2"))
+                .createDependings()
+                .update("")
+                .checkExport();
     }
 
     /**
@@ -449,10 +448,10 @@ public class RelationshipTest
         throws Exception
     {
         this.createNewData("Test")
-            .addAttribute(new AttributeStringData(this, "Test Attribute"))
-            .create();
+                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .create();
         this.createNewData("Test")
-            .failureUpdate(UpdateException_mxJPO.Error.DM_ABSTRACTWITHATTRIBUTES_UPDATE_ATTRIBUTE_REMOVED);
+                .failureUpdate(UpdateException_mxJPO.Error.DM_ABSTRACTWITHATTRIBUTES_UPDATE_ATTRIBUTE_REMOVED);
     }
 
     /**
@@ -465,13 +464,13 @@ public class RelationshipTest
         throws Exception
     {
         this.createNewData("Test")
-            .addAttribute(new AttributeStringData(this, "Test Attribute"))
-            .create();
+                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .create();
         this.createNewData("Test")
-            .update("", ValueKeys.DMRelationAttrIgnore.name(), "*");
+                .update("", ValueKeys.DMRelationAttrIgnore.name(), "*");
         this.createNewData("Test")
-            .addAttribute(new AttributeStringData(this, "Test Attribute"))
-            .checkExport();
+                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .checkExport();
     }
 
     /**
@@ -484,11 +483,59 @@ public class RelationshipTest
         throws Exception
     {
         this.createNewData("Test")
-            .addAttribute(new AttributeStringData(this, "Test Attribute"))
-            .create();
+                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .create();
         this.createNewData("Test")
-            .update("", ValueKeys.DMRelationAttrRemove.name(), "*")
-            .checkExport();
+                .update("", ValueKeys.DMRelationAttrRemove.name(), "*")
+                .checkExport();
+    }
+
+    /**
+     * Positive test for kind compositional.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "positive test for kind compositional")
+    public void positiveTestKindCompositional()
+        throws Exception
+    {
+        this.createNewData("Test")
+                .setFlag("preventduplicates", true)
+                .from().setCardinality(Cardinality.ONE)
+                .from().setFlag("propagateconnection", false)
+                .to().setClone(Behavior.REPLICATE)
+                .to().setRevision(Behavior.REPLICATE)
+                .to().setFlag("propagateconnection", false)
+                .create()
+                .setSingle("kind", "compositional")
+                .update("")
+                .checkExport();
+    }
+
+    /**
+     * Negative test if the kind is changed back to basic.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "negative test if the kind is changed back to basic")
+    public void negativeTestChangeKindBackToBasic()
+        throws Exception
+    {
+        this.createNewData("Test")
+                .setFlag("preventduplicates", true)
+                .from().setCardinality(Cardinality.ONE)
+                .from().setFlag("propagateconnection", false)
+                .to().setClone(Behavior.REPLICATE)
+                .to().setRevision(Behavior.REPLICATE)
+                .to().setFlag("propagateconnection", false)
+                .create()
+                .setSingle("kind", "compositional")
+                .update("")
+                .checkExport()
+                .setSingle("kind", "basic")
+                .failureUpdate(UpdateException_mxJPO.Error.DM_RELATIONSHIP_NOT_BASIC_KIND)
+                .setSingle("kind", "compositional")
+                .checkExport();
     }
 
     /**
@@ -497,7 +544,7 @@ public class RelationshipTest
      * @throws Exception if MQL execution failed
      */
     @BeforeMethod()
-    @AfterMethod()
+    @AfterClass(groups = "close")
     public void cleanup()
         throws Exception
     {
