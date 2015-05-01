@@ -68,17 +68,16 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
  * </ul>
  *
  * @author The MxUpdate Team
- * @param <CLASS> class defined from this class
  */
-public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mxJPO<CLASS>>
-    extends AbstractAdminObject_mxJPO<CLASS>
+public class AttributeCI_mxJPO
+    extends AbstractAdminObject_mxJPO<AttributeCI_mxJPO>
 {
     /** Set of all ignored URLs from the XML definition for attributes. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
-        AbstractAttribute_mxJPO.IGNORED_URLS.add("/rangeList");
-        AbstractAttribute_mxJPO.IGNORED_URLS.add("/rangeProgram");
-        AbstractAttribute_mxJPO.IGNORED_URLS.add("/triggerList");
+        AttributeCI_mxJPO.IGNORED_URLS.add("/rangeList");
+        AttributeCI_mxJPO.IGNORED_URLS.add("/rangeProgram");
+        AttributeCI_mxJPO.IGNORED_URLS.add("/triggerList");
     }
 
     /**
@@ -87,18 +86,18 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
      */
     private static final Map<String,String> RANGE_COMP = new HashMap<String,String>();
     static  {
-        AbstractAttribute_mxJPO.RANGE_COMP.put("equal",             "=");
-        AbstractAttribute_mxJPO.RANGE_COMP.put("greaterthan",       ">");
-        AbstractAttribute_mxJPO.RANGE_COMP.put("greaterthanequal",  ">=");
-        AbstractAttribute_mxJPO.RANGE_COMP.put("lessthan",          "<");
-        AbstractAttribute_mxJPO.RANGE_COMP.put("lessthanequal",     "<=");
-        AbstractAttribute_mxJPO.RANGE_COMP.put("notequal",          "!=");
-        AbstractAttribute_mxJPO.RANGE_COMP.put("match",             "match");
-        AbstractAttribute_mxJPO.RANGE_COMP.put("notmatch",          "!match");
-        AbstractAttribute_mxJPO.RANGE_COMP.put("smatch",            "smatch");
-        AbstractAttribute_mxJPO.RANGE_COMP.put("notsmatch",         "!smatch");
-        AbstractAttribute_mxJPO.RANGE_COMP.put("programRange",      "program");
-        AbstractAttribute_mxJPO.RANGE_COMP.put("between",           "between");
+        AttributeCI_mxJPO.RANGE_COMP.put("equal",             "=");
+        AttributeCI_mxJPO.RANGE_COMP.put("greaterthan",       ">");
+        AttributeCI_mxJPO.RANGE_COMP.put("greaterthanequal",  ">=");
+        AttributeCI_mxJPO.RANGE_COMP.put("lessthan",          "<");
+        AttributeCI_mxJPO.RANGE_COMP.put("lessthanequal",     "<=");
+        AttributeCI_mxJPO.RANGE_COMP.put("notequal",          "!=");
+        AttributeCI_mxJPO.RANGE_COMP.put("match",             "match");
+        AttributeCI_mxJPO.RANGE_COMP.put("notmatch",          "!match");
+        AttributeCI_mxJPO.RANGE_COMP.put("smatch",            "smatch");
+        AttributeCI_mxJPO.RANGE_COMP.put("notsmatch",         "!smatch");
+        AttributeCI_mxJPO.RANGE_COMP.put("programRange",      "program");
+        AttributeCI_mxJPO.RANGE_COMP.put("between",           "between");
     }
 
     /** Kind of the attribute. */
@@ -151,14 +150,18 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
      *
      * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the attribute object
-     * @param _kind     attribute kind
      */
-    public AbstractAttribute_mxJPO(final TypeDef_mxJPO _typeDef,
-                                   final String _mxName,
-                                   final Kind _kind)
+    public AttributeCI_mxJPO(final TypeDef_mxJPO _typeDef,
+                             final String _mxName)
     {
         super(_typeDef, _mxName);
-        this.kind = _kind;
+
+        for (final Kind checkKind : Kind.values())  {
+            if (checkKind.name().toLowerCase().equals(_typeDef.getMxUpdateKind()))  {
+                this.kind = checkKind;
+                break;
+            }
+        }
     }
 
     @Override()
@@ -175,7 +178,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
                                             final String _content)
     {
         final boolean parsed;
-        if (AbstractAttribute_mxJPO.IGNORED_URLS.contains(_url))  {
+        if (AttributeCI_mxJPO.IGNORED_URLS.contains(_url))  {
             parsed = true;
         } else if ("/accessRuleRef".equals(_url))  {
             this.rules.add(_content);
@@ -228,7 +231,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
             this.rangesStack.add(new Range());
             parsed = true;
         } else if ("/rangeList/range/rangeType".equals(_url))  {
-            this.rangesStack.peek().type = AbstractAttribute_mxJPO.RANGE_COMP.get(_content);
+            this.rangesStack.peek().type = AttributeCI_mxJPO.RANGE_COMP.get(_content);
             if (this.rangesStack.peek().type == null)  {
                 throw new Error("unknown range comparator " + _content);
             }
@@ -342,10 +345,10 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     @Override()
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,
-                             final CLASS _current)
+                             final AttributeCI_mxJPO _current)
         throws UpdateException_mxJPO
     {
-        final AbstractAttribute_mxJPO<CLASS> current = _current;
+        final AttributeCI_mxJPO current = _current;
 
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), current.getSymbolicNames());
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",         this.getDescription(), current.getDescription());

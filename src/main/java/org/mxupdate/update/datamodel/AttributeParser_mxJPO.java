@@ -8,8 +8,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
-import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO.Kind;
-import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO.Range;
+import org.mxupdate.update.datamodel.AttributeCI_mxJPO.Kind;
+import org.mxupdate.update.datamodel.AttributeCI_mxJPO.Range;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
@@ -18,7 +18,7 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 
 /**
- * Parses the update format for {@link AbstractAttribute_mxJPO}.
+ * Parses the update format for {@link AttributeCI_mxJPO}.
  */
 @SuppressWarnings("unused")
 class AttributeParser_mxJPO
@@ -31,7 +31,7 @@ class AttributeParser_mxJPO
  *
  * @param _attribute    target attribute to update with parsed values
  */
-  final public void parse(final AbstractAttribute_mxJPO<?> _attr) throws ParseException, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {Token tmp;
+  final public void parse(final AttributeCI_mxJPO _attr) throws ParseException, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {Token tmp;
     Trigger trigger;
     Range range;
     AdminProperty property;

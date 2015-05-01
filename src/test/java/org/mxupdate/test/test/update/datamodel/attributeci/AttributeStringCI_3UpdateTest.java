@@ -19,12 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mxupdate.test.data.datamodel.AttributeStringData;
-import org.mxupdate.update.datamodel.AttributeString_mxJPO;
+import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link AttributeString_mxJPO string attribute CI} export / update.
+ * Tests the {@link AttributeCI_mxJPO string attribute CI} export / update.
  *
  * @author The MxUpdate Team
  */

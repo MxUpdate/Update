@@ -44,7 +44,7 @@ public class UpdateException_mxJPO
      *     <li>114: {@link org.mxupdate.update.datamodel.Relationship_mxJPO relationship}</li>
      *     <li>116: {@link org.mxupdate.update.datamodel.Rule_mxJPO rule}</li>
      *     <li>118: {@link org.mxupdate.update.datamodel.Type_mxJPO type}</li>
-     *     <li>120: {@link org.mxupdate.update.datamodel.AbstractAttribute_mxJPO numeric attributes}</li>
+     *     <li>120: {@link org.mxupdate.update.datamodel.AttributeCI_mxJPO numeric attributes}</li>
      *     <li>121: {@link org.mxupdate.update.datamodel.AbstractDMWithAttributes_mxJPO data model with attributes}</li>
      *     <li>303: {@link org.mxupdate.update.user.Group_mxJPO group}</li>
      *     <li>306: {@link org.mxupdate.update.user.Person_mxJPO person}</li>

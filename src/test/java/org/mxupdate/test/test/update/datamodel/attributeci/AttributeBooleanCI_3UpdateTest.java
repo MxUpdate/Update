@@ -16,12 +16,12 @@
 package org.mxupdate.test.test.update.datamodel.attributeci;
 
 import org.mxupdate.test.data.datamodel.AttributeBooleanData;
-import org.mxupdate.update.datamodel.AttributeBoolean_mxJPO;
+import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link AttributeBoolean_mxJPO boolean attribute CI}
+ * Tests the {@link AttributeCI_mxJPO boolean attribute CI}
  * export / update.
  *
  * @author The MxUpdate Team

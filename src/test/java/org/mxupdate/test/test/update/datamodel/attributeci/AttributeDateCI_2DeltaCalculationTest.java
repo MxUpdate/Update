@@ -20,7 +20,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.AttributeDateData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
-import org.mxupdate.update.datamodel.AttributeDate_mxJPO;
+import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -28,14 +28,14 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link AttributeDate_mxJPO date attribute CI} delta
+ * Tests the {@link AttributeCI_mxJPO date attribute CI} delta
  * calculation.
  *
  * @author The MxUpdate Team
  */
 @Test()
 public class AttributeDateCI_2DeltaCalculationTest
-    extends AbstractDeltaCalculationTest<AttributeDate_mxJPO,AttributeDateData>
+    extends AbstractDeltaCalculationTest<AttributeCI_mxJPO,AttributeDateData>
 {
     @Override()
     @DataProvider(name = "data")
@@ -61,9 +61,9 @@ public class AttributeDateCI_2DeltaCalculationTest
     }
 
     @Override()
-    protected AttributeDate_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
-                                                final String _name)
+    protected AttributeCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
+                                              final String _name)
     {
-        return new AttributeDate_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_ATTRIBUTE_DATE.updateType), _name);
+        return new AttributeCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_ATTRIBUTE_DATE.updateType), _name);
     }
 }

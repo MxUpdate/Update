@@ -20,7 +20,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.AttributeRealData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
-import org.mxupdate.update.datamodel.AttributeReal_mxJPO;
+import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -28,14 +28,14 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link AttributeReal_mxJPO real attribute CI} delta
+ * Tests the {@link AttributeCI_mxJPO real attribute CI} delta
  * calculation.
  *
  * @author The MxUpdate Team
  */
 @Test()
 public class AttributeRealCI_2DeltaCalculationTest
-    extends AbstractDeltaCalculationTest<AttributeReal_mxJPO,AttributeRealData>
+    extends AbstractDeltaCalculationTest<AttributeCI_mxJPO,AttributeRealData>
 {
     @Override()
     @DataProvider(name = "data")
@@ -61,9 +61,9 @@ public class AttributeRealCI_2DeltaCalculationTest
     }
 
     @Override()
-    protected AttributeReal_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
-                                                   final String _name)
+    protected AttributeCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
+                                              final String _name)
     {
-        return new AttributeReal_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_ATTRIBUTE_REAL.updateType), _name);
+        return new AttributeCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_ATTRIBUTE_REAL.updateType), _name);
     }
 }

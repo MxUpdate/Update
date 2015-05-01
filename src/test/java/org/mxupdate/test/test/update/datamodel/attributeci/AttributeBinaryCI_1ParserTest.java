@@ -15,24 +15,20 @@
 
 package org.mxupdate.test.test.update.datamodel.attributeci;
 
-import java.io.IOException;
-
 import org.mxupdate.test.test.update.AbstractParserTest;
-import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO;
-import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO.Kind;
-import org.mxupdate.update.datamodel.AttributeBinary_mxJPO;
+import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the @link AttributeBinary_mxJPO binary attribute CI} parser.
+ * Tests the {@link AttributeCI_mxJPO binary attribute CI} parser.
  *
  * @author The MxUpdate Team
  */
 @Test()
 public class AttributeBinaryCI_1ParserTest
-    extends AbstractParserTest<AbstractAttribute_mxJPO<?>>
+    extends AbstractParserTest<AttributeCI_mxJPO>
 {
     @Override()
     @DataProvider(name = "data")
@@ -118,18 +114,9 @@ public class AttributeBinaryCI_1ParserTest
     }
 
     @Override()
-    protected AbstractAttribute_mxJPO<?> createNewData(final ParameterCache_mxJPO _paramCache,
-                                                  final String _name)
+    protected AttributeCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
+                                              final String _name)
     {
-        return new AbstractAttribute_mxJPO<AttributeBinary_mxJPO>(_paramCache.getMapping().getTypeDef("AttributeBinary"), _name, Kind.Binary)
-        {
-            @Override()
-            public void write(final ParameterCache_mxJPO _paramCache,
-                              final Appendable _out)
-                throws IOException
-            {
-                super.write(_paramCache, _out);
-            }
-        };
+        return new AttributeCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_ATTRIBUTE_BINARY.updateType), _name);
     }
 }

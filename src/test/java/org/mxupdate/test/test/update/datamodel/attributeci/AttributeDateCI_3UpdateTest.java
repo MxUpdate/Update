@@ -21,13 +21,13 @@ import java.util.List;
 import org.mxupdate.test.data.datamodel.AttributeDateData;
 import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.test.util.Version;
-import org.mxupdate.update.datamodel.AttributeDate_mxJPO;
+import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link AttributeDate_mxJPO date attribute CI} export / update.
+ * Tests the {@link AttributeCI_mxJPO date attribute CI} export / update.
  *
  * @author The MxUpdate Team
  */

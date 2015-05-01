@@ -23,13 +23,13 @@ import org.mxupdate.test.data.datamodel.DimensionData;
 import org.mxupdate.test.data.datamodel.DimensionData.UnitData;
 import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.test.util.Version;
-import org.mxupdate.update.datamodel.AttributeReal_mxJPO;
+import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link AttributeReal_mxJPO real attribute CI} export / update.
+ * Tests the {@link AttributeCI_mxJPO real attribute CI} export / update.
  *
  * @author The MxUpdate Team
  */

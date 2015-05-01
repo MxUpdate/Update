@@ -20,7 +20,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.AttributeBooleanData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
-import org.mxupdate.update.datamodel.AttributeBoolean_mxJPO;
+import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -28,14 +28,14 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link AttributeBoolean_mxJPO boolean attribute CI} delta
+ * Tests the {@link AttributeCI_mxJPO boolean attribute CI} delta
  * calculation.
  *
  * @author The MxUpdate Team
  */
 @Test()
 public class AttributeBooleanCI_2DeltaCalculationTest
-    extends AbstractDeltaCalculationTest<AttributeBoolean_mxJPO,AttributeBooleanData>
+    extends AbstractDeltaCalculationTest<AttributeCI_mxJPO,AttributeBooleanData>
 {
     @Override()
     @DataProvider(name = "data")
@@ -61,9 +61,9 @@ public class AttributeBooleanCI_2DeltaCalculationTest
     }
 
     @Override()
-    protected AttributeBoolean_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
-                                                  final String _name)
+    protected AttributeCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
+                                              final String _name)
     {
-        return new AttributeBoolean_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_ATTRIBUTE_BOOLEAN.updateType), _name);
+        return new AttributeCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_ATTRIBUTE_BOOLEAN.updateType), _name);
     }
 }
