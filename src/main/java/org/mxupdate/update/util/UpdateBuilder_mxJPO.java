@@ -63,7 +63,7 @@ public class UpdateBuilder_mxJPO
     {
         this.strg.append("mxUpdate ").append(_typeDef.getMxUpdateType()).append(" \"${NAME}\" ");
         if (_typeDef.getMxBusType() != null)  {
-            this.strg.append("\"${REVISION}\"  ");
+            this.strg.append("\"${REVISION}\" ");
         }
         this.strg.append("{\n");
         return this;

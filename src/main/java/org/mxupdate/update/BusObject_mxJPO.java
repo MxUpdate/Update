@@ -643,6 +643,7 @@ public class BusObject_mxJPO
             }
         }
 
+        // promote / demote
         if (CompareToUtil_mxJPO.compareWithNullAsEmpty(0, this.busCurrent,_current.busCurrent) != 0)  {
             _mql.pushPrefix("");
             final int idxTar = _current.busStates.indexOf(this.busCurrent);
@@ -656,6 +657,44 @@ public class BusObject_mxJPO
                 idxCur--;
             }
             _mql.popPrefix();
+        }
+
+        // remove obsolete connections
+        for (final Connection curCon : _current.connections)  {
+            boolean found = false;
+            for (final Connection newCon : this.connections)  {
+                if (curCon.compareTo(newCon) == 0)  {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)  {
+                _mql.pushPrefix("")
+                    .newLine()
+                    .cmd("escape delete connection ").arg(curCon.conId)
+                    .popPrefix();
+            }
+        }
+        // assign new connections
+        for (final Connection newCon : this.connections)  {
+            boolean found = false;
+                for (final Connection curCon : _current.connections)  {
+                if (curCon.compareTo(newCon) == 0)  {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)  {
+                _mql.pushPrefix("")
+                    .newLine()
+                    .cmd("escape connect bus ").arg(this.busType).cmd(" ").arg(this.busName).cmd(" ").arg(this.busRevision)
+                            .cmd(" relationship ").arg(newCon.relName).cmd(" ").cmd(newCon.direction)
+                            .cmd(" ").arg(newCon.type).cmd(" ").arg(newCon.name).cmd(" ").arg(newCon.revision);
+                for (final Entry<String,String> attrVal : newCon.attrValues.entrySet())  {
+                        _mql.cmd(" ").arg(attrVal.getKey()).cmd(" ").arg(attrVal.getValue());
+                }
+                _mql.popPrefix();
+            }
         }
     }
 
@@ -809,17 +848,17 @@ public class BusObject_mxJPO
         public void write(final UpdateBuilder_mxJPO _updateBuilder)
         {
             _updateBuilder
-                    .stepStartNewLine().stepSingle("connection").stepString(this.relName).stepSingle(this.direction).stepEndLineWithStartChild()
-                    .string("type", this.type)
-                    .string("name", this.name)
-                    .string("revision", this.revision);
-
-            for (final Entry<String,String> entry : this.attrValues.entrySet())  {
-                _updateBuilder.stepStartNewLine().stepSingle("attribute").stepString(entry.getKey()).stepString(entry.getValue()).stepEndLine();
+                    .stepStartNewLine().stepSingle("connection").stepString(this.relName).stepSingle(this.direction)
+                    .stepString(this.type).stepString(this.name).stepString(this.revision);
+            if (this.attrValues.isEmpty())  {
+                _updateBuilder.stepEndLine();
+            } else  {
+                _updateBuilder.stepEndLineWithStartChild();
+                for (final Entry<String,String> entry : this.attrValues.entrySet())  {
+                    _updateBuilder.stepStartNewLine().stepSingle("attribute").stepString(entry.getKey()).stepString(entry.getValue()).stepEndLine();
+                }
+                _updateBuilder.childEnd();
             }
-
-            _updateBuilder
-                    .childEnd();
         }
     }
 }

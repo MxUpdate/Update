@@ -179,109 +179,87 @@ this.setValue(connection, "direction", "to");
           jj_consume_token(-1);
           throw new ParseException();
         }
-        jj_consume_token(CONNECTION_OPEN);
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case CON_TYPE_STRING:{
+          tmp = jj_consume_token(CON_TYPE_STRING);
+this.setValue(connection, "type", this.getString(tmp.image));
+          break;
+          }
+        case CON_TYPE_SINGLE:{
+          tmp = jj_consume_token(CON_TYPE_SINGLE);
+this.setValue(connection, "type", this.getSingle(tmp.image));
+          break;
+          }
+        default:
+          jj_la1[8] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case CON_NAME_STRING:{
+          tmp = jj_consume_token(CON_NAME_STRING);
+this.setValue(connection, "name", this.getString(tmp.image));
+          break;
+          }
+        case CON_NAME_SINGLE:{
+          tmp = jj_consume_token(CON_NAME_SINGLE);
+this.setValue(connection, "name", this.getSingle(tmp.image));
+          break;
+          }
+        default:
+          jj_la1[9] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case CON_REVISION_STRING:{
+          tmp = jj_consume_token(CON_REVISION_STRING);
+this.setValue(connection, "revision", this.getString(tmp.image));
+          break;
+          }
+        case CON_REVISION_SINGLE:{
+          tmp = jj_consume_token(CON_REVISION_SINGLE);
+this.setValue(connection, "revision", this.getSingle(tmp.image));
+          break;
+          }
+        default:
+          jj_la1[10] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
         label_2:
         while (true) {
           switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-          case CONNECTION_TYPE:
-          case CONNECTION_NAME:
-          case CONNECTION_REVISION:
-          case CONNECTION_ATTRIBUTE:{
+          case 24:{
             ;
             break;
             }
           default:
-            jj_la1[8] = jj_gen;
+            jj_la1[11] = jj_gen;
             break label_2;
           }
-          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-          case CONNECTION_TYPE:{
-            jj_consume_token(CONNECTION_TYPE);
+          jj_consume_token(24);
+          label_3:
+          while (true) {
             switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-            case CONNECTION_STRING:{
-              tmp = jj_consume_token(CONNECTION_STRING);
-this.setValue(connection, "type",           this.getString(tmp.image));
-              break;
-              }
-            case CONNECTION_SINGLE:{
-              tmp = jj_consume_token(CONNECTION_SINGLE);
-this.setValue(connection, "type",           this.getSingle(tmp.image));
-              break;
-              }
-            default:
-              jj_la1[9] = jj_gen;
-              jj_consume_token(-1);
-              throw new ParseException();
-            }
-            break;
-            }
-          case CONNECTION_NAME:{
-            jj_consume_token(CONNECTION_NAME);
-            switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-            case CONNECTION_STRING:{
-              tmp = jj_consume_token(CONNECTION_STRING);
-this.setValue(connection, "name",           this.getString(tmp.image));
-              break;
-              }
-            case CONNECTION_SINGLE:{
-              tmp = jj_consume_token(CONNECTION_SINGLE);
-this.setValue(connection, "name",           this.getSingle(tmp.image));
-              break;
-              }
-            default:
-              jj_la1[10] = jj_gen;
-              jj_consume_token(-1);
-              throw new ParseException();
-            }
-            break;
-            }
-          case CONNECTION_REVISION:{
-            jj_consume_token(CONNECTION_REVISION);
-            switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-            case CONNECTION_STRING:{
-              tmp = jj_consume_token(CONNECTION_STRING);
-this.setValue(connection, "revision",       this.getString(tmp.image));
-              break;
-              }
-            case CONNECTION_SINGLE:{
-              tmp = jj_consume_token(CONNECTION_SINGLE);
-this.setValue(connection, "revision",       this.getSingle(tmp.image));
-              break;
-              }
-            default:
-              jj_la1[11] = jj_gen;
-              jj_consume_token(-1);
-              throw new ParseException();
-            }
-            break;
-            }
-          case CONNECTION_ATTRIBUTE:{
-            jj_consume_token(CONNECTION_ATTRIBUTE);
-            switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-            case CONNECTION_ATTRIBUTE_STRING:{
-              tmp = jj_consume_token(CONNECTION_ATTRIBUTE_STRING);
-attrName = this.getString(tmp.image);
-              break;
-              }
-            case CONNECTION_ATTRIBUTE_SINGLE:{
-              tmp = jj_consume_token(CONNECTION_ATTRIBUTE_SINGLE);
-attrName = this.getSingle(tmp.image);
+            case ATTRIBUTE:{
+              ;
               break;
               }
             default:
               jj_la1[12] = jj_gen;
-              jj_consume_token(-1);
-              throw new ParseException();
+              break label_3;
             }
+            jj_consume_token(ATTRIBUTE);
             switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-            case CONNECTION_MULTILINESTRING:{
-              tmp = jj_consume_token(CONNECTION_MULTILINESTRING);
-this.putValue(_busObject, "attrValues", attrName, this.getString(tmp.image));
+            case ATTRIBUTE_STRING:{
+              tmp = jj_consume_token(ATTRIBUTE_STRING);
+attrName = this.getString(tmp.image);
               break;
               }
-            case CONNECTION_MULTILINESINGLE:{
-              tmp = jj_consume_token(CONNECTION_MULTILINESINGLE);
-this.putValue(_busObject, "attrValues", attrName, this.getSingle(tmp.image));
+            case ATTRIBUTE_SINGLE:{
+              tmp = jj_consume_token(ATTRIBUTE_SINGLE);
+attrName = this.getSingle(tmp.image);
               break;
               }
             default:
@@ -289,15 +267,25 @@ this.putValue(_busObject, "attrValues", attrName, this.getSingle(tmp.image));
               jj_consume_token(-1);
               throw new ParseException();
             }
-            break;
+            switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+            case MULTILINESTRING:{
+              tmp = jj_consume_token(MULTILINESTRING);
+this.putValue(connection, "attrValues", attrName, this.getString(tmp.image));
+              break;
+              }
+            case MULTILINESINGLE:{
+              tmp = jj_consume_token(MULTILINESINGLE);
+this.putValue(connection, "attrValues", attrName, this.getSingle(tmp.image));
+              break;
+              }
+            default:
+              jj_la1[14] = jj_gen;
+              jj_consume_token(-1);
+              throw new ParseException();
             }
-          default:
-            jj_la1[14] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
           }
+          jj_consume_token(25);
         }
-        jj_consume_token(CONNECTION_CLOSE);
         break;
         }
       default:
@@ -323,7 +311,7 @@ this.putValue(_busObject, "attrValues", attrName, this.getSingle(tmp.image));
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x81e0,0x600,0x1800,0x600,0x6000,0x1800,0x600,0x30000,0xf00000,0x3000000,0x3000000,0x3000000,0xc000000,0x30000000,0xf00000,0x81e0,};
+      jj_la1_0 = new int[] {0x81e0,0x600,0x1800,0x600,0x6000,0x1800,0x600,0x30000,0xc0000,0x300000,0xc00000,0x1000000,0x100,0x6000,0x1800,0x81e0,};
    }
 
   /** Constructor with InputStream. */
@@ -448,7 +436,7 @@ this.putValue(_busObject, "attrValues", attrName, this.getSingle(tmp.image));
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[30];
+    boolean[] la1tokens = new boolean[26];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -462,7 +450,7 @@ this.putValue(_busObject, "attrValues", attrName, this.getSingle(tmp.image));
         }
       }
     }
-    for (int i = 0; i < 30; i++) {
+    for (int i = 0; i < 26; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

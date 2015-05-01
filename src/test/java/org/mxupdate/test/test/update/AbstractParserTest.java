@@ -83,8 +83,7 @@ public abstract class AbstractParserTest<DATA extends AbstractPropertyObject_mxJ
             oldDef = oldDef.replaceAll("  ", " ");
         }
 
-        final String startIndex = "mxUpdate " + data.getTypeDef().getMxAdminName() + " \"${NAME}\" {";
-        final String temp = generated.substring(generated.indexOf(startIndex) + startIndex.length() + 1, generated.length() - 2).toString();
+        final String temp = data.strip(generated);
         final StringBuilder newDefBuilder = new StringBuilder();
         for (final String line : temp.split("\n"))  {
             newDefBuilder.append(line.trim()).append(' ');

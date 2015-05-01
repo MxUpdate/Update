@@ -85,7 +85,7 @@ public class WrapperCIInstance<DATA extends AbstractPropertyObject_mxJPO<?>>
      * @param _generated    code to clean
      * @return stripped update code
      */
-    protected String strip(final String _generated)
+    public String strip(final String _generated)
     {
         final String ret;
         final String startAdmIndex = " \"${NAME}\" {";

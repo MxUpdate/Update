@@ -37,48 +37,32 @@ interface BusObjectParserConstants_mxJPO {
   /** RegularExpression Id. */
   int CONNECTIONFROM = 17;
   /** RegularExpression Id. */
-  int CONNECTION_OPEN = 18;
+  int CON_TYPE_STRING = 18;
   /** RegularExpression Id. */
-  int CONNECTION_CLOSE = 19;
+  int CON_TYPE_SINGLE = 19;
   /** RegularExpression Id. */
-  int CONNECTION_TYPE = 20;
+  int CON_NAME_STRING = 20;
   /** RegularExpression Id. */
-  int CONNECTION_NAME = 21;
+  int CON_NAME_SINGLE = 21;
   /** RegularExpression Id. */
-  int CONNECTION_REVISION = 22;
+  int CON_REVISION_STRING = 22;
   /** RegularExpression Id. */
-  int CONNECTION_ATTRIBUTE = 23;
-  /** RegularExpression Id. */
-  int CONNECTION_STRING = 24;
-  /** RegularExpression Id. */
-  int CONNECTION_SINGLE = 25;
-  /** RegularExpression Id. */
-  int CONNECTION_ATTRIBUTE_STRING = 26;
-  /** RegularExpression Id. */
-  int CONNECTION_ATTRIBUTE_SINGLE = 27;
-  /** RegularExpression Id. */
-  int CONNECTION_MULTILINESTRING = 28;
-  /** RegularExpression Id. */
-  int CONNECTION_MULTILINESINGLE = 29;
+  int CON_REVISION_SINGLE = 23;
 
   /** Lexical state. */
-  int CONNECTION_MULTILINESTRING_EXPECTED = 0;
+  int CON_REVISION_EXPECTED = 0;
   /** Lexical state. */
-  int CONNECTION_ATTRIBUTE_EXPECTED = 1;
+  int CON_NAME_EXPECTED = 1;
   /** Lexical state. */
-  int CONNECTION_STRING_EXPECTED = 2;
+  int CON_TYPE_EXPECTED = 2;
   /** Lexical state. */
-  int CONNECTION_EXPECTED = 3;
+  int ATTRIBUTE_EXPECTED = 3;
   /** Lexical state. */
-  int CONNECTION_OPENEXPECTED = 4;
+  int MULTILINESTRING_EXPECTED = 4;
   /** Lexical state. */
-  int ATTRIBUTE_EXPECTED = 5;
+  int STRING_EXPECTED = 5;
   /** Lexical state. */
-  int MULTILINESTRING_EXPECTED = 6;
-  /** Lexical state. */
-  int STRING_EXPECTED = 7;
-  /** Lexical state. */
-  int DEFAULT = 8;
+  int DEFAULT = 6;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -100,18 +84,14 @@ interface BusObjectParserConstants_mxJPO {
     "\"connection\"",
     "\"to\"",
     "\"from\"",
+    "<CON_TYPE_STRING>",
+    "<CON_TYPE_SINGLE>",
+    "<CON_NAME_STRING>",
+    "<CON_NAME_SINGLE>",
+    "<CON_REVISION_STRING>",
+    "<CON_REVISION_SINGLE>",
     "\"{\"",
     "\"}\"",
-    "\"type\"",
-    "\"name\"",
-    "\"revision\"",
-    "\"attribute\"",
-    "<CONNECTION_STRING>",
-    "<CONNECTION_SINGLE>",
-    "<CONNECTION_ATTRIBUTE_STRING>",
-    "<CONNECTION_ATTRIBUTE_SINGLE>",
-    "<CONNECTION_MULTILINESTRING>",
-    "<CONNECTION_MULTILINESINGLE>",
   };
 
 }
