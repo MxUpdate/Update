@@ -153,9 +153,9 @@ public class FormatData
         strg.append("mxUpdate format \"${NAME}\" {\n");
 
         // append flags
-        this.getFlags().append4CIFileValues("  ", strg, "\n");
+        this.getFlags().appendUpdate("  ", strg);
         // append values
-        this.getValues().appendUpdate("  ", strg, "\n");
+        this.getValues().appendUpdate("  ", strg);
 
         if (this.viewProgram != null)  {
             strg.append(" view \"").append(AbstractTest.convertUpdate(this.viewProgram.getName())).append("\"\n");
@@ -168,7 +168,7 @@ public class FormatData
         }
 
         // append properties
-        this.getProperties().appendCIFileUpdateFormat("  ", strg);
+        this.getProperties().appendUpdate("  ", strg);
 
         strg.append("}");
 

@@ -113,7 +113,7 @@ public abstract class AbstractTest
         DM_POLICY("policy", null, false, null, null, "Policy", "POLICY", "POLICY_", "datamodel/policy", true, "mxUpdate"),
 
         /** Configuration item Data Model Relationship. */
-        DM_RELATIONSHIP("relationship", null, false, null, null, "Relationship", "RELATIONSHIP", "RELATIONSHIP_", "datamodel/relationship", true, "mql"),
+        DM_RELATIONSHIP("relationship", null, false, null, null, "Relationship", "RELATIONSHIP", "RELATIONSHIP_", "datamodel/relationship", true, "mxUpdate"),
 
         /** Configuration item Data Model Rule. */
         DM_RULE("rule", null, false, null, null, "Rule", "RULE", "RULE_", "datamodel/rule", true, "mxUpdate"),

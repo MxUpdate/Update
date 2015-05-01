@@ -96,10 +96,10 @@ public class ChannelData
         final StringBuilder strg = new StringBuilder();
         this.append4CIFileHeader(strg);
         strg.append("mxUpdate channel \"${NAME}\" {\n");
-        this.getFlags().append4CIFileValues("    ", strg, "\n");
-        this.getValues().appendUpdate("    ", strg, "\n");
+        this.getFlags().appendUpdate("    ", strg);
+        this.getValues().appendUpdate("    ", strg);
         this.getSettings().appendUpdate("    ", strg, "\n");
-        this.getProperties().appendCIFileUpdateFormat("    ", strg);
+        this.getProperties().appendUpdate("    ", strg);
         for (final String ciLine : this.getCILines())  {
             strg.append("    ").append(ciLine).append('\n');
         }

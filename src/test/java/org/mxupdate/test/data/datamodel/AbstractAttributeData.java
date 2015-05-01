@@ -229,9 +229,9 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         strg.append("mxUpdate attribute \"${NAME}\" {\n");
 
         // append flags
-        this.getFlags().append4CIFileValues("    ", strg, "\n");
+        this.getFlags().appendUpdate("    ", strg);
         // append values
-        this.getValues().appendUpdate("    ", strg, "\n");
+        this.getValues().appendUpdate("    ", strg);
 
         // append rule
         if (this.rule != null) {
@@ -251,7 +251,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         }
 
         // append properties
-        this.getProperties().appendCIFileUpdateFormat("    ", strg);
+        this.getProperties().appendUpdate("    ", strg);
 
         strg.append("}");
 

@@ -50,6 +50,7 @@ public abstract class AbstractDataWithAttributesExportUpdateTest<DATAWITHATTRIBU
     {
         final List<Object[]> ret = new ArrayList<Object[]>();
 
+        if (_logText != null)  {
         ret.add(new Object[]{
                 _logText + " with one attribute",
                 this.createNewData("Test \" 1")
@@ -76,6 +77,7 @@ public abstract class AbstractDataWithAttributesExportUpdateTest<DATAWITHATTRIBU
                         .addIgnoreAttribute(new AttributeStringData(this, "String Attribute \" { Hello 4"))
                         .addRemoveAttribute(new AttributeStringData(this, "String Attribute \" ' Hello 5"))
                         .addRemoveAttribute(new AttributeStringData(this, "String Attribute \" { Hello 6"))});
+        }
 
         ret.addAll(Arrays.asList(_datas));
         return super.prepareData(_logText, ret.toArray(new Object[ret.size()][]));
@@ -109,13 +111,15 @@ public abstract class AbstractDataWithAttributesExportUpdateTest<DATAWITHATTRIBU
      * @param _description  description of the test case
      * @param _data         data to test
      * @param _expData      expected data
+     * @param _expUpdateLog not used
      * @throws Exception if test failed
      */
     @Test(dataProvider = "data",
           description = "test update of already created data")
-    public void testUpdate4Created(final String _description,
-                                   final DATAWITHATTRIBUTE _data,
-                                   final DATAWITHATTRIBUTE _expData)
+    public void positiveTestUpdate4Created(final String _description,
+                                           final DATAWITHATTRIBUTE _data,
+                                           final DATAWITHATTRIBUTE _expData,
+                                           final String _expUpdateLog)
         throws Exception
     {
         _data.create()

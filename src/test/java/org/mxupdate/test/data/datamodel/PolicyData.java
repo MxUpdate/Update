@@ -211,7 +211,7 @@ public class PolicyData
             .append("    hidden \"").append(this.getFlags().get("hidden") != null ? this.getFlags().get("hidden") : false).append("\"\n");
 
         // append values
-        this.getValues().appendUpdate("    ", strg, "\n");
+        this.getValues().appendUpdate("    ", strg);
 
         // type definition
         if (this.allTypes)  {
@@ -251,7 +251,7 @@ public class PolicyData
         }
 
         // append properties
-        this.getProperties().appendCIFileUpdateFormat("    ", strg);
+        this.getProperties().appendUpdate("    ", strg);
 
         strg.append("}");
 
@@ -622,7 +622,7 @@ public class PolicyData
             {
                 signature.append4CIFile(_cmd);
             }
-            this.properties.appendCIFileUpdateFormat("        ", _cmd);
+            this.properties.appendUpdate("        ", _cmd);
             _cmd.append("    }\n");
         }
 
@@ -702,7 +702,7 @@ public class PolicyData
                     }
                 }
             }
-            this.properties.appendCIFileUpdateFormat(" state", _cmd);
+            this.properties.appendUpdate(" state", _cmd);
         }
 
         /**

@@ -90,9 +90,9 @@ public class MenuData
             strg.append("    ").append(this.treeMenu ? "" : "!").append("treemenu\n");
         }
         this.getFlags().append4CIFileValues("    ", strg, "\n");
-        this.getValues().appendUpdate("    ", strg, "\n");
+        this.getValues().appendUpdate("    ", strg);
         this.getSettings().appendUpdate("    ", strg, "\n");
-        this.getProperties().appendCIFileUpdateFormat("    ", strg);
+        this.getProperties().appendUpdate("    ", strg);
         for (final String ciLine : this.getCILines())  {
             strg.append("    ").append(ciLine).append('\n');
         }

@@ -71,8 +71,8 @@ public class DimensionData
         strg.append("mxUpdate dimension \"${NAME}\" {\n")
             .append("    hidden \"").append(this.getFlags().get("hidden") != null ? this.getFlags().get("hidden") : false).append("\"\n");
 
-        this.getValues().appendUpdate("    ", strg, "\n");
-        this.getFlags().append4CIFileValues("    ", strg, "\n");
+        this.getValues().appendUpdate("    ", strg);
+        this.getFlags().appendUpdate("    ", strg);
 
         for (final UnitData unit : this.units)
         {
@@ -80,7 +80,7 @@ public class DimensionData
         }
 
         // append properties
-        this.getProperties().appendCIFileUpdateFormat("    ", strg);
+        this.getProperties().appendUpdate("    ", strg);
 
         strg.append("}");
 
@@ -317,7 +317,7 @@ public class DimensionData
                 _cmd.append("        ").append(value.getKey()).append(" ").append(AbstractTest.convertUpdate(value.getValue())).append("\n");
             }
 
-            this.properties.appendCIFileUpdateFormat("        ", _cmd);
+            this.properties.appendUpdate("        ", _cmd);
 
             _cmd.append("  }\n");
         }

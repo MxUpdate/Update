@@ -144,10 +144,9 @@ public class PropertyDefList
      * @param _prefix   prefix in front of a property definition
      * @param _str      string builder
      */
-    public void appendCIFileUpdateFormat(final String _prefix,
-                                         final StringBuilder _str)
+    public void appendUpdate(final String _prefix,
+                             final StringBuilder _str)
     {
-        // append properties
         for (final PropertyDef prop : this)  {
             _str.append(_prefix).append("property ").append(prop.getCIUpdateFormat()).append('\n');
         }

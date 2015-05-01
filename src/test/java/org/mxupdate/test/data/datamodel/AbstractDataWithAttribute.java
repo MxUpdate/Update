@@ -33,6 +33,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @param <DATAWITHATTRIBUTE>     derived data class with attributes
  * @author The MxUpdate Team
  */
+@Deprecated()
 public abstract class AbstractDataWithAttribute<DATAWITHATTRIBUTE extends AbstractDataWithAttribute<?>>
     extends AbstractAdminData<DATAWITHATTRIBUTE>
 {
@@ -87,6 +88,7 @@ public abstract class AbstractDataWithAttribute<DATAWITHATTRIBUTE extends Abstra
      * @return this data instance
      * @see #ignoreAttributes
      */
+    @Deprecated()
     @SuppressWarnings("unchecked")
     public DATAWITHATTRIBUTE addIgnoreAttribute(final AbstractAttributeData<?>... _attributes)
     {
@@ -101,6 +103,7 @@ public abstract class AbstractDataWithAttribute<DATAWITHATTRIBUTE extends Abstra
      * @return this data instance
      * @see #removeAttributes
      */
+    @Deprecated()
     @SuppressWarnings("unchecked")
     public DATAWITHATTRIBUTE addRemoveAttribute(final AbstractAttributeData<?>... _attributes)
     {
@@ -145,6 +148,7 @@ public abstract class AbstractDataWithAttribute<DATAWITHATTRIBUTE extends Abstra
      *
      * @param _cmd  string builder to append the attributes for the CI file
      */
+    @Deprecated()
     protected void append4CIAttributes(final StringBuilder _cmd)
     {
         _cmd.append("\n\ntestAttributes -").append(this.getCI().getMxType()).append(" \"${NAME}\"");
@@ -173,6 +177,7 @@ public abstract class AbstractDataWithAttribute<DATAWITHATTRIBUTE extends Abstra
      *                         called method in super class
      * @see #attributes
      */
+    @Deprecated()
     @Override()
     protected void append4Create(final StringBuilder _cmd)
         throws MatrixException
@@ -201,6 +206,7 @@ public abstract class AbstractDataWithAttribute<DATAWITHATTRIBUTE extends Abstra
      * @return this data instance
      * @throws MatrixException if append failed
      */
+    @Deprecated()
     @SuppressWarnings("unchecked")
     public DATAWITHATTRIBUTE appendIgnoredAttributes()
         throws MatrixException
@@ -221,6 +227,7 @@ public abstract class AbstractDataWithAttribute<DATAWITHATTRIBUTE extends Abstra
      * @return this data instance
      * @throws MatrixException if append failed
      */
+    @Deprecated()
     @SuppressWarnings("unchecked")
     public DATAWITHATTRIBUTE appendRemoveAttributes()
         throws MatrixException

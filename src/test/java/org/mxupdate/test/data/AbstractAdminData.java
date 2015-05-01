@@ -263,12 +263,13 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
      *              item file
      * @see #values
      */
+    @Deprecated()
     protected void append4CIFileValues(final StringBuilder _cmd)
     {
         // append flags
         this.flags.append4CIFileValues("    ", _cmd, "\n");
         // append values
-        this.getValues().appendUpdate("    ", _cmd, "\n");
+        this.getValues().appendUpdate("    ", _cmd);
 
         // check for add values
         final Set<String> needAdds = new HashSet<String>();
@@ -426,8 +427,31 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
          * @param _prefix   prefix in front of the values
          * @param _cmd      string builder with the TCL commands of the
          *                  configuration item file
+         */
+        public void appendUpdate(final String _prefix,
+                                 final StringBuilder _cmd)
+        {
+            for (final Map.Entry<String,Boolean> entry : this.entrySet())  {
+                if (entry.getValue() != null)  {
+                    _cmd.append(_prefix);
+                    if (!entry.getValue())  {
+                        _cmd.append('!');
+                    }
+                    _cmd.append(entry.getKey()).append('\n');
+                }
+            }
+        }
+
+        /**
+         * Appends the defined flags to the TCL code {@code _cmd} of the
+         * configuration item file.
+         *
+         * @param _prefix   prefix in front of the values
+         * @param _cmd      string builder with the TCL commands of the
+         *                  configuration item file
          * @param _suffix   suffix after the values
          */
+        @Deprecated()
         public void append4CIFileValues(final String _prefix,
                                         final StringBuilder _cmd,
                                         final String _suffix)
@@ -497,6 +521,21 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
          * @param _parentLine   parent line where the flags must be defined
          * @param _errorLabel   label used for shown error
          */
+        public void checkExport(final ExportParser _exportParser,
+                                final String _path)
+        {
+            for (final Map.Entry<String,Boolean> flag : this.entrySet())  {
+                _exportParser.checkFlag((_path.isEmpty() ? "" : _path + "/") + flag.getKey(), flag.getValue());
+            }
+        }
+
+        /**
+         * Checks for all defined flags.
+         *
+         * @param _parentLine   parent line where the flags must be defined
+         * @param _errorLabel   label used for shown error
+         */
+        @Deprecated()
         public void checkExport(final Line _parentLine,
                                 final String _errorLabel)
         {

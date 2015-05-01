@@ -67,9 +67,9 @@ public class ExpressionData
 
         strg.append("mxUpdate expression \"${NAME}\" {\n");
 
-        this.getFlags().append4CIFileValues("    ", strg, "\n");
-        this.getValues().appendUpdate("    ", strg, "\n");
-        this.getProperties().appendCIFileUpdateFormat("    ", strg);
+        this.getFlags().appendUpdate("    ", strg);
+        this.getValues().appendUpdate("    ", strg);
+        this.getProperties().appendUpdate("    ", strg);
 
         strg.append("}");
 

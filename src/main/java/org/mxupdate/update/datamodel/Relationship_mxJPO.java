@@ -15,19 +15,27 @@
 
 package org.mxupdate.update.datamodel;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.util.MqlUtil_mxJPO;
+import org.mxupdate.update.datamodel.helper.AttributeList_mxJPO;
+import org.mxupdate.update.datamodel.relationship.RelationshipDefParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.DeltaUtil_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.xml.sax.SAXException;
 
 /**
@@ -36,18 +44,8 @@ import org.xml.sax.SAXException;
  * @author The MxUpdate Team
  */
 public class Relationship_mxJPO
-    extends AbstractDMWithAttributes_mxJPO
+    extends AbstractDMWithTriggers_mxJPO
 {
-    /**
-     * Name of the parameter to define that connections between relationships
-     * are from current MX version supported. The parameter is needed to
-     * support the case that an old MX version is used....
-     *
-     * @see #prepare(ParameterCache_mxJPO)
-     * @see #update(ParameterCache_mxJPO, File, String)
-     */
-    private static final String PARAM_SUPPORT_REL_CONS = "DMRelationSupportRelCons";
-
     /**
      * Set of all ignored URLs from the XML definition for relationships.
      *
@@ -55,6 +53,7 @@ public class Relationship_mxJPO
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
+        Relationship_mxJPO.IGNORED_URLS.add("/attributeDefRefList");
         Relationship_mxJPO.IGNORED_URLS.add("/fromSide");
         // to be ignored, because read within prepare method
         Relationship_mxJPO.IGNORED_URLS.add("/fromSide/allowAllRelationships");
@@ -79,28 +78,16 @@ public class Relationship_mxJPO
         Relationship_mxJPO.IGNORED_URLS.add("/toSide/typeRefList/typeRef");
     }
 
-    /**
-     * Set holding all rules referencing this attribute.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private final Set<String> rules = new TreeSet<String>();
-
-    /**
-     * Prevent duplicates for this relationship.
-     */
-    private boolean preventDuplicates = false;
-
-    /**
-     * From side information.
-     */
+    /** Set holding rule referencing this relationship. */
+    private String rule;
+    /** Prevent duplicates for this relationship. */
+    private Boolean preventDuplicates = null;
+    /** From side information. */
     private final Side from = new Side("from");
-
-    /**
-     * To side information.
-     */
+    /** To side information. */
     private final Side to = new Side("to");
+    /** Attribute list. */
+    private final AttributeList_mxJPO attributeList = new AttributeList_mxJPO(this);
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -112,6 +99,25 @@ public class Relationship_mxJPO
                               final String _mxName)
     {
         super(_typeDef, _mxName);
+    }
+
+    /**
+     * Parses the given {@code _code} and updates this relationship instance.
+     *
+     * @param _code     code to parse
+     * @throws SecurityException
+     * @throws IllegalArgumentException
+     * @throws NoSuchMethodException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws ParseException
+     */
+    public void parseUpdate(final String _code)
+        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
+    {
+        new RelationshipDefParser_mxJPO(new StringReader(_code)).parse(this);
+        this.prepare();
     }
 
     /**
@@ -128,9 +134,7 @@ public class Relationship_mxJPO
     {
         super.parse(_paramCache);
 
-        // evaluate all from types / relationships
         this.from.eval(_paramCache);
-        // evaluate all to types / relationships
         this.to.eval(_paramCache);
     }
 
@@ -151,11 +155,14 @@ public class Relationship_mxJPO
         if (Relationship_mxJPO.IGNORED_URLS.contains(_url))  {
             parsed = true;
         } else if ("/accessRuleRef".equals(_url))  {
-            this.rules.add(_content);
+            this.rule = _content;
             parsed = true;
 
+        } else if (_url.startsWith("/attributeDefRefList"))  {
+            parsed = this.attributeList.parse(_paramCache, _url.substring(20), _content);
+
         } else if ("/fromSide/cardinality".equals(_url))  {
-            this.from.cardinality = _content.equalsIgnoreCase("1") ? "One" : _content.toUpperCase();
+            this.from.cardinality = _content.equalsIgnoreCase("1") ? "one" : _content.equalsIgnoreCase("N") ? "many" : _content;
             parsed = true;
         } else if ("/fromSide/cloneAction".equals(_url))  {
             this.from.cloneAction = _content;
@@ -178,7 +185,7 @@ public class Relationship_mxJPO
             parsed = true;
 
         } else if ("/toSide/cardinality".equals(_url))  {
-            this.to.cardinality = _content.equalsIgnoreCase("1") ? "One" : _content.toUpperCase();
+            this.to.cardinality = _content.equalsIgnoreCase("1") ? "one" : _content.equalsIgnoreCase("N") ? "many" : _content;
             parsed = true;
         } else if ("/toSide/cloneAction".equals(_url))  {
             this.to.cloneAction = _content;
@@ -203,8 +210,8 @@ public class Relationship_mxJPO
     }
 
     /**
-     * Writes all relationship specific information in the TCL update file.
-     * The relationship specific informations are:
+     * Writes the update script for this relationship.
+     * The relationship information are:
      * <ul>
      * <li>hidden flag</li>
      * <li>{@link #preventDuplicates prevent duplicates} flag</li>
@@ -212,109 +219,112 @@ public class Relationship_mxJPO
      * </ul>
      *
      * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the TCL code to the TCL update file could not be
-     *                     written
-     * @see Side#write(Appendable)
+     * @param _out          writer instance
+     * @throws IOException if the TCL update code could not be written
      */
     @Override()
-    protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Appendable _out)
         throws IOException
     {
-        _out.append(" \\\n    ").append(this.isHidden() ? "" : "!").append("hidden")
-            .append(" \\\n    ").append(this.preventDuplicates ? "" : "!").append("preventduplicates");
-        // rules
-        for (final String rule : this.rules)  {
-            _out.append(" \\\n    add rule \"").append(StringUtil_mxJPO.convertTcl(rule)).append('\"');
-        }
-        // triggers
-        this.getTriggers().write(_out, " \\\n    add ", "");
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO();
 
-        this.from.write(_out);
-        this.to.write(_out);
+        this.writeHeader(_paramCache, updateBuilder.getStrg());
+
+        updateBuilder.start("relationship")
+                .string("description", this.getDescription())
+                .flag("hidden", false, this.isHidden())
+                .flag("preventduplicates", false, this.preventDuplicates)
+                .stringIfNotNull("rule", this.rule);
+
+        this.getTriggers().write(updateBuilder);
+        this.from.write(updateBuilder);
+        this.to.write(updateBuilder);
+
+        this.attributeList.write(updateBuilder);
+
+        this.getProperties().writeProperties(_paramCache, updateBuilder.getStrg(), updateBuilder.prefix());
+
+        updateBuilder.end();
+
+        _out.append(updateBuilder.toString());
     }
 
     /**
-     * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this relationship. This
-     * includes:
+     * The method is called within the update of an administration object. The
+     * method is called directly within the update.
      * <ul>
-     * <li>reset description</li>
-     * <li>remove hidden and prevent duplicate flag</li>
-     * <li>remove all rules</li>
-     * <li>reset from and to information</li>
-     * <li>remove all from and to types</li>
+     * <li>All <code>@0@0@</code> are replaced by quot's and all
+     *     <code>@1@1@</code> are replaced by apostroph's.</li>
+     * <li>The new policy definition is parsed.</li>
+     * <li>A delta MQL script generated to update the policy to the new target
+     *     definition.</li>
+     * <li>All symbolic names for states are defined (as property on the
+     *     policy).</li>
+     * <li>The delta MQL script is executed.</li>
      * </ul>
      *
-     * @param _paramCache       parameter cache
-     * @param _preMQLCode       MQL statements which must be called before the
-     *                          TCL code is executed
-     * @param _postMQLCode      MQL statements which must be called after the
-     *                          TCL code is executed
-     * @param _preTCLCode       TCL code which is defined before the source
-     *                          file is sourced
-     * @param _tclVariables     map of all TCL variables where the key is the
-     *                          name and the value is value of the TCL variable
-     *                          (the value is automatically converted to TCL
-     *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update from derived class failed
+     * @param _paramCache   parameter cache
+     * @param _args         arguments from the TCL procedure
+     * @throws Exception if a state is not defined anymore or the policy could
+     *                   not be updated
+     * @see #TCL_PROCEDURE
      */
     @Override()
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final CharSequence _preMQLCode,
-                          final CharSequence _postMQLCode,
-                          final CharSequence _preTCLCode,
-                          final Map<String,String> _tclVariables,
-                          final File _sourceFile)
+    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
+                               final String... _args)
         throws Exception
     {
-        final StringBuilder preMQLCode = new StringBuilder()
-                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                // remove hidden, description, prevent duplicate
-                .append(" !hidden description \"\" !preventduplicate")
-                // reset from information
-                .append(" from !propagatemodify !propagateconnection ")
-                        .append("meaning \"\" cardinality one revision none clone none ")
-                .append(" from remove type all")
-                // reset to information
-                .append(" to !propagatemodify !propagateconnection ")
-                        .append("meaning \"\" cardinality one revision none clone none ")
-                .append(" to remove type all");
-        // are connections between relationships allowed?
-        // => yes, than all relationships must be removed from from / to side
-        if (_paramCache.getValueBoolean(Relationship_mxJPO.PARAM_SUPPORT_REL_CONS))  {
-            preMQLCode.append(" from remove relationship all")
-                      .append(" to remove relationship all");
-        }
-        // remove all rules
-        for (final String rule : this.rules)  {
-            preMQLCode.append(" remove rule \"").append(StringUtil_mxJPO.convertMql(rule)).append('\"');
-        }
-        // remove all from types
-        for (final String type : this.from.types)  {
-            preMQLCode.append(" from remove type \"").append(StringUtil_mxJPO.convertMql(type)).append('\"');
-        }
-        // remove all from relationships
-        for (final String rel : this.from.relations)  {
-            preMQLCode.append(" from remove relationship \"").append(StringUtil_mxJPO.convertMql(rel)).append('\"');
-        }
-        // remove all to types
-        for (final String type : this.to.types)  {
-            preMQLCode.append(" to remove type \"").append(StringUtil_mxJPO.convertMql(type)).append('\"');
-        }
-        // remove all to relationships
-        for (final String rel : this.to.relations)  {
-            preMQLCode.append(" to remove relationship \"").append(StringUtil_mxJPO.convertMql(rel)).append('\"');
-        }
+        if ((_args.length == 4) && "mxUpdate".equals(_args[0]) && this.getTypeDef().getMxAdminName().equals(_args[1])) {
 
-        // append already existing pre MQL code
-        preMQLCode.append(";\n")
-                  .append(_preMQLCode);
+            final Relationship_mxJPO relationship = (Relationship_mxJPO) this.getTypeDef().newTypeInstance(_args[2]);
+            relationship.parseUpdate(_args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\""));
 
-        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod relationship $1", this.getName());
+
+            relationship.calcDelta(_paramCache, mql, this);
+
+            mql.exec(_paramCache);
+        } else  {
+            super.jpoCallExecute(_paramCache, _args);
+        }
+    }
+
+    /**
+     * Calculates the delta between given {@code _current} relationship
+     * definition and this target relationship definition and appends the MQL
+     * append commands to {@code _mql}.
+     *
+     * @param _paramCache   parameter cache
+     * @param _mql          builder to append the MQL commands
+     * @param _current      current relationship definition
+     * @throws UpdateException_mxJPO if update is not allowed (because data can
+     *                      be lost)
+     */
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MultiLineMqlBuilder _mql,
+                             final Relationship_mxJPO _current)
+        throws UpdateException_mxJPO
+    {
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "description",              this.getDescription(),  _current.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta( _mql, "hidden",            false, this.isHidden(),        _current.isHidden());
+        DeltaUtil_mxJPO.calcFlagDelta( _mql, "preventduplicates", false, this.preventDuplicates, _current.preventDuplicates);
+
+        // only one rule can exists maximum, but they must be technically handled like as list
+        final Set<String> thisRules = new HashSet<String>(1);
+        if ((this.rule != null) && !this.rule.isEmpty())  {
+            thisRules.add(this.rule);
+        }
+        final Set<String> currentRules = new HashSet<String>();
+        if ((_current.rule != null) && !_current.rule.isEmpty())  {
+            currentRules.add(_current.rule);
+        }
+        DeltaUtil_mxJPO.calcListDelta( _mql, "rule",                     thisRules,              currentRules);
+
+        this.from           .calcDelta(_paramCache, _mql, _current.from);
+        this.to             .calcDelta(_paramCache, _mql, _current.to);
+        this.attributeList  .calcDelta(_paramCache, _mql, _current.attributeList);
+        this.getProperties().calcDelta(_mql, "", _current.getProperties());
     }
 
     /**
@@ -322,71 +332,29 @@ public class Relationship_mxJPO
      */
     private final class Side
     {
-        /**
-         * Side string of the relationship.
-         */
+        /** Side string of the relationship. */
         private final String side;
-
-        /**
-         * Side cardinality action.
-         */
-        private String cardinality = "";
-
-        /**
-         * Side clone action.
-         */
-        private String cloneAction = "";
-
-        /**
-         * Side meaning.
-         */
+        /** Side cardinality action. */
+        private String cardinality = "many";
+        /** Side clone action. */
+        private String cloneAction = "none";
+        /** Side revision action. */
+        private String revisionAction = "none";
+        /** Side meaning. */
         private String meaning = "";
+        /** Side propagate connection flag. */
+        private Boolean propagateConnection = null;
+        /** Side propagate modify flag. */
+        private Boolean propagateModify = null;
 
-        /**
-         * Side propagate connection flag.
-         */
-        private boolean propagateConnection = false;
-
-        /**
-         * Side propagate modify flag.
-         */
-        private boolean propagateModify = false;
-
-        /**
-         * Side revision action.
-         */
-        private String revisionAction = "";
-
-        /**
-         * Side type list.
-         *
-         * @see #prepare(ParameterCache_mxJPO)
-         * @see #fromTypeAll
-         */
-        private final Set<String> types = new TreeSet<String>();
-
-        /**
-         * Are all types on the side allowed?
-         *
-         * @see #prepare(ParameterCache_mxJPO)
-         * @see #types
-         */
+        /** Side type list. */
+        private final SortedSet<String> types = new TreeSet<String>();
+        /** Are all types on the side allowed? */
         private boolean typeAll = false;
 
-        /**
-         * From side relationship list.
-         *
-         * @see #prepare(ParameterCache_mxJPO)
-         * @see #relationAll
-         */
-        private final Set<String> relations = new TreeSet<String>();
-
-        /**
-         * Are all relationships on the from side allowed?
-         *
-         * @see #prepare(ParameterCache_mxJPO)
-         * @see #relations
-         */
+        /** From side relationship list. */
+        private final SortedSet<String> relations = new TreeSet<String>();
+        /** Are all relationships on the from side allowed? */
         private boolean relationAll = false;
 
         /**
@@ -409,12 +377,12 @@ public class Relationship_mxJPO
             throws MatrixException
         {
             // evaluate all to types
-            final String[] toTypesArr = MqlUtil_mxJPO.execMql(
-                            _paramCache,
-                            new StringBuilder("escape print rel \"")
-                                    .append(StringUtil_mxJPO.convertMql(Relationship_mxJPO.this.getName()))
-                                    .append("\" select ").append(this.side).append("type dump '\n'"))
-                    .split("\n");
+            final String[] toTypesArr = MqlBuilder_mxJPO.mql()
+                            .cmd("escape print rel ").arg(Relationship_mxJPO.this.getName())
+                            .cmd(" select ").arg(this.side + "type")
+                            .cmd(" dump ").arg("\n")
+                            .exec(_paramCache)
+                            .split("\n");
             for (final String toType : toTypesArr)  {
                 if ("all".equals(toType))  {
                     this.typeAll = true;
@@ -426,14 +394,14 @@ public class Relationship_mxJPO
             }
 
             // are connections between relationships allowed?
-            if (_paramCache.getValueBoolean(Relationship_mxJPO.PARAM_SUPPORT_REL_CONS))  {
+            if (_paramCache.getValueBoolean(ValueKeys.DMRelationSupportRelCons))  {
                 // evaluate all from relationships
-                final String[] fromRelsArr = MqlUtil_mxJPO.execMql(
-                                _paramCache,
-                                new StringBuilder("escape print rel \"")
-                                        .append(StringUtil_mxJPO.convertMql(Relationship_mxJPO.this.getName()))
-                                        .append("\" select ").append(this.side).append("rel dump '\n'"))
-                        .split("\n");
+                final String[] fromRelsArr = MqlBuilder_mxJPO.mql()
+                                .cmd("escape print rel ").arg(Relationship_mxJPO.this.getName())
+                                .cmd(" select ").arg(this.side + "rel")
+                                .cmd(" dump ").arg("\n")
+                                .exec(_paramCache)
+                                .split("\n");
                 for (final String fromRel : fromRelsArr)  {
                     if ("all".equals(fromRel))  {
                         this.relationAll = true;
@@ -456,40 +424,82 @@ public class Relationship_mxJPO
          * <li>{@link #cloneAction clone behavior / action}</li>
          * </ul>
          *
-         * @param _out          appendable instance to the TCL update file
-         * @throws IOException if the TCL code to the TCL update file could not
-         *                     be written
+         * @param _updateBuilder    update builder
          * @see Relationship_mxJPO#writeObject(ParameterCache_mxJPO, Appendable)
          */
-        protected void write(final Appendable _out)
-            throws IOException
+        protected void write(final UpdateBuilder_mxJPO _updateBuilder)
         {
-            _out.append(" \\\n    ").append(this.side)
-                .append(" \\\n        ").append(this.propagateModify ? "" : "!").append("propagatemodify")
-                .append(" \\\n        ").append(this.propagateConnection ? "" : "!").append("propagateconnection")
-                .append(" \\\n        meaning \"").append(StringUtil_mxJPO.convertTcl(this.meaning)).append('\"')
-                .append(" \\\n        cardinality \"")
-                        .append(StringUtil_mxJPO.convertTcl(this.cardinality)).append('\"')
-                .append(" \\\n        revision \"")
-                        .append(StringUtil_mxJPO.convertTcl(this.revisionAction)).append('\"')
-                .append(" \\\n        clone \"").append(StringUtil_mxJPO.convertTcl(this.cloneAction)).append('\"');
-            // from types
+            _updateBuilder
+                    .childStart(this.side)
+                    .string("meaning", this.meaning)
+                    .single("cardinality", this.cardinality)
+                    .single("revision", this.revisionAction)
+                    .single("clone", this.cloneAction)
+                    .flag("propagatemodify", false, this.propagateModify)
+                    .flag("propagateconnection", false, this.propagateConnection);
+
             if (this.typeAll)  {
-                _out.append(" \\\n        add type \"all\"");
+                _updateBuilder.single("type", "all");
             } else  {
-                for (final String type : this.types)  {
-                    _out.append(" \\\n        add type \"").append(StringUtil_mxJPO.convertTcl(type)).append('\"');
-                }
+                _updateBuilder.list("type", this.types);
             }
-            // from relationships
+
             if (this.relationAll)  {
-                _out.append(" \\\n        add relationship \"all\"");
+                _updateBuilder.single("relationship", "all");
             } else  {
-                for (final String relation : this.relations)  {
-                    _out.append(" \\\n        add relationship \"")
-                        .append(StringUtil_mxJPO.convertTcl(relation)).append('\"');
-                }
+                _updateBuilder.list("relationship", this.relations);
             }
+
+            _updateBuilder.childEnd();
+        }
+
+        /**
+         * Calculates the delta between given {@code _current} relationship side
+         * definition and this target relationship side definition and appends
+         * the MQL append commands to {@code _mql}.
+         *
+         * @param _paramCache   parameter cache
+         * @param _mql          builder to append the MQL commands
+         * @param _current      current relationship side definition
+         */
+        protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                                 final MultiLineMqlBuilder _mql,
+                                 final Side _current)
+        {
+            _mql.pushPrefixByAppending(this.side);
+
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "meaning",                    this.meaning,             _current.meaning);
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "cardinality",                this.cardinality,         _current.cardinality);
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "revision",                   this.revisionAction,      _current.revisionAction);
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "clone",                      this.cloneAction,         _current.cloneAction);
+            DeltaUtil_mxJPO.calcFlagDelta( _mql, "propagatemodify",     false, this.propagateModify,     _current.propagateModify);
+            DeltaUtil_mxJPO.calcFlagDelta( _mql, "propagateconnection", false, this.propagateConnection, _current.propagateConnection);
+
+            if (this.typeAll)  {
+                DeltaUtil_mxJPO.calcListDelta( _mql, "type", new TreeSet<String>(), _current.types);
+                if (!_current.typeAll)  {
+                    _mql.newLine().cmd("add type all");
+                }
+            } else  {
+                if (_current.typeAll)  {
+                    _mql.newLine().cmd("remove type all");
+                }
+                DeltaUtil_mxJPO.calcListDelta( _mql, "type", this.types, _current.types);
+            }
+
+            if (this.relationAll)  {
+                DeltaUtil_mxJPO.calcListDelta( _mql, "relationship", new TreeSet<String>(), _current.relations);
+                if (!_current.relationAll)  {
+                    _mql.newLine().cmd("add relationship all");
+                }
+            } else  {
+                if (_current.relationAll)  {
+                    _mql.newLine().cmd("remove relationship all");
+                }
+                DeltaUtil_mxJPO.calcListDelta( _mql, "relationship", this.relations, _current.relations);
+            }
+
+            _mql.popPrefix();
         }
     }
 }

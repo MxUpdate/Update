@@ -134,18 +134,24 @@ public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_
                             final String _fieldName,
                             final Object _value)
     {
-        try  {
-            final Field field = this.getField(_object, _fieldName).field;
-            final boolean accessible = field.isAccessible();
-            try  {
-                field.setAccessible(true);
-                field.set(_object, _value);
-            } finally  {
-                field.setAccessible(accessible);
-            }
-        } catch (final Exception e)  {
-            throw new ParseUpdateError(e);
-        }
+        this.getField(_object, _fieldName).set(_value);
+    }
+
+    /**
+     * Sets the new {@code _value} for field {@code _fieldName2} defined in
+     * {@code _filedName1} of {@code _object}.
+     *
+     * @param _object       object where the field must be updated
+     * @param _fieldName1   name of the field in {@code _object}
+     * @param _fieldName1   name of the field to update
+     * @param _value        new value
+     */
+    protected void setValue(final Object _object,
+                            final String _fieldName1,
+                            final String _fieldName2,
+                            final Object _value)
+    {
+        this.getField(this.getField(_object, _fieldName1).get(), _fieldName2).set(_value);
     }
 
     /**
@@ -202,6 +208,23 @@ public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_
         } catch (final Exception e)  {
             throw new ParseUpdateError(e);
         }
+    }
+
+    /**
+     * Appends the new {@code _value} for field {@code _fieldName2} defined in
+     * {@code _filedName1} of {@code _object}.
+     *
+     * @param _object       object where the field must be updated
+     * @param _fieldName1   name of the field in {@code _object}
+     * @param _fieldName1   name of the field to update
+     * @param _value        new value
+     */
+    protected void appendValue(final Object _object,
+                               final String _fieldName1,
+                               final String _fieldName2,
+                               final Object _value)
+    {
+        this.appendValue(this.getField(_object, _fieldName1).get(), _fieldName2, _value);
     }
 
     /**
@@ -335,16 +358,6 @@ public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_
         private Object object;
 
         /**
-         * Returns the {@link #field}.
-         *
-         * @return field
-         */
-        public Field getField()
-        {
-            return this.field;
-        }
-
-        /**
          * Returns current value of {@link #field} within {@link #object}.
          *
          * @param <T>   type of value
@@ -385,7 +398,7 @@ public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_
                     this.field.setAccessible(accessible);
                 }
             } catch (final Exception e)  {
-                throw new AbstractParser_mxJPO.ParseUpdateError(e);
+                throw new ParseUpdateError(e);
             }
         }
     }

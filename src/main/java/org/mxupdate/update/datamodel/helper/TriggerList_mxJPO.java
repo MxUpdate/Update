@@ -25,6 +25,7 @@ import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 
 /**
  * Handles the list of all defined triggers.
@@ -119,12 +120,29 @@ public class TriggerList_mxJPO
     }
 
     /**
+     * Writes the sorted trigger information to the update builder
+     *
+     * @param _updateBuilder    update builder
+     */
+    public void write(final UpdateBuilder_mxJPO _updateBuilder)
+    {
+        for (final Trigger trigger : this)  {
+            _updateBuilder.line(
+                    new StringBuilder()
+                            .append("trigger ").append(trigger.eventType)
+                            .append(' ').append(trigger.kind).append(" \"").append(StringUtil_mxJPO.convertUpdate(trigger.program)).append("\"")
+                            .append(" input \"").append(StringUtil_mxJPO.convertUpdate(trigger.arguments)).append('\"'));
+        }
+    }
+
+    /**
      * Writes the sorted trigger information to the writer instance.
      *
      * @param _out      writer instance
      * @param _prefix   prefix written before trigger definition
      * @throws IOException if write failed
      */
+    @Deprecated()
     public void write(final Appendable _out,
                       final String _prefix)
         throws IOException
@@ -142,6 +160,7 @@ public class TriggerList_mxJPO
      *
      * @param _cmd          string builder with current MQL statement
      */
+    @Deprecated()
     public void appendResetMQLStatement(final StringBuilder _cmd)
     {
         for (final Trigger trigger : this)  {

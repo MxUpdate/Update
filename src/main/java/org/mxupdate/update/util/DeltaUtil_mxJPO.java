@@ -89,6 +89,7 @@ public final class DeltaUtil_mxJPO
      * @param _newVal   new target value
      * @param _curVal   current value in the database
      */
+    @Deprecated()
     public static void calcFlagDelta(final MultiLineMqlBuilder _mql,
                                      final String _kind,
                                      final boolean _newVal,
@@ -107,11 +108,37 @@ public final class DeltaUtil_mxJPO
      * Calculates the delta between the new and the old value. If a delta
      * exists, the kind with the new delta is added to the string builder.
      *
+     * @param _mql              MQL builder to append the delta
+     * @param _kind             kind of the delta
+     * @param _newVal           new target value
+     * @param _newValDefault    default value if {@code _newVal} is not defined
+     * @param _curVal           current value in the database
+     */
+    public static void calcFlagDelta(final MultiLineMqlBuilder _mql,
+                                     final String _kind,
+                                     final boolean _newValDefault,
+                                     final Boolean _newVal,
+                                     final Boolean _curVal)
+    {
+        if ((_curVal == null) || (_curVal != _newVal))  {
+            _mql.newLine();
+            if (((_newVal == null) && !_newValDefault) || ((_newVal != null) && !_newVal))  {
+                _mql.cmd("!");
+            }
+            _mql.cmd(_kind);
+        }
+    }
+
+    /**
+     * Calculates the delta between the new and the old value. If a delta
+     * exists, the kind with the new delta is added to the string builder.
+     *
      * @param _out      appendable instance where the delta must be append
      * @param _kind     kind of the delta
      * @param _newVal   new target value
      * @param _curVal   current value in the database
      */
+    @Deprecated()
     public static void calcFlagDelta(final StringBuilder _out,
                                      final String _kind,
                                      final boolean _newVal,

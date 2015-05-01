@@ -35,6 +35,7 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
  *
  * @author The MxUpdate Team
  */
+@Deprecated()
 public abstract class AbstractDMWithAttributes_mxJPO
     extends AbstractDMWithTriggers_mxJPO
 {
@@ -297,16 +298,6 @@ public abstract class AbstractDMWithAttributes_mxJPO
                         ignoreAllAttrs.addAll(tmp1);
                     }
                     final Collection<String> tmp2 = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_REMOVE_INTERFACE);
-                    if (tmp2 != null)  {
-                        removeAllAttrs.addAll(tmp2);
-                    }
-                } else if ("-relationship".equals(arg) && this.getTypeDef().getMxAdminName().equals("relationship"))  {
-                    name = this.jpoCallExecuteConvert(_args[++idx]);
-                    final Collection<String> tmp1 = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_IGNORE_RELATIONSHIP);
-                    if (tmp1 != null)  {
-                        ignoreAllAttrs.addAll(tmp1);
-                    }
-                    final Collection<String> tmp2 = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_REMOVE_RELATIONSHIP);
                     if (tmp2 != null)  {
                         removeAllAttrs.addAll(tmp2);
                     }

@@ -17,9 +17,12 @@ package org.mxupdate.test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.mxupdate.test.AbstractTest.CI;
 import org.testng.Assert;
 
@@ -41,49 +44,25 @@ public class ExportParser
     private static final String HEADER_START_END
             = "\n################################################################################\n";
 
-    /**
-     * Reference to the configuration item enumeration.
-     */
+    /** Reference to the configuration item enumeration. */
     private final CI ci;
 
-    /**
-     * Parsed name from the header.
-     *
-     * @see #getName()
-     */
+    /** Parsed name from the header. */
     private final String name;
 
-    /**
-     * Parsed symbolic name from the header.
-     *
-     * @see #getSymbolicName()
-     */
+    /** Parsed symbolic name from the header. */
     private final String symbolicName;
 
-    /**
-     * Original configuration item update code.
-     *
-     * @see #getOrigCode()
-     */
+    /** Original configuration item update code. */
     private final String origCode;
 
-    /**
-     * Related code of the export without header.
-     *
-     * @see #getCode()
-     */
+    /** Related code of the export without header. */
     private final String code;
 
-    /**
-     * Logging information.
-     *
-     * @see #getLog();
-     */
+    /** Logging information. */
     private final String log;
 
-    /**
-     * List of all root lines.
-     */
+    /**List of all root lines. */
     private final List<Line> rootLines = new ArrayList<Line>();
 
     /**
@@ -122,7 +101,6 @@ public class ExportParser
         // parse all lines
         new Line(Arrays.asList(this.code.split("\n")).iterator(), null);
     }
-
 
     /**
      * Creates a new export parser used e.g. to check elements within a sub
@@ -204,6 +182,75 @@ public class ExportParser
             ret = _origCode.trim();
         }
         return ret;
+    }
+
+    /**
+     * Checks that given {@code _value} is defined for given {@code _path}.
+     *
+     * @param _path     path to check
+     * @param _value    value
+     * @return this export parser instance
+     */
+    public ExportParser checkValue(final String _path,
+                                   final String _value)
+    {
+        final List<String> valueLines = this.getRootLines().get(0).getLines(_path + "/@value");
+        Assert.assertEquals(valueLines.size(), 1,      "exact one line for path '" + _path + "' must be found");
+        Assert.assertEquals(valueLines.get(0), _value, "value for line with path '" + _path + "' must be correct");
+        return this;
+    }
+
+    /**
+     * Checks that given {@code _value}  flag is defined for given
+     * {@code _path}.
+     *
+     * @param _path     path to check
+     * @param _value    value
+     * @return this export parser instance
+     */
+    public ExportParser checkFlag(final String _path,
+                                  final Boolean _value)
+    {
+        final String[] paths = _path.split("/");
+        final String key = paths[paths.length - 1];
+        paths[paths.length - 1] = "!" + key;
+        final String negativPath = StringUtils.join(paths, "/");
+
+        final List<String> positivLines = this.getRootLines().get(0).getLines(_path       + "/@name");
+        final List<String> negativLines = this.getRootLines().get(0).getLines(negativPath + "/@name");
+        if (_value != null)  {
+            // check flag is defined
+            final List<String> lines = _value ? positivLines : negativLines;
+            Assert.assertEquals(lines.size(), 1, "check flag " + _path + " is defined");
+            Assert.assertEquals(lines.get(0), _value ? key : ("!" + key), "check flag " + key + " is defined");
+            // check that inverted flag is NOT defined
+            final List<String> linesInv = _value ? negativLines : positivLines;
+            Assert.assertEquals(linesInv.size(), 0, "check that " + _path + " does not contain flag " + !_value);
+        } else  {
+            // check flag is NOT defined
+            Assert.assertEquals(positivLines.size(), 0, "check flag  positive flag for " + _path + " is not defined");
+            // check that inverted flag is NOT defined
+            Assert.assertEquals(negativLines.size(), 0, "check flag  negative flag for " + _path + " is not defined");
+        }
+        return this;
+    }
+
+    /**
+     * Checks that given {@code _list} is defined for given {@code _path}.
+     *
+     * @param _path     path to check
+     * @param _value    value
+     * @return this export parser instance
+     */
+    public ExportParser checkList(final String _path,
+                                  final Collection<String> _list)
+    {
+        Assert.assertEquals(
+                new TreeSet<String>(this.getRootLines().get(0).getLines(_path + "/@value")),
+                new TreeSet<String>(_list),
+                "check that list is defined for " + _path);
+
+        return this;
     }
 
     /**
@@ -461,9 +508,9 @@ public class ExportParser
          * @param _index    current index (level) in the <code>_path</code>
          * @param _ret      list of all found strings
          */
-        protected void evalPath(final String[] _path,
-                                final int _index,
-                                final List<String> _ret)
+        private void evalPath(final String[] _path,
+                              final int _index,
+                              final List<String> _ret)
         {
             final String searchedTag = _path[_index];
             if (this.tag.equals(searchedTag))  {

@@ -607,19 +607,17 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
          * @param _prefix   prefix in front of the values
          * @param _cmd      string builder with the TCL commands of the
          *                  configuration item file
-         * @param _suffix   suffix after the values
          */
         public void appendUpdate(final String _prefix,
-                                 final StringBuilder _cmd,
-                                 final String _suffix)
+                                 final StringBuilder _cmd)
         {
             for (final Map.Entry<String,Object> entry : this.entrySet())  {
                 if ((entry.getValue() instanceof Character) || (entry.getValue() instanceof Integer))  {
-                    _cmd.append(_prefix).append(entry.getKey()).append(' ').append(entry.getValue()).append(_suffix);
+                    _cmd.append(_prefix).append(entry.getKey()).append(' ').append(entry.getValue()).append('\n');
                 } else  {
                     _cmd.append(_prefix).append(entry.getKey()).append(" ")
                         .append("\"").append(AbstractTest.convertUpdate(entry.getValue().toString())).append('\"')
-                        .append(_suffix);
+                        .append('\n');
                 }
             }
         }

@@ -1,0 +1,256 @@
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
+options {
+    JDK_VERSION = "1.6";
+    STATIC = false;
+    ERROR_REPORTING = true;
+    USER_TOKEN_MANAGER = false;
+    GENERATE_BOILERPLATE = false;
+}
+PARSER_BEGIN(RelationshipDefParser)
+package org.mxupdate.update.datamodel.relationship;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+
+import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.datamodel.Relationship_mxJPO;
+import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
+import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
+import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
+import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
+
+public class RelationshipDefParser
+    extends AbstractParser_mxJPO<Relationship_mxJPO>
+{
+}
+PARSER_END(RelationshipDefParser)
+
+<DEFAULT> SKIP :
+{
+    " "
+|   "\r"
+|   "\t"
+|   "\n"
+}
+
+<DEFAULT> TOKEN : /** first level */
+{
+      <DESCRIPTION:                         "description">                                  : STRING_EXPECTED
+    | <HIDDEN_TRUE:                         "hidden">
+    | <HIDDEN_FALSE:                        "!hidden">
+    | <PREVENTDUPLICATES_TRUE:              "preventduplicates">
+    | <PREVENTDUPLICATES_FALSE:             "!preventduplicates">
+    | <ATTRIBUTE:                           "attribute">                                    : STRING_EXPECTED
+    | <RULE:                                "rule">                                         : STRING_EXPECTED
+}
+
+/************************************************************** Common String */
+<STRING_EXPECTED> SKIP :
+{
+    " " | "\t" | "\n" | "\r"
+}
+
+<STRING_EXPECTED> TOKEN :
+{
+      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "{" | "}" | " ")*<APOSTROPHE>)> : DEFAULT
+    | <SINGLE: (<CHAR>)+> : DEFAULT
+    | <#APOSTROPHE: "\"" >
+    | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/******************************************************************** Trigger */
+<DEFAULT> TOKEN :
+{
+      <TRIGGER:                             "trigger">                                      : TRIGEVENT_EXPECTED
+    | <INPUT:                               "input">                                        : STRING_EXPECTED
+}
+
+/** Trigger Event */
+<TRIGEVENT_EXPECTED> SKIP :
+{
+    " " | "\t" | "\n" | "\r"
+}
+
+<TRIGEVENT_EXPECTED> TOKEN :
+{
+      <TRIGEVENT:           (~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"])+>         : TRIGKIND_EXPECTED
+}
+
+/** Trigger Kind */
+<TRIGKIND_EXPECTED> SKIP :
+{
+    " " | "\t" | "\n" | "\r"
+}
+
+<TRIGKIND_EXPECTED> TOKEN :
+{
+      <ACTION:                              "action">                                       : STRING_EXPECTED
+    | <CHECK:                               "check">                                        : STRING_EXPECTED
+    | <OVERRIDE:                            "override">                                     : STRING_EXPECTED
+ }
+
+/****************************************************** From / To Information */
+<DEFAULT> TOKEN :
+{
+      <START_FROM:                          "from" ([" ","\t","\n","\r"])+ "{" >            : FROMTO_EXPECTED
+    | <START_TO:                            "to"   ([" ","\t","\n","\r"])+ "{" >            : FROMTO_EXPECTED
+}
+
+<FROMTO_EXPECTED> SKIP :
+{
+    " " | "\t" | "\n" | "\r"
+}
+
+<FROMTO_EXPECTED> TOKEN :
+{
+      <FROMTO_PROPAGATEMODIFY_TRUE:         "propagatemodify">                              : FROMTO_EXPECTED
+    | <FROMTO_PROPAGATEMODIFY_FALSE:        "!propagatemodify">                             : FROMTO_EXPECTED
+    | <FROMTO_PROPAGATECONNECTION_TRUE:     "propagateconnection">                          : FROMTO_EXPECTED
+    | <FROMTO_PROPAGATECONNECTION_FALSE:    "!propagateconnection">                         : FROMTO_EXPECTED
+    | <FROMTO_MEANING:                      "meaning">                                      : FROMTO_STRING_EXPECTED
+    | <FROMTO_REVISION_NONE:                "revision" ([" ","\t","\n","\r"])+ "none">      : FROMTO_EXPECTED
+    | <FROMTO_REVISION_FLOAT:               "revision" ([" ","\t","\n","\r"])+ "float">     : FROMTO_EXPECTED
+    | <FROMTO_REVISION_REPLICATE:           "revision" ([" ","\t","\n","\r"])+ "replicate"> : FROMTO_EXPECTED
+    | <FROMTO_CLONE_NONE:                   "clone" ([" ","\t","\n","\r"])+ "none">         : FROMTO_EXPECTED
+    | <FROMTO_CLONE_FLOAT:                  "clone" ([" ","\t","\n","\r"])+ "float">        : FROMTO_EXPECTED
+    | <FROMTO_CLONE_REPLICATE:              "clone" ([" ","\t","\n","\r"])+ "replicate">    : FROMTO_EXPECTED
+    | <FROMTO_CARDINALITY_ONE:              "cardinality" ([" ","\t","\n","\r"])+ "one">    : FROMTO_EXPECTED
+    | <FROMTO_CARDINALITY_MANY:             "cardinality" ([" ","\t","\n","\r"])+ "many">   : FROMTO_EXPECTED
+    | <FROMTO_TYPE_ALL:                     "type" ([" ","\t","\n","\r"])+ "all">           : FROMTO_EXPECTED
+    | <FROMTO_TYPE:                         "type">                                         : FROMTO_STRING_EXPECTED
+    | <FROMTO_RELATIONSHIP_ALL:             "relationship" ([" ","\t","\n","\r"])+ "all">   : FROMTO_EXPECTED
+    | <FROMTO_RELATIONSHIP:                 "relationship">                                 : FROMTO_STRING_EXPECTED
+    | <FROMTO_END:                          "}">                                            : DEFAULT
+}
+
+/* From / To String */
+<FROMTO_STRING_EXPECTED> SKIP :
+{
+    " " | "\t" | "\n" | "\r"
+}
+
+<FROMTO_STRING_EXPECTED> TOKEN :
+{
+      <FROMTO_STRING: (<FROMTO_APOSTROPHE>(<FROMTO_CHAR> | "\\\"" | "{" | "}" | " ")*<FROMTO_APOSTROPHE>)>  : FROMTO_EXPECTED
+    | <FROMTO_SINGLE: (<FROMTO_CHAR>)+>                                                                     : FROMTO_EXPECTED
+    | <#FROMTO_APOSTROPHE: "\"" >
+    | <#FROMTO_CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/******************************************************************* Property */
+<DEFAULT> TOKEN :
+{
+      <PROPERTY:                            "property">                                     : STRING_EXPECTED
+    | <PROPERTYTO:                          "to">                                           : ADMINREF_EXPECTED
+    | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
+}
+
+<ADMINREF_EXPECTED> SKIP :
+{
+    " " | "\t" | "\n" | "\r"
+}
+
+<ADMINREF_EXPECTED> TOKEN :
+{
+      <ADMINTYPE_STRING : (<ADMINTYPE_APOSTROPHE>(<ADMINTYPE_CHAR> | "\\\"" | "{" | "}" | " ")*<ADMINTYPE_APOSTROPHE>)> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE : (<ADMINTYPE_CHAR>)+> : STRING_EXPECTED
+    | <#ADMINTYPE_APOSTROPHE : "\"" >
+    | <#ADMINTYPE_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/**************************************************************************** */
+/**
+ * Parses one complete relationship definition.
+ *
+ * @param _relationship target relationship to update with parsed values
+ */
+void parse(final Relationship_mxJPO _relationship)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+: {
+    Token tmp;
+    AdminProperty property;
+    Trigger trigger;
+    String fromTo;
+} {
+    (   ( <DESCRIPTION>             ( tmp = <STRING>                        {this.setValue(_relationship, "description",                    this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_relationship, "description",                    this.getSingle(tmp.image));} ) )
+
+      | ( <HIDDEN_TRUE>                                                     {this.setValue(_relationship, "hidden",                         true);} )
+      | ( <HIDDEN_FALSE>                                                    {this.setValue(_relationship, "hidden",                         false);} )
+
+      | ( <PREVENTDUPLICATES_TRUE>                                          {this.setValue(_relationship, "preventDuplicates",              true);} )
+      | ( <PREVENTDUPLICATES_FALSE>                                         {this.setValue(_relationship, "preventDuplicates",              false);} )
+
+      | ( <RULE>                    ( tmp = <STRING>                        {this.setValue(_relationship, "rule",                           this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_relationship, "rule",                           this.getSingle(tmp.image));} ) )
+
+      | ( <TRIGGER>                                                         {trigger = new Trigger();this.appendValue(_relationship, "triggers", "triggersStack", trigger);}
+            tmp = <TRIGEVENT>                                               {this.setValue(trigger, "eventType",                            this.getSingle(tmp.image));}
+                    ( <ACTION>                                              {this.setValue(trigger, "kind",                                 "action");}
+                    | <CHECK>                                               {this.setValue(trigger, "kind",                                 "check");}
+                    | <OVERRIDE>                                            {this.setValue(trigger, "kind",                                 "override");} )
+                            ( tmp = <STRING>                                {this.setValue(trigger, "program",                              this.getString(tmp.image));}
+                            | tmp = <SINGLE>                                {this.setValue(trigger, "program",                              this.getSingle(tmp.image));} )
+                                    ( <INPUT>
+                                            ( tmp = <STRING>                {this.setValue(trigger, "arguments",                            this.getString(tmp.image));}
+                                            | tmp = <SINGLE>                {this.setValue(trigger, "arguments",                            this.getSingle(tmp.image));} ) )?  )
+
+      | ( ( <START_FROM>                                                    {fromTo = "from";}
+          | <START_TO>                                                      {fromTo = "to";} )
+                (   ( <FROMTO_PROPAGATEMODIFY_TRUE>                         {this.setValue(_relationship, fromTo, "propagateModify",        true);} )
+                  | ( <FROMTO_PROPAGATEMODIFY_FALSE>                        {this.setValue(_relationship, fromTo, "propagateModify",        false);} )
+                  | ( <FROMTO_PROPAGATECONNECTION_TRUE>                     {this.setValue(_relationship, fromTo, "propagateConnection",    true);} )
+                  | ( <FROMTO_PROPAGATECONNECTION_FALSE>                    {this.setValue(_relationship, fromTo, "propagateConnection",    false);} )
+                  | ( <FROMTO_MEANING>        ( tmp = <FROMTO_STRING>       {this.setValue(_relationship, fromTo, "meaning",                this.getString(tmp.image));}
+                                              | tmp = <FROMTO_SINGLE>       {this.setValue(_relationship, fromTo, "meaning",                this.getSingle(tmp.image));} ) )
+                  | ( <FROMTO_REVISION_NONE>                                {this.setValue(_relationship, fromTo, "revisionAction",         "none");} )
+                  | ( <FROMTO_REVISION_FLOAT>                               {this.setValue(_relationship, fromTo, "revisionAction",         "float");} )
+                  | ( <FROMTO_REVISION_REPLICATE>                           {this.setValue(_relationship, fromTo, "revisionAction",         "replicate");} )
+                  | ( <FROMTO_CLONE_NONE>                                   {this.setValue(_relationship, fromTo, "cloneAction",            "none");} )
+                  | ( <FROMTO_CLONE_FLOAT>                                  {this.setValue(_relationship, fromTo, "cloneAction",            "float");} )
+                  | ( <FROMTO_CLONE_REPLICATE>                              {this.setValue(_relationship, fromTo, "cloneAction",            "replicate");} )
+                  | ( <FROMTO_CARDINALITY_ONE>                              {this.setValue(_relationship, fromTo, "cardinality",            "one");} )
+                  | ( <FROMTO_CARDINALITY_MANY>                             {this.setValue(_relationship, fromTo, "cardinality",            "many");} )
+                  | ( <FROMTO_TYPE>           ( tmp = <FROMTO_STRING>       {this.appendValue(_relationship, fromTo, "types",               this.getString(tmp.image));}
+                                              | tmp = <FROMTO_SINGLE>       {this.appendValue(_relationship, fromTo, "types",               this.getSingle(tmp.image));} ) )
+                  | ( <FROMTO_TYPE_ALL>                                     {this.setValue(_relationship, fromTo, "typeAll",                true);} )
+                  | ( <FROMTO_RELATIONSHIP>   ( tmp = <FROMTO_STRING>       {this.appendValue(_relationship, fromTo, "relations",           this.getString(tmp.image));}
+                                              | tmp = <FROMTO_SINGLE>       {this.appendValue(_relationship, fromTo, "relations",           this.getSingle(tmp.image));} ) )
+                  | ( <FROMTO_RELATIONSHIP_ALL>                             {this.setValue(_relationship, fromTo, "relationAll",            true);} )
+                )*
+          <FROMTO_END> )
+
+      | ( <ATTRIBUTE>               ( tmp = <STRING>                        {this.appendValue(_relationship, "attributeList", "attributes", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_relationship, "attributeList", "attributes", this.getSingle(tmp.image));} ) )
+
+      | ( <PROPERTY>                                                        {property = new AdminProperty();this.appendValue(_relationship, "properties", "propertiesStack", property);}
+                                    ( tmp = <STRING>                        {this.setValue(property, "name", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "name", this.getSingle(tmp.image));} )
+              (   ( <PROPERTYVAL>   ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <ADMINTYPE_SINGLE>              {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                    ( tmp = <STRING>                        {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+    )*
+}

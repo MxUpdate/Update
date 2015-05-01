@@ -378,11 +378,10 @@ public class ParameterCache_mxJPO
      * Returns for given key the related boolean value.
      *
      * @param _key  key of searched boolean value
-     * @return value of the boolean (or <code>null</code> if for the key no
-     *         boolean value is defined)
-     * @see #mapBoolean
+     * @return value of the boolean (or {@code null} if for the key no boolean
+     *         value is defined)
      */
-    public Boolean getValueBoolean(final Enum<?> _key)
+    public Boolean getValueBoolean(final ValueKeys _key)
     {
         return this.mapBoolean.get(_key.name());
     }
@@ -393,8 +392,8 @@ public class ParameterCache_mxJPO
      * @param _key  key of searched boolean value
      * @return value of the boolean (or <code>null</code> if for the key no
      *         boolean value is defined)
-     * @see #mapBoolean
      */
+    @Deprecated()
     public Boolean getValueBoolean(final String _key)
     {
         return this.mapBoolean.get(_key);
@@ -443,10 +442,20 @@ public class ParameterCache_mxJPO
      * Returns for given key the related list value.
      *
      * @param _key  key of searched list value
-     * @return list for related key (or <code>null</code> if no list is not
-     *         defined)
-     * @see #mapList
+     * @return list for related key (or {@code null} if no list is not defined)
      */
+    public Collection<String> getValueList(final ValueKeys _key)
+    {
+        return this.mapList.get(_key.name());
+    }
+
+    /**
+     * Returns for given key the related list value.
+     *
+     * @param _key  key of searched list value
+     * @return list for related key (or {@code null} if no list is not defined)
+     */
+    @Deprecated()
     public Collection<String> getValueList(final String _key)
     {
         return this.mapList.get(_key);
@@ -771,6 +780,13 @@ public class ParameterCache_mxJPO
         DMPolicyStateSupportsPublished,
         /** Boolean that policy states supports the 'enforce reserve access' flag. */
         DMPolicyStateSupportsEnforceReserveAccess,
+
+        /** List of removed attributes to ignored. */
+        DMRelationAttrIgnore,
+        /** List of removed attributes to remove. */
+        DMRelationAttrRemove,
+        /** Boolean that connections between connections from current MX version are supported. */
+        DMRelationSupportRelCons,
 
         /** Boolean that the access of rules are sorted. */
         DMRuleAllowExportAccessSorting,

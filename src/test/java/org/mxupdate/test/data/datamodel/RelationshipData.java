@@ -17,14 +17,13 @@ package org.mxupdate.test.data.datamodel;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.data.util.DataList;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.testng.Assert;
 
@@ -44,26 +43,14 @@ public class RelationshipData
         RelationshipData.REQUIRED_EXPORT_VALUES.put("description", "");
     }
 
-    /**
-     * Does the relationship prevent duplicates?
-     *
-     * @see #setPreventDuplicates(Boolean)
-     */
-    private Boolean preventDuplicates = false;
-
-    /**
-     * Values for the from side.
-     *
-     * @see #from()
-     */
+    /** Values for the from side. */
     private final FromTo from = new FromTo("from");
-
-    /**
-     * Values for the to side.
-     *
-     * @see #to()
-     */
+    /** Values for the to side. */
     private final FromTo to = new FromTo("to");
+    /** All attributes of this data with attribute instances. */
+    private final DataList<AbstractAttributeData<?>> attributes = new DataList<AbstractAttributeData<?>>();
+    /** All rule of this data with rule instances. */
+    private final DataList<RuleData> rules = new DataList<RuleData>();
 
     /**
      * Initialize this relationship data with given <code>_name</code>.
@@ -78,20 +65,6 @@ public class RelationshipData
         super(_test, AbstractTest.CI.DM_RELATIONSHIP, _name,
               RelationshipData.REQUIRED_EXPORT_VALUES,
               null);
-    }
-
-    /**
-     * Defines if this relationship data instance must prevent duplicates.
-     *
-     * @param _preventDuplicates    <i>true</i> if the data instance must
-     *                              prevent duplicates; otherwise <i>false</i>
-     * @return this relationship data instance
-     * @see #preventDuplicates
-     */
-    public RelationshipData setPreventDuplicates(final Boolean _preventDuplicates)
-    {
-        this.preventDuplicates = _preventDuplicates;
-        return this;
     }
 
     /**
@@ -117,6 +90,33 @@ public class RelationshipData
     }
 
     /**
+     * Assigns the {@code attributes} to this data instance.
+     *
+     * @param _attributes       attribute to assign
+     * @return this data instance
+     */
+    @Override
+    public RelationshipData addAttribute(final AbstractAttributeData<?>... _attributes)
+    {
+        this.attributes.addAll(Arrays.asList(_attributes));
+        return this;
+    }
+
+    /**
+     * Assigns the {@code _rule} to this relationship instance. Hint! Maximum
+     * one rule technical is possible!
+     *
+     * @param _rule     rule to defined
+     * @return this relationship instance
+     */
+    public RelationshipData setRule(final RuleData _rule)
+    {
+        this.rules.clear();
+        this.rules.add(_rule);
+        return this;
+    }
+
+    /**
      * Returns the TCL update file of this relationship data instance.
      *
      * @return TCL update file content
@@ -124,30 +124,21 @@ public class RelationshipData
     @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("mql escape mod relationship \"${NAME}\"");
+        final StringBuilder strg = new StringBuilder();
+        this.append4CIFileHeader(strg);
+        strg.append("mxUpdate relationship \"${NAME}\" {\n");
 
-        this.append4CIFileValues(cmd);
+        this.getFlags()     .appendUpdate("    ", strg);
+        this.getValues()    .appendUpdate("    ", strg);
+        this.rules          .appendUpdate("    ", strg);
+        this.from           .appendUpdate(strg);
+        this.to             .appendUpdate(strg);
+        this.attributes     .appendUpdate("    ", strg);
+        this.getProperties().appendUpdate("    ", strg);
 
-        // prevent duplicates
-        if (this.preventDuplicates != null)  {
-            cmd.append(' ');
-            if (!this.preventDuplicates)  {
-                cmd.append('!');
-            }
-            cmd.append("preventduplicates");
-        }
+        strg.append("}");
 
-        // append from side
-        this.from.append4CIFile(cmd);
-
-        // append to types
-        this.to.append4CIFile(cmd);
-
-        // append attributes
-        this.append4CIAttributes(cmd);
-
-        return cmd.toString();
+        return strg.toString();
     }
 
     /**
@@ -169,22 +160,17 @@ public class RelationshipData
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add relationship \"").append(AbstractTest.convertMql(this.getName())).append('\"');
 
-            // prevent duplicates
-            if (this.preventDuplicates != null)  {
-                cmd.append(' ');
-                if (!this.preventDuplicates)  {
-                    cmd.append('!');
-                }
-                cmd.append("preventduplicates");
-            }
+            this.getFlags().append4Create(cmd);
 
-            // append from side
             this.from.append4Create(cmd);
-
-            // append to side
             this.to.append4Create(cmd);
+            this.attributes.append4Create(cmd);
 
             this.append4Create(cmd);
+
+            cmd.append(";escape mod relationship \"").append(AbstractTest.convertMql(this.getName())).append('\"');
+
+            this.rules.append4CreateViaAdd(cmd);
 
             this.getTest().mql(cmd);
         }
@@ -205,22 +191,14 @@ public class RelationshipData
     {
         super.createDependings();
 
-        // create from types
-        for (final TypeData type : this.from.getTypes())  {
-            type.create();
-        }
-        // create from relationships
-        for (final RelationshipData relationship : this.from.getRelationships())  {
-            relationship.create();
-        }
-        // create to types
-        for (final TypeData type : this.to.getTypes())  {
-            type.create();
-        }
-        // create to relationships
-        for (final RelationshipData relationship : this.to.getRelationships())  {
-            relationship.create();
-        }
+        this.attributes.createDependings();
+        this.rules.createDependings();
+
+        this.from.types.createDependings();
+        this.from.relationships.createDependings();
+
+        this.to.types.createDependings();
+        this.to.relationships.createDependings();
 
         return this;
     }
@@ -235,23 +213,19 @@ public class RelationshipData
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        super.checkExport(_exportParser);
-
-        // prevent duplicates
+        // check symbolic name
         Assert.assertEquals(
-                _exportParser.getLines("/mql/preventduplicates/@value").size(),
-                ((this.preventDuplicates != null) && this.preventDuplicates) ? 1 : 0,
-                "check prevent duplicates is defined " + _exportParser.getLines("/mql/preventduplicates/@value"));
-        Assert.assertEquals(
-                _exportParser.getLines("/mql/!preventduplicates/@value").size(),
-                ((this.preventDuplicates != null) && this.preventDuplicates) ? 0 : 1,
-                "check prevent duplicates is defined " + _exportParser.getLines("/mql/!preventduplicates/@value"));
+                _exportParser.getSymbolicName(),
+                this.getSymbolicName(),
+                "check symbolic name");
 
-        // from side
+        this.getFlags().checkExport(_exportParser, "");
         this.from.checkExport(_exportParser);
-
-        // to side
         this.to.checkExport(_exportParser);
+
+        _exportParser
+                .checkList("attribute", this.attributes.toUpdateStringList())
+                .checkList("rule",      this.rules.toUpdateStringList());
     }
 
     /**
@@ -283,88 +257,28 @@ public class RelationshipData
      */
     public final class FromTo
     {
-        /**
-         * Information string about the side (value is to or from).
-         */
+        /** Information string about the side (value is to or from). */
         private final String side;
-
-        /**
-         * Must the connection propagated?
-         *
-         * @see #setPropagateConnection(Boolean)
-         */
-        private Boolean propagateConnection = false;
-
-        /**
-         * Must the modification propagated?
-         *
-         * @see #setPropagateModify(Boolean)
-         */
-        private Boolean propagateModify = false;
-
-        /**
-         * Meaning of the side.
-         *
-         * @see #setMeaning(String)
-         */
+        /** Defines flags for this data piece. */
+        private final Flags flags = new Flags();
+        /** Meaning of the side. */
         private String meaning;
+        /** Cardinality of the side. */
+        private Cardinality cardinality = Cardinality.MANY;
+        /** Clone behavior of the side. */
+        private Behavior clone = Behavior.NONE;
+        /** Revise behavior of the side. */
+        private Behavior revision = Behavior.NONE;
 
-        /**
-         * Cardinality of the side.
-         *
-         * @see #setCardinality(Cardinality)
-         */
-        private Cardinality cardinality;
-
-        /**
-         * Clone behavior of the side.
-         *
-         * @see #setClone(Behavior)
-         */
-        private Behavior clone;
-
-        /**
-         * Revise behavior of the side.
-         *
-         * @see #setRevision(Behavior)
-         */
-        private Behavior revision;
-
-        /**
-         * All types flag for the from side.
-         *
-         * @see #addAllTypes()
-         * @see #create()
-         * @see #checkExport(ExportParser)
-         */
+        /** All types flag for the from side. */
         private boolean allTypes;
+        /** Defined types on the from side. */
+        private final DataList<TypeData> types = new DataList<TypeData>();
 
-        /**
-         * Defined types on the from side.
-         *
-         * @see #addType(TypeData...)
-         * @see #create()
-         * @see #checkExport(ExportParser)
-         */
-        private final Set<TypeData> types = new HashSet<TypeData>();
-
-        /**
-         * All relationship flag for the from side.
-         *
-         * @see #addAllRelationships()
-         * @see #create()
-         * @see #checkExport(ExportParser)
-         */
+        /** All relationship flag for the from side. */
         private boolean allRelationships;
-
-        /**
-         * Defined relationships on the from side.
-         *
-         * @see #addRelationship(RelationshipData...)
-         * @see #create()
-         * @see #checkExport(ExportParser)
-         */
-        private final Set<RelationshipData> relationships = new HashSet<RelationshipData>();
+        /** Defined relationships on the from side. */
+        private final DataList<RelationshipData> relationships = new DataList<RelationshipData>();
 
         /**
          * Defines the side string.
@@ -377,32 +291,17 @@ public class RelationshipData
         }
 
         /**
-         * Defines if this relationship data instance must propate connection.
+         * Defines the flag and the value.
          *
-         * @param _propagateConnection  <i>true</i> if the data instance must
-         *                              propagate connections; otherwise
-         *                              <i>false</i>
-         * @return this relationship data instance
-         * @see #propagateConnection
+         * @param _key          key (name) of the flag
+         * @param _value        <i>true</i> to activate the flag; otherwise
+         *                      <i>false</i>; to undefine set to <code>null</code>
+         * @return this data instance
          */
-        public RelationshipData setPropagateConnection(final Boolean _propagateConnection)
+        public RelationshipData setFlag(final String _key,
+                                        final Boolean _value)
         {
-            this.propagateConnection = _propagateConnection;
-            return RelationshipData.this;
-        }
-
-        /**
-         * Defines if this relationship data instance must propagate modify.
-         *
-         * @param _propagateModify  <i>true</i> if the data instance must
-         *                          propagate modify; otherwise
-         *                          <i>false</i>
-         * @return this relationship data instance
-         * @see #propagateConnection
-         */
-        public RelationshipData setPropagateModify(final Boolean _propagateModify)
-        {
-            this.propagateModify = _propagateModify;
+            this.flags.put(_key, _value);
             return RelationshipData.this;
         }
 
@@ -485,17 +384,6 @@ public class RelationshipData
         }
 
         /**
-         * Returns all assigned {@link #types types}.
-         *
-         * @return all types
-         * @see #types
-         */
-        public Set<TypeData> getTypes()
-        {
-            return this.types;
-        }
-
-        /**
          * Assigns <code>_relationships</code> to the
          * {@link #relationships list of relationships} for this
          * relationship.
@@ -523,80 +411,51 @@ public class RelationshipData
         }
 
         /**
-         * Returns all assigned {@link #relationships relationships}.
-         *
-         * @return all from types
-         * @see #relationships
-         */
-        public Set<RelationshipData> getRelationships()
-        {
-            return this.relationships;
-        }
-
-        /**
          * Appends the TCL statements for the CI file for one side.
          *
          * @param _cmd      TCL string builder
          */
-        protected void append4CIFile(final StringBuilder _cmd)
+        protected void appendUpdate(final StringBuilder _cmd)
         {
-            // propagate connection
-            if (this.propagateConnection != null)  {
-                _cmd.append(' ').append(this.side).append(' ');
-                if (!this.propagateConnection)  {
-                    _cmd.append('!');
-                }
-                _cmd.append("propagateconnection");
-            }
+            _cmd.append("    ").append(this.side).append(" {\n");
 
-            // propagate modify
-            if (this.propagateModify != null)  {
-                _cmd.append(' ').append(this.side).append(' ');
-                if (!this.propagateModify)  {
-                    _cmd.append('!');
-                }
-                _cmd.append("propagatemodify");
-            }
+            this.flags.appendUpdate("        ", _cmd);
 
             // meaning
             if (this.meaning != null)  {
-                _cmd.append(" meaning \"").append(StringUtil_mxJPO.convertTcl(this.meaning)).append('\"');
+                _cmd.append("        meaning \"").append(StringUtil_mxJPO.convertUpdate(this.meaning)).append("\"\n");
             }
 
             // cardinality
             if (this.cardinality != null)  {
-                _cmd.append(" cardinality ").append(this.cardinality.name().toLowerCase());
+                _cmd.append("        cardinality ").append(this.cardinality.name().toLowerCase()).append("\n");
             }
 
             // clone behavior
             if (this.clone != null)  {
-                _cmd.append(" clone ").append(this.clone.name().toLowerCase());
+                _cmd.append("        clone ").append(this.clone.name().toLowerCase()).append("\n");
             }
 
             // clone behavior
             if (this.revision != null)  {
-                _cmd.append(" revision ").append(this.revision.name().toLowerCase());
+                _cmd.append("        revision ").append(this.revision.name().toLowerCase()).append("\n");
             }
 
             // append from types
             if (this.allTypes)  {
-                _cmd.append(" " + this.side + " add type all");
-            } else if (!this.types.isEmpty())  {
-                _cmd.append(" " + this.side);
-                for (final TypeData type : this.types)  {
-                    _cmd.append(" add type \"").append(AbstractTest.convertTcl(type.getName())).append("\"");
-                }
+                _cmd.append("        type all\n");
+            } else  {
+                this.types.appendUpdate("        ", _cmd);
             }
 
             // append from relationships
             if (this.allRelationships)  {
-                _cmd.append(" " + this.side + " add relationship all");
-            } else if (!this.relationships.isEmpty())  {
-                _cmd.append(" " + this.side);
-                for (final RelationshipData relationship : this.relationships)  {
-                    _cmd.append(" add relationship \"").append(AbstractTest.convertTcl(relationship.getName())).append("\"");
-                }
+                _cmd.append("        relationship all\n");
+            } else  {
+                this.relationships.appendUpdate("        ", _cmd);
             }
+
+            _cmd.append("    }\n");
         }
 
         /**
@@ -611,23 +470,11 @@ public class RelationshipData
         {
             _cmd.append(' ').append(this.side);
 
-            // propagate connection
-            _cmd.append(' ');
-            if ((this.propagateConnection == null) || !this.propagateConnection)  {
-                    _cmd.append('!');
-            }
-            _cmd.append("propagateconnection");
-
-            // propagate modify
-            _cmd.append(' ');
-            if ((this.propagateModify == null) || !this.propagateModify)  {
-                _cmd.append('!');
-            }
-            _cmd.append("propagatemodify");
+            this.flags.append4Create(_cmd);
 
             // meaning
             if (this.meaning != null)  {
-                _cmd.append(" meaning \"").append(StringUtil_mxJPO.convertMql(this.meaning)).append('\"');
+                _cmd.append(" meaning \"").append(AbstractTest.convertMql(this.meaning)).append('\"');
             }
 
             // cardinality
@@ -650,33 +497,15 @@ public class RelationshipData
             // append to types
             if (this.allTypes)  {
                 _cmd.append(" type all");
-            } else if (!this.types.isEmpty())  {
-                _cmd.append(" type ");
-                boolean first = true;
-                for (final TypeData type : this.types)  {
-                    if (first)  {
-                        first = false;
-                    } else  {
-                        _cmd.append(',');
-                    }
-                    _cmd.append("\"").append(AbstractTest.convertMql(type.getName())).append("\"");
-                }
+            } else  {
+                this.types.append4Create(_cmd);
             }
 
             // append to relationships
             if (this.allRelationships)  {
                 _cmd.append(" relationship all");
             } else if (!this.relationships.isEmpty())  {
-                _cmd.append(" relationship ");
-                boolean first = true;
-                for (final RelationshipData relationship : this.relationships)  {
-                    if (first)  {
-                        first = false;
-                    } else  {
-                        _cmd.append(',');
-                    }
-                    _cmd.append("\"").append(AbstractTest.convertMql(relationship.getName())).append("\"");
-                }
+                this.relationships.append4Create(_cmd);
             }
         }
 
@@ -689,80 +518,15 @@ public class RelationshipData
         protected void checkExport(final ExportParser _exportParser)
             throws MatrixException
         {
-            // propagate modify
-            Assert.assertEquals(
-                    _exportParser.getLines("/mql/" + this.side + "/propagateconnection/@value").size(),
-                    ((this.propagateConnection != null) && this.propagateConnection) ? 1 : 0,
-                    "check propagate connection is defined " + _exportParser.getLines("/mql/" + this.side + "/propagateconnection/@value"));
-            Assert.assertEquals(
-                    _exportParser.getLines("/mql/" + this.side + "/!propagateconnection/@value").size(),
-                    ((this.propagateConnection != null) && this.propagateConnection) ? 0 : 1,
-                    "check propagate connection is defined " + _exportParser.getLines("/mql/" + this.side + "/!propagateconnection/@value"));
+            this.flags.checkExport(_exportParser, this.side);
 
-            // propagate modify
-            Assert.assertEquals(
-                    _exportParser.getLines("/mql/" + this.side + "/propagatemodify/@value").size(),
-                    ((this.propagateModify != null) && this.propagateModify) ? 1 : 0,
-                    "check propagate modify is defined " + _exportParser.getLines("/mql/" + this.side + "/propagatemodify/@value"));
-            Assert.assertEquals(
-                    _exportParser.getLines("/mql/" + this.side + "/!propagatemodify/@value").size(),
-                    ((this.propagateModify != null) && this.propagateModify) ? 0 : 1,
-                    "check propagate modify is defined " + _exportParser.getLines("/mql/" + this.side + "/!propagatemodify/@value"));
-
-            // meaning
-            Assert.assertEquals(
-                    _exportParser.getLines("/mql/" + this.side + "/meaning/@value").get(0),
-                    (this.meaning != null) ? "\"" + StringUtil_mxJPO.convertTcl(this.meaning) + "\"" : "\"\"",
-                    "check for correct meaning");
-
-            // cardinality
-            Assert.assertEquals(
-                    _exportParser.getLines("/mql/" + this.side + "/cardinality/@value").get(0),
-                    (this.cardinality == null) || (this.cardinality == RelationshipData.Cardinality.ONE) ? "\"One\"" : "\"N\"",
-                    "check for correct cardinality");
-
-            // clone behavior
-            Assert.assertEquals(
-                    _exportParser.getLines("/mql/" + this.side + "/clone/@value").get(0),
-                    (this.clone != null) ? "\"" + this.clone.name().toLowerCase() + "\"" : "\"none\"",
-                    "check for correct clone behavior");
-
-            // revision behavior
-            Assert.assertEquals(
-                    _exportParser.getLines("/mql/" + this.side + "/revision/@value").get(0),
-                    (this.revision != null) ? "\"" + this.revision.name().toLowerCase() + "\"" : "\"none\"",
-                    "check for correct revision behavior");
-
-            // types and relationships
-            final Set<String> paresedFroms = new HashSet<String>(_exportParser.getLines("/mql/" + this.side + "/add/@value"));
-            Assert.assertEquals(
-                    paresedFroms.size(),
-                    ((this.allTypes) ? 1 : this.types.size()) + ((this.allRelationships) ? 1 : this.relationships.size()),
-                    "check that all " + this.side + " types and relationshipos are defined");
-            if (this.allTypes)  {
-                Assert.assertTrue(
-                        paresedFroms.contains("type \"all\""),
-                        "check that all " + this.side + " types are defined " + paresedFroms);
-            } else  {
-                for (final TypeData type : this.types)  {
-                    final String line = "type \"" + StringUtil_mxJPO.convertTcl(type.getName()) + "\"";
-                    Assert.assertTrue(
-                            paresedFroms.contains(line),
-                            "check that " + this.side + " " + type.getName() + " is defined");
-                }
-            }
-            if (this.allRelationships)  {
-                Assert.assertTrue(
-                        paresedFroms.contains("relationship \"all\""),
-                        "check that all " + this.side + " relationships are defined " + paresedFroms);
-            } else  {
-                for (final RelationshipData relationship : this.relationships)  {
-                    final String line = "relationship \"" + StringUtil_mxJPO.convertTcl(relationship.getName()) + "\"";
-                    Assert.assertTrue(
-                            paresedFroms.contains(line),
-                            "check that " + this.side + " " + relationship.getName() + " is defined");
-                }
-            }
+            _exportParser
+                    .checkValue(this.side + "/meaning",      "\"" + StringUtil_mxJPO.convertUpdate(this.meaning) + "\"")
+                    .checkValue(this.side + "/cardinality",  this.cardinality.name().toLowerCase())
+                    .checkValue(this.side + "/clone",        this.clone.name().toLowerCase())
+                    .checkValue(this.side + "/revision",     this.revision.name().toLowerCase())
+                    .checkList( this.side + "/type",         this.allTypes ? Arrays.asList(new String[]{"all"}) : this.types.toUpdateStringList())
+                    .checkList( this.side + "/relationship", this.allRelationships ? Arrays.asList(new String[]{"all"}) : this.relationships.toUpdateStringList());
         }
     }
 }
