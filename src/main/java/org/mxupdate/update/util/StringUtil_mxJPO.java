@@ -96,19 +96,48 @@ public final class StringUtil_mxJPO
      */
     public static String convertUpdate(final CharSequence _text)
     {
-        final String text;
+        final char[] text;
         if (_text == null)  {
-            text = "";
+            text = new char[0];
         } else  {
-            text = _text.toString();
+            text = _text.toString().toCharArray();
         }
-        return text.replaceAll("\\\\", "\\\\\\\\")
-                   .replaceAll("\\\"", "\\\\\"")
-                   .replaceAll("\\" + "$", "\\\\\\" + "$")
-                   .replaceAll("\\{", "\\\\{")
-                   .replaceAll("\\}", "\\\\}")
-                   .replaceAll("\\[", "\\\\[")
-                   .replaceAll("\\]", "\\\\]");
+        final StringBuilder ret = new StringBuilder(text.length + text.length);
+        int brace = 0;
+        for (final char ch : text)  {
+            switch (ch)  {
+                case '\"':
+                    ret.append("\\\"");
+                    break;
+                case '\\':
+                    ret.append("\\\\");
+                    break;
+                case '{':
+                    brace++;
+                    ret.append('{');
+                    break;
+                case '}':
+                    if (brace > 0)  {
+                        brace--;
+                    } else  {
+                        ret.append('\\');
+                    }
+                    ret.append('}');
+                    break;
+                default:
+                    ret.append(ch);
+            }
+        }
+        if (brace > 0)  {
+            for (int idx = ret.length() - 1; (idx >=0) && (brace > 0); idx--)  {
+                if (ret.charAt(idx) == '{')  {
+                    brace--;
+                    ret.insert(idx, '\\');
+                }
+            }
+        }
+
+        return ret.toString();
     }
 
     /**
@@ -127,6 +156,7 @@ public final class StringUtil_mxJPO
         } else  {
             text = _text.toString().replaceAll("\\\\", "\\\\\\\\\\\\\\\\");
         }
+
         return text.replaceAll("\\\"", "\\\\\"")
                    .replaceAll("\\" + "$", "\\\\\\" + "$")
                    .replaceAll("\\{", "\\\\{")
