@@ -1,0 +1,140 @@
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
+options {
+    JDK_VERSION = "1.6";
+    STATIC = false;
+    ERROR_REPORTING = true;
+    USER_TOKEN_MANAGER = false;
+    GENERATE_BOILERPLATE = false;
+    SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
+}
+PARSER_BEGIN(ParserTestImpl)
+package  org.mxupdate.test.test.parser;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+
+import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.datamodel.Rule_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
+import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
+import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+
+@SuppressWarnings("unused")
+class ParserTestImpl
+    extends AbstractParser_mxJPO<Rule_mxJPO>
+{
+}
+PARSER_END(ParserTestImpl)<*> SKIP :
+{
+  " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
+}
+
+<DEFAULT> TOKEN :
+{
+      <TEST1:       "string">               : STRING_EXPECTED
+    | <TEST2:       "multi-line-string">    : MULTILINESTRING_EXPECTED
+}
+
+/************************************************************** Common String */
+<STRING_EXPECTED> TOKEN :
+{
+      <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
+    | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/*************************************************** Common Multi-Line-String */
+<MULTILINESTRING_EXPECTED> TOKEN :
+{
+      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
+    | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/**************************************************************************** */
+
+/**
+ * Parses one complete string.
+ *
+ * @param _rule   target rule to update with parsed values
+ */
+String test1String()
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+: {
+    Token tmp;
+    String ret = null;
+} {
+    (   ( <TEST1>                   ( tmp = <STRING>                    {ret = this.getString(tmp.image);}
+                                    | tmp = <SINGLE>                    {ret = this.getSingle(tmp.image);} ) )
+    )*
+    {
+        return ret;
+    }
+}
+/**
+ * Parses one complete multiline-string.
+ *
+ * @param _rule   target rule to update with parsed values
+ */
+String test2MultilineString()
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+: {
+    Token tmp;
+    String ret = null;
+} {
+    (   ( <TEST2>                   ( tmp = <MULTILINESTRING>           {ret = this.getString(tmp.image);}
+                                    | tmp = <MULTILINESINGLE>           {ret = this.getSingle(tmp.image);} ) )
+    )*
+    {
+        return ret;    }
+}
+
+
+/**
+ * Parses one complete multiline-string.
+ *
+ * @param _rule   target rule to update with parsed values
+ */
+String test3Comment()
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+: {
+    Token tmp;
+    String ret = null;
+} {
+    (   ( <TEST1>                   ( tmp = <STRING>                    {ret = this.getString(tmp.image);}
+                                    | tmp = <SINGLE>                    {ret = this.getSingle(tmp.image);} ) )
+      | ( <TEST2>                   ( tmp = <MULTILINESTRING>           {ret = this.getString(tmp.image);}
+                                    | tmp = <MULTILINESINGLE>           {ret = this.getSingle(tmp.image);} ) )
+
+    )*
+    {
+        return ret;
+    }
+}
+/**
+ * Dummy definition to fulfill the parsert interface
+ *
+ * @param _rule     not used
+ */
+void parse(final Rule_mxJPO _rule)
+: {
+} {
+  <MULTILINESINGLE>
+}
