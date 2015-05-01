@@ -27,7 +27,6 @@ import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.data.util.PropertyDefList;
-import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.testng.Assert;
 
 /**
@@ -69,11 +68,11 @@ public class DimensionData
 
         this.append4CIFileHeader(strg);
 
-        strg.append("updateDimension \"${NAME}\" {\n")
-            .append("  hidden \"").append(this.getFlags().get("hidden") != null ? this.getFlags().get("hidden") : false).append("\"\n");
+        strg.append("mxUpdate dimension \"${NAME}\" {\n")
+            .append("    hidden \"").append(this.getFlags().get("hidden") != null ? this.getFlags().get("hidden") : false).append("\"\n");
 
         // append values
-        this.getValues().appendUpdate("  ", strg, "\n");
+        this.getValues().appendUpdate("    ", strg, "\n");
 
         // append state information
         for (final UnitData unit : this.units)
@@ -82,7 +81,7 @@ public class DimensionData
         }
 
         // append properties
-        this.getProperties().appendCIFileUpdateFormat("  ", strg);
+        this.getProperties().appendCIFileUpdateFormat("    ", strg);
 
         strg.append("}");
 
@@ -153,7 +152,7 @@ public class DimensionData
 
         // check for all required values
         for (final String valueName : DimensionData.REQUIRED_EXPORT_VALUES.keySet())  {
-            Assert.assertEquals(_exportParser.getLines("/updateDimension/" + valueName + "/@value").size(),
+            Assert.assertEquals(_exportParser.getLines("/mxUpdate/" + valueName + "/@value").size(),
                                 1,
                                 "required check that minimum and maximum one " + valueName + " is defined");
         }
@@ -181,7 +180,7 @@ public class DimensionData
         }
 
         // check for properties
-        this.getProperties().checkExport(_exportParser.getLines("/updateDimension/property/@value"));
+        this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
     }
 
     /**
@@ -308,17 +307,15 @@ public class DimensionData
          */
         protected void append4CIFile(final StringBuilder _cmd)
         {
-            _cmd.append("  unit \"").append(StringUtil_mxJPO.convertTcl(this.name)).append("\" {\n");
+            _cmd.append("    unit \"").append(AbstractTest.convertUpdate(this.name)).append("\" {\n");
             for (final Map.Entry<String,String> value : this.valuesWithQuots.entrySet())  {
-                _cmd.append("      ").append(value.getKey())
-                    .append(" \"").append(StringUtil_mxJPO.convertTcl(value.getValue())).append("\"\n");
+                _cmd.append("        ").append(value.getKey()).append(" \"").append(AbstractTest.convertUpdate(value.getValue())).append("\"\n");
             }
             for (final Map.Entry<String,String> value : this.valuesWOQuots.entrySet())  {
-                _cmd.append("      ").append(value.getKey())
-                    .append(" ").append(value.getValue()).append("\n");
+                _cmd.append("        ").append(value.getKey()).append(" ").append(value.getValue()).append("\n");
             }
 
-            this.properties.appendCIFileUpdateFormat("      ", _cmd);
+            this.properties.appendCIFileUpdateFormat("        ", _cmd);
 
             _cmd.append("  }\n");
         }
@@ -333,7 +330,7 @@ public class DimensionData
         protected void append4Create(final StringBuilder _cmd)
             throws MatrixException
         {
-            _cmd.append("  unit \"").append(StringUtil_mxJPO.convertMql(this.name)).append("\"");
+            _cmd.append("  unit \"").append(AbstractTest.convertMql(this.name)).append("\"");
             for (final Map.Entry<String,String> value : this.valuesWithQuots.entrySet())  {
                 _cmd.append(' ');
                 if ("description".equals(value.getKey()))  {
@@ -341,7 +338,7 @@ public class DimensionData
                 } else  {
                     _cmd.append(value.getKey());
                 };
-                _cmd.append(" \"").append(StringUtil_mxJPO.convertMql(value.getValue())).append('\"');
+                _cmd.append(" \"").append(AbstractTest.convertMql(value.getValue())).append('\"');
             }
             for (final Map.Entry<String,String> value : this.valuesWOQuots.entrySet())  {
                 _cmd.append(' ');
@@ -369,7 +366,7 @@ public class DimensionData
             throws MatrixException
         {
             boolean found = false;
-            final String value = "\"" + AbstractTest.convertTcl(this.name) + "\"";
+            final String value = "\"" + AbstractTest.convertUpdate(this.name) + "\"";
             List<String> propLines = null;
             for (final ExportParser.Line line : _exportParser.getRootLines().get(0).getChildren())  {
                 if ("unit".equals(line.getTag()) && line.getValue().startsWith(value))  {
@@ -384,7 +381,7 @@ public class DimensionData
                                 line,
                                 entry.getKey(),
                                 entry.getKey(),
-                                "\"" + AbstractTest.convertTcl(entry.getValue()) + "\"");
+                                "\"" + AbstractTest.convertUpdate(entry.getValue()) + "\"");
                     }
                     for (final Map.Entry<String,String> entry : this.valuesWOQuots.entrySet())  {
                         PolicyData.checkSingleValue(
@@ -395,7 +392,7 @@ public class DimensionData
                     }
                 }
             }
-            Assert.assertTrue(found, "check that state '" + this.name + "' is found");
+            Assert.assertTrue(found, "check that unit '" + this.name + "' is found");
 
             // check properties
             this.properties.checkExport(propLines);

@@ -37,21 +37,12 @@ import org.testng.annotations.Test;
 public class DimensionParserTest
     extends AbstractTest
 {
-    /**
-     * Name of the test dimension.
-     */
+    /** Name of the test dimension. */
     private static final String DIMENSION_NAME = AbstractTest.PREFIX + "_Test";
 
-    /**
-     * Start of the command to update the dimension to extract the code.
-     */
-    private static final String START_INDEX = "updateDimension \"${NAME}\"  {";
-
-    /**
-     * Length of the string of the command to update the dimension.
-     *
-     * @see #START_INDEX
-     */
+    /** Start of the command to update the dimension to extract the code. */
+    private static final String START_INDEX = "mxUpdate dimension \"${NAME}\" {";
+    /** Length of the string of the command to update the dimension. */
     private static final int START_INDEX_LENGTH = DimensionParserTest.START_INDEX.length();
 
     /**
@@ -105,8 +96,8 @@ public class DimensionParserTest
                         + "  property \"_test3\" value \"Test3\"\n"
                         + "  property \"abc\" value \"abc\"\n"
                         + "  property \"abc2\" value \"abc2\"\n"
-                        + "  property \"test2\" value \"Test2\"\n"
                         + "  property \"test\" to type \"Part\" value \"Test\"\n"
+                        + "  property \"test2\" value \"Test2\"\n"
                         + "}\n"
                         + "unit \"name2\" {\n"
                         + "  description \"description 2\"\n"
@@ -201,14 +192,14 @@ public class DimensionParserTest
                                                        paramCache.getMapping().getTypeDef("Dimension"),
                                                        DimensionParserTest.DIMENSION_NAME);
 
-        final StringBuilder bck = new StringBuilder();
+        final StringBuilder generated = new StringBuilder();
         final Method write = dimension.getClass()
                 .getDeclaredMethod("write", ParameterCache_mxJPO.class, Appendable.class);
         write.setAccessible(true);
-        write.invoke(dimension, paramCache, bck);
+        write.invoke(dimension, paramCache, generated);
 
         final StringBuilder oldDefBuilder = new StringBuilder();
-        for (final String line : ("".equals(_toTest)) ? _definition.split("\n") : _toTest.split("\n"))  {
+        for (final String line : _toTest.isEmpty() ? _definition.split("\n") : _toTest.split("\n"))  {
             oldDefBuilder.append(line.trim()).append(' ');
         }
         int length = 0;
@@ -218,10 +209,7 @@ public class DimensionParserTest
             oldDef = oldDef.replaceAll("  ", " ");
         }
 
-        final String temp = bck.substring(bck.indexOf(DimensionParserTest.START_INDEX)
-                                                      + DimensionParserTest.START_INDEX_LENGTH + 1,
-                                          bck.length() - 2)
-                               .toString();
+        final String temp = generated.substring(generated.indexOf(DimensionParserTest.START_INDEX) + DimensionParserTest.START_INDEX_LENGTH + 1, generated.length() - 2).toString();
         final StringBuilder newDef = new StringBuilder();
         for (final String line : temp.split("\n"))  {
             newDef.append(line.trim()).append(' ');

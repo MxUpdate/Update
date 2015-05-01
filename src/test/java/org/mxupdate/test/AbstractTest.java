@@ -93,7 +93,7 @@ public abstract class AbstractTest
         DM_ATTRIBUTE_STRING("attribute", null, false, null, null, "AttributeString", "ATTRIBUTE", "STRING_", "datamodel/attribute", true, "updateAttribute"),
 
         /** Configuration item Data Model Dimension. */
-        DM_DIMENSION("dimension", null, false, null, null, "Dimension", "DIMENSION", "DIMENSION_", "datamodel/dimension", true, "updateDimension"),
+        DM_DIMENSION("dimension", null, false, null, null, "Dimension", "DIMENSION", "DIMENSION_", "datamodel/dimension", true, "mxUpdate"),
 
         /** Configuration item Data Model Expression. */
         DM_EXPRESSION("expression", null, false, null, null, "Expression", "EXPRESSION", "EXPRESSION_", "datamodel/expression", true, "mxUpdate"),

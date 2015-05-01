@@ -63,7 +63,7 @@ public class Dimension
             + "#\n"
             + "################################################################################\n"
             + "\n"
-            + "updateDimension \"${NAME}\" {\n"
+            + "mxUpdate dimension \"${NAME}\" {\n"
             + "  description \"a simple description\"\n"
             + "  hidden \"true\"\n"
             + "  unit \"name1\" {\n"

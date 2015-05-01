@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.datamodel;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
@@ -49,30 +48,7 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
 public class Dimension_mxJPO
     extends AbstractAdminObject_mxJPO
 {
-    /**
-     * Called TCL procedure within the TCL update to parse the new dimension
-     * definition. The TCL procedure calls method
-     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)} with the new
-     * dimension definition. All quot's are replaced by <code>@0@0@</code> and
-     * all apostroph's are replaced by <code>@1@1@</code>.
-     *
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
-     */
-    private static final String TCL_PROCEDURE
-            = "proc updateDimension {_sDimension _lsArgs}  {\n"
-                + "regsub -all {'} $_lsArgs {@0@0@} sArg\n"
-                + "regsub -all {\\\"} $sArg {@1@1@} sArg\n"
-                + "regsub -all {\\\\\\[} $sArg {[} sArg\n"
-                + "regsub -all {\\\\\\]} $sArg {]} sArg\n"
-                + "mql exec prog org.mxupdate.update.util.JPOCaller dimension ${_sDimension} \"${sArg}\"\n"
-            + "}\n";
-
-    /**
-     * Set of all ignored URLs from the XML definition for dimensions.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     */
+    /** Set of all ignored URLs from the XML definition for dimensions. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
         Dimension_mxJPO.IGNORED_URLS.add("/unitList");
@@ -85,7 +61,7 @@ public class Dimension_mxJPO
     }
 
     /** Holds the list of already parsed units of this dimension. */
-    private final Set<Dimension_mxJPO.Unit> units = new TreeSet<Dimension_mxJPO.Unit>();
+    private final Set<Unit> units = new TreeSet<Unit>();
     /** Holds current parsed unit. */
     private Unit currentUnit;
 
@@ -217,107 +193,50 @@ public class Dimension_mxJPO
         this.writeHeader(_paramCache, _out);
 
         // write dimension description
-        _out.append("updateDimension \"${NAME}\"  {\n")
-            .append("  description \"").append(StringUtil_mxJPO.convertTcl(this.getDescription())).append("\"\n")
-            .append("  hidden \"").append(Boolean.toString(this.isHidden())).append("\"\n");
+        _out.append("mxUpdate dimension \"${NAME}\" {\n")
+            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n")
+            .append("    hidden \"").append(Boolean.toString(this.isHidden())).append("\"\n");
         for (final Unit unit : this.units)  {
-            _out.append("  unit \"").append(StringUtil_mxJPO.convertTcl(unit.name)).append("\" {\n");
+            _out.append("    unit \"").append(StringUtil_mxJPO.convertUpdate(unit.name)).append("\" {\n");
             if (unit.defaultUnit)  {
-                _out.append("    default true\n");
+                _out.append("        default true\n");
             }
-            _out.append("    description \"")
-                            .append(StringUtil_mxJPO.convertTcl(unit.description)).append("\"\n")
-                    .append("    label \"").append(StringUtil_mxJPO.convertTcl(unit.label)).append("\"\n")
-                    .append("    multiplier ").append(Double.toString(unit.multiplier)).append("\n")
-                    .append("    offset ").append(Double.toString(unit.offset)).append("\n");
+            _out.append("        description \"")
+                            .append(StringUtil_mxJPO.convertUpdate(unit.description)).append("\"\n")
+                    .append("        label \"").append(StringUtil_mxJPO.convertUpdate(unit.label)).append("\"\n")
+                    .append("        multiplier ").append(Double.toString(unit.multiplier)).append("\n")
+                    .append("        offset ").append(Double.toString(unit.offset)).append("\n");
             // system information
             for (final Map.Entry<String, Set<String>> systemInfo : unit.systemInfos.entrySet())  {
                 for (final String unitName : systemInfo.getValue())  {
-                    _out.append("    system \"").append(StringUtil_mxJPO.convertTcl(systemInfo.getKey()))
-                        .append("\" to unit \"").append(StringUtil_mxJPO.convertTcl(unitName))
+                    _out.append("        system \"").append(StringUtil_mxJPO.convertUpdate(systemInfo.getKey()))
+                        .append("\" to unit \"").append(StringUtil_mxJPO.convertUpdate(unitName))
                         .append("\"\n");
                 }
             }
             // settings
             for (final Map.Entry<String, String> setting : unit.settings.entrySet())  {
-                _out.append("    setting \"").append(StringUtil_mxJPO.convertTcl(setting.getKey()))
-                    .append("\" \"").append(StringUtil_mxJPO.convertTcl(setting.getValue()))
-                    .append("\"\n");
+                _out.append("        setting \"").append(StringUtil_mxJPO.convertUpdate(setting.getKey()))
+                    .append("\" \"").append(StringUtil_mxJPO.convertUpdate(setting.getValue())).append("\"\n");
             }
             // properties
             for (final AdminProperty prop : unit.properties)  {
-                _out.append("    property \"").append(StringUtil_mxJPO.convertTcl(prop.getName()))
-                    .append("\"");
+                _out.append("        property \"").append(StringUtil_mxJPO.convertUpdate(prop.getName())).append("\"");
                 if ((prop.getRefAdminName() != null) && (prop.getRefAdminType() != null))  {
-                    _out.append(" to ").append(prop.getRefAdminType())
-                        .append(" \"")
-                        .append(StringUtil_mxJPO.convertTcl(prop.getRefAdminName()))
-                        .append("\"");
+                    _out.append(" to ").append(prop.getRefAdminType()).append(" \"").append(StringUtil_mxJPO.convertUpdate(prop.getRefAdminName())).append("\"");
                 }
                 if (prop.getValue() != null)  {
-                    _out.append(" value \"")
-                        .append(StringUtil_mxJPO.convertTcl(prop.getValue()))
-                        .append("\"");
+                    _out.append(" value \"").append(StringUtil_mxJPO.convertUpdate(prop.getValue())).append("\"");
                 }
                 _out.append('\n');
             }
-            _out.append("  }\n");
+            _out.append("    }\n");
         }
 
         // append properties
-        this.getProperties().writeProperties(_paramCache, _out, "  ");
+        this.getProperties().writeProperties(_paramCache, _out, "    ");
 
         _out.append("}");
-    }
-
-    /**
-     * Only implemented as stub because
-     * {@link #write(ParameterCache_mxJPO, Appendable)} is new implemented.
-     *
-     * @param _paramCache   parameter cache (not used)
-     * @param _out          appendable instance to the TCL update file (not
-     *                      used)
-     */
-    @Override()
-    protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
-    {
-    }
-
-    /**
-     * The method overwrites the original method to add the TCL procedure
-     * {@link #TCL_PROCEDURE} so that the dimension could be updated with
-     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)}.
-     *
-     * @param _paramCache       parameter cache
-     * @param _preMQLCode       MQL statements which must be called before the
-     *                          TCL code is executed
-     * @param _postMQLCode      MQL statements which must be called after the
-     *                          TCL code is executed
-     * @param _preTCLCode       TCL code which is defined before the source
-     *                          file is sourced
-     * @param _tclVariables     map of all TCL variables where the key is the
-     *                          name and the value is value of the TCL variable
-     *                          (the value is automatically converted to TCL
-     *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update from derived class failed
-     */
-    @Override()
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final CharSequence _preMQLCode,
-                          final CharSequence _postMQLCode,
-                          final CharSequence _preTCLCode,
-                          final Map<String,String> _tclVariables,
-                          final File _sourceFile)
-            throws Exception
-    {
-        // add TCL code for the procedure
-        final StringBuilder tclCode = new StringBuilder()
-                .append(Dimension_mxJPO.TCL_PROCEDURE)
-                .append(_preTCLCode);
-
-        super.update(_paramCache, _preMQLCode, _postMQLCode, tclCode, _tclVariables, _sourceFile);
     }
 
     /**
@@ -344,67 +263,82 @@ public class Dimension_mxJPO
                                final String... _args)
         throws Exception
     {
-        if ((_args.length != 3) || !"dimension".equals(_args[0]))  {
+        if ((_args.length == 4) && "mxUpdate".equals(_args[0]) && "command".equals(_args[1])) {
             super.jpoCallExecute(_paramCache, _args);
-        } else if (!this.getName().equals(_args[1])) {
-            throw new Exception("Dimension '" + _args[1]
-                    + "' is wanted to updated, but have dimension '" + _args[1] + "'!");
+        } else if (!this.getName().equals(_args[2])) {
+            throw new Exception("Wrong dimenion '" + _args[2] + "' is set to update (currently command '" + this.getName() + "' is updated!)");
         } else  {
-            final String code = _args[2].replaceAll("@0@0@", "'")
-                                        .replaceAll("@1@1@", "\\\"");
+            final String code = _args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
 
             final DimensionDefParser_mxJPO parser = new DimensionDefParser_mxJPO(new StringReader(code));
             final Dimension_mxJPO dimension = parser.parse(_paramCache, this.getTypeDef(), this.getName());
 
             final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod dimension $1", this.getName());
 
-            // basic information
-            DeltaUtil_mxJPO.calcValueDelta(mql, "description", dimension.getDescription(), this.getDescription());
-            // hidden flag
-            DeltaUtil_mxJPO.calcFlagDelta(mql, "hidden", dimension.isHidden(), this.isHidden());
-
-            // prepare maps of units depending on the unit name (as key)
-            final Map<String,Unit> curUnits = new HashMap<String,Unit>();
-            for (final Unit unit : this.units)  {
-                curUnits.put(unit.name, unit);
-            }
-            final Map<String,Unit> tarUnits = new HashMap<String,Unit>();
-            for (final Unit unit : dimension.units)  {
-                tarUnits.put(unit.name, unit);
-            }
-
-            // remove units which not needed anymore (or throw exception)
-            for (final Map.Entry<String,Unit> curUnit : curUnits.entrySet())  {
-                if (!tarUnits.containsKey(curUnit.getKey()))  {
-                    if (!_paramCache.getValueBoolean(ValueKeys.DMDimAllowRemoveUnit))  {
-                        throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.DIMENSION_UPDATE_REMOVEUNIT);
-                    }
-                    mql.newLine().cmd("remove unit ").arg(curUnit.getKey());
-                }
-            }
-
-            // create non-existing units
-            for (final Map.Entry<String,Unit> tarUnit : tarUnits.entrySet())  {
-                if (!curUnits.containsKey(tarUnit.getKey()))  {
-                    _paramCache.logDebug("    add unit " + tarUnit.getKey());
-                    mql.newLine()
-                        .cmd("add unit ").arg(tarUnit.getValue().name).cmd(" ")
-                        .cmd(tarUnit.getValue().defaultUnit ? "" : "!").cmd("default ")
-                        .cmd("multiplier ").arg(String.valueOf(tarUnit.getValue().multiplier)).cmd(" ")
-                        .cmd("offset ").arg(String.valueOf(tarUnit.getValue().offset));
-                }
-            }
-
-            // update units
-            for (final Unit tarUnit : tarUnits.values())  {
-                tarUnit.calcDelta(_paramCache, curUnits.get(tarUnit.name), mql);
-            }
-
-            // properties
-            dimension.getProperties().calcDelta(mql, "", this.getProperties());
+            this.calcDelta(_paramCache, mql, dimension);
 
             mql.exec(_paramCache);
         }
+    }
+
+    /**
+     * Calculates the delta between this current dimension definition and the
+     * {@code _target} dimension definition and appends the MQL append commands
+     * to {@code _mql}.
+     *
+     * @param _paramCache   parameter cache
+     * @param _mql          builder to append the MQL commands
+     * @param _target       target format definition
+     * @throws UpdateException_mxJPO if update is not allowed (because data can
+     *                      be lost)
+     */
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MultiLineMqlBuilder _mql,
+                             final Dimension_mxJPO _target)
+        throws UpdateException_mxJPO
+    {
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "description", _target.getDescription(),                           this.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      _target.isHidden(),                                 this.isHidden());
+
+        // prepare maps of units depending on the unit name (as key)
+        final Map<String,Unit> curUnits = new HashMap<String,Unit>();
+        for (final Unit unit : this.units)  {
+            curUnits.put(unit.name, unit);
+        }
+        final Map<String,Unit> tarUnits = new HashMap<String,Unit>();
+        for (final Unit unit : _target.units)  {
+            tarUnits.put(unit.name, unit);
+        }
+
+        // remove units which not needed anymore (or throw exception)
+        for (final Map.Entry<String,Unit> curUnit : curUnits.entrySet())  {
+            if (!tarUnits.containsKey(curUnit.getKey()))  {
+                if (!_paramCache.getValueBoolean(ValueKeys.DMDimAllowRemoveUnit))  {
+                    throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.DIMENSION_UPDATE_REMOVEUNIT);
+                }
+                _mql.newLine().cmd("remove unit ").arg(curUnit.getKey());
+            }
+        }
+
+        // create non-existing units
+        for (final Map.Entry<String,Unit> tarUnit : tarUnits.entrySet())  {
+            if (!curUnits.containsKey(tarUnit.getKey()))  {
+                _paramCache.logDebug("    add unit " + tarUnit.getKey());
+                _mql.newLine()
+                    .cmd("add unit ").arg(tarUnit.getValue().name).cmd(" ")
+                    .cmd(tarUnit.getValue().defaultUnit ? "" : "!").cmd("default ")
+                    .cmd("multiplier ").arg(String.valueOf(tarUnit.getValue().multiplier)).cmd(" ")
+                    .cmd("offset ").arg(String.valueOf(tarUnit.getValue().offset));
+            }
+        }
+
+        // update units
+        for (final Unit tarUnit : tarUnits.values())  {
+            tarUnit.calcDelta(_paramCache, curUnits.get(tarUnit.name), _mql);
+        }
+
+        // properties
+        _target.getProperties().calcDelta(_mql, "", this.getProperties());
     }
 
     /**
