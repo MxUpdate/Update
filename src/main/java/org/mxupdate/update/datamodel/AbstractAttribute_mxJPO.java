@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.datamodel;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
@@ -57,28 +56,6 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     private static final String SELECT_ATTRS_WITH_OWNER = "escape list attribute * select type owner name dump \"" + AbstractAttribute_mxJPO.SELECT_KEY + "\"";
     /** MQL statement to list all attributes with type and name- */
     private static final String SELECT_ATTRS_WO_OWNER = "escape list attribute * select type name dump \"" + AbstractAttribute_mxJPO.SELECT_KEY + "\"";
-
-    /**
-     * Key used to identify the update of an attribute within
-     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)}.
-     */
-    private static final String JPO_CALLER_KEY = "updateAttribute";
-
-    /**
-     * Called TCL procedure within the TCL update to parse the new policy
-     * definition. The TCL procedure calls method
-     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)} with the new
-     * policy definition. All quot's are replaced by <code>@0@0@</code> and all
-     * apostroph's are replaced by <code>@1@1@</code>.
-     */
-    private static final String TCL_PROCEDURE
-            = "proc updateAttribute {_sName _lsArgs}  {\n"
-                + "regsub -all {'} $_lsArgs {@0@0@} sArg\n"
-                + "regsub -all {\\\"} $sArg {@1@1@} sArg\n"
-                + "regsub -all {\\\\\\[} $sArg {[} sArg\n"
-                + "regsub -all {\\\\\\]} $sArg {]} sArg\n"
-                + "mql exec prog org.mxupdate.update.util.JPOCaller " + AbstractAttribute_mxJPO.JPO_CALLER_KEY + " ${_sName} \"${sArg}\"\n"
-            + "}\n";
 
     /**
      * Set of all ignored URLs from the XML definition for attributes.
@@ -390,51 +367,37 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         this.writeHeader(_paramCache, _out);
 
         // write attribute
-        _out.append("updateAttribute \"${NAME}\"  {\n")
-            .append("  description \"").append(StringUtil_mxJPO.convertTcl(this.getDescription())).append("\"\n")
-            .append("  ").append(this.isHidden() ? "" : "!").append("hidden\n");
+        _out.append("mxUpdate attribute \"${NAME}\"  {\n")
+            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n")
+            .append("    ").append(this.isHidden() ? "" : "!").append("hidden\n");
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagMultiValue))  {
-            _out.append("  ").append(this.multiValue ? "" : "!").append("multivalue\n");
+            _out.append("    ").append(this.multiValue ? "" : "!").append("multivalue\n");
         }
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnClone))  {
-            _out.append("  ").append(this.resetOnClone ? "" : "!").append("resetonclone\n");
+            _out.append("    ").append(this.resetOnClone ? "" : "!").append("resetonclone\n");
         }
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnRevision))  {
-            _out.append("  ").append(this.resetOnRevision ? "" : "!").append("resetonrevision\n");
+            _out.append("    ").append(this.resetOnRevision ? "" : "!").append("resetonrevision\n");
         }
         this.writeAttributeSpecificValues(_paramCache, _out);
 
         if (!this.rules.isEmpty())  {
             assert (this.rules.size() == 1);
-            _out.append("  rule \"").append(StringUtil_mxJPO.convertTcl(this.rules.iterator().next())).append("\"\n");
+            _out.append("    rule \"").append(StringUtil_mxJPO.convertUpdate(this.rules.iterator().next())).append("\"\n");
         }
 
-        _out.append("  default \"").append((this.defaultValue != null) ? StringUtil_mxJPO.convertTcl(this.defaultValue) : "").append("\"\n");
+        _out.append("    default \"").append((this.defaultValue != null) ? StringUtil_mxJPO.convertUpdate(this.defaultValue) : "").append("\"\n");
 
         // append triggers
-        this.triggers.write(_out, "  ", "\n");
+        this.triggers.write(_out, "    ", "\n");
 
         // append ranges
         this.rangesSorted.write(_out);
 
         // append properties
-        this.getProperties().writeProperties(_paramCache, _out, "  ");
+        this.getProperties().writeProperties(_paramCache, _out, "    ");
 
         _out.append("}");
-    }
-
-    /**
-     * Only implemented as stub because
-     * {@link #write(ParameterCache_mxJPO, Appendable)} is new implemented.
-     *
-     * @param _paramCache   parameter cache (not used)
-     * @param _out          appendable instance to the TCL update file (not
-     *                      used)
-     */
-    @Override()
-    protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
-    {
     }
 
     /**
@@ -472,48 +435,6 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     }
 
     /**
-     * The method overwrites the original method to add the TCL procedure
-     * {@link #TCL_PROCEDURE} so that the attribute could be updated with
-     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)}.
-     *
-     * @param _paramCache       parameter cache
-     * @param _preMQLCode       MQL statements which must be called before the
-     *                          TCL code is executed
-     * @param _postMQLCode      MQL statements which must be called after the
-     *                          TCL code is executed
-     * @param _preTCLCode       TCL code which is defined before the source
-     *                          file is sourced
-     * @param _tclVariables     map of all TCL variables where the key is the
-     *                          name and the value is value of the TCL variable
-     *                          (the value is automatically converted to TCL
-     *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update from derived class failed
-     * @see Range#remove4Update(Appendable)
-     * @see #updateDimension(ParameterCache_mxJPO, String)
-     * @see #dimensionUpdated
-     * @see #TCL_PROCEDURE
-     * @see #PARAM_SUPPORT_FLAG_RESET_ON_CLONE
-     * @see #PARAM_SUPPORT_FLAG_RESET_ON_REVISION
-     */
-    @Override()
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final CharSequence _preMQLCode,
-                          final CharSequence _postMQLCode,
-                          final CharSequence _preTCLCode,
-                          final Map<String,String> _tclVariables,
-                          final File _sourceFile)
-        throws Exception
-    {
-        // add TCL code for the procedure
-        final StringBuilder preTCLCode = new StringBuilder()
-                .append(AbstractAttribute_mxJPO.TCL_PROCEDURE)
-                .append(_preTCLCode);
-
-        super.update(_paramCache, _preMQLCode, _postMQLCode, preTCLCode, _tclVariables, _sourceFile);
-    }
-
-    /**
      * The method is called from the TCL update code to define the this
      * attribute. If the correct use case is defined method
      * {@link #updateDimension(ParameterCache_mxJPO, String)} is called.
@@ -532,16 +453,14 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         throws Exception
     {
         // check if dimension is defined
-        if ((_args.length == 3) && AbstractAttribute_mxJPO.JPO_CALLER_KEY.equals(_args[0])) {
+        if ((_args.length == 4) && "mxUpdate".equals(_args[0]) && "attribute".equals(_args[1])) {
 // TODO: Exception Handling
             // check that attribute names are equal
-            if (!this.getName().equals(_args[1]))  {
-                throw new Exception("wrong attribute '"
-                        + _args[1] + "' is set to update (currently attribute '" + this.getName()
-                        + "' is updated!)");
+            if (!this.getName().equals(_args[2]))  {
+                throw new Exception("wrong attribute '" + _args[1] + "' is set to update (currently attribute '" + this.getName() + "' is updated!)");
             }
 
-            final String code = _args[2].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
+            final String code = _args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
 
             final AttributeDefParser_mxJPO parser = new AttributeDefParser_mxJPO(new StringReader(code));
             @SuppressWarnings("unchecked")
@@ -647,18 +566,18 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         private void write(final Appendable _out)
             throws IOException
         {
-            _out.append("  range ").append(this.type);
+            _out.append("    range ").append(this.type);
             // if the range is a program it is a 'global' attribute info
             if ("program".equals(this.type))  {
-                _out.append(" \"").append(StringUtil_mxJPO.convertTcl(this.value1)).append('\"');
+                _out.append(" \"").append(StringUtil_mxJPO.convertUpdate(this.value1)).append('\"');
                 if (this.value2 != null)  {
-                    _out.append(" input \"").append(StringUtil_mxJPO.convertTcl(this.value2)).append('\"');
+                    _out.append(" input \"").append(StringUtil_mxJPO.convertUpdate(this.value2)).append('\"');
                 }
             } else  {
-                _out.append(" \"").append(StringUtil_mxJPO.convertTcl(this.value1)).append("\"");
+                _out.append(" \"").append(StringUtil_mxJPO.convertUpdate(this.value1)).append("\"");
                 if ("between".equals(this.type))  {
                     _out.append(' ').append(this.include1 ? "inclusive" : "exclusive")
-                        .append(" \"").append(StringUtil_mxJPO.convertTcl(this.value2)).append("\"")
+                        .append(" \"").append(StringUtil_mxJPO.convertUpdate(this.value2)).append("\"")
                         .append(' ').append(this.include2 ? "inclusive" : "exclusive");
                 }
             }
@@ -709,18 +628,18 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
             final StringBuilder ret = new StringBuilder("[range type=").append(this.type);
             // if the range is a program it is a 'global' attribute info
             if ("program".equals(this.type))  {
-                ret.append(", program=").append(StringUtil_mxJPO.convertTcl(this.value1));
+                ret.append(", program=").append(StringUtil_mxJPO.convertUpdate(this.value1));
                 if (this.value2 != null)  {
-                    ret.append(", input=").append(StringUtil_mxJPO.convertTcl(this.value2));
+                    ret.append(", input=").append(StringUtil_mxJPO.convertUpdate(this.value2));
                 }
             } else  {
                 if ("between".equals(this.type))  {
-                    ret.append(", value1=").append(StringUtil_mxJPO.convertTcl(this.value1))
+                    ret.append(", value1=").append(StringUtil_mxJPO.convertUpdate(this.value1))
                         .append(' ').append(this.include1 ? "inclusive" : "exclusive")
-                        .append(", value2=").append(StringUtil_mxJPO.convertTcl(this.value2))
+                        .append(", value2=").append(StringUtil_mxJPO.convertUpdate(this.value2))
                         .append(' ').append(this.include2 ? "inclusive" : "exclusive");
                 } else  {
-                    ret.append(", value=").append(StringUtil_mxJPO.convertTcl(this.value1));
+                    ret.append(", value=").append(StringUtil_mxJPO.convertUpdate(this.value1));
                 }
             }
             return ret.append(']').toString();

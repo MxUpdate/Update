@@ -28,7 +28,6 @@ import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.program.AbstractProgramData;
 import org.mxupdate.test.util.MapUtil;
-import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.testng.Assert;
 
 /**
@@ -227,32 +226,32 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
 
         this.append4CIFileHeader(strg);
 
-        strg.append("updateAttribute \"${NAME}\" {\n");
+        strg.append("mxUpdate attribute \"${NAME}\" {\n");
 
         // append flags
-        this.getFlags().append4CIFileValues("  ", strg, "\n");
+        this.getFlags().append4CIFileValues("    ", strg, "\n");
         // append values
-        this.getValues().appendUpdate("  ", strg, "\n");
+        this.getValues().appendUpdate("    ", strg, "\n");
 
         // append rule
         if (this.rule != null) {
-            strg.append(" rule \"").append(StringUtil_mxJPO.convertTcl(this.rule.getName())).append("\"\n");
+            strg.append("   rule \"").append(AbstractTest.convertUpdate(this.rule.getName())).append("\"\n");
         }
 
         // append dimension
         if (this.dimension != null) {
-            strg.append(" dimension \"").append(StringUtil_mxJPO.convertTcl(this.dimension.getName())).append("\"\n");
+            strg.append("     dimension \"").append(AbstractTest.convertUpdate(this.dimension.getName())).append("\"\n");
         }
 
         // append 'adds' (trigger and ranges)
         final Set<String> needAdds = new HashSet<String>();
         this.evalAdds4CheckExport(needAdds);
         for (final String needAdd : needAdds)  {
-            strg.append("  ").append(needAdd).append('\n');
+            strg.append("    ").append(needAdd).append('\n');
         }
 
         // append properties
-        this.getProperties().appendCIFileUpdateFormat("  ", strg);
+        this.getProperties().appendCIFileUpdateFormat("    ", strg);
 
         strg.append("}");
 
@@ -272,27 +271,27 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         // check for defined values
         this.getValues().checkExport(_exportParser);
         // check for defined flags
-        this.getFlags().checkExport(_exportParser, "/" + this.getCI().getUrlTag() + "/", this.getCI().getMxType() + " " + this.getName());
+        this.getFlags().checkExport(_exportParser.getRootLines().get(0), "");
         // check for rule
         if (this.rule == null) {
             this.checkNotExistingSingleValue(_exportParser, "rule", "rule");
         } else  {
-            this.checkSingleValue(_exportParser, "rules", "rule", "\"" + StringUtil_mxJPO.convertTcl(this.rule.getName()) + "\"");
+            this.checkSingleValue(_exportParser, "rules", "rule", "\"" + AbstractTest.convertUpdate(this.rule.getName()) + "\"");
         }
         // check for dimension
         if (this.dimension == null) {
             this.checkNotExistingSingleValue(_exportParser, "dimension", "dimension");
         } else  {
-            this.checkSingleValue(_exportParser, "dimension", "dimension", "\"" + StringUtil_mxJPO.convertTcl(this.dimension.getName()) + "\"");
+            this.checkSingleValue(_exportParser, "dimension", "dimension", "\"" + AbstractTest.convertUpdate(this.dimension.getName()) + "\"");
         }
         // check for add values (triggers and ranges)
         final Set<String> needAdds = new HashSet<String>();
         this.evalAdds4CheckExport(needAdds);
         final List<String> foundAdds = new ArrayList<String>();
-        for (final String trigLine : _exportParser.getLines("/updateAttribute/trigger/@value"))  {
+        for (final String trigLine : _exportParser.getLines("/" + this.getCI().getUrlTag() + "/trigger/@value"))  {
             foundAdds.add("trigger " + trigLine);
         }
-        for (final String trigLine : _exportParser.getLines("/updateAttribute/range/@value"))  {
+        for (final String trigLine : _exportParser.getLines("/" + this.getCI().getUrlTag() + "/range/@value"))  {
             foundAdds.add("range " + trigLine);
         }
         Assert.assertEquals(
@@ -303,7 +302,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
             Assert.assertTrue(needAdds.contains(foundAdd), "check that add '" + foundAdd + "' is defined (found adds = " + foundAdds + "; need adds = " + needAdds + ")");
         }
         // check for properties
-        this.getProperties().checkExport(_exportParser.getLines("/updateAttribute/property/@value"));
+        this.getProperties().checkExport(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/property/@value"));
     }
 
     /**
@@ -367,7 +366,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         {
             final StringBuilder cmd = new StringBuilder()
                     .append("range ").append(this.comparator)
-                    .append(" \"").append(AbstractTest.convertTcl(this.value))
+                    .append(" \"").append(AbstractTest.convertUpdate(this.value))
                     .append("\"");
             _needAdds.add(cmd.toString());
         }
@@ -575,7 +574,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         protected void appendCreate(final StringBuilder _cmd)
         {
             _cmd.append(" range ").append(this.comparator)
-                .append(" \"").append(StringUtil_mxJPO.convertMql(this.program.getName()))
+                .append(" \"").append(AbstractTest.convertMql(this.program.getName()))
                 .append("\" input \"").append(AbstractTest.convertMql(this.value))
                 .append("\"");
         }
@@ -591,9 +590,9 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         {
             final StringBuilder cmd = new StringBuilder()
                     .append("range ").append(this.comparator)
-                    .append(" \"").append(StringUtil_mxJPO.convertMql(this.program.getName())).append("\"");
+                    .append(" \"").append(AbstractTest.convertUpdate(this.program.getName())).append("\"");
             if ((this.value != null) && !this.value.isEmpty())  {
-                cmd.append(" input \"").append(AbstractTest.convertTcl(this.value)).append("\"");
+                cmd.append(" input \"").append(AbstractTest.convertUpdate(this.value)).append("\"");
             }
             _needAdds.add(cmd.toString());
         }
@@ -660,9 +659,9 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         {
             final StringBuilder cmd = new StringBuilder()
                 .append("range ").append(this.comparator)
-                .append(" \"").append(AbstractTest.convertTcl(this.value))
+                .append(" \"").append(AbstractTest.convertUpdate(this.value))
                 .append("\" ").append(this.inclusive1 ? "inclusive" : "exclusive")
-                .append(" \"").append(AbstractTest.convertTcl(this.value2))
+                .append(" \"").append(AbstractTest.convertUpdate(this.value2))
                 .append("\" ").append(this.inclusive2 ? "inclusive" : "exclusive");
             _needAdds.add(cmd.toString());
         }

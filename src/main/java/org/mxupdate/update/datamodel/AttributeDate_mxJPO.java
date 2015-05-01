@@ -91,7 +91,7 @@ public class AttributeDate_mxJPO
     {
         super.writeAttributeSpecificValues(_paramCache, _out);
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagRangeValue))  {
-            _out.append("  ").append(this.rangeValue ? "" : "!").append("rangevalue\n");
+            _out.append("    ").append(this.rangeValue ? "" : "!").append("rangevalue\n");
         }
     }
 

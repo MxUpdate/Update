@@ -80,17 +80,17 @@ public abstract class AbstractTest
     public enum CI
     {
         /** Configuration item Data Model Binrary Attribute. */
-        DM_ATTRIBUTE_BINARY("attribute", null, false, null, null, "AttributeBinary", "ATTRIBUTE", "BINARY_", "datamodel/attribute", true, "updateAttribute"),
+        DM_ATTRIBUTE_BINARY("attribute", null, false, null, null, "AttributeBinary", "ATTRIBUTE", "BINARY_", "datamodel/attribute", true, "mxUpdate"),
         /** Configuration item Data Model Boolean Attribute. */
-        DM_ATTRIBUTE_BOOLEAN("attribute", null, false, null, null, "AttributeBoolean", "ATTRIBUTE", "BOOLEAN_", "datamodel/attribute", true, "updateAttribute"),
+        DM_ATTRIBUTE_BOOLEAN("attribute", null, false, null, null, "AttributeBoolean", "ATTRIBUTE", "BOOLEAN_", "datamodel/attribute", true, "mxUpdate"),
         /** Configuration item Data Model Date Attribute. */
-        DM_ATTRIBUTE_DATE("attribute", null, false, null, null, "AttributeDate", "ATTRIBUTE", "DATE_", "datamodel/attribute", true, "updateAttribute"),
+        DM_ATTRIBUTE_DATE("attribute", null, false, null, null, "AttributeDate", "ATTRIBUTE", "DATE_", "datamodel/attribute", true, "mxUpdate"),
         /** Configuration item Data Model Integer Attribute. */
-        DM_ATTRIBUTE_INTEGER("attribute", null, false, null, null, "AttributeInteger", "ATTRIBUTE", "INTEGER_", "datamodel/attribute", true, "updateAttribute"),
+        DM_ATTRIBUTE_INTEGER("attribute", null, false, null, null, "AttributeInteger", "ATTRIBUTE", "INTEGER_", "datamodel/attribute", true, "mxUpdate"),
         /** Configuration item Data Model Real Attribute. */
-        DM_ATTRIBUTE_REAL("attribute", null, false, null, null, "AttributeReal", "ATTRIBUTE", "REAL_", "datamodel/attribute", true, "updateAttribute"),
+        DM_ATTRIBUTE_REAL("attribute", null, false, null, null, "AttributeReal", "ATTRIBUTE", "REAL_", "datamodel/attribute", true, "mxUpdate"),
         /** Configuration item Data Model String Attribute. */
-        DM_ATTRIBUTE_STRING("attribute", null, false, null, null, "AttributeString", "ATTRIBUTE", "STRING_", "datamodel/attribute", true, "updateAttribute"),
+        DM_ATTRIBUTE_STRING("attribute", null, false, null, null, "AttributeString", "ATTRIBUTE", "STRING_", "datamodel/attribute", true, "mxUpdate"),
 
         /** Configuration item Data Model Dimension. */
         DM_DIMENSION("dimension", null, false, null, null, "Dimension", "DIMENSION", "DIMENSION_", "datamodel/dimension", true, "mxUpdate"),

@@ -100,9 +100,10 @@ public class AttributeString_mxJPO
                                                 final Appendable _out)
         throws IOException
     {
-        _out.append("  ").append(this.multiline ? "" : "!").append("multiline\n");
+        super.writeAttributeSpecificValues(_paramCache, _out);
+        _out.append("    ").append(this.multiline ? "" : "!").append("multiline\n");
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsPropMaxLength))  {
-            _out.append("  maxlength ").append(this.maxLength).append("\n");
+            _out.append("    maxlength ").append(this.maxLength).append("\n");
         }
     }
 
