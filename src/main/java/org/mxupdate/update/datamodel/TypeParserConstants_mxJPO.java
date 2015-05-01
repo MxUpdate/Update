@@ -35,42 +35,50 @@ interface TypeParserConstants_mxJPO {
   /** RegularExpression Id. */
   int CHAR = 20;
   /** RegularExpression Id. */
-  int TRIGGER = 21;
+  int KIND = 21;
   /** RegularExpression Id. */
-  int INPUT = 22;
+  int BASIC = 26;
   /** RegularExpression Id. */
-  int TRIGEVENT = 27;
+  int COMPOSED = 27;
   /** RegularExpression Id. */
-  int ACTION = 32;
+  int TRIGGER = 28;
   /** RegularExpression Id. */
-  int CHECK = 33;
+  int INPUT = 29;
   /** RegularExpression Id. */
-  int OVERRIDE = 34;
+  int TRIGEVENT = 34;
   /** RegularExpression Id. */
-  int PROPERTY = 35;
+  int ACTION = 39;
   /** RegularExpression Id. */
-  int PROPERTYTO = 36;
+  int CHECK = 40;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 37;
+  int OVERRIDE = 41;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 42;
+  int PROPERTY = 42;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 43;
+  int PROPERTYTO = 43;
   /** RegularExpression Id. */
-  int ADMINTYPE_APOSTROPHE = 44;
+  int PROPERTYVAL = 44;
   /** RegularExpression Id. */
-  int ADMINTYPE_CHAR = 45;
+  int ADMINTYPE_STRING = 49;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 50;
+  /** RegularExpression Id. */
+  int ADMINTYPE_APOSTROPHE = 51;
+  /** RegularExpression Id. */
+  int ADMINTYPE_CHAR = 52;
 
   /** Lexical state. */
   int DEFAULT = 0;
   /** Lexical state. */
   int STRING_EXPECTED = 1;
   /** Lexical state. */
-  int TRIGEVENT_EXPECTED = 2;
+  int KIND_EXPECTED = 2;
   /** Lexical state. */
-  int TRIGKIND_EXPECTED = 3;
+  int TRIGEVENT_EXPECTED = 3;
   /** Lexical state. */
-  int ADMINREF_EXPECTED = 4;
+  int TRIGKIND_EXPECTED = 4;
+  /** Lexical state. */
+  int ADMINREF_EXPECTED = 5;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -95,6 +103,13 @@ interface TypeParserConstants_mxJPO {
     "<SINGLE>",
     "\"\\\"\"",
     "<CHAR>",
+    "\"kind\"",
+    "\" \"",
+    "\"\\t\"",
+    "\"\\n\"",
+    "\"\\r\"",
+    "\"basic\"",
+    "\"composed\"",
     "\"trigger\"",
     "\"input\"",
     "\" \"",

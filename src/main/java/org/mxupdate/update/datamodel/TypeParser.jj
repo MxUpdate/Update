@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.datamodel.Type_mxJPO.Kind;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -81,6 +82,23 @@ class TypeParser
     | <SINGLE: (<CHAR>)+> : DEFAULT
     | <#APOSTROPHE: "\"" >
     | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/*********************************************************************** Kind */
+<DEFAULT> TOKEN :
+{
+      <KIND:                                "kind">                                         : KIND_EXPECTED
+}
+
+<KIND_EXPECTED> SKIP :
+{
+    " " | "\t" | "\n" | "\r"
+}
+
+<KIND_EXPECTED> TOKEN :
+{
+      <BASIC:                               "basic">                                        : DEFAULT
+    | <COMPOSED:                            "composed">                                     : DEFAULT
 }
 
 /******************************************************************** Trigger */
@@ -149,6 +167,9 @@ void parse(final Type_mxJPO _type)
 } {
     (   ( <DESCRIPTION>             ( tmp = <STRING>                        {this.setValue(_type, "description",                            this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.setValue(_type, "description",                            this.getSingle(tmp.image));} ) )
+
+      | ( <KIND>                    ( <BASIC>                               {this.setValue(_type, "kind",                                   Kind.Basic);}
+                                    | <COMPOSED>                            {this.setValue(_type, "kind",                                   Kind.Composed);} ) )
 
       | ( <ABSTRACT_TRUE>                                                   {this.setValue(_type, "abstractFlag",                           true);} )
       | ( <ABSTRACT_FALSE>                                                  {this.setValue(_type, "abstractFlag",                           false);} )

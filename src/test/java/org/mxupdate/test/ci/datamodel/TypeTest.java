@@ -299,6 +299,42 @@ public class TypeTest
                 .checkExport();
     }
 
+    /**
+     * Positive test for kind composed.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "positive test for kind composed")
+    public void t7a_positiveTestKindComposed()
+        throws Exception
+    {
+        this.createNewData("Test")
+                .create()
+                .setSingle("kind", "composed")
+                .update("")
+                .checkExport();
+    }
+
+    /**
+     * Negative test if the kind is changed back to basic.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "negative test if the kind is changed back to basic")
+    public void t7b_negativeTestChangeKindBackToBasic()
+        throws Exception
+    {
+        this.createNewData("Test")
+                .create()
+                .setSingle("kind", "composed")
+                .update("")
+                .checkExport()
+                .setSingle("kind", "basic")
+                .failureUpdate(ErrorKey.DM_TYPE_NOT_BASIC_KIND)
+                .setSingle("kind", "composed")
+                .checkExport();
+    }
+
     @BeforeMethod()
     @AfterClass(groups = "close")
     public void cleanup()

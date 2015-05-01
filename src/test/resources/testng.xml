@@ -25,6 +25,7 @@
             <package name="org.mxupdate.test.update.system"/>
             <package name="org.mxupdate.test.update.userinterface"/>
             <package name="org.mxupdate.test.update.userinterface.helper"/>
+            <package name="org.mxupdate.test.update.util"/>
         </packages>
     </test>
 

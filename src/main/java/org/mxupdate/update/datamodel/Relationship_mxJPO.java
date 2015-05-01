@@ -322,7 +322,6 @@ public class Relationship_mxJPO
             if (!currDerived.isEmpty())  {
                 throw new UpdateException_mxJPO(
                         ErrorKey.DM_RELATION_UPDATE_DERIVED,
-                        this.getTypeDef().getLogging(),
                         this.getName(),
                         _current.derived,
                         this.derived);
@@ -335,7 +334,6 @@ public class Relationship_mxJPO
             if (_current.kind != Kind.Basic)  {
                 throw new UpdateException_mxJPO(
                         ErrorKey.DM_RELATION_NOT_BASIC_KIND,
-                        this.getTypeDef().getLogging(),
                         this.getName(),
                         _current.kind,
                         this.kind);

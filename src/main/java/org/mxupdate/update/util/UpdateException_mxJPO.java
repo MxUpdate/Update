@@ -222,7 +222,7 @@ public class UpdateException_mxJPO
          * </p>
          */
         DM_RELATION_NOT_BASIC_KIND(11402,
-                "The new kind ''{3}' can not be set for {0} ''{1}'', because kind ''{2}'' is already set. Kinds of relationship can be only set for ''basic'' relationships."),
+                "The new kind ''{2}'' can not be set for relationship ''{0}'', because kind ''{1}'' is already set. Kinds of relationship can be only set for ''basic'' relationships."),
 
         /**
          * Derived of a relationship can not be changed because potentially some
@@ -230,7 +230,6 @@ public class UpdateException_mxJPO
          *
          * <p>Parameters:
          * <ol>
-         * <li>administration type (should be relationship)</li>
          * <li>name of the relationship</li>
          * <li>current derived relationship</li>
          * <li>new derived relationship (from the CI file)</li>
@@ -238,7 +237,7 @@ public class UpdateException_mxJPO
          * </p>
          */
         DM_RELATION_UPDATE_DERIVED(11403,
-                "The new derived ''{3}' can not be set for {0} ''{1}'', because derived ''{2}'' is already set and potentially some data can be lost."),
+                "The new derived ''{2}'' can not be set for relationship ''{0}'', because derived ''{1}'' is already set and potentially some data can be lost."),
 
         /**
          * <p>The given attribute is not defined anymore but assigned to the
@@ -271,19 +270,33 @@ public class UpdateException_mxJPO
                 "Current attribute ''{0}'' is defined to be removed from type ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
 
         /**
+         * Kind of a type can not be changed if the current kind is not basic.
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>name of the relationship</li>
+         * <li>current kind</li>
+         * <li>new kind (from the CI file)</li>
+         * </ol>
+         * </p>
+         */
+        DM_TYPE_NOT_BASIC_KIND(11802,
+                "The new kind ''{2}'' can not be set for type ''{0}'', because kind ''{1}'' is already set. Kinds of type can be only set for ''basic'' types."),
+
+        /**
          * Derived of a type can not be changed because potentially some
          * data can be lost.
          *
          * <p>Parameters:
          * <ol>
          * <li>name of the type</li>
-         * <li>current derived type</li>
-         * <li>new derived type (from the CI file)</li>
+         * <li>current derived type name</li>
+         * <li>new derived type name (from the CI file)</li>
          * </ol>
          * </p>
          */
-        DM_TYPE_UPDATE_DERIVED(11802,
-                "The new derived ''{2}' can not be set for type ''{0}'', because derived ''{1}'' is already set and potentially some data can be lost."),
+        DM_TYPE_UPDATE_DERIVED(11803,
+                "The new derived ''{2}'' can not be set for type ''{0}'', because derived ''{1}'' is already set and potentially some data can be lost."),
 
         /**
          * If the name of a configuration item could not be extracted from a

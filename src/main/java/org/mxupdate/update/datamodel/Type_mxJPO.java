@@ -63,6 +63,9 @@ public class Type_mxJPO
         Type_mxJPO.IGNORED_URLS.add("/methodList");
     }
 
+    /** Kind of type. */
+    private Kind kind = Kind.Basic;
+
     /** Is the type abstract? */
     private Boolean abstractFlag;
     /** From which type is this type derived? */
@@ -132,6 +135,16 @@ public class Type_mxJPO
         } else if ("/methodList/programRef".equals(_url))  {
             this.methods.add(_content);
             parsed = true;
+        } else if ("/typeKind".equals(_url))  {
+            if ("0".equals(_content))  {
+                this.kind = Kind.Basic;
+                parsed = true;
+            } else if ("1".equals(_content))  {
+                this.kind = Kind.Composed;
+                parsed = true;
+            } else  {
+                parsed = false;
+            }
         } else  {
             parsed = super.parse(_paramCache, _url, _content);
         }
@@ -150,6 +163,7 @@ public class Type_mxJPO
         updateBuilder.start("type")
                 //              tag             | default | value                              | write?
                 .string(        "description",              this.getDescription())
+                .singleIfTrue(  "kind",                     this.kind.name().toLowerCase(),     (this.kind == Kind.Composed))
                 .flagIfTrue(    "abstract",          false, this.abstractFlag,                  (this.abstractFlag != null) && this.abstractFlag)
                 .stringIfTrue(  "derived",                  this.derived,                       (this.derived != null) && !this.derived.isEmpty())
                 .flag(          "hidden",                   false, this.isHidden())
@@ -186,12 +200,34 @@ public class Type_mxJPO
             if (!currDerived.isEmpty())  {
                 throw new UpdateException_mxJPO(
                         ErrorKey.DM_TYPE_UPDATE_DERIVED,
-                        this.getTypeDef().getLogging(),
                         this.getName(),
                         _current.derived,
                         this.derived);
             }
             _mql.newLine().cmd("derived ").arg(thisDerived);
         }
+
+        // kind at least to ensure all properties are set
+        if (this.kind != _current.kind)  {
+            if (_current.kind != Kind.Basic)  {
+                throw new UpdateException_mxJPO(
+                        ErrorKey.DM_TYPE_NOT_BASIC_KIND,
+                        this.getName(),
+                        _current.kind,
+                        this.kind);
+            }
+            _mql.newLine().cmd(this.kind.name().toLowerCase());
+        }
+    }
+
+    /**
+     * Kind of type.
+     */
+    public enum Kind
+    {
+        /** Standard type. */
+        Basic,
+        /** Composed type. */
+        Composed;
     }
 }
