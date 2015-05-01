@@ -40,6 +40,7 @@ public class UpdateBuilder_mxJPO
     /**
      * Initializes the update builder.
      *
+     * @param _fileName     name of file
      * @param _paramCache   parameter cache
      */
     public UpdateBuilder_mxJPO(final String _fileName,
@@ -102,6 +103,40 @@ public class UpdateBuilder_mxJPO
     {
         if (_write)  {
             this.string(_tag, _value);
+        }
+        return this;
+    }
+
+    /**
+     * Appends given {@code _code} string surrounded with apostrophes and new
+     * lines.
+     *
+     * @param _tag      tag
+     * @param _code     code
+     * @return this update builder instance
+     */
+    public UpdateBuilder_mxJPO code(final String _tag,
+                                    final String _code)
+    {
+        this.string(_tag, ((_code != null) && (_code.indexOf('\n') > 0)) ? ("\n" + _code + "\n") : _code);
+        return this;
+    }
+
+    /**
+     * Appends given {@code _code} string surrounded with apostrophes and new
+     * lines if {@code _write} is <i>true</i>.
+     *
+     * @param _tag      tag
+     * @param _code     code
+     * @param _write    flag must be <i>true</i> that the code is written
+     * @return this update builder instance
+     */
+    public UpdateBuilder_mxJPO codeIfTrue(final String _tag,
+                                          final String _code,
+                                          final boolean _write)
+    {
+        if (_write)  {
+            this.code(_tag, _code);
         }
         return this;
     }

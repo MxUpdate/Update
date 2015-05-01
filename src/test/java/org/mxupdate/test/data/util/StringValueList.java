@@ -22,6 +22,7 @@ import matrix.util.MatrixException;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ExportParser;
 
 /**
  * String-value list.
@@ -93,6 +94,19 @@ public class StringValueList
     {
         for (final ImmutablePair<String,String> entry : this.values)  {
             _cmd.append(' ').append(entry.getKey()).append(" \"").append(AbstractTest.convertMql(entry.getValue().toString())).append('\"');
+        }
+    }
+
+    @Override()
+    public void check4Export(final ExportParser _exportParser,
+                             final String _path)
+    {
+        super.check4Export(_exportParser, _path);
+
+        for (final ImmutablePair<String,String> entry : this.values)  {
+            if (entry.getValue() == null ) {
+                _exportParser.checkNotExistingValue(_path.isEmpty() ? entry.getKey() : _path + "/" + entry.getKey());
+            }
         }
     }
 }

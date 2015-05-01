@@ -23,6 +23,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.program.AbstractProgramData;
+import org.mxupdate.test.data.program.MQLProgramData;
 import org.mxupdate.test.data.user.AbstractUserData;
 import org.testng.Assert;
 
@@ -44,7 +45,7 @@ public class ToolSetData<USER extends AbstractUserData<?>>
      * @see #ciFile()
      * @see #append4Create(StringBuilder)
      */
-    private final Set<AbstractProgramData<?>> programs = new HashSet<AbstractProgramData<?>>();
+    private final Set<MQLProgramData> programs = new HashSet<MQLProgramData>();
 
     /**
      * Default constructor.
@@ -67,7 +68,7 @@ public class ToolSetData<USER extends AbstractUserData<?>>
      * @return this tool set instance
      * @see #programs
      */
-    public ToolSetData<USER> addProgram(final AbstractProgramData<?> _program)
+    public ToolSetData<USER> addProgram(final MQLProgramData _program)
     {
         this.programs.add(_program);
         return this;
@@ -84,7 +85,7 @@ public class ToolSetData<USER extends AbstractUserData<?>>
         final StringBuilder cmd = new StringBuilder().append(super.ciFile());
 
         // programs
-        for(final AbstractProgramData<?> program : this.programs)  {
+        for(final MQLProgramData program : this.programs)  {
             cmd.append(" \\\n    program \"").append(AbstractTest.convertTcl(program.getName())).append("\"");
         }
 
@@ -103,7 +104,7 @@ public class ToolSetData<USER extends AbstractUserData<?>>
     {
         super.createDependings();
 
-        for (final AbstractProgramData<?> prog : this.programs)  {
+        for (final MQLProgramData prog : this.programs)  {
             prog.create();
         }
 
@@ -124,7 +125,7 @@ public class ToolSetData<USER extends AbstractUserData<?>>
         super.append4Create(_cmd);
 
         // programs
-        for(final AbstractProgramData<?> program : this.programs)  {
+        for(final MQLProgramData program : this.programs)  {
             _cmd.append(" program \"").append(AbstractTest.convertMql(program.getName())).append("\"");
         }
     }
@@ -143,7 +144,7 @@ public class ToolSetData<USER extends AbstractUserData<?>>
 
         // prepare target programs
         final Set<String> targets = new HashSet<String>();
-        for(final AbstractProgramData<?> program : this.programs)  {
+        for(final MQLProgramData program : this.programs)  {
             targets.add("\"" + AbstractTest.convertTcl(program.getName()) + "\"");
         }
         // check against parsed programs

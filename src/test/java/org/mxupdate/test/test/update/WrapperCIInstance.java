@@ -15,10 +15,14 @@
 
 package org.mxupdate.test.test.update;
 
+import java.io.File;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
@@ -48,6 +52,32 @@ public class WrapperCIInstance<DATA extends AbstractAdminObject_mxJPO<?>>
         throws Exception
     {
         this.data.parseUpdate(_ciCode);
+    }
+
+    /**
+     * Parses the ci file of {@code _data} instance.
+     *
+     * @param _data     data instance as target parse definition
+     * @throws Exception if parse failed
+     */
+    public void parseUpdate(final AbstractAdminData<?> _data)
+        throws Exception
+    {
+        this.parseUpdate(this.strip(_data.ciFile()));
+    }
+
+    /**
+     * Strips the update code.
+     *
+     * @param _generated    code to clean
+     * @return stripped update code
+     */
+    protected String strip(final String _generated)
+    {
+        final String startIndex = "mxUpdate " + this.getTypeDef().getMxAdminName() + " \"${NAME}\" {";
+        final int start = _generated.indexOf(startIndex) + startIndex.length() + 1;
+        final int end = _generated.length() - 2;
+        return (start < end)  ? _generated.substring(start, end) : "";
     }
 
     /**
@@ -81,33 +111,6 @@ public class WrapperCIInstance<DATA extends AbstractAdminObject_mxJPO<?>>
     }
 
     /**
-     * Calculates the delta.
-     *
-     * @param _paramCache   parameter cache
-     * @param _mql          MQL builder
-     * @param _current      current instance
-     * @throws Exception if calculation failed
-     */
-    public void calcDelta(final ParameterCache_mxJPO _paramCache,
-                          final MultiLineMqlBuilder _mql,
-                          final WrapperCIInstance<DATA> _current)
-        throws Exception
-    {
-        Method write = this.evalMethod("calcDelta", ParameterCache_mxJPO.class, MultiLineMqlBuilder.class, this.data.getClass());
-        // if not found, try with parent class as parameter
-        // (e.g. attributes works then...)
-        if (write == null)  {
-            write = this.evalMethod("calcDelta", ParameterCache_mxJPO.class, MultiLineMqlBuilder.class, this.data.getClass().getSuperclass());
-        }
-        write.setAccessible(true);
-        try {
-            write.invoke(this.data, _paramCache, _mql, _current.data);
-        } finally  {
-            write.setAccessible(false);
-        }
-    }
-
-    /**
      * Writes this instance as CI update.
      *
      * @param _paramCache   parameter cache
@@ -126,6 +129,76 @@ public class WrapperCIInstance<DATA extends AbstractAdminObject_mxJPO<?>>
             write.setAccessible(false);
         }
         return generated.toString();
+    }
+
+    /**
+     * Calculates the delta.
+     *
+     * @param _paramCache   parameter cache
+     * @param _mql          MQL builder
+     * @param _current      current instance
+     * @throws Exception if calculation failed
+     */
+    public void calcDelta(final ParameterCache_mxJPO _paramCache,
+                          final MultiLineMqlBuilder _mql,
+                          final WrapperCIInstance<DATA> _current)
+        throws Exception
+    {
+        Method write = this.evalMethod("calcDelta", ParameterCache_mxJPO.class, MultiLineMqlBuilder.class, this.data.getClass());
+        // if not found, try with parent class as parameter
+        // (e.g. attributes works then...)
+        Class<?> clazz = this.data.getClass().getSuperclass();
+        while ((write == null) && (clazz != null))  {
+            write = this.evalMethod("calcDelta", ParameterCache_mxJPO.class, MultiLineMqlBuilder.class, clazz);
+            clazz = clazz.getSuperclass();
+        }
+        write.setAccessible(true);
+        try {
+            write.invoke(this.data, _paramCache, _mql, _current.data);
+        } finally  {
+            write.setAccessible(false);
+        }
+    }
+
+    /**
+     * Updates this wrapper instance to target instance.
+     *
+     * @param _file         file used to update
+     * @param _paramCache   parameter cache
+     * @throws Exception if update failed
+     */
+    public void store(final File _file,
+                      final ParameterCache_mxJPO _paramCache)
+        throws Exception
+    {
+        final MultiLineMqlBuilder mql;
+        if ((this.data.getTypeDef().getMxAdminSuffix()) != null && !this.data.getTypeDef().getMxAdminSuffix().isEmpty())  {
+            mql = MqlBuilder_mxJPO.multiLine(_file, "escape mod " + this.data.getTypeDef().getMxAdminName() + " $1 " + this.data.getTypeDef().getMxAdminSuffix(), this.data.getName());
+        } else  {
+            mql = MqlBuilder_mxJPO.multiLine(_file, "escape mod " + this.data.getTypeDef().getMxAdminName() + " $1", this.data.getName());
+        }
+
+        final WrapperCIInstance<DATA> newInstance = this.newInstance();
+        newInstance.parse(_paramCache);
+
+        this.calcDelta(_paramCache, mql, newInstance);
+
+        mql.exec(_paramCache);
+    }
+
+    /**
+     * Initialize new empty instance.
+     *
+     * @return new instance
+     * @throws Exception if initialized failed
+     */
+    @SuppressWarnings("unchecked")
+    private WrapperCIInstance<DATA> newInstance()
+        throws Exception
+    {
+        final Constructor<?> constr = this.data.getClass().getConstructor(TypeDef_mxJPO.class, String.class);
+
+        return new WrapperCIInstance<DATA>((DATA) constr.newInstance(this.data.getTypeDef(), this.data.getName()));
     }
 
     /**

@@ -890,7 +890,9 @@ public class ParameterCache_mxJPO
      */
     public enum CacheKey
     {
-        /** List of attributes which are cached for easy reuse. */
-        Attributes;
+        /** List of attribute names which are cached for easy reuse. */
+        Attributes,
+        /** List of program names which are cached for easy reuse. */
+        Programs;
     }
 }

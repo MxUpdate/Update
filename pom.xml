@@ -158,6 +158,12 @@
             <version>3.4</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+            <scope>test</scope>
+        </dependency>
         <!-- needed to load settings (URL etc.) from the maven settings file -->
         <dependency>
             <groupId>org.apache.maven</groupId>

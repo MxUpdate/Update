@@ -472,9 +472,9 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
             // initialize MQL builder (with or w/o suffix!)
             final MultiLineMqlBuilder mql;
             if ((this.getTypeDef().getMxAdminSuffix() != null) && !this.getTypeDef().getMxAdminSuffix().isEmpty())  {
-                mql = MqlBuilder_mxJPO.multiLine("escape mod " + this.getTypeDef().getMxAdminName() + " $1 " + this.getTypeDef().getMxAdminSuffix(), this.getName());
+                mql = MqlBuilder_mxJPO.multiLine(new File(_args[5]), "escape mod " + this.getTypeDef().getMxAdminName() + " $1 " + this.getTypeDef().getMxAdminSuffix(), this.getName());
             } else  {
-                mql = MqlBuilder_mxJPO.multiLine("escape mod " + this.getTypeDef().getMxAdminName() + " $1", this.getName());
+                mql = MqlBuilder_mxJPO.multiLine(new File(_args[5]), "escape mod " + this.getTypeDef().getMxAdminName() + " $1", this.getName());
             }
 
             clazz.calcDelta(_paramCache, mql, (CLASS) this);

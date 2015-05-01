@@ -271,6 +271,34 @@ public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_
     }
 
     /**
+     * Extracts from the parsed string the related code string (without quotes,
+     * start/ending new lines, backslashes etc.).
+     *
+     * @param _token    string token
+     * @return extracted string
+     */
+    protected String getCode(final String _token)
+    {
+        final char[] token = _token.toCharArray();
+
+        // check for string embedded in apostrophe (must be removed)
+        int idxStart = 0;
+        int idxEnd   = token.length;
+        if (token[idxStart] == '\"' && token[idxEnd - 1] == '\"')  {
+            idxStart++;
+            idxEnd--;
+
+            // check for new line at start and end
+            if (token[idxStart] == '\n' && token[idxEnd - 1] == '\n')  {
+                idxStart++;
+                idxEnd--;
+            }
+        }
+
+        return this.decode(token, idxStart, idxEnd);
+    }
+
+    /**
      * Extracts from the parsed string the related Java string (without quotes,
      * backslashes etc.).
      *
@@ -289,12 +317,17 @@ public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_
             idxEnd--;
         }
 
-        final StringBuilder ret = new StringBuilder(idxEnd - idxStart);
-        for (int idx = idxStart; idx < idxEnd; )  {
-            final char ch = token[idx++];
+        return this.decode(token, idxStart, idxEnd);
+    }
+
+    private String decode(final char[] _token, final int _startIdx, final int _endIdx)
+    {
+        final StringBuilder ret = new StringBuilder(_endIdx - _startIdx);
+        for (int idx = _startIdx; idx < _endIdx; )  {
+            final char ch = _token[idx++];
             switch (ch)  {
                 case '\\':
-                    final char subCh = token[idx++];
+                    final char subCh = _token[idx++];
                     switch (subCh)  {
                         case 'n':
                             ret.append('\n');

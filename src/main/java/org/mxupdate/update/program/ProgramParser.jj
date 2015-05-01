@@ -1,0 +1,170 @@
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
+options {
+    JDK_VERSION = "1.6";
+    STATIC = false;
+    ERROR_REPORTING = true;
+    USER_TOKEN_MANAGER = false;
+    GENERATE_BOILERPLATE = false;
+    SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
+}
+PARSER_BEGIN(ProgramParser)
+package org.mxupdate.update.program;
+
+import java.lang.reflect.InvocationTargetException;
+
+import org.mxupdate.update.program.AbstractProgram_mxJPO.Execute;
+import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
+import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
+import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+
+/**
+ * Parses the update format for {@link MQLProgram_mxJPO}.
+ */
+@SuppressWarnings("unused")
+class ProgramParser
+    extends AbstractParser_mxJPO<AbstractProgram_mxJPO<?>>
+{
+}
+PARSER_END(ProgramParser)<*> SKIP :
+{
+  " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
+}
+
+<DEFAULT> TOKEN :
+{
+      <KIND:                                "kind">
+    | <MQL:                                 "mql">
+
+    | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+
+    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+
+    | <HIDDEN_TRUE:                         "hidden">
+    | <HIDDEN_FALSE:                        "!hidden">
+
+    | <NEEDSBUSINESSOBJECT_TRUE:            "needsbusinessobject">
+    | <NEEDSBUSINESSOBJECT_FALSE:           "!needsbusinessobject">
+
+    | <DOWNLOADABLE_TRUE:                   "downloadable">
+    | <DOWNLOADABLE_FALSE:                  "!downloadable">
+
+    | <PIPE_TRUE:                           "pipe">
+    | <PIPE_FALSE:                          "!pipe">
+
+    | <POOLED_TRUE:                         "pooled">
+    | <POOLED_FALSE:                        "!pooled">
+
+    | <RULE:                                "rule">                                         : STRING_EXPECTED
+
+    | <EXECUTE:                             "execute">
+    | <IMMEDIATE:                           "immediate">
+    | <DEFERRED:                            "deferred">
+    | <USER:                                "user">                                         : STRING_EXPECTED
+
+    | <CODE:                                "code">                                         : MULTILINESTRING_EXPECTED
+    | <FILE:                                "file">                                         : STRING_EXPECTED
+}
+
+/************************************************************** Common String */
+<STRING_EXPECTED> TOKEN :
+{
+      <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
+    | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/*************************************************** Common Multi-Line-String */
+<MULTILINESTRING_EXPECTED> TOKEN :
+{
+      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
+    | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/******************************************************************* Property */
+<DEFAULT> TOKEN :
+{
+      <PROPERTY:                            "property">                                     : STRING_EXPECTED
+    | <PROPERTYTO:                          "to">                                           : ADMINREF_EXPECTED
+    | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
+}
+
+<ADMINREF_EXPECTED> TOKEN :
+{
+      <ADMINTYPE_STRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
+}
+
+/**************************************************************************** */
+/**
+ * Parses one complete page definition.
+ *
+ * @param _page     target page to update with parsed values
+ */
+void parse(final AbstractProgram_mxJPO<?> _prog)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+: {
+    Token tmp;
+    AdminProperty property;
+} {
+      ( ( <KIND> <MQL> )
+      | ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_prog, "symbolicNames",           this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_prog, "symbolicNames",           this.getSingle(tmp.image));} ) )
+
+      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_prog, "description",                this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>               {this.setValue(_prog, "description",                this.getSingle(tmp.image));} ) )
+
+      | ( <HIDDEN_TRUE>                                                     {this.setValue(_prog, "hidden",                     true);} )
+      | ( <HIDDEN_FALSE>                                                    {this.setValue(_prog, "hidden",                     false);} )
+
+      | ( <NEEDSBUSINESSOBJECT_TRUE>                                        {this.setValue(_prog, "needsBusinessObjectContext", true);} )
+      | ( <NEEDSBUSINESSOBJECT_FALSE>                                       {this.setValue(_prog, "needsBusinessObjectContext", false);} )
+
+      | ( <DOWNLOADABLE_TRUE>                                               {this.setValue(_prog, "downloadable",               true);} )
+      | ( <DOWNLOADABLE_FALSE>                                              {this.setValue(_prog, "downloadable",               false);} )
+
+      | ( <PIPE_TRUE>                                                       {this.setValue(_prog, "pipe",                       true);} )
+      | ( <PIPE_FALSE>                                                      {this.setValue(_prog, "pipe",                       false);} )
+
+      | ( <POOLED_TRUE>                                                     {this.setValue(_prog, "pooled",                     true);} )
+      | ( <POOLED_FALSE>                                                    {this.setValue(_prog, "pooled",                     false);} )
+
+      | ( <RULE>                    ( tmp = <STRING>                        {this.setValue(_prog, "rule",                       this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_prog, "rule",                       this.getSingle(tmp.image));} ) )
+
+      | ( <EXECUTE>     ( <IMMEDIATE>                                       {this.setValue(_prog, "execute",                    Execute.IMMEDIATE);}
+                        | <DEFERRED>                                        {this.setValue(_prog, "execute",                    Execute.DEFERRED);}
+                        | ( <USER>          ( tmp = <STRING>                {this.setValue(_prog, "user",                       this.getString(tmp.image));}
+                                            | tmp = <SINGLE>                {this.setValue(_prog, "user",                       this.getSingle(tmp.image));} ) ) ) )
+
+      | ( <CODE>                    ( tmp = <MULTILINESTRING>               {this.setValue(_prog, "code",                       this.getCode(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>               {this.setValue(_prog, "code",                       this.getSingle(tmp.image));} ) )
+      | ( <FILE>                    ( tmp = <STRING>                        {this.setValue(_prog, "file",                       this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_prog, "file",                       this.getSingle(tmp.image));} ) )
+
+      | ( <PROPERTY>                                                        {property = new AdminProperty();this.appendValue(_prog, "properties", "propertiesStack", property);}
+                                    ( tmp = <STRING>                        {this.setValue(property, "name", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "name", this.getSingle(tmp.image));} )
+              (   ( <PROPERTYVAL>   ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <ADMINTYPE_SINGLE>              {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                    ( tmp = <STRING>                        {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+    )*
+}

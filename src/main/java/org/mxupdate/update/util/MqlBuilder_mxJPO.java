@@ -15,6 +15,7 @@
 
 package org.mxupdate.update.util;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -65,26 +66,18 @@ public final class MqlBuilder_mxJPO
     }
 
     /**
-     * Initializes new MQL builder without prefix.
-     *
-     * @return new MQL builder instance
-     */
-    public static MultiLineMqlBuilder multiLineMql()
-    {
-        return new MultiLineMqlBuilder("");
-    }
-
-    /**
      * Initializes new MQL builder.
      *
+     * @param _file     file which is executed
      * @param _prefix   MQL command for the prefix
      * @param _args     arguments for the MQL command prefix
      * @return new MQL builder instance
      */
-    public static MultiLineMqlBuilder multiLine(final CharSequence _prefix,
+    public static MultiLineMqlBuilder multiLine(final File _file,
+                                                final CharSequence _prefix,
                                                 final String... _args)
     {
-        return new MultiLineMqlBuilder(_prefix, _args);
+        return new MultiLineMqlBuilder(_file, _prefix, _args);
     }
 
     /**
@@ -92,6 +85,8 @@ public final class MqlBuilder_mxJPO
      */
     public final static class MultiLineMqlBuilder
     {
+        /** File which is currently executed. */
+        private final File file;
         /** Prefix line for all executed lines. */
         private final Stack<MqlBuilder> prefix = new Stack<MqlBuilder>();
         /** All lines. */
@@ -102,15 +97,28 @@ public final class MqlBuilder_mxJPO
         /**
          * Initializes the multi-line MQL builder.
          *
+         * @param _file     file which is executed
          * @param _prefix   MQL command for the prefix
          * @param _args     arguments for the MQL command prefix
          */
-        private MultiLineMqlBuilder(final CharSequence _prefix,
-                                 final String... _args)
+        private MultiLineMqlBuilder(final File _file,
+                                    final CharSequence _prefix,
+                                    final String... _args)
         {
+            this.file = _file;
             this.prefix.push(new MqlBuilder());
             this.prefix.peek().cmd.append(_prefix.toString());
             this.prefix.peek().args.addAll(Arrays.asList(_args));
+        }
+
+        /**
+         * Returns the {@link #file} which is executed.
+         *
+         * @return file
+         */
+        public File getFile()
+        {
+            return this.file;
         }
 
         /**

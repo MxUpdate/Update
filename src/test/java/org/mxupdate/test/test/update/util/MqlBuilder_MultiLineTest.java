@@ -15,13 +15,15 @@
 
 package org.mxupdate.test.test.update.util;
 
-import junit.framework.Assert;
+import java.io.File;
+
 import matrix.db.MQLCommand;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
+import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -72,7 +74,7 @@ public class MqlBuilder_MultiLineTest
         final TypeData type = new TypeData(this, "name");
         type.create();
 
-        MqlBuilder_mxJPO.multiLineMql()
+        MqlBuilder_mxJPO.multiLine((File) null, "")
             .newLine()
             .cmd("escape mod type ").arg(AbstractTest.PREFIX + "name").cmd(" description ").arg(_descr)
             .exec(this.getContext());
@@ -97,7 +99,7 @@ public class MqlBuilder_MultiLineTest
         final TypeData type = new TypeData(this, "name");
         type.create();
 
-        MqlBuilder_mxJPO.multiLineMql()
+        MqlBuilder_mxJPO.multiLine((File) null, "")
             .newLine()
             .cmd("escape print context")
             .exec(this.getContext());
@@ -113,7 +115,7 @@ public class MqlBuilder_MultiLineTest
     public void negativeTestNonExistingCommand()
         throws Exception
     {
-        MqlBuilder_mxJPO.multiLineMql()
+        MqlBuilder_mxJPO.multiLine((File) null, "")
             .newLine()
             .cmd("escape mod ddd")
             .exec(this.getContext());
@@ -130,7 +132,7 @@ public class MqlBuilder_MultiLineTest
     public void negativeTestCommandWOEscape()
         throws Exception
     {
-        MqlBuilder_mxJPO.multiLineMql()
+        MqlBuilder_mxJPO.multiLine((File) null, "")
             .newLine()
             .cmd("print context")
             .exec(this.getContext());

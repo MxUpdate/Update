@@ -24,7 +24,7 @@ import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.AbstractTest.CI;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
-import org.mxupdate.test.data.program.AbstractProgramData;
+import org.mxupdate.test.data.program.MQLProgramData;
 
 /**
  * The class is used to define all administration objects which could have
@@ -142,14 +142,14 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
      *
      * @param <T>   class of the derived trigger
      */
-    public abstract static class AbstractTrigger<T extends AbstractDataWithTrigger.AbstractTrigger<?>>
+    public abstract static class AbstractTrigger<T extends AbstractTrigger<?>>
     {
         /** Event type of this trigger. */
         private final String eventType;
         /** Kind of this trigger (action, check, overrider). */
         private final String kind;
         /** Called program of this trigger. */
-        private final AbstractProgramData<?> program;
+        private final MQLProgramData program;
         /** Input value of this trigger. */
         private String input;
 
@@ -162,7 +162,7 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
          */
         private AbstractTrigger(final String _eventType,
                                 final String _kind,
-                                final AbstractProgramData<?> _program)
+                                final MQLProgramData _program)
         {
             this.eventType = _eventType;
             this.kind = _kind;
@@ -174,7 +174,7 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
          *
          * @return trigger program
          */
-        public AbstractProgramData<?> getProgram()
+        public MQLProgramData getProgram()
         {
             return this.program;
         }
@@ -217,7 +217,7 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
      * Used to define action triggers.
      */
     public static class TriggerAction
-        extends AbstractDataWithTrigger.AbstractTrigger<AbstractDataWithTrigger.TriggerAction>
+        extends AbstractTrigger<TriggerAction>
     {
         /**
          * Initializes this action trigger with the <code>_eventType</code>
@@ -227,7 +227,7 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
          * @param _program      called program of the trigger
          */
         public TriggerAction(final String _eventType,
-                             final AbstractProgramData<?> _program)
+                             final MQLProgramData _program)
         {
             super(_eventType, "action", _program);
         }
@@ -237,7 +237,7 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
      * Used to define check triggers.
      */
     public static class TriggerCheck
-        extends AbstractDataWithTrigger.AbstractTrigger<AbstractDataWithTrigger.TriggerAction>
+        extends AbstractTrigger<TriggerAction>
     {
         /**
          * Initializes this check trigger with the <code>_eventType</code>
@@ -247,7 +247,7 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
          * @param _program      called program of the trigger
          */
         public TriggerCheck(final String _eventType,
-                             final AbstractProgramData<?> _program)
+                             final MQLProgramData _program)
         {
             super(_eventType, "check", _program);
         }
@@ -257,7 +257,7 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
      * Used to define override triggers.
      */
     public static class TriggerOverride
-        extends AbstractDataWithTrigger.AbstractTrigger<AbstractDataWithTrigger.TriggerAction>
+        extends AbstractTrigger<TriggerAction>
     {
         /**
          * Initializes this override trigger with the <code>_eventType</code>
@@ -267,7 +267,7 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
          * @param _program      called program of the trigger
          */
         public TriggerOverride(final String _eventType,
-                               final AbstractProgramData<?> _program)
+                               final MQLProgramData _program)
         {
             super(_eventType, "override", _program);
         }

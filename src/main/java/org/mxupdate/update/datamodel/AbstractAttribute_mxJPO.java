@@ -395,8 +395,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        MqlBuilder_mxJPO.multiLineMql()
-                .newLine()
+        MqlBuilder_mxJPO.mql()
                 .cmd("escape add ").cmd(this.getTypeDef().getMxAdminName()).cmd(" ").arg(this.getName()).cmd(" type ").cmd(this.kind.attrTypeCreate)
                 .exec(_paramCache);
     }

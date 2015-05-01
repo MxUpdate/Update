@@ -15,9 +15,10 @@
 
 package org.mxupdate.test.test.update;
 
+import java.io.File;
+
 import matrix.util.MatrixException;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.datamodel.PolicyData;
@@ -93,12 +94,12 @@ public abstract class AbstractDeltaNoChangeTest<DATA extends AbstractAdminObject
             // prepare the current
             final WrapperCIInstance<DATA> currentWrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()));
             currentWrapper.create(paramCache);
-            currentWrapper.parseUpdate(this.strip(currentWrapper.getTypeDef(), _currentData.ciFile()));
+            currentWrapper.parseUpdate(_currentData);
             final MultiLineMqlBuilder mql1;
             if ((currentWrapper.getTypeDef().getMxAdminSuffix()) != null && !currentWrapper.getTypeDef().getMxAdminSuffix().isEmpty())  {
-                mql1 = MqlBuilder_mxJPO.multiLine("escape mod " + currentWrapper.getTypeDef().getMxAdminName() + " $1 " + currentWrapper.getTypeDef().getMxAdminSuffix(), _currentData.getName());
+                mql1 = MqlBuilder_mxJPO.multiLine((File) null, "escape mod " + currentWrapper.getTypeDef().getMxAdminName() + " $1 " + currentWrapper.getTypeDef().getMxAdminSuffix(), _currentData.getName());
             } else  {
-                mql1 = MqlBuilder_mxJPO.multiLine("escape mod " + currentWrapper.getTypeDef().getMxAdminName() + " $1", _currentData.getName());
+                mql1 = MqlBuilder_mxJPO.multiLine((File) null, "escape mod " + currentWrapper.getTypeDef().getMxAdminName() + " $1", _currentData.getName());
             }
             currentWrapper.calcDelta(paramCache, mql1,  new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName())));
             mql1.exec(paramCache);
@@ -108,35 +109,12 @@ public abstract class AbstractDeltaNoChangeTest<DATA extends AbstractAdminObject
             currentWrapper2Mx.parse(paramCache);
             // parse again (to ensure empty not changed values!)
             final WrapperCIInstance<DATA> currentWrapper2Update = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()));
-            currentWrapper2Update.parseUpdate(this.strip(currentWrapper.getTypeDef(), _currentData.ciFile()));
+            currentWrapper2Update.parseUpdate(_currentData);
             // calculate delta between MX and new parsed
-            final MultiLineMqlBuilder mql2 = MqlBuilder_mxJPO.multiLine("escape mod " + currentWrapper.getTypeDef().getMxAdminName() + " $1 " + currentWrapper.getTypeDef().getMxAdminSuffix(), _currentData.getName());
+            final MultiLineMqlBuilder mql2 = MqlBuilder_mxJPO.multiLine((File) null, "escape mod " + currentWrapper.getTypeDef().getMxAdminName() + " $1 " + currentWrapper.getTypeDef().getMxAdminSuffix(), _currentData.getName());
             currentWrapper2Update.calcDelta(paramCache, mql2, currentWrapper2Mx);
 
             Assert.assertFalse(mql2.hasNewLines(), "no MQL update needed, but found:\n" + mql2);
         }
-    }
-
-    /**
-     * Strips the update code.
-     *
-     * @param _typeDef      type definition
-     * @param _generated    code to clean
-     * @return stripped update code
-     */
-    protected String strip(final TypeDef_mxJPO _typeDef,
-                           final String _generated)
-    {
-        final StringBuilder newDef = new StringBuilder();
-        final String startIndex = "mxUpdate " + _typeDef.getMxAdminName() + " \"${NAME}\" {";
-        final int start = _generated.indexOf(startIndex) + startIndex.length() + 1;
-        final int end = _generated.length() - 2;
-        if (start < end)  {
-            final String temp = _generated.substring(start, end).toString();
-            for (final String line : temp.split("\n"))  {
-                newDef.append(line.trim()).append(' ');
-            }
-        }
-        return newDef.toString();
     }
 }

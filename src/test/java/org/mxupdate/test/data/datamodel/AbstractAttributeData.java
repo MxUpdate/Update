@@ -24,7 +24,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.program.AbstractProgramData;
+import org.mxupdate.test.data.program.MQLProgramData;
 import org.testng.Assert;
 
 /**
@@ -498,10 +498,10 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * Program range definition.
      */
     public static class RangeProgram
-        extends AbstractAttributeData.AbstractRange
+        extends AbstractRange
     {
         /** Related program of the range. */
-        private final AbstractProgramData<?> program;
+        private final MQLProgramData program;
 
         /**
          * Program range constructor with the value.
@@ -509,7 +509,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
          * @param _program  related program
          * @param _input    input string
          */
-        public RangeProgram(final AbstractProgramData<?> _program,
+        public RangeProgram(final MQLProgramData _program,
                             final String _input)
         {
             super("program", _input);

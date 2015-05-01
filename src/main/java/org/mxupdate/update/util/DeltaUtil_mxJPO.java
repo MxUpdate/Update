@@ -114,30 +114,6 @@ public final class DeltaUtil_mxJPO
      * Calculates the delta between the new and the old value. If a delta
      * exists, the kind with the new delta is added to the string builder.
      *
-     * @param _mql      MQL builder to append the delta
-     * @param _kind     kind of the delta
-     * @param _newVal   new target value
-     * @param _curVal   current value in the database
-     */
-    @Deprecated()
-    public static void calcFlagDelta(final MultiLineMqlBuilder _mql,
-                                     final String _kind,
-                                     final boolean _newVal,
-                                     final Boolean _curVal)
-    {
-        if ((_curVal == null) || (_curVal != _newVal))  {
-            _mql.newLine();
-            if (!_newVal)  {
-                _mql.cmd("!");
-            }
-            _mql.cmd(_kind);
-        }
-    }
-
-    /**
-     * Calculates the delta between the new and the old value. If a delta
-     * exists, the kind with the new delta is added to the string builder.
-     *
      * @param _mql              MQL builder to append the delta
      * @param _kind             kind of the delta
      * @param _newVal           new target value

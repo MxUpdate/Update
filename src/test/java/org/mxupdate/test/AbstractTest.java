@@ -38,7 +38,6 @@ import org.apache.maven.settings.DefaultMavenSettingsBuilder;
 import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Settings;
 import org.mxupdate.test.util.Version;
-import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -141,7 +140,7 @@ public abstract class AbstractTest
         /** Configuration item JPO program. */
         PRG_JPO("program", null, false, null, null, "JPO", null, "", "program/jpo", true, "mql"),
         /** Configuration item MQL program. */
-        PRG_MQL_PROGRAM("program", null, false, null, null, "Program", null, "", "program/mql", true, "mql"),
+        PRG_MQL_PROGRAM("program", null, false, null, null, "Program", null, "MQLPROGRAM_", "program/mql", true, "mql"),
         /** Configuration item page program. */
         PRG_PAGE("page", null, false, null, null, "Page", "PAGE", "PAGE_", "program/page", true, "mql"),
 
@@ -433,7 +432,27 @@ public abstract class AbstractTest
     public String mql(final CharSequence _cmd)
         throws MatrixException
     {
-        return MqlUtil_mxJPO.execMql(this.context, _cmd, true);
+        return this.mqlWOTrim(_cmd).trim();
+    }
+
+    /**
+     * Executes given MQL command statement <code>_cmd</code> and returns the
+     * result.
+     *
+     * @param _cmd  MQL command statement to execute
+     * @return returned string value from the called MQL command
+     *         <code>_cmd</code>
+     * @throws MatrixException if MQL execution failed
+     */
+    public String mqlWOTrim(final CharSequence _cmd)
+        throws MatrixException
+    {
+        final MQLCommand mql = new MQLCommand();
+        mql.executeCommand(this.context, _cmd.toString());
+        if ((mql.getError() != null) && !mql.getError().isEmpty())  {
+            throw new MatrixException(mql.getError() + "\nMQL command was:\n" + _cmd);
+        }
+        return mql.getResult();
     }
 
     /**

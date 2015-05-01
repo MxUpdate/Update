@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -120,33 +119,7 @@ public class JPOProgram_mxJPO
     public JPOProgram_mxJPO(final TypeDef_mxJPO _typeDef,
                             final String _mxName)
     {
-        super(_typeDef, _mxName);
-    }
-
-    /**
-     * Searches for all programs which are JPOs and returns this list.
-     *
-     * @param _paramCache   parameter cache
-     * @return set of all JPO program names
-     * @throws MatrixException if the &quot;<code>list program</code>&quot;
-     *                         failed which is used to evaluate the JPO names
-     */
-    @Override()
-    public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
-    {
-        final StringBuilder cmd = new StringBuilder()
-                .append("list program * select name isjavaprogram dump \"\t\"");
-        final Set<String> ret = new TreeSet<String>();
-        for (final String name : MqlUtil_mxJPO.execMql(_paramCache, cmd).split("\n"))  {
-            if (!"".equals(name))  {
-                final String[] nameArr = name.split("\t");
-                if ("TRUE".equals(nameArr[1]))  {
-                    ret.add(nameArr[0]);
-                }
-            }
-        }
-        return ret;
+        super(Kind.JAVA, _typeDef, _mxName);
     }
 
     /**
@@ -440,6 +413,69 @@ public class JPOProgram_mxJPO
 
         // and update
         super.update(_paramCache, preMQLCode, _postMQLCode, preTCLCode, _tclVariables, null);
+    }
+
+    /**
+     * Extracts from <code>_prgCode</code> the TCL update code which is between
+     * <code>_markStart</code> and <code>_markEnd</code> defined. Each line of
+     * the code starts with <code>_linePrefix</code>. Only if
+     * <code>_execute</code> is set, the found TCL code is returned.
+     *
+     * @param _paramCache   parameter cache
+     * @param _tclCode      TCL code string builder to append the TCL update
+     *                      code which was extracted and if
+     *                      <code>_execute</code> is <i>true</i>
+     * @param _execute      <i>true</i> if TCL update code will be executed
+     * @param _prgCode      program code
+     * @param _markStart    start marker
+     * @param _markEnd      end marker
+     * @param _linePrefix   line prefix
+     * @return source code without TCL update code; <code>null</code> if source
+     *         includes no TCL update code
+     */
+    protected String extractTclUpdateCode(final ParameterCache_mxJPO _paramCache,
+                                          final StringBuilder _tclCode,
+                                          final boolean _execute,
+                                          final StringBuilder _prgCode,
+                                          final String _markStart,
+                                          final String _markEnd,
+                                          final String _linePrefix)
+    {
+        final String ret;
+
+        final int start = _prgCode.indexOf(_markStart);
+        final int end = _prgCode.indexOf(_markEnd);
+        if ((start >= 0) && (end > 0))  {
+            final String tclCode = _prgCode.substring(start + _markStart.length(), end).trim();
+            if (!"".equals(tclCode))  {
+                // TCL code must be executed only if allowed
+                // and line prefix is defined
+                if (_execute)  {
+                    _paramCache.logTrace("    - TCL update code is executed");
+                    // remove line prefixes from TCL code (if defined)
+                    final int linePrefixLength = (_linePrefix != null) ? _linePrefix.length() : -1;
+                    if (linePrefixLength > 0)  {
+                        final StringBuilder tclUpdateCode = new StringBuilder();
+                        for (final String line : tclCode.split("\n"))  {
+                            tclUpdateCode.append(line.substring(linePrefixLength)).append('\n');
+                        }
+                        _tclCode.append(tclUpdateCode.toString());
+                    } else  {
+                        _tclCode.append(tclCode);
+                    }
+                } else  {
+                    _paramCache.logError("    - Warning! Existing TCL update code is not executed!");
+                }
+            }
+            ret = new StringBuilder()
+                    .append(_prgCode.substring(0, start))
+                    .append('\n')
+                    .append(_prgCode.substring(end + _markEnd.length()))
+                    .toString();
+        } else  {
+            ret = null;
+        }
+        return ret;
     }
 
     /**
