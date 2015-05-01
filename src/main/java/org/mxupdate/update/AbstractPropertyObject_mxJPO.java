@@ -22,6 +22,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
@@ -76,7 +77,7 @@ public abstract class AbstractPropertyObject_mxJPO<CLASS extends AbstractPropert
                       final Appendable _out)
         throws IOException
     {
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(this.getFileName(), _paramCache);
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(FileHandlingUtil_mxJPO.calcCIFileName(this.getTypeDef(), this.getName()), _paramCache);
 
         updateBuilder.start(this.getTypeDef());
 

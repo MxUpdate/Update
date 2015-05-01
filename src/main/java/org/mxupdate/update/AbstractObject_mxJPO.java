@@ -15,7 +15,6 @@
 
 package org.mxupdate.update;
 
-import java.io.File;
 import java.io.IOException;
 
 import matrix.util.MatrixException;
@@ -24,7 +23,6 @@ import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * Abstract class from which must be derived for exporting and importing all
@@ -183,28 +181,5 @@ public abstract class AbstractObject_mxJPO
     protected void setDescription(final String _description)
     {
         this.description = _description;
-    }
-
-    /**
-     * Returns the file name for this MxUpdate administration object. The file
-     * name is a concatenation of the defined file prefix within the
-     * information annotation , the name of the MX object and the file suffix
-     * within the information annotation. All special characters are converted
-     * automatically from {@link StringUtil_mxJPO#convertToFileName(String)}.
-     *
-     * @return file name of this administration (business) object
-     * @see #export(ParameterCache_mxJPO, File)
-     */
-    public String getFileName()
-    {
-        final StringBuilder ret = new StringBuilder();
-        if (this.getTypeDef().getFilePrefix() != null)  {
-            ret.append(this.getTypeDef().getFilePrefix());
-        }
-        ret.append(this.getName());
-        if (this.getTypeDef().getFileSuffix() != null)  {
-            ret.append(this.getTypeDef().getFileSuffix());
-        }
-        return StringUtil_mxJPO.convertToFileName(ret.toString());
     }
 }

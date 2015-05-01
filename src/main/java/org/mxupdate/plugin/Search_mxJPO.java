@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
-import org.mxupdate.update.AbstractObject_mxJPO;
+import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
@@ -90,12 +90,11 @@ class Search_mxJPO
         for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
             if (typeDefList.contains(typeDef.getName()))  {
                 for (final String name : typeDef.matchMxNames(_paramCache, Arrays.asList(new String[]{match})))  {
-                    final AbstractObject_mxJPO  instance = typeDef.newTypeInstance(name);
                     final Map<String,String> map = new HashMap<String,String>();
                     map.put(Search_mxJPO.RETURN_KEY_TYPEDEF, typeDef.getName());
                     map.put(Search_mxJPO.RETURN_KEY_NAME, name);
-                    map.put(Search_mxJPO.RETURN_KEY_FILENAME, instance.getFileName());
-                    map.put(Search_mxJPO.RETURN_KEY_FILEPATH, instance.getTypeDef().getFilePath());
+                    map.put(Search_mxJPO.RETURN_KEY_FILENAME, FileHandlingUtil_mxJPO.calcCIFileName(typeDef, name));
+                    map.put(Search_mxJPO.RETURN_KEY_FILEPATH, typeDef.getFilePath());
                     ret.add(map);
                 }
             }

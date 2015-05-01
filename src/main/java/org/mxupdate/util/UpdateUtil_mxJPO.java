@@ -85,11 +85,11 @@ public final class UpdateUtil_mxJPO
                 final Set<String> existings = existingNames.get(typeDef);
 
                 for (final Entry<String,File> fileEntry : clazzMap.entrySet())  {
-                    final AbstractObject_mxJPO instance = typeDef.newTypeInstance(fileEntry.getKey());
                     _paramCache.logInfo("check " + typeDef.getLogging() + " '" + fileEntry.getKey() + "'");
 
                     final boolean update;
                     if (_paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_CHECK_FILE_DATE))  {
+                        final AbstractObject_mxJPO instance = typeDef.newTypeInstance(fileEntry.getKey());
                         final Date fileDate = new Date(fileEntry.getValue().lastModified());
                         final String instDateString;
                         if (existings.contains(fileEntry.getKey()))  {
@@ -131,7 +131,7 @@ public final class UpdateUtil_mxJPO
                             }
                             commit = true;
                             if (compile)  {
-                                compiles.add(instance);
+                                compiles.add(typeDef.newTypeInstance(fileEntry.getKey()));
                             }
                         } finally  {
                             if (!commit && !transActive && _paramCache.getContext().isTransactionActive())  {

@@ -60,7 +60,7 @@ public class ExportAction_mxJPO
         final Collection<String> paths = this.paramCache.getValueList(ValueKeys.Path);
 
         // check for definition of min. / max. one path
-        if (paths.isEmpty())  {
+        if ((paths == null) || paths.isEmpty())  {
             throw new Exception("no path is defined, but required for the export!");
         }
         if (paths.size() > 1)  {

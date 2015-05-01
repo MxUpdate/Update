@@ -27,6 +27,7 @@ import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.program.AbstractProgram_mxJPO;
 import org.mxupdate.update.program.JPOProgram_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 
@@ -65,7 +66,7 @@ public class ExportAdminProgramJPO_mxJPO
             clazz.parse(_paramCache);
 
             if (!clazz.hasNoValuesDefined(_paramCache) || (clazz.getCode() == null) || clazz.getCode().isEmpty())  {
-                final File file = new File(path, clazz.getFileName());
+                final File file = new File(path, FileHandlingUtil_mxJPO.calcCIFileName(_typeDef, _mxName));
                 if (!file.getParentFile().exists())  {
                     file.getParentFile().mkdirs();
                 }

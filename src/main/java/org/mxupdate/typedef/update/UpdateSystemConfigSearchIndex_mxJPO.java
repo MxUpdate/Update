@@ -26,7 +26,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  *
  * @author The MxUpdate Team
  */
-public class UpdateAdminSystemConfigSystemSearchIndex_mxJPO
+public class UpdateSystemConfigSearchIndex_mxJPO
     implements IUpdate_mxJPO
 {
     @Override()

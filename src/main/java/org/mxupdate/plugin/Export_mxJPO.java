@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
+import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
@@ -124,46 +125,45 @@ class Export_mxJPO
     {
         final String fileName = this.getArgument(_arguments, Export_mxJPO.ARGUMENT_KEY_FILENAME, null);
 
-        AbstractObject_mxJPO instance = null;
+        TypeDef_mxJPO typeDef = null;
+        String mxName = null;
 
         if (fileName != null)  {
             final Collection<File> files = Arrays.asList(new File[]{new File(fileName)});
 
             // first found related type definition
-            for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
+            for (final TypeDef_mxJPO oneTypeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
 
-                final Map<String,File> matchFiles = typeDef.matchFileNames(_paramCache, files);
+                final Map<String,File> matchFiles = oneTypeDef.matchFileNames(_paramCache, files);
 
                 if (!matchFiles.isEmpty())  {
-                    instance = typeDef.newTypeInstance(matchFiles.keySet().iterator().next());
+                    typeDef = oneTypeDef;
+                    mxName = matchFiles.keySet().iterator().next();
                     break;
                 }
             }
         } else  {
             // initialize arguments
-            final String typeDefName = this.getArgument(_arguments, Export_mxJPO.ARGUMENT_KEY_TYPEDEF, null);
-            final String item = this.getArgument(_arguments, Export_mxJPO.ARGUMENT_KEY_NAME, null);
-
-            // export all objects depending on the type definitions
-            final TypeDef_mxJPO typeDef = _paramCache.getMapping().getTypeDef(typeDefName);
-            instance = typeDef.newTypeInstance(item);
+            typeDef = _paramCache.getMapping().getTypeDef((String) this.getArgument(_arguments, Export_mxJPO.ARGUMENT_KEY_TYPEDEF, null));
+            mxName = this.getArgument(_arguments, Export_mxJPO.ARGUMENT_KEY_NAME, null);
         }
 
         // export code
         final Map<String,String> ret;
-        if (instance == null)  {
+        if (typeDef == null)  {
             ret = null;
         } else  {
             final StringBuilder code = new StringBuilder();
+            final AbstractObject_mxJPO instance = typeDef.newTypeInstance(mxName);
             instance.parse(_paramCache);
             instance.write(_paramCache, code);
 
             ret = new HashMap<String,String>();
-            ret.put(Export_mxJPO.RETURN_KEY_TYPEDEF,    instance.getTypeDef().getName());
-            ret.put(Export_mxJPO.RETURN_KEY_NAME,       instance.getName());
+            ret.put(Export_mxJPO.RETURN_KEY_TYPEDEF,    typeDef.getName());
+            ret.put(Export_mxJPO.RETURN_KEY_NAME,       mxName);
             ret.put(Export_mxJPO.RETURN_KEY_CODE,       code.toString());
-            ret.put(Export_mxJPO.RETURN_KEY_PATH,       instance.getTypeDef().getFilePath());
-            ret.put(Export_mxJPO.RETURN_KEY_FILENAME,   instance.getFileName());
+            ret.put(Export_mxJPO.RETURN_KEY_PATH,       typeDef.getFilePath());
+            ret.put(Export_mxJPO.RETURN_KEY_FILENAME,   FileHandlingUtil_mxJPO.calcCIFileName(typeDef, mxName));
         }
 
         return ret;

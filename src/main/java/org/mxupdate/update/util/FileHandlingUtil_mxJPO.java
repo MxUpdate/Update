@@ -15,6 +15,8 @@
 
 package org.mxupdate.update.util;
 
+import org.mxupdate.typedef.TypeDef_mxJPO;
+
 
 /**
  * Utility methods for the handling of files.
@@ -63,5 +65,31 @@ public final class FileHandlingUtil_mxJPO
             }
         }
         return ret;
+    }
+
+    /**
+     * Calculates the file name for type definition {@code _typeDef} with name
+     * {@code _mxName}. The file name is a concatenation of the defined file
+     * prefix within the type definition, the name of the MX object and the
+     * file suffix within the type definition. All special characters are
+     * converted automatically from
+     * {@link StringUtil_mxJPO#convertToFileName(String)}.
+     *
+     * @param _typeDef      type definition
+     * @param _mxName       name of ci object
+     * @return file name of this administration (business) object
+     */
+    public static String calcCIFileName(final TypeDef_mxJPO _typeDef,
+                                        final String _mxName)
+    {
+        final StringBuilder ret = new StringBuilder();
+        if (_typeDef.getFilePrefix() != null)  {
+            ret.append(_typeDef.getFilePrefix());
+        }
+        ret.append(_mxName);
+        if (_typeDef.getFileSuffix() != null)  {
+            ret.append(_typeDef.getFileSuffix());
+        }
+        return StringUtil_mxJPO.convertToFileName(ret.toString());
     }
 }

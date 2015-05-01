@@ -29,7 +29,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  *
  * @author The MxUpdate Team
  */
-public class MxNamesAdminSystemSearchIndex_mxJPO
+public class MxNamesSystemConfigSearchIndex_mxJPO
     implements IMatcherMxNames_mxJPO
 {
     /** Used default name of the search configuration. */
@@ -41,8 +41,8 @@ public class MxNamesAdminSystemSearchIndex_mxJPO
                                    final Collection<String> _matches)
     {
         final SortedSet<String> names = new TreeSet<String>();
-        if (StringUtil_mxJPO.match(MxNamesAdminSystemSearchIndex_mxJPO.DEFAULT_NAME, _matches))  {
-            names.add(MxNamesAdminSystemSearchIndex_mxJPO.DEFAULT_NAME);
+        if (StringUtil_mxJPO.match(MxNamesSystemConfigSearchIndex_mxJPO.DEFAULT_NAME, _matches))  {
+            names.add(MxNamesSystemConfigSearchIndex_mxJPO.DEFAULT_NAME);
         }
         return names;
     }
