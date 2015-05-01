@@ -88,7 +88,31 @@ public abstract class AbstractParser_mxJPO
     }
 
     /**
-     * Appends new {@code values≠ for field {@code _fieldName} of
+     * Clear all values for field {@code _fieldName} of {@code _object}.
+     *
+     * @param _object       object where the field must be updated
+     * @param _fieldName    name of the field to update
+     */
+    @SuppressWarnings("unchecked")
+    protected void clearValues(final Object _object,
+                               final String _fieldName)
+    {
+        try  {
+            final Field field = this.getField(_object, _fieldName).field;
+            final boolean accessible = field.isAccessible();
+            try  {
+                field.setAccessible(true);
+                ((Collection<Object>) field.get(_object)).clear();
+            } finally  {
+                field.setAccessible(accessible);
+            }
+        } catch (final Exception e)  {
+            throw new ParseUpdateError(e);
+        }
+    }
+
+    /**
+     * Appends new {@code values} for field {@code _fieldName} of
      * {@code _object}.
      *
      * @param _object       object where the field must be updated
@@ -105,8 +129,7 @@ public abstract class AbstractParser_mxJPO
             final boolean accessible = field.isAccessible();
             try  {
                 field.setAccessible(true);
-                final Collection<Object> set = (Collection<Object>) field.get(_object);
-                set.addAll(_values);
+                ((Collection<Object>) field.get(_object)).addAll(_values);
             } finally  {
                 field.setAccessible(accessible);
             }

@@ -69,25 +69,25 @@ public class PersonAdmin_mxJPO
     private final SortedSet<String> roles = new TreeSet<String>();
 
     /** Full name of the person. */
-    private String fullName;
+    private String fullName = "";
 
     /** Email address of the person. */
-    private String emailAddress;
+    private String emailAddress = "";
 
     /** Address of the person. */
-    private String address;
+    private String address = "";
 
     /** Fax number of the person. */
-    private String fax;
+    private String fax = "";
 
     /** Phone number of the person.*/
-    private String phone;
+    private String phone = "";
 
     /** Default vault of the person.*/
-    private String vault;
+    private String vault = "";
 
     /** Is the person not active? */
-    private boolean active = false;
+    private boolean active = true;
 
     /** Is the person a trusted user? */
     private boolean trusted = false;
@@ -105,7 +105,7 @@ public class PersonAdmin_mxJPO
     private final SortedSet<String> admin = new TreeSet<String>();
 
     /**  Defines the name of the assigned default application.  */
-    private String application;
+    private String application = "";
 
     /** All assigned products of the person. */
     private final SortedSet<String> products = new TreeSet<String>();
@@ -123,13 +123,37 @@ public class PersonAdmin_mxJPO
                              final String _mxName)
     {
         super(_typeDef, _mxName);
+        this.access.add("all");
+        this.types.add(TypeItem.APPLICATION);
+        this.types.add(TypeItem.FULL);
     }
 
     @Override()
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
+        // define dummy admin access (to be checked after parsing..)
+        this.admin.clear();
+        this.admin.add("dummy");
+
         new PersonAdminParser_mxJPO(new StringReader(_code)).parse(this);
+
+        // fix none admin access
+        if ((this.admin.size() == 1) && this.admin.iterator().next().equals("none")) {
+            this.admin.clear();
+        }
+        // fix dummy admin access
+        if ((this.admin.size() == 1) && this.admin.iterator().next().equals("dummy")) {
+            this.admin.clear();
+            if (this.types.contains(TypeItem.BUSINESS) || this.types.contains(TypeItem.SYSTEM))  {
+                this.admin.add("all");
+            }
+        }
+        // fix none access
+        if ((this.access.size() == 1) && this.access.iterator().next().equals("none")) {
+            this.access.clear();
+        }
+
         this.prepare();
     }
 
@@ -138,6 +162,8 @@ public class PersonAdmin_mxJPO
         throws MatrixException, ParseException
     {
         // to ensure that the value is the same default as in the DB
+        this.access.clear();
+        this.types.clear();
         this.iconmail = false;
         this.active = true;
         super.parse(_paramCache);
@@ -351,7 +377,7 @@ public class PersonAdmin_mxJPO
     {
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
         // type (application, full, business, system, inactive, trusted)
-        if (CompareToUtil_mxJPO.compare(0, this.types, _current.types) != 0 || this.active != _current.active || this.trusted != _current.trusted) {
+        if ((CompareToUtil_mxJPO.compare(0, this.types, _current.types) != 0) || (this.active != _current.active) || (this.trusted != _current.trusted))  {
             _mql.newLine().cmd("type ");
             boolean first = true;
             for (final TypeItem typeItem : TypeItem.values())  {

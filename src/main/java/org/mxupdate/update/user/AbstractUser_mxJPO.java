@@ -71,7 +71,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
     private static final String PARAM_IGNORE_WSO_USERS = "UserIgnoreWSO4Users";
 
     /** Related site of this group. */
-    private String site;
+    private String site = "";
 
     /**
      * Maps depending on the name of the cue to related cue information. The

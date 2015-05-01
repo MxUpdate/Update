@@ -143,11 +143,12 @@ this.setValue(_personAdmin, "trusted",                         false);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case ACCESS_ALL:{
           jj_consume_token(ACCESS_ALL);
-this.appendValue(_personAdmin, "access",                       "all");
+this.clearValues(_personAdmin, "access");this.appendValue(_personAdmin, "access", "all");
           break;
           }
         case ACCESS_OPEN:{
           jj_consume_token(ACCESS_OPEN);
+this.clearValues(_personAdmin, "access");
           label_2:
           while (true) {
             switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -177,11 +178,12 @@ this.appendValue(_personAdmin, "access",                       this.getString(tm
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case ADMIN_ALL:{
           jj_consume_token(ADMIN_ALL);
-this.appendValue(_personAdmin, "admin",                        "all");
+this.clearValues(_personAdmin, "admin");this.appendValue(_personAdmin, "admin", "all");
           break;
           }
         case ADMIN_OPEN:{
           jj_consume_token(ADMIN_OPEN);
+this.clearValues(_personAdmin, "admin");
           label_3:
           while (true) {
             switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -349,6 +351,7 @@ this.appendValue(_personAdmin, "products",                     this.getString(tm
       case TYPE:{
         jj_consume_token(TYPE);
         jj_consume_token(TYPE_OPEN);
+this.clearValues(_personAdmin, "types");
         label_5:
         while (true) {
           switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {

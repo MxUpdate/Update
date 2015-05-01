@@ -211,11 +211,13 @@ void parse(final PersonAdmin_mxJPO _personAdmin)
       | ( <TRUSTED_TRUE>                                                    {this.setValue(_personAdmin, "trusted",                         true);} )
       | ( <TRUSTED_FALSE>                                                   {this.setValue(_personAdmin, "trusted",                         false);} )
 
-      | ( <ACCESS>      ( <ACCESS_ALL>                                      {this.appendValue(_personAdmin, "access",                       "all");}
-                        | <ACCESS_OPEN> ( tmp = <ACCESS_EXPECTED_SINGLE>    {this.appendValue(_personAdmin, "access",                       this.getString(tmp.image));} )* <ACCESS_CLOSE > ) )
+      | ( <ACCESS>      ( <ACCESS_ALL>                                      {this.clearValues(_personAdmin, "access");this.appendValue(_personAdmin, "access", "all");}
+                        | <ACCESS_OPEN>                                     {this.clearValues(_personAdmin, "access");}
+                                        ( tmp = <ACCESS_EXPECTED_SINGLE>    {this.appendValue(_personAdmin, "access",                       this.getString(tmp.image));} )* <ACCESS_CLOSE > ) )
 
-      | ( <ADMIN>       ( <ADMIN_ALL>                                       {this.appendValue(_personAdmin, "admin",                        "all");}
-                        | <ADMIN_OPEN>  ( tmp = <ADMIN_EXPECTED_SINGLE>     {this.appendValue(_personAdmin, "admin",                        this.getString(tmp.image));} )* <ADMIN_CLOSE > ) )
+      | ( <ADMIN>       ( <ADMIN_ALL>                                       {this.clearValues(_personAdmin, "admin");this.appendValue(_personAdmin, "admin", "all");}
+                        | <ADMIN_OPEN>                                      {this.clearValues(_personAdmin, "admin");}
+                                        ( tmp = <ADMIN_EXPECTED_SINGLE>     {this.appendValue(_personAdmin, "admin",                        this.getString(tmp.image));} )* <ADMIN_CLOSE > ) )
 
       | ( <EMAIL_TRUE>                                                      {this.setValue(_personAdmin, "email",                           true);} )
       | ( <EMAIL_FALSE>                                                     {this.setValue(_personAdmin, "email",                           false);} )
@@ -235,7 +237,8 @@ void parse(final PersonAdmin_mxJPO _personAdmin)
 
       | ( <PRODUCT> <PRODUCT_OPEN>  ( tmp = <PRODUCT_EXPECTED_SINGLE>       {this.appendValue(_personAdmin, "products",                     this.getString(tmp.image));} )* <PRODUCT_CLOSE> )
 
-      | ( <TYPE> <TYPE_OPEN>        ( ( <TYPE_APPLICATION>                  {this.appendValue(_personAdmin, "types",                        TypeItem.APPLICATION);} )
+      | ( <TYPE> <TYPE_OPEN>                                                {this.clearValues(_personAdmin, "types");}
+                                    ( ( <TYPE_APPLICATION>                  {this.appendValue(_personAdmin, "types",                        TypeItem.APPLICATION);} )
                                     | ( <TYPE_FULL>                         {this.appendValue(_personAdmin, "types",                        TypeItem.FULL);} )
                                     | ( <TYPE_BUSINESS>                     {this.appendValue(_personAdmin, "types",                        TypeItem.BUSINESS);} )
                                     | ( <TYPE_SYSTEM>                       {this.appendValue(_personAdmin, "types",                        TypeItem.SYSTEM);} ) )* <TYPE_CLOSE > )
