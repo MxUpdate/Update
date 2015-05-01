@@ -98,7 +98,7 @@ public class Policy_mxJPO
     /** All possible formats of this policy. */
     private final SortedSet<String> formats = new TreeSet<String>();
     /** Are all formats allowed of this policy? */
-    private boolean allFormats;
+    private boolean allFormats = false;
     /** Locking enforced? */
     private boolean enforce;
 
@@ -115,7 +115,7 @@ public class Policy_mxJPO
     /** Set of all types of this policy. */
     private final SortedSet<String> types = new TreeSet<String>();
     /** Are all types allowed of this policy? */
-    private boolean allTypes;
+    private boolean allTypes = false;
 
     /** Are access for all states defined? */
     private boolean allState = false;
@@ -158,6 +158,14 @@ public class Policy_mxJPO
     {
         if (!this.updateWithCreate)  {
             super.parse(_paramCache);
+
+            // define default values..
+            if (this.minorsequence == null)  {
+                this.minorsequence = "";
+            }
+            if (this.majorsequence == null)  {
+                this.majorsequence = "";
+            }
 
             if (_paramCache.getValueBoolean(ValueKeys.DMPolicyAllowExportAccessSorting))  {
                 this.allStateAccess.sort();
@@ -357,11 +365,16 @@ public class Policy_mxJPO
 
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",                  this.getDescription(),                      _current.getDescription());
         DeltaUtil_mxJPO.calcListDelta( _mql, "type",        this.allTypes,   this.types,            _current.allTypes,   _current.types);
-        DeltaUtil_mxJPO.calcListDelta( _mql, "format",      this.allFormats, this.formats,          _current.allFormats, _current.formats);
+        // work-arround because if all format is defined, formats contains  in MX list of all formats!
+        if (!this.allFormats || !_current.allFormats)  {
+            DeltaUtil_mxJPO.calcListDelta( _mql, "format",      this.allFormats, this.formats,          _current.allFormats, _current.formats);
+        }
 
         // if not default format => ADMINISTRATION must be default format
         if ((this.defaultFormat == null) || this.defaultFormat.isEmpty())  {
-            _mql.newLine().cmd("defaultformat ").arg("ADMINISTRATION");
+            if ((_current.defaultFormat != null) && !_current.defaultFormat.isEmpty())  {
+                _mql.newLine().cmd("defaultformat ").arg("ADMINISTRATION");
+            }
         } else  {
             DeltaUtil_mxJPO.calcValueDelta(_mql, "defaultformat", this.defaultFormat, _current.defaultFormat);
         }
@@ -383,12 +396,13 @@ public class Policy_mxJPO
         // hidden flag, because hidden flag must be set with special syntax
         DeltaUtil_mxJPO.calcFlagDelta(_mql, "hidden", false, this.isHidden(), _current.isHidden());
 
-        // because the store of a policy could not be removed....
-        if ((this.store != null) && !this.store.isEmpty())  {
-            DeltaUtil_mxJPO.calcValueDelta(_mql, "store", this.store, _current.store);
-        // instead store 'ADMINISTRATION' must be assigned
+        // if not default store => ADMINISTRATION must be default store
+        if ((this.store == null) || this.store.isEmpty())  {
+            if ((_current.store != null) && !_current.store.isEmpty())  {
+                _mql.newLine().cmd("store ").arg("ADMINISTRATION");
+            }
         } else  {
-            _mql.newLine().cmd("store ").arg("ADMINISTRATION");
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "store", this.store, _current.store);
         }
 
         // all state access
@@ -460,14 +474,6 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
             _mql.pushPrefixByAppending("state $2", entry.getKey().name);
             entry.getKey().calcDelta(_paramCache, _mql, entry.getValue());
             _mql.popPrefix();
-        }
-
-        // set symbolic names for all policy states
-        for (final State state : _newPolicy.states)  {
-            for (final String symbolicName : state.symbolicNames)  {
-                _mql.newLine()
-                    .cmd("add property ").arg(symbolicName).cmd(" value ").arg(state.name);
-            }
         }
     }
 
@@ -703,7 +709,7 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
 
             _updateBuilder
                     .childStart("state \""+ StringUtil_mxJPO.convertUpdate(this.name) + "\"")
-                    .list(          "registeredName",              this.symbolicNames)
+                    .list(          "registeredname",              this.symbolicNames)
                     .flagIfTrue(    "enforcereserveaccess", false, this.enforcereserveaccess,       _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMPolicyStateSupportsEnforceReserveAccess))
                     .flagIfTrue(    "majorrevision",        false, this.majorrevisionable,          _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMPolicySupportsMajorMinor))
                     .flagIfTrue(    "minorrevision",        false, this.minorrevisionable,          _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMPolicySupportsMajorMinor))
@@ -748,7 +754,7 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
         {
             // enforcereserveaccess flag (if supported)
             if (_paramCache.getValueBoolean(ValueKeys.DMPolicyStateSupportsEnforceReserveAccess))  {
-                DeltaUtil_mxJPO.calcFlagDelta(_mql, "enforcereserveaccess", this.enforcereserveaccess, (_oldState != null) ? _oldState.enforcereserveaccess : null);
+                DeltaUtil_mxJPO.calcFlagDelta(_mql, "enforcereserveaccess", false, this.enforcereserveaccess, (_oldState != null) ? _oldState.enforcereserveaccess : null);
             }
             // basics
             DeltaUtil_mxJPO.calcValueDelta(_mql, "promote",         String.valueOf(this.autoPromotion),     (_oldState == null) ? null : String.valueOf(_oldState.autoPromotion));
@@ -817,8 +823,22 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
                 signature.calcDelta(_mql, oldSig);
             }
 
-            // properties
+            // state properties
             this.properties.calcDelta(_mql, "state", (_oldState != null) ? _oldState.properties : null);
+
+            // registered names (symbolic names)
+            if (_oldState != null)  {
+                for (final String symbolicName : _oldState.symbolicNames)  {
+                    if (!this.symbolicNames.contains(symbolicName))  {
+                        _mql.newLine().cmd("remove property ").arg(symbolicName);
+                    }
+                }
+            }
+            for (final String symbolicName : this.symbolicNames)  {
+                if ((_oldState == null) || !_oldState.symbolicNames.contains(symbolicName))  {
+                    _mql.newLine().cmd("add property ").arg(symbolicName).cmd(" value ").arg(this.name);
+                }
+            }
         }
     }
 

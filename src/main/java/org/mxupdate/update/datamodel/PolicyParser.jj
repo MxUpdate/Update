@@ -117,7 +117,8 @@ PARSER_END(PolicyParser)
 <DEFAULT> TOKEN : /** State and depending signature and trigger Tokens */
 {
       <STATE:                                           "state">                                                : STRING_EXPECTED
-    | <REGISTEREDNAME:                                  "registeredName">                                       : STRING_EXPECTED
+    | <REGISTEREDNAME:                                  "registeredname">                                       : STRING_EXPECTED
+    | <REGISTEREDNAME_OLD_SYNTAX:                       "registeredName">                                       : STRING_EXPECTED
 
     | <REVISION_TRUE:                                   "revision">
     | <REVISION_TRUE_VIA_VALUE:                         "revision" ([" ","\t","\n","\r"])+ (["t","T"] ["r","R"] ["u","U"] ["e","E"])>
@@ -406,7 +407,8 @@ void state(final Policy_mxJPO _policy) : {
     ( <STATE>                       ( tmp = <STRING>                        {this.setValue(state, "name", this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.setValue(state, "name", this.getSingle(tmp.image));} ) )
     "{"
-      ( ( <REGISTEREDNAME>          ( tmp = <STRING>                        {this.appendValue(state, "symbolicNames", this.getString(tmp.image));}
+      ( ( ( <REGISTEREDNAME> | <REGISTEREDNAME_OLD_SYNTAX> )
+                                    ( tmp = <STRING>                        {this.appendValue(state, "symbolicNames", this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.appendValue(state, "symbolicNames", this.getSingle(tmp.image));} ) )
 
       | ( ( <MINORREVISION_TRUE>

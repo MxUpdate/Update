@@ -114,6 +114,16 @@ public final class MqlBuilder_mxJPO
         }
 
         /**
+         * Checks if {@link #lines} are defined.
+         *
+         * @return <i>true<i> if new lines exist; otherwise <i>false</i>
+         */
+        public boolean hasNewLines()
+        {
+            return !this.lines.isEmpty();
+        }
+
+        /**
          * Defines new prefix.
          *
          * @param _prefix   MQL command for the prefix

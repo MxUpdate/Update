@@ -54,25 +54,25 @@ public class AccessList_mxJPO
         /** Holds the user references of a user access. */
         private String userRef = "";
         /** Key of the access filter. */
-        private String key;
+        private String key = "";
         /** Set holding the complete access. */
         private final SortedSet<String> access = new TreeSet<String>();
         /** Organization of the access definition. */
-        private String organization;
+        private String organization = "";
         /** Project of the access definition. */
-        private String project;
+        private String project = "";
         /** Owner of the access definition. */
         private String owner;
         /** Reserve of the access definition. */
-        private String reserve;
+        private String reserve = "";
         /** Maturity of the access definition. */
-        private String maturity;
+        private String maturity = "";
         /** Category of the access definition. */
-        private String category;
+        private String category = "";
         /** Filter expression. */
-        private String filter;
+        private String filter = "";
         /** Local filter expression. */
-        private String localfilter;
+        private String localfilter = "";
 
         /**
          * Returns the {@link #kind} of this access.
@@ -193,7 +193,6 @@ public class AccessList_mxJPO
         } else if ("/ownerRevoke".equals(_url))  {
             final Access accessFilter = new Access();
             accessFilter.kind = "owner";
-//            accessFilter.prefix = Prefix.Revoke;
             accessFilter.revoke = true;
             this.accessList.add(accessFilter);
         } else if (_url.startsWith("/ownerRevoke/access"))  {
@@ -215,7 +214,6 @@ public class AccessList_mxJPO
         } else if ("/publicRevoke".equals(_url))  {
             final Access accessFilter = new Access();
             accessFilter.kind = "public";
-//            accessFilter.prefix = Prefix.Revoke;
             accessFilter.revoke = true;
             this.accessList.add(accessFilter);
         } else if (_url.startsWith("/publicRevoke/access"))  {
@@ -245,10 +243,8 @@ public class AccessList_mxJPO
         } else if ("/userAccessList/userAccess/userAccessKind".equals(_url))  {
             this.accessList.peek().kind = _content;
         } else if ("/userAccessList/userAccess/userAccessLoginRole".equals(_url))  {
-   //         this.accessList.peek().prefix = Prefix.Login;
             this.accessList.peek().login = true;
         } else if ("/userAccessList/userAccess/userAccessRevoke".equals(_url))  {
- //           this.accessList.peek().prefix = Prefix.Revoke;
             this.accessList.peek().revoke = true;
         } else if ("/userAccessList/userAccess/userRef".equals(_url))  {
             this.accessList.peek().userRef = _content;
@@ -275,7 +271,12 @@ public class AccessList_mxJPO
         final List<Access> tmp = new ArrayList<Access>(this.accessList);
         Collections.sort(tmp);
         this.accessList.clear();
-        this.accessList.addAll(tmp);
+
+        for (final Access access : tmp)  {
+            if (!access.isEmpty())  {
+                this.accessList.add(access);
+            }
+        }
     }
 
     /**
@@ -358,10 +359,14 @@ public class AccessList_mxJPO
     public void calcDelta(final MultiLineMqlBuilder _mql,
                           final AccessList_mxJPO _currents)
     {
-        if (_currents != null)  {
-            _currents.cleanup(_mql);
+        if (_currents == null)  {
+            this.update(_mql);
+        } else  {
+            if (CompareToUtil_mxJPO.compare(0, this.accessList, _currents.accessList) != 0)  {
+                _currents.cleanup(_mql);
+                this.update(_mql);
+            }
         }
-        this.update(_mql);
     }
 
     /**
@@ -466,10 +471,10 @@ public class AccessList_mxJPO
                 if ((access.category != null) && !access.category.isEmpty() && !"any".equals(access.category))  {
                     _mql.cmd(" ").arg(access.category).cmd(" category");
                 }
-                if (access.filter != null)  {
+                if ((access.filter != null) && !access.filter.isEmpty())  {
                     _mql.cmd(" filter ").arg(access.filter);
                 }
-                if (access.localfilter != null)  {
+                if ((access.localfilter != null) && !access.localfilter.isEmpty())  {
                     _mql.cmd(" localfilter ").arg(access.localfilter);
                 }
             }
