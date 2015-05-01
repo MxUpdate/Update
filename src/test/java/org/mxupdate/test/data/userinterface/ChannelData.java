@@ -22,6 +22,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.testng.Assert;
 
@@ -31,7 +32,7 @@ import org.testng.Assert;
  * @author The MxUpdate Team
  */
 public class ChannelData
-    extends AbstractUIWithSettingData<ChannelData>
+    extends AbstractAdminData<ChannelData>
 {
     /** All commands of the channel. */
     private final List<CommandData> commands = new ArrayList<CommandData>();
@@ -88,7 +89,7 @@ public class ChannelData
         this.getFlags()     .append4Update("    ", strg);
         this.getValues()    .append4Update("    ", strg);
         this.getSingles()   .append4Update("    ", strg);
-        this.getSettings()  .appendUpdate("    ", strg, "\n");
+        this.getKeyValues() .append4Update("    ", strg);
         this.getProperties().append4Update("    ", strg);
         for (final String ciLine : this.getCILines())  {
             strg.append("    ").append(ciLine).append('\n');
@@ -176,7 +177,7 @@ public class ChannelData
         this.getFlags()     .check4Export(_exportParser, "");
         this.getValues()    .check4Export(_exportParser, "");
         this.getSingles()   .check4Export(_exportParser, "");
-        this.getSettings()  .checkExport(_exportParser.getLines("/mxUpdate/setting/@value"));
+        this.getKeyValues() .check4Export(_exportParser, "");
         this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
 
         // check for commands (in correct order!)

@@ -27,6 +27,7 @@ import java.util.Set;
 import matrix.util.MatrixException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.AbstractTest.CI;
 import org.mxupdate.test.data.AbstractData;
@@ -47,7 +48,7 @@ public class DataList<DATA extends AbstractData<?>>
     private final boolean appendMxType;
 
     /** Data list. */
-    private final List<DATA> list = new ArrayList<DATA>();
+    private final List<ImmutablePair<String,DATA>> list = new ArrayList<ImmutablePair<String,DATA>>();
 
     /** All flag */
     private final Set<CI> alls = new HashSet<CI>();
@@ -66,6 +67,7 @@ public class DataList<DATA extends AbstractData<?>>
      * @param _prefix4Update    prefix used for update failed
      * @param _prefix4Create    prefix used for create
      */
+    @Deprecated()
     public DataList(final String _prefix4Update,
                     final String _prefix4Create,
                     final boolean _appendMxType)
@@ -78,11 +80,24 @@ public class DataList<DATA extends AbstractData<?>>
     /**
      * Appends {@code _elem}.
      *
+     * @param _tag      tag (name) of the data element
      * @param _elem     element to append
      */
+    public void add(final String _tag,
+                    final DATA _elem)
+    {
+        this.list.add(new ImmutablePair<String,DATA>(_tag, _elem));
+    }
+
+    /**
+     * Appends {@code _elem}.
+     *
+     * @param _elem     element to append
+     */
+    @Deprecated()
     public void add(final DATA _elem)
     {
-        this.list.add(_elem);
+        this.add(_elem.getCI().getMxType(), _elem);
     }
 
     /**
@@ -90,9 +105,12 @@ public class DataList<DATA extends AbstractData<?>>
      *
      * @param _elems    elements to append
      */
+    @Deprecated()
     public void addAll(final Collection<DATA> _elems)
     {
-        this.list.addAll(_elems);
+        for (final DATA elem : _elems)  {
+            this.add(elem.getCI().getMxType(), elem);
+        }
     }
 
     /**
@@ -128,9 +146,9 @@ public class DataList<DATA extends AbstractData<?>>
         for (final CI ci: this.alls)  {
             _cmd.append(_prefix).append(this.prefix4Update).append(this.appendMxType ? ci.getMxType() : "").append(" all\n");
         }
-        for (final DATA data : this.list)  {
-            _cmd.append(_prefix).append(this.prefix4Update).append(this.appendMxType ? data.getCI().getMxType(): "")
-                .append(" \"").append(AbstractTest.convertUpdate(data.getName())).append("\"\n");
+        for (final ImmutablePair<String,DATA> data : this.list)  {
+            _cmd.append(_prefix).append(this.prefix4Update).append(this.appendMxType ? data.left : "")
+                .append(" \"").append(AbstractTest.convertUpdate(data.right.getName())).append("\"\n");
         }
     }
 
@@ -147,11 +165,11 @@ public class DataList<DATA extends AbstractData<?>>
         if (!this.list.isEmpty())  {
             // sort all data elements by MX type
             final Map<String,Set<String>> dataElems = new HashMap<String,Set<String>>();
-            for (final DATA data : this.list)  {
-                if (!dataElems.containsKey(data.getCI().getMxType()))  {
-                    dataElems.put(data.getCI().getMxType(), new HashSet<String>());
+            for (final ImmutablePair<String,DATA> data : this.list)  {
+                if (!dataElems.containsKey(data.left))  {
+                    dataElems.put(data.left, new HashSet<String>());
                 }
-                dataElems.get(data.getCI().getMxType()).add("\"" + AbstractTest.convertMql(data.getName()) + "\"");
+                dataElems.get(data.left).add("\"" + AbstractTest.convertMql(data.right.getName()) + "\"");
             }
 
             // append all elements
@@ -168,8 +186,8 @@ public class DataList<DATA extends AbstractData<?>>
      */
     public void append4CreateViaAdd(final StringBuilder _cmd)
     {
-        for (final DATA data : this.list)  {
-            _cmd.append(" add ").append(this.prefix4Create).append(this.appendMxType ? data.getCI().getMxType() : "").append(" \"").append(data.getName()).append('\"');
+        for (final ImmutablePair<String,DATA> data : this.list)  {
+            _cmd.append(" add ").append(this.prefix4Create).append(this.appendMxType ? data.left : "").append(" \"").append(data.right.getName()).append('\"');
         }
     }
 
@@ -181,8 +199,8 @@ public class DataList<DATA extends AbstractData<?>>
     public void createDependings()
         throws MatrixException
     {
-        for (final DATA data : this.list)  {
-            data.create();
+        for (final ImmutablePair<String,DATA> data : this.list)  {
+            data.right.create();
         }
     }
 }

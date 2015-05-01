@@ -60,10 +60,10 @@ public class ChannelTest
                 new Object[]{
                         "channel with settings",
                         new ChannelData(this, "hello \" test")
-                                .setSetting("Setting 1", "Setting Value ' 1")
-                                .setSetting("Setting 2", "Setting Value \"2\"")
-                                .setSetting("Setting 3", "Value3")
-                                .setSetting("Setting \"4\"", "Value 4")},
+                                .setKeyValue("setting", "Setting 1", "Setting Value ' 1")
+                                .setKeyValue("setting", "Setting 2", "Setting Value \"2\"")
+                                .setKeyValue("setting", "Setting 3", "Value3")
+                                .setKeyValue("setting", "Setting \"4\"", "Value 4")},
                 new Object[]{
                         "channel with one command",
                         new ChannelData(this, "hello \" test")

@@ -18,9 +18,12 @@ package org.mxupdate.test.ci.userinterface;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.data.user.RoleData;
 import org.mxupdate.test.data.userinterface.CommandData;
+import org.mxupdate.test.util.IssueLink;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -51,9 +54,9 @@ public class CommandTest
                                 .setValue("description", "\"\\\\ hallo")
                                 .setValue("href", "${COMMON_DIR}/emxTree.jsp?mode=insert")
                                 .setValue("alt", "${COMMON_DIR}/emxTreeAlt.jsp?mode=insert")
-                                .setSetting("Setting 1", "Setting Value ' 1")
-                                .setSetting("Setting 2", "Value2")
-                                .setSetting("Setting \"3\"", "Value 3")},
+                                .setKeyValue("setting", "Setting 1", "Setting Value ' 1")
+                                .setKeyValue("setting", "Setting 2", "Value2")
+                                .setKeyValue("setting", "Setting \"3\"", "Value 3")},
                 new Object[]{
                         "complex command with users",
                         new CommandData(this, "command")
@@ -61,9 +64,9 @@ public class CommandTest
                                 .setValue("description", "\"\\\\ hallo")
                                 .setValue("href", "${COMMON_DIR}/emxTree.jsp?mode=insert")
                                 .setValue("alt", "${COMMON_DIR}/emxTreeAlt.jsp?mode=insert")
-                                .setSetting("Setting 1", "Setting Value ' 1")
-                                .addUser(new RoleData(this, "assigned \"role\""))
-                                .addUser(new PersonAdminData(this, "assigned \"person\""))},
+                                .setKeyValue("setting", "Setting 1", "Setting Value ' 1")
+                                .defData("user", new RoleData(this, "assigned \"role\""))
+                                .defData("user", new PersonAdminData(this, "assigned \"person\""))},
                 new Object[]{
                         "complex command with value with escaped special characters but w/o any space",
                         new CommandData(this, "command")
@@ -71,25 +74,21 @@ public class CommandTest
                                 .setValue("description", "desc\"\\\\ription")
                                 .setValue("href", "javascript(\\\"test\\\")")
                                 .setValue("alt", "${COMMON_DIR}/emxTreeAlt.jsp?\"mode=insert")
-                                .setSetting("Setting 1", "SettingValue\"1")
-                                .setSetting("Setting 2", "desc\"\\\\ription")},
-                new Object[]{
-                        "issue #194: command with code",
-                        new CommandData(this, "command")
-                                .setCode("function beta()\n{\n    var idx = 1;\n    $[test]\n}")});
+                                .setKeyValue("setting", "Setting 1", "SettingValue\"1")
+                                .setKeyValue("setting", "Setting 2", "desc\"\\\\ription")});
     }
 
     /**
-     * Command with 'add setting' syntax.
+     * Positive test for Command with 'add setting' syntax.
      *
      * @throws Exception if test failed
      */
-    @Test(description = "command with 'add setting' syntax")
-    public void testUpdateWithAddSettingSyntax()
+    @Test(description = "positive test for command with 'add setting' syntax")
+    public void positiveTestUpdateWithAddSettingSyntax()
         throws Exception
     {
         final CommandData orgData = new CommandData(this, "command").addCILine("add setting \"Key\" \"Value\"");
-        final CommandData expData = new CommandData(this, "command").setSetting("Key", "Value");
+        final CommandData expData = new CommandData(this, "command").setKeyValue("setting", "Key", "Value");
 
         orgData.update("");
 
@@ -97,16 +96,16 @@ public class CommandTest
     }
 
     /**
-     * Command with 'add user' syntax.
+     * Positive test for command with 'add user' syntax.
      *
      * @throws Exception if test failed
      */
-    @Test(description = "command with 'add user' syntax")
-    public void testUpdateWithAddUserSyntax()
+    @Test(description = "positive test for command with 'add user' syntax")
+    public void positiveTestUpdateWithAddUserSyntax()
         throws Exception
     {
         final CommandData orgData = new CommandData(this, "command").addCILine("add user \"" + AbstractTest.PREFIX + "adminuser" + "\"");
-        final CommandData expData = new CommandData(this, "command").addUser(new PersonAdminData(this, "adminuser"));
+        final CommandData expData = new CommandData(this, "command").defData("user", new PersonAdminData(this, "adminuser"));
 
         expData.createDependings();
 
@@ -115,14 +114,34 @@ public class CommandTest
         expData.checkExport(expData.export());
     }
 
-
     /**
-     * Cleanup all test commands.
+     * Positive test for update of code.
      *
-     * @throws MatrixException if cleanup failed
+     * @throws Exception if test failed
      */
+    @IssueLink("194")
+    @Test(description = "issue #194: positive test for update of code")
+    public void positiveTestCodeUpdate()
+        throws Exception
+    {
+        final String code = "function beta()\n{\n    var idx = 1;\n    $[test]\n}";
+
+        final CommandData command = new CommandData(this, "Test").setValue("code", code).update("");
+
+        Assert.assertEquals(code, this.mql("print command " + command.getName() + " select code dump"));
+
+        final ExportParser exportParser = command.export();
+
+        // remove code and update via export
+        this.mql("mod command " + command.getName() + " code ''");
+        command.updateWithCode(exportParser.getCode(), "");
+
+        // and check result (so that the export of code is also checked!)
+        Assert.assertEquals(code, this.mql("print command " + command.getName() + " select code dump"));
+    }
+
     @BeforeMethod()
-    @AfterClass()
+    @AfterClass(groups = "close")
     public void cleanup()
         throws MatrixException
     {
@@ -131,12 +150,6 @@ public class CommandTest
         this.cleanup(AbstractTest.CI.USR_PERSONADMIN);
     }
 
-    /**
-     * Creates for given <code>_name</code> a new command instance.
-     *
-     * @param _name     name of the command instance
-     * @return command instance
-     */
     @Override()
     protected CommandData createNewData(final String _name)
     {

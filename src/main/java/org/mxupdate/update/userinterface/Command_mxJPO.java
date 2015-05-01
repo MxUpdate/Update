@@ -24,16 +24,27 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.userinterface.command.CommandDefParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * The class is used to export and import / update command configuration items.
+ * The command specific information are:
+ * <ul>
+ * <li>description</li>
+ * <li>hidden flag (only if <i>true</i>)</li>
+ * <li>label</li>
+ * <li>href</li>
+ * <li>alt label</li>
+ * <li>user</li>
+ * <li>settings</li>
+ * <li>properties</li>
+ * <li>code</li>
+ * </ul>
  *
  * @author The MxUpdate Team
  */
@@ -65,13 +76,14 @@ public class Command_mxJPO
                          final String _mxName)
     {
         super(_typeDef, _mxName);
+        this.getProperties().setOtherPropTag("setting");
     }
 
     @Override()
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
-        new CommandDefParser_mxJPO(new StringReader(_code)).parse(this);
+        new CommandParser_mxJPO(new StringReader(_code)).parse(this);
         this.prepare();
     }
 
@@ -108,53 +120,30 @@ public class Command_mxJPO
         return parsed;
     }
 
-    /**
-     * Writes the update script for this command.
-     * The command specific information are:
-     * <ul>
-     * <li>description</li>
-     * <li>hidden flag (only if <i>true</i>)</li>
-     * <li>label</li>
-     * <li>href</li>
-     * <li>alt label</li>
-     * <li>user</li>
-     * <li>settings</li>
-     * <li>properties</li>
-     * <li>code</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          writer instance
-     * @throws IOException if the TCL update code could not be written
-     */
     @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
         throws IOException
     {
-        this.writeHeader(_paramCache, _out);
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
 
-        _out.append("mxUpdate command \"${NAME}\"  {\n")
-            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n");
-        if (this.isHidden())  {
-            _out.append("    hidden\n");
-        }
-        _out.append("    label \"").append(StringUtil_mxJPO.convertUpdate(this.getLabel())).append("\"\n")
-            .append("    href \"").append(StringUtil_mxJPO.convertUpdate(this.getHref())).append("\"\n")
-            .append("    alt \"").append(StringUtil_mxJPO.convertUpdate(this.getAlt())).append("\"\n");
-        // users
-        for (final String user : this.users)  {
-            _out.append("    user \"").append(StringUtil_mxJPO.convertUpdate(user)).append("\"\n");
-        }
-        this.getProperties().writeSettings(_paramCache, _out, "    ");
-        this.getProperties().writeProperties(_paramCache, _out, "    ");
+        this.writeHeader(_paramCache, updateBuilder.getStrg());
 
-        if ((this.code != null) && !this.code.isEmpty())  {
-            _out.append("    code \"\n")
-                .append(StringUtil_mxJPO.convertUpdate(this.code)).append('\n')
-                .append("\"\n");
-        }
-        _out.append("}");
+        updateBuilder
+                .start("command")
+                //              tag             | default | value                              | write?
+                .string(        "description",             this.getDescription())
+                .flagIfTrue(    "hidden",           false, this.isHidden(),                     this.isHidden())
+                .string(        "label",                   this.getLabel())
+                .string(        "href",                    this.getHref())
+                .string(        "alt",                     this.getAlt())
+                .list(          "user",                    this.users)
+                .otherProps(this.getProperties())
+                .properties(this.getProperties())
+                .stringIfTrue(   "code",                    "\n" + ((this.code != null) ? this.code : "") + "\n", (this.code != null) && !this.code.isEmpty())
+                .end();
+
+        _out.append(updateBuilder.toString());
     }
 
     @Override()

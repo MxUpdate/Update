@@ -24,6 +24,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.data.util.DataList;
 import org.mxupdate.test.data.util.FlagList;
 import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.data.util.KeyValueList;
@@ -57,6 +58,8 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     private final FlagList flags = new FlagList();
     /** All properties for this data piece. */
     private final KeyValueList keyValues = new KeyValueList();
+    /** All defined data elements. */
+    private final DataList<AbstractAdminData<?>> datas = new DataList<AbstractAdminData<?>>();
     /** All properties for this data piece. */
     private final PropertyDefList properties = new PropertyDefList();
 
@@ -174,6 +177,41 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     }
 
     /**
+     * Returns the {@link #keyValues key/value list}.
+     *
+     * @return key/value list
+     */
+    public KeyValueList getKeyValues()
+    {
+        return this.keyValues;
+    }
+
+    /**
+     * Defines a datafor given {@code _tag}.
+     *
+     * @param _tag          used tag (name) of the data
+     * @param _data         data instance
+     * @return this data instance
+     */
+    @SuppressWarnings("unchecked")
+    public DATA defData(final String _tag,
+                        final AbstractAdminData<?> _data)
+    {
+        this.datas.add(_tag, _data);
+        return (DATA) this;
+    }
+
+    /**
+     * Returns the {@link #datas data list}.
+     *
+     * @return data list
+     */
+    public DataList<AbstractAdminData<?>> getDatas()
+    {
+        return this.datas;
+    }
+
+    /**
      * Assigns <code>_property</code> to this data piece.
      *
      * @param _property     property to add / assign
@@ -237,6 +275,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         this.flags      .append4Update("    ", strg);
         this.getValues().append4Update("    ", strg);
         this.keyValues  .append4Update("    ", strg);
+        this.datas      .append4Update("    ", strg);
         this.properties .append4Update("    ", strg);
         for (final String ciLine : this.getCILines())  {
             strg.append("    ").append(ciLine).append('\n');
@@ -257,17 +296,23 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     public DATA create()
         throws MatrixException
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("escape add " + this.getCI().getMxType() + " \"" + AbstractTest.convertMql(this.getName()) + "\"");
+        if (!this.isCreated())  {
+            this.createDependings();
 
-        this.append4Create(cmd);
+            final StringBuilder cmd = new StringBuilder()
+                    .append("escape add " + this.getCI().getMxType() + " \"" + AbstractTest.convertMql(this.getName()) + "\"");
 
-        cmd.append(";\n")
-           .append("escape add property ").append(this.getSymbolicName())
-           .append(" on program eServiceSchemaVariableMapping.tcl")
-           .append(" to " + this.getCI().getMxType() + " \"").append(AbstractTest.convertMql(this.getName())).append("\"");
+            this.append4Create(cmd);
 
-        this.getTest().mql(cmd);
+            cmd.append(";\n")
+               .append("escape add property ").append(this.getSymbolicName())
+               .append(" on program eServiceSchemaVariableMapping.tcl")
+               .append(" to " + this.getCI().getMxType() + " \"").append(AbstractTest.convertMql(this.getName())).append("\"");
+
+            this.getTest().mql(cmd);
+
+            this.setCreated(true);
+        }
 
         return (DATA) this;
     }
@@ -284,7 +329,8 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     public DATA createDependings()
         throws MatrixException
     {
-        this.properties.createDependings();
+        this.datas      .createDependings();
+        this.properties .createDependings();
 
         return (DATA) this;
     }
@@ -330,6 +376,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     {
         this.flags      .append4Create(_cmd);
         this.keyValues  .append4Create(_cmd);
+        this.datas      .append4Create(_cmd);
 
         // values
         for (final Map.Entry<String,String> entry : this.getValues().entrySet())  {
@@ -359,6 +406,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         this.getSingles().check4Export(_exportParser, "");
         this.flags       .check4Export(_exportParser, "");
         this.keyValues   .check4Export(_exportParser, "");
+        this.datas       .check4Export(_exportParser, "");
         this.properties  .check4Export(_exportParser, "");
     }
 

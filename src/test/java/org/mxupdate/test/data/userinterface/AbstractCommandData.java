@@ -16,6 +16,7 @@
 package org.mxupdate.test.data.userinterface;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.AbstractAdminData;
 
 /**
  * Handles test data for commands / menus.
@@ -24,7 +25,7 @@ import org.mxupdate.test.AbstractTest;
  * @author The MxUpdate Team
  */
 abstract class AbstractCommandData<T extends AbstractCommandData<?>>
-    extends AbstractUIWithSettingData<T>
+    extends AbstractAdminData<T>
 {
     /**
      *

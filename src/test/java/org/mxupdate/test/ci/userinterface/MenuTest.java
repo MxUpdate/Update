@@ -50,7 +50,7 @@ public class MenuTest
                                 .setValue("description", "\"\\\\ hallo")
                                 .setValue("href", "${COMMON_DIR}/emxTree.jsp?mode=insert")
                                 .setValue("alt", "${COMMON_DIR}/emxTreeAlt.jsp?mode=insert")
-                                .setSetting("Setting 1", "Setting Value ' 1")
+                                .setKeyValue("setting", "Setting 1", "Setting Value ' 1")
                                 .addChild(new MenuData(this, "child menu 1"))
                                 .addChild(new CommandData(this, "child command 1"))
                                 .addChild(new CommandData(this, "child command 2"))
