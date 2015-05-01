@@ -123,6 +123,7 @@ public class PropertyDefList
      *
      * @param _propLines    property lines
      */
+    @Deprecated()
     public void checkExport(final List<String> _propLines)
     {
         final Set<String> propDefs = new HashSet<String>(_propLines);

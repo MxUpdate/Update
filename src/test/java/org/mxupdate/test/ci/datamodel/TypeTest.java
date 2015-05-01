@@ -15,14 +15,18 @@
 
 package org.mxupdate.test.ci.datamodel;
 
+import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger;
 import org.mxupdate.test.data.datamodel.AttributeStringData;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.program.MQLProgramData;
+import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.util.IssueLink;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -33,14 +37,8 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 public class TypeTest
-    extends AbstractDataWithAttributesExportUpdateTest<TypeData>
+    extends AbstractDataExportUpdate<TypeData>
 {
-    /**
-     * Creates for given <code>_name</code> a new type data instance.
-     *
-     * @param _name     name of the type data instance
-     * @return type data instance
-     */
     @Override()
     protected TypeData createNewData(final String _name)
     {
@@ -58,50 +56,51 @@ public class TypeTest
     {
         return this.prepareData("types",
                 new Object[]{
-                        "type without anything",
+                        "0a) type without anything",
                         new TypeData(this, "TestType")},
                 new Object[]{
-                        "type with escaped name",
-                        new TypeData(this, "TestType \" 1")},
-                new Object[]{
-                        "issue #122: type which is abstract",
+                        "0b) type without anything (to test required fields)",
                         new TypeData(this, "TestType")
-                                .setValue("abstract", "true")},
+                                .setValue("description", "")
+                                .setFlag("hidden", false),
+                        new TypeData(this, "TestType")},
                 new Object[]{
-                        "type with two escaped attributes and trigger program",
+                        "0c) type with escaped name",
+                        new TypeData(this, "TestType \" 1")},
+                // description
+                new Object[]{
+                        "2) package with description",
+                        this.createNewData("Test")
+                                .setValue("description", "ABC { } \"")},
+                // abstract
+                new Object[]{
+                        "3a) issue #122: type which is abstract",
+                        new TypeData(this, "TestType").setFlag("abstract", true, Create.ViaValue)},
+                new Object[]{
+                        "3b) issue #122: type which is not abstract (to test default value)",
+                        new TypeData(this, "TestType").setFlag("abstract", false, Create.ViaValue),
+                        new TypeData(this, "TestType")},
+                // trigger
+                new Object[]{
+                        "4a) type with trigger program",
                         new TypeData(this, "TestType \" 1")
-                                .addAttribute(new AttributeStringData(this, "String Attribute \" ' Hallo"))
-                                .addAttribute(new AttributeStringData(this, "String Attribute \" { Hallo"))
-                                .addTrigger(new AbstractDataWithTrigger.TriggerAction("modify", new MQLProgramData(this, "Test Program")))},
+                                .addTrigger(new AbstractDataWithTrigger.TriggerAction("modifyattribute", new MQLProgramData(this, "Test Program")))},
                 new Object[]{
-                        "issue #36: type with one MQL program as method",
+                        "4b) type with two trigger program",
+                        new TypeData(this, "TestType \" 1")
+                                .addTrigger(new AbstractDataWithTrigger.TriggerAction("modifyattribute", new MQLProgramData(this, "Test Program 1")))
+                                .addTrigger(new AbstractDataWithTrigger.TriggerCheck( "modifyattribute", new MQLProgramData(this, "Test Program 2"))) },
+                // method
+                new Object[]{
+                        "4a) issue #36: type with one MQL program as method",
                         new TypeData(this, "TestType \" 1")
                                 .addMethod(new MQLProgramData(this, "Test Program"))},
                 new Object[]{
-                        "issue #36: type with two MQL programs as method",
+                        "4b) issue #36: type with two MQL programs as method",
                         new TypeData(this, "TestType \" 1")
                                 .addMethod(new MQLProgramData(this, "Test Program 1"))
                                 .addMethod(new MQLProgramData(this, "Test Program 2"))}
         );
-    }
-
-    /**
-     * Removes the MxUpdate programs, attributes and types.
-     *
-     * @throws Exception if MQL execution failed
-     */
-    @BeforeMethod()
-    @AfterMethod()
-    public void cleanup()
-        throws Exception
-    {
-        this.cleanup(AbstractTest.CI.PRG_MQL_PROGRAM);
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_BOOLEAN);
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_DATE);
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_INTEGER);
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_REAL);
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_STRING);
-        this.cleanup(AbstractTest.CI.DM_TYPE);
     }
 
     /**
@@ -111,7 +110,7 @@ public class TypeTest
      */
     @IssueLink("36")
     @Test(description = "update type with no method for existing type with no method")
-    public void updateNoMethod4ExistingTypeWithNoMethod()
+    public void t4c_positiveTestUpdateNoMethod4ExistingTypeWithNoMethod()
         throws Exception
     {
         final TypeData type = new TypeData(this, "TestType")
@@ -131,7 +130,7 @@ public class TypeTest
      */
     @IssueLink("36")
     @Test(description = "update type with no method for existing type with one method")
-    public void updateNoMethod4ExistingTypeWithOneMethod()
+    public void t4d_positiveTestUpdateNoMethod4ExistingTypeWithOneMethod()
         throws Exception
     {
         final MQLProgramData method = new MQLProgramData(this, "TestProd1").create();
@@ -156,7 +155,7 @@ public class TypeTest
      */
     @IssueLink("36")
     @Test(description = "update type with method for existing type with no method")
-    public void updateOneMethod4ExistingTypeWithNoMethod()
+    public void t4e_positiveTestUpdateOneMethod4ExistingTypeWithNoMethod()
         throws Exception
     {
         final MQLProgramData method = new MQLProgramData(this, "TestProd1").create();
@@ -169,5 +168,148 @@ public class TypeTest
         Assert.assertEquals(this.mql("print type '" + AbstractTest.convertMql(type.getName()) + "' select method dump"),
                             AbstractTest.convertMql(method.getName()),
                             "check that one method is defined");
+    }
+
+    /**
+     * Positive test with one attribute.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "positive test with one attribute")
+    public void t5a_positiveTestWithAttribute()
+        throws Exception
+    {
+        this.createNewData("Test")
+                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .create()
+                .checkExport()
+                .update("")
+                .checkExport();
+    }
+
+    /**
+     * Positive test with add of an attribute.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "positive test with add of an attribute")
+    public void t5b_positiveTestAttributeAdded()
+        throws Exception
+    {
+        this.createNewData("Test")
+                .addAttribute(new AttributeStringData(this, "Test Attribute 1"))
+                .create()
+                .addAttribute(new AttributeStringData(this, "Test Attribute 2"))
+                .createDependings()
+                .update("")
+                .checkExport();
+    }
+
+    /**
+     * Negative test if an attribute is removed.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "negative test if an attribute is removed")
+    public void t5c_negativeTestAttributesRemoved()
+        throws Exception
+    {
+        this.createNewData("Test")
+                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .create();
+        this.createNewData("Test")
+                .failureUpdate(ErrorKey.DM_TYPE_REMOVE_ATTRIBUTE);
+    }
+
+    /**
+     * Positive test if an ignored attribute is removed.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "positive test if an ignored attribute is removed")
+    public void t5d_positiveTestIgnoredAttributesRemoved()
+        throws Exception
+    {
+        this.createNewData("Test")
+                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .create();
+        this.createNewData("Test")
+                .update("", ValueKeys.DMTypeAttrIgnore.name(), "*");
+        this.createNewData("Test")
+                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .checkExport();
+    }
+
+    /**
+     * Positive test if an attribute is removed.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "positive test if an attribute is removed")
+    public void t5e_positiveTestAttributesRemoved()
+        throws Exception
+    {
+        this.createNewData("Test")
+                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .create();
+        this.createNewData("Test")
+                .update("", ValueKeys.DMTypeAttrRemove.name(), "*")
+                .checkExport();
+    }
+
+    /**
+     * Positive test that a derived type is defined.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "positive test that a derived type is defined")
+    public void t6a_positiveTestDerived()
+        throws Exception
+    {
+        this.createNewData("Parent")
+                .create();
+        this.createNewData("Test")
+                .create()
+                .update("")
+                .setValue("derived", AbstractTest.PREFIX + "Parent")
+                .update("")
+                .checkExport();
+    }
+
+    /**
+     * Negative test that an existing derived type is updated.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "negative test that derived type is changed")
+    public void t6b_negativeTestDerivedChanged()
+        throws Exception
+    {
+        this.createNewData("Parent1")
+                .create();
+        this.createNewData("Parent2")
+                .create();
+        this.createNewData("Test")
+                .create()
+                .setValue("derived", AbstractTest.PREFIX + "Parent1")
+                .update("")
+                .setValue("derived", AbstractTest.PREFIX + "Parent2")
+                .failureUpdate(ErrorKey.DM_TYPE_UPDATE_DERIVED)
+                .setValue("derived", AbstractTest.PREFIX + "Parent1")
+                .checkExport();
+    }
+
+    @BeforeMethod()
+    @AfterClass(groups = "close")
+    public void cleanup()
+        throws Exception
+    {
+        this.cleanup(AbstractTest.CI.PRG_MQL_PROGRAM);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_BOOLEAN);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_DATE);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_INTEGER);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_REAL);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_STRING);
+        this.cleanup(AbstractTest.CI.DM_TYPE);
     }
 }

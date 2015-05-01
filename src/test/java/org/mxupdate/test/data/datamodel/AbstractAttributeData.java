@@ -228,10 +228,10 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
 
         strg.append("mxUpdate attribute \"${NAME}\" {\n");
 
-        // append flags
-        this.getFlags().appendUpdate("    ", strg);
-        // append values
-        this.getValues().appendUpdate("    ", strg);
+        this.getFlags()     .appendUpdate("    ", strg);
+        this.getValues()    .appendUpdate("    ", strg);
+        this.getTriggers()  .appendUpdate("    ", strg);
+        this.getProperties().appendUpdate("    ", strg);
 
         // append rule
         if (this.rule != null) {
@@ -243,15 +243,14 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
             strg.append("     dimension \"").append(AbstractTest.convertUpdate(this.dimension.getName())).append("\"\n");
         }
 
-        // append 'adds' (trigger and ranges)
+        // append 'adds' ranges
         final Set<String> needAdds = new HashSet<String>();
-        this.evalAdds4CheckExport(needAdds);
+        for (final AbstractRange range : this.ranges)  {
+            range.evalAdds4CheckExport(needAdds);
+        }
         for (final String needAdd : needAdds)  {
             strg.append("    ").append(needAdd).append('\n');
         }
-
-        // append properties
-        this.getProperties().appendUpdate("    ", strg);
 
         strg.append("}");
 
@@ -268,10 +267,11 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        // check for defined values
-        this.getValues().checkExport(_exportParser, "");
-        // check for defined flags
-        this.getFlags().checkExport(_exportParser, "");
+        this.getValues()    .checkExport(_exportParser, "");
+        this.getFlags()     .checkExport(_exportParser, "");
+        this.getTriggers()  .checkExport(_exportParser, "");
+        this.getProperties().checkExport(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/property/@value"));
+
         // check for rule
         if (this.rule == null) {
             this.checkNotExistingSingleValue(_exportParser, "rule", "rule");
@@ -284,13 +284,12 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         } else  {
             this.checkSingleValue(_exportParser, "dimension", "dimension", "\"" + AbstractTest.convertUpdate(this.dimension.getName()) + "\"");
         }
-        // check for add values (triggers and ranges)
+        // check for ranges
         final Set<String> needAdds = new HashSet<String>();
-        this.evalAdds4CheckExport(needAdds);
-        final List<String> foundAdds = new ArrayList<String>();
-        for (final String trigLine : _exportParser.getLines("/" + this.getCI().getUrlTag() + "/trigger/@value"))  {
-            foundAdds.add("trigger " + trigLine);
+        for (final AbstractRange range : this.ranges)  {
+            range.evalAdds4CheckExport(needAdds);
         }
+        final List<String> foundAdds = new ArrayList<String>();
         for (final String trigLine : _exportParser.getLines("/" + this.getCI().getUrlTag() + "/range/@value"))  {
             foundAdds.add("range " + trigLine);
         }
@@ -300,23 +299,6 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
                 "all adds defined (found adds = " + foundAdds + "; need adds = " + needAdds + ")");
         for (final String foundAdd : foundAdds)  {
             Assert.assertTrue(needAdds.contains(foundAdd), "check that add '" + foundAdd + "' is defined (found adds = " + foundAdds + "; need adds = " + needAdds + ")");
-        }
-        // check for properties
-        this.getProperties().checkExport(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/property/@value"));
-    }
-
-    /**
-     * Evaluates all 'adds' for ranges in the configuration item file.
-     *
-     * @param _needAdds     set with add strings used to append the adds for
-     *                      {@link #ranges}
-     */
-    @Override()
-    protected void evalAdds4CheckExport(final Set<String> _needAdds)
-    {
-        super.evalAdds4CheckExport(_needAdds);
-        for (final AbstractRange range : this.ranges)  {
-            range.evalAdds4CheckExport(_needAdds);
         }
     }
 

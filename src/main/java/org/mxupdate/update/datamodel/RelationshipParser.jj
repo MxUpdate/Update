@@ -221,8 +221,8 @@ void parse(final Relationship_mxJPO _relationship)
       | ( <KIND>                    ( <BASIC>                               {this.setValue(_relationship, "kind",                           Kind.Basic);}
                                     | <COMPOSITIONAL>                       {this.setValue(_relationship, "kind",                           Kind.Compositional);} ) )
 
-      | ( <ABSTRACT_TRUE>                                                   {this.setValue(_relationship, "abstractRel",                    true);} )
-      | ( <ABSTRACT_FALSE>                                                  {this.setValue(_relationship, "abstractRel",                    false);} )
+      | ( <ABSTRACT_TRUE>                                                   {this.setValue(_relationship, "abstractFlag",                   true);} )
+      | ( <ABSTRACT_FALSE>                                                  {this.setValue(_relationship, "abstractFlag",                   false);} )
 
       | ( <DERIVED>                 ( tmp = <STRING>                        {this.setValue(_relationship, "derived",                        this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.setValue(_relationship, "derived",                        this.getSingle(tmp.image));} ) )

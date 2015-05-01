@@ -23,6 +23,8 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.AbstractTest.CI;
+import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.program.AbstractProgramData;
 
 /**
@@ -34,7 +36,7 @@ import org.mxupdate.test.data.program.AbstractProgramData;
  *                              class
  */
 public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractDataWithTrigger<?>>
-    extends AbstractDataWithAttribute<DATAWITHTRIGGERS>
+    extends AbstractAdminData<DATAWITHTRIGGERS>
 {
     /** Defines all assigned triggers to this administration object. */
     private final Triggers triggers = new Triggers();
@@ -85,12 +87,6 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
         return this.triggers;
     }
 
-    /**
-     * {@inheritDoc}
-     * Creates all programs from depending {@link #triggers}.
-     *
-     * @see #triggers
-     */
     @Override()
     @SuppressWarnings("unchecked")
     public DATAWITHTRIGGERS createDependings()
@@ -98,10 +94,7 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
     {
         super.createDependings();
 
-        // create programs
-        for (final AbstractDataWithTrigger.AbstractTrigger<?> trig : this.triggers)  {
-            trig.getProgram().create();
-        }
+        this.triggers.createDependings();
 
         return (DATAWITHTRIGGERS) this;
     }
@@ -121,19 +114,6 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
     {
         super.append4Create(_cmd);
         this.triggers.append4Create(_cmd);
-    }
-
-    /**
-     * Evaluates all 'adds' for triggers in the configuration item file.
-     *
-     * @param _needAdds     set with add strings used to append the adds for
-     *                      {@link #triggers}
-     */
-    @Override
-    protected void evalAdds4CheckExport(final Set<String> _needAdds)
-    {
-        super.evalAdds4CheckExport(_needAdds);
-        this.triggers.evalAdds4CheckExport(_needAdds);
     }
 
     /**
@@ -196,27 +176,6 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
             if (this.input != null)  {
                 _cmd.append(" input \"").append(AbstractTest.convertMql(this.input)).append('\"');
             }
-        }
-
-        /**
-         * Appends the add statement in TCL code for this trigger.
-         *
-         * @param _needAdds     set with add strings used to append the adds
-         *                      for this trigger
-         */
-        protected void evalAdds4CheckExport(final Set<String> _needAdds)
-        {
-            final StringBuilder cmd = new StringBuilder()
-                .append("trigger ").append(this.eventType)
-                .append(' ').append(this.kind)
-                .append(" \"").append(AbstractTest.convertTcl(this.program.getName()))
-                .append("\"")
-                .append(" input \"");
-            if (this.input != null)  {
-                cmd.append(AbstractTest.convertMql(this.input));
-            }
-            cmd.append("\"");
-            _needAdds.add(cmd.toString());
         }
 
         /**
@@ -303,6 +262,38 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
         private static final long serialVersionUID = 2134980869707730431L;
 
         /**
+         * Appends the defined triggers to the TCL code {@code _cmd} of the
+         * configuration item file.
+         *
+         * @param _prefix   prefix in front of the values
+         * @param _cmd      string builder with the TCL commands of the
+         *                  configuration item file
+         */
+        public void appendUpdate(final String _prefix,
+                                 final StringBuilder _cmd)
+        {
+            for (final AbstractTrigger<?> trigger : this)  {
+                _cmd.append(_prefix)
+                    .append("trigger ").append(trigger.eventType).append(' ').append(trigger.kind)
+                    .append(" \"").append(AbstractTest.convertUpdate(trigger.program.getName()))
+                    .append("\"").append(" input \"").append(AbstractTest.convertUpdate(trigger.input)).append("\"").append('\n');
+            }
+        }
+
+        /**
+         * Create depending programs for all triggers.
+         *
+         * @throws MatrixException if create failed
+         */
+        public void createDependings()
+            throws MatrixException
+        {
+            for (final AbstractTrigger<?> trigger : this)  {
+                trigger.program.create();
+            }
+        }
+
+        /**
          * Appends the MQL commands to define all {@link #triggers} within a
          * create.
          *
@@ -319,16 +310,24 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
         }
 
         /**
-         * Evaluates all 'adds' for triggers in the configuration item file.
+         * Checks that the trigger are correct defined for given {@code _path}.
          *
-         * @param _needAdds     set with add strings used to append the adds for
-         *                      {@link #triggers}
+         * @param _exportParser export parser
+         * @param _path         path to check
          */
-        void evalAdds4CheckExport(final Set<String> _needAdds)
+        public void checkExport(final ExportParser _exportParser,
+                                final String _path)
         {
+            final Set<String> trigLines = new HashSet<String>();
             for (final AbstractTrigger<?> trigger : this)  {
-                trigger.evalAdds4CheckExport(_needAdds);
+                trigLines.add(new StringBuilder()
+                        .append(trigger.eventType).append(' ').append(trigger.kind)
+                        .append(" \"").append(AbstractTest.convertUpdate(trigger.program.getName()))
+                        .append("\"").append(" input \"").append(AbstractTest.convertUpdate(trigger.input)).append("\"")
+                        .toString());
             }
+
+            _exportParser.checkList((_path.isEmpty() ? "" : _path + "/") + "trigger", trigLines);
         }
     }
 }

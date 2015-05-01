@@ -4,3 +4,6 @@
 /RelationshipParser.java
 /RelationshipParserConstants.java
 /RelationshipParserTokenManager.java
+/TypeParser.java
+/TypeParserConstants.java
+/TypeParserTokenManager.java

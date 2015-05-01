@@ -15,20 +15,22 @@
 
 package org.mxupdate.update.datamodel;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 
 /**
  * Data model type class.
@@ -36,13 +38,9 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
  * @author The MxUpdate Team
  */
 public class Type_mxJPO
-    extends AbstractDMWithAttributes_mxJPO<Type_mxJPO>
+    extends AbstractDMWithTriggers_mxJPO<Type_mxJPO>
 {
-    /**
-     * Set of all ignored URLs from the XML definition for types.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     */
+    /** Set of all ignored URLs from the XML definition for types. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
         Type_mxJPO.IGNORED_URLS.add("/derivedFrom");
@@ -65,30 +63,16 @@ public class Type_mxJPO
         Type_mxJPO.IGNORED_URLS.add("/methodList");
     }
 
-    /**
-     * Is the type abstract?
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private boolean abstractFlag = false;
+    /** Is the type abstract? */
+    private Boolean abstractFlag;
+    /** From which type is this type derived? */
+    private String derived;
 
-    /**
-     * From which type is this type derived?
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private String derived = "ADMINISTRATION";
-
-    /**
-     * Defines all methods of this type.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     */
+    /** Defines all methods of this type. */
     private final Set<String> methods = new TreeSet<String>();
+
+    /** Attribute list. */
+    private final Set<String> attributes = new TreeSet<String>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -106,8 +90,8 @@ public class Type_mxJPO
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
-//        new TypeDefParser_mxJPO(new StringReader(_code)).parse(this);
-//        this.prepare();
+        new TypeParser_mxJPO(new StringReader(_code)).parse(this);
+        this.prepare();
     }
 
     /**
@@ -139,6 +123,9 @@ public class Type_mxJPO
         } else if ("/abstract".equals(_url))  {
             this.abstractFlag = true;
             parsed = true;
+        } else if (_url.startsWith("/attributeDefRefList/attributeDefRef"))  {
+            this.attributes.add(_content);
+            parsed = true;
         } else if ("/derivedFrom/typeRefList/typeRef".equals(_url))  {
             this.derived = _content;
             parsed = true;
@@ -151,89 +138,28 @@ public class Type_mxJPO
         return parsed;
     }
 
-    /**
-     * Writes the type specific information in the TCL update file
-     * <code>_out</code>.
-     * The type specific information is:
-     * <ul>
-     * <li>{@link #derived}</li>
-     * <li>{@link #isHidden()}</li>
-     * <li>{@link #abstractFlag}</li>
-     * <li>{@link #methods}</li>
-     * <li>and triggers with {@link #writeTriggers(Appendable)}</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the TCL update code for the type could not be
-     *                     written
-     */
     @Override()
-    protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Appendable _out)
         throws IOException
     {
-        _out.append(" \\\n    derived \"").append(StringUtil_mxJPO.convertTcl(this.derived)).append('\"')
-            .append(" \\\n    ").append(this.isHidden() ? "" : "!").append("hidden")
-            .append(" \\\n    abstract \"").append(Boolean.toString(this.abstractFlag)).append('\"');
-        // methods
-        for (final String method : this.methods)  {
-            _out.append(" \\\n    add method \"").append(StringUtil_mxJPO.convertTcl(method)).append('\"');
-        }
-        // triggers
-        this.getTriggers().write(_out, " \\\n    add ", "");
-    }
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
 
-    /**
-     * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this type. Following steps are
-     * done:
-     * <ul>
-     * <li>set to not hidden</li>
-     * <li>set to not abstract</li>
-     * <li>reset description</li>
-     * <li>remove all {@link #methods}</li>
-     * </ul>
-     *
-     * @param _paramCache       parameter cache
-     * @param _preMQLCode       MQL statements which must be called before the
-     *                          TCL code is executed
-     * @param _postMQLCode      MQL statements which must be called after the
-     *                          TCL code is executed
-     * @param _preTCLCode       TCL code which is defined before the source
-     *                          file is sourced
-     * @param _tclVariables     map of all TCL variables where the key is the
-     *                          name and the value is value of the TCL variable
-     *                          (the value is automatically converted to TCL
-     *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update from derived class failed
-     */
-    @Override()
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final CharSequence _preMQLCode,
-                          final CharSequence _postMQLCode,
-                          final CharSequence _preTCLCode,
-                          final Map<String,String> _tclVariables,
-                          final File _sourceFile)
-        throws Exception
-    {
-        final StringBuilder preMQLCode = new StringBuilder()
-                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                .append(" !hidden description \"\" abstract false");
-        // remove methods
-        for (final String method : this.methods)  {
-            preMQLCode.append(" remove method \"")
-                      .append(StringUtil_mxJPO.convertMql(method))
-                      .append('\"');
-        }
+        this.writeHeader(_paramCache, updateBuilder.getStrg());
 
-        // append already existing pre MQL code
-        preMQLCode.append(";\n")
-                  .append(_preMQLCode);
+        updateBuilder.start("type")
+                //              tag             | default | value                              | write?
+                .string(        "description",              this.getDescription())
+                .flagIfTrue(    "abstract",          false, this.abstractFlag,                  (this.abstractFlag != null) && this.abstractFlag)
+                .stringIfTrue(  "derived",                  this.derived,                       (this.derived != null) && !this.derived.isEmpty())
+                .flag(          "hidden",                   false, this.isHidden())
+                .write(this.getTriggers())
+                .list(          "method",                   this.methods)
+                .list(          "attribute",                this.attributes)
+                .properties(this.getProperties())
+                .end();
 
-        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+        _out.append(updateBuilder.toString());
     }
 
     @Override()
@@ -242,5 +168,30 @@ public class Type_mxJPO
                              final Type_mxJPO _current)
         throws UpdateException_mxJPO
     {
+        DeltaUtil_mxJPO.calcValueDelta(  _mql,              "description",              this.getDescription(),  _current.getDescription());
+        DeltaUtil_mxJPO.calcValFlgDelta( _mql,              "abstract",          false, this.abstractFlag,      _current.abstractFlag);
+        DeltaUtil_mxJPO.calcFlagDelta(   _mql,              "hidden",            false, this.isHidden(),        _current.isHidden());
+        DeltaUtil_mxJPO.calcListDelta(   _mql,              "method",                   this.methods,           _current.methods);
+        DeltaUtil_mxJPO.calcListDelta(_paramCache, _mql,    "attribute",
+                ErrorKey.DM_TYPE_REMOVE_ATTRIBUTE, this.getName(),
+                ValueKeys.DMTypeAttrIgnore, ValueKeys.DMTypeAttrRemove,                 this.attributes,        _current.attributes);
+
+        this.getTriggers()  .calcDelta(_mql,     _current.getTriggers());
+        this.getProperties().calcDelta(_mql, "", _current.getProperties());
+
+        // derived information
+        final String thisDerived = (this.derived == null) ? "" : this.derived;
+        final String currDerived = (_current.derived == null) ? "" : _current.derived;
+        if (!thisDerived.equals(currDerived))  {
+            if (!currDerived.isEmpty())  {
+                throw new UpdateException_mxJPO(
+                        ErrorKey.DM_TYPE_UPDATE_DERIVED,
+                        this.getTypeDef().getLogging(),
+                        this.getName(),
+                        _current.derived,
+                        this.derived);
+            }
+            _mql.newLine().cmd("derived ").arg(thisDerived);
+        }
     }
 }

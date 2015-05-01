@@ -22,6 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
+import org.mxupdate.update.util.CompareToUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -92,33 +93,7 @@ public class TriggerList_mxJPO
      */
     public void prepare()
     {
-        for (final Trigger trigger : this.triggersStack)  {
-            this.add(trigger);
-        }
-    }
-
-    /**
-     * Writes the trigger information to the writer instance.
-     *
-     * @param _out      writer instance
-     * @param _prefix   prefix written before trigger definition
-     * @param _suffix   suffix written before trigger definition
-     * @throws IOException if write failed
-     */
-    @Deprecated()
-    public void write(final Appendable _out,
-                      final String _prefix,
-                      final String _suffix)
-        throws IOException
-    {
-        // output of triggers, but sorted!
-        for (final Trigger trigger : this)  {
-            _out.append(_prefix)
-                .append("trigger ").append(trigger.eventType).append(' ').append(trigger.kind)
-                .append(" \"").append(StringUtil_mxJPO.convertTcl(trigger.program)).append("\"")
-                .append(" input \"").append(StringUtil_mxJPO.convertTcl(trigger.arguments)).append("\"")
-                .append(_suffix);
-        }
+        this.addAll(this.triggersStack);
     }
 
     @Override()
@@ -153,19 +128,6 @@ public class TriggerList_mxJPO
                 .append("trigger ").append(trigger.eventType).append(' ').append(trigger.kind)
                 .append(" \"").append(StringUtil_mxJPO.convertUpdate(trigger.program)).append("\"")
                 .append(" input \"").append(StringUtil_mxJPO.convertUpdate(trigger.arguments)).append("\"\n");
-        }
-    }
-
-    /**
-     * Appends the MQL statement to remove all triggers.
-     *
-     * @param _cmd          string builder with current MQL statement
-     */
-    @Deprecated()
-    public void appendResetMQLStatement(final StringBuilder _cmd)
-    {
-        for (final Trigger trigger : this)  {
-            _cmd.append(" remove trigger ").append(trigger.eventType).append(' ').append(trigger.kind);
         }
     }
 
@@ -229,18 +191,7 @@ public class TriggerList_mxJPO
         private String arguments = "";
 
         /**
-         * Compare this range instance with given range instance. The compare
-         * is done for each instance variable in this order:
-         * <ul>
-         * <li>{@link #type}</li>
-         * <li>{@link #include1}</li>
-         * <li>{@link #include2}</li>
-         * <li>{@link #value1}</li>
-         * <li>{@link #value2}</li>
-         * </ul>
-         * If one of the compared instance variables are not equal, the
-         * compared value is returned. So only if all instance variable has the
-         * same values the ranges itself are identically.
+         * Compare this trigger instance with given trigger instance.
          *
          * @param _trigger  trigger instance to which this instance must be
          *                  compared to
@@ -250,20 +201,11 @@ public class TriggerList_mxJPO
         @Override()
         public int compareTo(final Trigger _trigger)
         {
-            int ret = this.eventType.compareTo(_trigger.eventType);
-            if (ret == 0)  {
-                ret = this.kind.compareTo(_trigger.kind);
-            }
-            if (ret == 0)  {
-                ret = (this.program != null)
-                      ? ((_trigger.program != null) ? this.program.compareTo(_trigger.program) : 0)
-                      : -1;
-            }
-            if (ret == 0)  {
-                ret = (this.arguments != null)
-                      ? ((_trigger.arguments != null) ? this.arguments.compareTo(_trigger.arguments) : 0)
-                      : -1;
-            }
+            int ret = 0;
+            ret = CompareToUtil_mxJPO.compare(ret, this.eventType, _trigger.eventType);
+            ret = CompareToUtil_mxJPO.compare(ret, this.kind,      _trigger.kind);
+            ret = CompareToUtil_mxJPO.compare(ret, this.program,   _trigger.program);
+            ret = CompareToUtil_mxJPO.compare(ret, this.arguments, _trigger.arguments);
             return ret;
         }
     }

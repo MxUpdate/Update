@@ -15,16 +15,15 @@
 
 package org.mxupdate.test.data.datamodel;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.Arrays;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.program.AbstractProgramData;
+import org.mxupdate.test.data.util.DataList;
+import org.testng.Assert;
 
 /**
  * Used to define a type, create them and test the result.
@@ -34,22 +33,10 @@ import org.mxupdate.test.data.program.AbstractProgramData;
 public class TypeData
     extends AbstractDataWithTrigger<TypeData>
 {
-    /**
-     * Within export the description must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>(1);
-    static  {
-        TypeData.REQUIRED_EXPORT_VALUES.put("description", "");
-        TypeData.REQUIRED_EXPORT_VALUES.put("abstract", "false");
-    }
-
-    /**
-     * All methods of this type.
-     *
-     * @see #addMethod(AbstractProgramData)
-     * @see #create()
-     */
-    private final Set<AbstractProgramData<?>> methods = new HashSet<AbstractProgramData<?>>();
+    /** All methods of this type. */
+    private final DataList<AbstractProgramData<?>> methods = new DataList<AbstractProgramData<?>>("method ", "method ", false);
+    /** All attributes of this data with attribute instances. */
+    private final DataList<AbstractAttributeData<?>> attributes = new DataList<AbstractAttributeData<?>>();
 
     /**
      * Initialize this type data with given <code>_name</code>.
@@ -61,17 +48,14 @@ public class TypeData
     public TypeData(final AbstractTest _test,
                     final String _name)
     {
-        super(_test, AbstractTest.CI.DM_TYPE, _name,
-              TypeData.REQUIRED_EXPORT_VALUES,
-              null);
+        super(_test, AbstractTest.CI.DM_TYPE, _name, null, null);
     }
 
     /**
-     * Assigns the <code>_method</code> to this type.
+     * Assigns the {@code _method} to this type.
      *
      * @param _method   method to assign
      * @return this type data instance
-     * @see #methods
      */
     public TypeData addMethod(final AbstractProgramData<?> _method)
     {
@@ -80,44 +64,37 @@ public class TypeData
     }
 
     /**
-     * Returns all methods for this type data instance.
+     * Assigns the {@code attributes} to this data instance.
      *
-     * @return all methods of this type data instance
-     * @see #methods
+     * @param _attributes       attribute to assign
+     * @return this type data instance
      */
-    public Set<AbstractProgramData<?>> getMethods()
+    public TypeData addAttribute(final AbstractAttributeData<?>... _attributes)
     {
-        return this.methods;
+        this.attributes.addAll(Arrays.asList(_attributes));
+        return this;
     }
 
-    /**
-     * Returns the TCL update file of this type data instance.
-     *
-     * @return TCL update file content
-     */
     @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("mql escape mod type \"${NAME}\"");
+        final StringBuilder strg = new StringBuilder();
+        this.append4CIFileHeader(strg);
+        strg.append("mxUpdate type \"${NAME}\" {\n");
 
-        this.append4CIFileValues(cmd);
+        this.getFlags()     .appendUpdate("    ", strg);
+        this.getValues()    .appendUpdate("    ", strg);
+        this.getSingles()   .appendUpdate("    ", strg);
+        this.getTriggers()  .appendUpdate("    ", strg);
+        this.methods        .appendUpdate("    ", strg);
+        this.attributes     .appendUpdate("    ", strg);
+        this.getProperties().appendUpdate("    ", strg);
 
-        // append attributes
-        this.append4CIAttributes(cmd);
+        strg.append("}");
 
-        return cmd.toString();
+        return strg.toString();
     }
 
-    /**
-     * Create the related type in MX for this type data instance and appends
-     * the {@link #methods} and {@link #attributes}.
-     *
-     * @return this type data instance
-     * @throws MatrixException if create failed
-     * @see #methods
-     * @see #attributes
-     */
     @Override()
     public TypeData create()
         throws MatrixException
@@ -130,10 +107,8 @@ public class TypeData
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add type \"").append(AbstractTest.convertMql(this.getName())).append('\"');
 
-            // append methods
-            for (final AbstractProgramData<?> method : this.methods)  {
-                cmd.append(" method \"").append(AbstractTest.convertMql(method.getName())).append("\"");
-            }
+            this.methods   .append4Create(cmd);
+            this.attributes.append4Create(cmd);
 
             this.append4Create(cmd);
 
@@ -143,57 +118,33 @@ public class TypeData
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     * Creates all programs referenced by {@link #methods}.
-     *
-     * @see #methods
-     */
     @Override()
     public TypeData createDependings()
         throws MatrixException
     {
         super.createDependings();
 
-        // create programs
-        for (final AbstractProgramData<?> prog : this.methods)  {
-            prog.create();
-        }
+        this.methods   .createDependings();
+        this.attributes.createDependings();
 
         return this;
     }
 
-    /**
-     * Appends the adds for the {@link #methods} and {@link #attributes}.
-     *
-     * @param _needAdds     set with add strings used to append the adds
-     * @see #methods
-     * @see #attributes
-     */
-    @Override()
-    protected void evalAdds4CheckExport(final Set<String> _needAdds)
-    {
-        super.evalAdds4CheckExport(_needAdds);
-
-        // append methods
-        for (final AbstractProgramData<?> method : this.methods)  {
-            final StringBuilder cmd = new StringBuilder()
-                    .append("method \"").append(AbstractTest.convertTcl(method.getName())).append("\"");
-            _needAdds.add(cmd.toString());
-        }
-    }
-
-    /**
-     * Checks the export of this data piece if all values are correct defined.
-     *
-     * @param _exportParser     parsed export
-     * @throws MatrixException if check failed
-     */
     @Override()
     public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
     {
-        super.checkExport(_exportParser);
+        // check symbolic name
+        Assert.assertEquals(
+                _exportParser.getSymbolicName(),
+                this.getSymbolicName(),
+                "check symbolic name");
 
+        this.getFlags()     .checkExport(_exportParser, "");
+        this.getValues()    .checkExport(_exportParser, "");
+        this.getSingles()   .checkExport(_exportParser, "");
+        this.getTriggers()  .checkExport(_exportParser, "");
+        this.methods        .checkExport(_exportParser, "");
+        this.attributes     .checkExport(_exportParser, "");
+        this.getProperties().checkExport(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/property/@value"));
     }
 }

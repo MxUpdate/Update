@@ -223,6 +223,16 @@ public final class MqlBuilder_mxJPO
                 line.exec(_context);
             }
         }
+
+        @Override()
+        public String toString()
+        {
+            final StringBuilder ret = new StringBuilder();
+            for (final MqlBuilder line : this.lines)  {
+                ret.append(line.toString()).append("\n");
+            }
+            return ret.toString();
+        }
     }
 
     /**

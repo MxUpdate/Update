@@ -42,6 +42,8 @@ public class UpdateException_mxJPO
      *     <li>109: {@link org.mxupdate.update.datamodel.Interface_mxJPO interface}</li>
      *     <li>111: {@link org.mxupdate.update.datamodel.Policy_mxJPO policy}</li>
      *     <li>114: {@link org.mxupdate.update.datamodel.Relationship_mxJPO relationship}</li>
+     *     <li>116: {@link org.mxupdate.update.datamodel.Rule_mxJPO rule}</li>
+     *     <li>118: {@link org.mxupdate.update.datamodel.Type_mxJPO type}</li>
      *     <li>120: {@link org.mxupdate.update.datamodel.AbstractAttribute_mxJPO numeric attributes}</li>
      *     <li>121: {@link org.mxupdate.update.datamodel.AbstractDMWithAttributes_mxJPO data model with attributes}</li>
      *     <li>601: {@link org.mxupdate.update.AbstractObject_mxJPO abstract object}</li>
@@ -157,52 +159,6 @@ public class UpdateException_mxJPO
 
         /**
          * <p>The given attribute is not defined anymore but assigned to the
-         * administration object. The attribute is not automatically removed
-         * because otherwise potentially data could be lost.</p>
-         *
-         * <p>Parameters:
-         * <ol>
-         * <li>attribute name</li>
-         * <li>MX administration object type (interface, relationship or
-         *     type)</li>
-         * <li>MX administration object name</li>
-         * </ol>
-         * </p>
-         */
-        DM_ABSTRACTWITHATTRIBUTES_UPDATE_ATTRIBUTE_REMOVED(12101,
-                "Attribute ''{0}'' is defined to be deleted in {1} ''{2}'', but not allowed (and this could potentially meant to loose data)!"),
-
-        /**
-         * <p>A wrong parameter was given the called TCL procedure
-         * <code>testAttributes</code> which defines the assigned attributes
-         * for an interface, relationship or type.</p>
-         *
-         * <p>Parameters:
-         * <ol>
-         * <li>wrong parameter</li>
-         * </ol>
-         * </p>
-         */
-        DM_ABSTRACTWITHATTRIBUTES_UPDATE_UKNOWN_PARAMETER(12102, "Unknown parameter {0} defined."),
-
-        /**
-         * <p>The name administration object is not the same then defined
-         * through the name of the CI file.</p>
-         *
-         * <p>Parameters:
-         * <ol>
-         * <li>MX administration object type (interface, relationship or
-         *     type)</li>
-         * <li>MX administration object name</li>
-         * <li>name defined in the TCL procedure</li>
-         * </ol>
-         * </p>
-         */
-        DM_ABSTRACTWITHATTRIBUTES_UPDATE_WRONG_OBJECT(12103,
-                "The {0} ''{1}'' was called to update via CI update script, but {0} ''{2}'' was called in the procedure..."),
-
-        /**
-         * <p>The given attribute is not defined anymore but assigned to the
          * interface object. The attribute is not automatically removed
          * because otherwise potentially data could be lost.</p>
          *
@@ -253,21 +209,6 @@ public class UpdateException_mxJPO
                 "The existing delimiter ''{2}'' of {0} ''{1}'' can be not updated to new delimiter ''{3}'' (limitation of MX)."),
 
         /**
-         * <p>The given attribute is not defined anymore but assigned to the
-         * interface object. The attribute is not automatically removed
-         * because otherwise potentially data could be lost.</p>
-         *
-         * <p>Parameters:
-         * <ol>
-         * <li>attribute name</li>
-         * <li>relationship which is tried to update</li>
-         * </ol>
-         * </p>
-         */
-        DM_RELATION_REMOVE_ATTRIBUTE(11401,
-                "Current attribute ''{0}'' is defined to be removed from relationship ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
-
-        /**
          * Kind of a relationship can not be changed if the current kind is not
          * basic.
          *
@@ -298,6 +239,51 @@ public class UpdateException_mxJPO
          */
         DM_RELATION_UPDATE_DERIVED(11403,
                 "The new derived ''{3}' can not be set for {0} ''{1}'', because derived ''{2}'' is already set and potentially some data can be lost."),
+
+        /**
+         * <p>The given attribute is not defined anymore but assigned to the
+         * interface object. The attribute is not automatically removed
+         * because otherwise potentially data could be lost.</p>
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>attribute name</li>
+         * <li>relationship which is tried to update</li>
+         * </ol>
+         * </p>
+         */
+        DM_RELATION_REMOVE_ATTRIBUTE(11401,
+                "Current attribute ''{0}'' is defined to be removed from relationship ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
+
+        /**
+         * <p>The given attribute is not defined anymore but assigned to the
+         * type object. The attribute is not automatically removed
+         * because otherwise potentially data could be lost.</p>
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>attribute name</li>
+         * <li>type which is tried to update</li>
+         * </ol>
+         * </p>
+         */
+        DM_TYPE_REMOVE_ATTRIBUTE(11801,
+                "Current attribute ''{0}'' is defined to be removed from type ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
+
+        /**
+         * Derived of a type can not be changed because potentially some
+         * data can be lost.
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>name of the type</li>
+         * <li>current derived type</li>
+         * <li>new derived type (from the CI file)</li>
+         * </ol>
+         * </p>
+         */
+        DM_TYPE_UPDATE_DERIVED(11802,
+                "The new derived ''{2}' can not be set for type ''{0}'', because derived ''{1}'' is already set and potentially some data can be lost."),
 
         /**
          * If the name of a configuration item could not be extracted from a

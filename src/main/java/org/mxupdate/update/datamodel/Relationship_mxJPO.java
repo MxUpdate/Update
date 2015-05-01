@@ -92,7 +92,7 @@ public class Relationship_mxJPO
     private Kind kind = Kind.Basic;
 
     /** Relationship is abstract. */
-    private Boolean abstractRel;
+    private Boolean abstractFlag;
     /** Relationship is derived from this relationship. */
     private String derived;
 
@@ -174,7 +174,7 @@ public class Relationship_mxJPO
         if (Relationship_mxJPO.IGNORED_URLS.contains(_url))  {
             parsed = true;
         } else if ("/abstract".equals(_url))  {
-            this.abstractRel = true;
+            this.abstractFlag = true;
             parsed = true;
         } else if ("/accessRuleRef".equals(_url))  {
             this.rule = _content;
@@ -270,7 +270,7 @@ public class Relationship_mxJPO
                 //              tag             | default | value                              | write?
                 .string(        "description",              this.getDescription())
                 .singleIfTrue(  "kind",                     this.kind.name().toLowerCase(),     (this.kind != Kind.Basic))
-                .flagIfTrue(    "abstract",          false, this.abstractRel,                   (this.abstractRel != null) && this.abstractRel)
+                .flagIfTrue(    "abstract",          false, this.abstractFlag,                  (this.abstractFlag != null) && this.abstractFlag)
                 .stringIfTrue(  "derived",                  this.derived,                       (this.derived != null) && !this.derived.isEmpty())
                 .flag(          "hidden",                   false, this.isHidden())
                 .flag(          "preventduplicates", false, this.preventDuplicates)
@@ -294,7 +294,7 @@ public class Relationship_mxJPO
         DeltaUtil_mxJPO.calcValueDelta(  _mql,              "description",              this.getDescription(),  _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(   _mql,              "hidden",            false, this.isHidden(),        _current.isHidden());
         DeltaUtil_mxJPO.calcFlagDelta(   _mql,              "preventduplicates", false, this.preventDuplicates, _current.preventDuplicates);
-        DeltaUtil_mxJPO.calcValFlgDelta( _mql,              "abstract",          false, this.abstractRel,       _current.abstractRel);
+        DeltaUtil_mxJPO.calcValFlgDelta( _mql,              "abstract",          false, this.abstractFlag,      _current.abstractFlag);
         DeltaUtil_mxJPO.calcListDelta(_paramCache, _mql,    "attribute",
                 ErrorKey.DM_RELATION_REMOVE_ATTRIBUTE, this.getName(),
                 ValueKeys.DMRelationAttrIgnore, ValueKeys.DMRelationAttrRemove,         this.attributes,        _current.attributes);
@@ -310,8 +310,9 @@ public class Relationship_mxJPO
         }
         DeltaUtil_mxJPO.calcListDelta( _mql, "rule",                     thisRules,              currentRules);
 
-        this.from           .calcDelta(_paramCache, _mql, _current.from);
-        this.to             .calcDelta(_paramCache, _mql, _current.to);
+        this.from           .calcDelta(_mql,     _current.from);
+        this.to             .calcDelta(_mql,     _current.to);
+        this.getTriggers()  .calcDelta(_mql,     _current.getTriggers());
         this.getProperties().calcDelta(_mql, "", _current.getProperties());
 
         // derived information
@@ -323,8 +324,8 @@ public class Relationship_mxJPO
                         ErrorKey.DM_RELATION_UPDATE_DERIVED,
                         this.getTypeDef().getLogging(),
                         this.getName(),
-                        _current.kind,
-                        this.kind);
+                        _current.derived,
+                        this.derived);
             }
             _mql.newLine().cmd("derived ").arg(thisDerived);
         }
@@ -478,12 +479,10 @@ public class Relationship_mxJPO
          * definition and this target relationship side definition and appends
          * the MQL append commands to {@code _mql}.
          *
-         * @param _paramCache   parameter cache
          * @param _mql          builder to append the MQL commands
          * @param _current      current relationship side definition
          */
-        protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                                 final MultiLineMqlBuilder _mql,
+        protected void calcDelta(final MultiLineMqlBuilder _mql,
                                  final Side _current)
         {
             _mql.pushPrefixByAppending(this.side);

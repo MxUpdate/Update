@@ -802,6 +802,11 @@ public class ParameterCache_mxJPO
         /** Boolean that rules supports the 'enforce reserve access' flag. */
         DMRuleSupportsEnforceReserveAccess,
 
+        /** List of removed attributes for types to be ignored. */
+        DMTypeAttrIgnore,
+        /** List of removed attributes for types to be removed. */
+        DMTypeAttrRemove,
+
         /** Boolean that the update continues if a error was thrown. */
         ParamContinueOnError;
     }

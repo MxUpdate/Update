@@ -119,7 +119,7 @@ public abstract class AbstractTest
         DM_RULE("rule", null, false, null, null, "Rule", "RULE", "RULE_", "datamodel/rule", true, "mxUpdate"),
 
         /** Configuration item Data Model Type. */
-        DM_TYPE("type", null, false, null, null, "Type", "TYPE", "TYPE_", "datamodel/type", true, "mql"),
+        DM_TYPE("type", null, false, null, null, "Type", "TYPE", "TYPE_", "datamodel/type", true, "mxUpdate"),
 
         /** Configuration item IEF Global Configuration. */
         IEF_EBOMSYNC_CONFIG(null, "IEF-EBOMSyncConfig", true, "IEF-EBOMSyncConfig", "eService Administration",
@@ -528,6 +528,11 @@ public abstract class AbstractTest
                     }
                 }
                 if ((_type == AbstractTest.CI.DM_RELATIONSHIP) && (this.getVersion().min(Version.V6R2013x)))  {
+                    for (final String element : elements)  {
+                        this.mql("escape mod " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\" remove derived");
+                    }
+                }
+                if (_type == AbstractTest.CI.DM_TYPE)  {
                     for (final String element : elements)  {
                         this.mql("escape mod " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\" remove derived");
                     }

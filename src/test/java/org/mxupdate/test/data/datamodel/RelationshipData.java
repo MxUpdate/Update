@@ -97,7 +97,6 @@ public class RelationshipData
      * @param _attributes       attribute to assign
      * @return this data instance
      */
-    @Override
     public RelationshipData addAttribute(final AbstractAttributeData<?>... _attributes)
     {
         this.attributes.addAll(Arrays.asList(_attributes));
@@ -133,6 +132,7 @@ public class RelationshipData
         this.getFlags()     .appendUpdate("    ", strg);
         this.getValues()    .appendUpdate("    ", strg);
         this.getSingles()   .appendUpdate("    ", strg);
+        this.getTriggers()  .appendUpdate("    ", strg);
         this.rules          .appendUpdate("    ", strg);
         this.from           .appendUpdate(strg);
         this.to             .appendUpdate(strg);
@@ -222,13 +222,15 @@ public class RelationshipData
                 this.getSymbolicName(),
                 "check symbolic name");
 
-        this.getFlags()  .checkExport(_exportParser, "");
-        this.getValues() .checkExport(_exportParser, "");
-        this.getSingles().checkExport(_exportParser, "");
-        this.from        .checkExport(_exportParser);
-        this.to          .checkExport(_exportParser);
-        this.attributes  .checkExport(_exportParser, "");
-        this.rules       .checkExport(_exportParser, "");
+        this.getFlags()     .checkExport(_exportParser, "");
+        this.getValues()    .checkExport(_exportParser, "");
+        this.getSingles()   .checkExport(_exportParser, "");
+        this.getTriggers()  .checkExport(_exportParser, "");
+        this.from           .checkExport(_exportParser);
+        this.to             .checkExport(_exportParser);
+        this.attributes     .checkExport(_exportParser, "");
+        this.rules          .checkExport(_exportParser, "");
+        this.getProperties().checkExport(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/property/@value"));
     }
 
     /**
