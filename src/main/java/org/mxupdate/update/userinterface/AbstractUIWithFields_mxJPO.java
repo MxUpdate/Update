@@ -125,12 +125,7 @@ public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObje
     protected abstract static class AbstractField
         implements UpdateLine, Comparable<AbstractField>
     {
-        /**
-         * Set of all ignored URLs from the XML definition for columns /
-         * fields.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         */
+        /** Set of all ignored URLs from the XML definition for columns / fields. */
         private static final Set<String> IGNORED_URLS = new HashSet<String>();
         static  {
             // ignored, because the XML export is in correct order...
@@ -142,27 +137,27 @@ public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObje
         }
 
         /** Name of the field / column. */
-        private String name;
+        private String name = "";
         /** Label of the field / column.*/
-        private String label;
+        private String label = "";
         /** HRef of the field / column. */
-        private String href;
+        private String href = "";
         /** URL of the range of the field / column. */
-        private String range;
+        private String range = "";
         /** URL of the update of this field / column.*/
-        private String updateURL;
+        private String updateURL = "";
         /** Alt label of the column / field. */
-        private String alt;
+        private String alt = "";
 
         /** Expression of the field / column.*/
-        private String expression;
+        private String expression = "";
         /** Defines how the field / column is sorted. */
         private ExpressionType expressionType = ExpressionType.SELECT;
 
         /** Defines how the field / column is sorted.*/
         private SortType sortType = SortType.NONE;
         /** Defines the sort program of this field / column.*/
-        private String sortProgram;
+        private String sortProgram = "";
 
         /** All settings of the field / column.*/
         private final Stack<Setting> settings = new Stack<Setting>();
@@ -536,7 +531,12 @@ System.err.println("y location is not 0.0 and this is currently not supported");
                         _mql.cmd(" relationship ").arg(this.expression);
                         break;
                     default:
-                        _mql.cmd(" select ").arg(this.expression);
+                        // different syntax between table columns and form fields..
+                        if (this instanceof Table_mxJPO.Column)  {
+                            _mql.cmd(" set ").arg(this.expression);
+                        } else  {
+                            _mql.cmd(" select ").arg(this.expression);
+                        }
                         break;
                 }
             }
