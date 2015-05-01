@@ -20,7 +20,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 
 /**
@@ -43,32 +42,6 @@ public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_
     /** Regular expression for a backslash backslash converted to backslash. */
     private final static String MQL_CONVERT_BACKSLASH_BACKSLASH_FROM        = "" + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c);
     private final static String MQL_CONVERT_BACKSLASH_BACKSLASH_TO          = "" + ((char) 0x005c) + ((char) 0x005c);
-
-    /**
-     * Parses one complete menu definition.
-     *
-     * @param _paramCache   parameter cache
-     * @param _typeDef      type definition of the menu (to instantiate the menu)
-     * @param _mxName       MX name of the menu
-     * @throws ParseException is parsing failed
-     * @throws SecurityException if values can not be set
-     * @throws IllegalArgumentException if values can not be set
-     * @throws NoSuchMethodException if values can not be set
-     * @throws InstantiationException if values can not be set
-     * @throws IllegalAccessException if values can not be set
-     * @throws InvocationTargetException if values can not be set
-     */
-    public TYPEIMPL parse(final ParameterCache_mxJPO _paramCache,
-                          final TypeDef_mxJPO _typeDef,
-                          final String _mxName)
-        throws ParseException, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
-    {
-        @SuppressWarnings("unchecked")
-        final TYPEIMPL ciObj = (TYPEIMPL) _typeDef.newTypeInstance(_mxName);
-        this.parse(ciObj);
-        this.prepareObject(_paramCache, ciObj);
-        return ciObj;
-    }
 
     /**
      * The stream is parsed and the result is stored in given instance

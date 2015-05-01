@@ -15,87 +15,55 @@
 
 package org.mxupdate.test.update.datamodel;
 
-import java.io.StringReader;
-import java.lang.reflect.Method;
-
-import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.update.AbstractParserTest;
 import org.mxupdate.update.datamodel.Dimension_mxJPO;
-import org.mxupdate.update.datamodel.dimension.DimensionDefParser_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Class is used to test the dimension parser {@link DimensionDefParser_mxJPO} with
- * some examples.
+ * Tests the {@link Dimension_mxJPO dimension CI} parser.
  *
  * @author The MxUpdate Team
  */
-public class DimensionParserTest
-    extends AbstractTest
+@Test()
+public class DimensionCI_ParserTest
+    extends AbstractParserTest<Dimension_mxJPO>
 {
-    /** Name of the test dimension. */
-    private static final String DIMENSION_NAME = AbstractTest.PREFIX + "_Test";
-
-    /** Start of the command to update the dimension to extract the code. */
-    private static final String START_INDEX = "mxUpdate dimension \"${NAME}\" {";
-    /** Length of the string of the command to update the dimension. */
-    private static final int START_INDEX_LENGTH = DimensionParserTest.START_INDEX.length();
-
-    /**
-     * Removes the MxUpdate test dimensions.
-     *
-     * @throws Exception if MQL execution failed
-     */
-    @BeforeMethod()
-    @AfterClass()
-    public void cleanup()
-        throws Exception
-    {
-        this.cleanup(AbstractTest.CI.DM_DIMENSION);
-    }
-
-    /**
-     * Returns data providers used for testing parses.
-     *
-     * @return test source code to parse
-     */
-    @DataProvider(name = "dimensions")
-    public Object[][] getCodes()
+    @Override()
+    @DataProvider(name = "data")
+    public Object[][] getData()
     {
         return new Object[][]{
-                new Object[]{
+                {
                         "1) simple hidden dimension definition without units",
                         "",
                         "description \"\" hidden"},
-                new Object[]{
+                {
                         "2a) simple not hidden dimension",
                         "",
                         "description \"\" !hidden"},
-                new Object[]{
+                {
                         "2b) simple not hidden dimension definition defined as value w/o apostrophe",
                         "description \"\" !hidden",
                         "description \"\" hidden FALSE"},
-                new Object[]{
+                {
                         "2c) simple not hidden dimension definition defined as value with apostrophe",
                         "description \"\" !hidden",
                         "description \"\" hidden \"false\""},
-                new Object[]{
+                {
                         "2d) simple hidden dimension definition",
                         "",
                         "description \"\" hidden"},
-                new Object[]{
+                {
                         "2e) simple hidden dimension definition defined as value w/o apostrophe",
                         "description \"\" hidden",
                         "description \"\" hidden TRUE"},
-                new Object[]{
+                {
                         "2f) simple hidden dimension definition defined as value with apostrophe",
                         "description \"\" hidden",
                         "description \"\" hidden \"True\""},
-                new Object[]{
+                {
                           "3a) dimension with simple default unit",
                           "",
                           "description \"\"\n"
@@ -114,7 +82,7 @@ public class DimensionParserTest
                         + "  offset 20.0\n"
                         + "}",
                 },
-                new Object[]{
+                {
                         "3b) dimension with simple default unit defined as value w/o apostrophe",
                         "description \"\"\n"
                       + "!hidden\n"
@@ -147,7 +115,7 @@ public class DimensionParserTest
                       + "  offset 20.0\n"
                       + "}",
                 },
-                new Object[]{
+                {
                         "3c) dimension with simple default unit defined as value with apostrophe",
                         "description \"\"\n"
                       + "!hidden\n"
@@ -180,7 +148,7 @@ public class DimensionParserTest
                       + "  offset 20.0\n"
                       + "}",
                 },
-                new Object[]{
+                {
                         "3d) dimension with simple default unit and not default",
                         "description \"\"\n"
                       + "!hidden\n"
@@ -214,7 +182,7 @@ public class DimensionParserTest
                       + "  offset 20.0\n"
                       + "}",
                 },
-                new Object[]{
+                {
                         "3e) dimension with simple default unit and not default as value w/o apostrophe",
                         "description \"\"\n"
                       + "!hidden\n"
@@ -248,7 +216,7 @@ public class DimensionParserTest
                       + "  offset 20.0\n"
                       + "}",
                 },
-                new Object[]{
+                {
                         "3f) dimension with simple default unit and not default as value with apostrophe",
                         "description \"\"\n"
                       + "!hidden\n"
@@ -282,7 +250,7 @@ public class DimensionParserTest
                       + "  offset 20.0\n"
                       + "}",
                 },
-                new Object[]{
+                {
                         "4) complex dimension definition",
                         "",
                           "description \"ein test\"\n"
@@ -310,7 +278,7 @@ public class DimensionParserTest
                         + "  system \"Duration Units\" to unit \"name2\"\n"
                         + "}",
                 },
-                new Object[]{
+                {
                         "5) dimension with unit with negative offset",
                         "",
                         "description \"ein test\"\n"
@@ -329,7 +297,7 @@ public class DimensionParserTest
                         + "  offset -20.0\n"
                         + "}",
                 },
-                new Object[]{
+                {
                         "6) dimension with unit with negative multiplier",
                         "",
                         "description \"ein test\"\n"
@@ -348,7 +316,7 @@ public class DimensionParserTest
                         + "  offset 20.0\n"
                         + "}",
                 },
-                new Object[]{
+                {
                         "7) dimension with unit with integer number",
                         "description \"ein test\"\n"
                         + "!hidden\n"
@@ -366,58 +334,27 @@ public class DimensionParserTest
                         + "  multiplier 1\n"
                         + "  offset 0\n"
                         + "}"
-                }
+                },
+                // property
+                {"8a) property special characters",
+                    "",
+                    "description \"\" !hidden property \"{}\\\"\""},
+                {"8b) property and value special characters",
+                    "",
+                    "description \"\" !hidden property \"{}\\\"\" value \"{}\\\"\""},
+                {"8c) property link special characters",
+                    "",
+                    "description \"\" !hidden property \"{}\\\"\" to type \"{}\\\"\""},
+                {"8d) property link and value special characters",
+                    "",
+                    "description \"\" !hidden property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\""},
         };
     }
 
-    /**
-     * Parsed the <code>_definition</code> code and compares the result with
-     * <code>_toTest</code>.
-     *
-     * @param _description  description of the test
-     * @param _toTest       expected result (if empty string
-     *                      <code>_definition</code> is the expected result)
-     * @param _definition   text of the definition to test
-     * @throws Exception if <code>_definition</code> could not parsed
-     */
-    @Test(dataProvider = "dimensions")
-    public void testDimension(final String _description,
-                              final String _toTest,
-                              final String _definition)
-        throws Exception
+    @Override()
+    protected Dimension_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
+                                            final String _name)
     {
-        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
-
-        this.mql("add dimension " + DimensionParserTest.DIMENSION_NAME);
-
-        final DimensionDefParser_mxJPO parser = new DimensionDefParser_mxJPO(new StringReader(_definition));
-        final Dimension_mxJPO dimension = parser.parse(paramCache,
-                                                       paramCache.getMapping().getTypeDef("Dimension"),
-                                                       DimensionParserTest.DIMENSION_NAME);
-
-        final StringBuilder generated = new StringBuilder();
-        final Method write = dimension.getClass()
-                .getDeclaredMethod("write", ParameterCache_mxJPO.class, Appendable.class);
-        write.setAccessible(true);
-        write.invoke(dimension, paramCache, generated);
-
-        final StringBuilder oldDefBuilder = new StringBuilder();
-        for (final String line : _toTest.isEmpty() ? _definition.split("\n") : _toTest.split("\n"))  {
-            oldDefBuilder.append(line.trim()).append(' ');
-        }
-        int length = 0;
-        String oldDef = oldDefBuilder.toString();
-        while (length != oldDef.length())  {
-            length = oldDef.length();
-            oldDef = oldDef.replaceAll("  ", " ");
-        }
-
-        final String temp = generated.substring(generated.indexOf(DimensionParserTest.START_INDEX) + DimensionParserTest.START_INDEX_LENGTH + 1, generated.length() - 2).toString();
-        final StringBuilder newDef = new StringBuilder();
-        for (final String line : temp.split("\n"))  {
-            newDef.append(line.trim()).append(' ');
-        }
-
-        Assert.assertEquals(newDef.toString().trim(), oldDef.trim());
+        return new Dimension_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_DIMENSION.updateType), _name);
     }
 }

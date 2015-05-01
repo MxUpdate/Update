@@ -285,12 +285,15 @@ public class AdminPropertyList_mxJPO
                           final String _propPrefix,
                           final AdminPropertyList_mxJPO _currents)
     {
-        final SortedSet<AdminProperty> thisProps = new TreeSet<AdminProperty>(this.propertiesStack);
-        final SortedSet<AdminProperty> currProps;
+        // properties / settings must be appended because they can be changed...
+        final SortedSet<AdminProperty> thisProps = new TreeSet<AdminProperty>();
+        thisProps.addAll(this.properties);
+        thisProps.addAll(this.settings);
+
+        final SortedSet<AdminProperty> currProps = new TreeSet<AdminProperty>();
         if (_currents != null)  {
-            currProps = new TreeSet<AdminProperty>(_currents.propertiesStack);
-        } else  {
-            currProps = new TreeSet<AdminProperty>();
+            currProps.addAll(_currents.properties);
+            currProps.addAll(_currents.settings);
         }
 
         // check properties to remove

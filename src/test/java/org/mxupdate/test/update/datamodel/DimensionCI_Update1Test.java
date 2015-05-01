@@ -13,13 +13,13 @@
  *
  */
 
-package org.mxupdate.test.ci.datamodel;
+package org.mxupdate.test.update.datamodel;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.data.datamodel.DimensionData;
 import org.mxupdate.test.data.datamodel.DimensionData.UnitData;
 import org.mxupdate.test.data.util.PropertyDef;
-import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -30,7 +30,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class DimensionTest
+public class DimensionCI_Update1Test
     extends AbstractDataExportUpdate<DimensionData>
 {
     /**
@@ -177,7 +177,7 @@ public class DimensionTest
      * @throws Exception if MQL execution failed
      */
     @BeforeMethod()
-    @AfterMethod()
+    @AfterClass(groups = "close")
     public void cleanup()
         throws Exception
     {

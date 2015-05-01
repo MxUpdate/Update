@@ -27,15 +27,15 @@ import java.util.TreeSet;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.datamodel.dimension.DimensionDefParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+import org.mxupdate.update.util.CompareToUtil_mxJPO;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
-import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 
@@ -82,19 +82,10 @@ public class Dimension_mxJPO
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
-        new DimensionDefParser_mxJPO(new StringReader(_code)).parse(this);
+        new DimensionParser_mxJPO(new StringReader(_code)).parse(this);
         this.prepare();
     }
 
-    /**
-     * Parses all dimension specific expression URLs.
-     *
-     * @param _paramCache   parameter cache with MX context
-     * @param _url          URL to parse
-     * @param _content      content of the URL to parse
-     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
-     *         <i>false</i>
-     */
     @Override()
     protected boolean parse(final ParameterCache_mxJPO _paramCache,
                             final String _url,
@@ -195,54 +186,46 @@ public class Dimension_mxJPO
                          final Appendable _out)
             throws IOException
     {
-        // write header
-        this.writeHeader(_paramCache, _out);
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
 
-        // write dimension description
-        _out.append("mxUpdate dimension \"${NAME}\" {\n")
-            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n")
-            .append("    ").append(this.isHidden() ? "" : "!").append("hidden\n");
+        this.writeHeader(_paramCache, updateBuilder.getStrg());
+
+        updateBuilder
+                .start("dimension")
+                //              tag             | default | value                              | write?
+                .string(        "description",             this.getDescription())
+                .flag(          "hidden",           false, this.isHidden());
+
         for (final Unit unit : this.units)  {
-            _out.append("    unit \"").append(StringUtil_mxJPO.convertUpdate(unit.name)).append("\" {\n");
-            if (unit.defaultUnit)  {
-                _out.append("        default\n");
-            }
-            _out.append("        description \"")
-                            .append(StringUtil_mxJPO.convertUpdate(unit.description)).append("\"\n")
-                    .append("        label \"").append(StringUtil_mxJPO.convertUpdate(unit.label)).append("\"\n")
-                    .append("        multiplier ").append(Double.toString(unit.multiplier)).append("\n")
-                    .append("        offset ").append(Double.toString(unit.offset)).append("\n");
+            updateBuilder
+                    .childStart("unit", unit.name)
+                    //              tag             | default | value                              | write?
+                    .flagIfTrue("default",              false, unit.defaultUnit,                    unit.defaultUnit)
+                    .string(    "description",                 unit.description)
+                    .string(    "label",                       unit.label)
+                    .single(    "multiplier",                  Double.toString(unit.multiplier))
+                    .single(    "offset",                      Double.toString(unit.offset));
             // system information
             for (final Map.Entry<String, Set<String>> systemInfo : unit.systemInfos.entrySet())  {
                 for (final String unitName : systemInfo.getValue())  {
-                    _out.append("        system \"").append(StringUtil_mxJPO.convertUpdate(systemInfo.getKey()))
-                        .append("\" to unit \"").append(StringUtil_mxJPO.convertUpdate(unitName))
-                        .append("\"\n");
+                    updateBuilder.stepStartNewLine().stepSingle("system").stepString(systemInfo.getKey()).stepSingle("to").stepSingle("unit").stepString(unitName).stepEndLine();
                 }
             }
             // settings
             for (final Map.Entry<String, String> setting : unit.settings.entrySet())  {
-                _out.append("        setting \"").append(StringUtil_mxJPO.convertUpdate(setting.getKey()))
-                    .append("\" \"").append(StringUtil_mxJPO.convertUpdate(setting.getValue())).append("\"\n");
+                updateBuilder.stepStartNewLine().stepSingle("setting").stepString(setting.getKey()).stepString(setting.getValue()).stepEndLine();
             }
-            // properties
-            for (final AdminProperty prop : unit.properties.getProperties())  {
-                _out.append("        property \"").append(StringUtil_mxJPO.convertUpdate(prop.getName())).append("\"");
-                if ((prop.getRefAdminName() != null) && (prop.getRefAdminType() != null))  {
-                    _out.append(" to ").append(prop.getRefAdminType()).append(" \"").append(StringUtil_mxJPO.convertUpdate(prop.getRefAdminName())).append("\"");
-                }
-                if (prop.getValue() != null)  {
-                    _out.append(" value \"").append(StringUtil_mxJPO.convertUpdate(prop.getValue())).append("\"");
-                }
-                _out.append('\n');
-            }
-            _out.append("    }\n");
+
+            updateBuilder
+                    .properties(unit.properties)
+                    .childEnd();
         }
 
-        // append properties
-        this.getProperties().writeProperties(_paramCache, _out, "    ");
+        updateBuilder
+                .properties(this.getProperties())
+                .end();
 
-        _out.append("}");
+        _out.append(updateBuilder.toString());
     }
 
     @Override()
@@ -302,34 +285,22 @@ public class Dimension_mxJPO
     public static class Unit
         implements Comparable<Dimension_mxJPO.Unit>
     {
-        /**
-         * Name of the unit.
-         */
+        /** Name of the unit. */
         private String name;
 
-        /**
-         * Description of the unit.
-         */
+        /** Description of the unit. */
         private String description;
 
-        /**
-         * Label of the unit.
-         */
+        /** Label of the unit. */
         private String label;
 
-        /**
-         * Multiplier of the unit.
-         */
+        /** Multiplier of the unit. */
         private double multiplier;
 
-        /**
-         * Offset of the unit.
-         */
+        /** Offset of the unit. */
         private double offset;
 
-        /**
-         * Is the unit the default unit?
-         */
+        /** Is the unit the default unit? */
         private boolean defaultUnit;
 
         /**
@@ -337,8 +308,6 @@ public class Dimension_mxJPO
          * is stored as property link and could be evaluated only after
          * complete dimension parsing. The key of the map is the system name,
          * the values are the related names of the units.
-         *
-         * @see Dimension_mxJPO#prepare(ParameterCache_mxJPO)
          */
         private final Map<String,Set<String>> systemInfos = new TreeMap<String,Set<String>>();
 
@@ -346,8 +315,6 @@ public class Dimension_mxJPO
          * Holds all unit specific settings for a dimension. The settings are
          * stored internally as property. Therefore the settings could  be
          * extracted only after a complete parsing.
-         *
-         * @see Dimension_mxJPO#prepare(ParameterCache_mxJPO)
          */
         private final Map<String,String> settings = new TreeMap<String,String>();
 
@@ -381,13 +348,7 @@ public class Dimension_mxJPO
         @Override()
         public int compareTo(final Unit _toCompare)
         {
-            return (this.name == null)
-                    ? (_toCompare.name == null)
-                        ? 0
-                        : 1
-                    : (_toCompare.name == null)
-                        ? -1
-                        : this.name.compareTo(_toCompare.name);
+            return CompareToUtil_mxJPO.compare(0, this.name, _toCompare.name);
         }
 
         /**

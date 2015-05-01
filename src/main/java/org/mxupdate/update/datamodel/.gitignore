@@ -1,6 +1,9 @@
 /AttributeParser.java
 /AttributeParserConstants.java
 /AttributeParserTokenManager.java
+/DimensionParser.java
+/DimensionParserConstants.java
+/DimensionParserTokenManager.java
 /InterfaceParser.java
 /InterfaceParserConstants.java
 /InterfaceParserTokenManager.java
