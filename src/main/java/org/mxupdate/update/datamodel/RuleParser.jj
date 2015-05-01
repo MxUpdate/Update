@@ -19,9 +19,10 @@ options {
     ERROR_REPORTING = true;
     USER_TOKEN_MANAGER = false;
     GENERATE_BOILERPLATE = false;
+    SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
 }
-PARSER_BEGIN(RuleDefParser)
-package org.mxupdate.update.datamodel.rule;
+PARSER_BEGIN(RuleParser)
+package org.mxupdate.update.datamodel;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -32,7 +33,6 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.Rule_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
-import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Prefix;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
@@ -41,11 +41,12 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
-public class RuleDefParser
+@SuppressWarnings("unused")
+class RuleParser
     extends AbstractParser_mxJPO<Rule_mxJPO>
 {
 }
-PARSER_END(RuleDefParser)<DEFAULT> SKIP :
+PARSER_END(RuleParser)<DEFAULT> SKIP :
 {
     " "
 |   "\r"
@@ -179,79 +180,35 @@ void parse(final Rule_mxJPO _rule)
 : {
     Token tmp;
     AdminProperty property;
+    Access access = new Access();
 } {
-    (   (<DESCRIPTION>              ( tmp = <STRING>           {this.setValue(_rule, "description", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(_rule, "description", this.getSingle(tmp.image));} ) )
-      | (<HIDDEN_TRUE>                                         {this.setValue(_rule, "hidden",       true);} )
-      | (<HIDDEN_FALSE>                                        {this.setValue(_rule, "hidden",       false);} )
-      | (<ENFORCERESERVEACCESS_TRUE>                           {this.setValue(_rule, "enforcereserveaccess", true);} )
-      | (<ENFORCERESERVEACCESS_FALSE>                          {this.setValue(_rule, "enforcereserveaccess", false);} )
-      | (<PROPERTY>                                            {property = new AdminProperty();this.appendValue(this.getValue(_rule, "properties"), "propertiesStack", property);}
-                                    ( tmp = <STRING>           {this.setValue(property, "name", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(property, "name", this.getSingle(tmp.image));} )
-              (   ( <PROPERTYVAL>   ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
-                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING> {this.setValue(property, "refAdminType", this.getString(tmp.image));}
-                                    | tmp = <ADMINTYPE_SINGLE> {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
-                                    ( tmp = <STRING>           {this.setValue(property, "refAdminName", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+    (   ( <DESCRIPTION>             ( tmp = <STRING>            {this.setValue(_rule, "description", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>            {this.setValue(_rule, "description", this.getSingle(tmp.image));} ) )
+
+      | ( <HIDDEN_TRUE>                                         {this.setValue(_rule, "hidden",       true);} )
+      | ( <HIDDEN_FALSE>                                        {this.setValue(_rule, "hidden",       false);} )
+
+      | ( <ENFORCERESERVEACCESS_TRUE>                           {this.setValue(_rule, "enforcereserveaccess", true);} )
+      | ( <ENFORCERESERVEACCESS_FALSE>                          {this.setValue(_rule, "enforcereserveaccess", false);} )
+
+      | ( ( <REVOKE>                                            {this.setValue(access, "revoke", true);} ) ?
+          ( <LOGIN>                                             {this.setValue(access, "login", true);} ) ?
+                ( <OWNER>                                       {this.setValue(access, "kind", "owner");}
+                | <PUBLIC>                                      {this.setValue(access, "kind", "public");}
+                | <USER>    ( tmp = <ACCESS_STRING>             {this.setValue(access, "kind", "user");this.setValue(access, "userRef", this.getString(tmp.image));}
+                            | tmp = <ACCESS_SINGLE_STRING>      {this.setValue(access, "kind", "user");this.setValue(access, "userRef", this.getSingle(tmp.image));} ) )
+                                    stateAccessDef(access)      {this.appendValue(_rule, "accessList", "accessList", access);/*reset*/access = new Access();} )
+
+      | (<PROPERTY>                                             {property = new AdminProperty();this.appendValue(this.getValue(_rule, "properties"), "propertiesStack", property);}
+                                    ( tmp = <STRING>            {this.setValue(property, "name", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>            {this.setValue(property, "name", this.getSingle(tmp.image));} )
+              (   ( <PROPERTYVAL>   ( tmp = <STRING>            {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>            {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>  {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <ADMINTYPE_SINGLE>  {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                    ( tmp = <STRING>            {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>            {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
     )*
-}
-
-/**
- * Parses the access and filter expression for the owner definition.
- *
- * @param _prefix   access filter prefix
- * @param _access   current parsed access definition of the policy
- */
-void stateOwnerAccess(final Prefix _prefix, final AccessList_mxJPO _accessList) : {
-    final Access access = new Access();
-}  {
-    ( <OWNER> stateAccessDef(access) )
-    {
-        this.getField(access, "prefix").set(_prefix);
-        this.getField(access, "kind").set("owner");
-        ((Collection<Access>)(this.getValue(_accessList, "accessList"))).add(access);
-    }
-}
-
-/**
- * Parses the access and filter expression for the public definition.
- *
- * @param _prefix   access filter prefix
- * @param _access   current parsed access definition of the policy
- */
-void statePublicAccess(final Prefix _prefix, final AccessList_mxJPO _accessList) : {
-    final Access access = new Access();
-}  {
-    ( <PUBLIC> stateAccessDef(access) )
-    {
-        this.getField(access, "prefix").set(_prefix);
-        this.getField(access, "kind").set("public");
-        ((Collection<Access>)(this.getValue(_accessList, "accessList"))).add(access);
-    }
-}
-
-/**
- * Parses the access and filter expression for a user definition.
- *
- * @param _prefix   access filter prefix
- * @param _access   current parsed access definition of the policy
- */
-void stateUserAccess(final Prefix _prefix, final AccessList_mxJPO _accessList) : {
-    final Access access = new Access();
-    String user;
-    Token tmp;
-}  {
-    ( <USER>    ( tmp = <ACCESS_STRING>         {user = this.getString(tmp.image);}
-                | tmp = <ACCESS_SINGLE_STRING>  {user = this.getSingle(tmp.image);} )
-                stateAccessDef(access) )
-    {
-        this.getField(access, "prefix").set(_prefix);
-        this.getField(access, "kind").set("user");
-        this.getField(access, "userRef").set(user);
-        ((Collection<Access>)(this.getValue(_accessList, "accessList"))).add(access);
-    }
 }
 
 void stateAccessDef(final Access _access) : {
@@ -263,8 +220,8 @@ void stateAccessDef(final Access _access) : {
                                     | tmp = <ACCESS_SINGLE_STRING>  {key = this.getSingle(tmp.image);} ) )
         | ( <FILTER>                ( tmp = <STRING>                {filter       = this.getString(tmp.image);}
                                     | tmp = <SINGLE>                {filter       = this.getSingle(tmp.image);} ) )
-        | ( <LOCALFILTER>           ( tmp = <STRING>                {filter       = this.getString(tmp.image);}
-                                    | tmp = <SINGLE>                {filter       = this.getSingle(tmp.image);} ) )
+        | ( <LOCALFILTER>           ( tmp = <STRING>                {localfilter  = this.getString(tmp.image);}
+                                    | tmp = <SINGLE>                {localfilter  = this.getSingle(tmp.image);} ) )
         | ( tmp = <ACCESS>                                          {access       = tmp.image
                                                                                        .replaceFirst("^\\{", "").replaceFirst("\\}$", "")  // remove {}
                                                                                        .replaceAll("(\t)|(\n)", " ")                       // replace tabs, new lines

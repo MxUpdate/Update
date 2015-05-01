@@ -77,7 +77,7 @@ public class UpdateBuilder_mxJPO
     public UpdateBuilder_mxJPO string(final String _tag,
                                       final String _value)
     {
-        return this.stepStartNewLine().stepCmd(_tag).stepSpace().stepString(_value).stepEndLine();
+        return this.stepStartNewLine().stepSingle(_tag).stepString(_value).stepEndLine();
     }
 
     /**
@@ -109,7 +109,7 @@ public class UpdateBuilder_mxJPO
     public UpdateBuilder_mxJPO single(final String _tag,
                                       final String _value)
     {
-        return this.stepStartNewLine().stepCmd(_tag).stepSpace().stepCmd(_value).stepEndLine();
+        return this.stepStartNewLine().stepSingle(_tag).stepSingle(_value).stepEndLine();
     }
 
     /**
@@ -145,7 +145,7 @@ public class UpdateBuilder_mxJPO
     {
         final boolean value = (_value != null) ? _value : _defaultValue;
 
-        return this.stepStartNewLine().stepCmd(value ? "" : "!").stepCmd(_tag).stepEndLine();
+        return this.stepStartNewLine().stepSingle(value ? _tag : ("!" + _tag)).stepEndLine();
     }
 
     /**
@@ -281,27 +281,34 @@ public class UpdateBuilder_mxJPO
         return this;
     }
 
+    private boolean first = false;
+
     public UpdateBuilder_mxJPO stepStartNewLine()
     {
         this.strg.append(this.prefix());
+        this.first = true;
         return this;
     }
 
     public UpdateBuilder_mxJPO stepString(final String _value)
     {
+        if (this.first)  {
+            this.first = false;
+        } else  {
+            this.strg.append(' ');
+        }
         this.strg.append('\"').append(StringUtil_mxJPO.convertUpdate(_value)).append('\"');
         return this;
     }
 
-    public UpdateBuilder_mxJPO stepCmd(final String _value)
+    public UpdateBuilder_mxJPO stepSingle(final String _value)
     {
+        if (this.first)  {
+            this.first = false;
+        } else  {
+            this.strg.append(' ');
+        }
         this.strg.append(_value);
-        return this;
-    }
-
-    public UpdateBuilder_mxJPO stepSpace()
-    {
-        this.strg.append(' ');
         return this;
     }
 

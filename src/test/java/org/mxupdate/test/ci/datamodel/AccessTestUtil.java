@@ -44,10 +44,10 @@ public final class AccessTestUtil
         final List<Object[]> ret = new ArrayList<Object[]>();
 
         for (final String kind : new String[]{"owner", "public", "user"})  {
-            for (final String prefix : new String[]{null, "login", "revoke"})  {
+            for (final String prefix : new String[]{null, "login", "revoke", "revoke login"})  {
                 if ((test.getVersion() != Version.V6R2011x)
-                        || ("owner".equals(kind)  && !"login".equals(prefix))
-                        || ("public".equals(kind) && !"login".equals(prefix))
+                        || ("owner".equals(kind)  && !"login".equals(prefix) && !"revoke login".equals(prefix))
+                        || ("public".equals(kind) && !"login".equals(prefix) && !"revoke login".equals(prefix))
                         || ("user".equals(kind)   && (prefix == null)))  {
                     final String txt = ((prefix != null) ? prefix + " ": "") + kind;
                     ret.add(new Object[]{
@@ -316,6 +316,7 @@ public final class AccessTestUtil
                                                         .setCategory(category))
                                         .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)});
                     }
+                    /* Deactivated, because of amount of tests and not realy needed, because also done from parser tests...
                     // user items with combination of all
                     for (final String org : new String[]{null, "single", "ancestor", "descendant", "related"})  {
                         for (final String project : new String[]{null, "single", "ancestor", "descendant", "related"})  {
@@ -345,7 +346,7 @@ public final class AccessTestUtil
                                 }
                             }
                         }
-                    }
+                    }*/
                 }
             }
         }

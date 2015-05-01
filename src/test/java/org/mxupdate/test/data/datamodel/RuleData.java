@@ -18,6 +18,8 @@ package org.mxupdate.test.data.datamodel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import matrix.util.MatrixException;
 
@@ -158,7 +160,7 @@ public class RuleData
         this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
 
         // access filter
-        String exportAccess  = "";
+        final SortedSet<String> curAccess = new TreeSet<String>();
         for (final Line subLine : _exportParser.getRootLines().get(0).getChildren())  {
             if (subLine.getTag().equals("public")
                     || subLine.getTag().equals("owner")
@@ -166,14 +168,15 @@ public class RuleData
                     || subLine.getTag().equals("login")
                     || subLine.getTag().equals("revoke"))  {
 
-                exportAccess += "    " + subLine.getTag() + ' ' + subLine.getValue() + '\n';
+                curAccess.add("    " + subLine.getTag() + ' ' + subLine.getValue());
             }
         }
-        final StringBuilder expAccess = new StringBuilder();
+        final SortedSet<String> expAccess = new TreeSet<String>();
         for (final Access access : this.accessList)  {
-            expAccess.append("   ");
-            access.append4CIFile(expAccess);
+            final StringBuilder tmp = new StringBuilder();
+            access.append4CIFile(tmp);
+            expAccess.add("    " + tmp.toString().trim());
         }
-        Assert.assertEquals(exportAccess, expAccess.toString(), "check access definition");
+        Assert.assertEquals(curAccess, expAccess, "check access definition");
     }
 }

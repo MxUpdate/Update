@@ -20,12 +20,13 @@ import org.mxupdate.test.ci.datamodel.AccessTestUtil.IAccessTest;
 import org.mxupdate.test.data.datamodel.RuleData;
 import org.mxupdate.test.data.datamodel.helper.Access;
 import org.mxupdate.test.util.IssueLink;
+import org.mxupdate.update.datamodel.Rule_mxJPO;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test class for rule exports.
+ * Test class for {@link Rule_mxJPO rule CI} access management.
  *
  * @author The MxUpdate Team
  */
@@ -72,7 +73,7 @@ public class Rule_AccessTest
     }
 
     /**
-     * Returns text string &quot;policy with allstate&quot;.
+     * Returns text string &quot;rule&quot;.
      */
     @Override()
     public String getDescriptionPrefix()
@@ -81,7 +82,7 @@ public class Rule_AccessTest
     }
 
     /**
-     * A new policy with allstate for the {@code _accesss} is defined.
+     * A new rule for the {@code _accesss} is defined.
      */
     @Override()
     public RuleData createTestData4Access(final Access... _accesss)

@@ -29,6 +29,8 @@ import org.mxupdate.update.util.CompareToUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateList;
 
 /**
  * Handles list of access definitions.
@@ -36,6 +38,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @author The MxUpdate Team
  */
 public class AccessList_mxJPO
+    implements UpdateList
 {
     /**
      * Class used to hold the user access for a state.
@@ -43,8 +46,12 @@ public class AccessList_mxJPO
     public static class Access
         implements Comparable<Access>
     {
+        /** Revoke access. */
+        private boolean revoke = false;
+        /** Login access. */
+        private boolean login = false;
         /** Prefix for the access kind. */
-        private Prefix prefix = Prefix.All;
+        private final Prefix prefix = Prefix.All;
         /** Access kind. */
         private String kind = "user";
         /** Holds the user references of a user access. */
@@ -139,19 +146,21 @@ public class AccessList_mxJPO
         {
             int ret = 0;
 
-            ret = CompareToUtil_mxJPO.compare(ret, this.prefix.name(),  _compareTo.prefix.name());
-            ret = CompareToUtil_mxJPO.compare(ret, this.kind,           _compareTo.kind);
-            ret = CompareToUtil_mxJPO.compare(ret, this.userRef,        _compareTo.userRef);
-            ret = CompareToUtil_mxJPO.compare(ret, this.key,            _compareTo.key);
-            ret = CompareToUtil_mxJPO.compare(ret, this.access,         _compareTo.access);
-            ret = CompareToUtil_mxJPO.compare(ret, this.organization,   _compareTo.organization);
-            ret = CompareToUtil_mxJPO.compare(ret, this.project,        _compareTo.project);
-            ret = CompareToUtil_mxJPO.compare(ret, this.owner,          _compareTo.owner);
-            ret = CompareToUtil_mxJPO.compare(ret, this.reserve,        _compareTo.reserve);
-            ret = CompareToUtil_mxJPO.compare(ret, this.maturity,       _compareTo.maturity);
-            ret = CompareToUtil_mxJPO.compare(ret, this.category,       _compareTo.category);
-            ret = CompareToUtil_mxJPO.compare(ret, this.filter,         _compareTo.filter);
-            ret = CompareToUtil_mxJPO.compare(ret, this.localfilter,    _compareTo.localfilter);
+            ret = CompareToUtil_mxJPO.compare(ret, this.revoke ? "1" : "0", _compareTo.revoke ? "1" : "0");
+            ret = CompareToUtil_mxJPO.compare(ret, this.login ? "1" : "0",  _compareTo.login ? "1" : "0");
+            ret = CompareToUtil_mxJPO.compare(ret, this.prefix.name(),      _compareTo.prefix.name());
+            ret = CompareToUtil_mxJPO.compare(ret, this.kind,               _compareTo.kind);
+            ret = CompareToUtil_mxJPO.compare(ret, this.userRef,            _compareTo.userRef);
+            ret = CompareToUtil_mxJPO.compare(ret, this.key,                _compareTo.key);
+            ret = CompareToUtil_mxJPO.compare(ret, this.access,             _compareTo.access);
+            ret = CompareToUtil_mxJPO.compare(ret, this.organization,       _compareTo.organization);
+            ret = CompareToUtil_mxJPO.compare(ret, this.project,            _compareTo.project);
+            ret = CompareToUtil_mxJPO.compare(ret, this.owner,              _compareTo.owner);
+            ret = CompareToUtil_mxJPO.compare(ret, this.reserve,            _compareTo.reserve);
+            ret = CompareToUtil_mxJPO.compare(ret, this.maturity,           _compareTo.maturity);
+            ret = CompareToUtil_mxJPO.compare(ret, this.category,           _compareTo.category);
+            ret = CompareToUtil_mxJPO.compare(ret, this.filter,             _compareTo.filter);
+            ret = CompareToUtil_mxJPO.compare(ret, this.localfilter,        _compareTo.localfilter);
 
             return ret;
         }
@@ -188,7 +197,8 @@ public class AccessList_mxJPO
         } else if ("/ownerRevoke".equals(_url))  {
             final Access accessFilter = new Access();
             accessFilter.kind = "owner";
-            accessFilter.prefix = Prefix.Revoke;
+//            accessFilter.prefix = Prefix.Revoke;
+            accessFilter.revoke = true;
             this.accessList.add(accessFilter);
         } else if (_url.startsWith("/ownerRevoke/access"))  {
             this.accessList.peek().access.add(_url.replaceAll("^/ownerRevoke/access/", "").replaceAll("Access$", "").toLowerCase());
@@ -209,13 +219,15 @@ public class AccessList_mxJPO
         } else if ("/publicRevoke".equals(_url))  {
             final Access accessFilter = new Access();
             accessFilter.kind = "public";
-            accessFilter.prefix = Prefix.Revoke;
+//            accessFilter.prefix = Prefix.Revoke;
+            accessFilter.revoke = true;
             this.accessList.add(accessFilter);
         } else if (_url.startsWith("/publicRevoke/access"))  {
             this.accessList.peek().access.add(_url.replaceAll("^/publicRevoke/access/", "").replaceAll("Access$", "").toLowerCase());
         } else if ("/publicRevoke/expressionFilter".equals(_url))  {
             this.accessList.peek().filter = _content;
 
+        // current parsing
         } else if ("/userAccessList/userAccess".equals(_url))  {
             this.accessList.add(new Access());
         } else if (_url.startsWith("/userAccessList/userAccess/access"))  {
@@ -237,9 +249,11 @@ public class AccessList_mxJPO
         } else if ("/userAccessList/userAccess/userAccessKind".equals(_url))  {
             this.accessList.peek().kind = _content;
         } else if ("/userAccessList/userAccess/userAccessLoginRole".equals(_url))  {
-            this.accessList.peek().prefix = Prefix.Login;
+   //         this.accessList.peek().prefix = Prefix.Login;
+            this.accessList.peek().login = true;
         } else if ("/userAccessList/userAccess/userAccessRevoke".equals(_url))  {
-            this.accessList.peek().prefix = Prefix.Revoke;
+ //           this.accessList.peek().prefix = Prefix.Revoke;
+            this.accessList.peek().revoke = true;
         } else if ("/userAccessList/userAccess/userRef".equals(_url))  {
             this.accessList.peek().userRef = _content;
         } else if ("/userAccessList/userAccess/expressionFilter".equals(_url))  {
@@ -268,6 +282,79 @@ public class AccessList_mxJPO
         this.accessList.addAll(tmp);
     }
 
+    /**
+     * Writes specific information about all defined access definition to the
+     * given writer instance {@code _out}.
+     *
+     * @param _updateBuilder    update builder
+     */
+    @Override()
+    public void write(final UpdateBuilder_mxJPO _updateBuilder)
+    {
+        for (final AccessList_mxJPO.Access access : this.accessList)  {
+            if (!access.isEmpty())  {
+                _updateBuilder.stepStartNewLine();
+                // revoke?
+                if (access.prefix != Prefix.All)  {
+                    _updateBuilder.stepSingle(access.prefix.mxValue);
+                }
+
+                // revoke
+                if (access.revoke)  {
+                    _updateBuilder.stepSingle("revoke");
+                }
+
+                // login
+                if (access.login)  {
+                    _updateBuilder.stepSingle("login");
+                }
+
+                // kind
+                _updateBuilder.stepSingle(access.kind);
+
+                // append user reference (only if not public / owner definition)
+                if (!"public".equals(access.kind) && !"owner".equals(access.kind))  {
+                    _updateBuilder.stepString(access.userRef);
+                }
+
+                // key
+                if ((access.key != null) && !access.key.isEmpty())  {
+                    _updateBuilder.stepSingle("key").stepString(access.key);
+                }
+
+                // access
+                _updateBuilder.stepSingle("{" + StringUtil_mxJPO.convertUpdate(false, access.access, null) + "}");
+
+                // user items
+                if ((access.organization != null) && !access.organization.isEmpty() && !"any".equals(access.organization))  {
+                    _updateBuilder.stepSingle(access.organization).stepSingle("organization");
+                }
+                if ((access.project != null) && !access.project.isEmpty() && !"any".equals(access.project))  {
+                    _updateBuilder.stepSingle(access.project).stepSingle("project");
+                }
+                if ((access.owner != null) && !access.owner.isEmpty() && !"any".equals(access.owner))  {
+                    _updateBuilder.stepSingle(access.owner).stepSingle("owner");
+                }
+                if ((access.reserve != null) && !access.reserve.isEmpty() && !"any".equals(access.reserve))  {
+                    _updateBuilder.stepSingle(access.reserve).stepSingle("reserve");
+                }
+                if ((access.maturity != null) && !access.maturity.isEmpty() && !"any".equals(access.maturity))  {
+                    _updateBuilder.stepSingle(access.maturity).stepSingle("maturity");
+                }
+                if ((access.category != null) && !access.category.isEmpty() && !"any".equals(access.category))  {
+                    _updateBuilder.stepSingle(access.category).stepSingle("category");
+                }
+                if ((access.filter != null) && !access.filter.isEmpty())  {
+                    _updateBuilder.stepSingle("filter").stepString(access.filter);
+                }
+                if ((access.localfilter != null) && !access.localfilter.isEmpty())  {
+                    _updateBuilder.stepSingle("localfilter").stepString(access.localfilter);
+                }
+
+                _updateBuilder.stepEndLine();
+            }
+        }
+    }
     /**
      * Writes specific information about all defined access definition to the
      * given writer instance {@code _out}.
@@ -337,6 +424,25 @@ public class AccessList_mxJPO
         }
     }
 
+
+    /**
+     * Calculates the delta between current access definition and this
+     * access definitions.
+     *
+     * @param _mql          MQL builder to append the delta
+     * @param _propPrefix   prefix before the property command (e.g. to define
+     *                      state properties)
+     * @param _current      current properties
+     */
+    public void calcDelta(final MultiLineMqlBuilder _mql,
+                          final AccessList_mxJPO _currents)
+    {
+        if (_currents != null)  {
+            _currents.cleanup(_mql);
+        }
+        this.update(_mql);
+    }
+
     /**
      * Appends the MQL Code to remove all defined access to {@code _out}.
      *
@@ -356,6 +462,14 @@ public class AccessList_mxJPO
             _mql.cmd(" remove");
             if (access.prefix != Prefix.All)  {
                 _mql.cmd(" ").cmd(access.prefix.mxValue);
+            }
+            // revoke
+            if (access.revoke)  {
+                _mql.cmd(" revoke");
+            }
+            // login
+            if (access.login)  {
+                _mql.cmd(" login");
             }
             _mql.cmd(" ").cmd(access.kind);
             if (!"public".equals(access.kind) && !"owner".equals(access.kind))  {
@@ -382,7 +496,14 @@ public class AccessList_mxJPO
             if (!access.isEmpty())  {
 
                 _mql.newLine();
-
+                // revoke
+                if (access.revoke)  {
+                    _mql.cmd(" revoke");
+                }
+                // login
+                if (access.login)  {
+                    _mql.cmd(" login");
+                }
                 // prefix login / revoke?
                 if (access.prefix != Prefix.All)  {
                     _mql.cmd(" ").cmd(access.prefix.mxValue);
@@ -414,22 +535,22 @@ public class AccessList_mxJPO
                 }
                 // user items
                 if ((access.organization != null) && !access.organization.isEmpty() && !"any".equals(access.organization))  {
-                    _mql.cmd(" ").cmd(access.organization).cmd(" organization");
+                    _mql.cmd(" ").arg(access.organization).cmd(" organization");
                 }
                 if ((access.project != null) && !access.project.isEmpty() && !"any".equals(access.project))  {
-                    _mql.cmd(" ").cmd(access.project).cmd(" project");
+                    _mql.cmd(" ").arg(access.project).cmd(" project");
                 }
                 if ((access.owner != null) && !access.owner.isEmpty() && !"any".equals(access.owner))  {
-                    _mql.cmd(" ").cmd(access.owner).cmd(" owner");
+                    _mql.cmd(" ").arg(access.owner).cmd(" owner");
                 }
                 if ((access.reserve != null) && !access.reserve.isEmpty() && !"any".equals(access.reserve))  {
-                    _mql.cmd(" ").cmd(access.reserve).cmd(" reserve");
+                    _mql.cmd(" ").arg(access.reserve).cmd(" reserve");
                 }
                 if ((access.maturity != null) && !access.maturity.isEmpty() && !"any".equals(access.maturity))  {
-                    _mql.cmd(" ").cmd(access.maturity).cmd(" maturity");
+                    _mql.cmd(" ").arg(access.maturity).cmd(" maturity");
                 }
                 if ((access.category != null) && !access.category.isEmpty() && !"any".equals(access.category))  {
-                    _mql.cmd(" ").cmd(access.category).cmd(" category");
+                    _mql.cmd(" ").arg(access.category).cmd(" category");
                 }
                 if (access.filter != null)  {
                     _mql.cmd(" filter ").arg(access.filter);

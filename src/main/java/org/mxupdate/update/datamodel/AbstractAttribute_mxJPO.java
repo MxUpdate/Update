@@ -550,15 +550,15 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         {
             _updateBuilder
                     .stepStartNewLine()
-                    .stepCmd("range").stepSpace().stepCmd(this.type).stepSpace().stepString(this.value1);
+                    .stepSingle("range").stepSingle(this.type).stepString(this.value1);
 
             if ("program".equals(this.type) && (this.value2 != null))  {
-                _updateBuilder.stepSpace().stepCmd("input").stepSpace().stepString(this.value2);
+                _updateBuilder.stepSingle("input").stepString(this.value2);
             } else if ("between".equals(this.type))  {
                 _updateBuilder
-                        .stepSpace().stepCmd(this.include1 ? "inclusive" : "exclusive")
-                        .stepSpace().stepString(this.value2)
-                        .stepSpace().stepCmd(this.include2 ? "inclusive" : "exclusive");
+                        .stepSingle(this.include1 ? "inclusive" : "exclusive")
+                        .stepString(this.value2)
+                        .stepSingle(this.include2 ? "inclusive" : "exclusive");
             }
             _updateBuilder.stepEndLine();
         }

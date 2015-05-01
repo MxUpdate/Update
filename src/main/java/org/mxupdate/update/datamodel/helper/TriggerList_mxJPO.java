@@ -102,11 +102,8 @@ public class TriggerList_mxJPO
         for (final Trigger trigger : this)  {
             _updateBuilder
                     .stepStartNewLine()
-                    .stepCmd("trigger").stepSpace()
-                    .stepCmd(trigger.eventType).stepSpace()
-                    .stepCmd(trigger.kind).stepSpace()
-                    .stepString(trigger.program).stepSpace()
-                    .stepCmd("input").stepSpace().stepString(trigger.arguments)
+                    .stepSingle("trigger").stepSingle(trigger.eventType).stepSingle(trigger.kind).stepString(trigger.program)
+                    .stepSingle("input").stepString(trigger.arguments)
                     .stepEndLine();
         }
     }

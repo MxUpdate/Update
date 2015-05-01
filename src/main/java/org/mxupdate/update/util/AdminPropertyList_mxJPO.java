@@ -149,12 +149,12 @@ public class AdminPropertyList_mxJPO
     {
         for (final AdminProperty prop : this.properties)  {
             if (PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null)  {
-                _updateBuilder.stepStartNewLine().stepCmd("property").stepSpace().stepString(prop.getName());
+                _updateBuilder.stepStartNewLine().stepSingle("property").stepString(prop.getName());
                 if (((prop.getRefAdminName()) != null) && (prop.getRefAdminType() != null))  {
-                    _updateBuilder.stepSpace().stepCmd("to").stepSpace().stepCmd(prop.getRefAdminType()).stepSpace().stepString(prop.getRefAdminName());
+                    _updateBuilder.stepSingle("to").stepSingle(prop.getRefAdminType()).stepString(prop.getRefAdminName());
                 }
                 if (prop.getValue() != null)  {
-                    _updateBuilder.stepSpace().stepCmd("value").stepSpace().stepString(prop.getValue());
+                    _updateBuilder.stepSingle("value").stepString(prop.getValue());
                 }
                 _updateBuilder.stepEndLine();
             }
@@ -204,12 +204,7 @@ public class AdminPropertyList_mxJPO
                               final UpdateBuilder_mxJPO _updateBuilder)
     {
         for (final AdminProperty prop : this.properties)  {
-            _updateBuilder
-                    .stepStartNewLine()
-                    .stepCmd("setting").stepSpace()
-                    .stepString(prop.getSettingName()).stepSpace()
-                    .stepString(prop.getValue())
-                    .stepEndLine();
+            _updateBuilder.stepStartNewLine().stepSingle("setting").stepString(prop.getSettingName()).stepString(prop.getValue()).stepEndLine();
         }
     }
 

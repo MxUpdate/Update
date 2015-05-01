@@ -26,13 +26,12 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
-import org.mxupdate.update.datamodel.rule.RuleDefParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
-import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.xml.sax.SAXException;
 
 /**
@@ -75,7 +74,7 @@ public class Rule_mxJPO
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
-        new RuleDefParser_mxJPO(new StringReader(_code)).parse(this);
+        new RuleParser_mxJPO(new StringReader(_code)).parse(this);
         this.prepare();
     }
 
@@ -123,6 +122,13 @@ public class Rule_mxJPO
         return parsed;
     }
 
+    @Override()
+    protected void prepare()
+    {
+        super.prepare();
+        this.accessList.sort();
+    }
+
     /**
      * Writes specific information about the cached rule to the given
      * writer instance.
@@ -137,20 +143,20 @@ public class Rule_mxJPO
                          final Appendable _out)
         throws IOException
     {
-        this.writeHeader(_paramCache, _out);
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
+        this.writeHeader(_paramCache, updateBuilder.getStrg());
 
-        _out.append("mxUpdate rule \"${NAME}\"  {\n")
-            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n")
-            .append("    ").append(this.isHidden() ? "" : "!").append("hidden\n");
-        // enforcereserveaccess flag (if supported)
-        if (_paramCache.getValueBoolean(ValueKeys.DMRuleSupportsEnforceReserveAccess))  {
-            _out.append("    ").append(this.enforcereserveaccess ? "" : "!").append("enforcereserveaccess\n");
-        }
+        updateBuilder
+                .start("rule")
+                //              tag                 | default | value                              | write?
+                .string(        "description",                  this.getDescription())
+                .flag(          "hidden",               false,  this.isHidden())
+                .flagIfTrue(    "enforcereserveaccess", false,  this.enforcereserveaccess,          _paramCache.getValueBoolean(ValueKeys.DMRuleSupportsEnforceReserveAccess))
+                .write(this.accessList)
+                .properties(this.getProperties())
+                .end();
 
-        this.accessList.write(_paramCache, "    ", _out);
-        this.getProperties().writeProperties(_paramCache, _out, "  ");
-
-        _out.append("}");
+        _out.append(updateBuilder.toString());
     }
 
     /**
@@ -176,11 +182,10 @@ public class Rule_mxJPO
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",        this.getDescription(),   _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false, this.isHidden(),         _current.isHidden());
         if (_paramCache.getValueBoolean(ValueKeys.DMRuleSupportsEnforceReserveAccess))  {
-            DeltaUtil_mxJPO.calcFlagDelta(_mql, "enforcereserveaccess", this.enforcereserveaccess, _current.enforcereserveaccess);
+            DeltaUtil_mxJPO.calcFlagDelta(_mql, "enforcereserveaccess", false, this.enforcereserveaccess, _current.enforcereserveaccess);
         }
 
-        this.accessList     .cleanup(_mql);
-        this.accessList     .update(_mql);
+        this.accessList     .calcDelta(_mql, _current.accessList);
         this.getProperties().calcDelta(_mql, "", _current.getProperties());
     }
 }

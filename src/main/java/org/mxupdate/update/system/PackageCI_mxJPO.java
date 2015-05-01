@@ -242,7 +242,7 @@ public class PackageCI_mxJPO
         @Override()
         public void write(final UpdateBuilder_mxJPO _updateBuilder)
         {
-            _updateBuilder.stepStartNewLine().stepCmd("member").stepSpace().stepCmd(this.refAdminType).stepSpace().stepString(this.refAdminName).stepEndLine();
+            _updateBuilder.stepStartNewLine().stepSingle("member").stepSingle(this.refAdminType).stepString(this.refAdminName).stepEndLine();
         }
     }
 }
