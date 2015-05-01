@@ -63,6 +63,25 @@ public final class CompareToUtil_mxJPO
         return comparison;
     }
 
+
+    /**
+     * Compares the {@code _lhs} to {@_rhs} including handling of the
+     * {@code null} case as empty string.
+     *
+     * @param _comparison   current comparison
+     * @param _lhs          left Comparable
+     * @param _rhs          right Comparable
+     * @return if {@code _comparision} is not 0 {@code _comparision} is
+     *         returned, otherwise the comparison result of {@code _lhs} and
+     *         {@code _rhs}
+     */
+    public static <T> int compareWithNullAsEmpty(final int _comparison,
+                                                 final String _lhs,
+                                                 final String _rhs)
+    {
+        return compare(_comparison, (_lhs == null) ? "" : _lhs, (_rhs == null) ? "" : _rhs);
+    }
+
     /**
      * Compares the {@code _lhs} to {@_rhs} including handling of the
      * {@code null} case.

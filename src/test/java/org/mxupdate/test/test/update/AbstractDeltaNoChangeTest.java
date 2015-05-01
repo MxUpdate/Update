@@ -15,15 +15,12 @@
 
 package org.mxupdate.test.test.update;
 
-import java.io.File;
-
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.datamodel.PolicyData;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.Assert;
@@ -95,14 +92,7 @@ public abstract class AbstractDeltaNoChangeTest<DATA extends AbstractAdminObject
             final WrapperCIInstance<DATA> currentWrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()));
             currentWrapper.create(paramCache);
             currentWrapper.parseUpdate(_currentData);
-            final MultiLineMqlBuilder mql1;
-            if ((currentWrapper.getTypeDef().getMxAdminSuffix()) != null && !currentWrapper.getTypeDef().getMxAdminSuffix().isEmpty())  {
-                mql1 = MqlBuilder_mxJPO.multiLine((File) null, "escape mod " + currentWrapper.getTypeDef().getMxAdminName() + " $1 " + currentWrapper.getTypeDef().getMxAdminSuffix(), _currentData.getName());
-            } else  {
-                mql1 = MqlBuilder_mxJPO.multiLine((File) null, "escape mod " + currentWrapper.getTypeDef().getMxAdminName() + " $1", _currentData.getName());
-            }
-            currentWrapper.calcDelta(paramCache, mql1,  new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName())));
-            mql1.exec(paramCache);
+            currentWrapper.calcDelta(paramCache, new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()))).exec(paramCache);
 
             // read from MX
             final WrapperCIInstance<DATA> currentWrapper2Mx = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()));
@@ -111,10 +101,9 @@ public abstract class AbstractDeltaNoChangeTest<DATA extends AbstractAdminObject
             final WrapperCIInstance<DATA> currentWrapper2Update = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()));
             currentWrapper2Update.parseUpdate(_currentData);
             // calculate delta between MX and new parsed
-            final MultiLineMqlBuilder mql2 = MqlBuilder_mxJPO.multiLine((File) null, "escape mod " + currentWrapper.getTypeDef().getMxAdminName() + " $1 " + currentWrapper.getTypeDef().getMxAdminSuffix(), _currentData.getName());
-            currentWrapper2Update.calcDelta(paramCache, mql2, currentWrapper2Mx);
+            final MultiLineMqlBuilder mql = currentWrapper2Update.calcDelta(paramCache, currentWrapper2Mx);
 
-            Assert.assertFalse(mql2.hasNewLines(), "no MQL update needed, but found:\n" + mql2);
+            Assert.assertFalse(mql.hasNewLines(), "no MQL update needed, but found:\n" + mql);
         }
     }
 }

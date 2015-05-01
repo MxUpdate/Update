@@ -21,6 +21,7 @@ import org.mxupdate.update.program.AbstractCode_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
@@ -39,24 +40,16 @@ public class TestOldXMLExportEncoding
      */
     private static final String INSERT_TEXT = "]Inserted_by_ENO" + "VIA]Inserted_by_ENO" + "VIA";
 
-    /**
-     * Start tag of the code section.
-     */
+    /** Start tag of the code section. */
     private static final String CODE_START = "<code>";
 
-    /**
-     * End tag of the code section.
-     */
+    /** End tag of the code section. */
     private static final String CODE_END = "</code>";
 
-    /**
-     * Start of the code with <code>CDATA</code> section.
-     */
+    /** Start of the code with <code>CDATA</code> section. */
     private static final String CDATA_START = TestOldXMLExportEncoding.CODE_START + "<![CDATA[";
 
-    /**
-     * End of the code with <code>CDATA</code> section.
-     */
+    /** End of the code with <code>CDATA</code> section. */
     private static final String CDATA_END = "]]>" + TestOldXMLExportEncoding.CODE_END;
 
     /**
@@ -151,6 +144,13 @@ public class TestOldXMLExportEncoding
                 throws UpdateException_mxJPO
         {
             // TODO Auto-generated method stub
+        }
+
+        @Override
+        protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
+        {
+            // TODO Auto-generated method stub
+
         }
     }
 }

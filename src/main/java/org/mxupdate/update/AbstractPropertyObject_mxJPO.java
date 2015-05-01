@@ -16,18 +16,25 @@
 package org.mxupdate.update;
 
 import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import matrix.util.MatrixException;
+
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.JPOCaller_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 
@@ -36,7 +43,7 @@ import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
  *
  * @author The MxUpdate Team
  */
-public abstract class AbstractPropertyObject_mxJPO
+public abstract class AbstractPropertyObject_mxJPO<CLASS extends AbstractPropertyObject_mxJPO<CLASS>>
     extends AbstractObject_mxJPO
 {
     /**
@@ -74,14 +81,34 @@ public abstract class AbstractPropertyObject_mxJPO
             + "proc logTrace {_sText}  {\n"
                 + "mql exec prog org.mxupdate.update.util.JPOCaller logTrace ${_sText}\n"
             + "}\n"
-            + "proc mxUpdate {_sKind _sName _lsArgs}  {\n"
+            + "proc mxUpdate {_sKind _sName _sReviLsArg {_lsArgs 0}}  {\n"
                 + "global FILEDATE FILENAME\n"
-                + "regsub -all {\\\\} $_lsArgs {@0@0@} sArg\n"
-                + "regsub -all {'}    $sArg    {@1@1@} sArg\n"
-                + "regsub -all {\\\"} $sArg    {@2@2@} sArg\n"
-                + "regsub -all {\\\\\\[} $sArg {[} sArg\n"
-                + "regsub -all {\\\\\\]} $sArg {]} sArg\n"
-                + "mql exec prog org.mxupdate.update.util.JPOCaller mxUpdate $_sKind $_sName \"${sArg}\" \"$FILEDATE\" \"$FILENAME\" \"END\"\n"
+                + "if {$_lsArgs == 0}  {\n"
+                        + "set sArg  $_sReviLsArg\n"
+                        + "set sRevi \"\""
+                + "} else  {\n"
+                        + "set sArg  $_lsArgs\n"
+                        + "set sRevi $_sReviLsArg"
+                + "}\n"
+                // sName
+                + "regsub -all {\\\\} $_sName   {@0@0@} sName;"
+                + "regsub -all {'}    $sName    {@1@1@} sName;"
+                + "regsub -all {\\\"} $sName    {@2@2@} sName;"
+                + "regsub -all {\\\\\\[} $sName {[} sName;"
+                + "regsub -all {\\\\\\]} $sName {]} sName\n"
+                // sRevi
+                + "regsub -all {\\\\} $sRevi    {@0@0@} sRevi;"
+                + "regsub -all {'}    $sRevi    {@1@1@} sRevi;"
+                + "regsub -all {\\\"} $sRevi    {@2@2@} sRevi;"
+                + "regsub -all {\\\\\\[} $sRevi {[} sRevi;"
+                + "regsub -all {\\\\\\]} $sRevi {]} sRevi\n"
+                // sArg
+                + "regsub -all {\\\\} $sArg     {@0@0@} sArg;"
+                + "regsub -all {'}    $sArg     {@1@1@} sArg;"
+                + "regsub -all {\\\"} $sArg     {@2@2@} sArg;"
+                + "regsub -all {\\\\\\[} $sArg  {[} sArg;"
+                + "regsub -all {\\\\\\]} $sArg  {]} sArg\n"
+                + "mql exec prog org.mxupdate.update.util.JPOCaller mxUpdate $_sKind $sName $sRevi \"${sArg}\" \"$FILEDATE\" \"$FILENAME\" \"END\"\n"
             + "}\n";
 
     /**
@@ -280,4 +307,67 @@ public abstract class AbstractPropertyObject_mxJPO
             JPOCaller_mxJPO.undefineInstance(_paramCache);
         }
     }
+
+    /**
+     * Parses the given {@code _code} and updates this data instance.
+     *
+     * @param _code     code to parse
+     * @throws SecurityException
+     * @throws IllegalArgumentException
+     * @throws NoSuchMethodException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws ParseException
+     */
+    public abstract void parseUpdate(final String _code)
+        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException;
+
+    /**
+     * Writes the complete update code.
+     *
+     * @param _paramCache   parameter cache
+     * @param _out          writer instance
+     * @throws IOException  if the write of the TCL update to the writer
+     *                      instance failed
+     * @throws MatrixException if an execution of a MQL command failed
+     */
+    @Override()
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Appendable _out)
+        throws IOException
+    {
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(this.getFileName(), _paramCache);
+
+        updateBuilder.start(this.getTypeDef());
+
+        this.writeUpdate(updateBuilder);
+
+        updateBuilder.end();
+
+        _out.append(updateBuilder.toString());
+    }
+
+    /**
+     * Writes the update file content to the builder.
+     *
+     * @param _updateBuilder    update builder
+     */
+    protected abstract void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder);
+
+    /**
+     * Calculates the delta between given {@code _current} admin object
+     * definition and this target admin object definition and appends the MQL
+     * append commands to {@code _mql}.
+     *
+     * @param _paramCache   parameter cache
+     * @param _mql          builder to append the MQL commands
+     * @param _current      current admin object definition
+     * @throws UpdateException_mxJPO if update is not allowed (e.g. if data can
+     *                      be potentially lost)
+     */
+    protected abstract void calcDelta(final ParameterCache_mxJPO _paramCache,
+                                      final MultiLineMqlBuilder _mql,
+                                      final CLASS _current)
+        throws UpdateException_mxJPO;
 }

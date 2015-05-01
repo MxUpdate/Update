@@ -15,17 +15,13 @@
 
 package org.mxupdate.test.test.update;
 
-import java.io.File;
-
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.AbstractAdminData;
+import org.mxupdate.test.data.AbstractData;
 import org.mxupdate.test.data.datamodel.PolicyData;
-import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
+import org.mxupdate.update.AbstractPropertyObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -39,7 +35,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @param <DATA> class of the data
  */
-public abstract class AbstractDeltaCalculationTest<DATA extends AbstractAdminObject_mxJPO<?>,TESTDATA extends AbstractAdminData<?>>
+public abstract class AbstractDeltaCalculationTest<DATA extends AbstractPropertyObject_mxJPO<?>,TESTDATA extends AbstractData<?>>
     extends AbstractTest
 {
     /**
@@ -101,16 +97,9 @@ public abstract class AbstractDeltaCalculationTest<DATA extends AbstractAdminObj
             final WrapperCIInstance<DATA> currentWrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()));
             currentWrapper.create(paramCache);
             currentWrapper.parseUpdate(_currentData);
-            final MultiLineMqlBuilder mql1;
-            if ((currentWrapper.getTypeDef().getMxAdminSuffix()) != null && !currentWrapper.getTypeDef().getMxAdminSuffix().isEmpty())  {
-                mql1 = MqlBuilder_mxJPO.multiLine((File) null, "escape mod " + currentWrapper.getTypeDef().getMxAdminName() + " $1 " + currentWrapper.getTypeDef().getMxAdminSuffix(), _currentData.getName());
-            } else  {
-                mql1 = MqlBuilder_mxJPO.multiLine((File) null, "escape mod " + currentWrapper.getTypeDef().getMxAdminName() + " $1", _currentData.getName());
-            }
             final WrapperCIInstance<DATA> tmp = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()));
             tmp.parse(paramCache);
-            currentWrapper.calcDelta(paramCache, mql1,  tmp);
-            mql1.exec(paramCache);
+            currentWrapper.calcDelta(paramCache,  tmp).exec(paramCache);
             _currentData.checkExport(new ExportParser(_currentData.getCI(), currentWrapper.write(paramCache), ""));
 
             // prepare the target form
@@ -118,14 +107,9 @@ public abstract class AbstractDeltaCalculationTest<DATA extends AbstractAdminObj
             targetWrapper.parseUpdate(_targetData);
 
             // delta between current and target
-            final MultiLineMqlBuilder mql2;
-            if ((targetWrapper.getTypeDef().getMxAdminSuffix()) != null && !targetWrapper.getTypeDef().getMxAdminSuffix().isEmpty())  {
-                mql2 = MqlBuilder_mxJPO.multiLine((File) null, "escape mod " + targetWrapper.getTypeDef().getMxAdminName() + " $1 " + targetWrapper.getTypeDef().getMxAdminSuffix(), _currentData.getName());
-            } else  {
-                mql2 = MqlBuilder_mxJPO.multiLine((File) null, "escape mod " + targetWrapper.getTypeDef().getMxAdminName() + " $1", _targetData.getName());
-            }
-            targetWrapper.calcDelta(paramCache, mql2, currentWrapper);
-            mql2.exec(paramCache);
+            final WrapperCIInstance<DATA> tmp2 = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _targetData.getName()));
+            tmp2.parse(paramCache);
+            targetWrapper.calcDelta(paramCache, tmp2).exec(paramCache);
 
             // check result from MX defined from calculated delta
             final WrapperCIInstance<DATA> resultWrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _targetData.getName()));

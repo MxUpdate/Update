@@ -19,8 +19,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.Map;
 
-import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.AbstractPropertyObject_mxJPO;
 
 /**
  * The class is used to define common methods for parsers within updates.
@@ -28,7 +29,7 @@ import org.mxupdate.update.AbstractAdminObject_mxJPO;
  * @author The MxUpdate Team
  * @param <TYPEIMPL>    parser is implemented for this class
  */
-public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_mxJPO<?>>
+public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractPropertyObject_mxJPO<?>>
 {
     /**
      * The stream is parsed and the result is stored in given instance
@@ -125,6 +126,35 @@ public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_
                             final Object _value)
     {
         this.getField(this.getField(_object, _fieldName1).get(), _fieldName2).set(_value);
+    }
+
+    /**
+     * Sets the new <code>_value</code> for field <code>_fieldName</code> of
+     * <code>_object</code>.
+     *
+     * @param _object       object where the field must be updated
+     * @param _fieldName    name of the field to update
+     * @param _value        new value
+     */
+    protected void putValue(final Object _object,
+                            final String _fieldName,
+                            final String _key,
+                            final Object _value)
+    {
+        try  {
+            final Field field = this.getField(_object, _fieldName).field;
+            final boolean accessible = field.isAccessible();
+            try  {
+                field.setAccessible(true);
+                @SuppressWarnings("unchecked")
+                final Map<String,Object> set = (Map<String,Object>) field.get(_object);
+                set.put(_key, _value);
+            } finally  {
+                field.setAccessible(accessible);
+            }
+        } catch (final Exception e)  {
+            throw new ParseUpdateError(e);
+        }
     }
 
     /**

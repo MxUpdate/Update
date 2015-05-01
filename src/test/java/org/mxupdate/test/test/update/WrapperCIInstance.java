@@ -20,8 +20,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.test.data.AbstractAdminData;
-import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.test.data.AbstractData;
+import org.mxupdate.update.AbstractPropertyObject_mxJPO;
+import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -32,7 +33,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  * @author The MxUpdate Team
  * @param <DATA> class of the CI data
  */
-public class WrapperCIInstance<DATA extends AbstractAdminObject_mxJPO<?>>
+public class WrapperCIInstance<DATA extends AbstractPropertyObject_mxJPO<?>>
 {
     /** Data instance to wrap. */
     private final DATA data;
@@ -72,7 +73,7 @@ public class WrapperCIInstance<DATA extends AbstractAdminObject_mxJPO<?>>
      * @param _data     data instance as target parse definition
      * @throws Exception if parse failed
      */
-    public void parseUpdate(final AbstractAdminData<?> _data)
+    public void parseUpdate(final AbstractData<?> _data)
         throws Exception
     {
         this.parseUpdate(_data.ciFile());
@@ -86,10 +87,22 @@ public class WrapperCIInstance<DATA extends AbstractAdminObject_mxJPO<?>>
      */
     protected String strip(final String _generated)
     {
-        final String startIndex = "mxUpdate " + this.getTypeDef().getMxAdminName() + " \"${NAME}\" {";
-        final int start = _generated.indexOf(startIndex) + startIndex.length() + 1;
-        final int end = _generated.length() - 2;
-        return (start < end)  ? _generated.substring(start, end) : "";
+        final String ret;
+        final String startAdmIndex = " \"${NAME}\" {";
+        final String startBusIndex = " \"${NAME}\" \"${REVISION}\" {";
+
+        if (_generated.indexOf(startAdmIndex) > 0)  {
+            final int start = _generated.indexOf(startAdmIndex) + startAdmIndex.length() + 1;
+            final int end = _generated.length() - 2;
+            ret = (start < end) ? _generated.substring(start, end) : "";
+        } else if (_generated.indexOf(startBusIndex) > 0)  {
+            final int start = _generated.indexOf(startBusIndex) + startBusIndex.length() + 1;
+            final int end = _generated.length() - 2;
+            ret = (start < end) ? _generated.substring(start, end) : "";
+        } else  {
+            ret = _generated;
+        }
+        return ret;
     }
 
     /**
@@ -151,11 +164,22 @@ public class WrapperCIInstance<DATA extends AbstractAdminObject_mxJPO<?>>
      * @param _current      current instance
      * @throws Exception if calculation failed
      */
-    public void calcDelta(final ParameterCache_mxJPO _paramCache,
-                          final MultiLineMqlBuilder _mql,
-                          final WrapperCIInstance<DATA> _current)
+    public MultiLineMqlBuilder calcDelta(final ParameterCache_mxJPO _paramCache,
+                                         final WrapperCIInstance<DATA> _current)
         throws Exception
     {
+        final MultiLineMqlBuilder ret;
+
+        // initialize MQL builder depending on the type
+        if ((this.getTypeDef().getMxAdminSuffix()) != null && !this.getTypeDef().getMxAdminSuffix().isEmpty())  {
+            ret = MqlBuilder_mxJPO.multiLine((File) null, "escape mod " + this.data.getTypeDef().getMxAdminName() + " $1 " + this.data.getTypeDef().getMxAdminSuffix(), _current.data.getName());
+        } else if (this.getTypeDef().getMxAdminName() != null) {
+            ret = MqlBuilder_mxJPO.multiLine((File) null, "escape mod " + this.data.getTypeDef().getMxAdminName() + " $1", this.data.getName());
+        } else  {
+            final BusObject_mxJPO bus = (BusObject_mxJPO) this.data;
+            ret = MqlBuilder_mxJPO.multiLine((File) null, "escape mod bus $1 $2 $3", bus.getBusType(), bus.getBusName(), bus.getBusRevision());
+        }
+
         Method write = this.evalMethod("calcDelta", ParameterCache_mxJPO.class, MultiLineMqlBuilder.class, this.data.getClass());
         // if not found, try with parent class as parameter
         // (e.g. attributes works then...)
@@ -166,10 +190,12 @@ public class WrapperCIInstance<DATA extends AbstractAdminObject_mxJPO<?>>
         }
         write.setAccessible(true);
         try {
-            write.invoke(this.data, _paramCache, _mql, _current.data);
+            write.invoke(this.data, _paramCache, ret, _current.data);
         } finally  {
             write.setAccessible(false);
         }
+
+        return ret;
     }
 
     /**
@@ -183,19 +209,9 @@ public class WrapperCIInstance<DATA extends AbstractAdminObject_mxJPO<?>>
                       final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        final MultiLineMqlBuilder mql;
-        if ((this.data.getTypeDef().getMxAdminSuffix()) != null && !this.data.getTypeDef().getMxAdminSuffix().isEmpty())  {
-            mql = MqlBuilder_mxJPO.multiLine(_file, "escape mod " + this.data.getTypeDef().getMxAdminName() + " $1 " + this.data.getTypeDef().getMxAdminSuffix(), this.data.getName());
-        } else  {
-            mql = MqlBuilder_mxJPO.multiLine(_file, "escape mod " + this.data.getTypeDef().getMxAdminName() + " $1", this.data.getName());
-        }
-
         final WrapperCIInstance<DATA> newInstance = this.newInstance();
         newInstance.parse(_paramCache);
-
-        this.calcDelta(_paramCache, mql, newInstance);
-
-        mql.exec(_paramCache);
+        this.calcDelta(_paramCache, newInstance).exec(_paramCache);
     }
 
     /**

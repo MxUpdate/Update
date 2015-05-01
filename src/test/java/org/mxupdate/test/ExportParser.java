@@ -219,6 +219,24 @@ public class ExportParser
     }
 
     /**
+     * Checks that given {@code _list} is defined for given {@code _path}.
+     *
+     * @param _path     path to check
+     * @param _value    value
+     * @return this export parser instance
+     */
+    public ExportParser checkListContains(final String _path,
+                                          final Collection<String> _list)
+    {
+        final Collection<String> curList = this.getRootLines().get(0).getLines(_path + "/@value");
+        for (final String elem : _list)  {
+            Assert.assertTrue(curList.contains(elem), "element " + elem + " is missed");
+        }
+        return this;
+    }
+
+
+    /**
      * Returns depending on the <code>_path</code> all found lines.
      *
      * @param _path     path of the lines

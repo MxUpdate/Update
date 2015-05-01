@@ -181,7 +181,7 @@ public class Dimension_mxJPO
 
         for (final Unit unit : this.units)  {
             _updateBuilder
-                    .childStart("unit", unit.name)
+                    .stepStartNewLine().stepSingle("unit").stepString(unit.name).stepEndLineWithStartChild()
                     //              tag             | default | value                              | write?
                     .flagIfTrue("default",              false, unit.defaultUnit,                    unit.defaultUnit)
                     .string(    "description",                 unit.description)

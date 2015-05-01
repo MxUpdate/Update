@@ -15,12 +15,9 @@
 
 package org.mxupdate.update.datamodel;
 
-import java.io.IOException;
-
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * @author The MxUpdate Team
@@ -58,7 +55,7 @@ public class NumberGenerator_mxJPO
      * @throws IOException if the TCL update code for the number generator
      *                     could not be written
      */
-    @Override()
+ /*   @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
         throws IOException
@@ -84,5 +81,5 @@ public class NumberGenerator_mxJPO
                     .append(attrNextNumber)
                     .append("\" \"").append(nextNumber).append("\"")
             .append("\n}");
-    }
+    }*/
 }

@@ -42,73 +42,14 @@ import org.xml.sax.SAXException;
  */
 public abstract class AbstractObject_mxJPO
 {
-    /**
-     * Stores the version information of this object. If the value is
-     * <code>null</code>, the version information is not defined.
-     */
-    @Deprecated()
-    private String version = null;
-
-    /**
-     * Defines the related type definition enumeration.
-     */
+    /** Defines the related type definition enumeration. */
     private final TypeDef_mxJPO typeDef;
 
     /** MX Name of the administration object. */
     private final String mxName;
 
-    /**
-     * Author of the MX administration object.
-     *
-     * @see #setAuthor(String)
-     * @see #getAuthor()
-     */
-    @Deprecated()
-    private String author;
-
-    /**
-     * Application of the MX administration object.
-     *
-     * @see #setApplication(String)
-     * @see #getApplication()
-     */
-    @Deprecated()
-    private String application;
-
-    /**
-     * Description of the MX administration object.
-     *
-     * @see #setDescription(String)
-     * @see #getDescription()
-     */
+    /** Description of the C object. */
     private String description = "";
-
-    /**
-     * Installation date of the MX administration object.
-     *
-     * @see #setInstallationDate(String)
-     * @see #getInstallationDate()
-     */
-    @Deprecated()
-    private String installationDate;
-
-    /**
-     * Installer of the MX administration object.
-     *
-     * @see #setInstaller(String)
-     * @see #getInstaller()
-     */
-    @Deprecated()
-    private String installer;
-
-    /**
-     * Original name of the MX administration object.
-     *
-     * @see #setOriginalName(String)
-     * @see #getOriginalName()
-     */
-    @Deprecated()
-    private String originalName;
 
     ////////////////////////////////////////////////////////////////////////////
     // global methods start
@@ -414,55 +355,6 @@ public abstract class AbstractObject_mxJPO
     }
 
     /**
-     * Getter method for instance variable {@link #author}.
-     *
-     * @return value of instance variable {@link #author}.
-     * @see #author
-     */
-    @Deprecated()
-    protected String getAuthor()
-    {
-        return this.author;
-    }
-
-    /**
-     * Setter method for instance variable {@link #author}.
-     *
-     * @param _author new value for instance variable {@link #author}
-     * @see #author
-     */
-    @Deprecated()
-    protected void setAuthor(final String _author)
-    {
-        this.author = _author;
-    }
-
-    /**
-     * Getter method for instance variable {@link #application}.
-     *
-     * @return value of instance variable {@link #application}.
-     * @see #application
-     */
-    @Deprecated()
-    protected String getApplication()
-    {
-        return this.application;
-    }
-
-    /**
-     * Setter method for instance variable {@link #application}.
-     *
-     * @param _application      new value for instance variable
-     *                          {@link #application}
-     * @see #application
-     */
-    @Deprecated()
-    protected void setApplication(final String _application)
-    {
-        this.application = _application;
-    }
-
-    /**
      * Getter method for instance variable {@link #description}.
      *
      * @return value of instance variable {@link #description}.
@@ -480,104 +372,6 @@ public abstract class AbstractObject_mxJPO
     protected void setDescription(final String _description)
     {
         this.description = _description;
-    }
-
-    /**
-     * Getter method for instance variable {@link #installationDate}.
-     *
-     * @return value of instance variable {@link #installationDate}.
-     * @see #installationDate
-     */
-    @Deprecated()
-    protected String getInstallationDate()
-    {
-        return this.installationDate;
-    }
-
-    /**
-     * Setter method for instance variable {@link #installationDate}.
-     *
-     * @param _installationDate     new value for instance variable
-     *                              {@link #installationDate}
-     * @see #installationDate
-     */
-    @Deprecated()
-    protected void setInstallationDate(final String _installationDate)
-    {
-        this.installationDate = _installationDate;
-    }
-
-    /**
-     * Getter method for instance variable {@link #installer}.
-     *
-     * @return value of instance variable {@link #installer}.
-     * @see #installer
-     */
-    @Deprecated()
-    protected String getInstaller()
-    {
-        return this.installer;
-    }
-
-    /**
-     * Setter method for instance variable {@link #installer}.
-     *
-     * @param _installer new value for instance variable {@link #installer}
-     * @see #installer
-     */
-    @Deprecated()
-    protected void setInstaller(final String _installer)
-    {
-        this.installer = _installer;
-    }
-
-    /**
-     * Getter method for instance variable {@link #originalName}.
-     *
-     * @return value of instance variable {@link #originalName}.
-     */
-    @Deprecated()
-    protected String getOriginalName()
-    {
-        return this.originalName;
-    }
-
-    /**
-     * Setter method for instance variable {@link #originalName}.
-     *
-     * @param _originalName     new value for instance variable
-     *                          {@link #originalName}.
-     */
-    @Deprecated()
-    protected void setOriginalName(final String _originalName)
-    {
-        this.originalName = _originalName;
-    }
-
-    /**
-     * Returns the version string of this administration (business) object. The
-     * method is the getter method for {@link #version}.
-     *
-     * @return version string
-     * @see #version
-     */
-    @Deprecated()
-    protected String getVersion()
-    {
-        return this.version;
-    }
-
-    /**
-     * Sets the new version string for this administration (business) object.
-     * It is the setter method for {@link #version}.
-     *
-     * @param _version  new version to set
-     * @see #version
-     */
-    @Deprecated()
-    protected void setVersion(final String _version)
-    {
-        this.version = _version;
     }
 
     /**

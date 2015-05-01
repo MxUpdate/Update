@@ -18,6 +18,7 @@ package org.mxupdate.update.util;
 import java.text.MessageFormat;
 import java.util.Collection;
 
+import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 
 /**
@@ -53,14 +54,18 @@ public class UpdateBuilder_mxJPO
     }
 
     /**
-     * Starts the update builder.
+     * Starts the update builder for given type definition.
      *
-     * @param _mxAdminType      MX admin type to update
+     * @param _typeDef      type definition
      * @return this update builder instance
      */
-    public UpdateBuilder_mxJPO start(final String _mxAdminType)
+    public UpdateBuilder_mxJPO start(final TypeDef_mxJPO _typeDef)
     {
-        this.strg.append("mxUpdate ").append(_mxAdminType).append(" \"${NAME}\" {\n");
+        this.strg.append("mxUpdate ").append(_typeDef.getMxAdminName()).append(" \"${NAME}\" ");
+        if (_typeDef.getMxBusType() != null)  {
+            this.strg.append("\"${REVISION}\"  ");
+        }
+        this.strg.append("{\n");
         return this;
     }
 
@@ -386,23 +391,7 @@ public class UpdateBuilder_mxJPO
      */
     public UpdateBuilder_mxJPO childStart(final String _tag)
     {
-        this.stepStartNewLine().stepSingle(_tag).stepSingle("{").stepEndLine();
-        this.prefixAmount++;
-        return this;
-    }
-
-    /**
-     * Starts a new child.
-     *
-     * @param _tag      tag
-     * @param _name     name for the tag as string value
-     * @return this update builder instance
-     */
-    public UpdateBuilder_mxJPO childStart(final String _tag,
-                                          final String _name)
-    {
-        this.stepStartNewLine().stepSingle(_tag).stepString(_name).stepSingle("{").stepEndLine();
-        this.prefixAmount++;
+        this.stepStartNewLine().stepSingle(_tag).stepEndLineWithStartChild();
         return this;
     }
 
@@ -427,6 +416,12 @@ public class UpdateBuilder_mxJPO
         return this;
     }
 
+    /**
+     * Step a new string value.
+     *
+     * @param _value    string value
+     * @return this update builder
+     */
     public UpdateBuilder_mxJPO stepString(final String _value)
     {
         if (this.first)  {
@@ -438,6 +433,12 @@ public class UpdateBuilder_mxJPO
         return this;
     }
 
+    /**
+     * Step a new single value.
+     *
+     * @param _value    single value
+     * @return this update builder
+     */
     public UpdateBuilder_mxJPO stepSingle(final String _value)
     {
         if (this.first)  {
@@ -446,6 +447,18 @@ public class UpdateBuilder_mxJPO
             this.strg.append(' ');
         }
         this.strg.append(_value);
+        return this;
+    }
+
+    /**
+     * End line with starting new child.
+     *
+     * @return this update builder
+     */
+    public UpdateBuilder_mxJPO stepEndLineWithStartChild()
+    {
+        this.strg.append(" {\n");
+        this.prefixAmount++;
         return this;
     }
 

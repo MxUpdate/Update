@@ -27,6 +27,8 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.AbstractTest.CI;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.data.util.KeyNotDefinedList;
+import org.mxupdate.test.data.util.KeyValueList;
 import org.mxupdate.test.data.util.SingleValueList;
 import org.mxupdate.test.data.util.StringValueList;
 import org.mxupdate.test.util.Version;
@@ -55,7 +57,10 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     private final SingleValueList singles = new SingleValueList();
     /** Values of this data piece. */
     private final StringValueList values = new StringValueList();
-
+    /** All properties for this data piece. */
+    private final KeyValueList keyValues = new KeyValueList();
+    /** All not defined keys. */
+    private final KeyNotDefinedList keyNotDefineds = new KeyNotDefinedList();
 
     /** Flag to indicate that this data piece is created.*/
     private boolean created;
@@ -121,6 +126,31 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     }
 
     /**
+     * Defines a new value entry which is put into {@link #singles}.
+     *
+     * @param _key      key of the value (e.g. &quot;description&quot;)
+     * @param _value    value of the value
+     * @return this original data instance
+     */
+    @SuppressWarnings("unchecked")
+    public DATA setSingle(final String _key,
+                          final String _value)
+    {
+        this.singles.def(_key, _value);
+        return (DATA) this;
+    }
+
+    /**
+     * Returns all defined {@link #values}.
+     *
+     * @return defined values
+     */
+    public SingleValueList getSingles()
+    {
+        return this.singles;
+    }
+
+    /**
      * Defines a new value entry which is put into {@link #values}.
      *
      * @param _key      key of the value (e.g. &quot;description&quot;)
@@ -160,28 +190,43 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     }
 
     /**
-     * Defines a new value entry which is put into {@link #singles}.
+     * Defines key / value for given {@code _tag}.
      *
-     * @param _key      key of the value (e.g. &quot;description&quot;)
-     * @param _value    value of the value
-     * @return this original data instance
+     * @param _tag          used tag (name) of the flag
+     * @param _key          key
+     * @param _value        value
+     * @return this data instance
      */
     @SuppressWarnings("unchecked")
-    public DATA setSingle(final String _key,
-                          final String _value)
+    public DATA setKeyValue(final String _tag,
+                            final String _key,
+                            final String _value)
     {
-        this.singles.def(_key, _value);
+        this.keyValues.addKeyValue(_tag, _key, _value);
         return (DATA) this;
     }
 
     /**
-     * Returns all defined {@link #values}.
+     * Returns the {@link #keyValues key/value list}.
      *
-     * @return defined values
+     * @return key/value list
      */
-    public SingleValueList getSingles()
+    public KeyValueList getKeyValues()
     {
-        return this.singles;
+        return this.keyValues;
+    }
+
+    /**
+     * Defines key / value for given {@code _tag}.
+     *
+     * @param _tag          used tag (name) of the flag
+     * @return this data instance
+     */
+    @SuppressWarnings("unchecked")
+    public DATA defKeyNotDefined(final String _tag)
+    {
+        this.keyNotDefineds.defKeyNotDefined(_tag);
+        return (DATA) this;
     }
 
     /**
@@ -330,7 +375,17 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @return this instance
      * @throws MatrixException if create failed
      */
-    public abstract DATA create() throws MatrixException;
+    public abstract DATA create()
+        throws MatrixException;
+
+    /**
+     * Creates all depending administration objects for given this instance.
+     *
+     * @return this data instance
+     * @throws MatrixException if create failed
+     */
+    public abstract DATA createDependings()
+        throws MatrixException;
 
     /**
      * Updates current configuration item.
@@ -565,11 +620,13 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * Checks the export of this data piece if all values are correct defined.
      *
      * @param _exportParser     parsed export
-     * @throws MatrixException if check failed
      */
     public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
     {
+        this.singles        .check4Export(_exportParser, "");
+        this.values         .check4Export(_exportParser, "");
+        this.keyValues      .check4Export(_exportParser, "");
+        this.keyNotDefineds .check4Export(_exportParser, "");
     }
 
     /**
@@ -623,28 +680,6 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
         Assert.assertEquals(_exportParser.getLines("/mxUpdate/" + _tag + "/@value").size(),
                             0,
                             "check " + _kind + " '" + this.getName() + "' that no " + _tag + " is defined");
-    }
-
-    /**
-     * Checks in the <code>_exportParser</code> if given <code>_tag</code>
-     * exists (with zero length value).
-     *
-     * @param _exportParser     parsed export
-     * @param _kind             kind of the check
-     * @param _tag              tag to check
-     * @param _exists           <i>true</i> means that the tag must exists;
-     *                          otherwise value must not defined
-     */
-    public void checkValueExists(final ExportParser _exportParser,
-                                 final String _kind,
-                                 final String _tag,
-                                 final boolean _exists)
-    {
-        if (_exists)  {
-            this.checkSingleValue(_exportParser, _kind, _tag, "");
-        } else  {
-            this.checkNotExistingSingleValue(_exportParser, _kind, _tag);
-        }
     }
 
     /**

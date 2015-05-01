@@ -872,7 +872,7 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
         public void write(final UpdateBuilder_mxJPO _updateBuilder)
         {
             _updateBuilder
-                    .childStart(    "signature",    this.name)
+                    .stepStartNewLine().stepSingle("signature").stepString(this.name).stepEndLineWithStartChild()
                     .string(        "branch",       this.branch)
                     .listOneLine(   "approve",      this.approverUsers)
                     .listOneLine(   "ignore",       this.ignoreUsers)

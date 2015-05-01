@@ -26,7 +26,6 @@ import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.util.DataList;
 import org.mxupdate.test.data.util.FlagList;
 import org.mxupdate.test.data.util.FlagList.Create;
-import org.mxupdate.test.data.util.KeyValueList;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.data.util.PropertyDefList;
 
@@ -54,8 +53,6 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
 
     /** Defines flags for this data piece. */
     private final FlagList flags = new FlagList();
-    /** All properties for this data piece. */
-    private final KeyValueList keyValues = new KeyValueList();
     /** All defined data elements. */
     private final DataList<AbstractAdminData<?>> datas = new DataList<AbstractAdminData<?>>();
     /** All properties for this data piece. */
@@ -155,33 +152,6 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     public FlagList getFlags()
     {
         return this.flags;
-    }
-
-    /**
-     * Defines key / value for given {@code _tag}.
-     *
-     * @param _tag          used tag (name) of the flag
-     * @param _key          key
-     * @param _value        value
-     * @return this data instance
-     */
-    @SuppressWarnings("unchecked")
-    public DATA setKeyValue(final String _tag,
-                            final String _key,
-                            final String _value)
-    {
-        this.keyValues.addKeyValue(_tag, _key, _value);
-        return (DATA) this;
-    }
-
-    /**
-     * Returns the {@link #keyValues key/value list}.
-     *
-     * @return key/value list
-     */
-    public KeyValueList getKeyValues()
-    {
-        return this.keyValues;
     }
 
     /**
@@ -286,7 +256,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         this.flags          .append4Update("    ", strg);
         this.getValues()    .append4Update("    ", strg);
         this.getSingles()   .append4Update("    ", strg);
-        this.keyValues      .append4Update("    ", strg);
+        this.getKeyValues() .append4Update("    ", strg);
         this.datas          .append4Update("    ", strg);
         this.properties     .append4Update("    ", strg);
         for (final String ciLine : this.getCILines())  {
@@ -329,14 +299,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         return (DATA) this;
     }
 
-    /**
-     * Creates all depending administration objects for given this instance.
-     * Only the depending {@link #properties} could be created.
-     *
-     * @return this data instance
-     * @throws MatrixException if create failed
-     * @see #properties
-     */
+    @Override()
     @SuppressWarnings("unchecked")
     public DATA createDependings()
         throws MatrixException
@@ -386,12 +349,12 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     protected void append4Create(final StringBuilder _cmd)
         throws MatrixException
     {
-        this.flags       .append4Create(_cmd);
-        this.keyValues   .append4Create(_cmd);
-        this.datas       .append4Create(_cmd);
-        this.getSingles().append4Create(_cmd);
-        this.getValues() .append4Create(_cmd);
-        this.properties  .append4Create(_cmd);
+        this.getSingles()   .append4Create(_cmd);
+        this.getValues()    .append4Create(_cmd);
+        this.getKeyValues() .append4Create(_cmd);
+        this.flags          .append4Create(_cmd);
+        this.datas          .append4Create(_cmd);
+        this.properties     .append4Create(_cmd);
     }
 
     /**
@@ -403,12 +366,11 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     @Override()
     public void checkExport(final ExportParser _exportParser)
     {
-        this.getValues() .check4Export(_exportParser, "");
-        this.getSingles().check4Export(_exportParser, "");
-        this.flags       .check4Export(_exportParser, "");
-        this.keyValues   .check4Export(_exportParser, "");
-        this.datas       .check4Export(_exportParser, "");
-        this.properties  .check4Export(_exportParser, "");
+        super.checkExport(_exportParser);
+
+        this.flags          .check4Export(_exportParser, "");
+        this.datas          .check4Export(_exportParser, "");
+        this.properties     .check4Export(_exportParser, "");
     }
 
     /**

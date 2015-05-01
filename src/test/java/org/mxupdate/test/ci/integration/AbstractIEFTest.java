@@ -66,11 +66,11 @@ public abstract class AbstractIEFTest<IEFCLASS extends AbstractBusData<IEFCLASS>
         ret.add(new Object[]{
                         "simple object with description",
                         this.createNewData(true, "Hello \"Test\"")
-                                .setDescription("a \"description\"")});
+                                .setValue("description", "a \"description\"")});
         ret.add(new Object[]{
                         "simple object with description and single apostrophe",
                         this.createNewData(true, "Hello \"Test\" 'with single apostrophe'")
-                                .setDescription("a \"description\" with single 'apostrophe'")});
+                                .setValue("description", "a \"description\" with single 'apostrophe'")});
         // default type must be only done if sub types are allowed
         if (tmp.getType() != null)  {
             ret.add(new Object[]{

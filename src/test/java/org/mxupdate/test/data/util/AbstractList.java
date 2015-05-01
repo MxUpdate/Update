@@ -31,6 +31,19 @@ import org.mxupdate.test.ExportParser;
  */
 public abstract class AbstractList
 {
+    /** All elements of the list must be container? */
+    private boolean checkAll = true;
+
+    /**
+     * Defines if defined expected elements must be equal to current elements.
+     *
+     * @param _checkAll     all elements to check?
+     */
+    public void setCheckAllElemens(final boolean _checkAll)
+    {
+        this.checkAll = _checkAll;
+    }
+
     /**
      * Appends given list to the configuration item file.
      *
@@ -65,7 +78,11 @@ public abstract class AbstractList
             }
 
             for (final Entry<String,Set<String>> checks : allChecks.entrySet())  {
-                _exportParser.checkList((_path.isEmpty() ? "" : _path + "/") + checks.getKey(), checks.getValue());
+                if (this.checkAll)  {
+                    _exportParser.checkList((_path.isEmpty() ? "" : _path + "/") + checks.getKey(), checks.getValue());
+                } else  {
+                    _exportParser.checkListContains((_path.isEmpty() ? "" : _path + "/") + checks.getKey(), checks.getValue());
+                }
             }
         }
     }

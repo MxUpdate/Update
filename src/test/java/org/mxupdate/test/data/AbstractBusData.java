@@ -18,7 +18,6 @@ package org.mxupdate.test.data;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.datamodel.TypeData;
 
 /**
@@ -31,38 +30,15 @@ import org.mxupdate.test.data.datamodel.TypeData;
 public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
     extends AbstractData<DATA>
 {
-    /**
-     * Used to separate type, name and revision of business objects within
-     * name of files.
-     */
+    /** Used to separate type, name and revision of business objects within name of files. */
     public static final String SEPARATOR = "________";
 
-    /**
-     * Related business type of this business object (if the type has children).
-     *
-     * @see #AbstractBusData(AbstractTest, AbstractTest.CI, String, String)
-     */
+    /** Related business type of this business object (if the type has children). */
     private final TypeData type;
-
-    /**
-     * Name of the business object.
-     */
+    /** Name of the business object. */
     private final String busName;
-
-    /**
-     * Revision of the business object.
-     */
+    /** Revision of the business object. */
     private final String busRevision;
-
-    /**
-     * Description of the business object.
-     *
-     * @see #setDescription(String)
-     * @see #create()
-     * @see #ciFile()
-     * @see #checkExport(ExportParser)
-     */
-    private String description;
 
     /**
      * Constructor to initialize this data piece.
@@ -78,6 +54,7 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
                               final String _revision)
     {
         this(_test, _ci, null, _name, _revision);
+        this.getKeyValues().setCheckAllElemens(false);
     }
 
     /**
@@ -145,7 +122,6 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
      *
      * @return related type (or <code>null</code> if not a specific derived type
      *         is defined)
-     * @see #type
      */
     public TypeData getType()
     {
@@ -156,7 +132,6 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
      * Returns the business object {@link #busName name}.
      *
      * @return business object name
-     * @see #busName
      */
     public String getBusName()
     {
@@ -167,25 +142,10 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
      * Returns the business object {@link #busRevision revision}.
      *
      * @return business object revision
-     * @see #busRevision
      */
     public String getBusRevision()
     {
         return this.busRevision;
-    }
-
-    /**
-     * Defines the {@link #description} of this business object instance.
-     *
-     * @param _description  description of the business object
-     * @return this business object instance
-     * @see #description
-     */
-    @SuppressWarnings("unchecked")
-    public DATA setDescription(final String _description)
-    {
-        this.description =  _description;
-        return (DATA) this;
     }
 
     /**
@@ -206,7 +166,6 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
                         .append(AbstractTest.convertMql((this.type != null) ? this.type.getName() : this.getCI().getBusType()))
                     .append("\" \"").append(AbstractTest.convertMql(this.busName))
                     .append("\" \"").append(AbstractTest.convertMql((this.busRevision != null) ? this.busRevision : ""))
-                    .append("\" description \"").append(AbstractTest.convertMql((this.description != null) ? this.description : ""))
                     .append("\" policy \"").append(AbstractTest.convertMql(this.getCI().getBusPolicy()))
                     .append("\" vault \"").append(AbstractTest.convertMql(this.getCI().getBusVault()))
                     .append('\"');
@@ -218,48 +177,32 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
         return (DATA) this;
     }
 
+    @Override()
+    @SuppressWarnings("unchecked")
+    public DATA createDependings()
+        throws MatrixException
+    {
+        return (DATA) this;
+    }
+
     /**
-     * Returns the TCL update file of this business object data instance.
+     * Returns the content for the configuration item update file for this
+     * business object data instance.
      *
-     * @return TCL update file content
+     * @return configuration item update file
      */
     @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("mql escape mod bus \"${OBJECTID}\" description \"")
-                .append(AbstractTest.convertTcl((this.description != null) ? this.description : ""))
-                .append('\"');
-        /*for (final Map.Entry<String,String> value : this.getValues().entrySet())  {
-            cmd.append(" \\\n    \"").append(AbstractTest.convertTcl(value.getKey()))
-               .append("\" \"").append(AbstractTest.convertTcl(value.getValue().toString()))
-               .append('\"');
-        }*/
-        return cmd.toString();
-    }
+        final StringBuilder strg = new StringBuilder();
+        strg.append("mxUpdate " + this.getCI().getBusType().toLowerCase() + " \"${NAME}\" \"${REVISION}\" {\n");
 
-    /**
-     * Checks the export of this data piece if all values are correct defined.
-     *
-     * @param _exportParser     parsed export
-     * @throws MatrixException if check failed
-     */
-    @Override()
-    public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
-    {
-        super.checkExport(_exportParser);
-        // check for defined values
-        this.checkSingleValue(_exportParser,
-                              "description",
-                              "description",
-                              "\"" + AbstractTest.convertTcl((this.description != null) ? this.description : "") + "\"");
-        // check for defined values
-        /*for (final Map.Entry<String,String> entry : this.getValues().entrySet())  {
-            this.checkSingleValue(_exportParser,
-                                  entry.getKey(),
-                                  "\"" + AbstractTest.convertTcl(entry.getKey()) + "\"",
-                                  "\"" + AbstractTest.convertTcl(entry.getValue().toString()) + "\"");
-        }*/
+        this.getSingles()   .append4Update("    ", strg);
+        this.getValues()    .append4Update("    ", strg);
+        this.getKeyValues() .append4Update("    ", strg);
+
+        strg.append("}");
+
+        return strg.toString();
     }
 }

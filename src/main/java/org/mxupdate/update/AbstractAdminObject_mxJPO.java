@@ -18,7 +18,6 @@ package org.mxupdate.update;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,7 +31,6 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
@@ -42,8 +40,6 @@ import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.update.util.UpdateBuilder_mxJPO;
-import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -59,7 +55,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @param <CLASS> derived from this class
  */
 public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObject_mxJPO<CLASS>>
-    extends AbstractPropertyObject_mxJPO
+    extends AbstractPropertyObject_mxJPO<CLASS>
 {
     /**
      * Name of the parameter to suppress warnings for not parsed URLs.
@@ -155,21 +151,6 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
                      ? tmp.substring(length)
                      : "";
     }
-
-    /**
-     * Parses the given {@code _code} and updates this data instance.
-     *
-     * @param _code     code to parse
-     * @throws SecurityException
-     * @throws IllegalArgumentException
-     * @throws NoSuchMethodException
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws InvocationTargetException
-     * @throws ParseException
-     */
-    public abstract void parseUpdate(final String _code)
-        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException;
 
     /**
      * Creates a XML representation of the Object to export, parses them and
@@ -285,41 +266,6 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     }
 
     /**
-     * Writes the complete update code.
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          writer instance
-     * @throws IOException  if the write of the TCL update to the writer
-     *                      instance failed
-     * @throws MatrixException if an execution of a MQL command failed
-     */
-    @Override()
-    protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Appendable _out)
-        throws IOException
-    {
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(this.getFileName(), _paramCache);
-
-        updateBuilder.start(this.getTypeDef().getMxAdminName());
-
-        this.writeUpdate(updateBuilder);
-
-        updateBuilder.end();
-
-        _out.append(updateBuilder.toString());
-    }
-
-    /**
-     * Writes the update file content to the builder.
-     *
-     * @param _updateBuilder    update builder
-     */
-    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
-    {
-        throw new Error("not implemented");
-    }
-
-    /**
      * Deletes administration object from given type with given name.
      *
      * @param _paramCache   parameter cache
@@ -430,17 +376,20 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
                                final String... _args)
         throws Exception
     {
-        if ((_args.length == 7) && "mxUpdate".equals(_args[0]) && this.getTypeDef().getMxAdminName().equals(_args[1])) {
+        if ((_args.length == 8) && "mxUpdate".equals(_args[0]) && this.getTypeDef().getMxAdminName().equals(_args[1])) {
 
-            final CLASS clazz = (CLASS) this.getTypeDef().newTypeInstance(_args[2]);
+            final String name = _args[2].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\");
+            final String devi = _args[4].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\");
 
-            clazz.parseUpdate(_args[3].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\"));
+            final CLASS clazz = (CLASS) this.getTypeDef().newTypeInstance(name);
+
+            clazz.parseUpdate(devi);
 
             // MxUpdate File Date => must be always overwritten if newer!
             clazz.getProperties().setValue4KeyValue(
                     _paramCache,
                     PropertyDef_mxJPO.FILEDATE,
-                    _args[4]);
+                    _args[5]);
 
             // installed date => reuse if already defined, new is not
             final String curInstalledDate = this.getProperties().getValue4KeyValue(_paramCache, PropertyDef_mxJPO.INSTALLEDDATE);
@@ -467,14 +416,14 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
             clazz.getProperties().setValue4KeyValue(
                     _paramCache,
                     PropertyDef_mxJPO.SUBPATH,
-                    FileHandlingUtil_mxJPO.extraceSubPath(_args[5], this.getTypeDef().getFilePath()));
+                    FileHandlingUtil_mxJPO.extraceSubPath(_args[6], this.getTypeDef().getFilePath()));
 
             // initialize MQL builder (with or w/o suffix!)
             final MultiLineMqlBuilder mql;
             if ((this.getTypeDef().getMxAdminSuffix() != null) && !this.getTypeDef().getMxAdminSuffix().isEmpty())  {
-                mql = MqlBuilder_mxJPO.multiLine(new File(_args[5]), "escape mod " + this.getTypeDef().getMxAdminName() + " $1 " + this.getTypeDef().getMxAdminSuffix(), this.getName());
+                mql = MqlBuilder_mxJPO.multiLine(new File(_args[6]), "escape mod " + this.getTypeDef().getMxAdminName() + " $1 " + this.getTypeDef().getMxAdminSuffix(), this.getName());
             } else  {
-                mql = MqlBuilder_mxJPO.multiLine(new File(_args[5]), "escape mod " + this.getTypeDef().getMxAdminName() + " $1", this.getName());
+                mql = MqlBuilder_mxJPO.multiLine(new File(_args[6]), "escape mod " + this.getTypeDef().getMxAdminName() + " $1", this.getName());
             }
 
             clazz.calcDelta(_paramCache, mql, (CLASS) this);
@@ -484,22 +433,6 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
             super.jpoCallExecute(_paramCache, _args);
         }
     }
-
-    /**
-     * Calculates the delta between given {@code _current} admin object
-     * definition and this target admin object definition and appends the MQL
-     * append commands to {@code _mql}.
-     *
-     * @param _paramCache   parameter cache
-     * @param _mql          builder to append the MQL commands
-     * @param _current      current admin object definition
-     * @throws UpdateException_mxJPO if update is not allowed (e.g. if data can
-     *                      be potentially lost)
-     */
-    protected abstract void calcDelta(final ParameterCache_mxJPO _paramCache,
-                                      final MultiLineMqlBuilder _mql,
-                                      final CLASS _current)
-        throws UpdateException_mxJPO;
 
     /**
      * Getter method for instance variable {@link #hidden}.

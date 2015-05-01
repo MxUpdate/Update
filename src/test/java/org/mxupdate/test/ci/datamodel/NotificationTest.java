@@ -48,15 +48,11 @@ public class NotificationTest
                 new Object[]{
                         "simple object with description",
                         new NotificationData(this, "Hello \"Test\"", "1")
-                                .setDescription("a \"description\"")},
+                                .setValue("description", "a \"description\"")},
                 new Object[]{
                         "simple object with description and single apostrophe",
                         new NotificationData(this, "Hello \"Test\" 'with single apostrophe'", "1")
-                                .setDescription("a \"description\" with single 'apostrophe'")},
-                new Object[]{
-                        "complex object",
-                        new NotificationData(this, "HelloTest", "1")
-                                .setValue("Attachments", "complex \"data\" 'and single 'apostrophe'")},
+                                .setValue("description", "a \"description\" with single 'apostrophe'")},
         };
     }
 
@@ -80,7 +76,8 @@ public class NotificationTest
      * @param _notification     notification to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "busDatas", description = "test export of new created notification objects")
+    @Test(description = "test export of new created notification objects",
+          dataProvider = "busDatas")
     public void simpleExport(final String _description,
                              final NotificationData _notification)
         throws Exception
@@ -97,13 +94,15 @@ public class NotificationTest
      * @param _notification     notification to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "busDatas", description = "test update of non existing table")
+    @Test(description = "test update of non existing table",
+          dataProvider = "busDatas")
     public void simpleUpdate(final String _description,
                              final NotificationData _notification)
         throws Exception
     {
         // first update with original content
         _notification.update((String) null);
+
         final ExportParser exportParser = _notification.export();
         _notification.checkExport(exportParser);
 

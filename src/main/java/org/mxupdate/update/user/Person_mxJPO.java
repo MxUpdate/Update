@@ -809,7 +809,7 @@ public class Person_mxJPO
                 final BusinessObject bus = new BusinessObject(this.getBusType(),
                                                               this.getBusName(),
                                                               this.getBusRevision(),
-                                                              this.getBusVault());
+                                                              null/*this.getBusVault()*/);
 
                 try  {
                     bus.open(_paramCache.getContext());
@@ -928,11 +928,11 @@ public class Person_mxJPO
             throws IOException
         {
             _out.append("mql mod bus \"${OBJECTID}\"")
-                .append(" \\\n    description \"").append(StringUtil_mxJPO.convertTcl(this.getBusDescription())).append("\"");
-            for (final AttributeValue attr : this.getAttrValuesSorted())  {
+                .append(" \\\n    description \"").append(StringUtil_mxJPO.convertTcl(this.getDescription())).append("\"");
+            /*for (final AttributeValue attr : this.getAttrValuesSorted())  {
                 _out.append(" \\\n    \"").append(StringUtil_mxJPO.convertTcl(attr.name))
                     .append("\" \"").append(StringUtil_mxJPO.convertTcl(attr.value)).append("\"");
-              }
+              }*/
             // employee of
             final Collection<String> matchEmpl = _paramCache.getValueList(Person_mxJPO.PARAM_EMPLOYEE_IGNORE);
             if ((matchEmpl == null) || !StringUtil_mxJPO.match(this.getName(), matchEmpl))  {
@@ -984,7 +984,7 @@ public class Person_mxJPO
             final BusinessObject bus = new BusinessObject(this.getBusType(),
                                                           this.getBusName(),
                                                           this.getBusRevision(),
-                                                          this.getBusVault());
+                                                          null/*this.getBusVault()*/);
             final String objectId = bus.getObjectId(_paramCache.getContext());
 
             // prepare map of all TCL variables incl. id of business object
