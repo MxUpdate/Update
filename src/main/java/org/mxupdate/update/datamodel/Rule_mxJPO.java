@@ -134,6 +134,7 @@ public class Rule_mxJPO
     {
         _updateBuilder
                 //              tag                 | default | value                              | write?
+                .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",                  this.getDescription())
                 .flag(          "hidden",               false,  this.isHidden())
                 .flagIfTrue(    "enforcereserveaccess", false,  this.enforcereserveaccess,          _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMRuleSupportsEnforceReserveAccess))
@@ -146,6 +147,7 @@ public class Rule_mxJPO
                              final MultiLineMqlBuilder _mql,
                              final Rule_mxJPO _current)
     {
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",        this.getDescription(),   _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false, this.isHidden(),         _current.isHidden());
         if (_paramCache.getValueBoolean(ValueKeys.DMRuleSupportsEnforceReserveAccess))  {

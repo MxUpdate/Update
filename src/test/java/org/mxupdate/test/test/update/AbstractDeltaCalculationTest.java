@@ -106,7 +106,9 @@ public abstract class AbstractDeltaCalculationTest<DATA extends AbstractAdminObj
             } else  {
                 mql1 = MqlBuilder_mxJPO.multiLine("escape mod " + currentWrapper.getTypeDef().getMxAdminName() + " $1", _currentData.getName());
             }
-            currentWrapper.calcDelta(paramCache, mql1,  new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName())));
+            final WrapperCIInstance<DATA> tmp = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()));
+            tmp.parse(paramCache);
+            currentWrapper.calcDelta(paramCache, mql1,  tmp);
             mql1.exec(paramCache);
 
             // prepare the target form

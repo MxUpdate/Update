@@ -32,7 +32,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class RuleCI_3AccessTest
+public class RuleCI_4AccessTest
     extends AbstractDataExportUpdate<RuleData>
     implements IAccessTest
 {

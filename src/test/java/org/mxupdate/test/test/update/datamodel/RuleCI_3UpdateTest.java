@@ -18,18 +18,19 @@ package org.mxupdate.test.test.update.datamodel;
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.data.datamodel.RuleData;
 import org.mxupdate.test.util.Version;
+import org.mxupdate.update.datamodel.Rule_mxJPO;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test class for rule exports and updates.
+ * Tests the {@link Rule_mxJPO rule CI} export / update.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class RuleCI_2UpdateTest
+public class RuleCI_3UpdateTest
     extends AbstractDataExportUpdate<RuleData>
 {
     /**

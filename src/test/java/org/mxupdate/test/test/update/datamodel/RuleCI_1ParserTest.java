@@ -35,9 +35,16 @@ public class RuleCI_1ParserTest
     public Object[][] getData()
     {
         return new Object[][]  {
-                {"1) simple",
+                {"0) simple",
                         "",
                         "description \"\" !hidden !enforcereserveaccess"},
+                // registered name
+                {"1a) symbolic name",
+                        "",
+                        "symbolicname \"rule_abc\" description \"\" !hidden !enforcereserveaccess"},
+                {"1b) two symbolic names",
+                        "symbolicname \"rule_abc\" symbolicname \"rule_def\" description \"\" !hidden !enforcereserveaccess",
+                        "symbolicname \"rule_def\" symbolicname \"rule_abc\" description \"\" !hidden !enforcereserveaccess"},
                 // description
                 {"2a) description",
                         "",

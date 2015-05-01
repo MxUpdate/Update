@@ -26,11 +26,7 @@ package org.mxupdate.update.datamodel;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.datamodel.Rule_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
@@ -39,7 +35,6 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
-import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
  * Parses the update format for {@link Rule_mxJPO}.
@@ -56,7 +51,9 @@ class RuleParser
 
 <DEFAULT> TOKEN :
 {
-      <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+
+    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
     | <HIDDEN_TRUE:                         "hidden">
     | <HIDDEN_FALSE:                        "!hidden">
@@ -166,22 +163,26 @@ void parse(final Rule_mxJPO _rule)
     AdminProperty property;
     Access access = new Access();
 } {
-    (   ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>   {this.setValue(_rule, "description", this.getString(tmp.image));}
-                                    | tmp = <MULTILINESINGLE>   {this.setValue(_rule, "description", this.getSingle(tmp.image));} ) )
+    (   ( <SYMBOLICNAME>            ( tmp = <STRING>            {this.appendValue(_rule, "symbolicNames",       this.getString(tmp.image));}
+                                    | tmp = <SINGLE>            {this.appendValue(_rule, "symbolicNames",       this.getSingle(tmp.image));} ) )
 
-      | ( <HIDDEN_TRUE>                                         {this.setValue(_rule, "hidden",       true);} )
-      | ( <HIDDEN_FALSE>                                        {this.setValue(_rule, "hidden",       false);} )
+      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>   {this.setValue(_rule, "description",            this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>   {this.setValue(_rule, "description",            this.getSingle(tmp.image));} ) )
 
-      | ( <ENFORCERESERVEACCESS_TRUE>                           {this.setValue(_rule, "enforcereserveaccess", true);} )
-      | ( <ENFORCERESERVEACCESS_FALSE>                          {this.setValue(_rule, "enforcereserveaccess", false);} )
+      | ( <HIDDEN_TRUE>                                         {this.setValue(_rule, "hidden",                 true);} )
+      | ( <HIDDEN_FALSE>                                        {this.setValue(_rule, "hidden",                 false);} )
 
-      | ( ( <REVOKE>                                            {this.setValue(access, "revoke", true);} ) ?
-          ( <LOGIN>                                             {this.setValue(access, "login", true);} ) ?
-                ( <OWNER>                                       {this.setValue(access, "kind", "owner");}
-                | <PUBLIC>                                      {this.setValue(access, "kind", "public");}
-                | <USER>    ( tmp = <ACCESS_STRING>             {this.setValue(access, "kind", "user");this.setValue(access, "userRef", this.getString(tmp.image));}
-                            | tmp = <ACCESS_SINGLE_STRING>      {this.setValue(access, "kind", "user");this.setValue(access, "userRef", this.getSingle(tmp.image));} ) )
-                                    stateAccessDef(access)      {this.appendValue(_rule, "accessList", "accessList", access);/*reset*/access = new Access();} )
+      | ( <ENFORCERESERVEACCESS_TRUE>                           {this.setValue(_rule, "enforcereserveaccess",   true);} )
+      | ( <ENFORCERESERVEACCESS_FALSE>                          {this.setValue(_rule, "enforcereserveaccess",   false);} )
+
+      | ( ( <REVOKE>                                            {this.setValue(access, "revoke",                true);} ) ?
+          ( <LOGIN>                                             {this.setValue(access, "login",                 true);} ) ?
+                ( <OWNER>                                       {this.setValue(access, "kind",                  "owner");}
+                | <PUBLIC>                                      {this.setValue(access, "kind",                  "public");}
+                | <USER>                                        {this.setValue(access, "kind",                  "user");}
+                            ( tmp = <ACCESS_STRING>             {this.setValue(access, "userRef",               this.getString(tmp.image));}
+                            | tmp = <ACCESS_SINGLE_STRING>      {this.setValue(access, "userRef",               this.getSingle(tmp.image));} ) )
+                                    stateAccessDef(access)      {this.appendValue(_rule, "accessList",          "accessList", access);/*reset*/access = new Access();} )
 
       | (<PROPERTY>                                             {property = new AdminProperty();this.appendValue(_rule, "properties", "propertiesStack", property);}
                                     ( tmp = <STRING>            {this.setValue(property, "name", this.getString(tmp.image));}
