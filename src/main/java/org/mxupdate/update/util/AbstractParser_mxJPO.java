@@ -30,19 +30,6 @@ import org.mxupdate.update.AbstractAdminObject_mxJPO;
  */
 public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_mxJPO<?>>
 {
-    // hint: to avoid challenges with backslashes, they are defined directly via character
-    /** Regular expression for a backslash n converted to new line. */
-    private final static String MQL_CONVERT_BACKSLASH_N                     = "" + ((char) 0x005c) + ((char) 0x005c) + "n";
-    /** Regular expression for a backslash apostrophe converted to apostrophe. */
-    private final static String MQL_CONVERT_BACKSLASH_APOSTROPHE            = "" + ((char) 0x005c) + ((char) 0x005c) + "\"";
-    /** Regular expression for a backslash } converted to }. */
-    private final static String MQL_CONVERT_BACKSLASH_CURLY_BRACKEN_OPEN    = "" + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c) + "{";
-    /** Regular expression for a backslash { converted to {. */
-    private final static String MQL_CONVERT_BACKSLASH_CURLY_BRACKEN_CLOSE   = "" + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c) + "}";
-    /** Regular expression for a backslash backslash converted to backslash. */
-    private final static String MQL_CONVERT_BACKSLASH_BACKSLASH_FROM        = "" + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c);
-    private final static String MQL_CONVERT_BACKSLASH_BACKSLASH_TO          = "" + ((char) 0x005c) + ((char) 0x005c);
-
     /**
      * The stream is parsed and the result is stored in given instance
      * {@code _ciObj}.
@@ -138,36 +125,6 @@ public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_
                             final Object _value)
     {
         this.getField(this.getField(_object, _fieldName1).get(), _fieldName2).set(_value);
-    }
-
-    /**
-     * Sets the new <code>_values</code> for field <code>_fieldName</code> of
-     * <code>_object</code>.
-     *
-     * @param _object       object where the field must be updated
-     * @param _fieldName    name of the field to update
-     * @param _values       new values of the field
-     * @deprecated replaced by {@link #appendValues(Object, String, Collection)}
-     */
-    @Deprecated()
-    @SuppressWarnings("unchecked")
-    protected void setValue(final Object _object,
-                            final String _fieldName,
-                            final Collection<?> _values)
-    {
-        try  {
-            final Field field = this.getField(_object, _fieldName).field;
-            final boolean accessible = field.isAccessible();
-            try  {
-                field.setAccessible(true);
-                final Collection<Object> set = (Collection<Object>) field.get(_object);
-                set.addAll(_values);
-            } finally  {
-                field.setAccessible(accessible);
-            }
-        } catch (final Exception e)  {
-            throw new ParseUpdateError(e);
-        }
     }
 
     /**
@@ -322,13 +279,38 @@ public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_
      */
     protected String getString(final String _token)
     {
-        return _token
-            .replaceAll("^\"", "").replaceAll("\"$", "")
-            .replaceAll(AbstractParser_mxJPO.MQL_CONVERT_BACKSLASH_N,                   "\n")
-            .replaceAll(AbstractParser_mxJPO.MQL_CONVERT_BACKSLASH_APOSTROPHE,          "\"")
-            .replaceAll(AbstractParser_mxJPO.MQL_CONVERT_BACKSLASH_CURLY_BRACKEN_OPEN,  "{")
-            .replaceAll(AbstractParser_mxJPO.MQL_CONVERT_BACKSLASH_CURLY_BRACKEN_CLOSE, "}")
-            .replaceAll(AbstractParser_mxJPO.MQL_CONVERT_BACKSLASH_BACKSLASH_FROM,      AbstractParser_mxJPO.MQL_CONVERT_BACKSLASH_BACKSLASH_TO);
+        final char[] token = _token.toCharArray();
+
+        // check for string embedded in apostrophe (must be removed)
+        int idxStart = 0;
+        int idxEnd   = token.length;
+        if (token[0] == '\"' && token[idxEnd - 1] == '\"')  {
+            idxStart++;
+            idxEnd--;
+        }
+
+        final StringBuilder ret = new StringBuilder(idxEnd - idxStart);
+        for (int idx = idxStart; idx < idxEnd; )  {
+            final char ch = token[idx++];
+            switch (ch)  {
+                case '\\':
+                    final char subCh = token[idx++];
+                    switch (subCh)  {
+                        case 'n':
+                            ret.append('\n');
+                            break;
+                        default:
+                            ret.append(subCh);
+                            break;
+                    }
+                    break;
+                default:
+                    ret.append(ch);
+                    break;
+            }
+        }
+
+        return ret.toString();
     }
 
     /**
