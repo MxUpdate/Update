@@ -11,49 +11,51 @@ interface MenuParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int DESCRIPTION = 5;
+  int SYMBOLICNAME = 5;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 6;
+  int DESCRIPTION = 6;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 7;
+  int HIDDEN_TRUE = 7;
   /** RegularExpression Id. */
-  int TREEMENU_TRUE = 8;
+  int HIDDEN_FALSE = 8;
   /** RegularExpression Id. */
-  int TREEMENU_FALSE = 9;
+  int TREEMENU_TRUE = 9;
   /** RegularExpression Id. */
-  int ALT = 10;
+  int TREEMENU_FALSE = 10;
   /** RegularExpression Id. */
-  int HREF = 11;
+  int ALT = 11;
   /** RegularExpression Id. */
-  int LABEL = 12;
+  int HREF = 12;
   /** RegularExpression Id. */
-  int COMMAND = 13;
+  int LABEL = 13;
   /** RegularExpression Id. */
-  int MENU = 14;
+  int COMMAND = 14;
   /** RegularExpression Id. */
-  int STRING = 15;
+  int MENU = 15;
   /** RegularExpression Id. */
-  int SINGLE = 16;
+  int STRING = 16;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 17;
+  int SINGLE = 17;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 18;
+  int MULTILINESTRING = 18;
   /** RegularExpression Id. */
-  int SETTING = 19;
+  int MULTILINESINGLE = 19;
   /** RegularExpression Id. */
-  int SETTING_STRING = 20;
+  int SETTING = 20;
   /** RegularExpression Id. */
-  int SETTING_SINGLE = 21;
+  int SETTING_STRING = 21;
   /** RegularExpression Id. */
-  int PROPERTY = 22;
+  int SETTING_SINGLE = 22;
   /** RegularExpression Id. */
-  int PROPERTYTO = 23;
+  int PROPERTY = 23;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 24;
+  int PROPERTYTO = 24;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 25;
+  int PROPERTYVAL = 25;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 26;
+  int ADMINTYPE_STRING = 26;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 27;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -73,6 +75,7 @@ interface MenuParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"symbolicname\"",
     "\"description\"",
     "\"hidden\"",
     "\"!hidden\"",

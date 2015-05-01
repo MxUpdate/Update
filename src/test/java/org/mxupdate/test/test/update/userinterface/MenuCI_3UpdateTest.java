@@ -21,13 +21,14 @@ import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ci.userinterface.AbstractUITest;
 import org.mxupdate.test.data.userinterface.CommandData;
 import org.mxupdate.test.data.userinterface.MenuData;
+import org.mxupdate.update.userinterface.Menu_mxJPO;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test cases for the export and update of menus.
+ * Tests the {@link Menu_mxJPO menu CI} export / update.
  *
  * @author The MxUpdate Team
  */

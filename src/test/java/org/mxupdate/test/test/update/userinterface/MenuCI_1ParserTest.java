@@ -22,7 +22,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link Menu_mxJPO menu} parser.
+ * Tests the {@link Menu_mxJPO menu CI} parser.
  *
  * @author The MxUpdate Team
  */
@@ -36,9 +36,16 @@ public class MenuCI_1ParserTest
     {
         return new Object[][]
         {
-            {"1) simple",
+            {"0) simple",
                     "",
                     "description \"\" label \"\" href \"\" alt \"\""},
+            // registered name
+            {"1a) symbolic name",
+                    "",
+                    "symbolicname \"menu__abc\" description \"\" label \"\" href \"\" alt \"\""},
+            {"1b) two symbolic names",
+                    "symbolicname \"menu__abc\" symbolicname \"menu__def\" description \"\" label \"\" href \"\" alt \"\"",
+                    "symbolicname \"menu__def\" symbolicname \"menu__abc\" description \"\" label \"\" href \"\" alt \"\""},
             // description
             {"2a) description",
                     "",

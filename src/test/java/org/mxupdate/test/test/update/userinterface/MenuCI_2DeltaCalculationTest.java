@@ -29,7 +29,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link Menu_mxJPO menu} delta calculation.
+ * Tests the {@link Menu_mxJPO menu CI} delta calculation.
  *
  * @author The MxUpdate Team
  */
@@ -42,18 +42,25 @@ public class MenuCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
-                {"simple test",
+                {"1) simple test",
                     new MenuData(this, "Menu1"),
                     new MenuData(this, "Menu1").setValue("description", "test").setValue("label", "").setValue("href", "").setValue("alt", "")},
-                {"tree menu",
+                {"2a) symbolic name",
+                    new MenuData(this, "Test"),
+                    new MenuData(this, "Test").setValue("symbolicname", "expression_123")},
+                {"2b) two symbolic name",
+                    new MenuData(this, "Test"),
+                    new MenuData(this, "Test").setValue("symbolicname", "expression_123").setValue("symbolicname", "expression_345")},
+                {"3) tree menu",
                     new MenuData(this, "Menu1"),
                     new MenuData(this, "Menu1").setTreeMenu(true)},
-                {"property name and value",
+                {"4) property name and value",
                     new MenuData(this, "Menu1"),
                     new MenuData(this, "Menu1").addProperty(new PropertyDef("property", "value"))},
        };
     }
 
+    @Override
     @BeforeMethod()
     @AfterClass(groups = "close" )
     public void cleanup()

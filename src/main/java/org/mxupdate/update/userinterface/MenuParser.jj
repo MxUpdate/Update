@@ -26,7 +26,6 @@ PARSER_BEGIN(MenuParser)
 package org.mxupdate.update.userinterface;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.AbstractRef;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.CommandRef;
@@ -56,15 +55,24 @@ PARSER_END(MenuParser)
 
 TOKEN :
 {
-      <DESCRIPTION:             "description">                                  : MULTILINESTRING_EXPECTED
+      <SYMBOLICNAME:            "symbolicname">                                 : STRING_EXPECTED
+
+    | <DESCRIPTION:             "description">                                  : MULTILINESTRING_EXPECTED
+
     | <HIDDEN_TRUE:             "hidden">
     | <HIDDEN_FALSE:            "!hidden">
+
     | <TREEMENU_TRUE:           "treemenu">
     | <TREEMENU_FALSE:          "!treemenu">
+
     | <ALT:                     "alt">                                          : STRING_EXPECTED
+
     | <HREF:                    "href">                                         : STRING_EXPECTED
+
     | <LABEL:                   "label">                                        : STRING_EXPECTED
+
     | <COMMAND:                 ("add" ([" ","\t","\n","\r"])+ )? "command">    : STRING_EXPECTED
+
     | <MENU:                    ("add" ([" ","\t","\n","\r"])+ )? "menu">       : STRING_EXPECTED
 }
 
@@ -123,16 +131,25 @@ void parse(Menu_mxJPO _menu)
     AbstractRef ref;
     int refIdx = 0;
 } {
-    (   (<DESCRIPTION>              ( tmp = <MULTILINESTRING>  {this.setValue(_menu, "description", this.getString(tmp.image));}
+    (   ( <SYMBOLICNAME>            ( tmp = <STRING>           {this.appendValue(_menu, "symbolicNames", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.appendValue(_menu, "symbolicNames", this.getSingle(tmp.image));} ) )
+
+
+      | (<DESCRIPTION>              ( tmp = <MULTILINESTRING>  {this.setValue(_menu, "description", this.getString(tmp.image));}
                                     | tmp = <MULTILINESINGLE>  {this.setValue(_menu, "description", this.getSingle(tmp.image));} ) )
+
       | (<HIDDEN_TRUE>                                         {this.setValue(_menu, "hidden", true);} )
       | (<HIDDEN_FALSE>                                        {this.setValue(_menu, "hidden", false);} )
+
       | (<TREEMENU_TRUE>                                       {this.setValue(_menu, "treeMenu", true);} )
       | (<TREEMENU_FALSE>                                      {this.setValue(_menu, "treeMenu", false);} )
+
       | (<ALT>                      ( tmp = <STRING>           {this.setValue(_menu, "alt", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(_menu, "alt", this.getSingle(tmp.image));} ) )
+
       | (<HREF>                     ( tmp = <STRING>           {this.setValue(_menu, "href", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(_menu, "href", this.getSingle(tmp.image));} ) )
+
       | (<LABEL>                    ( tmp = <STRING>           {this.setValue(_menu, "label", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(_menu, "label", this.getSingle(tmp.image));} ) )
 
