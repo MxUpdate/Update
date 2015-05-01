@@ -15,10 +15,9 @@
 
 package org.mxupdate.update.user;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
 
 import matrix.util.MatrixException;
 
@@ -26,25 +25,30 @@ import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * The class is used to export and import / update association configuration
  * items.
+ * The handled properties are:
+ * <ul>
+ * <li>description</li>
+ * <li>hidden flag</li>
+ * <li>{@link #definition}</li>
+ * <li>properties</li>
  *
  * @author The MxUpdate Team
  */
 public class Association_mxJPO
     extends AbstractAdminObject_mxJPO<Association_mxJPO>
 {
-    /**
-     * Stores the definition of this association instance.
-     */
-    private String definition = null;
+    /** Stores the definition of this association instance. */
+    private String definition = "";
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -62,6 +66,8 @@ public class Association_mxJPO
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
+        new AssociationParser_mxJPO(new StringReader(_code)).parse(this);
+        this.prepare();
     }
 
     /**
@@ -87,69 +93,6 @@ public class Association_mxJPO
             parsed = super.parse(_paramCache, _url, _content);
         }
         return parsed;
-    }
-
-    /**
-     * Writes specific information about the cached associations to the given
-     * writer instance.
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the TCL update code for the association could not
-     *                     be written
-     */
-    @Override()
-    protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
-        throws IOException
-    {
-        _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden")
-            .append(" \\\n    definition \"").append(StringUtil_mxJPO.convertTcl(this.definition)).append("\"");
-    }
-
-    /**
-     * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this association. Following
-     * steps are done:
-     * <ul>
-     * <li>reset description</li>
-     * <li>set definition to current context user</li>
-     * </ul>
-     *
-     * @param _paramCache       parameter cache
-     * @param _preMQLCode       MQL statements which must be called before the
-     *                          TCL code is executed
-     * @param _postMQLCode      MQL statements which must be called after the
-     *                          TCL code is executed
-     * @param _preTCLCode       TCL code which is defined before the source
-     *                          file is sourced
-     * @param _tclVariables     map of all TCL variables where the key is the
-     *                          name and the value is value of the TCL variable
-     *                          (the value is automatically converted to TCL
-     *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update from derived class failed
-     */
-    @Override()
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final CharSequence _preMQLCode,
-                          final CharSequence _postMQLCode,
-                          final CharSequence _preTCLCode,
-                          final Map<String,String> _tclVariables,
-                          final File _sourceFile)
-        throws Exception
-    {
-        // description and definition
-        final StringBuilder preMQLCode = new StringBuilder()
-                .append("mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append('\"')
-                .append(" description \"\"")
-                .append(" definition \"").append(_paramCache.getContext().getUser()).append("\";\n");
-
-        // append already existing pre MQL code
-        preMQLCode.append(_preMQLCode);
-
-        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
     }
 
     /**
@@ -188,10 +131,35 @@ public class Association_mxJPO
     }
 
     @Override()
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Appendable _out)
+        throws IOException
+    {
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
+
+        this.writeHeader(_paramCache, updateBuilder.getStrg());
+
+        updateBuilder.start("association")
+                //              tag             | default | value                              | write?
+                .string(        "description",              this.getDescription())
+                .flag(          "hidden",            false, this.isHidden())
+                .string(        "definition",               this.definition)
+                .properties(this.getProperties())
+                .end();
+
+        _out.append(updateBuilder.toString());
+    }
+
+    @Override()
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,
                              final Association_mxJPO _current)
         throws UpdateException_mxJPO
     {
+        DeltaUtil_mxJPO.calcValueDelta(     _mql, "description",        this.getDescription(),  _current.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(      _mql, "hidden",      false, this.isHidden(),        _current.isHidden());
+        DeltaUtil_mxJPO.calcValueDelta(     _mql, "definition",         this.definition,        _current.definition);
+
+        this.getProperties().calcDelta(_mql, "", _current.getProperties());
     }
 }

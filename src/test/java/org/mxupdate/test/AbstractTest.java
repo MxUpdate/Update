@@ -146,6 +146,8 @@ public abstract class AbstractTest
         PRG_PAGE("page", null, false, null, null, "Page", "PAGE", "PAGE_", "program/page", true, "mql"),
 
         /** Configuration item group. */
+        USR_ASSOCIATION("association", null, false, null, null, "Association", "ASSOCIATION", "ASSOCIATION_", "user/association", false, "mxUpdate"),
+        /** Configuration item group. */
         USR_GROUP("group", null, false, null, null, "Group", "GROUP", "GROUP_", "user/group", true, "mxUpdate"),
         /** Configuration item person. */
         USR_PERSON("person", "Person", false, "Person", "eService Production", "Person", "PERSON", "PERSON_", "user/person", true, "mql"),
