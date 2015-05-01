@@ -71,46 +71,51 @@ public abstract class AbstractDeltaCalculationTest<DATA extends AbstractAdminObj
                             final TESTDATA _targetData)
         throws Exception
     {
-        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
+        if (_currentData.isSupported(this.getVersion()) && _targetData.isSupported(this.getVersion()))  {
+            final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
 
-        Assert.assertEquals(_currentData.getName(), _targetData.getName(), "check that ci names are equal");
+            Assert.assertEquals(_currentData.getName(), _targetData.getName(), "check that ci names are equal");
 
-        // work-arround: policies must be created manually...
-        if (_currentData instanceof PolicyData)  {
-            _currentData.create();
+            // work-around: policies must be created manually...
+            if (_currentData instanceof PolicyData)  {
+                _currentData.create();
+            }
+            // create the depending objects to be able to connect to them
+            _currentData.createDependings();
+            _targetData.createDependings();
+
+            // prepare the current
+            final Wrapper currentWrapper = new Wrapper(this.createNewData(paramCache, _currentData.getName()));
+            currentWrapper.data.create(paramCache);
+            currentWrapper.data.parseUpdate(this.strip(currentWrapper.data.getTypeDef(), _currentData.ciFile()));
+            final MultiLineMqlBuilder mql1;
+            if ((currentWrapper.data.getTypeDef().getMxAdminSuffix()) != null && !currentWrapper.data.getTypeDef().getMxAdminSuffix().isEmpty())  {
+                mql1 = MqlBuilder_mxJPO.multiLine("escape mod " + currentWrapper.data.getTypeDef().getMxAdminName() + " $1 " + currentWrapper.data.getTypeDef().getMxAdminSuffix(), _currentData.getName());
+            } else  {
+                mql1 = MqlBuilder_mxJPO.multiLine("escape mod " + currentWrapper.data.getTypeDef().getMxAdminName() + " $1", _currentData.getName());
+            }
+            currentWrapper.calcDelta(paramCache, mql1, this.createNewData(paramCache, _currentData.getName()));
+            mql1.exec(paramCache);
+
+            // prepare the target form
+            final Wrapper targetWrapper = new Wrapper(this.createNewData(paramCache, _targetData.getName()));
+            targetWrapper.data.parseUpdate(this.strip(targetWrapper.data.getTypeDef(), _targetData.ciFile()));
+
+            // delta between current and target
+            final MultiLineMqlBuilder mql2;
+            if ((targetWrapper.data.getTypeDef().getMxAdminSuffix()) != null && !targetWrapper.data.getTypeDef().getMxAdminSuffix().isEmpty())  {
+                mql2 = MqlBuilder_mxJPO.multiLine("escape mod " + targetWrapper.data.getTypeDef().getMxAdminName() + " $1 " + targetWrapper.data.getTypeDef().getMxAdminSuffix(), _currentData.getName());
+            } else  {
+                mql2 = MqlBuilder_mxJPO.multiLine("escape mod " + targetWrapper.data.getTypeDef().getMxAdminName() + " $1", targetWrapper.data.getName());
+            }
+            targetWrapper.calcDelta(paramCache, mql2, currentWrapper.data);
+            mql2.exec(paramCache);
+
+            // check result from MX defined from calculated delta
+            final Wrapper resultWrapper = new Wrapper(this.createNewData(paramCache, _targetData.getName()));
+            resultWrapper.parse(paramCache);
+            _targetData.checkExport(new ExportParser(_targetData.getCI(), resultWrapper.write(paramCache), ""));
         }
-
-        // prepare the current
-        final Wrapper currentWrapper = new Wrapper(this.createNewData(paramCache, _currentData.getName()));
-        currentWrapper.data.create(paramCache);
-        currentWrapper.data.parseUpdate(this.strip(currentWrapper.data.getTypeDef(), _currentData.ciFile()));
-        final MultiLineMqlBuilder mql1;
-        if ((currentWrapper.data.getTypeDef().getMxAdminSuffix()) != null && !currentWrapper.data.getTypeDef().getMxAdminSuffix().isEmpty())  {
-            mql1 = MqlBuilder_mxJPO.multiLine("escape mod " + currentWrapper.data.getTypeDef().getMxAdminName() + " $1 " + currentWrapper.data.getTypeDef().getMxAdminSuffix(), _currentData.getName());
-        } else  {
-            mql1 = MqlBuilder_mxJPO.multiLine("escape mod " + currentWrapper.data.getTypeDef().getMxAdminName() + " $1", _currentData.getName());
-        }
-        currentWrapper.calcDelta(paramCache, mql1, this.createNewData(paramCache, _currentData.getName()));
-        mql1.exec(paramCache);
-
-        // prepare the target form
-        final Wrapper targetWrapper = new Wrapper(this.createNewData(paramCache, _targetData.getName()));
-        targetWrapper.data.parseUpdate(this.strip(targetWrapper.data.getTypeDef(), _targetData.ciFile()));
-
-        // delta between current and target
-        final MultiLineMqlBuilder mql2;
-        if ((targetWrapper.data.getTypeDef().getMxAdminSuffix()) != null && !targetWrapper.data.getTypeDef().getMxAdminSuffix().isEmpty())  {
-            mql2 = MqlBuilder_mxJPO.multiLine("escape mod " + targetWrapper.data.getTypeDef().getMxAdminName() + " $1 " + targetWrapper.data.getTypeDef().getMxAdminSuffix(), _currentData.getName());
-        } else  {
-            mql2 = MqlBuilder_mxJPO.multiLine("escape mod " + targetWrapper.data.getTypeDef().getMxAdminName() + " $1", targetWrapper.data.getName());
-        }
-        targetWrapper.calcDelta(paramCache, mql2, currentWrapper.data);
-        mql2.exec(paramCache);
-
-        // check result from MX defined from calculated delta
-        final Wrapper resultWrapper = new Wrapper(this.createNewData(paramCache, _targetData.getName()));
-        resultWrapper.parse(paramCache);
-        _targetData.checkExport(new ExportParser(_targetData.getCI(), resultWrapper.write(paramCache), ""));
     }
 
     /**

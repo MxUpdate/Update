@@ -213,6 +213,46 @@ public class UpdateBuilder_mxJPO
      * @param _list     list to append
      * @return this update builder instance
      */
+    public UpdateBuilder_mxJPO listOneLineSingle(final String _tag,
+                                                 final Collection<String> _list)
+    {
+        this.stepStartNewLine().stepSingle(_tag);
+        this.strg.append(" {");
+        this.first = true;
+        for (final String value : _list)  {
+            this.stepSingle(value);
+        }
+        this.strg.append("}");
+        this.stepEndLine();
+        return this;
+    }
+
+    /**
+     * Appends {@code _list} for {@code _tag} inside a single line if
+     * {@code _write} is <i>true</i>.
+     *
+     * @param _tag      tag
+     * @param _list     list to append
+     * @param _write    flag must be <i>true</i> that the value is written
+     * @return this update builder instance
+     */
+    public UpdateBuilder_mxJPO listOneLineSingleIfTrue(final String _tag,
+                                                       final Collection<String> _list,
+                                                       final boolean _write)
+    {
+        if (_write)  {
+            this.listOneLineSingle(_tag, _list);
+        }
+        return this;
+    }
+
+    /**
+     * Appends {@code _list} for {@code _tag} inside a single line.
+     *
+     * @param _tag      tag
+     * @param _list     list to append
+     * @return this update builder instance
+     */
     public UpdateBuilder_mxJPO listOneLine(final String _tag,
                                            final Collection<String> _list)
     {

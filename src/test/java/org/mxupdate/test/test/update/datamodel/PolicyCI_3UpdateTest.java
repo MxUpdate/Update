@@ -225,7 +225,7 @@ public class PolicyCI_3UpdateTest
                 new Object[]{
                         "issue #179: policy state w/o defined published (and will be false)",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")),
                         new PolicyData(this, "test")
@@ -235,14 +235,14 @@ public class PolicyCI_3UpdateTest
                 new Object[]{
                         "issue #179: policy state with published true",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .setFlag("published", true, Create.ViaValue))},
                 new Object[]{
                         "issue #179: policy state with published false",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .setFlag("published", false, Create.ViaValue))},
@@ -250,100 +250,100 @@ public class PolicyCI_3UpdateTest
                 new Object[]{
                         "issue #182: policy state with enforce true",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .setFlag("enforce", true)},
                 new Object[]{
                         "issue #182: policy state with enforce false (means that not defined)",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .setFlag("enforce", false),
                         new PolicyData(this, "test")},
                 // enforcereserveaccess state flag
                 new Object[] {
                         "issue #216: policy state with enforcereserveaccess true",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .setFlag("enforcereserveaccess", true))},
                 new Object[] {
                         "issue #216: policy state with enforcereserveaccess false",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .setFlag("enforcereserveaccess", false))},
                 new Object[] {
                         "issue #216: policy state with no enforcereserveaccess defined (within export must be defined)",
-                        new PolicyData(this, "test").notSupported(
+                        new PolicyData(this, "test").defNotSupported(
                                 Version.V6R2011x).addState(
                                 new State().setName("create")),
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .setFlag("enforcereserveaccess", false))},
             new Object[] {
                     "issue #216: policy state with notenforcereserveaccess defined",
                     new PolicyData(this, "test")
-                            .notSupported(Version.V6R2011x)
+                            .defNotSupported(Version.V6R2011x)
                             .addState(new State()
                                     .setName("create")
                                     .setFlag("notenforcereserveaccess", true)),
                     new PolicyData(this, "test")
-                            .notSupported(Version.V6R2011x)
+                            .defNotSupported(Version.V6R2011x)
                             .addState(new State()
                                     .setName("create")
                                     .setFlag("enforcereserveaccess", false))},
                new Object[] {
                         "issue #216: policy state with enforcereserveaccess value false defined",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .setValue("enforcereserveaccess", "false")),
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .setFlag("enforcereserveaccess", false))},
                 new Object[] {
                         "issue #216: policy state with enforcereserveaccess value true defined",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .setValue("enforcereserveaccess", "true")),
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .setFlag("enforcereserveaccess", true))},
                 new Object[] {
                         "issue #216: policy state with property and no value",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addProperty(new PropertyDef("Property")))},
                 new Object[] {
                         "issue #216: policy state with property and value",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addProperty(new PropertyDef("Property", "Value 1")))},
                 new Object[] {
                         "issue #216: policy state with property and link to policy",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addProperty(new PropertyDef("Property", new PolicyData(this, "test 2"))))},
                 new Object[] {
                         "issue #216: policy state with property, link and value",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addProperty(new PropertyDef("Property", "Value 1", new PolicyData(this, "test 2"))))},

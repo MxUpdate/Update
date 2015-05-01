@@ -47,11 +47,11 @@ public class RuleCI_2UpdateTest
                 new Object[]{
                         "issue #220: rule with enforce reserve access flag",
                         new RuleData(this, "test").setFlag("enforcereserveaccess", true)
-                                .notSupported(Version.V6R2011x)},
+                                .defNotSupported(Version.V6R2011x)},
                 new Object[]{
                         "issue #220: rule with negative defined enforce reserve access flag (which will not part of the CI file)",
                         new RuleData(this, "test").setFlag("enforcereserveaccess", false)
-                                .notSupported(Version.V6R2011x),
+                                .defNotSupported(Version.V6R2011x),
                         new RuleData(this, "test")}
         );
     }

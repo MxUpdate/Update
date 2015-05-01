@@ -65,7 +65,7 @@ public class GroupTest
                 new Object[]{
                         "2) group with assigned site",
                         new GroupData(this, "test")
-                                .setSite(new SiteData(this, "Test \" Site"))});
+                                .defData("site", new SiteData(this, "Test \" Site"))});
     }
 
 
@@ -94,7 +94,7 @@ public class GroupTest
     {
         this.cleanup(AbstractTest.CI.USR_GROUP);
         this.cleanup(AbstractTest.CI.USR_PERSONADMIN);
-        this.cleanup(AbstractTest.CI.OTHER_SITE);
+        this.cleanup(AbstractTest.CI.SYS_SITE);
         this.cleanup(AbstractTest.CI.PRG_MQL_PROGRAM);
     }
 

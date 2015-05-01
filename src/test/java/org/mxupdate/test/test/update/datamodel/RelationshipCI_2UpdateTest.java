@@ -79,10 +79,10 @@ public class RelationshipCI_2UpdateTest
                         new RelationshipData(this, "TestRelationship").setRule(new RuleData(this, "Rule"))},
                new Object[]{
                        "relationship abstract true",
-                       new RelationshipData(this, "TestRelationship").setFlag("abstract", true, Create.ViaValue).notSupported(Version.V6R2011x, Version.V6R2012x)},
+                       new RelationshipData(this, "TestRelationship").setFlag("abstract", true, Create.ViaValue).defNotSupported(Version.V6R2011x, Version.V6R2012x)},
                new Object[]{
                        "relationship abstract false",
-                       new RelationshipData(this, "TestRelationship").setFlag("abstract", false, Create.ViaValue).notSupported(Version.V6R2011x, Version.V6R2012x),
+                       new RelationshipData(this, "TestRelationship").setFlag("abstract", false, Create.ViaValue).defNotSupported(Version.V6R2011x, Version.V6R2012x),
                        new RelationshipData(this, "TestRelationship")},
                 // from side
                 new Object[]{

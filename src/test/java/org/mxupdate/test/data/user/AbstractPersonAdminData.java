@@ -17,7 +17,6 @@ package org.mxupdate.test.data.user;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -26,7 +25,6 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.testng.Assert;
 
 /**
  * The class is used to define all administration person (which have no related
@@ -496,20 +494,7 @@ public class AbstractPersonAdminData<PERSONDATA extends AbstractPersonAdminData<
     public void checkExport(final ExportParser _exportParser)
     {
         super.checkExport(_exportParser);
-
-        // check access
-        this.checkSingleValue(_exportParser,
-                              "person",
-                              "access",
-                              "\"" + StringUtil_mxJPO.joinTcl(',', false, this.access, "none") + "\"");
-
-        // check administration access
-        this.checkSingleValue(_exportParser,
-                              "person",
-                              "admin",
-                              "\"" + StringUtil_mxJPO.joinTcl(',', false, this.adminAccess, "none") + "\"");
-
-        // prepare list of all assignments
+         // prepare list of all assignments
         final Set<String> assigns = new HashSet<String>();
         for (final GroupData group : this.groups)  {
             assigns.add("group \"" + AbstractTest.convertTcl(group.getName()) + "\"");
@@ -517,49 +502,5 @@ public class AbstractPersonAdminData<PERSONDATA extends AbstractPersonAdminData<
         for (final RoleData role : this.roles)  {
             assigns.add("role \"" + AbstractTest.convertTcl(role.getName()) + "\"");
         }
-
-        // remove all assigned groups / roles in the TCL update file
-        for (final String assign : _exportParser.getLines("/mql/assign/@value"))  {
-            if (assigns.contains(assign))  {
-                assigns.remove(assign);
-            } else  {
-                Assert.assertNotNull(assign, "assign " + assign + "not known");
-            }
-        }
-        Assert.assertEquals(assigns.size(), 0, "check that all assignments for groups / roles are defined");
-
-        // password never expires flag
-        this.checkValueExists(_exportParser, "person", "neverexpires", (this.passwordNeverExpires != null) && this.passwordNeverExpires);
-        this.checkValueExists(_exportParser, "person", "!neverexpires", (this.passwordNeverExpires == null) || !this.passwordNeverExpires);
-
-        // email / icon mail flags
-        final Set<String> enabled = new HashSet<String>(_exportParser.getLines("/mql/enable/@value"));
-        final Set<String> disabled = new HashSet<String>(_exportParser.getLines("/mql/disable/@value"));
-        if ((this.wantsEmail != null) && this.wantsEmail)  {
-            Assert.assertTrue(enabled.contains("email"), "check email enabled");
-            Assert.assertFalse(disabled.contains("email"), "check email not disabled");
-        } else  {
-            Assert.assertFalse(enabled.contains("email"), "check email not enabled");
-            Assert.assertTrue(disabled.contains("email"), "check email disabled");
-        }
-        if ((this.wantsIconMail == null) || this.wantsIconMail)  {
-            Assert.assertTrue(enabled.contains("iconmail"), "check icon mail enabled");
-            Assert.assertFalse(disabled.contains("iconmail"), "check icon mail not disabled");
-        } else  {
-            Assert.assertFalse(enabled.contains("iconmail"), "check icon mail not enabled");
-            Assert.assertTrue(disabled.contains("iconmail"), "check icon mail disabled");
-        }
-
-        // check products
-        final List<String> tclProducts = _exportParser.getLines("/setProducts/@value");
-        Assert.assertEquals(
-                tclProducts.size(),
-                1,
-                "check that exact one line with definition for products exists");
-        final String tclProduct = tclProducts.get(0);
-        Assert.assertEquals(
-                tclProduct,
-                StringUtil_mxJPO.joinTcl(' ', true, this.products, ""),
-                "check that all products are correct defined");
     }
 }

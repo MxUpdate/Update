@@ -51,18 +51,18 @@ public class AttributeRealCI_2UpdateTest
                 "real attribute with defined rangevalue flag 'true'",
                 this.createNewData("hello")
                         .setFlag("rangevalue", true)
-                        .notSupported(Version.V6R2011x)});
+                        .defNotSupported(Version.V6R2011x)});
         ret.add(new Object[]{
                 "real attribute with defined rangevalue flag 'false'",
                 this.createNewData("hello")
                         .setFlag("rangevalue", false)
-                        .notSupported(Version.V6R2011x)});
+                        .defNotSupported(Version.V6R2011x)});
         ret.add(new Object[]{
                 "real attribute with no defined rangevalue flag 'false' (to check default value)",
                 this.createNewData("hello"),
                 this.createNewData("hello")
                         .setFlag("rangevalue", false)
-                        .notSupported(Version.V6R2011x)});
+                        .defNotSupported(Version.V6R2011x)});
 
         // dimension
         ret.add(new Object[]{

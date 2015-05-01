@@ -24,7 +24,7 @@ import org.mxupdate.test.AbstractTest;
  * @author The MxUpdate Team
  */
 public class PersonAdminData
-    extends AbstractPersonAdminData<PersonAdminData>
+    extends AbstractUserData<PersonAdminData>
 {
     /**
      * Constructor to initialize this administration person.
@@ -37,5 +37,28 @@ public class PersonAdminData
                            final String _name)
     {
         super(_test, AbstractTest.CI.USR_PERSONADMIN, _name);
+    }
+
+    @Override
+    public String ciFile()
+    {
+        final StringBuilder strg = new StringBuilder();
+        this.append4CIFileHeader(strg);
+        strg.append("mxUpdate person \"${NAME}\" {\n")
+            .append(" kind admin\n");
+
+        this.getFlags().append4Update("    ", strg);
+        this.getValues().append4Update("    ", strg);
+        this.getDatas().append4Update("    ", strg);
+        this.getSingles().append4Update("    ", strg);
+        this.getProperties().append4Update("    ", strg);
+        for (final String ciLine : this.getCILines())
+        {
+            strg.append("    ").append(ciLine).append('\n');
+        }
+
+        strg.append("}");
+
+        return strg.toString();
     }
 }

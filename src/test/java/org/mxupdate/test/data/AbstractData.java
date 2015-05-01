@@ -60,8 +60,12 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     /** Flag to indicate that this data piece is created.*/
     private boolean created;
 
+    /** Minimum version. */
+    private Version versionMax;
+    /** Maximum version. */
+    private Version versionMin;
     /** Set of versions where this definition is NOT supported. */
-    private final Set<Version> notSupportedVersions = new HashSet<Version>();
+    private final Set<Version> versionsNotSupported = new HashSet<Version>();
 
     /**
      * Constructor to initialize this data piece.
@@ -218,7 +222,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
                 fileName.append(ch);
             }
         }
-        fileName.append(".tcl");
+        fileName.append(".mxu");
 
         return fileName.toString();
     }
@@ -266,15 +270,41 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     }
 
     /**
-     * Defines {@link #notSupportedVersions not supported versions}.
+     * Defines {@link #versionsNotSupported not supported versions}.
      *
      * @param _versions     not supported versions
      * @return this data instance
      */
     @SuppressWarnings("unchecked")
-    public DATA notSupported(final Version... _versions)
+    public DATA defNotSupported(final Version... _versions)
     {
-        this.notSupportedVersions.addAll(Arrays.asList(_versions));
+        this.versionsNotSupported.addAll(Arrays.asList(_versions));
+        return (DATA) this;
+    }
+
+    /**
+     * Defines {@link #versionsNotSupported not supported versions}.
+     *
+     * @param _versions     not supported versions
+     * @return this data instance
+     */
+    @SuppressWarnings("unchecked")
+    public DATA defMaxSupported(final Version _version)
+    {
+        this.versionMax = _version;
+        return (DATA) this;
+    }
+
+    /**
+     * Defines {@link #versionsNotSupported not supported versions}.
+     *
+     * @param _versions     not supported versions
+     * @return this data instance
+     */
+    @SuppressWarnings("unchecked")
+    public DATA defMinSupported(final Version _version)
+    {
+        this.versionMin = _version;
         return (DATA) this;
     }
 
@@ -284,11 +314,13 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @param _version      version to test
      * @return <i>true</i> if {@code _version} is supported; otherwise
      *         <i>false</i>
-     * @see #notSupportedVersions
+     * @see #versionsNotSupported
      */
     public boolean isSupported(final Version _version)
     {
-        return !this.notSupportedVersions.contains(_version);
+        return !this.versionsNotSupported.contains(_version)
+                && ((this.versionMax == null) || _version.max(this.versionMax))
+                && ((this.versionMin == null) || _version.min(this.versionMin));
     }
 
     /**

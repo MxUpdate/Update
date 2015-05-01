@@ -81,8 +81,12 @@ public final class CompareToUtil_mxJPO
     {
         return CompareToUtil_mxJPO.compare(
                 _comparison,
-                (_lhs == null || _lhs != null && _lhs.size() == 0) ? null : (Comparable<T>[]) Array.newInstance(_lhs.iterator().next().getClass(), _lhs.size()),
-                (_rhs == null || _lhs != null && _lhs.size() == 0) ? null : (Comparable<T>[]) Array.newInstance(_rhs.iterator().next().getClass(), _rhs.size()));
+                (_lhs == null || _lhs != null && _lhs.size() == 0)
+                                    ? (Comparable<T>[]) null
+                                    : _lhs.toArray((T[]) Array.newInstance(_lhs.iterator().next().getClass(), _lhs.size())),
+                (_rhs == null || _rhs != null && _rhs.size() == 0)
+                                    ? (Comparable<T>[]) null
+                                    : _rhs.toArray((T[]) Array.newInstance(_rhs.iterator().next().getClass(), _rhs.size())));
     }
 
     /**

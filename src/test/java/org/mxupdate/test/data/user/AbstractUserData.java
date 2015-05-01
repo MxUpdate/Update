@@ -25,7 +25,6 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
-import org.mxupdate.test.data.other.SiteData;
 import org.mxupdate.test.data.user.workspace.CueData;
 import org.mxupdate.test.data.user.workspace.FilterData;
 import org.mxupdate.test.data.user.workspace.QueryData;
@@ -45,9 +44,6 @@ import org.testng.Assert;
 public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
     extends AbstractAdminData<DATA>
 {
-    /** Assigned site for this user. */
-    private SiteData site;
-
     /**
      * Related cues of the workspace data from this user.
      *
@@ -141,36 +137,6 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                                final String _name)
     {
         super(_test, _ci, _name);
-    }
-
-    /**
-     * Defines related site for this user.
-     *
-     * @param _site     site to assign
-     * @return this user data instance
-     * @see #site
-     */
-    @SuppressWarnings("unchecked")
-    public DATA setSite(final SiteData _site)
-    {
-        this.site = _site;
-        if (_site == null)  {
-//            this.getValues().remove("site");
-        } else  {
-            this.setValue("site", this.site.getName());
-        }
-        return (DATA) this;
-    }
-
-    /**
-     * Returns related {@link #site} of this user.
-     *
-     * @return assigned site; or <code>null</code> if not defined
-     * @see #site
-     */
-    public SiteData getSite()
-    {
-        return this.site;
     }
 
     /**
@@ -448,10 +414,7 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                     .append("escape add ")
                     .append(this.getCI().getMxType())
                     .append(" \"").append(AbstractTest.convertMql(this.getName())).append("\"");
-            // if site assigned, the site must be created
-            if (this.site != null)  {
-                this.site.create();
-            }
+
             this.append4Create(cmd);
             cmd.append(";\n");
             this.getTest().mql(cmd);
@@ -516,10 +479,6 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
     {
         super.createDependings();
 
-        // create site
-        if (this.site != null)  {
-            this.site.create();
-        }
         // create cue properties
         for (final CueData<DATA> cue : this.cues)  {
             cue.createDependings();
@@ -573,18 +532,7 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
     @Override()
     public void checkExport(final ExportParser _exportParser)
     {
-        // site
-        if (this.site != null)  {
-            this.checkSingleValue(
-                    _exportParser,
-                    this.getCI().getMxType(),
-                    "site",
-                    "\"" + AbstractTest.convertTcl(this.site.getName()) + "\"");
-        } else  {
-            this.checkNotExistingSingleValue(_exportParser,  this.getCI().getMxType(), "site");
-        }
-
-        // all workspace objects
+         // all workspace objects
         final Set<CueData<DATA>> tmpCues            = new HashSet<CueData<DATA>>(this.cues);
         final Set<FilterData<DATA>> tmpFilters      = new HashSet<FilterData<DATA>>(this.filters);
         final Set<QueryData<DATA>> tmpQueries       = new HashSet<QueryData<DATA>>(this.queries);

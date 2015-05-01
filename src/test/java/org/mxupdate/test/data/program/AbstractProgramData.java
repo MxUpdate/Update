@@ -22,6 +22,7 @@ import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.user.AbstractPersonAdminData;
 import org.mxupdate.test.data.user.AbstractUserData;
+import org.mxupdate.test.data.user.PersonAdminData;
 import org.testng.Assert;
 
 /**
@@ -48,7 +49,7 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
      * @see #setUser(AbstractPersonAdminData)
      * @see #getUser()
      */
-    private AbstractPersonAdminData<?> user;
+    private PersonAdminData user;
 
     /**
      * Execution of the program is deferred.
@@ -144,7 +145,7 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
      * @see #user
      */
     @SuppressWarnings("unchecked")
-    public T setUser(final AbstractPersonAdminData<?> _user)
+    public T setUser(final PersonAdminData _user)
     {
         this.user = _user;
         return (T) this;

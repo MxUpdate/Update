@@ -13,7 +13,7 @@
  *
  */
 
-package org.mxupdate.test.ci.user;
+package org.mxupdate.test.test.update.user;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,6 +22,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.ci.user.AbstractUserTest;
 import org.mxupdate.test.data.other.SiteData;
 import org.mxupdate.test.data.user.AbstractPersonAdminData;
 import org.mxupdate.test.data.user.GroupData;
@@ -39,7 +40,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @param <PERSON> person class
  */
-public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdminData<PERSON>>
+public abstract class AbstractPersonAdminCITest<PERSON extends AbstractPersonAdminData<PERSON>>
     extends AbstractUserTest<PERSON>
 {
     /**
@@ -52,52 +53,52 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
     {
         return this.prepareData("person",
                 new Object[]{
-                        "simple person",
+                        "1) simple person",
                         this.createNewData("hello \" test")
-                                .setValue("description", "\"\\\\ hallo")},
+                                .setValue("comment", "hallo")},
                 new Object[]{
-                        "person with some access",
+                        "2a) person with some access",
                         this.createNewData("hello \" test")
                                 .addAccess("changeName", "changeVault")},
                 new Object[]{
-                        "person with normal access but specific changeName / changevault access but no business access",
+                        "2b) person with normal access but specific changeName / changevault access but no business access",
                         this.createNewData("hello \" test")
                                 .addType("application", "full", "notbusiness", "notsystem", "notinactive", "nottrusted")
                                 .addAccess("changeName", "changeVault")},
                 new Object[]{
-                        "person with normal access but non specific access but no business access",
+                        "2c) person with normal access but non specific access but no business access",
                         this.createNewData("hello \" test")
                                 .addType("application", "full", "notbusiness", "notsystem", "notinactive", "nottrusted")},
                 new Object[]{
-                        "person as business administration for types",
+                        "3a) person as business administration for types",
                         this.createNewData("hello \" test")
                                 .addType("application", "notfull", "business", "notsystem", "notinactive", "nottrusted")
                                 .addAdminAccess("type")},
                 new Object[]{
-                        "person as business administration for types and vaults",
+                        "3b) person as business administration for types and vaults",
                         this.createNewData("hello \" test")
                                 .addType("application", "notfull", "business", "notsystem", "notinactive", "nottrusted")
                                 .addAdminAccess("type", "vault")},
                 new Object[]{
-                        "person with one group",
+                        "4a) person with one group",
                         this.createNewData("hello \" test")
                                 .addGroup(new GroupData(this, "test \"group\""))},
                 new Object[]{
-                        "person with two groups",
+                        "4b) person with two groups",
                         this.createNewData("hello \" test")
                                 .addGroup(new GroupData(this, "test \"group\" 1"))
                                 .addGroup(new GroupData(this, "test \"group\" 2"))},
                 new Object[]{
-                        "person with one role",
+                        "5a) person with one role",
                         this.createNewData("hello \" test")
                                 .addRole(new RoleData(this, "test \"role\""))},
                 new Object[]{
-                        "person with two roles",
+                        "5b) person with two roles",
                         this.createNewData("hello \" test")
                                 .addRole(new RoleData(this, "test \"role\" 1"))
                                 .addRole(new RoleData(this, "test \"role\" 2"))},
                 new Object[]{
-                        "person with two groups and roles",
+                        "5c) person with two groups and roles",
                         this.createNewData("hello \" test")
                                 .addGroup(new GroupData(this, "test \"group\" 1"))
                                 .addGroup(new GroupData(this, "test \"group\" 2"))
@@ -105,60 +106,59 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
                                 .addRole(new RoleData(this, "test \"role\" 2"))},
 
                 new Object[]{
-                        "person with assigned site",
+                        "6a) person with assigned site",
                         this.createNewData("hello \" test")
-                                .setSite(new SiteData(this, "Test \" Site"))},
+                                .defData("site", new SiteData(this, "Test \" Site"))},
                 new Object[]{
-                        "complex person",
+                        "7) complex person",
                         this.createNewData("hello \" test")
                                 .setValue("fullname", "test person \"full name\"")
-                                .setValue("description", "test person \"comment\"")
+                                .setValue("comment", "test person \"comment\"")
                                 .setValue("address", "test person \"address\"")
-                                .setValue("email", "test person \"email\" address")
                                 .setValue("phone", "test person \"phone\"")},
                 new Object[]{
-                        "person no password expires flag defined",
+                        "8a) person no password expires flag defined",
                         this.createNewData("hello \" test")
                                 .setPasswordNeverExpires(null)},
                 new Object[]{
-                        "person with password expires flag defined to true",
+                        "8b) person with password expires flag defined to true",
                         this.createNewData("hello \" test")
                                 .setPasswordNeverExpires(true)},
                 new Object[]{
-                        "person with password expires flag defined to false",
+                        "8c) person with password expires flag defined to false",
                         this.createNewData("hello \" test")
                                 .setPasswordNeverExpires(false)},
                 new Object[]{
-                        "person with no wants email flag",
+                        "9a) person with no wants email flag",
                         this.createNewData("hello \" test")
                                 .setWantsEmail(null)},
                 new Object[]{
-                        "person with wants email flag to true",
+                        "9b) person with wants email flag to true",
                         this.createNewData("hello \" test")
                                 .setWantsEmail(true)},
                 new Object[]{
-                        "person with wants email flag to false",
+                        "9c) person with wants email flag to false",
                         this.createNewData("hello \" test")
                                 .setWantsEmail(false)},
                 new Object[]{
-                        "person with no wants icon mail flag",
+                        "10a) person with no wants icon mail flag",
                         this.createNewData("hello \" test")
                                 .setWantsIconMail(null)},
                 new Object[]{
-                        "person with wants icon mail flag to true",
+                        "10b) person with wants icon mail flag to true",
                         this.createNewData("hello \" test")
                                 .setWantsIconMail(true)},
                 new Object[]{
-                        "person with wants icon mail flag to false",
+                        "10c) person with wants icon mail flag to false",
                         this.createNewData("hello \" test")
                                 .setWantsIconMail(false)},
 
                 new Object[]{
-                        "person with one product",
+                        "11a) person with one product",
                         this.createNewData("hello \" test")
                                 .addProduct("CPF")},
                 new Object[]{
-                        "person with two products",
+                        "11b) person with two products",
                         this.createNewData("hello \" test")
                                 .addProduct("CPF", "DC2")}
         );
@@ -195,7 +195,7 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
         this.cleanup(AbstractTest.CI.USR_PERSONADMIN);
         this.cleanup(AbstractTest.CI.USR_GROUP);
         this.cleanup(AbstractTest.CI.USR_ROLE);
-        this.cleanup(AbstractTest.CI.OTHER_SITE);
+        this.cleanup(AbstractTest.CI.SYS_SITE);
         this.cleanup(AbstractTest.CI.PRG_MQL_PROGRAM);
     }
 
@@ -209,9 +209,8 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
         throws Exception
     {
         final AbstractPersonAdminData<?> person = this.createNewData("hallo \" test")
-                .setSite(new SiteData(this, "Test \" Site"))
+                .defData("site", new SiteData(this, "Test \" Site"))
                 .create()
-                .setSite(null)
                 .update((String) null);
 
         Assert.assertEquals(this.mql("escape print person \""
@@ -219,72 +218,6 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
                                     + "\" select site dump"),
                             "",
                             "check that no site is defined");
-    }
-
-    /**
-     * Check that the hidden flag is removed within update.
-     *
-     * @throws Exception if test failed
-     */
-    @Test(description = "check that the hidden flag is removed within update")
-    public void checkHiddenFlagRemoveWithinUpdate()
-        throws Exception
-    {
-        final AbstractPersonAdminData<?> person = this.createNewData("hello \" test")
-                .setFlag("hidden", true)
-                .create()
-                .setFlag("hidden", null)
-                .update((String) null);
-
-        Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select hidden dump"),
-                            "FALSE",
-                            "check that person is not hidden");
-    }
-
-    /**
-     * Check that the password never expires flag is removed within update.
-     *
-     * @throws Exception if test failed
-     */
-    @Test(description = "check that the hidden flag is removed within update")
-    public void checkPasswordNeverExpiresFlagRemoveWithinUpdate()
-        throws Exception
-    {
-        final AbstractPersonAdminData<?> person = this.createNewData("hello \" test")
-                .setPasswordNeverExpires(true)
-                .create()
-                .setPasswordNeverExpires(null)
-                .update((String) null);
-
-        Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select neverexpires dump"),
-                            "FALSE",
-                            "check that password of person expires");
-    }
-
-    /**
-     * Checks that the password never expires flag is not reset if the
-     * parameter 'UserPersonIgnorePswdNeverExpires' is defined.
-     *
-     * @throws Exception if check failed
-     */
-    @Test(description = "checks that the password never expires flag is not reset if the parameter 'UserPersonIgnorePswdNeverExpires' is defined")
-    public void checkWithIgnoreParameterPasswordNeverExpiresFlagIsNotRemoved()
-        throws Exception
-    {
-        final AbstractPersonAdminData<?> person = this.createNewData("hello \" test")
-                .setPasswordNeverExpires(true)
-                .create()
-                .setPasswordNeverExpires(null)
-                .update((String) null, "UserPersonIgnorePswdNeverExpires", "*");
-
-        // check not updated
-        Assert.assertEquals(this.mql("escape print person \"" + AbstractTest.convertMql(person.getName()) + "\" select neverexpires dump"),
-                            "TRUE",
-                            "check that password of person never expires");
-        // check not defined within update file
-        final ExportParser exportParser = person.export("UserPersonIgnorePswdNeverExpires", "*");
-        person.checkValueExists(exportParser, "person", "neverexpires", false);
-        person.checkValueExists(exportParser, "person", "!neverexpires", false);
     }
 
     /**
@@ -423,7 +356,7 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
      * @throws Exception if test failed
      */
     @Test(description = "checks that assigned products of persons are ignored if the parameter is defined")
-    public void checkWithIgnoreProductsParameter()
+    public void _positiveTestIgnoreProductsParameter()
         throws Exception
     {
         final AbstractPersonAdminData<?> person = this.createNewData("test")
@@ -442,23 +375,5 @@ public abstract class AbstractPersonAdminTest<PERSON extends AbstractPersonAdmin
         Assert.assertTrue(
                 exportParser.getLines("/setProducts/@value").isEmpty(),
                 "check that no product definition is in the export file");
-    }
-
-    /**
-     * Check that the password expires flag is ignored.
-     *
-     * @throws Exception if test failed
-     */
-    @Test(description = "check that the password expires flag is ignored")
-    public void checkPasswordExpiresFlagIgnored()
-        throws Exception
-    {
-        final AbstractPersonAdminData<?> person = this.createNewData("hello")
-                .create()
-                .addType("notinactive");
-
-        this.mql("escape mod person \"" + AbstractTest.convertMql(person.getName()) + "\" passwordexpired");
-
-        person.export();
     }
 }

@@ -56,14 +56,14 @@ public class PolicyCI_4MajorMinorTest
                 new Object[]{
                         "issue #178: policy with delimiter and required minor / major sequence",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .setSingle("delimiter", ".")
                                 .setValue("minorsequence", "A,B,C")
                                 .setValue("majorsequence", "1,2,3")},
                 new Object[]{
                         "issue #178: policy with delimiter and required minor / major sequence ('sequence' key instead of 'minorsequence')",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .setSingle("delimiter", ".")
                                 .setValue("sequence", "A,B,C")
                                 .setValue("majorsequence", "1,2,3"),
@@ -75,21 +75,21 @@ public class PolicyCI_4MajorMinorTest
                 new Object[]{
                         "issue #178 (V6R2011x): policy with state revisionable",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2013x, Version.V6R2014x, Version.V6R2015x)
+                                .defNotSupported(Version.V6R2013x, Version.V6R2014x, Version.V6R2015x)
                                 .addState(new State()
                                             .setName("create")
                                             .setValue("revision", "true"))},
                 new Object[]{
                         "issue #178 (V6R2011x): policy with state not revisionable",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2013x, Version.V6R2014x, Version.V6R2015x)
+                                .defNotSupported(Version.V6R2013x, Version.V6R2014x, Version.V6R2015x)
                                 .addState(new State()
                                             .setName("create")
                                             .setValue("revision", "false"))},
                 new Object[]{
                         "issue #178 (V6R2011x): policy with state revisionable (defined in new style)",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2013x, Version.V6R2014x, Version.V6R2015x)
+                                .defNotSupported(Version.V6R2013x, Version.V6R2014x, Version.V6R2015x)
                                 .addState(new State()
                                             .setName("create")
                                             .setValue("minorrevision", "true")),
@@ -101,7 +101,7 @@ public class PolicyCI_4MajorMinorTest
                 new Object[]{
                         "issue #178: policy state w/o defined revisionable flag",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                             .setName("create")),
                         new PolicyData(this, "test")
@@ -112,7 +112,7 @@ public class PolicyCI_4MajorMinorTest
                new Object[]{
                         "issue #178: policy state with revisionable (defined in old style)",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                             .setName("create")
                                             .setValue("revision", "true")),
@@ -124,7 +124,7 @@ public class PolicyCI_4MajorMinorTest
                 new Object[]{
                         "issue #178: policy state with revisionable",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                             .setName("create")
                                             .setValue("majorrevision", "false")
@@ -132,7 +132,7 @@ public class PolicyCI_4MajorMinorTest
                 new Object[]{
                         "issue #178: policy state with not minor revisionable",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                             .setName("create")
                                             .setValue("majorrevision", "false")
@@ -140,7 +140,7 @@ public class PolicyCI_4MajorMinorTest
                 new Object[]{
                         "issue #178: policy state with major revisionable",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                             .setName("create")
                                             .setValue("majorrevision", "true")

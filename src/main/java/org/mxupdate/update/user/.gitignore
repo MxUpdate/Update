@@ -4,6 +4,9 @@
 /GroupParser.java
 /GroupParserConstants.java
 /GroupParserTokenManager.java
+/PersonAdminParser.java
+/PersonAdminParserConstants.java
+/PersonAdminParserTokenManager.java
 /RoleParser.java
 /RoleParserConstants.java
 /RoleParserTokenManager.java

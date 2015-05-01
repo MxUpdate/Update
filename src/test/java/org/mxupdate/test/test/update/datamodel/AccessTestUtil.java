@@ -96,7 +96,7 @@ public final class AccessTestUtil
                                                         .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
                                                         .addAccess("read", "show")
                                                         .setLocalFilter("current==\"hello\""))
-                                        .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)});
+                                        .defNotSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)});
                     ret.add(new Object[]{
                             _test.getDescriptionPrefix() + " access for " + txt + " all for key",
                             _test.createTestData4Access(
@@ -106,7 +106,7 @@ public final class AccessTestUtil
                                                         .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
                                                         .addAccess("all")
                                                         .setKey("abcd 123"))
-                                        .notSupported(Version.V6R2011x)});
+                                        .defNotSupported(Version.V6R2011x)});
 
                     final PersonAdminData tmpUser = "user".equals(kind) ? new PersonAdminData(test, "creator") : null;
                     ret.add(new Object[]{
@@ -129,7 +129,7 @@ public final class AccessTestUtil
                                                         .setUser(tmpUser)
                                                         .addAccess("toconnect", "todisconnect")
                                                         .setKey("abcd 2"))
-                                        .notSupported(Version.V6R2011x)});
+                                        .defNotSupported(Version.V6R2011x)});
                     // user item 'organization' / 'project'
                     ret.add(new Object[]{
                             _test.getDescriptionPrefix() + " access for " + txt + " for any organization",
@@ -140,7 +140,7 @@ public final class AccessTestUtil
                                                     .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
                                                     .addAccess("read", "show")
                                                     .setOrganization("any"))
-                                    .notSupported(Version.V6R2011x),
+                                    .defNotSupported(Version.V6R2011x),
                             _test.createTestData4Access(
                                             new Access()
                                                     .setPrefix(prefix)
@@ -156,7 +156,7 @@ public final class AccessTestUtil
                                                     .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
                                                     .addAccess("read", "show")
                                                     .setProject("any"))
-                                    .notSupported(Version.V6R2011x),
+                                    .defNotSupported(Version.V6R2011x),
                             _test.createTestData4Access(
                                             new Access()
                                                     .setPrefix(prefix)
@@ -173,7 +173,7 @@ public final class AccessTestUtil
                                                         .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
                                                         .addAccess("read", "show")
                                                         .setOrganization(orgOrProj))
-                                        .notSupported(Version.V6R2011x)});
+                                        .defNotSupported(Version.V6R2011x)});
                         ret.add(new Object[]{
                                 _test.getDescriptionPrefix() + " access for " + txt + " for " + orgOrProj + " project",
                                 _test.createTestData4Access(
@@ -183,7 +183,7 @@ public final class AccessTestUtil
                                                         .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
                                                         .addAccess("read", "show")
                                                         .setProject(orgOrProj))
-                                        .notSupported(Version.V6R2011x)});
+                                        .defNotSupported(Version.V6R2011x)});
                         ret.add(new Object[]{
                                 _test.getDescriptionPrefix() + " access for " + txt + " for any organization and " + orgOrProj + " project",
                                 _test.createTestData4Access(
@@ -194,7 +194,7 @@ public final class AccessTestUtil
                                                         .addAccess("read", "show")
                                                         .setOrganization("any")
                                                         .setProject(orgOrProj))
-                                        .notSupported(Version.V6R2011x),
+                                        .defNotSupported(Version.V6R2011x),
                                 _test.createTestData4Access(new Access()
                                                         .setPrefix(prefix)
                                                         .setKind(kind)
@@ -212,7 +212,7 @@ public final class AccessTestUtil
                                                     .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
                                                     .addAccess("read", "show")
                                                     .setOwner("any"))
-                                    .notSupported(Version.V6R2011x),
+                                    .defNotSupported(Version.V6R2011x),
                             _test.createTestData4Access(
                                             new Access()
                                                     .setPrefix(prefix)
@@ -228,7 +228,7 @@ public final class AccessTestUtil
                                                     .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
                                                     .addAccess("read", "show")
                                                     .setOwner("context"))
-                                    .notSupported(Version.V6R2011x)});
+                                    .defNotSupported(Version.V6R2011x)});
                     // user item 'reserve'
                     ret.add(new Object[]{
                             _test.getDescriptionPrefix() + " access for " + txt + " for any reserve",
@@ -239,7 +239,7 @@ public final class AccessTestUtil
                                                     .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
                                                     .addAccess("read", "show")
                                                     .setReserve("any"))
-                                    .notSupported(Version.V6R2011x),
+                                    .defNotSupported(Version.V6R2011x),
                             _test.createTestData4Access(
                                             new Access()
                                                     .setPrefix(prefix)
@@ -256,7 +256,7 @@ public final class AccessTestUtil
                                                         .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
                                                         .addAccess("read", "show")
                                                         .setReserve(reserve))
-                                        .notSupported(Version.V6R2011x)});
+                                        .defNotSupported(Version.V6R2011x)});
                     }
                     // user item 'maturity'
                     ret.add(new Object[]{
@@ -268,7 +268,7 @@ public final class AccessTestUtil
                                                     .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
                                                     .addAccess("read", "show")
                                                     .setMaturity("any"))
-                                    .notSupported(Version.V6R2011x),
+                                    .defNotSupported(Version.V6R2011x),
                             _test.createTestData4Access(
                                             new Access()
                                                     .setPrefix(prefix)
@@ -285,7 +285,7 @@ public final class AccessTestUtil
                                                         .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
                                                         .addAccess("read", "show")
                                                         .setMaturity(maturity))
-                                        .notSupported(Version.V6R2011x)});
+                                        .defNotSupported(Version.V6R2011x)});
                     }
                     // user item 'category'
                     ret.add(new Object[]{
@@ -297,7 +297,7 @@ public final class AccessTestUtil
                                                     .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
                                                     .addAccess("read", "show")
                                                     .setCategory("any"))
-                                    .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x),
+                                    .defNotSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x),
                             _test.createTestData4Access(
                                             new Access()
                                                     .setPrefix(prefix)
@@ -314,7 +314,7 @@ public final class AccessTestUtil
                                                         .setUser("user".equals(kind) ? new PersonAdminData(test, "creator") : null)
                                                         .addAccess("read", "show")
                                                         .setCategory(category))
-                                        .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)});
+                                        .defNotSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)});
                     }
                     /* Deactivated, because of amount of tests and not realy needed, because also done from parser tests...
                     // user items with combination of all

@@ -847,6 +847,28 @@ public class ParameterCache_mxJPO
 
         /** User role supports role type. */
         UserRoleSupportRoleType,
+        /**
+         * Defines the parameter for the match of persons for which workspace
+         * objects are not handled (neither exported nor updated).
+         */
+        UserIgnoreWSO4Persons,
+        /**
+         * If the parameter is set the 'wants email' - flag for persons is ignored.
+         * This means that the flag is not managed anymore from the MxUpdate Update
+         * tool.
+         */
+        UserPersonIgnoreWantsEmail,
+        /**
+         * If the parameter is set the 'wants icon mail' - flag for persons
+         * matching given string is ignored. This means that the flag is not
+         * managed anymore from the MxUpdate Update tool.
+         */
+        UserPersonIgnoreWantsIconMail,
+        /**
+         * If the parameter is set, products for persons matching given string are
+         * not updated.
+         */
+        UserPersonIgnoreProducts,
 
         /** Boolean that the update continues if a error was thrown. */
         ParamContinueOnError;

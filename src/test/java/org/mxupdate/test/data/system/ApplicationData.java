@@ -13,7 +13,7 @@
  *
  */
 
-package org.mxupdate.test.data.other;
+package org.mxupdate.test.data.system;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger;
@@ -23,19 +23,19 @@ import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger;
  *
  * @author The MxUpdate Team
  */
-public class SiteData
-    extends AbstractDataWithTrigger<SiteData>
+public class ApplicationData
+    extends AbstractDataWithTrigger<ApplicationData>
 {
     /**
-     * Initialize this site data with given <code>_name</code>.
+     * Initialize this type data with given <code>_name</code>.
      *
      * @param _test     related test implementation (where this type is
      *                  defined)
      * @param _name     name of the type
      */
-    public SiteData(final AbstractTest _test,
-                    final String _name)
+    public ApplicationData(final AbstractTest _test,
+                           final String _name)
     {
-        super(_test, AbstractTest.CI.SYS_SITE, _name);
+        super(_test, AbstractTest.CI.SYS_APPLICATION, _name);
     }
 }

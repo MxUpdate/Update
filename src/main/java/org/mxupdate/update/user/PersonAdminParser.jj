@@ -1,0 +1,262 @@
+/*
+ * Copyright 2008-2015 The MxUpdate Team
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+options {
+    JDK_VERSION = "1.6";
+    STATIC = false;
+    ERROR_REPORTING = true;
+    USER_TOKEN_MANAGER = false;
+    GENERATE_BOILERPLATE = false;
+    SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
+}
+PARSER_BEGIN(PersonAdminParser)
+package org.mxupdate.update.user;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+
+import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.user.PersonAdmin_mxJPO.TypeItem;
+import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
+import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
+import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+
+@SuppressWarnings("unused")
+class PersonAdminParser
+    extends AbstractParser_mxJPO<PersonAdmin_mxJPO>
+{
+}
+PARSER_END(PersonAdminParser)<*> SKIP :
+{
+  " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
+}
+
+<DEFAULT> TOKEN : /** first level */
+{
+      <KIND:                                "kind">                                        : KIND_EXPECTED
+    | <COMMENT:                             "comment">                                     : MULTILINESTRING_EXPECTED
+    | <HIDDEN_TRUE:                         "hidden">
+    | <HIDDEN_FALSE:                        "!hidden">
+    | <ACTIVE_TRUE:                         "active">
+    | <ACTIVE_FALSE:                        "!active">
+    | <TRUSTED_TRUE:                        "trusted">
+    | <TRUSTED_FALSE:                       "!trusted">
+    | <EMAIL_TRUE:                          "email">
+    | <EMAIL_FALSE:                         "!email">
+    | <INCONMAIL_TRUE:                      "iconmail">
+    | <INCONMAIL_FALSE:                     "!iconmail">
+    | <VAULT:                               "vault" >                                       : STRING_EXPECTED
+    | <APPLICATION:                         "application" >                                 : STRING_EXPECTED
+    | <SITE:                                "site" >                                        : STRING_EXPECTED
+    | <GROUP:                               "group" >                                       : STRING_EXPECTED
+    | <ROLE:                                "role" >                                        : STRING_EXPECTED
+    | <ADDRESS:                             "address">                                      : STRING_EXPECTED
+    | <EMAILADDRESS:                        "emailaddress">                                 : STRING_EXPECTED
+    | <FAX:                                 "fax">                                          : STRING_EXPECTED
+    | <FULLNAME:                            "fullname">                                     : STRING_EXPECTED
+    | <PHONE:                               "phone">                                        : STRING_EXPECTED
+}
+
+/************************************************************** Common String */
+<STRING_EXPECTED> TOKEN :
+{
+      <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
+    | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/*************************************************** Common Multi-Line-String */
+<MULTILINESTRING_EXPECTED> TOKEN :
+{
+      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
+    | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/*********************************************************************** Kind */
+<KIND_EXPECTED> TOKEN :
+{    <KIND_ADMIN:                             "admin">                                      : DEFAULT
+}
+
+/********************************************************************* Access */
+<DEFAULT> TOKEN :
+{
+       <ACCESS:                              "access">                                     : ACCESS_OPENEXPECTED
+}
+
+<ACCESS_OPENEXPECTED> TOKEN :
+{
+      <ACCESS_ALL:                           "all" >                                       : DEFAULT
+    | <ACCESS_OPEN:                          "{">                                          : ACCESS_EXPECTED
+}
+
+<ACCESS_EXPECTED> TOKEN :
+{
+      <ACCESS_CLOSE:                         "}">                                           : DEFAULT
+    | <ACCESS_EXPECTED_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+>
+}
+
+/********************************************************************** Admin */
+<DEFAULT> TOKEN :
+{
+       <ADMIN:                              "admin">                                        : ADMIN_OPENEXPECTED
+}
+
+<ADMIN_OPENEXPECTED> TOKEN :
+{
+      <ADMIN_ALL:                           "all" >                                         : DEFAULT
+    | <ADMIN_OPEN:                          "{">                                            : ADMIN_EXPECTED
+}
+
+<ADMIN_EXPECTED> TOKEN :
+{
+      <ADMIN_CLOSE:                         "}">                                           : DEFAULT
+    | <ADMIN_EXPECTED_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+>
+}
+
+/*********************************************************************** Type */
+<DEFAULT> TOKEN :
+{
+       <TYPE:                                "type">                                        : TYPE_OPENEXPECTED
+}
+
+<TYPE_OPENEXPECTED> TOKEN :
+{
+      <TYPE_OPEN:                            "{">                                          : TYPE_EXPECTED
+}
+
+<TYPE_EXPECTED> TOKEN :
+{
+      <TYPE_CLOSE:                           "}">                                           : DEFAULT
+    | <TYPE_APPLICATION:                     "application">                                 : TYPE_EXPECTED
+    | <TYPE_FULL:                            "full">                                        : TYPE_EXPECTED
+    | <TYPE_BUSINESS:                        "business">                                    : TYPE_EXPECTED
+    | <TYPE_SYSTEM:                          "system">                                      : TYPE_EXPECTED
+}
+
+/******************************************************************** Product */
+
+<DEFAULT> TOKEN :
+{
+      <PRODUCT:                              "product">                                    : PRODUCT_OPENEXPECTED
+}
+
+<PRODUCT_OPENEXPECTED> TOKEN :
+{
+      <PRODUCT_OPEN:                         "{">                                          : PRODUCT_EXPECTED
+}
+
+<PRODUCT_EXPECTED> TOKEN :
+{
+      <PRODUCT_CLOSE:                        "}">                                           : DEFAULT
+    | <PRODUCT_EXPECTED_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+>
+}
+
+/******************************************************************* Property */
+<DEFAULT> TOKEN :
+{
+      <PROPERTY:                            "property">                                     : STRING_EXPECTED
+    | <PROPERTYTO:                          "to">                                           : ADMINREF_EXPECTED
+    | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
+}
+
+<ADMINREF_EXPECTED> TOKEN :
+{
+      <ADMINTYPE_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
+}
+
+/**************************************************************************** */
+/**
+ * Parses one complete person definition.
+ *
+ * @param _personAdmin  target admin person to update with parsed values
+ */
+void parse(final PersonAdmin_mxJPO _personAdmin)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+: {
+    Token tmp;
+    AdminProperty property;
+} {
+    <KIND> <KIND_ADMIN>
+
+    (  ( <COMMENT>                  ( tmp = <MULTILINESTRING>               {this.setValue(_personAdmin, "description",                     this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>               {this.setValue(_personAdmin, "description",                     this.getSingle(tmp.image));} ) )
+
+      | ( <HIDDEN_TRUE>                                                     {this.setValue(_personAdmin, "hidden",                          true);} )
+      | ( <HIDDEN_FALSE>                                                    {this.setValue(_personAdmin, "hidden",                          false);} )
+      | ( <ACTIVE_TRUE>                                                     {this.setValue(_personAdmin, "active",                          true);} )
+      | ( <ACTIVE_FALSE>                                                    {this.setValue(_personAdmin, "active",                          false);} )
+      | ( <TRUSTED_TRUE>                                                    {this.setValue(_personAdmin, "trusted",                         true);} )
+      | ( <TRUSTED_FALSE>                                                   {this.setValue(_personAdmin, "trusted",                         false);} )
+
+      | ( <ACCESS>      ( <ACCESS_ALL>                                      {this.appendValue(_personAdmin, "access",                       "all");}
+                        | <ACCESS_OPEN> ( tmp = <ACCESS_EXPECTED_SINGLE>    {this.appendValue(_personAdmin, "access",                       this.getString(tmp.image));} )* <ACCESS_CLOSE > ) )
+
+      | ( <ADMIN>       ( <ADMIN_ALL>                                       {this.appendValue(_personAdmin, "admin",                        "all");}
+                        | <ADMIN_OPEN>  ( tmp = <ADMIN_EXPECTED_SINGLE>     {this.appendValue(_personAdmin, "admin",                        this.getString(tmp.image));} )* <ADMIN_CLOSE > ) )
+
+      | ( <EMAIL_TRUE>                                                      {this.setValue(_personAdmin, "email",                           true);} )
+      | ( <EMAIL_FALSE>                                                     {this.setValue(_personAdmin, "email",                           false);} )
+      | ( <INCONMAIL_TRUE>                                                  {this.setValue(_personAdmin, "iconmail",                        true);} )
+      | ( <INCONMAIL_FALSE>                                                 {this.setValue(_personAdmin, "iconmail",                        false);} )
+
+      | ( <ADDRESS>                 ( tmp = <STRING>                        {this.setValue(_personAdmin, "address",                         this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_personAdmin, "address",                         this.getSingle(tmp.image));} ) )
+      | ( <EMAILADDRESS>            ( tmp = <STRING>                        {this.setValue(_personAdmin, "emailAddress",                    this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_personAdmin, "emailAddress",                    this.getSingle(tmp.image));} ) )
+      | ( <FAX>                     ( tmp = <STRING>                        {this.setValue(_personAdmin, "fax",                             this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_personAdmin, "fax",                             this.getSingle(tmp.image));} ) )
+      | ( <FULLNAME>                ( tmp = <STRING>                        {this.setValue(_personAdmin, "fullName",                        this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_personAdmin, "fullName",                        this.getSingle(tmp.image));} ) )
+      | ( <PHONE>                   ( tmp = <STRING>                        {this.setValue(_personAdmin, "phone",                           this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_personAdmin, "phone",                           this.getSingle(tmp.image));} ) )
+
+      | ( <PRODUCT> <PRODUCT_OPEN>  ( tmp = <PRODUCT_EXPECTED_SINGLE>       {this.appendValue(_personAdmin, "products",                     this.getString(tmp.image));} )* <PRODUCT_CLOSE> )
+
+      | ( <TYPE> <TYPE_OPEN>        ( ( <TYPE_APPLICATION>                  {this.appendValue(_personAdmin, "types",                        TypeItem.APPLICATION);} )
+                                    | ( <TYPE_FULL>                         {this.appendValue(_personAdmin, "types",                        TypeItem.FULL);} )
+                                    | ( <TYPE_BUSINESS>                     {this.appendValue(_personAdmin, "types",                        TypeItem.BUSINESS);} )
+                                    | ( <TYPE_SYSTEM>                       {this.appendValue(_personAdmin, "types",                        TypeItem.SYSTEM);} ) )* <TYPE_CLOSE > )
+
+      | (<VAULT>                    ( tmp = <STRING>                        {this.setValue(_personAdmin, "vault",                           this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_personAdmin, "vault",                           this.getSingle(tmp.image));} ) )
+      | (<APPLICATION>              ( tmp = <STRING>                        {this.setValue(_personAdmin, "application",                     this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_personAdmin, "application",                     this.getSingle(tmp.image));} ) )
+      | (<SITE>                     ( tmp = <STRING>                        {this.setValue(_personAdmin, "site",                            this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_personAdmin, "site",                            this.getSingle(tmp.image));} ) )
+
+      | (<GROUP>                    ( tmp = <STRING>                        {this.appendValue(_personAdmin, "groups",                       this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_personAdmin, "groups",                       this.getSingle(tmp.image));} ) )
+
+      | (<ROLE>                     ( tmp = <STRING>                        {this.appendValue(_personAdmin, "roles",                        this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_personAdmin, "roles",                        this.getSingle(tmp.image));} ) )
+
+      | ( <PROPERTY>                                                        {property = new AdminProperty();this.appendValue(_personAdmin, "properties", "propertiesStack", property);}
+                                    ( tmp = <STRING>                        {this.setValue(property, "name", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "name", this.getSingle(tmp.image));} )
+              (   ( <PROPERTYVAL>   ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <ADMINTYPE_SINGLE>              {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                    ( tmp = <STRING>                        {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+    )*
+}

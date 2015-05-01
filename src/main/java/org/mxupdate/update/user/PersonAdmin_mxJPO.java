@@ -15,27 +15,28 @@
 
 package org.mxupdate.update.user;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
-import matrix.db.BusinessObjectWithSelect;
-import matrix.db.BusinessObjectWithSelectList;
-import matrix.db.Query;
 import matrix.util.MatrixException;
-import matrix.util.StringList;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.CompareToUtil_mxJPO;
+import org.mxupdate.update.util.DeltaUtil_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.xml.sax.SAXException;
 
 /**
  * The class is used to handle administration persons.
@@ -45,41 +46,6 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
 public class PersonAdmin_mxJPO
     extends AbstractUser_mxJPO<PersonAdmin_mxJPO>
 {
-    /**
-     * Called TCL procedure within the TCL update to assign current person to
-     * required products. Already assigned products are removed.
-     *
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     */
-    private static final String TCL_SET_PRODUCTS
-            = "proc setProducts {args}  {\n"
-                + "global NAME\n"
-                + "set lsCurrent [split [mql print person \"${NAME}\" select product dump '\\n'] '\\n']\n"
-                + "foreach sOneProduct ${lsCurrent}  {\n"
-                    + "if {([string length \"${sOneProduct}\"] > 0) && ([lsearch ${args} \"${sOneProduct}\"] < 0)}  {\n"
-                        + "logDebug \"    - remove product '${sOneProduct}'\"\n"
-                        + "mql mod product \"${sOneProduct}\" remove person \"${NAME}\"\n"
-                    + "}\n"
-                + "}\n"
-                + "foreach sOneProduct ${args}  {\n"
-                    + "if {[lsearch ${lsCurrent} \"${sOneProduct}\"] < 0}  {\n"
-                      + "logDebug \"    - assign product '${sOneProduct}'\"\n"
-                      + "mql mod product \"${sOneProduct}\" add person \"${NAME}\"\n"
-                    + "}\n"
-                + "}\n"
-            + "}\n";
-
-    /**
-     * Dummy procedure with logging information that the definition of products
-     * is ignored.
-     *
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     */
-    private static final String TCL_SET_PRODUCTS_DUMMY
-            = "proc setProducts {args}  {\n"
-                + "logDebug \"    - ignoring definition of products ${args}\""
-            + "}\n";
-
     /**
      * Set of all ignored URLs from the XML definition for persons.
      *
@@ -99,223 +65,59 @@ public class PersonAdmin_mxJPO
         PersonAdmin_mxJPO.IGNORED_URLS.add("/passwordModification");
         PersonAdmin_mxJPO.IGNORED_URLS.add("/passwordModification/datetime");
         PersonAdmin_mxJPO.IGNORED_URLS.add("/productList");
+        PersonAdmin_mxJPO.IGNORED_URLS.add("/passwordNeverExpires");
     }
 
-    /**
-     * Defines the parameter for the match of persons for which workspace
-     * objects are not handled (neither exported nor updated).
-     *
-     * @see #ignoreWorkspaceObjects(ParameterCache_mxJPO)
-     */
-    private static final String PARAM_IGNORE_WSO_PERSONS = "UserIgnoreWSO4Persons";
+    /** Holds all group assignments of this person. */
+    private final SortedSet<String> groups = new TreeSet<String>();
 
-    /**
-     * If the parameter is set the 'password never expires' - flag for persons
-     * is ignored. This means that the flag is not managed anymore from the
-     * MxUpdate Update tool.
-     *
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     */
-    private static final String PARAM_IGNORE_PSWD_NEVER_EXPIRES = "UserPersonIgnorePswdNeverExpires";
+    /** Holds all role assignments of this person. */
+    private final SortedSet<String> roles = new TreeSet<String>();
 
-    /**
-     * If the parameter is set the 'wants email' - flag for persons is ignored.
-     * This means that the flag is not managed anymore from the MxUpdate Update
-     * tool.
-     *
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     */
-    private static final String PARAM_IGNORE_WANTS_EMAIL = "UserPersonIgnoreWantsEmail";
-
-    /**
-     * If the parameter is set the 'wants icon mail' - flag for persons
-     * matching given string is ignored. This means that the flag is not
-     * managed anymore from the MxUpdate Update tool.
-     *
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     */
-    private static final String PARAM_IGNORE_WANTS_ICON_MAIL = "UserPersonIgnoreWantsIconMail";
-
-    /**
-     * If the parameter is set, products for persons matching given string are
-     * not updated.
-     *
-     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     */
-    private static final String PARAM_IGNORE_PRODUCTS = "UserPersonIgnoreProducts";
-
-    /**
-     * Holds all group assignments of this person.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private final Set<String> groups = new TreeSet<String>();
-
-    /**
-     * Holds all role assignments of this person.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private final Set<String> roles = new TreeSet<String>();
-
-    /**
-     * Full name of the person.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
+    /** Full name of the person. */
     private String fullName;
 
-    /**
-     * Email address of the person.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private String email;
+    /** Email address of the person. */
+    private String emailAddress;
 
-    /**
-     * Address of the person.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
+    /** Address of the person. */
     private String address;
 
-    /**
-     * Fax number of the person.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
+    /** Fax number of the person. */
     private String fax;
 
-    /**
-     * Phone number of the person.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
+    /** Phone number of the person.*/
     private String phone;
 
-    /**
-     * Default vault of the person.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
+    /** Default vault of the person.*/
     private String vault;
 
-    /**
-     * Is the person not active?
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
-     */
-    private boolean isInactive = false;
+    /** Is the person not active? */
+    private boolean active = false;
 
-    /**
-     * Is the person an application user?
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)s
-     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
-     */
-    private boolean isApplicationUser = false;
+    /** Is the person a trusted user? */
+    private boolean trusted = false;
 
-    /**
-     * Is the person a full user?
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
-     */
-    private boolean isFullUser = false;
+    /** Person wants email? */
+    private boolean email = false;
 
-    /**
-     * Is the person a business administrator?
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
-     */
-    private boolean isBusinessAdministrator = false;
+    /** Person wants (internal) icon mail. */
+    private boolean iconmail = true;
 
-    /**
-     * Is the person a system administrator?
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
-     */
-    private boolean isSystemAdministrator = false;
+    /** Set of access for this person. */
+    private final SortedSet<String> access = new TreeSet<String>();
 
-    /**
-     * Is the person a trusted user?
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeEnd(ParameterCache_mxJPO, Appendable)
-     */
-    private boolean isTrusted = false;
+    /** Set of administration access for this person. */
+    private final SortedSet<String> admin = new TreeSet<String>();
 
-    /**
-     * Person wants email?
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private boolean wantsEmail = false;
+    /**  Defines the name of the assigned default application.  */
+    private String application;
 
-    /**
-     * Person wants (internal) icon mail.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private boolean wantsIconMail = false;
+    /** All assigned products of the person. */
+    private final SortedSet<String> products = new TreeSet<String>();
 
-    /**
-     * Set of access for this person.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private final Set<String> access = new TreeSet<String>();
-
-    /**
-     * Set of administration access for this person.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private final Set<String> adminAccess = new TreeSet<String>();
-
-    /**
-     * Defines the name of the assigned default application.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private String defaultApplication;
-
-    /**
-     * The password of the person never expires.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private boolean passwordNeverExpires = false;
-
-    /**
-     * All assigned products of the person.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private final Set<String> products = new TreeSet<String>();
+    /** All assigned types of the person. */
+    private final Set<TypeItem> types = new TreeSet<TypeItem>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -329,45 +131,22 @@ public class PersonAdmin_mxJPO
         super(_typeDef, _mxName);
     }
 
-    /**
-     * Returns a set of found person names. First for all administration
-     * persons are searched. Then, all persons are removed from the matching
-     * set, for whom a related business person object exists. This new set is
-     * returned.
-     *
-     * @param _paramCache   parameter cache
-     * @return set of person names for which no person business object exists
-     * @throws MatrixException if the query for person objects failed
-     */
-    @Override()
-    public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
-    {
-        final Set<String> persons = super.getMxNames(_paramCache);
-
-        // evaluate for all business person object names
-        final StringList selects = new StringList();
-        selects.addElement("name");
-        final Query query = new Query();
-        query.open(_paramCache.getContext());
-        query.setBusinessObjectType(this.getTypeDef().getMxBusType());
-        final BusinessObjectWithSelectList list = query.select(_paramCache.getContext(), selects);
-        query.close(_paramCache.getContext());
-
-        // remove the found persons which related business object
-        for (final Object mapObj : list)  {
-            final BusinessObjectWithSelect map = (BusinessObjectWithSelect) mapObj;
-            final String busName = (String) map.getSelectDataList("name").get(0);
-            persons.remove(busName);
-        }
-
-        return persons;
-    }
-
     @Override()
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
+        new PersonAdminParser_mxJPO(new StringReader(_code)).parse(this);
+        this.prepare();
+    }
+
+    @Override()
+    protected void parse(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException, SAXException, IOException
+    {
+        // to ensure that the value is the same default as in the DB
+        this.iconmail = false;
+        this.active = true;
+        super.parse(_paramCache);
     }
 
     /**
@@ -421,50 +200,51 @@ public class PersonAdmin_mxJPO
         } else if ("/assignmentList/assignment/roleRef".equals(_url))  {
             this.roles.add(_content);
             parsed = true;
-
         } else if (_url.startsWith("/access"))  {
-            this.access.add(_url.substring(8).replaceAll("Access$", ""));
+            final String value = _url.substring(8).replaceAll("Access$", "");
+            if (!"none".equals(value)) {
+                this.access.add(value);
+            }
             parsed = true;
-
-        } else if (_url.startsWith("/adminAccess"))  {
-            this.adminAccess.add(_url.substring(13).replaceAll("Access$", ""));
+        } else if (_url.startsWith("/adminAccess")) {
+            final String value = _url.substring(13).replaceAll("Access$", "");
+            if (!"none".equals(value)) {
+                this.admin.add(value);
+            }
             parsed = true;
-
         } else if ("/defaultApplication/applicationRef".equals(_url))  {
-            this.defaultApplication = _content;
+            this.application = _content;
             parsed = true;
 
         } else if ("/inactive".equals(_url))  {
-            this.isInactive = true;
+            this.active = false;
             parsed = true;
         } else if ("/applicationsOnly".equals(_url))  {
-            this.isApplicationUser = true;
+            this.types.add(TypeItem.APPLICATION);
             parsed = true;
         } else if ("/fullUser".equals(_url))  {
-            this.isFullUser = true;
+            this.types.add(TypeItem.FULL);
             parsed = true;
         } else if ("/businessAdministrator".equals(_url))  {
-            this.isBusinessAdministrator = true;
+            this.types.add(TypeItem.BUSINESS);
             parsed = true;
         } else if ("/systemAdministrator".equals(_url))  {
-            this.isSystemAdministrator = true;
+            this.types.add(TypeItem.SYSTEM);
             parsed = true;
         } else if ("/trusted".equals(_url))  {
-            this.isTrusted = true;
+            this.trusted = true;
             parsed = true;
-
         } else if ("/wantsEmail".equals(_url))  {
-            this.wantsEmail = true;
+            this.email = true;
             parsed = true;
         } else if ("/wantsIconMail".equals(_url))  {
-            this.wantsIconMail = true;
+            this.iconmail = true;
             parsed = true;
-
         } else if ("/address".equals(_url))  {
             this.address = _content;
             parsed = true;
         } else if ("/email".equals(_url))  {
-            this.email = _content;
+            this.emailAddress = _content;
             parsed = true;
         } else if ("/fax".equals(_url))  {
             this.fax = _content;
@@ -478,15 +258,9 @@ public class PersonAdmin_mxJPO
         } else if ("/phone".equals(_url))  {
             this.phone = _content;
             parsed = true;
-
-        } else if ("/passwordNeverExpires".equals(_url))  {
-            this.passwordNeverExpires = true;
-            parsed = true;
-
         } else if ("/productList/productRef".equals(_url))  {
             this.products.add(_content);
             parsed = true;
-
         } else  {
             parsed = super.parse(_paramCache, _url, _content);
         }
@@ -498,264 +272,13 @@ public class PersonAdmin_mxJPO
      * because otherwise all sets and mails of the person to export are also
      * exported (but the sets and mails of the person is not needed....).
      *
-     * @return MQL command to make an XML export of the person
+     * @return XML export of the person
      */
     @Override()
-    protected String getExportMQL()
+    protected String execXMLExport(final ParameterCache_mxJPO _paramCache)
+            throws MatrixException
     {
-        return new StringBuilder()
-                .append("escape export person \"").append(StringUtil_mxJPO.convertMql(this.getName()))
-                .append("\" !mail !set xml")
-                .toString();
-    }
-
-    /**
-     * Writes specific information about the cached administration person to
-     * the given TCL update file <code>_out</code>. The included information is
-     * <ul>
-     * <li>{@link #passwordNeverExpires password never expires flag} (if
-     *     parameter {@link #PARAM_IGNORE_PSWD_NEVER_EXPIRES} is not set)</li>
-     * <li>{@link #access}</li>
-     * <li>{@link #adminAccess business administration access}</li>
-     * <li>person wants {@link #wantsEmail email} (if parameter
-     *     {@link #PARAM_IGNORE_WANTS_EMAIL} is not set)</li>
-     * <li>person wants {@link #wantsIconMail icon mail} (if parameter
-     *     {@link #PARAM_IGNORE_WANTS_ICON_MAIL} is not set)</li>
-     * <li>{@link #address}</li>
-     * <li>{@link #email email address}</li>
-     * <li>{@link #fax fax number}</li>
-     * <li>{@link #fullName full name}</li>
-     * <li>{@link #phone phone number}</li>
-     * <li>{@link #vault default vault}</li>
-     * <li>{@link #defaultApplication default application} (if defined)</li>
-     * <li>assigned {@link #groups}</li>
-     * <li>assigned {@link #roles}</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the TCL update code could not written
-     * @see #PARAM_IGNORE_PSWD_NEVER_EXPIRES
-     * @see #PARAM_IGNORE_WANTS_EMAIL
-     */
-    @Override()
-    protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
-        throws IOException
-    {
-        super.writeObject(_paramCache, _out);
-
-        // password never expires flag if not matched
-        final Collection<String> ignorePswdNeverExpires = _paramCache.getValueList(PersonAdmin_mxJPO.PARAM_IGNORE_PSWD_NEVER_EXPIRES);
-        if ((ignorePswdNeverExpires == null) || !StringUtil_mxJPO.match(this.getName(), ignorePswdNeverExpires))  {
-            _out.append(" \\\n    ").append(this.passwordNeverExpires ? "" : "!").append("neverexpires");
-        }
-        _out.append(" \\\n    access \"").append(StringUtil_mxJPO.joinTcl(',', false, this.access, "none")).append("\"")
-            .append(" \\\n    admin \"").append(StringUtil_mxJPO.joinTcl(',', false, this.adminAccess, "none")).append("\"");
-        // wants email only if not matched
-        final Collection<String> ignoreWantsEmail = _paramCache.getValueList(PersonAdmin_mxJPO.PARAM_IGNORE_WANTS_EMAIL);
-        if ((ignoreWantsEmail == null) || !StringUtil_mxJPO.match(this.getName(), ignoreWantsEmail))  {
-            _out.append(" \\\n    ").append(this.wantsEmail ? "enable" : "disable").append(" email");
-        }
-        // wants icon mail only if not matched
-        final Collection<String> ignoreWantsIconMail = _paramCache.getValueList(PersonAdmin_mxJPO.PARAM_IGNORE_WANTS_ICON_MAIL);
-        if ((ignoreWantsIconMail == null) || !StringUtil_mxJPO.match(this.getName(), ignoreWantsIconMail))  {
-            _out.append(" \\\n    ").append(this.wantsIconMail ? "enable" : "disable").append(" iconmail");
-        }
-        _out.append(" \\\n    address \"").append(StringUtil_mxJPO.convertTcl(this.address)).append("\"")
-            .append(" \\\n    email \"").append(StringUtil_mxJPO.convertTcl(this.email)).append("\"")
-            .append(" \\\n    fax \"").append(StringUtil_mxJPO.convertTcl(this.fax)).append("\"")
-            .append(" \\\n    fullname \"").append(StringUtil_mxJPO.convertTcl(this.fullName)).append("\"")
-            .append(" \\\n    phone \"").append(StringUtil_mxJPO.convertTcl(this.phone)).append("\"")
-            .append(" \\\n    vault \"").append(StringUtil_mxJPO.convertTcl(this.vault)).append("\"");
-        if (this.defaultApplication != null)  {
-            _out.append(" \\\n    application \"")
-                .append(StringUtil_mxJPO.convertTcl(this.defaultApplication)).append("\"");
-        }
-        for (final String group : this.groups)  {
-            _out.append(" \\\n    assign group \"")
-                .append(StringUtil_mxJPO.convertTcl(group))
-                .append("\"");
-        }
-        for (final String role : this.roles)  {
-            _out.append(" \\\n    assign role \"")
-                .append(StringUtil_mxJPO.convertTcl(role))
-                .append("\"");
-        }
-    }
-
-    /**
-     * Appends at the end of the TCL update file the change of the person
-     * &quot;type&quot; and others which could not be executed within same
-     * statement of the person properties.
-     * <ul>
-     * <li>type flag if person is {@link #isApplicationUser application user}</li>
-     * <li>type flag if person is {@link #isFullUser full user}</li>
-     * <li>type flag if person is
-     *     {@link #isBusinessAdministrator business administration}</li>
-     * <li>type flag if person is {@link #isInactive inactive}</li>
-     * <li>type flag if person is {@link #isTrusted trusted}</li>
-     * <li>type flag if person is
-     *     {@link #isSystemAdministrator system administrator}</li>
-     * <li>assigned {@link #products}</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the extension could not be written
-     */
-    @Override()
-    protected void writeEnd(final ParameterCache_mxJPO _paramCache,
-                            final Appendable _out)
-            throws IOException
-    {
-        super.writeEnd(_paramCache, _out);
-        _out.append("\nmql mod person \"${NAME}\" type ");
-        if (!this.isApplicationUser)  {
-            _out.append("not");
-        }
-        _out.append("application,");
-        if (!this.isFullUser)  {
-            _out.append("not");
-        }
-        _out.append("full,");
-        if (!this.isBusinessAdministrator)  {
-            _out.append("not");
-        }
-        _out.append("business,");
-        if (!this.isInactive)  {
-            _out.append("not");
-        }
-        _out.append("inactive,");
-        if (!this.isTrusted)  {
-            _out.append("not");
-        }
-        _out.append("trusted,");
-        if (!this.isSystemAdministrator)  {
-            _out.append("not");
-        }
-        _out.append("system");
-
-        // define products
-        final Collection<String> matchIgnoreProducts = _paramCache.getValueList(PersonAdmin_mxJPO.PARAM_IGNORE_PRODUCTS);
-        if ((matchIgnoreProducts == null) || !StringUtil_mxJPO.match(this.getName(), matchIgnoreProducts))  {
-            _out.append("\nsetProducts")
-                .append((this.products.isEmpty() ? "" : " "))
-                .append(StringUtil_mxJPO.joinTcl(' ', true, this.products, ""));
-        }
-    }
-
-    /**
-     * The method overwrites the original method to
-     * <ul>
-     * <li>reset the comment (description)</li>
-     * <li>set the version and author attribute</li>
-     * <li>reset all not ignored attributes</li>
-     * <li>define the TCL variable &quot;OBJECTID&quot; with the object id of
-     *     the represented business object</li>
-     * <li>sets the {@link #passwordNeverExpires password never expires flag}
-     *     to <i>false</i> (means that the password expires); depends on
-     *     parameter {@link #PARAM_IGNORE_PSWD_NEVER_EXPIRES}</li>
-     * <li>disables that the person wants email; depends on
-     *     parameter {@link #PARAM_IGNORE_WANTS_EMAIL}</li>
-     * <li>enables that the person wants icon mail; depends on
-     *     parameter {@link #PARAM_IGNORE_WANTS_ICON_MAIL}</li>
-     * </ul>
-     * The original method of the super class if called surrounded with a
-     * history off, because if the update itself is done the modified basic
-     * attribute and the version attribute of the business object is updated.
-     * <br/>
-     * The new generated MQL code is set in the front of the already defined
-     * MQL code in <code>_preMQLCode</code> and appended to the MQL statements
-     * in <code>_postMQLCode</code>.
-     *
-     * @param _paramCache       parameter cache
-     * @param _preMQLCode       MQL statements which must be called before the
-     *                          TCL code is executed
-     * @param _postMQLCode      MQL statements which must be called after the
-     *                          TCL code is executed
-     * @param _preTCLCode       TCL code which is defined before the source
-     *                          file is sourced
-     * @param _tclVariables     map of all TCL variables where the key is the
-     *                          name and the value is value of the TCL variable
-     *                          (the value is automatically converted to TCL
-     *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update from derived class failed
-     * @see #PARAM_IGNORE_PSWD_NEVER_EXPIRES
-     * @see #PARAM_IGNORE_WANTS_EMAIL
-     * @see #PARAM_IGNORE_WANTS_ICON_MAIL
-     */
-    @Override()
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final CharSequence _preMQLCode,
-                          final CharSequence _postMQLCode,
-                          final CharSequence _preTCLCode,
-                          final Map<String,String> _tclVariables,
-                          final File _sourceFile)
-        throws Exception
-    {
-        // append TCL procedures
-        final StringBuilder preTCLCode = new StringBuilder()
-                .append(_preTCLCode)
-                .append('\n');
-
-        // append TCL set products if not ignored (otherwise dummy TCL proc)
-        final Collection<String> matchIgnoreProducts = _paramCache.getValueList(PersonAdmin_mxJPO.PARAM_IGNORE_PRODUCTS);
-        if ((matchIgnoreProducts == null) || !StringUtil_mxJPO.match(this.getName(), matchIgnoreProducts))  {
-            preTCLCode.append(PersonAdmin_mxJPO.TCL_SET_PRODUCTS);
-        } else  {
-            preTCLCode.append(PersonAdmin_mxJPO.TCL_SET_PRODUCTS_DUMMY);
-        }
-
-        // append other pre MQL code
-        final StringBuilder preMQLCode = new StringBuilder()
-                .append(_preMQLCode)
-                .append("escape mod person \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
-                        .append("comment '' ")
-                        .append("access none ")
-                        .append("admin none ")
-                        .append("address '' ")
-                        .append("email '' ")
-                        .append("fax '' ")
-                        .append("fullname '' ")
-                        .append("phone '' ")
-                        .append("remove assign all");
-        // reset wants email if not ignored
-        final Collection<String> ignoreWantsEmail = _paramCache.getValueList(PersonAdmin_mxJPO.PARAM_IGNORE_WANTS_EMAIL);
-        if ((ignoreWantsEmail == null) || !StringUtil_mxJPO.match(this.getName(), ignoreWantsEmail))  {
-            preMQLCode.append(" disable email");
-        }
-        // reset wants icon mail if not ignored
-        final Collection<String> ignoreWantsIconMail = _paramCache.getValueList(PersonAdmin_mxJPO.PARAM_IGNORE_WANTS_ICON_MAIL);
-        if ((ignoreWantsIconMail == null) || !StringUtil_mxJPO.match(this.getName(), ignoreWantsIconMail))  {
-            preMQLCode.append(" enable iconmail");
-        }
-        // reset password never expires if not ignored
-        final Collection<String> ignorePswdNeverExpires = _paramCache.getValueList(PersonAdmin_mxJPO.PARAM_IGNORE_PSWD_NEVER_EXPIRES);
-        if ((ignorePswdNeverExpires == null) || !StringUtil_mxJPO.match(this.getName(), ignorePswdNeverExpires))  {
-            preMQLCode.append(" !neverexpires");
-        }
-        if (this.defaultApplication != null)  {
-            preMQLCode.append(" application \"\"");
-        }
-        preMQLCode.append(";\n");
-
-        // remove hidden flag
-        if (this.isHidden())  {
-            preMQLCode.append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                      .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                      .append(" !hidden;\n");
-        }
-
-        // remove site...
-        if (this.getSite() != null)  {
-            preMQLCode.append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                      .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                      .append(" site \"\";\n");
-        }
-
-        super.update(_paramCache, preMQLCode, _postMQLCode, preTCLCode, _tclVariables, _sourceFile);
+        return MqlBuilder_mxJPO.mql().cmd("escape export person ").arg(this.getName()).cmd(" !mail !set xml").exec(_paramCache);
     }
 
     /**
@@ -773,13 +296,65 @@ public class PersonAdmin_mxJPO
     protected boolean ignoreWorkspaceObjects(final ParameterCache_mxJPO _paramCache)
     {
         boolean ignore = super.ignoreWorkspaceObjects(_paramCache);
-        if (!ignore)  {
-            final Collection<String> ignoreMatches = _paramCache.getValueList(PersonAdmin_mxJPO.PARAM_IGNORE_WSO_PERSONS);
-            if (ignoreMatches != null)  {
+        if (!ignore)
+        {
+            final Collection<String> ignoreMatches = _paramCache.getValueList(ParameterCache_mxJPO.ValueKeys.UserIgnoreWSO4Persons);
+            if (ignoreMatches != null) {
                 ignore = StringUtil_mxJPO.match(this.getName(), ignoreMatches);
             }
         }
         return ignore;
+    }
+
+    @Override()
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Appendable _out)
+        throws IOException
+    {
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
+
+        this.writeHeader(_paramCache, updateBuilder.getStrg());
+
+        updateBuilder.start("person")
+            //                  tag             | default | value                              | write?
+            .single(                 "kind",                 "admin")
+            .string(                 "comment",              this.getDescription())
+            .flag(                   "active",        false, this.active)
+            .flag(                   "trusted",       false, this.trusted)
+            .flag(                   "hidden",        false, this.isHidden())
+            .singleIfTrue(           "access",               "all",                    this.access.size() == 1 && this.access.iterator().next().equals("all"))
+            .listOneLineSingleIfTrue("access",               this.access,              !(this.access.size() == 1 && this.access.iterator().next().equals("all")))
+            .singleIfTrue(           "admin",                "all",                    this.admin.size() == 1 && this.admin.iterator().next().equals("all"))
+            .listOneLineSingleIfTrue("admin",                this.admin,               !(this.admin.size() == 1 && this.admin.iterator().next().equals("all")))
+            .flag(                   "email",         false, this.email)
+            .flag(                   "iconmail",      false, this.iconmail)
+            .string(                 "address",              this.address)
+            .string(                 "emailaddress",         this.emailAddress)
+            .string(                 "fax",                  this.fax)
+            .string(                 "fullname",             this.fullName)
+            .string(                 "phone",                this.phone)
+            .listOneLineSingle(      "product",              this.products)
+            .listOneLineSingleIfTrue("type",                 this.getTypes(),          !this.types.isEmpty())
+            .stringIfTrue(           "vault",                this.vault,               this.vault != null && !this.vault.isEmpty())
+            .stringIfTrue(           "application",          this.application,         this.application != null && !this.application.isEmpty())
+            .stringIfTrue(           "site",                 this.getSite(),           this.getSite() != null && !this.getSite().isEmpty())
+            .listIfTrue(             "group",                this.groups,              this.groups != null && !this.groups.isEmpty())
+            .listIfTrue(             "role",                 this.roles,               this.roles != null && !this.roles.isEmpty())
+            .properties(this.getProperties())
+            .end();
+        _out.append(updateBuilder.toString());
+    }
+
+    /**
+     * @return sorted string set
+     */
+    private SortedSet<String> getTypes()
+    {
+        final SortedSet<String> ret = new TreeSet<String>();
+        for (final TypeItem item : this.types) {
+            ret.add(item.name().toLowerCase());
+        }
+        return ret;
     }
 
     @Override()
@@ -788,5 +363,147 @@ public class PersonAdmin_mxJPO
                              final PersonAdmin_mxJPO _current)
         throws UpdateException_mxJPO
     {
+        // type (application, full, business, system, inactive, trusted)
+        if (CompareToUtil_mxJPO.compare(0, this.types, _current.types) != 0 || this.active != _current.active || this.trusted != _current.trusted) {
+            _mql.newLine().cmd("type ");
+            boolean first = true;
+            for (final TypeItem typeItem : TypeItem.values())  {
+                if (first)  {
+                    first = false;
+                } else {
+                    _mql.cmd(",");
+                }
+                if (this.types.contains(typeItem))  {
+                    _mql.arg(typeItem.name().toLowerCase());
+                } else {
+                    _mql.arg("not" + typeItem.name().toLowerCase());
+                }
+            }
+            _mql.cmd(",");
+            if (this.active) {
+                _mql.arg("notinactive");
+            } else {
+                _mql.arg("inactive");
+            }
+            _mql.cmd(",");
+            if (this.trusted) {
+                _mql.arg("trusted");
+            } else {
+                _mql.arg("nottrusted");
+            }
+        }
+
+        if (CompareToUtil_mxJPO.compare(0, this.access, _current.access) != 0)  {
+            if (this.access.isEmpty()) {
+                _mql.newLine().cmd("access none");
+            } else if (this.access.size() == 1 && this.access.iterator().next().equals("all")) {
+                _mql.newLine().cmd("access all");
+            } else {
+                DeltaUtil_mxJPO.calcLstOneCallDelta(  _mql,      "access",       this.access,            _current.access);
+            }
+        }
+        if (CompareToUtil_mxJPO.compare(0, this.admin, _current.admin) != 0)  {
+            if (this.admin.isEmpty())  {
+                _mql.newLine().cmd("admin none");
+            } else if (this.admin.size() == 1 && this.admin.iterator().next().equals("all"))  {
+                _mql.newLine().cmd("admin all");
+            } else {
+                DeltaUtil_mxJPO.calcLstOneCallDelta(  _mql,      "admin",       this.admin,            _current.admin);
+            }
+        }
+
+        final Collection<String> ignoreEmailMatches = _paramCache.getValueList(ParameterCache_mxJPO.ValueKeys.UserPersonIgnoreWantsEmail);
+        final boolean ignoreEmail = ignoreEmailMatches != null &&  StringUtil_mxJPO.match(this.getName(), ignoreEmailMatches);
+        if (!ignoreEmail && (this.email != _current.email))  {
+            if (this.email)  {
+                _mql.newLine().cmd("enable email");
+            } else {
+                _mql.newLine().cmd("disable email");
+            }
+        }
+
+        final Collection<String> ignoreIconMailMatches = _paramCache.getValueList(ParameterCache_mxJPO.ValueKeys.UserPersonIgnoreWantsIconMail);
+        final boolean ignoreIconMail = ignoreIconMailMatches != null &&  StringUtil_mxJPO.match(this.getName(), ignoreIconMailMatches);
+        if (!ignoreIconMail && (this.iconmail != _current.iconmail))  {
+            if (this.iconmail)  {
+                _mql.newLine().cmd("enable iconmail");
+            } else {
+                _mql.newLine().cmd("disable iconmail");
+            }
+        }
+
+        DeltaUtil_mxJPO.calcValueDelta( _mql,   "comment",          this.getDescription(),  _current.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(  _mql,   "hidden",    false, this.isHidden(),        _current.isHidden());
+        DeltaUtil_mxJPO.calcValueDelta( _mql,   "address",          this.address,           _current.address);
+        DeltaUtil_mxJPO.calcValueDelta( _mql,   "email",            this.emailAddress,      _current.emailAddress);
+        DeltaUtil_mxJPO.calcValueDelta( _mql,   "fax",              this.fax,               _current.fax);
+        DeltaUtil_mxJPO.calcValueDelta( _mql,   "fullname",         this.fullName,          _current.fullName);
+        DeltaUtil_mxJPO.calcValueDelta( _mql,   "phone",            this.phone,             _current.phone);
+        DeltaUtil_mxJPO.calcValueDelta( _mql,   "vault",            this.vault,             _current.vault);
+        DeltaUtil_mxJPO.calcValueDelta( _mql,   "application",      this.application,       _current.application);
+        DeltaUtil_mxJPO.calcValueDelta( _mql,   "site",             this.getSite(),         _current.getSite());
+
+        // groups (specific syntax...)
+        for (final String curValue : _current.groups)  {
+            if (!this.groups.contains(curValue))  {
+                _mql.newLine()
+                    .cmd("remove assign group ").arg(curValue);
+            }
+        }
+        for (final String newValue : this.groups)  {
+            if (!_current.groups.contains(newValue))  {
+                _mql.newLine()
+                    .cmd("assign group ").arg(newValue);
+            }
+        }
+
+        // roles (specific syntax...)
+        for (final String curValue : _current.roles)  {
+            if (!this.roles.contains(curValue))  {
+                _mql.newLine()
+                    .cmd("remove assign role ").arg(curValue);
+            }
+        }
+        for (final String newValue : this.roles)  {
+            if (!_current.roles.contains(newValue))  {
+                _mql.newLine()
+                    .cmd("assign role ").arg(newValue);
+            }
+        }
+
+        this.getProperties().calcDelta(_mql, "", _current.getProperties());
+
+        // products
+        final Collection<String> ignoreProdMatches = _paramCache.getValueList(ParameterCache_mxJPO.ValueKeys.UserPersonIgnoreProducts);
+        final boolean ignoreProd = ignoreProdMatches != null &&  StringUtil_mxJPO.match(this.getName(), ignoreProdMatches);
+        if (!ignoreProd && CompareToUtil_mxJPO.compare(0, this.products, _current.products) != 0 ) {
+            _mql.pushPrefix("");
+            for (final String curValue : _current.products)  {
+                if (!this.products.contains(curValue))  {
+                    _mql.newLine()
+                        .cmd("escape mod product ").arg(curValue).cmd(" remove person ").arg(this.getName());
+                }
+            }
+            for (final String newValue : this.products)  {
+                if (!_current.products.contains(newValue))  {
+                    _mql.newLine()
+                        .cmd("escape mod product ").arg(newValue).cmd(" add person ").arg(this.getName());
+                }
+            }
+            _mql.popPrefix();
+        }
+    }
+
+
+    public enum TypeItem
+    {
+        /** Application User. */
+        APPLICATION,
+        /** Full User. */
+        FULL,
+        /** Business User. */
+        BUSINESS,
+        /** System Admin User. */
+        SYSTEM
     }
 }

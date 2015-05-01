@@ -208,8 +208,12 @@ public class ExportParser
                                    final String _value)
     {
         final List<String> valueLines = this.getRootLines().get(0).getLines(_path + "/@value");
-        Assert.assertEquals(valueLines.size(), 1,      "exact one line for path '" + _path + "' must be found");
-        Assert.assertEquals(valueLines.get(0), _value, "value for line with path '" + _path + "' must be correct");
+        if (_value == null) {
+            Assert.assertEquals(valueLines.size(), 0,      "exact none line for path '" + _path + "' must be found");
+        } else {
+            Assert.assertEquals(valueLines.size(), 1,      "exact one line for path '" + _path + "' must be found");
+            Assert.assertEquals(valueLines.get(0), _value, "value for line with path '" + _path + "' must be correct");
+        }
         return this;
     }
 

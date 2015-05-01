@@ -73,36 +73,36 @@ public class FormatCI_2UpdateTest
                 new Object[]{
                         "issue #212: format with view program",
                         new FormatData(this, "hello \" test")
-                                .notSupported(Version.V6R2014x, Version.V6R2015x)
+                                .defNotSupported(Version.V6R2014x, Version.V6R2015x)
                                 .setViewProgram(new MQLProgramData(this, "ViewProgram"))},
                 new Object[]{
                         "issue #212: format with view program",
                         new FormatData(this, "hello \" test")
-                                .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)
+                                .defNotSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)
                                 .setViewProgram(new MQLProgramData(this, "ViewProgram")),
                         new FormatData(this, "hello \" test"),
                         "[INFO]     - view program MXUPDATE_ViewProgram ignored (not supported anymore!)"},
                 new Object[]{
                         "issue #212: format with edit program",
                         new FormatData(this, "hello \" test")
-                                .notSupported(Version.V6R2014x, Version.V6R2015x)
+                                .defNotSupported(Version.V6R2014x, Version.V6R2015x)
                                 .setEditProgram(new MQLProgramData(this, "EditProgram"))},
                 new Object[]{
                         "issue #212: format with edit program",
                         new FormatData(this, "hello \" test")
-                                .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)
+                                .defNotSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)
                                 .setEditProgram(new MQLProgramData(this, "EditProgram")),
                         new FormatData(this, "hello \" test"),
                         "[INFO]     - edit program MXUPDATE_EditProgram ignored (not supported anymore!)"},
                 new Object[]{
                         "issue #212: format with print program",
                         new FormatData(this, "hello \" test")
-                                .notSupported(Version.V6R2014x, Version.V6R2015x)
+                                .defNotSupported(Version.V6R2014x, Version.V6R2015x)
                                 .setPrintProgram(new MQLProgramData(this, "PrintProgram"))},
                 new Object[]{
                         "issue #212: format with print program",
                         new FormatData(this, "hello \" test")
-                                .notSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)
+                                .defNotSupported(Version.V6R2011x, Version.V6R2012x, Version.V6R2013x)
                                 .setPrintProgram(new MQLProgramData(this, "PrintProgram")),
                         new FormatData(this, "hello \" test"),
                         "[INFO]     - print program MXUPDATE_PrintProgram ignored (not supported anymore!)"}

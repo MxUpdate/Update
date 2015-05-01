@@ -56,7 +56,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for public all for key",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(new Access()
@@ -66,7 +66,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for three public definitions",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(
@@ -85,7 +85,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for login public all w/o key",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(new Access()
@@ -95,7 +95,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for login public all for key",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(new Access()
@@ -106,7 +106,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for three login public definitions",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(
@@ -137,7 +137,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for revoke public all for key",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(new Access()
@@ -148,7 +148,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for three revoke public definitions",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(
@@ -178,7 +178,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for owner all for key",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(new Access()
@@ -188,7 +188,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for three owner definitions",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(
@@ -207,7 +207,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for login owner all w/o key",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(new Access()
@@ -217,7 +217,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for login owner all for key",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(new Access()
@@ -228,7 +228,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for three login owner definitions",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(
@@ -250,7 +250,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for revoke owner all w/o key",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(new Access()
@@ -260,7 +260,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for revoke owner all for key",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(new Access()
@@ -271,7 +271,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for three revoke owner definitions",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(
@@ -302,7 +302,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for user all for key",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(new Access()
@@ -313,7 +313,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for three user definitions",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State() {
                                     {
                                         final PersonAdminData user = new PersonAdminData(PolicyCI_6StateAccessKeyTest.this, "creator");
@@ -339,7 +339,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for login user all w/o key",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(new Access()
@@ -350,7 +350,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for login user all for key",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(new Access()
@@ -362,7 +362,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for three login user definitions",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State() {
                                     {
                                         final PersonAdminData user = new PersonAdminData(PolicyCI_6StateAccessKeyTest.this, "creator");
@@ -391,7 +391,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for revoke user all w/o key",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(new Access()
@@ -402,7 +402,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for revoke user all for key",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
                                         .addAccess(new Access()
@@ -414,7 +414,7 @@ public class PolicyCI_6StateAccessKeyTest
                 new Object[]{
                         "issue #180: policy state with access for three revoke user definitions",
                         new PolicyData(this, "test")
-                                .notSupported(Version.V6R2011x)
+                                .defNotSupported(Version.V6R2011x)
                                 .addState(new State()  {
                                     {
                                         final PersonAdminData user = new PersonAdminData(PolicyCI_6StateAccessKeyTest.this, "creator");

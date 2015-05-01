@@ -118,16 +118,16 @@ public abstract class AbstractAttributeWithRangesAndMultiValuesTest<ATTRIBUTEDAT
                     _logText + " with multi value flag true",
                     this.createNewData("hello")
                             .setFlag("multivalue", true)
-                            .notSupported(Version.V6R2011x)});
+                            .defNotSupported(Version.V6R2011x)});
             ret.add(new Object[]{
                     _logText + " with multi value flag false",
                     this.createNewData("hello")
                             .setFlag("multivalue", false)
-                            .notSupported(Version.V6R2011x)});
+                            .defNotSupported(Version.V6R2011x)});
             ret.add(new Object[]{
                     _logText + " without multi value flag (to test default value false in export)",
                     this.createNewData("hello")
-                            .notSupported(Version.V6R2011x),
+                            .defNotSupported(Version.V6R2011x),
                     this.createNewData("hello")
                             .setFlag("multivalue", false)});
         }

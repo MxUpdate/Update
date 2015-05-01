@@ -29,6 +29,7 @@ import org.mxupdate.test.data.user.organization.CompanyData;
 import org.mxupdate.test.data.user.organization.DepartmentData;
 import org.mxupdate.test.data.user.organization.PlantData;
 import org.mxupdate.test.data.util.PropertyDef;
+import org.mxupdate.test.test.update.user.AbstractPersonAdminCITest;
 import org.mxupdate.test.util.Version;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -44,7 +45,7 @@ import org.testng.annotations.Test;
  */
 @Test()
 public class PersonTest
-    extends AbstractPersonAdminTest<PersonData>
+    extends AbstractPersonAdminCITest<PersonData>
 {
     /**
      * Creates for given <code>_name</code> a new person instance.

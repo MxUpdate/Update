@@ -60,9 +60,11 @@ public class SingleValueList
                              final StringBuilder _cmd)
     {
         for (final Entry<String,String> entry : this.values.entrySet())  {
-            _cmd.append(_prefix).append(entry.getKey()).append(" ")
-                .append(AbstractTest.convertUpdate(entry.getValue().toString()))
-                .append('\n');
+            if (entry.getValue() != null ) {
+                _cmd.append(_prefix).append(entry.getKey()).append(" ")
+                    .append(AbstractTest.convertUpdate(entry.getValue().toString()))
+                    .append('\n');
+            }
         }
     }
 
@@ -75,7 +77,9 @@ public class SingleValueList
     public void append4Create(final StringBuilder _cmd)
     {
         for (final Map.Entry<String,String> entry : this.values.entrySet())  {
-            _cmd.append(' ').append(entry.getKey()).append(" ").append(AbstractTest.convertMql(entry.getValue().toString()));
+            if (entry.getValue() != null ) {
+                _cmd.append(' ').append(entry.getKey()).append(" ").append(AbstractTest.convertMql(entry.getValue().toString()));
+            }
         }
     }
 

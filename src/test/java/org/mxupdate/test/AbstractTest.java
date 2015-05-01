@@ -165,8 +165,12 @@ public abstract class AbstractTest
         /** Other definition for plant. */
         OTHER_PLANT(null, "Plant", false, "Organization", "eService Production", "Plant", null, null, null, true, "mql"),
 
+        /** Configuration item system application. */
+        SYS_APPLICATION("application", null, false, null, null, "SystemApplication", "APPLICATION", "APPLICATION_", "system/application", true, "mxUpdate"),
         /** Configuration item system package. */
         SYS_PACKAGE("package", null, false, null, null, "SystemPackage", "PACKAGE", "PACKAGE_", "system/package", true, "mql"),
+        /** Configuration item system site. */
+        SYS_SITE("site", null, false, null, null, "SystemSite", "SITE", "SITE_", "system/site", false, "mxUpdate"),
 
         /** Configuration item channel. */
         UI_CHANNEL("channel", null, false, null, null, "Channel", "CHANNEL", "CHANNEL_", "userinterface/channel", true, "mxUpdate"),
@@ -181,10 +185,7 @@ public abstract class AbstractTest
         /** Configuration item portal. */
         UI_PORTAL("portal", null, false, null, null, "Portal", "PORTAL", "PORTAL_", "userinterface/portal", true, "mxUpdate"),
         /** Configuration item table.*/
-        UI_TABLE("table", null, false, null, null, "Table", "TABLE", "TABLE_", "userinterface/table", false, "mxUpdate"),
-
-        /** Configuration item site (not handled as configuration item from the update tool itself). */
-        OTHER_SITE("site", null, false, null, null, "Site", null, null, null, true, "mql");
+        UI_TABLE("table", null, false, null, null, "Table", "TABLE", "TABLE_", "userinterface/table", false, "mxUpdate");
 
         /** Related type name in MX. */
         final String mxType;

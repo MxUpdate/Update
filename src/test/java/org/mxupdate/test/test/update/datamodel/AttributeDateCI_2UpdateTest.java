@@ -49,18 +49,18 @@ public class AttributeDateCI_2UpdateTest
                 "date attribute with defined rangevalue flag 'true'",
                 this.createNewData("hello")
                         .setFlag("rangevalue", true)
-                        .notSupported(Version.V6R2011x)});
+                        .defNotSupported(Version.V6R2011x)});
         ret.add(new Object[]{
                 "date attribute with defined rangevalue flag 'false'",
                 this.createNewData("hello")
                         .setFlag("rangevalue", false)
-                        .notSupported(Version.V6R2011x)});
+                        .defNotSupported(Version.V6R2011x)});
         ret.add(new Object[]{
                 "date attribute with no defined rangevalue flag 'false' (to check default value)",
                 this.createNewData("hello"),
                 this.createNewData("hello")
                         .setFlag("rangevalue", false)
-                        .notSupported(Version.V6R2011x)});
+                        .defNotSupported(Version.V6R2011x)});
 
         return this.prepareData("date attribute", "01/01/01", "02/02/02", ret.toArray(new Object[ret.size()][]));
     }
