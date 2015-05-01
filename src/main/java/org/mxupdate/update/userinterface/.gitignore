@@ -7,6 +7,9 @@
 /InquiryParser.java
 /InquiryParserConstants.java
 /InquiryParserTokenManager.java
+/MenuParser.java
+/MenuParserConstants.java
+/MenuParserTokenManager.java
 /TableParser.java
 /TableParserConstants.java
 /TableParserTokenManager.java
