@@ -15,15 +15,7 @@
 
 package org.mxupdate.update.datamodel;
 
-import java.io.IOException;
-
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.util.DeltaUtil_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
-import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
-import org.mxupdate.update.util.UpdateException_mxJPO;
-import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 
 /**
  * The class is used to evaluate information from date attributes within MX
@@ -34,9 +26,6 @@ import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 public class AttributeDate_mxJPO
     extends AbstractAttribute_mxJPO<AttributeDate_mxJPO>
 {
-    /** Range value flag. */
-    private boolean rangeValue;
-
     /**
      * Constructor used to initialize the date attribute instance with
      * related type definition and attribute name.
@@ -47,78 +36,6 @@ public class AttributeDate_mxJPO
     public AttributeDate_mxJPO(final TypeDef_mxJPO _typeDef,
                                final String _mxName)
     {
-        super(_typeDef, _mxName, "date", "timestamp");
-    }
-
-    /**
-     * The method parses the date attribute specific XML URLs. This includes
-     * information about:
-     * <ul>
-     * <li>contains the attribute {@link #rangeValue rangevalues}?</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache with MX context
-     * @param _url      URL to parse
-     * @param _content  content of the URL to parse
-     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
-     *         <i>false</i>
-     */
-    @Override()
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
-    {
-        final boolean parsed;
-        if ("/attrValueType".equals(_url) && "2".equals(_content))  {
-            this.rangeValue = true;
-            parsed = true;
-        } else  {
-            parsed = super.parse(_paramCache, _url, _content);
-        }
-        return parsed;
-    }
-
-    /**
-     * {@inheritDoc}
-     * Appends the date attribute specific values. Following values are
-     * written:
-     * <li>{@link #rangeValue range value} flag (if
-     *     {@link ValueKeys#DMAttrSupportsFlagRangeValue} is defined)</li>
-     */
-    @Override()
-    protected void writeAttributeSpecificValues(final ParameterCache_mxJPO _paramCache,
-                                                final Appendable _out)
-        throws IOException
-    {
-        super.writeAttributeSpecificValues(_paramCache, _out);
-        if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagRangeValue))  {
-            _out.append("    ").append(this.rangeValue ? "" : "!").append("rangevalue\n");
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * Appends the date attribute specific delta values. Following values are
-     * calculated:
-     * <li>{@link #rangeValue range value} flag (if
-     *     {@link ValueKeys#DMAttrSupportsFlagRangeValue} is defined)</li>
-     */
-    @Override()
-    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MultiLineMqlBuilder _mql,
-                             final AttributeDate_mxJPO _current)
-        throws UpdateException_mxJPO
-    {
-        super.calcDelta(_paramCache, _mql, _current);
-
-        if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagRangeValue))  {
-            if (!this.rangeValue)  {
-                DeltaUtil_mxJPO.calcFlagDelta(_mql, "rangevalue", this.rangeValue, _current.rangeValue);
-            } else if (!this.rangeValue)  {
-                throw new UpdateException_mxJPO(
-                        ErrorKey.ABSTRACTATTRIBUTE_UPDATE_RANGEVALUEFLAG_UPDATED,
-                        this.getName());
-            }
-        }
+        super(_typeDef, _mxName, Kind.Date);
     }
 }

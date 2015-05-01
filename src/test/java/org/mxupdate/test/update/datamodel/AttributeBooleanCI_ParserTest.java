@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import org.mxupdate.test.update.AbstractParserTest;
 import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO;
+import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO.Kind;
 import org.mxupdate.update.datamodel.AttributeString_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.DataProvider;
@@ -30,7 +31,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class AttributeCI_ParserTest
+public class AttributeBooleanCI_ParserTest
     extends AbstractParserTest<AbstractAttribute_mxJPO<?>>
 {
     @Override()
@@ -59,44 +60,65 @@ public class AttributeCI_ParserTest
             {"3b) not hidden (not defined)",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\"",
                 "description \"\" !multivalue !resetonclone !resetonrevision default \"\""},
+            // multivalue flag
+            {"4a) multivalue",
+                "",
+                "description \"\" !hidden multivalue !resetonclone !resetonrevision default \"\""},
+            {"4b) not multivalue not defined",
+                "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\"",
+                "description \"\" !hidden             !resetonclone !resetonrevision default \"\""},
+            // multivalue flag
+            {"5a) multivalue",
+                "",
+                "description \"\" !hidden !multivalue resetonclone !resetonrevision default \"\""},
+            {"5b) not multivalue not defined",
+                "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\"",
+                "description \"\" !hidden !multivalue                !resetonrevision default \"\""},
+            // resetonrevision flag
+            {"6a) multivalue",
+                "",
+                "description \"\" !hidden !multivalue !resetonclone resetonrevision default \"\""},
+            {"6b) not multivalue not defined",
+                "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\"",
+                "description \"\" !hidden !multivalue !resetonclone                  default \"\""},
             // default value
-            {"6a) default value",
+            {"7a) default value",
                 "",
                 "description \"\" hidden !multivalue !resetonclone !resetonrevision default \"abc\""},
-            {"6b) default value with new line",
+            {"7b) default value with new line",
                 "",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc\ndef\""},
-            {"6c) default value with apostrophe",
+            {"7c) default value with apostrophe",
                 "",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc\\\"def\""},
-            {"6d) default value with \\n to test replaced by newline",
+            {"7d) default value with \\n to test replaced by newline",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc\ndef\"",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc\\ndef\""},
-            {"6e) default value with \\\\ to test replaced by \\",
+            {"7e) default value with \\\\ to test replaced by \\",
                 "",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc\\\\def\""},
-            {"6f) default value with \\{ to test replaced by {",
+            {"7f) default value with \\{ to test replaced by {",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc{}def\"",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc\\{\\}def\""},
             // action trigger
-            {"7a) action trigger with input",
+            {"8a) action trigger with input",
                 "",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify action \"{}\\\"\" input \"{}\\\"\""},
-            {"7b) action trigger w/o input",
+            {"8b) action trigger w/o input",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify action \"{}\\\"\" input \"\"",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify action \"{}\\\"\""},
             // check trigger
-            {"8a) check trigger with input",
+            {"9a) check trigger with input",
                 "",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify check \"{}\\\"\" input \"{}\\\"\""},
-            {"8b) check trigger w/o input",
+            {"9b) check trigger w/o input",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify check \"{}\\\"\" input \"\"",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify check \"{}\\\"\""},
             // override trigger
-            {"9a) override trigger with input",
+            {"10a) override trigger with input",
                 "",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify override \"{}\\\"\" input \"{}\\\"\""},
-            {"9b) override trigger w/o input",
+            {"10b) override trigger w/o input",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify override \"{}\\\"\" input \"\"",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify override \"{}\\\"\""},
             // property
@@ -119,7 +141,7 @@ public class AttributeCI_ParserTest
     protected AbstractAttribute_mxJPO<?> createNewData(final ParameterCache_mxJPO _paramCache,
                                                   final String _name)
     {
-        return new AbstractAttribute_mxJPO<AttributeString_mxJPO>(_paramCache.getMapping().getTypeDef("AttributeString"), _name, "string", "string")
+        return new AbstractAttribute_mxJPO<AttributeString_mxJPO>(_paramCache.getMapping().getTypeDef("AttributeString"), _name, Kind.Boolean)
         {
             @Override()
             protected void write(final ParameterCache_mxJPO _paramCache,

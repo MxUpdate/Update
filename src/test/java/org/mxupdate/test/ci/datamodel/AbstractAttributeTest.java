@@ -26,7 +26,6 @@ import org.mxupdate.test.data.datamodel.AbstractAttributeData;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger.TriggerAction;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger.TriggerCheck;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger.TriggerOverride;
-import org.mxupdate.test.data.datamodel.AttributeRealData;
 import org.mxupdate.test.data.datamodel.RuleData;
 import org.mxupdate.test.data.program.MQLProgramData;
 import org.mxupdate.test.util.IssueLink;
@@ -184,12 +183,14 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
     public void negativeTestUpdateMultiValueFlag()
         throws Exception
     {
-        new AttributeRealData(this, "test")
+        this.createNewData("Test")
                 .setFlag("multivalue", true)
                 .create()
                 .update((String) null)
                 .checkExport()
                 .setFlag("multivalue", false)
-                .failureUpdate(ErrorKey.ABSTRACTATTRIBUTE_UPDATE_MULTIVALUEFLAG_UPDATED);
+                .failureUpdate(ErrorKey.ABSTRACTATTRIBUTE_UPDATE_MULTIVALUEFLAG_UPDATED)
+                .setFlag("multivalue", true)
+                .checkExport();
     }
 }

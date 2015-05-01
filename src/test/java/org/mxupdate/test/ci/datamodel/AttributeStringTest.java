@@ -57,11 +57,11 @@ public class AttributeStringTest
         ret.add(new Object[]{
                 "string attribute with max length 0",
                 this.createNewData("hello")
-                        .setValue("maxlength", 0)});
+                        .setSingle("maxlength", "0")});
         ret.add(new Object[]{
                 "string attribute with max length 5",
                 this.createNewData("hello")
-                        .setValue("maxlength", 5)});
+                        .setSingle("maxlength", "5")});
 
         // multiline flag
         ret.add(new Object[]{

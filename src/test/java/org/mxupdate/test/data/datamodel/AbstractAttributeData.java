@@ -230,6 +230,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
 
         this.getFlags()     .appendUpdate("    ", strg);
         this.getValues()    .appendUpdate("    ", strg);
+        this.getSingles()   .appendUpdate("    ", strg);
         this.getTriggers()  .appendUpdate("    ", strg);
         this.getProperties().appendUpdate("    ", strg);
 

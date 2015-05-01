@@ -24,7 +24,7 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
  * @author The MxUpdate Team
  */
 public class AttributeInteger_mxJPO
-    extends AbstractAttributeNumeric_mxJPO<AttributeInteger_mxJPO>
+    extends AbstractAttribute_mxJPO<AttributeInteger_mxJPO>
 {
     /**
      * Constructor used to initialize the date attribute instance with
@@ -36,6 +36,6 @@ public class AttributeInteger_mxJPO
     public AttributeInteger_mxJPO(final TypeDef_mxJPO _typeDef,
                                   final String _mxName)
     {
-        super(_typeDef, _mxName, "integer", "integer");
+        super(_typeDef, _mxName, Kind.Integer);
     }
 }

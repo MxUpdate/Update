@@ -24,7 +24,7 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
  * @author The MxUpdate Team
  */
 public class AttributeReal_mxJPO
-    extends AbstractAttributeNumeric_mxJPO<AttributeReal_mxJPO>
+    extends AbstractAttribute_mxJPO<AttributeReal_mxJPO>
 {
     /**
      * Constructor used to initialize the real attribute instance with
@@ -36,6 +36,6 @@ public class AttributeReal_mxJPO
     public AttributeReal_mxJPO(final TypeDef_mxJPO _typeDef,
                                final String _mxName)
     {
-        super(_typeDef, _mxName, "real", "real");
+        super(_typeDef, _mxName, Kind.Real);
     }
 }

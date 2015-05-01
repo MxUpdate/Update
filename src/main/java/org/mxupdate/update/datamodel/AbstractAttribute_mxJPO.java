@@ -40,11 +40,35 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateList;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * The class is used to evaluate information from attributes within MX used to
- * export, delete and update an attribute.
+ * export, delete and update an attribute. Following properties are handled:
+ * <ul>
+ * <li>flag &quot;{@link #multiValue multiple value}&quot; (if parameter
+ *     {@link ValueKeys#DMAttrSupportsFlagMultiValue} is defined)</li>
+ * <li>flag &quot;{@link #resetonclone}&quot; (if parameter
+ *     {@link ValueKeys#DMAttrSupportsFlagResetOnClone} is defined)</li>
+ * <li>flag &quot;{@link #resetOnRevision}&quot; (if parameter
+ *     {@link ValueKeys#DMAttrSupportsFlagResetOnRevision} is defined)</li>
+ * <li>{@link #maxLength max length} for {@link Kind#String string}
+ *     attributes</li>
+ * <li>{@link #multiline multi line} flag for {@link Kind#String string}
+ *     attributes</li>
+ * <li>{@link #rangeValue range value} flag for {@link Kind#Real real},
+ *     {@link Kind#Integer integer} and {@link Kind#Date date} attributes (if
+ *     {@link ValueKeys#DMAttrSupportsFlagRangeValue} is defined)</li>
+ * <li>{@link #dimension} for {@link Kind#Real real} and
+ *     {@link Kind#Integer integer} attributes (if
+ *     {@link ValueKeys#DMAttrSupportsDimension} is defined)</li>
+ * <li>all assigned {@link #rules}</li>
+ * <li>{@link #defaultValue default value}</li>
+ * <li>{@link #writeTriggers(Appendable) triggers}</li>
+ * <li>{@link #rangesSorted ranges}</li>
+ * </ul>
  *
  * @author The MxUpdate Team
  * @param <CLASS> class defined from this class
@@ -88,6 +112,9 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         AbstractAttribute_mxJPO.RANGE_COMP.put("between",           "between");
     }
 
+    /** Kind of the attribute. */
+    private final Kind kind;
+
     /** Set holding all rules referencing this attribute. */
     private final  SortedSet<String> rules = new TreeSet<String>();
 
@@ -96,7 +123,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
      * If the range is a program the value references a program. Because only
      * one range program could be defined at maximum, specific parsing exists!
      * So the range program is defined as variable directly on the attribute
-     * (and correct in {@link #prepare(ParameterCache_mxJPO)}).
+     * (and correct in {@link #prepare()}).
      */
     private String rangeProgramRef;
     /** If the range is a program the value are the input arguments. */
@@ -110,16 +137,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     private final TriggerList_mxJPO triggers = new TriggerList_mxJPO();
 
     /** Default value of the attribute. */
-    private String defaultValue = null;
-
-    /** Holds the attribute type used to create a new attribute. */
-    private final String attrTypeCreate;
-
-    /**
-     * Holds the attribute including the &quot;,&quot; returned from the
-     * <code>list attribute</code> statement {@link #SELECT_ATTRS}.
-     */
-    private final String attrTypeList;
+    private String defaultValue = "";
 
     /** Flag that the attribute has multiple values. */
     private boolean multiValue = false;
@@ -127,6 +145,18 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     private boolean resetOnClone = false;
     /** Flag that the attribute value is reset on revision. */
     private boolean resetOnRevision = false;
+
+    // string attribute
+    /** The attribute is a {@link Kind#String string} multi line attribute. */
+    private boolean multiline = false;
+    /** Maximum length of the value for {@link Kind#String string}  attributes. */
+    private String maxLength = "0";
+
+    // real / integer attribute
+    /** Range value flag. */
+    private Boolean rangeValue = null;
+    /** Stores the reference to the dimension of an attribute. */
+    private String dimension = null;
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -139,12 +169,10 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
      */
     public AbstractAttribute_mxJPO(final TypeDef_mxJPO _typeDef,
                                    final String _mxName,
-                                   final String _attrTypeCreate,
-                                   final String _attrTypeList)
+                                   final Kind _kind)
     {
         super(_typeDef, _mxName);
-        this.attrTypeCreate = _attrTypeCreate;
-        this.attrTypeList = _attrTypeList;
+        this.kind = _kind;
     }
 
     /**
@@ -194,42 +222,21 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         }
 
         // check that attribute type exists..
-        if (!attrs.containsKey(this.attrTypeList))  {
-            attrs.put(this.attrTypeList, new HashSet<String>());
+        if (!attrs.containsKey(this.kind.attrTypeList))  {
+            attrs.put(this.kind.attrTypeList, new HashSet<String>());
         }
 
-        return attrs.get(this.attrTypeList);
+        return attrs.get(this.kind.attrTypeList);
     }
 
     @Override()
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
-        new AttributeDefParser_mxJPO(new StringReader(_code)).parse(this);
+        new AttributeParser_mxJPO(new StringReader(_code)).parse(this);
         this.prepare();
     }
 
-    /**
-     * The method parses the attribute specific XML URLs. This includes
-     * information about:
-     * <ul>
-     * <li>assigned {@link #rules}</li>
-     * <li>{@link #defaultValue default value}</li>
-     * <li>{@link #multiValue multiple value} flag</li>
-     * <li>{@link #resetOnClone reset on clone} flag</li>
-     * <li>{@link #resetOnRevision reset on revision} flag</li>
-     * <li>defined {@link #rangesStack ranges},
-     *     {@link #rangeProgramRef program ranges} and
-     *     their {@link #rangeProgramInputArguments input arguments}</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache with MX context
-     * @param _url          URL to parse
-     * @param _content      content of the URL to parse
-     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
-     *         <i>false</i>
-     * @see #IGNORED_URLS
-     */
     @Override()
     protected boolean parse(final ParameterCache_mxJPO _paramCache,
                             final String _url,
@@ -242,7 +249,10 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
             this.rules.add(_content);
             parsed = true;
         } else if ("/attrValueType".equals(_url))  {
-            if ("1".equals(_content))  {
+            if ("2".equals(_content))  {
+                this.rangeValue = true;
+                parsed = true;
+            } else if ("1".equals(_content))  {
                 this.multiValue = true;
                 parsed = true;
             } else if ("0".equals(_content))  {
@@ -250,9 +260,22 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
             } else  {
                 parsed = false;
             }
+
         } else if ("/defaultValue".equals(_url))  {
             this.defaultValue = _content;
             parsed = true;
+
+        } else if ("/dimensionRef".equals(_url))  {
+            this.dimension = _content;
+            parsed = true;
+
+        } else if ("/maxlength".equals(_url))  {
+            this.maxLength = _content;
+            parsed = true;
+        } else if ("/multiline".equals(_url))  {
+            this.multiline = true;
+            parsed = true;
+
         } else if ("/resetonclone".equals(_url))  {
             this.resetOnClone = true;
             parsed = true;
@@ -333,88 +356,33 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         super.prepare();
     }
 
-    /**
-     * Writes the TCL update file for this attribute. The original method is
-     * overwritten because am attribute could not be only updated. A compare
-     * must be done in front or otherwise some data is lost. Following
-     * information is written
-     * <ul>
-     * <li>flag &quot;{@link #multiValue multiple value}&quot; (if parameter
-     *     {@link ValueKeys#DMAttrSupportsFlagMultiValue} is defined)</li>
-     * <li>flag &quot;{@link #resetonclone}&quot; (if parameter
-     *     {@link ValueKeys#DMAttrSupportsFlagResetOnClone} is defined)</li>
-     * <li>flag &quot;{@link #resetOnRevision}&quot; (if parameter
-     *     {@link ValueKeys#DMAttrSupportsFlagResetOnRevision} is defined)</li>
-     * <li>{@link #writeAttributeSpecificValues(ParameterCache_mxJPO, Appendable)
-     *     attribute specific properties and flags}</li>
-     * <li>all assigned {@link #rules}</li>
-     * <li>{@link #defaultValue default value}</li>
-     * <li>{@link #writeTriggers(Appendable) triggers}</li>
-     * <li>{@link #rangesSorted ranges}</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the TCL update code could not be written to the
-     *                     writer instance
-     * @see #PARAM_SUPPORT_FLAG_RESET_ON_CLONE
-     * @see #PARAM_SUPPORT_FLAG_RESET_ON_REVISION
-     * @see #writeAttributeSpecificValues(ParameterCache_mxJPO, Appendable)
-     */
     @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
         throws IOException
     {
-        // write header
-        this.writeHeader(_paramCache, _out);
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
+        this.writeHeader(_paramCache, updateBuilder.getStrg());
 
-        // write attribute
-        _out.append("mxUpdate attribute \"${NAME}\" {\n")
-            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n")
-            .append("    ").append(this.isHidden() ? "" : "!").append("hidden\n");
-        if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagMultiValue))  {
-            _out.append("    ").append(this.multiValue ? "" : "!").append("multivalue\n");
-        }
-        if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnClone))  {
-            _out.append("    ").append(this.resetOnClone ? "" : "!").append("resetonclone\n");
-        }
-        if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnRevision))  {
-            _out.append("    ").append(this.resetOnRevision ? "" : "!").append("resetonrevision\n");
-        }
-        this.writeAttributeSpecificValues(_paramCache, _out);
+        updateBuilder.start("attribute")
+                //              tag             | default | value                              | write?
+                .string(        "description",              this.getDescription())
+                .flag(          "hidden",                   false, this.isHidden())
+                .flagIfTrue(    "multivalue",        false, this.multiValue,                    _paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagMultiValue))
+                .flagIfTrue(    "resetonclone",      false, this.resetOnClone,                  _paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnClone))
+                .flagIfTrue(    "resetonrevision",   false, this.resetOnRevision,               _paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnRevision))
+                .flagIfTrue(    "multiline",         false, this.multiline,                     (this.kind == Kind.String))
+                .singleIfTrue(  "maxlength",                this.maxLength,                     ((this.kind == Kind.String) && _paramCache.getValueBoolean(ValueKeys.DMAttrSupportsPropMaxLength)))
+                .flagIfTrue(    "rangevalue",        false, this.rangeValue,                    (((this.kind == Kind.Date) || (this.kind == Kind.Integer) || (this.kind == Kind.Real)) && _paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagRangeValue)))
+                .stringIfTrue(  "dimension",                this.dimension,                     ((this.dimension != null) && !this.dimension.isEmpty() && ((this.kind == Kind.Integer) || (this.kind == Kind.Real)) && _paramCache.getValueBoolean(ValueKeys.DMAttrSupportsDimension)))
+                .listIfTrue(    "rule",                     this.rules,                         (this.rules.size() == 1))
+                .string(        "default",                  this.defaultValue)
+                .write(this.triggers)
+                .write(this.rangesSorted)
+                .properties(this.getProperties())
+                .end();
 
-        if (!this.rules.isEmpty())  {
-            assert (this.rules.size() == 1);
-            _out.append("    rule \"").append(StringUtil_mxJPO.convertUpdate(this.rules.iterator().next())).append("\"\n");
-        }
-
-        _out.append("    default \"").append((this.defaultValue != null) ? StringUtil_mxJPO.convertUpdate(this.defaultValue) : "").append("\"\n");
-
-        // append triggers
-        this.triggers.write(_out, "    ");
-
-        // append ranges
-        this.rangesSorted.write(_out);
-
-        // append properties
-        this.getProperties().writeProperties(_paramCache, _out, "    ");
-
-        _out.append("}");
-    }
-
-    /**
-     * Defines attribute specific values which are written to the CI file.
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the TCL update code could not be written to the
-     *                     writer instance
-     */
-    protected void writeAttributeSpecificValues(final ParameterCache_mxJPO _paramCache,
-                                                final Appendable _out)
-        throws IOException
-    {
+        _out.append(updateBuilder.toString());
     }
 
     /**
@@ -433,7 +401,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     {
         MqlBuilder_mxJPO.multiLineMql()
                 .newLine()
-                .cmd("escape add ").cmd(this.getTypeDef().getMxAdminName()).cmd(" ").arg(this.getName()).cmd(" type ").cmd(this.attrTypeCreate)
+                .cmd("escape add ").cmd(this.getTypeDef().getMxAdminName()).cmd(" ").arg(this.getName()).cmd(" type ").cmd(this.kind.attrTypeCreate)
                 .exec(_paramCache);
     }
 
@@ -449,9 +417,48 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         DeltaUtil_mxJPO.calcValueDelta(_mql, "default",             this.defaultValue,     current.defaultValue);
         DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false,  this.isHidden(),       current.isHidden());
 
+        switch (this.kind)  {
+            case String:
+                DeltaUtil_mxJPO.calcFlagDelta(_mql, "multiline", false, this.multiline, current.multiline);
+                if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsPropMaxLength))  {
+                    DeltaUtil_mxJPO.calcValueDelta(_mql, "maxlength", this.maxLength, current.maxLength);
+                }
+                break;
+            case Integer:
+            case Real:
+                if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsDimension))  {
+                    if ((current.dimension == null) || current.dimension.isEmpty()) {
+                        if ((this.dimension != null) && !this.dimension.isEmpty())  {
+                            _paramCache.logDebug("    - set dimension '" + this.dimension + "'");
+                            _mql.newLine().cmd("dimension ").arg(this.dimension);
+                        }
+                    } else if (!current.dimension.equals(this.dimension))  {
+                        throw new UpdateException_mxJPO(
+                                UpdateException_mxJPO.ErrorKey.ABSTRACTATTRIBUTE_UPDATE_DIMENSION_UPDATED,
+                                this.getName(),
+                                current.dimension,
+                                (this.dimension != null) ? this.dimension : "");
+                    }
+                }
+                // no break, because range value is also for integer / real!
+            case Date:
+                if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagRangeValue))  {
+                    if (!this.rangeValue)  {
+                        DeltaUtil_mxJPO.calcFlagDelta(_mql, "rangevalue", false, this.rangeValue, current.rangeValue);
+                    } else if (!this.rangeValue)  {
+                        throw new UpdateException_mxJPO(
+                                UpdateException_mxJPO.ErrorKey.ABSTRACTATTRIBUTE_UPDATE_RANGEVALUEFLAG_UPDATED,
+                                this.getName());
+                    }
+                }
+                break;
+            default:
+                break;
+        }
+
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagMultiValue))  {
             if (!current.multiValue)  {
-                DeltaUtil_mxJPO.calcFlagDelta(_mql, "multivalue", this.multiValue, current.multiValue);
+                DeltaUtil_mxJPO.calcFlagDelta(_mql, "multivalue", false, this.multiValue, current.multiValue);
             } else if (!this.multiValue)  {
                 throw new UpdateException_mxJPO(
                         UpdateException_mxJPO.ErrorKey.ABSTRACTATTRIBUTE_UPDATE_MULTIVALUEFLAG_UPDATED,
@@ -459,10 +466,10 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
             }
         }
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnClone))  {
-            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "resetonclone",    this.resetOnClone,     current.resetOnClone);
+            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "resetonclone", false, this.resetOnClone,     current.resetOnClone);
         }
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnRevision))  {
-            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "resetonrevision", this.resetOnRevision,  current.resetOnRevision);
+            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "resetonrevision", false, this.resetOnRevision,  current.resetOnRevision);
         }
         DeltaUtil_mxJPO.calcListDelta(_mql, "rule", this.rules, current.rules);
 
@@ -470,6 +477,36 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         this.rangesSorted   .calcDelta(_mql, current.rangesSorted);
         this.getProperties().calcDelta(_mql, "", _current.getProperties());
     }
+
+    /**
+     * Kind of the attribute.
+     */
+    public enum Kind
+    {
+        /** Binary attribute. */
+        Binary("binary", "binary"),
+        /** Boolean attribute. */
+        Boolean("boolean", "boolean"),
+        /** Date attribute. */
+        Date("date", "timestamp"),
+        /** Integer attribute. */
+        Integer("integer", "integer"),
+        /** Real attribute. */
+        Real("real", "real"),
+        /** String attribute. */
+        String("string", "string");
+
+        Kind(final String _attrTypeCreate, final String _attrTypeList)
+        {
+            this.attrTypeCreate = _attrTypeCreate;
+            this.attrTypeList = _attrTypeList;
+        }
+
+        /** Holds the attribute type used to create a new attribute. */
+        private final String attrTypeCreate;
+        /** Holds the attribute including the &quot;,&quot; returned from the {@kind list attribute} statement.*/
+        private final String attrTypeList;
+}
 
     /**
      * Class holding range values of this attribute.
@@ -493,45 +530,37 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
          * <li>smatch<li>
          * </ul>
          */
-        String type = null;
+        private String type = null;
 
         /** Hold the first range value. */
-        String value1 = null;
+        private String value1 = null;
         /** Holds the second range value. */
-        String value2 = null;
+        private String value2 = null;
         /** Include first value (used for range type &quot;between&quot;). */
-        Boolean include1 = false;
+        private Boolean include1 = false;
         /** Include second value (used for range type &quot;between&quot;). */
-        Boolean include2 = false;
+        private Boolean include2 = false;
 
         /**
          * Write this range value to the writer instance.
          *
-         * @param _out                          writer instance
-         * @param _rangeProgramRef              name of the program
-         * @param _rangeProgramInputArguments   input arguments from the
-         *                                      program input
-         * @throws IOException if write to the writer instance is not possible
+         * @param _updateBuilder                update builder
          */
-        private void write(final Appendable _out)
-            throws IOException
+        private void write(final UpdateBuilder_mxJPO _updateBuilder)
         {
-            _out.append("    range ").append(this.type);
-            // if the range is a program it is a 'global' attribute info
-            if ("program".equals(this.type))  {
-                _out.append(" \"").append(StringUtil_mxJPO.convertUpdate(this.value1)).append('\"');
-                if (this.value2 != null)  {
-                    _out.append(" input \"").append(StringUtil_mxJPO.convertUpdate(this.value2)).append('\"');
-                }
-            } else  {
-                _out.append(" \"").append(StringUtil_mxJPO.convertUpdate(this.value1)).append("\"");
-                if ("between".equals(this.type))  {
-                    _out.append(' ').append(this.include1 ? "inclusive" : "exclusive")
-                        .append(" \"").append(StringUtil_mxJPO.convertUpdate(this.value2)).append("\"")
-                        .append(' ').append(this.include2 ? "inclusive" : "exclusive");
-                }
+            _updateBuilder
+                    .stepStartNewLine()
+                    .stepCmd("range").stepSpace().stepCmd(this.type).stepSpace().stepString(this.value1);
+
+            if ("program".equals(this.type) && (this.value2 != null))  {
+                _updateBuilder.stepSpace().stepCmd("input").stepSpace().stepString(this.value2);
+            } else if ("between".equals(this.type))  {
+                _updateBuilder
+                        .stepSpace().stepCmd(this.include1 ? "inclusive" : "exclusive")
+                        .stepSpace().stepString(this.value2)
+                        .stepSpace().stepCmd(this.include2 ? "inclusive" : "exclusive");
             }
-            _out.append('\n');
+            _updateBuilder.stepEndLine();
         }
 
         /**
@@ -601,21 +630,21 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
      */
     class Ranges
         extends TreeSet<Range>
+        implements UpdateList
     {
-        /** Serial Version UID. */
-        private static final long serialVersionUID = -3281559363746986173L;
+        /** Dummy serial version UID. */
+        private static final long serialVersionUID = 1L;
 
         /**
          * Append all ranges.
          *
-         * @param _out  writer instance
-         * @throws IOException if write to the writer instance is not possible
+         * @param _updateBuilder    update builder
          */
-        void write(final Appendable _out)
-            throws IOException
+        @Override()
+        public void write(final UpdateBuilder_mxJPO _updateBuilder)
         {
             for (final Range range : this)  {
-                range.write(_out);
+                range.write(_updateBuilder);
             }
         }
 
