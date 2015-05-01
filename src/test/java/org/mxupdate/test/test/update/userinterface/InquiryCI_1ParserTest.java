@@ -22,7 +22,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link Inquiry_mxJPO inquiry} parser.
+ * Tests the {@link Inquiry_mxJPO inquiry CI} parser.
  *
  * @author The MxUpdate Team
  */
@@ -36,9 +36,16 @@ public class InquiryCI_1ParserTest
     {
         return new Object[][]
         {
-            {"1) simple",
+            {"0) simple",
                     "",
                     "description \"\" pattern \"\" format \"\" code \" \""},
+            // registered name
+            {"1a) symbolic name",
+                    "",
+                    "symbolicname \"form__abc\" description \"\" pattern \"\" format \"\" code \" \""},
+            {"1b) two symbolic names",
+                    "symbolicname \"form__abc\" symbolicname \"form__def\" description \"\"  pattern \"\" format \"\" code \" \"",
+                    "symbolicname \"form__def\" symbolicname \"form__abc\" description \"\"  pattern \"\" format \"\" code \" \""},
             // description
             {"2a) description",
                     "",

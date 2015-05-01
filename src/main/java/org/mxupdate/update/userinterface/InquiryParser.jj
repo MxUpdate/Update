@@ -54,7 +54,8 @@ class InquiryParser
 
 <DEFAULT> TOKEN :
 {
-      <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
     | <HIDDEN_TRUE:                         "hidden">
     | <HIDDEN_FALSE:                        "!hidden">
@@ -117,7 +118,11 @@ void parse(final Inquiry_mxJPO _inquiry)
     Token tmp;
     AdminProperty property;
 } {
-    (   ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_inquiry, "description",                         this.getString(tmp.image));}
+    (
+        ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_inquiry, "symbolicNames", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_inquiry, "symbolicNames", this.getSingle(tmp.image));} ) )
+
+      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_inquiry, "description",                         this.getString(tmp.image));}
                                     | tmp = <MULTILINESINGLE>               {this.setValue(_inquiry, "description",                         this.getSingle(tmp.image));} ) )
 
       | ( <HIDDEN_TRUE>                                                     {this.setValue(_inquiry, "hidden",                              true);} )
@@ -132,9 +137,9 @@ void parse(final Inquiry_mxJPO _inquiry)
       | ( <CODE>                    ( tmp = <MULTILINESTRING>               {this.setValue(_inquiry, "code",                                this.getString(tmp.image));}
                                     | tmp = <MULTILINESINGLE>               {this.setValue(_inquiry, "code",                                this.getSingle(tmp.image));} ) )
 
-      | (<ARGUMENT>                                                         {property = new AdminProperty();this.appendValue(this.getValue(_inquiry, "properties"), "propertiesStack", property);}
-	                    ( tmp = <ARGUMENT_STRING>                           {this.setValue(property, "name", "%" + this.getString(tmp.image));}
-	                    | tmp = <ARGUMENT_SINGLE>                           {this.setValue(property, "name", "%" + this.getSingle(tmp.image));})
+      | ( <ARGUMENT>                                                        {property = new AdminProperty();this.appendValue(this.getValue(_inquiry, "properties"), "propertiesStack", property);}
+                      ( tmp = <ARGUMENT_STRING>                             {this.setValue(property, "name", "%" + this.getString(tmp.image));}
+                      | tmp = <ARGUMENT_SINGLE>                             {this.setValue(property, "name", "%" + this.getSingle(tmp.image));} )
                                     ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
 

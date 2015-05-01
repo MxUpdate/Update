@@ -13,13 +13,15 @@
  *
  */
 
-package org.mxupdate.test.ci.userinterface;
+package org.mxupdate.test.test.update.userinterface;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.ci.userinterface.AbstractUITest;
 import org.mxupdate.test.data.userinterface.InquiryData;
+import org.mxupdate.update.userinterface.Inquiry_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -27,12 +29,12 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test cases for the export and update of inquiries.
+ * Tests the {@link Inquiry_mxJPO inquiry CI} export / update.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class InquiryTest
+public class InquiryCI_3UpdateTest
     extends AbstractUITest<InquiryData>
 {
     /**

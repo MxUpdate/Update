@@ -101,6 +101,7 @@ public class Inquiry_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",             this.getDescription())
                 .flagIfTrue(    "hidden",           false, this.isHidden(),                     this.isHidden())
                 .string(        "pattern",                 this.pattern)
@@ -116,11 +117,12 @@ public class Inquiry_mxJPO
                              final Inquiry_mxJPO _current)
         throws UpdateException_mxJPO
     {
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "description",         this.getDescription(),                      _current.getDescription());
-        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false,  this.isHidden(),                            _current.isHidden());
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "pattern",             this.pattern,                               _current.pattern);
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "format",              this.format,                                _current.format);
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "code",                this.code,                                  _current.code);
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "description",         this.getDescription(),                          _current.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false,  this.isHidden(),                                _current.isHidden());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "pattern",             this.pattern,                                   _current.pattern);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "format",              this.format,                                    _current.format);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "code",                (this.code == null) ? "" : this.code.trim(),    _current.code);
 
         this.getProperties().calcDelta(_mql, "", _current.getProperties());
     }
