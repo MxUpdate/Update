@@ -22,7 +22,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link Channel_mxJPO channel} parser.
+ * Tests the {@link Channel_mxJPO channel CI} parser.
  *
  * @author The MxUpdate Team
  */
@@ -36,9 +36,16 @@ public class ChannelCI_1ParserTest
     {
         return new Object[][]
         {
-            {"1) simple",
+            {"0) simple",
                     "",
                     "description \"\" label \"\" href \"\" alt \"\" height 0"},
+            // registered name
+            {"1a) symbolic name",
+                    "",
+                    "symbolicname \"channel_abc\" description \"\" label \"\" href \"\" alt \"\" height 0"},
+            {"1b) two symbolic names",
+                    "symbolicname \"channel_abc\" symbolicname \"channel_def\" description \"\" label \"\" href \"\" alt \"\" height 0",
+                    "symbolicname \"channel_def\" symbolicname \"channel_abc\" description \"\" label \"\" href \"\" alt \"\" height 0"},
             // description
             {"2a) description",
                     "",

@@ -54,7 +54,8 @@ PARSER_END(ChannelParser)
 
 TOKEN : /** first level */
 {
-      <DESCRIPTION:             "description">                                  : MULTILINESTRING_EXPECTED
+      <SYMBOLICNAME:            "symbolicname">                                 : STRING_EXPECTED
+    | <DESCRIPTION:             "description">                                  : MULTILINESTRING_EXPECTED
     | <HIDDEN_TRUE:             "hidden">
     | <HIDDEN_FALSE:            "!hidden">
     | <LABEL:                   "label">                                        : STRING_EXPECTED
@@ -111,9 +112,9 @@ TOKEN : /** first level */
 /**
  * Parses one complete menu definition.
  *
- * @param _menu     target menu to update with parsed values
+ * @param _channel     target menu to update with parsed values
  */
-void parse(Channel_mxJPO _menu)
+void parse(Channel_mxJPO _channel)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
 : {
     Token tmp;
@@ -121,34 +122,37 @@ void parse(Channel_mxJPO _menu)
     CommandRef ref;
     int refIdx = 0;
 } {
-    (   (<DESCRIPTION>              ( tmp = <MULTILINESTRING>  {this.setValue(_menu, "description", this.getString(tmp.image));}
-                                    | tmp = <MULTILINESINGLE>  {this.setValue(_menu, "description", this.getSingle(tmp.image));} ) )
+    (   ( <SYMBOLICNAME>            ( tmp = <STRING>           {this.appendValue(_channel, "symbolicNames", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.appendValue(_channel, "symbolicNames", this.getSingle(tmp.image));} ) )
 
-      | (<HIDDEN_TRUE>                                         {this.setValue(_menu, "hidden", true);} )
-      | (<HIDDEN_FALSE>                                        {this.setValue(_menu, "hidden", false);} )
+      | (<DESCRIPTION>              ( tmp = <MULTILINESTRING>  {this.setValue(_channel, "description", this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>  {this.setValue(_channel, "description", this.getSingle(tmp.image));} ) )
 
-      | (<LABEL>                    ( tmp = <STRING>           {this.setValue(_menu, "label", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(_menu, "label", this.getSingle(tmp.image));} ) )
+      | (<HIDDEN_TRUE>                                         {this.setValue(_channel, "hidden", true);} )
+      | (<HIDDEN_FALSE>                                        {this.setValue(_channel, "hidden", false);} )
 
-      | (<ALT>                      ( tmp = <STRING>           {this.setValue(_menu, "alt", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(_menu, "alt", this.getSingle(tmp.image));} ) )
+      | (<LABEL>                    ( tmp = <STRING>           {this.setValue(_channel, "label", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(_channel, "label", this.getSingle(tmp.image));} ) )
 
-      | (<HREF>                     ( tmp = <STRING>           {this.setValue(_menu, "href", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(_menu, "href", this.getSingle(tmp.image));} ) )
+      | (<ALT>                      ( tmp = <STRING>           {this.setValue(_channel, "alt", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(_channel, "alt", this.getSingle(tmp.image));} ) )
 
-      | (<HEIGHT>                   tmp = <INTEGER>            {this.setValue(_menu, "height", Integer.valueOf(tmp.image));} )
+      | (<HREF>                     ( tmp = <STRING>           {this.setValue(_channel, "href", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(_channel, "href", this.getSingle(tmp.image));} ) )
 
-      | (<SETTING>                                             {property = new AdminProperty();this.appendValue(this.getValue(_menu, "properties"), "propertiesStack", property);}
+      | (<HEIGHT>                   tmp = <INTEGER>            {this.setValue(_channel, "height", Integer.valueOf(tmp.image));} )
+
+      | (<SETTING>                                             {property = new AdminProperty();this.appendValue(this.getValue(_channel, "properties"), "propertiesStack", property);}
                                     ( tmp = <SETTING_STRING>   {this.setValue(property, "name", "%" + this.getString(tmp.image));}
                                     | tmp = <SETTING_SINGLE>   {this.setValue(property, "name", "%" + this.getSingle(tmp.image));})
                                     ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
 
-      | (<COMMAND>                                             {ref = new CommandRef();this.setValue(ref, "column", refIdx++);this.appendValue(this.getValue(_menu, "children"), "childrenStack", ref);}
+      | (<COMMAND>                                             {ref = new CommandRef();this.setValue(ref, "column", refIdx++);this.appendValue(this.getValue(_channel, "children"), "childrenStack", ref);}
                                     ( tmp = <STRING>           {this.setValue(ref, "name", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(ref, "name", this.getString(tmp.image));} ) )
 
-      | (<PROPERTY>                                            {property = new AdminProperty();this.appendValue(this.getValue(_menu, "properties"), "propertiesStack", property);}
+      | (<PROPERTY>                                            {property = new AdminProperty();this.appendValue(this.getValue(_channel, "properties"), "propertiesStack", property);}
                                     ( tmp = <STRING>           {this.setValue(property, "name", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(property, "name", this.getSingle(tmp.image));} )
               (   ( <PROPERTYVAL>   ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}

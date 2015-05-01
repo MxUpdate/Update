@@ -11,47 +11,49 @@ interface ChannelParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int DESCRIPTION = 5;
+  int SYMBOLICNAME = 5;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 6;
+  int DESCRIPTION = 6;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 7;
+  int HIDDEN_TRUE = 7;
   /** RegularExpression Id. */
-  int LABEL = 8;
+  int HIDDEN_FALSE = 8;
   /** RegularExpression Id. */
-  int ALT = 9;
+  int LABEL = 9;
   /** RegularExpression Id. */
-  int HREF = 10;
+  int ALT = 10;
   /** RegularExpression Id. */
-  int HEIGHT = 11;
+  int HREF = 11;
   /** RegularExpression Id. */
-  int SETTING = 12;
+  int HEIGHT = 12;
   /** RegularExpression Id. */
-  int COMMAND = 13;
+  int SETTING = 13;
   /** RegularExpression Id. */
-  int STRING = 14;
+  int COMMAND = 14;
   /** RegularExpression Id. */
-  int SINGLE = 15;
+  int STRING = 15;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 16;
+  int SINGLE = 16;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 17;
+  int MULTILINESTRING = 17;
   /** RegularExpression Id. */
-  int INTEGER = 18;
+  int MULTILINESINGLE = 18;
   /** RegularExpression Id. */
-  int SETTING_STRING = 19;
+  int INTEGER = 19;
   /** RegularExpression Id. */
-  int SETTING_SINGLE = 20;
+  int SETTING_STRING = 20;
   /** RegularExpression Id. */
-  int PROPERTY = 21;
+  int SETTING_SINGLE = 21;
   /** RegularExpression Id. */
-  int PROPERTYTO = 22;
+  int PROPERTY = 22;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 23;
+  int PROPERTYTO = 23;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 24;
+  int PROPERTYVAL = 24;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 25;
+  int ADMINTYPE_STRING = 25;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 26;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -73,6 +75,7 @@ interface ChannelParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"symbolicname\"",
     "\"description\"",
     "\"hidden\"",
     "\"!hidden\"",

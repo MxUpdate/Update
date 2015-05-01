@@ -132,6 +132,7 @@ public class Channel_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
                 .flagIfTrue(    "hidden",           false,  this.isHidden(),                     this.isHidden())
                 .string(        "label",                    this.getLabel())
@@ -149,6 +150,7 @@ public class Channel_mxJPO
                              final Channel_mxJPO _current)
         throws UpdateException_mxJPO
     {
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",         this.getDescription(),       _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false,  this.isHidden(),             _current.isHidden());
         DeltaUtil_mxJPO.calcValueDelta(_mql, "label",               this.getLabel(),             _current.getLabel());
