@@ -38,6 +38,13 @@ public class PageCI_1ParserTest
             {"0) simple",
                     "",
                     "description \"\" mime \"\" "},
+            // registered name
+            {"1a) symbolic name",
+                    "",
+                    "symbolicname \"channel_abc\" description \"\" mime \"\""},
+            {"1b) two symbolic names",
+                    "symbolicname \"channel_abc\" symbolicname \"channel_def\" description \"\" mime \"\"",
+                    "symbolicname \"channel_def\" symbolicname \"channel_abc\" description \"\" mime \"\""},
             // description
             {"2a) description",
                     "",

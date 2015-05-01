@@ -11,33 +11,35 @@ interface PageParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int DESCRIPTION = 5;
+  int SYMBOLICNAME = 5;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 6;
+  int DESCRIPTION = 6;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 7;
+  int HIDDEN_TRUE = 7;
   /** RegularExpression Id. */
-  int MIME = 8;
+  int HIDDEN_FALSE = 8;
   /** RegularExpression Id. */
-  int CONTENT = 9;
+  int MIME = 9;
   /** RegularExpression Id. */
-  int STRING = 10;
+  int CONTENT = 10;
   /** RegularExpression Id. */
-  int SINGLE = 11;
+  int STRING = 11;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 12;
+  int SINGLE = 12;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 13;
+  int MULTILINESTRING = 13;
   /** RegularExpression Id. */
-  int PROPERTY = 14;
+  int MULTILINESINGLE = 14;
   /** RegularExpression Id. */
-  int PROPERTYTO = 15;
+  int PROPERTY = 15;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 16;
+  int PROPERTYTO = 16;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 17;
+  int PROPERTYVAL = 17;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 18;
+  int ADMINTYPE_STRING = 18;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 19;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -55,6 +57,7 @@ interface PageParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"symbolicname\"",
     "\"description\"",
     "\"hidden\"",
     "\"!hidden\"",

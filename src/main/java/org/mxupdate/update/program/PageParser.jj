@@ -49,7 +49,9 @@ class PageParser
 
 <DEFAULT> TOKEN :
 {
-      <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+
+    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
     | <HIDDEN_TRUE:                         "hidden">
     | <HIDDEN_FALSE:                        "!hidden">
@@ -101,6 +103,9 @@ void parse(final Page_mxJPO _page)
 } {
     (   ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_page, "description",                            this.getString(tmp.image));}
                                     | tmp = <MULTILINESINGLE>               {this.setValue(_page, "description",                            this.getSingle(tmp.image));} ) )
+
+      | ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_page, "symbolicNames",                       this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_page, "symbolicNames",                       this.getSingle(tmp.image));} ) )
 
       | ( <HIDDEN_TRUE>                                                     {this.setValue(_page, "hidden",                                 true);} )
       | ( <HIDDEN_FALSE>                                                    {this.setValue(_page, "hidden",                                 false);} )

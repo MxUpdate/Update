@@ -13,7 +13,7 @@
  *
  */
 
-package org.mxupdate.test.ci.program;
+package org.mxupdate.test.test.update.program;
 
 import matrix.util.MatrixException;
 
@@ -32,7 +32,7 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-public class PageTest
+public class PageCI_3UpdateTest
     extends AbstractDataExportUpdate<PageData>
 {
     /**
