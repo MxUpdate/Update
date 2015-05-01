@@ -90,7 +90,7 @@ public class RelationshipCI_3UpdateTest
                         "relationship without from propagate connection",
                         new RelationshipData(this, "TestRelationship"),
                         new RelationshipData(this, "TestRelationship")
-                                .from().defFlag("propagateconnection", false)},
+                                .from().defFlag("propagateconnection", true)},
                 new Object[]{
                         "relationship with from propagate connection true",
                         new RelationshipData(this, "TestRelationship")
@@ -191,7 +191,7 @@ public class RelationshipCI_3UpdateTest
                 new Object[]{
                         "relationship without to propagate connection",
                         new RelationshipData(this, "TestRelationship"),
-                        new RelationshipData(this, "TestRelationship").to().defFlag("propagateconnection", false)},
+                        new RelationshipData(this, "TestRelationship").to().defFlag("propagateconnection", true)},
                 new Object[]{
                         "relationship with to propagate connection true",
                         new RelationshipData(this, "TestRelationship").to().defFlag("propagateconnection", true)},
