@@ -520,21 +520,6 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
     {
         final StringBuilder preMQLCode = new StringBuilder();
 
-if (!(this instanceof Group_mxJPO))  {
-        // remove hidden flag
-        if (this.isHidden())  {
-            preMQLCode.append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                      .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                      .append(" !hidden;\n");
-        }
-
-        // remove site...
-        if (this.site != null)  {
-            preMQLCode.append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                      .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                      .append(" site \"\";\n");
-        }
-
         if (!this.ignoreWorkspaceObjects(_paramCache))  {
             // remove all assigned cues
             for (final Cue_mxJPO cue : this.cues.values())  {
@@ -575,7 +560,7 @@ if (!(this instanceof Group_mxJPO))  {
 
         // append already existing pre MQL code
         preMQLCode.append(_preMQLCode);
-}
+
         super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
     }
 

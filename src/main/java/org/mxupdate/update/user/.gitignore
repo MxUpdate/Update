@@ -1,3 +1,6 @@
 /GroupParser.java
 /GroupParserConstants.java
 /GroupParserTokenManager.java
+/RoleParser.java
+/RoleParserConstants.java
+/RoleParserTokenManager.java

@@ -741,6 +741,20 @@ public class PersonAdmin_mxJPO
         }
         preMQLCode.append(";\n");
 
+        // remove hidden flag
+        if (this.isHidden())  {
+            preMQLCode.append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                      .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
+                      .append(" !hidden;\n");
+        }
+
+        // remove site...
+        if (this.getSite() != null)  {
+            preMQLCode.append("escape mod ").append(this.getTypeDef().getMxAdminName())
+                      .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
+                      .append(" site \"\";\n");
+        }
+
         super.update(_paramCache, preMQLCode, _postMQLCode, preTCLCode, _tclVariables, _sourceFile);
     }
 

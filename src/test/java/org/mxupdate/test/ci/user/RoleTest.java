@@ -18,10 +18,9 @@ package org.mxupdate.test.ci.user;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.other.SiteData;
 import org.mxupdate.test.data.user.RoleData;
-import org.testng.Assert;
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -37,18 +36,6 @@ public class RoleTest
     extends AbstractUserTest<RoleData>
 {
     /**
-     * Creates for given <code>_name</code> a new role instance.
-     *
-     * @param _name     name of the role instance
-     * @return role instance
-     */
-    @Override()
-    protected RoleData createNewData(final String _name)
-    {
-        return new RoleData(this, _name);
-    }
-
-    /**
      * Data provider for test roles.
      *
      * @return object array with all test roles
@@ -58,28 +45,27 @@ public class RoleTest
     {
         return this.prepareData("role",
                 new Object[]{
-                        "simple role",
+                        "0a) role without anything",
+                        new RoleData(this, "Test")},
+                new Object[]{
+                        "0b) role without anything (to test required fields)",
+                        new RoleData(this, "Test")
+                                .setValue("description", "")
+                                .setFlag("hidden", false),
+                        new RoleData(this, "Test")},
+                new Object[]{
+                        "0c) role with escaped name",
                         new RoleData(this, "hallo \" test")
                             .setValue("description", "\"\\\\ hallo")},
                 new Object[]{
-                        "simple organizational role",
-                        new RoleData(this, "hallo \" test")
-                            .setRoleType(RoleData.RoleType.ORGANIZATION)
-                            .setValue("description", "\"\\\\ hallo")},
-                new Object[]{
-                        "simple project role",
-                        new RoleData(this, "hallo \" test")
-                            .setRoleType(RoleData.RoleType.PROJECT)
-                            .setValue("description", "\"\\\\ hallo")},
-                new Object[]{
-                        "role with two parent roles",
-                        new RoleData(this, "hallo \" test")
+                        "1) role with two parent groups",
+                        new RoleData(this, "test")
                                 .setValue("description", "\"\\\\ hallo")
                                 .assignParents(new RoleData(this, "hallo parent1 \" test"))
                                 .assignParents(new RoleData(this, "hallo parent2 \" test"))},
                 new Object[]{
-                        "role with assigned site",
-                        new RoleData(this, "hallo \" test")
+                        "2) group with assigned site",
+                        new RoleData(this, "test")
                                 .setSite(new SiteData(this, "Test \" Site"))});
     }
 
@@ -102,12 +88,119 @@ public class RoleTest
     }
 
     /**
-     * Cleanup all test roles.
+     * Positive test for kind organization.
      *
-     * @throws MatrixException if cleanup failed
+     * @throws Exception if test failed
      */
+    @Test(description = "positive test for kind organization")
+    public void t3a_positiveTestKindOrganization()
+        throws Exception
+    {
+        this.createNewData("Test")
+                .create()
+                .setSingle("kind", "organization")
+                .update("")
+                .checkExport();
+    }
+
+    /**
+     * Positive test for kind organization.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "positive test for kind project")
+    public void t3b_positiveTestKindProject()
+        throws Exception
+    {
+        this.createNewData("Test")
+                .create()
+                .setSingle("kind", "project")
+                .update("")
+                .checkExport();
+    }
+
+    /**
+     * Negative test if the kind is changed from organization to project.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "negative test if the kind is changed from organization to project")
+    public void t3c_negativeTestChangeKindOrganizationToProject()
+        throws Exception
+    {
+        this.createNewData("Test")
+                .create()
+                .setSingle("kind", "organization")
+                .update("")
+                .checkExport()
+                .setSingle("kind", "project")
+                .failureUpdate(ErrorKey.USER_ROLE_NOT_ROLE_KIND)
+                .setSingle("kind", "organization")
+                .checkExport();
+    }
+
+    /**
+     * Negative test if the kind is changed from organization to role.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "negative test if the kind is changed from organization to role")
+    public void t3d_negativeTestChangeKindOrganizationToRole()
+        throws Exception
+    {
+        this.createNewData("Test")
+                .create()
+                .setSingle("kind", "organization")
+                .update("")
+                .checkExport()
+                .setSingle("kind", "role")
+                .failureUpdate(ErrorKey.USER_ROLE_NOT_ROLE_KIND)
+                .setSingle("kind", "organization")
+                .checkExport();
+    }
+
+    /**
+     * Negative test if the kind is changed back from project to organization.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "negative test if the kind is changed from project to organization")
+    public void t3e_negativeTestChangeKindProjectToOrganization()
+        throws Exception
+    {
+        this.createNewData("Test")
+                .create()
+                .setSingle("kind", "project")
+                .update("")
+                .checkExport()
+                .setSingle("kind", "organization")
+                .failureUpdate(ErrorKey.USER_ROLE_NOT_ROLE_KIND)
+                .setSingle("kind", "project")
+                .checkExport();
+    }
+
+    /**
+     * Negative test if the kind is changed from project to role.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "negative test if the kind is changed from project to role")
+    public void t3f_negativeTestChangeKindProjectToRole()
+        throws Exception
+    {
+        this.createNewData("Test")
+                .create()
+                .setSingle("kind", "project")
+                .update("")
+                .checkExport()
+                .setSingle("kind", "role")
+                .failureUpdate(ErrorKey.USER_ROLE_NOT_ROLE_KIND)
+                .setSingle("kind", "project")
+                .checkExport();
+    }
+
     @BeforeMethod()
-    @AfterClass()
+    @AfterClass(groups = "close")
     public void cleanup()
         throws MatrixException
     {
@@ -118,66 +211,9 @@ public class RoleTest
         this.cleanup(AbstractTest.CI.PRG_MQL_PROGRAM);
     }
 
-    /**
-     * Test an update of a role where the site is removed.
-     *
-     * @throws Exception if test failed
-     */
-    @Test(description = "update existing existing role with site by removing site")
-    public void checkExistingSiteRemovedWithinUpdate()
-        throws Exception
+    @Override()
+    protected RoleData createNewData(final String _name)
     {
-        final RoleData role = new RoleData(this, "hallo \" test")
-                .setSite(new SiteData(this, "Test \" Site"));
-        role.create();
-        role.setSite(null);
-        role.update((String) null);
-
-        Assert.assertEquals(this.mql("escape print role \"" + AbstractTest.convertMql(role.getName()) + "\" select site dump"),
-                            "",
-                            "check that no site is defined");
-    }
-
-    /**
-     * Check that the hidden flag is removed within update.
-     *
-     * @throws Exception if test failed
-     */
-    @Test(description = "check that the hidden flag is removed within update")
-    public void checkHiddenFlagRemoveWithinUpdate()
-        throws Exception
-    {
-        final RoleData role = new RoleData(this, "hallo \" test").setFlag("hidden", true);
-        role.create()
-            .setFlag("hidden", null)
-            .update((String) null);
-        Assert.assertEquals(this.mql("escape print role \"" + AbstractTest.convertMql(role.getName()) + "\" select hidden dump"),
-                            "FALSE",
-                            "check that role is not hidden");
-    }
-
-    /**
-     * Check that an update of an organizational role with child organizational
-     * role works.
-     *
-     * @throws Exception if test failed
-     */
-    @Test(description = "check that an update of an organizational role with child organizational role works")
-    public void checkOrgRoleWithChildOrgRole()
-        throws Exception
-    {
-        final RoleData parent = new RoleData(this, "parent")
-                .setRoleType(RoleData.RoleType.ORGANIZATION);
-        final RoleData child = new RoleData(this, "child")
-                .setRoleType(RoleData.RoleType.ORGANIZATION)
-                .assignParents(parent);
-        child.create();
-
-        final ExportParser exportParser = parent.export();
-        parent.checkExport(exportParser);
-
-        // second update with delivered content
-        parent.updateWithCode(exportParser.getOrigCode(), (String) null)
-              .checkExport();
+        return new RoleData(this, _name);
     }
 }

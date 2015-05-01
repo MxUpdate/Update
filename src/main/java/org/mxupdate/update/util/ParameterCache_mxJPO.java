@@ -807,6 +807,9 @@ public class ParameterCache_mxJPO
         /** List of removed attributes for types to be removed. */
         DMTypeAttrRemove,
 
+        /** User role supports role type. */
+        UserRoleSupportRoleType,
+
         /** Boolean that the update continues if a error was thrown. */
         ParamContinueOnError;
     }

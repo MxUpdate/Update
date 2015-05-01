@@ -46,6 +46,11 @@ public class UpdateException_mxJPO
      *     <li>118: {@link org.mxupdate.update.datamodel.Type_mxJPO type}</li>
      *     <li>120: {@link org.mxupdate.update.datamodel.AbstractAttribute_mxJPO numeric attributes}</li>
      *     <li>121: {@link org.mxupdate.update.datamodel.AbstractDMWithAttributes_mxJPO data model with attributes}</li>
+     *     <li>303: {@link org.mxupdate.update.user.Group_mxJPO group}</li>
+     *     <li>306: {@link org.mxupdate.update.user.Person_mxJPO person}</li>
+     *     <li>309: {@link org.mxupdate.update.user.PersonAdmin_mxJPO admin person}</li>
+     *     <li>312: {@link org.mxupdate.update.user.Role_mxJPO role}</li>
+     *     <li>315: {@link org.mxupdate.update.user.Group_mxJPO group}</li>
      *     <li>601: {@link org.mxupdate.update.AbstractObject_mxJPO abstract object}</li>
      *     <li>602: {@link org.mxupdate.update.AbstractAdminObject_mxJPO abstract administration object}</li>
      *     <li>603: {@link org.mxupdate.update.AbstractPropertyObject_mxJPO abstract property object}</li>
@@ -214,7 +219,6 @@ public class UpdateException_mxJPO
          *
          * <p>Parameters:
          * <ol>
-         * <li>administration type (should be relationship)</li>
          * <li>name of the relationship</li>
          * <li>current kind</li>
          * <li>new kind (from the CI file)</li>
@@ -297,6 +301,20 @@ public class UpdateException_mxJPO
          */
         DM_TYPE_UPDATE_DERIVED(11803,
                 "The new derived ''{2}'' can not be set for type ''{0}'', because derived ''{1}'' is already set and potentially some data can be lost."),
+
+        /**
+         * Kind of a role can not be changed if the current kind is not role.
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>name of the role</li>
+         * <li>current kind</li>
+         * <li>new kind (from the CI file)</li>
+         * </ol>
+         * </p>
+         */
+        USER_ROLE_NOT_ROLE_KIND(31201,
+                "The new kind ''{2}'' can not be set for role ''{0}'', because kind ''{1}'' is already set. Kinds of role can be only set for ''Role''."),
 
         /**
          * If the name of a configuration item could not be extracted from a

@@ -150,9 +150,8 @@ public abstract class AbstractTest
         USR_PERSON("person", "Person", false, "Person", "eService Production", "Person", "PERSON", "PERSON_", "user/person", true, "mql"),
         /** Configuration item administration person. */
         USR_PERSONADMIN("person", null, false, null, null, "PersonAdmin", "PERSONADMIN", "PERSONADMIN_", "user/personadmin", true, "mql"),
-
         /** Configuration item role. */
-        USR_ROLE("role", null, false, null, null, "Role", "ROLE", "ROLE_", "user/role", true, "mql"),
+        USR_ROLE("role", null, false, null, null, "Role", "ROLE", "ROLE_", "user/role", true, "mxUpdate"),
 
         /** Other definition for business unit. */
         OTHER_BUSINESSUNIT(null, "Business Unit", false, "Organization", "eService Production", "Business Unit", null, null, null, true, "mql"),
