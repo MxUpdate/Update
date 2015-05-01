@@ -36,9 +36,18 @@ public class DimensionCI_1ParserTest
     {
         return new Object[][]{
                 {
-                        "1) simple hidden dimension definition without units",
+                        "0) simple hidden dimension definition without units",
                         "",
                         "description \"\" hidden"},
+
+                // registered name
+                {"1a) symbolic name",
+                        "",
+                        "symbolicname \"channel_abc\" description \"\" !hidden "},
+                {"1b) two symbolic names",
+                        "symbolicname \"channel_abc\" symbolicname \"channel_def\" description \"\" !hidden",
+                        "symbolicname \"channel_def\" symbolicname \"channel_abc\" description \"\" !hidden"},
+
                 {
                         "2a) simple not hidden dimension",
                         "",

@@ -58,7 +58,8 @@ PARSER_END(DimensionParser)
 
 <DEFAULT> TOKEN :
 {
-      <DESCRIPTION:                         "description">                                          : MULTILINESTRING_EXPECTED
+      <SYMBOLICNAME:                        "symbolicname">                                         : STRING_EXPECTED
+    | <DESCRIPTION:                         "description">                                          : MULTILINESTRING_EXPECTED
     | <HIDDEN_TRUE:                         "hidden">
     | <HIDDEN_TRUE_VIA_VALUE:               "hidden" ([" ","\t","\n","\r"])+ ["t","T"] ["r","R"] ["u","U"] ["e","E"]>
     | <HIDDEN_TRUE_VIA_VALUE_APOSTROPHE:    "hidden" ([" ","\t","\n","\r"])+ "\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"">
@@ -72,6 +73,13 @@ PARSER_END(DimensionParser)
 {
       <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
     | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/************************************************************** Common String */
+<STRING_EXPECTED> TOKEN :
+{
+      <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
+    | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
 }
 
 /******************************************************* String for Unit Name */
@@ -185,7 +193,10 @@ void parse(final Dimension_mxJPO _dimension)
     AdminProperty tmpProp;
     Unit unit;
 } {
-    (   (<DESCRIPTION>  ( tmp = <MULTILINESTRING>                               {this.setValue(_dimension, "description", this.getString(tmp.image));}
+    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                            {this.appendValue(_dimension, "symbolicNames", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                            {this.appendValue(_dimension, "symbolicNames", this.getSingle(tmp.image));} ) )
+
+      | (<DESCRIPTION>  ( tmp = <MULTILINESTRING>                               {this.setValue(_dimension, "description", this.getString(tmp.image));}
                         | tmp = <MULTILINESINGLE>                               {this.setValue(_dimension, "description", this.getSingle(tmp.image));} ) )
       | ( (   <HIDDEN_TRUE>
             | <HIDDEN_TRUE_VIA_VALUE>
