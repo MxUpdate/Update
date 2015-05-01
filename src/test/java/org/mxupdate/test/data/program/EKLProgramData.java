@@ -16,8 +16,6 @@
 package org.mxupdate.test.data.program;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.AbstractAdminData;
-import org.testng.annotations.Test;
 
 /**
  * The class is used to define all MQL program objects used to create / update
@@ -25,9 +23,8 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
 public class EKLProgramData
-    extends AbstractAdminData<EKLProgramData>
+    extends AbstractProgramData<EKLProgramData>
 {
     /**
      * Initializes this MQL program.

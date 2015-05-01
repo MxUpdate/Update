@@ -48,10 +48,22 @@ public class WrapperCIInstance<DATA extends AbstractAdminObject_mxJPO<?>>
      * @param _ciCode   ci code to parse
      * @throws Exception if parse failed
      */
-    public void parseUpdate(final String _ciCode)
+    public void parseUpdateWOStrip(final String _ciCode)
         throws Exception
     {
         this.data.parseUpdate(_ciCode);
+    }
+
+    /**
+     * Parses the given {@code _ciCode}.
+     *
+     * @param _ciCode   ci code to parse
+     * @throws Exception if parse failed
+     */
+    public void parseUpdate(final String _ciCode)
+        throws Exception
+    {
+        this.data.parseUpdate(this.strip(_ciCode));
     }
 
     /**
@@ -63,7 +75,7 @@ public class WrapperCIInstance<DATA extends AbstractAdminObject_mxJPO<?>>
     public void parseUpdate(final AbstractAdminData<?> _data)
         throws Exception
     {
-        this.parseUpdate(this.strip(_data.ciFile()));
+        this.parseUpdate(_data.ciFile());
     }
 
     /**
@@ -196,7 +208,13 @@ public class WrapperCIInstance<DATA extends AbstractAdminObject_mxJPO<?>>
     private WrapperCIInstance<DATA> newInstance()
         throws Exception
     {
-        final Constructor<?> constr = this.data.getClass().getConstructor(TypeDef_mxJPO.class, String.class);
+        Constructor<?> constr = null;
+        try {
+            constr = this.data.getClass().getConstructor(TypeDef_mxJPO.class, String.class);
+        } catch (final NoSuchMethodException e)  {
+            // data class is an anonymoous class => use super class!
+            constr = this.data.getClass().getSuperclass().getConstructor(TypeDef_mxJPO.class, String.class);
+        }
 
         return new WrapperCIInstance<DATA>((DATA) constr.newInstance(this.data.getTypeDef(), this.data.getName()));
     }

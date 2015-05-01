@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.program;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -34,7 +33,6 @@ import org.mxupdate.update.util.MqlBuilder_mxJPO.MqlBuilder;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
-import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 
 /**
@@ -91,7 +89,6 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
         super(_typeDef, _mxName);
         this.kind = _kind;
     }
-
 
     /**
      * Searches for all programs objects depending on the program {@link Kind}.
@@ -188,6 +185,9 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
         } else if ("/eklProgram".equals(_url))  {
             this.kind = Kind.EKL;
             parsed = true;
+        } else if ("/javaProgram".equals(_url))  {
+            this.kind = Kind.JAVA;
+            parsed = true;
         } else if ("/mqlPipe".equals(_url))  {
             this.pipe = true;
             parsed = true;
@@ -209,108 +209,6 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
         return parsed;
     }
 
-    /**
-     * Appends the TCL update code to <code>_out</code> for this MQL program.
-     * This includes:
-     * <ul>
-     * <li>{@link #deferred} execution</li>
-     * <li>execute {@link #user}</li>
-     * <li>{@link #getDescription() description}</li>
-     * <li>{@link #isHidden() hidden flag}</li>
-     * <li>{@link #needsBusinessObjectContext needs context} of a business
-     *      object</li>
-     * <li>program is {@link #downloadable}</li>
-     * <li>input / output of the program is {@link #pipe piped}</li>
-     * <li>program is {@link #pooled}</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          update file (where the MQL program with the TCL
-     *                      update file is written)
-     * @param _markStart    start marker of the TCL update
-     * @param _markEnd      end marker of the TCL update
-     * @param _linePrefix   line prefix (before each TCL update line)
-     * @throws IOException if the TCL code could not be written to the file
-     */
-    @Deprecated()
-    protected void writeUpdateCode(final ParameterCache_mxJPO _paramCache,
-                                   final Appendable _out,
-                                   final String _markStart,
-                                   final String _markEnd,
-                                   final String _linePrefix)
-        throws IOException
-    {
-        final StringBuilder cmd = new StringBuilder();
-        if ((this.execute == Execute.DEFERRED) || this.needsBusinessObjectContext
-                || this.downloadable || this.pipe || this.pooled
-                || (this.user != null)
-                || ((this.getDescription() != null) && !"".equals(this.getDescription()))
-                || this.isHidden())  {
-            cmd.append("\nmql mod program \"${NAME}\"");
-            if (this.execute == Execute.DEFERRED)  {
-                cmd.append(" \\\n    execute deferred");
-            }
-            if (this.user != null)  {
-                cmd.append(" \\\n    execute user \"").append(StringUtil_mxJPO.convertTcl(this.user)).append('\"');
-            }
-            if ((this.getDescription() != null) && !"".equals(this.getDescription()))  {
-                cmd.append(" \\\n    description \"").append(StringUtil_mxJPO.convertTcl(this.getDescription())).append('\"');
-            }
-            if (this.isHidden())  {
-                cmd.append(" \\\n    hidden");
-            }
-            if (this.needsBusinessObjectContext)  {
-                cmd.append(" \\\n    needsbusinessobject");
-            }
-            if (this.downloadable)  {
-                cmd.append(" \\\n    downloadable");
-            }
-            if (this.pipe)  {
-                cmd.append(" \\\n    pipe");
-            }
-            if (this.pooled)  {
-                cmd.append(" \\\n    pooled");
-            }
-        }
-
-        this.getProperties().writeAddFormat(_paramCache, _out, this.getTypeDef());
-
-        if (!"".equals(cmd.toString()))  {
-            _out.append(_markStart.trim()).append('\n')
-                .append(this.makeLinePrefix(_linePrefix, cmd));
-            if (_linePrefix != null)  {
-                _out.append(_linePrefix);
-            }
-            _out.append('\n').append(_markEnd.trim()).append("\n\n");
-        }
-    }
-
-    /**
-     * For each line in the <code>_lines</code> text (separated by new line)
-     * the <code>_linePrefix</code> is added.
-     *
-     * @param _linePrefix   prefix for the lines; or <code>null</code> if no
-     *                      line prefix is defined
-     * @param _lines        complete lines as text with new lines
-     * @return new lines with prefixes
-     */
-    @Deprecated()
-    protected String makeLinePrefix(final String _linePrefix,
-                                    final CharSequence _lines)
-    {
-        final StringBuilder ret = new StringBuilder();
-
-        if ((_linePrefix != null) && !"".equals(_linePrefix))  {
-            for (final String line : _lines.toString().split("\n"))  {
-                ret.append(_linePrefix).append(line).append('\n');
-            }
-        } else  {
-            ret.append(_lines);
-        }
-
-        return ret.toString();
-    }
-
     @Override()
     protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
@@ -328,7 +226,40 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
                 .singleIfTrue(  "execute",                      this.execute.name().toLowerCase(),      (this.execute != Execute.IMMEDIATE))
                 .stringIfTrue(  "execute user",                 this.user,                              (this.user != null) && !this.user.isEmpty())
                 .properties(this.getProperties())
-                .codeIfTrue(    "code",                         this.getCode(),                         (this.getCode() != null) && !this.getCode().isEmpty());
+                .codeIfTrue(    "code",                         this.getCode(),                         (this.kind != Kind.JAVA) && (this.getCode() != null) && !this.getCode().isEmpty())
+                .stringIfTrue(  "file",     this.getName().replaceAll("\\.", "/") + "_" + "mxJPO.java", (this.kind == Kind.JAVA) && (this.getCode() != null) && !this.getCode().isEmpty());
+    }
+
+    /**
+     *
+     * @param _paramCache   parameter cache
+     */
+    public boolean hasNoValuesDefined(final ParameterCache_mxJPO _paramCache)
+    {
+        return     this.getSymbolicNames().isEmpty()
+                && ((this.getDescription() == null) || this.getDescription().isEmpty())
+                && !this.isHidden()
+                && !this.needsBusinessObjectContext
+                && !this.downloadable
+                && !this.pipe
+                && !this.pooled
+                && ((this.rule == null) || this.rule.isEmpty())
+                && (this.execute == Execute.IMMEDIATE)
+                && ((this.user == null) || this.user.isEmpty())
+                && this.getProperties().hasNoValuesDefined(_paramCache);
+    }
+
+    /**
+     * Creates given program object from given type with given name.
+     *
+     * @param _paramCache   parameter cache
+     * @throws Exception if create of JPO failed
+     */
+    @Override()
+    public void create(final ParameterCache_mxJPO _paramCache)
+        throws Exception
+    {
+        MqlBuilder_mxJPO.mql().cmd("escape add ").cmd(this.getTypeDef().getMxAdminName()).cmd(" ").arg(this.getName()).cmd(" ").cmd(this.kind.name().toLowerCase()).exec(_paramCache);
     }
 
     @Override()

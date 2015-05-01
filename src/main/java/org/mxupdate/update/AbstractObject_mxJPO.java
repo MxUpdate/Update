@@ -15,9 +15,7 @@
 
 package org.mxupdate.update;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -112,6 +110,96 @@ public abstract class AbstractObject_mxJPO
     @Deprecated()
     private String originalName;
 
+    ////////////////////////////////////////////////////////////////////////////
+    // global methods start
+
+    /**
+     * Returns a list of names exists within MX.
+     *
+     * @param _paramCache   parameter cache
+     * @return set of names of this administration type
+     * @throws MatrixException if the search within MX failed
+     */
+    public abstract Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException;
+
+    /**
+     * Checks if given MX name without prefix and suffix matches given match
+     * string.
+     *
+     * @param _paramCache   parameter cache
+     * @param _mxName       name of the administration object to check
+     * @param _matches      list of string which must be matched (if
+     *                      {@code null}, name matched!)
+     * @return <i>true</i> if the given MX name matches; otherwise <i>false</i>
+     */
+    public boolean matchMxName(final ParameterCache_mxJPO _paramCache,
+                               final String _mxName,
+                               final Collection<String> _matches)
+    {
+        return StringUtil_mxJPO.match(_mxName, _matches);
+    }
+
+    /**
+     * Extract for given {@code _files} all mx names for this type.
+     *
+     * @param _paramCache   parameter cache
+     * @param _files        files
+     * @param _matches      matches (if {@code null}, all is valid}
+     * @return map of MX names and depending file for this type definition
+     * @throws UpdateException_mxJPO if evaluate failed
+     */
+    public SortedMap<String,File> evalMatching(final ParameterCache_mxJPO _paramCache,
+                                               final Collection<File> _files,
+                                               final Collection<String> _matches)
+        throws UpdateException_mxJPO
+    {
+        final SortedMap<String,File> ret = new TreeMap<String,File>();
+
+        for (final File file : _files)  {
+            final String mxName = this.evalMxName(_paramCache, file);
+            if ((mxName != null)  && this.matchMxName(_paramCache, mxName, _matches))  {
+                ret.put(mxName, file);
+            }
+        }
+
+        return ret;
+    }
+
+    /**
+     * Extracts the MX name from given file name if the file prefix and suffix
+     * matches. If the file prefix and suffix not matches a <code>null</code>
+     * is returned.
+     *
+     * @param _paramCache   parameter cache
+     * @param _file         file for which the MX name is searched
+     * @return MX name or <code>null</code> if the file is not an update file
+     *         for current type definition
+     * @throws UpdateException_mxJPO if the configuration item name could not
+     *                               be extracted from the file name
+     */
+    public String evalMxName(final ParameterCache_mxJPO _paramCache,
+                             final File _file)
+        throws UpdateException_mxJPO
+    {
+        final String suffix = this.getTypeDef().getFileSuffix();
+        final int suffixLength = (suffix != null) ? suffix.length() : 0;
+        final String prefix = this.getTypeDef().getFilePrefix();
+        final int prefixLength = (prefix != null) ? prefix.length() : 0;
+
+        final String fileName = _file.getName();
+        final String mxName;
+        if (((prefix == null) || fileName.startsWith(prefix)) && ((suffix == null) || fileName.endsWith(suffix)))  {
+            mxName = StringUtil_mxJPO.convertFromFileName(fileName.substring(0, fileName.length() - suffixLength).substring(prefixLength));
+        } else  {
+            mxName = null;
+        }
+        return mxName;
+    }
+
+    // global methods end
+    ////////////////////////////////////////////////////////////////////////////
+
     /**
      * Initialize the type definition enumeration.
      *
@@ -167,10 +255,21 @@ public abstract class AbstractObject_mxJPO
     {
         try  {
             this.parse(_paramCache);
-            final File file = new File(_path, this.getFileName());
+
+            // append the stored sub path of the ci object from last import
+            final File file;
+            final String subPath = this.getPropValue(_paramCache, PropertyDef_mxJPO.SUBPATH);
+            if ((subPath != null) && !subPath.isEmpty())  {
+                file = new File(new File(_path, subPath), this.getFileName());
+            } else  {
+                file = new File(_path, this.getFileName());
+            }
+
+            // create parent directories
             if (!file.getParentFile().exists())  {
                 file.getParentFile().mkdirs();
             }
+
             final Writer out = new FileWriter(file);
             this.write(_paramCache, out);
             out.flush();
@@ -242,100 +341,6 @@ public abstract class AbstractObject_mxJPO
         throws MatrixException, SAXException, IOException;
 
     /**
-     * Returns a list of names exists within MX.
-     *
-     * @param _paramCache   parameter cache
-     * @return set of names of this administration type
-     * @throws MatrixException if the search within MX failed
-     */
-    public abstract Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException;
-
-    /**
-     * Checks if given MX name without prefix and suffix matches given match
-     * string.
-     *
-     * @param _paramCache   parameter cache
-     * @param _mxName       name of the administration object to check
-     * @param _match        string which must be matched
-     * @return <i>true</i> if the given MX name matches; otherwise <i>false</i>
-     */
-    public boolean matchMxName(final ParameterCache_mxJPO _paramCache,
-                               final String _mxName,
-                               final String _match)
-    {
-        return StringUtil_mxJPO.match(_mxName, _match);
-    }
-
-    /**
-     * Extract for given {@code _files} all mx names for this type.
-     *
-     * @param _paramCache   parameter cache
-     * @param _files        files
-     * @param _matches      matches (if {@code null}, all is valid}
-     * @return map of MX names and depending file for this type definition
-     * @throws UpdateException_mxJPO if evaluate failed
-     */
-    public SortedMap<String,File> evalMatching(final ParameterCache_mxJPO _paramCache,
-                                               final Collection<File> _files,
-                                               final Collection<String> _matches)
-        throws UpdateException_mxJPO
-    {
-        final SortedMap<String,File> ret = new TreeMap<String,File>();
-
-        for (final File file : _files)  {
-            final String mxName = this.evalMxName(_paramCache, file);
-            if (mxName != null)  {
-                if (_matches == null)
-                {
-                    ret.put(mxName, file);
-                }
-                else
-                {
-                    for (final String match : _matches)  {
-                        if (this.matchMxName(_paramCache, mxName, match))  {
-                            ret.put(mxName, file);
-                        }
-                    }
-                }
-            }
-        }
-
-        return ret;
-    }
-
-    /**
-     * Extracts the MX name from given file name if the file prefix and suffix
-     * matches. If the file prefix and suffix not matches a <code>null</code>
-     * is returned.
-     *
-     * @param _paramCache   parameter cache
-     * @param _file         file for which the MX name is searched
-     * @return MX name or <code>null</code> if the file is not an update file
-     *         for current type definition
-     * @throws UpdateException_mxJPO if the configuration item name could not
-     *                               be extracted from the file name
-     */
-    public String evalMxName(final ParameterCache_mxJPO _paramCache,
-                             final File _file)
-        throws UpdateException_mxJPO
-    {
-        final String suffix = this.getTypeDef().getFileSuffix();
-        final int suffixLength = (suffix != null) ? suffix.length() : 0;
-        final String prefix = this.getTypeDef().getFilePrefix();
-        final int prefixLength = (prefix != null) ? prefix.length() : 0;
-
-        final String fileName = _file.getName();
-        final String mxName;
-        if (((prefix == null) || fileName.startsWith(prefix)) && ((suffix == null) || fileName.endsWith(suffix)))  {
-            mxName = StringUtil_mxJPO.convertFromFileName(fileName.substring(0, fileName.length() - suffixLength).substring(prefixLength));
-        } else  {
-            mxName = null;
-        }
-        return mxName;
-    }
-
-    /**
      * Deletes administration object with given name.
      *
      * @param _paramCache       parameter cache
@@ -360,14 +365,11 @@ public abstract class AbstractObject_mxJPO
      * @param _create       <i>true</i> if the CI object is new created (and
      *                      first update is done)
      * @param _file         reference to the file to update
-     * @param _newVersion   new version which must be set within the update (or
-     *                      {@code null} if the version must not be set).
      * @throws Exception if update failed
      */
     public abstract void update(final ParameterCache_mxJPO _paramCache,
                                 final boolean _create,
-                                final File _file,
-                                final String _newVersion)
+                                final File _file)
         throws Exception;
 
     /**
@@ -386,29 +388,6 @@ public abstract class AbstractObject_mxJPO
     }
 
     /**
-     * Reads for given file the code and returns them.
-     *
-     * @param _file     file to read the code
-     * @return read code of the file
-     * @throws IOException if the file could not be opened or read
-     */
-    protected StringBuilder getCode(final File _file)
-        throws IOException
-    {
-        // read code
-        final StringBuilder code = new StringBuilder();
-        final BufferedReader reader = new BufferedReader(new FileReader(_file));
-        String line = reader.readLine();
-        while (line != null)  {
-            code.append(line).append('\n');
-            line = reader.readLine();
-        }
-        reader.close();
-
-        return code;
-    }
-
-    /**
      * <p>Returns the stored value within Matrix for administration object
      * with given property name. For performance reason the method should use
      * &quot;print&quot; commands, because a complete XML parse including a
@@ -420,7 +399,7 @@ public abstract class AbstractObject_mxJPO
      * @throws MatrixException if the property value could not be extracted
      */
     public abstract String getPropValue(final ParameterCache_mxJPO _paramCache,
-                               final PropertyDef_mxJPO _prop)
+                                        final PropertyDef_mxJPO _prop)
         throws MatrixException;
 
     /**

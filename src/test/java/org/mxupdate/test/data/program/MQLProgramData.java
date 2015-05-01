@@ -16,7 +16,6 @@
 package org.mxupdate.test.data.program;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.AbstractAdminData;
 
 /**
  * The class is used to define all MQL program objects used to create / update
@@ -25,7 +24,7 @@ import org.mxupdate.test.data.AbstractAdminData;
  * @author The MxUpdate Team
  */
 public class MQLProgramData
-    extends AbstractAdminData<MQLProgramData>
+    extends AbstractProgramData<MQLProgramData>
 {
     /**
      * Initializes this MQL program.

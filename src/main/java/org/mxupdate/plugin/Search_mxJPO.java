@@ -16,6 +16,7 @@
 package org.mxupdate.plugin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -108,7 +109,7 @@ class Search_mxJPO
             if (typeDefList.contains(typeDef.getName()))  {
                 final AbstractObject_mxJPO obj = typeDef.newTypeInstance(null);
                 for (final String name : obj.getMxNames(_paramCache))  {
-                    if (obj.matchMxName(_paramCache, name, match))  {
+                    if (obj.matchMxName(_paramCache, name, Arrays.asList(new String[]{match})))  {
                         final AbstractObject_mxJPO  instance = typeDef.newTypeInstance(name);
                         final Map<String,String> map = new HashMap<String,String>();
                         map.put(Search_mxJPO.RETURN_KEY_TYPEDEF, typeDef.getName());

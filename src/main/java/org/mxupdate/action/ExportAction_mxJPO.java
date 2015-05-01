@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -77,17 +76,8 @@ public class ExportAction_mxJPO
         for (final Map.Entry<TypeDef_mxJPO,Set<String>> entry : clazz2names.entrySet())  {
             for (final String name : entry.getValue())  {
                 final AbstractObject_mxJPO instance = entry.getKey().newTypeInstance(name);
-
-                // append the stored sub path of the ci object from last import
-                final String subPath = instance.getPropValue(this.paramCache, PropertyDef_mxJPO.SUBPATH);
-                final File path;
-                if ((subPath != null) && !subPath.isEmpty())  {
-                    path = new File(pathStr + File.separator + instance.getPath() + File.separator + subPath);
-                } else  {
-                    path = new File(pathStr + File.separator + instance.getPath());;
-                }
                 this.paramCache.logInfo("export "+instance.getTypeDef().getLogging() + " '" + name + "'");
-                instance.export(this.paramCache, path);
+                instance.export(this.paramCache, new File(pathStr + File.separator + instance.getPath()));
             }
         }
     }

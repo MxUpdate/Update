@@ -326,12 +326,11 @@ public class Policy_mxJPO
     @Override()
     public void update(final ParameterCache_mxJPO _paramCache,
                        final boolean _create,
-                       final File _file,
-                       final String _newVersion)
+                       final File _file)
         throws Exception
     {
         this.updateWithCreate = _create;
-        super.update(_paramCache, _create, _file, _newVersion);
+        super.update(_paramCache, _create, _file);
     }
 
     @Override()

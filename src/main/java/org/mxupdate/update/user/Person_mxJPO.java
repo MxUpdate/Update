@@ -545,7 +545,6 @@ public class Person_mxJPO
      * @param _create       <i>true</i> if the CI object is new created (and
      *                      first update is done)
      * @param _file         file used for update
-     * @param _newVersion   new target version
      * @throws Exception if parse or update failed
      * @see PersonBus#parse(ParameterCache_mxJPO)
      * @see PersonAdmin#update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
@@ -553,12 +552,11 @@ public class Person_mxJPO
     @Override()
     public void update(final ParameterCache_mxJPO _paramCache,
                        final boolean _create,
-                       final File _file,
-                       final String _newVersion)
+                       final File _file)
         throws Exception
     {
         this.personBus.parse(_paramCache);
-        this.personAdmin.update(_paramCache, _create, _file, _newVersion);
+        this.personAdmin.update(_paramCache, _create, _file);
     }
 
     @Override()

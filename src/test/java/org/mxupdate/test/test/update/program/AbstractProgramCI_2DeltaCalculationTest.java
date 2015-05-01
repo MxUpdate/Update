@@ -153,15 +153,15 @@ public abstract class AbstractProgramCI_2DeltaCalculationTest<DATA extends Abstr
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
 
         @SuppressWarnings("unchecked")
-        final TESTDATA prog = (TESTDATA) this.createNewTestData("Test").create().setValue("file", "src/test/resources/program/mql/test.tcl");
+        final TESTDATA prog = (TESTDATA) this.createNewTestData("Test").create().setValue("file", "program/mql/test.tcl");
 
         final WrapperCIInstance<DATA> wrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, prog.getName()));
         wrapper.parseUpdate(prog);
-        wrapper.store(new File(System.getProperty("user.dir"), "test.mxu"), paramCache);
+        wrapper.store(new File(this.getResourcesDir(), "test.mxu"), paramCache);
 
         Assert.assertEquals(
                 this.mqlWOTrim("escape print prog \"" + AbstractTest.convertMql(prog.getName()) + "\" select code dump"),
-                FileUtils.readFileToString(new File(System.getProperty("user.dir"), "src/test/resources/program/mql/test.tcl")) + "\n");
+                FileUtils.readFileToString(new File(this.getResourcesDir(), "program/mql/test.tcl")) + "\n");
     }
 
     /**
@@ -176,15 +176,15 @@ public abstract class AbstractProgramCI_2DeltaCalculationTest<DATA extends Abstr
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
 
         @SuppressWarnings("unchecked")
-        final TESTDATA prog = (TESTDATA) this.createNewTestData("Test").create().setValue("file", System.getProperty("user.dir") + "/src/test/resources/program/mql/test.tcl");
+        final TESTDATA prog = (TESTDATA) this.createNewTestData("Test").create().setValue("file", this.getResourcesDir() + "/program/mql/test.tcl");
 
         final WrapperCIInstance<DATA> wrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, prog.getName()));
         wrapper.parseUpdate(prog);
-        wrapper.store(new File(System.getProperty("user.dir"), "test.mxu"), paramCache);
+        wrapper.store(new File(this.getResourcesDir(), "test.mxu"), paramCache);
 
         Assert.assertEquals(
                 this.mqlWOTrim("escape print prog \"" + AbstractTest.convertMql(prog.getName()) + "\" select code dump"),
-                FileUtils.readFileToString(new File(System.getProperty("user.dir"), "src/test/resources/program/mql/test.tcl")) + "\n");
+                FileUtils.readFileToString(new File(this.getResourcesDir(), "program/mql/test.tcl")) + "\n");
     }
 
     /**

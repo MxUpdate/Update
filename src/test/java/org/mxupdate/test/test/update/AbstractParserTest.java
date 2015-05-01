@@ -68,7 +68,7 @@ public abstract class AbstractParserTest<DATA extends AbstractAdminObject_mxJPO<
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
 
         final WrapperCIInstance<DATA> data = new WrapperCIInstance<DATA>(this.createNewData(paramCache, AbstractTest.PREFIX + "_Test"));
-        data.parseUpdate(_definition);
+        data.parseUpdateWOStrip(_definition);
 
         final String generated = data.write(paramCache);
 

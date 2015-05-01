@@ -94,11 +94,8 @@ public class SelectTypeDefUtil_mxJPO
             final Set<String> matchingMxNames = new TreeSet<String>();
             clazz2names.put(entry.getKey(), matchingMxNames);
             for (final String mxName : instance.getMxNames(_paramCache))  {
-                for (final String match : entry.getValue())  {
-                    if (instance.matchMxName(_paramCache, mxName, match))  {
-                        matchingMxNames.add(mxName);
-                        break;
-                    }
+                if (instance.matchMxName(_paramCache, mxName, entry.getValue()))  {
+                    matchingMxNames.add(mxName);
                 }
             }
         }

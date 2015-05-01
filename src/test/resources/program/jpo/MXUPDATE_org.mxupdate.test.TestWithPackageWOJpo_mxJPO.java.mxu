@@ -1,0 +1,10 @@
+################################################################################
+# MXUPDATE_org.mxupdate.test.TestWithPackageWOJpo_mxJPO.java.mxu
+#
+#            This file describes the target of a Configuration Item.
+################################################################################
+
+mxUpdate program "${NAME}" {
+    kind java
+    description "abc"
+}

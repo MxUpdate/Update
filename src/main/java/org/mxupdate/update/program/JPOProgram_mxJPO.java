@@ -15,22 +15,26 @@
 
 package org.mxupdate.update.program;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashSet;
+import java.io.Writer;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
+import java.util.SortedMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
-import org.mxupdate.update.util.MqlUtil_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.xml.sax.SAXException;
 
 /**
  * The class is used to export, create, delete and update JPOs within MX.
@@ -40,63 +44,19 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
 public class JPOProgram_mxJPO
     extends AbstractProgram_mxJPO<JPOProgram_mxJPO>
 {
-    /**
-     * Set of all ignored URLs from the XML definition for JPO programs.
-     */
-    private static final Set<String> IGNORED_URLS = new HashSet<String>();
-    static  {
-        JPOProgram_mxJPO.IGNORED_URLS.add("/javaProgram");
-    }
-
-    /**
-     * String with name suffix (used also from the extract routine from
-     * Matrix).
-     *
-     * @see #write(ParameterCache_mxJPO, Appendable)
-     */
+    /** String with name suffix (used also from the extract routine from Matrix). */
     private static final String NAME_SUFFIX = "_" + "mxJPO";
 
-    /**
-     * Defines the parameter to define the string where the TCL update code
-     * starts.
-     *
-     * @see #write(ParameterCache_mxJPO, Appendable)
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     */
-    private static final String PARAM_MARKSTART = "JPOTclUpdateMarkStart";
+    /** String with name suffix (used also from the extract routine from Matrix). */
+    private static final String NAME_SUFFIX_EXTENDSION = JPOProgram_mxJPO.NAME_SUFFIX + ".java";
 
-    /**
-     * Defines the parameter to define the string where the TCL update code
-     * ends.
-     *
-     * @see #write(ParameterCache_mxJPO, Appendable)
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     */
-    private static final String PARAM_MARKEND = "JPOTclUpdateMarkEnd";
-
-    /**
-     * Defines the parameter to define if embedded TCL update code within JPOs
-     * must be executed.
-     *
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     */
-    private static final String PARAM_NEEDED = "JPOTclUpdateNeeded";
+    private static final int NAME_SUFFIX_EXTENDSION_LENGTH = JPOProgram_mxJPO.NAME_SUFFIX_EXTENDSION.length();
 
     /**
      * Regular expression for the package line. The package name must be
      * extracted to get the real name of the JPO used within MX.
-     *
-     * @see #extractMxName(ParameterCache_mxJPO, File)
      */
-    private static final Pattern PATTERN_PACKAGE = Pattern.compile("(?<=package)[ \\t]+[A-Za-z0-9\\._]*[ \\t]*;");
-
-    /**
-     * Used line prefix for the TCL update code.
-     *
-     * @see #write(ParameterCache_mxJPO, Appendable)
-     * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
-     */
-    private static final String LINE_PREFIX = "//";
+    private static final Pattern PATTERN_JPO_PACKAGE = Pattern.compile("(?<=package)[ \\t]+[A-Za-z0-9\\._]*[ \\t]*;");
 
     /**
      * The flag indicates that the back slashes are converted. In older MX
@@ -109,6 +69,77 @@ public class JPOProgram_mxJPO
      */
     private boolean backslashUpgraded = false;
 
+    ////////////////////////////////////////////////////////////////////////////
+    // global methods start
+
+    /**
+     * {@inheritDoc}
+     *
+     */
+    @Override()
+    public SortedMap<String,File> evalMatching(final ParameterCache_mxJPO _paramCache,
+                                               final Collection<File> _files,
+                                               final Collection<String> _matches)
+        throws UpdateException_mxJPO
+    {
+        final SortedMap<String,File> ret = super.evalMatching(_paramCache, _files, _matches);
+
+        for (final File file : _files)  {
+            if (file.getName().endsWith(JPOProgram_mxJPO.NAME_SUFFIX_EXTENDSION))  {
+                // file identified as JPO
+
+                final String code;
+                try {
+                    code = this.getCode(file).toString();
+                } catch (final IOException e)  {
+// TODO: exception handling!
+throw new Error("could not open file " + file, e);
+                }
+                String mxName = file.getName().substring(0, file.getName().length() - JPOProgram_mxJPO.NAME_SUFFIX_EXTENDSION_LENGTH);
+
+                // prefix with package name
+                for (final String line : code.split("\n"))  {
+                    final Matcher pckMatch = JPOProgram_mxJPO.PATTERN_JPO_PACKAGE.matcher(line);
+                    if (pckMatch.find())  {
+                        mxName = pckMatch.group().replace(';', ' ').trim() + "." + mxName;
+                        break;
+                    }
+                }
+
+                if (!ret.containsKey(mxName) && this.matchMxName(_paramCache, mxName, _matches))  {
+                    ret.put(mxName, file);
+                }
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Reads for given file the code and returns them.
+     *
+     * @param _file     file to read the code
+     * @return read code of the file
+     * @throws IOException if the file could not be opened or read
+     */
+    private StringBuilder getCode(final File _file)
+        throws IOException
+    {
+        // read code
+        final StringBuilder code = new StringBuilder();
+        final BufferedReader reader = new BufferedReader(new FileReader(_file));
+        String line = reader.readLine();
+        while (line != null)  {
+            code.append(line).append('\n');
+            line = reader.readLine();
+        }
+        reader.close();
+
+        return code;
+    }
+
+    // global methods end
+    ////////////////////////////////////////////////////////////////////////////
+
     /**
      * Constructor used to initialize the type definition enumeration and the
      * name.
@@ -120,95 +151,6 @@ public class JPOProgram_mxJPO
                             final String _mxName)
     {
         super(Kind.JAVA, _typeDef, _mxName);
-    }
-
-    /**
-     * Returns the file name for this JPO. The original method is overwritten
-     * because the name of a JPO could include points ('.') in a name which
-     * defines a package of a JPO (and is not included in the file name
-     * itself).
-     *
-     * @return file name of this administration (business) object (without
-     *         package names)
-     */
-    @Override()
-    public String getFileName()
-    {
-        final int index = this.getName().lastIndexOf('.');
-        return new StringBuilder()
-                .append((index >= 0)
-                        ? this.getName().substring(index + 1)
-                        : this.getName())
-                .append(this.getTypeDef().getFileSuffix())
-                .toString();
-    }
-
-    /**
-     * Returns the path where the file is located of this JPO including the sub
-     * path of the JPO package. A JPO has a package if the JPO name includes
-     * points ('.').
-     *
-     * @return sub path including package path
-     * @see #getTypeDef()
-     */
-    @Override()
-    public String getPath()
-    {
-        final StringBuilder ret = new StringBuilder().append(super.getPath());
-        final int index = this.getName().lastIndexOf('.');
-        if (index >= 0)  {
-            ret.append('/').append(this.getName().substring(0, index).replaceAll("\\.", "/"));
-        }
-        return ret.toString();
-    }
-
-    /**
-     * If a file is a JPO (checked by calling the extraxtMxName method from
-     * super class), the package is extracted from file and returned together
-     * with the extracted MxName from the file.
-     *
-     * @param _paramCache   parameter cache
-     * @param _file         file for which the MX name is searched
-     * @return MX name or <code>null</code> if the file is not an update file
-     *         for current type definition
-     * @throws UpdateException_mxJPO if the JPO name could not be extracted
-     *                               from the file name
-     * @see #PATTERN_PACKAGE
-     * @todo idea: maybe performance improvement by opening file itself and
-     *       read only till class, interface or enum is defined....
-     */
-    @Override()
-    public String evalMxName(final ParameterCache_mxJPO _paramCache,
-                                final File _file)
-        throws UpdateException_mxJPO
-    {
-        String mxName = super.evalMxName(_paramCache, _file);
-
-        if (mxName != null)  {
-            final String code;
-            try {
-                code = this.getCode(_file).toString();
-            } catch (final IOException e)  {
-                throw new Error("could not open file " + _file, e);
-            }
-            for (final String line : code.split("\n"))  {
-                final Matcher pckMatch = JPOProgram_mxJPO.PATTERN_PACKAGE.matcher(line);
-                if (pckMatch.find())  {
-                    mxName = pckMatch.group().replace(';', ' ').trim() + "." + mxName;
-                    break;
-                }
-            }
-        }
-        return mxName;
-    }
-
-    /**
-     * Dummy implementation because not used.
-     */
-    @Override()
-    public void parseUpdate(final String _code)
-    {
-        throw new Error("not supported");
     }
 
     /**
@@ -233,9 +175,7 @@ public class JPOProgram_mxJPO
                             final String _content)
     {
         final boolean parsed;
-        if (JPOProgram_mxJPO.IGNORED_URLS.contains(_url))  {
-            parsed = true;
-        } else if ("/backslashUpgraded".equals(_url))  {
+        if ("/backslashUpgraded".equals(_url))  {
             this.backslashUpgraded = true;
             parsed = true;
         } else  {
@@ -244,6 +184,87 @@ public class JPOProgram_mxJPO
         return parsed;
     }
 
+    /**
+     *
+     *
+     * @param _paramCache       parameter cache
+     * @param _path             path to write through (if required also
+     *                          including depending file path defined from the
+     *                          information annotation)
+     * @throws MatrixException  if some MQL statement failed
+     * @throws SAXException     if the XML export of the object could not
+     *                          parsed (for admin objects)
+     * @throws IOException      if the TCL update code could not be written
+     */
+    @Override()
+    public void export(final ParameterCache_mxJPO _paramCache,
+                       final File _path)
+        throws MatrixException, SAXException, IOException
+    {
+        try  {
+            this.parse(_paramCache);
+
+            if (!this.hasNoValuesDefined(_paramCache) || (this.getCode() == null) || this.getCode().isEmpty())  {
+                final File file = new File(_path, this.getFileName());
+                if (!file.getParentFile().exists())  {
+                    file.getParentFile().mkdirs();
+                }
+                final Writer out = new FileWriter(file);
+                try  {
+                    this.write(_paramCache, out);
+                    out.flush();
+                } finally {
+                    out.close();
+                }
+            }
+
+            if ((this.getCode() != null) && !this.getCode().isEmpty())  {
+
+                // prepare name of JPO to extract
+                final int index = this.getName().lastIndexOf('.');
+                final String fileName = new StringBuilder()
+                        .append((index >= 0) ? this.getName().substring(index + 1) : this.getName())
+                        .append(JPOProgram_mxJPO.NAME_SUFFIX_EXTENDSION)
+                        .toString();
+                // prepare path
+                final StringBuilder path = new StringBuilder().append(_path);
+                if (index >= 0)  {
+                    path.append('/').append(this.getName().substring(0, index).replaceAll("\\.", "/"));
+                }
+
+                final File file = new File(path.toString(), fileName);
+                if (!file.getParentFile().exists())  {
+                    file.getParentFile().mkdirs();
+                }
+                final Writer out = new FileWriter(file);
+                try  {
+                    this.write1(_paramCache, out);
+                    out.flush();
+                } finally {
+                    out.close();
+                }
+            }
+
+        } catch (final MatrixException e)  {
+            if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {
+                _paramCache.logError(e.toString());
+            } else {
+                throw e;
+            }
+        } catch (final SAXException e)  {
+            if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {
+                _paramCache.logError(e.toString());
+            } else {
+                throw e;
+            }
+        } catch (final IOException e)  {
+            if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {
+                _paramCache.logError(e.toString());
+            } else {
+                throw e;
+            }
+        }
+    }
 
     /**
      * Writes given JPO to given path for given name. The JPO code is first
@@ -258,43 +279,21 @@ public class JPOProgram_mxJPO
      * @throws MatrixException if the source code of the JPO could not be
      *                         extracted from MX
      */
-    @Override()
-    protected void write(final ParameterCache_mxJPO _paramCache,
+    protected void write1(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
         throws IOException
     {
-        final String markStart = this.makeLinePrefix(JPOProgram_mxJPO.LINE_PREFIX, _paramCache.getValueString(JPOProgram_mxJPO.PARAM_MARKSTART).trim());
-        final String markEnd = this.makeLinePrefix(JPOProgram_mxJPO.LINE_PREFIX, _paramCache.getValueString(JPOProgram_mxJPO.PARAM_MARKEND).trim());
-
-        this.writeUpdateCode(_paramCache, _out, markStart, markEnd, JPOProgram_mxJPO.LINE_PREFIX);
-
         // define package name (if points within JPO name)
         final int idx = this.getName().lastIndexOf('.');
         if (idx > 0)  {
-            _out.append("package ")
-                .append(this.getName().substring(0, idx))
-                .append(";\n");
-        }
-
-        // get original code (without old TCL update code)
-        final int start = this.getCode().indexOf(markStart);
-        final int end = this.getCode().indexOf(markEnd);
-        final String origCode;
-        if ((start >= 0) && (end > start))  {
-            origCode = new StringBuilder()
-                    .append(this.getCode().substring(0, start).trim())
-                    .append(this.getCode().substring(end + markEnd.length()).trim())
-                    .toString();
-        } else  {
-            origCode = this.getCode();
+            _out.append("package ").append(this.getName().substring(0, idx)).append(";\n");
         }
 
         // replace class names and references to other JPOs
         final String name = this.getName() + JPOProgram_mxJPO.NAME_SUFFIX;
-        final String code = origCode
+        final String code = this.getCode()
                                 .replaceAll("\\" + "$\\{CLASSNAME\\}", name.replaceAll(".*\\.", ""))
-                                .replaceAll("(?<=\\"+ "$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}",
-                                            JPOProgram_mxJPO.NAME_SUFFIX)
+                                .replaceAll("(?<=\\"+ "$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", JPOProgram_mxJPO.NAME_SUFFIX)
                                 .replaceAll("\\" + "$\\{CLASS\\:", "")
                                 .trim();
 
@@ -306,176 +305,30 @@ public class JPOProgram_mxJPO
         }
     }
 
+
     /**
-     * Creates given JPO object from given type with given name.
+     * Updates this administration (business) object if the stored information
+     * about the version is not the same as the file date. If an update is
+     * required, the file is read and the object is updated with
+     * {@link #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)}.
      *
      * @param _paramCache   parameter cache
-     * @throws Exception if create of JPO failed
+     * @param _create       <i>true</i> if the CI object is new created (and
+     *                      first update is done)
+     * @param _file         file with TCL update code
+     * @throws Exception if the update from the derived class failed
      */
     @Override()
-    public void create(final ParameterCache_mxJPO _paramCache)
+    public void update(final ParameterCache_mxJPO _paramCache,
+                       final boolean _create,
+                       final File _file)
         throws Exception
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("add ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(this.getName()).append("\" java");
-        MqlUtil_mxJPO.execMql(_paramCache, cmd);
-    }
-
-    /**
-     * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to update this JPO program. Following
-     * steps are done within update:
-     * <ul>
-     * <li>An existing execute user is removed.</li>
-     * <li>Execution of the JPO is immediate.</li>
-     * <li>The description is set to an empty string.</li>
-     * <li>The JPO program is set to not hidden.</li>
-     * <li>The JPO program does not need the context of a business object.</li>
-     * <li>The MQL program is not downloadable.</li>
-     * <li>The input / output of the MQL program is not piped.</li>
-     * <li>The MQL program is not pooled (used only for TCL programs).</li>
-     * <li>The JPO is updated with the content of <code>_sourceFile</code>.
-     *     </li>
-     * <li>Embedded TCL update code is searched depending on the file extension
-     *     and the TCL update needed parameter {@link #PARAM_NEEDED}. If for a
-     *     file extension a line prefix is defined, the line prefix is removed
-     *     from the TCL update code (and also the mark texts defined with
-     *     {@link #PARAM_MARKSTART} and {@link #PARAM_MARKEND} depends on the
-     *     line prefix).</li>
-     * </ul>
-     *
-     * @param _paramCache       parameter cache
-     * @param _preMQLCode       MQL statements which must be called before the
-     *                          TCL code is executed
-     * @param _postMQLCode      MQL statements which must be called after the
-     *                          TCL code is executed
-     * @param _preTCLCode       TCL code which is defined before the source
-     *                          file is sourced
-     * @param _tclVariables     map of all TCL variables where the key is the
-     *                          name and the value is value of the TCL variable
-     *                          (the value is automatically converted to TCL
-     *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update from derived class failed
-     * @see #PARAM_MARKEND
-     * @see #PARAM_MARKSTART
-     * @see #PARAM_NEEDED
-     */
-    @Override()
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final CharSequence _preMQLCode,
-                          final CharSequence _postMQLCode,
-                          final CharSequence _preTCLCode,
-                          final Map<String,String> _tclVariables,
-                          final File _sourceFile)
-        throws Exception
-    {
-        final StringBuilder preMQLCode = new StringBuilder();
-        final StringBuilder preTCLCode = new StringBuilder();
-
-        // get parameters
-        final String markStart = _paramCache.getValueString(JPOProgram_mxJPO.PARAM_MARKSTART).trim();
-        final String markEnd = _paramCache.getValueString(JPOProgram_mxJPO.PARAM_MARKEND).trim();
-        final String markStartWithPrefix = this.makeLinePrefix(JPOProgram_mxJPO.LINE_PREFIX, markStart);
-        final String markEndWithPrefix = this.makeLinePrefix(JPOProgram_mxJPO.LINE_PREFIX, markEnd);
-        final boolean exec = _paramCache.getValueBoolean(JPOProgram_mxJPO.PARAM_NEEDED);
-
-        // update JPO code; reset execute user + description + hidden flag
-        preMQLCode.append("escape mod prog \"").append(StringUtil_mxJPO.convertMql(this.getName()))
-                  .append("\" execute user \"\" execute immediate !needsbusinessobject !downloadable !pipe !pooled description \"\" !hidden;\n")
-                  .append("insert prog \"").append(_sourceFile.getPath()).append("\";\n");
-
-        // append TCL code of file (first without line prefix, then with)
-        final StringBuilder jpoCode = this.getCode(_sourceFile);
-        this.extractTclUpdateCode(_paramCache,
-                                  preTCLCode,
-                                  exec,
-                                  jpoCode,
-                                  markStart,
-                                  markEnd,
-                                  null);
-        this.extractTclUpdateCode(_paramCache,
-                                  preTCLCode,
-                                  exec,
-                                  jpoCode,
-                                  markStartWithPrefix,
-                                  markEndWithPrefix,
-                                  JPOProgram_mxJPO.LINE_PREFIX);
-
-        // append already existing pre MQL code
-        preMQLCode.append(";\n")
-                  .append(_preMQLCode);
-
-        // append procedure to order fields of the form
-        preTCLCode.append('\n')
-                  .append(_preTCLCode);
-
-        // and update
-        super.update(_paramCache, preMQLCode, _postMQLCode, preTCLCode, _tclVariables, null);
-    }
-
-    /**
-     * Extracts from <code>_prgCode</code> the TCL update code which is between
-     * <code>_markStart</code> and <code>_markEnd</code> defined. Each line of
-     * the code starts with <code>_linePrefix</code>. Only if
-     * <code>_execute</code> is set, the found TCL code is returned.
-     *
-     * @param _paramCache   parameter cache
-     * @param _tclCode      TCL code string builder to append the TCL update
-     *                      code which was extracted and if
-     *                      <code>_execute</code> is <i>true</i>
-     * @param _execute      <i>true</i> if TCL update code will be executed
-     * @param _prgCode      program code
-     * @param _markStart    start marker
-     * @param _markEnd      end marker
-     * @param _linePrefix   line prefix
-     * @return source code without TCL update code; <code>null</code> if source
-     *         includes no TCL update code
-     */
-    protected String extractTclUpdateCode(final ParameterCache_mxJPO _paramCache,
-                                          final StringBuilder _tclCode,
-                                          final boolean _execute,
-                                          final StringBuilder _prgCode,
-                                          final String _markStart,
-                                          final String _markEnd,
-                                          final String _linePrefix)
-    {
-        final String ret;
-
-        final int start = _prgCode.indexOf(_markStart);
-        final int end = _prgCode.indexOf(_markEnd);
-        if ((start >= 0) && (end > 0))  {
-            final String tclCode = _prgCode.substring(start + _markStart.length(), end).trim();
-            if (!"".equals(tclCode))  {
-                // TCL code must be executed only if allowed
-                // and line prefix is defined
-                if (_execute)  {
-                    _paramCache.logTrace("    - TCL update code is executed");
-                    // remove line prefixes from TCL code (if defined)
-                    final int linePrefixLength = (_linePrefix != null) ? _linePrefix.length() : -1;
-                    if (linePrefixLength > 0)  {
-                        final StringBuilder tclUpdateCode = new StringBuilder();
-                        for (final String line : tclCode.split("\n"))  {
-                            tclUpdateCode.append(line.substring(linePrefixLength)).append('\n');
-                        }
-                        _tclCode.append(tclUpdateCode.toString());
-                    } else  {
-                        _tclCode.append(tclCode);
-                    }
-                } else  {
-                    _paramCache.logError("    - Warning! Existing TCL update code is not executed!");
-                }
-            }
-            ret = new StringBuilder()
-                    .append(_prgCode.substring(0, start))
-                    .append('\n')
-                    .append(_prgCode.substring(end + _markEnd.length()))
-                    .toString();
+        if (_file.getName().endsWith(JPOProgram_mxJPO.NAME_SUFFIX_EXTENDSION))  {
+            MqlBuilder_mxJPO.mql().cmd("escape insert program ").arg(_file.toString()).exec(_paramCache);
         } else  {
-            ret = null;
+            super.update(_paramCache, _create, _file);
         }
-        return ret;
     }
 
     /**
@@ -489,23 +342,7 @@ public class JPOProgram_mxJPO
     public boolean compile(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        MqlUtil_mxJPO.execMql(_paramCache.getContext(), new StringBuilder()
-                              .append("escape compile prog \"")
-                              .append(StringUtil_mxJPO.convertMql(this.getName()))
-                              .append('\"'),
-                              false);
+        MqlBuilder_mxJPO.mql().cmd("escape compile prog ").arg(this.getName()).exec(_paramCache);
         return true;
-    }
-
-
-    /**
-     * Dummy implementation because not used.
-     */
-    @Override()
-    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MultiLineMqlBuilder _mql,
-                             final JPOProgram_mxJPO _current)
-    {
-        throw new Error("not supported");
     }
 }

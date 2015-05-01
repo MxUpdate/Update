@@ -52,6 +52,7 @@ class ProgramParser
 {
       <KIND:                                "kind">
     | <EKL:                                 "ekl">
+    | <JAVA:                                "java">
     | <MQL:                                 "mql">
 
     | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
@@ -125,7 +126,8 @@ void parse(final AbstractProgram_mxJPO<?> _prog)
     AdminProperty property;
 } {
       ( ( <KIND>                    ( <EKL>                                 {this.setValue(_prog, "kind",                       Kind.EKL);}
-                                    | <MQL>                                 {this.setValue(_prog, "kind",                       Kind.MQL);} ) )
+                                    | <MQL>                                 {this.setValue(_prog, "kind",                       Kind.MQL);}
+                                    | <JAVA>                                {this.setValue(_prog, "kind",                       Kind.JAVA);} ) )
       | ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_prog, "symbolicNames",           this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.appendValue(_prog, "symbolicNames",           this.getSingle(tmp.image));} ) )
 

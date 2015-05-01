@@ -150,7 +150,7 @@ public final class UpdateUtil_mxJPO
                         _paramCache.logDebug("    - update");
                     }
                     // execute update
-                    if (update && UpdateUtil_mxJPO.updateOne(_paramCache, !existings.contains(fileEntry.getKey()), instance, fileEntry.getValue(), version) && compile)  {
+                    if (update && UpdateUtil_mxJPO.updateOne(_paramCache, !existings.contains(fileEntry.getKey()), instance, fileEntry.getValue()) && compile)  {
                         compiles.add(instance);
                     }
                 }
@@ -223,15 +223,13 @@ public final class UpdateUtil_mxJPO
      *                      first update is done)
      * @param _instance     instance to update
      * @param _file         file with target definition
-     * @param _version      version to update
      * @return <i>true</i> if update was done; otherwise <i>false</i>
      * @throws Exception if update of the instance failed
      */
     protected static boolean updateOne(final ParameterCache_mxJPO _paramCache,
                                        final boolean _create,
                                        final AbstractObject_mxJPO _instance,
-                                       final File _file,
-                                       final String _version)
+                                       final File _file)
         throws Exception
     {
         boolean commit = false;
@@ -240,7 +238,7 @@ public final class UpdateUtil_mxJPO
             if (!transActive)  {
                 _paramCache.getContext().start(true);
             }
-            _instance.update(_paramCache, _create, _file, _version);
+            _instance.update(_paramCache, _create, _file);
             if (!transActive)  {
                 _paramCache.getContext().commit();
             }

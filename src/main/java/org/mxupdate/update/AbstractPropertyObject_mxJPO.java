@@ -106,15 +106,12 @@ public abstract class AbstractPropertyObject_mxJPO
      * @param _create       <i>true</i> if the CI object is new created (and
      *                      first update is done)
      * @param _file         file with TCL update code
-     * @param _newVersion   new version which must be set within the update
-     *                      (or {@code null} if the version must not be set).
      * @throws Exception if the update from the derived class failed
      */
     @Override()
     public void update(final ParameterCache_mxJPO _paramCache,
                        final boolean _create,
-                       final File _file,
-                       final String _newVersion)
+                       final File _file)
         throws Exception
     {
         // parse objects

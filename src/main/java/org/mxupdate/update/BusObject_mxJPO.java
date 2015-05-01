@@ -17,6 +17,7 @@ package org.mxupdate.update;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -157,45 +158,8 @@ public class BusObject_mxJPO
      */
     private final Set<Connection> connections = new TreeSet<Connection>();
 
-    /**
-     * Constructor used to initialize the type definition enumeration.
-     *
-     * @param _typeDef  defines the related type definition enumeration
-     * @param _mxName   MX name of the administration object
-     */
-    public BusObject_mxJPO(final TypeDef_mxJPO _typeDef,
-                           final String _mxName)
-    {
-        super(_typeDef,
-              (_typeDef.hasMxBusTypeDerived() && (_mxName != null) && !_mxName.contains(BusObject_mxJPO.SPLIT_TYPE))
-                      ? new StringBuilder().append(_typeDef.getMxBusType()).append(BusObject_mxJPO.SPLIT_TYPE).append(_mxName).toString()
-                      : _mxName);
-
-        if (_mxName != null)  {
-            if (_typeDef.hasMxBusTypeDerived())  {
-                final String[] typeNameRev = this.getName().split(BusObject_mxJPO.SPLIT_TYPE);
-                final String[] nameRev;
-                if (typeNameRev.length == 2)  {
-                    this.busType = typeNameRev[0];
-                    nameRev = typeNameRev[1].split(BusObject_mxJPO.SPLIT_NAME);
-                } else  {
-                    this.busType = _typeDef.getMxBusType();
-                    nameRev = this.getName().split(BusObject_mxJPO.SPLIT_NAME);
-                }
-                this.busName = nameRev[0];
-                this.busRevision = (nameRev.length > 1) ? nameRev[1] : "";
-            } else  {
-                final String[] nameRev = this.getName().split(BusObject_mxJPO.SPLIT_NAME);
-                this.busType = _typeDef.getMxBusType();
-                this.busName = nameRev[0];
-                this.busRevision = (nameRev.length > 1) ? nameRev[1] : "";
-            }
-        } else  {
-            this.busType = _typeDef.getMxBusType();
-            this.busName = null;
-            this.busRevision = null;
-        }
-    }
+    ////////////////////////////////////////////////////////////////////////////
+    // global methods start
 
     /**
      * Searches for all business object of current type definition and returns
@@ -271,17 +235,59 @@ public class BusObject_mxJPO
      * @param _paramCache   parameter cache
      * @param _mxName       name (and revision) of the administration business
      *                      object
-     * @param _match        string which must be matched
+     * @param _matches      collection string which must be matched
      * @return <i>true</i> if the given MX name matches; otherwise <i>false</i>
      */
     @Override()
     public boolean matchMxName(final ParameterCache_mxJPO _paramCache,
                                final String _mxName,
-                               final String _match)
+                               final Collection<String> _matches)
     {
         final String[] nameRev = _mxName.split(BusObject_mxJPO.SPLIT_NAME);
-        return (StringUtil_mxJPO.match(nameRev[0], _match)
-                || ((nameRev.length > 1) && StringUtil_mxJPO.match(nameRev[1], _match)));
+        return (StringUtil_mxJPO.match(nameRev[0], _matches) || ((nameRev.length > 1) && StringUtil_mxJPO.match(nameRev[1], _matches)));
+    }
+
+    // global methods end
+    ////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Constructor used to initialize the type definition enumeration.
+     *
+     * @param _typeDef  defines the related type definition enumeration
+     * @param _mxName   MX name of the administration object
+     */
+    public BusObject_mxJPO(final TypeDef_mxJPO _typeDef,
+                           final String _mxName)
+    {
+        super(_typeDef,
+              (_typeDef.hasMxBusTypeDerived() && (_mxName != null) && !_mxName.contains(BusObject_mxJPO.SPLIT_TYPE))
+                      ? new StringBuilder().append(_typeDef.getMxBusType()).append(BusObject_mxJPO.SPLIT_TYPE).append(_mxName).toString()
+                      : _mxName);
+
+        if (_mxName != null)  {
+            if (_typeDef.hasMxBusTypeDerived())  {
+                final String[] typeNameRev = this.getName().split(BusObject_mxJPO.SPLIT_TYPE);
+                final String[] nameRev;
+                if (typeNameRev.length == 2)  {
+                    this.busType = typeNameRev[0];
+                    nameRev = typeNameRev[1].split(BusObject_mxJPO.SPLIT_NAME);
+                } else  {
+                    this.busType = _typeDef.getMxBusType();
+                    nameRev = this.getName().split(BusObject_mxJPO.SPLIT_NAME);
+                }
+                this.busName = nameRev[0];
+                this.busRevision = (nameRev.length > 1) ? nameRev[1] : "";
+            } else  {
+                final String[] nameRev = this.getName().split(BusObject_mxJPO.SPLIT_NAME);
+                this.busType = _typeDef.getMxBusType();
+                this.busName = nameRev[0];
+                this.busRevision = (nameRev.length > 1) ? nameRev[1] : "";
+            }
+        } else  {
+            this.busType = _typeDef.getMxBusType();
+            this.busName = null;
+            this.busRevision = null;
+        }
     }
 
     /**

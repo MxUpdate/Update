@@ -406,6 +406,36 @@ public abstract class AbstractTest
     }
 
     /**
+     * Returns the root project directory.
+     *
+     * @return root project directory
+     */
+    public String getProjectDir()
+    {
+        return System.getProperty("user.dir");
+    }
+
+    /**
+     * Returns the resources directory.
+     *
+     * @return resources directory
+     */
+    public String getResourcesDir()
+    {
+        return this.getProjectDir() + "/src/test/resources";
+    }
+
+    /**
+     * Returns the target directory.
+     *
+     * @return target directory
+     */
+    public String getTargetDir()
+    {
+        return this.getProjectDir() + "/target/test";
+    }
+
+    /**
      * Executes given MQL command statement <code>_cmd</code> and returns the
      * result.
      *

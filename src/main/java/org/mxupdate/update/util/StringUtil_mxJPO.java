@@ -605,11 +605,13 @@ public final class StringUtil_mxJPO
     public static boolean match(final String _filename,
                                 final Collection<String> _wildcardMatchers)
     {
-        boolean ret = false;
-        for (final String wildcardMatcher : _wildcardMatchers)  {
-            if (StringUtil_mxJPO.match(_filename, wildcardMatcher))  {
-                ret = true;
-                break;
+        boolean ret = (_wildcardMatchers == null);
+        if (!ret)  {
+            for (final String wildcardMatcher : _wildcardMatchers)  {
+                if (StringUtil_mxJPO.match(_filename, wildcardMatcher))  {
+                    ret = true;
+                    break;
+                }
             }
         }
         return ret;

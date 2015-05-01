@@ -69,6 +69,46 @@ public final class AdminPropertyList_mxJPO
     }
 
     /**
+     * Checks that no properties defined (except system properties!).
+     * Hint: If a system property is defined as info properties, the algorithm
+     * returns that properties exists!
+     *
+     * @param _paramCache   parameter cache
+     * @return <i>true</i> if no property value is defined; otherwise
+     *         <i>false</i>
+     */
+    public boolean hasNoValuesDefined(final ParameterCache_mxJPO _paramCache)
+    {
+        boolean ret = true;
+
+        // first, check for information properties
+        if (_paramCache.contains(ValueKeys.ExportInfoPropsList))  {
+            for (final String propKey : _paramCache.getValueList(ValueKeys.ExportInfoPropsList))  {
+                for (final AdminProperty prop : this.properties)  {
+                    if (propKey.equals(prop.getName()))  {
+                        ret = false;
+                        break;
+                    }
+                }
+                if (!ret)  {
+                    break;
+                }
+            }
+        }
+
+        // now the rest of the properties
+        if (ret)  {
+            for (final AdminProperty prop : this.properties)  {
+                if (PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null)  {
+                    ret = false;
+                    break;
+                }
+            }
+        }
+        return ret;
+    }
+
+    /**
      * Parsed administration object related XML tags. This includes:
      * <ul>
      * <li>description</li>
