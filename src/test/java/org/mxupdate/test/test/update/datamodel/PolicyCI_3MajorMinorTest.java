@@ -13,22 +13,23 @@
  *
  */
 
-package org.mxupdate.test.ci.datamodel;
+package org.mxupdate.test.test.update.datamodel;
 
 import org.mxupdate.test.data.datamodel.PolicyData;
 import org.mxupdate.test.data.datamodel.PolicyData.State;
 import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.test.util.Version;
+import org.mxupdate.update.datamodel.Policy_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test class for policy exports of the major / minor information.
+ * Tests the {@link Policy_mxJPO policy CI} major / minor export / update.
  *
  * @author The MxUpdate Team
  */
-public class Policy_MajorMinorTest
+public class PolicyCI_3MajorMinorTest
     extends AbstractPolicyTest
 {
     /**

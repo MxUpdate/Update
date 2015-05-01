@@ -13,20 +13,21 @@
  *
  */
 
-package org.mxupdate.test.ci.datamodel;
+package org.mxupdate.test.test.update.datamodel;
 
 import org.mxupdate.test.data.datamodel.PolicyData;
 import org.mxupdate.test.data.datamodel.PolicyData.AllState;
 import org.mxupdate.test.util.IssueLink;
+import org.mxupdate.update.datamodel.Policy_mxJPO;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test class for policy exports.
+ * Tests the {@link Policy_mxJPO policy CI} allstate export / update.
  *
  * @author The MxUpdate Team
  */
-public class Policy_AllState_Test
+public class PolicyCI_4AllState_Test
     extends AbstractPolicyTest
 {
     /**

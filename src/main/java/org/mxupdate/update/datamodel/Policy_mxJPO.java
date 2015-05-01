@@ -754,7 +754,7 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
                     .flag(          "checkouthistory",      false, this.checkoutHistory)
                     .flagIfTrue(    "published",            false, this.published,          _paramCache.getValueBoolean(ValueKeys.DMPolicyStateSupportsPublished));
             // route
-            if ((this.routeMessage != null) || !this.routeUsers.isEmpty())  {
+            if (((this.routeMessage != null) && !this.routeMessage.isEmpty()) || !this.routeUsers.isEmpty())  {
                 _updateBuilder.stepStartNewLine().stepSingle("route {" + StringUtil_mxJPO.convertUpdate(true, this.routeUsers, null) + "}").stepString(this.routeMessage).stepEndLine();
             }
 

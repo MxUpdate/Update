@@ -38,412 +38,377 @@ public class PolicyCI_1ParserTest
         final String state  = "registeredName \"\" !enforcereserveaccess !majorrevision !minorrevision !version !promote !checkouthistory !published ";
 
         return new Object[][]{
-                new Object[]{
-                        "1) simple policy",
+                {"1) simple policy",
                         "",
                         simple},
+                // description
+                {"2a) description",
+                        "",
+                        "description \"abc def\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\""},
+                {"2b) description not defined",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\"",
+                        "                 !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\""},
+                {"2c) multi-line description",
+                        "",
+                        "description \"abc\ndef\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\""},
                 // hidden flag
-                new Object[]{
-                        "2a) simple not hidden policy",
+                {"3a) simple not hidden policy",
                         "",
                         "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\""},
-                new Object[]{
-                        "2b) not hidden policy defined as value w/o apostrophe",
+                {"3b) not hidden policy defined as value w/o apostrophe",
                         "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\"",
                         "description \"\" hidden false type {} format {} defaultformat \"\" sequence \"\" store \"\""},
-                new Object[]{
-                        "2c) not hidden policy defined as value with apostrophe",
+                {"3c) not hidden policy defined as value with apostrophe",
                         "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\"",
                         "description \"\" hidden \"FAlse\" type {} format {} defaultformat \"\" sequence \"\" store \"\""},
-                new Object[]{
-                        "2d) hidden policy",
+                {"3d) hidden policy",
                         "",
                         "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\""},
-                new Object[]{
-                        "2e) hidden hidden defined as value w/o apostrophe",
+                {"3e) hidden hidden defined as value w/o apostrophe",
                         "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\"",
                         "description \"\" hidden TRUE type {} format {} defaultformat \"\" sequence \"\" store \"\""},
-                new Object[]{
-                        "2f) hidden policy defined as value with apostrophe",
+                {"3f) hidden policy defined as value with apostrophe",
                         "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\"",
                         "description \"\" hidden \"True\" type {} format {} defaultformat \"\" sequence \"\" store \"\""},
                 // enforce flag
-                new Object[]{
-                        "3a) not enforce policy",
+                {"4a) not enforce policy",
                         "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\"",
                         "description \"\" !hidden type {} format {} defaultformat \"\" !enforce sequence \"\" store \"\""},
-                new Object[]{
-                        "3b) not enforce policy defined as value w/o apostrophe",
+                {"4b) not enforce policy defined as value w/o apostrophe",
                         "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\"",
                         "description \"\" !hidden type {} format {} defaultformat \"\" enforce false sequence \"\" store \"\""},
-                new Object[]{
-                        "3c) not enforce policy defined as value with apostrophe",
+                {"4c) not enforce policy defined as value with apostrophe",
                         "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\"",
                         "description \"\" !hidden type {} format {} defaultformat \"\" enforce \"FAlse\" sequence \"\" store \"\""},
-                new Object[]{
-                        "3d) enforce policy",
+                {"4d) enforce policy",
                         "",
                         "description \"\" !hidden type {} format {} defaultformat \"\" enforce sequence \"\" store \"\""},
-                new Object[]{
-                        "3e) enforce policy defined as value w/o apostrophe",
+                {"4e) enforce policy defined as value w/o apostrophe",
                         "description \"\" !hidden type {} format {} defaultformat \"\" enforce sequence \"\" store \"\"",
                         "description \"\" !hidden type {} format {} defaultformat \"\" enforce TRUE sequence \"\" store \"\""},
-                new Object[]{
-                        "3f) enforce policy defined as value with apostrophe",
+                {"4f) enforce policy defined as value with apostrophe",
                         "description \"\" !hidden type {} format {} defaultformat \"\" enforce sequence \"\" store \"\"",
                         "description \"\" !hidden type {} format {} defaultformat \"\" enforce \"True\" sequence \"\" store \"\""},
                 // special characters
-                new Object[]{
-                        "4a) policy with description special characters",
+                {"5a) policy with description special characters",
                         "",
                         "description \"{}\\\"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\""},
-                new Object[]{
-                        "4b) policy with type special characters",
+                {"5b) policy with type special characters",
                         "",
                         "description \"\" hidden type {\"{}\\\"\"} format {} defaultformat \"\" sequence \"\" store \"\""},
-                new Object[]{
-                        "4c) policy with format special characters",
+                {"5c) policy with format special characters",
                         "",
                         "description \"\" hidden type {} format {\"{}\\\"\"} defaultformat \"\" sequence \"\" store \"\""},
-                new Object[]{
-                        "4d) policy with defaultformat special characters",
+                {"5d) policy with defaultformat special characters",
                         "",
                         "description \"\" hidden type {} format {} defaultformat \"{}\\\"\" sequence \"\" store \"\""},
-                new Object[]{
-                        "4e) policy with sequence special characters",
+                {"5e) policy with sequence special characters",
                         "",
                         "description \"\" hidden type {} format {} defaultformat \"\" sequence \"{}\\\"\" store \"\""},
-                new Object[]{
-                        "4f) policy with store special characters",
+                {"5f) policy with store special characters",
                         "",
                         "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"{}\\\"\""},
-                new Object[]{
-                        "4g) policy with delimeter / minor special characters",
+                {"5g) policy with delimeter / minor special characters",
                         "",
-                        "description \"\" hidden type {} format {} defaultformat \"\" delimiter . minorsequence \"{}\\\"\" majorsequence \"{}\\\"\" store \"\""},
+                        "description \"\" hidden type {} format {} defaultformat \"\" delimiter \".\" minorsequence \"{}\\\"\" majorsequence \"{}\\\"\" store \"\""},
                 // policy property
-                new Object[]{
-                        "5a) policy with property special characters",
+                {"6a) policy with property special characters",
                         "",
                         simple + "property \"{}\\\"\""},
-                new Object[]{
-                        "5b) policy with property and value special characters",
+                {"6b) policy with property and value special characters",
                         "",
                         simple + "property \"{}\\\"\" value \"{}\\\"\""},
-                new Object[]{
-                        "5c) policy with property link special characters",
+                {"6c) policy with property link special characters",
                         "",
                         simple + "property \"{}\\\"\" to type \"{}\\\"\""},
-                new Object[]{
-                        "5d) policy with property link and value special characters",
+                {"6d) policy with property link and value special characters",
                         "",
                         simple + "property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\""},
                 // policy state with special characters
-                new Object[]{
-                        "6a) policy with state symbolic name special characters",
+                {"7a) policy with state symbolic name special characters",
                         "",
                         simple + "state \"{}\\\"\" { registeredName \"{}\\\"\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }"},
-                new Object[]{
-                        "6b) policy with state action",
+                {"7b) policy with state action",
                         "",
                         simple + "state \"A\" { registeredName \"A\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"AAA\" input \"\" }"},
-                new Object[]{
-                        "6c) policy with empty state action",
+                {"7c) policy with empty state action",
                         simple + "state \"A\" { registeredName \"A\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"A\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" }"},
-                new Object[]{
-                        "6d) policy with state action input",
+                {"7d) policy with state action input",
                         "",
                         simple + "state \"A\" { registeredName \"A\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"AAA\" }"},
-                new Object[]{
-                        "6e) policy with state check",
+                {"7e) policy with state check",
                         "",
                         simple + "state \"A\" { registeredName \"A\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published check \"AAA\" input \"\" }"},
-                new Object[]{
-                        "6f) policy with empty state check",
+                {"7f) policy with empty state check",
                         simple + "state \"A\" { registeredName \"A\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"A\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published check \"\" input \"\" }"},
-                new Object[]{
-                        "6g) policy with state check input",
+                {"7g) policy with state check input",
                         "",
                         simple + "state \"A\" { registeredName \"A\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published check \"\" input \"AAA\" }"},
                 // policy state property
-                new Object[]{
-                        "7a) policy with state property special characters",
+                {"8a) policy with state property special characters",
                         "",
                         simple + "state \"A\" { registeredName \"\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published property \"{}\\\"\" }"},
-                new Object[]{
-                        "7b) policy with state property and value special characters",
+                {"8b) policy with state property and value special characters",
                         "",
                         simple + "state \"A\" { registeredName \"\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published property \"{}\\\"\" value \"{}\\\"\" }"},
-                new Object[]{
-                        "7c) policy with state property link special characters",
+                {"8c) policy with state property link special characters",
                         "",
                         simple + "state \"A\" { registeredName \"\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published property \"{}\\\"\" to type \"{}\\\"\" }"},
-                new Object[]{
-                        "7d) policy with state property link and value special characters",
+                {"8d) policy with state property link and value special characters",
                         "",
                         simple + "state \"A\" { registeredName \"\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\" }"},
                 // policy state with enforce flag
-                new Object[]{
-                        "8a) policy state not enforcereserveaccess",
+                {"9a) policy state not enforcereserveaccess",
                         "",
                         simple + "state \"A\" { registeredName \"\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }"},
-                new Object[]{
-                        "8b) policy state not enforcereserveaccess defined as not",
+                {"9b) policy state not enforcereserveaccess defined as not",
                         simple + "state \"A\" { registeredName \"\"   !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" notenforcereserveaccess majorrevision minorrevision version promote checkouthistory published }"},
-                new Object[]{
-                        "8c) policy state not enforcereserveaccess defined as value w/o apostrophe",
+                {"9c) policy state not enforcereserveaccess defined as value w/o apostrophe",
                         simple + "state \"A\" { registeredName \"\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess false majorrevision minorrevision version promote checkouthistory published }"},
-                new Object[]{
-                        "8d) policy state not enforcereserveaccess defined as value with apostrophe",
+                {"9d) policy state not enforcereserveaccess defined as value with apostrophe",
                         simple + "state \"A\" { registeredName \"\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess \"FAlse\" majorrevision minorrevision version promote checkouthistory published }"},
-                new Object[]{
-                        "8e) policy state enforcereserveaccess",
+                {"9e) policy state enforcereserveaccess",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }"},
-                new Object[]{
-                        "8f) policy state enforcereserveaccess defined as value w/o apostrophe",
+                {"9f) policy state enforcereserveaccess defined as value w/o apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess TRUE majorrevision minorrevision version promote checkouthistory published }"},
-                new Object[]{
-                        "8g) policy state enforcereserveaccess defined as value with apostrophe",
+                {"9g) policy state enforcereserveaccess defined as value with apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess \"True\" majorrevision minorrevision version promote checkouthistory published }"},
                 // policy state with majorrevision flag
-                new Object[]{
-                        "9a) policy state not majorrevision",
+                {"10a) policy state not majorrevision",
                         "",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess !majorrevision minorrevision version promote checkouthistory published }"},
-                new Object[]{
-                        "9b) policy state not majorrevision defined as value w/o apostrophe",
+                {"10b) policy state not majorrevision defined as value w/o apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess !majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision false minorrevision version promote checkouthistory published }"},
-                new Object[]{
-                        "9c) policy state not majorrevision defined as value with apostrophe",
+                {"10c) policy state not majorrevision defined as value with apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess !majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision \"FAlse\" minorrevision version promote checkouthistory published }"},
-                new Object[]{
-                        "9d) policy state majorrevision",
+                {"10d) policy state majorrevision",
                         "",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }"},
-                new Object[]{
-                        "9e) policy state majorrevision defined as value w/o apostrophe",
+                {"10e) policy state majorrevision defined as value w/o apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision TRUE minorrevision version promote checkouthistory published }"},
-                new Object[]{
-                        "9f) policy state majorrevision defined as value with apostrophe",
+                {"10f) policy state majorrevision defined as value with apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision \"True\" minorrevision version promote checkouthistory published }"},
                 // policy state with minorrevision flag
-                new Object[]{
-                        "10a) policy state not minorrevision",
+                {"11a) policy state not minorrevision",
                         "",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision !minorrevision version promote checkouthistory published }"},
-                new Object[]{
-                        "10b) policy state not minorrevision defined as value w/o apostrophe",
+                {"11b) policy state not minorrevision defined as value w/o apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision !minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision false version promote checkouthistory published }"},
-                new Object[]{
-                        "10c) policy state not minorrevision defined as value with apostrophe",
+                {"11c) policy state not minorrevision defined as value with apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision !minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision \"FAlse\" version promote checkouthistory published }"},
-                new Object[]{
-                        "10d) policy state minorrevision",
+                {"11d) policy state minorrevision",
                         "",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }"},
-                new Object[]{
-                        "10e) policy state minorrevision defined as value w/o apostrophe",
+                {"11e) policy state minorrevision defined as value w/o apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision TRUE version promote checkouthistory published }"},
-                new Object[]{
-                        "10f) policy state minorrevision defined as value with apostrophe",
+                {"11f) policy state minorrevision defined as value with apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision \"True\" version promote checkouthistory published }"},
                 // policy state with revision flag
-                new Object[]{
-                        "11a) policy state not revision",
+                {"12a) policy state not revision",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision !minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision !revision version promote checkouthistory published }"},
-                new Object[]{
-                        "11b) policy state not minorrevision defined as value w/o apostrophe",
+                {"12b) policy state not minorrevision defined as value w/o apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision !minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision revision false version promote checkouthistory published }"},
-                new Object[]{
-                        "11c) policy state not minorrevision defined as value with apostrophe",
+                {"12c) policy state not minorrevision defined as value with apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision !minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision revision \"FAlse\" version promote checkouthistory published }"},
-                new Object[]{
-                        "11d) policy state minorrevision",
+                {"12d) policy state minorrevision",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision revision version promote checkouthistory published }"},
-                new Object[]{
-                        "11e) policy state minorrevision defined as value w/o apostrophe",
+                {"12e) policy state minorrevision defined as value w/o apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision revision TRUE version promote checkouthistory published }"},
-                new Object[]{
-                        "11f) policy state minorrevision defined as value with apostrophe",
+                {"12f) policy state minorrevision defined as value with apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision revision \"True\" version promote checkouthistory published }"},
                 // policy state with version flag
-                new Object[]{
-                        "12a) policy state not version",
+                {"13a) policy state not version",
                         "",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision !version promote checkouthistory published }"},
-                new Object[]{
-                        "12b) policy state not version defined as value w/o apostrophe",
+                {"13b) policy state not version defined as value w/o apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision !version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version false promote checkouthistory published }"},
-                new Object[]{
-                        "12c) policy state not version defined as value with apostrophe",
+                {"13c) policy state not version defined as value with apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision !version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version \"FAlse\" promote checkouthistory published }"},
-                new Object[]{
-                        "12d) policy state version",
+                {"13d) policy state version",
                         "",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }"},
-                new Object[]{
-                        "12e) policy state version defined as value w/o apostrophe",
+                {"13e) policy state version defined as value w/o apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version TRUE promote checkouthistory published }"},
-                new Object[]{
-                        "12f) policy state version defined as value with apostrophe",
+                {"13f) policy state version defined as value with apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version \"True\" promote checkouthistory published }"},
                 // policy state with promote flag
-                new Object[]{
-                        "13a) policy state not promote",
+                {"14a) policy state not promote",
                         "",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version !promote checkouthistory published }"},
-                new Object[]{
-                        "13b) policy state not promote defined as value w/o apostrophe",
+                {"14b) policy state not promote defined as value w/o apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version !promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote false checkouthistory published }"},
-                new Object[]{
-                        "13c) policy state not promote defined as value with apostrophe",
+                {"14c) policy state not promote defined as value with apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version !promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote \"FAlse\" checkouthistory published }"},
-                new Object[]{
-                        "13d) policy state promote",
+                {"14d) policy state promote",
                         "",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }"},
-                new Object[]{
-                        "13e) policy state promote defined as value w/o apostrophe",
+                {"14e) policy state promote defined as value w/o apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote TRUE checkouthistory published }"},
-                new Object[]{
-                        "13f) policy state promote defined as value with apostrophe",
+                {"14f) policy state promote defined as value with apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote \"True\" checkouthistory published }"},
                 // policy state with checkouthistory flag
-                new Object[]{
-                        "14a) policy state not checkouthistory",
+                {"15a) policy state not checkouthistory",
                         "",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote !checkouthistory published }"},
-                new Object[]{
-                        "14b) policy state not checkouthistory defined as value w/o apostrophe",
+                {"15b) policy state not checkouthistory defined as value w/o apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote !checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory false published }"},
-                new Object[]{
-                        "14c) policy state not checkouthistory defined as value with apostrophe",
+                {"15c) policy state not checkouthistory defined as value with apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote !checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory \"FAlse\" published }"},
-                new Object[]{
-                        "14d) policy state checkouthistory",
+                {"15d) policy state checkouthistory",
                         "",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }"},
-                new Object[]{
-                        "14e) policy state checkouthistory defined as value w/o apostrophe",
+                {"15e) policy state checkouthistory defined as value w/o apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory TRUE published }"},
-                new Object[]{
-                        "14f) policy state checkouthistory defined as value with apostrophe",
+                {"15f) policy state checkouthistory defined as value with apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory \"True\" published }"},
                 // policy state with published flag
-                new Object[]{
-                        "15a) policy state not published",
+                {"16a) policy state not published",
                         "",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory !published }"},
-                new Object[]{
-                        "15b) policy state not published defined as value w/o apostrophe",
+                {"16b) policy state not published defined as value w/o apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory !published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published false }"},
-                new Object[]{
-                        "15c) policy state not published defined as value with apostrophe",
+                {"16c) policy state not published defined as value with apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory !published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published \"FAlse\" }"},
-                new Object[]{
-                        "15d) policy state published",
+                {"16d) policy state published",
                         "",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }"},
-                new Object[]{
-                        "15e) policy state published defined as value w/o apostrophe",
+                {"16e) policy state published defined as value w/o apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published TRUE }"},
-                new Object[]{
-                        "15f) policy state published defined as value with apostrophe",
+                {"16f) policy state published defined as value with apostrophe",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published }",
                         simple + "state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published \"True\" }"},
 
                 // all state owner
-                new Object[]{"20a) all state owner", "", simple + "allstate {              owner             {read} }"},
-                new Object[]{"20b) all state owner", "", simple + "allstate {        login owner             {read} }"},
-                new Object[]{"20c) all state owner", "", simple + "allstate { revoke       owner             {read} }"},
-                new Object[]{"20d) all state owner", "", simple + "allstate { revoke login owner             {read} }"},
-                new Object[]{"20e) all state owner", "", simple + "allstate {              owner key \"key\" {read} }"},
-                new Object[]{"20f) all state owner", "", simple + "allstate {        login owner key \"key\" {read} }"},
-                new Object[]{"20g) all state owner", "", simple + "allstate { revoke       owner key \"key\" {read} }"},
-                new Object[]{"20h) all state owner", "", simple + "allstate { revoke login owner key \"key\" {read} }"},
+                {"20a) all state owner", "", simple + "allstate {              owner             {read} }"},
+                {"20b) all state owner", "", simple + "allstate {        login owner             {read} }"},
+                {"20c) all state owner", "", simple + "allstate { revoke       owner             {read} }"},
+                {"20d) all state owner", "", simple + "allstate { revoke login owner             {read} }"},
+                {"20e) all state owner", "", simple + "allstate {              owner key \"key\" {read} }"},
+                {"20f) all state owner", "", simple + "allstate {        login owner key \"key\" {read} }"},
+                {"20g) all state owner", "", simple + "allstate { revoke       owner key \"key\" {read} }"},
+                {"20h) all state owner", "", simple + "allstate { revoke login owner key \"key\" {read} }"},
                 // all state public
-                new Object[]{"21a) all state public", "", simple + "allstate {              public             {read} }"},
-                new Object[]{"21b) all state public", "", simple + "allstate {        login public             {read} }"},
-                new Object[]{"21c) all state public", "", simple + "allstate { revoke       public             {read} }"},
-                new Object[]{"21d) all state public", "", simple + "allstate { revoke login public             {read} }"},
-                new Object[]{"21e) all state public", "", simple + "allstate {              public key \"key\" {read} }"},
-                new Object[]{"21f) all state public", "", simple + "allstate {        login public key \"key\" {read} }"},
-                new Object[]{"21g) all state public", "", simple + "allstate { revoke       public key \"key\" {read} }"},
-                new Object[]{"21h) all state public", "", simple + "allstate { revoke login public key \"key\" {read} }"},
+                {"21a) all state public", "", simple + "allstate {              public             {read} }"},
+                {"21b) all state public", "", simple + "allstate {        login public             {read} }"},
+                {"21c) all state public", "", simple + "allstate { revoke       public             {read} }"},
+                {"21d) all state public", "", simple + "allstate { revoke login public             {read} }"},
+                {"21e) all state public", "", simple + "allstate {              public key \"key\" {read} }"},
+                {"21f) all state public", "", simple + "allstate {        login public key \"key\" {read} }"},
+                {"21g) all state public", "", simple + "allstate { revoke       public key \"key\" {read} }"},
+                {"21h) all state public", "", simple + "allstate { revoke login public key \"key\" {read} }"},
                 // allstate state user
-                new Object[]{"22a) all state user", "", simple + "allstate {              user \"createor\"             {read} }"},
-                new Object[]{"22b) all state user", "", simple + "allstate {        login user \"createor\"             {read} }"},
-                new Object[]{"22c) all state user", "", simple + "allstate { revoke       user \"createor\"             {read} }"},
-                new Object[]{"22d) all state user", "", simple + "allstate { revoke login user \"createor\"             {read} }"},
-                new Object[]{"22e) all state user", "", simple + "allstate {              user \"createor\" key \"key\" {read} }"},
-                new Object[]{"22f) all state user", "", simple + "allstate {        login user \"createor\" key \"key\" {read} }"},
-                new Object[]{"22g) all state user", "", simple + "allstate { revoke       user \"createor\" key \"key\" {read} }"},
-                new Object[]{"22h) all state user", "", simple + "allstate { revoke login user \"createor\" key \"key\" {read} }"},
+                {"22a) all state user", "", simple + "allstate {              user \"createor\"             {read} }"},
+                {"22b) all state user", "", simple + "allstate {        login user \"createor\"             {read} }"},
+                {"22c) all state user", "", simple + "allstate { revoke       user \"createor\"             {read} }"},
+                {"22d) all state user", "", simple + "allstate { revoke login user \"createor\"             {read} }"},
+                {"22e) all state user", "", simple + "allstate {              user \"createor\" key \"key\" {read} }"},
+                {"22f) all state user", "", simple + "allstate {        login user \"createor\" key \"key\" {read} }"},
+                {"22g) all state user", "", simple + "allstate { revoke       user \"createor\" key \"key\" {read} }"},
+                {"22h) all state user", "", simple + "allstate { revoke login user \"createor\" key \"key\" {read} }"},
 
                 // single state owner
-                new Object[]{"30a) single state owner", "", simple + "state \"A\" { " + state + "              owner             {read} }"},
-                new Object[]{"30b) single state owner", "", simple + "state \"A\" { " + state + "        login owner             {read} }"},
-                new Object[]{"30c) single state owner", "", simple + "state \"A\" { " + state + " revoke       owner             {read} }"},
-                new Object[]{"30d) single state owner", "", simple + "state \"A\" { " + state + " revoke login owner             {read} }"},
-                new Object[]{"30e) single state owner", "", simple + "state \"A\" { " + state + "              owner key \"key\" {read} }"},
-                new Object[]{"30f) single state owner", "", simple + "state \"A\" { " + state + "        login owner key \"key\" {read} }"},
-                new Object[]{"30g) single state owner", "", simple + "state \"A\" { " + state + " revoke       owner key \"key\" {read} }"},
-                new Object[]{"30h) single state owner", "", simple + "state \"A\" { " + state + " revoke login owner key \"key\" {read} }"},
+                {"30a) single state owner", "", simple + "state \"A\" { " + state + "              owner             {read} }"},
+                {"30b) single state owner", "", simple + "state \"A\" { " + state + "        login owner             {read} }"},
+                {"30c) single state owner", "", simple + "state \"A\" { " + state + " revoke       owner             {read} }"},
+                {"30d) single state owner", "", simple + "state \"A\" { " + state + " revoke login owner             {read} }"},
+                {"30e) single state owner", "", simple + "state \"A\" { " + state + "              owner key \"key\" {read} }"},
+                {"30f) single state owner", "", simple + "state \"A\" { " + state + "        login owner key \"key\" {read} }"},
+                {"30g) single state owner", "", simple + "state \"A\" { " + state + " revoke       owner key \"key\" {read} }"},
+                {"30h) single state owner", "", simple + "state \"A\" { " + state + " revoke login owner key \"key\" {read} }"},
                 // single state public
-                new Object[]{"31a) single state public", "", simple + "state \"A\" { " + state + "              public             {read} }"},
-                new Object[]{"31b) single state public", "", simple + "state \"A\" { " + state + "        login public             {read} }"},
-                new Object[]{"31c) single state public", "", simple + "state \"A\" { " + state + " revoke       public             {read} }"},
-                new Object[]{"31d) single state public", "", simple + "state \"A\" { " + state + " revoke login public             {read} }"},
-                new Object[]{"31e) single state public", "", simple + "state \"A\" { " + state + "              public key \"key\" {read} }"},
-                new Object[]{"31f) single state public", "", simple + "state \"A\" { " + state + "        login public key \"key\" {read} }"},
-                new Object[]{"31g) single state public", "", simple + "state \"A\" { " + state + " revoke       public key \"key\" {read} }"},
-                new Object[]{"31h) single state public", "", simple + "state \"A\" { " + state + " revoke login public key \"key\" {read} }"},
+                {"31a) single state public", "", simple + "state \"A\" { " + state + "              public             {read} }"},
+                {"31b) single state public", "", simple + "state \"A\" { " + state + "        login public             {read} }"},
+                {"31c) single state public", "", simple + "state \"A\" { " + state + " revoke       public             {read} }"},
+                {"31d) single state public", "", simple + "state \"A\" { " + state + " revoke login public             {read} }"},
+                {"31e) single state public", "", simple + "state \"A\" { " + state + "              public key \"key\" {read} }"},
+                {"31f) single state public", "", simple + "state \"A\" { " + state + "        login public key \"key\" {read} }"},
+                {"31g) single state public", "", simple + "state \"A\" { " + state + " revoke       public key \"key\" {read} }"},
+                {"31h) single state public", "", simple + "state \"A\" { " + state + " revoke login public key \"key\" {read} }"},
                 // single state user
-                new Object[]{"32a) single state user", "", simple + "state \"A\" { " + state + "              user \"createor\"             {read} }"},
-                new Object[]{"32b) single state user", "", simple + "state \"A\" { " + state + "        login user \"createor\"             {read} }"},
-                new Object[]{"32c) single state user", "", simple + "state \"A\" { " + state + " revoke       user \"createor\"             {read} }"},
-                new Object[]{"32d) single state user", "", simple + "state \"A\" { " + state + " revoke login user \"createor\"             {read} }"},
-                new Object[]{"32e) single state user", "", simple + "state \"A\" { " + state + "              user \"createor\" key \"key\" {read} }"},
-                new Object[]{"32f) single state user", "", simple + "state \"A\" { " + state + "        login user \"createor\" key \"key\" {read} }"},
-                new Object[]{"32g) single state user", "", simple + "state \"A\" { " + state + " revoke       user \"createor\" key \"key\" {read} }"},
-                new Object[]{"32h) single state user", "", simple + "state \"A\" { " + state + " revoke login user \"createor\" key \"key\" {read} }"},
+                {"32a) single state user", "", simple + "state \"A\" { " + state + "              user \"createor\"             {read} }"},
+                {"32b) single state user", "", simple + "state \"A\" { " + state + "        login user \"createor\"             {read} }"},
+                {"32c) single state user", "", simple + "state \"A\" { " + state + " revoke       user \"createor\"             {read} }"},
+                {"32d) single state user", "", simple + "state \"A\" { " + state + " revoke login user \"createor\"             {read} }"},
+                {"32e) single state user", "", simple + "state \"A\" { " + state + "              user \"createor\" key \"key\" {read} }"},
+                {"32f) single state user", "", simple + "state \"A\" { " + state + "        login user \"createor\" key \"key\" {read} }"},
+                {"32g) single state user", "", simple + "state \"A\" { " + state + " revoke       user \"createor\" key \"key\" {read} }"},
+                {"32h) single state user", "", simple + "state \"A\" { " + state + " revoke login user \"createor\" key \"key\" {read} }"},
+
+                // state route
+                {"40a) state with route",                "", simple + "state \"A\" { " + state + " route {\"abc\"} \"\"     }"},
+                {"40b) state with route & message",      "", simple + "state \"A\" { " + state + " route {\"abc\"} \"abc\"  }"},
+                {"40c) state with multiple route users (to test sorting)",
+                        simple + "state \"A\" { " + state + " route {\"abc\" \"def\"} \"\" }",
+                        simple + "state \"A\" { " + state + " route {\"def\" \"abc\"} \"\" }"},
+                {"40d) state with empty route user",
+                        simple + "state \"A\" { " + state + "               }",
+                        simple + "state \"A\" { " + state + " route {} \"\" }"},
+
+                // state trigger
+                {"50a) state with check trigger",               "", simple + "state \"A\" { " + state + " trigger modify check    \"Prog\" input \"\" }"},
+                {"50b) state with check trigger & input",       "", simple + "state \"A\" { " + state + " trigger modify check    \"Prog\" input \"abc\" }"},
+                {"50c) state with check trigger & empty input",
+                        simple + "state \"A\" { " + state + " trigger modify check    \"Prog\" input \"\" }",
+                        simple + "state \"A\" { " + state + " trigger modify check    \"Prog\"            }"},
+                {"51a) state with override trigger",         "", simple + "state \"A\" { " + state + " trigger modify override \"Prog\" input \"\" }"},
+                {"51b) state with override trigger & input", "", simple + "state \"A\" { " + state + " trigger modify override \"Prog\" input \"abc\" }"},
+                {"51c) state with check trigger & empty input",
+                        simple + "state \"A\" { " + state + " trigger modify override    \"Prog\" input \"\" }",
+                        simple + "state \"A\" { " + state + " trigger modify override    \"Prog\"            }"},
+
+                {"52a) state with action trigger",           "", simple + "state \"A\" { " + state + " trigger modify action   \"Prog\" input \"\" }"},
+                {"52b) state with action trigger & input",   "", simple + "state \"A\" { " + state + " trigger modify action   \"Prog\" input \"abc\" }"},
+                {"52c) state with check trigger & no input",
+                        simple + "state \"A\" { " + state + " trigger modify action    \"Prog\" input \"\" }",
+                        simple + "state \"A\" { " + state + " trigger modify action    \"Prog\"             }"},
+
+                // state signature (branch)
+                {"60a) state with signature",         "", simple + "state \"A\" { " + state + " signature \"A\" { branch \"\"    approve {}        ignore {}        reject {}        filter \"\"    } }"},
+                {"60b) state with signature branch",  "", simple + "state \"A\" { " + state + " signature \"A\" { branch \"abc\" approve {}        ignore {}        reject {}        filter \"\"    } }"},
+                {"60c) state with signature approve", "", simple + "state \"A\" { " + state + " signature \"A\" { branch \"\"    approve {\"abc\"} ignore {}        reject {}        filter \"\"    } }"},
+                {"60d) state with signature ignore",  "", simple + "state \"A\" { " + state + " signature \"A\" { branch \"\"    approve {}        ignore {\"abc\"} reject {}        filter \"\"    } }"},
+                {"60e) state with signature reject",  "", simple + "state \"A\" { " + state + " signature \"A\" { branch \"\"    approve {}        ignore {}        reject {\"abc\"} filter \"\"    } }"},
+                {"60f) state with signature filter",  "", simple + "state \"A\" { " + state + " signature \"A\" { branch \"\"    approve {}        ignore {}        reject {}        filter \"abc\" } }"},
+                {"60g) state with empty signature value (to check default values)",
+                        simple + "state \"A\" { " + state + " signature \"A\" { branch \"\" approve {} ignore {} reject {} filter \"\" } }",
+                        simple + "state \"A\" { " + state + " signature \"A\" { } }"},
         };
     }
 

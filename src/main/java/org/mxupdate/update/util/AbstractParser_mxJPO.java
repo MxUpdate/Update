@@ -147,11 +147,41 @@ public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_
      * @param _object       object where the field must be updated
      * @param _fieldName    name of the field to update
      * @param _values       new values of the field
+     * @deprecated replaced by {@link #appendValues(Object, String, Collection)}
      */
+    @Deprecated()
     @SuppressWarnings("unchecked")
     protected void setValue(final Object _object,
                             final String _fieldName,
                             final Collection<?> _values)
+    {
+        try  {
+            final Field field = this.getField(_object, _fieldName).field;
+            final boolean accessible = field.isAccessible();
+            try  {
+                field.setAccessible(true);
+                final Collection<Object> set = (Collection<Object>) field.get(_object);
+                set.addAll(_values);
+            } finally  {
+                field.setAccessible(accessible);
+            }
+        } catch (final Exception e)  {
+            throw new ParseUpdateError(e);
+        }
+    }
+
+    /**
+     * Appends new {@code values≠ for field {@code _fieldName} of
+     * {@code _object}.
+     *
+     * @param _object       object where the field must be updated
+     * @param _fieldName    name of the field to update
+     * @param _values       new values of the field
+     */
+    @SuppressWarnings("unchecked")
+    protected void appendValues(final Object _object,
+                                final String _fieldName,
+                                final Collection<?> _values)
     {
         try  {
             final Field field = this.getField(_object, _fieldName).field;

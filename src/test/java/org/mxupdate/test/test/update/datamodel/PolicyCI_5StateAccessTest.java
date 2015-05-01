@@ -13,20 +13,21 @@
  *
  */
 
-package org.mxupdate.test.ci.datamodel;
+package org.mxupdate.test.test.update.datamodel;
 
 import org.mxupdate.test.data.datamodel.PolicyData;
 import org.mxupdate.test.data.datamodel.PolicyData.State;
 import org.mxupdate.test.data.datamodel.helper.Access;
+import org.mxupdate.update.datamodel.Policy_mxJPO;
 import org.testng.annotations.Test;
 
 /**
- * Test class for policy exports.
+ * Tests the {@link Policy_mxJPO policy CI} state export / update.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class Policy_StateAccessTest
+public class PolicyCI_5StateAccessTest
     extends AbstractPolicy_AccessTest
 {
     /**

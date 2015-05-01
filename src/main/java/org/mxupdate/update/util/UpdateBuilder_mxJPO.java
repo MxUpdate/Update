@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.util;
 
-import java.io.IOException;
 import java.util.Collection;
 
 /**
@@ -219,6 +218,7 @@ public class UpdateBuilder_mxJPO
     {
         this.stepStartNewLine().stepSingle(_tag);
         this.strg.append(" {");
+        this.first = true;
         for (final String value : _list)  {
             this.stepString(value);
         }

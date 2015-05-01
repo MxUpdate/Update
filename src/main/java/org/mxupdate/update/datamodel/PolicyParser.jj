@@ -28,13 +28,11 @@ package org.mxupdate.update.datamodel;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
+import org.mxupdate.update.datamodel.Policy_mxJPO.Signature;
 import org.mxupdate.update.datamodel.Policy_mxJPO.State;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
@@ -43,8 +41,10 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
-import org.mxupdate.update.util.ParameterCache_mxJPO;
 
+/**
+ * Parses the update format for {@link Policy_mxJPO}.
+ */
 @SuppressWarnings("unused")
 class PolicyParser
     extends AbstractParser_mxJPO<Policy_mxJPO>
@@ -52,44 +52,68 @@ class PolicyParser
 }
 PARSER_END(PolicyParser)
 
-<DEFAULT> SKIP :
+<*> SKIP :
 {
-  " "
-| "\t"
-| "\n"
-| "\r"
+  " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
-<DEFAULT> TOKEN : /** first level */
+<DEFAULT> TOKEN :
 {
-      <DESCRIPTION:                                     "description">                                          : STRING_EXPECTED
-    | <TYPE:                                            "type">                                                 : LALL_EXPECTED
-    | <FORMAT:                                          "format">                                               : LALL_EXPECTED
-    | <STORE:                                           "store">                                                : STRING_EXPECTED
-    | <DEFAULTFORMAT:                                   "defaultformat">                                        : STRING_EXPECTED
-    | <ENFORCE_TRUE:                                    "enforce">
-    | <ENFORCE_TRUE_VIA_VALUE:                          "enforce" ([" ","\t","\n","\r"])+ ["t","T"] ["r","R"] ["u","U"] ["e","E"]>
-    | <ENFORCE_TRUE_VIA_VALUE_APOSTROPHE:               "enforce" ([" ","\t","\n","\r"])+ "\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"">
-    | <ENFORCE_FALSE:                                   "!enforce">
-    | <ENFORCE_FALSE_VIA_VALUE:                         "enforce" ([" ","\t","\n","\r"])+ ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"]>
-    | <ENFORCE_FALSE_VIA_VALUE_APOSTROPHE:              "enforce" ([" ","\t","\n","\r"])+ "\"" ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] "\"">
-    | <DELIMITER:                                       "delimiter">                                            : D_EXPECTED
-    | <SEQUENCE:                                        "sequence">                                             : STRING_EXPECTED
-    | <MINORSEQUENCE:                                   "minorsequence">                                        : STRING_EXPECTED
-    | <MAJORSEQUENCE:                                   "majorsequence">                                        : STRING_EXPECTED
-    | <HIDDEN_TRUE:                                     "hidden">
-    | <HIDDEN_TRUE_VIA_VALUE:                           "hidden" ([" ","\t","\n","\r"])+ ["t","T"] ["r","R"] ["u","U"] ["e","E"]>
-    | <HIDDEN_TRUE_VIA_VALUE_APOSTROPHE:                "hidden" ([" ","\t","\n","\r"])+ "\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"">
-    | <HIDDEN_FALSE:                                    "!hidden">
-    | <HIDDEN_FALSE_VIA_VALUE:                          "hidden" ([" ","\t","\n","\r"])+ ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"]>
-    | <HIDDEN_FALSE_VIA_VALUE_APOSTROPHE:               "hidden" ([" ","\t","\n","\r"])+ "\"" ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] "\"">
-    | <STATE:                                           "state">                                                : STRING_EXPECTED
-    | <ALLSTATE:                                        "allstate">                                             : DEFAULT
+      <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+
+    | <TYPE_ALL:                            "type" ([" ","\t","\n"])+ "all">                : DEFAULT
+    | <TYPE_LIST:                           "type" ([" ","\t","\n"])+ "{">                  : LIST_EXPECTED
+
+    | <FORMAT_ALL:                          "format" ([" ","\t","\n"])+ "all">              : DEFAULT
+    | <FORMAT_LIST:                         "format" ([" ","\t","\n"])+ "{">                : LIST_EXPECTED
+
+    | <STORE:                               "store">                                        : STRING_EXPECTED
+    | <DEFAULTFORMAT:                       "defaultformat">                                : STRING_EXPECTED
+    | <ENFORCE_TRUE:                        "enforce">
+    | <ENFORCE_TRUE_VIA_VALUE:              "enforce" ([" ","\t","\n","\r"])+ ["t","T"] ["r","R"] ["u","U"] ["e","E"]>
+    | <ENFORCE_TRUE_VIA_VALUE_APOSTROPHE:   "enforce" ([" ","\t","\n","\r"])+ "\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"">
+    | <ENFORCE_FALSE:                       "!enforce">
+    | <ENFORCE_FALSE_VIA_VALUE:             "enforce" ([" ","\t","\n","\r"])+ ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"]>
+    | <ENFORCE_FALSE_VIA_VALUE_APOSTROPHE:  "enforce" ([" ","\t","\n","\r"])+ "\"" ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] "\"">
+    | <SEQUENCE:                            "sequence">                                     : STRING_EXPECTED
+    | <MINORSEQUENCE:                       "minorsequence">                                : STRING_EXPECTED
+    | <MAJORSEQUENCE:                       "majorsequence">                                : STRING_EXPECTED
+    | <HIDDEN_TRUE:                         "hidden">
+    | <HIDDEN_TRUE_VIA_VALUE:               "hidden" ([" ","\t","\n","\r"])+ ["t","T"] ["r","R"] ["u","U"] ["e","E"]>
+    | <HIDDEN_TRUE_VIA_VALUE_APOSTROPHE:    "hidden" ([" ","\t","\n","\r"])+ "\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"">
+    | <HIDDEN_FALSE:                        "!hidden">
+    | <HIDDEN_FALSE_VIA_VALUE:              "hidden" ([" ","\t","\n","\r"])+ ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"]>
+    | <HIDDEN_FALSE_VIA_VALUE_APOSTROPHE:   "hidden" ([" ","\t","\n","\r"])+ "\"" ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] "\"">
+    | <ALLSTATE:                            "allstate">
 }
 
+/************************************************************** Common String */
+<STRING_EXPECTED> TOKEN :
+{
+      <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
+    | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/*************************************************** Common Multi-Line-String */
+<MULTILINESTRING_EXPECTED> TOKEN :
+{
+      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
+    | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/***************************************************** Common List of Strings */
+<LIST_EXPECTED> TOKEN :
+{
+      <LISTSTRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : LIST_EXPECTED
+    | <LISTSINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : LIST_EXPECTED
+    | <LISTCLOSE : "}">   : DEFAULT
+}
+
+/********************************************************************** State */
 <DEFAULT> TOKEN : /** State and depending signature and trigger Tokens */
 {
-      <REGISTEREDNAME:                                  "registeredName">                                       : STRING_EXPECTED
+      <STATE:                                           "state">                                                : STRING_EXPECTED
+    | <REGISTEREDNAME:                                  "registeredName">                                       : STRING_EXPECTED
 
     | <REVISION_TRUE:                                   "revision">
     | <REVISION_TRUE_VIA_VALUE:                         "revision" ([" ","\t","\n","\r"])+ (["t","T"] ["r","R"] ["u","U"] ["e","E"])>
@@ -153,28 +177,41 @@ PARSER_END(PolicyParser)
     | <OWNER:                                           "owner">                                                : STATEACCESS_EXPECTED
     | <PUBLIC:                                          "public">                                               : STATEACCESS_EXPECTED
     | <USER:                                            "user">                                                 : STATEACCESS_STRING_EXPECTED
-    | <ACTION:                                          "action">                                               : STRING_EXPECTED
-    | <CHECK:                                           "check">                                                : STRING_EXPECTED
-    | <OVERRIDE:                                        "override">                                             : STRING_EXPECTED
     | <INPUT:                                           "input">                                                : STRING_EXPECTED
-    | <TRIGGER:                                         "trigger">                                              : STRING_EXPECTED
-    | <APPROVE:                                         "approve">                                              : L_EXPECTED
-    | <IGNORE:                                          "ignore">                                               : L_EXPECTED
-    | <REJECT:                                          "reject">                                               : L_EXPECTED
+    | <APPROVE_LIST:                                    "approve" ([" ","\t","\n"])+ "{">                       : LIST_EXPECTED
+    | <IGNORE_LIST:                                     "ignore" ([" ","\t","\n"])+ "{">                        : LIST_EXPECTED
+    | <REJECT_LIST:                                     "reject" ([" ","\t","\n"])+ "{">                        : LIST_EXPECTED
     | <BRANCH:                                          "branch">                                               : STRING_EXPECTED
     | <SIGNATURE:                                       "signature">                                            : STRING_EXPECTED
-    | <ROUTE:                                           "route">                                                : LS_EXPECTED
 }
 
-/************************************************************** State Access */
-<STATEACCESS_EXPECTED> SKIP :
+/************************************************************ Legacy Triggers */
+<DEFAULT> TOKEN :
+{      <LEGACYACTION:                        "action">                                       : STRING_EXPECTED
+    | <LEGACYCHECK:                         "check">                                        : STRING_EXPECTED
+}
+
+/******************************************************************* Triggers */
+<DEFAULT> TOKEN :
 {
-  " "
-| "\t"
-| "\n"
-| "\r"
+      <TRIGGER:                             "trigger">                                      : TRIGEVENT_EXPECTED
 }
 
+/** Trigger Event */
+<TRIGEVENT_EXPECTED> TOKEN :
+{
+      <TRIGEVENT:           (~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"])+>         : TRIGKIND_EXPECTED
+}
+
+/** Trigger Kind */
+<TRIGKIND_EXPECTED> TOKEN :
+{
+      <ACTION:                              "action">                                       : STRING_EXPECTED
+    | <CHECK:                               "check">                                        : STRING_EXPECTED
+    | <OVERRIDE:                            "override">                                     : STRING_EXPECTED
+}
+
+/********************************************************************* Access */
 <STATEACCESS_EXPECTED> TOKEN:
 {
       <KEY:                                 "key" >                                                 : STATEACCESS_STRING_EXPECTED
@@ -182,18 +219,10 @@ PARSER_END(PolicyParser)
                                                                                                     : DEFAULT
 }
 /** String within State Access */
-<STATEACCESS_STRING_EXPECTED> SKIP :
-{
-  " " | "\t" | "\n" | "\r"
-}
-
 <STATEACCESS_STRING_EXPECTED> TOKEN :
 {
-      <STATEACCESS_STRING : (<STATEACCESS_STRING_APOSTROPHE>(<STATEACCESS_STRING_CHAR> | "\\\"" | "{" | "}" | " ")*<STATEACCESS_STRING_APOSTROPHE>)>
-                                                                                                    : STATEACCESS_EXPECTED
-    | <STATEACCESS_SINGLE_STRING : (<STATEACCESS_STRING_CHAR>)+>                                    : STATEACCESS_EXPECTED
-    | <#STATEACCESS_STRING_APOSTROPHE: "\"" >
-    | <#STATEACCESS_STRING_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <STATEACCESS_STRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STATEACCESS_EXPECTED
+    | <STATEACCESS_SINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STATEACCESS_EXPECTED
 }
 
 /** After access definition back to default */
@@ -232,127 +261,45 @@ PARSER_END(PolicyParser)
     | <CATEGORY_CONTRACTOR:                 "contractor"  ([" ","\t","\n","\r"])+ "category">       : DEFAULT
 }
 
-/*********************************************** Property and State Property */
+/******************************************************************* Property */
 <DEFAULT> TOKEN :
-{      <PROPERTY:                            "property">                                             : STRING_EXPECTED
-    | <PROPERTYVAL:                         "value">                                                : STRING_EXPECTED
-    | <PROPERTYTO:                          "to">                                                   : PROPERTYTO_EXPECTED
+{
+      <PROPERTY:                            "property">                                     : STRING_EXPECTED
+    | <PROPERTYTO:                          "to">                                           : ADMINREF_EXPECTED
+    | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
 }
 
-<PROPERTYTO_EXPECTED> SKIP :
+<ADMINREF_EXPECTED> TOKEN :
 {
-  " " | "\t" | "\n" | "\r"
+      <ADMINTYPE_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
 }
 
-<PROPERTYTO_EXPECTED> TOKEN :
-{
-      <SS_STRING : (<SS_APOSTROPHE>(<SS_CHAR> | "\\\"" | "{" | "}" | " ")*<SS_APOSTROPHE>)>         : STRING_EXPECTED
-    | <SS_SINGLE : (<SS_CHAR>)+> : STRING_EXPECTED
-    | <#SS_APOSTROPHE : "\"" >
-    | <#SS_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+/******************************************************** Delimiter Character */
+<DEFAULT> TOKEN:
+{      <DELIMITER:                           "delimiter">                                    : DELIMITER_EXPECTED
 }
 
-/*************************************************** Delimiter Chacter */
-<D_EXPECTED> SKIP :
+<DELIMITER_EXPECTED> TOKEN :
 {
-  " " | "\t" | "\n" | "\r"
-}
-
-<D_EXPECTED> TOKEN :
-{
-      <DELIMITER_CHAR : (<DELIMITER_CHARSTR> | "\"" <DELIMITER_CHARSTR> "\"")>  : DEFAULT
+      <DELIMITERSTRING : ( "\"" <DELIMITER_CHARSTR> "\"" )>  : DEFAULT
+    | <DELIMITERSINGLE : ( <DELIMITER_CHARSTR> )>  : DEFAULT
     | <#DELIMITER_CHARSTR : ~["\u0000"-"\u0020","0"-"9","a"-"z","A"-"Z","?","*","'","\"","[","]","(",")"]>
 }
 
-/************************************************************* List -> String */
-<LS_EXPECTED> SKIP:
-{
-  " " | "\t" | "\n" | "\r"
+/********************************************************************** Route */
+<DEFAULT> TOKEN :
+{      <ROUTE:                               "route" ([" ","\t","\n"])+ "{">                 : ROUTEUSER_EXPECTED
 }
 
-<LS_EXPECTED> TOKEN : /* List of Strings */
+<ROUTEUSER_EXPECTED> TOKEN :
 {
-      <LS_CURLY_BRACKET_OPEN : "{">    : LS_EXPECTED
-    | <LS_CURLY_BRACKET_CLOSE : "}">   : STRING_EXPECTED
-    | <LS_STRING : (<LS_APOSTROPHE>(<LS_CHAR> | "\\\"" | "{" | "}" | " ")*<LS_APOSTROPHE>)> : LS_EXPECTED
-    | <LS_SINGLE_STRING : (<LS_CHAR>)+> : LS_EXPECTED
-    | <#LS_APOSTROPHE: "\"" >
-    | <#LS_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <ROUTEUSERSTRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : ROUTEUSER_EXPECTED
+    | <ROUTEUSERSINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : ROUTEUSER_EXPECTED
+    | <ROUTEUSERCLOSE : "}">   : STRING_EXPECTED
 }
 
-/************************************************************* String -> List */
-<SL_EXPECTED> SKIP :
-{
-  " " | "\t" | "\n" | "\r"
-}
-
-<SL_EXPECTED> TOKEN :
-{
-      <SL_STRING : (<SL_APOSTROPHE>(<SL_CHAR> | "\\\"" | "{" | "}" | " ")*<SL_APOSTROPHE>)> : L_EXPECTED
-    | <SL_SINGLE_STRING : (<SL_CHAR>)+> : L_EXPECTED
-    | <#SL_APOSTROPHE: "\"" >
-    | <#SL_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
-}
-
-/******************************************************************** String  */
-<STRING_EXPECTED> SKIP :
-{
-  " " | "\t" | "\n" | "\r"
-}
-
-<STRING_EXPECTED> TOKEN :
-{
-      <S_STRING : (<S_APOSTROPHE> (<S_CHAR> | "\\\"" | "{" | "}" | " ")* <S_APOSTROPHE>)> : DEFAULT
-    | <S_SINGLE_STRING : (<S_CHAR>)+> : DEFAULT
-    | <#S_APOSTROPHE: "\"" >
-    | <#S_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
-}
-
-/**************************************************************** List or All */
-<LALL_EXPECTED> SKIP:
-{
-  " " | "\t" | "\n" | "\r"
-}
-<LALL_EXPECTED> TOKEN : /* List of Strings */
-{
-    < LALL_CURLY_BRACKET_OPEN : "{" >    : L2_EXPECTED
-  | < LALL_ALL : "all" > : DEFAULT
-}
-
-/*********************************************************************** List */
-<L_EXPECTED> SKIP:
-{
-  " " | "\t" | "\n" | "\r"
-}
-<L_EXPECTED> TOKEN : /* List of Strings */
-{
-      <L_CURLY_BRACKET_OPEN : "{">    : L2_EXPECTED
-}
-
-<L2_EXPECTED> SKIP:
-{
-  " " | "\t" | "\n" | "\r"
-}
-<L2_EXPECTED> TOKEN : /* List of Strings */
-{
-      <L_CURLY_BRACKET_CLOSE : "}">   : DEFAULT
-    | <L_STRING : (<L_APOSTROPHE>(<L_CHAR> | "\\\"" | "{" | "}" | " ")*<L_APOSTROPHE>)> : L2_EXPECTED
-    | <L_SINGLE_STRING : (<L_CHAR>)+> : L2_EXPECTED
-    | <#L_APOSTROPHE: "\"" >
-    | <#L_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
-    | <L2_CURLY_BRACKET_OPEN : "{">    : L3_EXPECTED
-}
-
-<L3_EXPECTED> TOKEN : /* List of Strings */
-{
-      <L3_BRACE_STRING  : (<L3_CHAR>)*> : L4_EXPECTED
-    | <#L3_CHAR : ~["\u0000"-"\u001f","{","}","\u0100"-"\uffff"]>
-}
-
-<L4_EXPECTED> TOKEN : /* List of Strings */
-{
-      <L4_CURLY_BRACKET_CLOSE : "}">   : L2_EXPECTED
-}
+/**************************************************************************** */
 
 /**
  * Parses one complete policy definition.
@@ -362,99 +309,74 @@ PARSER_END(PolicyParser)
 void parse(final Policy_mxJPO _policy)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
 : {
-    String tmpStr;
     Token tmp;
     AdminProperty property;
     Access access = new Access();
 } {
-    (   ( <DESCRIPTION>             ( tmp = <S_STRING>                          {this.setValue(_policy, "description", this.getString(tmp.image));}
-                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(_policy, "description", this.getSingle(tmp.image));} ) )
-      | ( format(_policy) )
-      | ( type(_policy) )
-      | ( <DEFAULTFORMAT>           ( tmp = <S_STRING>                          {this.setValue(_policy, "defaultFormat", this.getString(tmp.image));}
-                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(_policy, "defaultFormat", this.getSingle(tmp.image));} ) )
+    (   ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_policy, "description",                          this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>               {this.setValue(_policy, "description",                          this.getSingle(tmp.image));} ) )
+
+      | ( <FORMAT_ALL>                                                      {this.setValue(_policy, "allFormats",                           true);} )
+      | ( <FORMAT_LIST>             ( tmp = <LISTSTRING>                    {this.appendValue(_policy, "formats",                           this.getString(tmp.image));}
+                                    | tmp = <LISTSINGLE>                    {this.appendValue(_policy, "formats",                           this.getSingle(tmp.image));} )*
+                                                    <LISTCLOSE>)
+
+      | ( <TYPE_ALL>                                                        {this.setValue(_policy, "allTypes",                             true);} )
+      | ( <TYPE_LIST>               ( tmp = <LISTSTRING>                    {this.appendValue(_policy, "types",                             this.getString(tmp.image));}
+                                    | tmp = <LISTSINGLE>                    {this.appendValue(_policy, "types",                             this.getSingle(tmp.image));} )*
+                                                    <LISTCLOSE>)
+
+      | ( <DEFAULTFORMAT>           ( tmp = <STRING>                        {this.setValue(_policy, "defaultFormat",                        this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_policy, "defaultFormat",                        this.getSingle(tmp.image));} ) )
+
       | ( (   <ENFORCE_TRUE>
             | <ENFORCE_TRUE_VIA_VALUE>
-            | <ENFORCE_TRUE_VIA_VALUE_APOSTROPHE> )                             {this.setValue(_policy, "enforce", true);} )
+            | <ENFORCE_TRUE_VIA_VALUE_APOSTROPHE> )                         {this.setValue(_policy, "enforce",                              true);} )
       | ( (   <ENFORCE_FALSE>
             | <ENFORCE_FALSE_VIA_VALUE>
-            | <ENFORCE_FALSE_VIA_VALUE_APOSTROPHE> )                            {this.setValue(_policy, "enforce", false);} )
-      | ( <DELIMITER>               tmp = <DELIMITER_CHAR>                      {this.setValue(_policy, "delimiter", this.getSingle(tmp.image));} )
+            | <ENFORCE_FALSE_VIA_VALUE_APOSTROPHE> )                        {this.setValue(_policy, "enforce",                              false);} )
+
+      | ( <DELIMITER>               ( tmp = <DELIMITERSTRING>               {this.setValue(_policy, "delimiter",                            this.getString(tmp.image));}
+                                    | tmp = <DELIMITERSINGLE>               {this.setValue(_policy, "delimiter",                            this.getSingle(tmp.image));} ) )
+
       | ( ( <SEQUENCE> | <MINORSEQUENCE> )
-                                    ( tmp = <S_STRING>                          {this.setValue(_policy, "minorsequence", this.getString(tmp.image));}
-                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(_policy, "minorsequence", this.getSingle(tmp.image));} ) )
-      | ( <MAJORSEQUENCE>           ( tmp = <S_STRING>                          {this.setValue(_policy, "majorsequence", this.getString(tmp.image));}
-                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(_policy, "majorsequence", this.getSingle(tmp.image));} ) )
-      | ( <STORE>                   ( tmp = <S_STRING>                          {this.setValue(_policy, "store", this.getString(tmp.image));}
-                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(_policy, "store", this.getSingle(tmp.image));} ) )
+                                    ( tmp = <STRING>                        {this.setValue(_policy, "minorsequence",                        this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_policy, "minorsequence",                        this.getSingle(tmp.image));} ) )
+      | ( <MAJORSEQUENCE>           ( tmp = <STRING>                        {this.setValue(_policy, "majorsequence",                        this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_policy, "majorsequence",                        this.getSingle(tmp.image));} ) )
+
+      | ( <STORE>                   ( tmp = <STRING>                        {this.setValue(_policy, "store",                                this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_policy, "store",                                this.getSingle(tmp.image));} ) )
+
       | ( (   <HIDDEN_TRUE>
             | <HIDDEN_TRUE_VIA_VALUE>
-            | <HIDDEN_TRUE_VIA_VALUE_APOSTROPHE> )                              {this.setValue(_policy, "hidden", true);} )
+            | <HIDDEN_TRUE_VIA_VALUE_APOSTROPHE> )                          {this.setValue(_policy, "hidden",                               true);} )
       | ( (   <HIDDEN_FALSE>
             | <HIDDEN_FALSE_VIA_VALUE>
-            | <HIDDEN_FALSE_VIA_VALUE_APOSTROPHE> )                             {this.setValue(_policy, "hidden", false);} )
+            | <HIDDEN_FALSE_VIA_VALUE_APOSTROPHE> )                         {this.setValue(_policy, "hidden",                               false);} )
 
-      | ( <ALLSTATE> "{"                                                        {this.setValue(_policy, "allState", true);}
-               ( ( <REVOKE>                                                     {this.setValue(access, "revoke", true);} ) ?
-                 ( <LOGIN>                                                      {this.setValue(access, "login", true);} ) ?
-                        ( <OWNER>                                               {this.setValue(access, "kind", "owner");}
-                        | <PUBLIC>                                              {this.setValue(access, "kind", "public");}
-                        | <USER>    ( tmp = <STATEACCESS_STRING>                {this.setValue(access, "kind", "user");this.setValue(access, "userRef", this.getString(tmp.image));}
-                                    | tmp = <STATEACCESS_SINGLE_STRING>         {this.setValue(access, "kind", "user");this.setValue(access, "userRef", this.getSingle(tmp.image));} ) )
-                                                stateAccessDef(access)          {this.appendValue(_policy, "allStateAccess", "accessList", access);/*reset*/access = new Access();} )*
+      | ( <ALLSTATE> "{"                                                    {this.setValue(_policy, "allState",                             true);}
+               ( ( <REVOKE>                                                 {this.setValue(access, "revoke",                                true);} ) ?
+                 ( <LOGIN>                                                  {this.setValue(access, "login",                                 true);} ) ?
+                        ( <OWNER>                                           {this.setValue(access, "kind",                                  "owner");}
+                        | <PUBLIC>                                          {this.setValue(access, "kind",                                  "public");}
+                        | <USER>    ( tmp = <STATEACCESS_STRING>            {this.setValue(access, "kind", "user");this.setValue(access, "userRef", this.getString(tmp.image));}
+                                    | tmp = <STATEACCESS_SINGLE>            {this.setValue(access, "kind", "user");this.setValue(access, "userRef", this.getSingle(tmp.image));} ) )
+                                                stateAccessDef(access)      {this.appendValue(_policy, "allStateAccess", "accessList", access);/*reset*/access = new Access();} )*
                                                         "}" )
 
       | ( state(_policy) )
-      | (<PROPERTY>                                                             {property = new AdminProperty();this.appendValue(this.getValue(_policy, "properties"), "propertiesStack", property);}
-                                    ( tmp = <S_STRING>                          {this.setValue(property, "name", this.getString(tmp.image));}
-                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(property, "name", this.getSingle(tmp.image));} )
-              (   ( <PROPERTYVAL>   ( tmp = <S_STRING>                          {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
-                | ( <PROPERTYTO>    ( tmp = <SS_STRING>                         {this.setValue(property, "refAdminType", this.getString(tmp.image));}
-                                    | tmp = <SS_SINGLE>                         {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
-                                    ( tmp = <S_STRING>                          {this.setValue(property, "refAdminName", this.getString(tmp.image));}
-                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+
+      | ( <PROPERTY>                                                        {property = new AdminProperty();this.appendValue(_policy, "properties", "propertiesStack", property);}
+                                    ( tmp = <STRING>                        {this.setValue(property, "name", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "name", this.getSingle(tmp.image));} )
+              (   ( <PROPERTYVAL>   ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <ADMINTYPE_SINGLE>              {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                    ( tmp = <STRING>                        {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
     )*
-}
-
-/**
- * Format of a policy definition.
- *
- * @param _policy   current parsed policy
- */
-void format(final Policy_mxJPO _policy) :
-{
-    Set<String> set;
-}
-{
-    <FORMAT>
-    ( LOOKAHEAD(2)
-        ( <LALL_ALL> {set = new HashSet<String>();set.add("all");} )
-      | ( set = lList() )
-    )
-    {
-        this.setValue(_policy, "formats", set);
-    }
-}
-
-/**
- * Format of a type definition.
- *
- * @param _policy   current parsed policy
- */
-void type(final Policy_mxJPO _policy) :
-{
-    Set<String> set;
-}
-{
-    <TYPE>
-    ( LOOKAHEAD(2)
-        ( <LALL_ALL> {set = new HashSet<String>();set.add("all");} )
-      | ( set = lList() )
-    )
-    {
-        this.setValue(_policy, "types", set);
-    }
 }
 
 /**
@@ -464,295 +386,197 @@ void type(final Policy_mxJPO _policy) :
  */
 void state(final Policy_mxJPO _policy) : {
     final State state = new State();
-    String tmpStr;
     Set<String> tmpSet;
     Token tmp;
+    Trigger trigger;
+    Signature signature;
     AdminProperty property;
     Access access = new Access();
 } {
-    ( <STATE>                       ( tmp = <S_STRING>                          {this.setValue(state, "name", this.getString(tmp.image));}
-                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(state, "name", this.getSingle(tmp.image));} ) )
+    ( <STATE>                       ( tmp = <STRING>                        {this.setValue(state, "name", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(state, "name", this.getSingle(tmp.image));} ) )
     "{"
-        (              ( <REGISTEREDNAME>    tmpStr = sString()                          {this.appendValue(state, "symbolicNames", tmpStr);} )
+      ( ( <REGISTEREDNAME>          ( tmp = <STRING>                        {this.appendValue(state, "symbolicNames", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(state, "symbolicNames", this.getSingle(tmp.image));} ) )
 
-            | ( ( <MINORREVISION_TRUE>
-                | <MINORREVISION_TRUE_VIA_VALUE>
-                | <MINORREVISION_TRUE_VIA_VALUE_APOSTROPHE>
-                | <REVISION_TRUE>
-                | <REVISION_TRUE_VIA_VALUE>
-                | <REVISION_TRUE_VIA_VALUE_APOSTROPHE>)                         {this.setValue(state, "minorrevisionable", true);} )
-            | ( ( <MINORREVISION_FALSE>
-                | <MINORREVISION_FALSE_VIA_VALUE>
-                | <MINORREVISION_FALSE_VIA_VALUE_APOSTROPHE>
-                | <REVISION_FALSE>
-                | <REVISION_FALSE_VIA_VALUE>
-                | <REVISION_FALSE_VIA_VALUE_APOSTROPHE>)                        {this.setValue(state, "minorrevisionable", false);} )
+      | ( ( <MINORREVISION_TRUE>
+          | <MINORREVISION_TRUE_VIA_VALUE>
+          | <MINORREVISION_TRUE_VIA_VALUE_APOSTROPHE>
+          | <REVISION_TRUE>
+          | <REVISION_TRUE_VIA_VALUE>
+          | <REVISION_TRUE_VIA_VALUE_APOSTROPHE>)                           {this.setValue(state, "minorrevisionable", true);} )
+      | ( ( <MINORREVISION_FALSE>
+          | <MINORREVISION_FALSE_VIA_VALUE>
+          | <MINORREVISION_FALSE_VIA_VALUE_APOSTROPHE>
+          | <REVISION_FALSE>
+          | <REVISION_FALSE_VIA_VALUE>
+          | <REVISION_FALSE_VIA_VALUE_APOSTROPHE>)                          {this.setValue(state, "minorrevisionable", false);} )
 
-            | ( ( <MAJORREVISION_TRUE>
-                | <MAJORREVISION_TRUE_VIA_VALUE>
-                | <MAJORREVISION_TRUE_VIA_VALUE_APOSTROPHE>)                    {this.setValue(state, "majorrevisionable", true);} )
-            | ( ( <MAJORREVISION_FALSE>
-                | <MAJORREVISION_FALSE_VIA_VALUE>
-                | <MAJORREVISION_FALSE_VIA_VALUE_APOSTROPHE>)                   {this.setValue(state, "majorrevisionable", false);} )
+      | ( ( <MAJORREVISION_TRUE>
+          | <MAJORREVISION_TRUE_VIA_VALUE>
+          | <MAJORREVISION_TRUE_VIA_VALUE_APOSTROPHE>)                      {this.setValue(state, "majorrevisionable", true);} )
+      | ( ( <MAJORREVISION_FALSE>
+          | <MAJORREVISION_FALSE_VIA_VALUE>
+          | <MAJORREVISION_FALSE_VIA_VALUE_APOSTROPHE>)                     {this.setValue(state, "majorrevisionable", false);} )
 
-            | ( ( <VERSION_TRUE>
-                | <VERSION_TRUE_VIA_VALUE>
-                | <VERSION_TRUE_VIA_VALUE_APOSTROPHE>)                          {this.setValue(state, "versionable", true);} )
-            | ( ( <VERSION_FALSE>
-                | <VERSION_FALSE_VIA_VALUE>
-                | <VERSION_FALSE_VIA_VALUE_APOSTROPHE>)                         {this.setValue(state, "versionable", false);} )
+      | ( ( <VERSION_TRUE>
+          | <VERSION_TRUE_VIA_VALUE>
+          | <VERSION_TRUE_VIA_VALUE_APOSTROPHE>)                            {this.setValue(state, "versionable", true);} )
+      | ( ( <VERSION_FALSE>
+          | <VERSION_FALSE_VIA_VALUE>
+          | <VERSION_FALSE_VIA_VALUE_APOSTROPHE>)                           {this.setValue(state, "versionable", false);} )
 
-            | ( ( <PROMOTE_TRUE>
-                | <PROMOTE_TRUE_VIA_VALUE>
-                | <PROMOTE_TRUE_VIA_VALUE_APOSTROPHE>)                          {this.setValue(state, "autoPromotion", true);} )
-            | ( ( <PROMOTE_FALSE>
-                | <PROMOTE_FALSE_VIA_VALUE>
-                | <PROMOTE_FALSE_VIA_VALUE_APOSTROPHE>)                         {this.setValue(state, "autoPromotion", false);} )
+      | ( ( <PROMOTE_TRUE>
+          | <PROMOTE_TRUE_VIA_VALUE>
+          | <PROMOTE_TRUE_VIA_VALUE_APOSTROPHE>)                            {this.setValue(state, "autoPromotion", true);} )
+      | ( ( <PROMOTE_FALSE>
+          | <PROMOTE_FALSE_VIA_VALUE>
+          | <PROMOTE_FALSE_VIA_VALUE_APOSTROPHE>)                           {this.setValue(state, "autoPromotion", false);} )
 
-            | ( ( <CHECKOUTHISTORY_TRUE>
-                | <CHECKOUTHISTORY_TRUE_VIA_VALUE>
-                | <CHECKOUTHISTORY_TRUE_VIA_VALUE_APOSTROPHE>)                  {this.setValue(state, "checkoutHistory", true);} )
-            | ( ( <CHECKOUTHISTORY_FALSE>
-                | <CHECKOUTHISTORY_FALSE_VIA_VALUE>
-                | <CHECKOUTHISTORY_FALSE_VIA_VALUE_APOSTROPHE>)                 {this.setValue(state, "checkoutHistory", false);} )
+      | ( ( <CHECKOUTHISTORY_TRUE>
+          | <CHECKOUTHISTORY_TRUE_VIA_VALUE>
+          | <CHECKOUTHISTORY_TRUE_VIA_VALUE_APOSTROPHE>)                    {this.setValue(state, "checkoutHistory", true);} )
+      | ( ( <CHECKOUTHISTORY_FALSE>
+          | <CHECKOUTHISTORY_FALSE_VIA_VALUE>
+          | <CHECKOUTHISTORY_FALSE_VIA_VALUE_APOSTROPHE>)                   {this.setValue(state, "checkoutHistory", false);} )
 
-            | ( ( <ENFORCERESERVEACCESS_TRUE>
-                | <ENFORCERESERVEACCESS_TRUE_VIA_VALUE>
-                | <ENFORCERESERVEACCESS_TRUE_VIA_VALUE_APOSTROPHE>)             {this.setValue(state, "enforcereserveaccess", true);} )
-            | ( ( <ENFORCERESERVEACCESS_FALSE>
-                | <ENFORCERESERVEACCESS_FALSE_VIA_NOT>
-                | <ENFORCERESERVEACCESS_FALSE_VIA_VALUE>
-                | <ENFORCERESERVEACCESS_FALSE_VIA_VALUE_APOSTROPHE>)            {this.setValue(state, "enforcereserveaccess", false);} )
+      | ( ( <ENFORCERESERVEACCESS_TRUE>
+          | <ENFORCERESERVEACCESS_TRUE_VIA_VALUE>
+          | <ENFORCERESERVEACCESS_TRUE_VIA_VALUE_APOSTROPHE>)               {this.setValue(state, "enforcereserveaccess", true);} )
+      | ( ( <ENFORCERESERVEACCESS_FALSE>
+          | <ENFORCERESERVEACCESS_FALSE_VIA_NOT>
+          | <ENFORCERESERVEACCESS_FALSE_VIA_VALUE>
+          | <ENFORCERESERVEACCESS_FALSE_VIA_VALUE_APOSTROPHE>)              {this.setValue(state, "enforcereserveaccess", false);} )
 
-            | ( ( <PUBLISHED_TRUE>
-                | <PUBLISHED_TRUE_VIA_VALUE>
-                | <PUBLISHED_TRUE_VIA_VALUE_APOSTROPHE>)                        {this.setValue(state, "published", true);} )
-            | ( ( <PUBLISHED_FALSE>
-                | <PUBLISHED_FALSE_VIA_VALUE>
-                | <PUBLISHED_FALSE_VIA_VALUE_APOSTROPHE>)                       {this.setValue(state, "published", false);} )
+      | ( ( <PUBLISHED_TRUE>
+          | <PUBLISHED_TRUE_VIA_VALUE>
+          | <PUBLISHED_TRUE_VIA_VALUE_APOSTROPHE>)                          {this.setValue(state, "published", true);} )
+      | ( ( <PUBLISHED_FALSE>
+          | <PUBLISHED_FALSE_VIA_VALUE>
+          | <PUBLISHED_FALSE_VIA_VALUE_APOSTROPHE>)                         {this.setValue(state, "published", false);} )
 
-            | ( ( <REVOKE>                                                      {this.setValue(access, "revoke", true);} ) ?
-                ( <LOGIN>                                                       {this.setValue(access, "login", true);} ) ?
-                        ( <OWNER>                                               {this.setValue(access, "kind", "owner");}
-                        | <PUBLIC>                                              {this.setValue(access, "kind", "public");}
-                        | <USER>    ( tmp = <STATEACCESS_STRING>                {this.setValue(access, "kind", "user");this.setValue(access, "userRef", this.getString(tmp.image));}
-                                    | tmp = <STATEACCESS_SINGLE_STRING>         {this.setValue(access, "kind", "user");this.setValue(access, "userRef", this.getSingle(tmp.image));} ) )
-                                                stateAccessDef(access)          {this.appendValue(state, "access", "accessList", access);/*reset*/access = new Access();} )
+      | ( ( <REVOKE>                                                        {this.setValue(access, "revoke", true);} ) ?
+          ( <LOGIN>                                                         {this.setValue(access, "login", true);} ) ?
+                    ( <OWNER>                                               {this.setValue(access, "kind", "owner");}
+                    | <PUBLIC>                                              {this.setValue(access, "kind", "public");}
+                    | <USER>    ( tmp = <STATEACCESS_STRING>                {this.setValue(access, "kind", "user");this.setValue(access, "userRef", this.getString(tmp.image));}
+                                | tmp = <STATEACCESS_SINGLE>                {this.setValue(access, "kind", "user");this.setValue(access, "userRef", this.getSingle(tmp.image));} ) )
+                                            stateAccessDef(access)          {this.appendValue(state, "access", "accessList", access);/*reset*/access = new Access();} )
 
-            | ( <ACTION>            ( tmp = <S_STRING>                          {this.setValue(state, "actionProgram", this.getString(tmp.image));}
-                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(state, "actionProgram", this.getSingle(tmp.image));} )
-                           <INPUT>  ( tmp = <S_STRING>                          {this.setValue(state, "actionInput", this.getString(tmp.image));}
-                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(state, "actionInput", this.getSingle(tmp.image));} ) )
-            | ( <CHECK>             ( tmp = <S_STRING>                          {this.setValue(state, "checkProgram", this.getString(tmp.image));}
-                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(state, "checkProgram", this.getSingle(tmp.image));} )
-                           <INPUT>  ( tmp = <S_STRING>                          {this.setValue(state, "checkInput", this.getString(tmp.image));}
-                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(state, "checkInput", this.getSingle(tmp.image));} ) )
-            | ( <ROUTE>             tmpSet = lsList()                           {this.setValue(state, "routeUsers", tmpSet);}
-                                    tmpStr = sString()                          {this.setValue(state, "routeMessage", tmpStr);})
-            | stateTrigger(state)
-            | stateSignature(state)
-            | (<PROPERTY>                                                       {property = new AdminProperty();this.appendValue(this.getValue(state, "properties"), "propertiesStack", property);}
-                                        ( tmp = <S_STRING>                      {this.setValue(property, "name", this.getString(tmp.image));}
-                                        | tmp = <S_SINGLE_STRING>               {this.setValue(property, "name", this.getSingle(tmp.image));} )
-                  (   ( <PROPERTYVAL>   ( tmp = <S_STRING>                      {this.setValue(property, "value", this.getString(tmp.image));}
-                                        | tmp = <S_SINGLE_STRING>               {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
-                    | ( <PROPERTYTO>    ( tmp = <SS_STRING>                     {this.setValue(property, "refAdminType", this.getString(tmp.image));}
-                                        | tmp = <SS_SINGLE>                     {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
-                                        ( tmp = <S_STRING>                      {this.setValue(property, "refAdminName", this.getString(tmp.image));}
-                                        | tmp = <S_SINGLE_STRING>               {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
-        )*
-    "}"
+      | ( <LEGACYACTION>      ( tmp = <STRING>                              {this.setValue(state, "actionProgram",                          this.getString(tmp.image));}
+                              | tmp = <SINGLE>                              {this.setValue(state, "actionProgram",                          this.getSingle(tmp.image));} )
+                     <INPUT>  ( tmp = <STRING>                              {this.setValue(state, "actionInput",                            this.getString(tmp.image));}
+                              | tmp = <SINGLE>                              {this.setValue(state, "actionInput",                            this.getSingle(tmp.image));} ) )
+      | ( <LEGACYCHECK>       ( tmp = <STRING>                              {this.setValue(state, "checkProgram",                           this.getString(tmp.image));}
+                              | tmp = <SINGLE>                              {this.setValue(state, "checkProgram",                           this.getSingle(tmp.image));} )
+                     <INPUT>  ( tmp = <STRING>                              {this.setValue(state, "checkInput",                             this.getString(tmp.image));}
+                              | tmp = <SINGLE>                              {this.setValue(state, "checkInput",                             this.getSingle(tmp.image));} ) )
+
+      | ( <ROUTE>      ( tmp = <ROUTEUSERSTRING>                            {this.appendValue(state, "routeUsers",                          this.getString(tmp.image));}
+                       | tmp = <ROUTEUSERSINGLE>                            {this.appendValue(state, "routeUsers",                          this.getSingle(tmp.image));} )* <ROUTEUSERCLOSE>
+                                    ( tmp = <STRING>                        {this.setValue(state, "routeMessage",                           this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(state, "routeMessage",                           this.getSingle(tmp.image));} ) )
+
+      | ( <TRIGGER>                                                         {trigger = new Trigger();this.appendValue(state, "triggers", "triggersStack", trigger);}
+            tmp = <TRIGEVENT>                                               {this.setValue(trigger, "eventType",                            this.getSingle(tmp.image));}
+                    ( <ACTION>                                              {this.setValue(trigger, "kind",                                 "action");}
+                    | <CHECK>                                               {this.setValue(trigger, "kind",                                 "check");}
+                    | <OVERRIDE>                                            {this.setValue(trigger, "kind",                                 "override");} )
+                            ( tmp = <STRING>                                {this.setValue(trigger, "program",                              this.getString(tmp.image));}
+                            | tmp = <SINGLE>                                {this.setValue(trigger, "program",                              this.getSingle(tmp.image));} )
+                                    ( <INPUT>
+                                            ( tmp = <STRING>                {this.setValue(trigger, "arguments",                            this.getString(tmp.image));}
+                                            | tmp = <SINGLE>                {this.setValue(trigger, "arguments",                            this.getSingle(tmp.image));} ) )?  )
+
+      | ( <SIGNATURE>                                                       {signature = new Signature();this.appendValue(state, "signatures", signature);}
+                ( tmp = <STRING>                                            {this.setValue(signature, "name",                               this.getString(tmp.image));}
+                | tmp = <SINGLE>                                            {this.setValue(signature, "name",                               this.getSingle(tmp.image));} )
+                    "{" ( (<BRANCH>         ( tmp = <STRING>                {this.setValue(signature, "branch",                             this.getString(tmp.image));}
+                                            | tmp = <SINGLE>                {this.setValue(signature, "branch",                             this.getSingle(tmp.image));} ) )
+                        | (<APPROVE_LIST>   ( tmp = <LISTSTRING>            {this.appendValue(signature, "approverUsers",                   this.getString(tmp.image));}
+                                            | tmp = <LISTSINGLE>            {this.appendValue(signature, "approverUsers",                   this.getSingle(tmp.image));} )* <LISTCLOSE>)
+                        | (<IGNORE_LIST>    ( tmp = <LISTSTRING>            {this.appendValue(signature, "ignoreUsers",                     this.getString(tmp.image));}
+                                            | tmp = <LISTSINGLE>            {this.appendValue(signature, "ignoreUsers",                     this.getSingle(tmp.image));} )* <LISTCLOSE>)
+                        | (<REJECT_LIST>    ( tmp = <LISTSTRING>            {this.appendValue(signature, "rejectUsers",                     this.getString(tmp.image));}
+                                            | tmp = <LISTSINGLE>            {this.appendValue(signature, "rejectUsers",                     this.getSingle(tmp.image));} )* <LISTCLOSE>)
+                        | (<FILTER>         ( tmp = <STRING>                {this.setValue(signature, "filter",                             this.getString(tmp.image));}
+                                            | tmp = <SINGLE>                {this.setValue(signature, "filter",                             this.getSingle(tmp.image));} ) ) )* "}" )
+
+      | ( <PROPERTY>                                                        {property = new AdminProperty();this.appendValue(state, "properties", "propertiesStack", property);}
+                                    ( tmp = <STRING>                        {this.setValue(property, "name", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "name", this.getSingle(tmp.image));} )
+              (   ( <PROPERTYVAL>   ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <ADMINTYPE_SINGLE>              {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                    ( tmp = <STRING>                        {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+    )* "}"
     {
         this.appendValue(_policy, "states", state);
     }
 }
 
 void stateAccessDef(final Access _access) : {
-    String key = null, filter = null, localfilter = null, organization = null, project = null, owner = null, reserve = null, maturity = null, category = null;
+    Token tmp;
     Token access = null;
 } {
     (
-          ( <KEY> key = stateAccessString())
-        | ( <FILTER> filter = sString())
-        | ( <LOCALFILTER> localfilter = sString() )
+          ( <KEY>                   ( tmp = <STATEACCESS_STRING>            {this.setValue(_access, "key",                                  this.getString(tmp.image));}
+                                    | tmp = <STATEACCESS_SINGLE>            {this.setValue(_access, "key",                                  this.getSingle(tmp.image));} ) )
+
+        | ( <FILTER>                ( tmp = <STRING>                        {this.setValue(_access, "filter",                               this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_access, "filter",                               this.getSingle(tmp.image));} ) )
+
+        | ( <LOCALFILTER>           ( tmp = <STRING>                        {this.setValue(_access, "localfilter",                          this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_access, "localfilter",                          this.getSingle(tmp.image));} ) )
+
         | ( access = <ACCESS> )
-        | ( <ORGANIZATION_ANY>        {organization = "any";        } )
-        | ( <ORGANIZATION_SINGLE>     {organization = "single";     } )
-        | ( <ORGANIZATION_ANCESTOR>   {organization = "ancestor";   } )
-        | ( <ORGANIZATION_DESCENDANT> {organization = "descendant"; } )
-        | ( <ORGANIZATION_RELATED>    {organization = "related";    } )
-        | ( <PROJECT_ANY>             {project      = "any";        } )
-        | ( <PROJECT_SINGLE>          {project      = "single";     } )
-        | ( <PROJECT_ANCESTOR>        {project      = "ancestor";   } )
-        | ( <PROJECT_DESCENDANT>      {project      = "descendant"; } )
-        | ( <PROJECT_RELATED>         {project      = "related";    } )
-        | ( <OWNER_ANY>               {owner        = "any";        } )
-        | ( <OWNER_CONTEXT>           {owner        = "context";    } )
-        | ( <RESERVE_ANY>             {reserve      = "any";        } )
-        | ( <RESERVE_CONTEXT>         {reserve      = "context";    } )
-        | ( <RESERVE_NO>              {reserve      = "no";         } )
-        | ( <RESERVE_INCLUSIVE>       {reserve      = "inclusive";  } )
-        | ( <MATURITY_ANY>            {maturity     = "any";        } )
-        | ( <MATURITY_NO>             {maturity     = "no";         } )
-        | ( <MATURITY_PUBLIC>         {maturity     = "public";     } )
-        | ( <MATURITY_PROTECTED>      {maturity     = "protected";  } )
-        | ( <MATURITY_PRIVATE>        {maturity     = "private";    } )
-        | ( <MATURITY_NOTPRIVATE>     {maturity     = "notprivate"; } )
-        | ( <MATURITY_PPP>            {maturity     = "ppp";        } )
-        | ( <CATEGORY_ANY>            {category     = "any";         } )
-        | ( <CATEGORY_OEM>            {category     = "oem";         } )
-        | ( <CATEGORY_GOLDPARTNER>    {category     = "goldpartner"; } )
-        | ( <CATEGORY_PARTNER>        {category     = "partner";     } )
-        | ( <CATEGORY_SUPPLIER>       {category     = "supplier";    } )
-        | ( <CATEGORY_CUSTOMER>       {category     = "customer";    } )
-        | ( <CATEGORY_CONTRACTOR>     {category     = "contractor";  } )
+
+        | ( <ORGANIZATION_ANY>                                              {this.setValue(_access, "organization",                         "any");} )
+        | ( <ORGANIZATION_SINGLE>                                           {this.setValue(_access, "organization",                         "single");} )
+        | ( <ORGANIZATION_ANCESTOR>                                         {this.setValue(_access, "organization",                         "ancestor");} )
+        | ( <ORGANIZATION_DESCENDANT>                                       {this.setValue(_access, "organization",                         "descendant");} )
+        | ( <ORGANIZATION_RELATED>                                          {this.setValue(_access, "organization",                         "related");} )
+
+        | ( <PROJECT_ANY>                                                   {this.setValue(_access, "project",                              "any");} )
+        | ( <PROJECT_SINGLE>                                                {this.setValue(_access, "project",                              "single");} )
+        | ( <PROJECT_ANCESTOR>                                              {this.setValue(_access, "project",                              "ancestor");} )
+        | ( <PROJECT_DESCENDANT>                                            {this.setValue(_access, "project",                              "descendant");} )
+        | ( <PROJECT_RELATED>                                               {this.setValue(_access, "project",                              "related");} )
+
+        | ( <OWNER_ANY>                                                     {this.setValue(_access, "owner",                                "any");} )
+        | ( <OWNER_CONTEXT>                                                 {this.setValue(_access, "owner",                                "context");} )
+
+        | ( <RESERVE_ANY>                                                   {this.setValue(_access, "reserve",                              "any");} )
+        | ( <RESERVE_CONTEXT>                                               {this.setValue(_access, "reserve",                              "context");} )
+        | ( <RESERVE_NO>                                                    {this.setValue(_access, "reserve",                              "no");} )
+        | ( <RESERVE_INCLUSIVE>                                             {this.setValue(_access, "reserve",                              "inclusive");} )
+
+        | ( <MATURITY_ANY>                                                  {this.setValue(_access, "maturity",                             "any");} )
+        | ( <MATURITY_NO>                                                   {this.setValue(_access, "maturity",                             "no");} )
+        | ( <MATURITY_PUBLIC>                                               {this.setValue(_access, "maturity",                             "public");} )
+        | ( <MATURITY_PROTECTED>                                            {this.setValue(_access, "maturity",                             "protected");} )
+        | ( <MATURITY_PRIVATE>                                              {this.setValue(_access, "maturity",                             "private");} )
+        | ( <MATURITY_NOTPRIVATE>                                           {this.setValue(_access, "maturity",                             "notprivate");} )
+        | ( <MATURITY_PPP>                                                  {this.setValue(_access, "maturity",                             "ppp");} )
+
+        | ( <CATEGORY_ANY>                                                  {this.setValue(_access, "category",                             "any");} )
+        | ( <CATEGORY_OEM>                                                  {this.setValue(_access, "category",                             "oem");} )
+        | ( <CATEGORY_GOLDPARTNER>                                          {this.setValue(_access, "category",                             "goldpartner");} )
+        | ( <CATEGORY_PARTNER>                                              {this.setValue(_access, "category",                             "partner");} )
+        | ( <CATEGORY_SUPPLIER>                                             {this.setValue(_access, "category",                             "supplier");} )
+        | ( <CATEGORY_CUSTOMER>                                             {this.setValue(_access, "category",                             "customer");} )
+        | ( <CATEGORY_CONTRACTOR>                                           {this.setValue(_access, "category",                             "contractor");} )
     )*
     {
-        this.setValue(_access, "key", key);
-        this.setValue(_access, "filter", filter);
-        this.setValue(_access, "localfilter", localfilter);
-        this.setValue(_access, "organization", organization);
-        this.setValue(_access, "project", project);
-        this.setValue(_access, "owner", owner);
-        this.setValue(_access, "reserve", reserve);
-        this.setValue(_access, "maturity", maturity);
-        this.setValue(_access, "category", category);
-
         if (access != null)  {
-            final String tmp = access.image
+            final String tmpStr = access.image
                     .replaceFirst("^\\{", "").replaceFirst("\\}$", "")  // remove {}
                     .replaceAll("(\t)|(\n)", " ")                       // replace tabs, new lines
                     .replaceAll("( )+", " ")                            // multiple spaces => one space
                     .trim();                                            // remove trailing spaces
-            this.setValue(_access, "access", Arrays.asList(tmp.split(" ")));
+            this.appendValues(_access, "access", Arrays.asList(tmpStr.split(" ")));
         }
-    }
-}
-
-/**
- * Evaluates a simple string where the state access definition must follow.
- *
- * @return evaluated simple string
- */
-String stateAccessString() : {
-    Token tmp;
-    String ret;
-} {
-    (
-        (tmp = <STATEACCESS_STRING>)         {ret = this.getString(tmp.image);}
-        |
-        (tmp = <STATEACCESS_SINGLE_STRING>)  {ret = this.getSingle(tmp.image);}
-    )
-    {
-        return ret;
-    }
-}
-
-void stateTrigger(final State _state) : {
-    final Trigger trigger = new Trigger();
-    String tmp;
-} {
-    <TRIGGER> tmp = sString()       {this.setValue(trigger, "eventType", tmp);}
-            ( <ACTION>              {this.setValue(trigger, "kind", "action");}
-            | <CHECK>               {this.setValue(trigger, "kind", "check");}
-            | <OVERRIDE>            {this.setValue(trigger, "kind", "override");})
-            tmp = sString()         {this.setValue(trigger, "program", tmp);}
-            <INPUT> tmp = sString() {this.setValue(trigger, "arguments", tmp);}
-    {
-        this.appendValue(this.getValue(_state, "triggers"), "triggersStack", trigger);
-    }
-}
-
-void stateSignature(final State _state) : {
-    final Policy_mxJPO.Signature signature = new Policy_mxJPO.Signature();
-    String tmpStr;
-    Set<String> tmpSet;
-} {
-    <SIGNATURE> tmpStr = sString() {this.setValue(signature, "name", tmpStr);}
-    "{"
-        ( (<BRANCH> tmpStr = sString()  {this.setValue(signature, "branch", tmpStr);})
-        | (<APPROVE> tmpSet = lList()   {this.setValue(signature, "approverUsers", tmpSet);})
-        | (<IGNORE> tmpSet = lList()    {this.setValue(signature, "ignoreUsers", tmpSet);})
-        | (<REJECT> tmpSet = lList()    {this.setValue(signature, "rejectUsers", tmpSet);})
-        | (<FILTER> tmpStr = sString()  {this.setValue(signature, "filter", tmpStr);})) *
-    "}"
-    {
-        this.appendValue(_state, "signatures", signature);
-    }
-}
-
-/******************************************************************************/
-
-Set<String> lsList() :  {
-    Token tmp;
-    Set<String> ret = new HashSet<String>();
-}  {
-    (
-        <LS_CURLY_BRACKET_OPEN>
-            (
-                (tmp = <LS_STRING>)         {ret.add(this.getString(tmp.image));}
-                |
-                (tmp = <LS_SINGLE_STRING>)  {ret.add(this.getSingle(tmp.image));}
-            )*
-        <LS_CURLY_BRACKET_CLOSE>
-    )
-    {
-        return ret;
-    }
-}
-
-Set<String> lList() :  {
-    Token tmp;
-    Set<String> ret = new HashSet<String>();
-}  {
-    (
-        ( <L_CURLY_BRACKET_OPEN> | <LALL_CURLY_BRACKET_OPEN> )
-            ( tmp = <L_STRING>                  {ret.add(this.getString(tmp.image));}
-            | tmp = <L_SINGLE_STRING>           {ret.add(this.getSingle(tmp.image));}
-            |   <L2_CURLY_BRACKET_OPEN>
-                    (tmp = <L3_BRACE_STRING>)   {ret.add(tmp.image);}
-                <L4_CURLY_BRACKET_CLOSE>
-            )*
-        <L_CURLY_BRACKET_CLOSE>
-    )
-    {
-        return ret;
-    }
-}
-
-/**
- * Evaluates a simple string where a list must follow.
- *
- * @return evaluated simple string
- */
-String slString() : {
-    Token tmp;
-    String ret;
-} {
-    (
-        (tmp = <SL_STRING>)         {ret = this.getString(tmp.image);}
-        |
-        (tmp = <SL_SINGLE_STRING>)  {ret = this.getSingle(tmp.image);}
-    )
-    {
-        return ret;
-    }
-}
-
-/**
- * Evaluates a simple string.
- *
- * @return evaluated simple string
- */
-String sString() : {
-    Token tmp;
-    String ret;
-} {
-    (
-          (tmp = <S_STRING>)          {ret = this.getString(tmp.image);}
-        | (tmp = <S_SINGLE_STRING>)   {ret = this.getSingle(tmp.image);}
-    )
-    {
-        return ret;
     }
 }
