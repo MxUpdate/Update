@@ -51,12 +51,6 @@ public final class UpdateUtil_mxJPO
     private static final String PARAM_CHECK_FILE_DATE = "UpdateCheckFileDate";
 
     /**
-     * String of the key within the parameter cache for the use file date as
-     * version parameter.
-     */
-    public static final String PARAM_FILEDATE2VERSION = "FileDate2Version";
-
-    /**
      * The constructor is defined so that no instance of the update utility
      * could be created.
      */
@@ -92,12 +86,9 @@ public final class UpdateUtil_mxJPO
 
                 for (final Entry<String,File> fileEntry : clazzMap.entrySet())  {
                     final AbstractObject_mxJPO instance = clazz.newTypeInstance(fileEntry.getKey());
-                    _paramCache.logInfo("check "+instance.getTypeDef().getLogging() + " '" + fileEntry.getKey() + "'");
+                    _paramCache.logInfo("check " + clazz.getLogging() + " '" + fileEntry.getKey() + "'");
 
                     final boolean update;
-                    final String version = _paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_FILEDATE2VERSION)
-                                    ? Long.toString(fileEntry.getValue().lastModified() / 1000)
-                                    : _paramCache.getValueString(ParameterCache_mxJPO.KEY_VERSION);
                     if (_paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_CHECK_FILE_DATE))  {
                         final Date fileDate = new Date(fileEntry.getValue().lastModified());
                         final String instDateString;
@@ -107,7 +98,7 @@ public final class UpdateUtil_mxJPO
                             instDateString = null;
                         }
                         Date instDate;
-                        if ((instDateString == null) || "".equals(instDateString))  {
+                        if ((instDateString == null) || instDateString.isEmpty())  {
                             instDate = null;
                         } else  {
                             try {
