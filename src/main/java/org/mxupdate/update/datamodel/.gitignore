@@ -7,6 +7,9 @@
 /ExpressionParser.java
 /ExpressionParserConstants.java
 /ExpressionParserTokenManager.java
+/FormatParser.java
+/FormatParserConstants.java
+/FormatParserTokenManager.java
 /InterfaceParser.java
 /InterfaceParserConstants.java
 /InterfaceParserTokenManager.java
