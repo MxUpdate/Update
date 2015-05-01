@@ -13,11 +13,12 @@
  *
  */
 
-package org.mxupdate.test.ci.userinterface;
+package org.mxupdate.test.test.update.userinterface;
 
+import org.mxupdate.test.ci.userinterface.AbstractUITest;
 import org.mxupdate.test.data.userinterface.ChannelData;
 import org.mxupdate.test.data.userinterface.PortalData;
-import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -28,14 +29,9 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class PortalTest
+public class PortalCI_2UpdateTest
     extends AbstractUITest<PortalData>
 {
-    /**
-     * Data provider for test portals.
-     *
-     * @return object array with all test portals
-     */
     @DataProvider(name = "data")
     public Object[][] getPortals()
     {
@@ -95,13 +91,8 @@ public class PortalTest
                 .checkExport();
     }
 
-    /**
-     * Removes the MxUpdate portals and programs.
-     *
-     * @throws Exception if MQL execution failed
-     */
     @BeforeMethod()
-    @AfterMethod()
+    @AfterClass(groups = "close" )
     public void cleanup()
         throws Exception
     {

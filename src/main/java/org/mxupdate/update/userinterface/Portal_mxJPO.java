@@ -28,12 +28,21 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * The class parses the information about the portal and writes the script used
- * to update portals.
+ * to update portals. The handles properties are
+ * <ul>
+ * <li>hidden flag (only if hidden)</li>
+ * <li>{@link #label}</li>
+ * <li>{@link #href}</li>
+ * <li>{@link #alt}</li>
+ * <li>settings defined as properties starting with &quot;%&quot; in
+ *     {@link #getPropertiesMap()}</li>
+ * <li>channel references {@link #children}</li>
+ * </ul>
  *
  * @author The MxUpdate Team
  */
@@ -63,7 +72,8 @@ public class Portal_mxJPO
                         final String _mxName)
     {
         super(_typeDef, _mxName);
-    }
+        this.getProperties().setOtherPropTag("setting");
+   }
 
     @Override()
     public void parseUpdate(final String _code)
@@ -112,23 +122,6 @@ public class Portal_mxJPO
         super.prepare();
     }
 
-    /**
-     * Writes specific information about the cached portal to the given writer
-     * instance. This includes
-     * <ul>
-     * <li>hidden flag (only if hidden)</li>
-     * <li>{@link #label}</li>
-     * <li>{@link #href}</li>
-     * <li>{@link #alt}</li>
-     * <li>settings defined as properties starting with &quot;%&quot; in
-     *     {@link #getPropertiesMap()}</li>
-     * <li>channel references {@link #children}</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          writer instance to the TCL update file
-     * @throws IOException if the TCL update code could not be written
-     */
     @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
@@ -136,21 +129,24 @@ public class Portal_mxJPO
     {
         this.writeHeader(_paramCache, _out);
 
-        _out.append("mxUpdate portal \"${NAME}\"  {\n")
-            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n");
-        if (this.isHidden())  {
-            _out.append("    hidden\n");
-        }
-        _out.append("    label \"").append(StringUtil_mxJPO.convertUpdate(this.getLabel())).append("\"\n")
-            .append("    href \"").append(StringUtil_mxJPO.convertUpdate(this.getHref())).append("\"\n")
-            .append("    alt \"").append(StringUtil_mxJPO.convertUpdate(this.getAlt())).append("\"\n");
-        this.getProperties().writeSettings(_paramCache, _out, "    ");
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
 
-        this.children.write(_out);
+        this.writeHeader(_paramCache, updateBuilder.getStrg());
 
-        this.getProperties().writeProperties(_paramCache, _out, "    ");
+        updateBuilder
+                .start("portal")
+                //              tag             | default | value                              | write?
+                .string(        "description",              this.getDescription())
+                .flagIfTrue(    "hidden",           false,  this.isHidden(),                     this.isHidden())
+                .string(        "label",                    this.getLabel())
+                .string(        "href",                     this.getHref())
+                .string(        "alt",                      this.getAlt())
+                .otherProps(this.getProperties())
+                .write(this.children)
+                .properties(this.getProperties())
+                .end();
 
-        _out.append("}");
+        _out.append(updateBuilder.toString());
     }
 
     @Override()
