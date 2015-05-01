@@ -108,7 +108,7 @@ public class Policy_mxJPO
     private String majorsequence = null;
 
     /** Store of this policy. */
-     private String store;
+    private String store;
 
     /** Set of all types of this policy. */
     private final SortedSet<String> types = new TreeSet<String>();
@@ -337,7 +337,6 @@ public class Policy_mxJPO
                              final Policy_mxJPO _current)
         throws UpdateException_mxJPO
     {
-        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
         // creates policy if done within update
         if (_current.updateWithCreate)  {
             _paramCache.logDebug("    - create policy");
@@ -359,6 +358,8 @@ public class Policy_mxJPO
                     _current.delimiter,
                     this.delimiter);
         }
+
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
 
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",                  this.getDescription(),                      _current.getDescription());
         DeltaUtil_mxJPO.calcListDelta( _mql, "type",        this.allTypes,   this.types,            _current.allTypes,   _current.types);
