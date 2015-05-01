@@ -15,21 +15,26 @@
 
 package org.mxupdate.update.datamodel;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.util.MqlUtil_mxJPO;
+import org.mxupdate.update.datamodel.expression.ExpressionDefParser_mxJPO;
+import org.mxupdate.update.util.DeltaUtil_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.xml.sax.SAXException;
 
 /**
+ * Handles the export and the update of the expression configuration item.
  *
  * @author The MxUpdate Team
  */
@@ -48,13 +53,8 @@ public class Expression_mxJPO
         Expression_mxJPO.IGNORED_URLS.add("/expression");
     }
 
-    /**
-     * Hold the expression itself.
-     *
-     * @see #prepare(ParameterCache_mxJPO)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private String expression = null;
+    /** Hold the expression itself. */
+    private String value = null;
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -66,6 +66,21 @@ public class Expression_mxJPO
                             final String _mxName)
     {
         super(_typeDef, _mxName);
+    }
+
+    /**
+     * {@inheritDoc}
+     * Also the value of the expression is extracted from MX
+     */
+    @Override()
+    protected void parse(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException, SAXException, IOException
+    {
+        super.parse(_paramCache);
+
+        this.value = MqlBuilder_mxJPO.mql()
+                .cmd("escape print expression ").arg(this.getName()).cmd(" select ").arg("value").cmd(" dump")
+                .exec(_paramCache);
     }
 
     /**
@@ -93,93 +108,92 @@ public class Expression_mxJPO
     }
 
     /**
-     * Extract the value of the expression from MX.
-     *
-     * @param _paramCache   parameter cache
-     * @throws MatrixException if the preparation from derived class failed or
-     *                         the expression value could not be extraced from
-     *                         MX
-     * @see #expression
-     */
-    @Override()
-    protected void prepare(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
-    {
-        final String cmd = new StringBuilder()
-                .append("escape print expression \"").append(StringUtil_mxJPO.convertMql(this.getName()))
-                .append("\" select value dump")
-                .toString();
-        this.expression = MqlUtil_mxJPO.execMql(_paramCache, cmd);
-        super.prepare(_paramCache);
-    }
-
-    /**
-     * Writes specific information about the cached expression to the given
-     * writer instance.
+     * Writes the TCL update file for this expression.
      *
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the TCL update code for the expression could not
-     *                     be written
+     * @throws IOException if the TCL update code could not be written to the
+     *                     writer instance
      */
     @Override()
-    protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Appendable _out)
         throws IOException
     {
-        _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden");
-        _out.append(" \\\n    value \"");
-        final String expr = StringUtil_mxJPO.convertTcl(this.expression);
-        // bug-fix: expression with starting and ending ' (but without ')
-        // must have a " as first and last character
-        if (expr.matches("^'[^']*'$"))  {
-            _out.append("\\\"").append(expr).append("\\\"");
-        } else  {
-            _out.append(expr);
+        this.writeHeader(_paramCache, _out);
+
+        _out.append("mxUpdate expression \"${NAME}\"  {\n")
+            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n");
+        if (this.isHidden())  {
+            _out.append("    ").append(this.isHidden() ? "" : "!").append("hidden\n");
         }
-        _out.append('\"');
+        _out.append("    value \"").append(StringUtil_mxJPO.convertUpdate(this.value)).append("\"\n");
+        this.getProperties().writeProperties(_paramCache, _out, "    ");
+
+        _out.append("}");
     }
 
     /**
-     * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this expression. Following
-     * steps are done:
-     * <ul>
-     * <li>set to not hidden</li>
-     * <li>reset description and value (expression itself)</li>
-     * </ul>
+     * The method is called from the TCL update code to define the this
+     * expression.
      *
-     * @param _paramCache       parameter cache
-     * @param _preMQLCode       MQL statements which must be called before the
-     *                          TCL code is executed
-     * @param _postMQLCode      MQL statements which must be called after the
-     *                          TCL code is executed
-     * @param _preTCLCode       TCL code which is defined before the source
-     *                          file is sourced
-     * @param _tclVariables     map of all TCL variables where the key is the
-     *                          name and the value is value of the TCL variable
-     *                          (the value is automatically converted to TCL
-     *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update from derived class failed
+     * @param _paramCache   parameter cache
+     * @param _args         first index defines the use case (must be
+     *                      &quot;updateAttribute&quot; that the expression
+     *                      is updated); second index the name of the expression
+     *                      to update
+     * @throws Exception if the update of the dimension failed or for all other
+     *                   use cases from super JPO call
      */
     @Override()
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final CharSequence _preMQLCode,
-                          final CharSequence _postMQLCode,
-                          final CharSequence _preTCLCode,
-                          final Map<String,String> _tclVariables,
-                          final File _sourceFile)
+    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
+                               final String... _args)
         throws Exception
     {
-        final StringBuilder preMQLCode = new StringBuilder()
-                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                .append(" !hidden description \"\" value \"\";\n");
+        // check if dimension is defined
+        if ((_args.length == 4) && "mxUpdate".equals(_args[0]) && "expression".equals(_args[1])) {
+// TODO: Exception Handling
+            // check that expression names are equal
+            if (!this.getName().equals(_args[2]))  {
+                throw new Exception("wrong expression '" + _args[2] + "' is set to update (currently expression '" + this.getName() + "' is updated!)");
+            }
 
-        // append already existing pre MQL code
-        preMQLCode.append(_preMQLCode);
+            final String code = _args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
 
-        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+            final ExpressionDefParser_mxJPO parser = new ExpressionDefParser_mxJPO(new StringReader(code));
+            final Expression_mxJPO expression = parser.parse(_paramCache, this.getTypeDef(), this.getName());
+
+            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod expression $1", this.getName());
+
+            this.calcDelta(_paramCache, mql, expression);
+
+            mql.exec(_paramCache);
+
+        } else  {
+            super.jpoCallExecute(_paramCache, _args);
+        }
+    }
+
+    /**
+     * Calculates the delta between this current expression definition and the
+     * {@code _target} expression definition and appends the MQL append commands
+     * to {@code _mql}.
+     *
+     * @param _paramCache   parameter cache
+     * @param _cmd          string builder to append the MQL commands
+     * @param _target       target expression definition
+     * @throws UpdateException_mxJPO if update is not allowed (because data can
+     *                      be lost)
+     */
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MultiLineMqlBuilder _mql,
+                             final Expression_mxJPO _target)
+        throws UpdateException_mxJPO
+    {
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "description", _target.getDescription(),   this.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      _target.isHidden(),         this.isHidden());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "value",       _target.value,              this.value);
+
+        _target.getProperties().calcDelta(_mql, "", this.getProperties());
     }
 }

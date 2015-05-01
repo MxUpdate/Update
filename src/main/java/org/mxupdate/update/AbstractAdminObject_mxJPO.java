@@ -32,6 +32,7 @@ import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO;
 import org.mxupdate.update.datamodel.Dimension_mxJPO;
+import org.mxupdate.update.datamodel.Expression_mxJPO;
 import org.mxupdate.update.datamodel.Format_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
 import org.mxupdate.update.datamodel.Rule_mxJPO;
@@ -453,9 +454,11 @@ public abstract class AbstractAdminObject_mxJPO
      * @param _out          appendable instance to the TCL update file
      * @throws IOException if the TCL update code could not be written
      */
-    protected abstract void writeObject(final ParameterCache_mxJPO _paramCache,
-                                        final Appendable _out)
-        throws IOException;
+    protected void writeObject(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
+        throws IOException
+    {
+    }
 
     /**
      * At the end of the write to the TCL update file in some cases some
@@ -556,6 +559,7 @@ public abstract class AbstractAdminObject_mxJPO
         // (only if not attribute, because attributes and formats uses calulated deltas)
         if (!(this instanceof AbstractAttribute_mxJPO)
                 && !(this instanceof Dimension_mxJPO)
+                && !(this instanceof Expression_mxJPO)
                 && !(this instanceof Format_mxJPO)
                 && !(this instanceof Policy_mxJPO)
                 && !(this instanceof Rule_mxJPO)

@@ -21,6 +21,7 @@ import java.util.Map;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
 
 /**
@@ -60,15 +61,19 @@ public class ExpressionData
     @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder();
+        final StringBuilder strg = new StringBuilder();
 
-        this.append4CIFileHeader(cmd);
+        this.append4CIFileHeader(strg);
 
-        cmd.append("mql escape mod expression \"${NAME}\"");
+        strg.append("mxUpdate expression \"${NAME}\" {\n");
 
-        this.append4CIFileValues(cmd);
+        this.getFlags().append4CIFileValues("    ", strg, "\n");
+        this.getValues().appendUpdate("    ", strg, "\n");
+        this.getProperties().appendCIFileUpdateFormat("    ", strg);
 
-        return cmd.toString();
+        strg.append("}");
+
+        return strg.toString();
     }
 
     /**
@@ -98,5 +103,14 @@ public class ExpressionData
             this.getTest().mql(cmd);
         }
         return this;
+    }
+
+    @Override()
+    public void checkExport(final ExportParser _exportParser)
+        throws MatrixException
+    {
+        this.getValues().checkExport(_exportParser);
+        this.getFlags().checkExport(_exportParser.getRootLines().get(0), "");
+        this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
     }
 }
