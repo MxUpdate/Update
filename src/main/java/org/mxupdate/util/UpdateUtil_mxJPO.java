@@ -144,9 +144,7 @@ public final class UpdateUtil_mxJPO
     {
         final Map<TypeDef_mxJPO,Set<String>> existingNames = new HashMap<TypeDef_mxJPO,Set<String>>();
         for (final TypeDef_mxJPO clazz : _typeDefs)  {
-            if (!existingNames.containsKey(clazz))  {
-                existingNames.put(clazz, clazz.fetchMxNames(_paramCache));
-            }
+            existingNames.put(clazz, clazz.matchMxNames(_paramCache, null));
         }
         return existingNames;
     }

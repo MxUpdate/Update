@@ -15,6 +15,7 @@
 
 package org.mxupdate.typedef.mxnames;
 
+import java.util.Collection;
 import java.util.SortedSet;
 
 import matrix.util.MatrixException;
@@ -33,11 +34,12 @@ public class MxNamesAdminUserPersonAdmin_mxJPO
     extends MxNamesAdmin_mxJPO
 {
     @Override()
-    public SortedSet<String> fetch(final ParameterCache_mxJPO _paramCache,
-                                   final TypeDef_mxJPO _typeDef)
+    public SortedSet<String> match(final ParameterCache_mxJPO _paramCache,
+                                   final TypeDef_mxJPO _typeDef,
+                                   final Collection<String> _matches)
         throws MatrixException
     {
-        final SortedSet<String> ret = super.fetch(_paramCache, _typeDef);
+        final SortedSet<String> ret = super.match(_paramCache, _typeDef, _matches);
 
         final String personStr = MqlBuilder_mxJPO.mql()
                 .cmd("escape temp query bus ").arg(_typeDef.getMxBusType()).cmd(" ").arg("*").cmd(" ").arg("*")

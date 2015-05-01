@@ -15,6 +15,7 @@
 
 package org.mxupdate.typedef.mxnames;
 
+import java.util.Collection;
 import java.util.SortedSet;
 
 import matrix.util.MatrixException;
@@ -27,17 +28,19 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  *
  * @author The MxUpdate Team
  */
-public interface IFetchMxNames_mxJPO
+public interface IMatcherMxNames_mxJPO
 {
     /**
      * Fetches for given type definition all existing names in MX.
      *
      * @param _paramCache   parameter cache with MX context
      * @param _typeDef      type definition
+     * @param _matches      matches to fulfill
      * @return found set of names
      * @throws MatrixException
      */
-    SortedSet<String> fetch(final ParameterCache_mxJPO _paramCache,
-                            final TypeDef_mxJPO _typeDef)
+    SortedSet<String> match(final ParameterCache_mxJPO _paramCache,
+                            final TypeDef_mxJPO _typeDef,
+                            final Collection<String> _matches)
         throws MatrixException;
 }

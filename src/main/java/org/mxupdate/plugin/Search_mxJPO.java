@@ -107,17 +107,14 @@ class Search_mxJPO
         // first sort the matches depending on the type definition
         for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
             if (typeDefList.contains(typeDef.getName()))  {
-                final AbstractObject_mxJPO obj = typeDef.newTypeInstance(null);
-                for (final String name : typeDef.fetchMxNames(_paramCache))  {
-                    if (obj.matchMxName(_paramCache, name, Arrays.asList(new String[]{match})))  {
-                        final AbstractObject_mxJPO  instance = typeDef.newTypeInstance(name);
-                        final Map<String,String> map = new HashMap<String,String>();
-                        map.put(Search_mxJPO.RETURN_KEY_TYPEDEF, typeDef.getName());
-                        map.put(Search_mxJPO.RETURN_KEY_NAME, name);
-                        map.put(Search_mxJPO.RETURN_KEY_FILENAME, instance.getFileName());
-                        map.put(Search_mxJPO.RETURN_KEY_FILEPATH, instance.getPath());
-                        ret.add(map);
-                    }
+                for (final String name : typeDef.matchMxNames(_paramCache, Arrays.asList(new String[]{match})))  {
+                    final AbstractObject_mxJPO  instance = typeDef.newTypeInstance(name);
+                    final Map<String,String> map = new HashMap<String,String>();
+                    map.put(Search_mxJPO.RETURN_KEY_TYPEDEF, typeDef.getName());
+                    map.put(Search_mxJPO.RETURN_KEY_NAME, name);
+                    map.put(Search_mxJPO.RETURN_KEY_FILENAME, instance.getFileName());
+                    map.put(Search_mxJPO.RETURN_KEY_FILEPATH, instance.getPath());
+                    ret.add(map);
                 }
             }
         }

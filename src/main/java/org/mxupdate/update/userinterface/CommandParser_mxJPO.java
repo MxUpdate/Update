@@ -4,7 +4,6 @@ package org.mxupdate.update.userinterface;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;

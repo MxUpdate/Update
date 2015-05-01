@@ -15,6 +15,7 @@
 
 package org.mxupdate.typedef.mxnames;
 
+import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -23,6 +24,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * Searches for all administration object of given type definition and
@@ -31,11 +33,12 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  * @author The MxUpdate Team
  */
 public class MxNamesAdmin_mxJPO
-    implements IFetchMxNames_mxJPO
+    implements IMatcherMxNames_mxJPO
 {
     @Override()
-    public SortedSet<String> fetch(final ParameterCache_mxJPO _paramCache,
-                                   final TypeDef_mxJPO _typeDef)
+    public SortedSet<String> match(final ParameterCache_mxJPO _paramCache,
+                                   final TypeDef_mxJPO _typeDef,
+                                   final Collection<String> _matches)
         throws MatrixException
     {
         final String listStr = MqlBuilder_mxJPO.mql()
@@ -44,8 +47,10 @@ public class MxNamesAdmin_mxJPO
 
         final SortedSet<String> ret = new TreeSet<String>();
         if (!listStr.isEmpty())  {
-            for (final String name : listStr.split("\n"))  {
-                ret.add(name);
+            for (final String mxName : listStr.split("\n"))  {
+                if (StringUtil_mxJPO.match(mxName, _matches))  {
+                    ret.add(mxName);
+                }
             }
         }
         return ret;

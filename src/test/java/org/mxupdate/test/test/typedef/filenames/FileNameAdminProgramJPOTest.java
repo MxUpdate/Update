@@ -13,7 +13,7 @@
  *
  */
 
-package org.mxupdate.test.test.update.program;
+package org.mxupdate.test.test.typedef.filenames;
 
 import java.io.File;
 import java.util.Arrays;
@@ -33,7 +33,7 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-public class JPOProgramCI_4EvalFilesTest
+public class FileNameAdminProgramJPOTest
     extends AbstractTest
 {
     /** Original files. */
@@ -42,7 +42,7 @@ public class JPOProgramCI_4EvalFilesTest
     /**
      * Initialize the file handlers.
      */
-    public JPOProgramCI_4EvalFilesTest()
+    public FileNameAdminProgramJPOTest()
     {
         this.origDir    = new File(this.getResourcesDir(), "program/jpo");
         this.origJPO    = new File(this.origDir, "MXUPDATE_Test_mxJPO.java");
@@ -88,7 +88,7 @@ public class JPOProgramCI_4EvalFilesTest
             expMap.put((String) _exp[idx++], (File) _exp[idx++]);
         }
         Assert.assertEquals(
-                new JPOProgram_mxJPO(paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), null).evalMatching(paramCache, files, null),
+                paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType).matchFileNames(paramCache, files),
                 expMap);
     }
 }

@@ -19,9 +19,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Collection;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import matrix.util.MatrixException;
 
@@ -31,7 +28,6 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * Abstract class from which must be derived for exporting and importing all
@@ -49,86 +45,6 @@ public abstract class AbstractObject_mxJPO
 
     /** Description of the C object. */
     private String description = "";
-
-    ////////////////////////////////////////////////////////////////////////////
-    // global methods start
-
-    /**
-     * Checks if given MX name without prefix and suffix matches given match
-     * string.
-     *
-     * @param _paramCache   parameter cache
-     * @param _mxName       name of the administration object to check
-     * @param _matches      list of string which must be matched (if
-     *                      {@code null}, name matched!)
-     * @return <i>true</i> if the given MX name matches; otherwise <i>false</i>
-     */
-    public boolean matchMxName(final ParameterCache_mxJPO _paramCache,
-                               final String _mxName,
-                               final Collection<String> _matches)
-    {
-        return StringUtil_mxJPO.match(_mxName, _matches);
-    }
-
-    /**
-     * Extract for given {@code _files} all mx names for this type.
-     *
-     * @param _paramCache   parameter cache
-     * @param _files        files
-     * @param _matches      matches (if {@code null}, all is valid}
-     * @return map of MX names and depending file for this type definition
-     * @throws UpdateException_mxJPO if evaluate failed
-     */
-    public SortedMap<String,File> evalMatching(final ParameterCache_mxJPO _paramCache,
-                                               final Collection<File> _files,
-                                               final Collection<String> _matches)
-        throws UpdateException_mxJPO
-    {
-        final SortedMap<String,File> ret = new TreeMap<String,File>();
-
-        for (final File file : _files)  {
-            final String mxName = this.evalMxName(_paramCache, file);
-            if ((mxName != null)  && this.matchMxName(_paramCache, mxName, _matches))  {
-                ret.put(mxName, file);
-            }
-        }
-
-        return ret;
-    }
-
-    /**
-     * Extracts the MX name from given file name if the file prefix and suffix
-     * matches. If the file prefix and suffix not matches a <code>null</code>
-     * is returned.
-     *
-     * @param _paramCache   parameter cache
-     * @param _file         file for which the MX name is searched
-     * @return MX name or <code>null</code> if the file is not an update file
-     *         for current type definition
-     * @throws UpdateException_mxJPO if the configuration item name could not
-     *                               be extracted from the file name
-     */
-    public String evalMxName(final ParameterCache_mxJPO _paramCache,
-                             final File _file)
-        throws UpdateException_mxJPO
-    {
-        final String suffix = this.getTypeDef().getFileSuffix();
-        final int suffixLength = (suffix != null) ? suffix.length() : 0;
-        final String prefix = this.getTypeDef().getFilePrefix();
-        final int prefixLength = (prefix != null) ? prefix.length() : 0;
-
-        final String fileName = _file.getName();
-        final String mxName;
-        if (((prefix == null) || fileName.startsWith(prefix)) && ((suffix == null) || fileName.endsWith(suffix)))  {
-            mxName = StringUtil_mxJPO.convertFromFileName(fileName.substring(0, fileName.length() - suffixLength).substring(prefixLength));
-        } else  {
-            mxName = null;
-        }
-        return mxName;
-    }
-
-    // global methods end
-    ////////////////////////////////////////////////////////////////////////////
 
     /**
      * Initialize the type definition enumeration.

@@ -16,6 +16,8 @@
 package org.mxupdate.plugin;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -133,17 +135,16 @@ class Export_mxJPO
         AbstractObject_mxJPO instance = null;
 
         if (fileName != null)  {
-            final File file = new File(fileName);
+            final Collection<File> files = Arrays.asList(new File[]{new File(fileName)});
 
             // first found related type definition
             for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
-                instance = typeDef.newTypeInstance(null);
-                final String mxName = instance.evalMxName(_paramCache, file);
-                if (mxName != null)  {
-                    instance = typeDef.newTypeInstance(mxName);
+
+                final Map<String,File> matchFiles = typeDef.matchFileNames(_paramCache, files);
+
+                if (!matchFiles.isEmpty())  {
+                    instance = typeDef.newTypeInstance(matchFiles.keySet().iterator().next());
                     break;
-                } else  {
-                    instance = null;
                 }
             }
         } else  {

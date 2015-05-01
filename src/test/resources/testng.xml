@@ -21,6 +21,8 @@
     <test name="1 - Test Updates" annotations="JDK">
         <packages>
             <package name="org.mxupdate.test.test.typedef"/>
+            <package name="org.mxupdate.test.test.typedef.filenames"/>
+            <package name="org.mxupdate.test.test.typedef.mxnames"/>
             <package name="org.mxupdate.test.test.update.datamodel"/>
             <package name="org.mxupdate.test.test.update.datamodel.attributeci"/>
             <package name="org.mxupdate.test.test.update.datamodel.dimensionci"/>

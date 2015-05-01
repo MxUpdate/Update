@@ -27,7 +27,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
-import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -90,14 +89,7 @@ public class SelectTypeDefUtil_mxJPO
         // and now depending on the type definition prepare return list
         final Map<TypeDef_mxJPO,Set<String>> clazz2names = new HashMap<TypeDef_mxJPO,Set<String>>();
         for (final Entry<TypeDef_mxJPO,Set<String>> entry : this.clazz2matches.entrySet())  {
-            final AbstractObject_mxJPO instance = entry.getKey().newTypeInstance(null);
-            final Set<String> matchingMxNames = new TreeSet<String>();
-            clazz2names.put(entry.getKey(), matchingMxNames);
-            for (final String mxName : entry.getKey().fetchMxNames(_paramCache))  {
-                if (instance.matchMxName(_paramCache, mxName, entry.getValue()))  {
-                    matchingMxNames.add(mxName);
-                }
-            }
+            clazz2names.put(entry.getKey(), entry.getKey().matchMxNames(_paramCache, entry.getValue()));
         }
 
         // and now remove ignored matches
@@ -164,7 +156,7 @@ public class SelectTypeDefUtil_mxJPO
                     }
                 }
                 // get all matching files depending on the update classes
-                this.evalMatches(_paramCache, entry.getKey(), clazz2names, allFiles, null);
+                clazz2names.put(entry.getKey(), entry.getKey().matchFileNames(_paramCache, allFiles));
             }
         // path parameter is defined
         } else  {
@@ -175,7 +167,7 @@ public class SelectTypeDefUtil_mxJPO
             }
             // get all matching files depending on the update classes
             for (final Entry<TypeDef_mxJPO,Set<String>> entry : this.clazz2matches.entrySet())  {
-                this.evalMatches(_paramCache, entry.getKey(), clazz2names, allFiles, entry.getValue());
+                clazz2names.put(entry.getKey(), entry.getKey().matchFileNames(_paramCache, allFiles, entry.getValue()));
             }
         }
 
@@ -205,30 +197,6 @@ public class SelectTypeDefUtil_mxJPO
 
         return ret;
     }
-
-    /**
-     *
-     * @param _paramCache           parameter cache
-     * @param _selectedTypeDefs     selected type definitions from the MxUpdate
-     *                              parameters
-     * @param _fileMatchLast        must be <i>true</i> if the last match is
-     *                              executed; <i>false</i> otherwise
-     * @param _clazz2names
-     * @param _matchedFiles         already matched files
-     * @param _matches
-     * @throws Exception if the evaluate for the match fails
-     */
-    private void evalMatches(final ParameterCache_mxJPO _paramCache,
-                             final TypeDef_mxJPO _selectedTypeDefs,
-                             final Map<TypeDef_mxJPO,Map<String,File>> _clazz2names,
-                             final Set<File> _allFiles,
-                             final Collection<String> _matches)
-        throws Exception
-    {
-        final AbstractObject_mxJPO instance = _selectedTypeDefs.newTypeInstance(null);
-        _clazz2names.put(_selectedTypeDefs, instance.evalMatching(_paramCache, _allFiles, _matches));
-    }
-
 
     /**
      * Evaluates depending on given path all files in the sub directories.

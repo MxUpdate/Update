@@ -15,17 +15,11 @@
 
 package org.mxupdate.update.program;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Collection;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import matrix.util.MatrixException;
 
@@ -34,7 +28,6 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
-import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * The class is used to export, create, delete and update JPOs within MX.
@@ -45,18 +38,12 @@ public class JPOProgram_mxJPO
     extends AbstractProgram_mxJPO<JPOProgram_mxJPO>
 {
     /** String with name suffix (used also from the extract routine from Matrix). */
-    private static final String NAME_SUFFIX = "_" + "mxJPO";
+    public static final String NAME_SUFFIX_EXTENDSION = JPOProgram_mxJPO.NAME_SUFFIX + ".java";
+
+    public static final int NAME_SUFFIX_EXTENDSION_LENGTH = JPOProgram_mxJPO.NAME_SUFFIX_EXTENDSION.length();
 
     /** String with name suffix (used also from the extract routine from Matrix). */
-    private static final String NAME_SUFFIX_EXTENDSION = JPOProgram_mxJPO.NAME_SUFFIX + ".java";
-
-    private static final int NAME_SUFFIX_EXTENDSION_LENGTH = JPOProgram_mxJPO.NAME_SUFFIX_EXTENDSION.length();
-
-    /**
-     * Regular expression for the package line. The package name must be
-     * extracted to get the real name of the JPO used within MX.
-     */
-    private static final Pattern PATTERN_JPO_PACKAGE = Pattern.compile("(?<=package)[ \\t]+[A-Za-z0-9\\._]*[ \\t]*;");
+    private static final String NAME_SUFFIX = "_" + "mxJPO";
 
     /**
      * The flag indicates that the back slashes are converted. In older MX
@@ -68,77 +55,6 @@ public class JPOProgram_mxJPO
      * @see #write(ParameterCache_mxJPO, Appendable)
      */
     private boolean backslashUpgraded = false;
-
-    ////////////////////////////////////////////////////////////////////////////
-    // global methods start
-
-    /**
-     * {@inheritDoc}
-     *
-     */
-    @Override()
-    public SortedMap<String,File> evalMatching(final ParameterCache_mxJPO _paramCache,
-                                               final Collection<File> _files,
-                                               final Collection<String> _matches)
-        throws UpdateException_mxJPO
-    {
-        final SortedMap<String,File> ret = super.evalMatching(_paramCache, _files, _matches);
-
-        for (final File file : _files)  {
-            if (file.getName().endsWith(JPOProgram_mxJPO.NAME_SUFFIX_EXTENDSION))  {
-                // file identified as JPO
-
-                final String code;
-                try {
-                    code = this.getCode(file).toString();
-                } catch (final IOException e)  {
-// TODO: exception handling!
-throw new Error("could not open file " + file, e);
-                }
-                String mxName = file.getName().substring(0, file.getName().length() - JPOProgram_mxJPO.NAME_SUFFIX_EXTENDSION_LENGTH);
-
-                // prefix with package name
-                for (final String line : code.split("\n"))  {
-                    final Matcher pckMatch = JPOProgram_mxJPO.PATTERN_JPO_PACKAGE.matcher(line);
-                    if (pckMatch.find())  {
-                        mxName = pckMatch.group().replace(';', ' ').trim() + "." + mxName;
-                        break;
-                    }
-                }
-
-                if (!ret.containsKey(mxName) && this.matchMxName(_paramCache, mxName, _matches))  {
-                    ret.put(mxName, file);
-                }
-            }
-        }
-        return ret;
-    }
-
-    /**
-     * Reads for given file the code and returns them.
-     *
-     * @param _file     file to read the code
-     * @return read code of the file
-     * @throws IOException if the file could not be opened or read
-     */
-    private StringBuilder getCode(final File _file)
-        throws IOException
-    {
-        // read code
-        final StringBuilder code = new StringBuilder();
-        final BufferedReader reader = new BufferedReader(new FileReader(_file));
-        String line = reader.readLine();
-        while (line != null)  {
-            code.append(line).append('\n');
-            line = reader.readLine();
-        }
-        reader.close();
-
-        return code;
-    }
-
-    // global methods end
-    ////////////////////////////////////////////////////////////////////////////
 
     /**
      * Constructor used to initialize the type definition enumeration and the

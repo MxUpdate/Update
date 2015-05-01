@@ -15,6 +15,7 @@
 
 package org.mxupdate.typedef.mxnames;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
@@ -28,6 +29,7 @@ import org.mxupdate.update.util.MqlBuilder_mxJPO.MqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * Searches for all attribute objects depending on the attribute type.
@@ -35,14 +37,15 @@ import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
  * @author The MxUpdate Team
  */
 public class MxNamesAdminAttribute_mxJPO
-    implements IFetchMxNames_mxJPO
+    implements IMatcherMxNames_mxJPO
 {
     /** Key used for the select statement. */
     private static final String SELECT_KEY = "@@@2@@@2@@@";
 
     @Override()
-    public SortedSet<String> fetch(final ParameterCache_mxJPO _paramCache,
-                                   final TypeDef_mxJPO _typeDef)
+    public SortedSet<String> match(final ParameterCache_mxJPO _paramCache,
+                                   final TypeDef_mxJPO _typeDef,
+                                   final Collection<String> _matches)
         throws MatrixException
     {
         @SuppressWarnings("unchecked")
@@ -73,7 +76,7 @@ public class MxNamesAdminAttribute_mxJPO
                 final String[] typeOwnerNameArr = typeOwnerNameStr.split(MxNamesAdminAttribute_mxJPO.SELECT_KEY);
                 String kind = typeOwnerNameArr[0];
                 // fix wrong type in list to correct kind definition
-                if (!"timestampe".equals(kind))  {
+                if ("timestamp".equals(kind))  {
                     kind = "date";
                 }
                 if (!attrs.containsKey(kind))  {
@@ -89,6 +92,19 @@ public class MxNamesAdminAttribute_mxJPO
             attrs.put(_typeDef.getMxUpdateKind(), new TreeSet<String>());
         }
 
-        return attrs.get(_typeDef.getMxUpdateKind());
+        // now prepare list of returned attributes
+        final SortedSet<String> ret;
+        if (_matches == null)  {
+            ret = attrs.get(_typeDef.getMxUpdateKind());
+        } else  {
+            ret = new TreeSet<String>();
+            for (final String mxName : attrs.get(_typeDef.getMxUpdateKind()))  {
+                if (StringUtil_mxJPO.match(mxName, _matches))  {
+                    ret.add(mxName);
+                }
+            }
+        }
+
+        return ret;
     }
 }

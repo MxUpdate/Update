@@ -18,7 +18,6 @@ package org.mxupdate.update;
 import java.io.File;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -65,17 +64,13 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
 public class BusObject_mxJPO
     extends AbstractPropertyObject_mxJPO<BusObject_mxJPO>
 {
-    /** Parameter key to cache allowed attributes for relationships. */
-    private static final String PARAM_RELATION_ATTRS = "BusRelationAttributes";
-
     /** String used to split the name and revision of administration business object. */
     public static final String SPLIT_NAME = "________";
-
-    /**
-     * String used to split the type and name with revision of administration
-     * business object.
-     */
+    /** String used to split the type and name with revision of administration business object. */
     public static final String SPLIT_TYPE = BusObject_mxJPO.SPLIT_NAME + BusObject_mxJPO.SPLIT_NAME;
+
+    /** Parameter key to cache allowed attributes for relationships. */
+    private static final String PARAM_RELATION_ATTRS = "BusRelationAttributes";
 
     /** Alphanumeric-comparator for string used within sorted sets. */
     private static final Comparator<String> COMP = new Comparator<String>() {
@@ -117,52 +112,6 @@ public class BusObject_mxJPO
 
     /** Holds all connected objects. */
     private final SortedSet<Connection> connections = new TreeSet<Connection>();
-
-    ////////////////////////////////////////////////////////////////////////////
-    // global methods start
-
-    /**
-     * {@inheritDoc}
-     * If the type definition has derived types and the extracted name does not
-     * include the the type, the business type is added.
-     */
-    @Override()
-    public String evalMxName(final ParameterCache_mxJPO _paramCache,
-                             final File _file)
-        throws UpdateException_mxJPO
-    {
-        String ret = super.evalMxName(_paramCache, _file);
-        if ((ret != null) && this.getTypeDef().hasMxBusTypeDerived() && !ret.contains(BusObject_mxJPO.SPLIT_TYPE))  {
-            ret = new StringBuilder().append(this.getTypeDef().getMxBusType())
-                                     .append(BusObject_mxJPO.SPLIT_TYPE)
-                                     .append(ret).toString();
-        }
-        return ret;
-    }
-
-    /**
-     * Checks if given MX name without prefix and suffix matches given match
-     * string. The MX name is split with {@link #SPLIT_NAME} to get
-     * the name and revision of the business object. A MX name matches if the
-     * business object name or revision matches.
-     *
-     * @param _paramCache   parameter cache
-     * @param _mxName       name (and revision) of the administration business
-     *                      object
-     * @param _matches      collection string which must be matched
-     * @return <i>true</i> if the given MX name matches; otherwise <i>false</i>
-     */
-    @Override()
-    public boolean matchMxName(final ParameterCache_mxJPO _paramCache,
-                               final String _mxName,
-                               final Collection<String> _matches)
-    {
-        final String[] nameRev = _mxName.split(BusObject_mxJPO.SPLIT_NAME);
-        return (StringUtil_mxJPO.match(nameRev[0], _matches) || ((nameRev.length > 1) && StringUtil_mxJPO.match(nameRev[1], _matches)));
-    }
-
-    // global methods end
-    ////////////////////////////////////////////////////////////////////////////
 
     /**
      * Constructor used to initialize the type definition enumeration.

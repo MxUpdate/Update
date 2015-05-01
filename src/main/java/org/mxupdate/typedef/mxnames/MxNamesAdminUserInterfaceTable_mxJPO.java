@@ -19,31 +19,40 @@ import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import matrix.util.MatrixException;
+
 import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
- * In MX only one search index exists. Therefore the list only includes
- * {@value #DEFAULT_NAME} as valid MX name.
+ * Searches for all administration object of given type definition and
+ * returns all found names as set.
  *
  * @author The MxUpdate Team
  */
-public class MxNamesAdminSystemSearchIndex_mxJPO
+public class MxNamesAdminUserInterfaceTable_mxJPO
     implements IMatcherMxNames_mxJPO
 {
-    /** Used default name of the search configuration. */
-    private final static String DEFAULT_NAME = "Config"; //$NON-NLS-1$
-
     @Override()
     public SortedSet<String> match(final ParameterCache_mxJPO _paramCache,
                                    final TypeDef_mxJPO _typeDef,
                                    final Collection<String> _matches)
+        throws MatrixException
     {
-        final SortedSet<String> names = new TreeSet<String>();
-        if (StringUtil_mxJPO.match(MxNamesAdminSystemSearchIndex_mxJPO.DEFAULT_NAME, _matches))  {
-            names.add(MxNamesAdminSystemSearchIndex_mxJPO.DEFAULT_NAME);
+        final String listStr = MqlBuilder_mxJPO.mql()
+                .cmd("escape list ").cmd(_typeDef.getMxAdminName()).cmd(" system")
+                .exec(_paramCache);
+
+        final SortedSet<String> ret = new TreeSet<String>();
+        if (!listStr.isEmpty())  {
+            for (final String mxName : listStr.split("\n"))  {
+                if (StringUtil_mxJPO.match(mxName, _matches))  {
+                    ret.add(mxName);
+                }
+            }
         }
-        return names;
+        return ret;
     }
 }

@@ -15,6 +15,7 @@
 
 package org.mxupdate.typedef.mxnames;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
@@ -27,6 +28,7 @@ import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * Searches for all programs objects depending on the program kind.
@@ -34,14 +36,15 @@ import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
  * @author The MxUpdate Team
  */
 public class MxNamesAdminProgram_mxJPO
-    implements IFetchMxNames_mxJPO
+    implements IMatcherMxNames_mxJPO
 {
     /** Key used for the select statement. */
     private static final String SELECT_KEY = "@@@2@@@2@@@";
 
     @Override()
-    public SortedSet<String> fetch(final ParameterCache_mxJPO _paramCache,
-                                   final TypeDef_mxJPO _typeDef)
+    public SortedSet<String> match(final ParameterCache_mxJPO _paramCache,
+                                   final TypeDef_mxJPO _typeDef,
+                                   final Collection<String> _matches)
         throws MatrixException
     {
         @SuppressWarnings("unchecked")
@@ -76,6 +79,19 @@ public class MxNamesAdminProgram_mxJPO
             _paramCache.setCache(CacheKey.Programs, progs);
         }
 
-        return progs.get(_typeDef.getMxUpdateKind());
+        // now prepare list of returned programs
+        final SortedSet<String> ret;
+        if (_matches == null)  {
+            ret = progs.get(_typeDef.getMxUpdateKind());
+        } else  {
+            ret = new TreeSet<String>();
+            for (final String mxName : progs.get(_typeDef.getMxUpdateKind()))  {
+                if (StringUtil_mxJPO.match(mxName, _matches))  {
+                    ret.add(mxName);
+                }
+            }
+        }
+
+        return ret;
     }
 }

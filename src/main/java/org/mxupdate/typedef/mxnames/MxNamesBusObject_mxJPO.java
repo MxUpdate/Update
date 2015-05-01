@@ -15,6 +15,7 @@
 
 package org.mxupdate.typedef.mxnames;
 
+import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -27,6 +28,7 @@ import matrix.util.StringList;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * Fetches the names for  for all business object of current type definition.
@@ -38,11 +40,12 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  * @author The MxUpdate Team
  */
 public class MxNamesBusObject_mxJPO
-    implements IFetchMxNames_mxJPO
+    implements IMatcherMxNames_mxJPO
 {
     @Override()
-    public SortedSet<String> fetch(final ParameterCache_mxJPO _paramCache,
-                                   final TypeDef_mxJPO _typeDef)
+    public SortedSet<String> match(final ParameterCache_mxJPO _paramCache,
+                                   final TypeDef_mxJPO _typeDef,
+                                   final Collection<String> _matches)
         throws MatrixException
     {
         final StringList selects = new StringList(3);
@@ -62,15 +65,18 @@ public class MxNamesBusObject_mxJPO
             final String busType = (String) map.getSelectDataList("type").get(0);
             final String busName = (String) map.getSelectDataList("name").get(0);
             final String busRevision = (String) map.getSelectDataList("revision").get(0);
-            final StringBuilder name = new StringBuilder();
-            if (_typeDef.hasMxBusTypeDerived())  {
-                name.append(busType).append(BusObject_mxJPO.SPLIT_TYPE);
+
+            if (StringUtil_mxJPO.match(busName, _matches) || StringUtil_mxJPO.match(busRevision, _matches))  {
+                final StringBuilder name = new StringBuilder();
+                if (_typeDef.hasMxBusTypeDerived())  {
+                    name.append(busType).append(BusObject_mxJPO.SPLIT_TYPE);
+                }
+                name.append(busName);
+                if ((busRevision != null) && !busRevision.isEmpty())  {
+                    name.append(BusObject_mxJPO.SPLIT_NAME).append(busRevision);
+                }
+                ret.add(name.toString());
             }
-            name.append(busName);
-            if ((busRevision != null) && !busRevision.isEmpty())  {
-                name.append(BusObject_mxJPO.SPLIT_NAME).append(busRevision);
-            }
-            ret.add(name.toString());
         }
         return ret;
     }

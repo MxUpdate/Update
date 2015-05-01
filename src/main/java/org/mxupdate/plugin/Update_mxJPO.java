@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
-import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.util.UpdateUtil_mxJPO;
 
@@ -148,17 +147,10 @@ class Update_mxJPO
         throws Exception
     {
         final Map<TypeDef_mxJPO,Map<String,File>> ret = new HashMap<TypeDef_mxJPO,Map<String,File>>();
-        for (final File file : _files)  {
-            for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
-                final AbstractObject_mxJPO instance = typeDef.newTypeInstance(null);
-                final String mxName = instance.evalMxName(_paramCache, file);
-                if (mxName != null)  {
-                    if (!ret.containsKey(typeDef))  {
-                        ret.put(typeDef, new HashMap<String,File>());
-                    }
-                    ret.get(typeDef).put(mxName, file);
-                    break;
-                }
+        for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
+            final Map<String,File> tmp = typeDef.matchFileNames(_paramCache, _files);
+            if (!tmp.isEmpty())  {
+                ret.put(typeDef, typeDef.matchFileNames(_paramCache, _files));
             }
         }
         return ret;
