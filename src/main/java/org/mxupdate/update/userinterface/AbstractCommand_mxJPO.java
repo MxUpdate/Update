@@ -38,11 +38,11 @@ abstract class AbstractCommand_mxJPO<CLASS extends AbstractAdminObject_mxJPO<CLA
     }
 
     /** Alt label of the command. */
-    private String alt;
+    private String alt = "";
     /** Label of the command. */
-    private String label;
+    private String label = "";
     /** HRef of the command. */
-    private String href;
+    private String href = "";
 
     /**
      * Constructor used to initialize the type definition enumeration.

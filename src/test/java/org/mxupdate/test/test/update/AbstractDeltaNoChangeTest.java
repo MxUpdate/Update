@@ -106,4 +106,25 @@ public abstract class AbstractDeltaNoChangeTest<DATA extends AbstractAdminObject
             Assert.assertFalse(mql.hasNewLines(), "no MQL update needed, but found:\n" + mql);
         }
     }
+
+    /**
+     * Positive test against not parsed values (to check that default values
+     * from MX and defined are equal).
+     *
+     * @param _description  not used
+     * @param _currentData  current starting data
+     * @throws Exception if test failed
+     */
+    @Test(description = "positive test against not parsed values (to check that default values from MX and defined are equal)")
+    public void positivTestAgainstNotParsed()
+        throws Exception
+    {
+        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
+
+        final WrapperCIInstance<DATA> currentWrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, AbstractTest.PREFIX + "Test"));
+        currentWrapper.create(paramCache);
+        final MultiLineMqlBuilder mql = currentWrapper.calcDelta(paramCache, new WrapperCIInstance<DATA>(this.createNewData(paramCache, AbstractTest.PREFIX + "Test")));
+
+        Assert.assertFalse(mql.hasNewLines(), "no MQL update needed, but found:\n" + mql);
+    }
 }

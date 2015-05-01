@@ -59,7 +59,7 @@ public class Command_mxJPO
     /** Sorted list of assigned users of the command. */
     private final SortedSet<String> users = new TreeSet<String>();
     /** Code of the command. */
-    private String code;
+    private String code = "";
 
     /**
      * Constructor used to initialize the type definition enumeration.
