@@ -743,7 +743,7 @@ final Object tmp = this;
             clazz.getProperties().parse(_paramCache, "/property/name", "version");
             clazz.getProperties().parse(_paramCache, "/property/value", _args[10]);
 
-            clazz.parseUpdate(_args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\""));
+            clazz.parseUpdate(_args[3].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\"));
 
             final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod " + this.getTypeDef().getMxAdminName() + " $1", this.getName());
 

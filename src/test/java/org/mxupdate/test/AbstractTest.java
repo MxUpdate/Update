@@ -39,6 +39,7 @@ import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Settings;
 import org.mxupdate.test.util.Version;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -757,17 +758,11 @@ public abstract class AbstractTest
      *
      * @param _text     character sequence to convert
      * @return converted string
+     * @see StringUtil_mxJPO#convertUpdate(CharSequence)
      */
     public static String convertUpdate(final CharSequence _text)
     {
-        final String text;
-        if (_text == null)  {
-            text = "";
-        } else  {
-            text = _text.toString();
-        }
-        return text.replaceAll("\\\\", "\\\\\\\\")
-                   .replaceAll("\\\"", "\\\\\"");
+        return StringUtil_mxJPO.convertUpdate(_text);
     }
 
     /**
