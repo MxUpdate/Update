@@ -1,7 +1,3 @@
-/MenuDefParserConstants.java
-/ParseException.java
-/SimpleCharStream.java
-/Token.java
-/TokenMgrError.java
 /MenuDefParser.java
+/MenuDefParserConstants.java
 /MenuDefParserTokenManager.java

@@ -18,6 +18,7 @@ options {
     STATIC = false;
     ERROR_REPORTING = true;
     USER_TOKEN_MANAGER = false;
+    GENERATE_BOILERPLATE = false;
 }
 
 PARSER_BEGIN(DimensionDefParser)
@@ -32,11 +33,15 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.Dimension_mxJPO;
 import org.mxupdate.update.datamodel.Dimension_mxJPO.Unit;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
+import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
+import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 public class DimensionDefParser
-    extends AbstractParser_mxJPO
+    extends AbstractParser_mxJPO<Dimension_mxJPO>
 {
 }
 PARSER_END(DimensionDefParser)
@@ -248,28 +253,22 @@ TOKEN : /** first level */
 /**
  * Parses one complete dimension definition.
  *
- * @param _paramCache   parameter cache
- * @param _typeDef      type definition of the dimension (to instanciate the
- *                      dimension)
- * @param _mxName       MX name of the dimension
+ * @param _dimension    target dimension to update with parsed values
  */
-Dimension_mxJPO dimension(final ParameterCache_mxJPO _paramCache,
-                          final TypeDef_mxJPO _typeDef,
-                          final String _mxName)
+void parse(final Dimension_mxJPO _dimension)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
 : {
-    final Dimension_mxJPO dimension = (Dimension_mxJPO) _typeDef.newTypeInstance(_mxName);
     String tmpStr;
     Token tmpToken;
     Set<String> set;
     AdminProperty tmpProp;
 } {
-    (   (<DESCRIPTION>  ( tmpToken = <DESCRIPTION_STRING>                       {this.setValue(dimension, "description", this.getString(tmpToken.image));}
-                        | tmpToken = <DESCRIPTION_SINGLE>                       {this.setValue(dimension, "description", this.getSingle(tmpToken.image));} ) )
-      | (<HIDDEN>       ( <HIDDEN_BOOLEAN_TRUE>                                 {this.setValue(dimension, "hidden", true);}
-                        | <HIDDEN_BOOLEAN_FALSE>                                {this.setValue(dimension, "hidden", false);} ) )
-      | (unit(dimension))
-      | (<PROPERTY>                                                             {tmpProp = new AdminProperty();this.appendValue(this.getValue(dimension, "properties"), "propertiesStack", tmpProp);}
+    (   (<DESCRIPTION>  ( tmpToken = <DESCRIPTION_STRING>                       {this.setValue(_dimension, "description", this.getString(tmpToken.image));}
+                        | tmpToken = <DESCRIPTION_SINGLE>                       {this.setValue(_dimension, "description", this.getSingle(tmpToken.image));} ) )
+      | (<HIDDEN>       ( <HIDDEN_BOOLEAN_TRUE>                                 {this.setValue(_dimension, "hidden", true);}
+                        | <HIDDEN_BOOLEAN_FALSE>                                {this.setValue(_dimension, "hidden", false);} ) )
+      | (unit(_dimension))
+      | (<PROPERTY>                                                             {tmpProp = new AdminProperty();this.appendValue(this.getValue(_dimension, "properties"), "propertiesStack", tmpProp);}
                 ( tmpToken = <PROPERTY_STRING_STRING>                           {this.setValue(tmpProp, "name", this.getString(tmpToken.image));}
                 | tmpToken = <PROPERTY_STRING_SINGLE>                           {this.setValue(tmpProp, "name", this.getSingle(tmpToken.image));} )
               (   ( <PROPERTYTO>   tmpToken = <PROPERTYTOTYPE>                  {this.setValue(tmpProp, "refAdminType", this.getSingle(tmpToken.image));}
@@ -278,10 +277,6 @@ Dimension_mxJPO dimension(final ParameterCache_mxJPO _paramCache,
                 | ( <PROPERTYVAL> ( ( tmpToken = <PROPERTY_STRING_STRING>       {this.setValue(tmpProp, "value", this.getString(tmpToken.image));} )
                                   | ( tmpToken = <PROPERTY_STRING_SINGLE>       {this.setValue(tmpProp, "value", this.getSingle(tmpToken.image));} ) ) ) )* )
     )*
-    {
-        this.prepareObject(_paramCache, dimension);
-        return dimension;
-    }
 }
 
 /**

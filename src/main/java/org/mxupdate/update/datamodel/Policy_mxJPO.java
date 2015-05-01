@@ -462,7 +462,7 @@ public class Policy_mxJPO
                                         .replaceAll("@1@1@", "\\\"");
 
             final PolicyDefParser_mxJPO parser = new PolicyDefParser_mxJPO(new StringReader(code));
-            final Policy_mxJPO policy = parser.policy(_paramCache, this.getTypeDef(), _args[1]);
+            final Policy_mxJPO policy = parser.parse(_paramCache, this.getTypeDef(), _args[1]);
 
             final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod policy $1", this.getName());
 

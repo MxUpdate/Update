@@ -14,10 +14,11 @@
  */
 
 options {
-  JDK_VERSION = "1.6";
-  STATIC = false;
-  ERROR_REPORTING = false;
-  USER_TOKEN_MANAGER = false;
+    JDK_VERSION = "1.6";
+    STATIC = false;
+    ERROR_REPORTING = true;
+    USER_TOKEN_MANAGER = false;
+    GENERATE_BOILERPLATE = false;
 }
 PARSER_BEGIN(FormatDefParser)
 package org.mxupdate.update.datamodel.format;
@@ -28,11 +29,15 @@ import java.util.Arrays;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.Format_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
+import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
+import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 public class FormatDefParser
-    extends AbstractParser_mxJPO
+    extends AbstractParser_mxJPO<Format_mxJPO>
 {
 }
 PARSER_END(FormatDefParser)SKIP :
@@ -55,9 +60,9 @@ TOKEN : /** first level */
     | <VIEW:                    "view">             : STRING_EXPECTED
     | <EDIT:                    "edit">             : STRING_EXPECTED
     | <PRINT:                   "print">            : STRING_EXPECTED
-    | <PROPERTY:                "property">                                 : STRING_EXPECTED
-    | <PROPERTYTO:              "to">                                       : ADMINREF_EXPECTED
-    | <PROPERTYVAL:             "value">                                    : STRING_EXPECTED
+    | <PROPERTY:                "property">         : STRING_EXPECTED
+    | <PROPERTYTO:              "to">               : ADMINREF_EXPECTED
+    | <PROPERTYVAL:             "value">            : STRING_EXPECTED
 }
 
 /***************************************************** String for Description */
@@ -90,39 +95,33 @@ TOKEN : /** first level */
 /**
  * Parses one complete format definition.
  *
- * @param _paramCache   parameter cache
- * @param _typeDef      type definition of the format (to instantiate the
- *                      format)
- * @param _mxName       MX name of the format
+ * @param _format   target format to update with parsed values
  */
-Format_mxJPO format(final ParameterCache_mxJPO _paramCache,
-                    final TypeDef_mxJPO _typeDef,
-                    final String _mxName)
+void parse(final Format_mxJPO _format)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
 : {
-    final Format_mxJPO attr = (Format_mxJPO) _typeDef.newTypeInstance(_mxName);
     Token tmp;
     AdminProperty property;
 } {
-    (   (<DESCRIPTION>              ( tmp = <STRING>           {this.setValue(attr, "description", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(attr, "description", this.getSingle(tmp.image));} ) )
-      | (<HIDDEN_TRUE>                                         {this.setValue(attr, "hidden",       true);} )
-      | (<HIDDEN_FALSE>                                        {this.setValue(attr, "hidden",       false);} )
-      | (<MIME>                     ( tmp = <STRING>           {this.setValue(attr, "mimeType",     this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(attr, "mimeType",     this.getSingle(tmp.image));} ) )
-      | (<SUFFIX>                   ( tmp = <STRING>           {this.setValue(attr, "fileSuffix",   this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(attr, "fileSuffix",   this.getSingle(tmp.image));} ) )
-      | (<TYPE>                     ( tmp = <STRING>           {this.setValue(attr, "type",         this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(attr, "type",         this.getSingle(tmp.image));} ) )
-      | (<VERSION>                  ( tmp = <STRING>           {this.setValue(attr, "version",      this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(attr, "version",      this.getSingle(tmp.image));} ) )
-      | (<VIEW>                     ( tmp = <STRING>           {this.setValue(attr, "commandView",  this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(attr, "commandView",  this.getSingle(tmp.image));} ) )
-      | (<EDIT>                     ( tmp = <STRING>           {this.setValue(attr, "commandEdit",  this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(attr, "commandEdit",  this.getSingle(tmp.image));} ) )
-      | (<PRINT>                    ( tmp = <STRING>           {this.setValue(attr, "commandPrint", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(attr, "commandPrint", this.getSingle(tmp.image));} ) )
-      | (<PROPERTY>                                            {property = new AdminProperty();this.appendValue(this.getValue(attr, "properties"), "propertiesStack", property);}
+    (   (<DESCRIPTION>              ( tmp = <STRING>           {this.setValue(_format, "description", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(_format, "description", this.getSingle(tmp.image));} ) )
+      | (<HIDDEN_TRUE>                                         {this.setValue(_format, "hidden",       true);} )
+      | (<HIDDEN_FALSE>                                        {this.setValue(_format, "hidden",       false);} )
+      | (<MIME>                     ( tmp = <STRING>           {this.setValue(_format, "mimeType",     this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(_format, "mimeType",     this.getSingle(tmp.image));} ) )
+      | (<SUFFIX>                   ( tmp = <STRING>           {this.setValue(_format, "fileSuffix",   this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(_format, "fileSuffix",   this.getSingle(tmp.image));} ) )
+      | (<TYPE>                     ( tmp = <STRING>           {this.setValue(_format, "type",         this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(_format, "type",         this.getSingle(tmp.image));} ) )
+      | (<VERSION>                  ( tmp = <STRING>           {this.setValue(_format, "version",      this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(_format, "version",      this.getSingle(tmp.image));} ) )
+      | (<VIEW>                     ( tmp = <STRING>           {this.setValue(_format, "commandView",  this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(_format, "commandView",  this.getSingle(tmp.image));} ) )
+      | (<EDIT>                     ( tmp = <STRING>           {this.setValue(_format, "commandEdit",  this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(_format, "commandEdit",  this.getSingle(tmp.image));} ) )
+      | (<PRINT>                    ( tmp = <STRING>           {this.setValue(_format, "commandPrint", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(_format, "commandPrint", this.getSingle(tmp.image));} ) )
+      | (<PROPERTY>                                            {property = new AdminProperty();this.appendValue(this.getValue(_format, "properties"), "propertiesStack", property);}
                                     ( tmp = <STRING>           {this.setValue(property, "name", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(property, "name", this.getSingle(tmp.image));} )
               (   ( <PROPERTYVAL>   ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
@@ -132,8 +131,4 @@ Format_mxJPO format(final ParameterCache_mxJPO _paramCache,
                                     ( tmp = <STRING>           {this.setValue(property, "refAdminName", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
     )*
-    {
-        this.prepareObject(_paramCache, attr);
-        return attr;
-    }
 }

@@ -14,10 +14,11 @@
  */
 
 options {
-  JDK_VERSION = "1.6";
-  STATIC = false;
-  ERROR_REPORTING = true;
-  USER_TOKEN_MANAGER = false;
+    JDK_VERSION = "1.6";
+    STATIC = false;
+    ERROR_REPORTING = true;
+    USER_TOKEN_MANAGER = false;
+    GENERATE_BOILERPLATE = false;
 }
 
 PARSER_BEGIN(MenuDefParser)
@@ -30,29 +31,16 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.userinterface.Menu_mxJPO;
 import org.mxupdate.update.userinterface.Menu_mxJPO.MenuChild;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
+import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
+import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 public class MenuDefParser
-    extends AbstractParser_mxJPO
+    extends AbstractParser_mxJPO<Menu_mxJPO>
 {
-    /**
-     * Parses one complete menu definition.
-     *
-     * @param _paramCache   parameter cache
-     * @param _typeDef      type definition of the menu (to instantiate the menu)
-     * @param _mxName       MX name of the menu
-     */
-    public Menu_mxJPO parse(final ParameterCache_mxJPO _paramCache,
-                            final TypeDef_mxJPO _typeDef,
-                            final String _mxName)
-        throws ParseException, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
-    {
-        final Menu_mxJPO menu = (Menu_mxJPO) _typeDef.newTypeInstance(_mxName);
-        this.parse(menu);
-        this.prepareObject(_paramCache, menu);
-        return menu;
-    }
 }
 
 PARSER_END(MenuDefParser)
@@ -139,8 +127,7 @@ void parse(Menu_mxJPO _menu)
     AdminProperty property;
     int childIdx = 0;
 } {
-    (
-        (<DESCRIPTION>              ( tmp = <STRING>           {this.setValue(_menu, "description", this.getString(tmp.image));}
+    (   (<DESCRIPTION>              ( tmp = <STRING>           {this.setValue(_menu, "description", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(_menu, "description", this.getSingle(tmp.image));} ) )
       | (<HIDDEN_TRUE>                                         {this.setValue(_menu, "hidden", true);} )
       | (<HIDDEN_FALSE>                                        {this.setValue(_menu, "hidden", false);} )

@@ -273,7 +273,7 @@ public class Format_mxJPO
             final String code = _args[2].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
 
             final FormatDefParser_mxJPO parser = new FormatDefParser_mxJPO(new StringReader(code));
-            final Format_mxJPO format = parser.format(_paramCache, this.getTypeDef(), this.getName());
+            final Format_mxJPO format = parser.parse(_paramCache, this.getTypeDef(), this.getName());
 
             final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod format $1", this.getName());
 

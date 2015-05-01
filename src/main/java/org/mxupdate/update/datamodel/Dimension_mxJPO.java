@@ -354,7 +354,7 @@ public class Dimension_mxJPO
                                         .replaceAll("@1@1@", "\\\"");
 
             final DimensionDefParser_mxJPO parser = new DimensionDefParser_mxJPO(new StringReader(code));
-            final Dimension_mxJPO dimension = parser.dimension(_paramCache, this.getTypeDef(), this.getName());
+            final Dimension_mxJPO dimension = parser.parse(_paramCache, this.getTypeDef(), this.getName());
 
             final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod dimension $1", this.getName());
 

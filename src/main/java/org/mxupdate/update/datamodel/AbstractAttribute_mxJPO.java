@@ -545,7 +545,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
 
             final AttributeDefParser_mxJPO parser = new AttributeDefParser_mxJPO(new StringReader(code));
             @SuppressWarnings("unchecked")
-            final CLASS attribute = (CLASS) parser.attribute(_paramCache, this.getTypeDef(), this.getName());
+            final CLASS attribute = (CLASS) parser.parse(_paramCache, this.getTypeDef(), this.getName());
 
             final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod attribute $1", this.getName());
 

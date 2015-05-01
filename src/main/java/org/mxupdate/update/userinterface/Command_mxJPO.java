@@ -176,7 +176,7 @@ public class Command_mxJPO
             final String code = _args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
 
             final CommandDefParser_mxJPO parser = new CommandDefParser_mxJPO(new StringReader(code));
-            final Command_mxJPO command = parser.command(_paramCache, this.getTypeDef(), this.getName());
+            final Command_mxJPO command = parser.parse(_paramCache, this.getTypeDef(), this.getName());
 
             final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod command $1", this.getName());
 

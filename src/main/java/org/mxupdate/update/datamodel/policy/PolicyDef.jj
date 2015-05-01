@@ -18,11 +18,7 @@ options {
     STATIC = false;
     ERROR_REPORTING = true;
     USER_TOKEN_MANAGER = false;
-//  USER_CHAR_STREAM = true;
-//  OPTIMIZE_TOKEN_MANAGER = true;
-    SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
-    LOOKAHEAD = 1;
-//    DEBUG_PARSER = true;
+    GENERATE_BOILERPLATE = false;
 }
 
 PARSER_BEGIN(PolicyDefParser)
@@ -44,11 +40,15 @@ import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Prefix;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
+import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
+import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 public class PolicyDefParser
-    extends AbstractParser_mxJPO
+    extends AbstractParser_mxJPO<Policy_mxJPO>
 {
 }
 PARSER_END(PolicyDefParser)
@@ -316,45 +316,34 @@ PARSER_END(PolicyDefParser)
 /**
  * Parses one complete policy definition.
  *
- * @param _paramCache   parameter cache
- * @param _typeDef      type definition of the policy (to instantiate the
- *                      policy)
- * @param _mxName       MX name of the policy
+ * @param _policy   target policy to update with parsed values
  */
-Policy_mxJPO policy(final ParameterCache_mxJPO _paramCache,
-                    final TypeDef_mxJPO _typeDef,
-                    final String _mxName)
+void parse(final Policy_mxJPO _policy)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
 : {
-    final Policy_mxJPO policy = (Policy_mxJPO) _typeDef.newTypeInstance(_mxName);
     String tmpStr;
     Token tmpToken;
     AdminProperty tmpProp;
 } {
-    (
-        ( <DESCRIPTION>    tmpStr = sString()                       {this.getField(policy, "description").set(tmpStr);} )
-      | ( format(policy) )
-      | ( type(policy) )
-      | ( <DEFAULTFORMAT>  tmpStr = sString()                       {this.getField(policy, "defaultFormat").set(tmpStr);} )
-      | ( <ENFORCE>        ( <BOOLEAN_TRUE>                         {this.getField(policy, "enforce").set(true);}
-                           | <BOOLEAN_FALSE>                        {this.getField(policy, "enforce").set(false);} ) )
-      | ( <DELIMITER>      tmpStr = sString()                       {this.getField(policy, "delimiter").set(tmpStr);} )
-      | ( <SEQUENCE>       tmpStr = sString()                       {this.getField(policy, "minorsequence").set(tmpStr);} )
-      | ( <MINORSEQUENCE>  tmpStr = sString()                       {this.getField(policy, "minorsequence").set(tmpStr);} )
-      | ( <MAJORSEQUENCE>  tmpStr = sString()                       {this.getField(policy, "majorsequence").set(tmpStr);} )
-      | ( <STORE>          tmpStr = sString()                       {this.getField(policy, "store").set(tmpStr);} )
-      | ( <HIDDEN>         ( <BOOLEAN_TRUE>                         {this.getField(policy, "hidden").set(true);}
-                           | <BOOLEAN_FALSE>                        {this.getField(policy, "hidden").set(false);} ) )
-      | ( allstate(policy) )
-      | ( state(policy) )
-      | (<PROPERTY>  tmpStr = sString()                             {tmpProp = new AdminProperty();this.appendValue(this.getValue(policy, "properties"), "propertiesStack", tmpProp);this.setValue(tmpProp, "name", tmpStr);}
+    (   ( <DESCRIPTION>    tmpStr = sString()                       {this.getField(_policy, "description").set(tmpStr);} )
+      | ( format(_policy) )
+      | ( type(_policy) )
+      | ( <DEFAULTFORMAT>  tmpStr = sString()                       {this.getField(_policy, "defaultFormat").set(tmpStr);} )
+      | ( <ENFORCE>        ( <BOOLEAN_TRUE>                         {this.getField(_policy, "enforce").set(true);}
+                           | <BOOLEAN_FALSE>                        {this.getField(_policy, "enforce").set(false);} ) )
+      | ( <DELIMITER>      tmpStr = sString()                       {this.getField(_policy, "delimiter").set(tmpStr);} )
+      | ( <SEQUENCE>       tmpStr = sString()                       {this.getField(_policy, "minorsequence").set(tmpStr);} )
+      | ( <MINORSEQUENCE>  tmpStr = sString()                       {this.getField(_policy, "minorsequence").set(tmpStr);} )
+      | ( <MAJORSEQUENCE>  tmpStr = sString()                       {this.getField(_policy, "majorsequence").set(tmpStr);} )
+      | ( <STORE>          tmpStr = sString()                       {this.getField(_policy, "store").set(tmpStr);} )
+      | ( <HIDDEN>         ( <BOOLEAN_TRUE>                         {this.getField(_policy, "hidden").set(true);}
+                           | <BOOLEAN_FALSE>                        {this.getField(_policy, "hidden").set(false);} ) )
+      | ( allstate(_policy) )
+      | ( state(_policy) )
+      | (<PROPERTY>  tmpStr = sString()                             {tmpProp = new AdminProperty();this.appendValue(this.getValue(_policy, "properties"), "propertiesStack", tmpProp);this.setValue(tmpProp, "name", tmpStr);}
               (   ( <PROPERTYTO>  tmpToken = <PROPERTYTOTYPE>       {this.setValue(tmpProp, "refAdminType", this.getString(tmpToken.image));}                                  tmpStr = sString()                {this.setValue(tmpProp, "refAdminName", tmpStr);} )
                 | ( <PROPERTYVAL> tmpStr = sString()                {this.setValue(tmpProp, "value", tmpStr);} ) )* )
     )*
-    {
-        this.prepareObject(_paramCache, policy);
-        return policy;
-    }
 }
 
 /**

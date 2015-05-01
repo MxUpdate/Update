@@ -197,9 +197,9 @@ public class DimensionParserTest
         this.mql("add dimension " + DimensionParserTest.DIMENSION_NAME);
 
         final DimensionDefParser_mxJPO parser = new DimensionDefParser_mxJPO(new StringReader(_definition));
-        final Dimension_mxJPO dimension = parser.dimension(paramCache,
-                                                           paramCache.getMapping().getTypeDef("Dimension"),
-                                                           DimensionParserTest.DIMENSION_NAME);
+        final Dimension_mxJPO dimension = parser.parse(paramCache,
+                                                       paramCache.getMapping().getTypeDef("Dimension"),
+                                                       DimensionParserTest.DIMENSION_NAME);
 
         final StringBuilder bck = new StringBuilder();
         final Method write = dimension.getClass()
