@@ -15,31 +15,30 @@
 
 package org.mxupdate.test.test.update.program;
 
-import org.mxupdate.update.program.MQLProgram_mxJPO;
+import org.mxupdate.test.data.program.EKLProgramData;
+import org.mxupdate.update.program.EKLProgram_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link MQLProgram_mxJPO mql program CI} parser.
+ * Tests the {@link EKLProgram_mxJPO mql program CI} delta calculation.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class MQLProgramCI_1ParserTest
-    extends AbstractProgramCI_1ParserTest<MQLProgram_mxJPO>
+public class EKLProgramCI_2DeltaCalculationTest
+    extends AbstractProgramCI_2DeltaCalculationTest<EKLProgram_mxJPO,EKLProgramData>
 {
     @Override()
-    @DataProvider(name = "data")
-    public Object[][] getData()
-    {
-        return this.getData("mql");
-    }
-
-    @Override()
-    protected MQLProgram_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
+    protected EKLProgram_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                              final String _name)
     {
-        return new MQLProgram_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_EKL.updateType), _name);
+        return new EKLProgram_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_EKL.updateType), _name);
+    }
+
+    @Override
+    protected EKLProgramData createNewTestData(final String _name)
+    {
+        return new EKLProgramData(this, _name);
     }
 }

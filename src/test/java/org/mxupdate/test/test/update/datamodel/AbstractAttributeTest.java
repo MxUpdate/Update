@@ -144,7 +144,7 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
         this.cleanup(CI.DM_ATTRIBUTE_STRING);
         this.cleanup(CI.DM_DIMENSION);
         this.cleanup(CI.DM_RULE);
-        this.cleanup(CI.PRG_MQL_PROGRAM);
+        this.cleanup(CI.PRG_MQL);
     }
 
     /**

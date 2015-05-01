@@ -15,31 +15,31 @@
 
 package org.mxupdate.test.test.update.program;
 
-import org.mxupdate.update.program.MQLProgram_mxJPO;
+import org.mxupdate.update.program.EKLProgram_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link MQLProgram_mxJPO mql program CI} parser.
+ * Tests the {@link EKLProgram_mxJPO mql program CI} parser.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class MQLProgramCI_1ParserTest
-    extends AbstractProgramCI_1ParserTest<MQLProgram_mxJPO>
+public class EKLProgramCI_1ParserTest
+    extends AbstractProgramCI_1ParserTest<EKLProgram_mxJPO>
 {
     @Override()
     @DataProvider(name = "data")
     public Object[][] getData()
     {
-        return this.getData("mql");
+        return this.getData("ekl");
     }
 
     @Override()
-    protected MQLProgram_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
+    protected EKLProgram_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                              final String _name)
     {
-        return new MQLProgram_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_EKL.updateType), _name);
+        return new EKLProgram_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_EKL.updateType), _name);
     }
 }

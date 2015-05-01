@@ -115,7 +115,7 @@ public class FormatCI_3UpdateTest
         throws Exception
     {
         this.cleanup(CI.DM_FORMAT);
-        this.cleanup(CI.PRG_MQL_PROGRAM);
+        this.cleanup(CI.PRG_MQL);
     }
 
     @Override()

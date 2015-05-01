@@ -47,7 +47,7 @@ public class Common
     private static final Set<AbstractTest.CI> IGNORES = new HashSet<AbstractTest.CI>();
     static  {
         Common.IGNORES.add(AbstractTest.CI.PRG_JPO);
-        Common.IGNORES.add(AbstractTest.CI.PRG_MQL_PROGRAM);
+        Common.IGNORES.add(AbstractTest.CI.PRG_MQL);
         Common.IGNORES.add(AbstractTest.CI.PRG_PAGE);
     }
 

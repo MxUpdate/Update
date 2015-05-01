@@ -345,7 +345,7 @@ public class TypeCI_3UpdateTest
     public void cleanup()
         throws Exception
     {
-        this.cleanup(AbstractTest.CI.PRG_MQL_PROGRAM);
+        this.cleanup(AbstractTest.CI.PRG_MQL);
         this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_BOOLEAN);
         this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_DATE);
         this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_INTEGER);

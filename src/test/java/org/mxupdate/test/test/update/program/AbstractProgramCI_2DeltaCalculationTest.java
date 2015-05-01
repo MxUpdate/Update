@@ -201,7 +201,8 @@ public abstract class AbstractProgramCI_2DeltaCalculationTest<DATA extends Abstr
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(CI.PRG_MQL_PROGRAM);
+        this.cleanup(CI.PRG_EKL);
+        this.cleanup(CI.PRG_MQL);
         this.cleanup(CI.DM_RULE);
         this.cleanup(CI.USR_PERSONADMIN);
     }

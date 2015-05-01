@@ -13,63 +13,65 @@ interface ProgramParserConstants_mxJPO {
   /** RegularExpression Id. */
   int KIND = 5;
   /** RegularExpression Id. */
-  int MQL = 6;
+  int EKL = 6;
   /** RegularExpression Id. */
-  int SYMBOLICNAME = 7;
+  int MQL = 7;
   /** RegularExpression Id. */
-  int DESCRIPTION = 8;
+  int SYMBOLICNAME = 8;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 9;
+  int DESCRIPTION = 9;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 10;
+  int HIDDEN_TRUE = 10;
   /** RegularExpression Id. */
-  int NEEDSBUSINESSOBJECT_TRUE = 11;
+  int HIDDEN_FALSE = 11;
   /** RegularExpression Id. */
-  int NEEDSBUSINESSOBJECT_FALSE = 12;
+  int NEEDSBUSINESSOBJECT_TRUE = 12;
   /** RegularExpression Id. */
-  int DOWNLOADABLE_TRUE = 13;
+  int NEEDSBUSINESSOBJECT_FALSE = 13;
   /** RegularExpression Id. */
-  int DOWNLOADABLE_FALSE = 14;
+  int DOWNLOADABLE_TRUE = 14;
   /** RegularExpression Id. */
-  int PIPE_TRUE = 15;
+  int DOWNLOADABLE_FALSE = 15;
   /** RegularExpression Id. */
-  int PIPE_FALSE = 16;
+  int PIPE_TRUE = 16;
   /** RegularExpression Id. */
-  int POOLED_TRUE = 17;
+  int PIPE_FALSE = 17;
   /** RegularExpression Id. */
-  int POOLED_FALSE = 18;
+  int POOLED_TRUE = 18;
   /** RegularExpression Id. */
-  int RULE = 19;
+  int POOLED_FALSE = 19;
   /** RegularExpression Id. */
-  int EXECUTE = 20;
+  int RULE = 20;
   /** RegularExpression Id. */
-  int IMMEDIATE = 21;
+  int EXECUTE = 21;
   /** RegularExpression Id. */
-  int DEFERRED = 22;
+  int IMMEDIATE = 22;
   /** RegularExpression Id. */
-  int USER = 23;
+  int DEFERRED = 23;
   /** RegularExpression Id. */
-  int CODE = 24;
+  int USER = 24;
   /** RegularExpression Id. */
-  int FILE = 25;
+  int CODE = 25;
   /** RegularExpression Id. */
-  int STRING = 26;
+  int FILE = 26;
   /** RegularExpression Id. */
-  int SINGLE = 27;
+  int STRING = 27;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 28;
+  int SINGLE = 28;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 29;
+  int MULTILINESTRING = 29;
   /** RegularExpression Id. */
-  int PROPERTY = 30;
+  int MULTILINESINGLE = 30;
   /** RegularExpression Id. */
-  int PROPERTYTO = 31;
+  int PROPERTY = 31;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 32;
+  int PROPERTYTO = 32;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 33;
+  int PROPERTYVAL = 33;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 34;
+  int ADMINTYPE_STRING = 34;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 35;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -88,6 +90,7 @@ interface ProgramParserConstants_mxJPO {
     "\"\\n\"",
     "<token of kind 4>",
     "\"kind\"",
+    "\"ekl\"",
     "\"mql\"",
     "\"symbolicname\"",
     "\"description\"",

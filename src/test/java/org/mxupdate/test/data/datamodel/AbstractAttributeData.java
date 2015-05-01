@@ -260,7 +260,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
             range.evalAdds4CheckExport(needAdds);
         }
         final List<String> foundAdds = new ArrayList<String>();
-        for (final String trigLine : _exportParser.getLines("/" + this.getCI().getUrlTag() + "/range/@value"))  {
+        for (final String trigLine : _exportParser.getLines("/mxUpdate/range/@value"))  {
             foundAdds.add("range " + trigLine);
         }
         Assert.assertEquals(

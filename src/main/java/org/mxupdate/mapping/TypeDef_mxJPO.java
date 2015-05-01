@@ -203,21 +203,10 @@ public final class TypeDef_mxJPO
      */
     private static final String PREFIX_ORDERNO = "OrderNo";
 
-    /**
-     * Defines the name of the admin type.
-     *
-     * @see #getMxAdminName()
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     */
+    /** Defines the name of the admin type. */
     private String adminType;
-
-    /**
-     * Defines the suffix of the admin type.
-     *
-     * @see #getMxAdminSuffix()
-     * @see #defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     */
-    private String adminSuffix;
+    /** Defines the suffix of the admin type. */
+    private String adminSuffix = "";
 
     /**
      * Must be checked if the business type exists?

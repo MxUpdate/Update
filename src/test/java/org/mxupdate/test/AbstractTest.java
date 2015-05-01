@@ -81,110 +81,112 @@ public abstract class AbstractTest
     public enum CI
     {
         /** Configuration item Data Model Binrary Attribute. */
-        DM_ATTRIBUTE_BINARY("attribute", null, false, null, null, "AttributeBinary", "ATTRIBUTE", "BINARY_", "datamodel/attribute", true, "mxUpdate"),
+        DM_ATTRIBUTE_BINARY("attribute", null, false, null, null,   "AttributeBinary",      "datamodel/attribute",      "BINARY_",       ".mxu", true),
         /** Configuration item Data Model Boolean Attribute. */
-        DM_ATTRIBUTE_BOOLEAN("attribute", null, false, null, null, "AttributeBoolean", "ATTRIBUTE", "BOOLEAN_", "datamodel/attribute", true, "mxUpdate"),
+        DM_ATTRIBUTE_BOOLEAN("attribute", null, false, null, null,  "AttributeBoolean",     "datamodel/attribute",      "BOOLEAN_",      ".mxu", true),
         /** Configuration item Data Model Date Attribute. */
-        DM_ATTRIBUTE_DATE("attribute", null, false, null, null, "AttributeDate", "ATTRIBUTE", "DATE_", "datamodel/attribute", true, "mxUpdate"),
+        DM_ATTRIBUTE_DATE("attribute", null, false, null, null,     "AttributeDate",        "datamodel/attribute",      "DATE_",         ".mxu", true),
         /** Configuration item Data Model Integer Attribute. */
-        DM_ATTRIBUTE_INTEGER("attribute", null, false, null, null, "AttributeInteger", "ATTRIBUTE", "INTEGER_", "datamodel/attribute", true, "mxUpdate"),
+        DM_ATTRIBUTE_INTEGER("attribute", null, false, null, null,  "AttributeInteger",     "datamodel/attribute",      "INTEGER_",      ".mxu", true),
         /** Configuration item Data Model Real Attribute. */
-        DM_ATTRIBUTE_REAL("attribute", null, false, null, null, "AttributeReal", "ATTRIBUTE", "REAL_", "datamodel/attribute", true, "mxUpdate"),
+        DM_ATTRIBUTE_REAL("attribute", null, false, null, null,     "AttributeReal",        "datamodel/attribute",      "REAL_",         ".mxu", true),
         /** Configuration item Data Model String Attribute. */
-        DM_ATTRIBUTE_STRING("attribute", null, false, null, null, "AttributeString", "ATTRIBUTE", "STRING_", "datamodel/attribute", true, "mxUpdate"),
+        DM_ATTRIBUTE_STRING("attribute", null, false, null, null,   "AttributeString",      "datamodel/attribute",      "STRING_",       ".mxu", true),
 
         /** Configuration item Data Model Dimension. */
-        DM_DIMENSION("dimension", null, false, null, null, "Dimension", "DIMENSION", "DIMENSION_", "datamodel/dimension", true, "mxUpdate"),
+        DM_DIMENSION("dimension", null, false, null, null,          "Dimension",            "datamodel/dimension",      "DIMENSION_",    ".mxu", true),
 
         /** Configuration item Data Model Expression. */
-        DM_EXPRESSION("expression", null, false, null, null, "Expression", "EXPRESSION", "EXPRESSION_", "datamodel/expression", true, "mxUpdate"),
+        DM_EXPRESSION("expression", null, false, null, null,        "Expression",           "datamodel/expression",     "EXPRESSION_",   ".mxu", true),
 
         /** Configuration item Data Model Format. */
-        DM_FORMAT("format", null, false, null, null, "Format", "FORMAT", "FORMAT_", "datamodel/format", true, "mxUpdate"),
+        DM_FORMAT("format", null, false, null, null,                "Format",               "datamodel/format",         "FORMAT_",       ".mxu", true),
 
         /** Configuration item Data Model Interface. */
-        DM_INTERFACE("interface", null, false, null, null, "Interface", "INTERFACE", "INTERFACE_", "datamodel/interface", true, "mxUpdate"),
+        DM_INTERFACE("interface", null, false, null, null,          "Interface",            "datamodel/interface",      "INTERFACE_",    ".mxu", true),
 
         /** Configuration item IEF Global Configuration. */
         DM_NOTIFICATION(null, "Notification", false, "Business Rule", "eService Administration",
-                              "Notification", "NOTIFICATION", "NOTIFICATION_", "datamodel/notification", true, "mql"),
+                                                                    "Notification",         "datamodel/notification",   "NOTIFICATION_", ".mxu", true),
 
         /** Configuration item Data Model Policy. */
-        DM_POLICY("policy", null, false, null, null, "Policy", "POLICY", "POLICY_", "datamodel/policy", true, "mxUpdate"),
+        DM_POLICY("policy", null, false, null, null,                "Policy",               "datamodel/policy",         "POLICY_",       ".mxu", true),
 
         /** Configuration item Data Model Relationship. */
-        DM_RELATIONSHIP("relationship", null, false, null, null, "Relationship", "RELATIONSHIP", "RELATIONSHIP_", "datamodel/relationship", true, "mxUpdate"),
+        DM_RELATIONSHIP("relationship", null, false, null, null, "Relationship", "datamodel/relationship", "RELATIONSHIP_", ".mxu", true),
 
         /** Configuration item Data Model Rule. */
-        DM_RULE("rule", null, false, null, null, "Rule", "RULE", "RULE_", "datamodel/rule", true, "mxUpdate"),
+        DM_RULE("rule", null, false, null, null, "Rule", "datamodel/rule", "RULE_", ".mxu", true),
 
         /** Configuration item Data Model Type. */
-        DM_TYPE("type", null, false, null, null, "Type", "TYPE", "TYPE_", "datamodel/type", true, "mxUpdate"),
+        DM_TYPE("type", null, false, null, null, "Type", "datamodel/type", "TYPE_", ".mxu", true),
 
         /** Configuration item IEF Global Configuration. */
         IEF_EBOMSYNC_CONFIG(null, "IEF-EBOMSyncConfig", true, "IEF-EBOMSyncConfig", "eService Administration",
-                            "IEFEBOMSyncConfig", "IEFEBOMSYNC", "IEFEBOMSYNC_", "integration/ebomsync", true, "mql"),
+                            "IEFEBOMSyncConfig", "integration/ebomsync", "IEFEBOMSYNC_", ".mxu", true),
         /** Configuration item IEF Global Configuration. */
         IEF_GLOBAL_CONFIG(null, "MCADInteg-GlobalConfig", true, "MCADInteg-ConfigObjectPolicy", "eService Administration",
-                          "IEFGlobalConfig", "IEFGLOBALCONFIG", "IEFGLOBALCONFIG_", "integration/globalconfig", true, "mql"),
+                          "IEFGlobalConfig", "integration/globalconfig", "IEFGLOBALCONFIG_", ".mxu", true),
         /** Configuration item IEF Global Registry.*/
         IEF_GLOBAL_REGISTRY(null, "IEF-GlobalRegistry", false, "MCADInteg-ConfigObjectPolicy", "eService Administration",
-                            "IEFGlobalRegistry", "IEFGLOBALREGISTRY", "IEFGLOBALREGISTRY_", "integration/globalregistry", true, "mql"),
+                            "IEFGlobalRegistry", "integration/globalregistry", "IEFGLOBALREGISTRY_", ".mxu", true),
         /** Configuration item IEF Mass Promote Configuration. */
         IEF_MASS_PROMOTE_CONFIG(null, "IEF-MassPromoteConfig", true, "MCADInteg-ConfigObjectPolicy", "eService Administration",
-                                "IEFMassPromoteConfig", "IEFMASSPROMOTECONFIG", "IEFMASSPROMOTECONFIG_", "integration/masspromoteconfig", true, "mql"),
+                                "IEFMassPromoteConfig", "integration/masspromoteconfig", "IEFMASSPROMOTECONFIG_", ".mxu", true),
         /** Configuration item IEF unassigned registry. */
         IEF_UNASSIGNED_REGISTRY(null, "IEF-UnassignedIntegRegistry", true, "MCADInteg-ConfigObjectPolicy", "eService Administration",
-                                "IEFUnassignedRegistry", "IEFUNASSIGNEDREGISTRY", "IEFUNASSIGNEDREGISTRY_", "integration/unassignedregistry", true, "mql"),
+                                "IEFUnassignedRegistry", "integration/unassignedregistry", "IEFUNASSIGNEDREGISTRY_", ".mxu", true),
 
-        /** Configuration item JPO program. */
-        PRG_JPO("program", null, false, null, null, "JPO", null, "", "program/jpo", true, "mql"),
         /** Configuration item MQL program. */
-        PRG_MQL_PROGRAM("program", null, false, null, null, "Program", null, "MQLPROGRAM_", "program/mql", true, "mql"),
+        PRG_EKL("program",  null, false, null, null, "ProgramEKL",  "program/ekl",  "",         ".ekl.mxu",     true),
+        /** Configuration item JPO program. */
+        PRG_JPO("program",  null, false, null, null, "JPO",         "program/jpo",  "",         ".java.mxu",    true),
+        /** Configuration item MQL program. */
+        PRG_MQL("program",  null, false, null, null, "Program",     "program/mql",  "",         ".mql.mxu",     true),
         /** Configuration item page program. */
-        PRG_PAGE("page", null, false, null, null, "Page", "PAGE", "PAGE_", "program/page", true, "mql"),
+        PRG_PAGE("page",    null, false, null, null, "Page",        "program/page", "PAGE_",    ".mxu",         true),
 
         /** Configuration item group. */
-        USR_ASSOCIATION("association", null, false, null, null, "Association", "ASSOCIATION", "ASSOCIATION_", "user/association", false, "mxUpdate"),
+        USR_ASSOCIATION("association", null, false, null, null, "Association", "user/association", "ASSOCIATION_", ".mxu", false),
         /** Configuration item group. */
-        USR_GROUP("group", null, false, null, null, "Group", "GROUP", "GROUP_", "user/group", true, "mxUpdate"),
+        USR_GROUP("group", null, false, null, null, "Group", "user/group", "GROUP_", ".mxu", true),
         /** Configuration item person. */
-        USR_PERSON("person", "Person", false, "Person", "eService Production", "Person", "PERSON", "PERSON_", "user/person", true, "mql"),
+        USR_PERSON("person", "Person", false, "Person", "eService Production", "Person", "user/person", "PERSON_", ".mxu", true),
         /** Configuration item administration person. */
-        USR_PERSONADMIN("person", null, false, null, null, "PersonAdmin", "PERSONADMIN", "PERSONADMIN_", "user/personadmin", true, "mql"),
+        USR_PERSONADMIN("person", null, false, null, null, "PersonAdmin", "user/personadmin", "PERSONADMIN_", ".mxu", true),
         /** Configuration item role. */
-        USR_ROLE("role", null, false, null, null, "Role", "ROLE", "ROLE_", "user/role", true, "mxUpdate"),
+        USR_ROLE("role", null, false, null, null, "Role", "user/role", "ROLE_", ".mxu", true),
 
         /** Other definition for business unit. */
-        OTHER_BUSINESSUNIT(null, "Business Unit", false, "Organization", "eService Production", "Business Unit", null, null, null, true, "mql"),
+        OTHER_BUSINESSUNIT(null, "Business Unit", false, "Organization", "eService Production", "Business Unit", null, null, null, true),
         /** Other definition for company. */
-        OTHER_COMPANY(null, "Company", false, "Organization", "eService Production", "Company", null, null, null, true, "mql"),
+        OTHER_COMPANY(null, "Company", false, "Organization", "eService Production", "Company", null, null, null, true),
         /** Other definition for department. */
-        OTHER_DEPARTMENT(null, "Department", false, "Organization", "eService Production", "Department", null, null, null, true, "mql"),
+        OTHER_DEPARTMENT(null, "Department", false, "Organization", "eService Production", "Department", null, null, null, true),
         /** Other definition for plant. */
-        OTHER_PLANT(null, "Plant", false, "Organization", "eService Production", "Plant", null, null, null, true, "mql"),
+        OTHER_PLANT(null, "Plant", false, "Organization", "eService Production", "Plant", null, null, null, true),
 
         /** Configuration item system application. */
-        SYS_APPLICATION("application", null, false, null, null, "SystemApplication", "APPLICATION", "APPLICATION_", "system/application", true, "mxUpdate"),
+        SYS_APPLICATION("application", null, false, null, null, "SystemApplication", "system/application", "APPLICATION_", ".mxu", true),
         /** Configuration item system package. */
-        SYS_PACKAGE("package", null, false, null, null, "SystemPackage", "PACKAGE", "PACKAGE_", "system/package", true, "mql"),
+        SYS_PACKAGE("package", null, false, null, null, "SystemPackage", "system/package", "PACKAGE_", ".mxu", true),
         /** Configuration item system site. */
-        SYS_SITE("site", null, false, null, null, "SystemSite", "SITE", "SITE_", "system/site", false, "mxUpdate"),
+        SYS_SITE("site", null, false, null, null, "SystemSite", "system/site", "SITE_", ".mxu", false),
 
         /** Configuration item channel. */
-        UI_CHANNEL("channel", null, false, null, null, "Channel", "CHANNEL", "CHANNEL_", "userinterface/channel", true, "mxUpdate"),
+        UI_CHANNEL("channel", null, false, null, null, "Channel", "userinterface/channel", "CHANNEL_", ".mxu", true),
         /** Configuration item command. */
-        UI_COMMAND("command", null, false, null, null, "Command", "COMMAND", "COMMAND_", "userinterface/command", true, "mxUpdate"),
+        UI_COMMAND("command", null, false, null, null, "Command", "userinterface/command", "COMMAND_", ".mxu", true),
         /** Configuration item form. */
-        UI_FORM("form", null, false, null, null, "Form", "FORM", "FORM_", "userinterface/form", true, "mxUpdate"),
+        UI_FORM("form", null, false, null, null, "Form", "userinterface/form", "FORM_", ".mxu", true),
         /** Configuration item inquiry. */
-        UI_INQUIRY("inquiry", null, false, null, null, "Inquiry", "INQUIRY", "INQUIRY_", "userinterface/inquiry", true, "mql"),
+        UI_INQUIRY("inquiry", null, false, null, null, "Inquiry", "userinterface/inquiry", "INQUIRY_", ".mxu", true),
         /** Configuration item menu. */
-        UI_MENU("menu", null, false, null, null, "Menu", "MENU", "MENU_", "userinterface/menu", true, "mxUpdate"),
+        UI_MENU("menu", null, false, null, null, "Menu", "userinterface/menu", "MENU_", ".mxu", true),
         /** Configuration item portal. */
-        UI_PORTAL("portal", null, false, null, null, "Portal", "PORTAL", "PORTAL_", "userinterface/portal", true, "mxUpdate"),
+        UI_PORTAL("portal", null, false, null, null, "Portal", "userinterface/portal", "PORTAL_", ".mxu", true),
         /** Configuration item table.*/
-        UI_TABLE("table", null, false, null, null, "Table", "TABLE", "TABLE_", "userinterface/table", false, "mxUpdate");
+        UI_TABLE("table", null, false, null, null, "Table", "userinterface/table", "TABLE_", ".mxu", false);
 
         /** Related type name in MX. */
         final String mxType;
@@ -198,19 +200,15 @@ public abstract class AbstractTest
         /** Related vault of the business object. */
         private final String busVault;
 
-        /** Starting tag used in the CI file. */
-        private final String urlTag;
-
         /** Related type name in MxUpdate Update. */
         public final String updateType;
 
-        /** Used name in the header. */
-        public final String header;
-
-        /** Prefix used for the file name. */
-        public final String filePrefix;
         /** Path where the configuration item update file is located. */
         public final String filePath;
+        /** Prefix used for the file name. */
+        public final String filePrefix;
+        /** Prefix used for the file name. */
+        public final String fileSuffix;
 
         /** Does the wild card search for the type works? */
         public final boolean wildcardSearch;
@@ -225,10 +223,9 @@ public abstract class AbstractTest
          * @param _busPolicy            related policy of the business object
          * @param _busVault             related vault of the business object
          * @param _updateType           related type name in MxUpdate Update
-         * @param _header               used text in the header to define the
-         *                              name
-         * @param _filePrefix           prefix used for the file
          * @param _filePath             file path
+         * @param _filePrefix           prefix used for the file
+         * @param _fileSuffix           suffix used for the file
          * @param _wildcardSearch       wild card search allowed?
          * @param _urlTag               url tag
          */
@@ -238,11 +235,10 @@ public abstract class AbstractTest
            final String _busPolicy,
            final String _busVault,
            final String _updateType,
-           final String _header,
-           final String _filePrefix,
            final String _filePath,
-           final boolean _wildcardSearch,
-           final String _urlTag)
+           final String _filePrefix,
+           final String _fileSuffix,
+           final boolean _wildcardSearch)
         {
             this.mxType = _mxType;
             this.busType = _busType;
@@ -250,11 +246,10 @@ public abstract class AbstractTest
             this.busPolicy = _busPolicy;
             this.busVault = _busVault;
             this.updateType = _updateType;
-            this.header = _header;
-            this.filePrefix = _filePrefix;
             this.filePath = _filePath;
+            this.filePrefix = _filePrefix;
+            this.fileSuffix = _fileSuffix;
             this.wildcardSearch = _wildcardSearch;
-            this.urlTag = _urlTag;
         }
 
         /**
@@ -306,16 +301,6 @@ public abstract class AbstractTest
         public String getBusVault()
         {
             return this.busVault;
-        }
-
-        /**
-         * Returns the {@link #urlTag Url tag}.
-         *
-         * @return Url tag
-         */
-        public String getUrlTag()
-        {
-            return this.urlTag;
         }
     }
 

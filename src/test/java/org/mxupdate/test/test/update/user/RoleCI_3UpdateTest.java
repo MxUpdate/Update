@@ -218,7 +218,7 @@ public class RoleCI_3UpdateTest
         this.cleanup(AbstractTest.CI.USR_GROUP);
         this.cleanup(AbstractTest.CI.USR_ROLE);
         this.cleanup(AbstractTest.CI.SYS_SITE);
-        this.cleanup(AbstractTest.CI.PRG_MQL_PROGRAM);
+        this.cleanup(AbstractTest.CI.PRG_MQL);
     }
 
     @Override()

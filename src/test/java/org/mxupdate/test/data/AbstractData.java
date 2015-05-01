@@ -590,15 +590,15 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
                                  final String _value)
     {
         if (_value != null)  {
-            Assert.assertEquals(_exportParser.getLines("/" + this.ci.getUrlTag() + "/" + _tag + "/@value").size(),
+            Assert.assertEquals(_exportParser.getLines("/mxUpdate/" + _tag + "/@value").size(),
                                 1,
                                 "check " + _kind + " for '" + this.getName() + "' that " + _tag + " is defined");
-            Assert.assertEquals(_exportParser.getLines("/" + this.ci.getUrlTag() + "/" + _tag + "/@value").get(0),
+            Assert.assertEquals(_exportParser.getLines("/mxUpdate/" + _tag + "/@value").get(0),
                                 _value,
                                 "check " + _kind + " for '" + this.getName() + "' that " + _tag + " is " + _value);
 
         } else  {
-            Assert.assertEquals(_exportParser.getLines("/" + this.ci.getUrlTag() + "/" + _tag + "/@value").size(),
+            Assert.assertEquals(_exportParser.getLines("/mxUpdate/" + _tag + "/@value").size(),
                                 0,
                                 "check " + _kind + " '" + this.getName() + "' that no " + _tag + " is defined");
         }
@@ -620,7 +620,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
                                                final String _kind,
                                                final String _tag)
     {
-        Assert.assertEquals(_exportParser.getLines("/" + this.ci.getUrlTag() + "/" + _tag + "/@value").size(),
+        Assert.assertEquals(_exportParser.getLines("/mxUpdate/" + _tag + "/@value").size(),
                             0,
                             "check " + _kind + " '" + this.getName() + "' that no " + _tag + " is defined");
     }

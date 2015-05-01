@@ -285,7 +285,9 @@ public final class MqlBuilder_mxJPO
          */
         public MqlBuilder cmd(final CharSequence _cmd)
         {
-            this.cmd.append(_cmd);
+            if (_cmd != null)  {
+                this.cmd.append(_cmd);
+            }
             return this;
         }
 

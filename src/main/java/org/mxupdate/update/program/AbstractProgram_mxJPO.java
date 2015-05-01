@@ -185,6 +185,9 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
         } else if ("/downloadable".equals(_url) || "/usesInterface".equals(_url))  {
             this.downloadable = true;
             parsed = true;
+        } else if ("/eklProgram".equals(_url))  {
+            this.kind = Kind.EKL;
+            parsed = true;
         } else if ("/mqlPipe".equals(_url))  {
             this.pipe = true;
             parsed = true;
@@ -384,6 +387,8 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
     /** Enumeration for programs. */
     enum Kind
     {
+        /** MQL program. */
+        EKL("iseklprogram"),
         /** Java program. */
         JAVA("isjavaprogram"),
         /** MQL program. */

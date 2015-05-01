@@ -27,6 +27,7 @@ package org.mxupdate.update.program;
 import java.lang.reflect.InvocationTargetException;
 
 import org.mxupdate.update.program.AbstractProgram_mxJPO.Execute;
+import org.mxupdate.update.program.AbstractProgram_mxJPO.Kind;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
@@ -50,6 +51,7 @@ class ProgramParser
 <DEFAULT> TOKEN :
 {
       <KIND:                                "kind">
+    | <EKL:                                 "ekl">
     | <MQL:                                 "mql">
 
     | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
@@ -122,7 +124,8 @@ void parse(final AbstractProgram_mxJPO<?> _prog)
     Token tmp;
     AdminProperty property;
 } {
-      ( ( <KIND> <MQL> )
+      ( ( <KIND>                    ( <EKL>                                 {this.setValue(_prog, "kind",                       Kind.EKL);}
+                                    | <MQL>                                 {this.setValue(_prog, "kind",                       Kind.MQL);} ) )
       | ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_prog, "symbolicNames",           this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.appendValue(_prog, "symbolicNames",           this.getSingle(tmp.image));} ) )
 

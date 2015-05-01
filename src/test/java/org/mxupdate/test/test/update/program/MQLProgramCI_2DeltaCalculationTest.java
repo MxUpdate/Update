@@ -33,7 +33,7 @@ public class MQLProgramCI_2DeltaCalculationTest
     protected MQLProgram_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                              final String _name)
     {
-        return new MQLProgram_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_MQL_PROGRAM.updateType), _name);
+        return new MQLProgram_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_MQL.updateType), _name);
     }
 
     @Override

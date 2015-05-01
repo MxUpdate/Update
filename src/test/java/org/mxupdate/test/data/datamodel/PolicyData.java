@@ -216,12 +216,12 @@ public class PolicyData
 
         // check for all state flag
         if (this.allState == null)  {
-            Assert.assertEquals(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/allstate/@value").size(),
+            Assert.assertEquals(_exportParser.getLines("/mxUpdate/allstate/@value").size(),
                                 0,
                                 "check that not all state access is defined");
         } else  {
             Assert.assertEquals(
-                    _exportParser.getLines("/" + this.getCI().getUrlTag() + "/allstate/@value").size(),
+                    _exportParser.getLines("/mxUpdate/allstate/@value").size(),
                     1,
                     "check that all state access is defined");
             this.allState.checkExport(_exportParser);

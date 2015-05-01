@@ -91,7 +91,7 @@ public class MQLTest
     public void cleanup()
         throws Exception
     {
-        this.cleanup(CI.PRG_MQL_PROGRAM);
+        this.cleanup(CI.PRG_MQL);
         this.cleanup(CI.USR_PERSONADMIN);
     }
 }
