@@ -118,6 +118,10 @@ public abstract class AbstractTest
         /** Configuration item Data Model Rule. */
         DM_RULE(                "rule",         "rule",             null, false, null, null, "Rule", "datamodel/rule", "RULE_", ".mxu", true),
 
+        /** Configuration item IEF Global Configuration. */
+        DM_TRIGGER(             "trigger",      null,               "eService Trigger Program Parameters", false, "eService Trigger Program Policy", "eService Administration",
+                                                                    "Trigger",         "datamodel/trigger",   "TRIGGER_", ".mxu", true),
+
         /** Configuration item Data Model Type. */
         DM_TYPE(                "type",         "type",             null, false, null, null, "Type", "datamodel/type", "TYPE_", ".mxu", true),
 

@@ -13,7 +13,7 @@
  *
  */
 
-package org.mxupdate.test.ci.datamodel;
+package org.mxupdate.test.test.update.datamodel;
 
 import matrix.util.MatrixException;
 
@@ -29,14 +29,14 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class NotificationTest
+public class TriggerCI_3UpdateTest
     extends AbstractBusUpdateTest<BusData>
 {
     @Override()
     protected BusData createNewData(final String _name,
                                     final String _revision)
     {
-        return new BusData(this, CI.DM_NOTIFICATION, _name, _revision);
+        return new BusData(this, CI.DM_TRIGGER, _name, _revision);
     }
 
     @Override()
@@ -45,6 +45,6 @@ public class NotificationTest
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(CI.DM_NOTIFICATION);
+        this.cleanup(CI.DM_TRIGGER);
     }
 }
