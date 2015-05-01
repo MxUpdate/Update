@@ -101,38 +101,65 @@ public class RelationshipCI_1ParserTest
                     "",
                     "description \"\" abstract hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
             // derived
             {"5a) derived",
                     "",
                     "description \"\" derived \"123\" !hidden !preventduplicates "
-                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
-            {"5a) not derived (with empty string)",
+                            + "from { } "
+                            + "  to { }"},
+            {"5b) not derived (with empty string)",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }",
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }",
                     "description \"\" derived \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
+            {"5c) derived with defined from/to properties (to check that they are removed)",
+                "description \"\" derived \"abc\" !hidden !preventduplicates "
+                        + "from { } "
+                        + "  to { }",
+                "description \"\" derived \"abc\" !hidden !preventduplicates "
+                        + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                        + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
+            {"5d) derived with from+to type all",
+                "",
+                "description \"\" derived \"123\" !hidden !preventduplicates "
+                        + "from { type all } "
+                        + "  to { type all }"},
+            {"5e) derived with from+to type",
+                "",
+                "description \"\" derived \"123\" !hidden !preventduplicates "
+                        + "from { type \"abc\" } "
+                        + "  to { type \"def\" }"},
+            {"5f) derived with from+to relationship all",
+                "",
+                "description \"\" derived \"123\" !hidden !preventduplicates "
+                        + "from { relationship all } "
+                        + "  to { relationship all }"},
+            {"5g) derived with from+to relationship",
+                "",
+                "description \"\" derived \"123\" !hidden !preventduplicates "
+                        + "from { relationship \"abc\" } "
+                        + "  to { relationship \"def\" }"},
             // hidden flag
             {"6a) not hidden",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
             {"6b) hidden",
                     "",
                     "description \"\" hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
             {"6c) default hidden",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }",
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }",
                     "description \"\" !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
             // hidden flag
             {"7a) not preventduplicates",
                     "",
@@ -568,7 +595,7 @@ public class RelationshipCI_1ParserTest
                               + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection relationship \"ABC\" relationship \"DEF\" }",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection relationship \"DEF\" relationship \"ABC\" }"},
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection relationship \"DEF\" relationship \"ABC\" }"},
         };
     }
 

@@ -22,6 +22,7 @@ import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.util.DataList;
 import org.mxupdate.test.data.util.FlagList;
+import org.mxupdate.test.data.util.KeyNotDefinedList;
 import org.mxupdate.test.data.util.SingleValueList;
 import org.mxupdate.test.data.util.StringValueList;
 
@@ -227,6 +228,8 @@ public class RelationshipData
         private final StringValueList strings = new StringValueList();
         /** All defined data elements. */
         private final DataList<AbstractAdminData<?>> datas = new DataList<AbstractAdminData<?>>();
+        /** List of not defined keys. */
+        private final KeyNotDefinedList keyNotDefineds = new KeyNotDefinedList();
 
         /**
          * Defines the side string.
@@ -308,6 +311,17 @@ public class RelationshipData
         }
 
         /**
+         * Defines key which must not be defined.
+         *
+         * @param _key  not defined key
+         */
+        public RelationshipData defNotDefined(final String _key)
+        {
+            this.keyNotDefineds.defKeyNotDefined(_key);
+            return RelationshipData.this;
+        }
+
+        /**
          * Appends the TCL statements for the CI file for one side.
          *
          * @param _cmd      TCL string builder
@@ -349,10 +363,11 @@ public class RelationshipData
          */
         protected void checkExport(final ExportParser _exportParser)
         {
-            this.flags  .check4Export(_exportParser, this.side);
-            this.singles.check4Export(_exportParser, this.side);
-            this.strings.check4Export(_exportParser, this.side);
-            this.datas  .check4Export(_exportParser, this.side);
+            this.flags          .check4Export(_exportParser, this.side);
+            this.singles        .check4Export(_exportParser, this.side);
+            this.strings        .check4Export(_exportParser, this.side);
+            this.datas          .check4Export(_exportParser, this.side);
+            this.keyNotDefineds .check4Export(_exportParser, this.side);
         }
     }
 }

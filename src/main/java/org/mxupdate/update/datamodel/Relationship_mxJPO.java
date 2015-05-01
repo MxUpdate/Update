@@ -300,7 +300,7 @@ public class Relationship_mxJPO
                 throw new UpdateException_mxJPO(
                         ErrorKey.DM_RELATION_UPDATE_DERIVED,
                         this.getName(),
-                        _current.derived,
+                        currDerived,
                         this.derived);
             }
             _mql.newLine().cmd("derived ").arg(thisDerived);
@@ -435,13 +435,19 @@ public class Relationship_mxJPO
         public void write(final UpdateBuilder_mxJPO _updateBuilder)
         {
             _updateBuilder
-                    .childStart(this.side)
-                    .string(        "meaning",                      this.meaning)
-                    .single(        "cardinality",                  this.cardinality)
-                    .single(        "revision",                     this.revisionAction)
-                    .single(        "clone",                        this.cloneAction)
-                    .flag(          "propagatemodify",      false,  this.propagateModify)
-                    .flag(          "propagateconnection",  false,  this.propagateConnection)
+                    .childStart(this.side);
+
+            if ((Relationship_mxJPO.this.derived == null) || Relationship_mxJPO.this.derived.isEmpty())  {
+                _updateBuilder
+                        .string(        "meaning",                      this.meaning)
+                        .single(        "cardinality",                  this.cardinality)
+                        .single(        "revision",                     this.revisionAction)
+                        .single(        "clone",                        this.cloneAction)
+                        .flag(          "propagatemodify",      false,  this.propagateModify)
+                        .flag(          "propagateconnection",  false,  this.propagateConnection);
+            }
+
+            _updateBuilder
                     .singleIfTrue(  "type",                         "all",                      this.typeAll)
                     .listIfTrue(    "type",                         this.types,                 !this.typeAll)
                     .singleIfTrue(  "relationship",                 "all",                      this.relationAll)
@@ -462,12 +468,14 @@ public class Relationship_mxJPO
         {
             _mql.pushPrefixByAppending(this.side);
 
-            DeltaUtil_mxJPO.calcValueDelta(_mql, "meaning",                    this.meaning,                        _current.meaning);
-            DeltaUtil_mxJPO.calcValueDelta(_mql, "cardinality",                this.cardinality,                    _current.cardinality);
-            DeltaUtil_mxJPO.calcValueDelta(_mql, "revision",                   this.revisionAction,                 _current.revisionAction);
-            DeltaUtil_mxJPO.calcValueDelta(_mql, "clone",                      this.cloneAction,                    _current.cloneAction);
-            DeltaUtil_mxJPO.calcFlagDelta( _mql, "propagatemodify",     false, this.propagateModify,                _current.propagateModify);
-            DeltaUtil_mxJPO.calcFlagDelta( _mql, "propagateconnection", false, this.propagateConnection,            _current.propagateConnection);
+            if ((Relationship_mxJPO.this.derived == null) || Relationship_mxJPO.this.derived.isEmpty())  {
+                DeltaUtil_mxJPO.calcValueDelta(_mql, "meaning",                    this.meaning,                        _current.meaning);
+                DeltaUtil_mxJPO.calcValueDelta(_mql, "cardinality",                this.cardinality,                    _current.cardinality);
+                DeltaUtil_mxJPO.calcValueDelta(_mql, "revision",                   this.revisionAction,                 _current.revisionAction);
+                DeltaUtil_mxJPO.calcValueDelta(_mql, "clone",                      this.cloneAction,                    _current.cloneAction);
+                DeltaUtil_mxJPO.calcFlagDelta( _mql, "propagatemodify",     false, this.propagateModify,                _current.propagateModify);
+                DeltaUtil_mxJPO.calcFlagDelta( _mql, "propagateconnection", false, this.propagateConnection,            _current.propagateConnection);
+            }
             DeltaUtil_mxJPO.calcListDelta(_mql,  "type",                       this.typeAll, this.types,            _current.typeAll, _current.types);
             DeltaUtil_mxJPO.calcListDelta(_mql,  "relationship",               this.relationAll, this.relations,    _current.relationAll, _current.relations);
 

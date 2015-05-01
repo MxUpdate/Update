@@ -19,6 +19,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.RelationshipData;
+import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.datamodel.Relationship_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -40,7 +41,7 @@ public class RelationshipCI_2DeltaCalculationTest
     @DataProvider(name = "data")
     public Object[][] getData()
     {
-        return new Object[][] {
+        return new Object[][] {/*
             {"1a) symbolic name",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test").setValue("symbolicname", "expression_123")},
@@ -49,8 +50,104 @@ public class RelationshipCI_2DeltaCalculationTest
                     new RelationshipData(this, "Test").setValue("symbolicname", "expression_123").setValue("symbolicname", "expression_345")},
             {"2) description",
                     new RelationshipData(this, "Test"),
-                    new RelationshipData(this, "Test").setValue("description", "abc def")},
-            // from propagatemodify flag
+                    new RelationshipData(this, "Test").setValue("description", "abc def")},*/
+            // derived
+            {"5a) derived",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").from().defString("meaning", "abc")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").from().defNotDefined("meaning")},
+            {"5.10) derived from meaning",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").from().defString("meaning", "abc")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").from().defNotDefined("meaning")},
+            {"5.11) derived from cardinality one",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").from().defString("cardinality", "one")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").from().defNotDefined("cardinality")},
+            {"5.12) derived from cardinality many",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").from().defString("cardinality", "many")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").from().defNotDefined("cardinality")},
+            {"5.13) derived from revision none",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").from().defString("revision", "none")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").from().defNotDefined("revision")},
+            {"5.14) derived from revision float",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").from().defString("revision", "float")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").from().defNotDefined("revision")},
+            {"5.15) derived from revision replicate",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").from().defString("revision", "replicate")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").from().defNotDefined("revision")},
+            {"5.16) derived from clone none",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").from().defString("clone", "none")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").from().defNotDefined("clone")},
+            {"5.17) derived from clone float",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").from().defString("clone", "float")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").from().defNotDefined("clone")},
+            {"5.18) derived from clone replicate",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").from().defString("clone", "replicate")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").from().defNotDefined("clone")},
+            {"5.19) derived from propagatemodify true",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").from().defFlag("propagatemodify", true)),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").from().defNotDefined("propagatemodify").from().defNotDefined("!propagatemodify")},
+            {"5.20) derived from propagatemodify false",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").from().defFlag("propagatemodify", false)),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").from().defNotDefined("propagatemodify").from().defNotDefined("!propagatemodify")},
+            {"5.21) derived from propagateconnection true",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").from().defFlag("propagateconnection", true)),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").from().defNotDefined("propagateconnection").from().defNotDefined("!propagateconnection")},
+            {"5.22) derived from propagateconnection false",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").from().defFlag("propagateconnection", false)),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").from().defNotDefined("propagateconnection").from().defNotDefined("!propagateconnection")},
+            {"5.23) derived from type all",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").from().defSingle("type", "all")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").from().defNotDefined("type")},
+            {"5.24) derived from type single type",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").from().defSingle("type", "all")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").from().defData("type", new TypeData(this, "Type"))},
+            {"5.30) derived to meaning",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").to().defString("meaning", "abc")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").to().defNotDefined("meaning")},
+            {"5.31) derived to cardinality one",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").to().defString("cardinality", "one")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").to().defNotDefined("cardinality")},
+            {"5.32) derived to cardinality many",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").to().defString("cardinality", "many")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").to().defNotDefined("cardinality")},
+            {"5.33) derived to revision none",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").to().defString("revision", "none")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").to().defNotDefined("revision")},
+            {"5.34) derived to revision float",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").to().defString("revision", "float")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").to().defNotDefined("revision")},
+            {"5.35) derived to revision replicate",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").to().defString("revision", "replicate")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").to().defNotDefined("revision")},
+            {"5.36) derived to clone none",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").to().defString("clone", "none")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").to().defNotDefined("clone")},
+            {"5.37) derived to clone float",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").to().defString("clone", "float")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").to().defNotDefined("clone")},
+            {"5.38) derived to clone replicate",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").to().defString("clone", "replicate")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").to().defNotDefined("clone")},
+            {"5.39) derived to propagatemodify true",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").to().defFlag("propagatemodify", true)),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").to().defNotDefined("propagatemodify").to().defNotDefined("!propagatemodify")},
+            {"5.40) derived to propagatemodify false",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").to().defFlag("propagatemodify", false)),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").to().defNotDefined("propagatemodify").to().defNotDefined("!propagatemodify")},
+            {"5.41) derived to propagateconnection true",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").to().defFlag("propagateconnection", true)),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").to().defNotDefined("propagateconnection").to().defNotDefined("!propagateconnection")},
+            {"5.42) derived to propagateconnection false",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").to().defFlag("propagateconnection", false)),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").to().defNotDefined("propagateconnection").to().defNotDefined("!propagateconnection")},
+            {"5.43) derived to type all",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").to().defSingle("type", "all")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").to().defNotDefined("type")},
+            {"5.44) derived to type single type",
+                    new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").to().defSingle("type", "all")),
+                    new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").to().defData("type", new TypeData(this, "Type"))},
+
+
+   /*         // from propagatemodify flag
             {"24a) relationship with from propagate modify true",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test").from().defFlag("propagatemodify", true)},
@@ -77,7 +174,7 @@ public class RelationshipCI_2DeltaCalculationTest
                     new RelationshipData(this, "Test").to().defFlag("propagateconnection", true)},
             {"35b) relationship with to propagate connection false",
                     new RelationshipData(this, "Test"),
-                    new RelationshipData(this, "Test").to().defFlag("propagateconnection", false)},
+                    new RelationshipData(this, "Test").to().defFlag("propagateconnection", false)},*/
        };
     }
 
@@ -88,6 +185,7 @@ public class RelationshipCI_2DeltaCalculationTest
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.DM_RELATIONSHIP);
+        this.cleanup(AbstractTest.CI.DM_TYPE);
     }
 
     @Override()

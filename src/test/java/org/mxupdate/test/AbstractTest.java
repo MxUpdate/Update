@@ -517,7 +517,11 @@ public abstract class AbstractTest
                 }
                 if ((_type == AbstractTest.CI.DM_RELATIONSHIP) && (this.getVersion().min(Version.V6R2013x)))  {
                     for (final String element : elements)  {
-                        this.mql("escape mod " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\" remove derived");
+                        if ("TRUE".equals(this.mql("escape print relation \"" + AbstractTest.convertMql(element) + "\" select compositional dump")))  {
+                            this.mql("escape mod relation \"" + AbstractTest.convertMql(element) + "\" remove derived from cardinality 1 notpropagateconnection to clone replicate revision replicate notpropagateconnection");
+                        } else  {
+                            this.mql("escape mod relation \"" + AbstractTest.convertMql(element) + "\" remove derived");
+                        }
                     }
                 }
                 if (_type == AbstractTest.CI.DM_TYPE)  {
