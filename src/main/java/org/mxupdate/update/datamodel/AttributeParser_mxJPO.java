@@ -40,6 +40,7 @@ class AttributeParser_mxJPO
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case SYMBOLICNAME:
       case DESCRIPTION:
       case DEFAULTVALUE:
       case HIDDEN_TRUE:
@@ -79,21 +80,41 @@ class AttributeParser_mxJPO
         break label_1;
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case SYMBOLICNAME:{
+        jj_consume_token(SYMBOLICNAME);
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case STRING:{
+          tmp = jj_consume_token(STRING);
+this.appendValue(_attr, "symbolicNames",       this.getString(tmp.image));
+          break;
+          }
+        case SINGLE:{
+          tmp = jj_consume_token(SINGLE);
+this.appendValue(_attr, "symbolicNames",       this.getSingle(tmp.image));
+          break;
+          }
+        default:
+          jj_la1[1] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+        break;
+        }
       case DESCRIPTION:{
         jj_consume_token(DESCRIPTION);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case MULTILINESTRING:{
           tmp = jj_consume_token(MULTILINESTRING);
-this.setValue(_attr, "description", this.getString(tmp.image));
+this.setValue(_attr, "description",            this.getString(tmp.image));
           break;
           }
         case MULTILINESINGLE:{
           tmp = jj_consume_token(MULTILINESINGLE);
-this.setValue(_attr, "description", this.getSingle(tmp.image));
+this.setValue(_attr, "description",            this.getSingle(tmp.image));
           break;
           }
         default:
-          jj_la1[1] = jj_gen;
+          jj_la1[2] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -104,16 +125,16 @@ this.setValue(_attr, "description", this.getSingle(tmp.image));
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case MULTILINESTRING:{
           tmp = jj_consume_token(MULTILINESTRING);
-this.setValue(_attr, "defaultValue", this.getString(tmp.image));
+this.setValue(_attr, "defaultValue",           this.getString(tmp.image));
           break;
           }
         case MULTILINESINGLE:{
           tmp = jj_consume_token(MULTILINESINGLE);
-this.setValue(_attr, "defaultValue", this.getSingle(tmp.image));
+this.setValue(_attr, "defaultValue",           this.getSingle(tmp.image));
           break;
           }
         default:
-          jj_la1[2] = jj_gen;
+          jj_la1[3] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -121,68 +142,68 @@ this.setValue(_attr, "defaultValue", this.getSingle(tmp.image));
         }
       case HIDDEN_TRUE:{
         jj_consume_token(HIDDEN_TRUE);
-this.setValue(_attr, "hidden", true);
+this.setValue(_attr, "hidden",                 true);
         break;
         }
       case HIDDEN_FALSE:{
         jj_consume_token(HIDDEN_FALSE);
-this.setValue(_attr, "hidden", false);
+this.setValue(_attr, "hidden",                 false);
         break;
         }
       case MULTIVALUE_TRUE:{
         jj_consume_token(MULTIVALUE_TRUE);
-this.setValue(_attr, "multiValue", true);
+this.setValue(_attr, "multiValue",             true);
         break;
         }
       case MULTIVALUE_FALSE:{
         jj_consume_token(MULTIVALUE_FALSE);
-this.setValue(_attr, "multiValue", false);
+this.setValue(_attr, "multiValue",             false);
         break;
         }
       case RESETONCLONE_TRUE:{
         jj_consume_token(RESETONCLONE_TRUE);
-this.setValue(_attr, "resetOnClone", true);
+this.setValue(_attr, "resetOnClone",           true);
         break;
         }
       case RESETONCLONE_FALSE:{
         jj_consume_token(RESETONCLONE_FALSE);
-this.setValue(_attr, "resetOnClone", false);
+this.setValue(_attr, "resetOnClone",           false);
         break;
         }
       case RESETONREVISION_TRUE:{
         jj_consume_token(RESETONREVISION_TRUE);
-this.setValue(_attr, "resetOnRevision", true);
+this.setValue(_attr, "resetOnRevision",        true);
         break;
         }
       case RESETONREVISION_FALSE:{
         jj_consume_token(RESETONREVISION_FALSE);
-this.setValue(_attr, "resetOnRevision", false);
+this.setValue(_attr, "resetOnRevision",        false);
         break;
         }
       case RANGEVALUE_TRUE:{
         jj_consume_token(RANGEVALUE_TRUE);
-this.setValue(_attr, "rangeValue", true);
+this.setValue(_attr, "rangeValue",             true);
         break;
         }
       case RANGEVALUE_FALSE:{
         jj_consume_token(RANGEVALUE_FALSE);
-this.setValue(_attr, "rangeValue", false);
+this.setValue(_attr, "rangeValue",             false);
         break;
         }
       case MULTILINE_TRUE:{
         jj_consume_token(MULTILINE_TRUE);
-this.setValue(_attr, "multiline", true);
+this.setValue(_attr, "multiline",              true);
         break;
         }
       case MULTILINE_FALSE:{
         jj_consume_token(MULTILINE_FALSE);
-this.setValue(_attr, "multiline", false);
+this.setValue(_attr, "multiline",              false);
         break;
         }
       case MAXLENGTH:{
         jj_consume_token(MAXLENGTH);
         tmp = jj_consume_token(MAXLENGTH_NUMBER);
-this.setValue(_attr, "maxLength", this.getSingle(tmp.image));
+this.setValue(_attr, "maxLength",              this.getSingle(tmp.image));
         break;
         }
       case RULE:{
@@ -190,16 +211,16 @@ this.setValue(_attr, "maxLength", this.getSingle(tmp.image));
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case STRING:{
           tmp = jj_consume_token(STRING);
-this.setValue(_attr, "rules", Arrays.asList(new String[]{this.getString(tmp.image)}));
+this.appendValue(_attr, "rules",               this.getString(tmp.image));
           break;
           }
         case SINGLE:{
           tmp = jj_consume_token(SINGLE);
-this.setValue(_attr, "rules", Arrays.asList(new String[]{this.getSingle(tmp.image)}));
+this.appendValue(_attr, "rules",               this.getSingle(tmp.image));
           break;
           }
         default:
-          jj_la1[3] = jj_gen;
+          jj_la1[4] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -210,16 +231,16 @@ this.setValue(_attr, "rules", Arrays.asList(new String[]{this.getSingle(tmp.imag
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case STRING:{
           tmp = jj_consume_token(STRING);
-this.setValue(_attr, "dimension", this.getString(tmp.image));
+this.setValue(_attr, "dimension",              this.getString(tmp.image));
           break;
           }
         case SINGLE:{
           tmp = jj_consume_token(SINGLE);
-this.setValue(_attr, "dimension", this.getSingle(tmp.image));
+this.setValue(_attr, "dimension",              this.getSingle(tmp.image));
           break;
           }
         default:
-          jj_la1[4] = jj_gen;
+          jj_la1[5] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -229,41 +250,41 @@ this.setValue(_attr, "dimension", this.getSingle(tmp.image));
         jj_consume_token(TRIGGER);
 trigger = new Trigger();this.appendValue(_attr, "triggers", "triggersStack", trigger);
         tmp = jj_consume_token(TRIGEVENT);
-this.setValue(trigger, "eventType",                            this.getSingle(tmp.image));
+this.setValue(trigger, "eventType",            this.getSingle(tmp.image));
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case ACTION:{
           jj_consume_token(ACTION);
-this.setValue(trigger, "kind",                                 "action");
+this.setValue(trigger, "kind",                 "action");
           break;
           }
         case CHECK:{
           jj_consume_token(CHECK);
-this.setValue(trigger, "kind",                                 "check");
+this.setValue(trigger, "kind",                 "check");
           break;
           }
         case OVERRIDE:{
           jj_consume_token(OVERRIDE);
-this.setValue(trigger, "kind",                                 "override");
+this.setValue(trigger, "kind",                 "override");
           break;
           }
         default:
-          jj_la1[5] = jj_gen;
+          jj_la1[6] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case STRING:{
           tmp = jj_consume_token(STRING);
-this.setValue(trigger, "program",                              this.getString(tmp.image));
+this.setValue(trigger, "program",              this.getString(tmp.image));
           break;
           }
         case SINGLE:{
           tmp = jj_consume_token(SINGLE);
-this.setValue(trigger, "program",                              this.getSingle(tmp.image));
+this.setValue(trigger, "program",              this.getSingle(tmp.image));
           break;
           }
         default:
-          jj_la1[6] = jj_gen;
+          jj_la1[7] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -273,23 +294,23 @@ this.setValue(trigger, "program",                              this.getSingle(tm
           switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
           case STRING:{
             tmp = jj_consume_token(STRING);
-this.setValue(trigger, "arguments",                            this.getString(tmp.image));
+this.setValue(trigger, "arguments",            this.getString(tmp.image));
             break;
             }
           case SINGLE:{
             tmp = jj_consume_token(SINGLE);
-this.setValue(trigger, "arguments",                            this.getSingle(tmp.image));
+this.setValue(trigger, "arguments",            this.getSingle(tmp.image));
             break;
             }
           default:
-            jj_la1[7] = jj_gen;
+            jj_la1[8] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
           break;
           }
         default:
-          jj_la1[8] = jj_gen;
+          jj_la1[9] = jj_gen;
           ;
         }
         break;
@@ -308,7 +329,7 @@ range = new Range();this.setValue(range, "type", "=");      this.setValue(range,
           break;
           }
         default:
-          jj_la1[9] = jj_gen;
+          jj_la1[10] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -328,7 +349,7 @@ range = new Range();this.setValue(range, "type", ">");      this.setValue(range,
           break;
           }
         default:
-          jj_la1[10] = jj_gen;
+          jj_la1[11] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -348,7 +369,7 @@ range = new Range();this.setValue(range, "type", ">=");     this.setValue(range,
           break;
           }
         default:
-          jj_la1[11] = jj_gen;
+          jj_la1[12] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -368,7 +389,7 @@ range = new Range();this.setValue(range, "type", "<");      this.setValue(range,
           break;
           }
         default:
-          jj_la1[12] = jj_gen;
+          jj_la1[13] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -388,7 +409,7 @@ range = new Range();this.setValue(range, "type", "<=");     this.setValue(range,
           break;
           }
         default:
-          jj_la1[13] = jj_gen;
+          jj_la1[14] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -408,7 +429,7 @@ range = new Range();this.setValue(range, "type", "!=");     this.setValue(range,
           break;
           }
         default:
-          jj_la1[14] = jj_gen;
+          jj_la1[15] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -428,7 +449,7 @@ range = new Range();this.setValue(range, "type", "match");  this.setValue(range,
           break;
           }
         default:
-          jj_la1[15] = jj_gen;
+          jj_la1[16] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -448,7 +469,7 @@ range = new Range();this.setValue(range, "type", "!match"); this.setValue(range,
           break;
           }
         default:
-          jj_la1[16] = jj_gen;
+          jj_la1[17] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -468,7 +489,7 @@ range = new Range();this.setValue(range, "type", "smatch"); this.setValue(range,
           break;
           }
         default:
-          jj_la1[17] = jj_gen;
+          jj_la1[18] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -488,7 +509,7 @@ range = new Range();this.setValue(range, "type", "!smatch");this.setValue(range,
           break;
           }
         default:
-          jj_la1[18] = jj_gen;
+          jj_la1[19] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -508,7 +529,7 @@ range = new Range();this.setValue(range, "type", "program");this.setValue(range,
           break;
           }
         default:
-          jj_la1[19] = jj_gen;
+          jj_la1[20] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -527,14 +548,14 @@ this.setValue(range, "value2", this.getSingle(tmp.image));
             break;
             }
           default:
-            jj_la1[20] = jj_gen;
+            jj_la1[21] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
           break;
           }
         default:
-          jj_la1[21] = jj_gen;
+          jj_la1[22] = jj_gen;
           ;
         }
         break;
@@ -554,7 +575,7 @@ this.setValue(range, "value1", this.getSingle(tmp.image));
           break;
           }
         default:
-          jj_la1[22] = jj_gen;
+          jj_la1[23] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -570,7 +591,7 @@ this.setValue(range, "include1", false);
           break;
           }
         default:
-          jj_la1[23] = jj_gen;
+          jj_la1[24] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -586,7 +607,7 @@ this.setValue(range, "value2", this.getSingle(tmp.image));
           break;
           }
         default:
-          jj_la1[24] = jj_gen;
+          jj_la1[25] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -602,7 +623,7 @@ this.setValue(range, "include2", false);
           break;
           }
         default:
-          jj_la1[25] = jj_gen;
+          jj_la1[26] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -623,7 +644,7 @@ this.setValue(property, "name", this.getSingle(tmp.image));
           break;
           }
         default:
-          jj_la1[26] = jj_gen;
+          jj_la1[27] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -636,7 +657,7 @@ this.setValue(property, "name", this.getSingle(tmp.image));
             break;
             }
           default:
-            jj_la1[27] = jj_gen;
+            jj_la1[28] = jj_gen;
             break label_2;
           }
           switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -654,7 +675,7 @@ this.setValue(property, "value", this.getSingle(tmp.image));
               break;
               }
             default:
-              jj_la1[28] = jj_gen;
+              jj_la1[29] = jj_gen;
               jj_consume_token(-1);
               throw new ParseException();
             }
@@ -674,7 +695,7 @@ this.setValue(property, "refAdminType", this.getSingle(tmp.image));
               break;
               }
             default:
-              jj_la1[29] = jj_gen;
+              jj_la1[30] = jj_gen;
               jj_consume_token(-1);
               throw new ParseException();
             }
@@ -690,14 +711,14 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
               break;
               }
             default:
-              jj_la1[30] = jj_gen;
+              jj_la1[31] = jj_gen;
               jj_consume_token(-1);
               throw new ParseException();
             }
             break;
             }
           default:
-            jj_la1[31] = jj_gen;
+            jj_la1[32] = jj_gen;
             jj_consume_token(-1);
             throw new ParseException();
           }
@@ -705,7 +726,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
         break;
         }
       default:
-        jj_la1[32] = jj_gen;
+        jj_la1[33] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -721,7 +742,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[33];
+  final private int[] jj_la1 = new int[34];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -729,10 +750,10 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x103fffe0,0x6000000,0x6000000,0x1800000,0x1800000,0xc0000000,0x1800000,0x1800000,0x400000,0x1800000,0x1800000,0x1800000,0x1800000,0x1800000,0x1800000,0x1800000,0x1800000,0x1800000,0x1800000,0x1800000,0x1800000,0x400000,0x0,0x0,0x0,0x0,0x1800000,0x0,0x1800000,0x0,0x1800000,0x0,0x103fffe0,};
+      jj_la1_0 = new int[] {0x207fffe0,0x3000000,0xc000000,0xc000000,0x3000000,0x3000000,0x80000000,0x3000000,0x3000000,0x800000,0x3000000,0x3000000,0x3000000,0x3000000,0x3000000,0x3000000,0x3000000,0x3000000,0x3000000,0x3000000,0x3000000,0x3000000,0x800000,0x0,0x0,0x0,0x0,0x3000000,0x0,0x3000000,0x0,0x3000000,0x0,0x207fffe0,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x2001ffe,0x0,0x0,0x0,0x0,0x1,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x6000,0x60000,0x180000,0x1800000,0x0,0xc000000,0x0,0x30000000,0x0,0xc000000,0x2001ffe,};
+      jj_la1_1 = new int[] {0x4003ffc,0x0,0x0,0x0,0x0,0x0,0x3,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xc000,0xc0000,0x300000,0x3000000,0x0,0x18000000,0x0,0x60000000,0x0,0x18000000,0x4003ffc,};
    }
 
   /** Constructor with InputStream. */
@@ -746,7 +767,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 33; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 34; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -760,7 +781,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 33; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 34; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -770,7 +791,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 33; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 34; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -788,7 +809,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 33; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 34; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -797,7 +818,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 33; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 34; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -806,7 +827,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 33; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 34; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -857,12 +878,12 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[62];
+    boolean[] la1tokens = new boolean[63];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 33; i++) {
+    for (int i = 0; i < 34; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -874,7 +895,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
         }
       }
     }
-    for (int i = 0; i < 62; i++) {
+    for (int i = 0; i < 63; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

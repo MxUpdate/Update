@@ -18,9 +18,9 @@ package org.mxupdate.test.test.update.datamodel;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.datamodel.AttributeStringData;
+import org.mxupdate.test.data.datamodel.AttributeIntegerData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
-import org.mxupdate.update.datamodel.AttributeString_mxJPO;
+import org.mxupdate.update.datamodel.AttributeInteger_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -28,13 +28,14 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link AttributeString_mxJPO attribute} delta calculation.
+ * Tests the {@link AttributeInteger_mxJPO integer attribute CI} delta
+ * calculation.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class AttributeStringCI_2DeltaCalculationTest
-    extends AbstractDeltaCalculationTest<AttributeString_mxJPO,AttributeStringData>
+public class AttributeIntegerCI_2DeltaCalculationTest
+    extends AbstractDeltaCalculationTest<AttributeInteger_mxJPO,AttributeIntegerData>
 {
     @Override()
     @DataProvider(name = "data")
@@ -42,14 +43,11 @@ public class AttributeStringCI_2DeltaCalculationTest
     {
         return new Object[][] {
             {"1a) symbolic name",
-                    new AttributeStringData(this, "Test"),
-                    new AttributeStringData(this, "Test").setValue("symbolicname", "attribute_123")},
+                    new AttributeIntegerData(this, "Test"),
+                    new AttributeIntegerData(this, "Test").setValue("symbolicname", "attribute_123")},
             {"1b) two symbolic name",
-                    new AttributeStringData(this, "Test"),
-                    new AttributeStringData(this, "Test").setValue("symbolicname", "attribute_123").setValue("symbolicname", "attribute_345")},
-            {"2) with maxlength",
-                    new AttributeStringData(this, "Test"),
-                    new AttributeStringData(this, "Test").setSingle("maxlength", "5")},
+                    new AttributeIntegerData(this, "Test"),
+                    new AttributeIntegerData(this, "Test").setValue("symbolicname", "attribute_123").setValue("symbolicname", "attribute_345")},
        };
     }
 
@@ -59,13 +57,13 @@ public class AttributeStringCI_2DeltaCalculationTest
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_STRING);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_INTEGER);
     }
 
     @Override()
-    protected AttributeString_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
-                                                  final String _name)
+    protected AttributeInteger_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
+                                                   final String _name)
     {
-        return new AttributeString_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_ATTRIBUTE_STRING.updateType), _name);
+        return new AttributeInteger_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_ATTRIBUTE_INTEGER.updateType), _name);
     }
 }

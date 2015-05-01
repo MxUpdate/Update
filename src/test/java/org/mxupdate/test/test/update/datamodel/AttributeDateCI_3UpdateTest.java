@@ -21,17 +21,18 @@ import java.util.List;
 import org.mxupdate.test.data.datamodel.AttributeDateData;
 import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.test.util.Version;
+import org.mxupdate.update.datamodel.AttributeDate_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test cases for the update and export of date attributes.
+ * Tests the {@link AttributeDate_mxJPO date attribute CI} export / update.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class AttributeDateCI_2UpdateTest
+public class AttributeDateCI_3UpdateTest
     extends AbstractAttributeWithRangesAndMultiValuesTest<AttributeDateData>
 {
     /**

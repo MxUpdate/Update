@@ -357,6 +357,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
                 .flag(          "hidden",                   false, this.isHidden())
                 .flagIfTrue(    "multivalue",        false, this.multiValue,                    _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMAttrSupportsFlagMultiValue))
@@ -401,6 +402,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     {
         final AbstractAttribute_mxJPO<CLASS> current = _current;
 
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), current.getSymbolicNames());
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",         this.getDescription(), current.getDescription());
         DeltaUtil_mxJPO.calcValueDelta(_mql, "default",             this.defaultValue,     current.defaultValue);
         DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false,  this.isHidden(),       current.isHidden());

@@ -16,16 +16,18 @@
 package org.mxupdate.test.test.update.datamodel;
 
 import org.mxupdate.test.data.datamodel.AttributeBooleanData;
+import org.mxupdate.update.datamodel.AttributeBoolean_mxJPO;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test cases for the update and export of boolean attributes.
+ * Tests the {@link AttributeBoolean_mxJPO boolean attribute CI}
+ * export / update.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class AttributeBooleanCI_2UpdateTest
+public class AttributeBooleanCI_3UpdateTest
     extends AbstractAttributeWithRangesAndMultiValuesTest<AttributeBooleanData>
 {
     @Override()

@@ -54,24 +54,37 @@ class AttributeParser
 
 TOKEN : /** first level */
 {
-      <DESCRIPTION:             "description">                              : MULTILINESTRING_EXPECTED
-    | <DEFAULTVALUE:            "default">                                  : MULTILINESTRING_EXPECTED
-    | <HIDDEN_TRUE:             "hidden">
-    | <HIDDEN_FALSE:            "!hidden">
-    | <MULTIVALUE_TRUE:         "multivalue">
-    | <MULTIVALUE_FALSE:        "!multivalue">
-    | <RESETONCLONE_TRUE:       "resetonclone">
-    | <RESETONCLONE_FALSE:      "!resetonclone">
-    | <RESETONREVISION_TRUE:    "resetonrevision">
-    | <RESETONREVISION_FALSE:   "!resetonrevision">
-    | <RANGEVALUE_TRUE:         "rangevalue">
-    | <RANGEVALUE_FALSE:        "!rangevalue">
-    | <MULTILINE_TRUE:          "multiline">
-    | <MULTILINE_FALSE:         "!multiline">
-    | <MAXLENGTH:               "maxlength">                                : MAXLENGTH_EXPECTED
-    | <RULE:                    "rule">                                     : STRING_EXPECTED
-    | <DIMENSION:               "dimension">                                : STRING_EXPECTED
-    | <INPUT:                   "input">                                    : STRING_EXPECTED
+      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+
+    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+
+    | <DEFAULTVALUE:                        "default">                                      : MULTILINESTRING_EXPECTED
+
+    | <HIDDEN_TRUE:                         "hidden">
+    | <HIDDEN_FALSE:                        "!hidden">
+
+    | <MULTIVALUE_TRUE:                     "multivalue">
+    | <MULTIVALUE_FALSE:                    "!multivalue">
+
+    | <RESETONCLONE_TRUE:                   "resetonclone">
+    | <RESETONCLONE_FALSE:                  "!resetonclone">
+
+    | <RESETONREVISION_TRUE:                "resetonrevision">
+    | <RESETONREVISION_FALSE:               "!resetonrevision">
+
+    | <RANGEVALUE_TRUE:                     "rangevalue">
+    | <RANGEVALUE_FALSE:                    "!rangevalue">
+
+    | <MULTILINE_TRUE:                      "multiline">
+    | <MULTILINE_FALSE:                     "!multiline">
+
+    | <MAXLENGTH:                           "maxlength">                                    : MAXLENGTH_EXPECTED
+
+    | <RULE:                                "rule">                                         : STRING_EXPECTED
+
+    | <DIMENSION:                           "dimension">                                    : STRING_EXPECTED
+
+    | <INPUT:                               "input">                                        : STRING_EXPECTED
 }
 
 /************************************************************** Common String */
@@ -187,48 +200,51 @@ void parse(final AbstractAttribute_mxJPO<?> _attr)
     Range range;
     AdminProperty property;
 } {
-    (   (<DESCRIPTION>              ( tmp = <MULTILINESTRING>               {this.setValue(_attr, "description", this.getString(tmp.image));}
-                                    | tmp = <MULTILINESINGLE>               {this.setValue(_attr, "description", this.getSingle(tmp.image));} ) )
+    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_attr, "symbolicNames",       this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_attr, "symbolicNames",       this.getSingle(tmp.image));} ) )
 
-      | (<DEFAULTVALUE>             ( tmp = <MULTILINESTRING>               {this.setValue(_attr, "defaultValue", this.getString(tmp.image));}
-                                    | tmp = <MULTILINESINGLE>               {this.setValue(_attr, "defaultValue", this.getSingle(tmp.image));} ) )
+      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_attr, "description",            this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>               {this.setValue(_attr, "description",            this.getSingle(tmp.image));} ) )
 
-      | (<HIDDEN_TRUE>                                                      {this.setValue(_attr, "hidden", true);} )
-      | (<HIDDEN_FALSE>                                                     {this.setValue(_attr, "hidden", false);} )
+      | (<DEFAULTVALUE>             ( tmp = <MULTILINESTRING>               {this.setValue(_attr, "defaultValue",           this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>               {this.setValue(_attr, "defaultValue",           this.getSingle(tmp.image));} ) )
 
-      | (<MULTIVALUE_TRUE>                                                  {this.setValue(_attr, "multiValue", true);} )
-      | (<MULTIVALUE_FALSE>                                                 {this.setValue(_attr, "multiValue", false);} )
+      | (<HIDDEN_TRUE>                                                      {this.setValue(_attr, "hidden",                 true);} )
+      | (<HIDDEN_FALSE>                                                     {this.setValue(_attr, "hidden",                 false);} )
 
-      | (<RESETONCLONE_TRUE>                                                {this.setValue(_attr, "resetOnClone", true);} )
-      | (<RESETONCLONE_FALSE>                                               {this.setValue(_attr, "resetOnClone", false);} )
+      | (<MULTIVALUE_TRUE>                                                  {this.setValue(_attr, "multiValue",             true);} )
+      | (<MULTIVALUE_FALSE>                                                 {this.setValue(_attr, "multiValue",             false);} )
 
-      | (<RESETONREVISION_TRUE>                                             {this.setValue(_attr, "resetOnRevision", true);} )
-      | (<RESETONREVISION_FALSE>                                            {this.setValue(_attr, "resetOnRevision", false);} )
+      | (<RESETONCLONE_TRUE>                                                {this.setValue(_attr, "resetOnClone",           true);} )
+      | (<RESETONCLONE_FALSE>                                               {this.setValue(_attr, "resetOnClone",           false);} )
 
-      | (<RANGEVALUE_TRUE>                                                  {this.setValue(_attr, "rangeValue", true);} )
-      | (<RANGEVALUE_FALSE>                                                 {this.setValue(_attr, "rangeValue", false);} )
+      | (<RESETONREVISION_TRUE>                                             {this.setValue(_attr, "resetOnRevision",        true);} )
+      | (<RESETONREVISION_FALSE>                                            {this.setValue(_attr, "resetOnRevision",        false);} )
 
-      | (<MULTILINE_TRUE>                                                   {this.setValue(_attr, "multiline", true);} )
-      | (<MULTILINE_FALSE>                                                  {this.setValue(_attr, "multiline", false);} )
+      | (<RANGEVALUE_TRUE>                                                  {this.setValue(_attr, "rangeValue",             true);} )
+      | (<RANGEVALUE_FALSE>                                                 {this.setValue(_attr, "rangeValue",             false);} )
 
-      | (<MAXLENGTH>                ( tmp = <MAXLENGTH_NUMBER>              {this.setValue(_attr, "maxLength", this.getSingle(tmp.image));} ) )
+      | (<MULTILINE_TRUE>                                                   {this.setValue(_attr, "multiline",              true);} )
+      | (<MULTILINE_FALSE>                                                  {this.setValue(_attr, "multiline",              false);} )
 
-      | (<RULE>                     ( tmp = <STRING>                        {this.setValue(_attr, "rules", Arrays.asList(new String[]{this.getString(tmp.image)}));}
-                                    | tmp = <SINGLE>                        {this.setValue(_attr, "rules", Arrays.asList(new String[]{this.getSingle(tmp.image)}));} ) )
+      | (<MAXLENGTH>                ( tmp = <MAXLENGTH_NUMBER>              {this.setValue(_attr, "maxLength",              this.getSingle(tmp.image));} ) )
 
-      | (<DIMENSION>                ( tmp = <STRING>                        {this.setValue(_attr, "dimension", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_attr, "dimension", this.getSingle(tmp.image));} ) )
+      | (<RULE>                     ( tmp = <STRING>                        {this.appendValue(_attr, "rules",               this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_attr, "rules",               this.getSingle(tmp.image));} ) )
+
+      | (<DIMENSION>                ( tmp = <STRING>                        {this.setValue(_attr, "dimension",              this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_attr, "dimension",              this.getSingle(tmp.image));} ) )
 
       | ( <TRIGGER>                                                         {trigger = new Trigger();this.appendValue(_attr, "triggers", "triggersStack", trigger);}
-            tmp = <TRIGEVENT>                                               {this.setValue(trigger, "eventType",                            this.getSingle(tmp.image));}
-                    ( <ACTION>                                              {this.setValue(trigger, "kind",                                 "action");}
-                    | <CHECK>                                               {this.setValue(trigger, "kind",                                 "check");}
-                    | <OVERRIDE>                                            {this.setValue(trigger, "kind",                                 "override");} )
-                            ( tmp = <STRING>                                {this.setValue(trigger, "program",                              this.getString(tmp.image));}
-                            | tmp = <SINGLE>                                {this.setValue(trigger, "program",                              this.getSingle(tmp.image));} )
+            tmp = <TRIGEVENT>                                               {this.setValue(trigger, "eventType",            this.getSingle(tmp.image));}
+                    ( <ACTION>                                              {this.setValue(trigger, "kind",                 "action");}
+                    | <CHECK>                                               {this.setValue(trigger, "kind",                 "check");}
+                    | <OVERRIDE>                                            {this.setValue(trigger, "kind",                 "override");} )
+                            ( tmp = <STRING>                                {this.setValue(trigger, "program",              this.getString(tmp.image));}
+                            | tmp = <SINGLE>                                {this.setValue(trigger, "program",              this.getSingle(tmp.image));} )
                                     ( <INPUT>
-                                            ( tmp = <STRING>                {this.setValue(trigger, "arguments",                            this.getString(tmp.image));}
-                                            | tmp = <SINGLE>                {this.setValue(trigger, "arguments",                            this.getSingle(tmp.image));} ) )?  )
+                                            ( tmp = <STRING>                {this.setValue(trigger, "arguments",            this.getString(tmp.image));}
+                                            | tmp = <SINGLE>                {this.setValue(trigger, "arguments",            this.getSingle(tmp.image));} ) )?  )
 
       | (<RANGE_EQUAL>              ( tmp = <STRING>                        {range = new Range();this.setValue(range, "type", "=");      this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(_attr, "rangesStack", range);}
                                     | tmp = <SINGLE>                        {range = new Range();this.setValue(range, "type", "=");      this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(_attr, "rangesStack", range);} ) )

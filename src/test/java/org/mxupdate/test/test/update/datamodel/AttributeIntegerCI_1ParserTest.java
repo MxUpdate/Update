@@ -20,13 +20,14 @@ import java.io.IOException;
 import org.mxupdate.test.test.update.AbstractParserTest;
 import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO;
 import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO.Kind;
+import org.mxupdate.update.datamodel.AttributeInteger_mxJPO;
 import org.mxupdate.update.datamodel.AttributeString_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link AbstractAttribute_mxJPO attribute CI} parser.
+ * Tests the {@link AttributeInteger_mxJPO integer attribute CI} parser.
  *
  * @author The MxUpdate Team
  */
@@ -40,12 +41,19 @@ public class AttributeIntegerCI_1ParserTest
     {
         return new Object[][]
         {
-            {"1a) simple",
+            {"0a) simple",
                 "",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
-            {"1b) simple w/o anything to test default values",
+            {"0b) simple w/o anything to test default values",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\"",
                 ""},
+            // registered name
+            {"1a) symbolic name",
+                    "",
+                    "symbolicname \"attribute_abc\" description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
+            {"1b) two symbolic names",
+                    "symbolicname \"attribute_abc\" symbolicname \"attribute_def\" description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\"",
+                    "symbolicname \"attribute_def\" symbolicname \"attribute_abc\" description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
             // description
             {"2a) description",
                 "",

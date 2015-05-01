@@ -16,16 +16,17 @@
 package org.mxupdate.test.test.update.datamodel;
 
 import org.mxupdate.test.data.datamodel.AttributeBinaryData;
+import org.mxupdate.update.datamodel.AttributeBinary_mxJPO;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test cases for the update and export of binary attributes.
+ * Tests the {@link AttributeBinary_mxJPO binary attribute CI} export / update.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class AttributeBinaryCI_1UpdateTest
+public class AttributeBinaryCI_3UpdateTest
     extends AbstractAttributeTest<AttributeBinaryData>
 {
     /**

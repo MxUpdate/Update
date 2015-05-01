@@ -18,26 +18,27 @@ package org.mxupdate.test.test.update.datamodel;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mxupdate.test.data.datamodel.AttributeIntegerData;
+import org.mxupdate.test.data.datamodel.AttributeRealData;
 import org.mxupdate.test.data.datamodel.DimensionData;
 import org.mxupdate.test.data.datamodel.DimensionData.UnitData;
 import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.test.util.Version;
+import org.mxupdate.update.datamodel.AttributeReal_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test cases for the update and export of integer attributes.
+ * Tests the {@link AttributeReal_mxJPO real attribute CI} export / update.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class AttributeIntegerCI_2UpdateTest
-    extends AbstractAttributeWithRangesAndMultiValuesTest<AttributeIntegerData>
+public class AttributeRealCI_3UpdateTest
+    extends AbstractAttributeWithRangesAndMultiValuesTest<AttributeRealData>
 {
     /**
-     * Data provider for test integer attributes.
+     * Data provider for test real attributes.
      *
      * @return object array with all test attributes
      */
@@ -48,17 +49,17 @@ public class AttributeIntegerCI_2UpdateTest
 
         // range value flag
         ret.add(new Object[]{
-                "integer attribute with defined rangevalue flag 'true'",
+                "real attribute with defined rangevalue flag 'true'",
                 this.createNewData("hello")
                         .setFlag("rangevalue", true)
                         .defNotSupported(Version.V6R2011x)});
         ret.add(new Object[]{
-                "integer attribute with defined rangevalue flag 'false'",
+                "real attribute with defined rangevalue flag 'false'",
                 this.createNewData("hello")
                         .setFlag("rangevalue", false)
                         .defNotSupported(Version.V6R2011x)});
         ret.add(new Object[]{
-                "integer attribute with no defined rangevalue flag 'false' (to check default value)",
+                "real attribute with no defined rangevalue flag 'false' (to check default value)",
                 this.createNewData("hello"),
                 this.createNewData("hello")
                         .setFlag("rangevalue", false)
@@ -66,7 +67,7 @@ public class AttributeIntegerCI_2UpdateTest
 
         // dimension
         ret.add(new Object[]{
-                "integer attribute with dimension",
+                "real attribute with dimension",
                 this.createNewData("hello")
                         .setDimension(new DimensionData(this, "Test Dimension")
                                 .addUnit(new UnitData("unit")
@@ -76,7 +77,7 @@ public class AttributeIntegerCI_2UpdateTest
                                         .setValueWOQuots("multiplier", "1.0")
                                         .setValueWOQuots("offset", "0.0")))});
 
-        return this.prepareData("integer attribute", "0", "1", ret.toArray(new Object[ret.size()][]));
+        return this.prepareData("real attribute", "1.234567", "9.876543", ret.toArray(new Object[ret.size()][]));
     }
 
     /**
@@ -89,7 +90,7 @@ public class AttributeIntegerCI_2UpdateTest
     public void negativeTestUpdateRangeValueFlag()
         throws Exception
     {
-        new AttributeIntegerData(this, "test")
+        new AttributeRealData(this, "test")
                 .setFlag("rangevalue", true)
                 .create()
                 .update((String) null)
@@ -104,10 +105,10 @@ public class AttributeIntegerCI_2UpdateTest
      * @throws Exception if test failed
      */
     @Test(description = "negative test that update failed for modified dimension")
-    public void negativeTestUpdateDimension()
+    public void negativeTestUpdateDelimiter()
         throws Exception
     {
-        new AttributeIntegerData(this, "test")
+        new AttributeRealData(this, "test")
                 .setDimension(new DimensionData(this, "Test Dimension")
                         .addUnit(new UnitData("unit")
                                 .setFlag("default", true)
@@ -123,8 +124,8 @@ public class AttributeIntegerCI_2UpdateTest
     }
 
     @Override()
-    protected AttributeIntegerData createNewData(final String _name)
+    protected AttributeRealData createNewData(final String _name)
     {
-        return new AttributeIntegerData(this, _name);
+        return new AttributeRealData(this, _name);
     }
 }

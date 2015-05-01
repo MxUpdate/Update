@@ -40,12 +40,19 @@ public class AttributeStringCI_1ParserTest
     {
         return new Object[][]
         {
-            {"1a) simple",
+            {"0a) simple",
                 "",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\""},
-            {"1b) simple w/o anything to test default values",
+            {"0b) simple w/o anything to test default values",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\"",
                 ""},
+            // registered name
+            {"1a) symbolic name",
+                    "",
+                    "symbolicname \"attribute_abc\" description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\""},
+            {"1b) two symbolic names",
+                    "symbolicname \"attribute_abc\" symbolicname \"attribute_def\" description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\"",
+                    "symbolicname \"attribute_def\" symbolicname \"attribute_abc\" description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\""},
             // description
             {"2a) description",
                 "",

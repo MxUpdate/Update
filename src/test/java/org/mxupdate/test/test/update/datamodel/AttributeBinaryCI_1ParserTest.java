@@ -20,19 +20,18 @@ import java.io.IOException;
 import org.mxupdate.test.test.update.AbstractParserTest;
 import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO;
 import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO.Kind;
-import org.mxupdate.update.datamodel.AttributeBoolean_mxJPO;
-import org.mxupdate.update.datamodel.AttributeString_mxJPO;
+import org.mxupdate.update.datamodel.AttributeBinary_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link AttributeBoolean_mxJPO boolean attribute CI} parser.
+ * Tests the @link AttributeBinary_mxJPO binary attribute CI} parser.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class AttributeBooleanCI_1ParserTest
+public class AttributeBinaryCI_1ParserTest
     extends AbstractParserTest<AbstractAttribute_mxJPO<?>>
 {
     @Override()
@@ -71,20 +70,6 @@ public class AttributeBooleanCI_1ParserTest
             {"3b) not hidden (not defined)",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\"",
                 "description \"\" !multivalue !resetonclone !resetonrevision default \"\""},
-            // multivalue flag
-            {"4a) multivalue",
-                "",
-                "description \"\" !hidden multivalue !resetonclone !resetonrevision default \"\""},
-            {"4b) not multivalue not defined",
-                "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\"",
-                "description \"\" !hidden             !resetonclone !resetonrevision default \"\""},
-            // multivalue flag
-            {"5a) multivalue",
-                "",
-                "description \"\" !hidden !multivalue resetonclone !resetonrevision default \"\""},
-            {"5b) not multivalue not defined",
-                "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\"",
-                "description \"\" !hidden !multivalue                !resetonrevision default \"\""},
             // resetonrevision flag
             {"6a) multivalue",
                 "",
@@ -92,25 +77,6 @@ public class AttributeBooleanCI_1ParserTest
             {"6b) not multivalue not defined",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\"",
                 "description \"\" !hidden !multivalue !resetonclone                  default \"\""},
-            // default value
-            {"7a) default value",
-                "",
-                "description \"\" hidden !multivalue !resetonclone !resetonrevision default \"abc\""},
-            {"7b) default value with new line",
-                "",
-                "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc\ndef\""},
-            {"7c) default value with apostrophe",
-                "",
-                "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc\\\"def\""},
-            {"7d) default value with \\n to test replaced by newline",
-                "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc\ndef\"",
-                "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc\\ndef\""},
-            {"7e) default value with \\\\ to test replaced by \\",
-                "",
-                "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc\\\\def\""},
-            {"7f) default value with \\{ to test replaced by {",
-                "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc{}def\"",
-                "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc\\{\\}def\""},
             // action trigger
             {"8a) action trigger with input",
                 "",
@@ -152,7 +118,7 @@ public class AttributeBooleanCI_1ParserTest
     protected AbstractAttribute_mxJPO<?> createNewData(final ParameterCache_mxJPO _paramCache,
                                                   final String _name)
     {
-        return new AbstractAttribute_mxJPO<AttributeString_mxJPO>(_paramCache.getMapping().getTypeDef("AttributeString"), _name, Kind.Boolean)
+        return new AbstractAttribute_mxJPO<AttributeBinary_mxJPO>(_paramCache.getMapping().getTypeDef("AttributeBinary"), _name, Kind.Binary)
         {
             @Override()
             protected void write(final ParameterCache_mxJPO _paramCache,
