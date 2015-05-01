@@ -68,15 +68,15 @@ public class Format_mxJPO
     private String commandView = null;
 
     /** Mime type of the format. */
-    private String mimeType = null;
+    private String mimeType = "";
     /** File suffix of the format. */
-    private String fileSuffix = null;
+    private String fileSuffix = "";
 
     /** Type and creator of the format (used only for MacOS, creator is always equal type!). */
-    private String type = null;
+    private String type = "";
 
     /** Version of the format. */
-    private String version = null;
+    private String version = "";
 
     /**
      * Constructor used to initialize the type definition enumeration.
