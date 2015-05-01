@@ -1074,7 +1074,7 @@ public static final String[] lexStateNames = {
 
 /** Lex State array. */
 public static final int[] jjnewLexState = {
-   -1, -1, -1, -1, -1, 1, -1, -1, 2, 3, 3, 3, 3, 2, 0, 2, 2, 
+   -1, -1, -1, -1, -1, 1, -1, -1, 1, 3, 3, 3, 3, 2, 0, 2, 2, 
 };
 static final long[] jjtoToken = {
    0x1ffe1L, 

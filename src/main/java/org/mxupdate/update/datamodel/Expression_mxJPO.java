@@ -124,8 +124,6 @@ public class Expression_mxJPO
                          final Appendable _out)
         throws IOException
     {
-        this.writeHeader(_paramCache, _out);
-
         final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
 
         this.writeHeader(_paramCache, updateBuilder.getStrg());

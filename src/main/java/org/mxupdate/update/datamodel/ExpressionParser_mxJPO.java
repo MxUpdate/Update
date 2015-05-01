@@ -78,13 +78,13 @@ this.setValue(_expression, "hidden",       false);property = null;
       case VALUE:{
         jj_consume_token(VALUE);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case STRING:{
-          tmp = jj_consume_token(STRING);
+        case MULTILINESTRING:{
+          tmp = jj_consume_token(MULTILINESTRING);
 tmpStr = this.getString(tmp.image);
           break;
           }
-        case SINGLE:{
-          tmp = jj_consume_token(SINGLE);
+        case MULTILINESINGLE:{
+          tmp = jj_consume_token(MULTILINESINGLE);
 tmpStr = this.getSingle(tmp.image);
           break;
           }
@@ -189,7 +189,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x21e0,0x1800,0x600,0x600,0x18000,0x600,0x4000,0x21e0,};
+      jj_la1_0 = new int[] {0x21e0,0x1800,0x1800,0x600,0x18000,0x600,0x4000,0x21e0,};
    }
 
   /** Constructor with InputStream. */

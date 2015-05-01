@@ -62,6 +62,9 @@ public class ExpressionCI_1ParserTest
             {"4b) value not defined",
                     "description \"\" !hidden value \"\"",
                     "description \"\" !hidden           "},
+            {"4c) multi-line value",
+                "",
+                "description \"\" !hidden value \"abc\ndef\""},
             // property
             {"8a) property special characters",
                 "",

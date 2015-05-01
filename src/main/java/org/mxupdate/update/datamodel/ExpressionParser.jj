@@ -54,7 +54,7 @@ class ExpressionParser
     | <HIDDEN_TRUE:                         "hidden">
     | <HIDDEN_FALSE:                        "!hidden">
 
-    | <VALUE:                               "value">                                        : STRING_EXPECTED
+    | <VALUE:                               "value">                                        : MULTILINESTRING_EXPECTED
 }
 
 /************************************************************** Common String */
@@ -103,8 +103,8 @@ void parse(final Expression_mxJPO _expression)
       | (<HIDDEN_TRUE>                                                      {this.setValue(_expression, "hidden",       true); property = null;} )
       | (<HIDDEN_FALSE>                                                     {this.setValue(_expression, "hidden",       false);property = null;} )
 
-      | (<VALUE>                    ( tmp = <STRING>                        {tmpStr = this.getString(tmp.image);}
-                                    | tmp = <SINGLE>                        {tmpStr = this.getSingle(tmp.image);} )
+      | (<VALUE>                    ( tmp = <MULTILINESTRING>               {tmpStr = this.getString(tmp.image);}
+                                    | tmp = <MULTILINESINGLE>               {tmpStr = this.getSingle(tmp.image);} )
                                                                             {   // hint: token value is used twice
                                                                                 // (for property and es expression value)
                                                                                 // => staffed via property variable                                                                                if (property == null)  {
