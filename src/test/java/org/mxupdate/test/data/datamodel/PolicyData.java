@@ -643,6 +643,7 @@ public class PolicyData
         {
             _cmd.append("  state \"").append(StringUtil_mxJPO.convertTcl(this.name)).append("\" {\n");
             for (final Access accessFilter : this.access)  {
+                _cmd.append("     ");
                 accessFilter.append4CIFile(_cmd);
             }
             this.getFlags().append4CIFileValues("      ", _cmd, "\n");
@@ -751,6 +752,7 @@ public class PolicyData
                     }
                     final StringBuilder expAccess = new StringBuilder();
                     for (final Access accessFilter : this.access)  {
+                        expAccess.append("     ");
                         accessFilter.append4CIFile(expAccess);
                     }
                     Assert.assertEquals(
@@ -819,6 +821,7 @@ public class PolicyData
         {
             _cmd.append("    allstate {\n");
             for (final Access accessFilter : this.access)  {
+                _cmd.append("     ");
                 accessFilter.append4CIFile(_cmd);
             }
             _cmd.append("    }\n");
@@ -865,6 +868,7 @@ public class PolicyData
                     // prepare expected definition
                     final StringBuilder expAccess = new StringBuilder();
                     for (final Access accessFilter : this.access)  {
+                        expAccess.append("     ");
                         accessFilter.append4CIFile(expAccess);
                     }
                     Assert.assertEquals(

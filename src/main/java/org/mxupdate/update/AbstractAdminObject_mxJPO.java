@@ -34,6 +34,7 @@ import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO;
 import org.mxupdate.update.datamodel.Dimension_mxJPO;
 import org.mxupdate.update.datamodel.Format_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
+import org.mxupdate.update.datamodel.Rule_mxJPO;
 import org.mxupdate.update.userinterface.Channel_mxJPO;
 import org.mxupdate.update.userinterface.Command_mxJPO;
 import org.mxupdate.update.userinterface.Menu_mxJPO;
@@ -554,9 +555,10 @@ public abstract class AbstractAdminObject_mxJPO
         // remove all properties
         // (only if not attribute, because attributes and formats uses calulated deltas)
         if (!(this instanceof AbstractAttribute_mxJPO)
-                && !(this instanceof Format_mxJPO)
                 && !(this instanceof Dimension_mxJPO)
+                && !(this instanceof Format_mxJPO)
                 && !(this instanceof Policy_mxJPO)
+                && !(this instanceof Rule_mxJPO)
                 && !(this instanceof Channel_mxJPO)
                 && !(this instanceof Command_mxJPO)
                 && !(this instanceof Menu_mxJPO)

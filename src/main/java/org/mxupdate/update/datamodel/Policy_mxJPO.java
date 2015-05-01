@@ -349,14 +349,14 @@ public class Policy_mxJPO
 
         // all state access
         if (this.allState)  {
-            _out.append("\n  allstate {");
-            this.allStateAccess.writeObject(_paramCache, _out);
-            _out.append("\n  }");
+            _out.append("\n  allstate {\n");
+            this.allStateAccess.write(_paramCache, "    ", _out);
+            _out.append("  }");
         }
 
         // all states
         for (final State state : this.states)  {
-            state.writeObject(_paramCache, _out);
+            state.write(_paramCache, "  ", _out);
         }
 
         // append properties
@@ -868,8 +868,9 @@ throw new Exception("some states are not defined anymore!");
          * </ul>
          */
         @Override()
-        public void writeObject(final ParameterCache_mxJPO _paramCache,
-                                final Appendable _out)
+        public void write(final ParameterCache_mxJPO _paramCache,
+                          final String _prefix,
+                          final Appendable _out)
             throws IOException
         {
             // state name and registered name
@@ -913,9 +914,10 @@ throw new Exception("some states are not defined anymore!");
                     .append(StringUtil_mxJPO.convertTcl(this.routeMessage)).append('\"');
             }
             // write access statements
-            super.writeObject(_paramCache, _out);
+            _out.append("\n");
+            super.write(_paramCache, "    ", _out);
             // write event statements
-            _out.append("\n    action \"").append(StringUtil_mxJPO.convertTcl(this.actionProgram))
+            _out.append("    action \"").append(StringUtil_mxJPO.convertTcl(this.actionProgram))
                 .append("\" input \"").append(StringUtil_mxJPO.convertTcl(this.actionInput)).append('\"')
                 .append("\n    check \"").append(StringUtil_mxJPO.convertTcl(this.checkProgram))
                 .append("\" input \"").append(StringUtil_mxJPO.convertTcl(this.checkInput)).append('\"');

@@ -235,8 +235,6 @@ public class Access
      */
     public void append4CIFile(final StringBuilder _cmd)
     {
-        _cmd.append("     ");
-
         if (this.prefix != null)  {
             _cmd.append(' ').append(this.prefix);
         }
@@ -244,11 +242,11 @@ public class Access
         _cmd.append(' ').append(this.kind);
 
         if (this.user != null)  {
-            _cmd.append(" \"").append(StringUtil_mxJPO.convertTcl(this.user.getName())).append('\"');
+            _cmd.append(" \"").append(StringUtil_mxJPO.convertUpdate(this.user.getName())).append('\"');
         }
 
         if (this.key != null)  {
-            _cmd.append(" key \"").append(StringUtil_mxJPO.convertTcl(this.key)).append('\"');
+            _cmd.append(" key \"").append(StringUtil_mxJPO.convertUpdate(this.key)).append('\"');
         }
 
         _cmd.append(" {").append(StringUtil_mxJPO.joinTcl(' ', false, this.accessList, "none")).append("}");
@@ -272,10 +270,10 @@ public class Access
             _cmd.append(' ').append(this.category).append(" category");
         }
         if (this.filter != null)  {
-            _cmd.append(" filter \"").append(StringUtil_mxJPO.convertTcl(this.filter)).append('\"');
+            _cmd.append(" filter \"").append(StringUtil_mxJPO.convertUpdate(this.filter)).append('\"');
         }
         if (this.localfilter != null)  {
-            _cmd.append(" localfilter \"").append(StringUtil_mxJPO.convertTcl(this.localfilter)).append('\"');
+            _cmd.append(" localfilter \"").append(StringUtil_mxJPO.convertUpdate(this.localfilter)).append('\"');
         }
 
         _cmd.append('\n');
@@ -325,10 +323,10 @@ public class Access
             ret.append(this.category).append(" category ");
         }
         if (this.filter != null)  {
-            ret.append("filter \"").append(AbstractTest.convertTcl(this.filter)).append("\" ");
+            ret.append("filter \"").append(AbstractTest.convertMql(this.filter)).append("\" ");
         }
         if (this.localfilter != null)  {
-            ret.append("localfilter \"").append(AbstractTest.convertTcl(this.localfilter)).append("\" ");
+            ret.append("localfilter \"").append(AbstractTest.convertMql(this.localfilter)).append("\" ");
         }
         return ret.toString();
     }

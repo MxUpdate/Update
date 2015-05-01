@@ -234,16 +234,18 @@ public class AccessList_mxJPO
      * given writer instance {@code _out}.
      *
      * @param _paramCache   parameter cache
-     * @param _out      writer instance
+     * @param _prefix       prefix written in front of each line
+     * @param _out          writer instance
      * @throws IOException if the TCL update code could not be written
      */
-    public void writeObject(final ParameterCache_mxJPO _paramCache,
-                            final Appendable _out)
+    public void write(final ParameterCache_mxJPO _paramCache,
+                      final String _prefix,
+                      final Appendable _out)
         throws IOException
     {
         for (final AccessList_mxJPO.Access access : this.accessList)  {
             if (!access.isEmpty())  {
-                _out.append("\n   ");
+                _out.append(_prefix.substring(0, _prefix.length() - 1));
 
                 // revoke?
                 if (access.prefix != Prefix.All)  {
@@ -255,18 +257,16 @@ public class AccessList_mxJPO
 
                 // append user reference (only if not public / owner definition)
                 if (!"public".equals(access.kind) && !"owner".equals(access.kind))  {
-                    _out.append(" \"").append(StringUtil_mxJPO.convertTcl(access.userRef)).append('\"');
+                    _out.append(" \"").append(StringUtil_mxJPO.convertUpdate(access.userRef)).append('\"');
                 }
 
                 // key
                 if ((access.key != null) && !access.key.isEmpty())  {
-                    _out.append(" key \"").append(StringUtil_mxJPO.convertTcl(access.key)).append('\"');
+                    _out.append(" key \"").append(StringUtil_mxJPO.convertUpdate(access.key)).append('\"');
                 }
 
                 // access
-                _out.append(" {")
-                    .append(StringUtil_mxJPO.joinTcl(' ', false, access.access, null))
-                    .append('}');
+                _out.append(" {").append(StringUtil_mxJPO.joinTcl(' ', false, access.access, null)).append('}');
 
                 // user items
                 if ((access.organization != null) && !access.organization.isEmpty() && !"any".equals(access.organization))  {
@@ -288,43 +288,13 @@ public class AccessList_mxJPO
                     _out.append(' ').append(access.category).append(" category");
                 }
                 if ((access.filter != null) && !access.filter.isEmpty())  {
-                    _out.append(" filter \"").append(StringUtil_mxJPO.convertTcl(access.filter)).append('\"');
+                    _out.append(" filter \"").append(StringUtil_mxJPO.convertUpdate(access.filter)).append('\"');
                 }
                 if ((access.localfilter != null) && !access.localfilter.isEmpty())  {
-                    _out.append(" localfilter \"").append(StringUtil_mxJPO.convertTcl(access.localfilter)).append('\"');
+                    _out.append(" localfilter \"").append(StringUtil_mxJPO.convertUpdate(access.localfilter)).append('\"');
                 }
+                _out.append('\n');
             }
-        }
-    }
-
-    /**
-     * Appends the MQL Code to remove all defined access to {@code _out}.
-     *
-     * @param _out      writer instance
-     */
-    @Deprecated()
-    public void cleanup(final StringBuilder _out)
-    {
-        // to ensure that public / owner filters are removed:
-        // define them first with empty filter and remove them afterwards
-        // (not possible via 'remove all' for all MX versions)
-        _out.append(" revoke public none filter \"\" remove revoke public all ")
-            .append(" revoke owner none filter \"\" remove revoke owner all ")
-            .append(" public none filter \"\" remove public all ")
-            .append(" owner none filter \"\" remove owner all ");
-        for (final AccessList_mxJPO.Access access : this.accessList)  {
-            _out.append(" remove");
-            if (access.prefix != Prefix.All)  {
-                _out.append(' ').append(access.prefix.mxValue);
-            }
-            _out.append(' ').append(access.kind);
-            if (!"public".equals(access.kind) && !"owner".equals(access.kind))  {
-                _out.append(" \"").append(StringUtil_mxJPO.convertMql(access.userRef)).append('\"');
-            }
-            if ((access.key != null) && !access.key.isEmpty())  {
-                _out.append(" key \"").append(StringUtil_mxJPO.convertMql(access.key)).append('\"');
-            }
-            _out.append(" all filter \"\"");
         }
     }
 
@@ -364,10 +334,8 @@ public class AccessList_mxJPO
      * with {@code _linePrefix}.
      *
      * @param _mql              mql builder
-     * @throws IOException if write failed
      */
     public void update(final MultiLineMqlBuilder _mql)
-        throws IOException
     {
         // append all new access definitions
         for (final AccessList_mxJPO.Access access : this.accessList)  {
@@ -429,70 +397,6 @@ public class AccessList_mxJPO
                 }
                 if (access.localfilter != null)  {
                     _mql.cmd(" localfilter ").arg(access.localfilter);
-                }
-            }
-        }
-    }
-
-    /**
-     * Appends all access items to the {@code _out}. Each line is prefixed
-     * with {@code _linePrefix}.
-     *
-     * @param _linePrefix       line prefix
-     * @param _out              writer instance
-     * @throws IOException if write failed
-     */
-    @Deprecated()
-    public void update(final String _linePrefix,
-                       final Appendable _out)
-        throws IOException
-    {
-        // append all new access definitions
-        for (final AccessList_mxJPO.Access access : this.accessList)  {
-
-            if (!access.isEmpty())  {
-                _out.append(_linePrefix);
-
-                // prefix login / revoke?
-                if (access.prefix != Prefix.All)  {
-                    _out.append(' ').append(access.prefix.mxValue);
-                }
-                // kind
-                _out.append(' ').append(access.kind);
-                // append user reference (only if not public / owner definition)
-                if (!"public".equals(access.kind) && !"owner".equals(access.kind))  {
-                    _out.append(" \"").append(StringUtil_mxJPO.convertMql(access.userRef)).append('\"');
-                }
-                // access filter key
-                if ((access.key != null) && !access.key.isEmpty())  {
-                    _out.append(" key \"").append(StringUtil_mxJPO.convertMql(access.key)).append('\"');
-                }
-                // access
-                _out.append(' ').append(StringUtil_mxJPO.joinMql(',', false, access.access, "none"));
-                // user items
-                if ((access.organization != null) && !access.organization.isEmpty() && !"any".equals(access.organization))  {
-                    _out.append(' ').append(access.organization).append(" organization");
-                }
-                if ((access.project != null) && !access.project.isEmpty() && !"any".equals(access.project))  {
-                    _out.append(' ').append(access.project).append(" project");
-                }
-                if ((access.owner != null) && !access.owner.isEmpty() && !"any".equals(access.owner))  {
-                    _out.append(' ').append(access.owner).append(" owner");
-                }
-                if ((access.reserve != null) && !access.reserve.isEmpty() && !"any".equals(access.reserve))  {
-                    _out.append(' ').append(access.reserve).append(" reserve");
-                }
-                if ((access.maturity != null) && !access.maturity.isEmpty() && !"any".equals(access.maturity))  {
-                    _out.append(' ').append(access.maturity).append(" maturity");
-                }
-                if ((access.category != null) && !access.category.isEmpty() && !"any".equals(access.category))  {
-                    _out.append(' ').append(access.category).append(" category");
-                }
-                if (access.filter != null)  {
-                    _out.append(" filter \"").append(StringUtil_mxJPO.convertMql(access.filter)).append('\"');
-                }
-                if (access.localfilter != null)  {
-                    _out.append(" localfilter \"").append(StringUtil_mxJPO.convertMql(access.localfilter)).append('\"');
                 }
             }
         }

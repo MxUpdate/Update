@@ -15,15 +15,18 @@
 
 package org.mxupdate.update.datamodel;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
+import org.mxupdate.update.datamodel.rule.RuleDefParser_mxJPO;
+import org.mxupdate.update.util.DeltaUtil_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
@@ -97,62 +100,98 @@ public class Rule_mxJPO
      *                     written
      */
     @Override()
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Appendable _out)
+        throws IOException
+    {
+        this.writeHeader(_paramCache, _out);
+
+        _out.append("mxUpdate rule \"${NAME}\"  {\n")
+            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n")
+            .append("    ").append(this.isHidden() ? "" : "!").append("hidden\n");
+
+        this.accessList.write(_paramCache, "    ", _out);
+        this.getProperties().writeProperties(_paramCache, _out, "  ");
+
+        _out.append("}");
+    }
+
+    /**
+     * Only implemented as stub because
+     * {@link #write(ParameterCache_mxJPO, Appendable)} is new implemented.
+     *
+     * @param _paramCache   parameter cache (not used)
+     * @param _out          appendable instance to the TCL update file (not
+     *                      used)
+     */
+    @Override()
     protected void writeObject(final ParameterCache_mxJPO _paramCache,
                                final Appendable _out)
         throws IOException
     {
-        // hidden?
-        _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden");
+    }
 
-        this.accessList.update(" \\\n    add", _out);
+
+    /**
+     * The method is called from the TCL update code to define the this
+     * rule.
+     *
+     * @param _paramCache   parameter cache
+     * @param _args         first index defines the use case (must be
+     *                      &quot;updateAttribute&quot; that the attribute
+     *                      is updated); second index the name of the attribute
+     *                      to update
+     * @throws Exception if the update of the dimension failed or for all other
+     *                   use cases from super JPO call
+     */
+    @Override()
+    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
+                               final String... _args)
+        throws Exception
+    {
+        // check if dimension is defined
+        if ((_args.length == 4) && "mxUpdate".equals(_args[0]) && "rule".equals(_args[1])) {
+// TODO: Exception Handling
+            // check that rule names are equal
+            if (!this.getName().equals(_args[2]))  {
+                throw new Exception("wrong rule '" + _args[1] + "' is set to update (currently rule '" + this.getName() + "' is updated!)");
+            }
+
+            final String code = _args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
+
+            final RuleDefParser_mxJPO parser = new RuleDefParser_mxJPO(new StringReader(code));
+            final Rule_mxJPO rule = parser.parse(_paramCache, this.getTypeDef(), this.getName());
+
+            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod rule $1", this.getName());
+
+            this.calcDelta(_paramCache, mql, rule);
+
+            mql.exec(_paramCache);
+
+        } else  {
+            super.jpoCallExecute(_paramCache, _args);
+        }
     }
 
     /**
-     * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this rule. Following steps are
-     * done:
-     * <ul>
-     * <li>set to not hidden</li>
-     * <li>no owner and public access</li>
-     * <li>no public or owner revoke definition (only if not defined or if not
-     *     <code>none</code>)</li>
-     * <li>remove all users</li>
-     * </ul>
+     * Calculates the delta between this current rule definition and the
+     * {@code _target} rule definition and appends the MQL append rules
+     * to {@code _mql}.
      *
-     * @param _paramCache       parameter cache
-     * @param _preMQLCode       MQL statements which must be called before the
-     *                          TCL code is executed
-     * @param _postMQLCode      MQL statements which must be called after the
-     *                          TCL code is executed
-     * @param _preTCLCode       TCL code which is defined before the source
-     *                          file is sourced
-     * @param _tclVariables     map of all TCL variables where the key is the
-     *                          name and the value is value of the TCL variable
-     *                          (the value is automatically converted to TCL
-     *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the called update from derived class failed
+     * @param _paramCache   parameter cache
+     * @param _mql          builder to append the MQL rules
+     * @param _target       target format definition
      */
-    @Override()
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final CharSequence _preMQLCode,
-                          final CharSequence _postMQLCode,
-                          final CharSequence _preTCLCode,
-                          final Map<String,String> _tclVariables,
-                          final File _sourceFile)
-        throws Exception
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MultiLineMqlBuilder _mql,
+                             final Rule_mxJPO _target)
     {
-        final StringBuilder preMQLCode = new StringBuilder()
-            .append("escape mod ").append(this.getTypeDef().getMxAdminName())
-            .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-            .append(" !hidden ");
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "description", _target.getDescription(),   this.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      _target.isHidden(),         this.isHidden());
 
-        this.accessList.cleanup(preMQLCode);
+        _target.accessList.cleanup(_mql);
+        _target.accessList.update(_mql);
 
-        // append already existing pre MQL code
-        preMQLCode.append(";\n")
-                  .append(_preMQLCode);
-
-        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+        _target.getProperties().calcDelta(_mql, "", this.getProperties());
     }
 }

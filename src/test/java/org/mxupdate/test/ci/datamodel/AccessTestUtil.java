@@ -50,7 +50,7 @@ public final class AccessTestUtil
                         || ("public".equals(kind) && !"login".equals(prefix))
                         || ("user".equals(kind)   && (prefix == null)))  {
                     final String txt = ((prefix != null) ? prefix + " ": "") + kind;
-                    /*ret.add(new Object[]{
+                    ret.add(new Object[]{
                             _test.getDescriptionPrefix() + " access for " + txt + " read/show",
                             _test.createTestData4Access(
                                                 new Access()
@@ -77,7 +77,7 @@ public final class AccessTestUtil
                                                 new Access()
                                                         .setKind("user")
                                                         .setUser(new PersonAdminData(test, "guest"))
-                                                        .addAccess("read", "show"))});*/
+                                                        .addAccess("read", "show"))});
                     ret.add(new Object[]{
                             _test.getDescriptionPrefix() + " access for " + txt + " read/show with filter expression",
                             _test.createTestData4Access(

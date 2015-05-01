@@ -20,13 +20,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.ExportParser.Line;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.datamodel.helper.Access;
+import org.testng.Assert;
 
 /**
  * Used to define a rule, create them and test the result.
@@ -80,12 +82,25 @@ public class RuleData
     @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder()
-            .append("mql escape mod rule \"${NAME}\"");
+        final StringBuilder strg = new StringBuilder();
+        this.append4CIFileHeader(strg);
+        strg.append("mxUpdate rule \"${NAME}\" {\n");
 
-        this.append4CIFileValues(cmd);
+        this.getFlags().append4CIFileValues("    ", strg, "\n");
+        this.getValues().appendUpdate("    ", strg, "\n");
 
-        return cmd.toString();
+        for (final Access access : this.accessList)  {
+            strg.append("   ");
+            access.append4CIFile(strg);
+        }
+
+        this.getProperties().appendCIFileUpdateFormat("    ", strg);
+        for (final String ciLine : this.getCILines())  {
+            strg.append("    ").append(ciLine).append('\n');
+        }
+        strg.append("}");
+
+        return strg.toString();
     }
 
     /**
@@ -136,17 +151,39 @@ public class RuleData
     }
 
     /**
-     * Appends the add statements for the owner / public access / revokes.
-     *
-     * @param _needAdds     set where all adds are appended
+     * {@inheritDoc}
      */
     @Override()
-    protected void evalAdds4CheckExport(final Set<String> _needAdds)
+    public void checkExport(final ExportParser _exportParser)
+        throws MatrixException
     {
-        super.evalAdds4CheckExport(_needAdds);
+        // check symbolic name
+        Assert.assertEquals(
+                _exportParser.getSymbolicName(),
+                this.getSymbolicName(),
+                "check symbolic name");
 
-        for (final Access access : this.accessList)  {
-            _needAdds.add(access.getMQLCreateString().trim());
+        this.getFlags().checkExport(_exportParser.getRootLines().get(0), "");
+        this.getValues().checkExport(_exportParser);
+        this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
+
+        // access filter
+        String exportAccess  = "";
+        for (final Line subLine : _exportParser.getRootLines().get(0).getChildren())  {
+            if (subLine.getTag().equals("public")
+                    || subLine.getTag().equals("owner")
+                    || subLine.getTag().equals("user")
+                    || subLine.getTag().equals("login")
+                    || subLine.getTag().equals("revoke"))  {
+
+                exportAccess += "    " + subLine.getTag() + ' ' + subLine.getValue() + '\n';
+            }
         }
+        final StringBuilder expAccess = new StringBuilder();
+        for (final Access access : this.accessList)  {
+            expAccess.append("   ");
+            access.append4CIFile(expAccess);
+        }
+        Assert.assertEquals(exportAccess, expAccess.toString(), "check access definition");
     }
 }

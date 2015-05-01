@@ -1,0 +1,312 @@
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
+options {
+    JDK_VERSION = "1.6";
+    STATIC = false;
+    ERROR_REPORTING = true;
+    USER_TOKEN_MANAGER = false;
+    GENERATE_BOILERPLATE = false;
+}
+PARSER_BEGIN(RuleDefParser)
+package org.mxupdate.update.datamodel.rule;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+
+import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.datamodel.Rule_mxJPO;
+import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
+import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
+import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Prefix;
+import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
+import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
+import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
+
+public class RuleDefParser
+    extends AbstractParser_mxJPO<Rule_mxJPO>
+{
+}
+PARSER_END(RuleDefParser)<DEFAULT> SKIP :
+{
+    " "
+|   "\r"
+|   "\t"
+|   "\n"
+}
+
+<DEFAULT> TOKEN : /** first level */
+{
+      <DESCRIPTION:             "description">      : STRING_EXPECTED
+    | <HIDDEN_TRUE:             "hidden">
+    | <HIDDEN_FALSE:            "!hidden">
+    | <PROPERTY:                "property">         : STRING_EXPECTED
+    | <PROPERTYTO:              "to">               : ADMINREF_EXPECTED
+    | <PROPERTYVAL:             "value">            : STRING_EXPECTED
+}
+
+/*********************************************************** Access Definition */
+
+<DEFAULT> TOKEN :
+{
+      <REVOKE:                  "revoke">           : DEFAULT
+    | <LOGIN:                   "login">            : DEFAULT
+    | <OWNER:                   "owner">            : ACCESS_EXPECTED
+    | <PUBLIC:                  "public">           : ACCESS_EXPECTED
+    | <USER:                    "user">             : ACCESS_STRING_EXPECTED
+}
+
+<ACCESS_EXPECTED> SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+}
+
+<ACCESS_EXPECTED> TOKEN:
+{
+      <KEY:                                 "key" >                                                 : ACCESS_STRING_EXPECTED
+    | <ACCESS:                              "{" ([" ","\t","\n","\r"])* (["a"-"z"]) (["a"-"z"," ","\t","\n","\r"])* "}">
+                                                                                                    : DEFAULT
+}
+/** String within Access */
+<ACCESS_STRING_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<ACCESS_STRING_EXPECTED> TOKEN :
+{
+      <ACCESS_STRING : (<ACCESS_STRING_APOSTROPHE>(<ACCESS_STRING_CHAR> | "\\\"" | "{" | "}" | " ")*<ACCESS_STRING_APOSTROPHE>)>
+                                                                                                    : ACCESS_EXPECTED
+    | <ACCESS_SINGLE_STRING : (<ACCESS_STRING_CHAR>)+>                                              : ACCESS_EXPECTED
+    | <#ACCESS_STRING_APOSTROPHE: "\"" >
+    | <#ACCESS_STRING_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/** After access definition back to default */
+<DEFAULT> TOKEN:
+{
+      <FILTER:                              "filter">                                               : STRING_EXPECTED
+    | <LOCALFILTER:                         "localfilter">                                          : STRING_EXPECTED
+    | <ORGANIZATION_ANY:                    "any"         ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
+    | <ORGANIZATION_SINGLE:                 "single"      ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
+    | <ORGANIZATION_ANCESTOR:               "ancestor"    ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
+    | <ORGANIZATION_DESCENDANT:             "descendant"  ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
+    | <ORGANIZATION_RELATED:                "related"     ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
+    | <PROJECT_ANY:                         "any"         ([" ","\t","\n","\r"])+ "project">        : DEFAULT
+    | <PROJECT_SINGLE:                      "single"      ([" ","\t","\n","\r"])+ "project">        : DEFAULT
+    | <PROJECT_ANCESTOR:                    "ancestor"    ([" ","\t","\n","\r"])+ "project">        : DEFAULT
+    | <PROJECT_DESCENDANT:                  "descendant"  ([" ","\t","\n","\r"])+ "project">        : DEFAULT
+    | <PROJECT_RELATED:                     "related"     ([" ","\t","\n","\r"])+ "project">        : DEFAULT
+    | <OWNER_ANY:                           "any"         ([" ","\t","\n","\r"])+ "owner">          : DEFAULT
+    | <OWNER_CONTEXT:                       "context"     ([" ","\t","\n","\r"])+ "owner">          : DEFAULT
+    | <RESERVE_ANY:                         "any"         ([" ","\t","\n","\r"])+ "reserve">        : DEFAULT
+    | <RESERVE_CONTEXT:                     "context"     ([" ","\t","\n","\r"])+ "reserve">        : DEFAULT
+    | <RESERVE_NO:                          "no"          ([" ","\t","\n","\r"])+ "reserve">        : DEFAULT
+    | <RESERVE_INCLUSIVE:                   "inclusive"   ([" ","\t","\n","\r"])+ "reserve">        : DEFAULT
+    | <MATURITY_ANY:                        "any"         ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
+    | <MATURITY_NO:                         "no"          ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
+    | <MATURITY_PUBLIC:                     "public"      ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
+    | <MATURITY_PROTECTED:                  "protected"   ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
+    | <MATURITY_PRIVATE:                    "private"     ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
+    | <MATURITY_NOTPRIVATE:                 "notprivate"  ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
+    | <MATURITY_PPP:                        "ppp"         ([" ","\t","\n","\r"])+ "maturity">       : DEFAULT
+    | <CATEGORY_ANY:                        "any"         ([" ","\t","\n","\r"])+ "category">       : DEFAULT
+    | <CATEGORY_OEM:                        "oem"         ([" ","\t","\n","\r"])+ "category">       : DEFAULT
+    | <CATEGORY_GOLDPARTNER:                "goldpartner" ([" ","\t","\n","\r"])+ "category">       : DEFAULT
+    | <CATEGORY_PARTNER:                    "partner"     ([" ","\t","\n","\r"])+ "category">       : DEFAULT
+    | <CATEGORY_SUPPLIER:                   "supplier"    ([" ","\t","\n","\r"])+ "category">       : DEFAULT
+    | <CATEGORY_CUSTOMER:                   "customer"    ([" ","\t","\n","\r"])+ "category">       : DEFAULT
+    | <CATEGORY_CONTRACTOR:                 "contractor"  ([" ","\t","\n","\r"])+ "category">       : DEFAULT
+}
+
+/************************************************************** Common String */
+<STRING_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<STRING_EXPECTED> TOKEN :
+{
+      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "{" | "}" | " ")*<APOSTROPHE>)> : DEFAULT
+    | <SINGLE: (<CHAR>)+> : DEFAULT
+    | <#APOSTROPHE: "\"" >
+    | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/**************************************** Two Strings for Property Definition */
+<ADMINREF_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<ADMINREF_EXPECTED> TOKEN :
+{
+      <ADMINTYPE_STRING : (<ADMINTYPE_APOSTROPHE>(<ADMINTYPE_CHAR> | "\\\"" | "{" | "}" | " ")*<ADMINTYPE_APOSTROPHE>)> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE : (<ADMINTYPE_CHAR>)+> : STRING_EXPECTED
+    | <#ADMINTYPE_APOSTROPHE : "\"" >
+    | <#ADMINTYPE_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+/**
+ * Parses one complete rule definition.
+ *
+ * @param _rule   target rule to update with parsed values
+ */
+void parse(final Rule_mxJPO _rule)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+: {
+    Token tmp;
+    AdminProperty property;
+} {
+    (   (<DESCRIPTION>              ( tmp = <STRING>           {this.setValue(_rule, "description", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(_rule, "description", this.getSingle(tmp.image));} ) )
+      | (<HIDDEN_TRUE>                                         {this.setValue(_rule, "hidden",       true);} )
+      | (<HIDDEN_FALSE>                                        {this.setValue(_rule, "hidden",       false);} )
+      | (<PROPERTY>                                            {property = new AdminProperty();this.appendValue(this.getValue(_rule, "properties"), "propertiesStack", property);}
+                                    ( tmp = <STRING>           {this.setValue(property, "name", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(property, "name", this.getSingle(tmp.image));} )
+              (   ( <PROPERTYVAL>   ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING> {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <ADMINTYPE_SINGLE> {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                    ( tmp = <STRING>           {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+    )*
+}
+
+/**
+ * Parses the access and filter expression for the owner definition.
+ *
+ * @param _prefix   access filter prefix
+ * @param _access   current parsed access definition of the policy
+ */
+void stateOwnerAccess(final Prefix _prefix, final AccessList_mxJPO _accessList) : {
+    final Access access = new Access();
+}  {
+    ( <OWNER> stateAccessDef(access) )
+    {
+        this.getField(access, "prefix").set(_prefix);
+        this.getField(access, "kind").set("owner");
+        ((Collection<Access>)(this.getValue(_accessList, "accessList"))).add(access);
+    }
+}
+
+/**
+ * Parses the access and filter expression for the public definition.
+ *
+ * @param _prefix   access filter prefix
+ * @param _access   current parsed access definition of the policy
+ */
+void statePublicAccess(final Prefix _prefix, final AccessList_mxJPO _accessList) : {
+    final Access access = new Access();
+}  {
+    ( <PUBLIC> stateAccessDef(access) )
+    {
+        this.getField(access, "prefix").set(_prefix);
+        this.getField(access, "kind").set("public");
+        ((Collection<Access>)(this.getValue(_accessList, "accessList"))).add(access);
+    }
+}
+
+/**
+ * Parses the access and filter expression for a user definition.
+ *
+ * @param _prefix   access filter prefix
+ * @param _access   current parsed access definition of the policy
+ */
+void stateUserAccess(final Prefix _prefix, final AccessList_mxJPO _accessList) : {
+    final Access access = new Access();
+    String user;
+    Token tmp;
+}  {
+    ( <USER>    ( tmp = <ACCESS_STRING>         {user = this.getString(tmp.image);}
+                | tmp = <ACCESS_SINGLE_STRING>  {user = this.getSingle(tmp.image);} )
+                stateAccessDef(access) )
+    {
+        this.getField(access, "prefix").set(_prefix);
+        this.getField(access, "kind").set("user");
+        this.getField(access, "userRef").set(user);
+        ((Collection<Access>)(this.getValue(_accessList, "accessList"))).add(access);
+    }
+}
+
+void stateAccessDef(final Access _access) : {
+    String key = null, access = null, filter = null, localfilter = null, organization = null, project = null, owner = null, reserve = null, maturity = null, category = null;
+    Token tmp;
+} {
+    (
+          ( <KEY>                   ( tmp = <ACCESS_STRING>         {key = this.getString(tmp.image);}
+                                    | tmp = <ACCESS_SINGLE_STRING>  {key = this.getSingle(tmp.image);} ) )
+        | ( <FILTER>                ( tmp = <STRING>                {filter       = this.getString(tmp.image);}
+                                    | tmp = <SINGLE>                {filter       = this.getSingle(tmp.image);} ) )
+        | ( <LOCALFILTER>           ( tmp = <STRING>                {filter       = this.getString(tmp.image);}
+                                    | tmp = <SINGLE>                {filter       = this.getSingle(tmp.image);} ) )
+        | ( tmp = <ACCESS>                                          {access       = tmp.image
+                                                                                       .replaceFirst("^\\{", "").replaceFirst("\\}$", "")  // remove {}
+                                                                                       .replaceAll("(\t)|(\n)", " ")                       // replace tabs, new lines
+                                                                                       .replaceAll("( )+", " ")                            // multiple spaces => one space
+                                                                                       .trim();} )                              // remove trailing spaces
+        | ( <ORGANIZATION_ANY>                                      {organization = "any";        } )
+        | ( <ORGANIZATION_SINGLE>                                   {organization = "single";     } )
+        | ( <ORGANIZATION_ANCESTOR>                                 {organization = "ancestor";   } )
+        | ( <ORGANIZATION_DESCENDANT>                               {organization = "descendant"; } )
+        | ( <ORGANIZATION_RELATED>                                  {organization = "related";    } )
+        | ( <PROJECT_ANY>                                           {project      = "any";        } )
+        | ( <PROJECT_SINGLE>                                        {project      = "single";     } )
+        | ( <PROJECT_ANCESTOR>                                      {project      = "ancestor";   } )
+        | ( <PROJECT_DESCENDANT>                                    {project      = "descendant"; } )
+        | ( <PROJECT_RELATED>                                       {project      = "related";    } )
+        | ( <OWNER_ANY>                                             {owner        = "any";        } )
+        | ( <OWNER_CONTEXT>                                         {owner        = "context";    } )
+        | ( <RESERVE_ANY>                                           {reserve      = "any";        } )
+        | ( <RESERVE_CONTEXT>                                       {reserve      = "context";    } )
+        | ( <RESERVE_NO>                                            {reserve      = "no";         } )
+        | ( <RESERVE_INCLUSIVE>                                     {reserve      = "inclusive";  } )
+        | ( <MATURITY_ANY>                                          {maturity     = "any";        } )
+        | ( <MATURITY_NO>                                           {maturity     = "no";         } )
+        | ( <MATURITY_PUBLIC>                                       {maturity     = "public";     } )
+        | ( <MATURITY_PROTECTED>                                    {maturity     = "protected";  } )
+        | ( <MATURITY_PRIVATE>                                      {maturity     = "private";    } )
+        | ( <MATURITY_NOTPRIVATE>                                   {maturity     = "notprivate"; } )
+        | ( <MATURITY_PPP>                                          {maturity     = "ppp";        } )
+        | ( <CATEGORY_ANY>                                          {category     = "any";         } )
+        | ( <CATEGORY_OEM>                                          {category     = "oem";         } )
+        | ( <CATEGORY_GOLDPARTNER>                                  {category     = "goldpartner"; } )
+        | ( <CATEGORY_PARTNER>                                      {category     = "partner";     } )
+        | ( <CATEGORY_SUPPLIER>                                     {category     = "supplier";    } )
+        | ( <CATEGORY_CUSTOMER>                                     {category     = "customer";    } )
+        | ( <CATEGORY_CONTRACTOR>                                   {category     = "contractor";  } )
+    )*
+    {
+        this.getField(_access, "key").set(key);
+        this.getField(_access, "filter").set(filter);
+        this.getField(_access, "localfilter").set(localfilter);
+        this.getField(_access, "organization").set(organization);
+        this.getField(_access, "project").set(project);
+        this.getField(_access, "owner").set(owner);
+        this.getField(_access, "reserve").set(reserve);
+        this.getField(_access, "maturity").set(maturity);
+        this.getField(_access, "category").set(category);
+        this.getField(_access, "access").set(new HashSet<String>(access == null ? null : Arrays.asList(access.split(" "))));
+    }
+}

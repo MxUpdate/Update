@@ -115,7 +115,7 @@ public abstract class AbstractTest
         DM_RELATIONSHIP("relationship", null, false, null, null, "Relationship", "RELATIONSHIP", "RELATIONSHIP_", "datamodel/relationship", true, "mql"),
 
         /** Configuration item Data Model Rule. */
-        DM_RULE("rule", null, false, null, null, "Rule", "RULE", "RULE_", "datamodel/rule", true, "mql"),
+        DM_RULE("rule", null, false, null, null, "Rule", "RULE", "RULE_", "datamodel/rule", true, "mxUpdate"),
 
         /** Configuration item Data Model Type. */
         DM_TYPE("type", null, false, null, null, "Type", "TYPE", "TYPE_", "datamodel/type", true, "mql"),
