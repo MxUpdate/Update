@@ -155,7 +155,7 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
     {
         this.site = _site;
         if (_site == null)  {
-            this.getValues().remove("site");
+//            this.getValues().remove("site");
         } else  {
             this.setValue("site", this.site.getName());
         }

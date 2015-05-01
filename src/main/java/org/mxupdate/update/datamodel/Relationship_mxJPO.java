@@ -40,17 +40,24 @@ import org.xml.sax.SAXException;
 
 /**
  * Data model relationship class used to export and update relationships.
+ * The handles properties are
+ * <ul>
+ * <li>description</li>
+ * <li>{@link #kind}</li>
+ * <li>{@link #abstractFlag abstract flag}</li>
+ * <li>{@link #derived}</li>
+ * <li>hidden flag</li>
+ * <li>{@link #preventDuplicates prevent duplicates} flag</li>
+ * <li>{@link #from} and {@link #to} side informations</li>
+ * <li>{@link #attributes}</li>
+ * </ul>
  *
  * @author The MxUpdate Team
  */
 public class Relationship_mxJPO
     extends AbstractDMWithTriggers_mxJPO<Relationship_mxJPO>
 {
-    /**
-     * Set of all ignored URLs from the XML definition for relationships.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     */
+    /** Set of all ignored URLs from the XML definition for relationships. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
         Relationship_mxJPO.IGNORED_URLS.add("/attributeDefRefList");
@@ -119,19 +126,7 @@ public class Relationship_mxJPO
         super(_typeDef, _mxName);
     }
 
-    /**
-     * Parses the given {@code _code} and updates this relationship instance.
-     *
-     * @param _code     code to parse
-     * @throws SecurityException
-     * @throws IllegalArgumentException
-     * @throws NoSuchMethodException
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws InvocationTargetException
-     * @throws ParseException
-     */
-    @Override
+    @Override()
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
@@ -244,19 +239,6 @@ public class Relationship_mxJPO
         return parsed;
     }
 
-    /**
-     * Writes the update script for this relationship.
-     * The relationship information are:
-     * <ul>
-     * <li>hidden flag</li>
-     * <li>{@link #preventDuplicates prevent duplicates} flag</li>
-     * <li>{@link #from} and {@link #to} side informations</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          writer instance
-     * @throws IOException if the TCL update code could not be written
-     */
     @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)

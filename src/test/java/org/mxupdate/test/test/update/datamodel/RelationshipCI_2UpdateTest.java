@@ -13,15 +13,13 @@
  *
  */
 
-package org.mxupdate.test.ci.datamodel;
+package org.mxupdate.test.test.update.datamodel;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger;
 import org.mxupdate.test.data.datamodel.AttributeStringData;
 import org.mxupdate.test.data.datamodel.RelationshipData;
-import org.mxupdate.test.data.datamodel.RelationshipData.Behavior;
-import org.mxupdate.test.data.datamodel.RelationshipData.Cardinality;
 import org.mxupdate.test.data.datamodel.RuleData;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.program.MQLProgramData;
@@ -39,7 +37,7 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-public class RelationshipTest
+public class RelationshipCI_2UpdateTest
     extends AbstractDataExportUpdate<RelationshipData>
 {
     /**
@@ -91,239 +89,201 @@ public class RelationshipTest
                         "relationship without from propagate connection",
                         new RelationshipData(this, "TestRelationship"),
                         new RelationshipData(this, "TestRelationship")
-                                .from().setFlag("propagateconnection", false)},
+                                .from().defFlag("propagateconnection", false)},
                 new Object[]{
                         "relationship with from propagate connection true",
                         new RelationshipData(this, "TestRelationship")
-                                .from().setFlag("propagateconnection", true)},
+                                .from().defFlag("propagateconnection", true)},
                 new Object[]{
                         "relationship with from propagate connection false",
                         new RelationshipData(this, "TestRelationship")
-                                .from().setFlag("propagateconnection", false)},
+                                .from().defFlag("propagateconnection", false)},
                 new Object[]{
                         "relationship without from propagate modify",
                         new RelationshipData(this, "TestRelationship"),
                         new RelationshipData(this, "TestRelationship")
-                                .from().setFlag("propagatemodify", false)},
+                                .from().defFlag("propagatemodify", false)},
                 new Object[]{
                         "relationship with from propagate modify true",
-                        new RelationshipData(this, "TestRelationship")
-                                .from().setFlag("propagatemodify", true)},
+                        new RelationshipData(this, "TestRelationship").from().defFlag("propagatemodify", true)},
                 new Object[]{
                         "relationship with from propagate modify false",
-                        new RelationshipData(this, "TestRelationship")
-                                .from().setFlag("propagatemodify", false)},
+                        new RelationshipData(this, "TestRelationship").from().defFlag("propagatemodify", false)},
 
                 new Object[]{
                         "relationship with escaped from meaning",
-                        new RelationshipData(this, "TestRelationship")
-                                .from().setMeaning("this is a \"test\"")},
+                        new RelationshipData(this, "TestRelationship").from().defString("meaning", "this is a \"test\"")},
 
                 new Object[]{
                         "relationship without from cardinality",
-                        new RelationshipData(this, "TestRelationship")
-                                .from().setCardinality(null),
-                        new RelationshipData(this, "TestRelationship")
-                                .from().setCardinality(Cardinality.MANY)},
+                        new RelationshipData(this, "TestRelationship"),
+                        new RelationshipData(this, "TestRelationship").from().defSingle("cardinality", "many")},
                 new Object[]{
                         "relationship with from cardinality one",
-                        new RelationshipData(this, "TestRelationship")
-                                .from().setCardinality(Cardinality.ONE)},
+                        new RelationshipData(this, "TestRelationship").from().defSingle("cardinality", "one")},
                 new Object[]{
                         "relationship with from cardinality many",
-                        new RelationshipData(this, "TestRelationship")
-                                .from().setCardinality(Cardinality.MANY)},
+                        new RelationshipData(this, "TestRelationship").from().defSingle("cardinality", "many")},
 
                 new Object[]{
                         "relationship without from clone behavior",
-                        new RelationshipData(this, "TestRelationship")
-                                .from().setClone(null),
-                        new RelationshipData(this, "TestRelationship")
-                                .from().setClone(Behavior.NONE)},
+                        new RelationshipData(this, "TestRelationship"),
+                        new RelationshipData(this, "TestRelationship").from().defSingle("clone", "none")},
                 new Object[]{
                         "relationship with from clone behavior none",
-                        new RelationshipData(this, "TestRelationship")
-                                .from().setClone(Behavior.NONE)},
+                        new RelationshipData(this, "TestRelationship").from().defSingle("clone", "none")},
                 new Object[]{
                         "relationship with from clone behavior float",
-                        new RelationshipData(this, "TestRelationship")
-                                .from().setClone(Behavior.FLOAT)},
+                        new RelationshipData(this, "TestRelationship").from().defSingle("clone", "float")},
                 new Object[]{
                         "relationship with from clone behavior replicate",
-                        new RelationshipData(this, "TestRelationship")
-                                .from().setClone(Behavior.REPLICATE)},
+                        new RelationshipData(this, "TestRelationship").from().defSingle("clone", "replicate")},
 
                 new Object[]{
                         "relationship without from revision behavior",
-                        new RelationshipData(this, "TestRelationship")
-                                .from().setRevision(null),
-                        new RelationshipData(this, "TestRelationship")
-                                .from().setRevision(Behavior.NONE)},
+                        new RelationshipData(this, "TestRelationship"),
+                        new RelationshipData(this, "TestRelationship").from().defSingle("revision", "none")},
                 new Object[]{
                         "relationship with from revision behavior none",
-                        new RelationshipData(this, "TestRelationship")
-                                .from().setRevision(Behavior.NONE)},
+                        new RelationshipData(this, "TestRelationship").from().defSingle("revision", "none")},
                 new Object[]{
                         "relationship with from revision behavior float",
-                        new RelationshipData(this, "TestRelationship")
-                                .from().setRevision(Behavior.FLOAT)},
+                        new RelationshipData(this, "TestRelationship").from().defSingle("revision", "float")},
                 new Object[]{
                         "relationship with from revision behavior replicate",
-                        new RelationshipData(this, "TestRelationship")
-                                .from().setRevision(Behavior.REPLICATE)},
+                        new RelationshipData(this, "TestRelationship").from().defSingle("revision", "replicate")},
 
                 new Object[]{
                         "relationship with one from type",
                         new RelationshipData(this, "TestRelationship \" 1")
-                                .from().addType(new TypeData(this, "Test Type"))},
+                                .from().defData("type", new TypeData(this, "Test Type"))},
                 new Object[]{
                         "relationship with two escaped from types",
                         new RelationshipData(this, "TestRelationship \" 1")
-                                .from().addType(new TypeData(this, "Test Type \" 1"))
-                                .from().addType(new TypeData(this, "Test Type \" 2"))},
+                                .from().defData("type", new TypeData(this, "Test Type \" 1"))
+                                .from().defData("type", new TypeData(this, "Test Type \" 2"))},
                 new Object[]{
                         "relationship with all from types",
                         new RelationshipData(this, "TestRelationship \" 1")
-                                .from().addAllTypes()},
+                                .from().defDataAll("type")},
                 new Object[]{
                         "relationship with one from relationship",
                         new RelationshipData(this, "TestRelationship \" 1")
-                                .from().addRelationship(new RelationshipData(this, "Test Relationship"))},
+                                .from().defData("relationship", new RelationshipData(this, "Test Relationship"))},
                 new Object[]{
                         "relationship with two escaped from relationships",
                         new RelationshipData(this, "TestRelationship \" 1")
-                                .from().addRelationship(new RelationshipData(this, "Test Relationship \" 1"))
-                                .from().addRelationship(new RelationshipData(this, "Test Relationship \" 2"))},
+                                .from().defData("relationship", new RelationshipData(this, "Test Relationship \" 1"))
+                                .from().defData("relationship", new RelationshipData(this, "Test Relationship \" 2"))},
                 new Object[]{
                         "relationship with all from relationships",
                         new RelationshipData(this, "TestRelationship \" 1")
-                                .from().addAllRelationships()},
+                                .from().defDataAll("relationship")},
                 new Object[]{
                         "relationship with two escaped from types and relationships",
                         new RelationshipData(this, "TestRelationship \" 1")
-                                .from().addRelationship(new RelationshipData(this, "Test Relationship \" 1"))
-                                .from().addRelationship(new RelationshipData(this, "Test Relationship \" 2"))
-                                .from().addType(new TypeData(this, "Test Type \" 1"))
-                                .from().addType(new TypeData(this, "Test Type \" 2"))},
+                                .from().defData("relationship", new RelationshipData(this, "Test Relationship \" 1"))
+                                .from().defData("relationship", new RelationshipData(this, "Test Relationship \" 2"))
+                                .from().defData("type", new TypeData(this, "Test Type \" 1"))
+                                .from().defData("type", new TypeData(this, "Test Type \" 2"))},
                 // to side
                 new Object[]{
                         "relationship without to propagate connection",
                         new RelationshipData(this, "TestRelationship"),
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setFlag("propagateconnection", false)},
+                        new RelationshipData(this, "TestRelationship").to().defFlag("propagateconnection", false)},
                 new Object[]{
                         "relationship with to propagate connection true",
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setFlag("propagateconnection", true)},
+                        new RelationshipData(this, "TestRelationship").to().defFlag("propagateconnection", true)},
                 new Object[]{
                         "relationship with to propagate connection false",
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setFlag("propagateconnection", false)},
+                        new RelationshipData(this, "TestRelationship").to().defFlag("propagateconnection", false)},
                 new Object[]{
                         "relationship without to propagate modify",
                         new RelationshipData(this, "TestRelationship"),
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setFlag("propagatemodify", false)},
+                        new RelationshipData(this, "TestRelationship").to().defFlag("propagatemodify", false)},
                 new Object[]{
                         "relationship with to propagate modify true",
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setFlag("propagatemodify", true)},
+                        new RelationshipData(this, "TestRelationship").to().defFlag("propagatemodify", true)},
                 new Object[]{
                         "relationship with to propagate modify false",
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setFlag("propagatemodify", false)},
+                        new RelationshipData(this, "TestRelationship").to().defFlag("propagatemodify", false)},
 
                 new Object[]{
                         "relationship with escaped meaning",
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setMeaning("this is a \"test\"")},
+                        new RelationshipData(this, "TestRelationship").to().defString("meaning", "this is a \"test\"")},
 
                 new Object[]{
                         "relationship without cardinality",
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setCardinality(null),
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setCardinality(Cardinality.MANY)},
+                        new RelationshipData(this, "TestRelationship"),
+                        new RelationshipData(this, "TestRelationship").to().defSingle("cardinality", "many")},
                 new Object[]{
                         "relationship with cardinality one",
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setCardinality(Cardinality.ONE)},
+                        new RelationshipData(this, "TestRelationship").to().defSingle("cardinality", "one")},
                 new Object[]{
                         "relationship with cardinality many",
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setCardinality(Cardinality.MANY)},
+                        new RelationshipData(this, "TestRelationship").to().defSingle("cardinality", "many")},
 
                 new Object[]{
                         "relationship without clone behavior",
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setClone(null),
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setClone(Behavior.NONE)},
+                        new RelationshipData(this, "TestRelationship"),
+                        new RelationshipData(this, "TestRelationship").to().defSingle("clone", "none")},
                 new Object[]{
                         "relationship with clone behavior none",
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setClone(Behavior.NONE)},
+                        new RelationshipData(this, "TestRelationship").to().defSingle("clone", "none")},
                 new Object[]{
                         "relationship with clone behavior float",
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setClone(Behavior.FLOAT)},
+                        new RelationshipData(this, "TestRelationship").to().defSingle("clone", "float")},
                 new Object[]{
                         "relationship with clone behavior replicate",
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setClone(Behavior.REPLICATE)},
+                        new RelationshipData(this, "TestRelationship").to().defSingle("clone", "replicate")},
 
                 new Object[]{
                         "relationship without to revision behavior",
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setRevision(null),
-                        new RelationshipData(this, "TestRelationship")
-                                 .to().setRevision(Behavior.NONE)},
+                        new RelationshipData(this, "TestRelationship"),
+                        new RelationshipData(this, "TestRelationship").to().defSingle("revision", "none")},
                 new Object[]{
                         "relationship with to revision behavior none",
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setRevision(Behavior.NONE)},
+                        new RelationshipData(this, "TestRelationship").to().defSingle("revision", "none")},
                 new Object[]{
                         "relationship with to revision behavior float",
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setRevision(Behavior.FLOAT)},
+                        new RelationshipData(this, "TestRelationship").to().defSingle("revision", "float")},
                 new Object[]{
                         "relationship with to revision behavior replicate",
-                        new RelationshipData(this, "TestRelationship")
-                                .to().setRevision(Behavior.REPLICATE)},
+                        new RelationshipData(this, "TestRelationship").to().defSingle("revision", "replicate")},
 
                 new Object[]{
                         "relationship with one to type",
                         new RelationshipData(this, "TestRelationship \" 1")
-                                .to().addType(new TypeData(this, "Test Type"))},
+                                .to().defData("type", new TypeData(this, "Test Type"))},
                 new Object[]{
                         "relationship with two escaped to types",
                         new RelationshipData(this, "TestRelationship \" 1")
-                                .to().addType(new TypeData(this, "Test Type \" 1"))
-                                .to().addType(new TypeData(this, "Test Type \" 2"))},
+                                .to().defData("type", new TypeData(this, "Test Type \" 1"))
+                                .to().defData("type", new TypeData(this, "Test Type \" 2"))},
                 new Object[]{
                         "relationship with all to types",
                         new RelationshipData(this, "TestRelationship \" 1")
-                                .to().addAllTypes()},
+                                .to().defDataAll("type")},
                 new Object[]{
                         "relationship with one to relationship",
                         new RelationshipData(this, "TestRelationship \" 1")
-                                .to().addRelationship(new RelationshipData(this, "Test Relationship"))},
+                                .to().defData("relationship", new RelationshipData(this, "Test Relationship"))},
                 new Object[]{
                         "relationship with two escaped to relationships",
                         new RelationshipData(this, "TestRelationship \" 1")
-                                .to().addRelationship(new RelationshipData(this, "Test Relationship \" 1"))
-                                .to().addRelationship(new RelationshipData(this, "Test Relationship \" 2"))},
+                                .to().defData("relationship", new RelationshipData(this, "Test Relationship \" 1"))
+                                .to().defData("relationship", new RelationshipData(this, "Test Relationship \" 2"))},
                 new Object[]{
                         "relationship with all to relationships",
                         new RelationshipData(this, "TestRelationship \" 1")
-                                .to().addAllRelationships()},
+                                .to().defDataAll("relationship")},
                 new Object[]{
                         "relationship with two escaped to types and relationships",
                         new RelationshipData(this, "TestRelationship \" 1")
-                                .to().addRelationship(new RelationshipData(this, "Test Relationship \" 1"))
-                                .to().addRelationship(new RelationshipData(this, "Test Relationship \" 2"))
-                                .to().addType(new TypeData(this, "Test Type \" 1"))
-                                .to().addType(new TypeData(this, "Test Type \" 2"))}
+                                .to().defData("relationship", new RelationshipData(this, "Test Relationship \" 1"))
+                                .to().defData("relationship", new RelationshipData(this, "Test Relationship \" 2"))
+                                .to().defData("type", new TypeData(this, "Test Type \" 1"))
+                                .to().defData("type", new TypeData(this, "Test Type \" 2"))}
         );
     }
 
@@ -337,12 +297,12 @@ public class RelationshipTest
         throws Exception
     {
         new RelationshipData(this, "Test")
-                .from().addType(new TypeData(this, "Test1"))
-                .from().addType(new TypeData(this, "Test2"))
+                .from().defData("type", new TypeData(this, "Test1"))
+                .from().defData("type", new TypeData(this, "Test2"))
                 .create();
 
         new RelationshipData(this, "Test")
-                .from().addAllTypes()
+                .from().defDataAll("type")
                 .update("")
                 .checkExport();
     }
@@ -357,12 +317,12 @@ public class RelationshipTest
         throws Exception
     {
         new RelationshipData(this, "Test")
-                .from().addAllTypes()
+                .from().defDataAll("type")
                 .create();
 
         new RelationshipData(this, "Test")
-                .from().addType(new TypeData(this, "Test1"))
-                .from().addType(new TypeData(this, "Test2"))
+                .from().defData("type", new TypeData(this, "Test1"))
+                .from().defData("type", new TypeData(this, "Test2"))
                 .createDependings()
                 .update("")
                 .checkExport();
@@ -378,12 +338,12 @@ public class RelationshipTest
         throws Exception
     {
         new RelationshipData(this, "Test")
-                .from().addRelationship(new RelationshipData(this, "Test1"))
-                .from().addRelationship(new RelationshipData(this, "Test2"))
+                .from().defData("relationship", new RelationshipData(this, "Test1"))
+                .from().defData("relationship", new RelationshipData(this, "Test2"))
                 .create();
 
         new RelationshipData(this, "Test")
-                .from().addAllTypes()
+                .from().defDataAll("relationship")
                 .update("")
                 .checkExport();
     }
@@ -398,12 +358,12 @@ public class RelationshipTest
         throws Exception
     {
         new RelationshipData(this, "Test")
-                .from().addAllRelationships()
+                .from().defDataAll("relationship")
                 .create();
 
         new RelationshipData(this, "Test")
-                .from().addRelationship(new RelationshipData(this, "Test1"))
-                .from().addRelationship(new RelationshipData(this, "Test2"))
+                .from().defData("relationship", new RelationshipData(this, "Test1"))
+                .from().defData("relationship", new RelationshipData(this, "Test2"))
                 .createDependings()
                 .update("")
                 .checkExport();
@@ -419,7 +379,7 @@ public class RelationshipTest
         throws Exception
     {
         this.createNewData("Test")
-                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
                 .create()
                 .checkExport()
                 .update("")
@@ -436,9 +396,9 @@ public class RelationshipTest
         throws Exception
     {
         this.createNewData("Test")
-                .addAttribute(new AttributeStringData(this, "Test Attribute 1"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute 1"))
                 .create()
-                .addAttribute(new AttributeStringData(this, "Test Attribute 2"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute 2"))
                 .createDependings()
                 .update("")
                 .checkExport();
@@ -454,7 +414,7 @@ public class RelationshipTest
         throws Exception
     {
         this.createNewData("Test")
-                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
                 .create();
         this.createNewData("Test")
                 .failureUpdate(ErrorKey.DM_RELATION_REMOVE_ATTRIBUTE);
@@ -470,12 +430,12 @@ public class RelationshipTest
         throws Exception
     {
         this.createNewData("Test")
-                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
                 .create();
         this.createNewData("Test")
                 .update("", ValueKeys.DMRelationAttrIgnore.name(), "*");
         this.createNewData("Test")
-                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
                 .checkExport();
     }
 
@@ -489,7 +449,7 @@ public class RelationshipTest
         throws Exception
     {
         this.createNewData("Test")
-                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
                 .create();
         this.createNewData("Test")
                 .update("", ValueKeys.DMRelationAttrRemove.name(), "*")
@@ -507,11 +467,11 @@ public class RelationshipTest
     {
         this.createNewData("Test")
                 .setFlag("preventduplicates", true)
-                .from().setCardinality(Cardinality.ONE)
-                .from().setFlag("propagateconnection", false)
-                .to().setClone(Behavior.REPLICATE)
-                .to().setRevision(Behavior.REPLICATE)
-                .to().setFlag("propagateconnection", false)
+                .from().defSingle("cardinality", "one")
+                .from().defFlag("propagateconnection", false)
+                .to().defSingle("clone", "replicate")
+                .to().defSingle("revision", "replicate")
+                .to().defFlag("propagateconnection", false)
                 .create()
                 .setSingle("kind", "compositional")
                 .update("")
@@ -529,11 +489,11 @@ public class RelationshipTest
     {
         this.createNewData("Test")
                 .setFlag("preventduplicates", true)
-                .from().setCardinality(Cardinality.ONE)
-                .from().setFlag("propagateconnection", false)
-                .to().setClone(Behavior.REPLICATE)
-                .to().setRevision(Behavior.REPLICATE)
-                .to().setFlag("propagateconnection", false)
+                .from().defSingle("cardinality", "one")
+                .from().defFlag("propagateconnection", false)
+                .to().defSingle("clone", "replicate")
+                .to().defSingle("revision", "replicate")
+                .to().defFlag("propagateconnection", false)
                 .create()
                 .setSingle("kind", "compositional")
                 .update("")

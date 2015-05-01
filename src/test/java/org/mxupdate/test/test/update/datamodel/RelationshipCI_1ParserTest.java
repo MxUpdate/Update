@@ -57,11 +57,16 @@ public class RelationshipCI_1ParserTest
                 "description \"abc def\" !hidden !preventduplicates "
                         + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                           + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
-            {"2a) description",
+            {"2b) description",
                 "description \"\" !hidden !preventduplicates "
                         + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                           + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }",
                 "!hidden !preventduplicates "
+                        + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                          + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
+            {"2c) multi-line description",
+                "",
+                "description \"abc\ndef\" !hidden !preventduplicates "
                         + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                           + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
             // kind

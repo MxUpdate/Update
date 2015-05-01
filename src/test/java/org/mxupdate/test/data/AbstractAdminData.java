@@ -17,7 +17,6 @@ package org.mxupdate.test.data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -388,20 +387,12 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     protected void append4Create(final StringBuilder _cmd)
         throws MatrixException
     {
-        this.flags      .append4Create(_cmd);
-        this.keyValues  .append4Create(_cmd);
-        this.datas      .append4Create(_cmd);
-
-        // singles
-        for (final Map.Entry<String,String> entry : this.getSingles().entrySet())  {
-            _cmd.append(' ').append(entry.getKey()).append(" ").append(AbstractTest.convertMql(entry.getValue().toString()));
-        }
-        // values
-        for (final Map.Entry<String,String> entry : this.getValues().entrySet())  {
-            _cmd.append(' ').append(entry.getKey()).append(" \"").append(AbstractTest.convertMql(entry.getValue().toString())).append('\"');
-        }
-        // properties
-        this.properties.append4Create(_cmd);
+        this.flags       .append4Create(_cmd);
+        this.keyValues   .append4Create(_cmd);
+        this.datas       .append4Create(_cmd);
+        this.getSingles().append4Create(_cmd);
+        this.getValues() .append4Create(_cmd);
+        this.properties  .append4Create(_cmd);
     }
 
     /**

@@ -27,6 +27,8 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.AbstractTest.CI;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.data.util.SingleValueList;
+import org.mxupdate.test.data.util.StringValueList;
 import org.mxupdate.test.util.Version;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.Assert;
@@ -50,9 +52,9 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     private final String name;
 
     /** Single values of this data piece. */
-    private final SingleValues singles = new SingleValues();
+    private final SingleValueList singles = new SingleValueList();
     /** Values of this data piece. */
-    private final StringValues values = new StringValues();
+    private final StringValueList values = new StringValueList();
 
 
     /** Flag to indicate that this data piece is created.*/
@@ -137,9 +139,9 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @return value for related <code>_key</code>; if not found
      *         <code>null</code>
      */
-    public Object getValue(final String _key)
+    public String getValue(final String _key)
     {
-        return this.values.get(_key);
+        return this.values.getValue(_key);
     }
 
     /**
@@ -147,7 +149,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      *
      * @return defined values
      */
-    public StringValues getValues()
+    public StringValueList getValues()
     {
         return this.values;
     }
@@ -172,7 +174,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      *
      * @return defined values
      */
-    public SingleValues getSingles()
+    public SingleValueList getSingles()
     {
         return this.singles;
     }
@@ -623,106 +625,5 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     public String toString()
     {
         return "[" + (this.ci == null ? "NONE" : this.ci.updateType) + " '" + this.name + "']";
-    }
-
-    /**
-     * Single values w/o apostrophe.
-     */
-    public class SingleValues
-        extends HashMap<String,String>
-    {
-        /** Dummy serial Version UID. */
-        private static final long serialVersionUID = -1;
-
-        /**
-         * Appends the defined flags to the TCL code {@code _cmd} of the
-         * configuration item file.
-         *
-         * @param _prefix   prefix in front of the values
-         * @param _cmd      string builder with the TCL commands of the
-         *                  configuration item file
-         */
-        public void append4Update(final String _prefix,
-                                 final StringBuilder _cmd)
-        {
-            for (final Entry<String,String> entry : this.entrySet())  {
-                _cmd.append(_prefix).append(entry.getKey()).append(" ")
-                    .append(AbstractTest.convertUpdate(entry.getValue().toString()))
-                    .append('\n');
-            }
-        }
-
-        /**
-         * Checks for all defined values.
-         *
-         * @param _exportParser     parsed export
-         * @param _path             sub path
-         */
-        public void check4Export(final ExportParser _exportParser,
-                                final String _path)
-        {
-            for (final Entry<String,String> single : this.entrySet())  {
-                _exportParser.checkValue((_path.isEmpty() ? "" : _path + "/") + single.getKey(), single.getValue());
-            }
-        }
-    }
-
-    /**
-     * String values.
-     */
-    public class StringValues
-        extends HashMap<String,String>
-    {
-        /** Dummy serial Version UID. */
-        private static final long serialVersionUID = 1;
-
-        /**
-         * Appends the defined flags to the TCL code {@code _cmd} of the
-         * configuration item file.
-         *
-         * @param _prefix   prefix in front of the values
-         * @param _cmd      string builder with the TCL commands of the
-         *                  configuration item file
-         */
-        public void append4Update(final String _prefix,
-                                 final StringBuilder _cmd)
-        {
-            for (final Entry<String,String> entry : this.entrySet())  {
-                _cmd.append(_prefix).append(entry.getKey()).append(" ")
-                    .append("\"").append(AbstractTest.convertUpdate(entry.getValue().toString())).append('\"')
-                    .append('\n');
-            }
-        }
-
-        /**
-         * Checks for all defined values.
-         *
-         * @param _exportParser     parsed export
-         * @param _path             sub path
-         */
-        public void check4Export(final ExportParser _exportParser,
-                                final String _path)
-        {
-            for (final Entry<String,String> entry : this.entrySet())  {
-                _exportParser.checkValue((_path.isEmpty() ? "" : _path + "/") + entry.getKey(), "\"" + AbstractTest.convertUpdate(entry.getValue().toString()) + "\"");
-            }
-        }
-
-        /**
-         * Checks for all defined values.
-         *
-         * @param _exportParser     parsed export
-         */
-        @Deprecated()
-        public void checkExport(final ExportParser _exportParser)
-        {
-            for (final Map.Entry<String,String> entry : this.entrySet())  {
-                AbstractData.this.checkSingleValue(
-                        _exportParser,
-                        entry.getKey(),
-                        entry.getKey(),
-                        "\"" + AbstractTest.convertUpdate(entry.getValue().toString()) + "\"");
-            }
-        }
     }
 }

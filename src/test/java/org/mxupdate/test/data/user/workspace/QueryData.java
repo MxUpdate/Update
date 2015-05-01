@@ -84,9 +84,9 @@ public class QueryData<USER extends AbstractUserData<?>>
         final String revision = this.getValue("revision").toString();
 
         // remove type, name and revision from values
-        this.getValues().remove("type");
-        this.getValues().remove("name");
-        this.getValues().remove("revision");
+    //    this.getValues().remove("type");
+  //      this.getValues().remove("name");
+//        this.getValues().remove("revision");
 
         super.append4Create(_cmd);
 
@@ -125,9 +125,9 @@ public class QueryData<USER extends AbstractUserData<?>>
         final String revision = this.getValue("revision").toString();
 
         // cache type, name and revision
-        this.getValues().remove("type");
-        this.getValues().remove("name");
-        this.getValues().remove("revision");
+    //    this.getValues().remove("type");
+   //     this.getValues().remove("name");
+  //      this.getValues().remove("revision");
 
         super.append4CIFileValues(_cmd);
 
@@ -164,9 +164,9 @@ public class QueryData<USER extends AbstractUserData<?>>
         final String revision = this.getValue("revision").toString();
 
         // cache type, name and revision
-        this.getValues().remove("type");
-        this.getValues().remove("name");
-        this.getValues().remove("revision");
+    //    this.getValues().remove("type");
+   //     this.getValues().remove("name");
+  //      this.getValues().remove("revision");
 
         super.checkExport(_exportParser);
 

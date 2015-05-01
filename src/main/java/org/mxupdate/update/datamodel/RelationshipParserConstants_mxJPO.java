@@ -31,118 +31,112 @@ interface RelationshipParserConstants_mxJPO {
   /** RegularExpression Id. */
   int RULE = 14;
   /** RegularExpression Id. */
-  int STRING = 19;
+  int STRING = 15;
   /** RegularExpression Id. */
-  int SINGLE = 20;
+  int SINGLE = 16;
   /** RegularExpression Id. */
-  int APOSTROPHE = 21;
+  int MULTILINESTRING = 17;
   /** RegularExpression Id. */
-  int CHAR = 22;
+  int MULTILINESINGLE = 18;
   /** RegularExpression Id. */
-  int KIND = 23;
+  int KIND = 19;
   /** RegularExpression Id. */
-  int BASIC = 28;
+  int BASIC = 20;
   /** RegularExpression Id. */
-  int COMPOSITIONAL = 29;
+  int COMPOSITIONAL = 21;
   /** RegularExpression Id. */
-  int TRIGGER = 30;
+  int TRIGGER = 22;
   /** RegularExpression Id. */
-  int INPUT = 31;
+  int INPUT = 23;
   /** RegularExpression Id. */
-  int TRIGEVENT = 36;
+  int TRIGEVENT = 24;
   /** RegularExpression Id. */
-  int ACTION = 41;
+  int ACTION = 25;
   /** RegularExpression Id. */
-  int CHECK = 42;
+  int CHECK = 26;
   /** RegularExpression Id. */
-  int OVERRIDE = 43;
+  int OVERRIDE = 27;
   /** RegularExpression Id. */
-  int START_FROM = 44;
+  int START_FROM = 28;
   /** RegularExpression Id. */
-  int START_TO = 45;
+  int START_TO = 29;
   /** RegularExpression Id. */
-  int FROMTO_PROPAGATEMODIFY_TRUE = 50;
+  int FROMTO_PROPAGATEMODIFY_TRUE = 30;
   /** RegularExpression Id. */
-  int FROMTO_PROPAGATEMODIFY_FALSE = 51;
+  int FROMTO_PROPAGATEMODIFY_FALSE = 31;
   /** RegularExpression Id. */
-  int FROMTO_PROPAGATECONNECTION_TRUE = 52;
+  int FROMTO_PROPAGATECONNECTION_TRUE = 32;
   /** RegularExpression Id. */
-  int FROMTO_PROPAGATECONNECTION_FALSE = 53;
+  int FROMTO_PROPAGATECONNECTION_FALSE = 33;
   /** RegularExpression Id. */
-  int FROMTO_MEANING = 54;
+  int FROMTO_MEANING = 34;
   /** RegularExpression Id. */
-  int FROMTO_REVISION_NONE = 55;
+  int FROMTO_REVISION_NONE = 35;
   /** RegularExpression Id. */
-  int FROMTO_REVISION_FLOAT = 56;
+  int FROMTO_REVISION_FLOAT = 36;
   /** RegularExpression Id. */
-  int FROMTO_REVISION_REPLICATE = 57;
+  int FROMTO_REVISION_REPLICATE = 37;
   /** RegularExpression Id. */
-  int FROMTO_CLONE_NONE = 58;
+  int FROMTO_CLONE_NONE = 38;
   /** RegularExpression Id. */
-  int FROMTO_CLONE_FLOAT = 59;
+  int FROMTO_CLONE_FLOAT = 39;
   /** RegularExpression Id. */
-  int FROMTO_CLONE_REPLICATE = 60;
+  int FROMTO_CLONE_REPLICATE = 40;
   /** RegularExpression Id. */
-  int FROMTO_CARDINALITY_ONE = 61;
+  int FROMTO_CARDINALITY_ONE = 41;
   /** RegularExpression Id. */
-  int FROMTO_CARDINALITY_MANY = 62;
+  int FROMTO_CARDINALITY_MANY = 42;
   /** RegularExpression Id. */
-  int FROMTO_TYPE_ALL = 63;
+  int FROMTO_TYPE_ALL = 43;
   /** RegularExpression Id. */
-  int FROMTO_TYPE = 64;
+  int FROMTO_TYPE = 44;
   /** RegularExpression Id. */
-  int FROMTO_RELATIONSHIP_ALL = 65;
+  int FROMTO_RELATIONSHIP_ALL = 45;
   /** RegularExpression Id. */
-  int FROMTO_RELATIONSHIP = 66;
+  int FROMTO_RELATIONSHIP = 46;
   /** RegularExpression Id. */
-  int FROMTO_END = 67;
+  int FROMTO_END = 47;
   /** RegularExpression Id. */
-  int FROMTO_STRING = 72;
+  int FROMTO_STRING = 48;
   /** RegularExpression Id. */
-  int FROMTO_SINGLE = 73;
+  int FROMTO_SINGLE = 49;
   /** RegularExpression Id. */
-  int FROMTO_APOSTROPHE = 74;
+  int PROPERTY = 50;
   /** RegularExpression Id. */
-  int FROMTO_CHAR = 75;
+  int PROPERTYTO = 51;
   /** RegularExpression Id. */
-  int PROPERTY = 76;
+  int PROPERTYVAL = 52;
   /** RegularExpression Id. */
-  int PROPERTYTO = 77;
+  int ADMINTYPE_STRING = 53;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 78;
-  /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 83;
-  /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 84;
-  /** RegularExpression Id. */
-  int ADMINTYPE_APOSTROPHE = 85;
-  /** RegularExpression Id. */
-  int ADMINTYPE_CHAR = 86;
+  int ADMINTYPE_SINGLE = 54;
 
   /** Lexical state. */
-  int DEFAULT = 0;
+  int ADMINREF_EXPECTED = 0;
   /** Lexical state. */
-  int STRING_EXPECTED = 1;
+  int FROMTO_STRING_EXPECTED = 1;
   /** Lexical state. */
-  int KIND_EXPECTED = 2;
+  int FROMTO_EXPECTED = 2;
   /** Lexical state. */
-  int TRIGEVENT_EXPECTED = 3;
+  int TRIGKIND_EXPECTED = 3;
   /** Lexical state. */
-  int TRIGKIND_EXPECTED = 4;
+  int TRIGEVENT_EXPECTED = 4;
   /** Lexical state. */
-  int FROMTO_EXPECTED = 5;
+  int KIND_EXPECTED = 5;
   /** Lexical state. */
-  int FROMTO_STRING_EXPECTED = 6;
+  int MULTILINESTRING_EXPECTED = 6;
   /** Lexical state. */
-  int ADMINREF_EXPECTED = 7;
+  int STRING_EXPECTED = 7;
+  /** Lexical state. */
+  int DEFAULT = 8;
 
   /** Literal token values. */
   String[] tokenImage = {
     "<EOF>",
     "\" \"",
-    "\"\\r\"",
     "\"\\t\"",
     "\"\\n\"",
+    "<token of kind 4>",
     "\"description\"",
     "\"abstract\"",
     "\"!abstract\"",
@@ -153,41 +147,21 @@ interface RelationshipParserConstants_mxJPO {
     "\"!preventduplicates\"",
     "\"attribute\"",
     "\"rule\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<STRING>",
     "<SINGLE>",
-    "\"\\\"\"",
-    "<CHAR>",
+    "<MULTILINESTRING>",
+    "<MULTILINESINGLE>",
     "\"kind\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "\"basic\"",
     "\"compositional\"",
     "\"trigger\"",
     "\"input\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<TRIGEVENT>",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "\"action\"",
     "\"check\"",
     "\"override\"",
     "<START_FROM>",
     "<START_TO>",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "\"propagatemodify\"",
     "\"!propagatemodify\"",
     "\"propagateconnection\"",
@@ -206,25 +180,13 @@ interface RelationshipParserConstants_mxJPO {
     "<FROMTO_RELATIONSHIP_ALL>",
     "\"relationship\"",
     "\"}\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<FROMTO_STRING>",
     "<FROMTO_SINGLE>",
-    "\"\\\"\"",
-    "<FROMTO_CHAR>",
     "\"property\"",
     "\"to\"",
     "\"value\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<ADMINTYPE_STRING>",
     "<ADMINTYPE_SINGLE>",
-    "\"\\\"\"",
-    "<ADMINTYPE_CHAR>",
   };
 
 }

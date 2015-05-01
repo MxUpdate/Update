@@ -41,6 +41,9 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
+/**
+ * Parses the update format for {@link Relationship_mxJPO}.
+ */
 @SuppressWarnings("unused")
 class RelationshipParser
     extends AbstractParser_mxJPO<Relationship_mxJPO>
@@ -48,17 +51,14 @@ class RelationshipParser
 }
 PARSER_END(RelationshipParser)
 
-<DEFAULT> SKIP :
+<*> SKIP :
 {
-    " "
-|   "\r"
-|   "\t"
-|   "\n"
+  " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
 <DEFAULT> TOKEN : /** first level */
 {
-      <DESCRIPTION:                         "description">                                  : STRING_EXPECTED
+      <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
     | <ABSTRACT_TRUE:                       "abstract">
     | <ABSTRACT_FALSE:                      "!abstract">
     | <DERIVED:                             "derived">                                      : STRING_EXPECTED
@@ -71,28 +71,23 @@ PARSER_END(RelationshipParser)
 }
 
 /************************************************************** Common String */
-<STRING_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
-
 <STRING_EXPECTED> TOKEN :
 {
-      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "{" | "}" | " ")*<APOSTROPHE>)> : DEFAULT
-    | <SINGLE: (<CHAR>)+> : DEFAULT
-    | <#APOSTROPHE: "\"" >
-    | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
+    | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/*************************************************** Common Multi-Line-String */
+<MULTILINESTRING_EXPECTED> TOKEN :
+{
+      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
+    | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
 }
 
 /*********************************************************************** Kind */
 <DEFAULT> TOKEN :
 {
       <KIND:                                "kind">                                         : KIND_EXPECTED
-}
-
-<KIND_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
 }
 
 <KIND_EXPECTED> TOKEN :
@@ -109,22 +104,12 @@ PARSER_END(RelationshipParser)
 }
 
 /** Trigger Event */
-<TRIGEVENT_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
-
 <TRIGEVENT_EXPECTED> TOKEN :
 {
       <TRIGEVENT:           (~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"])+>         : TRIGKIND_EXPECTED
 }
 
 /** Trigger Kind */
-<TRIGKIND_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
-
 <TRIGKIND_EXPECTED> TOKEN :
 {
       <ACTION:                              "action">                                       : STRING_EXPECTED
@@ -135,13 +120,8 @@ PARSER_END(RelationshipParser)
 /****************************************************** From / To Information */
 <DEFAULT> TOKEN :
 {
-      <START_FROM:                          "from" ([" ","\t","\n","\r"])+ "{" >            : FROMTO_EXPECTED
-    | <START_TO:                            "to"   ([" ","\t","\n","\r"])+ "{" >            : FROMTO_EXPECTED
-}
-
-<FROMTO_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
+      <START_FROM:                          "from" ([" ","\t","\n"])+ "{" >                 : FROMTO_EXPECTED
+    | <START_TO:                            "to"   ([" ","\t","\n"])+ "{" >                 : FROMTO_EXPECTED
 }
 
 <FROMTO_EXPECTED> TOKEN :
@@ -151,33 +131,26 @@ PARSER_END(RelationshipParser)
     | <FROMTO_PROPAGATECONNECTION_TRUE:     "propagateconnection">                          : FROMTO_EXPECTED
     | <FROMTO_PROPAGATECONNECTION_FALSE:    "!propagateconnection">                         : FROMTO_EXPECTED
     | <FROMTO_MEANING:                      "meaning">                                      : FROMTO_STRING_EXPECTED
-    | <FROMTO_REVISION_NONE:                "revision" ([" ","\t","\n","\r"])+ "none">      : FROMTO_EXPECTED
-    | <FROMTO_REVISION_FLOAT:               "revision" ([" ","\t","\n","\r"])+ "float">     : FROMTO_EXPECTED
-    | <FROMTO_REVISION_REPLICATE:           "revision" ([" ","\t","\n","\r"])+ "replicate"> : FROMTO_EXPECTED
-    | <FROMTO_CLONE_NONE:                   "clone" ([" ","\t","\n","\r"])+ "none">         : FROMTO_EXPECTED
-    | <FROMTO_CLONE_FLOAT:                  "clone" ([" ","\t","\n","\r"])+ "float">        : FROMTO_EXPECTED
-    | <FROMTO_CLONE_REPLICATE:              "clone" ([" ","\t","\n","\r"])+ "replicate">    : FROMTO_EXPECTED
-    | <FROMTO_CARDINALITY_ONE:              "cardinality" ([" ","\t","\n","\r"])+ "one">    : FROMTO_EXPECTED
-    | <FROMTO_CARDINALITY_MANY:             "cardinality" ([" ","\t","\n","\r"])+ "many">   : FROMTO_EXPECTED
-    | <FROMTO_TYPE_ALL:                     "type" ([" ","\t","\n","\r"])+ "all">           : FROMTO_EXPECTED
+    | <FROMTO_REVISION_NONE:                "revision" ([" ","\t","\n"])+ "none">           : FROMTO_EXPECTED
+    | <FROMTO_REVISION_FLOAT:               "revision" ([" ","\t","\n"])+ "float">          : FROMTO_EXPECTED
+    | <FROMTO_REVISION_REPLICATE:           "revision" ([" ","\t","\n"])+ "replicate">      : FROMTO_EXPECTED
+    | <FROMTO_CLONE_NONE:                   "clone" ([" ","\t","\n"])+ "none">              : FROMTO_EXPECTED
+    | <FROMTO_CLONE_FLOAT:                  "clone" ([" ","\t","\n"])+ "float">             : FROMTO_EXPECTED
+    | <FROMTO_CLONE_REPLICATE:              "clone" ([" ","\t","\n"])+ "replicate">         : FROMTO_EXPECTED
+    | <FROMTO_CARDINALITY_ONE:              "cardinality" ([" ","\t","\n"])+ "one">         : FROMTO_EXPECTED
+    | <FROMTO_CARDINALITY_MANY:             "cardinality" ([" ","\t","\n"])+ "many">        : FROMTO_EXPECTED
+    | <FROMTO_TYPE_ALL:                     "type" ([" ","\t","\n"])+ "all">                : FROMTO_EXPECTED
     | <FROMTO_TYPE:                         "type">                                         : FROMTO_STRING_EXPECTED
-    | <FROMTO_RELATIONSHIP_ALL:             "relationship" ([" ","\t","\n","\r"])+ "all">   : FROMTO_EXPECTED
+    | <FROMTO_RELATIONSHIP_ALL:             "relationship" ([" ","\t","\n"])+ "all">        : FROMTO_EXPECTED
     | <FROMTO_RELATIONSHIP:                 "relationship">                                 : FROMTO_STRING_EXPECTED
     | <FROMTO_END:                          "}">                                            : DEFAULT
 }
 
 /* From / To String */
-<FROMTO_STRING_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
-
 <FROMTO_STRING_EXPECTED> TOKEN :
 {
-      <FROMTO_STRING: (<FROMTO_APOSTROPHE>(<FROMTO_CHAR> | "\\\"" | "{" | "}" | " ")*<FROMTO_APOSTROPHE>)>  : FROMTO_EXPECTED
-    | <FROMTO_SINGLE: (<FROMTO_CHAR>)+>                                                                     : FROMTO_EXPECTED
-    | <#FROMTO_APOSTROPHE: "\"" >
-    | <#FROMTO_CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <FROMTO_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : FROMTO_EXPECTED
+    | <FROMTO_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : FROMTO_EXPECTED
 }
 
 /******************************************************************* Property */
@@ -188,17 +161,10 @@ PARSER_END(RelationshipParser)
     | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
 }
 
-<ADMINREF_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
-
 <ADMINREF_EXPECTED> TOKEN :
 {
-      <ADMINTYPE_STRING : (<ADMINTYPE_APOSTROPHE>(<ADMINTYPE_CHAR> | "\\\"" | "{" | "}" | " ")*<ADMINTYPE_APOSTROPHE>)> : STRING_EXPECTED
-    | <ADMINTYPE_SINGLE : (<ADMINTYPE_CHAR>)+> : STRING_EXPECTED
-    | <#ADMINTYPE_APOSTROPHE : "\"" >
-    | <#ADMINTYPE_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <ADMINTYPE_STRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
 }
 
 /**************************************************************************** */
@@ -215,8 +181,8 @@ void parse(final Relationship_mxJPO _relationship)
     Trigger trigger;
     String fromTo;
 } {
-    (   ( <DESCRIPTION>             ( tmp = <STRING>                        {this.setValue(_relationship, "description",                    this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_relationship, "description",                    this.getSingle(tmp.image));} ) )
+    (   ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_relationship, "description",                    this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>               {this.setValue(_relationship, "description",                    this.getSingle(tmp.image));} ) )
 
       | ( <KIND>                    ( <BASIC>                               {this.setValue(_relationship, "kind",                           Kind.Basic);}
                                     | <COMPOSITIONAL>                       {this.setValue(_relationship, "kind",                           Kind.Compositional);} ) )

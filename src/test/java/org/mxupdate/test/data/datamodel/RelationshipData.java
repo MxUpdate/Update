@@ -15,15 +15,15 @@
 
 package org.mxupdate.test.data.datamodel;
 
-import java.util.Arrays;
-
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.util.DataList;
 import org.mxupdate.test.data.util.FlagList;
-import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.test.data.util.SingleValueList;
+import org.mxupdate.test.data.util.StringValueList;
 
 /**
  * Used to define a relationship, create them and test the result.
@@ -37,8 +37,6 @@ public class RelationshipData
     private final FromTo from = new FromTo("from");
     /** Values for the to side. */
     private final FromTo to = new FromTo("to");
-    /** All attributes of this data with attribute instances. */
-    private final DataList<AbstractAttributeData<?>> attributes = new DataList<AbstractAttributeData<?>>();
     /** All rule of this data with rule instances. */
     private final DataList<RuleData> rules = new DataList<RuleData>();
 
@@ -78,18 +76,6 @@ public class RelationshipData
     }
 
     /**
-     * Assigns the {@code attributes} to this data instance.
-     *
-     * @param _attributes       attribute to assign
-     * @return this data instance
-     */
-    public RelationshipData addAttribute(final AbstractAttributeData<?>... _attributes)
-    {
-        this.attributes.addAll(Arrays.asList(_attributes));
-        return this;
-    }
-
-    /**
      * Assigns the {@code _rule} to this relationship instance. Hint! Maximum
      * one rule technical is possible!
      *
@@ -98,7 +84,7 @@ public class RelationshipData
      */
     public RelationshipData setRule(final RuleData _rule)
     {
-        this.rules.add(_rule);
+        this.rules.add("rule", _rule);
         return this;
     }
 
@@ -117,11 +103,12 @@ public class RelationshipData
         this.getFlags()     .append4Update("    ", strg);
         this.getValues()    .append4Update("    ", strg);
         this.getSingles()   .append4Update("    ", strg);
+        this.getKeyValues() .append4Update("    ", strg);
         this.getTriggers()  .append4Update("    ", strg);
+        this.getDatas()     .append4Update("    ", strg);
         this.rules          .append4Update("    ", strg);
         this.from           .appendUpdate(strg);
         this.to             .appendUpdate(strg);
-        this.attributes     .append4Update("    ", strg);
         this.getProperties().append4Update("    ", strg);
 
         strg.append("}");
@@ -152,7 +139,6 @@ public class RelationshipData
 
             this.from.append4Create(cmd);
             this.to.append4Create(cmd);
-            this.attributes.append4Create(cmd);
 
             this.append4Create(cmd);
 
@@ -179,14 +165,10 @@ public class RelationshipData
     {
         super.createDependings();
 
-        this.attributes.createDependings();
         this.rules.createDependings();
 
-        this.from.types.createDependings();
-        this.from.relationships.createDependings();
-
-        this.to.types.createDependings();
-        this.to.relationships.createDependings();
+        this.from.datas.createDependings();
+        this.to.datas.createDependings();
 
         return this;
     }
@@ -203,7 +185,6 @@ public class RelationshipData
 
         this.from       .checkExport(_exportParser);
         this.to         .checkExport(_exportParser);
-        this.attributes .check4Export(_exportParser, "");
         this.rules      .check4Export(_exportParser, "");
     }
 
@@ -240,20 +221,12 @@ public class RelationshipData
         private final String side;
         /** Defines flags for this data piece. */
         private final FlagList flags = new FlagList();
-        /** Meaning of the side. */
-        private String meaning;
-        /** Cardinality of the side. */
-        private Cardinality cardinality = Cardinality.MANY;
-        /** Clone behavior of the side. */
-        private Behavior clone = Behavior.NONE;
-        /** Revise behavior of the side. */
-        private Behavior revision = Behavior.NONE;
-
-        /** Defined types on the from side. */
-        private final DataList<TypeData> types = new DataList<TypeData>();
-
-        /** Defined relationships on the from side. */
-        private final DataList<RelationshipData> relationships = new DataList<RelationshipData>();
+        /** Single values of this data piece. */
+        private final SingleValueList singles = new SingleValueList();
+        /** String values of this data piece. */
+        private final StringValueList strings = new StringValueList();
+        /** All defined data elements. */
+        private final DataList<AbstractAdminData<?>> datas = new DataList<AbstractAdminData<?>>();
 
         /**
          * Defines the side string.
@@ -273,7 +246,7 @@ public class RelationshipData
          *                      <i>false</i>; to undefine set to <code>null</code>
          * @return this data instance
          */
-        public RelationshipData setFlag(final String _key,
+        public RelationshipData defFlag(final String _key,
                                         final Boolean _value)
         {
             this.flags.setFlag(_key, _value);
@@ -281,107 +254,56 @@ public class RelationshipData
         }
 
         /**
-         * Defines the {@link #meaning} of the side.
+         * Defines a new value entry which is put into {@link #singles}.
          *
-         * @param _meaning      meaning of the side
-         * @return relationship data instance
-         * @see #meaning
+         * @param _key      key of the value (e.g. &quot;description&quot;)
+         * @param _value    value of the value
+         * @return this original data instance
          */
-        public RelationshipData setMeaning(final String _meaning)
+        public RelationshipData defSingle(final String _key,
+                                          final String _value)
         {
-            this.meaning = _meaning;
+            this.singles.put(_key, _value);
             return RelationshipData.this;
         }
 
         /**
-         * Defines the {@link #cardinality} of the side.
+         * Defines a new value entry which is put into {@link #strings}.
          *
-         * @param _cardinality      cardinality of the side
-         * @return relationship data instance
-         * @see #cardinality
+         * @param _key      key of the value (e.g. &quot;description&quot;)
+         * @param _value    value of the value
+         * @return this original data instance
          */
-        public RelationshipData setCardinality(final Cardinality _cardinality)
+        public RelationshipData defString(final String _key,
+                                          final String _value)
         {
-            this.cardinality = _cardinality;
+            this.strings.put(_key, _value);
             return RelationshipData.this;
         }
 
         /**
-         * Defines the {@link #clone} behavior of the side.
+         * Defines a {@code _data} for given {@code _tag}.
          *
-         * @param _clone    clone behavior of the side
-         * @return relationship data instance
-         * @see #clone
+         * @param _tag          used tag (name) of the data
+         * @param _data         data instance
+         * @return this data instance
          */
-        public RelationshipData setClone(final Behavior _clone)
+        public RelationshipData defData(final String _tag,
+                                        final AbstractAdminData<?> _data)
         {
-            this.clone = _clone;
+            this.datas.add(_tag, _data);
             return RelationshipData.this;
         }
 
         /**
-         * Defines the {@link #revision} behavior of the side.
+         * Defines 'all' given {@code _tag}.
          *
-         * @param _revision     revision behavior of the side
-         * @return relationship data instance
-         * @see #revision
+         * @param _tag          used tag (name)
+         * @return this data instance
          */
-        public RelationshipData setRevision(final Behavior _revision)
+        public RelationshipData defDataAll(final String _tag)
         {
-            this.revision = _revision;
-            return RelationshipData.this;
-        }
-
-        /**
-         * Assigns <code>_types</code> to the {@link #types list of types}
-         * for this relationship.
-         *
-         * @param _types     types to assign
-         * @return this relationship data instance
-         * @see #types
-         */
-        public RelationshipData addType(final TypeData... _types)
-        {
-            this.types.addAll(Arrays.asList(_types));
-            return RelationshipData.this;
-        }
-
-        /**
-         * Defines that the relationship is assigned to all from types.
-         *
-         * @return this relationship data instance
-         * @see #allTypes
-         */
-        public RelationshipData addAllTypes()
-        {
-            this.types.addAll("type");
-            return RelationshipData.this;
-        }
-
-        /**
-         * Assigns <code>_relationships</code> to the
-         * {@link #relationships list of relationships} for this
-         * relationship.
-         *
-         * @param _relationships    relationship to assign
-         * @return this relationship data instance
-         * @see #relationships
-         */
-        public RelationshipData addRelationship(final RelationshipData... _relationships)
-        {
-            this.relationships.addAll(Arrays.asList(_relationships));
-            return RelationshipData.this;
-        }
-
-        /**
-         * Defines that the relationship is assigned to all relationships.
-         *
-         * @return this relationship data instance
-         * @see #allRelationships
-         */
-        public RelationshipData addAllRelationships()
-        {
-            this.relationships.addAll("relationship");
+            this.datas.addAll(_tag);
             return RelationshipData.this;
         }
 
@@ -394,30 +316,10 @@ public class RelationshipData
         {
             _cmd.append("    ").append(this.side).append(" {\n");
 
-            this.flags.append4Update("        ", _cmd);
-
-            // meaning
-            if (this.meaning != null)  {
-                _cmd.append("        meaning \"").append(StringUtil_mxJPO.convertUpdate(this.meaning)).append("\"\n");
-            }
-
-            // cardinality
-            if (this.cardinality != null)  {
-                _cmd.append("        cardinality ").append(this.cardinality.name().toLowerCase()).append("\n");
-            }
-
-            // clone behavior
-            if (this.clone != null)  {
-                _cmd.append("        clone ").append(this.clone.name().toLowerCase()).append("\n");
-            }
-
-            // clone behavior
-            if (this.revision != null)  {
-                _cmd.append("        revision ").append(this.revision.name().toLowerCase()).append("\n");
-            }
-
-            this.types.append4Update("        ", _cmd);
-            this.relationships.append4Update("        ", _cmd);
+            this.flags  .append4Update("        ", _cmd);
+            this.singles.append4Update("        ", _cmd);
+            this.strings.append4Update("        ", _cmd);
+            this.datas  .append4Update("        ", _cmd);
 
             _cmd.append("    }\n");
         }
@@ -434,32 +336,10 @@ public class RelationshipData
         {
             _cmd.append(' ').append(this.side);
 
-            this.flags        .append4Create(_cmd);
-            this.types        .append4Create(_cmd);
-            this.relationships.append4Create(_cmd);
-
-            // meaning
-            if (this.meaning != null)  {
-                _cmd.append(" meaning \"").append(AbstractTest.convertMql(this.meaning)).append('\"');
-            }
-
-            // cardinality
-            if (this.cardinality != null)  {
-                _cmd.append(" cardinality ").append(this.cardinality.name().toLowerCase());
-            } else  {
-                _cmd.append(" cardinality one");
-            }
-
-            // clone behavior
-            if (this.clone != null)  {
-                _cmd.append(" clone ").append(this.clone.name().toLowerCase());
-            }
-
-            // clone behavior
-            if (this.revision != null)  {
-                _cmd.append(" revision ").append(this.revision.name().toLowerCase());
-            }
-
+            this.flags  .append4Create(_cmd);
+            this.singles.append4Create(_cmd);
+            this.strings.append4Create(_cmd);
+            this.datas  .append4Create(_cmd);
         }
 
         /**
@@ -469,15 +349,10 @@ public class RelationshipData
          */
         protected void checkExport(final ExportParser _exportParser)
         {
-            this.flags        .check4Export(_exportParser, this.side);
-            this.types        .check4Export(_exportParser, this.side);
-            this.relationships.check4Export(_exportParser, this.side);
-
-            _exportParser
-                    .checkValue(this.side + "/meaning",      "\"" + StringUtil_mxJPO.convertUpdate(this.meaning) + "\"")
-                    .checkValue(this.side + "/cardinality",  this.cardinality.name().toLowerCase())
-                    .checkValue(this.side + "/clone",        this.clone.name().toLowerCase())
-                    .checkValue(this.side + "/revision",     this.revision.name().toLowerCase());
+            this.flags  .check4Export(_exportParser, this.side);
+            this.singles.check4Export(_exportParser, this.side);
+            this.strings.check4Export(_exportParser, this.side);
+            this.datas  .check4Export(_exportParser, this.side);
         }
     }
 }
