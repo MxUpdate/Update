@@ -126,6 +126,7 @@ public class Portal_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
                 .flagIfTrue(    "hidden",           false,  this.isHidden(),                     this.isHidden())
                 .string(        "label",                    this.getLabel())
@@ -142,6 +143,7 @@ public class Portal_mxJPO
                              final Portal_mxJPO _current)
         throws UpdateException_mxJPO
     {
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",         this.getDescription(),   _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false,  this.isHidden(),         _current.isHidden());
         DeltaUtil_mxJPO.calcValueDelta(_mql, "alt",                 this.getAlt(),           _current.getAlt());

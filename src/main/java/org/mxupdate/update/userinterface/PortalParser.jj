@@ -25,7 +25,6 @@ PARSER_BEGIN(PortalParser)
 package org.mxupdate.update.userinterface;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.ChannelRef;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
@@ -52,14 +51,23 @@ PARSER_END(PortalParser)
 
 TOKEN : /** first level */
 {
-      <DESCRIPTION:             "description">                                  : MULTILINESTRING_EXPECTED
+      <SYMBOLICNAME:            "symbolicname">                                 : STRING_EXPECTED
+
+    | <DESCRIPTION:             "description">                                  : MULTILINESTRING_EXPECTED
+
     | <HIDDEN_TRUE:             "hidden">
     | <HIDDEN_FALSE:            "!hidden">
+
     | <ALT:                     "alt">                                          : STRING_EXPECTED
+
     | <HREF:                    "href">                                         : STRING_EXPECTED
+
     | <LABEL:                   "label">                                        : STRING_EXPECTED
+
     | <SETTING:                 ("add" ([" ","\t","\n","\r"])+ )? "setting">    : SETTING_EXPECTED
+
     | <CHANNEL:                 "channel">                                      : STRING_EXPECTED
+
     | <NEWROW:                  "newrow">
 }
 
@@ -113,7 +121,10 @@ void parse(Portal_mxJPO _portal)
     ChannelRef ref;
     int refRowIdx = 0, refColIdx = 0;
 } {
-    (   (<DESCRIPTION>              ( tmp = <MULTILINESTRING>  {this.setValue(_portal, "description", this.getString(tmp.image));}
+    (   ( <SYMBOLICNAME>            ( tmp = <STRING>           {this.appendValue(_portal, "symbolicNames", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.appendValue(_portal, "symbolicNames", this.getSingle(tmp.image));} ) )
+
+      | (<DESCRIPTION>              ( tmp = <MULTILINESTRING>  {this.setValue(_portal, "description", this.getString(tmp.image));}
                                     | tmp = <MULTILINESINGLE>  {this.setValue(_portal, "description", this.getSingle(tmp.image));} ) )
 
       | (<HIDDEN_TRUE>                                         {this.setValue(_portal, "hidden", true);} )

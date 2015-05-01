@@ -18,18 +18,19 @@ package org.mxupdate.test.test.update.userinterface;
 import org.mxupdate.test.ci.userinterface.AbstractUITest;
 import org.mxupdate.test.data.userinterface.ChannelData;
 import org.mxupdate.test.data.userinterface.PortalData;
+import org.mxupdate.update.userinterface.Portal_mxJPO;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test class for portal exports and updates.
+ * Tests the {@link Portal_mxJPO portal CI} export / update.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class PortalCI_2UpdateTest
+public class PortalCI_3UpdateTest
     extends AbstractUITest<PortalData>
 {
     @DataProvider(name = "data")
