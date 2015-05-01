@@ -147,17 +147,8 @@ public class RuleData
      */
     @Override()
     public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
     {
-        // check symbolic name
-        Assert.assertEquals(
-                _exportParser.getSymbolicName(),
-                this.getSymbolicName(),
-                "check symbolic name");
-
-        this.getFlags().check4Export(_exportParser, "");
-        this.getValues().check4Export(_exportParser, "");
-        this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
+        super.checkExport(_exportParser);
 
         // access filter
         final SortedSet<String> curAccess = new TreeSet<String>();

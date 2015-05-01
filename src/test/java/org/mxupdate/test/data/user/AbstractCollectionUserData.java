@@ -20,7 +20,6 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.util.DataList;
-import org.testng.Assert;
 
 /**
  * The class is used to define all collection user objects used to create /
@@ -107,18 +106,9 @@ public class AbstractCollectionUserData<DATA extends AbstractCollectionUserData<
 
     @Override()
     public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
     {
-        // check symbolic name
-        Assert.assertEquals(
-                _exportParser.getSymbolicName(),
-                this.getSymbolicName(),
-                "check symbolic name");
+        super.checkExport(_exportParser);
 
-        this.getFlags()     .check4Export(_exportParser, "");
-        this.getValues()    .check4Export(_exportParser, "");
-        this.getSingles()   .check4Export(_exportParser, "");
         this.parents        .check4Export(_exportParser, "");
-        this.getProperties().checkExport(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/property/@value"));
     }
 }

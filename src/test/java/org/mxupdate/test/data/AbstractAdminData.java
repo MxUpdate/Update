@@ -272,11 +272,12 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         this.append4CIFileHeader(strg);
         strg.append("mxUpdate " + this.getCI().getMxType() + " \"${NAME}\" {\n");
 
-        this.flags      .append4Update("    ", strg);
-        this.getValues().append4Update("    ", strg);
-        this.keyValues  .append4Update("    ", strg);
-        this.datas      .append4Update("    ", strg);
-        this.properties .append4Update("    ", strg);
+        this.flags          .append4Update("    ", strg);
+        this.getValues()    .append4Update("    ", strg);
+        this.getSingles()   .append4Update("    ", strg);
+        this.keyValues      .append4Update("    ", strg);
+        this.datas          .append4Update("    ", strg);
+        this.properties     .append4Update("    ", strg);
         for (final String ciLine : this.getCILines())  {
             strg.append("    ").append(ciLine).append('\n');
         }
@@ -398,7 +399,6 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
      */
     @Override()
     public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
     {
         // check symbolic name
         Assert.assertEquals(

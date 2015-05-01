@@ -119,7 +119,6 @@ public class FieldData<FORMTABLE extends AbstractAdminData<?>>
      *
      * @param _exportParser     parsed export
      * @param _path             sub path
-     * @throws MatrixException  if test failed
      */
     public void check4Export(final ExportParser _exportParser,
                              final String _path)

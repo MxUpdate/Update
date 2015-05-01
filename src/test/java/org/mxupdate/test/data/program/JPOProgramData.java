@@ -134,7 +134,6 @@ public class JPOProgramData
      */
     @Override()
     public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
     {
         super.checkExport(_exportParser);
 

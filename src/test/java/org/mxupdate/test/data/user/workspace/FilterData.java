@@ -111,11 +111,9 @@ public class FilterData<USER extends AbstractUserData<?>>
      * The {@link #active active flag} is checked.
      *
      * @param _exportParser     parsed export
-     * @throws MatrixException if check failed
      */
     @Override()
     public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
     {
         super.checkExport(_exportParser);
 

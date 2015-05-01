@@ -357,18 +357,8 @@ public class PolicyData
      */
     @Override()
     public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
     {
-        // check symbolic name
-        Assert.assertEquals(
-                _exportParser.getSymbolicName(),
-                this.getSymbolicName(),
-                "check symbolic name");
-
-        this.getValues()    .check4Export(_exportParser, "");
-        this.getSingles()   .check4Export(_exportParser, "");
-        this.getValues()    .check4Export(_exportParser, "");
-        this.getProperties().checkExport(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/property/@value"));
+        super.checkExport(_exportParser);
 
         // check for types
         if (this.allTypes)  {
@@ -693,7 +683,6 @@ public class PolicyData
          * @throws MatrixException if information could not be fetched
          */
         public void checkExport(final ExportParser _exportParser)
-            throws MatrixException
         {
             boolean found = false;
             final String value = "\"" + AbstractTest.convertUpdate(this.name) + "\"";
@@ -807,7 +796,6 @@ public class PolicyData
          * @throws MatrixException if information could not be fetched
          */
         public void checkExport(final ExportParser _exportParser)
-            throws MatrixException
         {
             int found = 0;
             for (final ExportParser.Line line : _exportParser.getRootLines().get(0).getChildren())  {

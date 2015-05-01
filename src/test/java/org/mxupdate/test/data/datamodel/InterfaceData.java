@@ -24,7 +24,6 @@ import org.mxupdate.test.AbstractTest.CI;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.util.DataList;
-import org.testng.Assert;
 
 /**
  * Used to define an interface, create them and test the result.
@@ -220,21 +219,12 @@ public class InterfaceData
      * Checks the export of this data piece if all values are correct defined.
      *
      * @param _exportParser     parsed export
-     * @throws MatrixException if check failed
      */
     @Override()
     public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
     {
-        // check symbolic name
-        Assert.assertEquals(
-                _exportParser.getSymbolicName(),
-                this.getSymbolicName(),
-                "check symbolic name");
+        super.checkExport(_exportParser);
 
-        this.getFlags()  .check4Export(_exportParser, "");
-        this.getValues() .check4Export(_exportParser, "");
-        this.getSingles().check4Export(_exportParser, "");
         this.attributes  .check4Export(_exportParser, "");
         this.fors        .check4Export(_exportParser, "");
         this.parents     .check4Export(_exportParser, "");

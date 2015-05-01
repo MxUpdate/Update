@@ -94,12 +94,12 @@ public class TypeTest
                 new Object[]{
                         "4a) issue #36: type with one MQL program as method",
                         new TypeData(this, "TestType \" 1")
-                                .addMethod(new MQLProgramData(this, "Test Program"))},
+                                .defData("method", new MQLProgramData(this, "Test Program"))},
                 new Object[]{
                         "4b) issue #36: type with two MQL programs as method",
                         new TypeData(this, "TestType \" 1")
-                                .addMethod(new MQLProgramData(this, "Test Program 1"))
-                                .addMethod(new MQLProgramData(this, "Test Program 2"))}
+                                .defData("method", new MQLProgramData(this, "Test Program 1"))
+                                .defData("method", new MQLProgramData(this, "Test Program 2"))}
         );
     }
 
@@ -162,7 +162,7 @@ public class TypeTest
         final TypeData type = new TypeData(this, "TestType").create();
 
         // method must be defined after create (to test the update..)
-        type.addMethod(method)
+        type.defData("method", method)
                 .update((String) null);
 
         Assert.assertEquals(this.mql("print type '" + AbstractTest.convertMql(type.getName()) + "' select method dump"),
@@ -180,7 +180,7 @@ public class TypeTest
         throws Exception
     {
         this.createNewData("Test")
-                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
                 .create()
                 .checkExport()
                 .update("")
@@ -197,9 +197,9 @@ public class TypeTest
         throws Exception
     {
         this.createNewData("Test")
-                .addAttribute(new AttributeStringData(this, "Test Attribute 1"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute 1"))
                 .create()
-                .addAttribute(new AttributeStringData(this, "Test Attribute 2"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute 2"))
                 .createDependings()
                 .update("")
                 .checkExport();
@@ -215,7 +215,7 @@ public class TypeTest
         throws Exception
     {
         this.createNewData("Test")
-                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
                 .create();
         this.createNewData("Test")
                 .failureUpdate(ErrorKey.DM_TYPE_REMOVE_ATTRIBUTE);
@@ -231,12 +231,12 @@ public class TypeTest
         throws Exception
     {
         this.createNewData("Test")
-                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
                 .create();
         this.createNewData("Test")
                 .update("", ValueKeys.DMTypeAttrIgnore.name(), "*");
         this.createNewData("Test")
-                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
                 .checkExport();
     }
 
@@ -250,7 +250,7 @@ public class TypeTest
         throws Exception
     {
         this.createNewData("Test")
-                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
                 .create();
         this.createNewData("Test")
                 .update("", ValueKeys.DMTypeAttrRemove.name(), "*")

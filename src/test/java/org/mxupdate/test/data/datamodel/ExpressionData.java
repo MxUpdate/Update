@@ -15,10 +15,7 @@
 
 package org.mxupdate.test.data.datamodel;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
 
 /**
@@ -40,66 +37,5 @@ public class ExpressionData
                           final String _name)
     {
         super(_test, AbstractTest.CI.DM_EXPRESSION, _name);
-    }
-
-    /**
-     * Returns the TCL update file of this expression data instance.
-     *
-     * @return TCL update file content
-     */
-    @Override()
-    public String ciFile()
-    {
-        final StringBuilder strg = new StringBuilder();
-
-        this.append4CIFileHeader(strg);
-
-        strg.append("mxUpdate expression \"${NAME}\" {\n");
-
-        this.getFlags().append4Update("    ", strg);
-        this.getValues().append4Update("    ", strg);
-        this.getProperties().append4Update("    ", strg);
-
-        strg.append("}");
-
-        return strg.toString();
-    }
-
-    /**
-     * Create the related expression in MX for this expression data instance.
-     *
-     * @return this expression data instance
-     * @throws MatrixException if create failed
-     */
-    @Override()
-    public ExpressionData create()
-        throws MatrixException
-    {
-        if (!this.isCreated())  {
-            this.setCreated(true);
-
-            this.createDependings();
-
-            final StringBuilder cmd = new StringBuilder();
-            cmd.append("escape add expression \"").append(AbstractTest.convertMql(this.getName())).append('\"');
-            this.append4Create(cmd);
-
-            cmd.append(";\n")
-               .append("escape add property ").append(this.getSymbolicName())
-               .append(" on program eServiceSchemaVariableMapping.tcl")
-               .append(" to expression \"").append(AbstractTest.convertMql(this.getName())).append("\"");
-
-            this.getTest().mql(cmd);
-        }
-        return this;
-    }
-
-    @Override()
-    public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
-    {
-        this.getValues().check4Export(_exportParser, "");
-        this.getFlags().check4Export(_exportParser, "");
-        this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
     }
 }

@@ -129,28 +129,17 @@ public class DimensionData
      * Checks the export of this data piece if all values are correct defined.
      *
      * @param _exportParser     parsed export
-     * @throws MatrixException if check failed
      */
     @Override()
     public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
     {
-        // check symbolic name
-        Assert.assertEquals(
-                _exportParser.getSymbolicName(),
-                this.getSymbolicName(),
-                "check symbolic name");
+        super.checkExport(_exportParser);
 
         // check all units
         for (final UnitData unit : this.units)
         {
             unit.checkExport(_exportParser);
         }
-
-        this.getValues()    .check4Export(_exportParser, "");
-        this.getSingles()   .check4Export(_exportParser, "");
-        this.getFlags()     .check4Export(_exportParser, "");
-        this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
     }
 
     /**
@@ -339,10 +328,8 @@ public class DimensionData
          * Checks the export.
          *
          * @param _exportParser     export parsed
-         * @throws MatrixException if information could not be fetched
          */
         public void checkExport(final ExportParser _exportParser)
-            throws MatrixException
         {
             boolean found = false;
             final String value = "\"" + AbstractTest.convertUpdate(this.name) + "\"";

@@ -226,11 +226,9 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
      * The hidden flag and the {@link #visible visible users} are checked.
      *
      * @param _exportParser     parsed export
-     * @throws MatrixException if check failed
      */
     @Override()
     public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
     {
         super.checkExport(_exportParser);
 

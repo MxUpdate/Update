@@ -15,15 +15,7 @@
 
 package org.mxupdate.test.data.datamodel;
 
-import java.util.Arrays;
-
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.program.AbstractProgramData;
-import org.mxupdate.test.data.util.DataList;
-import org.testng.Assert;
 
 /**
  * Used to define a type, create them and test the result.
@@ -33,11 +25,6 @@ import org.testng.Assert;
 public class TypeData
     extends AbstractDataWithTrigger<TypeData>
 {
-    /** All methods of this type. */
-    private final DataList<AbstractProgramData<?>> methods = new DataList<AbstractProgramData<?>>("method ", "method ", false);
-    /** All attributes of this data with attribute instances. */
-    private final DataList<AbstractAttributeData<?>> attributes = new DataList<AbstractAttributeData<?>>();
-
     /**
      * Initialize this type data with given <code>_name</code>.
      *
@@ -49,102 +36,5 @@ public class TypeData
                     final String _name)
     {
         super(_test, AbstractTest.CI.DM_TYPE, _name);
-    }
-
-    /**
-     * Assigns the {@code _method} to this type.
-     *
-     * @param _method   method to assign
-     * @return this type data instance
-     */
-    public TypeData addMethod(final AbstractProgramData<?> _method)
-    {
-        this.methods.add(_method);
-        return this;
-    }
-
-    /**
-     * Assigns the {@code attributes} to this data instance.
-     *
-     * @param _attributes       attribute to assign
-     * @return this type data instance
-     */
-    public TypeData addAttribute(final AbstractAttributeData<?>... _attributes)
-    {
-        this.attributes.addAll(Arrays.asList(_attributes));
-        return this;
-    }
-
-    @Override()
-    public String ciFile()
-    {
-        final StringBuilder strg = new StringBuilder();
-        this.append4CIFileHeader(strg);
-        strg.append("mxUpdate type \"${NAME}\" {\n");
-
-        this.getFlags()     .append4Update("    ", strg);
-        this.getValues()    .append4Update("    ", strg);
-        this.getSingles()   .append4Update("    ", strg);
-        this.getTriggers()  .appendUpdate("    ", strg);
-        this.methods        .append4Update("    ", strg);
-        this.attributes     .append4Update("    ", strg);
-        this.getProperties().append4Update("    ", strg);
-
-        strg.append("}");
-
-        return strg.toString();
-    }
-
-    @Override()
-    public TypeData create()
-        throws MatrixException
-    {
-        if (!this.isCreated())  {
-            this.setCreated(true);
-
-            this.createDependings();
-
-            final StringBuilder cmd = new StringBuilder();
-            cmd.append("escape add type \"").append(AbstractTest.convertMql(this.getName())).append('\"');
-
-            this.methods   .append4Create(cmd);
-            this.attributes.append4Create(cmd);
-
-            this.append4Create(cmd);
-
-            this.getTest().mql(cmd);
-        }
-
-        return this;
-    }
-
-    @Override()
-    public TypeData createDependings()
-        throws MatrixException
-    {
-        super.createDependings();
-
-        this.methods   .createDependings();
-        this.attributes.createDependings();
-
-        return this;
-    }
-
-    @Override()
-    public void checkExport(final ExportParser _exportParser)
-    {
-        // check symbolic name
-        Assert.assertEquals(
-                _exportParser.getSymbolicName(),
-                this.getSymbolicName(),
-                "check symbolic name");
-
-        this.getFlags()     .check4Export(_exportParser, "");
-        this.getValues()    .check4Export(_exportParser, "");
-        this.getSingles()   .check4Export(_exportParser, "");
-        this.getTriggers()  .checkExport(_exportParser, "");
-        this.methods        .check4Export(_exportParser, "");
-        this.attributes     .check4Export(_exportParser, "");
-        this.getProperties().checkExport(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/property/@value"));
     }
 }

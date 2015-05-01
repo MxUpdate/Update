@@ -21,7 +21,6 @@ import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.util.DataList;
-import org.testng.Assert;
 
 /**
  * Defines the data for package configuration items.
@@ -131,17 +130,9 @@ public class PackageData
 
     @Override()
     public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
     {
-        // check symbolic name
-        Assert.assertEquals(
-                _exportParser.getSymbolicName(),
-                this.getSymbolicName(),
-                "check symbolic name");
+        super.checkExport(_exportParser);
 
-        this.getFlags()     .check4Export(_exportParser, "");
-        this.getValues()    .check4Export(_exportParser, "");
-        this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
         this.usePackages    .check4Export(_exportParser, "");
         this.members        .check4Export(_exportParser, "");
     }

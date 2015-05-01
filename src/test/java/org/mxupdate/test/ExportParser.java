@@ -271,13 +271,17 @@ public class ExportParser
      *
      * @param _path     path of the lines
      * @return list of all found strings
+     * @deprecated use check methods
      */
+    @Deprecated()
     public List<String> getLines(final String _path)
     {
         final List<String> ret = new ArrayList<String>();
         final String[] path = _path.split("/");
         for (final Line line : this.rootLines)  {
-            line.evalPath(path, 1, ret);
+            if (path[1].equals(line.tag))  {
+                line.evalPath(path, 2, ret);
+            }
         }
 
         return ret;

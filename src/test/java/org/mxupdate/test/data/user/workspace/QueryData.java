@@ -154,11 +154,9 @@ public class QueryData<USER extends AbstractUserData<?>>
      * Checks the export of this data piece if all values are correct defined.
      *
      * @param _exportParser     parsed export
-     * @throws MatrixException if check failed
      */
     @Override()
     public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
     {
         // cache type, name and revision
         final String type = this.getValue("type").toString();

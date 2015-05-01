@@ -206,7 +206,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         this.getFlags()     .append4Update("    ", strg);
         this.getValues()    .append4Update("    ", strg);
         this.getSingles()   .append4Update("    ", strg);
-        this.getTriggers()  .appendUpdate("    ", strg);
+        this.getTriggers()  .append4Update("    ", strg);
         this.getProperties().append4Update("    ", strg);
 
         // append rule
@@ -236,28 +236,23 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * Checks the export of this data piece if all values are correct defined.
      *
      * @param _exportParser     parsed export
-     * @throws MatrixException if check failed
      */
     @Override()
     public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
     {
-        this.getValues()    .check4Export(_exportParser, "");
-        this.getFlags()     .check4Export(_exportParser, "");
-        this.getTriggers()  .checkExport(_exportParser, "");
-        this.getProperties().checkExport(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/property/@value"));
+        super.checkExport(_exportParser);
 
         // check for rule
         if (this.rule == null) {
-            this.checkNotExistingSingleValue(_exportParser, "rule", "rule");
+            _exportParser.checkNotExistingValue("rule");
         } else  {
             this.checkSingleValue(_exportParser, "rules", "rule", "\"" + AbstractTest.convertUpdate(this.rule.getName()) + "\"");
         }
         // check for dimension
         if (this.dimension == null) {
-            this.checkNotExistingSingleValue(_exportParser, "dimension", "dimension");
+            _exportParser.checkNotExistingValue("dimension");
         } else  {
-            this.checkSingleValue(_exportParser, "dimension", "dimension", "\"" + AbstractTest.convertUpdate(this.dimension.getName()) + "\"");
+            _exportParser.checkValue("dimension", "\"" + AbstractTest.convertUpdate(this.dimension.getName()) + "\"");
         }
         // check for ranges
         final Set<String> needAdds = new HashSet<String>();

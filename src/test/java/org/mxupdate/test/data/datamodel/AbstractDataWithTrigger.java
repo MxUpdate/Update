@@ -80,6 +80,25 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
     }
 
     @Override()
+    public String ciFile()
+    {
+        final StringBuilder strg = new StringBuilder();
+        this.append4CIFileHeader(strg);
+        strg.append("mxUpdate " + this.getCI().getMxType() + " \"${NAME}\" {\n");
+
+        this.getFlags()     .append4Update("    ", strg);
+        this.getValues()    .append4Update("    ", strg);
+        this.getSingles()   .append4Update("    ", strg);
+        this.getTriggers()  .append4Update("    ", strg);
+        this.triggers       .append4Update("    ", strg);
+        this.getProperties().append4Update("    ", strg);
+
+        strg.append("}");
+
+        return strg.toString();
+    }
+
+    @Override()
     @SuppressWarnings("unchecked")
     public DATAWITHTRIGGERS createDependings()
         throws MatrixException
@@ -106,6 +125,14 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
     {
         super.append4Create(_cmd);
         this.triggers.append4Create(_cmd);
+    }
+
+    @Override()
+    public void checkExport(final ExportParser _exportParser)
+    {
+        super.checkExport(_exportParser);
+
+        this.triggers.checkExport(_exportParser, "");
     }
 
     /**
@@ -261,7 +288,7 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
          * @param _cmd      string builder with the TCL commands of the
          *                  configuration item file
          */
-        public void appendUpdate(final String _prefix,
+        public void append4Update(final String _prefix,
                                  final StringBuilder _cmd)
         {
             for (final AbstractTrigger<?> trigger : this)  {

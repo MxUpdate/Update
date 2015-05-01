@@ -569,11 +569,9 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
      * </ul>
      *
      * @param _exportParser     parsed export
-     * @throws MatrixException if check failed
      */
     @Override()
     public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
     {
         // site
         if (this.site != null)  {

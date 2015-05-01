@@ -354,7 +354,6 @@ public class PersonData
      */
     @Override()
     public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
     {
         // differ export for admin / bus update
         final List<ExportParser.Line> adminLines = new ArrayList<ExportParser.Line>();

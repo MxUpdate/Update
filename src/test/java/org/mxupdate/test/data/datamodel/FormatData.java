@@ -232,14 +232,8 @@ public class FormatData
      */
     @Override()
     public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
     {
-        // check for defined values
-        this.getValues().check4Export(_exportParser, "");
-        // check for defined flags
-        this.getFlags().check4Export(_exportParser, "");
-        // check for properties
-        this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
+        super.checkExport(_exportParser);
 
         if (this.getTest().getVersion().max(Version.V6R2013x))  {
             this.checkSingleValue(_exportParser, "view program", "view",

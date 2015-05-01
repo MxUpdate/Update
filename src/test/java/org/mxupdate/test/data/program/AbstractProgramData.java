@@ -366,8 +366,8 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
      */
     @Override()
     public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
     {
+try  {
         Assert.assertTrue(!"".equals(this.getTest().mql("escape list program \"" + AbstractTest.convertMql(this.getName()) + "\"")),
                           "check program is created");
         Assert.assertTrue(!"".equals(this.getTest().mql("escape list property to program \"" + AbstractTest.convertMql(this.getName()) + "\"")),
@@ -432,5 +432,8 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
             }
         }
 */
+} catch (final MatrixException e) {
+    throw new Error(e);
+}
     }
 }

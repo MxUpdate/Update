@@ -25,7 +25,6 @@ import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.util.DataList;
 import org.mxupdate.test.data.util.FlagList;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.testng.Assert;
 
 /**
  * Used to define a relationship, create them and test the result.
@@ -119,7 +118,7 @@ public class RelationshipData
         this.getFlags()     .append4Update("    ", strg);
         this.getValues()    .append4Update("    ", strg);
         this.getSingles()   .append4Update("    ", strg);
-        this.getTriggers()  .appendUpdate("    ", strg);
+        this.getTriggers()  .append4Update("    ", strg);
         this.rules          .append4Update("    ", strg);
         this.from           .appendUpdate(strg);
         this.to             .appendUpdate(strg);
@@ -197,27 +196,16 @@ public class RelationshipData
      * Checks the export of this data piece if all values are correct defined.
      *
      * @param _exportParser     parsed export
-     * @throws MatrixException if check failed
      */
     @Override()
     public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
     {
-        // check symbolic name
-        Assert.assertEquals(
-                _exportParser.getSymbolicName(),
-                this.getSymbolicName(),
-                "check symbolic name");
+        super.checkExport(_exportParser);
 
-        this.getFlags()     .check4Export(_exportParser, "");
-        this.getValues()    .check4Export(_exportParser, "");
-        this.getSingles()   .check4Export(_exportParser, "");
-        this.getTriggers()  .checkExport(_exportParser, "");
-        this.from           .checkExport(_exportParser);
-        this.to             .checkExport(_exportParser);
-        this.attributes     .check4Export(_exportParser, "");
-        this.rules          .check4Export(_exportParser, "");
-        this.getProperties().checkExport(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/property/@value"));
+        this.from       .checkExport(_exportParser);
+        this.to         .checkExport(_exportParser);
+        this.attributes .check4Export(_exportParser, "");
+        this.rules      .check4Export(_exportParser, "");
     }
 
     /**
@@ -479,10 +467,8 @@ public class RelationshipData
          * Checks the export for one side of a relationship.
          *
          * @param _exportParser     export parser
-         * @throws MatrixException if check failed
          */
         protected void checkExport(final ExportParser _exportParser)
-            throws MatrixException
         {
             this.flags        .check4Export(_exportParser, this.side);
             this.types        .check4Export(_exportParser, this.side);
