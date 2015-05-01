@@ -47,6 +47,21 @@ public class Type_mxJPO
     static  {
         Type_mxJPO.IGNORED_URLS.add("/derivedFrom");
         Type_mxJPO.IGNORED_URLS.add("/derivedFrom/typeRefList");
+        Type_mxJPO.IGNORED_URLS.add("/localAttributes");
+        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList");
+        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties");
+        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/creationInfo");
+        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/creationInfo/datetime");
+        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/modificationInfo");
+        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/modificationInfo/datetime");
+        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList");
+        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history");
+        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/agent");
+        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/datetime");
+        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/event");
+        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/order");
+        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/string");
+        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/propertyList");
         Type_mxJPO.IGNORED_URLS.add("/methodList");
     }
 
