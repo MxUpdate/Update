@@ -15,7 +15,7 @@
 
 package org.mxupdate.test.test.update.userinterface;
 
-import org.mxupdate.test.update.AbstractParserTest;
+import org.mxupdate.test.test.update.AbstractParserTest;
 import org.mxupdate.update.userinterface.Table_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.DataProvider;
