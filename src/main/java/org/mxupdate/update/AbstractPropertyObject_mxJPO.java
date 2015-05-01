@@ -177,13 +177,13 @@ public abstract class AbstractPropertyObject_mxJPO
                 + "mql exec prog org.mxupdate.update.util.JPOCaller logTrace ${_sText}\n"
             + "}\n"
             + "proc mxUpdate {_sKind _sName _lsArgs}  {\n"
-                + "global APPLICATION AUTHOR FILEDATE INSTALLEDDATE INSTALLER ORIGINALNAME VERSION\n"
+                + "global APPLICATION AUTHOR FILEDATE FILENAME INSTALLEDDATE INSTALLER ORIGINALNAME VERSION\n"
                 + "regsub -all {\\\\} $_lsArgs {@0@0@} sArg\n"
                 + "regsub -all {'}    $sArg    {@1@1@} sArg\n"
                 + "regsub -all {\\\"} $sArg    {@2@2@} sArg\n"
                 + "regsub -all {\\\\\\[} $sArg {[} sArg\n"
                 + "regsub -all {\\\\\\]} $sArg {]} sArg\n"
-                + "mql exec prog org.mxupdate.update.util.JPOCaller mxUpdate $_sKind $_sName \"${sArg}\" \"$APPLICATION\" \"$AUTHOR\" \"$FILEDATE\" \"$INSTALLEDDATE\" \"$INSTALLER\" \"$ORIGINALNAME\" \"$VERSION\" \"END\"\n"
+                + "mql exec prog org.mxupdate.update.util.JPOCaller mxUpdate $_sKind $_sName \"${sArg}\" \"$APPLICATION\" \"$AUTHOR\" \"$FILEDATE\" \"$FILENAME\" \"$INSTALLEDDATE\" \"$INSTALLER\" \"$ORIGINALNAME\" \"$VERSION\" \"END\"\n"
             + "}\n";
 
     /**
@@ -425,6 +425,9 @@ public abstract class AbstractPropertyObject_mxJPO
 
         // define installation date
         tclVariables.put(PropertyDef_mxJPO.INSTALLEDDATE.name(), StringUtil_mxJPO.formatInstalledDate(_paramCache, new Date()));
+
+        // define file name
+        tclVariables.put("FILENAME", _file.toString().replaceAll("\\\\", "/"));
 
         try {
             this.update(_paramCache, "", "", "", tclVariables, _file);

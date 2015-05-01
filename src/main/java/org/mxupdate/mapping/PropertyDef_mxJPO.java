@@ -36,6 +36,8 @@ public enum PropertyDef_mxJPO
     INSTALLER,
     /** Admin property to store the original name. */
     ORIGINALNAME,
+    /** Property to store the sub path. */
+    SUBPATH,
     /** Admin property to store the version. */
     VERSION;
 

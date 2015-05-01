@@ -35,6 +35,7 @@ import org.mxupdate.update.user.PersonAdmin_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
@@ -707,7 +708,7 @@ final Object tmp = this;
                                final String... _args)
         throws Exception
     {
-        if ((_args.length == 12) && "mxUpdate".equals(_args[0]) && this.getTypeDef().getMxAdminName().equals(_args[1])) {
+        if ((_args.length == 13) && "mxUpdate".equals(_args[0]) && this.getTypeDef().getMxAdminName().equals(_args[1])) {
 
             final CLASS clazz = (CLASS) this.getTypeDef().newTypeInstance(_args[2]);
 
@@ -723,18 +724,20 @@ final Object tmp = this;
             clazz.getProperties().parse(_paramCache, "/property/value", _args[6]);
             clazz.getProperties().parse(_paramCache, "/property", "");
             clazz.getProperties().parse(_paramCache, "/property/name", "installed date");
-            clazz.getProperties().parse(_paramCache, "/property/value", _args[7]);
-            clazz.getProperties().parse(_paramCache, "/property", "");
-            clazz.getProperties().parse(_paramCache, "/property/name", "installer");
             clazz.getProperties().parse(_paramCache, "/property/value", _args[8]);
             clazz.getProperties().parse(_paramCache, "/property", "");
-            clazz.getProperties().parse(_paramCache, "/property/name", "original name");
+            clazz.getProperties().parse(_paramCache, "/property/name", "installer");
             clazz.getProperties().parse(_paramCache, "/property/value", _args[9]);
             clazz.getProperties().parse(_paramCache, "/property", "");
-            clazz.getProperties().parse(_paramCache, "/property/name", "version");
+            clazz.getProperties().parse(_paramCache, "/property/name", "original name");
             clazz.getProperties().parse(_paramCache, "/property/value", _args[10]);
+            clazz.getProperties().parse(_paramCache, "/property", "");
+            clazz.getProperties().parse(_paramCache, "/property/name", "version");
+            clazz.getProperties().parse(_paramCache, "/property/value", _args[11]);
 
             clazz.parseUpdate(_args[3].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\"));
+
+            clazz.getProperties().setValue4KeyValue(_paramCache, PropertyDef_mxJPO.SUBPATH, FileHandlingUtil_mxJPO.extraceSubPath(_args[7], this.getTypeDef().getFilePath()));
 
             // initialize MQL builder (with or w/o suffix!)
             final MultiLineMqlBuilder mql;

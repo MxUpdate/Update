@@ -138,6 +138,58 @@ public final class AdminPropertyList_mxJPO
     }
 
     /**
+     * Returns for given {@code _key} related property value.
+     *
+     * @param _paramCache   parameter cache
+     * @param _key          key of searched property
+     * @return value for searched property key
+     */
+    public String getValue4KeyValue(final ParameterCache_mxJPO _paramCache,
+                                    final PropertyDef_mxJPO _key)
+    {
+        final String key = _key.getPropName(_paramCache);
+        String ret = null;
+        for (final AdminProperty prop : this.properties)  {
+            if (((prop.getRefAdminName()) == null) && (prop.getRefAdminType() == null) && key.equals(prop.getName()))  {
+                ret = prop.getValue();
+                break;
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Defines the value for a key/value-pair property. If a property with same
+     * key exists, the value is overridden. If the property not exists, a new
+     * property is defined.
+     *
+     * @param _paramCache   parameter cache
+     * @param _key          key of property
+     * @param _value        value of property
+     */
+    public void setValue4KeyValue(final ParameterCache_mxJPO _paramCache,
+                                  final PropertyDef_mxJPO _key,
+                                  final String _value)
+    {
+        final String key = _key.getPropName(_paramCache);
+        AdminProperty found = null;
+        for (final AdminProperty prop : this.properties)  {
+            if (((prop.getRefAdminName()) == null) && (prop.getRefAdminType() == null) && key.equals(prop.getName()))  {
+                found = prop;
+                break;
+            }
+        }
+        if (found == null)  {
+            found = new AdminProperty();
+            found.name = key;
+            found.value = _value;
+            this.properties.add(found);
+        } else  {
+            found.value = _value;
+        }
+    }
+
+    /**
      * Returns all {@link #properties}.
      *
      * @return all properties

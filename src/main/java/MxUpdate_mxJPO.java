@@ -31,6 +31,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.Mode_mxJPO;
 import org.mxupdate.mapping.ParameterDef_mxJPO;
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDefGroup_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
@@ -584,7 +585,15 @@ public class MxUpdate_mxJPO
         for (final Map.Entry<TypeDef_mxJPO,Set<String>> entry : clazz2names.entrySet())  {
             for (final String name : entry.getValue())  {
                 final AbstractObject_mxJPO instance = entry.getKey().newTypeInstance(name);
-                final File path = new File(pathStr + File.separator + instance.getPath());
+
+                // append the stored sub path of the ci object from last import
+                final String subPath = instance.getPropValue(_paramCache, PropertyDef_mxJPO.SUBPATH);
+                final File path;
+                if ((subPath != null) && !subPath.isEmpty())  {
+                    path = new File(pathStr + File.separator + instance.getPath() + File.separator + subPath);
+                } else  {
+                    path = new File(pathStr + File.separator + instance.getPath());;
+                }
                 _paramCache.logInfo("export "+instance.getTypeDef().getLogging() + " '" + name + "'");
                 instance.export(_paramCache, path);
             }
