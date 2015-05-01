@@ -138,7 +138,7 @@ class Export_mxJPO
             // first found related type definition
             for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
                 instance = typeDef.newTypeInstance(null);
-                final String mxName = instance.extractMxName(_paramCache, file);
+                final String mxName = instance.evalMxName(_paramCache, file);
                 if (mxName != null)  {
                     instance = typeDef.newTypeInstance(mxName);
                     break;

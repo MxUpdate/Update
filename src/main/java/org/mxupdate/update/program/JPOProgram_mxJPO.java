@@ -178,11 +178,11 @@ public class JPOProgram_mxJPO
      *       read only till class, interface or enum is defined....
      */
     @Override()
-    public String extractMxName(final ParameterCache_mxJPO _paramCache,
+    public String evalMxName(final ParameterCache_mxJPO _paramCache,
                                 final File _file)
         throws UpdateException_mxJPO
     {
-        String mxName = super.extractMxName(_paramCache, _file);
+        String mxName = super.evalMxName(_paramCache, _file);
 
         if (mxName != null)  {
             final String code;

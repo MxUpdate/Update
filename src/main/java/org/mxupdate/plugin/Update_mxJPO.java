@@ -143,20 +143,20 @@ class Update_mxJPO
      * @return map with the files and depending MX type definition instance
      * @throws Exception if instances could not be evaluated
      */
-    protected Map<TypeDef_mxJPO,Map<File,String>> evalInstances(final ParameterCache_mxJPO _paramCache,
+    protected Map<TypeDef_mxJPO,Map<String,File>> evalInstances(final ParameterCache_mxJPO _paramCache,
                                                                 final Set<File> _files)
         throws Exception
     {
-        final Map<TypeDef_mxJPO,Map<File,String>> ret = new HashMap<TypeDef_mxJPO,Map<File,String>>();
+        final Map<TypeDef_mxJPO,Map<String,File>> ret = new HashMap<TypeDef_mxJPO,Map<String,File>>();
         for (final File file : _files)  {
             for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
                 final AbstractObject_mxJPO instance = typeDef.newTypeInstance(null);
-                final String mxName = instance.extractMxName(_paramCache, file);
+                final String mxName = instance.evalMxName(_paramCache, file);
                 if (mxName != null)  {
                     if (!ret.containsKey(typeDef))  {
-                        ret.put(typeDef, new HashMap<File,String>());
+                        ret.put(typeDef, new HashMap<String,File>());
                     }
-                    ret.get(typeDef).put(file, mxName);
+                    ret.get(typeDef).put(mxName, file);
                     break;
                 }
             }

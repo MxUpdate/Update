@@ -249,11 +249,11 @@ public class BusObject_mxJPO
      * include the the type, the business type is added.
      */
     @Override()
-    public String extractMxName(final ParameterCache_mxJPO _paramCache,
-                                final File _file)
+    public String evalMxName(final ParameterCache_mxJPO _paramCache,
+                             final File _file)
         throws UpdateException_mxJPO
     {
-        String ret = super.extractMxName(_paramCache, _file);
+        String ret = super.evalMxName(_paramCache, _file);
         if ((ret != null) && this.getTypeDef().hasMxBusTypeDerived() && !ret.contains(BusObject_mxJPO.SPLIT_TYPE))  {
             ret = new StringBuilder().append(this.getTypeDef().getMxBusType())
                                      .append(BusObject_mxJPO.SPLIT_TYPE)

@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
@@ -78,7 +79,7 @@ public final class UpdateUtil_mxJPO
      * @see UpdateCheck_mxJPO
      */
     public static void update(final ParameterCache_mxJPO _paramCache,
-                              final Map<TypeDef_mxJPO,Map<File,String>> _clazz2names)
+                              final Map<TypeDef_mxJPO,Map<String,File>> _clazz2names)
         throws Exception
     {
         // fetch existing CI's
@@ -91,23 +92,22 @@ public final class UpdateUtil_mxJPO
         final List<AbstractObject_mxJPO> compiles = new ArrayList<AbstractObject_mxJPO>();
         final boolean compile = _paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_COMPILE);
         for (final TypeDef_mxJPO clazz : _paramCache.getMapping().getAllTypeDefsSorted())  {
-            final Map<File,String> clazzMap = _clazz2names.get(clazz);
+            final Map<String,File> clazzMap = _clazz2names.get(clazz);
             if (clazzMap != null)  {
                 final Set<String> existings = existingNames.get(clazz);
 
-                for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
-                    final AbstractObject_mxJPO instance = clazz.newTypeInstance(fileEntry.getValue());
-                    _paramCache.logInfo("check "+instance.getTypeDef().getLogging()
-                           + " '" + fileEntry.getValue() + "'");
+                for (final Entry<String,File> fileEntry : clazzMap.entrySet())  {
+                    final AbstractObject_mxJPO instance = clazz.newTypeInstance(fileEntry.getKey());
+                    _paramCache.logInfo("check "+instance.getTypeDef().getLogging() + " '" + fileEntry.getKey() + "'");
 
                     final boolean update;
                     final String version = _paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_FILEDATE2VERSION)
-                                    ? Long.toString(fileEntry.getKey().lastModified() / 1000)
+                                    ? Long.toString(fileEntry.getValue().lastModified() / 1000)
                                     : _paramCache.getValueString(ParameterCache_mxJPO.KEY_VERSION);
                     if (_paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_CHECK_FILE_DATE))  {
-                        final Date fileDate = new Date(fileEntry.getKey().lastModified());
+                        final Date fileDate = new Date(fileEntry.getValue().lastModified());
                         final String instDateString;
-                        if (existings.contains(fileEntry.getValue()))  {
+                        if (existings.contains(fileEntry.getKey()))  {
                             instDateString = instance.getPropValue(_paramCache, PropertyDef_mxJPO.FILEDATE);
                         } else  {
                             instDateString = null;
@@ -130,7 +130,7 @@ public final class UpdateUtil_mxJPO
                         }
                     } else if (_paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_CHECK_VERSION))  {
                         final String instVersion;
-                        if (existings.contains(fileEntry.getValue()))  {
+                        if (existings.contains(fileEntry.getKey()))  {
                             instVersion = instance.getPropValue(_paramCache, PropertyDef_mxJPO.VERSION);
                         } else  {
                             instVersion = null;
@@ -140,7 +140,7 @@ public final class UpdateUtil_mxJPO
                         } else  {
                             update = true;
                             if (_paramCache.getValueBoolean(UpdateUtil_mxJPO.PARAM_FILEDATE2VERSION))  {
-                                _paramCache.logDebug("    - update to version from " + new Date(fileEntry.getKey().lastModified()));
+                                _paramCache.logDebug("    - update to version from " + new Date(fileEntry.getValue().lastModified()));
                             } else  {
                                 _paramCache.logDebug("    - update to version " + version);
                             }
@@ -150,9 +150,7 @@ public final class UpdateUtil_mxJPO
                         _paramCache.logDebug("    - update");
                     }
                     // execute update
-                    if (update
-                            && UpdateUtil_mxJPO.updateOne(_paramCache, !existings.contains(fileEntry.getValue()), instance, fileEntry.getKey(), version)
-                            && compile)  {
+                    if (update && UpdateUtil_mxJPO.updateOne(_paramCache, !existings.contains(fileEntry.getKey()), instance, fileEntry.getValue(), version) && compile)  {
                         compiles.add(instance);
                     }
                 }
@@ -197,18 +195,18 @@ public final class UpdateUtil_mxJPO
      */
     protected static void create(final ParameterCache_mxJPO _paramCache,
                                  final Map<TypeDef_mxJPO,Set<String>> _existingNames,
-                                 final Map<TypeDef_mxJPO,Map<File,String>> _clazz2names)
+                                 final Map<TypeDef_mxJPO,Map<String,File>> _clazz2names)
         throws Exception
     {
         // create if needed (and not in the list of existing objects)
         for (final TypeDef_mxJPO clazz : _paramCache.getMapping().getAllTypeDefsSorted())  {
-            final Map<File,String> clazzMap = _clazz2names.get(clazz);
+            final Map<String,File> clazzMap = _clazz2names.get(clazz);
             if (clazzMap != null)  {
-                for (final Map.Entry<File, String> fileEntry : clazzMap.entrySet())  {
+                for (final Entry<String,File> fileEntry : clazzMap.entrySet())  {
                     final Set<String> existings = _existingNames.get(clazz);
-                    if (!existings.contains(fileEntry.getValue()))  {
-                        final AbstractObject_mxJPO instance = clazz.newTypeInstance(fileEntry.getValue());
-                        _paramCache.logInfo("create "+instance.getTypeDef().getLogging() + " '" + fileEntry.getValue() + "'");
+                    if (!existings.contains(fileEntry.getKey()))  {
+                        final AbstractObject_mxJPO instance = clazz.newTypeInstance(fileEntry.getKey());
+                        _paramCache.logInfo("create "+instance.getTypeDef().getLogging() + " '" + fileEntry.getKey() + "'");
                         instance.create(_paramCache);
                     }
                 }

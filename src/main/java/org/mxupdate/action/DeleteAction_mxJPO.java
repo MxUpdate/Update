@@ -16,7 +16,6 @@
 package org.mxupdate.action;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -66,15 +65,13 @@ public class DeleteAction_mxJPO
         final Map<TypeDef_mxJPO,Set<String>> clazz2MxNames = this.selects.getMatching(this.paramCache);
 
         // get all matching files depending on the update classes
-        final Map<TypeDef_mxJPO,Map<File,String>> clazz2FileNames = this.selects.evalMatches(this.paramCache);
+        final Map<TypeDef_mxJPO,Map<String,File>> clazz2FileNames = this.selects.evalMatches(this.paramCache);
 
         // and now loop throw the list of file names and compare to existing
         for (final Map.Entry<TypeDef_mxJPO,Set<String>> entry : clazz2MxNames.entrySet())  {
-            final Collection<String> fileNames = clazz2FileNames.containsKey(entry.getKey())
-                                                 ? clazz2FileNames.get(entry.getKey()).values()
-                                                 : null;
+            final Set<String> mxNames = clazz2FileNames.containsKey(entry.getKey()) ? clazz2FileNames.get(entry.getKey()).keySet() : null;
             for (final String name : entry.getValue())  {
-                if ((fileNames == null) || !fileNames.contains(name))  {
+                if ((mxNames == null) || !mxNames.contains(name))  {
                     this.paramCache.logInfo("delete " + entry.getKey().getLogging() + " '" + name + "'");
                     boolean commit = false;
                     final boolean transActive = this.paramCache.getContext().isTransactionActive();

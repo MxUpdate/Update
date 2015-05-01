@@ -21,7 +21,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import matrix.util.MatrixException;
 
@@ -265,6 +268,43 @@ public abstract class AbstractObject_mxJPO
     }
 
     /**
+     * Extract for given {@code _files} all mx names for this type.
+     *
+     * @param _paramCache   parameter cache
+     * @param _files        files
+     * @param _matches      matches (if {@code null}, all is valid}
+     * @return map of MX names and depending file for this type definition
+     * @throws UpdateException_mxJPO if evaluate failed
+     */
+    public SortedMap<String,File> evalMatching(final ParameterCache_mxJPO _paramCache,
+                                               final Collection<File> _files,
+                                               final Collection<String> _matches)
+        throws UpdateException_mxJPO
+    {
+        final SortedMap<String,File> ret = new TreeMap<String,File>();
+
+        for (final File file : _files)  {
+            final String mxName = this.evalMxName(_paramCache, file);
+            if (mxName != null)  {
+                if (_matches == null)
+                {
+                    ret.put(mxName, file);
+                }
+                else
+                {
+                    for (final String match : _matches)  {
+                        if (this.matchMxName(_paramCache, mxName, match))  {
+                            ret.put(mxName, file);
+                        }
+                    }
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    /**
      * Extracts the MX name from given file name if the file prefix and suffix
      * matches. If the file prefix and suffix not matches a <code>null</code>
      * is returned.
@@ -276,8 +316,8 @@ public abstract class AbstractObject_mxJPO
      * @throws UpdateException_mxJPO if the configuration item name could not
      *                               be extracted from the file name
      */
-    public String extractMxName(final ParameterCache_mxJPO _paramCache,
-                                final File _file)
+    public String evalMxName(final ParameterCache_mxJPO _paramCache,
+                             final File _file)
         throws UpdateException_mxJPO
     {
         final String suffix = this.getTypeDef().getFileSuffix();
@@ -288,8 +328,7 @@ public abstract class AbstractObject_mxJPO
         final String fileName = _file.getName();
         final String mxName;
         if (((prefix == null) || fileName.startsWith(prefix)) && ((suffix == null) || fileName.endsWith(suffix)))  {
-            mxName = StringUtil_mxJPO.convertFromFileName(fileName.substring(0, fileName.length() - suffixLength)
-                                                 .substring(prefixLength));
+            mxName = StringUtil_mxJPO.convertFromFileName(fileName.substring(0, fileName.length() - suffixLength).substring(prefixLength));
         } else  {
             mxName = null;
         }

@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -139,10 +140,10 @@ public class SelectTypeDefUtil_mxJPO
      * @return map of update classes and the depending files with their names
      * @throws Exception if match for the files failed
      */
-    public Map<TypeDef_mxJPO,Map<File,String>> evalMatches(final ParameterCache_mxJPO _paramCache)
+    public Map<TypeDef_mxJPO,Map<String,File>> evalMatches(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        final Map<TypeDef_mxJPO,Map<File,String>> clazz2names = new HashMap<TypeDef_mxJPO,Map<File,String>>();
+        final Map<TypeDef_mxJPO,Map<String,File>> clazz2names = new HashMap<TypeDef_mxJPO,Map<String,File>>();
 
         // get path parameters
         final Collection<String> ignoreFiles = _paramCache.getValueList(ValueKeys.PathIgnoreFile);
@@ -182,15 +183,15 @@ public class SelectTypeDefUtil_mxJPO
         }
 
         // and now remove ignored matches
-        final Map<TypeDef_mxJPO,Map<File,String>> ret = new HashMap<TypeDef_mxJPO,Map<File,String>>();
-        for (final Entry<TypeDef_mxJPO,Map<File,String>> entry : clazz2names.entrySet())  {
+        final Map<TypeDef_mxJPO,Map<String,File>> ret = new HashMap<TypeDef_mxJPO,Map<String,File>>();
+        for (final Entry<TypeDef_mxJPO,Map<String,File>> entry : clazz2names.entrySet())  {
             final Collection<String> matchOpps = this.clazz2matchesOpp.get(entry.getKey());
             if ((matchOpps != null) && !matchOpps.isEmpty())  {
-                final Map<File,String> files = new TreeMap<File,String>();
-                for (final Map.Entry<File,String> fileEntry : entry.getValue().entrySet())  {
+                final SortedMap<String,File> files = new TreeMap<String,File>();
+                for (final Map.Entry<String,File> fileEntry : entry.getValue().entrySet())  {
                     boolean allowed = true;
                     for (final String matchOpp : matchOpps)  {
-                        if (StringUtil_mxJPO.match(fileEntry.getValue(), matchOpp))  {
+                        if (StringUtil_mxJPO.match(fileEntry.getKey(), matchOpp))  {
                             allowed = false;
                             break;
                         }
@@ -218,47 +219,17 @@ public class SelectTypeDefUtil_mxJPO
      * @param _clazz2names
      * @param _matchedFiles         already matched files
      * @param _matches
-     * @return ??
      * @throws Exception if the evaluate for the match fails
      */
-    private boolean evalMatches(final ParameterCache_mxJPO _paramCache,
-                                final TypeDef_mxJPO _selectedTypeDefs,
-                                final Map<TypeDef_mxJPO,Map<File,String>> _clazz2names,
-                                final Set<File> _allFiles,
-                                final Collection<String> _matches)
+    private void evalMatches(final ParameterCache_mxJPO _paramCache,
+                             final TypeDef_mxJPO _selectedTypeDefs,
+                             final Map<TypeDef_mxJPO,Map<String,File>> _clazz2names,
+                             final Set<File> _allFiles,
+                             final Collection<String> _matches)
         throws Exception
     {
-        final boolean foundOther = false;
-
-        // fetch map with files matching type definition
-        Map<File,String> tmp = _clazz2names.get(_selectedTypeDefs);
-        if (tmp == null)  {
-            tmp = new TreeMap<File,String>();
-            _clazz2names.put(_selectedTypeDefs, tmp);
-        }
-
         final AbstractObject_mxJPO instance = _selectedTypeDefs.newTypeInstance(null);
-
-        for (final File file : _allFiles)  {
-            final String mxName = instance.extractMxName(_paramCache, file);
-            if (mxName != null)  {
-                if (_matches == null)
-                {
-                    tmp.put(file, mxName);
-                }
-                else
-                {
-                    for (final String match : _matches)  {
-                        if (instance.matchMxName(_paramCache, mxName, match))  {
-                            // only if user had selected them
-                            tmp.put(file, mxName);
-                        }
-                    }
-                }
-            }
-        }
-
-        return foundOther;
+        _clazz2names.put(_selectedTypeDefs, instance.evalMatching(_paramCache, _allFiles, _matches));
     }
 
 
