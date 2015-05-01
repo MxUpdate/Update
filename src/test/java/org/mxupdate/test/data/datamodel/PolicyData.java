@@ -110,8 +110,7 @@ public class PolicyData
         final StringBuilder strg = new StringBuilder();
         this.append4CIFileHeader(strg);
 
-        strg.append("mxUpdate policy \"${NAME}\" {\n")
-            .append("    hidden \"").append(this.getFlags().getValue("hidden") != null ? this.getFlags().getValue("hidden") : false).append("\"\n");
+        strg.append("mxUpdate policy \"${NAME}\" {\n");
 
         this.getFlags()     .append4Update("    ", strg);
         this.getValues()    .append4Update("    ", strg);
@@ -164,11 +163,6 @@ public class PolicyData
             {
                 state.append4Create(cmd);
             }
-
-            cmd.append(";\n")
-                .append("escape add property ").append(this.getSymbolicName())
-                .append(" on program eServiceSchemaVariableMapping.tcl")
-                .append(" to policy \"").append(AbstractTest.convertMql(this.getName())).append("\"");
 
             this.getTest().mql(cmd);
         }

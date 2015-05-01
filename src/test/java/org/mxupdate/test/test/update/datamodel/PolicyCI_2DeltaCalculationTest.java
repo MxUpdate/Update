@@ -41,6 +41,12 @@ public class PolicyCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
+            {"1a) symbolic name",
+                    new PolicyData(this, "Test"),
+                    new PolicyData(this, "Test").setValue("symbolicname", "policy_123")},
+            {"1b) two symbolic name",
+                    new PolicyData(this, "Test"),
+                    new PolicyData(this, "Test").setValue("symbolicname", "policy_123").setValue("symbolicname", "policy_345")},
             {"with all types",
                     new PolicyData(this, "Test"),
                     new PolicyData(this, "Test").defDataAll("type")},
@@ -50,6 +56,7 @@ public class PolicyCI_2DeltaCalculationTest
        };
     }
 
+    @Override
     @BeforeMethod()
     @AfterClass(groups = "close" )
     public void cleanup()

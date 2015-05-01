@@ -59,7 +59,9 @@ PARSER_END(PolicyParser)
 
 <DEFAULT> TOKEN :
 {
-      <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+
+    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
     | <TYPE_ALL:                            "type" ([" ","\t","\n"])+ "all">                : DEFAULT
     | <TYPE_LIST:                           "type" ([" ","\t","\n"])+ "{">                  : LIST_EXPECTED
@@ -315,7 +317,10 @@ void parse(final Policy_mxJPO _policy)
     AdminProperty property;
     Access access = new Access();
 } {
-    (   ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_policy, "description",                          this.getString(tmp.image));}
+    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_policy, "symbolicNames",                     this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_policy, "symbolicNames",                     this.getSingle(tmp.image));} ) )
+
+      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_policy, "description",                          this.getString(tmp.image));}
                                     | tmp = <MULTILINESINGLE>               {this.setValue(_policy, "description",                          this.getSingle(tmp.image));} ) )
 
       | ( <FORMAT_ALL>                                                      {this.setValue(_policy, "allFormats",                           true);} )

@@ -280,20 +280,21 @@ public class Policy_mxJPO
     protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
-                //                  tag             | default | value                                                                 | write?
-                .string(            "description",              this.getDescription())
-                .flag(              "hidden",            false, this.isHidden())
-                .singleIfTrue(      "type",                     "all",                                                                  this.allTypes)
-                .listIfTrue(        "type",                     this.types,                                                             !this.allTypes)
-                .singleIfTrue(      "format",                   "all",                                                                  this.allFormats)
-                .listIfTrue(        "format",                   this.formats,                                                           !this.allFormats)
-                .string(            "defaultformat",            this.defaultFormat)
-                .flagIfTrue(        "enforce",           false, this.enforce,                                                           this.enforce)
-                .stringIfTrue(      "delimiter",                this.delimiter,                                                         (this.delimiter != null) && !this.delimiter.isEmpty())
-                .stringIfTrue(      "minorsequence",            this.minorsequence,                                                     (this.delimiter != null) && !this.delimiter.isEmpty())
-                .stringIfTrue(      "majorsequence",            this.majorsequence,                                                     (this.delimiter != null) && !this.delimiter.isEmpty())
-                .stringIfTrue(      "sequence",                 this.minorsequence,                                                     (this.delimiter == null) || this.delimiter.isEmpty())
-                .string(            "store",                    this.store);
+                //              tag             | default | value                                                                 | write?
+                .list(          "symbolicname",             this.getSymbolicNames())
+                .string(        "description",              this.getDescription())
+                .flag(          "hidden",            false, this.isHidden())
+                .singleIfTrue(  "type",                     "all",                                                                  this.allTypes)
+                .listIfTrue(    "type",                     this.types,                                                             !this.allTypes)
+                .singleIfTrue(  "format",                   "all",                                                                  this.allFormats)
+                .listIfTrue(    "format",                   this.formats,                                                           !this.allFormats)
+                .string(        "defaultformat",            this.defaultFormat)
+                .flagIfTrue(    "enforce",           false, this.enforce,                                                           this.enforce)
+                .stringIfTrue(  "delimiter",                this.delimiter,                                                         (this.delimiter != null) && !this.delimiter.isEmpty())
+                .stringIfTrue(  "minorsequence",            this.minorsequence,                                                     (this.delimiter != null) && !this.delimiter.isEmpty())
+                .stringIfTrue(  "majorsequence",            this.majorsequence,                                                     (this.delimiter != null) && !this.delimiter.isEmpty())
+                .stringIfTrue(  "sequence",                 this.minorsequence,                                                     (this.delimiter == null) || this.delimiter.isEmpty())
+                .string(        "store",                    this.store);
 
         // all state access
         if (this.allState)  {
@@ -331,6 +332,7 @@ public class Policy_mxJPO
                              final Policy_mxJPO _current)
         throws UpdateException_mxJPO
     {
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
         // creates policy if done within update
         if (_current.updateWithCreate)  {
             _paramCache.logDebug("    - create policy");

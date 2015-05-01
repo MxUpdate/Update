@@ -680,7 +680,8 @@ public class PolicyCI_3UpdateTest
     {
         new PolicyData(this, "Test")
             .setValue("store", "STORE")
-            .create()
+            .create();
+        new PolicyData(this, "Test")
             .setValue("store", "")
             .update((String) null)
             .checkExport();

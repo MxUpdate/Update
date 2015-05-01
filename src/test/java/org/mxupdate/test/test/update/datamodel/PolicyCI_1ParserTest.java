@@ -38,9 +38,16 @@ public class PolicyCI_1ParserTest
         final String state  = "registeredName \"\" !enforcereserveaccess !majorrevision !minorrevision !version !promote !checkouthistory !published ";
 
         return new Object[][]{
-                {"1) simple policy",
+                {"0) simple policy",
                         "",
                         simple},
+                // registered name
+                {"1a) symbolic name",
+                        "",
+                        "symbolicname \"policy_abc\" " + simple},
+                {"1b) two symbolic names",
+                        "symbolicname \"policy_abc\" symbolicname \"policy_def\" " + simple,
+                        "symbolicname \"policy_def\" symbolicname \"policy_abc\" " + simple},
                 // description
                 {"2a) description",
                         "",
