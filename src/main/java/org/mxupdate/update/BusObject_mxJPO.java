@@ -405,10 +405,7 @@ public class BusObject_mxJPO
                                                               true);
 
         for (final Object obj : expandTo.getRelationships())  {
-            this.connections.add(new Connection(_relation,
-                                                _getFrom ? "from" : "to",
-                                                (RelationshipWithSelect) obj,
-                                                attrs));
+            this.connections.add(new Connection(_relation, _getFrom ? "from" : "to", (RelationshipWithSelect) obj, attrs));
         }
 
     }
@@ -423,10 +420,7 @@ public class BusObject_mxJPO
     public void delete(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        final BusinessObject bus = new BusinessObject(this.busType,
-                                                      this.busName,
-                                                      this.busRevision,
-                                                      null);
+        final BusinessObject bus = new BusinessObject(this.busType, this.busName, this.busRevision, null);
         bus.remove(_paramCache.getContext());
     }
 
@@ -440,10 +434,7 @@ public class BusObject_mxJPO
     public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        final BusinessObject bus = new BusinessObject(this.busType,
-                                                      this.busName,
-                                                      this.busRevision,
-                                                      this.getTypeDef().getMxBusVault());
+        final BusinessObject bus = new BusinessObject(this.busType, this.busName, this.busRevision, this.getTypeDef().getMxBusVault());
         bus.create(_paramCache.getContext(), this.getTypeDef().getMxBusPolicy());
     }
 
@@ -580,7 +571,7 @@ public class BusObject_mxJPO
                                final String... _args)
         throws Exception
     {
-        if ((_args.length == 8) && "mxUpdate".equals(_args[0]) /*&& this.getTypeDef().getMxAdminName().equals(_args[1])*/) {
+        if ((_args.length == 8) && "mxUpdate".equals(_args[0]) && this.getTypeDef().getMxUpdateType().equals(_args[1])) {
 
             final String name = _args[2].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\");
             final String revi = _args[3].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\");

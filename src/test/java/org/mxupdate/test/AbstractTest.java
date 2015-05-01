@@ -81,114 +81,117 @@ public abstract class AbstractTest
     public enum CI
     {
         /** Configuration item Data Model Binrary Attribute. */
-        DM_ATTRIBUTE_BINARY("attribute", null, false, null, null,   "AttributeBinary",      "datamodel/attribute",      "BINARY_",       ".mxu", true),
+        DM_ATTRIBUTE_BINARY(    "attribute",    "attribute",        null, false, null, null,   "AttributeBinary",      "datamodel/attribute",      "BINARY_",       ".mxu", true),
         /** Configuration item Data Model Boolean Attribute. */
-        DM_ATTRIBUTE_BOOLEAN("attribute", null, false, null, null,  "AttributeBoolean",     "datamodel/attribute",      "BOOLEAN_",      ".mxu", true),
+        DM_ATTRIBUTE_BOOLEAN(   "attribute",    "attribute",        null, false, null, null,  "AttributeBoolean",     "datamodel/attribute",      "BOOLEAN_",      ".mxu", true),
         /** Configuration item Data Model Date Attribute. */
-        DM_ATTRIBUTE_DATE("attribute", null, false, null, null,     "AttributeDate",        "datamodel/attribute",      "DATE_",         ".mxu", true),
+        DM_ATTRIBUTE_DATE(      "attribute",    "attribute",        null, false, null, null,     "AttributeDate",        "datamodel/attribute",      "DATE_",         ".mxu", true),
         /** Configuration item Data Model Integer Attribute. */
-        DM_ATTRIBUTE_INTEGER("attribute", null, false, null, null,  "AttributeInteger",     "datamodel/attribute",      "INTEGER_",      ".mxu", true),
+        DM_ATTRIBUTE_INTEGER(   "attribute",    "attribute",        null, false, null, null,  "AttributeInteger",     "datamodel/attribute",      "INTEGER_",      ".mxu", true),
         /** Configuration item Data Model Real Attribute. */
-        DM_ATTRIBUTE_REAL("attribute", null, false, null, null,     "AttributeReal",        "datamodel/attribute",      "REAL_",         ".mxu", true),
+        DM_ATTRIBUTE_REAL(      "attribute",    "attribute",        null, false, null, null,     "AttributeReal",        "datamodel/attribute",      "REAL_",         ".mxu", true),
         /** Configuration item Data Model String Attribute. */
-        DM_ATTRIBUTE_STRING("attribute", null, false, null, null,   "AttributeString",      "datamodel/attribute",      "STRING_",       ".mxu", true),
+        DM_ATTRIBUTE_STRING(    "attribute",    "attribute",        null, false, null, null,   "AttributeString",      "datamodel/attribute",      "STRING_",       ".mxu", true),
 
         /** Configuration item Data Model Dimension. */
-        DM_DIMENSION("dimension", null, false, null, null,          "Dimension",            "datamodel/dimension",      "DIMENSION_",    ".mxu", true),
+        DM_DIMENSION(           "dimension",    "dimension",        null, false, null, null,          "Dimension",            "datamodel/dimension",      "DIMENSION_",    ".mxu", true),
 
         /** Configuration item Data Model Expression. */
-        DM_EXPRESSION("expression", null, false, null, null,        "Expression",           "datamodel/expression",     "EXPRESSION_",   ".mxu", true),
+        DM_EXPRESSION(          "expression",   "expression",       null, false, null, null,        "Expression",           "datamodel/expression",     "EXPRESSION_",   ".mxu", true),
 
         /** Configuration item Data Model Format. */
-        DM_FORMAT("format", null, false, null, null,                "Format",               "datamodel/format",         "FORMAT_",       ".mxu", true),
+        DM_FORMAT(              "format",       "format",           null, false, null, null,                "Format",               "datamodel/format",         "FORMAT_",       ".mxu", true),
 
         /** Configuration item Data Model Interface. */
-        DM_INTERFACE("interface", null, false, null, null,          "Interface",            "datamodel/interface",      "INTERFACE_",    ".mxu", true),
+        DM_INTERFACE(           "interface",    "interface",        null, false, null, null,          "Interface",            "datamodel/interface",      "INTERFACE_",    ".mxu", true),
 
         /** Configuration item IEF Global Configuration. */
-        DM_NOTIFICATION(null, "Notification", false, "Business Rule", "eService Administration",
+        DM_NOTIFICATION(        "notification", null,               "Notification", false, "Business Rule", "eService Administration",
                                                                     "Notification",         "datamodel/notification",   "NOTIFICATION_", ".mxu", true),
 
         /** Configuration item Data Model Policy. */
-        DM_POLICY("policy", null, false, null, null,                "Policy",               "datamodel/policy",         "POLICY_",       ".mxu", true),
+        DM_POLICY(              "policy",       "policy",           null, false, null, null,                "Policy",               "datamodel/policy",         "POLICY_",       ".mxu", true),
 
         /** Configuration item Data Model Relationship. */
-        DM_RELATIONSHIP("relationship", null, false, null, null, "Relationship", "datamodel/relationship", "RELATIONSHIP_", ".mxu", true),
+        DM_RELATIONSHIP(        "relationship", "relationship",     null, false, null, null, "Relationship", "datamodel/relationship", "RELATIONSHIP_", ".mxu", true),
 
         /** Configuration item Data Model Rule. */
-        DM_RULE("rule", null, false, null, null, "Rule", "datamodel/rule", "RULE_", ".mxu", true),
+        DM_RULE(                "rule",         "rule",             null, false, null, null, "Rule", "datamodel/rule", "RULE_", ".mxu", true),
 
         /** Configuration item Data Model Type. */
-        DM_TYPE("type", null, false, null, null, "Type", "datamodel/type", "TYPE_", ".mxu", true),
+        DM_TYPE(                "type",         "type",             null, false, null, null, "Type", "datamodel/type", "TYPE_", ".mxu", true),
 
         /** Configuration item IEF Global Configuration. */
-        IEF_EBOMSYNC_CONFIG(null, "IEF-EBOMSyncConfig", true, "IEF-EBOMSyncConfig", "eService Administration",
+        IEF_EBOMSYNC_CONFIG(    "ebomsyncconfig", null, "IEF-EBOMSyncConfig", true, "IEF-EBOMSyncConfig", "eService Administration",
                             "IEFEBOMSyncConfig", "integration/ebomsync", "IEFEBOMSYNC_", ".mxu", true),
         /** Configuration item IEF Global Configuration. */
-        IEF_GLOBAL_CONFIG(null, "MCADInteg-GlobalConfig", true, "MCADInteg-ConfigObjectPolicy", "eService Administration",
+        IEF_GLOBAL_CONFIG(      "globalconfig", null, "MCADInteg-GlobalConfig", true, "MCADInteg-ConfigObjectPolicy", "eService Administration",
                           "IEFGlobalConfig", "integration/globalconfig", "IEFGLOBALCONFIG_", ".mxu", true),
         /** Configuration item IEF Global Registry.*/
-        IEF_GLOBAL_REGISTRY(null, "IEF-GlobalRegistry", false, "MCADInteg-ConfigObjectPolicy", "eService Administration",
+        IEF_GLOBAL_REGISTRY(    "globalregistry", null, "IEF-GlobalRegistry", false, "MCADInteg-ConfigObjectPolicy", "eService Administration",
                             "IEFGlobalRegistry", "integration/globalregistry", "IEFGLOBALREGISTRY_", ".mxu", true),
         /** Configuration item IEF Mass Promote Configuration. */
-        IEF_MASS_PROMOTE_CONFIG(null, "IEF-MassPromoteConfig", true, "MCADInteg-ConfigObjectPolicy", "eService Administration",
+        IEF_MASS_PROMOTE_CONFIG("masspromoteconfig", null, "IEF-MassPromoteConfig", true, "MCADInteg-ConfigObjectPolicy", "eService Administration",
                                 "IEFMassPromoteConfig", "integration/masspromoteconfig", "IEFMASSPROMOTECONFIG_", ".mxu", true),
         /** Configuration item IEF unassigned registry. */
-        IEF_UNASSIGNED_REGISTRY(null, "IEF-UnassignedIntegRegistry", true, "MCADInteg-ConfigObjectPolicy", "eService Administration",
+        IEF_UNASSIGNED_REGISTRY("unassignedintegregistry", null, "IEF-UnassignedIntegRegistry", true, "MCADInteg-ConfigObjectPolicy", "eService Administration",
                                 "IEFUnassignedRegistry", "integration/unassignedregistry", "IEFUNASSIGNEDREGISTRY_", ".mxu", true),
 
         /** Configuration item MQL program. */
-        PRG_EKL("program",  null, false, null, null, "ProgramEKL",  "program/ekl",  "",         ".ekl.mxu",     true),
+        PRG_EKL(                "program",  "program",  null, false, null, null, "ProgramEKL",  "program/ekl",  "",         ".ekl.mxu",     true),
         /** Configuration item JPO program. */
-        PRG_JPO("program",  null, false, null, null, "JPO",         "program/jpo",  "",         ".java.mxu",    true),
+        PRG_JPO(                "program",  "program",  null, false, null, null, "JPO",         "program/jpo",  "",         ".java.mxu",    true),
         /** Configuration item MQL program. */
-        PRG_MQL("program",  null, false, null, null, "Program",     "program/mql",  "",         ".mql.mxu",     true),
+        PRG_MQL(                "program",  "program",  null, false, null, null, "Program",     "program/mql",  "",         ".mql.mxu",     true),
         /** Configuration item page program. */
-        PRG_PAGE("page",    null, false, null, null, "Page",        "program/page", "PAGE_",    ".mxu",         true),
+        PRG_PAGE(               "page",    "page",  null, false, null, null, "Page",        "program/page", "PAGE_",    ".mxu",         true),
 
         /** Configuration item group. */
-        USR_ASSOCIATION("association", null, false, null, null, "Association", "user/association", "ASSOCIATION_", ".mxu", false),
+        USR_ASSOCIATION(        "association", "association", null, false, null, null, "Association", "user/association", "ASSOCIATION_", ".mxu", false),
         /** Configuration item group. */
-        USR_GROUP("group", null, false, null, null, "Group", "user/group", "GROUP_", ".mxu", true),
+        USR_GROUP(              "group", "group", null, false, null, null, "Group", "user/group", "GROUP_", ".mxu", true),
         /** Configuration item person. */
-        USR_PERSON("person", "Person", false, "Person", "eService Production", "Person", "user/person", "PERSON_", ".mxu", true),
+        USR_PERSON(             "person", "person", "Person", false, "Person", "eService Production", "Person", "user/person", "PERSON_", ".mxu", true),
         /** Configuration item administration person. */
-        USR_PERSONADMIN("person", null, false, null, null, "PersonAdmin", "user/personadmin", "PERSONADMIN_", ".mxu", true),
+        USR_PERSONADMIN(        "person", "person", null, false, null, null, "PersonAdmin", "user/personadmin", "PERSONADMIN_", ".mxu", true),
         /** Configuration item role. */
-        USR_ROLE("role", null, false, null, null, "Role", "user/role", "ROLE_", ".mxu", true),
+        USR_ROLE(               "role", "role", null, false, null, null, "Role", "user/role", "ROLE_", ".mxu", true),
 
         /** Other definition for business unit. */
-        OTHER_BUSINESSUNIT(null, "Business Unit", false, "Organization", "eService Production", "Business Unit", null, null, null, true),
+        OTHER_BUSINESSUNIT(     null, null, "Business Unit", false, "Organization", "eService Production", "Business Unit", null, null, null, true),
         /** Other definition for company. */
-        OTHER_COMPANY(null, "Company", false, "Organization", "eService Production", "Company", null, null, null, true),
+        OTHER_COMPANY(          null, null, "Company", false, "Organization", "eService Production", "Company", null, null, null, true),
         /** Other definition for department. */
-        OTHER_DEPARTMENT(null, "Department", false, "Organization", "eService Production", "Department", null, null, null, true),
+        OTHER_DEPARTMENT(       null, null, "Department", false, "Organization", "eService Production", "Department", null, null, null, true),
         /** Other definition for plant. */
-        OTHER_PLANT(null, "Plant", false, "Organization", "eService Production", "Plant", null, null, null, true),
+        OTHER_PLANT(            null, null, "Plant", false, "Organization", "eService Production", "Plant", null, null, null, true),
 
         /** Configuration item system application. */
-        SYS_APPLICATION("application", null, false, null, null, "SystemApplication", "system/application", "APPLICATION_", ".mxu", true),
+        SYS_APPLICATION(        "application", "application", null, false, null, null, "SystemApplication", "system/application", "APPLICATION_", ".mxu", true),
         /** Configuration item system package. */
-        SYS_PACKAGE("package", null, false, null, null, "SystemPackage", "system/package", "PACKAGE_", ".mxu", true),
+        SYS_PACKAGE(            "package", "package", null, false, null, null, "SystemPackage", "system/package", "PACKAGE_", ".mxu", true),
         /** Configuration item system site. */
-        SYS_SITE("site", null, false, null, null, "SystemSite", "system/site", "SITE_", ".mxu", false),
+        SYS_SITE(               null, "site", null, false, null, null, "SystemSite", "system/site", "SITE_", ".mxu", false),
 
         /** Configuration item channel. */
-        UI_CHANNEL("channel", null, false, null, null, "Channel", "userinterface/channel", "CHANNEL_", ".mxu", true),
+        UI_CHANNEL(             "channel", "channel", null, false, null, null, "Channel", "userinterface/channel", "CHANNEL_", ".mxu", true),
         /** Configuration item command. */
-        UI_COMMAND("command", null, false, null, null, "Command", "userinterface/command", "COMMAND_", ".mxu", true),
+        UI_COMMAND(             "command", "command", null, false, null, null, "Command", "userinterface/command", "COMMAND_", ".mxu", true),
         /** Configuration item form. */
-        UI_FORM("form", null, false, null, null, "Form", "userinterface/form", "FORM_", ".mxu", true),
+        UI_FORM(                "form", "form", null, false, null, null, "Form", "userinterface/form", "FORM_", ".mxu", true),
         /** Configuration item inquiry. */
-        UI_INQUIRY("inquiry", null, false, null, null, "Inquiry", "userinterface/inquiry", "INQUIRY_", ".mxu", true),
+        UI_INQUIRY(             "inquiry", "inquiry", null, false, null, null, "Inquiry", "userinterface/inquiry", "INQUIRY_", ".mxu", true),
         /** Configuration item menu. */
-        UI_MENU("menu", null, false, null, null, "Menu", "userinterface/menu", "MENU_", ".mxu", true),
+        UI_MENU(                "menu", "menu", null, false, null, null, "Menu", "userinterface/menu", "MENU_", ".mxu", true),
         /** Configuration item portal. */
-        UI_PORTAL("portal", null, false, null, null, "Portal", "userinterface/portal", "PORTAL_", ".mxu", true),
+        UI_PORTAL(              "portal", "portal", null, false, null, null, "Portal", "userinterface/portal", "PORTAL_", ".mxu", true),
         /** Configuration item table.*/
-        UI_TABLE("table", null, false, null, null, "Table", "userinterface/table", "TABLE_", ".mxu", false);
+        UI_TABLE(               "table", "table", null, false, null, null, "Table", "userinterface/table", "TABLE_", ".mxu", false);
 
-        /** Related type name in MX. */
+        /** MxUpdate type. */
+        public final String mxUpdateType;
+
+        /** Related admin type name in MX. */
         final String mxType;
 
         /** Related type of the business object. */
@@ -229,7 +232,8 @@ public abstract class AbstractTest
          * @param _wildcardSearch       wild card search allowed?
          * @param _urlTag               url tag
          */
-        CI(final String _mxType,
+        CI(final String _mxUpdateType,
+           final String _mxType,
            final String _busType,
            final boolean _hasDerived,
            final String _busPolicy,
@@ -240,6 +244,7 @@ public abstract class AbstractTest
            final String _fileSuffix,
            final boolean _wildcardSearch)
         {
+            this.mxUpdateType = _mxUpdateType;
             this.mxType = _mxType;
             this.busType = _busType;
             this.hasDerived = _hasDerived;

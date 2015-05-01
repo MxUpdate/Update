@@ -22,6 +22,7 @@ import java.util.Collection;
 import matrix.util.MatrixException;
 
 import org.mxupdate.update.AbstractObject_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
@@ -69,8 +70,11 @@ public final class TypeDef_mxJPO
     private static final String PREFIX_FILE_PATH = "FilePath";
     /** Used prefix of file prefix definitions within the property file. */
     private static final String PREFIX_FILE_PREFIX = "FilePrefix";
-    /** Used file suffix of file suffix definitions within the property file. */
+    /** Used prefix of file suffix definitions within the property file. */
     private static final String PREFIX_FILE_SUFFIX = "FileSuffix";
+
+    /** Used prefix of mxupdate type definitions within the property file. */
+    private static final String PREFIX_MXUPDATE_TYPE = "MxUpdateType";
 
     /** Used file suffix of icon path definitions within the property file. */
     private static final String PREFIX_ICONPATH = "Icon";
@@ -116,6 +120,9 @@ public final class TypeDef_mxJPO
     private String filePrefix;
     /** Mapping between internal used administration type definitions and the file suffixes. */
     private String fileSuffix;
+
+    /** Name of the mxUpdate type fir this type definition */
+    private String mxUpdateType;
 
     /** Stores the path to the icon for the type definition. */
     private String iconPath;
@@ -189,6 +196,8 @@ public final class TypeDef_mxJPO
             typeDef.filePrefix = _value;
         } else if (key.equals(TypeDef_mxJPO.PREFIX_FILE_SUFFIX))  {
             typeDef.fileSuffix = _value;
+        } else if (key.equals(TypeDef_mxJPO.PREFIX_MXUPDATE_TYPE))  {
+            typeDef.mxUpdateType = _value;
         } else if (key.equals(TypeDef_mxJPO.PREFIX_ICONPATH))  {
             typeDef.iconPath = _value;
         } else if (key.equals(TypeDef_mxJPO.PREFIX_JPO))  {
@@ -276,7 +285,6 @@ public final class TypeDef_mxJPO
      * called!
      *
      * @return MX name of the administration type definition
-     * @see #adminType
      */
     public String getMxAdminName()
     {
@@ -304,10 +312,9 @@ public final class TypeDef_mxJPO
      * @throws MatrixException if the check failed
      */
     public boolean existsBusType(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
+        throws MatrixException
     {
-        final String tmp = MqlUtil_mxJPO.execMql(_paramCache,
-                new StringBuilder().append("list type '").append(this.busType).append("'"));
+        final String tmp = MqlBuilder_mxJPO.mql() .cmd("escape list type ").arg(this.busType).exec(_paramCache);
         return (tmp.length() > 0);
     }
 
@@ -410,11 +417,10 @@ public final class TypeDef_mxJPO
     }
 
     /**
-     * Returns the related file path. The method returns only correct
-     * values if the initialize method was called!
+     * Returns the related {@link #filePath file path}. The method returns only
+     * correct values if the initialize method was called!
      *
      * @return file path of the administration type definition
-     * @see #filePath
      */
     public String getFilePath()
     {
@@ -422,11 +428,10 @@ public final class TypeDef_mxJPO
     }
 
     /**
-     * Returns the related file name prefix. The method returns only
-     * correct values if the initialize method was called!
+     * Returns the related {@link #filePrefix file name prefix}. The method
+     * returns only correct values if the initialize method was called!
      *
      * @return file name prefix of the administration type definition
-     * @see #filePrefix
      */
     public String getFilePrefix()
     {
@@ -434,11 +439,10 @@ public final class TypeDef_mxJPO
     }
 
     /**
-     * Returns the related file name suffix. The method returns only
-     * correct values if the initialize method was called!
+     * Returns the related {@link #fileSuffix file name suffix}. The method
+     * returns only correct values if the initialize method was called!
      *
      * @return file name prefix of the administration type definition
-     * @see #fileSuffix
      */
     public String getFileSuffix()
     {
@@ -446,11 +450,21 @@ public final class TypeDef_mxJPO
     }
 
     /**
-     * Returns the related icon path. The method returns only correct values if
-     * the initialize method was called!
+     * Returns the related {@link #mxUpdateType MxUpdate type}. The method
+     * returns only correct values if the initialize method was called!
+     *
+     * @return MxUpdate type of the administration type definition
+     */
+    public String getMxUpdateType()
+    {
+        return this.mxUpdateType;
+    }
+
+    /**
+     * Returns the related {@link #iconPath icon path}. The method returns only
+     * correct values if the initialize method was called!
      *
      * @return icon path for this type definition
-     * @see #iconPath
      */
     public String getIconPath()
     {

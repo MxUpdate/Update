@@ -195,7 +195,7 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
     public String ciFile()
     {
         final StringBuilder strg = new StringBuilder();
-        strg.append("mxUpdate " + this.getCI().getBusType().toLowerCase() + " \"${NAME}\" \"${REVISION}\" {\n");
+        strg.append("mxUpdate " + this.getCI().mxUpdateType + " \"${NAME}\" \"${REVISION}\" {\n");
 
         this.getSingles()   .append4Update("    ", strg);
         this.getValues()    .append4Update("    ", strg);

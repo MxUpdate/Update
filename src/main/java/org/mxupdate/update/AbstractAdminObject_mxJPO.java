@@ -376,7 +376,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
                                final String... _args)
         throws Exception
     {
-        if ((_args.length == 8) && "mxUpdate".equals(_args[0]) && this.getTypeDef().getMxAdminName().equals(_args[1])) {
+        if ((_args.length == 8) && "mxUpdate".equals(_args[0]) && this.getTypeDef().getMxUpdateType().equals(_args[1])) {
 
             final String name = _args[2].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\");
             final String devi = _args[4].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\");
