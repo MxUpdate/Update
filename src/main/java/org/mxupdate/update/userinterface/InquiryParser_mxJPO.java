@@ -3,11 +3,7 @@
 package org.mxupdate.update.userinterface;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.Type_mxJPO.Kind;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -15,14 +11,13 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
-import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
  * Parses the update format for {@link Inquiry_mxJPO}.
  */
 @SuppressWarnings("unused")
 class InquiryParser_mxJPO
-    extends AbstractParser_mxJPO<Inquiry_mxJPO> implements InquiryParserConstants_mxJPO {
+    extends AbstractParser_mxJPO implements InquiryParserConstants_mxJPO {
 
 /**************************************************************************** */
 

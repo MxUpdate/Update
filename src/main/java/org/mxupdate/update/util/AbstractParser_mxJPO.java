@@ -16,86 +16,16 @@
 package org.mxupdate.update.util;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Map;
-
-import org.mxupdate.update.AbstractPropertyObject_mxJPO;
 
 /**
  * The class is used to define common methods for parsers within updates.
  *
  * @author The MxUpdate Team
- * @param <TYPEIMPL>    parser is implemented for this class
  */
-public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractPropertyObject_mxJPO<?>>
+public abstract class AbstractParser_mxJPO
 {
-    /**
-     * The stream is parsed and the result is stored in given instance
-     * {@code _ciObj}.
-     *
-     * @param _ciObj        target CI object
-     * @throws ParseException is parsing failed
-     * @throws SecurityException if values can not be set
-     * @throws IllegalArgumentException if values can not be set
-     * @throws NoSuchMethodException if values can not be set
-     * @throws InstantiationException if values can not be set
-     * @throws IllegalAccessException if values can not be set
-     * @throws InvocationTargetException if values can not be set
-     */
-    abstract public void parse(TYPEIMPL _ciObj)
-        throws ParseException, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException;
-
-
-    /**
-     * Calls for the administration object <code>_object</code> the prepare
-     * method.
-     *
-     * @param _paramCache   parameter cache
-     * @param _object       cache for which the prepare method must be called
-     */
-    protected void prepareObject(final ParameterCache_mxJPO _paramCache,
-                                 final TYPEIMPL _object)
-    {
-        try {
-            Method method = null;
-            Class<?> clazz = _object.getClass();
-            try  {
-                method = clazz.getDeclaredMethod("prepare");
-            } catch (final NoSuchMethodException e)  {
-            }
-            while ((method == null) && (clazz != null))  {
-                clazz = clazz.getSuperclass();
-                if (clazz != null)  {
-                    try  {
-                        method = clazz.getDeclaredMethod("prepare");
-                    } catch (final NoSuchMethodException e)  {
-                    }
-                }
-            }
-            if (method == null)  {
-                throw new NoSuchMethodException(_object.getClass() + ".prepare()");
-            }
-            try  {
-                method.setAccessible(true);
-                method.invoke(_object);
-            } finally  {
-                method.setAccessible(false);
-            }
-        } catch (final IllegalArgumentException e) {
-            throw new ParseUpdateError(e);
-        } catch (final IllegalAccessException e) {
-            throw new ParseUpdateError(e);
-        } catch (final InvocationTargetException e) {
-            throw new ParseUpdateError(e);
-        } catch (final SecurityException e) {
-            throw new ParseUpdateError(e);
-        } catch (final NoSuchMethodException e) {
-            throw new ParseUpdateError(e);
-        }
-    }
-
     /**
      * Sets the new <code>_value</code> for field <code>_fieldName</code> of
      * <code>_object</code>.

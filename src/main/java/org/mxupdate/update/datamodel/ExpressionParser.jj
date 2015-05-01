@@ -20,6 +20,7 @@ options {
     USER_TOKEN_MANAGER = false;
     GENERATE_BOILERPLATE = false;
     SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
+    UNICODE_INPUT = true;
 }
 PARSER_BEGIN(ExpressionParser)
 package org.mxupdate.update.datamodel;
@@ -39,7 +40,7 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
  */
 @SuppressWarnings("unused")
 class ExpressionParser
-    extends AbstractParser_mxJPO<Expression_mxJPO>
+    extends AbstractParser_mxJPO
 {
 }
 PARSER_END(ExpressionParser)<*> SKIP :

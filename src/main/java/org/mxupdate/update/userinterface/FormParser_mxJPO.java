@@ -18,7 +18,7 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
  * Parses the update format for {@link Form_mxJPO}. */
 @SuppressWarnings("unused")
 class FormParser_mxJPO
-    extends AbstractParser_mxJPO<Form_mxJPO> implements FormParserConstants_mxJPO {
+    extends AbstractParser_mxJPO implements FormParserConstants_mxJPO {
 
 /**************************************************************************** */
 

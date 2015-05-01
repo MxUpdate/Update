@@ -3,7 +3,6 @@
 package org.mxupdate.update.userinterface;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
@@ -12,14 +11,13 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
-import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
  * Parses the update format for {@link Command_mxJPO}.
  */
 @SuppressWarnings("unused")
 class CommandParser_mxJPO
-    extends AbstractParser_mxJPO<Command_mxJPO> implements CommandParserConstants_mxJPO {
+    extends AbstractParser_mxJPO implements CommandParserConstants_mxJPO {
 
 /**************************************************************************** */
 

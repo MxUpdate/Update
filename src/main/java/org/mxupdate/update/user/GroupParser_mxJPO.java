@@ -13,7 +13,7 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 
 @SuppressWarnings("unused")
 class GroupParser_mxJPO
-    extends AbstractParser_mxJPO<Group_mxJPO> implements GroupParserConstants_mxJPO {
+    extends AbstractParser_mxJPO implements GroupParserConstants_mxJPO {
 
 /**************************************************************************** */
 

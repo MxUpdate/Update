@@ -20,6 +20,7 @@ options {
     USER_TOKEN_MANAGER = false;
     GENERATE_BOILERPLATE = false;
     SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
+    UNICODE_INPUT = true;
 }
 PARSER_BEGIN(RoleParser)
 package org.mxupdate.update.user;
@@ -39,7 +40,7 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
  */
 @SuppressWarnings("unused")
 class RoleParser
-    extends AbstractParser_mxJPO<Role_mxJPO>
+    extends AbstractParser_mxJPO
 {
 }
 PARSER_END(RoleParser)<*> SKIP :

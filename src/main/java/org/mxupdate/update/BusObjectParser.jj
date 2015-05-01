@@ -20,30 +20,27 @@ options {
     USER_TOKEN_MANAGER = false;
     GENERATE_BOILERPLATE = false;
     SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
+    UNICODE_INPUT = true;
 }
 
 PARSER_BEGIN(BusObjectParser)
 package org.mxupdate.update;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.BusObject_mxJPO.Connection;
-import org.mxupdate.update.util.ParameterCache_mxJPO;
-
 
 /**
  * Parses the update format for {@link BusObject_mxJPO}.
  */
 @SuppressWarnings("unused")
 class BusObjectParser
-    extends AbstractParser_mxJPO<BusObject_mxJPO>
+    extends AbstractParser_mxJPO
 {
 }
 
@@ -124,51 +121,37 @@ void parse(BusObject_mxJPO _busObject)
     Connection connection;
     String attrName;
 } {
-    (   ( <TYPE>                    ( tmp = <STRING>                    {this.setValue(_busObject, "busType", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                    {this.setValue(_busObject, "busType", this.getSingle(tmp.image));} ) )
+    (   ( <TYPE>                    ( tmp = <STRING>                            {this.setValue(_busObject, "busType", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                            {this.setValue(_busObject, "busType", this.getSingle(tmp.image));} ) )
 
-      | (<DESCRIPTION>              ( tmp = <MULTILINESTRING>           {this.setValue(_busObject, "description", this.getString(tmp.image));}
-                                    | tmp = <MULTILINESINGLE>           {this.setValue(_busObject, "description", this.getSingle(tmp.image));} ) )
+      | (<DESCRIPTION>              ( tmp = <MULTILINESTRING>                   {this.setValue(_busObject, "description", this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>                   {this.setValue(_busObject, "description", this.getSingle(tmp.image));} ) )
 
-      | (<CURRENT>                  ( tmp = <STRING>                    {this.setValue(_busObject, "busCurrent", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                    {this.setValue(_busObject, "busCurrent", this.getSingle(tmp.image));} ) )
+      | (<CURRENT>                  ( tmp = <STRING>                            {this.setValue(_busObject, "busCurrent", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                            {this.setValue(_busObject, "busCurrent", this.getSingle(tmp.image));} ) )
 
       | ( <ATTRIBUTE>
-            ( tmp = <ATTRIBUTE_STRING>                                  {attrName = this.getString(tmp.image);}
-            | tmp = <ATTRIBUTE_SINGLE>                                  {attrName = this.getSingle(tmp.image);} )
-                    ( tmp = <MULTILINESTRING>                           {this.putValue(_busObject, "attrValues", attrName, this.getString(tmp.image));}
-                    | tmp = <MULTILINESINGLE>                           {this.putValue(_busObject, "attrValues", attrName, this.getSingle(tmp.image));} ) )
+            ( tmp = <ATTRIBUTE_STRING>                                          {attrName = this.getString(tmp.image);}
+            | tmp = <ATTRIBUTE_SINGLE>                                          {attrName = this.getSingle(tmp.image);} )
+                    ( tmp = <MULTILINESTRING>                                   {this.putValue(_busObject, "attrValues", attrName, this.getString(tmp.image));}
+                    | tmp = <MULTILINESINGLE>                                   {this.putValue(_busObject, "attrValues", attrName, this.getSingle(tmp.image));} ) )
 
-      | ( <CONNECTION>                                                  {connection = new Connection();this.appendValue(_busObject, "connections", connection);  }
-            ( tmp = <STRING>                                            {this.setValue(connection, "relName", this.getString(tmp.image));}
-            | tmp = <SINGLE>                                            {this.setValue(connection, "relName", this.getSingle(tmp.image));} )
-                ( <CONNECTIONFROM>                                      {this.setValue(connection, "direction", "from");}
-                | <CONNECTIONTO>                                        {this.setValue(connection, "direction", "to");} )
-                    ( tmp = <CON_TYPE_STRING>                           {this.setValue(connection, "type", this.getString(tmp.image));}
-                    | tmp = <CON_TYPE_SINGLE>                           {this.setValue(connection, "type", this.getSingle(tmp.image));} )
-                        ( tmp = <CON_NAME_STRING>                       {this.setValue(connection, "name", this.getString(tmp.image));}
-                        | tmp = <CON_NAME_SINGLE>                       {this.setValue(connection, "name", this.getSingle(tmp.image));} )
-                                ( tmp = <CON_REVISION_STRING>           {this.setValue(connection, "revision", this.getString(tmp.image));}
-                                | tmp = <CON_REVISION_SINGLE>           {this.setValue(connection, "revision", this.getSingle(tmp.image));} )
-                                    ( "{"      ( <ATTRIBUTE>
-            ( tmp = <ATTRIBUTE_STRING>                                  {attrName = this.getString(tmp.image);}
-            | tmp = <ATTRIBUTE_SINGLE>                                  {attrName = this.getSingle(tmp.image);} )
-                    ( tmp = <MULTILINESTRING>                           {this.putValue(connection, "attrValues", attrName, this.getString(tmp.image));}
-                    | tmp = <MULTILINESINGLE>                           {this.putValue(connection, "attrValues", attrName, this.getSingle(tmp.image));} ) )* "}" )*
-
-/*
-                    <CONNECTION_OPEN>
-                            ( <CONNECTION_TYPE>         ( tmp = <CONNECTION_STRING>             {this.setValue(connection, "type",           this.getString(tmp.image));}
-                                                        | tmp = <CONNECTION_SINGLE>             {this.setValue(connection, "type",           this.getSingle(tmp.image));} )
-                            | <CONNECTION_NAME>         ( tmp = <CONNECTION_STRING>             {this.setValue(connection, "name",           this.getString(tmp.image));}
-                                                        | tmp = <CONNECTION_SINGLE>             {this.setValue(connection, "name",           this.getSingle(tmp.image));} )
-                            | <CONNECTION_REVISION>     ( tmp = <CONNECTION_STRING>             {this.setValue(connection, "revision",       this.getString(tmp.image));}
-                                                        | tmp = <CONNECTION_SINGLE>             {this.setValue(connection, "revision",       this.getSingle(tmp.image));} )
-                            | (<CONNECTION_ATTRIBUTE>
-                                         ( tmp = <CONNECTION_ATTRIBUTE_STRING>                  {attrName = this.getString(tmp.image);}
-                                         | tmp = <CONNECTION_ATTRIBUTE_SINGLE>                  {attrName = this.getSingle(tmp.image);} )
-                                                    ( tmp = <CONNECTION_MULTILINESTRING>        {this.putValue(_busObject, "attrValues", attrName, this.getString(tmp.image));}
-                                                    | tmp = <CONNECTION_MULTILINESINGLE>        {this.putValue(_busObject, "attrValues", attrName, this.getSingle(tmp.image));} ) ) )* <CONNECTION_CLOSE>*/
+      | ( <CONNECTION>                                                          {connection = new Connection();this.appendValue(_busObject, "connections", connection);  }
+            ( tmp = <STRING>                                                    {this.setValue(connection, "relName", this.getString(tmp.image));}
+            | tmp = <SINGLE>                                                    {this.setValue(connection, "relName", this.getSingle(tmp.image));} )
+                ( <CONNECTIONFROM>                                              {this.setValue(connection, "direction", "from");}
+                | <CONNECTIONTO>                                                {this.setValue(connection, "direction", "to");} )
+                    ( tmp = <CON_TYPE_STRING>                                   {this.setValue(connection, "type", this.getString(tmp.image));}
+                    | tmp = <CON_TYPE_SINGLE>                                   {this.setValue(connection, "type", this.getSingle(tmp.image));} )
+                        ( tmp = <CON_NAME_STRING>                               {this.setValue(connection, "name", this.getString(tmp.image));}
+                        | tmp = <CON_NAME_SINGLE>                               {this.setValue(connection, "name", this.getSingle(tmp.image));} )
+                                ( tmp = <CON_REVISION_STRING>                   {this.setValue(connection, "revision", this.getString(tmp.image));}
+                                | tmp = <CON_REVISION_SINGLE>                   {this.setValue(connection, "revision", this.getSingle(tmp.image));} )
+                                    ( "{"                                        ( <ATTRIBUTE>
+                                            ( tmp = <ATTRIBUTE_STRING>          {attrName = this.getString(tmp.image);}
+                                            | tmp = <ATTRIBUTE_SINGLE>          {attrName = this.getSingle(tmp.image);} )
+                                                ( tmp = <MULTILINESTRING>       {this.putValue(connection, "attrValues", attrName, this.getString(tmp.image));}
+                                                | tmp = <MULTILINESINGLE>       {this.putValue(connection, "attrValues", attrName, this.getSingle(tmp.image));} ) )* "}" )?
         )
     )*
 }

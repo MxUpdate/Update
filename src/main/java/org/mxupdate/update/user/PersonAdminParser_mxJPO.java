@@ -17,7 +17,7 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
  */
 @SuppressWarnings("unused")
 class PersonAdminParser_mxJPO
-    extends AbstractParser_mxJPO<PersonAdmin_mxJPO> implements PersonAdminParserConstants_mxJPO {
+    extends AbstractParser_mxJPO implements PersonAdminParserConstants_mxJPO {
 
 /**************************************************************************** */
 

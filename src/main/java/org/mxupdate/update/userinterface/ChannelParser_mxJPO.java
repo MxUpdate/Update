@@ -3,7 +3,6 @@
 package org.mxupdate.update.userinterface;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.CommandRef;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
@@ -18,7 +17,7 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
  */
 @SuppressWarnings("unused")
 class ChannelParser_mxJPO
-    extends AbstractParser_mxJPO<Channel_mxJPO> implements ChannelParserConstants_mxJPO {
+    extends AbstractParser_mxJPO implements ChannelParserConstants_mxJPO {
 
 /**************************************************************************** */
 

@@ -7,8 +7,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.datamodel.Relationship_mxJPO;
 import org.mxupdate.update.datamodel.Relationship_mxJPO.Kind;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
@@ -17,14 +15,13 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
-import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
  * Parses the update format for {@link Relationship_mxJPO}.
  */
 @SuppressWarnings("unused")
 class RelationshipParser_mxJPO
-    extends AbstractParser_mxJPO<Relationship_mxJPO> implements RelationshipParserConstants_mxJPO {
+    extends AbstractParser_mxJPO implements RelationshipParserConstants_mxJPO {
 
 /**************************************************************************** */
 /**

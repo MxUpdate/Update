@@ -15,9 +15,6 @@
 
 package org.mxupdate.test.test.update.util;
 
-import java.lang.reflect.InvocationTargetException;
-
-import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
@@ -60,19 +57,10 @@ public class Parser_GetStringTest
                                    final String _input,
                                    final String _expected)
     {
-        new AbstractParser_mxJPO<AbstractAdminObject_mxJPO<?>>()
+        new AbstractParser_mxJPO()
         {
             {
                 Assert.assertEquals(this.getString(_input), _expected);
-            }
-
-            @Override()
-            public void parse(final AbstractAdminObject_mxJPO<?> _ciObj)
-                    throws ParseException, SecurityException,
-                    IllegalArgumentException, NoSuchMethodException,
-                    InstantiationException, IllegalAccessException,
-                    InvocationTargetException
-            {
             }
         };
     }

@@ -19,7 +19,7 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
  */
 @SuppressWarnings("unused")
 class MenuParser_mxJPO
-    extends AbstractParser_mxJPO<Menu_mxJPO> implements MenuParserConstants_mxJPO {
+    extends AbstractParser_mxJPO implements MenuParserConstants_mxJPO {
 
 /**************************************************************************** */
 

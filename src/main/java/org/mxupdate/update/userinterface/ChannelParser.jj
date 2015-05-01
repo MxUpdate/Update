@@ -20,13 +20,13 @@ options {
     USER_TOKEN_MANAGER = false;
     GENERATE_BOILERPLATE = false;
     SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
+    UNICODE_INPUT = true;
 }
 
 PARSER_BEGIN(ChannelParser)
 package org.mxupdate.update.userinterface;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.CommandRef;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
@@ -41,7 +41,7 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
  */
 @SuppressWarnings("unused")
 class ChannelParser
-    extends AbstractParser_mxJPO<Channel_mxJPO>
+    extends AbstractParser_mxJPO
 {
 }
 

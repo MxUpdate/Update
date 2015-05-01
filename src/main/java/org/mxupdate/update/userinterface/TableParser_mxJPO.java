@@ -19,7 +19,7 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
  * Parses the update format for {@link Table_mxJPO}. */
 @SuppressWarnings("unused")
 class TableParser_mxJPO
-    extends AbstractParser_mxJPO<Table_mxJPO> implements TableParserConstants_mxJPO {
+    extends AbstractParser_mxJPO implements TableParserConstants_mxJPO {
 
 /**************************************************************************** */
 

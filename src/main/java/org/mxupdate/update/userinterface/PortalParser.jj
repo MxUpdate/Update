@@ -19,6 +19,7 @@ options {
     ERROR_REPORTING = true;
     USER_TOKEN_MANAGER = false;
     GENERATE_BOILERPLATE = false;
+    UNICODE_INPUT = true;
 }
 
 PARSER_BEGIN(PortalParser)
@@ -39,9 +40,10 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
  */
 @SuppressWarnings("unused")
 class PortalParser
-    extends AbstractParser_mxJPO<Portal_mxJPO>
+    extends AbstractParser_mxJPO
 {
 }
+
 PARSER_END(PortalParser)
 
 <*> SKIP :

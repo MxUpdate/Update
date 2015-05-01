@@ -3,24 +3,20 @@
 package org.mxupdate.update;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.BusObject_mxJPO.Connection;
-import org.mxupdate.update.util.ParameterCache_mxJPO;
-
 
 /**
  * Parses the update format for {@link BusObject_mxJPO}.
  */
 @SuppressWarnings("unused")
 class BusObjectParser_mxJPO
-    extends AbstractParser_mxJPO<BusObject_mxJPO> implements BusObjectParserConstants_mxJPO {
+    extends AbstractParser_mxJPO implements BusObjectParserConstants_mxJPO {
 
 /**************************************************************************** */
 
@@ -227,19 +223,10 @@ this.setValue(connection, "revision", this.getSingle(tmp.image));
           jj_consume_token(-1);
           throw new ParseException();
         }
-        label_2:
-        while (true) {
-          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-          case 24:{
-            ;
-            break;
-            }
-          default:
-            jj_la1[11] = jj_gen;
-            break label_2;
-          }
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case 24:{
           jj_consume_token(24);
-          label_3:
+          label_2:
           while (true) {
             switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
             case ATTRIBUTE:{
@@ -247,8 +234,8 @@ this.setValue(connection, "revision", this.getSingle(tmp.image));
               break;
               }
             default:
-              jj_la1[12] = jj_gen;
-              break label_3;
+              jj_la1[11] = jj_gen;
+              break label_2;
             }
             jj_consume_token(ATTRIBUTE);
             switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -263,7 +250,7 @@ attrName = this.getSingle(tmp.image);
               break;
               }
             default:
-              jj_la1[13] = jj_gen;
+              jj_la1[12] = jj_gen;
               jj_consume_token(-1);
               throw new ParseException();
             }
@@ -279,12 +266,17 @@ this.putValue(connection, "attrValues", attrName, this.getSingle(tmp.image));
               break;
               }
             default:
-              jj_la1[14] = jj_gen;
+              jj_la1[13] = jj_gen;
               jj_consume_token(-1);
               throw new ParseException();
             }
           }
           jj_consume_token(25);
+          break;
+          }
+        default:
+          jj_la1[14] = jj_gen;
+          ;
         }
         break;
         }
@@ -311,7 +303,7 @@ this.putValue(connection, "attrValues", attrName, this.getSingle(tmp.image));
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x81e0,0x600,0x1800,0x600,0x6000,0x1800,0x600,0x30000,0xc0000,0x300000,0xc00000,0x1000000,0x100,0x6000,0x1800,0x81e0,};
+      jj_la1_0 = new int[] {0x81e0,0x600,0x1800,0x600,0x6000,0x1800,0x600,0x30000,0xc0000,0x300000,0xc00000,0x100,0x6000,0x1800,0x1000000,0x81e0,};
    }
 
   /** Constructor with InputStream. */

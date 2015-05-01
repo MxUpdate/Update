@@ -16,7 +16,7 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
  * Parses the update format for {@link PackageCI_mxJPO}. */
 @SuppressWarnings("unused")
 class PackageParser_mxJPO
-    extends AbstractParser_mxJPO<PackageCI_mxJPO> implements PackageParserConstants_mxJPO {
+    extends AbstractParser_mxJPO implements PackageParserConstants_mxJPO {
 
 /**************************************************************************** */
 

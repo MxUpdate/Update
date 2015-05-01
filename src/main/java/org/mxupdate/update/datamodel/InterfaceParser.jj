@@ -20,6 +20,7 @@ options {
     USER_TOKEN_MANAGER = false;
     GENERATE_BOILERPLATE = false;
     SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
+    UNICODE_INPUT = true;
 }
 PARSER_BEGIN(InterfaceParser)
 package org.mxupdate.update.datamodel;
@@ -37,7 +38,7 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
  * Parses the update format for {@link Interface_mxJPO}. */
 @SuppressWarnings("unused")
 class InterfaceParser
-    extends AbstractParser_mxJPO<Interface_mxJPO>
+    extends AbstractParser_mxJPO
 {
 }
 PARSER_END(InterfaceParser)<*> SKIP :

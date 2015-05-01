@@ -23,7 +23,7 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
  */
 @SuppressWarnings("unused")
 class PolicyParser_mxJPO
-    extends AbstractParser_mxJPO<Policy_mxJPO> implements PolicyParserConstants_mxJPO {
+    extends AbstractParser_mxJPO implements PolicyParserConstants_mxJPO {
 
 /**************************************************************************** */
 
