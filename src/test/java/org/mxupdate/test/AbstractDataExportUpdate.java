@@ -18,7 +18,6 @@ package org.mxupdate.test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.util.PropertyDef;
@@ -190,11 +189,6 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
     protected DATA createCleanNewData(final DATA _original)
     {
         final DATA ret = this.createNewData(_original.getName().substring(AbstractTest.PREFIX.length()));
-
-        // define all required values to empty values so that they are checked
-        for (final Map.Entry<String,Object> value : ret.getRequiredExportValues().entrySet())  {
-            ret.setValue(value.getKey(), value.getValue());
-        }
 
         return ret;
     }

@@ -15,9 +15,6 @@
 
 package org.mxupdate.test.data.datamodel;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
@@ -33,14 +30,6 @@ public class ExpressionData
     extends AbstractAdminData<ExpressionData>
 {
     /**
-     * Within export the description must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
-    static  {
-        ExpressionData.REQUIRED_EXPORT_VALUES.put("description", "");
-    }
-
-    /**
      * Initialize this expression data with given <code>_name</code>.
      *
      * @param _test     related test implementation (where this expression is
@@ -50,7 +39,7 @@ public class ExpressionData
     public ExpressionData(final AbstractTest _test,
                           final String _name)
     {
-        super(_test, AbstractTest.CI.DM_EXPRESSION, _name, ExpressionData.REQUIRED_EXPORT_VALUES, null);
+        super(_test, AbstractTest.CI.DM_EXPRESSION, _name);
     }
 
     /**

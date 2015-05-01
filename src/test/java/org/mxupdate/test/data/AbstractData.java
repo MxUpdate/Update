@@ -123,7 +123,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      */
     @SuppressWarnings("unchecked")
     public DATA setValue(final String _key,
-                         final Object _value)
+                         final String _value)
     {
         this.values.put(_key, _value);
         return (DATA) this;
@@ -668,7 +668,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * String values.
      */
     public class StringValues
-        extends HashMap<String,Object>
+        extends HashMap<String,String>
     {
         /** Dummy serial Version UID. */
         private static final long serialVersionUID = 1;
@@ -684,14 +684,10 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
         public void appendUpdate(final String _prefix,
                                  final StringBuilder _cmd)
         {
-            for (final Entry<String,Object> entry : this.entrySet())  {
-                if ((entry.getValue() instanceof Character) || (entry.getValue() instanceof Integer))  {
-                    _cmd.append(_prefix).append(entry.getKey()).append(' ').append(entry.getValue()).append('\n');
-                } else  {
-                    _cmd.append(_prefix).append(entry.getKey()).append(" ")
-                        .append("\"").append(AbstractTest.convertUpdate(entry.getValue().toString())).append('\"')
-                        .append('\n');
-                }
+            for (final Entry<String,String> entry : this.entrySet())  {
+                _cmd.append(_prefix).append(entry.getKey()).append(" ")
+                    .append("\"").append(AbstractTest.convertUpdate(entry.getValue().toString())).append('\"')
+                    .append('\n');
             }
         }
 
@@ -704,12 +700,8 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
         public void checkExport(final ExportParser _exportParser,
                                 final String _path)
         {
-            for (final Entry<String,Object> entry : this.entrySet())  {
-                if ((entry.getValue() instanceof Character) || (entry.getValue() instanceof Integer))  {
-                    _exportParser.checkValue((_path.isEmpty() ? "" : _path + "/") + entry.getKey(), entry.getValue().toString());
-                } else  {
-                    _exportParser.checkValue((_path.isEmpty() ? "" : _path + "/") + entry.getKey(), "\"" + AbstractTest.convertUpdate(entry.getValue().toString()) + "\"");
-                }
+            for (final Entry<String,String> entry : this.entrySet())  {
+                _exportParser.checkValue((_path.isEmpty() ? "" : _path + "/") + entry.getKey(), "\"" + AbstractTest.convertUpdate(entry.getValue().toString()) + "\"");
             }
         }
 
@@ -718,22 +710,15 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
          *
          * @param _exportParser     parsed export
          */
+        @Deprecated()
         public void checkExport(final ExportParser _exportParser)
         {
-            for (final Map.Entry<String,Object> entry : this.entrySet())  {
-                if ((entry.getValue() instanceof Character) || (entry.getValue() instanceof Integer))  {
-                    AbstractData.this.checkSingleValue(
-                            _exportParser,
-                            entry.getKey(),
-                            entry.getKey(),
-                            entry.getValue().toString());
-                } else  {
-                    AbstractData.this.checkSingleValue(
-                            _exportParser,
-                            entry.getKey(),
-                            entry.getKey(),
-                            "\"" + AbstractTest.convertUpdate(entry.getValue().toString()) + "\"");
-                }
+            for (final Map.Entry<String,String> entry : this.entrySet())  {
+                AbstractData.this.checkSingleValue(
+                        _exportParser,
+                        entry.getKey(),
+                        entry.getKey(),
+                        "\"" + AbstractTest.convertUpdate(entry.getValue().toString()) + "\"");
             }
         }
     }

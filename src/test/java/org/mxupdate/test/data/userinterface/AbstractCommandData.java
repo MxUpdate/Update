@@ -15,9 +15,6 @@
 
 package org.mxupdate.test.data.userinterface;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mxupdate.test.AbstractTest;
 
 /**
@@ -30,16 +27,6 @@ abstract class AbstractCommandData<T extends AbstractCommandData<?>>
     extends AbstractUIWithSettingData<T>
 {
     /**
-     * Within export the description, label and href must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>(3);
-    static  {
-        AbstractCommandData.REQUIRED_EXPORT_VALUES.put("description", "");
-        AbstractCommandData.REQUIRED_EXPORT_VALUES.put("label", "");
-        AbstractCommandData.REQUIRED_EXPORT_VALUES.put("href", "");
-    }
-
-    /**
      *
      * @param _test         related test implementation (where this command is
      *                      defined)
@@ -50,6 +37,6 @@ abstract class AbstractCommandData<T extends AbstractCommandData<?>>
                         final AbstractTest.CI _ci,
                         final String _name)
     {
-        super(_test, _ci, _name, AbstractCommandData.REQUIRED_EXPORT_VALUES);
+        super(_test, _ci, _name);
     }
 }

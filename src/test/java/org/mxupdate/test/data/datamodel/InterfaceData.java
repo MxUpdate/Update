@@ -53,7 +53,7 @@ public class InterfaceData
     public InterfaceData(final AbstractTest _test,
                          final String _name)
     {
-        super(_test, AbstractTest.CI.DM_INTERFACE, _name, null, null);
+        super(_test, AbstractTest.CI.DM_INTERFACE, _name);
     }
 
     /**

@@ -36,6 +36,6 @@ public class AttributeIntegerData
     public AttributeIntegerData(final AbstractTest _test,
                                 final String _name)
     {
-        super(_test, CI.DM_ATTRIBUTE_INTEGER, _name, "integer", null, null);
+        super(_test, CI.DM_ATTRIBUTE_INTEGER, _name, "integer");
     }
 }

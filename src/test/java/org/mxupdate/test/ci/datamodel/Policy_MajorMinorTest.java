@@ -56,18 +56,18 @@ public class Policy_MajorMinorTest
                         "issue #178: policy with delimiter and required minor / major sequence",
                         new PolicyData(this, "test")
                                 .notSupported(Version.V6R2011x)
-                                .setValue("delimiter", '.')
+                                .setSingle("delimiter", ".")
                                 .setValue("minorsequence", "A,B,C")
                                 .setValue("majorsequence", "1,2,3")},
                 new Object[]{
                         "issue #178: policy with delimiter and required minor / major sequence ('sequence' key instead of 'minorsequence')",
                         new PolicyData(this, "test")
                                 .notSupported(Version.V6R2011x)
-                                .setValue("delimiter", '.')
+                                .setSingle("delimiter", ".")
                                 .setValue("sequence", "A,B,C")
                                 .setValue("majorsequence", "1,2,3"),
                         new PolicyData(this, "test")
-                                .setValue("delimiter", '.')
+                                .setSingle("delimiter", ".")
                                 .setValue("minorsequence", "A,B,C")
                                 .setValue("majorsequence", "1,2,3")},
                 // revisionable (V6R2011x)
@@ -159,12 +159,12 @@ public class Policy_MajorMinorTest
     {
         if (this.getVersion() != Version.V6R2011x)  {
             new PolicyData(this, "test")
-                    .setValue("delimiter", '.')
+                    .setSingle("delimiter", ".")
                     .setValue("minorsequence", "A,B,C")
                     .setValue("majorsequence", "1,2,3")
                     .update((String) null)
                     .checkExport()
-                    .setValue("delimiter", '|')
+                    .setSingle("delimiter", "|")
                     .failureUpdate(ErrorKey.DM_POLICY_UPDATE_DELIMITER);
         }
     }

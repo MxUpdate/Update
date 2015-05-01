@@ -16,10 +16,8 @@
 package org.mxupdate.test.data.datamodel;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -27,7 +25,6 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.program.AbstractProgramData;
-import org.mxupdate.test.util.MapUtil;
 import org.testng.Assert;
 
 /**
@@ -40,24 +37,6 @@ import org.testng.Assert;
 public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     extends AbstractDataWithTrigger<T>
 {
-    /**
-     * Within export the description and default value must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
-    static  {
-        AbstractAttributeData.REQUIRED_EXPORT_VALUES.put("description", "");
-        AbstractAttributeData.REQUIRED_EXPORT_VALUES.put("default", "");
-    }
-
-    /**
-     * Within export the resetonclone and resetonrevision flag must be defined.
-     */
-    private static final Map<String,Boolean> REQUIRED_EXPORT_FLAGS = new HashMap<String,Boolean>();
-    static  {
-        AbstractAttributeData.REQUIRED_EXPORT_FLAGS.put("resetonclone", false);
-        AbstractAttributeData.REQUIRED_EXPORT_FLAGS.put("resetonrevision", false);
-    }
-
     /** Attribute type of the attribute (string, integer, ....). */
     private final String attrType;
 
@@ -80,13 +59,9 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     protected AbstractAttributeData(final AbstractTest _test,
                                     final AbstractTest.CI _ci,
                                     final String _name,
-                                    final String _attrType,
-                                    final Map<String,Object> _requiredExportValues,
-                                    final Map<String,Boolean> _requiredExportFlags)
+                                    final String _attrType)
     {
-        super(_test, _ci, _name,
-              MapUtil.<String,Object>combine(AbstractAttributeData.REQUIRED_EXPORT_VALUES, _requiredExportValues),
-              MapUtil.<String,Boolean>combine(AbstractAttributeData.REQUIRED_EXPORT_FLAGS, _requiredExportFlags));
+        super(_test, _ci, _name);
         this.attrType = _attrType;
     }
 
@@ -254,7 +229,6 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         }
 
         strg.append("}");
-
         return strg.toString();
     }
 

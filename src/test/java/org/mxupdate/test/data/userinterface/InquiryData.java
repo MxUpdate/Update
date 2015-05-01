@@ -78,7 +78,7 @@ public class InquiryData
     public InquiryData(final AbstractTest _test,
                        final String _name)
     {
-        super(_test, AbstractTest.CI.UI_INQUIRY, _name, InquiryData.REQUIRED_EXPORT_VALUES, null);
+        super(_test, AbstractTest.CI.UI_INQUIRY, _name);
     }
 
     /**

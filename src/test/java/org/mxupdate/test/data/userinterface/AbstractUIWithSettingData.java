@@ -51,10 +51,9 @@ abstract class AbstractUIWithSettingData<T extends AbstractUIWithSettingData<?>>
      */
     AbstractUIWithSettingData(final AbstractTest _test,
                               final AbstractTest.CI _ci,
-                              final String _name,
-                              final Map<String,Object> _requiredExportValues)
+                              final String _name)
     {
-        super(_test, _ci, _name, _requiredExportValues, null);
+        super(_test, _ci, _name);
     }
 
     /**

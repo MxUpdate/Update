@@ -36,6 +36,6 @@ public class AttributeBinaryData
     public AttributeBinaryData(final AbstractTest _test,
                                 final String _name)
     {
-        super(_test, CI.DM_ATTRIBUTE_BINARY, _name, "binary", null, null);
+        super(_test, CI.DM_ATTRIBUTE_BINARY, _name, "binary");
     }
 }

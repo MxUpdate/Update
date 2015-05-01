@@ -16,8 +16,6 @@
 package org.mxupdate.test.data.datamodel;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 import matrix.util.MatrixException;
 
@@ -37,14 +35,6 @@ import org.testng.Assert;
 public class RelationshipData
     extends AbstractDataWithTrigger<RelationshipData>
 {
-    /**
-     * Within export the description must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
-    static  {
-        RelationshipData.REQUIRED_EXPORT_VALUES.put("description", "");
-    }
-
     /** Values for the from side. */
     private final FromTo from = new FromTo("from");
     /** Values for the to side. */
@@ -64,9 +54,7 @@ public class RelationshipData
     public RelationshipData(final AbstractTest _test,
                             final String _name)
     {
-        super(_test, AbstractTest.CI.DM_RELATIONSHIP, _name,
-              RelationshipData.REQUIRED_EXPORT_VALUES,
-              null);
+        super(_test, AbstractTest.CI.DM_RELATIONSHIP, _name);
     }
 
     /**

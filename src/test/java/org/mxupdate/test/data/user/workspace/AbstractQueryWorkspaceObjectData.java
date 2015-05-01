@@ -15,8 +15,6 @@
 
 package org.mxupdate.test.data.user.workspace;
 
-import java.util.Map;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.user.AbstractUserData;
 
@@ -40,17 +38,13 @@ abstract class AbstractQueryWorkspaceObjectData<DATA extends AbstractQueryWorksp
      * @param _user                 user for which this visual query workspace
      *                              object is defined
      * @param _name                 name of the visual query workspace object
-     * @param _requiredExportValues defines the required values of the
-     *                              export within the configuration item
-     *                              file
      */
     AbstractQueryWorkspaceObjectData(final AbstractTest _test,
                                      final String _mxAdminType,
                                      final USER _user,
-                                     final String _name,
-                                     final Map<String,Object> _requiredExportValues)
+                                     final String _name)
     {
-        super(_test, _mxAdminType, _user, _name, _requiredExportValues);
+        super(_test, _mxAdminType, _user, _name);
         this.setValue("type", "*");
         this.setValue("name", "*");
         this.setValue("revision", "*");

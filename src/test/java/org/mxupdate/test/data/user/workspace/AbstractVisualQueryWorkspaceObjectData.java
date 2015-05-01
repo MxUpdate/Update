@@ -16,7 +16,6 @@
 package org.mxupdate.test.data.user.workspace;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -53,17 +52,13 @@ abstract class AbstractVisualQueryWorkspaceObjectData<DATA extends AbstractVisua
      * @param _user                 user for which this visual query workspace
      *                              object is defined
      * @param _name                 name of the visual query workspace object
-     * @param _requiredExportValues defines the required values of the
-     *                              export within the configuration item
-     *                              file
      */
     AbstractVisualQueryWorkspaceObjectData(final AbstractTest _test,
                                            final String _mxAdminType,
                                            final USER _user,
-                                           final String _name,
-                                           final Map<String,Object> _requiredExportValues)
+                                           final String _name)
     {
-        super(_test, _mxAdminType, _user, _name, _requiredExportValues);
+        super(_test, _mxAdminType, _user, _name);
     }
 
     /**

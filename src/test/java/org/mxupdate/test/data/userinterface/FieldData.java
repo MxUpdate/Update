@@ -160,7 +160,7 @@ public class FieldData<FORMTABLE extends AbstractAdminData<?>>
                      final FORMTABLE _tableForm,
                      final String _name)
     {
-        super(_test, null, _name, null, null);
+        super(_test, null, _name);
         this.tableForm = _tableForm;
     }
 

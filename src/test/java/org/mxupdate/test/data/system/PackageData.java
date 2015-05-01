@@ -46,7 +46,7 @@ public class PackageData
     public PackageData(final AbstractTest _test,
                        final String _name)
     {
-        super(_test, AbstractTest.CI.SYS_PACKAGE, _name, null, null);
+        super(_test, AbstractTest.CI.SYS_PACKAGE, _name);
     }
 
     /**

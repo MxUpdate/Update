@@ -97,7 +97,7 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
                                   final AbstractTest.CI _ci,
                                   final String _name)
     {
-        super(_test, _ci, _name, null, null);
+        super(_test, _ci, _name);
     }
 
     /**

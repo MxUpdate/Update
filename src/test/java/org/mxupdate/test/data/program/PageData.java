@@ -15,9 +15,6 @@
 
 package org.mxupdate.test.data.program;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
@@ -34,17 +31,6 @@ import org.testng.Assert;
 public class PageData
     extends AbstractAdminData<PageData>
 {
-    /**
-     * Within export the description and mime type must be defined.
-     *
-     * @see #PageData(AbstractTest, String)
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
-    static  {
-        PageData.REQUIRED_EXPORT_VALUES.put("description", "");
-        PageData.REQUIRED_EXPORT_VALUES.put("mime", "");
-    }
-
     /**
      * Separator used between the configuration item update code the the
      * page content itself.
@@ -72,7 +58,7 @@ public class PageData
     public PageData(final AbstractTest _test,
                     final String _name)
     {
-        super(_test, AbstractTest.CI.PRG_PAGE, _name, PageData.REQUIRED_EXPORT_VALUES, null);
+        super(_test, AbstractTest.CI.PRG_PAGE, _name);
     }
 
     /**

@@ -17,9 +17,7 @@ package org.mxupdate.test.data.datamodel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import matrix.util.MatrixException;
 
@@ -38,14 +36,6 @@ import org.testng.Assert;
 public class RuleData
     extends AbstractAdminData<RuleData>
 {
-    /**
-     * Within export the description and default value must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
-    static  {
-        RuleData.REQUIRED_EXPORT_VALUES.put("description", "");
-    }
-
     /** Access definitions for this state. */
     private final List<Access> accessList = new ArrayList<Access>();
 
@@ -59,7 +49,7 @@ public class RuleData
     public RuleData(final AbstractTest _test,
                     final String _name)
     {
-        super(_test, AbstractTest.CI.DM_RULE, _name, RuleData.REQUIRED_EXPORT_VALUES, null);
+        super(_test, AbstractTest.CI.DM_RULE, _name);
     }
 
     /**

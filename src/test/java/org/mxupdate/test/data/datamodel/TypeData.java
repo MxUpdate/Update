@@ -48,7 +48,7 @@ public class TypeData
     public TypeData(final AbstractTest _test,
                     final String _name)
     {
-        super(_test, AbstractTest.CI.DM_TYPE, _name, null, null);
+        super(_test, AbstractTest.CI.DM_TYPE, _name);
     }
 
     /**

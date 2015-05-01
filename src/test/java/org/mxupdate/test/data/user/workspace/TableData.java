@@ -16,10 +16,8 @@
 package org.mxupdate.test.data.user.workspace;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import matrix.util.MatrixException;
 
@@ -40,13 +38,6 @@ public class TableData<USER extends AbstractUserData<?>>
     extends AbstractVisualWorkspaceObjectData<TableData<USER>,USER>
 {
     /**
-     * Within export the description must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
-    static  {
-    }
-
-    /**
      * All columns of this user specific table.
      *
      * @see #newField(String)
@@ -66,7 +57,7 @@ public class TableData<USER extends AbstractUserData<?>>
                      final USER _user,
                      final String _name)
     {
-        super(_test, "table", _user, _name, TableData.REQUIRED_EXPORT_VALUES);
+        super(_test, "table", _user, _name);
     }
 
     /**

@@ -15,9 +15,7 @@
 
 package org.mxupdate.test.data.user.workspace;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -39,13 +37,6 @@ public class ToolSetData<USER extends AbstractUserData<?>>
     extends AbstractVisualWorkspaceObjectData<ToolSetData<USER>,USER>
 {
     /**
-     * Within export the description must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
-    static  {
-    }
-
-    /**
      * Set of all programs defined by this tool set.
      *
      * @see #addProgram(AbstractProgramData)
@@ -66,7 +57,7 @@ public class ToolSetData<USER extends AbstractUserData<?>>
                        final USER _user,
                        final String _name)
     {
-        super(_test, "toolset", _user, _name, ToolSetData.REQUIRED_EXPORT_VALUES);
+        super(_test, "toolset", _user, _name);
     }
 
     /**

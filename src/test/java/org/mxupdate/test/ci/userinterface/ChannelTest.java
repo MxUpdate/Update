@@ -51,12 +51,12 @@ public class ChannelTest
                 new Object[]{
                         "channel with height",
                         new ChannelData(this, "hello \" test")
-                                .setValue("height", 100)},
+                                .setSingle("height", "100")},
                new Object[]{
                         "channel with default height",
                         new ChannelData(this, "hello \" test"),
                         new ChannelData(this, "hello \" test")
-                                .setValue("height", 0)},
+                                .setSingle("height", "0")},
                 new Object[]{
                         "channel with settings",
                         new ChannelData(this, "hello \" test")

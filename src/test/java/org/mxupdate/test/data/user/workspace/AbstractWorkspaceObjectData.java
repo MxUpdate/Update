@@ -18,7 +18,6 @@ package org.mxupdate.test.data.user.workspace;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -74,10 +73,9 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
     AbstractWorkspaceObjectData(final AbstractTest _test,
                                 final String _mxAdminType,
                                 final USER _user,
-                                final String _name,
-                                final Map<String,Object> _requiredExportValues)
+                                final String _name)
     {
-        super(_test, null, _name, _requiredExportValues, null);
+        super(_test, null, _name);
         this.mxAdminType = _mxAdminType;
         this.user = _user;
     }

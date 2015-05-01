@@ -15,9 +15,6 @@
 
 package org.mxupdate.test.data.user.workspace;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.user.AbstractUserData;
 
@@ -32,20 +29,6 @@ public class CueData<USER extends AbstractUserData<?>>
     extends AbstractVisualQueryWorkspaceObjectData<CueData<USER>,USER>
 {
     /**
-     * Within export the description must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>(3);
-    static  {
-        CueData.REQUIRED_EXPORT_VALUES.put("user", "");
-        CueData.REQUIRED_EXPORT_VALUES.put("appliesto", "");
-        CueData.REQUIRED_EXPORT_VALUES.put("type", "");
-        CueData.REQUIRED_EXPORT_VALUES.put("name", "");
-        CueData.REQUIRED_EXPORT_VALUES.put("revision", "");
-        CueData.REQUIRED_EXPORT_VALUES.put("vault", "");
-        CueData.REQUIRED_EXPORT_VALUES.put("owner", "");
-    }
-
-    /**
      * Default constructor.
      *
      * @param _test     related test case
@@ -56,7 +39,7 @@ public class CueData<USER extends AbstractUserData<?>>
                    final USER _user,
                    final String _name)
     {
-        super(_test, "cue", _user, _name, CueData.REQUIRED_EXPORT_VALUES);
+        super(_test, "cue", _user, _name);
         this.setValue("appliesto", "all");
     }
 }

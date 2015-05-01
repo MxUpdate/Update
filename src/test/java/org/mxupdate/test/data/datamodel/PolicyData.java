@@ -47,19 +47,6 @@ import org.testng.Assert;
 public class PolicyData
     extends AbstractAdminData<PolicyData>
 {
-    /** Within export the given values must be defined. */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
-    static  {
-        PolicyData.REQUIRED_EXPORT_VALUES.put("description", "");
-        PolicyData.REQUIRED_EXPORT_VALUES.put("defaultformat", "");
-        PolicyData.REQUIRED_EXPORT_VALUES.put("store", "");
-    }
-    /** Within export the given flags must be defined. */
-    private static final Map<String,Boolean> REQUIRED_EXPORT_FLAGS = new HashMap<String,Boolean>();
-    static  {
-        PolicyData.REQUIRED_EXPORT_FLAGS.put("hidden", false);
-    }
-
     /** Are all types assigned? */
     private boolean allTypes = false;
     /** All defined types for this policy. */
@@ -86,7 +73,7 @@ public class PolicyData
     public PolicyData(final AbstractTest _test,
                       final String _name)
     {
-        super(_test, AbstractTest.CI.DM_POLICY, _name, PolicyData.REQUIRED_EXPORT_VALUES, PolicyData.REQUIRED_EXPORT_FLAGS);
+        super(_test, AbstractTest.CI.DM_POLICY, _name);
     }
 
     /**
@@ -212,8 +199,10 @@ public class PolicyData
         strg.append("mxUpdate policy \"${NAME}\" {\n")
             .append("    hidden \"").append(this.getFlags().getValue("hidden") != null ? this.getFlags().getValue("hidden") : false).append("\"\n");
 
-        // append values
-        this.getValues().appendUpdate("    ", strg);
+        this.getValues()    .appendUpdate("    ", strg);
+        this.getSingles()   .appendUpdate("    ", strg);
+        this.getFlags()     .appendUpdate("    ", strg);
+        this.getProperties().appendUpdate("    ", strg);
 
         // type definition
         if (this.allTypes)  {
@@ -237,11 +226,6 @@ public class PolicyData
             strg.append("    format {").append(AbstractTest.convertUpdate(true, formatNames, null)).append("}\n");
         }
 
-        // enforce
-        if (this.getFlags().getValue("enforce") != null)  {
-            strg.append("    enforce \"").append(this.getFlags().getValue("enforce")).append("\"\n");
-        }
-
         if (this.allState != null)  {
             this.allState.append4CIFile(strg);
         }
@@ -251,9 +235,6 @@ public class PolicyData
         {
             state.append4CIFile(strg);
         }
-
-        // append properties
-        this.getProperties().appendUpdate("    ", strg);
 
         strg.append("}");
 
@@ -384,15 +365,10 @@ public class PolicyData
                 this.getSymbolicName(),
                 "check symbolic name");
 
-        // check for all required values
-        for (final String valueName : PolicyData.REQUIRED_EXPORT_VALUES.keySet())  {
-            Assert.assertEquals(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/" + valueName + "/@value").size(),
-                                1,
-                                "required check that minimum and maximum one " + valueName + " is defined");
-        }
-
-        this.getValues().checkExport(_exportParser);
-        this.getValues().checkExport(_exportParser);
+        this.getValues()    .checkExport(_exportParser, "");
+        this.getSingles()   .checkExport(_exportParser, "");
+        this.getValues()    .checkExport(_exportParser, "");
+        this.getProperties().checkExport(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/property/@value"));
 
         // check for types
         if (this.allTypes)  {
@@ -437,9 +413,6 @@ public class PolicyData
         {
             state.checkExport(_exportParser);
         }
-
-        // check for properties
-        this.getProperties().checkExport(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/property/@value"));
     }
 
 

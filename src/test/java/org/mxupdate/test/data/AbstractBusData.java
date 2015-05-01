@@ -212,7 +212,7 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
                     .append("\" policy \"").append(AbstractTest.convertMql(this.getCI().getBusPolicy()))
                     .append("\" vault \"").append(AbstractTest.convertMql(this.getCI().getBusVault()))
                     .append('\"');
-            for (final Map.Entry<String,Object> value : this.getValues().entrySet())  {
+            for (final Map.Entry<String,String> value : this.getValues().entrySet())  {
                 cmd.append(" \"").append(AbstractTest.convertMql(value.getKey()))
                    .append("\" \"").append(AbstractTest.convertMql(value.getValue().toString()))
                    .append('\"');
@@ -234,7 +234,7 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
                 .append("mql escape mod bus \"${OBJECTID}\" description \"")
                 .append(AbstractTest.convertTcl((this.description != null) ? this.description : ""))
                 .append('\"');
-        for (final Map.Entry<String,Object> value : this.getValues().entrySet())  {
+        for (final Map.Entry<String,String> value : this.getValues().entrySet())  {
             cmd.append(" \\\n    \"").append(AbstractTest.convertTcl(value.getKey()))
                .append("\" \"").append(AbstractTest.convertTcl(value.getValue().toString()))
                .append('\"');
@@ -259,7 +259,7 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
                               "description",
                               "\"" + AbstractTest.convertTcl((this.description != null) ? this.description : "") + "\"");
         // check for defined values
-        for (final Map.Entry<String,Object> entry : this.getValues().entrySet())  {
+        for (final Map.Entry<String,String> entry : this.getValues().entrySet())  {
             this.checkSingleValue(_exportParser,
                                   entry.getKey(),
                                   "\"" + AbstractTest.convertTcl(entry.getKey()) + "\"",

@@ -16,9 +16,7 @@
 package org.mxupdate.test.data.userinterface;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import matrix.util.MatrixException;
 
@@ -35,15 +33,6 @@ import org.testng.Assert;
 public class ChannelData
     extends AbstractUIWithSettingData<ChannelData>
 {
-    /**
-     * Within export the description and label must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
-    static  {
-        ChannelData.REQUIRED_EXPORT_VALUES.put("description", "");
-        ChannelData.REQUIRED_EXPORT_VALUES.put("label", "");
-    }
-
     /** All commands of the channel. */
     private final List<CommandData> commands = new ArrayList<CommandData>();
 
@@ -57,7 +46,7 @@ public class ChannelData
     public ChannelData(final AbstractTest _test,
                        final String _name)
     {
-        super(_test, AbstractTest.CI.UI_CHANNEL, _name, ChannelData.REQUIRED_EXPORT_VALUES);
+        super(_test, AbstractTest.CI.UI_CHANNEL, _name);
     }
 
     /**
@@ -96,9 +85,10 @@ public class ChannelData
         final StringBuilder strg = new StringBuilder();
         this.append4CIFileHeader(strg);
         strg.append("mxUpdate channel \"${NAME}\" {\n");
-        this.getFlags().appendUpdate("    ", strg);
-        this.getValues().appendUpdate("    ", strg);
-        this.getSettings().appendUpdate("    ", strg, "\n");
+        this.getFlags()     .appendUpdate("    ", strg);
+        this.getValues()    .appendUpdate("    ", strg);
+        this.getSingles()   .appendUpdate("    ", strg);
+        this.getSettings()  .appendUpdate("    ", strg, "\n");
         this.getProperties().appendUpdate("    ", strg);
         for (final String ciLine : this.getCILines())  {
             strg.append("    ").append(ciLine).append('\n');
@@ -183,9 +173,10 @@ public class ChannelData
                 this.getSymbolicName(),
                 "check symbolic name");
 
-        this.getFlags().checkExport(_exportParser, "");
-        this.getValues().checkExport(_exportParser, "");
-        this.getSettings().checkExport(_exportParser.getLines("/mxUpdate/setting/@value"));
+        this.getFlags()     .checkExport(_exportParser, "");
+        this.getValues()    .checkExport(_exportParser, "");
+        this.getSingles()   .checkExport(_exportParser, "");
+        this.getSettings()  .checkExport(_exportParser.getLines("/mxUpdate/setting/@value"));
         this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
 
         // check for commands (in correct order!)

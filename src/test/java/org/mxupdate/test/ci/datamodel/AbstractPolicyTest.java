@@ -73,7 +73,7 @@ public abstract class AbstractPolicyTest
 
         // if delimiter is defined, must be also defined for new cleaned policy
         if (_original.getValue("delimiter") != null)  {
-            ret.setValue("delimiter", _original.getFlags().getValue("delimiter"));
+            ret.setFlag("delimiter", _original.getFlags().getValue("delimiter"));
             // if delimiter is defined, major / minor sequence must be defined
             // (the trick: they are changed vvs.)
             ret.setFlag("minorsequence", _original.getFlags().getValue("majorsequence"));

@@ -105,7 +105,7 @@ public class ViewData<USER extends AbstractUserData<?>>
                      final USER _user,
                      final String _name)
     {
-        super(_test, "view", _user, _name, ViewData.REQUIRED_EXPORT_VALUES);
+        super(_test, "view", _user, _name);
     }
 
     /**

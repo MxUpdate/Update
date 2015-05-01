@@ -36,6 +36,6 @@ public class AttributeBooleanData
     public AttributeBooleanData(final AbstractTest _test,
                                 final String _name)
     {
-        super(_test, CI.DM_ATTRIBUTE_BOOLEAN, _name, "boolean", null, null);
+        super(_test, CI.DM_ATTRIBUTE_BOOLEAN, _name, "boolean");
     }
 }

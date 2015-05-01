@@ -16,10 +16,8 @@
 package org.mxupdate.test.data.user;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -40,14 +38,6 @@ import org.testng.Assert;
 public class AbstractPersonAdminData<PERSONDATA extends AbstractPersonAdminData<?>>
     extends AbstractUserData<PERSONDATA>
 {
-    /**
-     * Within export the description must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
-    static  {
-        AbstractPersonAdminData.REQUIRED_EXPORT_VALUES.put("description", "");
-    }
-
     /**
      * Access of this person.
      *
@@ -152,7 +142,7 @@ public class AbstractPersonAdminData<PERSONDATA extends AbstractPersonAdminData<
                                    final AbstractTest.CI _ci,
                                    final String _name)
     {
-        super(_test, _ci, _name, AbstractPersonAdminData.REQUIRED_EXPORT_VALUES);
+        super(_test, _ci, _name);
     }
 
     /**

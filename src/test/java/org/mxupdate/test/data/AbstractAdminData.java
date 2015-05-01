@@ -16,7 +16,6 @@
 package org.mxupdate.test.data;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -57,28 +56,6 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     /** Defines flags for this data piece. */
     private final FlagList flags = new FlagList();
 
-    /**
-     * Defines the flags and their default value which must be defined for an
-     * export. They are tested for existence from
-     * {@link #checkExport(ExportParser)}. The values must be defined at
-     * minimum and at maximum once in the configuration item file. The default
-     * value is checked only if in {@link #flags} the value is not defined.
-     *
-     * @see #checkExport(ExportParser)
-     */
-    private final Map<String,Boolean> requiredExportFlags = new HashMap<String,Boolean>();
-
-    /**
-     * Defines the values which must be defined for exports. They are tested
-     * for existence from {@link #checkExport(ExportParser)}. This values must
-     * be defined minimum and maximum one time in the configuration item file.
-     * The key is the name of the value, the value of the map the expected
-     * default value.
-     *
-     * @see #checkExport(ExportParser)
-     */
-    private final Map<String,Object> requiredExportValues = new HashMap<String,Object>();
-
     /** All properties for this data piece. */
     private final PropertyDefList properties = new PropertyDefList();
 
@@ -99,20 +76,12 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
      */
     protected AbstractAdminData(final AbstractTest _test,
                                 final AbstractTest.CI _ci,
-                                final String _name,
-                                final Map<String,Object> _requiredExportValues,
-                                final Map<String,Boolean> _requiredExportFlags)
+                                final String _name)
     {
         super(_test, _ci, _name);
         this.symbolicName = (_ci != null)
                             ? _ci.getMxType() + "_" + this.getName().replaceAll(AbstractAdminData.NOT_ALLOWED_CHARS, "")
                             : null;
-        if (_requiredExportValues != null)  {
-            this.requiredExportValues.putAll(_requiredExportValues);
-        }
-        if (_requiredExportFlags != null)  {
-            this.requiredExportFlags.putAll(_requiredExportFlags);
-        }
     }
 
     /**
@@ -184,17 +153,6 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     public FlagList getFlags()
     {
         return this.flags;
-    }
-
-    /**
-     * Returns all {@link #requiredExportValues required export values}.
-     *
-     * @return required export values
-     * @see #requiredExportValues
-     */
-    public Map<String,Object> getRequiredExportValues()
-    {
-        return this.requiredExportValues;
     }
 
     /**
@@ -330,14 +288,8 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         this.flags.append4Create(_cmd);
 
         // values
-        for (final Map.Entry<String,Object> entry : this.getValues().entrySet())  {
-            if (entry.getValue() instanceof Character)  {
-                _cmd.append(' ').append(entry.getKey()).append(' ').append(entry.getValue());
-            } else  {
-                _cmd.append(' ').append(entry.getKey()).append(" \"")
-                    .append(AbstractTest.convertMql(entry.getValue().toString()))
-                    .append('\"');
-            }
+        for (final Map.Entry<String,String> entry : this.getValues().entrySet())  {
+            _cmd.append(' ').append(entry.getKey()).append(" \"").append(AbstractTest.convertMql(entry.getValue().toString())).append('\"');
         }
         // properties
         this.properties.append4Create(_cmd);
@@ -363,29 +315,6 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         // check for defined flags
         this.getFlags().checkExport(_exportParser, "/" + this.getCI().getUrlTag() + "/", this.getCI().getMxType() + " " + this.getName());
 
-        // check for all required flags
-        if (!this.requiredExportFlags.isEmpty())  {
-            final Set<String> main = new HashSet<String>(_exportParser.getLines("/mql/"));
-            for (final Map.Entry<String,Boolean> flag : this.requiredExportFlags.entrySet())  {
-                final boolean value = this.flags.contains(flag.getKey()) && (this.flags.getValue(flag.getKey()) != null)
-                                      ? this.flags.getValue(flag.getKey())
-                                      : flag.getValue();
-                Assert.assertEquals(
-                        main.contains(flag.getKey()) || main.contains(flag.getKey() + " \\"),
-                        value,
-                        "check that flag '" + flag.getKey() + "' for " + this.getCI().getMxType() + " '" + this.getName() + "' is defined as " + value);
-                Assert.assertEquals(
-                        main.contains("!" + flag.getKey()) || main.contains("!" + flag.getKey() + " \\"),
-                        !value,
-                        "check that flag '" + flag.getKey() + "' for " + this.getCI().getMxType() + " '" + this.getName() + "' is defined " + value);
-            }
-        }
-        // check for all required values
-        for (final String valueName : this.requiredExportValues.keySet())  {
-            Assert.assertEquals(_exportParser.getLines("/mql/" + valueName + "/@value").size(),
-                                1,
-                                "required check that minimum and maximum one " + valueName + " is defined");
-        }
         // check for add values
         final Set<String> needAdds = new HashSet<String>();
         this.evalAdds4CheckExport(needAdds);

@@ -16,10 +16,8 @@
 package org.mxupdate.test.data.userinterface;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import matrix.util.MatrixException;
 
@@ -37,14 +35,6 @@ import org.testng.Assert;
 public class FormData
     extends AbstractAdminData<FormData>
 {
-    /**
-     * Within export the description must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>(3);
-    static  {
-        FormData.REQUIRED_EXPORT_VALUES.put("description", "");
-    }
-
     /**
      * All fields of this form.
      *
@@ -64,7 +54,7 @@ public class FormData
     public FormData(final AbstractTest _test,
                     final String _name)
     {
-        super(_test, AbstractTest.CI.UI_FORM, _name, FormData.REQUIRED_EXPORT_VALUES, null);
+        super(_test, AbstractTest.CI.UI_FORM, _name);
     }
 
     /**

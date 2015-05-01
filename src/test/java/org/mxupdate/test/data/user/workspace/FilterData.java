@@ -15,9 +15,7 @@
 
 package org.mxupdate.test.data.user.workspace;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -38,20 +36,6 @@ public class FilterData<USER extends AbstractUserData<?>>
     extends AbstractVisualQueryWorkspaceObjectData<FilterData<USER>,USER>
 {
     /**
-     * Within export the description must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
-    static  {
-        FilterData.REQUIRED_EXPORT_VALUES.put("user", "");
-        FilterData.REQUIRED_EXPORT_VALUES.put("appliesto", "");
-        FilterData.REQUIRED_EXPORT_VALUES.put("type", "");
-        FilterData.REQUIRED_EXPORT_VALUES.put("name", "");
-        FilterData.REQUIRED_EXPORT_VALUES.put("revision", "");
-        FilterData.REQUIRED_EXPORT_VALUES.put("vault", "");
-        FilterData.REQUIRED_EXPORT_VALUES.put("owner", "");
-    }
-
-    /**
      * Defines the direction of the connections to which the filter applies.
      */
     private Direction direction = Direction.BOTH;
@@ -67,7 +51,7 @@ public class FilterData<USER extends AbstractUserData<?>>
                       final USER _user,
                       final String _name)
     {
-        super(_test, "filter", _user, _name, FilterData.REQUIRED_EXPORT_VALUES);
+        super(_test, "filter", _user, _name);
         this.setValue("appliesto", "relationship");
     }
 
@@ -161,19 +145,11 @@ public class FilterData<USER extends AbstractUserData<?>>
      */
     public enum Direction
     {
-        /**
-         * To direction.
-         */
+        /** To direction. */
         TO,
-
-        /**
-         * From direction.
-         */
+        /** From direction. */
         FROM,
-
-        /**
-         * Both (to and from) directions.
-         */
+        /** Both (to and from) directions. */
         BOTH;
     }
 }

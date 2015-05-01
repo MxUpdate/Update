@@ -16,9 +16,7 @@
 package org.mxupdate.test.data.userinterface;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import matrix.util.MatrixException;
 
@@ -35,15 +33,6 @@ import org.testng.Assert;
 public class PortalData
     extends AbstractUIWithSettingData<PortalData>
 {
-    /**
-     * Within export the description and label must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>(3);
-    static  {
-        PortalData.REQUIRED_EXPORT_VALUES.put("description", "");
-        PortalData.REQUIRED_EXPORT_VALUES.put("label", "");
-    }
-
     /** All channels of the portal. */
     private final List<ChannelData> channels = new ArrayList<ChannelData>();
 
@@ -57,7 +46,7 @@ public class PortalData
     public PortalData(final AbstractTest _test,
                        final String _name)
     {
-        super(_test, AbstractTest.CI.UI_PORTAL, _name, PortalData.REQUIRED_EXPORT_VALUES);
+        super(_test, AbstractTest.CI.UI_PORTAL, _name);
     }
 
     /**

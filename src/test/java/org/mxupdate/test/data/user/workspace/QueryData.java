@@ -15,9 +15,7 @@
 
 package org.mxupdate.test.data.user.workspace;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -37,19 +35,7 @@ import org.testng.Assert;
 public class QueryData<USER extends AbstractUserData<?>>
     extends AbstractQueryWorkspaceObjectData<QueryData<USER>,USER>
 {
-    /**
-     * Within export the description must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
-    static  {
-        QueryData.REQUIRED_EXPORT_VALUES.put("user", "");
-        QueryData.REQUIRED_EXPORT_VALUES.put("vault", "");
-        QueryData.REQUIRED_EXPORT_VALUES.put("owner", "");
-    }
-
-    /**
-     * Must the types expand for the query?
-     */
+    /** Must the types expand for the query? */
     private boolean expandType = false;
 
     /**
@@ -63,7 +49,7 @@ public class QueryData<USER extends AbstractUserData<?>>
                      final USER _user,
                      final String _name)
     {
-        super(_test, "query", _user, _name, QueryData.REQUIRED_EXPORT_VALUES);
+        super(_test, "query", _user, _name);
     }
 
     /**

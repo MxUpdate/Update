@@ -15,8 +15,6 @@
 
 package org.mxupdate.test.data.datamodel;
 
-import java.util.HashMap;
-
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
@@ -50,23 +48,7 @@ public class FormatData
     public FormatData(final AbstractTest _test,
                       final String _name)
     {
-        super(_test, AbstractTest.CI.DM_FORMAT, _name,
-                new HashMap<String,Object>() {
-                    private static final long serialVersionUID = 1L;
-                    {
-                        this.put("description", "");
-                        this.put("version", "");
-                        this.put("suffix", "");
-                        this.put("mime", "");
-                        this.put("type", "");
-                        if (_test.getVersion().max(Version.V6R2013x))  {
-                            this.put("view", "");
-                            this.put("edit", "");
-                            this.put("print", "");
-                        }
-                    }
-                },
-                null);
+        super(_test, AbstractTest.CI.DM_FORMAT, _name);
     }
 
     /**

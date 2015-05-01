@@ -36,6 +36,6 @@ public class AttributeDateData
     public AttributeDateData(final AbstractTest _test,
                              final String _name)
     {
-        super(_test, CI.DM_ATTRIBUTE_DATE, _name, "date", null, null);
+        super(_test, CI.DM_ATTRIBUTE_DATE, _name, "date");
     }
 }

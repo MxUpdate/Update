@@ -16,7 +16,6 @@
 package org.mxupdate.test.data.datamodel;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -47,19 +46,12 @@ public abstract class AbstractDataWithTrigger<DATAWITHTRIGGERS extends AbstractD
      * @param _test                 related test case
      * @param _ci                   related configuration type
      * @param _name                 name of the administration object
-     * @param _requiredExportValues defines the required values of the
-     *                              export within the configuration item
-     *                              file
-     * @param _requiredExportFlags  defines the required flags of the export
-     *                              within the configuration item file
      */
     protected AbstractDataWithTrigger(final AbstractTest _test,
                                       final CI _ci,
-                                      final String _name,
-                                      final Map<String,Object> _requiredExportValues,
-                                      final Map<String,Boolean> _requiredExportFlags)
+                                      final String _name)
     {
-        super(_test, _ci, _name, _requiredExportValues, _requiredExportFlags);
+        super(_test, _ci, _name);
     }
 
     /**

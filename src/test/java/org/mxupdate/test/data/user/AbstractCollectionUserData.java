@@ -48,7 +48,7 @@ public class AbstractCollectionUserData<DATA extends AbstractCollectionUserData<
                                       final AbstractTest.CI _ci,
                                       final String _name)
     {
-        super(_test, _ci, _name, null);
+        super(_test, _ci, _name);
     }
 
     /**

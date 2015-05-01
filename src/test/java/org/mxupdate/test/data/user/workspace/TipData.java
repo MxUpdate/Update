@@ -15,9 +15,6 @@
 
 package org.mxupdate.test.data.user.workspace;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.user.AbstractUserData;
 
@@ -32,20 +29,6 @@ public class TipData<USER extends AbstractUserData<?>>
     extends AbstractVisualQueryWorkspaceObjectData<TipData<USER>,USER>
 {
     /**
-     * Within export the description must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
-    static  {
-        TipData.REQUIRED_EXPORT_VALUES.put("user", "");
-        TipData.REQUIRED_EXPORT_VALUES.put("appliesto", "");
-        TipData.REQUIRED_EXPORT_VALUES.put("type", "");
-        TipData.REQUIRED_EXPORT_VALUES.put("name", "");
-        TipData.REQUIRED_EXPORT_VALUES.put("revision", "");
-        TipData.REQUIRED_EXPORT_VALUES.put("vault", "");
-        TipData.REQUIRED_EXPORT_VALUES.put("owner", "");
-    }
-
-    /**
      * Default constructor.
      *
      * @param _test     related test case
@@ -56,7 +39,7 @@ public class TipData<USER extends AbstractUserData<?>>
                    final USER _user,
                    final String _name)
     {
-        super(_test, "tip", _user, _name, TipData.REQUIRED_EXPORT_VALUES);
+        super(_test, "tip", _user, _name);
         this.setValue("appliesto", "relationship");
     }
 }

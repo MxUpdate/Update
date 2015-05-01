@@ -16,10 +16,8 @@
 package org.mxupdate.test.data.userinterface;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import matrix.util.MatrixException;
 
@@ -37,14 +35,6 @@ import org.testng.Assert;
 public class TableData
     extends AbstractAdminData<TableData>
 {
-    /**
-     * Within export the description must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
-    static  {
-        TableData.REQUIRED_EXPORT_VALUES.put("description", "");
-    }
-
     /**
      * All fields of this table.
      *
@@ -64,7 +54,7 @@ public class TableData
     public TableData(final AbstractTest _test,
                      final String _name)
     {
-        super(_test, AbstractTest.CI.UI_TABLE, _name, TableData.REQUIRED_EXPORT_VALUES, null);
+        super(_test, AbstractTest.CI.UI_TABLE, _name);
     }
 
     /**

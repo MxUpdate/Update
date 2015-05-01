@@ -38,14 +38,6 @@ import org.testng.Assert;
 public class DimensionData
     extends AbstractAdminData<DimensionData>
 {
-    /**
-//     * Within export the description must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
-    static  {
-//        ExpressionData.REQUIRED_EXPORT_VALUES.put("description", "");
-    }
-
     /** All units for this dimension. */
     private final List<UnitData> units = new ArrayList<UnitData>();
 
@@ -59,7 +51,7 @@ public class DimensionData
     public DimensionData(final AbstractTest _test,
                          final String _name)
     {
-        super(_test, AbstractTest.CI.DM_DIMENSION, _name, DimensionData.REQUIRED_EXPORT_VALUES, null);
+        super(_test, AbstractTest.CI.DM_DIMENSION, _name);
     }
 
     @Override()
@@ -149,14 +141,6 @@ public class DimensionData
                 this.getSymbolicName(),
                 "check symbolic name");
 
-        // check for all required values
-        for (final String valueName : DimensionData.REQUIRED_EXPORT_VALUES.keySet())  {
-            Assert.assertEquals(_exportParser.getLines("/mxUpdate/" + valueName + "/@value").size(),
-                                1,
-                                "required check that minimum and maximum one " + valueName + " is defined");
-        }
-
-
         // check all units
         for (final UnitData unit : this.units)
         {
@@ -164,6 +148,7 @@ public class DimensionData
         }
 
         this.getValues()    .checkExport(_exportParser, "");
+        this.getSingles()   .checkExport(_exportParser, "");
         this.getFlags()     .checkExport(_exportParser, "");
         this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
     }
