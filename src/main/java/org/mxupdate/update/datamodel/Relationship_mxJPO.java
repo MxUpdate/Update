@@ -244,6 +244,7 @@ public class Relationship_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
                 .singleIfTrue(  "kind",                     this.kind.name().toLowerCase(),     (this.kind != Kind.Basic))
                 .flagIfTrue(    "abstract",          false, this.abstractFlag,                  (this.abstractFlag != null) && this.abstractFlag)
@@ -264,6 +265,7 @@ public class Relationship_mxJPO
                              final Relationship_mxJPO _current)
         throws UpdateException_mxJPO
     {
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
         DeltaUtil_mxJPO.calcValueDelta(  _mql,              "description",              this.getDescription(),  _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(   _mql,              "hidden",            false, this.isHidden(),        _current.isHidden());
         DeltaUtil_mxJPO.calcFlagDelta(   _mql,              "preventduplicates", false, this.preventDuplicates, _current.preventDuplicates);

@@ -11,105 +11,107 @@ interface RelationshipParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int DESCRIPTION = 5;
+  int SYMBOLICNAME = 5;
   /** RegularExpression Id. */
-  int ABSTRACT_TRUE = 6;
+  int DESCRIPTION = 6;
   /** RegularExpression Id. */
-  int ABSTRACT_FALSE = 7;
+  int ABSTRACT_TRUE = 7;
   /** RegularExpression Id. */
-  int DERIVED = 8;
+  int ABSTRACT_FALSE = 8;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 9;
+  int DERIVED = 9;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 10;
+  int HIDDEN_TRUE = 10;
   /** RegularExpression Id. */
-  int PREVENTDUPLICATES_TRUE = 11;
+  int HIDDEN_FALSE = 11;
   /** RegularExpression Id. */
-  int PREVENTDUPLICATES_FALSE = 12;
+  int PREVENTDUPLICATES_TRUE = 12;
   /** RegularExpression Id. */
-  int ATTRIBUTE = 13;
+  int PREVENTDUPLICATES_FALSE = 13;
   /** RegularExpression Id. */
-  int RULE = 14;
+  int ATTRIBUTE = 14;
   /** RegularExpression Id. */
-  int STRING = 15;
+  int RULE = 15;
   /** RegularExpression Id. */
-  int SINGLE = 16;
+  int STRING = 16;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 17;
+  int SINGLE = 17;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 18;
+  int MULTILINESTRING = 18;
   /** RegularExpression Id. */
-  int KIND = 19;
+  int MULTILINESINGLE = 19;
   /** RegularExpression Id. */
-  int BASIC = 20;
+  int KIND = 20;
   /** RegularExpression Id. */
-  int COMPOSITIONAL = 21;
+  int BASIC = 21;
   /** RegularExpression Id. */
-  int TRIGGER = 22;
+  int COMPOSITIONAL = 22;
   /** RegularExpression Id. */
-  int INPUT = 23;
+  int TRIGGER = 23;
   /** RegularExpression Id. */
-  int TRIGEVENT = 24;
+  int INPUT = 24;
   /** RegularExpression Id. */
-  int ACTION = 25;
+  int TRIGEVENT = 25;
   /** RegularExpression Id. */
-  int CHECK = 26;
+  int ACTION = 26;
   /** RegularExpression Id. */
-  int OVERRIDE = 27;
+  int CHECK = 27;
   /** RegularExpression Id. */
-  int START_FROM = 28;
+  int OVERRIDE = 28;
   /** RegularExpression Id. */
-  int START_TO = 29;
+  int START_FROM = 29;
   /** RegularExpression Id. */
-  int FROMTO_PROPAGATEMODIFY_TRUE = 30;
+  int START_TO = 30;
   /** RegularExpression Id. */
-  int FROMTO_PROPAGATEMODIFY_FALSE = 31;
+  int FROMTO_PROPAGATEMODIFY_TRUE = 31;
   /** RegularExpression Id. */
-  int FROMTO_PROPAGATECONNECTION_TRUE = 32;
+  int FROMTO_PROPAGATEMODIFY_FALSE = 32;
   /** RegularExpression Id. */
-  int FROMTO_PROPAGATECONNECTION_FALSE = 33;
+  int FROMTO_PROPAGATECONNECTION_TRUE = 33;
   /** RegularExpression Id. */
-  int FROMTO_MEANING = 34;
+  int FROMTO_PROPAGATECONNECTION_FALSE = 34;
   /** RegularExpression Id. */
-  int FROMTO_REVISION_NONE = 35;
+  int FROMTO_MEANING = 35;
   /** RegularExpression Id. */
-  int FROMTO_REVISION_FLOAT = 36;
+  int FROMTO_REVISION_NONE = 36;
   /** RegularExpression Id. */
-  int FROMTO_REVISION_REPLICATE = 37;
+  int FROMTO_REVISION_FLOAT = 37;
   /** RegularExpression Id. */
-  int FROMTO_CLONE_NONE = 38;
+  int FROMTO_REVISION_REPLICATE = 38;
   /** RegularExpression Id. */
-  int FROMTO_CLONE_FLOAT = 39;
+  int FROMTO_CLONE_NONE = 39;
   /** RegularExpression Id. */
-  int FROMTO_CLONE_REPLICATE = 40;
+  int FROMTO_CLONE_FLOAT = 40;
   /** RegularExpression Id. */
-  int FROMTO_CARDINALITY_ONE = 41;
+  int FROMTO_CLONE_REPLICATE = 41;
   /** RegularExpression Id. */
-  int FROMTO_CARDINALITY_MANY = 42;
+  int FROMTO_CARDINALITY_ONE = 42;
   /** RegularExpression Id. */
-  int FROMTO_TYPE_ALL = 43;
+  int FROMTO_CARDINALITY_MANY = 43;
   /** RegularExpression Id. */
-  int FROMTO_TYPE = 44;
+  int FROMTO_TYPE_ALL = 44;
   /** RegularExpression Id. */
-  int FROMTO_RELATIONSHIP_ALL = 45;
+  int FROMTO_TYPE = 45;
   /** RegularExpression Id. */
-  int FROMTO_RELATIONSHIP = 46;
+  int FROMTO_RELATIONSHIP_ALL = 46;
   /** RegularExpression Id. */
-  int FROMTO_END = 47;
+  int FROMTO_RELATIONSHIP = 47;
   /** RegularExpression Id. */
-  int FROMTO_STRING = 48;
+  int FROMTO_END = 48;
   /** RegularExpression Id. */
-  int FROMTO_SINGLE = 49;
+  int FROMTO_STRING = 49;
   /** RegularExpression Id. */
-  int PROPERTY = 50;
+  int FROMTO_SINGLE = 50;
   /** RegularExpression Id. */
-  int PROPERTYTO = 51;
+  int PROPERTY = 51;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 52;
+  int PROPERTYTO = 52;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 53;
+  int PROPERTYVAL = 53;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 54;
+  int ADMINTYPE_STRING = 54;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 55;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -137,6 +139,7 @@ interface RelationshipParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"symbolicname\"",
     "\"description\"",
     "\"abstract\"",
     "\"!abstract\"",

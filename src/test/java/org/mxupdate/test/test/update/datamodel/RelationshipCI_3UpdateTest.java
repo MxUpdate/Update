@@ -25,6 +25,7 @@ import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.program.MQLProgramData;
 import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.util.Version;
+import org.mxupdate.update.datamodel.Relationship_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.annotations.AfterClass;
@@ -33,11 +34,11 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Class is used to test relationship updates.
+ * Tests the {@link Relationship_mxJPO relationship CI} export / update.
  *
  * @author The MxUpdate Team
  */
-public class RelationshipCI_2UpdateTest
+public class RelationshipCI_3UpdateTest
     extends AbstractDataExportUpdate<RelationshipData>
 {
     /**
@@ -494,12 +495,33 @@ public class RelationshipCI_2UpdateTest
                 .to().defSingle("clone", "replicate")
                 .to().defSingle("revision", "replicate")
                 .to().defFlag("propagateconnection", false)
-                .create()
+                .create();
+        this.createNewData("Test")
+                .setFlag("preventduplicates", true)
+                .from().defSingle("cardinality", "one")
+                .from().defFlag("propagateconnection", false)
+                .to().defSingle("clone", "replicate")
+                .to().defSingle("revision", "replicate")
+                .to().defFlag("propagateconnection", false)
                 .setSingle("kind", "compositional")
                 .update("")
-                .checkExport()
+                .checkExport();
+        this.createNewData("Test")
+                .setFlag("preventduplicates", true)
+                .from().defSingle("cardinality", "one")
+                .from().defFlag("propagateconnection", false)
+                .to().defSingle("clone", "replicate")
+                .to().defSingle("revision", "replicate")
+                .to().defFlag("propagateconnection", false)
                 .setSingle("kind", "basic")
-                .failureUpdate(ErrorKey.DM_RELATION_NOT_BASIC_KIND)
+                .failureUpdate(ErrorKey.DM_RELATION_NOT_BASIC_KIND);
+        this.createNewData("Test")
+                .setFlag("preventduplicates", true)
+                .from().defSingle("cardinality", "one")
+                .from().defFlag("propagateconnection", false)
+                .to().defSingle("clone", "replicate")
+                .to().defSingle("revision", "replicate")
+                .to().defFlag("propagateconnection", false)
                 .setSingle("kind", "compositional")
                 .checkExport();
     }
@@ -539,9 +561,11 @@ public class RelationshipCI_2UpdateTest
         this.createNewData("Test")
                 .create()
                 .setValue("derived", AbstractTest.PREFIX + "Parent1")
-                .update("")
+                .update("");
+        this.createNewData("Test")
                 .setValue("derived", AbstractTest.PREFIX + "Parent2")
-                .failureUpdate(ErrorKey.DM_RELATION_UPDATE_DERIVED)
+                .failureUpdate(ErrorKey.DM_RELATION_UPDATE_DERIVED);
+        this.createNewData("Test")
                 .setValue("derived", AbstractTest.PREFIX + "Parent1")
                 .checkExport();
     }

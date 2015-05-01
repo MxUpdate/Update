@@ -58,7 +58,8 @@ PARSER_END(RelationshipParser)
 
 <DEFAULT> TOKEN : /** first level */
 {
-      <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
     | <ABSTRACT_TRUE:                       "abstract">
     | <ABSTRACT_FALSE:                      "!abstract">
     | <DERIVED:                             "derived">                                      : STRING_EXPECTED
@@ -181,7 +182,10 @@ void parse(final Relationship_mxJPO _relationship)
     Trigger trigger;
     String fromTo;
 } {
-    (   ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_relationship, "description",                    this.getString(tmp.image));}
+    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_relationship, "symbolicNames", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_relationship, "symbolicNames", this.getSingle(tmp.image));} ) )
+
+      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_relationship, "description",                    this.getString(tmp.image));}
                                     | tmp = <MULTILINESINGLE>               {this.setValue(_relationship, "description",                    this.getSingle(tmp.image));} ) )
 
       | ( <KIND>                    ( <BASIC>                               {this.setValue(_relationship, "kind",                           Kind.Basic);}
