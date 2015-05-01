@@ -289,7 +289,7 @@ public abstract class AbstractAdminObject_mxJPO
         inputSource.setEncoding("UTF8");
         reader.parse(inputSource);
         // prepare post preparation
-        this.prepare(_paramCache);
+        this.prepare();
         // reads symbolic names of the administration objects
         this.readSymbolicNames(_paramCache);
     }
@@ -367,11 +367,9 @@ public abstract class AbstractAdminObject_mxJPO
      * Sorted the properties, sets the author and version depending on the
      * properties and reads the symbolic names.
      *
-     * @param _paramCache   parameter cache
      * @throws MatrixException if the symbolic names could not be extracted
      */
-    protected void prepare(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
+    protected void prepare()
     {
         // sort the properties
         this.properties.prepare();

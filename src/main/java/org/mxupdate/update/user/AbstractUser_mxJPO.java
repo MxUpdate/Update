@@ -345,44 +345,43 @@ public abstract class AbstractUser_mxJPO
      * @throws MatrixException if the symbolic names could not be extracted
      */
     @Override()
-    protected void prepare(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
+    protected void prepare()
     {
-        super.prepare(_paramCache);
+        super.prepare();
 
         // cues
         for (final Cue_mxJPO cue : this.cues.values())  {
-            cue.prepare(_paramCache);
+            cue.prepare();
         }
 
         // filters
         for (final Filter_mxJPO filter : this.filters.values())  {
-            filter.prepare(_paramCache);
+            filter.prepare();
         }
 
         // queries
         for (final Query_mxJPO query : this.queries.values())  {
-            query.prepare(_paramCache);
+            query.prepare();
         }
 
         // tables
         for (final Table_mxJPO table : this.tables.values())  {
-            table.prepare(_paramCache);
+            table.prepare();
         }
 
         // tips
         for (final Tip_mxJPO tip : this.tips.values())  {
-            tip.prepare(_paramCache);
+            tip.prepare();
         }
 
         // tool sets
         for (final ToolSet_mxJPO toolSet : this.toolSets.values())  {
-            toolSet.prepare(_paramCache);
+            toolSet.prepare();
         }
 
         // views
         for (final View_mxJPO view : this.views.values())  {
-            view.prepare(_paramCache);
+            view.prepare();
         }
     }
 

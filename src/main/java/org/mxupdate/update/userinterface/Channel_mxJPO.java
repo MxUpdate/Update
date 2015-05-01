@@ -20,8 +20,6 @@ import java.io.StringReader;
 import java.util.HashSet;
 import java.util.Set;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.userinterface.channel.ChannelDefParser_mxJPO;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO;
@@ -101,19 +99,13 @@ public class Channel_mxJPO
 
     /**
      * Order the command references.
-     *
-     * @param _paramCache   parameter cache
-     * @throws MatrixException if the preparation from derived class failed
-     * @see #commandRefs        stack of not ordered commands references
-     * @see #orderCmds          instance of ordered commands references
      */
     @Override()
-    protected void prepare(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
+    protected void prepare()
     {
         this.children.prepare();
 
-        super.prepare(_paramCache);
+        super.prepare();
     }
 
     /**

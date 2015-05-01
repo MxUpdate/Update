@@ -102,6 +102,7 @@ public class TriggerList_mxJPO
      * @param _suffix   suffix written before trigger definition
      * @throws IOException if write failed
      */
+    @Deprecated()
     public void write(final Appendable _out,
                       final String _prefix,
                       final String _suffix)
@@ -114,6 +115,25 @@ public class TriggerList_mxJPO
                 .append(" \"").append(StringUtil_mxJPO.convertTcl(trigger.program)).append("\"")
                 .append(" input \"").append(StringUtil_mxJPO.convertTcl(trigger.arguments)).append("\"")
                 .append(_suffix);
+        }
+    }
+
+    /**
+     * Writes the sorted trigger information to the writer instance.
+     *
+     * @param _out      writer instance
+     * @param _prefix   prefix written before trigger definition
+     * @throws IOException if write failed
+     */
+    public void write(final Appendable _out,
+                      final String _prefix)
+        throws IOException
+    {
+        for (final Trigger trigger : this)  {
+            _out.append(_prefix)
+                .append("trigger ").append(trigger.eventType).append(' ').append(trigger.kind)
+                .append(" \"").append(StringUtil_mxJPO.convertUpdate(trigger.program)).append("\"")
+                .append(" input \"").append(StringUtil_mxJPO.convertUpdate(trigger.arguments)).append("\"\n");
         }
     }
 

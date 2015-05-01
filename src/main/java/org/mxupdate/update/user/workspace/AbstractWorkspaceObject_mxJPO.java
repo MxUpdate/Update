@@ -20,8 +20,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.update.user.AbstractUser_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
@@ -160,15 +158,9 @@ abstract class AbstractWorkspaceObject_mxJPO
     }
 
     /**
-     * Sorted the {@link #propertiesStack properties}.
-     *
-     * @param _paramCache   parameter cache
-     * @throws MatrixException of preparation failed
-     * @see #propertiesStack
-     * @see #propertiesSet
+     * Sorted the {@link #properties}.
      */
-    public void prepare(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
+    public void prepare()
     {
         this.properties.prepare();
     }

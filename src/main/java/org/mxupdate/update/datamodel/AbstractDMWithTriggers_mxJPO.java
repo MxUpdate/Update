@@ -20,8 +20,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO;
@@ -91,20 +89,15 @@ public abstract class AbstractDMWithTriggers_mxJPO
     }
 
     /**
-     * After the type XML file is parsed, the triggers must be sorted.
-     *
-     * @param _paramCache   parameter cache
-     * @throws MatrixException if the preparation from derived class failed
-     * @see #triggersStack
+     * After the type XML file is parsed, the {@link #triggers} must be sorted.
      */
     @Override()
-    protected void prepare(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
+    protected void prepare()
     {
         // sort all triggers
         this.triggers.prepare();
 
-        super.prepare(_paramCache);
+        super.prepare();
     }
 
     /**

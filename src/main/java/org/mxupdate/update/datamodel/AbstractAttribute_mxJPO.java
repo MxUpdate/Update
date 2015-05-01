@@ -296,13 +296,9 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
      * The program range definition is correct (by defining
      * {@link Range#value1} as {@link #rangeProgramRef} and
      * {@link Range#value2} as {@link #rangeProgramInputArguments}).
-     *
-     * @param _paramCache   parameter cache
-     * @throws MatrixException if the prepare from the derived class failed
      */
     @Override()
-    protected void prepare(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
+    protected void prepare()
     {
         // sort all triggers
         this.triggers.prepare();
@@ -327,7 +323,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
             progRange.value2 = this.rangeProgramInputArguments;
         }
 
-        super.prepare(_paramCache);
+        super.prepare();
     }
 
     /**
@@ -389,7 +385,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         _out.append("    default \"").append((this.defaultValue != null) ? StringUtil_mxJPO.convertUpdate(this.defaultValue) : "").append("\"\n");
 
         // append triggers
-        this.triggers.write(_out, "    ", "\n");
+        this.triggers.write(_out, "    ");
 
         // append ranges
         this.rangesSorted.write(_out);

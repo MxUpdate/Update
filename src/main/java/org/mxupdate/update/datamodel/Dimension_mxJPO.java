@@ -24,8 +24,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.dimension.DimensionDefParser_mxJPO;
@@ -141,13 +139,9 @@ public class Dimension_mxJPO
      * <li>If the {@link Unit#properties} includes a grouped system information
      *     the values are written into {@link Unit#systemInfos}.</li>
      * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @throws MatrixException if preparation failed
      */
     @Override()
-    protected void prepare(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
+    protected void prepare()
     {
         if (this.currentUnit != null)  {
             this.units.add(this.currentUnit);
@@ -171,7 +165,7 @@ public class Dimension_mxJPO
                 }
             }
         }
-        super.prepare(_paramCache);
+        super.prepare();
     }
 
     /**

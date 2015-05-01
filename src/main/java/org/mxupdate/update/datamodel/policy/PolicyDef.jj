@@ -63,24 +63,24 @@ PARSER_END(PolicyDefParser)
 
 <DEFAULT> TOKEN : /** first level */
 {
-    <DESCRIPTION:     "description">      : S_EXPECTED
+    <DESCRIPTION:     "description">      : STRING_EXPECTED
   | <TYPE:            "type">             : LALL_EXPECTED
   | <FORMAT:          "format">           : LALL_EXPECTED
-  | <STORE:           "store">            : S_EXPECTED
-  | <DEFAULTFORMAT:   "defaultformat">    : S_EXPECTED
+  | <STORE:           "store">            : STRING_EXPECTED
+  | <DEFAULTFORMAT:   "defaultformat">    : STRING_EXPECTED
   | <ENFORCE:         "enforce">          : B_EXPECTED
   | <DELIMITER:       "delimiter">        : D_EXPECTED
-  | <SEQUENCE:        "sequence">         : S_EXPECTED
-  | <MINORSEQUENCE:   "minorsequence">    : S_EXPECTED
-  | <MAJORSEQUENCE:   "majorsequence">    : S_EXPECTED
+  | <SEQUENCE:        "sequence">         : STRING_EXPECTED
+  | <MINORSEQUENCE:   "minorsequence">    : STRING_EXPECTED
+  | <MAJORSEQUENCE:   "majorsequence">    : STRING_EXPECTED
   | <HIDDEN:          "hidden">           : B_EXPECTED
-  | <STATE:           "state">            : S_EXPECTED
+  | <STATE:           "state">            : STRING_EXPECTED
   | <ALLSTATE:        "allstate">         : DEFAULT
 }
 
 <DEFAULT> TOKEN : /** State and depending signature and trigger Tokens */
 {
-      <REGISTEREDNAME:                      "registeredName">                                       : S_EXPECTED
+      <REGISTEREDNAME:                      "registeredName">                                       : STRING_EXPECTED
     | <REVISION:                            "revision">                                             : B_EXPECTED
     | <MINORREVISION:                       "minorrevision">                                        : B_EXPECTED
     | <MAJORREVISION:                       "majorrevision">                                        : B_EXPECTED
@@ -100,16 +100,16 @@ PARSER_END(PolicyDefParser)
     | <OWNER:                               "owner">                                                : STATEACCESS_EXPECTED
     | <PUBLIC:                              "public">                                               : STATEACCESS_EXPECTED
     | <USER:                                "user">                                                 : STATEACCESS_STRING_EXPECTED
-    | <ACTION:                              "action">                                               : S_EXPECTED
-    | <CHECK:                               "check">                                                : S_EXPECTED
-    | <OVERRIDE:                            "override">                                             : S_EXPECTED
-    | <INPUT:                               "input">                                                : S_EXPECTED
-    | <TRIGGER:                             "trigger">                                              : S_EXPECTED
+    | <ACTION:                              "action">                                               : STRING_EXPECTED
+    | <CHECK:                               "check">                                                : STRING_EXPECTED
+    | <OVERRIDE:                            "override">                                             : STRING_EXPECTED
+    | <INPUT:                               "input">                                                : STRING_EXPECTED
+    | <TRIGGER:                             "trigger">                                              : STRING_EXPECTED
     | <APPROVE:                             "approve">                                              : L_EXPECTED
     | <IGNORE:                              "ignore">                                               : L_EXPECTED
     | <REJECT:                              "reject">                                               : L_EXPECTED
-    | <BRANCH:                              "branch">                                               : S_EXPECTED
-    | <SIGNATURE:                           "signature">                                            : S_EXPECTED
+    | <BRANCH:                              "branch">                                               : STRING_EXPECTED
+    | <SIGNATURE:                           "signature">                                            : STRING_EXPECTED
     | <ROUTE:                               "route">                                                : LS_EXPECTED
 }
 
@@ -136,7 +136,7 @@ PARSER_END(PolicyDefParser)
 
 <STATEACCESS_STRING_EXPECTED> TOKEN :
 {
-      <STATEACCESS_STRING : (<STATEACCESS_STRING_APOSTROPHE>(<STATEACCESS_STRING_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<STATEACCESS_STRING_APOSTROPHE>)>
+      <STATEACCESS_STRING : (<STATEACCESS_STRING_APOSTROPHE>(<STATEACCESS_STRING_CHAR> | "\\\"" | "{" | "}" | " ")*<STATEACCESS_STRING_APOSTROPHE>)>
                                                                                                     : STATEACCESS_EXPECTED
     | <STATEACCESS_SINGLE_STRING : (<STATEACCESS_STRING_CHAR>)+>                                    : STATEACCESS_EXPECTED
     | <#STATEACCESS_STRING_APOSTROPHE: "\"" >
@@ -145,8 +145,8 @@ PARSER_END(PolicyDefParser)
 
 /** After access definition back to default */
 <DEFAULT> TOKEN:
-{      <FILTER:                              "filter">                                               : S_EXPECTED
-    | <LOCALFILTER:                         "localfilter">                                          : S_EXPECTED
+{      <FILTER:                              "filter">                                               : STRING_EXPECTED
+    | <LOCALFILTER:                         "localfilter">                                          : STRING_EXPECTED
     | <ORGANIZATION_ANY:                    "any"         ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
     | <ORGANIZATION_SINGLE:                 "single"      ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
     | <ORGANIZATION_ANCESTOR:               "ancestor"    ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
@@ -181,8 +181,8 @@ PARSER_END(PolicyDefParser)
 
 /*********************************************** Property and State Property */
 <DEFAULT> TOKEN :
-{      <PROPERTY:                            "property">                                             : S_EXPECTED
-    | <PROPERTYVAL:                         "value">                                                : S_EXPECTED
+{      <PROPERTY:                            "property">                                             : STRING_EXPECTED
+    | <PROPERTYVAL:                         "value">                                                : STRING_EXPECTED
     | <PROPERTYTO:                          "to">                                                   : PROPERTYTO_EXPECTED
 }
 
@@ -193,7 +193,9 @@ PARSER_END(PolicyDefParser)
 
 <PROPERTYTO_EXPECTED> TOKEN :
 {
-      <PROPERTYTOTYPE : (<SS_CHAR>)+> : S_EXPECTED
+      <SS_STRING : (<SS_APOSTROPHE>(<SS_CHAR> | "\\\"" | "{" | "}" | " ")*<SS_APOSTROPHE>)>         : STRING_EXPECTED
+    | <SS_SINGLE : (<SS_CHAR>)+> : STRING_EXPECTED
+    | <#SS_APOSTROPHE : "\"" >
     | <#SS_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
 }
 
@@ -232,8 +234,8 @@ PARSER_END(PolicyDefParser)
 <LS_EXPECTED> TOKEN : /* List of Strings */
 {
       <LS_CURLY_BRACKET_OPEN : "{">    : LS_EXPECTED
-    | <LS_CURLY_BRACKET_CLOSE : "}">   : S_EXPECTED
-    | <LS_STRING : (<LS_APOSTROPHE>(<LS_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<LS_APOSTROPHE>)> : LS_EXPECTED
+    | <LS_CURLY_BRACKET_CLOSE : "}">   : STRING_EXPECTED
+    | <LS_STRING : (<LS_APOSTROPHE>(<LS_CHAR> | "\\\"" | "{" | "}" | " ")*<LS_APOSTROPHE>)> : LS_EXPECTED
     | <LS_SINGLE_STRING : (<LS_CHAR>)+> : LS_EXPECTED
     | <#LS_APOSTROPHE: "\"" >
     | <#LS_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
@@ -247,21 +249,21 @@ PARSER_END(PolicyDefParser)
 
 <SL_EXPECTED> TOKEN :
 {
-      <SL_STRING : (<SL_APOSTROPHE>(<SL_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<SL_APOSTROPHE>)> : L_EXPECTED
+      <SL_STRING : (<SL_APOSTROPHE>(<SL_CHAR> | "\\\"" | "{" | "}" | " ")*<SL_APOSTROPHE>)> : L_EXPECTED
     | <SL_SINGLE_STRING : (<SL_CHAR>)+> : L_EXPECTED
     | <#SL_APOSTROPHE: "\"" >
     | <#SL_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
 }
 
 /******************************************************************** String  */
-<S_EXPECTED> SKIP :
+<STRING_EXPECTED> SKIP :
 {
   " " | "\t" | "\n" | "\r"
 }
 
-<S_EXPECTED> TOKEN :
+<STRING_EXPECTED> TOKEN :
 {
-      <S_STRING : (<S_APOSTROPHE>(<S_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<S_APOSTROPHE>)> : DEFAULT
+      <S_STRING : (<S_APOSTROPHE> (<S_CHAR> | "\\\"" | "{" | "}" | " ")* <S_APOSTROPHE>)> : DEFAULT
     | <S_SINGLE_STRING : (<S_CHAR>)+> : DEFAULT
     | <#S_APOSTROPHE: "\"" >
     | <#S_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
@@ -295,7 +297,7 @@ PARSER_END(PolicyDefParser)
 <L2_EXPECTED> TOKEN : /* List of Strings */
 {
       <L_CURLY_BRACKET_CLOSE : "}">   : DEFAULT
-    | <L_STRING : (<L_APOSTROPHE>(<L_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<L_APOSTROPHE>)> : L2_EXPECTED
+    | <L_STRING : (<L_APOSTROPHE>(<L_CHAR> | "\\\"" | "{" | "}" | " ")*<L_APOSTROPHE>)> : L2_EXPECTED
     | <L_SINGLE_STRING : (<L_CHAR>)+> : L2_EXPECTED
     | <#L_APOSTROPHE: "\"" >
     | <#L_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
@@ -322,27 +324,38 @@ void parse(final Policy_mxJPO _policy)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
 : {
     String tmpStr;
-    Token tmpToken;
-    AdminProperty tmpProp;
+    Token tmp;
+    AdminProperty property;
 } {
-    (   ( <DESCRIPTION>    tmpStr = sString()                       {this.getField(_policy, "description").set(tmpStr);} )
+    (   ( <DESCRIPTION>             ( tmp = <S_STRING>                          {this.setValue(_policy, "description", this.getString(tmp.image));}
+                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(_policy, "description", this.getSingle(tmp.image));} ) )
       | ( format(_policy) )
       | ( type(_policy) )
-      | ( <DEFAULTFORMAT>  tmpStr = sString()                       {this.getField(_policy, "defaultFormat").set(tmpStr);} )
-      | ( <ENFORCE>        ( <BOOLEAN_TRUE>                         {this.getField(_policy, "enforce").set(true);}
-                           | <BOOLEAN_FALSE>                        {this.getField(_policy, "enforce").set(false);} ) )
-      | ( <DELIMITER>      tmpStr = sString()                       {this.getField(_policy, "delimiter").set(tmpStr);} )
-      | ( <SEQUENCE>       tmpStr = sString()                       {this.getField(_policy, "minorsequence").set(tmpStr);} )
-      | ( <MINORSEQUENCE>  tmpStr = sString()                       {this.getField(_policy, "minorsequence").set(tmpStr);} )
-      | ( <MAJORSEQUENCE>  tmpStr = sString()                       {this.getField(_policy, "majorsequence").set(tmpStr);} )
-      | ( <STORE>          tmpStr = sString()                       {this.getField(_policy, "store").set(tmpStr);} )
-      | ( <HIDDEN>         ( <BOOLEAN_TRUE>                         {this.getField(_policy, "hidden").set(true);}
-                           | <BOOLEAN_FALSE>                        {this.getField(_policy, "hidden").set(false);} ) )
+      | ( <DEFAULTFORMAT>           ( tmp = <S_STRING>                          {this.setValue(_policy, "defaultFormat", this.getString(tmp.image));}
+                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(_policy, "defaultFormat", this.getSingle(tmp.image));} ) )
+      | ( <ENFORCE>                 ( <BOOLEAN_TRUE>                            {this.setValue(_policy, "enforce", true);}
+                                    | <BOOLEAN_FALSE>                           {this.setValue(_policy, "enforce", false);} ) )
+      | ( <DELIMITER>               tmp = <DELIMITER_CHAR>                      {this.setValue(_policy, "delimiter", this.getSingle(tmp.image));} )
+      | ( ( <SEQUENCE> | <MINORSEQUENCE> )
+                                    ( tmp = <S_STRING>                          {this.setValue(_policy, "minorsequence", this.getString(tmp.image));}
+                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(_policy, "minorsequence", this.getSingle(tmp.image));} ) )
+      | ( <MAJORSEQUENCE>           ( tmp = <S_STRING>                          {this.setValue(_policy, "majorsequence", this.getString(tmp.image));}
+                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(_policy, "majorsequence", this.getSingle(tmp.image));} ) )
+      | ( <STORE>                   ( tmp = <S_STRING>                          {this.setValue(_policy, "store", this.getString(tmp.image));}
+                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(_policy, "store", this.getSingle(tmp.image));} ) )
+      | ( <HIDDEN>                  ( <BOOLEAN_TRUE>                            {this.setValue(_policy, "hidden", true);}
+                                    | <BOOLEAN_FALSE>                           {this.setValue(_policy, "hidden", false);} ) )
       | ( allstate(_policy) )
       | ( state(_policy) )
-      | (<PROPERTY>  tmpStr = sString()                             {tmpProp = new AdminProperty();this.appendValue(this.getValue(_policy, "properties"), "propertiesStack", tmpProp);this.setValue(tmpProp, "name", tmpStr);}
-              (   ( <PROPERTYTO>  tmpToken = <PROPERTYTOTYPE>       {this.setValue(tmpProp, "refAdminType", this.getString(tmpToken.image));}                                  tmpStr = sString()                {this.setValue(tmpProp, "refAdminName", tmpStr);} )
-                | ( <PROPERTYVAL> tmpStr = sString()                {this.setValue(tmpProp, "value", tmpStr);} ) )* )
+      | (<PROPERTY>                                                             {property = new AdminProperty();this.appendValue(this.getValue(_policy, "properties"), "propertiesStack", property);}
+                                    ( tmp = <S_STRING>                          {this.setValue(property, "name", this.getString(tmp.image));}
+                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(property, "name", this.getSingle(tmp.image));} )
+              (   ( <PROPERTYVAL>   ( tmp = <S_STRING>                          {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                | ( <PROPERTYTO>    ( tmp = <SS_STRING>                         {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <SS_SINGLE>                         {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                    ( tmp = <S_STRING>                          {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
     )*
 }
 
@@ -418,46 +431,56 @@ void state(final Policy_mxJPO _policy) : {
     final State state = new State();
     String tmpStr;
     Set<String> tmpSet;
-    Token tmpToken;
-    AdminProperty tmpProp;
+    Token tmp;
+    AdminProperty property;
 } {
-    <STATE> tmpStr = sString() {this.getField(state, "name").set(tmpStr);}
+    ( <STATE>                       ( tmp = <S_STRING>                          {this.setValue(state, "name", this.getString(tmp.image));}
+                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(state, "name", this.getSingle(tmp.image));} ) )
     "{"
-        (              (<REGISTEREDNAME>     tmpStr = sString()                          {this.appendValue(state, "symbolicNames", tmpStr);})
-            | (<REVISION>           ( <BOOLEAN_TRUE>                            {this.getField(state, "minorrevisionable").set(true);}
+        (              ( <REGISTEREDNAME>    tmpStr = sString()                          {this.appendValue(state, "symbolicNames", tmpStr);} )
+            | ( <REVISION>          ( <BOOLEAN_TRUE>                            {this.getField(state, "minorrevisionable").set(true);}
                                     | <BOOLEAN_FALSE>                           {this.getField(state, "minorrevisionable").set(false);} ) )
-            | (<MINORREVISION>      ( <BOOLEAN_TRUE>                            {this.getField(state, "minorrevisionable").set(true);}
+            | ( <MINORREVISION>     ( <BOOLEAN_TRUE>                            {this.getField(state, "minorrevisionable").set(true);}
                                     | <BOOLEAN_FALSE>                           {this.getField(state, "minorrevisionable").set(false);} ) )
-            | (<MAJORREVISION>      ( <BOOLEAN_TRUE>                            {this.getField(state, "majorrevisionable").set(true);}
+            | ( <MAJORREVISION>     ( <BOOLEAN_TRUE>                            {this.getField(state, "majorrevisionable").set(true);}
                                     | <BOOLEAN_FALSE>                           {this.getField(state, "majorrevisionable").set(false);} ) )
-            | (<VERSION>            ( <BOOLEAN_TRUE>                            {this.getField(state, "versionable").set(true);}
+            | ( <VERSION>           ( <BOOLEAN_TRUE>                            {this.getField(state, "versionable").set(true);}
                                     | <BOOLEAN_FALSE>                           {this.getField(state, "versionable").set(false);} ) )
-            | (<PROMOTE>            ( <BOOLEAN_TRUE>                            {this.getField(state, "autoPromotion").set(true);}
+            | ( <PROMOTE>           ( <BOOLEAN_TRUE>                            {this.getField(state, "autoPromotion").set(true);}
                                     | <BOOLEAN_FALSE>                           {this.getField(state, "autoPromotion").set(false);} ) )
-            | (<CHECKOUTHISTORY>    ( <BOOLEAN_TRUE>                            {this.getField(state, "checkoutHistory").set(true);}
+            | ( <CHECKOUTHISTORY>   ( <BOOLEAN_TRUE>                            {this.getField(state, "checkoutHistory").set(true);}
                                     | <BOOLEAN_FALSE>                           {this.getField(state, "checkoutHistory").set(false);} ) )
-            | ((<ENFORCERESERVEACCESS> | <ENFORCERESERVEACCESS_TRUE>)           {this.getField(state, "enforcereserveaccess").set(true);} )
-            | ((<ENFORCERESERVEACCESS_NOT> | <ENFORCERESERVEACCESS_EXCLAMATION> | <ENFORCERESERVEACCESS_FALSE>)
+            | ( (<ENFORCERESERVEACCESS> | <ENFORCERESERVEACCESS_TRUE>)           {this.getField(state, "enforcereserveaccess").set(true);} )
+            | ( (<ENFORCERESERVEACCESS_NOT> | <ENFORCERESERVEACCESS_EXCLAMATION> | <ENFORCERESERVEACCESS_FALSE>)
                                                                                 {this.getField(state, "enforcereserveaccess").set(false);} )
-            | (<PUBLISHED>          ( <BOOLEAN_TRUE>                            {this.getField(state, "published").set(true);}
+            | ( <PUBLISHED>         ( <BOOLEAN_TRUE>                            {this.getField(state, "published").set(true);}
                                     | <BOOLEAN_FALSE>                           {this.getField(state, "published").set(false);} ) )
             | stateOwnerAccess(Prefix.All, state)
             | statePublicAccess(Prefix.All, state)
             | stateUserAccess(Prefix.All, state)
-            | (<REVOKE> ( stateOwnerAccess(Prefix.Revoke, state) | statePublicAccess(Prefix.Revoke, state) | stateUserAccess(Prefix.Revoke, state) ) )
-            | (<LOGIN>  ( stateOwnerAccess(Prefix.Login,  state) | statePublicAccess(Prefix.Login,  state) | stateUserAccess(Prefix.Login,  state) ) )
-            | (<ACTION>             tmpStr = sString()                          {this.getField(state, "actionProgram").set(tmpStr);}
-               <INPUT>              tmpStr = sString()                          {this.getField(state, "actionInput").set(tmpStr);})
-            | (<CHECK>              tmpStr = sString()                          {this.getField(state, "checkProgram").set(tmpStr);}
-               <INPUT>              tmpStr = sString()                          {this.getField(state, "checkInput").set(tmpStr);})
-            | (<ROUTE>              tmpSet = lsList()                           {this.getField(state, "routeUsers").set(tmpSet);}
+            | ( <REVOKE> ( stateOwnerAccess(Prefix.Revoke, state) | statePublicAccess(Prefix.Revoke, state) | stateUserAccess(Prefix.Revoke, state) ) )
+            | ( <LOGIN>  ( stateOwnerAccess(Prefix.Login,  state) | statePublicAccess(Prefix.Login,  state) | stateUserAccess(Prefix.Login,  state) ) )
+            | ( <ACTION>            ( tmp = <S_STRING>                          {this.setValue(state, "actionProgram", this.getString(tmp.image));}
+                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(state, "actionProgram", this.getSingle(tmp.image));} )
+                           <INPUT>  ( tmp = <S_STRING>                          {this.setValue(state, "actionInput", this.getString(tmp.image));}
+                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(state, "actionInput", this.getSingle(tmp.image));} ) )
+            | ( <CHECK>             ( tmp = <S_STRING>                          {this.setValue(state, "checkProgram", this.getString(tmp.image));}
+                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(state, "checkProgram", this.getSingle(tmp.image));} )
+                           <INPUT>  ( tmp = <S_STRING>                          {this.setValue(state, "checkInput", this.getString(tmp.image));}
+                                    | tmp = <S_SINGLE_STRING>                   {this.setValue(state, "checkInput", this.getSingle(tmp.image));} ) )
+            | ( <ROUTE>             tmpSet = lsList()                           {this.getField(state, "routeUsers").set(tmpSet);}
                                     tmpStr = sString()                          {this.getField(state, "routeMessage").set(tmpStr);})
             | stateTrigger(state)
             | stateSignature(state)
-            | (<PROPERTY>  tmpStr = sString()                                   {tmpProp = new AdminProperty();this.appendValue(this.getValue(state, "properties"), "propertiesStack", tmpProp);this.setValue(tmpProp, "name", tmpStr);}
-                      (   ( <PROPERTYTO>  tmpToken = <PROPERTYTOTYPE>           {this.setValue(tmpProp, "refAdminType", this.getString(tmpToken.image));}
-                                          tmpStr = sString()                    {this.setValue(tmpProp, "refAdminName", tmpStr);} )
-                        | ( <PROPERTYVAL> tmpStr = sString()                    {this.setValue(tmpProp, "value", tmpStr);} ) )* )
+            | (<PROPERTY>                                                       {property = new AdminProperty();this.appendValue(this.getValue(state, "properties"), "propertiesStack", property);}
+                                        ( tmp = <S_STRING>                      {this.setValue(property, "name", this.getString(tmp.image));}
+                                        | tmp = <S_SINGLE_STRING>               {this.setValue(property, "name", this.getSingle(tmp.image));} )
+                  (   ( <PROPERTYVAL>   ( tmp = <S_STRING>                      {this.setValue(property, "value", this.getString(tmp.image));}
+                                        | tmp = <S_SINGLE_STRING>               {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                    | ( <PROPERTYTO>    ( tmp = <SS_STRING>                     {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                        | tmp = <SS_SINGLE>                     {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                        ( tmp = <S_STRING>                      {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                        | tmp = <S_SINGLE_STRING>               {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
         )*
     "}"
     {
@@ -660,14 +683,10 @@ Set<String> lList() :  {
 }  {
     (
         ( <L_CURLY_BRACKET_OPEN> | <LALL_CURLY_BRACKET_OPEN> )
-            (
-                (tmp = <L_STRING>) {ret.add(this.getString(tmp.image));}
-                |
-                (tmp = <L_SINGLE_STRING>) {ret.add(this.getSingle(tmp.image));}
-                |
-                <L2_CURLY_BRACKET_OPEN>
-                    (tmp = <L3_BRACE_STRING>)
-                    {ret.add(tmp.image);}
+            ( tmp = <L_STRING>                  {ret.add(this.getString(tmp.image));}
+            | tmp = <L_SINGLE_STRING>           {ret.add(this.getSingle(tmp.image));}
+            |   <L2_CURLY_BRACKET_OPEN>
+                    (tmp = <L3_BRACE_STRING>)   {ret.add(tmp.image);}
                 <L4_CURLY_BRACKET_CLOSE>
             )*
         <L_CURLY_BRACKET_CLOSE>
@@ -708,7 +727,6 @@ String sString() : {
     (
           (tmp = <S_STRING>)          {ret = this.getString(tmp.image);}
         | (tmp = <S_SINGLE_STRING>)   {ret = this.getSingle(tmp.image);}
-        | (tmp = <DELIMITER_CHAR>)    {ret = this.getSingle(tmp.image);}
     )
     {
         return ret;

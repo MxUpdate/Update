@@ -35,7 +35,6 @@ import org.mxupdate.test.data.datamodel.helper.Access;
 import org.mxupdate.test.data.user.AbstractUserData;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.data.util.PropertyDefList;
-import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.testng.Assert;
 
 /**
@@ -206,37 +205,37 @@ public class PolicyData
         final StringBuilder strg = new StringBuilder();
         this.append4CIFileHeader(strg);
 
-        strg.append("updatePolicy \"${NAME}\" {\n")
-            .append("  hidden \"").append(this.getFlags().get("hidden") != null ? this.getFlags().get("hidden") : false).append("\"\n");
+        strg.append("mxUpdate policy \"${NAME}\" {\n")
+            .append("    hidden \"").append(this.getFlags().get("hidden") != null ? this.getFlags().get("hidden") : false).append("\"\n");
 
         // append values
-        this.getValues().appendUpdate("  ", strg, "\n");
+        this.getValues().appendUpdate("    ", strg, "\n");
 
         // type definition
         if (this.allTypes)  {
-            strg.append(" type all\n");
+            strg.append("    type all\n");
         } else if (!this.types.isEmpty()) {
             final List<String> typeNames = new ArrayList<String>();
             for (final TypeData type : this.types)  {
                 typeNames.add(type.getName());
             }
-            strg.append(" type {").append(StringUtil_mxJPO.joinMql(' ', true, typeNames, null)).append("}\n");
+            strg.append("    type {").append(AbstractTest.convertUpdate(true, typeNames, null)).append("}\n");
         }
 
         // format definition
         if (this.allFormats)  {
-            strg.append(" format all\n");
+            strg.append("    format all\n");
         } else if (!this.formats.isEmpty()) {
             final List<String> formatNames = new ArrayList<String>();
             for (final FormatData format : this.formats)  {
                 formatNames.add(format.getName());
             }
-            strg.append(" format {").append(StringUtil_mxJPO.joinMql(' ', true, formatNames, null)).append("}\n");
+            strg.append("    format {").append(AbstractTest.convertUpdate(true, formatNames, null)).append("}\n");
         }
 
         // enforce
         if (this.getFlags().get("enforce") != null)  {
-            strg.append("  enforce \"").append(this.getFlags().get("enforce")).append("\"\n");
+            strg.append("    enforce \"").append(this.getFlags().get("enforce")).append("\"\n");
         }
 
         if (this.allState != null)  {
@@ -250,7 +249,7 @@ public class PolicyData
         }
 
         // append properties
-        this.getProperties().appendCIFileUpdateFormat("  ", strg);
+        this.getProperties().appendCIFileUpdateFormat("    ", strg);
 
         strg.append("}");
 
@@ -284,7 +283,7 @@ public class PolicyData
                     typeNames.add(type.getName());
                     type.create();
                 }
-                cmd.append(" type ").append(StringUtil_mxJPO.joinMql(',', true, typeNames, null));
+                cmd.append(" type ").append(AbstractTest.convertMql(',', true, typeNames, null));
             }
 
             // assign formats / enforce flag
@@ -296,7 +295,7 @@ public class PolicyData
                     formatNames.add(format.getName());
                     format.create();
                 }
-                cmd.append(" format ").append(StringUtil_mxJPO.joinMql(',', true, formatNames, null));
+                cmd.append(" format ").append(AbstractTest.convertMql(',', true, formatNames, null));
             }
             if (this.getFlags().get("enforce") != null)  {
                 cmd.append(' ');
@@ -388,7 +387,7 @@ public class PolicyData
 
         // check for all required values
         for (final String valueName : PolicyData.REQUIRED_EXPORT_VALUES.keySet())  {
-            Assert.assertEquals(_exportParser.getLines("/updatePolicy/" + valueName + "/@value").size(),
+            Assert.assertEquals(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/" + valueName + "/@value").size(),
                                 1,
                                 "required check that minimum and maximum one " + valueName + " is defined");
         }
@@ -417,7 +416,7 @@ public class PolicyData
             for (final TypeData type : this.types)  {
                 typeNames.add(type.getName());
             }
-            this.checkSingleValue(_exportParser, "types", "type", "{" + StringUtil_mxJPO.joinMql(' ', true, typeNames, null) + "}");
+            this.checkSingleValue(_exportParser, "types", "type", "{" + AbstractTest.convertUpdate(true, typeNames, null) + "}");
         } else  {
             this.checkSingleValue(_exportParser, "types", "type", "{}");
         }
@@ -445,19 +444,19 @@ public class PolicyData
             for (final FormatData format : this.formats)  {
                 formatNames.add(format.getName());
             }
-            this.checkSingleValue(_exportParser, "formats", "format", "{" + StringUtil_mxJPO.joinMql(' ', true, formatNames, null) + "}");
+            this.checkSingleValue(_exportParser, "formats", "format", "{" + AbstractTest.convertUpdate(true, formatNames, null) + "}");
         } else  {
             this.checkSingleValue(_exportParser, "formats", "format", "{}");
         }
 
         // check for all state flag
         if (this.allState == null)  {
-            Assert.assertEquals(_exportParser.getLines("/updatePolicy/allstate/@value").size(),
+            Assert.assertEquals(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/allstate/@value").size(),
                                 0,
                                 "check that not all state access is defined");
         } else  {
             Assert.assertEquals(
-                    _exportParser.getLines("/updatePolicy/allstate/@value").size(),
+                    _exportParser.getLines("/" + this.getCI().getUrlTag() + "/allstate/@value").size(),
                     1,
                     "check that all state access is defined");
             this.allState.checkExport(_exportParser);
@@ -469,7 +468,7 @@ public class PolicyData
         }
 
         // check for properties
-        this.getProperties().checkExport(_exportParser.getLines("/updatePolicy/property/@value"));
+        this.getProperties().checkExport(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/property/@value"));
     }
 
 
@@ -641,7 +640,7 @@ public class PolicyData
          */
         protected void append4CIFile(final StringBuilder _cmd)
         {
-            _cmd.append("  state \"").append(StringUtil_mxJPO.convertTcl(this.name)).append("\" {\n");
+            _cmd.append("    state \"").append(AbstractTest.convertUpdate(this.name)).append("\" {\n");
             for (final Access accessFilter : this.access)  {
                 _cmd.append("     ");
                 accessFilter.append4CIFile(_cmd);
@@ -649,7 +648,7 @@ public class PolicyData
             this.getFlags().append4CIFileValues("      ", _cmd, "\n");
             for (final Map.Entry<String,Object> value : this.getValues().entrySet())  {
                 _cmd.append("    ").append(value.getKey())
-                    .append(" \"").append(StringUtil_mxJPO.convertTcl(value.getValue().toString())).append("\"\n");
+                    .append(" \"").append(AbstractTest.convertUpdate(value.getValue().toString())).append("\"\n");
             }
             for (final Signature signature : this.signatures)
             {
@@ -666,23 +665,23 @@ public class PolicyData
          */
         protected void append4Create(final StringBuilder _cmd)
         {
-            _cmd.append("    state \"").append(StringUtil_mxJPO.convertMql(this.name)).append("\" public none owner none");
+            _cmd.append("    state \"").append(AbstractTest.convertMql(this.name)).append("\" public none owner none");
             for (final Access accessFilter : this.access)  {
                 _cmd.append(' ').append(accessFilter.getMQLCreateString());
             }
             for (final Map.Entry<String,Object> value : this.getValues().entrySet())  {
                 _cmd.append(' ').append(value.getKey())
-                    .append(" \"").append(StringUtil_mxJPO.convertMql(value.getValue().toString())).append('\"');
+                    .append(" \"").append(AbstractTest.convertMql(value.getValue().toString())).append('\"');
             }
             this.getFlags().append4CIFileValues(" ", _cmd, " ");
             for (final Signature signature : this.signatures)
             {
-                _cmd.append(" signature \"").append(StringUtil_mxJPO.convertMql(signature.name)).append('\"');
+                _cmd.append(" signature \"").append(AbstractTest.convertMql(signature.name)).append('\"');
                 if ((signature.branch != null) && !signature.branch.isEmpty())  {
-                    _cmd.append(" branch \"").append(StringUtil_mxJPO.convertMql(signature.branch)).append('\"');
+                    _cmd.append(" branch \"").append(AbstractTest.convertMql(signature.branch)).append('\"');
                 }
                 if ((signature.filter != null) && !signature.filter.isEmpty())  {
-                    _cmd.append(" filter \"").append(StringUtil_mxJPO.convertMql(signature.filter)).append('\"');
+                    _cmd.append(" filter \"").append(AbstractTest.convertMql(signature.filter)).append('\"');
                 }
                 if (!signature.approve.isEmpty())  {
                     _cmd.append(" approve ");
@@ -693,7 +692,7 @@ public class PolicyData
                         } else  {
                             _cmd.append(",");
                         }
-                        _cmd.append("\"").append(StringUtil_mxJPO.convertMql(user.getName())).append("\"");
+                        _cmd.append("\"").append(AbstractTest.convertMql(user.getName())).append("\"");
                     }
                 }
                 if (!signature.ignore.isEmpty())  {
@@ -705,7 +704,7 @@ public class PolicyData
                         } else  {
                             _cmd.append(",");
                         }
-                        _cmd.append("\"").append(StringUtil_mxJPO.convertMql(user.getName())).append("\"");
+                        _cmd.append("\"").append(AbstractTest.convertMql(user.getName())).append("\"");
                     }
                 }
                 if (!signature.reject.isEmpty())  {
@@ -717,7 +716,7 @@ public class PolicyData
                         } else  {
                             _cmd.append(",");
                         }
-                        _cmd.append("\"").append(StringUtil_mxJPO.convertMql(user.getName())).append("\"");
+                        _cmd.append("\"").append(AbstractTest.convertMql(user.getName())).append("\"");
                     }
                 }
             }
@@ -733,7 +732,7 @@ public class PolicyData
             throws MatrixException
         {
             boolean found = false;
-            final String value = "\"" + AbstractTest.convertTcl(this.name) + "\"";
+            final String value = "\"" + AbstractTest.convertUpdate(this.name) + "\"";
             for (final ExportParser.Line line : _exportParser.getRootLines().get(0).getChildren())  {
                 if ("state".equals(line.getTag()) && line.getValue().startsWith(value))  {
                     found = true;
@@ -773,7 +772,7 @@ public class PolicyData
                                 entry.getKey(),
                                 (entry.getValue() instanceof Character)
                                         ? entry.getValue().toString()
-                                        : "\"" + AbstractTest.convertTcl(entry.getValue().toString()) + "\"");
+                                        : "\"" + AbstractTest.convertUpdate(entry.getValue().toString()) + "\"");
                     }
 
                     this.getFlags().checkExport(line, "state " + this.name);
@@ -1013,12 +1012,12 @@ public class PolicyData
                 rejectSet.add(user.getName());
             }
 
-            _cmd.append("        signature \"").append(AbstractTest.convertTcl(this.name)).append("\" {\n")
-                .append("            branch \"").append(AbstractTest.convertTcl(this.branch)).append("\"\n")
-                .append("            approve {").append(StringUtil_mxJPO.joinTcl(' ', true, new ArrayList<String>(approveSet), "")).append("}\n")
-                .append("            ignore {").append(StringUtil_mxJPO.joinTcl(' ', true, new ArrayList<String>(ignoreSet), "")).append("}\n")
-                .append("            reject {").append(StringUtil_mxJPO.joinTcl(' ', true, new ArrayList<String>(rejectSet), "")).append("}\n")
-                .append("            filter \"").append(AbstractTest.convertTcl(this.filter)).append("\"\n")
+            _cmd.append("        signature \"").append(AbstractTest.convertUpdate(this.name)).append("\" {\n")
+                .append("            branch \"").append(AbstractTest.convertUpdate(this.branch)).append("\"\n")
+                .append("            approve {").append(AbstractTest.convertUpdate(true, new ArrayList<String>(approveSet), "")).append("}\n")
+                .append("            ignore {").append(AbstractTest.convertUpdate(true, new ArrayList<String>(ignoreSet), "")).append("}\n")
+                .append("            reject {").append(AbstractTest.convertUpdate(true, new ArrayList<String>(rejectSet), "")).append("}\n")
+                .append("            filter \"").append(AbstractTest.convertUpdate(this.filter)).append("\"\n")
                 .append("        }\n");
         }
 
@@ -1044,29 +1043,29 @@ public class PolicyData
             }
 
             boolean found = false;
-            final String value = "\"" + AbstractTest.convertTcl(this.name) + "\"";
+            final String value = "\"" + AbstractTest.convertUpdate(this.name) + "\"";
             for (final ExportParser.Line line : _exportState.getChildren())  {
                 if ("signature".equals(line.getTag()) && line.getValue().startsWith(value))  {
                     found = true;
                     Assert.assertEquals(
                             line.evalSingleValue("branch"),
-                            "\"" + AbstractTest.convertTcl(this.branch) + "\"",
+                            "\"" + AbstractTest.convertUpdate(this.branch) + "\"",
                             "check for correct branch");
                     Assert.assertEquals(
                             line.evalSingleValue("approve"),
-                            "{" + StringUtil_mxJPO.joinTcl(' ', true, new ArrayList<String>(approveSet), "") + "}",
+                            "{" + AbstractTest.convertUpdate(true, new ArrayList<String>(approveSet), "") + "}",
                             "check for correct approve user");
                     Assert.assertEquals(
                             line.evalSingleValue("ignore"),
-                            "{" + StringUtil_mxJPO.joinTcl(' ', true, new ArrayList<String>(ignoreSet), "") + "}",
+                            "{" + AbstractTest.convertUpdate(true, new ArrayList<String>(ignoreSet), "") + "}",
                             "check for correct ignore user");
                     Assert.assertEquals(
                             line.evalSingleValue("reject"),
-                            "{" + StringUtil_mxJPO.joinTcl(' ', true, new ArrayList<String>(rejectSet), "") + "}",
+                            "{" + AbstractTest.convertUpdate(true, new ArrayList<String>(rejectSet), "") + "}",
                             "check for correct reject user");
                     Assert.assertEquals(
                             line.evalSingleValue("filter"),
-                            "\"" + AbstractTest.convertTcl(this.filter) + "\"",
+                            "\"" + AbstractTest.convertUpdate(this.filter) + "\"",
                             "check for correct filter");
                 }
             }

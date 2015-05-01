@@ -88,14 +88,14 @@ public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_
             Method method = null;
             Class<?> clazz = _object.getClass();
             try  {
-                method = clazz.getDeclaredMethod("prepare", ParameterCache_mxJPO.class);
+                method = clazz.getDeclaredMethod("prepare");
             } catch (final NoSuchMethodException e)  {
             }
             while ((method == null) && (clazz != null))  {
                 clazz = clazz.getSuperclass();
                 if (clazz != null)  {
                     try  {
-                        method = clazz.getDeclaredMethod("prepare", ParameterCache_mxJPO.class);
+                        method = clazz.getDeclaredMethod("prepare");
                     } catch (final NoSuchMethodException e)  {
                     }
                 }
@@ -105,7 +105,7 @@ public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_
             }
             try  {
                 method.setAccessible(true);
-                method.invoke(_object, _paramCache);
+                method.invoke(_object);
             } finally  {
                 method.setAccessible(false);
             }
@@ -286,9 +286,7 @@ public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_
         return _token
             .replaceAll("^\"", "")
             .replaceAll("\"$", "")
-            .replaceAll("\\\\\\\"", "\"")
-            .replaceAll("\\\\\\{", "{")
-            .replaceAll("\\\\\\}", "}");
+            .replaceAll("\\\\\\\"", "\"");
     }
 
     /**

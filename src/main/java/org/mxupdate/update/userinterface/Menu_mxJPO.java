@@ -114,17 +114,13 @@ public class Menu_mxJPO
 
     /**
      * Sorts the child objects as defined.
-     *
-     * @param _paramCache   parameter cache
-     * @throws MatrixException if the preparation from derived class failed
      */
     @Override()
-    protected void prepare(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
+    protected void prepare()
     {
         this.children.prepare();
 
-        super.prepare(_paramCache);
+        super.prepare();
     }
 
     /**

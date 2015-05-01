@@ -28,6 +28,7 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.xml.sax.SAXException;
 
 /**
  * Data model relationship class used to export and update relationships.
@@ -114,6 +115,26 @@ public class Relationship_mxJPO
     }
 
     /**
+     * Evaluates the from and to type information. Because MX does not handle
+     * the to or from side types correctly within XML exports, the from and to
+     * side types must be evaluated via a &quot;<code>print relationship ...
+     * select fromtype / totype</code>&quot; MQL statement. If this is not done
+     * in this way, there is no other possibility to evaluate the information
+     * {@link Side#typeAll} or {@link Side#relationAll}.
+     */
+    @Override()
+    protected void parse(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException, SAXException, IOException
+    {
+        super.parse(_paramCache);
+
+        // evaluate all from types / relationships
+        this.from.eval(_paramCache);
+        // evaluate all to types / relationships
+        this.to.eval(_paramCache);
+    }
+
+    /**
      * @param _paramCache   parameter cache with MX context
      * @param _url          URL to parse
      * @param _content      content of the URL to parse
@@ -179,32 +200,6 @@ public class Relationship_mxJPO
             parsed = super.parse(_paramCache, _url, _content);
         }
         return parsed;
-    }
-
-    /**
-     * Evaluates the from and to type information. Because MX does not handle
-     * the to or from side types correctly within XML exports, the from and to
-     * side types must be evaluated via a &quot;<code>print relationship ...
-     * select fromtype / totype</code>&quot; MQL statement. If this is not done
-     * in this way, there is no other possibility to evaluate the information
-     * {@link Side#typeAll} or {@link Side#relationAll}.
-     *
-     * @param _paramCache   parameter cache
-     * @throws MatrixException if the from / to side types could not be
-     *                         evaluated or the prepare from the derived class
-     *                         failed
-     */
-    @Override()
-    protected void prepare(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
-    {
-        // evaluate all from types / relationships
-        this.from.prepare(_paramCache);
-
-        // evaluate all to types / relationships
-        this.to.prepare(_paramCache);
-
-        super.prepare(_paramCache);
     }
 
     /**
@@ -410,7 +405,7 @@ public class Relationship_mxJPO
          * @param _paramCache       parameter cache with the MX context
          * @throws MatrixException if information could not be read
          */
-        private void prepare(final ParameterCache_mxJPO _paramCache)
+        private void eval(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
         {
             // evaluate all to types

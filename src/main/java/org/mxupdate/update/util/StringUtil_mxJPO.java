@@ -141,11 +141,56 @@ public final class StringUtil_mxJPO
     }
 
     /**
+     * A list of string is joined to one string. Between two string the
+     * separator ' ' is set. If quotes parameter is defined each element of the
+     * list is surrounded with quotes. Each element is
+     * {@link #convertUpdate(CharSequence) converted to update code}.
+     *
+     * @param _separator    separator between two list items
+     * @param _quotes       surround the elements of the string with quotes
+     * @param _list         list of strings
+     * @param _emptyString  string which is written if the list is empty (or
+     *                      <code>null</code> if no string for empty list is
+     *                      written)
+     * @return joined string of the list items
+     */
+    public static String convertUpdate(final boolean _quotes,
+                                       final Collection<String> _list,
+                                       final String _emptyString)
+    {
+        final StringBuilder ret = new StringBuilder();
+
+        boolean first = true;
+        if (_list.isEmpty())  {
+            if (_emptyString != null)  {
+                ret.append(_emptyString);
+            }
+        } else  {
+            for (final String elem : _list)  {
+                if (!first)  {
+                    ret.append(' ');
+                } else  {
+                    first = false;
+                }
+                if (_quotes)  {
+                    ret.append('\"');
+                }
+                ret.append(StringUtil_mxJPO.convertUpdate(elem));
+                if (_quotes)  {
+                    ret.append('\"');
+                }
+            }
+        }
+        return ret.toString();
+    }
+
+    /**
      * Converts given string by escaping all special characters for TCL.
      *
      * @param _text     character stream to convert
      * @return converted string
      */
+    @Deprecated()
     public static String convertTcl(final CharSequence _text)
     {
         final String text;
@@ -163,27 +208,6 @@ public final class StringUtil_mxJPO
                    .replaceAll("\\}", "\\\\}")
                    .replaceAll("\\[", "\\\\[")
                    .replaceAll("\\]", "\\\\]");
-    }
-
-    /**
-     * Converts given string by escaping all special characters for TCL for
-     * escaped MQL commands. In some cases a quote must be converted to
-     * backslash backslash backslash quote '\\\&quot;'.
-     *
-     * @param _text     character stream to convert
-     * @return converted string
-     */
-    public static String convertTclDoubleEscaped(final CharSequence _text)
-    {
-        return (_text != null)
-               ? _text.toString().replaceAll("\\\\", "\\\\\\\\")
-                                 .replaceAll("\\\"", "\\\\\\\\\\\\\"")
-                                 .replaceAll("\\" + "$", "\\\\\\" + "$")
-                                 .replaceAll("\\{", "\\\\{")
-                                 .replaceAll("\\}", "\\\\}")
-                                 .replaceAll("\\[", "\\\\[")
-                                 .replaceAll("\\]", "\\\\]")
-               : "";
     }
 
     /**
@@ -364,6 +388,7 @@ public final class StringUtil_mxJPO
      * @return joined string of the list items
      * @see #convertMql(CharSequence)
      */
+    @Deprecated()
     public static String joinTcl(final char _separator,
                                  final boolean _quotes,
                                  final Collection<String> _list,

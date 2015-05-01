@@ -19,15 +19,10 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
-import java.util.regex.Pattern;
-
-import matrix.util.MatrixException;
 
 import org.mxupdate.update.user.AbstractUser_mxJPO;
 import org.mxupdate.update.userinterface.AbstractUIWithFields_mxJPO.Field;
-import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * User specific class to store the workspace object for one table.
@@ -129,6 +124,8 @@ public class Table_mxJPO
      * @param _paramCache   parameter cache
      * @throws MatrixException of preparation failed
      */
+//TODO: must be rewritten...
+/*
     @Override()
     public void prepare(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
@@ -144,7 +141,7 @@ public class Table_mxJPO
                                                         .append(StringUtil_mxJPO.convertMql(this.getUser().getName())));
         this.setActive(Pattern.compile("\n[ ]*active[ ]*\n").matcher(bck).find());
     }
-
+*/
 
     /**
      * <p>Writes all table specific values to the TCL update file

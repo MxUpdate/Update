@@ -17,6 +17,7 @@ package org.mxupdate.update;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -457,7 +458,7 @@ public abstract class AbstractPropertyObject_mxJPO
         } else if ("logWarning".equals(_args[0]))  {
             _paramCache.logWarning(_args[1]);
         } else  {
-            throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.ABSTRACT_PROPERTY_JPO_CALL_METHOD_UNKNOWN, _args[0]);
+            throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.ABSTRACT_PROPERTY_JPO_CALL_METHOD_UNKNOWN, Arrays.asList(_args));
         }
     }
 

@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -109,7 +110,7 @@ public abstract class AbstractTest
                               "Notification", "NOTIFICATION", "NOTIFICATION_", "datamodel/notification", true, "mql"),
 
         /** Configuration item Data Model Policy. */
-        DM_POLICY("policy", null, false, null, null, "Policy", "POLICY", "POLICY_", "datamodel/policy", true, "updatePolicy"),
+        DM_POLICY("policy", null, false, null, null, "Policy", "POLICY", "POLICY_", "datamodel/policy", true, "mxUpdate"),
 
         /** Configuration item Data Model Relationship. */
         DM_RELATIONSHIP("relationship", null, false, null, null, "Relationship", "RELATIONSHIP", "RELATIONSHIP_", "datamodel/relationship", true, "mql"),
@@ -713,6 +714,51 @@ public abstract class AbstractTest
     }
 
     /**
+     * A list of string is joined to one string. Between two string the given
+     * separator is set. If quotes parameter is defined each element of the
+     * list is surrounded with quotes. Each element is converted to MQL code.
+     *
+     * @param _separator    separator between two list items
+     * @param _quotes       surround the elements of the string with quotes
+     * @param _list         list of strings
+     * @param _emptyString  string which is written if the list is empty (or
+     *                      <code>null</code> if no string for empty list is
+     *                      written)
+     * @return joined string of the list items
+     * @see #convertMql(CharSequence)
+     */
+    public static String convertMql(final char _separator,
+                                    final boolean _quotes,
+                                    final Collection<String> _list,
+                                    final String _emptyString)
+    {
+        final StringBuilder ret = new StringBuilder();
+
+        boolean first = true;
+        if (_list.isEmpty())  {
+            if (_emptyString != null)  {
+                ret.append(_emptyString);
+            }
+        } else  {
+            for (final String elem : _list)  {
+                if (!first)  {
+                    ret.append(_separator);
+                } else  {
+                    first = false;
+                }
+                if (_quotes)  {
+                    ret.append('\"');
+                }
+                ret.append(AbstractTest.convertMql(elem));
+                if (_quotes)  {
+                    ret.append('\"');
+                }
+            }
+        }
+        return ret.toString();
+    }
+
+    /**
      * Converts given string to MQL by escaping the &quot; so that in escape
      * mode on string could be handled with &quot; and '.
      *
@@ -729,6 +775,48 @@ public abstract class AbstractTest
         }
         return text.replaceAll("\\\\", "\\\\\\\\")
                    .replaceAll("\\\"", "\\\\\"");
+    }
+
+    /**
+     * A list of string is joined to one string. Between two string the given
+     * separator is set. If quotes parameter is defined each element of the
+     * list is surrounded with quotes. Each element is converted to TCL code.
+     *
+     * @param _quotes       surround the elements of the string with quotes
+     * @param _list         list of strings
+     * @param _emptyString  string which is written if the list is empty (or
+     *                      {@code null} if no string for empty list is
+     *                      written)
+     * @return joined string of the list items
+     */
+    public static String convertUpdate(final boolean _quotes,
+                                       final Collection<String> _list,
+                                       final String _emptyString)
+    {
+        final StringBuilder ret = new StringBuilder();
+
+        boolean first = true;
+        if (_list.isEmpty())  {
+            if (_emptyString != null)  {
+                ret.append(_emptyString);
+            }
+        } else  {
+            for (final String elem : _list)  {
+                if (!first)  {
+                    ret.append(' ');
+                } else  {
+                    first = false;
+                }
+                if (_quotes)  {
+                    ret.append('\"');
+                }
+                ret.append(AbstractTest.convertUpdate(elem));
+                if (_quotes)  {
+                    ret.append('\"');
+                }
+            }
+        }
+        return ret.toString();
     }
 
     /**

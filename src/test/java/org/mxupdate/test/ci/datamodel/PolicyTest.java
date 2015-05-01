@@ -65,7 +65,7 @@ public class PolicyTest
             + "#\n"
             + "################################################################################\n"
             + "\n"
-            + "updatePolicy \"${NAME}\" {\n"
+            + "mxUpdate policy \"${NAME}\" {\n"
             + "  description \"\"\n"
             + "  type {all}\n"
             + "  format {generic}\n"
@@ -487,7 +487,7 @@ public class PolicyTest
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
 
         final String updateCode =
-            "updatePolicy \"${NAME}\" {\n"
+            "mxUpdate policy \"${NAME}\" {\n"
             + "  description \"\"\n"
             + "  format {all}\n"
             + "}";
@@ -512,7 +512,7 @@ public class PolicyTest
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
 
         final String updateCode =
-            "updatePolicy \"${NAME}\" {\n"
+            "mxUpdate policy \"${NAME}\" {\n"
             + "  description \"\"\n"
             + "  format all\n"
             + "}";
@@ -537,7 +537,7 @@ public class PolicyTest
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
 
         policy.updateWithCode(
-                    "updatePolicy \"${NAME}\" {"
+                    "mxUpdate policy \"${NAME}\" {"
                     + "  state \"Pending\"  {"
                     + "    registeredName \"state_Exists\""
                     + "    registeredName \"state_Pending\""
@@ -633,7 +633,7 @@ public class PolicyTest
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
 
         final String updateCode =
-            "updatePolicy \"${NAME}\" {\n"
+              "mxUpdate policy \"${NAME}\" {\n"
             + "  description \"\"\n"
             + "  type {all}\n"
             + "}";
@@ -658,7 +658,7 @@ public class PolicyTest
         final PolicyData policy = new PolicyData(this, PolicyTest.POLICY_NAME);
 
         final String updateCode =
-            "updatePolicy \"${NAME}\" {\n"
+            "mxUpdate policy \"${NAME}\" {\n"
             + "  description \"\"\n"
             + "  type all\n"
             + "}";

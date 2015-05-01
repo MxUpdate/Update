@@ -29,6 +29,7 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.xml.sax.SAXException;
 
 /**
  * The class is used to export, create, delete and update roles within MX.
@@ -95,6 +96,31 @@ public class Role_mxJPO
     }
 
     /**
+     * {@inheritDoc}
+     * Prepares the internal information after the XML export was parsed by
+     * adding the information about the role type (because the role type
+     * information was numbers within the XML string).
+     */
+    @Override()
+    protected void parse(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException, SAXException, IOException
+    {
+        super.parse(_paramCache);
+
+        // must the role type evaluated?
+        if (_paramCache.getValueBoolean(Role_mxJPO.PARAM_SUPPORT_ROLE_TYPES))  {
+            final String testRoleType = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
+                    .append("escape print role \"").append(StringUtil_mxJPO.convertMql(this.getName()))
+                    .append("\" select isanorg isaproject dump"));
+            if ("FALSE,TRUE".equals(testRoleType))  {
+                this.roleType = RoleType.PROJECT;
+            } else if ("TRUE,FALSE".equals(testRoleType)) {
+                this.roleType = RoleType.ORGANIZATION;
+            }
+        }
+    }
+
+    /**
      * <p>Parses all role specific URL values. This includes:
      * <ul>
      * <li>{@link #parentRoles parent roles}</li>
@@ -125,37 +151,6 @@ public class Role_mxJPO
             parsed = super.parse(_paramCache, _url, _content);
         }
         return parsed;
-    }
-
-    /**
-     * Prepares the internal information after the XML export was parsed by
-     * adding the information about the role type (because the role type
-     * information was numbers within the XML string).
-     *
-     * @param _paramCache   parameter cache with the MX context
-     * @throws MatrixException if the information about the role type could not
-     *                         be fetched or if the exception was thrown from
-     *                         called super method
-     * @see #roleType
-     * @see #PARAM_SUPPORT_ROLE_TYPES
-     */
-    @Override()
-    protected void prepare(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
-    {
-        // must the role type evaluated?
-        if (_paramCache.getValueBoolean(Role_mxJPO.PARAM_SUPPORT_ROLE_TYPES))  {
-            final String testRoleType = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
-                    .append("escape print role \"").append(StringUtil_mxJPO.convertMql(this.getName()))
-                    .append("\" select isanorg isaproject dump"));
-            if ("FALSE,TRUE".equals(testRoleType))  {
-                this.roleType = RoleType.PROJECT;
-            } else if ("TRUE,FALSE".equals(testRoleType)) {
-                this.roleType = RoleType.ORGANIZATION;
-            }
-        }
-
-        super.prepare(_paramCache);
     }
 
     /**

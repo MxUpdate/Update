@@ -20,8 +20,6 @@ import java.io.StringReader;
 import java.util.HashSet;
 import java.util.Set;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.WriteAppendChildSyntax;
@@ -97,17 +95,13 @@ public class Portal_mxJPO
 
     /**
      * Order the channel references.
-     *
-     * @param _paramCache   parameter cache
-     * @throws MatrixException if the preparation from derived class failed
      */
     @Override()
-    protected void prepare(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
+    protected void prepare()
     {
         this.children.prepare();
 
-        super.prepare(_paramCache);
+        super.prepare();
     }
 
     /**
