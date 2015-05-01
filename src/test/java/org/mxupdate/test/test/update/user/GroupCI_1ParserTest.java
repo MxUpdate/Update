@@ -22,7 +22,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link Group_mxJPO type CI} parser.
+ * Tests the {@link Group_mxJPO group CI} parser.
  *
  * @author The MxUpdate Team
  */
@@ -36,53 +36,60 @@ public class GroupCI_1ParserTest
     {
         return new Object[][]
         {
-            {"1) simple",
-                "",
-                "description \"\" !hidden"},
+            {"0) simple",
+                    "",
+                    "description \"\" !hidden"},
+            // registered name
+            {"1a) symbolic name",
+                    "",
+                    "symbolicname \"group_abc\" description \"\" !hidden"},
+            {"1b) two symbolic names",
+                    "symbolicname \"group_abc\" symbolicname \"group_def\" description \"\" !hidden",
+                    "symbolicname \"group_def\" symbolicname \"group_abc\" description \"\" !hidden"},
             // description
             {"2a) description",
-                "",
-                "description \"abc def\" !hidden"},
+                    "",
+                    "description \"abc def\" !hidden"},
             {"2b) description not defined",
-                "description \"\" !hidden",
-                "!hidden"},
+                    "description \"\" !hidden",
+                    "!hidden"},
             // hidden flag
             {"3a) hidden",
-                "",
-                "description \"\" hidden"},
+                    "",
+                    "description \"\" hidden"},
             {"3b) not hidden (not defined)",
-                "description \"\" !hidden",
-                "description \"\""},
+                    "description \"\" !hidden",
+                    "description \"\""},
             // description
             {"4a) site",
-                "",
-                "description \"\" !hidden site \"side\""},
+                    "",
+                    "description \"\" !hidden site \"side\""},
             {"4b) empty site",
-                "description \"\" !hidden",
-                "description \"\" !hidden site \"\""},
+                    "description \"\" !hidden",
+                    "description \"\" !hidden site \"\""},
             // parent groups
             {"5a) parent",
-                "",
-                "description \"\" !hidden parent \"111\""},
+                    "",
+                    "description \"\" !hidden parent \"111\""},
             {"5b) parent name w/o apostrophe",
-                "description \"\" !hidden parent \"111\"",
-                "description \"\" !hidden parent 111"},
+                    "description \"\" !hidden parent \"111\"",
+                    "description \"\" !hidden parent 111"},
             {"5c) two parents (to check sort)",
-                "description \"\" !hidden parent \"111\" parent \"222\"",
-                "description \"\" !hidden parent \"222\" parent \"111\""},
+                    "description \"\" !hidden parent \"111\" parent \"222\"",
+                    "description \"\" !hidden parent \"222\" parent \"111\""},
             // property
             {"6a) property special characters",
-                "",
-                "description \"\" !hidden property \"{}\\\"\""},
+                    "",
+                    "description \"\" !hidden property \"{}\\\"\""},
             {"6b) property and value special characters",
-                "",
-                "description \"\" !hidden property \"{}\\\"\" value \"{}\\\"\""},
+                    "",
+                    "description \"\" !hidden property \"{}\\\"\" value \"{}\\\"\""},
             {"6c) property link special characters",
-                "",
-                "description \"\" !hidden property \"{}\\\"\" to type \"{}\\\"\""},
+                    "",
+                    "description \"\" !hidden property \"{}\\\"\" to type \"{}\\\"\""},
             {"6d) property link and value special characters",
-                "",
-                "description \"\" !hidden property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\""},
+                    "",
+                    "description \"\" !hidden property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\""},
         };
     }
 

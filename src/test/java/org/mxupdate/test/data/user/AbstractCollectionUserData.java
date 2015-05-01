@@ -75,6 +75,8 @@ public class AbstractCollectionUserData<DATA extends AbstractCollectionUserData<
         this.getFlags()     .append4Update("    ", strg);
         this.getValues()    .append4Update("    ", strg);
         this.getSingles()   .append4Update("    ", strg);
+        this.getKeyValues() .append4Update("    ", strg);
+        this.getDatas()     .append4Update("    ", strg);
         this.getProperties().append4Update("    ", strg);
         this.parents        .append4Update("    ", strg);
 

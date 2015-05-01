@@ -56,7 +56,8 @@ PARSER_END(GroupParser)
 
 <DEFAULT> TOKEN : /** first level */
 {
-      <DESCRIPTION:                         "description">                                  : STRING_EXPECTED
+      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+    | <DESCRIPTION:                         "description">                                  : STRING_EXPECTED
 
     | <HIDDEN_TRUE:                         "hidden">
     | <HIDDEN_FALSE:                        "!hidden">
@@ -114,7 +115,10 @@ void parse(final Group_mxJPO _group)
     Token tmp;
     AdminProperty property;
 } {
-    (   ( <DESCRIPTION>             ( tmp = <STRING>                        {this.setValue(_group, "description",                           this.getString(tmp.image));}
+    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_group, "symbolicNames", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_group, "symbolicNames", this.getSingle(tmp.image));} ) )
+
+      | ( <DESCRIPTION>             ( tmp = <STRING>                        {this.setValue(_group, "description",                           this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.setValue(_group, "description",                           this.getSingle(tmp.image));} ) )
 
       | ( <HIDDEN_TRUE>                                                     {this.setValue(_group, "hidden",                                true);} )

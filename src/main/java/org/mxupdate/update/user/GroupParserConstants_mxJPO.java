@@ -11,37 +11,39 @@ interface GroupParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int DESCRIPTION = 5;
+  int SYMBOLICNAME = 5;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 6;
+  int DESCRIPTION = 6;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 7;
+  int HIDDEN_TRUE = 7;
   /** RegularExpression Id. */
-  int PARENT = 8;
+  int HIDDEN_FALSE = 8;
   /** RegularExpression Id. */
-  int SITE = 9;
+  int PARENT = 9;
   /** RegularExpression Id. */
-  int STRING = 14;
+  int SITE = 10;
   /** RegularExpression Id. */
-  int SINGLE = 15;
+  int STRING = 15;
   /** RegularExpression Id. */
-  int APOSTROPHE = 16;
+  int SINGLE = 16;
   /** RegularExpression Id. */
-  int CHAR = 17;
+  int APOSTROPHE = 17;
   /** RegularExpression Id. */
-  int PROPERTY = 18;
+  int CHAR = 18;
   /** RegularExpression Id. */
-  int PROPERTYTO = 19;
+  int PROPERTY = 19;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 20;
+  int PROPERTYTO = 20;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 25;
+  int PROPERTYVAL = 21;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 26;
+  int ADMINTYPE_STRING = 26;
   /** RegularExpression Id. */
-  int ADMINTYPE_APOSTROPHE = 27;
+  int ADMINTYPE_SINGLE = 27;
   /** RegularExpression Id. */
-  int ADMINTYPE_CHAR = 28;
+  int ADMINTYPE_APOSTROPHE = 28;
+  /** RegularExpression Id. */
+  int ADMINTYPE_CHAR = 29;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -57,6 +59,7 @@ interface GroupParserConstants_mxJPO {
     "\"\\r\"",
     "\"\\t\"",
     "\"\\n\"",
+    "\"symbolicname\"",
     "\"description\"",
     "\"hidden\"",
     "\"!hidden\"",

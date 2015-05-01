@@ -13,25 +13,27 @@
  *
  */
 
-package org.mxupdate.test.ci.user;
+package org.mxupdate.test.test.update.user;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ci.user.AbstractUserTest;
 import org.mxupdate.test.data.system.SiteData;
 import org.mxupdate.test.data.user.GroupData;
+import org.mxupdate.update.user.Group_mxJPO;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test cases for the export and update of groups.
+ * Tests the {@link Group_mxJPO group CI} export / update.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class GroupTest
+public class GroupCI_3UpdateTest
     extends AbstractUserTest<GroupData>
 {
     /**
