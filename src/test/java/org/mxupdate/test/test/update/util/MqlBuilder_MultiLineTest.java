@@ -31,7 +31,7 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-public class MqlBuilderTest
+public class MqlBuilder_MultiLineTest
     extends AbstractTest
 {
     /**
@@ -72,7 +72,7 @@ public class MqlBuilderTest
         final TypeData type = new TypeData(this, "name");
         type.create();
 
-        MqlBuilder_mxJPO.init()
+        MqlBuilder_mxJPO.multiLineMql()
             .newLine()
             .cmd("escape mod type ").arg(AbstractTest.PREFIX + "name").cmd(" description ").arg(_descr)
             .exec(this.getContext());
@@ -97,7 +97,7 @@ public class MqlBuilderTest
         final TypeData type = new TypeData(this, "name");
         type.create();
 
-        MqlBuilder_mxJPO.init()
+        MqlBuilder_mxJPO.multiLineMql()
             .newLine()
             .cmd("escape print context")
             .exec(this.getContext());
@@ -113,7 +113,7 @@ public class MqlBuilderTest
     public void negativeTestNonExistingCommand()
         throws Exception
     {
-        MqlBuilder_mxJPO.init()
+        MqlBuilder_mxJPO.multiLineMql()
             .newLine()
             .cmd("escape mod ddd")
             .exec(this.getContext());
@@ -130,7 +130,7 @@ public class MqlBuilderTest
     public void negativeTestCommandWOEscape()
         throws Exception
     {
-        MqlBuilder_mxJPO.init()
+        MqlBuilder_mxJPO.multiLineMql()
             .newLine()
             .cmd("print context")
             .exec(this.getContext());

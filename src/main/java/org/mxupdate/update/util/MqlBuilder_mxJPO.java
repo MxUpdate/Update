@@ -31,7 +31,7 @@ import matrix.util.MatrixException;
  *
  * @author The MxUpdate Team
  */
-public class MqlBuilder_mxJPO
+public final class MqlBuilder_mxJPO
 {
     // hint: to avoid challenges with backslashes, they are defined directly via character
     /** Regular expression to replace backslashes. */
@@ -43,25 +43,21 @@ public class MqlBuilder_mxJPO
     /** String which will be the target for quotations. */
     private final static String MQL_CONVERT_QUOTATION_TO    = "" + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x0022);
 
-    /** Prefix line for all executed lines. */
-    private final Stack<Line> prefix = new Stack<Line>();
-    /** All lines. */
-    private final List<Line> lines = new ArrayList<Line>();
-    /** Latest appended line. */
-    private Line lastLine;
+    /**
+     * Private constructor to avoid external initialization.
+     */
+    private MqlBuilder_mxJPO()
+    {
+    }
 
     /**
-     * Initializes the MQL builder.
+     * Initializes new single line MQL builder.
      *
-     * @param _prefix   MQL command for the prefix
-     * @param _args     arguments for the MQL command prefix
+     * @return new MQL builder instance
      */
-    private MqlBuilder_mxJPO(final CharSequence _prefix,
-                             final String... _args)
+    public static MqlBuilder mql()
     {
-        this.prefix.push(new Line());
-        this.prefix.peek().cmd.append(_prefix.toString());
-        this.prefix.peek().args.addAll(Arrays.asList(_args));
+        return new MqlBuilder();
     }
 
     /**
@@ -69,9 +65,9 @@ public class MqlBuilder_mxJPO
      *
      * @return new MQL builder instance
      */
-    public static MqlBuilder_mxJPO init()
+    public static MultiLineMqlBuilder multiLineMql()
     {
-        return new MqlBuilder_mxJPO("");
+        return new MultiLineMqlBuilder("");
     }
 
     /**
@@ -81,147 +77,197 @@ public class MqlBuilder_mxJPO
      * @param _args     arguments for the MQL command prefix
      * @return new MQL builder instance
      */
-    public static MqlBuilder_mxJPO init(final CharSequence _prefix,
-                                        final String... _args)
+    public static MultiLineMqlBuilder multiLine(final CharSequence _prefix,
+                                                final String... _args)
     {
-        return new MqlBuilder_mxJPO(_prefix, _args);
+        return new MultiLineMqlBuilder(_prefix, _args);
     }
 
     /**
-     * Defines new prefix.
-     *
-     * @param _prefix   MQL command for the prefix
-     * @param _args     arguments for the MQL command prefix
-     * @return this MQL builder
+     * MQL builder for multi-line MQL statements.
      */
-    public MqlBuilder_mxJPO pushPrefix(final CharSequence _prefix,
-                                       final String... _args)
+    public final static class MultiLineMqlBuilder
     {
-        this.prefix.push(new Line());
-        this.prefix.peek().cmd.append(_prefix.toString());
-        this.prefix.peek().args.addAll(Arrays.asList(_args));
-        return this;
-    }
+        /** Prefix line for all executed lines. */
+        private final Stack<MqlBuilder> prefix = new Stack<MqlBuilder>();
+        /** All lines. */
+        private final List<MqlBuilder> lines = new ArrayList<MqlBuilder>();
+        /** Latest appended line. */
+        private MqlBuilder lastLine;
 
-    /**
-     * Defines new prefix by appending further definition to previous prefix.
-     *
-     * @param _prefix   MQL command for the prefix
-     * @param _args     arguments for the MQL command prefix
-     * @return this MQL builder
-     */
-    public MqlBuilder_mxJPO pushPrefixByAppending(final CharSequence _prefix,
-                                                  final String... _args)
-    {
-        final Line prev = this.prefix.peek();
-
-        this.prefix.push(new Line());
-        this.prefix.peek().cmd.append(prev.cmd).append(' ').append(_prefix.toString());
-        this.prefix.peek().args.addAll(prev.args);
-        this.prefix.peek().args.addAll(Arrays.asList(_args));
-        return this;
-    }
-
-    /**
-     * Removes the latest prefix definition back the prefix defined before the
-     * latest.
-     *
-     * @return this MQL builder
-     */
-    public MqlBuilder_mxJPO popPrefix()
-    {
-        this.prefix.pop();
-        return this;
-    }
-
-    /**
-     * Returns the size of the arguments for the latest line.
-     *
-     * @return size of latest arguments
-     */
-    public int argSize()
-    {
-        return this.lastLine.args.size();
-    }
-
-    /**
-     * Appends a new line to the MQL builder.
-     *
-     * @return this MQL builder
-     */
-    public MqlBuilder_mxJPO newLine()
-    {
-        this.lastLine = new Line();
-        if ((this.prefix.peek().cmd.length() > 0) && !this.prefix.peek().args.isEmpty())  {
-            this.lastLine.cmd.append(this.prefix.peek().cmd).append(' ');
-            this.lastLine.args.addAll(this.prefix.peek().args);
+        /**
+         * Initializes the multi-line MQL builder.
+         *
+         * @param _prefix   MQL command for the prefix
+         * @param _args     arguments for the MQL command prefix
+         */
+        private MultiLineMqlBuilder(final CharSequence _prefix,
+                                 final String... _args)
+        {
+            this.prefix.push(new MqlBuilder());
+            this.prefix.peek().cmd.append(_prefix.toString());
+            this.prefix.peek().args.addAll(Arrays.asList(_args));
         }
-        this.lines.add(this.lastLine);
-        return this;
-    }
 
-    /**
-     * Appends given MQL command and arguments to latest line.
-     *
-     * @param _cmd      MQL command line to append
-     * @return this MQL builder
-     */
-    public MqlBuilder_mxJPO cmd(final CharSequence _cmd)
-    {
-        this.lastLine.cmd.append(_cmd);
-        return this;
-    }
+        /**
+         * Defines new prefix.
+         *
+         * @param _prefix   MQL command for the prefix
+         * @param _args     arguments for the MQL command prefix
+         * @return this MQL builder
+         */
+        public MultiLineMqlBuilder pushPrefix(final CharSequence _prefix,
+                                              final String... _args)
+        {
+            this.prefix.push(new MqlBuilder());
+            this.prefix.peek().cmd.append(_prefix.toString());
+            this.prefix.peek().args.addAll(Arrays.asList(_args));
+            return this;
+        }
 
-    /**
-     * Appends given MQL command and arguments to latest line.
-     *
-     * @param _cmd      MQL command line to append
-     * @param _args     arguments for the MQL command line (if {@code null}, an
-     *                  empty string is defined!
-     * @return this MQL builder
-     */
-    public MqlBuilder_mxJPO arg(final String _argument)
-    {
-        this.lastLine.cmd.append("$").append(this.argSize() + 1);
-        this.lastLine.args.add((_argument != null) ? _argument : "");
-        return this;
-    }
+        /**
+         * Defines new prefix by appending further definition to previous prefix.
+         *
+         * @param _prefix   MQL command for the prefix
+         * @param _args     arguments for the MQL command prefix
+         * @return this MQL builder
+         */
+        public MultiLineMqlBuilder pushPrefixByAppending(final CharSequence _prefix,
+                                                         final String... _args)
+        {
+            final MqlBuilder prev = this.prefix.peek();
 
-    /**
-     * Executes all lines of the MQL builder.
-     *
-     * @param _paramCache       parameter cache with the context
-     * @throws MatrixException if execute failed
-     */
-    public void exec(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
-    {
-        this.exec(_paramCache.getContext());
-    }
+            this.prefix.push(new MqlBuilder());
+            this.prefix.peek().cmd.append(prev.cmd).append(' ').append(_prefix.toString());
+            this.prefix.peek().args.addAll(prev.args);
+            this.prefix.peek().args.addAll(Arrays.asList(_args));
+            return this;
+        }
 
-    /**
-     * Executes all lines of the MQL builder.
-     *
-     * @param _paramCache       parameter cache with the context
-     * @throws MatrixException if execute failed
-     */
-    public void exec(final Context _context)
-        throws MatrixException
-    {
-        for (final Line line : this.lines)  {
-            line.exec(_context);
+        /**
+         * Removes the latest prefix definition back the prefix defined before the
+         * latest.
+         *
+         * @return this MQL builder
+         */
+        public MultiLineMqlBuilder popPrefix()
+        {
+            this.prefix.pop();
+            return this;
+        }
+
+        /**
+         * Appends a new line to the MQL builder.
+         *
+         * @return this MQL builder
+         */
+        public MultiLineMqlBuilder newLine()
+        {
+            this.lastLine = new MqlBuilder();
+            if ((this.prefix.peek().cmd.length() > 0) && !this.prefix.peek().args.isEmpty())  {
+                this.lastLine.cmd.append(this.prefix.peek().cmd).append(' ');
+                this.lastLine.args.addAll(this.prefix.peek().args);
+            }
+            this.lines.add(this.lastLine);
+            return this;
+        }
+
+        /**
+         * Appends given MQL command and arguments to latest line.
+         *
+         * @param _cmd      MQL command line to append
+         * @return this MQL builder
+         */
+        public MultiLineMqlBuilder cmd(final CharSequence _cmd)
+        {
+            this.lastLine.cmd(_cmd);
+            return this;
+        }
+
+        /**
+         * Appends given MQL command and arguments to latest line.
+         *
+         * @param _cmd      MQL command line to append
+         * @param _args     arguments for the MQL command line (if {@code null}, an
+         *                  empty string is defined!
+         * @return this MQL builder
+         */
+        public MultiLineMqlBuilder arg(final String _argument)
+        {
+            this.lastLine.arg(_argument);
+            return this;
+        }
+
+        /**
+         * Executes all lines of the MQL builder.
+         *
+         * @param _paramCache       parameter cache with the context
+         * @throws MatrixException if execute failed
+         */
+        public void exec(final ParameterCache_mxJPO _paramCache)
+            throws MatrixException
+        {
+            this.exec(_paramCache.getContext());
+        }
+
+        /**
+         * Executes all lines of the MQL builder.
+         *
+         * @param _paramCache       parameter cache with the context
+         * @throws MatrixException if execute failed
+         */
+        public void exec(final Context _context)
+            throws MatrixException
+        {
+            for (final MqlBuilder line : this.lines)  {
+                line.exec(_context);
+            }
         }
     }
 
     /**
      * Handles one MQL line.
      */
-    private static class Line
+    public final static class MqlBuilder
     {
         /** MQL line. */
         private final StringBuilder cmd = new StringBuilder();
         /** Arguments of the line. */
         final List<String> args = new ArrayList<String>();
+
+        /**
+         * Private constructor to avoid external initialization.
+         */
+        private MqlBuilder()
+        {
+        }
+
+        /**
+         * Appends given MQL command and arguments to latest line.
+         *
+         * @param _cmd      MQL command line to append
+         * @return this MQL builder
+         */
+        public MqlBuilder cmd(final CharSequence _cmd)
+        {
+            this.cmd.append(_cmd);
+            return this;
+        }
+
+        /**
+         * Appends given MQL command and arguments to latest line.
+         *
+         * @param _cmd      MQL command line to append
+         * @param _args     arguments for the MQL command line (if {@code null}, an
+         *                  empty string is defined!
+         * @return this MQL builder
+         */
+        public MqlBuilder arg(final String _argument)
+        {
+            this.cmd.append("$").append(this.args.size() + 1);
+            this.args.add((_argument != null) ? _argument : "");
+            return this;
+        }
 
         /**
          * Executes given MQL command.
@@ -230,7 +276,7 @@ public class MqlBuilder_mxJPO
          * @return trimmed result of the MQL execution
          * @throws MatrixException if MQL execution failed
          */
-        private String exec(final Context _context)
+        public String exec(final Context _context)
             throws MatrixException
         {
             if (!this.cmd.toString().startsWith("escape"))  {

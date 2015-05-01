@@ -33,6 +33,7 @@ import org.mxupdate.update.datamodel.attribute.AttributeDefParser_mxJPO;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
@@ -464,7 +465,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        MqlBuilder_mxJPO.init()
+        MqlBuilder_mxJPO.multiLineMql()
                 .newLine()
                 .cmd("escape add ").cmd(this.getTypeDef().getMxAdminName()).cmd(" ").arg(this.getName()).cmd(" type ").cmd(this.attrTypeCreate)
                 .exec(_paramCache);
@@ -546,7 +547,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
             @SuppressWarnings("unchecked")
             final CLASS attribute = (CLASS) parser.attribute(_paramCache, this.getTypeDef(), this.getName());
 
-            final MqlBuilder_mxJPO mql = MqlBuilder_mxJPO.init("escape mod attribute $1", this.getName());
+            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod attribute $1", this.getName());
 
             this.calcDelta(_paramCache, mql, attribute);
 
@@ -569,7 +570,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
      *                      be lost)
      */
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MqlBuilder_mxJPO _mql,
+                             final MultiLineMqlBuilder _mql,
                              final CLASS _target)
         throws UpdateException_mxJPO
     {
@@ -596,9 +597,9 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         }
         DeltaUtil_mxJPO.calcListDelta(_mql, "rule", target.rules, this.rules);
 
-        target.triggers.calcDelta(this.triggers, _mql);
-        target.rangesSorted.calcDelta(this.rangesSorted, _mql);
-        target.getProperties().calcDelta("", this.getProperties(), _mql);
+        target.triggers.calcDelta(_mql, this.triggers);
+        target.rangesSorted.calcDelta(_mql, this.rangesSorted);
+        target.getProperties().calcDelta(_mql, "", this.getProperties());
     }
 
     /**
@@ -753,11 +754,11 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
          * Calculates the delta between {@code _currents} range definition and
          * this target range definitions.
          *
-         * @param _currents current ranges
          * @param _mql      MQL builder to append the delta
+         * @param _currents current ranges
          */
-        protected void calcDelta(final Ranges _currents,
-                                 final MqlBuilder_mxJPO _mql)
+        protected void calcDelta(final MultiLineMqlBuilder _mql,
+                                 final Ranges _currents)
         {
             // remove obsolete ranges
             for (final Range current : _currents)  {

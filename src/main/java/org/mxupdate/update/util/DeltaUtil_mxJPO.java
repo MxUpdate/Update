@@ -17,6 +17,8 @@ package org.mxupdate.update.util;
 
 import java.util.Set;
 
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
+
 /**
  * The JPO class holds utilities for calculating delta's.
  *
@@ -41,7 +43,7 @@ public final class DeltaUtil_mxJPO
      * @param _newVal   new target value
      * @param _curVal   current value in the database
      */
-    public static void calcValueDelta(final MqlBuilder_mxJPO _mql,
+    public static void calcValueDelta(final MultiLineMqlBuilder _mql,
                                       final String _kind,
                                       final String _newVal,
                                       final String _curVal)
@@ -87,7 +89,7 @@ public final class DeltaUtil_mxJPO
      * @param _newVal   new target value
      * @param _curVal   current value in the database
      */
-    public static void calcFlagDelta(final MqlBuilder_mxJPO _mql,
+    public static void calcFlagDelta(final MultiLineMqlBuilder _mql,
                                      final String _kind,
                                      final boolean _newVal,
                                      final Boolean _curVal)
@@ -133,7 +135,7 @@ public final class DeltaUtil_mxJPO
      * @param _new      new target values
      * @param _current  current values in MX
      */
-    public static void calcListDelta(final MqlBuilder_mxJPO _mql,
+    public static void calcListDelta(final MultiLineMqlBuilder _mql,
                                      final String _kind,
                                      final Set<String> _new,
                                      final Set<String> _current)

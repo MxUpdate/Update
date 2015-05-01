@@ -40,6 +40,7 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -463,7 +464,7 @@ public class Policy_mxJPO
             final PolicyDefParser_mxJPO parser = new PolicyDefParser_mxJPO(new StringReader(code));
             final Policy_mxJPO policy = parser.policy(_paramCache, this.getTypeDef(), _args[1]);
 
-            final MqlBuilder_mxJPO mql = MqlBuilder_mxJPO.init("escape mod policy $1", this.getName());
+            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod policy $1", this.getName());
 
             // creates policy if done within update
             if (this.updateWithCreate)  {
@@ -546,7 +547,7 @@ public class Policy_mxJPO
             this.calcStatesDelta(_paramCache, mql, policy);
 
             // properties
-            policy.getProperties().calcDelta("", this.getProperties(), mql);
+            policy.getProperties().calcDelta(mql, "", this.getProperties());
 
             mql.exec(_paramCache);
         }
@@ -562,7 +563,7 @@ public class Policy_mxJPO
      * @throws Exception if calculation of the delta failed
      */
     protected void calcAllStateAccess(final ParameterCache_mxJPO _paramCache,
-                                      final MqlBuilder_mxJPO _mql,
+                                      final MultiLineMqlBuilder _mql,
                                       final Policy_mxJPO _newPolicy)
         throws Exception
     {
@@ -591,7 +592,7 @@ public class Policy_mxJPO
      * @throws Exception if calculation of the delta failed
      */
     protected void calcStatesDelta(final ParameterCache_mxJPO _paramCache,
-                                   final MqlBuilder_mxJPO _mql,
+                                   final MultiLineMqlBuilder _mql,
                                    final Policy_mxJPO _newPolicy)
         throws Exception
     {
@@ -944,7 +945,7 @@ throw new Exception("some states are not defined anymore!");
          * @throws IOException if write failed
          */
         protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                                 final MqlBuilder_mxJPO _mql,
+                                 final MultiLineMqlBuilder _mql,
                                  final State _oldState)
             throws IOException
         {
@@ -991,7 +992,7 @@ throw new Exception("some states are not defined anymore!");
             this.update(_mql);
 
             // triggers
-            this.triggers.calcDelta((_oldState != null) ? _oldState.triggers : null, _mql);
+            this.triggers.calcDelta(_mql, (_oldState != null) ? _oldState.triggers : null);
 
             // signatures
             final Set<String> newSigs = new HashSet<String>();
@@ -1023,7 +1024,7 @@ throw new Exception("some states are not defined anymore!");
             }
 
             // properties
-            this.properties.calcDelta("state", (_oldState != null) ? _oldState.properties : null, _mql);
+            this.properties.calcDelta(_mql, "state", (_oldState != null) ? _oldState.properties : null);
         }
     }
 
@@ -1087,7 +1088,7 @@ throw new Exception("some states are not defined anymore!");
          * @param _oldSignature old signature to compare
          * @throws IOException if the delta could not appended
          */
-        protected void calcDelta(final MqlBuilder_mxJPO _mql,
+        protected void calcDelta(final MultiLineMqlBuilder _mql,
                                  final Signature _oldSignature)
             throws IOException
         {

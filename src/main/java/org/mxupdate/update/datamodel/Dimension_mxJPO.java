@@ -34,6 +34,7 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -355,7 +356,7 @@ public class Dimension_mxJPO
             final DimensionDefParser_mxJPO parser = new DimensionDefParser_mxJPO(new StringReader(code));
             final Dimension_mxJPO dimension = parser.dimension(_paramCache, this.getTypeDef(), this.getName());
 
-            final MqlBuilder_mxJPO mql = MqlBuilder_mxJPO.init("escape mod dimension $1", this.getName());
+            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod dimension $1", this.getName());
 
             // basic information
             DeltaUtil_mxJPO.calcValueDelta(mql, "description", dimension.getDescription(), this.getDescription());
@@ -400,7 +401,7 @@ public class Dimension_mxJPO
             }
 
             // properties
-            dimension.getProperties().calcDelta("", this.getProperties(), mql);
+            dimension.getProperties().calcDelta(mql, "", this.getProperties());
 
             mql.exec(_paramCache);
         }
@@ -516,7 +517,7 @@ public class Dimension_mxJPO
          */
         protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                                  final Unit _current,
-                                 final MqlBuilder_mxJPO _mql)
+                                 final MultiLineMqlBuilder _mql)
             throws UpdateException_mxJPO
         {
             _mql.pushPrefixByAppending("modify unit $2", this.name);
@@ -599,7 +600,7 @@ public class Dimension_mxJPO
             }
 
             // delta for properties
-            this.properties.calcDelta("", (_current != null) ? _current.properties : null, _mql);
+            this.properties.calcDelta(_mql, "", (_current != null) ? _current.properties : null);
 
             _mql.popPrefix();
         }

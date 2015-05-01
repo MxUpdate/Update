@@ -27,6 +27,7 @@ import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.format.FormatDefParser_mxJPO;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -274,7 +275,7 @@ public class Format_mxJPO
             final FormatDefParser_mxJPO parser = new FormatDefParser_mxJPO(new StringReader(code));
             final Format_mxJPO format = parser.format(_paramCache, this.getTypeDef(), this.getName());
 
-            final MqlBuilder_mxJPO mql = MqlBuilder_mxJPO.init("escape mod format $1", this.getName());
+            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod format $1", this.getName());
 
             this.calcDelta(_paramCache, mql, format);
 
@@ -297,7 +298,7 @@ public class Format_mxJPO
      *                      be lost)
      */
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MqlBuilder_mxJPO _mql,
+                             final MultiLineMqlBuilder _mql,
                              final Format_mxJPO _target)
         throws UpdateException_mxJPO
     {
@@ -324,6 +325,6 @@ public class Format_mxJPO
             }
         }
 
-        _target.getProperties().calcDelta("", this.getProperties(), _mql);
+        _target.getProperties().calcDelta(_mql, "", this.getProperties());
     }
 }

@@ -24,6 +24,7 @@ import java.util.TreeSet;
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 
 /**
  *
@@ -202,14 +203,14 @@ public class AdminPropertyList_mxJPO
      * Calculates the delta between current properties definition and this
      * properties definitions.
      *
+     * @param _mql          MQL builder to append the delta
      * @param _propPrefix   prefix before the property command (e.g. to define
      *                      state properties)
      * @param _current      current properties
-     * @param _mql          MQL builder to append the delta
      */
-    public void calcDelta(final String _propPrefix,
-                          final AdminPropertyList_mxJPO _currents,
-                          final MqlBuilder_mxJPO _mql)
+    public void calcDelta(final MultiLineMqlBuilder _mql,
+                          final String _propPrefix,
+                          final AdminPropertyList_mxJPO _currents)
     {
         // check properties to remove
         if (_currents != null)  {

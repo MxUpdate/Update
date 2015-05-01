@@ -19,7 +19,7 @@ import java.io.IOException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.UpdateException_mxJPO;
@@ -118,7 +118,7 @@ public class AttributeString_mxJPO
      */
     @Override()
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MqlBuilder_mxJPO _mql,
+                             final MultiLineMqlBuilder _mql,
                              final AttributeString_mxJPO _target)
         throws UpdateException_mxJPO
     {

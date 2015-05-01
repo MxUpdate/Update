@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
@@ -333,7 +333,7 @@ public class AccessList_mxJPO
      *
      * @param _mql  MQL builder
      */
-    public void cleanup(final MqlBuilder_mxJPO _mql)
+    public void cleanup(final MultiLineMqlBuilder _mql)
     {
         // to ensure that public / owner filters are removed:
         // define them first with empty filter and remove them afterwards
@@ -366,7 +366,7 @@ public class AccessList_mxJPO
      * @param _mql              mql builder
      * @throws IOException if write failed
      */
-    public void update(final MqlBuilder_mxJPO _mql)
+    public void update(final MultiLineMqlBuilder _mql)
         throws IOException
     {
         // append all new access definitions

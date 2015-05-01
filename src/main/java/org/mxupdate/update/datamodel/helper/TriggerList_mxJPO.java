@@ -22,7 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
@@ -133,11 +133,11 @@ public class TriggerList_mxJPO
      * Calculates the delta between current trigger definition and this
      * target trigger definitions.
      *
-     * @param _currents current triggers
      * @param _mql      MQL builder to append the delta
+     * @param _currents current triggers
      */
-    public void calcDelta(final TriggerList_mxJPO _currents,
-                          final MqlBuilder_mxJPO _mql)
+    public void calcDelta(final MultiLineMqlBuilder _mql,
+                          final TriggerList_mxJPO _currents)
     {
         // remove obsolete triggers
         if (_currents != null)  {
