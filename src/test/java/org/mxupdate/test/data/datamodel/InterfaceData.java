@@ -18,7 +18,6 @@ package org.mxupdate.test.data.datamodel;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.AbstractTest.CI;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.util.DataList;
@@ -68,7 +67,7 @@ public class InterfaceData
      */
     public InterfaceData addAllTypes()
     {
-        this.fors.addAll(CI.DM_TYPE);
+        this.fors.addAll("type");
         return this;
     }
 
@@ -95,7 +94,7 @@ public class InterfaceData
      */
     public InterfaceData addAllRelationships()
     {
-        this.fors.addAll(CI.DM_RELATIONSHIP);
+        this.fors.addAll("relationship");
         return this;
     }
 

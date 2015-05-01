@@ -27,7 +27,7 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-public class PolicyCI_4AllState_Test
+public class PolicyCI_5AllState_Test
     extends AbstractPolicyTest
 {
     /**

@@ -16,37 +16,39 @@
 package org.mxupdate.test.test.update.datamodel;
 
 import org.mxupdate.test.data.datamodel.PolicyData;
-import org.mxupdate.test.data.datamodel.PolicyData.AllState;
+import org.mxupdate.test.data.datamodel.PolicyData.State;
 import org.mxupdate.test.data.datamodel.helper.Access;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link Policy_mxJPO policy CI} allstate access export / update.
+ * Tests the {@link Policy_mxJPO policy CI} state export / update.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class PolicyCI_4AllStateAccessTest
+public class PolicyCI_6StateAccessTest
     extends AbstractPolicy_AccessTest
 {
     /**
-     * Returns text string &quot;policy with allstate&quot;.
+     * Returns text string &quot;policy with state&quot;.
      */
     @Override()
     public String getDescriptionPrefix()
     {
-        return "policy with allstate";
+        return "policy with state";
     }
 
     /**
-     * A new policy with allstate for the {@code _accesss} is defined.
+     * A new policy with one new state with the access list {@code _accesss} is
+     * defined.
      */
     @Override()
     public PolicyData createTestData4Access(final Access... _accesss)
     {
         return new PolicyData(this, "test")
-                .setAllState(new AllState()
+                .addState(new State()
+                        .setName("create")
                         .addAccess(_accesss));
     }
 }

@@ -18,10 +18,8 @@ package org.mxupdate.test.data.datamodel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -47,16 +45,6 @@ import org.testng.Assert;
 public class PolicyData
     extends AbstractAdminData<PolicyData>
 {
-    /** Are all types assigned? */
-    private boolean allTypes = false;
-    /** All defined types for this policy. */
-    private final Set<TypeData> types = new HashSet<TypeData>();
-
-    /** Are all formats assigned? */
-    private boolean allFormats = false;
-    /** All defined formats for this policy. */
-    private final Set<FormatData> formats = new HashSet<FormatData>();
-
     /** Access for all states. */
     private AllState allState;
 
@@ -74,80 +62,6 @@ public class PolicyData
                       final String _name)
     {
         super(_test, AbstractTest.CI.DM_POLICY, _name);
-    }
-
-    /**
-     * Defines if all types are allowed for this policy.
-     *
-     * @param _allTypes     new value
-     * @return this policy data instance
-     * @see #allTypes
-     */
-    public PolicyData setAllTypes(final boolean _allTypes)
-    {
-        this.allTypes = _allTypes;
-        return this;
-    }
-
-    /**
-     * Appends given <code>_types</code> to the list of all {@link #types}.
-     *
-     * @param _types    type instances to append
-     * @return this instance
-     * @see #types
-     */
-    public PolicyData appendTypes(final TypeData... _types)
-    {
-        this.types.addAll(Arrays.asList(_types));
-        return this;
-    }
-
-    /**
-     * Returns all {@link #types} of this policy.
-     *
-     * @return all assigned types
-     * @see #types
-     */
-    public Set<TypeData> getTypes()
-    {
-        return this.types;
-    }
-
-    /**
-     * Defines if all types are allowed for this policy.
-     *
-     * @param _allFormats     new value
-     * @return this policy data instance
-     * @see #allFormats
-     */
-    public PolicyData setAllFormats(final boolean _allFormats)
-    {
-        this.allFormats = _allFormats;
-        return this;
-    }
-
-    /**
-     * Appends given <code>_formats</code> to the list of all {@link #formats}.
-     *
-     * @param _formats    format instances to append
-     * @return this instance
-     * @see #formats
-     */
-    public PolicyData appendFormats(final FormatData... _formats)
-    {
-        this.formats.addAll(Arrays.asList(_formats));
-        return this;
-    }
-
-    /**
-     * Returns all {@link #formats} of this policy.
-     *
-     * @return all assigned formats
-     * @see #formats
-     */
-    public Set<FormatData> getFormats()
-    {
-        return this.formats;
     }
 
     /**
@@ -199,32 +113,12 @@ public class PolicyData
         strg.append("mxUpdate policy \"${NAME}\" {\n")
             .append("    hidden \"").append(this.getFlags().getValue("hidden") != null ? this.getFlags().getValue("hidden") : false).append("\"\n");
 
+        this.getFlags()     .append4Update("    ", strg);
         this.getValues()    .append4Update("    ", strg);
         this.getSingles()   .append4Update("    ", strg);
-        this.getFlags()     .append4Update("    ", strg);
+        this.getKeyValues() .append4Update("    ", strg);
+        this.getDatas()     .append4Update("    ", strg);
         this.getProperties().append4Update("    ", strg);
-
-        // type definition
-        if (this.allTypes)  {
-            strg.append("    type all\n");
-        } else if (!this.types.isEmpty()) {
-            final List<String> typeNames = new ArrayList<String>();
-            for (final TypeData type : this.types)  {
-                typeNames.add(type.getName());
-            }
-            strg.append("    type {").append(AbstractTest.convertUpdate(true, typeNames, null)).append("}\n");
-        }
-
-        // format definition
-        if (this.allFormats)  {
-            strg.append("    format all\n");
-        } else if (!this.formats.isEmpty()) {
-            final List<String> formatNames = new ArrayList<String>();
-            for (final FormatData format : this.formats)  {
-                formatNames.add(format.getName());
-            }
-            strg.append("    format {").append(AbstractTest.convertUpdate(true, formatNames, null)).append("}\n");
-        }
 
         if (this.allState != null)  {
             this.allState.append4CIFile(strg);
@@ -259,37 +153,11 @@ public class PolicyData
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add policy \"").append(AbstractTest.convertMql(this.getName())).append('\"');
 
-            // assign types
-            if (this.allTypes)  {
-                cmd.append(" type all ");
-            } else if (!this.types.isEmpty()) {
-                final List<String> typeNames = new ArrayList<String>();
-                for (final TypeData type : this.types)  {
-                    typeNames.add(type.getName());
-                    type.create();
-                }
-                cmd.append(" type ").append(AbstractTest.convertMql(',', true, typeNames, null));
-            }
-
-            // assign formats / enforce flag
-            if (this.allFormats)  {
-                cmd.append(" format all ");
-            } else if (!this.formats.isEmpty()) {
-                final List<String> formatNames = new ArrayList<String>();
-                for (final FormatData format : this.formats)  {
-                    formatNames.add(format.getName());
-                    format.create();
-                }
-                cmd.append(" format ").append(AbstractTest.convertMql(',', true, formatNames, null));
-            }
-
-            this.getFlags().append4Create(cmd);
+            this.append4Create(cmd);
 
             if (this.allState != null)  {
                 this.allState.append4Create(cmd);
             }
-
-            this.append4Create(cmd);
 
             // append state information
             for (final State state : this.states)
@@ -322,14 +190,6 @@ public class PolicyData
     {
         super.createDependings();
 
-        // create assigned types
-        for (final TypeData type : this.types)  {
-            type.create();
-        }
-        // create assigned formats
-        for (final FormatData format : this.formats)  {
-            format.create();
-        }
         // create assigned users
         if (this.allState != null)  {
             for (final Access access : this.allState.access)  {
@@ -359,32 +219,6 @@ public class PolicyData
     public void checkExport(final ExportParser _exportParser)
     {
         super.checkExport(_exportParser);
-
-        // check for types
-        if (this.allTypes)  {
-            this.checkSingleValue(_exportParser, "all types", "type", "all");
-        } else if (!this.types.isEmpty()) {
-            final Set<String> typeNames = new TreeSet<String>();
-            for (final TypeData type : this.types)  {
-                typeNames.add(type.getName());
-            }
-            this.checkSingleValue(_exportParser, "types", "type", "{" + AbstractTest.convertUpdate(true, typeNames, null) + "}");
-        } else  {
-            this.checkSingleValue(_exportParser, "types", "type", "{}");
-        }
-
-        // check for formats
-        if (this.allFormats)  {
-            this.checkSingleValue(_exportParser, "all formats", "format", "all");
-        } else if (!this.formats.isEmpty()) {
-            final Set<String> formatNames = new TreeSet<String>();
-            for (final FormatData format : this.formats)  {
-                formatNames.add(format.getName());
-            }
-            this.checkSingleValue(_exportParser, "formats", "format", "{" + AbstractTest.convertUpdate(true, formatNames, null) + "}");
-        } else  {
-            this.checkSingleValue(_exportParser, "formats", "format", "{}");
-        }
 
         // check for all state flag
         if (this.allState == null)  {

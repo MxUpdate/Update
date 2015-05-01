@@ -40,7 +40,7 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-public class PolicyCI_2UpdateTest
+public class PolicyCI_3UpdateTest
     extends AbstractPolicyTest
 {
     /** Name of test policy. */
@@ -51,11 +51,11 @@ public class PolicyCI_2UpdateTest
               "################################################################################\n"
             + "# POLICY:\n"
             + "# ~~~~~~~\n"
-            + "# " + PolicyCI_2UpdateTest.POLICY_NAME + "\n"
+            + "# " + PolicyCI_3UpdateTest.POLICY_NAME + "\n"
             + "#\n"
             + "# SYMBOLIC NAME:\n"
             + "# ~~~~~~~~~~~~~~\n"
-            + "# policy_" + PolicyCI_2UpdateTest.POLICY_NAME + "\n"
+            + "# policy_" + PolicyCI_3UpdateTest.POLICY_NAME + "\n"
             + "#\n"
             + "# DESCRIPTION:\n"
             + "# ~~~~~~~~~~~~\n"
@@ -174,57 +174,53 @@ public class PolicyCI_2UpdateTest
 
                 new Object[]{
                         "issue #119: policy with default format",
-                        new PolicyData(this, "hello \" test")
-                                .setValue("defaultformat", "generic")},
+                        new PolicyData(this, "hello \" test").setValue("defaultformat", "generic")},
 
                 new Object[]{
                         "policy with store",
-                        new PolicyData(this, "hello \" test")
-                                .setValue("store", "STORE")},
+                        new PolicyData(this, "hello \" test").setValue("store", "STORE")},
 
                 new Object[]{
                         "policy with default hidden flag",
-                        new PolicyData(this, "hello \" test")
-                                .setFlag("hidden", null)},
+                        new PolicyData(this, "hello \" test").setFlag("hidden", null),
+                        new PolicyData(this, "hello \" test").setFlag("hidden", false)},
                 new Object[]{
                         "policy with hidden flag false",
-                        new PolicyData(this, "hello \" test")
-                                .setFlag("hidden", false)},
+                        new PolicyData(this, "hello \" test").setFlag("hidden", false)},
                 new Object[]{
                         "policy with hidden flag true",
-                        new PolicyData(this, "hello \" test")
-                                .setFlag("hidden", true)},
+                        new PolicyData(this, "hello \" test").setFlag("hidden", true)},
 
                 // issue 30
                 new Object[]{
                         "issue #30, #120: policy with all types",
                         new PolicyData(this, "hello \" test")
-                                .setAllTypes(true)},
+                                .defDataAll("type")},
 
                 // issue 86
                 new Object[]{
                         "issue #86: policy with one type",
                         new PolicyData(this, "hello \" test")
-                                .appendTypes(new TypeData(this, "Type \"Test\""))},
+                                .defData("type", new TypeData(this, "Type \"Test\""))},
                 new Object[]{
                         "issue #86: policy with two type",
                         new PolicyData(this, "hello \" test")
-                                .appendTypes(new TypeData(this, "Type \"Test\" 1"))
-                                .appendTypes(new TypeData(this, "Type \"Test\" 2"))},
+                                .defData("type", new TypeData(this, "Type \"Test\" 1"))
+                                .defData("type", new TypeData(this, "Type \"Test\" 2"))},
 
                 new Object[]{
                         "issue #86, #121: policy with all formats",
                         new PolicyData(this, "hello \" test")
-                                .setAllFormats(true)},
+                                .defDataAll("format")},
                 new Object[]{
                         "issue #86: policy with one format",
                         new PolicyData(this, "hello \" test")
-                                .appendFormats(new FormatData(this, "Type \"Test\""))},
+                                .defData("format", new FormatData(this, "Type \"Test\""))},
                 new Object[]{
                         "issue #86: policy with two formats",
                         new PolicyData(this, "hello \" test")
-                                .appendFormats(new FormatData(this, "Type \"Test\" 1"))
-                                .appendFormats(new FormatData(this, "Type \"Test\" 2"))},
+                                .defData("format", new FormatData(this, "Type \"Test\" 1"))
+                                .defData("format", new FormatData(this, "Type \"Test\" 2"))},
                 // published flag
                 new Object[]{
                         "issue #179: policy state w/o defined published (and will be false)",
@@ -410,14 +406,14 @@ public class PolicyCI_2UpdateTest
     public void testPositiveExportNoPropertyDefinitionForStateSymbolicName()
         throws Exception
     {
-        this.mql("add policy " + PolicyCI_2UpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyCI_3UpdateTest.POLICY_NAME
                 + " state create property state_create value create");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyCI_2UpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyCI_3UpdateTest.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyCI_2UpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyCI_3UpdateTest.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(code.indexOf("mql add property \"state_create\"") < 0,
@@ -435,14 +431,14 @@ public class PolicyCI_2UpdateTest
     public void testPositiveExportAllSymbolicNamesForStatesDefined()
         throws Exception
     {
-        this.mql("add policy " + PolicyCI_2UpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyCI_3UpdateTest.POLICY_NAME
                 + " state create property state_create value create property state_exists value create");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyCI_2UpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyCI_3UpdateTest.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyCI_2UpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyCI_3UpdateTest.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(code.indexOf("registeredName \"state_create\"") >= 0,
@@ -462,14 +458,14 @@ public class PolicyCI_2UpdateTest
     public void testPositiveExportStateSymbolicNameExportedIfNotDefined()
         throws Exception
     {
-        this.mql("add policy " + PolicyCI_2UpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyCI_3UpdateTest.POLICY_NAME
                 + " state create");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyCI_2UpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyCI_3UpdateTest.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyCI_2UpdateTest.POLICY_NAME + ".tcl",
+                            "POLICY_" + PolicyCI_3UpdateTest.POLICY_NAME + ".tcl",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(code.indexOf("registeredName \"state_create\"") >= 0,
@@ -486,7 +482,7 @@ public class PolicyCI_2UpdateTest
     public void testPositiveUpdateFormatAllWithBraces()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, PolicyCI_2UpdateTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
 
         final String updateCode =
             "mxUpdate policy \"${NAME}\" {\n"
@@ -511,7 +507,7 @@ public class PolicyCI_2UpdateTest
     public void testPositiveUpdateFormatAllWithoutBraces()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, PolicyCI_2UpdateTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
 
         final String updateCode =
             "mxUpdate policy \"${NAME}\" {\n"
@@ -536,7 +532,7 @@ public class PolicyCI_2UpdateTest
     public void testPositiveUpdateMultipleStateSymbolicNames()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, PolicyCI_2UpdateTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
 
         policy.updateWithCode(
                     "mxUpdate policy \"${NAME}\" {"
@@ -571,11 +567,11 @@ public class PolicyCI_2UpdateTest
     public void testPositiveUpdateNullProperties()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, PolicyCI_2UpdateTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
 
         this.mql("add policy " + policy.getName() + " state Pending property \"\" value Test");
 
-        policy.updateWithCode(PolicyCI_2UpdateTest.POLICY_UPDATE_CODE, (String) null);
+        policy.updateWithCode(PolicyCI_3UpdateTest.POLICY_UPDATE_CODE, (String) null);
 
         // check that only 11 properties are defined....
         // 4 state properties + installer + installed date + original name +
@@ -602,9 +598,9 @@ public class PolicyCI_2UpdateTest
     public void testPositiveUpdateProperties()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, PolicyCI_2UpdateTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
 
-        policy.updateWithCode(PolicyCI_2UpdateTest.POLICY_UPDATE_CODE, (String) null);
+        policy.updateWithCode(PolicyCI_3UpdateTest.POLICY_UPDATE_CODE, (String) null);
 
         Assert.assertTrue(!"".equals(this.mql("list policy " + policy.getName())),
                           "policy was not created!");
@@ -632,7 +628,7 @@ public class PolicyCI_2UpdateTest
     public void testPositiveUpdateTypeAllWithBraces()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, PolicyCI_2UpdateTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
 
         final String updateCode =
               "mxUpdate policy \"${NAME}\" {\n"
@@ -657,7 +653,7 @@ public class PolicyCI_2UpdateTest
     public void testPositiveUpdateTypeAllWithoutBraces()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, PolicyCI_2UpdateTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
 
         final String updateCode =
             "mxUpdate policy \"${NAME}\" {\n"

@@ -29,7 +29,7 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-public class PolicyCI_3MajorMinorTest
+public class PolicyCI_4MajorMinorTest
     extends AbstractPolicyTest
 {
     /**

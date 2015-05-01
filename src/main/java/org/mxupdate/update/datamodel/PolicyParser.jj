@@ -63,9 +63,11 @@ PARSER_END(PolicyParser)
 
     | <TYPE_ALL:                            "type" ([" ","\t","\n"])+ "all">                : DEFAULT
     | <TYPE_LIST:                           "type" ([" ","\t","\n"])+ "{">                  : LIST_EXPECTED
+    | <TYPE:                                "type">                                         : STRING_EXPECTED
 
     | <FORMAT_ALL:                          "format" ([" ","\t","\n"])+ "all">              : DEFAULT
     | <FORMAT_LIST:                         "format" ([" ","\t","\n"])+ "{">                : LIST_EXPECTED
+    | <FORMAT:                              "format">                                       : STRING_EXPECTED
 
     | <STORE:                               "store">                                        : STRING_EXPECTED
     | <DEFAULTFORMAT:                       "defaultformat">                                : STRING_EXPECTED
@@ -318,13 +320,16 @@ void parse(final Policy_mxJPO _policy)
 
       | ( <FORMAT_ALL>                                                      {this.setValue(_policy, "allFormats",                           true);} )
       | ( <FORMAT_LIST>             ( tmp = <LISTSTRING>                    {this.appendValue(_policy, "formats",                           this.getString(tmp.image));}
-                                    | tmp = <LISTSINGLE>                    {this.appendValue(_policy, "formats",                           this.getSingle(tmp.image));} )*
-                                                    <LISTCLOSE>)
+                                    | tmp = <LISTSINGLE>                    {this.appendValue(_policy, "formats",                           this.getSingle(tmp.image));} )* <LISTCLOSE>)
+      | ( <FORMAT>                  ( tmp = <STRING>                        {this.appendValue(_policy, "formats",                           this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_policy, "formats",                           this.getSingle(tmp.image));} ) )
+
 
       | ( <TYPE_ALL>                                                        {this.setValue(_policy, "allTypes",                             true);} )
       | ( <TYPE_LIST>               ( tmp = <LISTSTRING>                    {this.appendValue(_policy, "types",                             this.getString(tmp.image));}
-                                    | tmp = <LISTSINGLE>                    {this.appendValue(_policy, "types",                             this.getSingle(tmp.image));} )*
-                                                    <LISTCLOSE>)
+                                    | tmp = <LISTSINGLE>                    {this.appendValue(_policy, "types",                             this.getSingle(tmp.image));} )* <LISTCLOSE>)
+      | ( <TYPE>                    ( tmp = <STRING>                        {this.appendValue(_policy, "types",                             this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_policy, "types",                             this.getSingle(tmp.image));} ) )
 
       | ( <DEFAULTFORMAT>           ( tmp = <STRING>                        {this.setValue(_policy, "defaultFormat",                        this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.setValue(_policy, "defaultFormat",                        this.getSingle(tmp.image));} ) )

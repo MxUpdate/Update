@@ -21,6 +21,7 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
+import org.mxupdate.test.data.datamodel.PolicyData;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
@@ -73,6 +74,11 @@ public abstract class AbstractDeltaCalculationTest<DATA extends AbstractAdminObj
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
 
         Assert.assertEquals(_currentData.getName(), _targetData.getName(), "check that ci names are equal");
+
+        // work-arround: policies must be created manually...
+        if (_currentData instanceof PolicyData)  {
+            _currentData.create();
+        }
 
         // prepare the current
         final Wrapper currentWrapper = new Wrapper(this.createNewData(paramCache, _currentData.getName()));

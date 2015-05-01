@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -302,9 +301,9 @@ public class Policy_mxJPO
                 .string(            "description",              this.getDescription())
                 .flag(              "hidden",            false, this.isHidden())
                 .singleIfTrue(      "type",                     "all",                                                                  this.allTypes)
-                .listOneLineIfTrue( "type",                     this.types,                                                             !this.allTypes)
+                .listIfTrue(        "type",                     this.types,                                                             !this.allTypes)
                 .singleIfTrue(      "format",                   "all",                                                                  this.allFormats)
-                .listOneLineIfTrue("format",                    this.formats,                                                           !this.allFormats)
+                .listIfTrue(        "format",                   this.formats,                                                           !this.allFormats)
                 .string(            "defaultformat",            this.defaultFormat)
                 .flagIfTrue(        "enforce",           false, this.enforce,                                                           this.enforce)
                 .stringIfTrue(      "delimiter",                this.delimiter,                                                         (this.delimiter != null) && !this.delimiter.isEmpty())
@@ -374,28 +373,9 @@ public class Policy_mxJPO
                     this.delimiter);
         }
 
-        // basic information
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "description", this.getDescription(), _current.getDescription());
-
-        // if all types are defined, the compare must be against set with all
-        if (_current.allTypes)  {
-            final SortedSet<String> curTypes = new TreeSet<String>();
-            curTypes.addAll(_current.types);
-            curTypes.addAll(Arrays.asList(new String[]{"all"}));
-            DeltaUtil_mxJPO.calcListDelta(_mql, "type", this.types, curTypes);
-        } else  {
-            DeltaUtil_mxJPO.calcListDelta(_mql, "type", this.types, _current.types);
-        }
-
-        // if all formats are defined, the compare must be against set with all
-        if (_current.allFormats)  {
-            final SortedSet<String> curFormats = new TreeSet<String>();
-            curFormats.addAll(_current.formats);
-            curFormats.addAll(Arrays.asList(new String[]{"all"}));
-            DeltaUtil_mxJPO.calcListDelta(_mql, "format", this.formats, curFormats);
-        } else  {
-            DeltaUtil_mxJPO.calcListDelta(_mql, "format", this.formats, _current.formats);
-        }
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "description",                  this.getDescription(),                      _current.getDescription());
+        DeltaUtil_mxJPO.calcListDelta( _mql, "type",        this.allTypes,   this.types,            _current.allTypes,   _current.types);
+        DeltaUtil_mxJPO.calcListDelta( _mql, "format",      this.allFormats, this.formats,          _current.allFormats, _current.formats);
 
         // if not default format => ADMINISTRATION must be default format
         if ((this.defaultFormat == null) || this.defaultFormat.isEmpty())  {
@@ -444,10 +424,8 @@ public class Policy_mxJPO
 
         // states delta
         _current.calcStatesDelta(_paramCache, _mql, this);
-
         // properties
         this.getProperties().calcDelta(_mql, "", _current.getProperties());
-
     }
 
     /**

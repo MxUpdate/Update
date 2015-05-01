@@ -20,7 +20,6 @@ import java.util.Arrays;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.AbstractTest.CI;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.util.DataList;
 import org.mxupdate.test.data.util.FlagList;
@@ -355,7 +354,7 @@ public class RelationshipData
          */
         public RelationshipData addAllTypes()
         {
-            this.types.addAll(CI.DM_TYPE);
+            this.types.addAll("type");
             return RelationshipData.this;
         }
 
@@ -382,7 +381,7 @@ public class RelationshipData
          */
         public RelationshipData addAllRelationships()
         {
-            this.relationships.addAll(CI.DM_RELATIONSHIP);
+            this.relationships.addAll("relationship");
             return RelationshipData.this;
         }
 

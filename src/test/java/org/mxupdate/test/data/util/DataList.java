@@ -29,7 +29,6 @@ import matrix.util.MatrixException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.AbstractTest.CI;
 import org.mxupdate.test.data.AbstractData;
 
 /**
@@ -51,7 +50,7 @@ public class DataList<DATA extends AbstractData<?>>
     private final List<ImmutablePair<String,DATA>> list = new ArrayList<ImmutablePair<String,DATA>>();
 
     /** All flag */
-    private final Set<CI> alls = new HashSet<CI>();
+    private final Set<String> alls = new HashSet<String>();
 
     /**
      * Default data list w/o any prefixes.
@@ -118,19 +117,9 @@ public class DataList<DATA extends AbstractData<?>>
      *
      * @param _ci   CI for which all must be defined
      */
-    public void addAll(final CI _ci)
+    public void addAll(final String _tag)
     {
-        this.alls.add(_ci);
-    }
-
-    /**
-     * Defines the {@link #alls}.
-     *
-     * @param _ci   CI for which all must be removed
-     */
-    public void removeAll(final CI _ci)
-    {
-        this.alls.remove(_ci);
+        this.alls.add(_tag);
     }
 
     /**
@@ -143,8 +132,8 @@ public class DataList<DATA extends AbstractData<?>>
     public void append4Update(final String _prefix,
                               final StringBuilder _cmd)
     {
-        for (final CI ci: this.alls)  {
-            _cmd.append(_prefix).append(this.prefix4Update).append(this.appendMxType ? ci.getMxType() : "").append(" all\n");
+        for (final String tag : this.alls)  {
+            _cmd.append(_prefix).append(tag).append(" all\n");
         }
         for (final ImmutablePair<String,DATA> data : this.list)  {
             _cmd.append(_prefix).append(this.prefix4Update).append(this.appendMxType ? data.left : "")
@@ -159,8 +148,8 @@ public class DataList<DATA extends AbstractData<?>>
      */
     public void append4Create(final StringBuilder _cmd)
     {
-        for (final CI ci: this.alls)  {
-            _cmd.append(' ').append(this.prefix4Create).append(this.appendMxType ? ci.getMxType() : "").append(" all");
+        for (final String tag: this.alls)  {
+            _cmd.append(' ').append(tag).append(" all");
         }
         if (!this.list.isEmpty())  {
             // sort all data elements by MX type

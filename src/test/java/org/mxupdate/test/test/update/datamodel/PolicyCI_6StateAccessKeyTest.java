@@ -31,7 +31,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class PolicyCI_5StateAccessKeyTest
+public class PolicyCI_6StateAccessKeyTest
     extends AbstractPolicyTest
 {
     /**
@@ -316,7 +316,7 @@ public class PolicyCI_5StateAccessKeyTest
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State() {
                                     {
-                                        final PersonAdminData user = new PersonAdminData(PolicyCI_5StateAccessKeyTest.this, "creator");
+                                        final PersonAdminData user = new PersonAdminData(PolicyCI_6StateAccessKeyTest.this, "creator");
                                         this.setName("create")
                                             .addAccess(
                                                     new Access()
@@ -365,7 +365,7 @@ public class PolicyCI_5StateAccessKeyTest
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State() {
                                     {
-                                        final PersonAdminData user = new PersonAdminData(PolicyCI_5StateAccessKeyTest.this, "creator");
+                                        final PersonAdminData user = new PersonAdminData(PolicyCI_6StateAccessKeyTest.this, "creator");
                                         this.setName("create")
                                             .addAccess(
                                                     new Access()
@@ -417,7 +417,7 @@ public class PolicyCI_5StateAccessKeyTest
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()  {
                                     {
-                                        final PersonAdminData user = new PersonAdminData(PolicyCI_5StateAccessKeyTest.this, "creator");
+                                        final PersonAdminData user = new PersonAdminData(PolicyCI_6StateAccessKeyTest.this, "creator");
                                         this.setName("create")
                                             .addAccess(
                                                     new Access()

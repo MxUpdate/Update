@@ -187,7 +187,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     }
 
     /**
-     * Defines a datafor given {@code _tag}.
+     * Defines a {@code _data} for given {@code _tag}.
      *
      * @param _tag          used tag (name) of the data
      * @param _data         data instance
@@ -198,6 +198,19 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
                         final AbstractAdminData<?> _data)
     {
         this.datas.add(_tag, _data);
+        return (DATA) this;
+    }
+
+    /**
+     * Defines 'all' given {@code _tag}.
+     *
+     * @param _tag          used tag (name)
+     * @return this data instance
+     */
+    @SuppressWarnings("unchecked")
+    public DATA defDataAll(final String _tag)
+    {
+        this.datas.addAll(_tag);
         return (DATA) this;
     }
 
