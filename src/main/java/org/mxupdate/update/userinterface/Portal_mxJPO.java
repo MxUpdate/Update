@@ -48,11 +48,7 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
 public class Portal_mxJPO
     extends AbstractCommand_mxJPO<Portal_mxJPO>
 {
-    /**
-     * Set of all ignored URLs from the XML definition for portals.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     */
+    /** Set of all ignored URLs from the XML definition for portals. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
         Portal_mxJPO.IGNORED_URLS.add("/channelRefList");
@@ -93,9 +89,9 @@ public class Portal_mxJPO
      *         <i>false</i>
      */
     @Override()
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
+    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
+                                            final String _url,
+                                            final String _content)
     {
         final boolean parsed;
         if (Portal_mxJPO.IGNORED_URLS.contains(_url))  {
@@ -105,7 +101,7 @@ public class Portal_mxJPO
             parsed = this.children.parse(_url.substring(15), _content);
 
         } else  {
-            parsed = super.parse(_paramCache, _url, _content);
+            parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
         }
         return parsed;
     }

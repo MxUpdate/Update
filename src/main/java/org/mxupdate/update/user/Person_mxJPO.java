@@ -38,10 +38,10 @@ import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -503,7 +503,7 @@ public class Person_mxJPO
      */
     @Override()
     protected void parse(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException, SAXException, IOException
+        throws MatrixException, ParseException
     {
         this.personAdmin.parse(_paramCache);
         this.personBus.parse(_paramCache);
@@ -617,7 +617,7 @@ public class Person_mxJPO
          */
         @Override()
         protected void parse(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException, SAXException, IOException
+            throws MatrixException, ParseException
         {
             super.parse(_paramCache);
         }

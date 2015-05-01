@@ -76,9 +76,9 @@ public class Inquiry_mxJPO
     }
 
     @Override()
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
+    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
+                                            final String _url,
+                                            final String _content)
     {
         final boolean parsed;
         if ("/code".equals(_url))  {
@@ -91,7 +91,7 @@ public class Inquiry_mxJPO
             this.pattern = _content;
             parsed = true;
         } else  {
-            parsed = super.parse(_paramCache, _url, _content);
+            parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
         }
         return parsed;
     }

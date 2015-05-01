@@ -97,9 +97,9 @@ public class Channel_mxJPO
      * @see #IGNORED_URLS
      */
     @Override()
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
+    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
+                                            final String _url,
+                                            final String _content)
     {
         final boolean parsed;
         if (Channel_mxJPO.IGNORED_URLS.contains(_url))  {
@@ -111,7 +111,7 @@ public class Channel_mxJPO
             this.height = Integer.parseInt(_content);
             parsed = true;
         } else  {
-            parsed = super.parse(_paramCache, _url, _content);
+            parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
         }
         return parsed;
     }

@@ -108,9 +108,9 @@ public class Format_mxJPO
      *         <i>false</i>
      */
     @Override()
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
+    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
+                                            final String _url,
+                                            final String _content)
     {
         final boolean parsed;
         if (Format_mxJPO.IGNORED_URLS.contains(_url))  {
@@ -140,7 +140,7 @@ public class Format_mxJPO
             parsed = true;
 
         } else  {
-            parsed = super.parse(_paramCache, _url, _content);
+            parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
         }
         return parsed;
     }

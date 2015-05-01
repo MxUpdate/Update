@@ -64,6 +64,8 @@ public abstract class AbstractDMWithTriggers_mxJPO<CLASS extends AbstractDMWithT
     }
 
     /**
+     * Parses the {@link #triggers}.
+     *
      * @param _paramCache   parameter cache with MX context
      * @param _url          URL to parse
      * @param _content      content of the URL to parse
@@ -71,9 +73,9 @@ public abstract class AbstractDMWithTriggers_mxJPO<CLASS extends AbstractDMWithT
      *         <i>false</i>
      */
     @Override()
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
+    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
+                                            final String _url,
+                                            final String _content)
     {
         final boolean parsed;
         if (AbstractDMWithTriggers_mxJPO.IGNORED_URLS.contains(_url))  {
@@ -81,7 +83,7 @@ public abstract class AbstractDMWithTriggers_mxJPO<CLASS extends AbstractDMWithT
         } else if (_url.startsWith("/triggerList"))  {
             parsed = this.triggers.parse(_paramCache, _url.substring(12), _content);
         } else  {
-            parsed = super.parse(_paramCache, _url, _content);
+            parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
         }
         return parsed;
     }

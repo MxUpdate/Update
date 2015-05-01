@@ -30,11 +30,11 @@ import java.util.regex.Pattern;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.UpdateException_mxJPO;
-import org.xml.sax.SAXException;
 
 /**
  * The class is used to export, create, delete and update JPOs within MX.
@@ -64,7 +64,7 @@ public class JPOProgram_mxJPO
      * double back slashes must be replaced. In newer MX versions this
      * 'feature' does not exists anymore if an MQL insert was done.
      *
-     * @see #parse(ParameterCache_mxJPO, String, String)
+     * @see #parseAdminXMLExportEvent(ParameterCache_mxJPO, String, String)
      * @see #write(ParameterCache_mxJPO, Appendable)
      */
     private boolean backslashUpgraded = false;
@@ -167,39 +167,38 @@ throw new Error("could not open file " + file, e);
      * @param _content      content depending on the URL
      * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
      *         <i>false</i>
-     * @see #IGNORED_URLS
      */
     @Override()
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
+    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
+                                            final String _url,
+                                            final String _content)
     {
         final boolean parsed;
         if ("/backslashUpgraded".equals(_url))  {
             this.backslashUpgraded = true;
             parsed = true;
         } else  {
-            parsed = super.parse(_paramCache, _url, _content);
+            parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
         }
         return parsed;
     }
 
     /**
-     *
+     * First writes the MXU file and then the JPO itself.
      *
      * @param _paramCache       parameter cache
      * @param _path             path to write through (if required also
      *                          including depending file path defined from the
      *                          information annotation)
+     * @throws IOException      if JPO or MXU file can not be written
      * @throws MatrixException  if some MQL statement failed
-     * @throws SAXException     if the XML export of the object could not
+     * @throws ParseException   if the XML export of the object could not
      *                          parsed (for admin objects)
-     * @throws IOException      if the TCL update code could not be written
      */
     @Override()
     public void export(final ParameterCache_mxJPO _paramCache,
                        final File _path)
-        throws MatrixException, SAXException, IOException
+        throws IOException, MatrixException, ParseException
     {
         try  {
             this.parse(_paramCache);
@@ -244,20 +243,19 @@ throw new Error("could not open file " + file, e);
                     out.close();
                 }
             }
-
+        } catch (final IOException e)  {
+            if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {
+                _paramCache.logError(e.toString());
+            } else {
+                throw e;
+            }
         } catch (final MatrixException e)  {
             if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {
                 _paramCache.logError(e.toString());
             } else {
                 throw e;
             }
-        } catch (final SAXException e)  {
-            if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {
-                _paramCache.logError(e.toString());
-            } else {
-                throw e;
-            }
-        } catch (final IOException e)  {
+        } catch (final ParseException e)  {
             if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {
                 _paramCache.logError(e.toString());
             } else {

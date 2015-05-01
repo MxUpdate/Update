@@ -60,18 +60,18 @@ public class Table_mxJPO
      * @see #IGNORED_URLS
      */
     @Override()
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
+    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
+                                            final String _url,
+                                            final String _content)
     {
         final boolean parsed;
         if ("/derivedtable".equals(_url))  {
-            if (_content != null)  {
+            if ((_content != null) && !_content.isEmpty())  {
 System.err.println("The table is derived from '" + _content + "'! This is currently not supported!");
             }
             parsed = true;
         } else  {
-            parsed = super.parse(_paramCache, _url, _content);
+            parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
         }
         return parsed;
     }

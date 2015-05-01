@@ -47,12 +47,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO<CLASS>>
     extends AbstractAdminObject_mxJPO<CLASS>
 {
-    /**
-     * Set of all ignored URLs from the XML definition for common stuff of
-     * users.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     */
+    /** Set of all ignored URLs from the XML definition for common stuff of users. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
         AbstractUser_mxJPO.IGNORED_URLS.add("/homeSite");
@@ -82,7 +77,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
      * Maps depending on the name of the cue to related cue information. The
      * map is used to sort the cues depending on the name.
      *
-     * @see #parse(ParameterCache_mxJPO, String, String)
+     * @see #parseAdminXMLExportEvent(ParameterCache_mxJPO, String, String)
      * @see #prepare(ParameterCache_mxJPO)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
@@ -92,7 +87,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
     /**
      * Current cue which is read.
      *
-     * @see #parse(ParameterCache_mxJPO, String, String)
+     * @see #parseAdminXMLExportEvent(ParameterCache_mxJPO, String, String)
      */
     private Cue_mxJPO currentCue;
 
@@ -100,7 +95,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
      * Maps depending on the name of the filter to related filter information.
      * The map is used to sort the filters depending on the name.
      *
-     * @see #parse(ParameterCache_mxJPO, String, String)
+     * @see #parseAdminXMLExportEvent(ParameterCache_mxJPO, String, String)
      * @see #prepare(ParameterCache_mxJPO)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
@@ -110,7 +105,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
     /**
      * Current filter which is read.
      *
-     * @see #parse(ParameterCache_mxJPO, String, String)
+     * @see #parseAdminXMLExportEvent(ParameterCache_mxJPO, String, String)
      */
     private Filter_mxJPO currentFilter;
 
@@ -118,7 +113,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
      * Maps depending on the name of the query to related query information.
      * The map is used to sort the queries depending on the name.
      *
-     * @see #parse(ParameterCache_mxJPO, String, String)
+     * @see #parseAdminXMLExportEvent(ParameterCache_mxJPO, String, String)
      * @see #prepare(ParameterCache_mxJPO)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
@@ -128,7 +123,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
     /**
      * Current query which is read.
      *
-     * @see #parse(ParameterCache_mxJPO, String, String)
+     * @see #parseAdminXMLExportEvent(ParameterCache_mxJPO, String, String)
      */
     private Query_mxJPO currentQuery;
 
@@ -136,7 +131,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
      * Maps depending on the name of the table to related table information.
      * The map is used to sort the tables depending on the name.
      *
-     * @see #parse(ParameterCache_mxJPO, String, String)
+     * @see #parseAdminXMLExportEvent(ParameterCache_mxJPO, String, String)
      * @see #prepare(ParameterCache_mxJPO)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
@@ -146,7 +141,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
     /**
      * Current table which is read.
      *
-     * @see #parse(ParameterCache_mxJPO, String, String)
+     * @see #parseAdminXMLExportEvent(ParameterCache_mxJPO, String, String)
      */
     private Table_mxJPO currentTable;
 
@@ -154,7 +149,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
      * Maps depending on the name of the tip to related tip information.
      * The map is used to sort the tips depending on the name.
      *
-     * @see #parse(ParameterCache_mxJPO, String, String)
+     * @see #parseAdminXMLExportEvent(ParameterCache_mxJPO, String, String)
      * @see #prepare(ParameterCache_mxJPO)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
@@ -164,7 +159,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
     /**
      * Current tip which is read.
      *
-     * @see #parse(ParameterCache_mxJPO, String, String)
+     * @see #parseAdminXMLExportEvent(ParameterCache_mxJPO, String, String)
      */
     private Tip_mxJPO currentTip;
 
@@ -173,7 +168,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
      * information. The map is used to sort the tool sets depending on the
      * name.
      *
-     * @see #parse(ParameterCache_mxJPO, String, String)
+     * @see #parseAdminXMLExportEvent(ParameterCache_mxJPO, String, String)
      * @see #prepare(ParameterCache_mxJPO)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
@@ -183,7 +178,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
     /**
      * Current tip which is read.
      *
-     * @see #parse(ParameterCache_mxJPO, String, String)
+     * @see #parseAdminXMLExportEvent(ParameterCache_mxJPO, String, String)
      */
     private ToolSet_mxJPO currentToolSet;
 
@@ -191,7 +186,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
      * Maps depending on the name of the view to related view information. The
      * map is used to sort the tool sets depending on the name.
      *
-     * @see #parse(ParameterCache_mxJPO, String, String)
+     * @see #parseAdminXMLExportEvent(ParameterCache_mxJPO, String, String)
      * @see #prepare(ParameterCache_mxJPO)
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
@@ -201,7 +196,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
     /**
      * Current tip which is read.
      *
-     * @see #parse(ParameterCache_mxJPO, String, String)
+     * @see #parseAdminXMLExportEvent(ParameterCache_mxJPO, String, String)
      */
     private View_mxJPO currentView;
 
@@ -248,12 +243,11 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
      * @param _content      content of the URL to parse
      * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
      *         <i>false</i>
-     * @see #IGNORED_URLS
      */
     @Override()
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
+    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
+                                            final String _url,
+                                            final String _content)
     {
         final boolean parsed;
         if (AbstractUser_mxJPO.IGNORED_URLS.contains(_url))  {
@@ -328,7 +322,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
             parsed = this.currentView.parse(_paramCache, _url.substring(14), _content);
 
         } else  {
-            parsed = super.parse(_paramCache, _url, _content);
+            parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
         }
         return parsed;
     }

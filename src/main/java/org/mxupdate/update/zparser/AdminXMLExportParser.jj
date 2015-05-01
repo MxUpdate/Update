@@ -1,0 +1,164 @@
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
+options {
+    JDK_VERSION = "1.6";
+    STATIC = false;
+    ERROR_REPORTING = true;
+    USER_TOKEN_MANAGER = false;
+    GENERATE_BOILERPLATE = false;
+    SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
+    UNICODE_INPUT = true;
+}
+
+PARSER_BEGIN(AdminXMLExportParser)
+package org.mxupdate.update.zparser;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Stack;
+
+import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
+import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
+import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
+
+/**
+ * Parses the XML export for all kind of MX administration objects.
+ */
+@SuppressWarnings("unused")
+public class AdminXMLExportParser
+    extends AbstractParser_mxJPO
+{
+    /** Stack of the parsed URL. */
+    private final Stack<String> stack = new Stack<String>();
+    /** Parameter cache used for the interface of the event method. */
+    private ParameterCache_mxJPO paramCache;
+    /** Parsed object where the events are called. */
+    private AdminXMLExportObject_mxJPO object;
+
+    /**
+     * Executes a single admin XML export event.
+     *
+     * @param _content  content for current URL
+     */
+    private void event(final String _content)
+    {
+        final StringBuilder ret = new StringBuilder();
+        for (final String tag : this.stack.subList(1, this.stack.size()))  {
+            ret.append('/').append(tag);
+        }
+
+        this.object.parseAdminXMLExportEvent(this.paramCache, ret.toString(), _content);
+    }
+
+    /**
+     * @param _paramCache       parameter cache
+     * @param _object           object where to execute the events
+     */
+    public void parse(final ParameterCache_mxJPO _paramCache,
+                      final AdminXMLExportObject_mxJPO _object)
+        throws ParseException
+    {
+      this.object = _object;
+      this.paramCache = _paramCache;
+      this.rootParse();
+    }
+}
+
+PARSER_END(AdminXMLExportParser)
+
+<DEFAULT> SKIP :
+{
+      " "
+    | "\t"
+    | "\n"
+    | <("<?" (~[">"])* "?>")>
+    | <("<!--" (~[">"])* "-->")>
+    | <("<!DOCTYPE" (~[">"])* ">") >
+}
+
+TOKEN :
+{
+
+      <STARTTAG_START:                    "<">                                         : STARTTAG_EXPECTED
+
+    | <ENDTAG_START: "</" > : ENDTAG_EXPECTED
+    | <TEXT: (~["<","&"])+ >
+    | <DTDINFO: "&ematrixProductDtd;" >
+    | <CDATA_START: "<![CDATA[">                          : CDATA_EXPECTED
+}
+
+<STARTTAG_EXPECTED> TOKEN :
+{
+      <STARTTAG_SINGLE: ( ["a"-"z","A"-"Z"] )+> : STARTTAG_ATTR_OR_END_EXPECTED
+}
+
+<STARTTAG_ATTR_OR_END_EXPECTED> SKIP :
+{
+    " " | < ( ["a"-"z","A"-"Z"] )+ "=\"" (~["\""])* "\"" >
+}
+
+<STARTTAG_ATTR_OR_END_EXPECTED> TOKEN:
+{      <STARTTAG_END: ">"> : DEFAULT
+    | <STARTTAG_COMPLETE_END: "/>" > : DEFAULT
+}
+
+
+<ENDTAG_EXPECTED> TOKEN :
+{
+      <ENDTAG_SINGLE: ( ["a"-"z","A"-"Z"] )+> : ENDTAG_EXPECTED
+    | <ENDTAG_END: ">"> : DEFAULT
+}
+
+<CDATA_EXPECTED> TOKEN :
+{
+      <CDATA_CHAR: ~[]> : CDATA_EXPECTED
+    | <CDATA_END: "]]>"> : DEFAULT}
+
+/**************************************************************************** */
+
+private void rootParse()
+: {
+} {      <STARTTAG_START> <STARTTAG_SINGLE> <STARTTAG_END>
+       ( parse() )*
+      <ENDTAG_START> <ENDTAG_SINGLE> <ENDTAG_END>
+}
+
+/**
+ * Parses one complete command definition.
+ *
+ * @param _command  target command to update with parsed values
+ */
+private void parse()
+: {
+    Token tmp;
+    StringBuilder text = new StringBuilder();
+} {
+      <STARTTAG_START> tmp = <STARTTAG_SINGLE> {this.stack.push(tmp.image);}
+
+ (      (         <STARTTAG_COMPLETE_END> { this.event(null);this.stack.pop();} )
+|
+  ( <STARTTAG_END>
+            ( (tmp = <DTDINFO>  {text.append(tmp.image);})            | (tmp = <TEXT>     {text.append(tmp.image);})
+            | (<CDATA_START> ( tmp = <CDATA_CHAR> {text.append(tmp.image);} )* <CDATA_END>) )*
+
+       {this.event(text.toString());}
+
+       ( parse() )*
+
+      <ENDTAG_START> tmp = <ENDTAG_SINGLE> {this.stack.pop();} <ENDTAG_END> ) )
+}

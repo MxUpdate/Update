@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.user;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
@@ -36,7 +35,6 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
-import org.xml.sax.SAXException;
 
 /**
  * The class is used to handle administration persons.
@@ -46,11 +44,7 @@ import org.xml.sax.SAXException;
 public class PersonAdmin_mxJPO
     extends AbstractUser_mxJPO<PersonAdmin_mxJPO>
 {
-    /**
-     * Set of all ignored URLs from the XML definition for persons.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     */
+    /** Set of all ignored URLs from the XML definition for persons. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
         PersonAdmin_mxJPO.IGNORED_URLS.add("/assignmentList");
@@ -141,7 +135,7 @@ public class PersonAdmin_mxJPO
 
     @Override()
     protected void parse(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException, SAXException, IOException
+        throws MatrixException, ParseException
     {
         // to ensure that the value is the same default as in the DB
         this.iconmail = false;
@@ -184,12 +178,11 @@ public class PersonAdmin_mxJPO
      * @param _content      content depending on the URL
      * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
      *         <i>false</i>
-     * @see #IGNORED_URLS
      */
     @Override()
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
+    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
+                                            final String _url,
+                                            final String _content)
     {
         final boolean parsed;
         if (PersonAdmin_mxJPO.IGNORED_URLS.contains(_url))  {
@@ -262,7 +255,7 @@ public class PersonAdmin_mxJPO
             this.products.add(_content);
             parsed = true;
         } else  {
-            parsed = super.parse(_paramCache, _url, _content);
+            parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
         }
         return parsed;
     }

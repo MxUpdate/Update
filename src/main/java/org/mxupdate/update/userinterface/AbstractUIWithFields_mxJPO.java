@@ -79,9 +79,9 @@ public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObje
      *         <i>false</i>
      */
     @Override()
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
+    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
+                                            final String _url,
+                                            final String _content)
     {
         final boolean parsed;
         if (AbstractUIWithFields_mxJPO.IGNORED_URLS.contains(_url))  {
@@ -102,7 +102,7 @@ public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObje
             parsed = this.fields.peek().parse(_paramCache, _url.substring(16), _content);
 
         } else  {
-            parsed = super.parse(_paramCache, _url, _content);
+            parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
         }
         return parsed;
     }
@@ -257,7 +257,7 @@ public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObje
                 if ("/alt".equals(_url))  {
                     this.alt = _content;
                 } else if ("/derivedfield".equals(_url))  {
-                    if (_content != null)  {
+                    if ((_content != null) && !_content.isEmpty())  {
 // TODO:
 System.err.println("derived field not null! This is not supported!");
                     }

@@ -30,6 +30,7 @@
             <package name="org.mxupdate.test.test.update.userinterface"/>
             <package name="org.mxupdate.test.test.update.userinterface.helper"/>
             <package name="org.mxupdate.test.test.update.util"/>
+            <package name="org.mxupdate.test.test.update.zparser"/>
         </packages>
     </test>
 

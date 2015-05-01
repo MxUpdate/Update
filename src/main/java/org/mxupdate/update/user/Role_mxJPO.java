@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.user;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
@@ -37,7 +36,6 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
-import org.xml.sax.SAXException;
 
 /**
  * The class is used to export, create, delete and update roles within MX.
@@ -105,7 +103,7 @@ public class Role_mxJPO
      */
     @Override()
     protected void parse(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException, SAXException, IOException
+        throws MatrixException, ParseException
     {
         super.parse(_paramCache);
 
@@ -123,9 +121,9 @@ public class Role_mxJPO
     }
 
     @Override()
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
+    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
+                                            final String _url,
+                                            final String _content)
     {
         final boolean parsed;
         if (Role_mxJPO.IGNORED_URLS.contains(_url))  {
@@ -134,7 +132,7 @@ public class Role_mxJPO
             this.parentRoles.add(_content);
             parsed = true;
         } else  {
-            parsed = super.parse(_paramCache, _url, _content);
+            parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
         }
         return parsed;
     }

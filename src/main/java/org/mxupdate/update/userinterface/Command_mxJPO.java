@@ -50,11 +50,7 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
 public class Command_mxJPO
     extends AbstractCommand_mxJPO<Command_mxJPO>
 {
-    /**
-     * Set of all ignored URLs from the XML definition for commands.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     */
+    /** Set of all ignored URLs from the XML definition for commands. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
         Command_mxJPO.IGNORED_URLS.add("/userRefList");
@@ -100,9 +96,9 @@ public class Command_mxJPO
      *         <i>false</i>
      */
     @Override()
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
+    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
+                                            final String _url,
+                                            final String _content)
     {
         final boolean parsed;
         if (Command_mxJPO.IGNORED_URLS.contains(_url))  {
@@ -114,7 +110,7 @@ public class Command_mxJPO
             this.users.add(_content);
             parsed = true;
         } else  {
-            parsed = super.parse(_paramCache, _url, _content);
+            parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
         }
         return parsed;
     }

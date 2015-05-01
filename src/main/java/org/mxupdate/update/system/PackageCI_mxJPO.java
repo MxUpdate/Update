@@ -88,9 +88,9 @@ public class PackageCI_mxJPO
     }
 
     @Override()
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
+    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
+                                            final String _url,
+                                            final String _content)
     {
         final boolean parsed;
         if (PackageCI_mxJPO.IGNORED_URLS.contains(_url))  {
@@ -115,7 +115,7 @@ public class PackageCI_mxJPO
             this.usesPackages.add(_content);
             parsed = true;
         } else  {
-            parsed = super.parse(_paramCache, _url, _content);
+            parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
         }
         return parsed;
     }

@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.datamodel;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
@@ -32,7 +31,6 @@ import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
-import org.xml.sax.SAXException;
 
 /**
  * Handles the export and the update of the expression configuration item.
@@ -86,7 +84,7 @@ public class Expression_mxJPO
      */
     @Override()
     protected void parse(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException, SAXException, IOException
+        throws MatrixException, ParseException
     {
         super.parse(_paramCache);
 
@@ -106,15 +104,15 @@ public class Expression_mxJPO
      * @see #IGNORED_URLS
      */
     @Override()
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
+    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
+                                            final String _url,
+                                            final String _content)
     {
         final boolean parsed;
         if (Expression_mxJPO.IGNORED_URLS.contains(_url))  {
             parsed = true;
         } else  {
-            parsed = super.parse(_paramCache, _url, _content);
+            parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
         }
         return parsed;
     }

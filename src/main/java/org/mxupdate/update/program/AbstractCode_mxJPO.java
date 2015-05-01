@@ -164,9 +164,9 @@ public abstract class AbstractCode_mxJPO<CLASS extends AbstractCode_mxJPO<CLASS>
      *         <i>false</i>
      */
     @Override()
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
+    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
+                                            final String _url,
+                                            final String _content)
     {
         final boolean parsed;
         // JPO + MQL programs
@@ -182,7 +182,7 @@ public abstract class AbstractCode_mxJPO<CLASS extends AbstractCode_mxJPO<CLASS>
                         : "";
             parsed = true;
         } else  {
-            parsed = super.parse(_paramCache, _url, _content);
+            parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
         }
         return parsed;
     }

@@ -16,7 +16,6 @@
 package org.mxupdate.update.datamodel;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -49,7 +48,6 @@ import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateLine;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
-import org.xml.sax.SAXException;
 
 /**
  * The class is used to export and import / update policy configuration items.
@@ -154,7 +152,7 @@ public class Policy_mxJPO
      */
     @Override()
     protected void parse(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException, SAXException, IOException
+        throws MatrixException, ParseException
     {
         if (!this.updateWithCreate)  {
             super.parse(_paramCache);
@@ -187,9 +185,9 @@ public class Policy_mxJPO
      * @see #IGNORED_URLS
      */
     @Override()
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
+    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
+                                            final String _url,
+                                            final String _content)
     {
         final boolean parsed;
         if (Policy_mxJPO.IGNORED_URLS.contains(_url))  {
@@ -241,7 +239,7 @@ public class Policy_mxJPO
             parsed = this.states.peek().parse(_paramCache, _url.substring(22), _content);
 
         } else  {
-            parsed = super.parse(_paramCache, _url, _content);
+            parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
         }
         return parsed;
     }

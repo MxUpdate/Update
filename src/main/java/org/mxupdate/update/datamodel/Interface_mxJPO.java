@@ -44,7 +44,7 @@ public class Interface_mxJPO
     /**
      * Set of all ignored URLs from the XML definition for interfaces.
      *
-     * @see #parse(ParameterCache_mxJPO, String, String)
+     * @see #parseAdminXMLExportEvent(ParameterCache_mxJPO, String, String)
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
@@ -116,15 +116,11 @@ public class Interface_mxJPO
      * @param _content      content of the URL to parse
      * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
      *         <i>false</i>
-     * @see #abstractFlag
-     * @see #allTypes
-     * @see #types
-     * @see #IGNORED_URLS
      */
     @Override()
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
+    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
+                                            final String _url,
+                                            final String _content)
     {
         final boolean parsed;
         if (Interface_mxJPO.IGNORED_URLS.contains(_url))  {
@@ -151,7 +147,7 @@ public class Interface_mxJPO
             this.types.add(_content);
             parsed = true;
         } else  {
-            parsed = super.parse(_paramCache, _url, _content);
+            parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
         }
         return parsed;
     }

@@ -168,9 +168,9 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
      *         <i>false</i>
      */
     @Override()
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
+    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
+                                            final String _url,
+                                            final String _content)
     {
         final boolean parsed;
         if ("/accessRuleRef".equals(_url))  {
@@ -204,7 +204,7 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
             this.user = _content;
             parsed = true;
         } else  {
-            parsed = super.parse(_paramCache, _url, _content);
+            parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
         }
         return parsed;
     }

@@ -28,11 +28,11 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
-import org.xml.sax.SAXException;
 
 /**
  * Abstract class from which must be derived for exporting and importing all
@@ -186,13 +186,13 @@ public abstract class AbstractObject_mxJPO
      *                          including depending file path defined from the
      *                          information annotation)
      * @throws MatrixException  if some MQL statement failed
-     * @throws SAXException     if the XML export of the object could not
+     * @throws ParseException   if the XML export of the object could not
      *                          parsed (for admin objects)
      * @throws IOException      if the TCL update code could not be written
      */
     public void export(final ParameterCache_mxJPO _paramCache,
                        final File _path)
-        throws MatrixException, SAXException, IOException
+        throws IOException, MatrixException, ParseException
     {
         try  {
             this.parse(_paramCache);
@@ -221,13 +221,7 @@ public abstract class AbstractObject_mxJPO
             } else {
                 throw e;
             }
-        } catch (final SAXException e)  {
-            if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {
-                _paramCache.logError(e.toString());
-            } else {
-                throw e;
-            }
-        } catch (final IOException e)  {
+        } catch (final ParseException e)  {
             if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {
                 _paramCache.logError(e.toString());
             } else {
@@ -242,15 +236,13 @@ public abstract class AbstractObject_mxJPO
      * @param _out          appendable instance where the TCL update code is
      *                      written
      * @throws MatrixException  if some MQL statement failed
-     * @throws SAXException     if the XML export of the object could not
+     * @throws ParseException   if the XML export of the object could not
      *                          parsed (for admin objects)
-     * @throws IOException      if the TCL update code could not be written
-     * @see #parse(ParameterCache_mxJPO)
-     * @see #write(ParameterCache_mxJPO, Appendable)
+     * @throws IOException      if the update code could not be written
      */
     public void export(final ParameterCache_mxJPO _paramCache,
                        final Appendable _out)
-        throws MatrixException, SAXException, IOException
+        throws IOException, MatrixException, ParseException
     {
         this.parse(_paramCache);
         this.write(_paramCache, _out);
@@ -271,15 +263,13 @@ public abstract class AbstractObject_mxJPO
     /**
      * Parses all information for given administration object.
      *
-     * @param _paramCache   parameter cache
+     * @param _paramCache       parameter cache
      * @throws MatrixException  if XML export could not be created or if
      *                          another MX action failed
-     * @throws SAXException     if the XML document could not be parsed
-     * @throws IOException      if the XML document could not be opened (should
-     *                          never happen)
+     * @throws ParseException   if the admin XML export can not be parsed
      */
     protected abstract void parse(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException, SAXException, IOException;
+        throws MatrixException, ParseException;
 
     /**
      * Deletes administration object with given name.

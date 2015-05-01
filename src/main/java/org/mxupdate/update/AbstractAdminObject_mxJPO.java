@@ -16,7 +16,6 @@
 package org.mxupdate.update;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,6 +30,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
@@ -40,12 +40,11 @@ import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.zparser.AdminXMLExportObject_mxJPO;
+import org.mxupdate.update.zparser.AdminXMLExportParser_mxJPO;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * The class is used to export, create, delete and update administration
@@ -56,6 +55,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObject_mxJPO<CLASS>>
     extends AbstractPropertyObject_mxJPO<CLASS>
+    implements AdminXMLExportObject_mxJPO
 {
     /**
      * Name of the parameter to suppress warnings for not parsed URLs.
@@ -158,30 +158,16 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
      *
      * @param _paramCache   parameter cache
      * @throws MatrixException  if the export of the admin object failed
-     * @throws SAXException     if the exported XML document could not be
+     * @throws ParseException   if the exported XML document could not be
      *                          parsed
-     * @throws IOException      should not happen; only if the input source of
-     *                          the string reader which embeds the XML document
-     *                          failed
      * @see PadSaxHandler                   SAX handler to parse the XML file
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #prepare(ParameterCache_mxJPO)
      */
     @Override()
     protected void parse(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException, SAXException, IOException
+        throws MatrixException, ParseException
     {
-        // create XML reader
-        final XMLReader reader = XMLReaderFactory.createXMLReader();
-        // register Sax Content Handler
-        final PadSaxHandler handler = new PadSaxHandler(_paramCache);
-        reader.setContentHandler(handler);
-        reader.setDTDHandler(handler);
-        reader.setEntityResolver(handler);
-        // parse the XML string of the export
-        final InputSource inputSource = new InputSource(new StringReader(this.execXMLExport(_paramCache)));
-        inputSource.setEncoding("UTF8");
-        reader.parse(inputSource);
+        new AdminXMLExportParser_mxJPO(new StringReader(this.execXMLExport(_paramCache))).parse(_paramCache, this);
+
         // prepare post preparation
         this.prepare();
 
@@ -231,9 +217,10 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
      *         <i>false</i>
      * @see #IGNORED_URLS
      */
-    protected boolean parse(final ParameterCache_mxJPO _paramCache,
-                            final String _url,
-                            final String _content)
+    @Override()
+    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
+                                            final String _url,
+                                            final String _content)
     {
         final boolean parsed;
         if (AbstractAdminObject_mxJPO.IGNORED_URLS.contains(_url))  {
@@ -661,7 +648,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
          * <p>Current XML element is evaluated. The path of the element defined
          * by the {@link #stack} fetched from {@link #getUrl()} is used to
          * identify the XML element. Evaluation of a XML element means to call
-         * {@link AbstractAdminObject_mxJPO#parse(ParameterCache_mxJPO, String, String)}.</p>
+         * {@link AbstractAdminObject_mxJPO#parseAdminXMLExportEvent(ParameterCache_mxJPO, String, String)}.</p>
          * <p>The parser is only called if the deep of a XML element is higher
          * than two, because this XML tags defines the administration element.
          * Deep 0 till 2 is used from MX for administration.</p>
@@ -671,7 +658,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
         private void evaluate()
         {
             if ((this.stack.size() > 2) && !"creationProperties".equals(this.stack.get(1)))  {
-                final boolean parsed = AbstractAdminObject_mxJPO.this.parse(
+                final boolean parsed = AbstractAdminObject_mxJPO.this.parseAdminXMLExportEvent(
                         this.paramCache,
                         this.getUrl(2),
                         (this.content != null) ? this.content.toString() : null);
