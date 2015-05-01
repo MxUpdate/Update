@@ -30,7 +30,6 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.datamodel.attribute.AttributeDefParser_mxJPO;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
@@ -371,7 +370,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         this.writeHeader(_paramCache, _out);
 
         // write attribute
-        _out.append("mxUpdate attribute \"${NAME}\"  {\n")
+        _out.append("mxUpdate attribute \"${NAME}\" {\n")
             .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n")
             .append("    ").append(this.isHidden() ? "" : "!").append("hidden\n");
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagMultiValue))  {

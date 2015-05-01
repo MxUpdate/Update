@@ -29,8 +29,21 @@ import org.mxupdate.update.AbstractAdminObject_mxJPO;
  * @author The MxUpdate Team
  * @param <TYPEIMPL>    parser is implemented for this class
  */
-public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_mxJPO>
+public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_mxJPO<?>>
 {
+    // hint: to avoid challenges with backslashes, they are defined directly via character
+    /** Regular expression for a backslash n converted to new line. */
+    private final static String MQL_CONVERT_BACKSLASH_N                     = "" + ((char) 0x005c) + ((char) 0x005c) + "n";
+    /** Regular expression for a backslash apostrophe converted to apostrophe. */
+    private final static String MQL_CONVERT_BACKSLASH_APOSTROPHE            = "" + ((char) 0x005c) + ((char) 0x005c) + "\"";
+    /** Regular expression for a backslash } converted to }. */
+    private final static String MQL_CONVERT_BACKSLASH_CURLY_BRACKEN_OPEN    = "" + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c) + "{";
+    /** Regular expression for a backslash { converted to {. */
+    private final static String MQL_CONVERT_BACKSLASH_CURLY_BRACKEN_CLOSE   = "" + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c) + "}";
+    /** Regular expression for a backslash backslash converted to backslash. */
+    private final static String MQL_CONVERT_BACKSLASH_BACKSLASH_FROM        = "" + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c);
+    private final static String MQL_CONVERT_BACKSLASH_BACKSLASH_TO          = "" + ((char) 0x005c) + ((char) 0x005c);
+
     /**
      * Parses one complete menu definition.
      *
@@ -307,9 +320,12 @@ public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_
     protected String getString(final String _token)
     {
         return _token
-            .replaceAll("^\"", "")
-            .replaceAll("\"$", "")
-            .replaceAll("\\\\\\\"", "\"");
+            .replaceAll("^\"", "").replaceAll("\"$", "")
+            .replaceAll(AbstractParser_mxJPO.MQL_CONVERT_BACKSLASH_N,                   "\n")
+            .replaceAll(AbstractParser_mxJPO.MQL_CONVERT_BACKSLASH_APOSTROPHE,          "\"")
+            .replaceAll(AbstractParser_mxJPO.MQL_CONVERT_BACKSLASH_CURLY_BRACKEN_OPEN,  "{")
+            .replaceAll(AbstractParser_mxJPO.MQL_CONVERT_BACKSLASH_CURLY_BRACKEN_CLOSE, "}")
+            .replaceAll(AbstractParser_mxJPO.MQL_CONVERT_BACKSLASH_BACKSLASH_FROM,      AbstractParser_mxJPO.MQL_CONVERT_BACKSLASH_BACKSLASH_TO);
     }
 
     /**
