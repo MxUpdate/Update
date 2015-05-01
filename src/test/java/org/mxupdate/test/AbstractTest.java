@@ -173,7 +173,7 @@ public abstract class AbstractTest
         /** Configuration item command. */
         UI_COMMAND("command", null, false, null, null, "Command", "COMMAND", "COMMAND_", "userinterface/command", true, "mxUpdate"),
         /** Configuration item form. */
-        UI_FORM("form", null, false, null, null, "Form", "FORM", "FORM_", "userinterface/form", true, "mql"),
+        UI_FORM("form", null, false, null, null, "Form", "FORM", "FORM_", "userinterface/form", true, "mxUpdate"),
         /** Configuration item inquiry. */
         UI_INQUIRY("inquiry", null, false, null, null, "Inquiry", "INQUIRY", "INQUIRY_", "userinterface/inquiry", true, "mql"),
         /** Configuration item menu. */
@@ -181,7 +181,7 @@ public abstract class AbstractTest
         /** Configuration item portal. */
         UI_PORTAL("portal", null, false, null, null, "Portal", "PORTAL", "PORTAL_", "userinterface/portal", true, "mxUpdate"),
         /** Configuration item table.*/
-        UI_TABLE("table", null, false, null, null, "Table", "TABLE", "TABLE_", "userinterface/table", false, "mql"),
+        UI_TABLE("table", null, false, null, null, "Table", "TABLE", "TABLE_", "userinterface/table", false, "mxUpdate"),
 
         /** Configuration item site (not handled as configuration item from the update tool itself). */
         OTHER_SITE("site", null, false, null, null, "Site", null, null, null, true, "mql");

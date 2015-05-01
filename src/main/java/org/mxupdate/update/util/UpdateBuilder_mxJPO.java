@@ -15,6 +15,7 @@
 
 package org.mxupdate.update.util;
 
+import java.io.IOException;
 import java.util.Collection;
 
 /**

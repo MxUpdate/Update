@@ -18,7 +18,6 @@ package org.mxupdate.test.ci.userinterface;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.user.GroupData;
 import org.mxupdate.test.data.user.RoleData;
 import org.mxupdate.test.data.userinterface.FormData;
 import org.testng.annotations.AfterClass;
@@ -48,8 +47,10 @@ public class FormTest
                         "simple form with two fields",
                         new FormData(this, "hello \" test")
                             .setValue("description", "\"\\\\ hello")
-                            .newField("field \"1\"").getFormTable()
-                            .newField("field \"2\"").getFormTable()},
+                            .newField("field \"1\"")
+                                    .getFormTable()
+                            .newField("field \"2\"")
+                                    .getFormTable()},
                 new Object[]{
                         "simple form with complex field",
                         new FormData(this, "hello \" test")
@@ -59,9 +60,8 @@ public class FormTest
                                     .setValue("range", "an \"range\"")
                                     .setValue("href", "an \"url\"")
                                     .setValue("alt", "an \"alt\"")
-                                    .setValue("update", "an \"alt\"")
-                                    .setSetting("first \"key\"", "first \"value\"")
-                                    .setSetting("second \"key\"", "second \"value\"")
+                                    .setKeyValue("setting", "first \"key\"", "first \"value\"")
+                                    .setKeyValue("setting", "second \"key\"", "second \"value\"")
                                     .getFormTable()},
                 new Object[]{
                         "form with business object select",
@@ -78,22 +78,16 @@ public class FormTest
                                     .setValue("relationship", "select \"expression\"")
                                     .getFormTable()},
                 new Object[]{
-                        "form with one role and one group",
+                        "form with one role",
                         new FormData(this, "hello \" test")
                             .newField("field")
-                                    .addUser(new RoleData(this, "user \"role\""))
-                                    .addUser(new GroupData(this, "user \"group\""))
+                                    .defData("user", new RoleData(this, "user \"role\""))
                                     .getFormTable()}
         );
     }
 
-    /**
-     * Cleanup all test web forms.
-     *
-     * @throws MatrixException if cleanup failed
-     */
     @BeforeMethod()
-    @AfterClass()
+    @AfterClass(groups = "close")
     public void cleanup()
         throws MatrixException
     {
@@ -102,12 +96,6 @@ public class FormTest
         this.cleanup(AbstractTest.CI.USR_GROUP);
     }
 
-    /**
-     * Creates for given <code>_name</code> a new form instance.
-     *
-     * @param _name     name of the form instance
-     * @return form instance
-     */
     @Override()
     protected FormData createNewData(final String _name)
     {

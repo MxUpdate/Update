@@ -15,7 +15,8 @@
 
 package org.mxupdate.update.util;
 
-import java.util.SortedSet;
+import java.lang.reflect.Array;
+import java.util.Collection;
 
 /**
  * Utility class to compare objects.
@@ -36,15 +37,16 @@ public final class CompareToUtil_mxJPO
      * {@code null} case.
      *
      * @param _comparison   current comparison
-     * @param _lhs          left string
-     * @param _rhs          right string
+     * @param _lhs          left Comparable
+     * @param _rhs          right Comparable
      * @return if {@code _comparision} is not 0 {@code _comparision} is
      *         returned, otherwise the comparison result of {@code _lhs} and
      *         {@code _rhs}
      */
-    public static int compare(final int _comparison,
-                              final String _lhs,
-                              final String _rhs)
+    @SuppressWarnings("unchecked")
+    public static <T> int compare(final int _comparison,
+                                  final Comparable<T> _lhs,
+                                  final Comparable<T> _rhs)
     {
         final int comparison;
         if (_comparison != 0)  {
@@ -56,7 +58,7 @@ public final class CompareToUtil_mxJPO
         } else if (_rhs == null)  {
             comparison = +1;
         } else  {
-            comparison = _lhs.compareTo(_rhs);
+            comparison = _lhs.compareTo((T) _rhs);
         }
         return comparison;
     }
@@ -66,20 +68,21 @@ public final class CompareToUtil_mxJPO
      * {@code null} case.
      *
      * @param _comparison   current comparison
-     * @param _lhs          left string
-     * @param _rhs          right string
+     * @param _lhs          left Comparable
+     * @param _rhs          right Comparable
      * @return if {@code _comparision} is not 0 {@code _comparision} is
      *         returned, otherwise the comparison result of {@code _lhs} and
      *         {@code _rhs}
      */
-    public static int compare(final int _comparison,
-                              final SortedSet<String> _lhs,
-                              final SortedSet<String> _rhs)
+    @SuppressWarnings("unchecked")
+    public static <T extends Comparable<T>> int compare(final int _comparison,
+                                                        final Collection<T> _lhs,
+                                                        final Collection<T> _rhs)
     {
         return CompareToUtil_mxJPO.compare(
                 _comparison,
-                (_lhs == null) ? null : _lhs.toArray(new String[_lhs.size()]),
-                (_rhs == null) ? null : _rhs.toArray(new String[_rhs.size()]));
+                (_lhs == null || _lhs != null && _lhs.size() == 0) ? null : (Comparable<T>[]) Array.newInstance(_lhs.iterator().next().getClass(), _lhs.size()),
+                (_rhs == null || _lhs != null && _lhs.size() == 0) ? null : (Comparable<T>[]) Array.newInstance(_rhs.iterator().next().getClass(), _rhs.size()));
     }
 
     /**
@@ -87,15 +90,15 @@ public final class CompareToUtil_mxJPO
      * {@code null} case.
      *
      * @param _comparison   current comparison
-     * @param _lhs          left string
-     * @param _rhs          right string
+     * @param _lhs          left Comparable
+     * @param _rhs          right Comparable
      * @return if {@code _comparision} is not 0 {@code _comparision} is
      *         returned, otherwise the comparison result of {@code _lhs} and
      *         {@code _rhs}
      */
-    public static int compare(final int _comparison,
-                              final String[] _lhs,
-                              final String[] _rhs)
+    public static  <T> int compare(final int _comparison,
+                                   final Comparable<T>[] _lhs,
+                                   final Comparable<T>[] _rhs)
     {
         final int comparison;
         if (_comparison != 0)  {

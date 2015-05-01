@@ -16,18 +16,24 @@
 package org.mxupdate.update.userinterface;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.userinterface.Form_mxJPO.Field;
+import org.mxupdate.update.userinterface.Table_mxJPO.Column;
+import org.mxupdate.update.util.CompareToUtil_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateLine;
 
 /**
  * The class if used to handle fields for web forms and columns for web tables.
@@ -38,12 +44,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObject_mxJPO<CLASS>>
     extends AbstractAdminObject_mxJPO<CLASS>
 {
-    /**
-     * Set of all ignored URLs from the XML definition for web forms / web
-     * tables.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     */
+    /** Set of all ignored URLs from the XML definition for web forms / web  tables. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
         // web table
@@ -52,13 +53,8 @@ public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObje
         AbstractUIWithFields_mxJPO.IGNORED_URLS.add("/fieldList");
     }
 
-    /**
-     * Stores all fields / columns of this form  / table instance.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see Field
-     */
-    private final Stack<Field> fields = new Stack<Field>();
+    /** Stores all fields / columns of this form  / table instance. */
+    private final Stack<AbstractField> fields = new Stack<AbstractField>();
 
     /**
      *
@@ -74,7 +70,7 @@ public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObje
     /**
      * Parses the fields of web forms and / or columns of web tables. To parse
      * the content of a field / column
-     * {@link Field#parse(ParameterCache_mxJPO, String, String)} is called.
+     * {@link AbstractField#parse(ParameterCache_mxJPO, String, String)} is called.
      *
      * @param _paramCache   parameter cache with MX context
      * @param _url          URL to parse
@@ -93,7 +89,7 @@ public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObje
 
         // -------- web table columns
         } else if ("/columnList/column".equals(_url))  {
-            this.fields.add(new Field());
+            this.fields.add(new Column());
             parsed = true;
         } else if (_url.startsWith("/columnList/column/"))  {
             parsed = this.fields.peek().parse(_paramCache, _url.substring(18), _content);
@@ -118,7 +114,7 @@ public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObje
      * @return collection of all defined fields / columns
      * @see #fields
      */
-    protected Collection<Field> getFields()
+    protected Stack<AbstractField> getFields()
     {
         return this.fields;
     }
@@ -126,7 +122,8 @@ public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObje
     /**
      * Class used to define a column of a web table or a field of a web form.
      */
-    public static class Field
+    protected abstract static class AbstractField
+        implements UpdateLine, Comparable<AbstractField>
     {
         /**
          * Set of all ignored URLs from the XML definition for columns /
@@ -137,175 +134,55 @@ public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObje
         private static final Set<String> IGNORED_URLS = new HashSet<String>();
         static  {
             // ignored, because the XML export is in correct order...
-            AbstractUIWithFields_mxJPO.Field.IGNORED_URLS.add("/fieldOrder");
+            AbstractUIWithFields_mxJPO.AbstractField.IGNORED_URLS.add("/fieldOrder");
             // the geometry information is defined as sub tags
-            AbstractUIWithFields_mxJPO.Field.IGNORED_URLS.add("/geometry");
-            AbstractUIWithFields_mxJPO.Field.IGNORED_URLS.add("/fieldSettingList");
-            AbstractUIWithFields_mxJPO.Field.IGNORED_URLS.add("/fieldUserList");
+            AbstractUIWithFields_mxJPO.AbstractField.IGNORED_URLS.add("/geometry");
+            AbstractUIWithFields_mxJPO.AbstractField.IGNORED_URLS.add("/fieldSettingList");
+            AbstractUIWithFields_mxJPO.AbstractField.IGNORED_URLS.add("/fieldUserList");
         }
 
-        /**
-         * Name of the field / column.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
+        /** Name of the field / column. */
         private String name;
-
-        /**
-         * Label of the field / column.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
+        /** Label of the field / column.*/
         private String label;
-
-        /**
-         * HRef of the field / column.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
+        /** HRef of the field / column. */
         private String href;
-
-        /**
-         * URL of the range of the field / column.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
-        private String rangeURL;
-
-        /**
-         * URL of the update of this field / column.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
+        /** URL of the range of the field / column. */
+        private String range;
+        /** URL of the update of this field / column.*/
         private String updateURL;
-
-        /**
-         * Alt label of the column / field.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
+        /** Alt label of the column / field. */
         private String alt;
 
-        /**
-         * Expression of the field / column.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
+        /** Expression of the field / column.*/
         private String expression;
+        /** Defines how the field / column is sorted. */
+        private ExpressionType expressionType = ExpressionType.SELECT;
 
-        /**
-         * If set to <i>true</i> the {@link #expression} of the field belongs
-         * to business objects.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
-        private boolean isBusinessObject = false;
-
-        /**
-         * If set to <i>true</i> the {@link #expression} of the field belongs
-         * to connections.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
-        private boolean isRelationship = false;
-
-        /**
-         * Defines how the field / column is sorted.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
+        /** Defines how the field / column is sorted.*/
         private SortType sortType = SortType.NONE;
-
-        /**
-         * Defines the sort program of this field / column.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
+        /** Defines the sort program of this field / column.*/
         private String sortProgram;
 
-        /**
-         * All settings of the field / column.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
-        private final Stack<Setting_mxJPO> settings = new Stack<Setting_mxJPO>();
+        /** All settings of the field / column.*/
+        private final Stack<Setting> settings = new Stack<Setting>();
 
-        /**
-         * Set of all users for this field.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
-        private final Set<String> users = new TreeSet<String>();
+        /** Set of all users for this field.*/
+        private final SortedSet<String> users = new TreeSet<String>();
 
-        /**
-         * Scale value for this field.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
+        /** Scale value for this field.*/
         private Double scale;
-
-        /**
-         * Height of this column / field. If not specified the value is
-         * <code>1.0</code>.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
+        /** Height of this column / field. If not specified the value is {@code 1.0}. */
         private double height = 1.0;
-
-        /**
-         * Width of this column / field. If not specified the value is
-         * <code>1.0</code>.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
+        /** Width of this column / field. If not specified the value is {@code 1.0}. */
         private double width = 1.0;
-
-        /**
-         * Minimum height of this column / field.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
+        /** Minimum height of this column / field.*/
         private double minHeight;
-
-        /**
-         * Minimum width of this column / field.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
+        /** Minimum width of this column / field.*/
         private double minWidth;
-
-        /**
-         * Auto height is defined for this field.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
+        /** Auto height is defined for this field.*/
         private boolean autoHeight = false;
-
-        /**
-         * Auto width is defined for this field.
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
-         */
+        /** Auto width is defined for this field.*/
         private boolean autoWidth = false;
 
         /**
@@ -314,9 +191,6 @@ public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObje
          * will write the edit flag!</p>
          * <p>The flag only belongs to tables. Forms does not known the flag
          * (and ignored because default value is <i>false</i>).</p>
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
          */
         private boolean editable = false;
 
@@ -326,11 +200,21 @@ public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObje
          * will write the edit flag!</p>
          * <p>The flag only belongs to tables. Forms does not known the flag
          * (and ignored because default value is <i>false</i>).</p>
-         *
-         * @see #parse(ParameterCache_mxJPO, String, String)
-         * @see #write(Appendable)
          */
         private boolean hidden = false;
+
+        /** Tag used for this field.*/
+        private final String tag;
+
+        /**
+         * Constructor setting the tag.
+         *
+         * @param _tag tag to be used
+         */
+        protected AbstractField(final String _tag)
+        {
+            this.tag = _tag;
+        }
 
         /**
          * Parses a field / column. This includes:
@@ -369,7 +253,7 @@ public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObje
                              final String _content)
         {
             boolean parsed = true;
-            if (!AbstractUIWithFields_mxJPO.Field.IGNORED_URLS.contains(_url))  {
+            if (!AbstractUIWithFields_mxJPO.AbstractField.IGNORED_URLS.contains(_url))  {
                 if ("/alt".equals(_url))  {
                     this.alt = _content;
                 } else if ("/derivedfield".equals(_url))  {
@@ -381,7 +265,7 @@ System.err.println("derived field not null! This is not supported!");
                 } else if ("/href".equals(_url))  {
                     this.href = _content;
                 } else if ("/rangeHref".equals(_url))  {
-                    this.rangeURL = _content;
+                    this.range = _content;
                 } else if ("/updateUrl".equals(_url))  {
                     this.updateURL = _content;
                 } else if ("/label".equals(_url))  {
@@ -390,13 +274,13 @@ System.err.println("derived field not null! This is not supported!");
                     this.name = _content;
                 } else if ("/sortType".equals(_url))  {
                     if ("0".equals(_content))  {
-                        this.sortType = AbstractUIWithFields_mxJPO.Field.SortType.NONE;
+                        this.sortType = AbstractUIWithFields_mxJPO.AbstractField.SortType.NONE;
                     } else if ("1".equals(_content))  {
-                        this.sortType = AbstractUIWithFields_mxJPO.Field.SortType.ALPHANUMERIC;
+                        this.sortType = AbstractUIWithFields_mxJPO.AbstractField.SortType.ALPHANUMERIC;
                     } else if ("2".equals(_content))  {
-                        this.sortType = AbstractUIWithFields_mxJPO.Field.SortType.NUMERIC;
+                        this.sortType = AbstractUIWithFields_mxJPO.AbstractField.SortType.NUMERIC;
                     } else if ("3".equals(_content))  {
-                        this.sortType = AbstractUIWithFields_mxJPO.Field.SortType.OTHER;
+                        this.sortType = AbstractUIWithFields_mxJPO.AbstractField.SortType.OTHER;
                     } else  {
 // TODO: correct error message!
 System.err.println("unknown sort type '" + _content + "'");
@@ -407,9 +291,9 @@ System.err.println("unknown sort type '" + _content + "'");
                 } else if ("/expression".equals(_url) || "/fieldValue".equals(_url))  {
                     this.expression = _content;
                 } else if ("/usesBusinessObject".equals(_url))  {
-                    this.isBusinessObject = true;
+                    this.expressionType = ExpressionType.BUSINESSOBJECT;
                 } else if ("/usesRelationship".equals(_url))  {
-                    this.isRelationship = true;
+                    this.expressionType = ExpressionType.RELATIONSHIP;
                 } else if ("/fieldType".equals(_url))  {
 if (!"select".equals(_content))  {
     System.err.println("unknown field type '" + _content + "'");
@@ -421,7 +305,7 @@ if (!"select".equals(_content))  {
                     this.users.add(_content);
 
                 } else if ("/fieldSettingList/fieldSetting".equals(_url))  {
-                    this.settings.add(new Setting_mxJPO());
+                    this.settings.add(new Setting());
                 } else if ("/fieldSettingList/fieldSetting/fieldSettingName".equals(_url))  {
                     this.settings.peek().name = _content;
                 } else if ("/fieldSettingList/fieldSetting/fieldSettingValue".equals(_url))  {
@@ -498,6 +382,7 @@ System.err.println("y location is not 0.0 and this is currently not supported");
          * @param _out      appendable instance to the TCL update file
          * @throws IOException if the TCL update code could not be written
          */
+        @Deprecated()
         public void write(final Appendable _out)
             throws IOException
         {
@@ -505,17 +390,17 @@ System.err.println("y location is not 0.0 and this is currently not supported");
                 .append(" \\\n        label \"")
                         .append((this.label != null) ? StringUtil_mxJPO.convertTcl(this.label) : "")
                         .append("\"");
-            if (this.isBusinessObject && (this.expression != null))  {
+            if (ExpressionType.BUSINESSOBJECT.equals(this.expressionType) && (this.expression != null))  {
                 _out.append(" \\\n        businessobject \"")
                     .append(StringUtil_mxJPO.convertTcl(this.expression)).append("\"");
             }
-            if (this.isRelationship && (this.expression != null))  {
+            if (ExpressionType.RELATIONSHIP.equals(this.expressionType) && (this.expression != null))  {
                 _out.append(" \\\n        relationship \"")
                     .append(StringUtil_mxJPO.convertTcl(this.expression)).append("\"");
             }
 
             _out.append(" \\\n        range \"")
-                        .append((this.rangeURL != null) ? StringUtil_mxJPO.convertTcl(this.rangeURL) : "")
+                        .append((this.range != null) ? StringUtil_mxJPO.convertTcl(this.range) : "")
                         .append("\"");
             if (this.updateURL != null)  {
                 _out.append(" \\\n        update \"").append(StringUtil_mxJPO.convertTcl(this.updateURL)).append("\"");
@@ -572,7 +457,7 @@ System.err.println("y location is not 0.0 and this is currently not supported");
 
             // settings
             final Map<String,String> tmpSettings  = new TreeMap<String,String>();
-            for (final Setting_mxJPO setting : this.settings)  {
+            for (final Setting setting : this.settings)  {
                 tmpSettings.put((setting.name == null) ? "" : setting.name,
                                 (setting.value == null) ? "" : setting.value);
             }
@@ -586,45 +471,104 @@ System.err.println("y location is not 0.0 and this is currently not supported");
             }
         }
 
-        /**
-         * Returns the name of the form field / table column. The method is the
-         * getter method for instance variable {@link #name}.
-         *
-         * @return name of field / column name
-         * @see #name
-         */
-        public String getName()
+        @Override()
+        public void write(final UpdateBuilder_mxJPO _updateBuilder)
         {
-            return this.name;
+            _updateBuilder
+                .childStart(this.tag)
+                //              tag             | default | value                       | write?
+                .string(        "name",                     this.name)
+                .string(        "label",                    this.label)
+                .stringIfTrue(  "select",                   this.expression,            (ExpressionType.SELECT         == this.expressionType) && (this.expression != null) && !this.expression.isEmpty())
+                .stringIfTrue(  "businessobject",           this.expression,            (ExpressionType.BUSINESSOBJECT == this.expressionType) && (this.expression != null) && !this.expression.isEmpty())
+                .stringIfTrue(  "relationship",             this.expression,            (ExpressionType.RELATIONSHIP   == this.expressionType) && (this.expression != null) && !this.expression.isEmpty())
+                .stringIfTrue(  "range",                    this.range,                 (this.range != null) && !this.range.isEmpty())
+                .stringIfTrue(  "href",                     this.href,                  (this.href != null) && !this.href.isEmpty())
+                .stringIfTrue(  "alt",                      this.alt,                   (this.alt != null) && !this.alt.isEmpty())
+                .flagIfTrue(    "hidden",           false,  this.hidden,                this.hidden)
+                .list(          "user",                     this.users)
+                .singleIfTrue(  "sorttype",                 this.sortType.mxValue,      (this.sortType != SortType.NONE))
+                .list(this.settings)
+                .childEnd();
+        }
+
+        @Override()
+        public int compareTo(final AbstractField _compareTo)
+        {
+            int ret = 0;
+            ret = CompareToUtil_mxJPO.compare(ret, this.name,           _compareTo.name);
+            ret = CompareToUtil_mxJPO.compare(ret, this.label,          _compareTo.label);
+            ret = CompareToUtil_mxJPO.compare(ret, this.expression,     _compareTo.expression);
+            ret = CompareToUtil_mxJPO.compare(ret, this.expressionType, _compareTo.expressionType);
+            ret = CompareToUtil_mxJPO.compare(ret, this.range,          _compareTo.range);
+            ret = CompareToUtil_mxJPO.compare(ret, this.href,           _compareTo.href);
+            ret = CompareToUtil_mxJPO.compare(ret, this.alt,            _compareTo.alt);
+            ret = CompareToUtil_mxJPO.compare(ret, this.hidden,         _compareTo.hidden);
+            ret = CompareToUtil_mxJPO.compare(ret, this.users,          _compareTo.users);
+            ret = CompareToUtil_mxJPO.compare(ret, this.sortType,       _compareTo.sortType);
+            ret = CompareToUtil_mxJPO.compare(ret, this.settings,       _compareTo.settings);
+            return ret;
+        }
+
+        /**
+         * The delta consists only in creation and
+         * the MQL append commands to {@code _mql}.
+         *
+         * @param _mql          builder to append the MQL commands
+         */
+        public void calcDelta(final MultiLineMqlBuilder _mql,
+                              final Integer _order)
+        {
+            _mql.newLine()
+                .cmd(this.tag)
+                .cmd(" name ").arg(this.name != null ? this.name : "")
+                .cmd(" label ").arg(this.label)
+                .cmd(" range ").arg(this.range)
+                .cmd(" href ").arg(this.href)
+                .cmd(" alt ").arg(this.alt);
+
+            if (this.expression != null)  {
+                switch (this.expressionType) {
+                    case BUSINESSOBJECT:
+                        _mql.cmd(" businessobject ").arg(this.expression);
+                        break;
+                    case RELATIONSHIP:
+                        _mql.cmd(" relationship ").arg(this.expression);
+                        break;
+                    default:
+                        _mql.cmd(" select ").arg(this.expression);
+                        break;
+                }
+            }
+            if (this.hidden)  {
+                _mql.cmd(" hidden");
+            }
+            for (final String user : this.users)  {
+                _mql.cmd(" user ").arg(user);
+            }
+            if (this.sortType != SortType.NONE)  {
+                _mql.cmd(" sorttype ").cmd(this.sortType.mxValue);
+            }
+            for (final Setting setting : this.settings)  {
+                setting.calcDelta(_mql);
+            }
+            _mql.cmd(" order ").arg(String.valueOf(_order));
         }
 
         /**
          * Enumeration for the different sort types of a web table column.
          */
         public enum SortType  {
-            /**
-             * None sorting.
-             */
+            /** None sorting. */
             NONE("none"),
-
-            /**
-             * Alpha-numerical sorting.
-             */
+            /** Alpha-numerical sorting. */
             ALPHANUMERIC("alpha"),
-
-            /**
-             * Numerical sorting.
-             */
+            /** Numerical sorting. */
             NUMERIC("numeric"),
-
-            /**
-             * Other sorting.
-             */
+            /** Other sorting. */
             OTHER("other");
 
-            /**
-             * Related value of the sorting type within MX.
-             */
+            /** Related value of the sorting type within MX. */
             final String mxValue;
 
             /**
@@ -637,6 +581,71 @@ System.err.println("y location is not 0.0 and this is currently not supported");
             {
                 this.mxValue = _mxValue;
             }
+        }
+
+        /**
+         * Expression type of the select.
+         */
+        public enum ExpressionType
+        {
+            /** Basic case. */
+            SELECT,
+            /** Business object select. */
+            BUSINESSOBJECT,
+            /** Relationship select. */
+            RELATIONSHIP;
+        }
+    }
+
+    /**
+     * Setting of a field / column.
+     */
+    public static class Setting
+        implements UpdateLine, Comparable<Setting>
+    {
+        /**
+         * Name of the setting.
+         */
+        String name = null;
+
+        /**
+         * Value of the setting.
+         */
+        String value = null;
+
+        @Override()
+        public void write(final UpdateBuilder_mxJPO _updateBuilder)
+        {
+            if (this.name != null && !this.name.isEmpty()) {
+                _updateBuilder
+                    .stepStartNewLine()
+                    .stepSingle("setting")
+                    .stepString(this.name)
+                    .stepString(this.value)
+                    .stepEndLine();
+            }
+        }
+
+        public void calcDelta(final MultiLineMqlBuilder _mql)
+        {
+            _mql.cmd(" setting ").arg(this.name).cmd(" ").arg(this.value);
+        }
+
+        /**
+         * {@inheritDoc}
+         * The string representation includes the {@link #name} and the
+         * {@link #value}.
+         */
+        @Override()
+        public String toString()
+        {
+            return "[name=" + this.name + ", value=" + this.value + "]";
+        }
+
+        @Override
+        public int compareTo(final Setting _setting)
+        {
+            return 0;
         }
     }
 }

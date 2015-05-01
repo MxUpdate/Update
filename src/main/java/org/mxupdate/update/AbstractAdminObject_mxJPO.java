@@ -32,8 +32,6 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.user.PersonAdmin_mxJPO;
-import org.mxupdate.update.userinterface.Form_mxJPO;
-import org.mxupdate.update.userinterface.Table_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
@@ -569,9 +567,7 @@ final String propName = prop.getName().replaceAll(" ", "").toUpperCase();
 final Object tmp = this;
         // remove all properties
         // (only if not attribute, because attributes and formats uses calulated deltas)
-        if ((tmp instanceof PersonAdmin_mxJPO)
-                || (tmp instanceof Form_mxJPO)
-                || (tmp instanceof Table_mxJPO))  {
+        if (tmp instanceof PersonAdmin_mxJPO)  {
 
             for (final AdminProperty prop : this.properties.getProperties())  {
                 if (PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null)  {
@@ -602,9 +598,7 @@ final Object tmp = this;
 
         final StringBuilder postMQLCode = new StringBuilder();
 
-        if ((tmp instanceof PersonAdmin_mxJPO)
-                || (tmp instanceof Form_mxJPO)
-                || (tmp instanceof Table_mxJPO))  {
+        if (tmp instanceof PersonAdmin_mxJPO)  {
             // define version property
             postMQLCode.append(_postMQLCode)
                        .append("escape mod ").append(this.getTypeDef().getMxAdminName())
@@ -742,7 +736,13 @@ final Object tmp = this;
 
             clazz.parseUpdate(_args[3].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\"));
 
-            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod " + this.getTypeDef().getMxAdminName() + " $1", this.getName());
+            // initialize MQL builder (with or w/o suffix!)
+            final MultiLineMqlBuilder mql;
+            if ((this.getTypeDef().getMxAdminSuffix() != null) && !this.getTypeDef().getMxAdminSuffix().isEmpty())  {
+                mql = MqlBuilder_mxJPO.multiLine("escape mod " + this.getTypeDef().getMxAdminName() + " $1 " + this.getTypeDef().getMxAdminSuffix(), this.getName());
+            } else  {
+                mql = MqlBuilder_mxJPO.multiLine("escape mod " + this.getTypeDef().getMxAdminName() + " $1", this.getName());
+            }
 
             clazz.calcDelta(_paramCache, mql, (CLASS) this);
 

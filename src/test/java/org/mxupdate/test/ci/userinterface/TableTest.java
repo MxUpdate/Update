@@ -18,7 +18,6 @@ package org.mxupdate.test.ci.userinterface;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.user.GroupData;
 import org.mxupdate.test.data.user.RoleData;
 import org.mxupdate.test.data.userinterface.TableData;
 import org.testng.annotations.AfterClass;
@@ -45,13 +44,13 @@ public class TableTest
     {
         return this.prepareData("table",
                 new Object[]{
-                        "simple table with two fields",
+                        "1) simple table with two fields",
                         new TableData(this, "hallo \" test")
                             .setValue("description", "\"\\\\ hallo")
-                            .newField("field \"1\"").getFormTable()
-                            .newField("field \"2\"").getFormTable()},
+                            .newField("field \"1\"").setValue("name", "1").getFormTable()
+                            .newField("field \"2\"").setValue("name", "2").getFormTable()},
                 new Object[]{
-                        "simple table with complex field",
+                        "2) simple table with complex field",
                         new TableData(this, "hallo \" test")
                             .setValue("description", "\"\\\\ hallo")
                             .newField("field")
@@ -59,47 +58,53 @@ public class TableTest
                                     .setValue("range", "an \"range\"")
                                     .setValue("href", "an \"url\"")
                                     .setValue("alt", "an \"alt\"")
-                                    .setValue("update", "an \"alt\"")
-                                    .setSetting("first \"key\"", "first \"value\"")
-                                    .setSetting("second \"key\"", "second \"value\"")
+                                    .setKeyValue("setting", "first \"key\"", "first \"value\"")
+                                    .setKeyValue("setting", "second \"key\"", "second \"value\"")
                                     .getFormTable()},
                 new Object[]{
-                        "table with business object select",
+                        "3a) table with business object select",
                         new TableData(this, "hallo \" test")
                             .setValue("description", "\"\\\\ hallo")
                             .newField("field")
                                     .setValue("businessobject", "select \"expression\"")
                                     .getFormTable()},
                 new Object[]{
-                        "table with relationship select",
+                        "3b) table with relationship select",
                         new TableData(this, "hallo \" test")
                             .setValue("description", "\"\\\\ hallo")
                             .newField("field")
                                     .setValue("relationship", "select \"expression\"")
                                     .getFormTable()},
                 new Object[]{
-                        "table with one role and one group",
+                        "4) table with one role",
                         new TableData(this, "hallo \" test")
                             .newField("field")
-                                    .addUser(new RoleData(this, "user \"role\""))
-                                    .addUser(new GroupData(this, "user \"group\""))
+                                    .defData("user", new RoleData(this, "user \"role\""))
                                     .getFormTable()},
                 new Object[]{
-                        "table with one hidden column",
+                        "5) table with one hidden column",
                         new TableData(this, "hallo \" test")
                             .newField("field")
                                     .setFlag("hidden", true)
-                                    .getFormTable()}
+                                    .getFormTable()},
+                new Object[]{
+                        "6a) table column with sorttype alpha",
+                        new TableData(this, "hallo \" test").newField("field").setValue("label", "").setSingle("sorttype", "alpha").getFormTable()},
+                new Object[]{
+                        "6b) table column with sorttype numeric",
+                        new TableData(this, "hallo \" test").newField("field").setSingle("sorttype", "numeric").getFormTable()},
+                new Object[]{
+                        "6c) table column with sorttype other",
+                        new TableData(this, "hallo \" test").newField("field").setSingle("sorttype", "other").getFormTable()},
+                new Object[]{
+                        "6d) table column with sorttype none",
+                        new TableData(this, "hallo \" test").newField("field").setSingle("sorttype", "none").getFormTable(),
+                        new TableData(this, "hallo \" test").newField("field").getFormTable()}
         );
     }
 
-    /**
-     * Cleanup all test web tables.
-     *
-     * @throws MatrixException if cleanup failed
-     */
     @BeforeMethod()
-    @AfterClass()
+    @AfterClass(groups = "close")
     public void cleanup()
         throws MatrixException
     {
@@ -109,12 +114,6 @@ public class TableTest
         this.cleanup(AbstractTest.CI.USR_GROUP);
     }
 
-    /**
-     * Creates for given <code>_name</code> a new table instance.
-     *
-     * @param _name     name of the table instance
-     * @return table instance
-     */
     @Override()
     protected TableData createNewData(final String _name)
     {

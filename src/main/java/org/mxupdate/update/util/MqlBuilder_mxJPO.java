@@ -184,6 +184,9 @@ public final class MqlBuilder_mxJPO
          */
         public MultiLineMqlBuilder cmd(final CharSequence _cmd)
         {
+            if (this.lastLine == null) {
+                this.newLine();
+            }
             this.lastLine.cmd(_cmd);
             return this;
         }
@@ -348,6 +351,7 @@ public final class MqlBuilder_mxJPO
                 } catch (final IllegalAccessException e)  {
                     throw new MatrixException(e);
                 } catch (final IllegalArgumentException e)  {
+                    System.err.println("Failed for " + this.toString());
                     throw new MatrixException(e);
                 } catch (final InvocationTargetException e)  {
                     if (e.getCause() instanceof MatrixException)  {

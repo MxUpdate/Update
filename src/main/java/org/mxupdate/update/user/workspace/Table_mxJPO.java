@@ -18,10 +18,8 @@ package org.mxupdate.update.user.workspace;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Stack;
 
 import org.mxupdate.update.user.AbstractUser_mxJPO;
-import org.mxupdate.update.userinterface.AbstractUIWithFields_mxJPO.Field;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
@@ -66,7 +64,7 @@ public class Table_mxJPO
      *
      * @see #parse(ParameterCache_mxJPO, String, String)
      */
-    private final Stack<Field> fields = new Stack<Field>();
+//    private final Stack<AbstractField> fields = new Stack<AbstractField>();
 
     /**
      * Default constructor.
@@ -105,11 +103,11 @@ public class Table_mxJPO
         final boolean parsed;
         if (Table_mxJPO.IGNORED_URLS.contains(_url))  {
             parsed = true;
-        } else if ("/columnList/column".equals(_url))  {
-            this.fields.add(new Field());
-            parsed = true;
-        } else if (_url.startsWith("/columnList/column/"))  {
-            parsed = this.fields.peek().parse(_paramCache, _url.substring(18), _content);
+//        } else if ("/columnList/column".equals(_url))  {
+//            this.fields.add(new AbstractField());
+//            parsed = true;
+//        } else if (_url.startsWith("/columnList/column/"))  {
+//            parsed = this.fields.peek().parse(_paramCache, _url.substring(18), _content);
         } else  {
             parsed = super.parse(_paramCache, _url, _content);
         }
@@ -171,9 +169,9 @@ public class Table_mxJPO
         _out.append(cmd.toString().replaceFirst(Table_mxJPO.EXPR_LINE_USER, Table_mxJPO.REPLACE_LINE_USER_WITH_UNITS));
 
         // web table colums
-        for (final Field field : this.fields)  {
+        /*for (final AbstractField field : this.fields)  {
             _out.append(" \\\n    column");
             field.write(_out);
-        }
+        }*/
     }
 }

@@ -16,7 +16,6 @@
 package org.mxupdate.test.data.userinterface;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import matrix.util.MatrixException;
@@ -24,8 +23,6 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
-import org.mxupdate.test.data.user.AbstractUserData;
-import org.testng.Assert;
 
 /**
  * Used to define a web form, create them and test the result.
@@ -35,13 +32,7 @@ import org.testng.Assert;
 public class FormData
     extends AbstractAdminData<FormData>
 {
-    /**
-     * All fields of this form.
-     *
-     * @see #newField(String)
-     * @see #append4Create(StringBuilder)
-     * @see #ciFile()
-     */
+    /** All fields of this form. */
     private final List<FieldData<FormData>> fields = new ArrayList<FieldData<FormData>>();
 
     /**
@@ -92,16 +83,22 @@ public class FormData
     @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder();
-        this.append4CIFileHeader(cmd);
-        cmd.append("mql escape mod form \"${NAME}\"");
+        final StringBuilder strg = new StringBuilder();
+        this.append4CIFileHeader(strg);
+        strg.append("mxUpdate form \"${NAME}\" {\n");
 
-        this.append4CIFileValues(cmd);
-        // and all fields...
-        for (final FieldData<FormData> field : this.fields)  {
-            cmd.append(" \\\n    field").append(field.ciFile());
+        this.getFlags().append4Update("    ", strg);
+        this.getValues().append4Update("    ", strg);
+        this.getProperties().append4Update("    ", strg);
+        for (final String ciLine : this.getCILines())  {
+            strg.append("    ").append(ciLine).append('\n');
         }
-        return cmd.toString();
+        for (final FieldData<FormData> field : this.fields)  {
+            strg.append(field.ciFile());
+        }
+        strg.append("}");
+
+        return strg.toString();
     }
 
     /**
@@ -152,13 +149,9 @@ public class FormData
     {
         super.createDependings();
 
-        // create users
         for (final FieldData<FormData> field : this.fields)  {
-            for (final AbstractUserData<?> user : field.getUsers())  {
-                user.create();
-            }
+            field.createDependings();
         }
-
         return this;
     }
 
@@ -179,28 +172,9 @@ public class FormData
     {
         super.checkExport(_exportParser);
 
-        // fetch all columns of the table
-        final List<ExportParser.Line> columnLines = new ArrayList<ExportParser.Line>();
-        // first only the table is the root line...
-        for (final ExportParser.Line rootLine : _exportParser.getRootLines())  {
-            // loop through all columns
-            for (final ExportParser.Line line : rootLine.getChildren())  {
-                if ("field".equals(line.getTag()))  {
-                    columnLines.add(line);
-                }
-            }
-        }
-
-        // and check all columns
-        Assert.assertEquals(columnLines.size(),
-                            this.fields.size(),
-                            "check that all columns / fields are correct defined");
-        final Iterator<ExportParser.Line> columnLinesIter = columnLines.iterator();
-        final Iterator<FieldData<FormData>> fieldsIter = this.fields.iterator();
-        while (columnLinesIter.hasNext() && fieldsIter.hasNext())  {
-            final FieldData<FormData> field = fieldsIter.next();
-            final ExportParser.Line line = columnLinesIter.next();
-            field.checkExport(new ExportParser(field.getName(), _exportParser.getLog(), "mql", line.getValue(), line.getChildren()));
+        int idx = 0;
+        for (final FieldData<FormData> field: this.fields) {
+            field.check4Export(_exportParser, "field[" + (idx++) + "]");
         }
     }
 }

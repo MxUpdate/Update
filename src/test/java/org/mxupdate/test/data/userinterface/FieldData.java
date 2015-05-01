@@ -15,18 +15,11 @@
 
 package org.mxupdate.test.data.userinterface;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
-import org.mxupdate.test.data.user.AbstractUserData;
-import org.testng.Assert;
 
 /**
  * Defines on column / field of a table.
@@ -37,117 +30,8 @@ import org.testng.Assert;
 public class FieldData<FORMTABLE extends AbstractAdminData<?>>
     extends AbstractAdminData<FieldData<FORMTABLE>>
 {
-    /**
-     * Related table / form which defines this field.
-     *
-     * @see #getFormTable()
-     */
+    /** Related table / form which defines this field. */
     private final FORMTABLE tableForm;
-
-    /**
-     * Sort type of this column / field.
-     */
-    private String sortType;
-
-    /**
-     * Height of this column / field.
-     *
-     * @see #setSize(Double,Double)
-     * @see #ciFile()
-     * @see #append4Create(StringBuilder)
-     * @see #checkExport(ExportParser)
-     */
-    private Double height;
-
-    /**
-     * Width of this column / field.
-     *
-     * @see #setSize(Double,Double)
-     * @see #ciFile()
-     * @see #append4Create(StringBuilder)
-     * @see #checkExport(ExportParser)
-     */
-    private Double width;
-
-    /**
-     * Minimum height of this column / field.
-     *
-     * @see #setMinSize(Double,Double)
-     * @see #ciFile()
-     * @see #append4Create(StringBuilder)
-     * @see #checkExport(ExportParser)
-     */
-    private Double minHeight;
-
-    /**
-     * Minimum width of this column / field.
-     *
-     * @see #setMinSize(Double,Double)
-     * @see #ciFile()
-     * @see #append4Create(StringBuilder)
-     * @see #checkExport(ExportParser)
-     */
-    private Double minWidth;
-
-    /**
-     * Must be <i>true</i> if the column / field has auto height.
-     *
-     * @see #setAutoHeight(Boolean)
-     * @see #ciFile()
-     * @see #append4Create(StringBuilder)
-     * @see #checkExport(ExportParser)
-     */
-    private Boolean autoHeight;
-
-    /**
-     * Must be <i>true</i> if the column / field has auto width.
-     *
-     * @see #setAutoWidth(Boolean)
-     * @see #ciFile()
-     * @see #append4Create(StringBuilder)
-     * @see #checkExport(ExportParser)
-     */
-    private Boolean autoWidth;
-
-    /**
-     * The scale of a column is a natural number, but for test purposes the
-     * scale is here a double.
-     *
-     * @see #setScale(Double)
-     * @see #ciFile()
-     * @see #append4Create(StringBuilder)
-     * @see #checkExport(ExportParser)
-     */
-    private Double scale;
-
-    /**
-     * Must be <i>true</i> if the column / field id editable.
-     *
-     * @see #setEditable(Boolean)
-     * @see #ciFile()
-     * @see #append4Create(StringBuilder)
-     * @see #checkExport(ExportParser)
-     */
-    private Boolean editable;
-
-    /**
-     * All settings related to this field.
-     *
-     * @see #setSetting(String, String)
-     * @see #ciFile()
-     * @see #append4Create(StringBuilder)
-     */
-    private final Map<String,String> settings = new HashMap<String,String>();
-
-    /**
-     * All users related to this field.
-     *
-     * @see #addUser(AbstractUserData)
-     * @see #getUsers()
-     * @see #ciFile()
-     * @see #append4Create(StringBuilder)
-     */
-    private final Set<AbstractUserData<?>> users = new HashSet<AbstractUserData<?>>();
 
     /**
      * Default constructor.
@@ -175,144 +59,6 @@ public class FieldData<FORMTABLE extends AbstractAdminData<?>>
     }
 
     /**
-     * Defines the {@link #sortType sort type} of this column (only
-     * possible for tables).
-     *
-     * @param _sortType new sort type
-     * @return this field instance
-     */
-    public FieldData<FORMTABLE> setSortType(final String _sortType)
-    {
-        this.sortType = _sortType;
-        return this;
-    }
-
-    /**
-     * Defines the size ({@link #width} and {@link #height}) of this
-     * column / field.
-     *
-     * @param _width     width
-     * @param _height    height
-     * @return this field instance
-     * @see #height
-     * @see #width
-     */
-    public FieldData<FORMTABLE> setSize(final Double _width,
-                                        final Double _height)
-    {
-        this.height = _height;
-        this.width = _width;
-        return this;
-    }
-
-    /**
-     * Defines the minimum size ({@link #minWidth minimum width} and
-     * {@link #minHeight minimum height}) of this column / field.
-     *
-     * @param _minWidth     minimum width
-     * @param _minHeight    minimum height
-     * @return this field instance
-     * @see #minHeight
-     * @see #minWidth
-     */
-    public FieldData<FORMTABLE> setMinSize(final Double _minWidth,
-                                           final Double _minHeight)
-    {
-        this.minHeight = _minHeight;
-        this.minWidth = _minWidth;
-        return this;
-    }
-
-    /**
-     * Defines if the height of the column is auto sized.
-     *
-     * @param _autoHeight   <i>true</i> if auto sized; otherwise
-     *                      <i>false</i>
-     * @return this field instance
-     */
-    public FieldData<FORMTABLE> setAutoHeight(final Boolean _autoHeight)
-    {
-        this.autoHeight = _autoHeight;
-        return this;
-    }
-
-    /**
-     * Defines if the width of the column is auto sized.
-     *
-     * @param _autoWidth    <i>true</i> if auto sized; otherwise
-     *                      <i>false</i>
-     * @return this field instance
-     */
-    public FieldData<FORMTABLE> setAutoWidth(final Boolean _autoWidth)
-    {
-        this.autoWidth = _autoWidth;
-        return this;
-    }
-
-    /**
-     * Defines the {@link #scale} of the column.
-     *
-     * @param _scale    scale value
-     * @return this field instance
-     */
-    public FieldData<FORMTABLE> setScale(final Double _scale)
-    {
-        this.scale = _scale;
-        return this;
-    }
-
-    /**
-     * Defines if the column / field is {@link #editable}.
-     *
-     * @param _editable     <i>true</i> if editable; otherwise <i>false</i>
-     * @return this field instance
-     */
-    public FieldData<FORMTABLE> setEditable(final Boolean _editable)
-    {
-        this.editable = _editable;
-        return this;
-    }
-
-    /**
-     * Defines a new setting for this field.
-     *
-     * @param _key      key of the setting
-     * @param _value    value of the setting
-     * @return this field instance
-     * @see #settings
-     */
-    public FieldData<FORMTABLE> setSetting(final String _key,
-                                           final String _value)
-    {
-        this.settings.put(_key, _value);
-        return this;
-    }
-
-    /**
-     * Assigns a new user.
-     *
-     * @param _user     user to assign
-     * @return this field instance
-     * @see #users
-     */
-    public FieldData<FORMTABLE> addUser(final AbstractUserData<?> _user)
-    {
-        this.users.add(_user);
-        return this;
-    }
-
-    /**
-     * Returns all assigned users of this field.
-     *
-     * @return all assign users
-     * @see #users
-     */
-    public Set<AbstractUserData<?>> getUsers()
-    {
-        return this.users;
-    }
-
-    /**
      * Returns the column / field specific part of the CI update file.
      *
      * @return column / field specific part of the CI update file
@@ -320,52 +66,23 @@ public class FieldData<FORMTABLE extends AbstractAdminData<?>>
     @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder();
+        final StringBuilder strg = new StringBuilder();
 
-        if (this.getName() != null)  {
-            cmd.append(" name \"").append(AbstractTest.convertTcl(this.getName())).append("\"");
+        if (this.tableForm instanceof FormData) {
+            strg .append("    field {\n");
+        } else {
+            strg .append("    column {\n");
         }
-        // sort type
-        if (this.sortType != null)  {
-            cmd.append(" sorttype ").append(this.sortType);
-        }
-        // size
-        if ((this.height != null) && (this.width != null))  {
-            cmd.append(" size ").append(this.width.doubleValue()).append(' ').append(this.height.doubleValue());
-        }
-        // minimum size
-        if ((this.minHeight != null) && (this.minWidth != null))  {
-            cmd.append(" minsize ").append(this.minWidth.doubleValue()).append(' ').append(this.minHeight.doubleValue());
-        }
-        // auto height
-        if (this.autoHeight != null)  {
-            cmd.append(" autoheight ").append(this.autoHeight.booleanValue());
-        }
-        // auto width
-        if (this.autoWidth != null)  {
-            cmd.append(" autowidth ").append(this.autoWidth.booleanValue());
-        }
-        // scale
-        if (this.scale != null)  {
-            cmd.append(" scale ").append(this.scale.doubleValue());
-        }
-        // editable flag
-        if (this.editable != null)  {
-            cmd.append(" edit ").append(this.editable.booleanValue());
-        }
-        // setting
-        for (final Map.Entry<String,String> setting : this.settings.entrySet())  {
-            cmd.append(" setting \"").append(AbstractTest.convertTcl(setting.getKey()))
-               .append("\" \"").append(AbstractTest.convertTcl(setting.getValue())).append('\"');
-        }
-        // users
-        for (final AbstractUserData<?> user : this.users)  {
-            cmd.append(" user \"").append(AbstractTest.convertTcl(user.getName())).append('\"');
-        }
+        strg.append("        name \"").append(AbstractTest.convertUpdate(this.getName())).append("\"\n");
 
-        this.append4CIFileValues(cmd);
+        this.getValues()   .append4Update("        ", strg);
+        this.getSingles()  .append4Update("        ", strg);
+        this.getFlags()    .append4Update("        ", strg);
+        this.getKeyValues().append4Update("        ", strg);
+        this.getDatas()    .append4Update("        ", strg);
 
-        return cmd.toString();
+        strg.append("    }\n");
+        return strg.toString();
     }
 
     /**
@@ -392,48 +109,7 @@ public class FieldData<FORMTABLE extends AbstractAdminData<?>>
     public void append4Create(final StringBuilder _cmd)
         throws MatrixException
     {
-        // column name
-        if (this.getName() != null)  {
-            _cmd.append(" name \"").append(AbstractTest.convertMql(this.getName())).append("\"");
-        }
-        // sort type
-        if (this.sortType != null)  {
-            _cmd.append(" sorttype ").append(this.sortType);
-        }
-        // size
-        if ((this.height != null) && (this.width != null))  {
-            _cmd.append(" size ").append(this.width.doubleValue()).append(' ').append(this.height.doubleValue());
-        }
-        // minimum size
-        if ((this.minHeight != null) && (this.minWidth != null))  {
-            _cmd.append(" minsize ").append(this.minWidth.doubleValue()).append(' ').append(this.minHeight.doubleValue());
-        }
-        // auto height
-        if (this.autoHeight != null)  {
-            _cmd.append(" autoheight ").append(this.autoHeight.booleanValue());
-        }
-        // auto width
-        if (this.autoWidth != null)  {
-            _cmd.append(" autowidth ").append(this.autoWidth.booleanValue());
-        }
-        // scale
-        if (this.scale != null)  {
-            _cmd.append(" scale ").append(this.scale.doubleValue());
-        }
-        // editable flag
-        if (this.editable != null)  {
-            _cmd.append(" edit ").append(this.editable.booleanValue());
-        }
-        // setting
-        for (final Map.Entry<String,String> setting : this.settings.entrySet())  {
-            _cmd.append(" setting \"").append(AbstractTest.convertMql(setting.getKey()))
-                .append("\" \"").append(AbstractTest.convertMql(setting.getValue())).append('\"');
-        }
-        // users
-        for (final AbstractUserData<?> user : this.users)  {
-            user.create();
-            _cmd.append(" user \"").append(AbstractTest.convertMql(user.getName())).append('\"');
-        }
+        _cmd.append(" name \"").append(AbstractTest.convertMql(this.getName())).append('\"');
 
         super.append4Create(_cmd);
     }
@@ -441,102 +117,17 @@ public class FieldData<FORMTABLE extends AbstractAdminData<?>>
     /**
      * Checks all specific values of an export for a column / field.
      *
-     * @param _exportParser     export parser
+     * @param _exportParser     parsed export
+     * @param _path             sub path
      * @throws MatrixException  if test failed
      */
-    @Override()
-    public void checkExport(final ExportParser _exportParser)
-        throws MatrixException
+    public void check4Export(final ExportParser _exportParser,
+                             final String _path)
     {
-        super.checkExport(_exportParser);
-
-        // sort type (default value is none and must be ignored...)
-        if ((this.sortType != null) && !this.sortType.equals("none"))  {
-            this.checkSingleValue(_exportParser, "column / field", "sorttype", this.sortType);
-        } else  {
-            this.checkNotExistingSingleValue(_exportParser, "column / field", "sorttype");
-        }
-
-        // hidden flag
-        this.checkValueExists(_exportParser, "column / field", "hidden", this.getFlags().getValue("hidden") != null ? this.getFlags().getValue("hidden") : false);
-
-        // size
-        if ((this.width != null) && (this.height != null)
-                && ((this.width.doubleValue() != 1.0) || (this.height.doubleValue() != 1.0)))  {
-            this.checkSingleValue(
-                    _exportParser,
-                    "column / field",
-                    "size",
-                    String.valueOf(this.width.doubleValue()) + " " + String.valueOf(this.height.doubleValue()));
-        } else  {
-            this.checkNotExistingSingleValue(_exportParser, "column / field", "size");
-        }
-
-        // minimum size
-        if ((this.minWidth != null) && (this.minHeight != null)
-                && ((this.minWidth.doubleValue() != 0.0) || (this.minHeight.doubleValue() != 0.0)))  {
-            this.checkSingleValue(
-                    _exportParser,
-                    "column / field",
-                    "minsize",
-                    String.valueOf(this.minWidth.doubleValue()) + " " + String.valueOf(this.minHeight.doubleValue()));
-        } else  {
-            this.checkNotExistingSingleValue(_exportParser, "column / field", "minsize");
-        }
-
-        // auto height
-        if ((this.autoHeight != null) && this.autoHeight)  {
-            this.checkSingleValue(_exportParser, "column / field", "autoheight", "true");
-        } else  {
-            this.checkNotExistingSingleValue(_exportParser, "column / field", "autoheight");
-        }
-
-        // auto width
-        if ((this.autoWidth != null) && this.autoWidth)  {
-            this.checkSingleValue(_exportParser, "column / field", "autowidth", "true");
-        } else  {
-            this.checkNotExistingSingleValue(_exportParser, "column / field", "autowidth");
-        }
-
-        // scale
-        if (this.scale != null)  {
-            this.checkSingleValue(_exportParser, "column / field", "scale", String.valueOf(this.scale.longValue()));
-        } else  {
-            this.checkNotExistingSingleValue(_exportParser, "column / field", "scale");
-        }
-
-        // editable flag
-        if ((this.editable != null) && this.editable)  {
-            this.checkSingleValue(_exportParser, "column / field", "edit", "true");
-        } else  {
-            this.checkNotExistingSingleValue(_exportParser, "column / field", "edit");
-        }
-
-        // settings
-        final Set<String> curSettings = new HashSet<String>(_exportParser.getLines("/mql/setting/@value"));
-        for (final Map.Entry<String,String> setting : this.settings.entrySet())  {
-            final String key = new StringBuilder()
-                    .append('\"').append(AbstractTest.convertTcl(setting.getKey()))
-                    .append("\" \"").append(AbstractTest.convertTcl(setting.getValue())).append('\"')
-                    .toString();
-            Assert.assertTrue(curSettings.contains(key),
-                              "check setting " + setting + " is defined");
-            curSettings.remove(key);
-        }
-        Assert.assertTrue(curSettings.isEmpty(),
-                          "check that all settings are defined (have " + curSettings + ")");
-
-        // users
-        final Set<String> curUsers = new HashSet<String>(_exportParser.getLines("/mql/user/@value"));
-        for (final AbstractUserData<?> user : this.users)  {
-            final String key = new StringBuilder()
-                    .append('\"').append(AbstractTest.convertTcl(user.getName())).append('\"')
-                    .toString();
-            Assert.assertTrue(curUsers.contains(key),
-                              "check user " + key + " is defined");
-            curUsers.remove(key);
-        }
-        Assert.assertTrue(curUsers.isEmpty(),
-                          "check that all users are defined (have " + curUsers + ")");
+        this.getFlags()     .check4Export(_exportParser, _path);
+        this.getValues()    .check4Export(_exportParser, _path);
+        this.getSingles()   .check4Export(_exportParser, _path);
+        this.getKeyValues() .check4Export(_exportParser, _path);
+        this.getDatas()     .check4Export(_exportParser, _path);
     }
 }

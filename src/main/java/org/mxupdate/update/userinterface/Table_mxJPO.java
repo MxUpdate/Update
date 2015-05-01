@@ -15,16 +15,17 @@
 
 package org.mxupdate.update.userinterface;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
+import java.util.Iterator;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
@@ -80,87 +81,29 @@ System.err.println("The table is derived from '" + _content + "'! This is curren
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
-//        new TableDefParser_mxJPO(new StringReader(_code)).parse(this);
-//        this.prepare();
+        new TableParser_mxJPO(new StringReader(_code)).parse(this);
+        this.prepare();
     }
 
-    /**
-     * Writes all columns of the web table to the TCL update file. This
-     * includes
-     * <ul>
-     * <li>hidden flag (only if hidden)</li>
-     * <li>all {@link #getFields() columns}</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the TCL update code could not be written
-     * @see AbstractUIWithFields_mxJPO.Field#write(Appendable)
-     */
     @Override()
-    protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Appendable _out)
         throws IOException
     {
-        if (this.isHidden())  {
-            _out.append(" \\\n    hidden");
-        }
-        for (final Field column : this.getFields())  {
-            _out.append(" \\\n    column");
-            column.write(_out);
-        }
-    }
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
 
-    /**
-     * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this web table. Following steps
-     * are done:
-     * <ul>
-     * <li>remove all columns of the web table</li>
-     * <li>set to not hidden</li>
-     * <li>remove description</li>
-     * </ul>
-     *
-     * @param _paramCache       parameter cache
-     * @param _preMQLCode       MQL statements which must be called before the
-     *                          TCL code is executed
-     * @param _postMQLCode      MQL statements which must be called after the
-     *                          TCL code is executed
-     * @param _preTCLCode       TCL code which is defined before the source
-     *                          file is sourced
-     * @param _tclVariables     map of all TCL variables where the key is the
-     *                          name and the value is value of the TCL variable
-     *                          (the value is automatically converted to TCL
-     *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update from derived class failed
-     */
-    @Override()
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final CharSequence _preMQLCode,
-                          final CharSequence _postMQLCode,
-                          final CharSequence _preTCLCode,
-                          final Map<String,String> _tclVariables,
-                          final File _sourceFile)
-        throws Exception
-    {
-        // set to not hidden
-        final StringBuilder preMQLCode = new StringBuilder()
-                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                .append(' ').append(this.getTypeDef().getMxAdminSuffix())
-                .append(" !hidden description \"\"");
+        this.writeHeader(_paramCache, updateBuilder.getStrg());
 
-        // remove all columns
-        for (final Field column : this.getFields())  {
-            preMQLCode.append(" column delete name \"").append(StringUtil_mxJPO.convertMql(column.getName())).append('\"');
-        }
+        updateBuilder
+                .start("table")
+                //              tag             | default | value                              | write?
+                .string(        "description",              this.getDescription())
+                .flagIfTrue(    "hidden",           false,  this.isHidden(),                    this.isHidden())
+                .list(this.getFields())
+                .properties(this.getProperties())
+                .end();
 
-        // append already existing pre MQL code
-        preMQLCode.append(";\n")
-                  .append(_preMQLCode);
-
-        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+        _out.append(updateBuilder.toString());
     }
 
     @Override()
@@ -169,5 +112,63 @@ System.err.println("The table is derived from '" + _content + "'! This is curren
                              final Table_mxJPO _current)
         throws UpdateException_mxJPO
     {
+        DeltaUtil_mxJPO.calcValueDelta(  _mql,              "description",              this.getDescription(),  _current.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(   _mql,              "hidden",            false, this.isHidden(),        _current.isHidden());
+
+        final Iterator<AbstractField> currentFieldIter = _current.getFields().iterator();
+        final Iterator<AbstractField> targetFieldIter = this.getFields().iterator();
+
+        int idx = 1;
+        boolean equal = _current.getFields().size() == this.getFields().size();
+        // compare the field in sequence
+        AbstractField targetField = null;
+        while(currentFieldIter.hasNext() && targetFieldIter.hasNext()) {
+            final AbstractField currentField = currentFieldIter.next();
+            targetField = targetFieldIter.next();
+            if (currentField.compareTo(targetField) == 0)  {
+                idx++;
+                targetField = null;
+            } else {
+                equal = false;
+                break;
+            }
+        }
+
+        // the fields are not the same from idx on or the current has more than the target
+        // --> updates must be done
+        if (!equal) {
+            // remove all field after the ones that were equal
+            int idy = _current.getFields().size();
+            while (idy > idx - 1) {
+                _mql.newLine()
+                    .cmd("column delete ").arg(String.valueOf(idy));
+                idy--;
+            }
+
+            if (!equal) {
+                // append new fields
+                if (targetField != null) {
+                    targetField.calcDelta(_mql, idx++);
+                }
+                while(targetFieldIter.hasNext()) {
+                    targetField = targetFieldIter.next();
+                    targetField.calcDelta(_mql, idx++);
+                }
+            }
+        }
+        this.getProperties().calcDelta(_mql, "", _current.getProperties());
+    }
+
+    /**
+     * Class used to define a column of a web table.
+     */
+    public static class Column
+        extends AbstractField
+    {
+        /** Constructor setting the tag. */
+        public Column()
+        {
+            super("column");
+        }
     }
 }

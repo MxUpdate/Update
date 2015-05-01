@@ -159,8 +159,8 @@ public class FlagList
     /**
      * Checks for all defined flags.
      *
-     * @param _parentLine   parent line where the flags must be defined
-     * @param _errorLabel   label used for shown error
+     * @param _exportParser     parsed export
+     * @param _path             sub path
      */
     public void check4Export(final ExportParser _exportParser,
                              final String _path)

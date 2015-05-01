@@ -266,6 +266,7 @@ public class ExportParser
         for (final Line line : this.rootLines)  {
             line.evalPath(path, 1, ret);
         }
+
         return ret;
     }
 
@@ -477,10 +478,8 @@ public class ExportParser
         public List<String> getLines(final String _path)
         {
             final List<String> ret = new ArrayList<String>();
-            final String[] path = _path.split("/");
-            for (final Line line : this.children)  {
-                line.evalPath(path, 0, ret);
-            }
+
+            this.evalPath(_path.split("/"), 0, ret);
             return ret;
         }
 
@@ -504,28 +503,38 @@ public class ExportParser
 
         /**
          *
-         * @param _path     array of path to evaluate
-         * @param _index    current index (level) in the <code>_path</code>
+         * @param _path         array of path to evaluate
+         * @param _pathIndex    current index (level) in the {@code _path}
          * @param _ret      list of all found strings
          */
         private void evalPath(final String[] _path,
-                              final int _index,
+                              final int _pathIndex,
                               final List<String> _ret)
         {
-            final String searchedTag = _path[_index];
-            if (this.tag.equals(searchedTag))  {
-                if (_index < (_path.length - 2))  {
-                    for (final Line child : this.children)  {
-                        child.evalPath(_path, _index + 1, _ret);
+            String searchedTag = _path[_pathIndex];
+            int searchedIdx = -1;
+            final int strColIdx = searchedTag.indexOf("[");
+            final int endColIdx = searchedTag.indexOf("]");
+            if ((strColIdx > 0) && (endColIdx > strColIdx))  {
+                searchedIdx = Integer.valueOf(searchedTag.substring(strColIdx + 1, endColIdx));
+                searchedTag = searchedTag.substring(0, strColIdx);
+            }
+
+            int idx = -1;
+            for (final Line line : this.children)  {
+                if (line.tag.equals(searchedTag))  {
+                    idx++;
+                    if ((searchedIdx < 0) || (searchedIdx == idx))  {
+                        if (_pathIndex < (_path.length - 2))  {
+                            line.evalPath(_path, _pathIndex + 1, _ret);
+                        } else if (_pathIndex == (_path.length - 1))  {
+                            _ret.add(line.line.trim());
+                        } else if ("@name".equals(_path[_pathIndex + 1]))  {
+                            _ret.add(line.tag);
+                        } else if ("@value".equals(_path[_pathIndex + 1]))  {
+                            _ret.add(line.value);
+                        }
                     }
-                } else if (_index == (_path.length - 1))  {
-                    for (final Line child : this.children)  {
-                        _ret.add(child.line.trim());
-                    }
-                } else if ("@name".equals(_path[_index + 1]))  {
-                    _ret.add(this.tag);
-                } else if ("@value".equals(_path[_index + 1]))  {
-                    _ret.add(this.value);
                 }
             }
         }

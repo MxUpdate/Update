@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import matrix.util.MatrixException;
@@ -620,7 +621,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     @Override()
     public String toString()
     {
-        return "[" + this.ci.updateType + " '" + this.name + "']";
+        return "[" + (this.ci == null ? "NONE" : this.ci.updateType) + " '" + this.name + "']";
     }
 
     /**
