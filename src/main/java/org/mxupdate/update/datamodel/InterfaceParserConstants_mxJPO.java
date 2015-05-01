@@ -11,47 +11,49 @@ interface InterfaceParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int DESCRIPTION = 5;
+  int SYMBOLICNAME = 5;
   /** RegularExpression Id. */
-  int ABSTRACT_TRUE = 6;
+  int DESCRIPTION = 6;
   /** RegularExpression Id. */
-  int ABSTRACT_FALSE = 7;
+  int ABSTRACT_TRUE = 7;
   /** RegularExpression Id. */
-  int DERIVED = 8;
+  int ABSTRACT_FALSE = 8;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 9;
+  int DERIVED = 9;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 10;
+  int HIDDEN_TRUE = 10;
   /** RegularExpression Id. */
-  int ATTRIBUTE = 11;
+  int HIDDEN_FALSE = 11;
   /** RegularExpression Id. */
-  int STRING = 12;
+  int ATTRIBUTE = 12;
   /** RegularExpression Id. */
-  int SINGLE = 13;
+  int STRING = 13;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 14;
+  int SINGLE = 14;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 15;
+  int MULTILINESTRING = 15;
   /** RegularExpression Id. */
-  int FOR = 16;
+  int MULTILINESINGLE = 16;
   /** RegularExpression Id. */
-  int FOR_RELATIONSHIP_ALL = 17;
+  int FOR = 17;
   /** RegularExpression Id. */
-  int FOR_RELATIONSHIP = 18;
+  int FOR_RELATIONSHIP_ALL = 18;
   /** RegularExpression Id. */
-  int FOR_TYPE_ALL = 19;
+  int FOR_RELATIONSHIP = 19;
   /** RegularExpression Id. */
-  int FOR_TYPE = 20;
+  int FOR_TYPE_ALL = 20;
   /** RegularExpression Id. */
-  int PROPERTY = 21;
+  int FOR_TYPE = 21;
   /** RegularExpression Id. */
-  int PROPERTYTO = 22;
+  int PROPERTY = 22;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 23;
+  int PROPERTYTO = 23;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 24;
+  int PROPERTYVAL = 24;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 25;
+  int ADMINTYPE_STRING = 25;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 26;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -71,6 +73,7 @@ interface InterfaceParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"symbolicname\"",
     "\"description\"",
     "\"abstract\"",
     "\"!abstract\"",

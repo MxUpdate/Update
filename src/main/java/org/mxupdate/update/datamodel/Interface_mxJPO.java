@@ -160,6 +160,7 @@ public class Interface_mxJPO
     protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
+                .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
                 .flagIfTrue(    "abstract",         false,  this.abstractFlag,      (this.abstractFlag != null) && this.abstractFlag)
                 .list(          "derived",                  this.derived)
@@ -178,6 +179,7 @@ public class Interface_mxJPO
                              final Interface_mxJPO _current)
         throws UpdateException_mxJPO
     {
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
         DeltaUtil_mxJPO.calcValueDelta(            _mql, "description",                 this.getDescription(),              _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(             _mql, "hidden",              false,  this.isHidden(),                    _current.isHidden());
         DeltaUtil_mxJPO.calcValFlgDelta(           _mql, "abstract",            false,  this.abstractFlag,                  _current.abstractFlag);

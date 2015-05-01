@@ -29,7 +29,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link Interface_mxJPO interface} delta calculation.
+ * Tests the {@link Interface_mxJPO interface CI} delta calculation.
  *
  * @author The MxUpdate Team
  */
@@ -42,12 +42,19 @@ public class InterfaceCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
-            {"with property",
+            {"1a) symbolic name",
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test").setValue("symbolicname", "interface_123")},
+            {"1b) two symbolic name",
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test").setValue("symbolicname", "interface_123").setValue("symbolicname", "interface_345")},
+            {"2a) with property",
                     new InterfaceData(this, "Test"),
                     new InterfaceData(this, "Test").addProperty(new PropertyDef("my test \"property\" desc\"\\\\ription"))},
        };
     }
 
+    @Override
     @BeforeMethod()
     @AfterClass(groups = "close" )
     public void cleanup()

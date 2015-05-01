@@ -22,7 +22,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link Interface_mxJPO interface} parser.
+ * Tests the {@link Interface_mxJPO interface CI} parser.
  *
  * @author The MxUpdate Team
  */
@@ -36,9 +36,16 @@ public class InterfaceCI_1ParserTest
     {
         return new Object[][]
         {
-            {"1) simple",
+            {"0) simple",
                 "",
                 "description \"\" !hidden"},
+          // registered name
+            {"1a) symbolic name",
+                    "",
+                    "symbolicname \"interface_abc\" description \"\" !hidden"},
+            {"1b) two symbolic names",
+                    "symbolicname \"interface_abc\" symbolicname \"interface_def\" description \"\" !hidden",
+                    "symbolicname \"interface_def\" symbolicname \"interface_abc\" description \"\" !hidden"},
             // description
             {"2a) description",
                 "",

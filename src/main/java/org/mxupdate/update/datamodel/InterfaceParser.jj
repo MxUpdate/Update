@@ -47,7 +47,8 @@ class InterfaceParser
 
 <DEFAULT> TOKEN :
 {
-      <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
     | <ABSTRACT_TRUE:                       "abstract">
     | <ABSTRACT_FALSE:                      "!abstract">
@@ -115,7 +116,10 @@ void parse(final Interface_mxJPO _interface)
     Token tmp;
     AdminProperty property;
 } {
-    (   ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_interface, "description",                       this.getString(tmp.image));}
+    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_interface, "symbolicNames", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_interface, "symbolicNames", this.getSingle(tmp.image));} ) )
+
+      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_interface, "description",                       this.getString(tmp.image));}
                                     | tmp = <MULTILINESINGLE>               {this.setValue(_interface, "description",                       this.getSingle(tmp.image));} ) )
 
       | ( <ABSTRACT_TRUE>                                                   {this.setValue(_interface, "abstractFlag",                      true);} )
