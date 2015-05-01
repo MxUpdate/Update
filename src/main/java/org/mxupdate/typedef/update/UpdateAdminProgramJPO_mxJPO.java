@@ -16,12 +16,16 @@
 package org.mxupdate.typedef.update;
 
 import java.io.File;
+import java.util.Date;
 import java.util.Map;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.program.JPOProgram_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * Updates given admin program JPO CI.
@@ -52,7 +56,24 @@ public class UpdateAdminProgramJPO_mxJPO
         throws Exception
     {
         if (_file.getName().endsWith(JPOProgram_mxJPO.NAME_SUFFIX_EXTENDSION))  {
-            MqlBuilder_mxJPO.mql().cmd("escape insert program ").arg(_file.toString()).exec(_paramCache);
+            final String propName = PropertyDef_mxJPO.FILEDATE.getPropName(_paramCache);
+
+            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine(_file, "");
+
+            // check property already exists => remove property
+            final String propExists = MqlBuilder_mxJPO.mql().cmd("escape print program ").arg(_name).cmd(" select ").arg("property[" + propName + "]").exec(_paramCache);
+            if (!propExists.isEmpty())  {
+                mql.newLine().cmd("escape mod program ").arg(_name).cmd(" remove property ").arg(propName);
+            }
+            // define file date
+            mql.newLine().cmd("escape mod program ").arg(_name).cmd(" add property ")
+                    .arg(propName).cmd(" value ").arg(StringUtil_mxJPO.formatFileDate(_paramCache, new Date(_file.lastModified())));
+
+            // insert program
+            mql.newLine().cmd("escape insert program ").arg(_file.toString()).exec(_paramCache);
+
+            // and execute all
+            mql.exec(_paramCache);
         } else  {
             super.update(_paramCache, _typeDef, _create, _name, _file);
         }

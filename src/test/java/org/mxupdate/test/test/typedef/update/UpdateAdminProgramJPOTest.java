@@ -22,6 +22,7 @@ import java.util.Map;
 import matrix.util.MatrixException;
 
 import org.apache.commons.io.FileUtils;
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.test.update.WrapperCIInstance;
 import org.mxupdate.typedef.TypeDef_mxJPO;
@@ -127,6 +128,15 @@ public class UpdateAdminProgramJPOTest
                 !this.mql("print prog '" + _name + "' select description dump").isEmpty(),
                 _expUpdateCalled,
                 "description defined");
+
+        // TODO: file date is only defined if not update is called
+        if (!_expUpdateCalled)  {
+            final String fileDate = this.mql("print prog '" + _name + "' select property[" + PropertyDef_mxJPO.FILEDATE.getPropName(paramCache) + "] dump");
+            Assert.assertEquals(
+                    fileDate.isEmpty(),
+                    false,
+                    "file date is defined (have '" + fileDate + "')");
+        }
     }
 
     @BeforeMethod()
