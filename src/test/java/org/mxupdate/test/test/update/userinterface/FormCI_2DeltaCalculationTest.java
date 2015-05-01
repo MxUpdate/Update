@@ -18,6 +18,7 @@ package org.mxupdate.test.test.update.userinterface;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.data.userinterface.FormData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.userinterface.Form_mxJPO;
@@ -43,87 +44,135 @@ public class FormCI_2DeltaCalculationTest
         return new Object[][] {
             {"1a) symbolic name",
                 new FormData(this, "Test"),
-                new FormData(this, "Test").setValue("symbolicname", "expression_123")},
-
+                new FormData(this, "Test")
+                        .setValue("symbolicname", "expression_123")},
             {"1b) two symbolic name",
                 new FormData(this, "Test"),
-                new FormData(this, "Test").setValue("symbolicname", "expression_123").setValue("symbolicname", "expression_345")},
+                new FormData(this, "Test")
+                        .setValue("symbolicname", "expression_123")
+                        .setValue("symbolicname", "expression_345")},
 
-            {"2) field add",
+            // field add / remove
+            {"2a) field add to empty",
                 new FormData(this, "Form1"),
                 new FormData(this, "Form1")
                         .setValue("description", "\"\\\\ hello")
-                        .newField("field")
-                            .setValue("label", "an \"label\"")
-                        .getFormTable() },
-
-            {"3) two field add",
+                        .newField("field").setValue("label", "an \"label\"").getFormTable()},
+            {"2b) two field add to empty",
                 new FormData(this, "Form1"),
                 new FormData(this, "Form1")
-                    .setValue("description", "\"\\\\ hello")
-                        .newField("field")
-                            .setValue("label", "an \"label\"")
-                        .getFormTable()
-                        .newField("field2")
-                            .setValue("label", "an \"label\"")
-                        .getFormTable() },
-
-            {"4) field remove",
+                        .setValue("description", "\"\\\\ hello")
+                        .newField("field") .setValue("label", "an \"label\"").getFormTable()
+                        .newField("field2").setValue("label", "an \"label\"").getFormTable()},
+            {"2c) field remove all",
                 new FormData(this, "Form1")
-                    .setValue("description", "description")
-                        .newField("field")
-                            .setValue("label", "an \"label\"")
-                        .getFormTable()
-                        .newField("field2")
-                            .setValue("label", "an \"label\"")
-                        .getFormTable(),
+                        .setValue("description", "description")
+                        .newField("field") .setValue("label", "an \"label\"").getFormTable()
+                        .newField("field2").setValue("label", "an \"label\"").getFormTable(),
                 new FormData(this, "Form1")
-                    .setValue("description", "description")},
-
-            {"5) field insert",
+                        .setValue("description", "description")},
+            {"2d) field remove one field",
                new FormData(this, "Form1")
-                    .setValue("description", "description")
-                        .newField("field")
-                            .setValue("label", "an \"label\"")
-                        .getFormTable()
-                        .newField("field2")
-                            .setValue("label", "an \"label\"")
-                        .getFormTable(),
-                new FormData(this, "Form1")
-                    .setValue("description", "description")
-                    .newField("field2")
-                        .setValue("label", "an \"label\"")
-                        .getFormTable() },
-
-            {"6) field modify",
+                        .setValue("description", "description")
+                        .newField("field") .setValue("label", "an \"label\"").getFormTable()
+                        .newField("field2").setValue("label", "an \"label\"").getFormTable(),
                 new FormData(this, "Form1")
                         .setValue("description", "description")
-                            .newField("field")
-                                .setValue("label", "an \"label\"")
-                            .getFormTable()
-                            .newField("field2")
-                                .setValue("label", "an \"label\"")
-                            .getFormTable(),
+                        .newField("field2").setValue("label", "an \"label\"").getFormTable()},
+            {"2e) field add",
                 new FormData(this, "Form1")
                         .setValue("description", "description")
-                        .newField("field")
-                            .setValue("label", "an \"label\"")
-                            .getFormTable()
-                        .newField("field2")
-                            .setValue("label", "an \"label\"")
-                            .getFormTable()
-                        .newField("field3")
-                            .setValue("label", "an \"label\"")
-                            .getFormTable() },
-            };
+                        .newField("field") .setValue("label", "an \"label\"").getFormTable()
+                        .newField("field2").setValue("label", "an \"label\"").getFormTable(),
+                new FormData(this, "Form1")
+                        .setValue("description", "description")
+                        .newField("field") .setValue("label", "an \"label\"").getFormTable()
+                        .newField("field2").setValue("label", "an \"label\"").getFormTable()
+                        .newField("field3").setValue("label", "an \"label\"").getFormTable()},
+            // field set values
+            {"10a) set business object expression",
+                new FormData(this, "Form1"),
+                new FormData(this, "Form1")
+                        .newField("field").setValue("businessobject", "value.new").getFormTable()},
+            {"10b) set relationship expression",
+                new FormData(this, "Form1"),
+                new FormData(this, "Form1")
+                        .newField("field").setValue("relationship", "value.new").getFormTable()},
+            {"11) set label",
+                new FormData(this, "Form1"),
+                new FormData(this, "Form1")
+                        .newField("field").setValue("label", "value.new").getFormTable()},
+            {"12) new field with alt",
+                new FormData(this, "Form1"),
+                new FormData(this, "Form1")
+                        .newField("field").setValue("alt", "value.new").getFormTable()},
+            {"13) new field with href",
+                new FormData(this, "Form1"),
+                new FormData(this, "Form1")
+                        .newField("field").setValue("href", "value.new").getFormTable()},
+            {"14) new field with range href",
+                new FormData(this, "Form1"),
+                new FormData(this, "Form1")
+                        .newField("field").setValue("range", "value.new").getFormTable()},
+            {"17) set user",
+                new FormData(this, "Form1"),
+                new FormData(this, "Form1")
+                        .newField("field").defData("user", new PersonAdminData(this, "Test.Old")).getFormTable()},
+            {"18) new setting",
+                new FormData(this, "Form1"),
+                new FormData(this, "Form1")
+                        .newField("field").setKeyValue("setting", "key", "value.new").getFormTable()},
+            // field update values
+            {"20a) update business object expression",
+                new FormData(this, "Form1")
+                        .newField("field").setValue("businessobject", "label.old").getFormTable(),
+                new FormData(this, "Form1")
+                        .newField("field").setValue("businessobject", "label.new").getFormTable()},
+            {"20b) update relationship expression",
+                new FormData(this, "Form1")
+                        .newField("field").setValue("relationship", "label.old").getFormTable(),
+                new FormData(this, "Form1")
+                        .newField("field").setValue("relationship", "label.new").getFormTable()},
+            {"21) update label",
+                new FormData(this, "Form1")
+                        .newField("field").setValue("label", "label.old").getFormTable(),
+                new FormData(this, "Form1")
+                        .newField("field").setValue("label", "label.new").getFormTable()},
+            {"22) update alt",
+                new FormData(this, "Form1")
+                        .newField("field").setValue("alt", "label.old").getFormTable(),
+                new FormData(this, "Form1")
+                        .newField("field").setValue("alt", "label.new").getFormTable()},
+            {"23) update hraf",
+                new FormData(this, "Form1")
+                        .newField("field").setValue("href", "label.old").getFormTable(),
+                new FormData(this, "Form1")
+                        .newField("field").setValue("href", "label.new").getFormTable()},
+            {"24) update range href",
+                new FormData(this, "Form1")
+                        .newField("field").setValue("range", "value.old").getFormTable(),
+                new FormData(this, "Form1")
+                        .newField("field").setValue("range", "value.new").getFormTable()},
+            {"27) update user",
+                new FormData(this, "Form1")
+                        .newField("field").defData("user", new PersonAdminData(this, "Test.Old")).getFormTable(),
+                new FormData(this, "Form1")
+                        .newField("field").defData("user", new PersonAdminData(this, "Test.New")).getFormTable()},
+            {"28) update setting",
+                new FormData(this, "Form1")
+                        .newField("field").setKeyValue("setting", "key", "value.old").getFormTable(),
+                new FormData(this, "Form1")
+                        .newField("field").setKeyValue("setting", "key", "value.new").getFormTable()},
+        };
     }
 
-    @Override
+    @Override()
     @BeforeMethod()
-    @AfterClass(groups = "close" )
+    @AfterClass(groups = "close")
     public void cleanup()
         throws MatrixException
     {
+        this.cleanup(AbstractTest.CI.USR_PERSON);
         this.cleanup(AbstractTest.CI.UI_FORM);
     }
 

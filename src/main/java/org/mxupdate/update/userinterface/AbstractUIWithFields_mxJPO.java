@@ -603,14 +603,9 @@ System.err.println("y location is not 0.0 and this is currently not supported");
     public static class Setting
         implements UpdateLine, Comparable<Setting>
     {
-        /**
-         * Name of the setting.
-         */
+        /** Name of the setting. */
         String name = null;
-
-        /**
-         * Value of the setting.
-         */
+        /** Value of the setting. */
         String value = null;
 
         @Override()
@@ -642,10 +637,13 @@ System.err.println("y location is not 0.0 and this is currently not supported");
             return "[name=" + this.name + ", value=" + this.value + "]";
         }
 
-        @Override
-        public int compareTo(final Setting _setting)
+        @Override()
+        public int compareTo(final Setting _compareTo)
         {
-            return 0;
+            int ret = 0;
+            ret = CompareToUtil_mxJPO.compare(ret, this.name,   _compareTo.name);
+            ret = CompareToUtil_mxJPO.compare(ret, this.value,  _compareTo.value);
+            return ret;
         }
     }
 }
