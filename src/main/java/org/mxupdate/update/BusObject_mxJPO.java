@@ -67,14 +67,7 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
 public class BusObject_mxJPO
     extends AbstractPropertyObject_mxJPO<BusObject_mxJPO>
 {
-    /**
-     * Key used to store default attribute values within the parameter cache.
-     */
-    private static final String PARAM_DEFAULT_ATTRS = "BusDefaultAttrValues";
-
-    /**
-     * Parameter key to cache allowed attributes for relationships.
-     */
+    /** Parameter key to cache allowed attributes for relationships. */
     private static final String PARAM_RELATION_ATTRS = "BusRelationAttributes";
 
     /** String used to split the name and revision of administration business object. */
@@ -117,17 +110,12 @@ public class BusObject_mxJPO
 
     /** Revision of business object. */
     private final String busRevision;
-    /** Vault of the business object. */
-    private String busVault;
 
     /** Current state of the related business object. */
     private String busCurrent;
 
     /** All possible states of the related business object. */
     private StringList busStates;
-
-    /** Object id of the business object. */
-    private String busOid;
 
     /** Holds all connected objects. */
     private final SortedSet<Connection> connections = new TreeSet<Connection>();
@@ -298,14 +286,10 @@ public class BusObject_mxJPO
                                                       null);
         // id, vault, description and current MX state
         final StringList select = new StringList(4);
-        select.addElement("id");
-        select.addElement("vault");
         select.addElement("description");
         select.addElement("current");
         select.addElement("policy.state");
         final BusinessObjectWithSelect sel = bus.select(_paramCache.getContext(), select);
-        this.busOid = sel.getSelectData("id");
-        this.busVault = sel.getSelectData("vault");
         this.setDescription(sel.getSelectData("description"));
         this.busCurrent = sel.getSelectData("current");
         this.busStates = sel.getSelectDataList("policy.state");
@@ -558,6 +542,9 @@ public class BusObject_mxJPO
         // now the rest of the properties w/o info properties
         for (final Entry<String,String> entry : this.attrValues.entrySet())  {
             if (!notWriteProps.contains(entry.getKey()))  {
+                if (this.getTypeDef().getMxBusIgnoredAttributes().contains(entry.getKey()))  {
+                    _updateBuilder.stepStartNewLine().stepSingle(_updateBuilder.getParamCache().getValueString(ValueKeys.ExportBusIgnoredAttrText)).stepEndLine();
+                }
                 _updateBuilder.stepStartNewLine().stepSingle("attribute").stepString(entry.getKey()).stepString(entry.getValue()).stepEndLine();
             }
         }
@@ -618,6 +605,13 @@ public class BusObject_mxJPO
                 clazz.attrValues.put(
                         attrSubPath,
                         FileHandlingUtil_mxJPO.extraceSubPath(_args[6], this.getTypeDef().getFilePath()));
+            }
+
+            // attributes to ignore
+            for (final String attrName : this.getTypeDef().getMxBusIgnoredAttributes())  {
+                if ((this.attrValues.get(attrName) != null) && !this.attrValues.get(attrName).isEmpty())  {
+                    clazz.attrValues.put(attrName, this.attrValues.get(attrName));
+                }
             }
 
             // initialize MQL builder

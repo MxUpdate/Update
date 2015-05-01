@@ -18,6 +18,8 @@ package org.mxupdate.mapping;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import matrix.util.MatrixException;
 
@@ -98,7 +100,7 @@ public final class TypeDef_mxJPO
     /** Must be checked if the business type exists? */
     private boolean busCheckExists = false;
     /** Defines the list of attributes which are automatically ignored within the update. */
-    private Collection<String> busIgnoredAttributes;
+    private final Set<String> busIgnoredAttributes = new HashSet<String>();
     /** Mapping between internal used type definitions and the MX policy names. */
     private String busPolicy;
     /** Defines the list of both relationships which must be evaluated to write and run of update script. */
@@ -175,7 +177,7 @@ public final class TypeDef_mxJPO
         } else if (key.equals(TypeDef_mxJPO.PREFIX_BUS_CHECKEXISTS))  {
             typeDef.busCheckExists = _value.equalsIgnoreCase("true");
         } else if (key.equals(TypeDef_mxJPO.PREFIX_BUS_IGNOREATTRIBUTES))  {
-            typeDef.busIgnoredAttributes = Arrays.asList(_value.split(","));
+            typeDef.busIgnoredAttributes.addAll(Arrays.asList(_value.split(",")));
         } else if (key.equals(TypeDef_mxJPO.PREFIX_BUS_RELSBOTH))  {
             typeDef.busRelsBoth = Arrays.asList(_value.split(","));
         } else if (key.equals(TypeDef_mxJPO.PREFIX_BUS_RELSFROM))  {
@@ -319,14 +321,13 @@ public final class TypeDef_mxJPO
     }
 
     /**
-     * Returns the list of attributes for business object which are ignored for
+     * Returns the set of attributes for business object which are ignored for
      * the update (means this attributes are not reseted). The method returns
      * only correct values if the initialize method was called!
      *
      * @return MX name of the business type definition
-     * @see #busIgnoredAttributes
      */
-    public Collection<String> getMxBusIgnoredAttributes()
+    public Set<String> getMxBusIgnoredAttributes()
     {
         return this.busIgnoredAttributes;
     }

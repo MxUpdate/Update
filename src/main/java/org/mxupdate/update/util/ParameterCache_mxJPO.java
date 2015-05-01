@@ -747,6 +747,8 @@ public class ParameterCache_mxJPO
         /** Parameter for the help usage used for the help description. */
         HelpUsage,
 
+        /** Comment written above ignored business object attributes. */
+        ExportBusIgnoredAttrText,
         /** Header used for file exports. */
         ExportFileHeader,
         /** List of admin property names used as information in front of the list of properties. */
