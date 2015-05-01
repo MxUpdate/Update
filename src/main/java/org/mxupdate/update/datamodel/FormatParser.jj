@@ -48,7 +48,8 @@ class FormatParser
 
 TOKEN : /** first level */
 {
-      <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
     | <HIDDEN_TRUE:                         "hidden">
     | <HIDDEN_FALSE:                        "!hidden">
     | <MIME:                                "mime">                                         : STRING_EXPECTED
@@ -100,7 +101,11 @@ void parse(final Format_mxJPO _format)
     Token tmp;
     AdminProperty property;
 } {
-    (   (<DESCRIPTION>              ( tmp = <MULTILINESTRING>               {this.setValue(_format, "description", this.getString(tmp.image));}
+    (
+        ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_format, "symbolicNames", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_format, "symbolicNames", this.getSingle(tmp.image));} ) )
+
+      | (<DESCRIPTION>              ( tmp = <MULTILINESTRING>               {this.setValue(_format, "description", this.getString(tmp.image));}
                                     | tmp = <MULTILINESINGLE>               {this.setValue(_format, "description", this.getSingle(tmp.image));} ) )
 
       | (<HIDDEN_TRUE>                                                      {this.setValue(_format, "hidden",       true);} )

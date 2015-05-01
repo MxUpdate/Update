@@ -11,43 +11,45 @@ public interface FormatParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int DESCRIPTION = 5;
+  int SYMBOLICNAME = 5;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 6;
+  int DESCRIPTION = 6;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 7;
+  int HIDDEN_TRUE = 7;
   /** RegularExpression Id. */
-  int MIME = 8;
+  int HIDDEN_FALSE = 8;
   /** RegularExpression Id. */
-  int SUFFIX = 9;
+  int MIME = 9;
   /** RegularExpression Id. */
-  int TYPE = 10;
+  int SUFFIX = 10;
   /** RegularExpression Id. */
-  int VERSION = 11;
+  int TYPE = 11;
   /** RegularExpression Id. */
-  int VIEW = 12;
+  int VERSION = 12;
   /** RegularExpression Id. */
-  int EDIT = 13;
+  int VIEW = 13;
   /** RegularExpression Id. */
-  int PRINT = 14;
+  int EDIT = 14;
   /** RegularExpression Id. */
-  int STRING = 15;
+  int PRINT = 15;
   /** RegularExpression Id. */
-  int SINGLE = 16;
+  int STRING = 16;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 17;
+  int SINGLE = 17;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 18;
+  int MULTILINESTRING = 18;
   /** RegularExpression Id. */
-  int PROPERTY = 19;
+  int MULTILINESINGLE = 19;
   /** RegularExpression Id. */
-  int PROPERTYTO = 20;
+  int PROPERTY = 20;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 21;
+  int PROPERTYTO = 21;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 22;
+  int PROPERTYVAL = 22;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 23;
+  int ADMINTYPE_STRING = 23;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 24;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -65,6 +67,7 @@ public interface FormatParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"symbolicname\"",
     "\"description\"",
     "\"hidden\"",
     "\"!hidden\"",

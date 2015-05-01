@@ -31,7 +31,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class FormatCI_2UpdateTest
+public class FormatCI_3UpdateTest
     extends AbstractDataExportUpdate<FormatData>
 {
     /**

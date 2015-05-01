@@ -35,9 +35,17 @@ public class FormatCI_1ParserTest
     public Object[][] getData()
     {
         return new Object[][]{
-            {"1) simple",
+            {"0) simple",
                     "",
                     "description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
+            // registered name
+            {"1a) symbolic name",
+                    "",
+                    "symbolicname \"format_abc\" description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
+            {"1b) two symbolic names",
+                    "symbolicname \"format_abc\" symbolicname \"format_def\" description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\"",
+                    "symbolicname \"format_def\" symbolicname \"format_abc\" description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
+
             // description
             {"2a) description",
                     "",
