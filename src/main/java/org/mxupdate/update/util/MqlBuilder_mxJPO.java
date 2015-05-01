@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import matrix.db.Context;
 import matrix.db.MQLCommand;
@@ -34,14 +36,16 @@ import matrix.util.MatrixException;
 public final class MqlBuilder_mxJPO
 {
     // hint: to avoid challenges with backslashes, they are defined directly via character
+    /** Regular expression for the matcher in the converter. */
+    private final static String MQL_MATCHER                 = "" + ((char) 0x005c) + "$[0-9]+";
     /** Regular expression to replace backslashes. */
     private final static String MQL_CONVERT_BACKSLASH_FROM  = "" + ((char) 0x005c) + ((char) 0x005c);
     /** String which will be the target for backslashes. */
-    private final static String MQL_CONVERT_BACKSLASH_TO    = "" + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c);
+    private final static String MQL_CONVERT_BACKSLASH_TO    = "" + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c);
     /** Regular expression to replace quotations. */
     private final static String MQL_CONVERT_QUOTATION_FROM  = "" + ((char) 0x005c) + ((char) 0x0022);
     /** String which will be the target for quotations. */
-    private final static String MQL_CONVERT_QUOTATION_TO    = "" + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x0022);
+    private final static String MQL_CONVERT_QUOTATION_TO    = "" + ((char) 0x005c) + ((char) 0x005c) + ((char) 0x0022);
 
     /**
      * Private constructor to avoid external initialization.
@@ -339,20 +343,8 @@ public final class MqlBuilder_mxJPO
 
             // old MX versions where method has no arguments...
             } else if (meth != null)  {
-                String tmpCmd = this.cmd.toString();
-                for (int idx = this.args.size(); idx > 0; idx --)
-                {
-                     tmpCmd = tmpCmd.replaceAll(
-                            ((char) 0x005c) + "$" + idx,
-                            "\""
-                                    + this.args.get(idx - 1)
-                                            .replaceAll(MqlBuilder_mxJPO.MQL_CONVERT_BACKSLASH_FROM, MqlBuilder_mxJPO.MQL_CONVERT_BACKSLASH_TO)
-                                            .replaceAll(MqlBuilder_mxJPO.MQL_CONVERT_QUOTATION_FROM, MqlBuilder_mxJPO.MQL_CONVERT_QUOTATION_TO)
-                                    + "\"");
-                }
-
                 try  {
-                    meth.invoke(mql, _context, this.cmd);
+                    meth.invoke(mql, _context, this.mqlConvertLegacy());
                 } catch (final IllegalAccessException e)  {
                     throw new MatrixException(e);
                 } catch (final IllegalArgumentException e)  {
@@ -370,6 +362,40 @@ public final class MqlBuilder_mxJPO
                         + "\nMQL command was:\n" + this.toString());
             }
             return mql.getResult().trim();
+        }
+
+        /**
+         * Converts the defined {@link #cmd} with {@link #args} to one MQL
+         * statement for legacy calls.
+         *
+         * @return converted MQL statement
+         */
+        private String mqlConvertLegacy()
+        {
+            final StringBuilder ret = new StringBuilder();
+            final String tmpCmd = this.cmd.toString();
+            final Matcher matcher = Pattern.compile(MqlBuilder_mxJPO.MQL_MATCHER).matcher(this.cmd.toString());
+            int startIdx = 0;
+            while (matcher.find())  {
+                final int argIdx = Integer.parseInt(matcher.group().substring(1));
+                final String replace;
+                if (this.args.size() >= argIdx)  {
+                    replace = "\""
+                            + this.args.get(argIdx - 1)
+                            .replaceAll(MqlBuilder_mxJPO.MQL_CONVERT_BACKSLASH_FROM, MqlBuilder_mxJPO.MQL_CONVERT_BACKSLASH_TO)
+                            .replaceAll(MqlBuilder_mxJPO.MQL_CONVERT_QUOTATION_FROM, MqlBuilder_mxJPO.MQL_CONVERT_QUOTATION_TO)
+                            + "\"";
+                } else  {
+                    replace = matcher.group();
+                }
+
+                ret.append(tmpCmd.substring(startIdx, matcher.start())).append(replace);
+
+                startIdx = matcher.end();
+            }
+            ret.append(tmpCmd.substring(startIdx, tmpCmd.length()));
+
+            return ret.toString();
         }
 
         @Override()
