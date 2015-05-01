@@ -20,7 +20,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -53,16 +52,6 @@ public abstract class AbstractObject_mxJPO
 
     ////////////////////////////////////////////////////////////////////////////
     // global methods start
-
-    /**
-     * Returns a list of names exists within MX.
-     *
-     * @param _paramCache   parameter cache
-     * @return set of names of this administration type
-     * @throws MatrixException if the search within MX failed
-     */
-    public abstract Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException;
 
     /**
      * Checks if given MX name without prefix and suffix matches given match

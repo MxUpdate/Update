@@ -36,9 +36,7 @@ import matrix.db.Attribute;
 import matrix.db.AttributeList;
 import matrix.db.BusinessObject;
 import matrix.db.BusinessObjectWithSelect;
-import matrix.db.BusinessObjectWithSelectList;
 import matrix.db.ExpansionWithSelect;
-import matrix.db.Query;
 import matrix.db.RelationshipWithSelect;
 import matrix.util.MatrixException;
 import matrix.util.StringList;
@@ -122,52 +120,6 @@ public class BusObject_mxJPO
 
     ////////////////////////////////////////////////////////////////////////////
     // global methods start
-
-    /**
-     * Searches for all business object of current type definition and returns
-     * all MX names. The revision of the business object is appended to the
-     * name of the business object split by {@link #SPLIT_NAME}. If types which
-     * are derived from original type are used, the type is the prefix of the
-     * name with the prefix {@link #SPLIT_TYPE}.
-     *
-     * @param _paramCache   parameter cache
-     * @return set of found business object names (and revision)
-     * @throws MatrixException if the query for all business objects for given
-     *                         type failed
-     */
-    @Override()
-    public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
-    {
-        final StringList selects = new StringList(3);
-        selects.addElement("type");
-        selects.addElement("name");
-        selects.addElement("revision");
-
-        final Query query = new Query();
-        query.open(_paramCache.getContext());
-        query.setBusinessObjectType(this.getTypeDef().getMxBusType());
-        final BusinessObjectWithSelectList list = query.select(_paramCache.getContext(), selects);
-        query.close(_paramCache.getContext());
-
-        final Set<String> ret = new TreeSet<String>();
-        for (final Object mapObj : list)  {
-            final BusinessObjectWithSelect map = (BusinessObjectWithSelect) mapObj;
-            final String busType = (String) map.getSelectDataList("type").get(0);
-            final String busName = (String) map.getSelectDataList("name").get(0);
-            final String busRevision = (String) map.getSelectDataList("revision").get(0);
-            final StringBuilder name = new StringBuilder();
-            if (this.getTypeDef().hasMxBusTypeDerived())  {
-                name.append(busType).append(BusObject_mxJPO.SPLIT_TYPE);
-            }
-            name.append(busName);
-            if ((busRevision != null) && !"".equals(busRevision))  {
-                name.append(BusObject_mxJPO.SPLIT_NAME).append(busRevision);
-            }
-            ret.add(name.toString());
-        }
-        return ret;
-    }
 
     /**
      * {@inheritDoc}

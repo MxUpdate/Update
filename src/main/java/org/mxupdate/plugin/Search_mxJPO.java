@@ -108,7 +108,7 @@ class Search_mxJPO
         for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
             if (typeDefList.contains(typeDef.getName()))  {
                 final AbstractObject_mxJPO obj = typeDef.newTypeInstance(null);
-                for (final String name : obj.getMxNames(_paramCache))  {
+                for (final String name : typeDef.fetchMxNames(_paramCache))  {
                     if (obj.matchMxName(_paramCache, name, Arrays.asList(new String[]{match})))  {
                         final AbstractObject_mxJPO  instance = typeDef.newTypeInstance(name);
                         final Map<String,String> map = new HashMap<String,String>();

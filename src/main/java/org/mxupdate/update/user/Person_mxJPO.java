@@ -468,7 +468,7 @@ public class Person_mxJPO
      * @throws MatrixException if the query for persons failed
      * @see #personBus
      */
-    @Override()
+    /*@Override()
     public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
@@ -478,7 +478,7 @@ public class Person_mxJPO
             ret.add(busName.split(BusObject_mxJPO.SPLIT_NAME)[0]);
         }
         return ret;
-    }
+    }*/
 
     /**
      * {@inheritDoc}

@@ -25,18 +25,14 @@ import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeSet;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MqlBuilder;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
@@ -77,9 +73,6 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
 public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mxJPO<CLASS>>
     extends AbstractAdminObject_mxJPO<CLASS>
 {
-    /** Key used for the select statement. */
-    private static final String SELECT_KEY = "@@@2@@@2@@@";
-
     /** Set of all ignored URLs from the XML definition for attributes. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
@@ -166,60 +159,6 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     {
         super(_typeDef, _mxName);
         this.kind = _kind;
-    }
-
-    /**
-     * Searches for all attribute objects depending on the attribute type.
-     *
-     * @param _paramCache   parameter cache
-     * @return set of MX names of all attributes of attribute type
-     *         {@link #attrTypeList}
-     * @throws MatrixException if the query for attribute objects failed
-     */
-    @Override()
-    public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
-    {
-        @SuppressWarnings("unchecked")
-        Map<String,Set<String>> attrs = (Map<String,Set<String>>) _paramCache.getCache(CacheKey.Attributes);
-
-        if (attrs == null)  {
-
-            final MqlBuilder mql;
-            if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsOwner))  {
-                // new enovia version => only attribute w/o defined owner...
-                mql = MqlBuilder_mxJPO.mql()
-                        .cmd("escape list attribute ").arg("*")
-                                .cmd(" where ").arg("owner==\"\"")
-                                .cmd(" select ").arg("type").cmd(" ").arg("name")
-                                .cmd(" dump ").arg(AbstractAttribute_mxJPO.SELECT_KEY);
-
-            } else  {
-                // old enovia version w/o support for owners...
-                mql = MqlBuilder_mxJPO.mql()
-                        .cmd("escape list attribute ").arg("*")
-                                .cmd(" select ").arg("type").cmd(" ").arg("name")
-                                .cmd(" dump ").arg(AbstractAttribute_mxJPO.SELECT_KEY);
-            }
-
-            // evaluate list of attributes
-            attrs = new HashMap<String,Set<String>>();
-            for (final String typeOwnerNameStr : mql.exec(_paramCache).split("\n"))  {
-                final String[] typeOwnerNameArr = typeOwnerNameStr.split(AbstractAttribute_mxJPO.SELECT_KEY);
-                if (!attrs.containsKey(typeOwnerNameArr[0]))  {
-                    attrs.put(typeOwnerNameArr[0], new HashSet<String>());
-                }
-                attrs.get(typeOwnerNameArr[0]).add(typeOwnerNameArr[1]);
-            }
-            _paramCache.setCache(CacheKey.Attributes, attrs);
-        }
-
-        // check that attribute type exists..
-        if (!attrs.containsKey(this.kind.attrTypeList))  {
-            attrs.put(this.kind.attrTypeList, new HashSet<String>());
-        }
-
-        return attrs.get(this.kind.attrTypeList);
     }
 
     @Override()
@@ -480,28 +419,25 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     public enum Kind
     {
         /** Binary attribute. */
-        Binary("binary", "binary"),
+        Binary("binary"),
         /** Boolean attribute. */
-        Boolean("boolean", "boolean"),
+        Boolean("boolean"),
         /** Date attribute. */
-        Date("date", "timestamp"),
+        Date("date"),
         /** Integer attribute. */
-        Integer("integer", "integer"),
+        Integer("integer"),
         /** Real attribute. */
-        Real("real", "real"),
+        Real("real"),
         /** String attribute. */
-        String("string", "string");
+        String("string");
 
-        Kind(final String _attrTypeCreate, final String _attrTypeList)
+        Kind(final String _attrTypeCreate)
         {
             this.attrTypeCreate = _attrTypeCreate;
-            this.attrTypeList = _attrTypeList;
         }
 
         /** Holds the attribute type used to create a new attribute. */
         private final String attrTypeCreate;
-        /** Holds the attribute including the &quot;,&quot; returned from the {@kind list attribute} statement.*/
-        private final String attrTypeList;
     }
 
     /**

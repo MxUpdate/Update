@@ -17,8 +17,6 @@ package org.mxupdate.update.system;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import matrix.util.MatrixException;
 
@@ -38,13 +36,6 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 public class ConfigSystemSearchIndex_mxJPO
     extends AbstractObject_mxJPO
 {
-    /**
-     * Used default name of the search configuration.
-     *
-     * @see #getMxNames(ParameterCache_mxJPO)
-     */
-    private final static String DEFAULT_NAME = "Config"; //$NON-NLS-1$
-
     /**
      * MQL statement to get the search index configuration from the system.
      *
@@ -121,17 +112,6 @@ public class ConfigSystemSearchIndex_mxJPO
         throws IOException
     {
         _out.append(this.searchIndex);
-    }
-
-    /**
-     * @param _paramCache   parameter cache with MX context (not used)
-     */
-    @Override()
-    public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
-    {
-        final Set<String> names = new HashSet<String>(1);
-        names.add(ConfigSystemSearchIndex_mxJPO.DEFAULT_NAME);
-        return names;
     }
 
     @Override()

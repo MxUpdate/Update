@@ -106,33 +106,6 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     }
 
     /**
-     * Searches for all administration object of current type definition and
-     * returns all found names as set.
-     *
-     * @param _paramCache   parameter cache
-     * @return set of all administration object of current type definition
-     * @throws MatrixException if the query for current administration object
-     *                         failed
-     */
-    @Override()
-    public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
-    {
-        final StringBuilder cmd = new StringBuilder()
-                .append("list ")
-                .append(this.getTypeDef().getMxAdminName())
-                .append(" ")
-                .append(this.getTypeDef().getMxAdminSuffix());
-        final Set<String> ret = new TreeSet<String>();
-        for (final String name : MqlUtil_mxJPO.execMql(_paramCache, cmd).split("\n"))  {
-            if (!"".equals(name))  {
-                ret.add(name);
-            }
-        }
-        return ret;
-    }
-
-    /**
      * {@inheritDoc}
      * <p>A print on the property with a key is internally done.</p>
      */

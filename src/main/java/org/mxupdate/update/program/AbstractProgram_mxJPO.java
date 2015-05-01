@@ -17,22 +17,14 @@ package org.mxupdate.update.program;
 
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.CompareToUtil_mxJPO;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MqlBuilder;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 
 /**
@@ -44,9 +36,6 @@ import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLASS>>
     extends AbstractCode_mxJPO<CLASS>
 {
-    /** Key used for the select statement. */
-    private static final String SELECT_KEY = "@@@2@@@2@@@";
-
     /** Program kind. */
     private Kind kind = null;
 
@@ -88,57 +77,6 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
     {
         super(_typeDef, _mxName);
         this.kind = _kind;
-    }
-
-    /**
-     * Searches for all programs objects depending on the program {@link Kind}.
-     *
-     * @param _paramCache   parameter cache
-     * @return set of MX names of all programs of kind {@link #kind}
-     * @throws MatrixException if the query for ∏rogram objects failed
-     */
-    @Override()
-    public Set<String> getMxNames(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
-    {
-        @SuppressWarnings("unchecked")
-        Map<Kind,Set<String>> progs = (Map<Kind,Set<String>>) _paramCache.getCache(CacheKey.Programs);
-
-        if (progs == null)  {
-            // prepare MQL statement
-            final MqlBuilder mql = MqlBuilder_mxJPO.mql()
-                        .cmd("escape list program ").arg("*")
-                                .cmd(" select ").arg("name");
-            for (final Kind kind : Kind.values())  {
-                mql.cmd(" ").arg(kind.select);
-            }
-            mql.cmd(" dump ").arg(AbstractProgram_mxJPO.SELECT_KEY);
-
-            // prepare list of programs
-            progs = new HashMap<Kind,Set<String>>();
-            for (final Kind tmpKind : Kind.values())  {
-                progs.put(tmpKind, new HashSet<String>());
-            }
-
-            // evaluate list of programs
-            for (final String lineStr : mql.exec(_paramCache).split("\n"))  {
-                final String[] lineArr = lineStr.split(AbstractProgram_mxJPO.SELECT_KEY);
-                int idx = 1;
-                Kind lineKind = null;
-                for (final Kind tmpKind : Kind.values())  {
-                    if ("TRUE".equalsIgnoreCase(lineArr[idx++]))  {
-                        lineKind = tmpKind;
-                        break;
-                    }
-                }
-                if (lineKind != null)  {
-                    progs.get(lineKind).add(lineArr[0]);
-                }
-            }
-            _paramCache.setCache(CacheKey.Programs, progs);
-        }
-
-        return progs.get(this.kind);
     }
 
     @Override()
@@ -319,24 +257,11 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
     enum Kind
     {
         /** MQL program. */
-        EKL("iseklprogram"),
+        EKL,
         /** Java program. */
-        JAVA("isjavaprogram"),
+        JAVA,
         /** MQL program. */
-        MQL("ismqlprogram");
-
-        /** MQL select statement. */
-        private final String select;
-
-        /**
-         * Initialize the MQL select statement.
-         *
-         * @param _select   select statement
-         */
-        private Kind(final String _select)
-        {
-            this.select = _select;
-        }
+        MQL;
     }
 
     /** */

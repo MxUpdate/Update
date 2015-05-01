@@ -20,9 +20,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
 
 import matrix.util.MatrixException;
 
+import org.mxupdate.action.mxnames.IFetchMxNames_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
@@ -43,54 +45,6 @@ public final class TypeDef_mxJPO
      * @see #defineJPOClass(ParameterCache_mxJPO, Mapping_mxJPO, String)
      */
     private static final String MQL_LISTPROG = "list prog org.mxupdate.* select name classname dump '\t'";
-
-    /** Used prefix of admin type suffix. */
-    private static final String PREFIX_ADMIN_SUFFIX = "AdminSuffix";
-    /** Used prefix of the admin type name. */
-    private static final String PREFIX_ADMIN_TYPE = "AdminType";
-
-    /** Used prefix of ignored attributes for business objects within the property file. */
-    private static final String PREFIX_BUS_IGNOREATTRIBUTES = "BusIgnoreAttributes";
-    /** Used prefix of check exists definitions within the property file. */
-    private static final String PREFIX_BUS_CHECKEXISTS = "BusCheckExists";
-    /** Used prefix of policy definitions within the property file. */
-    private static final String PREFIX_BUS_POLICY = "BusPolicy";
-    /** Used prefix of both relationship definitions within the property file. */
-    private static final String PREFIX_BUS_RELSBOTH = "BusRelsBoth";
-    /** Used prefix of from relationship definitions within the property file. */
-    private static final String PREFIX_BUS_RELSFROM = "BusRelsFrom";
-    /** Used prefix of to relationship definitions within the property file. */
-    private static final String PREFIX_BUS_RELSTO = "BusRelsTo";
-    /** Used prefix of business type definitions within the property file. */
-    private static final String PREFIX_BUS_TYPE = "BusType";
-    /** Used prefix of business type derived definitions within the property file. */
-    private static final String PREFIX_BUS_TYPE_DERIVED = "BusTypeDerived";
-    /** Used prefix of vault definitions within the property file. */
-    private static final String PREFIX_BUS_VAULT = "BusVault";
-
-    /** Used prefix of type definitions within the property file. */
-    private static final String PREFIX_FILE_PATH = "FilePath";
-    /** Used prefix of file prefix definitions within the property file. */
-    private static final String PREFIX_FILE_PREFIX = "FilePrefix";
-    /** Used prefix of file suffix definitions within the property file. */
-    private static final String PREFIX_FILE_SUFFIX = "FileSuffix";
-
-    /** Used prefix of mxupdate type definitions within the property file. */
-    private static final String PREFIX_MXUPDATE_TYPE = "MxUpdateType";
-
-    /** Used file suffix of icon path definitions within the property file. */
-    private static final String PREFIX_ICONPATH = "Icon";
-
-    /** Used prefix of the JPO name. */
-    private static final String PREFIX_JPO = "JPO";
-
-    /** Used logging text of type definitions within the property file. */
-    private static final String PREFIX_TEXT_LOGGING = "TextLogging";
-    /** Used title of type definitions within the property file. */
-    private static final String PREFIX_TEXT_TITLE = "TextTitle";
-
-    /** Used order number within update. */
-    private static final String PREFIX_ORDERNO = "OrderNo";
 
     /** Defines the name of the admin type. */
     private String adminType;
@@ -123,14 +77,18 @@ public final class TypeDef_mxJPO
     /** Mapping between internal used administration type definitions and the file suffixes. */
     private String fileSuffix;
 
-    /** Name of the mxUpdate type fir this type definition */
+    /** Name of the mxUpdate kind for this type definition */
+    private String mxUpdateKind;
+    /** Name of the mxUpdate type for this type definition */
     private String mxUpdateType;
 
     /** Stores the path to the icon for the type definition. */
     private String iconPath;
 
-    /** Stores the class implementing the MxUpdate functionality. */
+    /** JPO implementing the CI MxUpdate functionality. */
     private Class<? extends AbstractObject_mxJPO> jpoClass;
+    /** JPO implementing the Fetch-Mx-Names interface. */
+    private Class<? extends IFetchMxNames_mxJPO> jpoFetchMxNames;
 
     /** Order number used within update. */
     private int orderNo = Integer.MAX_VALUE;
@@ -155,6 +113,7 @@ public final class TypeDef_mxJPO
      * @see Mapping_mxJPO#getTypeDefMap()
      * @see #defineJPOClass(ParameterCache_mxJPO, Mapping_mxJPO, String)
      */
+    @SuppressWarnings("unchecked")
     protected static void defineValue(final ParameterCache_mxJPO _paramCache,
                                       final Mapping_mxJPO _mapping,
                                       final String _key,
@@ -170,60 +129,49 @@ public final class TypeDef_mxJPO
             _mapping.getTypeDefMap().put(enumName, typeDef);
         }
 
-        if (key.equals(TypeDef_mxJPO.PREFIX_ADMIN_SUFFIX))  {
-            typeDef.adminSuffix = _value;
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_ADMIN_TYPE))  {
-            typeDef.adminType = _value;
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_BUS_CHECKEXISTS))  {
-            typeDef.busCheckExists = _value.equalsIgnoreCase("true");
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_BUS_IGNOREATTRIBUTES))  {
-            typeDef.busIgnoredAttributes.addAll(Arrays.asList(_value.split(",")));
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_BUS_RELSBOTH))  {
-            typeDef.busRelsBoth = Arrays.asList(_value.split(","));
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_BUS_RELSFROM))  {
-            typeDef.busRelsFrom = Arrays.asList(_value.split(","));
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_BUS_RELSTO))  {
-            typeDef.busRelsTo = Arrays.asList(_value.split(","));
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_BUS_POLICY))  {
-            typeDef.busPolicy = _value;
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_BUS_TYPE))  {
-            typeDef.busType = _value;
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_BUS_TYPE_DERIVED))  {
-            typeDef.busTypeDerived = Boolean.valueOf(_value);
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_BUS_VAULT))  {
-            typeDef.busVault = _value;
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_FILE_PATH))  {
-            typeDef.filePath = _value;
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_FILE_PREFIX))  {
-            typeDef.filePrefix = _value;
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_FILE_SUFFIX))  {
-            typeDef.fileSuffix = _value;
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_MXUPDATE_TYPE))  {
-            typeDef.mxUpdateType = _value;
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_ICONPATH))  {
-            typeDef.iconPath = _value;
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_JPO))  {
-            typeDef.defineJPOClass(_paramCache, _mapping, _value);
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_ORDERNO))  {
-            typeDef.orderNo = Integer.parseInt(_value);
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_TEXT_LOGGING))  {
-            typeDef.textLogging = _value;
-        } else if (key.equals(TypeDef_mxJPO.PREFIX_TEXT_TITLE))  {
-            typeDef.textTitle = _value;
-        } else  {
-            typeDef.defineValues(key, _value);
+        Prefix prefix;
+        try  {
+            prefix = Prefix.valueOf(key);
+        } catch (final IllegalArgumentException e)  {
+            prefix = null;
         }
-    }
 
-    /**
-     * The constructor is defined private so that a new instance could only
-     * created within this class.
-     *
-     * @param _name     name of the type definition group
-     */
-    private TypeDef_mxJPO(final String _name)
-    {
-        super(_name);
+        if (prefix == null)  {
+            typeDef.defineValues(key, _value);
+        } else  {
+            switch (prefix)  {
+                case AdminSuffix:           typeDef.adminSuffix = _value;break;
+                case AdminType:             typeDef.adminType = _value;break;
+
+                case BusCheckExists:        typeDef.busCheckExists = _value.equalsIgnoreCase("true");break;
+                case BusIgnoreAttributes:   typeDef.busIgnoredAttributes.addAll(Arrays.asList(_value.split(",")));break;
+                case BusRelsBoth:           typeDef.busRelsBoth = Arrays.asList(_value.split(","));break;
+                case BusRelsFrom:           typeDef.busRelsFrom = Arrays.asList(_value.split(","));break;
+                case BusRelsTo:             typeDef.busRelsTo = Arrays.asList(_value.split(","));break;
+                case BusPolicy:             typeDef.busPolicy = _value;break;
+                case BusType:               typeDef.busType = _value;break;
+                case BusTypeDerived:        typeDef.busTypeDerived = Boolean.valueOf(_value);break;
+                case BusVault:              typeDef.busVault = _value;break;
+
+                case FilePath:              typeDef.filePath = _value;break;
+                case FilePrefix:            typeDef.filePrefix = _value;break;
+                case FileSuffix:            typeDef.fileSuffix = _value;break;
+
+                case MxUpdateKind:          typeDef.mxUpdateKind = _value;break;
+                case MxUpdateType:          typeDef.mxUpdateType = _value;break;
+
+                case Icon:                  typeDef.iconPath = _value;break;
+
+                case JPO:                   typeDef.jpoClass        = (Class<? extends AbstractObject_mxJPO>) TypeDef_mxJPO.fetchJPOClass(_paramCache, _mapping, _value);break;
+                case JpoFetchMxNames:       typeDef.jpoFetchMxNames = (Class<? extends IFetchMxNames_mxJPO>) TypeDef_mxJPO.fetchJPOClass(_paramCache, _mapping, _value);break;
+
+                case OrderNo:               typeDef.orderNo = Integer.parseInt(_value);break;
+
+                case TextLogging:           typeDef.textLogging = _value;break;
+                case TextTitle:             typeDef.textTitle = _value;break;
+                default:                    typeDef.defineValues(key, _value);break;
+            }
+        }
     }
 
     /**
@@ -237,11 +185,10 @@ public final class TypeDef_mxJPO
      * @see #MQL_LISTPROG
      * @see #jpoClass
      */
-    @SuppressWarnings("unchecked")
-    private void defineJPOClass(final ParameterCache_mxJPO _paramCache,
-                                final Mapping_mxJPO _mapping,
-                                final String _jpoName)
-            throws Exception
+    private static Class<?> fetchJPOClass(final ParameterCache_mxJPO _paramCache,
+                                          final Mapping_mxJPO _mapping,
+                                          final String _jpoName)
+        throws Exception
     {
         if (_mapping.getTypeDefJPOsMap().isEmpty())  {
             final String tmp = MqlUtil_mxJPO.execMql(_paramCache, TypeDef_mxJPO.MQL_LISTPROG);
@@ -256,16 +203,30 @@ public final class TypeDef_mxJPO
         if (jpoClassName == null)  {
             throw new Exception("unknown jpo class definition for " + _jpoName);
         }
+
+        Class<?> ret;
         try
         {
             // directly in MX
-            this.jpoClass = (Class<? extends AbstractObject_mxJPO>) Class.forName(jpoClassName);
+            ret = Class.forName(jpoClassName);
         }
         catch (final ClassNotFoundException e)
         {
             // run separately
-            this.jpoClass = (Class<? extends AbstractObject_mxJPO>) Class.forName(_jpoName + "_mxJPO");
+            ret = Class.forName(_jpoName + "_mxJPO");
         }
+        return ret;
+    }
+
+    /**
+     * The constructor is defined private so that a new instance could only
+     * created within this class.
+     *
+     * @param _name     name of the type definition group
+     */
+    private TypeDef_mxJPO(final String _name)
+    {
+        super(_name);
     }
 
     /**
@@ -451,6 +412,17 @@ public final class TypeDef_mxJPO
     }
 
     /**
+     * Returns the related {@link #mxUpdateKind MxUpdate kind}. The method
+     * returns only correct values if the initialize method was called!
+     *
+     * @return MxUpdate kind of the administration type definition
+     */
+    public String getMxUpdateKind()
+    {
+        return this.mxUpdateKind;
+    }
+
+    /**
      * Returns the related {@link #mxUpdateType MxUpdate type}. The method
      * returns only correct values if the initialize method was called!
      *
@@ -513,11 +485,31 @@ public final class TypeDef_mxJPO
      *                                      exception
      */
     public AbstractObject_mxJPO newTypeInstance(final String _mxName)
-            throws NoSuchMethodException, InstantiationException,
-                   IllegalAccessException, InvocationTargetException
+            throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
         return this.jpoClass.getConstructor(TypeDef_mxJPO.class, String.class)
                             .newInstance(this, _mxName);
+    }
+
+    /**
+     * Fetches all MX names for this type definition.
+     *
+     * @param _paramCache               parameter cache
+     * @return set of MX names for this type definition
+     * @throws NoSuchMethodException        if the constructor does not exists
+     * @throws InstantiationException       if a new instance of the class
+     *                                      {@link #jpoFetchMxNames} could not
+     *                                      be created
+     * @throws IllegalAccessException       if the constructor is not public
+     * @throws InvocationTargetException    if the constructor of the
+     *                                      {@link #jpoFetchMxNames} itself
+     *                                      throws an exception
+     * @throws MatrixException              if fetch of Mx names failed
+     */
+    public SortedSet<String> fetchMxNames(final ParameterCache_mxJPO _paramCache)
+            throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, MatrixException
+    {
+        return this.jpoFetchMxNames.getConstructor().newInstance().fetch(_paramCache, this);
     }
 
     /**
@@ -538,5 +530,63 @@ public final class TypeDef_mxJPO
             ret = this.getName().compareTo(_other.getName());
         }
         return ret;
+    }
+
+    /**
+     * All prefix defined the mapping file.
+     */
+    enum Prefix
+    {
+        /** Used prefix of admin type suffix. */
+        AdminSuffix,
+        /** Used prefix of the admin type name. */
+        AdminType,
+
+        /** Used prefix of ignored attributes for business objects within the property file. */
+        BusIgnoreAttributes,
+        /** Used prefix of check exists definitions within the property file. */
+        BusCheckExists,
+        /** Used prefix of policy definitions within the property file. */
+        BusPolicy,
+        /** Used prefix of both relationship definitions within the property file. */
+        BusRelsBoth,
+        /** Used prefix of from relationship definitions within the property file. */
+        BusRelsFrom,
+        /** Used prefix of to relationship definitions within the property file. */
+        BusRelsTo,
+        /** Used prefix of business type definitions within the property file. */
+        BusType,
+        /** Used prefix of business type derived definitions within the property file. */
+        BusTypeDerived,
+        /** Used prefix of vault definitions within the property file. */
+        BusVault,
+
+        /** Used prefix of type definitions within the property file. */
+        FilePath,
+        /** Used prefix of file prefix definitions within the property file. */
+        FilePrefix,
+        /** Used prefix of file suffix definitions within the property file. */
+        FileSuffix,
+
+        /** Used prefix of mxupdate kind definitions within the property file. */
+        MxUpdateKind,
+        /** Used prefix of mxupdate type definitions within the property file. */
+        MxUpdateType,
+
+        /** Used file suffix of icon path definitions within the property file. */
+        Icon,
+
+        /** Used prefix of the JPO name. */
+        JPO,
+        /** Used prefix of the JPO names to fetch MX names. */
+        JpoFetchMxNames,
+
+        /** Used logging text of type definitions within the property file. */
+        TextLogging,
+        /** Used title of type definitions within the property file. */
+        TextTitle,
+
+        /** Used order number within update. */
+        OrderNo;
     }
 }
