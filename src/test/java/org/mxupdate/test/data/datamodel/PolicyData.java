@@ -720,7 +720,7 @@ public class PolicyData
                     found = true;
 
                     // access filter
-                    String exportAccess  = "";
+                    final List<String> exportAccess  = new ArrayList<String>();
                     for (final Line subLine : line.getChildren())  {
                         if (subLine.getTag().equals("public")
                                 || subLine.getTag().equals("owner")
@@ -728,18 +728,16 @@ public class PolicyData
                                 || subLine.getTag().equals("login")
                                 || subLine.getTag().equals("revoke"))  {
 
-                            exportAccess += "      " + subLine.getTag() + ' ' + subLine.getValue() + '\n';
+                            exportAccess.add(subLine.getTag() + ' ' + subLine.getValue());
                         }
                     }
-                    final StringBuilder expAccess = new StringBuilder();
+                    final List<String> expAccess  = new ArrayList<String>();
                     for (final Access accessFilter : this.access)  {
-                        expAccess.append("     ");
-                        accessFilter.append4CIFile(expAccess);
+                        final StringBuilder tmp = new StringBuilder();
+                        accessFilter.append4CIFile(tmp);
+                        expAccess.add(tmp.toString().trim());
                     }
-                    Assert.assertEquals(
-                            exportAccess,
-                            expAccess.toString(),
-                            "check access definition for state " + line.getValue());
+                    Assert.assertEquals(exportAccess, expAccess, "check access definition for state " + line.getValue());
 
                     // signature
                     for (final Signature signature : this.signatures)  {

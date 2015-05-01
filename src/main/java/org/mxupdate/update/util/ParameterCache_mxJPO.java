@@ -762,32 +762,20 @@ public class ParameterCache_mxJPO
          * is used (where the view program is not working anymore).
          */
         DMFormatSupportsPrograms,
-        /**
-         * Name of the parameter to define that the &quot;majorrevision&quot;
-         * property for policies and &quot;delimited&quot; property for policy
-         * states from current MX version is supported. The parameter is needed
-         * to support the case that an old MX version is used....
-         */
+
+        /** Boolean that the access of policies are sorted. */
+        DMPolicyAllowExportAccessSorting,
+        /** Boolean that policy supports the 'majorrevision' property for policies*/
         DMPolicySupportsMajorMinor,
-        /**
-         * Name of the parameter to define that the policy states supports the
-         * published property.
-         */
+        /** Boolean that policy states supports the published property. */
         DMPolicyStateSupportsPublished,
-        /**
-         * Name of parameter to check that the policy states supports the
-         * 'enforce reserve access' flag.
-         */
+        /** Boolean that policy states supports the 'enforce reserve access' flag. */
         DMPolicyStateSupportsEnforceReserveAccess,
-        /**
-         * Name of the parameter to check that rules supports the 'enforce
-         * reserve access' flag.
-         */
+
+        /** Boolean that rules supports the 'enforce reserve access' flag. */
         DMRuleSupportsEnforceReserveAccess,
-        /**
-         * Name of the key within the parameter cache that the update continues
-         * if a error was thrown.
-         */
+
+        /** Boolean that the update continues if a error was thrown. */
         ParamContinueOnError;
     }
 

@@ -35,6 +35,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
+import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO;
 import org.mxupdate.update.datamodel.policy.PolicyDefParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -159,7 +160,9 @@ public class Policy_mxJPO
     /**
      * {@inheritDoc}
      * Parsing is only allowed if the update is not done within
-     * {@link #updateWithCreate create}.
+     * {@link #updateWithCreate create}. The
+     * {@link #allStateAccess all state access} and
+     * {@link State#access state access} statements are sorted if defined.
      */
     @Override()
     protected void parse(final ParameterCache_mxJPO _paramCache)
@@ -167,6 +170,13 @@ public class Policy_mxJPO
     {
         if (!this.updateWithCreate)  {
             super.parse(_paramCache);
+
+            if (_paramCache.getValueBoolean(ValueKeys.DMPolicyAllowExportAccessSorting))  {
+                this.allStateAccess.sort();
+                for (final State state : this.states)  {
+                    state.access.sort();
+                }
+            }
         }
     }
 
@@ -593,7 +603,6 @@ throw new Exception("some states are not defined anymore!");
      * Class defining states of a policy.
      */
     public static class State
-        extends AccessList_mxJPO
     {
         /** Name of the state. */
         private String name;
@@ -630,6 +639,9 @@ throw new Exception("some states are not defined anymore!");
         /** Is the business object in this state versionable? */
         private boolean versionable = false;
 
+        /** Access definitions. */
+        private final AccessList_mxJPO access = new AccessList_mxJPO();
+
         /** Route message of this state. */
         private String routeMessage;
         /** Route users of this state. */
@@ -647,7 +659,6 @@ throw new Exception("some states are not defined anymore!");
         /**
          * {@inheritDoc}
          */
-        @Override()
         public boolean parse(final ParameterCache_mxJPO _paramCache,
                              final String _url,
                              final String _content)
@@ -708,7 +719,7 @@ throw new Exception("some states are not defined anymore!");
                 ret = this.triggers.parse(_paramCache, _url.substring(12), _content);
 
             } else  {
-                ret = super.parse(_paramCache, _url, _content);
+                ret = this.access.parse(_paramCache, _url, _content);
             }
             return ret;
         }
@@ -740,26 +751,26 @@ throw new Exception("some states are not defined anymore!");
                 final Map<String,List<Access>> approveMap = new HashMap<String,List<Access>>();
                 final Map<String,List<Access>> ignoreMap = new HashMap<String,List<Access>>();
                 final Map<String,List<Access>> rejectMap = new HashMap<String,List<Access>>();
-                for (final Access access : this.getAccessList())  {
-                    if ((access.getKey() != null) && !access.getKey().isEmpty() && access.getAccess().size() == 1)  {
-                        final String accessStr = access.getAccess().iterator().next();
-                        if ("public".equals(access.getKind()) && "none".equals(accessStr))  {
-                            filterMap.put(access.getKey(), access);
-                        } else if ("user".equals(access.getKind()) && "approve".equals(accessStr))  {
-                            if (!approveMap.containsKey(access.getKey()))  {
-                                approveMap.put(access.getKey(), new ArrayList<Access>());
+                for (final Access oneAccess : this.access.getAccessList())  {
+                    if ((oneAccess.getKey() != null) && !oneAccess.getKey().isEmpty() && oneAccess.getAccess().size() == 1)  {
+                        final String accessStr = oneAccess.getAccess().iterator().next();
+                        if ("public".equals(oneAccess.getKind()) && "none".equals(accessStr))  {
+                            filterMap.put(oneAccess.getKey(), oneAccess);
+                        } else if ("user".equals(oneAccess.getKind()) && "approve".equals(accessStr))  {
+                            if (!approveMap.containsKey(oneAccess.getKey()))  {
+                                approveMap.put(oneAccess.getKey(), new ArrayList<Access>());
                             }
-                            approveMap.get(access.getKey()).add(access);
-                        } else if ("user".equals(access.getKind()) && "ignore".equals(accessStr))  {
-                            if (!ignoreMap.containsKey(access.getKey()))  {
-                                ignoreMap.put(access.getKey(), new ArrayList<Access>());
+                            approveMap.get(oneAccess.getKey()).add(oneAccess);
+                        } else if ("user".equals(oneAccess.getKind()) && "ignore".equals(accessStr))  {
+                            if (!ignoreMap.containsKey(oneAccess.getKey()))  {
+                                ignoreMap.put(oneAccess.getKey(), new ArrayList<Access>());
                             }
-                            ignoreMap.get(access.getKey()).add(access);
-                        } else if ("user".equals(access.getKind()) && "reject".equals(accessStr))  {
-                            if (!rejectMap.containsKey(access.getKey()))  {
-                                rejectMap.put(access.getKey(), new ArrayList<Access>());
+                            ignoreMap.get(oneAccess.getKey()).add(oneAccess);
+                        } else if ("user".equals(oneAccess.getKind()) && "reject".equals(accessStr))  {
+                            if (!rejectMap.containsKey(oneAccess.getKey()))  {
+                                rejectMap.put(oneAccess.getKey(), new ArrayList<Access>());
                             }
-                            rejectMap.get(access.getKey()).add(access);
+                            rejectMap.get(oneAccess.getKey()).add(oneAccess);
                         }
                     }
                 }
@@ -767,30 +778,30 @@ throw new Exception("some states are not defined anymore!");
                 for (final Signature signature : this.signatures)  {
                     // approve
                     if (approveMap.containsKey(signature.name))  {
-                        for (final Access access : approveMap.get(signature.name))  {
-                            signature.approverUsers.add(access.getUserRef());
-                            this.getAccessList().remove(access);
+                        for (final Access oneAccess : approveMap.get(signature.name))  {
+                            signature.approverUsers.add(oneAccess.getUserRef());
+                            this.access.getAccessList().remove(oneAccess);
                         }
                     }
                     // ignore
                     if (ignoreMap.containsKey(signature.name))  {
-                        for (final Access access : ignoreMap.get(signature.name))  {
-                            signature.ignoreUsers.add(access.getUserRef());
-                            this.getAccessList().remove(access);
+                        for (final Access oneAccess : ignoreMap.get(signature.name))  {
+                            signature.ignoreUsers.add(oneAccess.getUserRef());
+                            this.access.getAccessList().remove(oneAccess);
                         }
                     }
                     // reject
                     if (rejectMap.containsKey(signature.name))  {
-                        for (final Access access : rejectMap.get(signature.name))  {
-                            signature.rejectUsers.add(access.getUserRef());
-                            this.getAccessList().remove(access);
+                        for (final Access oneAccess : rejectMap.get(signature.name))  {
+                            signature.rejectUsers.add(oneAccess.getUserRef());
+                            this.access.getAccessList().remove(oneAccess);
                         }
                     }
                     // filter
                     if (filterMap.containsKey(signature.name))  {
-                        final Access access = filterMap.get(signature.name);
-                        signature.filter = access.getFilter();
-                        this.getAccessList().remove(access);
+                        final Access oneAccess = filterMap.get(signature.name);
+                        signature.filter = oneAccess.getFilter();
+                        this.access.getAccessList().remove(oneAccess);
                     }
                 }
             }
@@ -813,7 +824,6 @@ throw new Exception("some states are not defined anymore!");
          * <li>signatures
          * </ul>
          */
-        @Override()
         public void write(final ParameterCache_mxJPO _paramCache,
                           final String _prefix,
                           final Appendable _out)
@@ -856,7 +866,7 @@ throw new Exception("some states are not defined anymore!");
                     .append(StringUtil_mxJPO.convertUpdate(this.routeMessage)).append("\"\n");
             }
             // write access statements
-            super.write(_paramCache, "        ", _out);
+            this.access.write(_paramCache, "        ", _out);
             // write event statements
             _out.append("        action \"").append(StringUtil_mxJPO.convertUpdate(this.actionProgram)).append("\" input \"").append(StringUtil_mxJPO.convertUpdate(this.actionInput)).append("\"\n")
                 .append("        check \"").append(StringUtil_mxJPO.convertUpdate(this.checkProgram))  .append("\" input \"").append(StringUtil_mxJPO.convertUpdate(this.checkInput)).append("\"\n");
@@ -927,9 +937,9 @@ throw new Exception("some states are not defined anymore!");
 
             // access list
             if (_oldState != null)  {
-                _oldState.cleanup(_mql);
+                _oldState.access.cleanup(_mql);
             }
-            this.update(_mql);
+            this.access.update(_mql);
 
             // triggers
             this.triggers.calcDelta(_mql, (_oldState != null) ? _oldState.triggers : null);

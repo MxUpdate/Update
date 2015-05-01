@@ -554,6 +554,7 @@ this.getField(_policy, "allState").set(true);
  * @param _policy   policy for which the all state definition is parsed
  */
   final public void state(final Policy_mxJPO _policy) throws ParseException {final State state = new State();
+    final AccessList_mxJPO accessList = this.getField(state, "access").<AccessList_mxJPO>get();
     String tmpStr;
     Set<String> tmpSet;
     Token tmp;
@@ -1026,30 +1027,30 @@ this.setValue(state, "published", false);
         break;
         }
       case OWNER:{
-        stateOwnerAccess(Prefix.All, state);
+        stateOwnerAccess(Prefix.All, accessList);
         break;
         }
       case PUBLIC:{
-        statePublicAccess(Prefix.All, state);
+        statePublicAccess(Prefix.All, accessList);
         break;
         }
       case USER:{
-        stateUserAccess(Prefix.All, state);
+        stateUserAccess(Prefix.All, accessList);
         break;
         }
       case REVOKE:{
         jj_consume_token(REVOKE);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case OWNER:{
-          stateOwnerAccess(Prefix.Revoke, state);
+          stateOwnerAccess(Prefix.Revoke, accessList);
           break;
           }
         case PUBLIC:{
-          statePublicAccess(Prefix.Revoke, state);
+          statePublicAccess(Prefix.Revoke, accessList);
           break;
           }
         case USER:{
-          stateUserAccess(Prefix.Revoke, state);
+          stateUserAccess(Prefix.Revoke, accessList);
           break;
           }
         default:
@@ -1063,15 +1064,15 @@ this.setValue(state, "published", false);
         jj_consume_token(LOGIN);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case OWNER:{
-          stateOwnerAccess(Prefix.Login,  state);
+          stateOwnerAccess(Prefix.Login,  accessList);
           break;
           }
         case PUBLIC:{
-          statePublicAccess(Prefix.Login,  state);
+          statePublicAccess(Prefix.Login,  accessList);
           break;
           }
         case USER:{
-          stateUserAccess(Prefix.Login,  state);
+          stateUserAccess(Prefix.Login,  accessList);
           break;
           }
         default:
@@ -1544,25 +1545,23 @@ category     = "contractor";
         throw new ParseException();
       }
     }
-this.getField(_access, "key").set(key);
-        this.getField(_access, "filter").set(filter);
-        this.getField(_access, "localfilter").set(localfilter);
-        this.getField(_access, "organization").set(organization);
-        this.getField(_access, "project").set(project);
-        this.getField(_access, "owner").set(owner);
-        this.getField(_access, "reserve").set(reserve);
-        this.getField(_access, "maturity").set(maturity);
-        this.getField(_access, "category").set(category);
+this.setValue(_access, "key", key);
+        this.setValue(_access, "filter", filter);
+        this.setValue(_access, "localfilter", localfilter);
+        this.setValue(_access, "organization", organization);
+        this.setValue(_access, "project", project);
+        this.setValue(_access, "owner", owner);
+        this.setValue(_access, "reserve", reserve);
+        this.setValue(_access, "maturity", maturity);
+        this.setValue(_access, "category", category);
 
-        if (access == null)  {
-            this.getField(_access, "access").set(new HashSet<String>());
-        } else  {
+        if (access != null)  {
             final String tmp = access.image
                     .replaceFirst("^\\{", "").replaceFirst("\\}$", "")  // remove {}
                     .replaceAll("(\t)|(\n)", " ")                       // replace tabs, new lines
                     .replaceAll("( )+", " ")                            // multiple spaces => one space
                     .trim();                                            // remove trailing spaces
-            this.getField(_access, "access").set(new HashSet<String>(Arrays.asList(tmp.split(" "))));
+            this.setValue(_access, "access", Arrays.asList(tmp.split(" ")));
         }
   }
 

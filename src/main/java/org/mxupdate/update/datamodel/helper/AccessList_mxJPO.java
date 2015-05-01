@@ -16,11 +16,16 @@
 package org.mxupdate.update.datamodel.helper;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeSet;
 
+import org.mxupdate.update.util.CompareToUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -36,6 +41,7 @@ public class AccessList_mxJPO
      * Class used to hold the user access for a state.
      */
     public static class Access
+        implements Comparable<Access>
     {
         /** Prefix for the access kind. */
         private Prefix prefix = Prefix.All;
@@ -46,7 +52,7 @@ public class AccessList_mxJPO
         /** Key of the access filter. */
         private String key;
         /** Set holding the complete access. */
-        private final Set<String> access = new TreeSet<String>();
+        private final SortedSet<String> access = new TreeSet<String>();
         /** Organization of the access definition. */
         private String organization;
         /** Project of the access definition. */
@@ -126,6 +132,28 @@ public class AccessList_mxJPO
             return ((this.access.isEmpty() || ((this.access.size() == 1) && this.access.contains("none"))))
                     && ((this.filter == null) || this.filter.isEmpty())
                     && ((this.localfilter == null) || this.localfilter.isEmpty());
+        }
+
+        @Override()
+        public int compareTo(final Access _compareTo)
+        {
+            int ret = 0;
+
+            ret = CompareToUtil_mxJPO.compare(ret, this.prefix.name(),  _compareTo.prefix.name());
+            ret = CompareToUtil_mxJPO.compare(ret, this.kind,           _compareTo.kind);
+            ret = CompareToUtil_mxJPO.compare(ret, this.userRef,        _compareTo.userRef);
+            ret = CompareToUtil_mxJPO.compare(ret, this.key,            _compareTo.key);
+            ret = CompareToUtil_mxJPO.compare(ret, this.access,         _compareTo.access);
+            ret = CompareToUtil_mxJPO.compare(ret, this.organization,   _compareTo.organization);
+            ret = CompareToUtil_mxJPO.compare(ret, this.project,        _compareTo.project);
+            ret = CompareToUtil_mxJPO.compare(ret, this.owner,          _compareTo.owner);
+            ret = CompareToUtil_mxJPO.compare(ret, this.reserve,        _compareTo.reserve);
+            ret = CompareToUtil_mxJPO.compare(ret, this.maturity,       _compareTo.maturity);
+            ret = CompareToUtil_mxJPO.compare(ret, this.category,       _compareTo.category);
+            ret = CompareToUtil_mxJPO.compare(ret, this.filter,         _compareTo.filter);
+            ret = CompareToUtil_mxJPO.compare(ret, this.localfilter,    _compareTo.localfilter);
+
+            return ret;
         }
     }
 
@@ -224,9 +252,20 @@ public class AccessList_mxJPO
         return ret;
     }
 
-    protected Collection<Access> getAccessList()
+    public Collection<Access> getAccessList()
     {
         return this.accessList;
+    }
+
+    /**
+     * Sort the complete {@link #accessList access list}.
+     */
+    public void sort()
+    {
+        final List<Access> tmp = new ArrayList<Access>(this.accessList);
+        Collections.sort(tmp);
+        this.accessList.clear();
+        this.accessList.addAll(tmp);
     }
 
     /**
@@ -266,7 +305,7 @@ public class AccessList_mxJPO
                 }
 
                 // access
-                _out.append(" {").append(StringUtil_mxJPO.joinTcl(' ', false, access.access, null)).append('}');
+                _out.append(" {").append(StringUtil_mxJPO.convertUpdate(false, access.access, null)).append('}');
 
                 // user items
                 if ((access.organization != null) && !access.organization.isEmpty() && !"any".equals(access.organization))  {

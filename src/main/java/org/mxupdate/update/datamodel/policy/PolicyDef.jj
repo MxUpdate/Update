@@ -477,6 +477,7 @@ void allstate(final Policy_mxJPO _policy) : {
  */
 void state(final Policy_mxJPO _policy) : {
     final State state = new State();
+    final AccessList_mxJPO accessList = this.getField(state, "access").<AccessList_mxJPO>get();
     String tmpStr;
     Set<String> tmpSet;
     Token tmp;
@@ -543,11 +544,11 @@ void state(final Policy_mxJPO _policy) : {
                 | <PUBLISHED_FALSE_VIA_VALUE>
                 | <PUBLISHED_FALSE_VIA_VALUE_APOSTROPHE>)                       {this.setValue(state, "published", false);} )
 
-            | stateOwnerAccess(Prefix.All, state)
-            | statePublicAccess(Prefix.All, state)
-            | stateUserAccess(Prefix.All, state)
-            | ( <REVOKE> ( stateOwnerAccess(Prefix.Revoke, state) | statePublicAccess(Prefix.Revoke, state) | stateUserAccess(Prefix.Revoke, state) ) )
-            | ( <LOGIN>  ( stateOwnerAccess(Prefix.Login,  state) | statePublicAccess(Prefix.Login,  state) | stateUserAccess(Prefix.Login,  state) ) )
+            | stateOwnerAccess(Prefix.All, accessList)
+            | statePublicAccess(Prefix.All, accessList)
+            | stateUserAccess(Prefix.All, accessList)
+            | ( <REVOKE> ( stateOwnerAccess(Prefix.Revoke, accessList) | statePublicAccess(Prefix.Revoke, accessList) | stateUserAccess(Prefix.Revoke, accessList) ) )
+            | ( <LOGIN>  ( stateOwnerAccess(Prefix.Login,  accessList) | statePublicAccess(Prefix.Login,  accessList) | stateUserAccess(Prefix.Login,  accessList) ) )
             | ( <ACTION>            ( tmp = <S_STRING>                          {this.setValue(state, "actionProgram", this.getString(tmp.image));}
                                     | tmp = <S_SINGLE_STRING>                   {this.setValue(state, "actionProgram", this.getSingle(tmp.image));} )
                            <INPUT>  ( tmp = <S_STRING>                          {this.setValue(state, "actionInput", this.getString(tmp.image));}
@@ -670,25 +671,23 @@ void stateAccessDef(final Access _access) : {
         | ( <CATEGORY_CONTRACTOR>     {category     = "contractor";  } )
     )*
     {
-        this.getField(_access, "key").set(key);
-        this.getField(_access, "filter").set(filter);
-        this.getField(_access, "localfilter").set(localfilter);
-        this.getField(_access, "organization").set(organization);
-        this.getField(_access, "project").set(project);
-        this.getField(_access, "owner").set(owner);
-        this.getField(_access, "reserve").set(reserve);
-        this.getField(_access, "maturity").set(maturity);
-        this.getField(_access, "category").set(category);
+        this.setValue(_access, "key", key);
+        this.setValue(_access, "filter", filter);
+        this.setValue(_access, "localfilter", localfilter);
+        this.setValue(_access, "organization", organization);
+        this.setValue(_access, "project", project);
+        this.setValue(_access, "owner", owner);
+        this.setValue(_access, "reserve", reserve);
+        this.setValue(_access, "maturity", maturity);
+        this.setValue(_access, "category", category);
 
-        if (access == null)  {
-            this.getField(_access, "access").set(new HashSet<String>());
-        } else  {
+        if (access != null)  {
             final String tmp = access.image
                     .replaceFirst("^\\{", "").replaceFirst("\\}$", "")  // remove {}
                     .replaceAll("(\t)|(\n)", " ")                       // replace tabs, new lines
                     .replaceAll("( )+", " ")                            // multiple spaces => one space
                     .trim();                                            // remove trailing spaces
-            this.getField(_access, "access").set(new HashSet<String>(Arrays.asList(tmp.split(" "))));
+            this.setValue(_access, "access", Arrays.asList(tmp.split(" ")));
         }
     }
 }

@@ -700,49 +700,13 @@ public class PolicyTest
         throws Exception
     {
         final PersonAdminData creator = new PersonAdminData(this, "creator").create();
-        final State state = new State().setName("Test");
-        if (this.getVersion() == Version.V6R2011x)  {
-            // for 2011x another order of the access definition...
-            state.addAccess(
-                    new Access()
-                            .setKind("owner")
-                            .addAccess("all"),
-                    new Access()
-                            .setPrefix("revoke")
-                            .setKind("owner")
-                            .addAccess("read"),
-                    new Access()
-                            .setKind("public")
-                            .addAccess("all"),
-                    new Access()
-                            .setPrefix("revoke")
-                            .setKind("public")
-                            .addAccess("read"),
-                    new Access()
-                            .setKind("user")
-                            .setUser(creator)
-                            .addAccess("read", "show"));
-        } else  {
-            state.addAccess(
-                    new Access()
-                            .setPrefix("revoke")
-                            .setKind("public")
-                            .addAccess("read"),
-                    new Access()
-                            .setPrefix("revoke")
-                            .setKind("owner")
-                            .addAccess("read"),
-                    new Access()
-                            .setKind("public")
-                            .addAccess("all"),
-                    new Access()
-                            .setKind("owner")
-                            .addAccess("all"),
-                    new Access()
-                            .setKind("user")
-                            .setUser(creator)
-                            .addAccess("read", "show"));
-        }
+        final State state = new State().setName("Test")
+                .addAccess(
+                        new Access().setKind("owner").addAccess("all"),
+                        new Access().setKind("public").addAccess("all"),
+                        new Access().setKind("user").setUser(creator).addAccess("read", "show"),
+                        new Access().setPrefix("revoke").setKind("owner").addAccess("read"),
+                        new Access().setPrefix("revoke").setKind("public").addAccess("read"));
         final PolicyData policy = new PolicyData(this, "Test")
                 .addState(state)
                 .update((String) null)
