@@ -50,6 +50,34 @@ public class RelationshipCI_2DeltaCalculationTest
             {"2) description",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test").setValue("description", "abc def")},
+            // from propagatemodify flag
+            {"24a) relationship with from propagate modify true",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test").from().defFlag("propagatemodify", true)},
+            {"24b) relationship with from propagate modify false",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test").from().defFlag("propagatemodify", false)},
+            // from propagateconnection flag
+            {"25a) relationship with from propagate connection true",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test").from().defFlag("propagateconnection", true)},
+            {"25b) relationship with from propagate connection false",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test").from().defFlag("propagateconnection", false)},
+            // to propagatemodify flag
+            {"34a) relationship with to propagate modify true",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test").to().defFlag("propagatemodify", true)},
+            {"34b) relationship with to propagate modify false",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test").to().defFlag("propagatemodify", false)},
+            // to propagateconnection flag
+            {"35a) relationship with to propagate connection true",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test").to().defFlag("propagateconnection", true)},
+            {"35b) relationship with to propagate connection false",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test").to().defFlag("propagateconnection", false)},
        };
     }
 

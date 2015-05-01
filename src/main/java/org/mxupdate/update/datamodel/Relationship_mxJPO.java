@@ -97,14 +97,14 @@ public class Relationship_mxJPO
     private Kind kind = Kind.Basic;
 
     /** Relationship is abstract. */
-    private Boolean abstractFlag;
+    private boolean abstractFlag = false;
     /** Relationship is derived from this relationship. */
     private String derived;
 
     /** Set holding rule referencing this relationship. */
     private String rule;
     /** Prevent duplicates for this relationship. */
-    private Boolean preventDuplicates;
+    private boolean preventDuplicates = false;
     /** From side information. */
     private final Side from = new Side("from");
     /** To side information. */
@@ -144,6 +144,10 @@ public class Relationship_mxJPO
     protected void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, ParseException
     {
+        // to ensure that the value is the same default as in the DB
+        this.from.propagateConnection = false;
+        this.to.propagateConnection = false;
+
         super.parse(_paramCache);
 
         this.from.eval(_paramCache);
@@ -245,7 +249,7 @@ public class Relationship_mxJPO
                 .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
                 .singleIfTrue(  "kind",                     this.kind.name().toLowerCase(),     (this.kind != Kind.Basic))
-                .flagIfTrue(    "abstract",          false, this.abstractFlag,                  (this.abstractFlag != null) && this.abstractFlag)
+                .flagIfTrue(    "abstract",          false, this.abstractFlag,                  this.abstractFlag)
                 .stringIfTrue(  "derived",                  this.derived,                       (this.derived != null) && !this.derived.isEmpty())
                 .flag(          "hidden",                   false, this.isHidden())
                 .flag(          "preventduplicates", false, this.preventDuplicates)
@@ -343,9 +347,9 @@ public class Relationship_mxJPO
         /** Side meaning. */
         private String meaning = "";
         /** Side propagate connection flag. */
-        private Boolean propagateConnection = null;
+        private boolean propagateConnection = true;
         /** Side propagate modify flag. */
-        private Boolean propagateModify = null;
+        private boolean propagateModify = false;
 
         /** Side type list. */
         private final SortedSet<String> types = new TreeSet<String>();

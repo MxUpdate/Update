@@ -368,7 +368,7 @@ public class RelationshipCI_1ParserTest
                               + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
             {"25b) from: default propagateconnection",
                     "description \"\" hidden !preventduplicates "
-                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify  propagateconnection } "
                               + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }",
                     "description \"\" hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify                      } "
@@ -474,69 +474,69 @@ public class RelationshipCI_1ParserTest
                               + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }",
                     "description \"\" !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many               clone none !propagatemodify !propagateconnection }"},
+                            + "  to { meaning \"\" cardinality many               clone none !propagatemodify !propagateconnection }"},
             // to clone
             {"33a) to: float clone",
                     "",
                     "description \"\" hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone float !propagatemodify !propagateconnection }"},
+                            + "  to { meaning \"\" cardinality many revision none clone float !propagatemodify !propagateconnection }"},
             {"33b) to: replicate clone",
                     "",
                     "description \"\" hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone replicate !propagatemodify !propagateconnection }"},
+                            + "  to { meaning \"\" cardinality many revision none clone replicate !propagatemodify !propagateconnection }"},
             {"33c) to: default clone",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }",
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }",
                     "description \"\" !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none            !propagatemodify !propagateconnection }"},
+                            + "  to { meaning \"\" cardinality many revision none            !propagatemodify !propagateconnection }"},
             // to propagatemodify flag
             {"34a) to: propagatemodify",
                     "",
                     "description \"\" hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none  propagatemodify !propagateconnection }"},
+                            + "  to { meaning \"\" cardinality many revision none clone none  propagatemodify !propagateconnection }"},
             {"34b) to: default propagatemodify",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }",
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }",
                     "description \"\" !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none                  !propagateconnection }"},
+                            + "  to { meaning \"\" cardinality many revision none clone none                  !propagateconnection }"},
             // to propagateconnection flag
             {"35a) to: propagateconnection",
                     "",
                     "description \"\" hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none  propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify  propagateconnection }"},
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify  propagateconnection }"},
             {"35b) to: default propagateconnection",
                     "description \"\" hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }",
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify  propagateconnection }",
                     "description \"\" hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify                      }"},
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify                      }"},
             // to type
             {"36a) from: all type",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection type all }"},
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection type all }"},
             {"36b) from: 1 type",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection type \"ABC\" }"},
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection type \"ABC\" }"},
             {"36c) from: 1 type w/o apostrophe",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection type \"ABC\" }",
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection type \"ABC\" }",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection type ABC }"},
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection type ABC }"},
             {"36d) from: 2 types unsorted",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
