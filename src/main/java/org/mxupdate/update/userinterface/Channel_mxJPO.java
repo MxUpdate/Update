@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.userinterface.channel.ChannelDefParser_mxJPO;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.WriteAppendChildSyntax;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -68,7 +67,7 @@ public class Channel_mxJPO
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
-        new ChannelDefParser_mxJPO(new StringReader(_code)).parse(this);
+        new ChannelParser_mxJPO(new StringReader(_code)).parse(this);
         this.prepare();
     }
 
