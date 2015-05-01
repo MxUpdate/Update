@@ -16,6 +16,7 @@
 package org.mxupdate.typedef;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,9 +31,11 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.AbstractValue_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO;
+import org.mxupdate.typedef.export.IExport_mxJPO;
 import org.mxupdate.typedef.filenames.IMatcherFileNames_mxJPO;
 import org.mxupdate.typedef.mxnames.IMatcherMxNames_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
@@ -88,6 +91,8 @@ public final class TypeDef_mxJPO
 
     /** JPO implementing the CI MxUpdate functionality. */
     private Class<? extends AbstractObject_mxJPO> jpoClass;
+    /** JPO implementing the export interface. */
+    private Class<? extends IExport_mxJPO> jpoExport;
     /** JPO implementing the Match File Names interface. */
     private Class<? extends IMatcherFileNames_mxJPO> jpoMatchFileNames;
     /** JPO implementing the Fetch-Mx-Names interface. */
@@ -167,6 +172,7 @@ public final class TypeDef_mxJPO
                 case Icon:                  typeDef.iconPath = _value;break;
 
                 case JPO:                   typeDef.jpoClass            = (Class<? extends AbstractObject_mxJPO>)    TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
+                case JpoExport:             typeDef.jpoExport           = (Class<? extends IExport_mxJPO>)           TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
                 case JpoMatchFileNames:     typeDef.jpoMatchFileNames   = (Class<? extends IMatcherFileNames_mxJPO>) TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
                 case JpoMatchMxNames:       typeDef.jpoMatchMxNames     = (Class<? extends IMatcherMxNames_mxJPO>)   TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
 
@@ -505,26 +511,30 @@ public final class TypeDef_mxJPO
     }
 
     /**
-     * Fetches all MX names for this type definition for given {@code _matches}.
+     * Exports given admin object.
      *
      * @param _paramCache   parameter cache
+     * @param _files        files to test
      * @param _matches      matches to fulfill
-     * @return set of MX names for this type definition
-     * @throws NoSuchMethodException        if the constructor does not exists
-     * @throws InstantiationException       if a new instance of the class
-     *                                      {@link #jpoMatchMxNames} could not
-     *                                      be created
+     * @return map of MX names and depending files for this type definition
+     * @throws ParseException               if parse failed
+     * @throws MatrixException              if fetch failed
+     * @throws IOException                  if write failed
+     * @throws InvocationTargetException    if the constructor of the
+     *                                      {@link #jpoExport} itself
+     *                                      throws an exception
      * @throws IllegalAccessException       if the constructor is not public
      * @throws InvocationTargetException    if the constructor of the
-     *                                      {@link #jpoMatchMxNames} itself
+     *                                      {@link #jpoExport} itself
      *                                      throws an exception
-     * @throws MatrixException              if fetch of Mx names failed
+     * @throws NoSuchMethodException        if the constructor does not exists
      */
-    public SortedSet<String> matchMxNames(final ParameterCache_mxJPO _paramCache,
-                                          final Collection<String> _matches)
-        throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, MatrixException
+    public void export(final ParameterCache_mxJPO _paramCache,
+                       final String _mxName,
+                       final File _path)
+        throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, IOException, MatrixException, ParseException
     {
-        return this.jpoMatchMxNames.getConstructor().newInstance().match(_paramCache, this, _matches);
+        this.jpoExport.getConstructor().newInstance().export(_paramCache, this, _mxName, _path);
     }
 
     /**
@@ -574,6 +584,29 @@ public final class TypeDef_mxJPO
         throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UpdateException_mxJPO
     {
         return this.jpoMatchFileNames.getConstructor().newInstance().match(_paramCache, this, _files, null);
+    }
+
+    /**
+     * Fetches all MX names for this type definition for given {@code _matches}.
+     *
+     * @param _paramCache   parameter cache
+     * @param _matches      matches to fulfill
+     * @return set of MX names for this type definition
+     * @throws NoSuchMethodException        if the constructor does not exists
+     * @throws InstantiationException       if a new instance of the class
+     *                                      {@link #jpoMatchMxNames} could not
+     *                                      be created
+     * @throws IllegalAccessException       if the constructor is not public
+     * @throws InvocationTargetException    if the constructor of the
+     *                                      {@link #jpoMatchMxNames} itself
+     *                                      throws an exception
+     * @throws MatrixException              if fetch of Mx names failed
+     */
+    public SortedSet<String> matchMxNames(final ParameterCache_mxJPO _paramCache,
+                                          final Collection<String> _matches)
+        throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, MatrixException
+    {
+        return this.jpoMatchMxNames.getConstructor().newInstance().match(_paramCache, this, _matches);
     }
 
     /**
@@ -642,6 +675,8 @@ public final class TypeDef_mxJPO
 
         /** Used prefix of the JPO name. */
         JPO,
+        /** Used prefix of the JPO names to export as file. */
+        JpoExport,
         /** Used prefix of the JPO names to fetch MX names. */
         JpoMatchMxNames,
         /** Used prefix of the JPO names to match file names. */

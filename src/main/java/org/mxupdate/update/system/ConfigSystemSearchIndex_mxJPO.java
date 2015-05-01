@@ -88,7 +88,7 @@ public class ConfigSystemSearchIndex_mxJPO
      * @throws MatrixException if the search index could not be read
      */
     @Override()
-    protected void parse(final ParameterCache_mxJPO _paramCache)
+    public void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
         final String tmp = MqlUtil_mxJPO.execMql(_paramCache, ConfigSystemSearchIndex_mxJPO.MQL_GET_INDEX);
@@ -107,8 +107,8 @@ public class ConfigSystemSearchIndex_mxJPO
      * @throws IOException  if write of the configuration file failed
      */
     @Override()
-    protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Appendable _out)
+    public void write(final ParameterCache_mxJPO _paramCache,
+                      final Appendable _out)
         throws IOException
     {
         _out.append(this.searchIndex);

@@ -91,7 +91,7 @@ public abstract class AbstractCode_mxJPO<CLASS extends AbstractCode_mxJPO<CLASS>
      * @return code of this program
      * @see #code
      */
-    protected String getCode()
+    public String getCode()
     {
         return this.code;
     }

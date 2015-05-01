@@ -90,7 +90,7 @@ public class Menu_mxJPO
      * Also it is checked if the menu is assigned to the tree menu.
      */
     @Override()
-    protected void parse(final ParameterCache_mxJPO _paramCache)
+    public void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, ParseException
     {
         super.parse(_paramCache);

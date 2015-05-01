@@ -135,7 +135,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
      * @see PadSaxHandler                   SAX handler to parse the XML file
      */
     @Override()
-    protected void parse(final ParameterCache_mxJPO _paramCache)
+    public void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, ParseException
     {
         new AdminXMLExportParser_mxJPO(new StringReader(this.execXMLExport(_paramCache))).parse(_paramCache, this);

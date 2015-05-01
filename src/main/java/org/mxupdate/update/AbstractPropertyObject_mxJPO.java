@@ -281,8 +281,8 @@ public abstract class AbstractPropertyObject_mxJPO<CLASS extends AbstractPropert
      * @throws MatrixException if an execution of a MQL command failed
      */
     @Override()
-    protected void write(final ParameterCache_mxJPO _paramCache,
-                         final Appendable _out)
+    public void write(final ParameterCache_mxJPO _paramCache,
+                      final Appendable _out)
         throws IOException
     {
         final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(this.getFileName(), _paramCache);

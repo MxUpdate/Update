@@ -178,7 +178,7 @@ public class BusObject_mxJPO
      * @throws MatrixException if the parse failed
      */
     @Override()
-    protected void parse(final ParameterCache_mxJPO _paramCache)
+    public void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
         final BusinessObject bus = new BusinessObject(this.busType, this.busName, this.busRevision, null);

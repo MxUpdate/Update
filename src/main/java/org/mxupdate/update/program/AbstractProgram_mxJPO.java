@@ -64,6 +64,14 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
     private String file;
 
     /**
+     * The flag indicates that the back slashes are converted. In older MX
+     * versions double back slashes was escaped. In this cases all escaped
+     * double back slashes must be replaced. In newer MX versions this
+     * 'feature' does not exists anymore if an MQL insert was done.
+     */
+    private boolean backslashUpgraded = false;
+
+    /**
      * Constructor used to initialize the type definition enumeration and the
      * name.
      *
@@ -97,6 +105,8 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
      * <li>program is {@link #downloadable}</li>
      * <li>input / output of the program is {@link #pipe piped}</li>
      * <li>program is {@link #pooled}</li>
+     * <li>{@link #backslashUpgraded back slash flag} to indicate the a JPO is
+     *     upgraded</li>
      * </ul></p>
      *
      * @param _paramCache   parameter cache with MX context
@@ -113,6 +123,9 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
         final boolean parsed;
         if ("/accessRuleRef".equals(_url))  {
             this.rule = _content;
+            parsed = true;
+        } else if ("/backslashUpgraded".equals(_url))  {
+            this.backslashUpgraded = true;
             parsed = true;
         } else if ("/deferred".equals(_url))  {
             this.execute = Execute.DEFERRED;
@@ -251,6 +264,17 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
         }
 
         this.getProperties().calcDelta(_mql, "", current.getProperties());
+    }
+
+    /**
+     * Returns if backslashes for JPOs are upgraded.
+     *
+     * @return <i>true</i> if backslashes are upgraded for JPOs; otherwise
+     *         <i>false</i>
+     */
+    public boolean isBackslashUpgraded()
+    {
+        return this.backslashUpgraded;
     }
 
     /** Enumeration for programs. */

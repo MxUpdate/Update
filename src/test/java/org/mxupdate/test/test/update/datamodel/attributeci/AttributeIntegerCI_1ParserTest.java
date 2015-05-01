@@ -172,8 +172,8 @@ public class AttributeIntegerCI_1ParserTest
         return new AbstractAttribute_mxJPO<AttributeString_mxJPO>(_paramCache.getMapping().getTypeDef("AttributeString"), _name, Kind.Integer)
         {
             @Override()
-            protected void write(final ParameterCache_mxJPO _paramCache,
-                                 final Appendable _out)
+            public void write(final ParameterCache_mxJPO _paramCache,
+                              final Appendable _out)
                 throws IOException
             {
                 super.write(_paramCache, _out);

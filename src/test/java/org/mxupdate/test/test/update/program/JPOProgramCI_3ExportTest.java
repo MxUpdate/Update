@@ -28,6 +28,7 @@ import org.mxupdate.test.data.program.JPOProgramData;
 import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.test.update.WrapperCIInstance;
+import org.mxupdate.typedef.export.ExportAdminProgramJPO_mxJPO;
 import org.mxupdate.update.program.JPOProgram_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.Assert;
@@ -150,9 +151,7 @@ public class JPOProgramCI_3ExportTest
         // insert again to ensure that the code is defined...
         this.mql("insert prog '" + _origJPO + "'");
 
-        final JPOProgram_mxJPO prog = new JPOProgram_mxJPO(paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName());
-
-        prog.export(paramCache, this.testDir);
+        new ExportAdminProgramJPO_mxJPO().export(paramCache, paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName(), this.testDir);
         Assert.assertTrue(FileUtils.contentEquals(_origJPO, _testJPO), "check file content equal");
         Assert.assertEquals(this.testDir.list().length, 1, "only jpo file exists");
     }
@@ -190,9 +189,7 @@ public class JPOProgramCI_3ExportTest
         // insert again to ensure that the code is defined...
         this.mql("insert prog '" + _origJPO + "'");
 
-        final JPOProgram_mxJPO prog = new JPOProgram_mxJPO(paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName());
-
-        prog.export(paramCache, this.testDir);
+        new ExportAdminProgramJPO_mxJPO().export(paramCache, paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName(), this.testDir);
 
         Assert.assertTrue(FileUtils.contentEquals(_origJPO, _testJPO), "check JPO content equal");
         Assert.assertTrue(_testMXU.exists(), "MXU file exists");
@@ -231,9 +228,7 @@ public class JPOProgramCI_3ExportTest
         wrapper.parseUpdate(_progData);
         wrapper.store((File) null, paramCache);
 
-        final JPOProgram_mxJPO prog = new JPOProgram_mxJPO(paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName());
-
-        prog.export(paramCache, this.testDir);
+        new ExportAdminProgramJPO_mxJPO().export(paramCache, paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName(), this.testDir);
 
         Assert.assertFalse(_testJPO.exists(), "JPO file not exists");
         Assert.assertTrue(_testMXU.exists(), "MXU file exists");
@@ -272,9 +267,7 @@ public class JPOProgramCI_3ExportTest
         wrapper.parseUpdate(_progData);
         wrapper.store((File) null, paramCache);
 
-        final JPOProgram_mxJPO prog = new JPOProgram_mxJPO(paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName());
-
-        prog.export(paramCache, this.testDir);
+        new ExportAdminProgramJPO_mxJPO().export(paramCache, paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName(), this.testDir);
 
         Assert.assertFalse(_testJPO.exists(), "JPO file not exists");
         Assert.assertTrue(_testMXU.exists(), "MXU file exists");

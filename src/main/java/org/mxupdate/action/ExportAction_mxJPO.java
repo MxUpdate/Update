@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
-import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 
@@ -74,10 +73,9 @@ public class ExportAction_mxJPO
 
         // export
         for (final Map.Entry<TypeDef_mxJPO,Set<String>> entry : clazz2names.entrySet())  {
-            for (final String name : entry.getValue())  {
-                final AbstractObject_mxJPO instance = entry.getKey().newTypeInstance(name);
-                this.paramCache.logInfo("export "+instance.getTypeDef().getLogging() + " '" + name + "'");
-                instance.export(this.paramCache, new File(pathStr + File.separator + instance.getPath()));
+            for (final String mxName : entry.getValue())  {
+                this.paramCache.logInfo("export " + entry.getKey().getLogging() + " '" + mxName + "'");
+                entry.getKey().export(this.paramCache, mxName, new File(pathStr));
             }
         }
     }

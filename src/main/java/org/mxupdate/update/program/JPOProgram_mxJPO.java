@@ -16,18 +16,11 @@
 package org.mxupdate.update.program;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.Map;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.typedef.TypeDef_mxJPO;
-import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 
 /**
  * The class is used to export, create, delete and update JPOs within MX.
@@ -43,18 +36,7 @@ public class JPOProgram_mxJPO
     public static final int NAME_SUFFIX_EXTENDSION_LENGTH = JPOProgram_mxJPO.NAME_SUFFIX_EXTENDSION.length();
 
     /** String with name suffix (used also from the extract routine from Matrix). */
-    private static final String NAME_SUFFIX = "_" + "mxJPO";
-
-    /**
-     * The flag indicates that the back slashes are converted. In older MX
-     * versions double back slashes was escaped. In this cases all escaped
-     * double back slashes must be replaced. In newer MX versions this
-     * 'feature' does not exists anymore if an MQL insert was done.
-     *
-     * @see #parseAdminXMLExportEvent(ParameterCache_mxJPO, String, String)
-     * @see #write(ParameterCache_mxJPO, Appendable)
-     */
-    private boolean backslashUpgraded = false;
+    public static final String NAME_SUFFIX = "_" + "mxJPO";
 
     /**
      * Constructor used to initialize the type definition enumeration and the
@@ -68,157 +50,6 @@ public class JPOProgram_mxJPO
     {
         super(Kind.JAVA, _typeDef, _mxName);
     }
-
-    /**
-     * <p>Parses all common program specific URL values. This includes:
-     * <ul>
-     * <li>{@link #backslashUpgraded back slash flag} to indicate the they are
-     *     upgraded</li>
-     * </ul></p>
-     * <p>If an <code>_url</code> is included in {@link #IGNORED_URLS}, this
-     * URL is ignored.</p>
-     *
-     * @param _paramCache   parameter cache with MX context
-     * @param _url          URL to parse
-     * @param _content      content depending on the URL
-     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
-     *         <i>false</i>
-     */
-    @Override()
-    public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
-                                            final String _url,
-                                            final String _content)
-    {
-        final boolean parsed;
-        if ("/backslashUpgraded".equals(_url))  {
-            this.backslashUpgraded = true;
-            parsed = true;
-        } else  {
-            parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
-        }
-        return parsed;
-    }
-
-    /**
-     * First writes the MXU file and then the JPO itself.
-     *
-     * @param _paramCache       parameter cache
-     * @param _path             path to write through (if required also
-     *                          including depending file path defined from the
-     *                          information annotation)
-     * @throws IOException      if JPO or MXU file can not be written
-     * @throws MatrixException  if some MQL statement failed
-     * @throws ParseException   if the XML export of the object could not
-     *                          parsed (for admin objects)
-     */
-    @Override()
-    public void export(final ParameterCache_mxJPO _paramCache,
-                       final File _path)
-        throws IOException, MatrixException, ParseException
-    {
-        try  {
-            this.parse(_paramCache);
-
-            if (!this.hasNoValuesDefined(_paramCache) || (this.getCode() == null) || this.getCode().isEmpty())  {
-                final File file = new File(_path, this.getFileName());
-                if (!file.getParentFile().exists())  {
-                    file.getParentFile().mkdirs();
-                }
-                final Writer out = new FileWriter(file);
-                try  {
-                    this.write(_paramCache, out);
-                    out.flush();
-                } finally {
-                    out.close();
-                }
-            }
-
-            if ((this.getCode() != null) && !this.getCode().isEmpty())  {
-
-                // prepare name of JPO to extract
-                final int index = this.getName().lastIndexOf('.');
-                final String fileName = new StringBuilder()
-                        .append((index >= 0) ? this.getName().substring(index + 1) : this.getName())
-                        .append(JPOProgram_mxJPO.NAME_SUFFIX_EXTENDSION)
-                        .toString();
-                // prepare path
-                final StringBuilder path = new StringBuilder().append(_path);
-                if (index >= 0)  {
-                    path.append('/').append(this.getName().substring(0, index).replaceAll("\\.", "/"));
-                }
-
-                final File file = new File(path.toString(), fileName);
-                if (!file.getParentFile().exists())  {
-                    file.getParentFile().mkdirs();
-                }
-                final Writer out = new FileWriter(file);
-                try  {
-                    this.write1(_paramCache, out);
-                    out.flush();
-                } finally {
-                    out.close();
-                }
-            }
-        } catch (final IOException e)  {
-            if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {
-                _paramCache.logError(e.toString());
-            } else {
-                throw e;
-            }
-        } catch (final MatrixException e)  {
-            if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {
-                _paramCache.logError(e.toString());
-            } else {
-                throw e;
-            }
-        } catch (final ParseException e)  {
-            if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {
-                _paramCache.logError(e.toString());
-            } else {
-                throw e;
-            }
-        }
-    }
-
-    /**
-     * Writes given JPO to given path for given name. The JPO code is first
-     * converted, because Matrix uses keywords which must be replaced to have
-     * real Java code. The conversion works like the original extract method,
-     * but only converts the given JPOs and not depending JPOs.
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          writer instance to the file where the JPO code must
-     *                      be written
-     * @throws IOException if the source code could not be written
-     * @throws MatrixException if the source code of the JPO could not be
-     *                         extracted from MX
-     */
-    protected void write1(final ParameterCache_mxJPO _paramCache,
-                         final Appendable _out)
-        throws IOException
-    {
-        // define package name (if points within JPO name)
-        final int idx = this.getName().lastIndexOf('.');
-        if (idx > 0)  {
-            _out.append("package ").append(this.getName().substring(0, idx)).append(";\n");
-        }
-
-        // replace class names and references to other JPOs
-        final String name = this.getName() + JPOProgram_mxJPO.NAME_SUFFIX;
-        final String code = this.getCode()
-                                .replaceAll("\\" + "$\\{CLASSNAME\\}", name.replaceAll(".*\\.", ""))
-                                .replaceAll("(?<=\\"+ "$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", JPOProgram_mxJPO.NAME_SUFFIX)
-                                .replaceAll("\\" + "$\\{CLASS\\:", "")
-                                .trim();
-
-        // for old MX all backslashes are doubled...
-        if (!this.backslashUpgraded)  {
-            _out.append(code.replaceAll("\\\\\\\\", "\\\\"));
-        } else  {
-            _out.append(code);
-        }
-    }
-
 
     /**
      * Updates this administration (business) object if the stored information

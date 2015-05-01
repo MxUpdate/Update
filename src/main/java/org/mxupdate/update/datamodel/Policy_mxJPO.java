@@ -151,7 +151,7 @@ public class Policy_mxJPO
      * {@link State#access state access} statements are sorted if defined.
      */
     @Override()
-    protected void parse(final ParameterCache_mxJPO _paramCache)
+    public void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, ParseException
     {
         if (!this.updateWithCreate)  {

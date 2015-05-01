@@ -158,7 +158,7 @@ public class PersonAdmin_mxJPO
     }
 
     @Override()
-    protected void parse(final ParameterCache_mxJPO _paramCache)
+    public void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, ParseException
     {
         // to ensure that the value is the same default as in the DB

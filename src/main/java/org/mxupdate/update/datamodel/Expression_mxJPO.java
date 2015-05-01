@@ -83,7 +83,7 @@ public class Expression_mxJPO
      * Also the value of the expression is extracted from MX
      */
     @Override()
-    protected void parse(final ParameterCache_mxJPO _paramCache)
+    public void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, ParseException
     {
         super.parse(_paramCache);

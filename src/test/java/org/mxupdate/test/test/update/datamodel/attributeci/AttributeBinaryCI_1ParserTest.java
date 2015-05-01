@@ -124,8 +124,8 @@ public class AttributeBinaryCI_1ParserTest
         return new AbstractAttribute_mxJPO<AttributeBinary_mxJPO>(_paramCache.getMapping().getTypeDef("AttributeBinary"), _name, Kind.Binary)
         {
             @Override()
-            protected void write(final ParameterCache_mxJPO _paramCache,
-                                 final Appendable _out)
+            public void write(final ParameterCache_mxJPO _paramCache,
+                              final Appendable _out)
                 throws IOException
             {
                 super.write(_paramCache, _out);

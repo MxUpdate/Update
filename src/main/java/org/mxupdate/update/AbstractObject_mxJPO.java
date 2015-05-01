@@ -16,9 +16,7 @@
 package org.mxupdate.update;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
 
 import matrix.util.MatrixException;
 
@@ -26,7 +24,6 @@ import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
@@ -60,18 +57,6 @@ public abstract class AbstractObject_mxJPO
     }
 
     /**
-     * Returns the path where the file is located of this matrix object. The
-     * method used the information annotation.
-     *
-     * @return sub path
-     * @see #getTypeDef()
-     */
-    public String getPath()
-    {
-        return this.getTypeDef().getFilePath();
-    }
-
-    /**
      * Returns the {@link #typeDef type definition} instance.
      *
      * @return type definition enumeration
@@ -82,78 +67,6 @@ public abstract class AbstractObject_mxJPO
     }
 
     /**
-     * Export given administration (business) object with given name into given
-     * path. The name of the file where is written through is evaluated within
-     * this export method.
-     *
-     * @param _paramCache       parameter cache
-     * @param _path             path to write through (if required also
-     *                          including depending file path defined from the
-     *                          information annotation)
-     * @throws MatrixException  if some MQL statement failed
-     * @throws ParseException   if the XML export of the object could not
-     *                          parsed (for admin objects)
-     * @throws IOException      if the TCL update code could not be written
-     */
-    public void export(final ParameterCache_mxJPO _paramCache,
-                       final File _path)
-        throws IOException, MatrixException, ParseException
-    {
-        try  {
-            this.parse(_paramCache);
-
-            // append the stored sub path of the ci object from last import
-            final File file;
-            final String subPath = this.getPropValue(_paramCache, PropertyDef_mxJPO.SUBPATH);
-            if ((subPath != null) && !subPath.isEmpty())  {
-                file = new File(new File(_path, subPath), this.getFileName());
-            } else  {
-                file = new File(_path, this.getFileName());
-            }
-
-            // create parent directories
-            if (!file.getParentFile().exists())  {
-                file.getParentFile().mkdirs();
-            }
-
-            final Writer out = new FileWriter(file);
-            this.write(_paramCache, out);
-            out.flush();
-            out.close();
-        } catch (final MatrixException e)  {
-            if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {
-                _paramCache.logError(e.toString());
-            } else {
-                throw e;
-            }
-        } catch (final ParseException e)  {
-            if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {
-                _paramCache.logError(e.toString());
-            } else {
-                throw e;
-            }
-        }
-    }
-
-    /**
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance where the TCL update code is
-     *                      written
-     * @throws MatrixException  if some MQL statement failed
-     * @throws ParseException   if the XML export of the object could not
-     *                          parsed (for admin objects)
-     * @throws IOException      if the update code could not be written
-     */
-    public void export(final ParameterCache_mxJPO _paramCache,
-                       final Appendable _out)
-        throws IOException, MatrixException, ParseException
-    {
-        this.parse(_paramCache);
-        this.write(_paramCache, _out);
-    }
-
-    /**
      *
      * @param _paramCache       parameter cache
      * @param _out              appendable instance to write the TCL update
@@ -161,8 +74,8 @@ public abstract class AbstractObject_mxJPO
      * @throws IOException      if write of the TCL update failed
      * @throws MatrixException  if MQL commands failed
      */
-    protected abstract void write(final ParameterCache_mxJPO _paramCache,
-                                  final Appendable _out)
+    public abstract void write(final ParameterCache_mxJPO _paramCache,
+                               final Appendable _out)
             throws IOException, MatrixException;
 
     /**
@@ -173,7 +86,7 @@ public abstract class AbstractObject_mxJPO
      *                          another MX action failed
      * @throws ParseException   if the admin XML export can not be parsed
      */
-    protected abstract void parse(final ParameterCache_mxJPO _paramCache)
+    public abstract void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, ParseException;
 
     /**

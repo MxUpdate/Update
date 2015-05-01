@@ -35,19 +35,11 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 class Export_mxJPO
     extends AbstractPlugin_mxJPO
 {
-    /**
-     * Argument key for the items.
-     */
+    /** Argument key for the items. */
     private static final String ARGUMENT_KEY_NAME = "Name"; //$NON-NLS-1$
-
-    /**
-     * Argument key for the type definition.
-     */
+    /** Argument key for the type definition. */
     private static final String ARGUMENT_KEY_TYPEDEF = "TypeDef"; //$NON-NLS-1$
-
-    /**
-     * Argument key for the file name.
-     */
+    /** Argument key for the file name. */
     private static final String ARGUMENT_KEY_FILENAME = "FileName"; //$NON-NLS-1$
 
     /**
@@ -163,13 +155,14 @@ class Export_mxJPO
             ret = null;
         } else  {
             final StringBuilder code = new StringBuilder();
-            instance.export(_paramCache, code);
+            instance.parse(_paramCache);
+            instance.write(_paramCache, code);
 
             ret = new HashMap<String,String>();
             ret.put(Export_mxJPO.RETURN_KEY_TYPEDEF,    instance.getTypeDef().getName());
             ret.put(Export_mxJPO.RETURN_KEY_NAME,       instance.getName());
             ret.put(Export_mxJPO.RETURN_KEY_CODE,       code.toString());
-            ret.put(Export_mxJPO.RETURN_KEY_PATH,       instance.getPath());
+            ret.put(Export_mxJPO.RETURN_KEY_PATH,       instance.getTypeDef().getFilePath());
             ret.put(Export_mxJPO.RETURN_KEY_FILENAME,   instance.getFileName());
         }
 

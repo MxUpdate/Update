@@ -35,35 +35,17 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 class Search_mxJPO
     extends AbstractPlugin_mxJPO
 {
-    /**
-     * Argument key for the match string.
-     */
+    /** Argument key for the match string. */
     private static final String ARGUMENT_KEY_MATCH = "Match"; //$NON-NLS-1$
-
-    /**
-     * Argument key for the type definition list.
-     */
+    /** Argument key for the type definition list. */
     private static final String ARGUMENT_KEY_TYPEDEFLIST = "TypeDefList"; //$NON-NLS-1$
-
-    /**
-     * Key in the map for the name of the type definition of found one
-     * configuration item..
-     */
+    /** Key in the map for the name of the type definition of found one configuration item.. */
     private static final String RETURN_KEY_TYPEDEF = "TypeDef"; //$NON-NLS-1$
-
-    /**
-     * Key in the map for the name of found one configuration item.
-     */
+    /** Key in the map for the name of found one configuration item. */
     private static final String RETURN_KEY_NAME = "Name"; //$NON-NLS-1$
-
-    /**
-     * Key in the map for the file name of found one configuration item.
-     */
+    /** Key in the map for the file name of found one configuration item. */
     private static final String RETURN_KEY_FILENAME = "FileName"; //$NON-NLS-1$
-
-    /**
-     * Key in the map for the file path of found one configuration item.
-     */
+    /** Key in the map for the file path of found one configuration item. */
     private static final String RETURN_KEY_FILEPATH = "FilePath"; //$NON-NLS-1$
 
     /**
@@ -113,7 +95,7 @@ class Search_mxJPO
                     map.put(Search_mxJPO.RETURN_KEY_TYPEDEF, typeDef.getName());
                     map.put(Search_mxJPO.RETURN_KEY_NAME, name);
                     map.put(Search_mxJPO.RETURN_KEY_FILENAME, instance.getFileName());
-                    map.put(Search_mxJPO.RETURN_KEY_FILEPATH, instance.getPath());
+                    map.put(Search_mxJPO.RETURN_KEY_FILEPATH, instance.getTypeDef().getFilePath());
                     ret.add(map);
                 }
             }

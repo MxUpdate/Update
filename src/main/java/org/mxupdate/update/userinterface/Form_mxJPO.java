@@ -76,7 +76,7 @@ public class Form_mxJPO
     }
 
     @Override()
-    protected void parse(final ParameterCache_mxJPO _paramCache)
+    public void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, ParseException
     {
         super.parse(_paramCache);
