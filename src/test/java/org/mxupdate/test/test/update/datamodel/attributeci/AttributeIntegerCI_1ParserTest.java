@@ -64,6 +64,9 @@ public class AttributeIntegerCI_1ParserTest
             {"2c) multi-line description",
                     "",
                     "kind integer description \"abc\ndef\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
+            {"2d) tab's in description",
+                    "",
+                    "kind integer description \"abc\tdef\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
             // hidden flag
             {"3a) hidden",
                     "",

@@ -96,7 +96,7 @@ class ProgramParser
 /*************************************************** Common Multi-Line-String */
 <MULTILINESTRING_EXPECTED> TOKEN :
 {
-      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
+      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\n" | "\t" | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" | "\\t" )* "\"" )> : DEFAULT
     | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
 }
 

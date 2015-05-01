@@ -70,18 +70,18 @@ PARSER_END(DimensionParser)
     | <HIDDEN_FALSE_VIA_VALUE_APOSTROPHE:   "hidden" ([" ","\t","\n","\r"])+ "\"" ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] "\"">
 }
 
-/*************************************************** Common Multi-Line-String */
-<MULTILINESTRING_EXPECTED> TOKEN :
-{
-      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
-    | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
-}
-
 /************************************************************** Common String */
 <STRING_EXPECTED> TOKEN :
 {
       <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
     | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/*************************************************** Common Multi-Line-String */
+<MULTILINESTRING_EXPECTED> TOKEN :
+{
+      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\n" | "\t" | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" | "\\t" )* "\"" )> : DEFAULT
+    | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
 }
 
 /******************************************************* String for Unit Name */

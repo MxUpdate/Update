@@ -36,23 +36,26 @@ public class NotficationCI_1ParserTest
     {
         return new Object[][]
         {
-            {"1) simple",
+            {"0) simple",
                 "",
                 "description \"\" current \"\""},
             // type
-            {"2) type defined",
+            {"1) type defined",
                     "                      description \"\" current \"Active\"",
                     "type \"Notification\" description \"\" current \"Active\""},
             // description
-            {"3a) description",
+            {"2a) description",
                     "",
                     "description \"abc def\" current \"Active\""},
-            {"3b) description not defined",
+            {"2b) description not defined",
                     "description \"\" current \"Active\"",
                     "                 current \"Active\""},
-            {"3c) multi-line description",
+            {"2c) multi-line description",
                     "",
                     "description \"abc\ndef\" current \"Active\""},
+            {"2d) tab's in description",
+                    "",
+                    "description \"abc\tdef\" current \"Active\""},
             // attribute
             {"4a) one attribute ",
                     "",

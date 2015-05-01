@@ -34,8 +34,7 @@ public class InquiryCI_1ParserTest
     @DataProvider(name = "data")
     public Object[][] getData()
     {
-        return new Object[][]
-        {
+        return new Object[][]  {
             {"0) simple",
                     "",
                     "description \"\" pattern \"\" format \"\" code \" \""},
@@ -53,6 +52,12 @@ public class InquiryCI_1ParserTest
             {"2b) description not defined",
                     "description \"\" pattern \"\" format \"\" code \" \"",
                     "                 pattern \"\" format \"\" code \" \""},
+            {"2c) multi-line description",
+                    "",
+                    "description \"abc\ndef\" pattern \"\" format \"\" code \" \""},
+            {"2d) tab's in description",
+                    "",
+                    "description \"abc\tdef\" pattern \"\" format \"\" code \" \""},
             // hidden flag
             {"3a) hidden",
                     "",

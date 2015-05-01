@@ -37,7 +37,7 @@ public class PolicyCI_1ParserTest
         final String simple = "description \"\" hidden defaultformat \"\" sequence \"\" store \"\" ";
         final String state  = "!enforcereserveaccess !majorrevision !minorrevision !version !promote !checkouthistory !published ";
 
-        return new Object[][]{
+        return new Object[][] {
                 {"0) simple policy",
                         "",
                         simple},
@@ -58,6 +58,9 @@ public class PolicyCI_1ParserTest
                 {"2c) multi-line description",
                         "",
                         "description \"abc\ndef\" !hidden defaultformat \"\" sequence \"\" store \"\""},
+                {"2d) tab's in description",
+                        "",
+                        "description \"abc\tdef\" !hidden defaultformat \"\" sequence \"\" store \"\""},
                 // hidden flag
                 {"3a) simple not hidden policy",
                         "",

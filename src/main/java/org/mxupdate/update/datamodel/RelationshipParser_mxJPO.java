@@ -3,9 +3,6 @@
 package org.mxupdate.update.datamodel;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 
 import org.mxupdate.update.datamodel.Relationship_mxJPO.Kind;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;

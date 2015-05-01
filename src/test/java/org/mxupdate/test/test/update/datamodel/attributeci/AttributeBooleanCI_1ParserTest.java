@@ -64,6 +64,9 @@ public class AttributeBooleanCI_1ParserTest
             {"2c) multi-line description",
                     "",
                     "kind boolean description \"abc\ndef\" !hidden !multivalue !resetonclone !resetonrevision default \"\""},
+            {"2d) tab's in description",
+                    "",
+                    "kind boolean description \"abc\tdef\" !hidden !multivalue !resetonclone !resetonrevision default \"\""},
             // hidden flag
             {"3a) hidden",
                     "",

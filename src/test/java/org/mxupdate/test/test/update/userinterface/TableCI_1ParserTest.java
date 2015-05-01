@@ -35,8 +35,7 @@ public class TableCI_1ParserTest
     @DataProvider(name = "data")
     public Object[][] getData()
     {
-        return new Object[][]
-        {
+        return new Object[][]  {
             {"0) simple",
                     "",
                     "description \"\""},
@@ -54,6 +53,12 @@ public class TableCI_1ParserTest
             {"2b) description not defined",
                     "description \"\" ",
                     ""},
+            {"2c) multi-line description",
+                    "",
+                    "description \"abc\ndef\""},
+            {"2d) tab's in description",
+                    "",
+                    "description \"abc\tdef\""},
             // hidden
             {"3a) not hidden",
                     "description \"\"",

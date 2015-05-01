@@ -34,8 +34,7 @@ public class RelationshipCI_1ParserTest
     @DataProvider(name = "data")
     public Object[][] getData()
     {
-        return new Object[][]
-        {
+        return new Object[][] {
             {"0) simple",
                     "",
                     "description \"\" !hidden !preventduplicates "
@@ -59,19 +58,24 @@ public class RelationshipCI_1ParserTest
                     "",
                     "description \"abc def\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
             {"2b) description",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                               + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }",
                     "!hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
             {"2c) multi-line description",
                     "",
                     "description \"abc\ndef\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
-                              + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
+            {"2d) tab's in description",
+                    "",
+                    "description \"abc\tdef\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
             // kind
             {"3a) basic kind",
                     "description \"\" !hidden !preventduplicates "

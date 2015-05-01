@@ -292,6 +292,9 @@ public abstract class AbstractParser_mxJPO
                         case 'n':
                             ret.append('\n');
                             break;
+                        case 't':
+                            ret.append('\t');
+                            break;
                         default:
                             ret.append(subCh);
                             break;

@@ -27,13 +27,13 @@ interface DimensionParserConstants_mxJPO {
   /** RegularExpression Id. */
   int HIDDEN_FALSE_VIA_VALUE_APOSTROPHE = 12;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 13;
+  int STRING = 13;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 14;
+  int SINGLE = 14;
   /** RegularExpression Id. */
-  int STRING = 15;
+  int MULTILINESTRING = 15;
   /** RegularExpression Id. */
-  int SINGLE = 16;
+  int MULTILINESINGLE = 16;
   /** RegularExpression Id. */
   int UNIT = 17;
   /** RegularExpression Id. */
@@ -132,9 +132,9 @@ interface DimensionParserConstants_mxJPO {
   /** Lexical state. */
   int UNITNAME_EXPECTED = 9;
   /** Lexical state. */
-  int STRING_EXPECTED = 10;
+  int MULTILINESTRING_EXPECTED = 10;
   /** Lexical state. */
-  int MULTILINESTRING_EXPECTED = 11;
+  int STRING_EXPECTED = 11;
   /** Lexical state. */
   int DEFAULT = 12;
 
@@ -153,10 +153,10 @@ interface DimensionParserConstants_mxJPO {
     "\"!hidden\"",
     "<HIDDEN_FALSE_VIA_VALUE>",
     "<HIDDEN_FALSE_VIA_VALUE_APOSTROPHE>",
-    "<MULTILINESTRING>",
-    "<MULTILINESINGLE>",
     "<STRING>",
     "<SINGLE>",
+    "<MULTILINESTRING>",
+    "<MULTILINESINGLE>",
     "\"unit\"",
     "<UNITNAME_STRING>",
     "<UNITNAME_SINGLE>",

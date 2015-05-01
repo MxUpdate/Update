@@ -48,8 +48,10 @@ public class Parser_2MultilineStringTest
             {"7) curly braces close",           "abc}def",      "\"abc\\}def\""},
             {"8) escaped curly braces close",   "abc}def",      "\"abc\\}def\""},
             {"9) escaped quotations mark",      "abc\"def",     "\"abc\\\"def\""},
-            {"10) new line",                     "abc\ndef",     "\"abc\ndef\""},
-            {"11) escaped new line",             "abc\ndef",     "\"abc\\ndef\""},
+            {"10a) new line",                   "abc\ndef",     "\"abc\ndef\""},
+            {"10b) escaped new line",           "abc\ndef",     "\"abc\\ndef\""},
+            {"11a) tab",                        "abc\tdef",     "\"abc\tdef\""},
+            {"11b) escaped tab",                "abc\tdef",     "\"abc\\tdef\""},
         };
     }
 

@@ -55,6 +55,9 @@ public class RuleCI_1ParserTest
                 {"2c) multi-line description",
                         "",
                         "description \"abc\ndef\" !hidden !enforcereserveaccess"},
+                {"2d) tab's in description",
+                        "",
+                        "description \"abc\tdef\" !hidden !enforcereserveaccess"},
                 // hidden flag
                 {"3a) hidden",
                         "",

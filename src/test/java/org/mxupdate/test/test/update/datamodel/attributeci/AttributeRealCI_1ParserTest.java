@@ -64,6 +64,9 @@ public class AttributeRealCI_1ParserTest
             {"2c) multi-line description",
                     "",
                     "kind real description \"abc\ndef\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
+            {"2d) tab's in description",
+                    "",
+                    "kind real description \"abc\tdef\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
             // hidden flag
             {"3a) hidden",
                     "",

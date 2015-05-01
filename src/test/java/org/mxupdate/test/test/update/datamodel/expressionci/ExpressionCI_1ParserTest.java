@@ -55,6 +55,9 @@ public class ExpressionCI_1ParserTest
             {"2c) multi-line description",
                     "",
                     "description \"abc\ndef\" !hidden value \"\""},
+            {"2d) tab's in description",
+                    "",
+                    "description \"abc\tdef\" !hidden value \"\""},
             // hidden
             {"3a) not hidden",
                     "description \"\" !hidden value \"\"",

@@ -29,8 +29,7 @@ public abstract class AbstractProgramCI_1ParserTest<DATA extends AbstractAdminOb
 {
     protected Object[][] getData(final String _kind)
     {
-        return new Object[][]
-        {
+        return new Object[][]  {
             {"1) simple",
                     "",
                     "kind " + _kind + " description \"\" "},
@@ -41,6 +40,12 @@ public abstract class AbstractProgramCI_1ParserTest<DATA extends AbstractAdminOb
             {"2b) description not defined",
                     "kind " + _kind + " description \"\"",
                     "kind " + _kind + "                  "},
+            {"2c) multi-line description",
+                    "",
+                    "kind " + _kind + " description \"abc\ndef\""},
+            {"2d) tab's in description",
+                    "",
+                    "kind " + _kind + " description \"abc\tdef\""},
             // hidden flag
             {"3a) hidden",
                     "",

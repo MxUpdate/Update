@@ -36,23 +36,26 @@ public class ObjectGeneratorCI_1ParserTest
     {
         return new Object[][]
         {
-            {"1) simple",
+            {"0) simple",
                 "",
                 "description \"\" current \"\""},
             // type
-            {"2) type defined",
+            {"1) type defined",
                     "                                   description \"\" current \"\"",
                     "type \"eService Object Generator\" description \"\" current \"\""},
             // description
-            {"3a) description",
+            {"2a) description",
                     "",
                     "description \"abc def\" current \"\""},
-            {"3b) description not defined",
+            {"2b) description not defined",
                     "description \"\" current \"\"",
                     "                 current \"\""},
-            {"3c) multi-line description",
+            {"2c) multi-line description",
                     "",
                     "description \"abc\ndef\" current \"\""},
+            {"2d) tab's in description",
+                    "",
+                    "description \"abc\tdef\" current \"\""},
             // attribute
             {"4a) one attribute ",
                     "",

@@ -45,7 +45,6 @@ public class FormatCI_1ParserTest
             {"1b) two symbolic names",
                     "symbolicname \"format_abc\" symbolicname \"format_def\" description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\"",
                     "symbolicname \"format_def\" symbolicname \"format_abc\" description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
-
             // description
             {"2a) description",
                     "",
@@ -56,6 +55,9 @@ public class FormatCI_1ParserTest
             {"2c) multi-line description",
                     "",
                     "description \"abc\ndef\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
+            {"2d) tab's in description",
+                    "",
+                    "description \"abc\tdef\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
             // hidden
             {"3a) not hidden",
                     "description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\"",

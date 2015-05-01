@@ -34,8 +34,7 @@ public class TypeCI_1ParserTest
     @DataProvider(name = "data")
     public Object[][] getData()
     {
-        return new Object[][]
-        {
+        return new Object[][]  {
             {"0) simple",
                     "",
                     "description \"\" !hidden"},
@@ -56,6 +55,9 @@ public class TypeCI_1ParserTest
             {"2c) multi-line description",
                     "",
                     "description \"abc\ndef\" !hidden"},
+            {"2d) tab's in description",
+                    "",
+                    "description \"abc\tdef\" !hidden"},
             // kind
             {"3a) basic kind",
                     "description \"\" !hidden",

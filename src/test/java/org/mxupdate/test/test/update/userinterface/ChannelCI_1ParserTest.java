@@ -34,8 +34,7 @@ public class ChannelCI_1ParserTest
     @DataProvider(name = "data")
     public Object[][] getData()
     {
-        return new Object[][]
-        {
+        return new Object[][]  {
             {"0) simple",
                     "",
                     "description \"\" label \"\" href \"\" alt \"\" height 0"},
@@ -53,6 +52,12 @@ public class ChannelCI_1ParserTest
             {"2b) description not defined",
                     "description \"\" label \"\" href \"\" alt \"\" height 0",
                     "                 label \"\" href \"\" alt \"\" height 0"},
+            {"2c) multi-line description",
+                    "",
+                    "description \"abc\ndef\" label \"\" href \"\" alt \"\" height 0"},
+            {"2d) tab's in description",
+                    "",
+                    "description \"abc\tdef\" label \"\" href \"\" alt \"\" height 0"},
             // hidden
             {"3a) not hidden",
                     "description \"\"         label \"\" href \"\" alt \"\" height 0",

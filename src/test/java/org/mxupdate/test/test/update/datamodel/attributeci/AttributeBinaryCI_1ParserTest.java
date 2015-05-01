@@ -63,6 +63,9 @@ public class AttributeBinaryCI_1ParserTest
             {"2c) multi-line description",
                     "",
                     "kind binary description \"abc\ndef\" !hidden !multivalue !resetonclone !resetonrevision default \"\""},
+            {"2d) tab's in description",
+                    "",
+                    "kind binary description \"abc\tdef\" !hidden !multivalue !resetonclone !resetonrevision default \"\""},
             // hidden flag
             {"3a) hidden",
                     "",
