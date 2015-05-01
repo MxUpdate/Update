@@ -82,8 +82,8 @@ public final class AdminPropertyList_mxJPO
         boolean ret = true;
 
         // first, check for information properties
-        if (_paramCache.contains(ValueKeys.ExportInfoPropsList))  {
-            for (final String propKey : _paramCache.getValueList(ValueKeys.ExportInfoPropsList))  {
+        if (_paramCache.contains(ValueKeys.ExportInfoPropsListAdmin))  {
+            for (final String propKey : _paramCache.getValueList(ValueKeys.ExportInfoPropsListAdmin))  {
                 for (final AdminProperty prop : this.properties)  {
                     if (propKey.equals(prop.getName()))  {
                         ret = false;
@@ -268,8 +268,8 @@ public final class AdminPropertyList_mxJPO
     {
         // first, write information properties
         final List<AdminProperty> infoProps = new ArrayList<AdminProperty>();
-        if (_paramCache.contains(ValueKeys.ExportInfoPropsList))  {
-            for (final String propKey : _paramCache.getValueList(ValueKeys.ExportInfoPropsList))  {
+        if (_paramCache.contains(ValueKeys.ExportInfoPropsListAdmin))  {
+            for (final String propKey : _paramCache.getValueList(ValueKeys.ExportInfoPropsListAdmin))  {
                 for (final AdminProperty prop : this.properties)  {
                     if (propKey.equals(prop.getName()))  {
                         infoProps.add(prop);

@@ -749,8 +749,10 @@ public class ParameterCache_mxJPO
 
         /** Header used for file exports. */
         ExportFileHeader,
-        /** List of property names used as information in front of the list of properties. */
-        ExportInfoPropsList,
+        /** List of admin property names used as information in front of the list of properties. */
+        ExportInfoPropsListAdmin,
+        /** List of business object property names used as information in front of the list of properties. */
+        ExportInfoPropsListBus,
         /** End text for the information properties. */
         ExportInfoPropsTextEnd,
         /** Start text for the information properties. */

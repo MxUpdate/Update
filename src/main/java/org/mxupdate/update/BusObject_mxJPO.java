@@ -20,7 +20,9 @@ import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -45,10 +47,12 @@ import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.CompareToUtil_mxJPO;
+import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateLine;
@@ -535,8 +539,36 @@ public class BusObject_mxJPO
                 .string(        "description",              this.getDescription())
                 .string(        "current",                  this.busCurrent);
 
+        // system properties are not written
+        final Set<String> notWriteProps = new HashSet<String>();
+        for (final PropertyDef_mxJPO propDef : PropertyDef_mxJPO.values())  {
+            final String attrName = propDef.getAttrName(_updateBuilder.getParamCache());
+            if (attrName != null)  {
+                notWriteProps.add(attrName);
+            }
+        }
+        // write information properties
+        if (_updateBuilder.getParamCache().contains(ValueKeys.ExportInfoPropsListBus))  {
+            notWriteProps.addAll(_updateBuilder.getParamCache().getValueList(ValueKeys.ExportInfoPropsListBus));
+            boolean found = false;
+            for (final String propKey : _updateBuilder.getParamCache().getValueList(ValueKeys.ExportInfoPropsListBus))  {
+                if (this.attrValues.containsKey(propKey))  {
+                    if (!found)  {
+                        _updateBuilder.stepStartNewLine().stepSingle(_updateBuilder.getParamCache().getValueString(ValueKeys.ExportInfoPropsTextStart)).stepEndLine();
+                        found = true;
+                    }
+                    _updateBuilder.stepStartNewLine().stepSingle("attribute").stepString(propKey).stepString(this.attrValues.get(propKey)).stepEndLine();
+                }
+            }
+            if (found)  {
+                _updateBuilder.stepStartNewLine().stepSingle(_updateBuilder.getParamCache().getValueString(ValueKeys.ExportInfoPropsTextEnd)).stepEndLine();
+            }
+        }
+        // now the rest of the properties w/o info properties
         for (final Entry<String,String> entry : this.attrValues.entrySet())  {
-            _updateBuilder.stepStartNewLine().stepSingle("attribute").stepString(entry.getKey()).stepString(entry.getValue()).stepEndLine();
+            if (!notWriteProps.contains(entry.getKey()))  {
+                _updateBuilder.stepStartNewLine().stepSingle("attribute").stepString(entry.getKey()).stepString(entry.getValue()).stepEndLine();
+            }
         }
 
         _updateBuilder
@@ -557,6 +589,45 @@ public class BusObject_mxJPO
             final BusObject_mxJPO clazz = (BusObject_mxJPO) this.getTypeDef().newTypeInstance(name + BusObject_mxJPO.SPLIT_NAME + revi);
 
             clazz.parseUpdate(devi);
+
+            // MxUpdate File Date => must be always overwritten if newer!
+            final String attrFileDate = PropertyDef_mxJPO.FILEDATE.getAttrName(_paramCache);
+            if ((attrFileDate != null) && !attrFileDate.isEmpty())  {
+                clazz.attrValues.put(attrFileDate, _args[5]);
+            }
+
+            // installed date => reuse if already defined, new is not
+            final String attrInstDate = PropertyDef_mxJPO.INSTALLEDDATE.getAttrName(_paramCache);
+            if ((attrInstDate != null) && !attrInstDate.isEmpty())  {
+                final String curInstalledDate = this.attrValues.get(attrInstDate);
+                clazz.attrValues.put(
+                        attrInstDate,
+                        ((curInstalledDate != null) && !curInstalledDate.trim().isEmpty()) ? curInstalledDate : StringUtil_mxJPO.formatInstalledDate(_paramCache, new Date()));
+            }
+
+            // installer
+            // => check if already defined
+            // => check if installed via parameter
+            // => use default installer
+            final String attrInstaller = PropertyDef_mxJPO.INSTALLER.getAttrName(_paramCache);
+            if ((attrInstaller != null) && !attrInstaller.isEmpty())  {
+                final String curInstaller = this.attrValues.get(attrInstaller);
+                clazz.attrValues.put(
+                        attrInstaller,
+                        _paramCache.contains(ValueKeys.Installer)
+                                ? _paramCache.getValueString(ValueKeys.Installer)
+                                : ((curInstaller != null) && !curInstaller.isEmpty())
+                                        ? curInstaller
+                                        : _paramCache.getValueString(ValueKeys.DefaultInstaller));
+            }
+
+            // calc sub path always
+            final String attrSubPath = PropertyDef_mxJPO.SUBPATH.getAttrName(_paramCache);
+            if ((attrSubPath != null) && !attrSubPath.isEmpty())  {
+                clazz.attrValues.put(
+                        attrSubPath,
+                        FileHandlingUtil_mxJPO.extraceSubPath(_args[6], this.getTypeDef().getFilePath()));
+            }
 
             // initialize MQL builder
             final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine(new File(_args[6]), "escape mod bus $1 $2 $3", this.busType, this.busName, this.busRevision);
