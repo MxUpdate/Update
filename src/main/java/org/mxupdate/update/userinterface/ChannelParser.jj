@@ -19,16 +19,15 @@ options {
     ERROR_REPORTING = true;
     USER_TOKEN_MANAGER = false;
     GENERATE_BOILERPLATE = false;
+    SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
 }
 
-PARSER_BEGIN(ChannelDefParser)
-package org.mxupdate.update.userinterface.channel;
+PARSER_BEGIN(ChannelParser)
+package org.mxupdate.update.userinterface;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.userinterface.Channel_mxJPO;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.CommandRef;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -36,26 +35,26 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
-import org.mxupdate.update.util.ParameterCache_mxJPO;
 
-public class ChannelDefParser
+/**
+ * Parses the update format for {@link Channel_mxJPO}.
+ */
+@SuppressWarnings("unused")
+class ChannelParser
     extends AbstractParser_mxJPO<Channel_mxJPO>
 {
 }
 
-PARSER_END(ChannelDefParser)
+PARSER_END(ChannelParser)
 
-SKIP :
+<*> SKIP :
 {
-    " "
-|   "\r"
-|   "\t"
-|   "\n"
+  " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
 TOKEN : /** first level */
 {
-      <DESCRIPTION:             "description">                                  : STRING_EXPECTED
+      <DESCRIPTION:             "description">                                  : MULTILINESTRING_EXPECTED
     | <HIDDEN_TRUE:             "hidden">
     | <HIDDEN_FALSE:            "!hidden">
     | <LABEL:                   "label">                                        : STRING_EXPECTED
@@ -64,63 +63,50 @@ TOKEN : /** first level */
     | <HEIGHT:                  "height">                                       : INTEGER_EXPECTED
     | <SETTING:                 ("add" ([" ","\t","\n","\r"])+ )? "setting">    : SETTING_EXPECTED
     | <COMMAND:                 ("add" ([" ","\t","\n","\r"])+ )? "command">    : STRING_EXPECTED
-    | <PROPERTY:                "property">                                     : STRING_EXPECTED
-    | <PROPERTYTO:              "to">                                           : ADMINREF_EXPECTED
-    | <PROPERTYVAL:             "value">                                        : STRING_EXPECTED
 }
 
 /************************************************************** Common String */
-<STRING_EXPECTED> SKIP :
-{
-  " " | "\t" | "\n" | "\r"
-}
-
 <STRING_EXPECTED> TOKEN :
 {
-      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "{" | "}" | " " | "\n")*<APOSTROPHE>)> : DEFAULT
-    | <SINGLE: (<CHAR>)+> : DEFAULT
-    | <#APOSTROPHE: "\"" >
-    | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
+    | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/*************************************************** Common Multi-Line-String */
+<MULTILINESTRING_EXPECTED> TOKEN :
+{
+      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
+    | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
 }
 
 /************************************************************* Common Integer */
-<INTEGER_EXPECTED> SKIP :
-{
-  " " | "\t" | "\n" | "\r"
-}
-
 <INTEGER_EXPECTED> TOKEN :
 {
       <INTEGER: (("0") | (["1"-"9"](["0"-"9"])*))> : DEFAULT
 }
 
 /********************************************************* Setting Key String */
-<SETTING_EXPECTED> SKIP :
-{
-  " " | "\t" | "\n" | "\r"
-}
-
 <SETTING_EXPECTED> TOKEN :
 {
-      <SETTING_STRING: (<SETTING_APOSTROPHE>(<SETTING_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<SETTING_APOSTROPHE>)> : STRING_EXPECTED
-    | <SETTING_SINGLE: (<SETTING_CHAR>)+> : DEFAULT
-    | <#SETTING_APOSTROPHE: "\"" >
-    | <#SETTING_CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <SETTING_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
+    | <SETTING_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
 }
 
-/**************************************** Two Strings for Property Definition */
-<ADMINREF_EXPECTED> SKIP :
+/******************************************************************* Property */
+<DEFAULT> TOKEN :
 {
-  " " | "\t" | "\n" | "\r"
+      <PROPERTY:                            "property">                                     : STRING_EXPECTED
+    | <PROPERTYTO:                          "to">                                           : ADMINREF_EXPECTED
+    | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
 }
 
 <ADMINREF_EXPECTED> TOKEN :
 {
-      <ADMINTYPE_STRING : (<ADMINTYPE_APOSTROPHE>(<ADMINTYPE_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<ADMINTYPE_APOSTROPHE>)> : STRING_EXPECTED
-    | <ADMINTYPE_SINGLE : (<ADMINTYPE_CHAR>)+> : STRING_EXPECTED
-    | <#ADMINTYPE_APOSTROPHE : "\"" >
-    | <#ADMINTYPE_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <ADMINTYPE_STRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
 }
+
+/**************************************************************************** */
 
 /**
  * Parses one complete menu definition.
@@ -135,25 +121,33 @@ void parse(Channel_mxJPO _menu)
     CommandRef ref;
     int refIdx = 0;
 } {
-    (   (<DESCRIPTION>              ( tmp = <STRING>           {this.setValue(_menu, "description", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(_menu, "description", this.getSingle(tmp.image));} ) )
+    (   (<DESCRIPTION>              ( tmp = <MULTILINESTRING>  {this.setValue(_menu, "description", this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>  {this.setValue(_menu, "description", this.getSingle(tmp.image));} ) )
+
       | (<HIDDEN_TRUE>                                         {this.setValue(_menu, "hidden", true);} )
       | (<HIDDEN_FALSE>                                        {this.setValue(_menu, "hidden", false);} )
+
       | (<LABEL>                    ( tmp = <STRING>           {this.setValue(_menu, "label", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(_menu, "label", this.getSingle(tmp.image));} ) )
+
       | (<ALT>                      ( tmp = <STRING>           {this.setValue(_menu, "alt", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(_menu, "alt", this.getSingle(tmp.image));} ) )
+
       | (<HREF>                     ( tmp = <STRING>           {this.setValue(_menu, "href", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(_menu, "href", this.getSingle(tmp.image));} ) )
+
       | (<HEIGHT>                   tmp = <INTEGER>            {this.setValue(_menu, "height", Integer.valueOf(tmp.image));} )
+
       | (<SETTING>                                             {property = new AdminProperty();this.appendValue(this.getValue(_menu, "properties"), "propertiesStack", property);}
                                     ( tmp = <SETTING_STRING>   {this.setValue(property, "name", "%" + this.getString(tmp.image));}
                                     | tmp = <SETTING_SINGLE>   {this.setValue(property, "name", "%" + this.getSingle(tmp.image));})
                                     ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+
       | (<COMMAND>                                             {ref = new CommandRef();this.setValue(ref, "column", refIdx++);this.appendValue(this.getValue(_menu, "children"), "childrenStack", ref);}
                                     ( tmp = <STRING>           {this.setValue(ref, "name", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(ref, "name", this.getString(tmp.image));} ) )
+
       | (<PROPERTY>                                            {property = new AdminProperty();this.appendValue(this.getValue(_menu, "properties"), "propertiesStack", property);}
                                     ( tmp = <STRING>           {this.setValue(property, "name", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(property, "name", this.getSingle(tmp.image));} )

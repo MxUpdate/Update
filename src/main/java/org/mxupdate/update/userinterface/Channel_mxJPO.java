@@ -28,11 +28,22 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * The class is used to export and import / update channel configuration items.
+ * The handled properties are:
+ * <ul>
+ * <li>hidden flag (only if hidden)</li>
+ * <li>{@link #label}</li>
+ * <li>{@link #href}</li>
+ * <li>{@link #alt}</li>
+ * <li>{@link #height}</li>
+ * <li>settings defined as properties starting with &quot;%&quot; in
+ *     {@link #getPropertiesMap()}</li>
+ * <li>command references {@link #children}</li>
+ * </ul>
  *
  * @author The MxUpdate Team
  */
@@ -61,6 +72,7 @@ public class Channel_mxJPO
                          final String _mxName)
     {
         super(_typeDef, _mxName);
+        this.getProperties().setOtherPropTag("setting");
     }
 
     @Override()
@@ -116,25 +128,6 @@ public class Channel_mxJPO
         super.prepare();
     }
 
-    /**
-     * Writes specific information about the cached channel to the given writer
-     * instance. This includes
-     * <ul>
-     * <li>hidden flag (only if hidden)</li>
-     * <li>{@link #label}</li>
-     * <li>{@link #href}</li>
-     * <li>{@link #alt}</li>
-     * <li>{@link #height}</li>
-     * <li>settings defined as properties starting with &quot;%&quot; in
-     *     {@link #getPropertiesMap()}</li>
-     * <li>command references {@link #children}</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the TCL update code for the channel could not be
-     *                     written
-     */
     @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
@@ -142,25 +135,25 @@ public class Channel_mxJPO
     {
         this.writeHeader(_paramCache, _out);
 
-        _out.append("mxUpdate channel \"${NAME}\"  {\n")
-            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n");
-        if (this.isHidden())  {
-            _out.append("    hidden\n");
-        }
-        _out.append("    label \"").append(StringUtil_mxJPO.convertUpdate(this.getLabel())).append("\"\n")
-            .append("    alt \"").append(StringUtil_mxJPO.convertUpdate(this.getAlt())).append("\"\n");
-        if ((this.getHref() != null) && !this.getHref().isEmpty())  {
-            _out.append("    href \"").append(StringUtil_mxJPO.convertUpdate(this.getHref())).append("\"\n");
-        }
-        _out.append("    height ").append(String.valueOf(this.height)).append("\n");
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
 
-        this.getProperties().writeSettings(_paramCache, _out, "    ");
+        this.writeHeader(_paramCache, updateBuilder.getStrg());
 
-        this.children.write(_out);
+        updateBuilder
+                .start("channel")
+                //              tag             | default | value                              | write?
+                .string(        "description",              this.getDescription())
+                .flagIfTrue(    "hidden",           false,  this.isHidden(),                     this.isHidden())
+                .string(        "label",                    this.getLabel())
+                .string(        "href",                     this.getHref())
+                .string(        "alt",                      this.getAlt())
+                .single(        "height",                   String.valueOf(this.height))
+                .otherProps(this.getProperties())
+                .write(this.children)
+                .properties(this.getProperties())
+                .end();
 
-        this.getProperties().writeProperties(_paramCache, _out, "    ");
-
-        _out.append("}");
+        _out.append(updateBuilder.toString());
     }
 
     @Override()

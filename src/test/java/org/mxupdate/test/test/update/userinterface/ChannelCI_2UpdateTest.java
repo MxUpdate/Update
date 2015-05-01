@@ -13,8 +13,9 @@
  *
  */
 
-package org.mxupdate.test.ci.userinterface;
+package org.mxupdate.test.test.update.userinterface;
 
+import org.mxupdate.test.ci.userinterface.AbstractUITest;
 import org.mxupdate.test.data.userinterface.ChannelData;
 import org.mxupdate.test.data.userinterface.CommandData;
 import org.testng.annotations.AfterMethod;
@@ -28,14 +29,9 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class ChannelTest
+public class ChannelCI_2UpdateTest
     extends AbstractUITest<ChannelData>
 {
-    /**
-     * Data provider for test channels.
-     *
-     * @return object array with all test channels
-     */
     @DataProvider(name = "data")
     public Object[][] getChannels()
     {
@@ -102,11 +98,6 @@ public class ChannelTest
                 .checkExport();
     }
 
-    /**
-     * Removes the MxUpdate channels and programs.
-     *
-     * @throws Exception if MQL execution failed
-     */
     @BeforeMethod()
     @AfterMethod()
     public void cleanup()
@@ -116,13 +107,7 @@ public class ChannelTest
         this.cleanup(CI.UI_COMMAND);
     }
 
-    /**
-     * Creates for given <code>_name</code> a new channel instance.
-     *
-     * @param _name     name of the channel instance
-     * @return channel instance
-     */
-    @Override()
+    @Override
     protected ChannelData createNewData(final String _name)
     {
         return new ChannelData(this, _name);
