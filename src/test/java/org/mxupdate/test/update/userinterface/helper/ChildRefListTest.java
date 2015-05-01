@@ -73,7 +73,52 @@ public class ChildRefListTest
                     this.parse("/commandRef/order", "0");
                 }}
             },
-        };
+            {
+                "    channel \"abc\"\n"
+              + "    channel \"bcd\"\n"
+              + "    newrow\n"
+              + "    channel \"cde\"\n",
+                new ChildRefList_mxJPO()  {{
+                    this.parse("/channelRef", "");
+                    this.parse("/channelRef/name", "bcd");
+                    this.parse("/channelRef/portalRow", "0");
+                    this.parse("/channelRef/portalColumn", "1");
+                    this.parse("/channelRef", "");
+                    this.parse("/channelRef/name", "cde");
+                    this.parse("/channelRef/portalRow", "2");
+                    this.parse("/channelRef/portalColumn", "0");
+                    this.parse("/channelRef", "");
+                    this.parse("/channelRef/name", "abc");
+                    this.parse("/channelRef/portalRow", "0");
+                    this.parse("/channelRef/portalColumn", "0");
+                }}
+            },
+            {
+                "    channel \"abc\"\n"
+              + "    channel \"bcd\"\n"
+              + "    newrow\n"
+              + "    channel \"cde\"\n"
+              + "    channel \"def\"\n",
+                new ChildRefList_mxJPO()  {{
+                    this.parse("/channelRef", "");
+                    this.parse("/channelRef/name", "bcd");
+                    this.parse("/channelRef/portalRow", "0");
+                    this.parse("/channelRef/portalColumn", "1");
+                    this.parse("/channelRef", "");
+                    this.parse("/channelRef/name", "cde");
+                    this.parse("/channelRef/portalRow", "2");
+                    this.parse("/channelRef/portalColumn", "0");
+                    this.parse("/channelRef", "");
+                    this.parse("/channelRef/name", "abc");
+                    this.parse("/channelRef/portalRow", "0");
+                    this.parse("/channelRef/portalColumn", "0");
+                    this.parse("/channelRef", "");
+                    this.parse("/channelRef/name", "def");
+                    this.parse("/channelRef/portalRow", "2");
+                    this.parse("/channelRef/portalColumn", "1");
+                }}
+            },
+       };
     }
 
     /**

@@ -47,14 +47,27 @@ public class ChildRefList_mxJPO
                          final String _content)
     {
         final boolean parsed;
-        if ("/commandRef".equals(_url))  {
+        if ("/channelRef".equals(_url))  {
+            this.childrenStack.add(new ChannelRef());
+            parsed = true;
+        } else if ("/channelRef/name".equals(_url))  {
+            this.childrenStack.peek().name = _content;
+            parsed = true;
+        } else if ("/channelRef/portalRow".equals(_url))  {
+            this.childrenStack.peek().row = Integer.parseInt(_content);
+            parsed = true;
+        } else if ("/channelRef/portalColumn".equals(_url))  {
+            this.childrenStack.peek().column = Integer.parseInt(_content);
+            parsed = true;
+
+        } else if ("/commandRef".equals(_url))  {
             this.childrenStack.add(new CommandRef());
             parsed = true;
         } else if ("/commandRef/name".equals(_url))  {
             this.childrenStack.peek().name = _content;
             parsed = true;
         } else if ("/commandRef/order".equals(_url))  {
-            this.childrenStack.peek().order = Integer.parseInt(_content);
+            this.childrenStack.peek().column = Integer.parseInt(_content);
             parsed = true;
 
         } else if ("/menuRef".equals(_url))  {
@@ -64,7 +77,7 @@ public class ChildRefList_mxJPO
             this.childrenStack.peek().name = _content;
             parsed = true;
         } else if ("/menuRef/order".equals(_url))  {
-            this.childrenStack.peek().order = Integer.parseInt(_content);
+            this.childrenStack.peek().column = Integer.parseInt(_content);
             parsed = true;
 
         } else  {
@@ -91,8 +104,15 @@ public class ChildRefList_mxJPO
     public void write(final Appendable _out)
         throws IOException
     {
-        for (final AbstractRef ref : this)  {
-            _out.append("    ").append(ref.kind()).append(" \"").append(StringUtil_mxJPO.convertUpdate(ref.name)).append("\"\n");
+        if (!this.isEmpty())  {
+            int row = this.first().row;
+            for (final AbstractRef ref : this)  {
+                if (row != ref.row)  {
+                    _out.append("    newrow\n");
+                    row = ref.row;
+                }
+                _out.append("    ").append(ref.kind()).append(" \"").append(StringUtil_mxJPO.convertUpdate(ref.name)).append("\"\n");
+            }
         }
     }
 
@@ -113,14 +133,16 @@ public class ChildRefList_mxJPO
         final Iterator<AbstractRef> iterTarget  = this.iterator();
         AbstractRef childThis   = null;
         AbstractRef childTarget = null;
+        AbstractRef prevChildTarget = null;
         boolean equal = true;
         while (iterCurrent.hasNext() && iterTarget.hasNext())  {
             childThis   = iterCurrent.next();
             childTarget = iterTarget.next();
-            if (!childThis.equals(childTarget))  {
+            if ((childThis.row != childTarget.row) || !childThis.name.equals(childTarget.name) || !childThis.kind().equals(childTarget.kind()))  {
                 equal = false;
                 break;
             }
+            prevChildTarget = childTarget;
         }
         // remove current children if needed
         if (!equal)  {
@@ -150,6 +172,25 @@ public class ChildRefList_mxJPO
                     _mql.newLine().cmd("place ").arg(childTarget.name).cmd(" after ").arg("");
                 }
                 break;
+            case PlaceWithNewRow:
+                if (!equal)  {
+                    _mql.newLine().cmd("place ").arg(childTarget.name);
+                    if ((prevChildTarget != null) && (childTarget.row != prevChildTarget.row))  {
+                        _mql.cmd(" newrow");
+                    }
+                    _mql.cmd(" after ").arg("");
+                    prevChildTarget = childTarget;
+                }
+                while (iterTarget.hasNext())  {
+                    childTarget = iterTarget.next();
+                    _mql.newLine().cmd("place ").arg(childTarget.name);
+                    if ((prevChildTarget != null) && (childTarget.row != prevChildTarget.row))  {
+                        _mql.cmd(" newrow");
+                    }
+                    _mql.cmd(" after ").arg("");
+                    prevChildTarget = childTarget;
+                }
+                break;
         }
     }
 
@@ -162,8 +203,10 @@ public class ChildRefList_mxJPO
     {
         /** For menus, each child must be added. */
         Add,
-        /** For channels, each child must be placed (with after '' as suffix) */
-        Place
+        /** For channels, each child must be placed (with after '' as suffix). */
+        Place,
+        /** For portals, each child must be placed (with after '' as suffix) and needed new row tag. */
+        PlaceWithNewRow
     }
 
     /**
@@ -172,8 +215,8 @@ public class ChildRefList_mxJPO
     public static abstract class AbstractRef
         implements Comparable<AbstractRef>
     {
-        /** Order of the reference. */
-        Integer order;
+        /** Row (also order) and column of the reference. */
+        int row, column;
         /** Name of the reference. */
         String name;
 
@@ -187,18 +230,25 @@ public class ChildRefList_mxJPO
         @Override()
         public int compareTo(final AbstractRef _toCompare)
         {
-            final int ret;
-            if ((this.order != null) && (_toCompare.order != null))  {
-                ret = this.order.compareTo(_toCompare.order);
-            } else if ((this.order != null) && (_toCompare.order != null))  {
-                ret = 0;
-            } else if (this.order != null)  {
-                ret = 1;
-            } else  {
-                ret = -1;
+            int ret = new Integer(this.row).compareTo(_toCompare.row);
+            if (ret == 0)  {
+                ret = new Integer(this.column).compareTo(_toCompare.column);
             }
 
             return ret;
+        }
+    }
+
+    /**
+     * References all kind of commands like command, menu or channels.
+     */
+    public static class ChannelRef
+        extends AbstractRef
+    {
+        @Override()
+        String kind()
+        {
+            return "channel";
         }
     }
 
@@ -227,20 +277,4 @@ public class ChildRefList_mxJPO
             return "menu";
         }
     }
-
-    /**
-     * References all kind of commands like command, menu or channels.
-     */
-    /*
-    public static class ChannelRef
-        extends AbstractRef
-    {
-        @Override()
-        public void write(final Appendable _out)
-            throws IOException
-        {
-//            _out.append("    channel \"").append(StringUtil_mxJPO.convertUpdate(this.getName())).append("\"\n");
-        }
-    }
-    */
 }

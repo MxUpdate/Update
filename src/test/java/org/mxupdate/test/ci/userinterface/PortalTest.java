@@ -68,6 +68,34 @@ public class PortalTest
     }
 
     /**
+     * Positive test to change the order of children's.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "positive test to change the order of children's")
+    public void positiveTestChangeOrderChilds()
+        throws Exception
+    {
+        new PortalData(this, "test")
+                .addChannel(new ChannelData(this, "child channel 0"))
+                .addChannel(new ChannelData(this, "child channel 1"))
+                .addNewRow()
+                .addChannel(new ChannelData(this, "child channel 2"))
+                .addChannel(new ChannelData(this, "child channel 3"))
+                .create()
+                .checkExport();
+
+        new PortalData(this, "test")
+                .addChannel(new ChannelData(this, "child channel 0"))
+                .addNewRow()
+                .addChannel(new ChannelData(this, "child channel 3"))
+                .addChannel(new ChannelData(this, "child channel 2"))
+                .addChannel(new ChannelData(this, "child channel 1"))
+                .update("")
+                .checkExport();
+    }
+
+    /**
      * Removes the MxUpdate portals and programs.
      *
      * @throws Exception if MQL execution failed

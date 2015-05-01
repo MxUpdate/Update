@@ -151,7 +151,7 @@ void parse(Channel_mxJPO _menu)
                                     | tmp = <SETTING_SINGLE>   {this.setValue(property, "name", "%" + this.getSingle(tmp.image));})
                                     ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
-      | (<COMMAND>                                             {ref = new CommandRef();this.setValue(ref, "order", refIdx++);this.appendValue(this.getValue(_menu, "children"), "childrenStack", ref);}
+      | (<COMMAND>                                             {ref = new CommandRef();this.setValue(ref, "column", refIdx++);this.appendValue(this.getValue(_menu, "children"), "childrenStack", ref);}
                                     ( tmp = <STRING>           {this.setValue(ref, "name", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(ref, "name", this.getString(tmp.image));} ) )
       | (<PROPERTY>                                            {property = new AdminProperty();this.appendValue(this.getValue(_menu, "properties"), "propertiesStack", property);}

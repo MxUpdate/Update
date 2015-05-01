@@ -175,7 +175,7 @@ public abstract class AbstractTest
         /** Configuration item menu. */
         UI_MENU("menu", null, false, null, null, "Menu", "MENU", "MENU_", "userinterface/menu", true, "mxUpdate"),
         /** Configuration item portal. */
-        UI_PORTAL("portal", null, false, null, null, "Portal", "PORTAL", "PORTAL_", "userinterface/portal", true, "mql"),
+        UI_PORTAL("portal", null, false, null, null, "Portal", "PORTAL", "PORTAL_", "userinterface/portal", true, "mxUpdate"),
         /** Configuration item table.*/
         UI_TABLE("table", null, false, null, null, "Table", "TABLE", "TABLE_", "userinterface/table", false, "mql"),
 

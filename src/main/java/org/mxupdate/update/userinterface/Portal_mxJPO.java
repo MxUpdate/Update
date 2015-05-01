@@ -15,21 +15,23 @@
 
 package org.mxupdate.update.userinterface;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
-import java.util.TreeMap;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO;
+import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.WriteAppendChildSyntax;
+import org.mxupdate.update.userinterface.portal.PortalDefParser_mxJPO;
+import org.mxupdate.update.util.DeltaUtil_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * The class parses the information about the portal and writes the script used
@@ -38,7 +40,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @author The MxUpdate Team
  */
 public class Portal_mxJPO
-    extends AbstractAdminObject_mxJPO
+    extends AbstractCommand_mxJPO
 {
     /**
      * Set of all ignored URLs from the XML definition for portals.
@@ -50,42 +52,8 @@ public class Portal_mxJPO
         Portal_mxJPO.IGNORED_URLS.add("/channelRefList");
     }
 
-    /**
-     * Alt (label) of the portal.
-     *
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private String alt = null;
-
-    /**
-     * Href of the portal.
-     *
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private String href = null;
-
-    /**
-     * Label of the portal.
-     *
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private String label = null;
-
-    /**
-     * Stack used to parse the channel references.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #prepare(ParameterCache_mxJPO)
-     */
-    private final Stack<ChannelRef> channelRefs = new Stack<ChannelRef>();
-
-    /**
-     * Ordered channel references by row and column.
-     *
-     * @see #prepare(ParameterCache_mxJPO)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    final Map<Integer,Map<Integer,ChannelRef>> orderedChannelRefs = new TreeMap<Integer,Map<Integer,ChannelRef>>();
+    /** All referenced children. */
+    private final ChildRefList_mxJPO children = new ChildRefList_mxJPO();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -101,7 +69,7 @@ public class Portal_mxJPO
 
     /**
      * Parses the {@link #alt}, {@link #href}, {@link #label} and the channel
-     * reference {@link #channelRefs}.
+     * reference {@link #children}.
      *
      * @param _paramCache   parameter cache with MX context
      * @param _url          url of the XML tag
@@ -117,28 +85,9 @@ public class Portal_mxJPO
         final boolean parsed;
         if (Portal_mxJPO.IGNORED_URLS.contains(_url))  {
             parsed = true;
-        } else if ("/alt".equals(_url))  {
-            this.alt = _content;
-            parsed = true;
-        } else if ("/href".equals(_url))  {
-            this.href = _content;
-            parsed = true;
-        } else if ("/label".equals(_url))  {
-            this.label = _content;
-            parsed = true;
 
-        } else if ("/channelRefList/channelRef".equals(_url))  {
-            this.channelRefs.add(new ChannelRef());
-            parsed = true;
-        } else if ("/channelRefList/channelRef/name".equals(_url))  {
-            this.channelRefs.peek().name = _content;
-            parsed = true;
-        } else if ("/channelRefList/channelRef/portalRow".equals(_url))  {
-            this.channelRefs.peek().row = Integer.parseInt(_content);
-            parsed = true;
-        } else if ("/channelRefList/channelRef/portalColumn".equals(_url))  {
-            this.channelRefs.peek().column = Integer.parseInt(_content);
-            parsed = true;
+        } else if (_url.startsWith("/channelRefList"))  {
+            parsed = this.children.parse(_url.substring(15), _content);
 
         } else  {
             parsed = super.parse(_paramCache, _url, _content);
@@ -151,22 +100,12 @@ public class Portal_mxJPO
      *
      * @param _paramCache   parameter cache
      * @throws MatrixException if the preparation from derived class failed
-     * @see #channelRefs        stack of not ordered channel references
-     * @see #orderedChannelRefs ordered channel references
      */
     @Override()
     protected void prepare(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
-        // sort the channels by row and column
-        for (final ChannelRef channelRef : this.channelRefs)  {
-            Map<Integer,ChannelRef> sub = this.orderedChannelRefs.get(channelRef.row);
-            if (sub == null)  {
-                sub = new TreeMap<Integer,ChannelRef>();
-                this.orderedChannelRefs.put(channelRef.row, sub);
-            }
-            sub.put(channelRef.column, channelRef);
-        }
+        this.children.prepare();
 
         super.prepare(_paramCache);
     }
@@ -181,7 +120,7 @@ public class Portal_mxJPO
      * <li>{@link #alt}</li>
      * <li>settings defined as properties starting with &quot;%&quot; in
      *     {@link #getPropertiesMap()}</li>
-     * <li>channel references {@link #orderedChannelRefs}</li>
+     * <li>channel references {@link #children}</li>
      * </ul>
      *
      * @param _paramCache   parameter cache
@@ -189,122 +128,94 @@ public class Portal_mxJPO
      * @throws IOException if the TCL update code could not be written
      */
     @Override()
-    protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Appendable _out)
         throws IOException
     {
+        this.writeHeader(_paramCache, _out);
+
+        _out.append("mxUpdate portal \"${NAME}\"  {\n")
+            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n");
         if (this.isHidden())  {
-            _out.append(" \\\n    hidden");
+            _out.append("    hidden\n");
         }
-        _out.append(" \\\n    label \"").append(StringUtil_mxJPO.convertTcl(this.label)).append("\"");
-        if (this.href != null)  {
-            _out.append(" \\\n    href \"").append(StringUtil_mxJPO.convertTcl(this.href)).append("\"");
-        }
-        if (this.alt != null)  {
-            _out.append(" \\\n    alt \"").append(StringUtil_mxJPO.convertTcl(this.alt)).append("\"");
-        }
-        // settings
-        for (final AdminProperty prop : this.getProperties())  {
-            if (prop.isSetting())  {
-                _out.append(" \\\n    add setting \"")
-                    .append(StringUtil_mxJPO.convertTcl(prop.getName().substring(1))).append("\"")
-                    .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getValue())).append("\"");
-            }
-        }
-        // channel references
-        boolean firstRow = true;
-        for (final Map<Integer,ChannelRef> channelRefs : this.orderedChannelRefs.values())  {
-            boolean firstCol = true;
-            for (final ChannelRef channelRef : channelRefs.values())  {
-                _out.append(" \\\n    place \"").append(StringUtil_mxJPO.convertTcl(channelRef.name)).append("\"");
-                if (!firstRow && firstCol)  {
-                    _out.append(" newrow");
-                }
-                _out.append(" after \"\"");
-                firstCol = false;
-            }
-            firstRow = false;
-        }
+        _out.append("    label \"").append(StringUtil_mxJPO.convertUpdate(this.getLabel())).append("\"\n")
+            .append("    href \"").append(StringUtil_mxJPO.convertUpdate(this.getHref())).append("\"\n")
+            .append("    alt \"").append(StringUtil_mxJPO.convertUpdate(this.getAlt())).append("\"\n");
+        this.getProperties().writeSettings(_paramCache, _out, "    ");
+
+        this.children.write(_out);
+
+        this.getProperties().writeProperties(_paramCache, _out, "    ");
+
+        _out.append("}");
     }
 
     /**
-     * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this portal. Following steps
-     * are done:
-     * <ul>
-     * <li>reset hidden flag, {@link #href}, description, {@link #alt} and
-     *     {@link #label}</li>
-     * <li>remove all settings and channels</li>
-     * </ul>
+     * The method is called from the TCL update code to define the this
+     * portal.
      *
-     * @param _paramCache       parameter cache
-     * @param _preMQLCode       MQL statements which must be called before the
-     *                          TCL code is executed
-     * @param _postMQLCode      MQL statements which must be called after the
-     *                          TCL code is executed
-     * @param _preTCLCode       TCL code which is defined before the source
-     *                          file is sourced
-     * @param _tclVariables     map of all TCL variables where the key is the
-     *                          name and the value is value of the TCL variable
-     *                          (the value is automatically converted to TCL
-     *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update from derived class failed
+     * @param _paramCache   parameter cache
+     * @param _args         first index defines the use case (must be
+     *                      &quot;updateAttribute&quot; that the attribute
+     *                      is updated); second index the name of the attribute
+     *                      to update
+     * @throws Exception if the update of the dimension failed or for all other
+     *                   use cases from super JPO call
      */
     @Override()
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final CharSequence _preMQLCode,
-                          final CharSequence _postMQLCode,
-                          final CharSequence _preTCLCode,
-                          final Map<String,String> _tclVariables,
-                          final File _sourceFile)
+    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
+                               final String... _args)
         throws Exception
     {
-        // HRef, description, alt and label
-        final StringBuilder preMQLCode = new StringBuilder()
-                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                .append(" !hidden href \"\" description \"\" alt \"\" label \"\"");
-
-        // reset settings
-        for (final AdminProperty prop : this.getProperties())  {
-            if (prop.isSetting())  {
-                preMQLCode.append(" remove setting \"").append(StringUtil_mxJPO.convertMql(prop.getName().substring(1))).append('\"');
+        // check if dimension is defined
+        if ((_args.length == 4) && "mxUpdate".equals(_args[0]) && "portal".equals(_args[1])) {
+// TODO: Exception Handling
+            // check that command names are equal
+            if (!this.getName().equals(_args[2]))  {
+                throw new Exception("wrong portal '" + _args[2] + "' is set to update (currently portal '" + this.getName() + "' is updated!)");
             }
+
+            final String code = _args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
+
+            final PortalDefParser_mxJPO parser = new PortalDefParser_mxJPO(new StringReader(code));
+            final Portal_mxJPO menu = parser.parse(_paramCache, this.getTypeDef(), this.getName());
+
+            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine("escape mod portal $1", this.getName());
+
+            this.calcDelta(_paramCache, mql, menu);
+
+            mql.exec(_paramCache);
+
+        } else  {
+            super.jpoCallExecute(_paramCache, _args);
         }
-        preMQLCode.append(";\n");
-
-        // remove channels (each channel must be removed in a single line...)
-        for (final ChannelRef channelRef : this.channelRefs)  {
-            preMQLCode.append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                      .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                      .append(" remove channel \"").append(StringUtil_mxJPO.convertMql(channelRef.name)).append("\";\n");
-        }
-
-        // append already existing pre MQL code
-        preMQLCode.append(_preMQLCode);
-
-        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
     }
 
     /**
-     * Class holding the channel reference.
+     * Calculates the delta between this current portal definition and the
+     * {@code _target} portal definition and appends the MQL append commands
+     * to {@code _cmd}.
+     *
+     * @param _paramCache   parameter cache
+     * @param _cmd          string builder to append the MQL commands
+     * @param _target       target portal definition
+     * @throws UpdateException_mxJPO if update is not allowed (because data can
+     *                      be lost)
      */
-    private class ChannelRef
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MultiLineMqlBuilder _mql,
+                             final Portal_mxJPO _target)
+        throws UpdateException_mxJPO
     {
-        /**
-         * Name of the channel.
-         */
-        String name = null;
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "description", _target.getDescription(),   this.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      _target.isHidden(),         this.isHidden());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "alt",         _target.getAlt(),           this.getAlt());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "href",        _target.getHref(),          this.getHref());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "label",       _target.getLabel(),         this.getLabel());
 
-        /**
-         * Row of the channel.
-         */
-        Integer row = null;
+        _target.children.calcDelta(_mql, WriteAppendChildSyntax.PlaceWithNewRow, this.children);
 
-        /**
-         * Column of the channel.
-         */
-        Integer column = null;
+        _target.getProperties().calcDelta(_mql, "", this.getProperties());
     }
 }

@@ -192,7 +192,7 @@ this.setValue(property, "value", this.getSingle(tmp.image));
         }
       case COMMAND:{
         jj_consume_token(COMMAND);
-ref = new CommandRef();this.setValue(ref, "order", refIdx++);this.appendValue(this.getValue(_menu, "children"), "childrenStack", ref);
+ref = new CommandRef();this.setValue(ref, "column", refIdx++);this.appendValue(this.getValue(_menu, "children"), "childrenStack", ref);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case STRING:{
           tmp = jj_consume_token(STRING);
@@ -213,7 +213,7 @@ this.setValue(ref, "name", this.getString(tmp.image));
         }
       case MENU:{
         jj_consume_token(MENU);
-ref = new MenuRef();this.setValue(ref, "order", refIdx++);this.appendValue(this.getValue(_menu, "children"), "childrenStack", ref);
+ref = new MenuRef();this.setValue(ref, "column", refIdx++);this.appendValue(this.getValue(_menu, "children"), "childrenStack", ref);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case STRING:{
           tmp = jj_consume_token(STRING);
