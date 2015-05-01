@@ -13,13 +13,13 @@
  *
  */
 
-package org.mxupdate.test.test.mapping;
+package org.mxupdate.test.test.typedef;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;

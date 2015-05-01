@@ -21,7 +21,7 @@ import java.io.IOException;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
-import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;

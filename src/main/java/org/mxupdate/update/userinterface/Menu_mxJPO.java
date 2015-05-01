@@ -22,7 +22,7 @@ import java.util.Set;
 
 import matrix.util.MatrixException;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.WriteAppendChildSyntax;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;

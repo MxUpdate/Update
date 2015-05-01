@@ -19,7 +19,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.Set;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 

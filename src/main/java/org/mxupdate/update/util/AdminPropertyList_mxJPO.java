@@ -25,7 +25,7 @@ import java.util.Stack;
 import java.util.TreeSet;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
-import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 

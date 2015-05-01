@@ -7,7 +7,7 @@ import java.io.StringReader;
 import java.util.Collection;
 import java.util.Set;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.Dimension_mxJPO;
 import org.mxupdate.update.datamodel.Dimension_mxJPO.Unit;
 import org.mxupdate.update.util.AbstractParser_mxJPO;

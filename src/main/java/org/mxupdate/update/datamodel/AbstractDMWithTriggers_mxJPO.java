@@ -18,7 +18,7 @@ package org.mxupdate.update.datamodel;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;

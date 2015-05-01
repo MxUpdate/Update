@@ -32,7 +32,7 @@ import matrix.util.MatrixException;
 import matrix.util.Mime64;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
-import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;

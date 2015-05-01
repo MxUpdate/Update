@@ -27,7 +27,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.mapping.Mode_mxJPO;
 import org.mxupdate.mapping.ParameterDef_mxJPO;
 import org.mxupdate.mapping.TypeDefGroup_mxJPO;
-import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 

@@ -35,7 +35,7 @@ import matrix.util.MatrixException;
 import matrix.util.StringList;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
-import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;

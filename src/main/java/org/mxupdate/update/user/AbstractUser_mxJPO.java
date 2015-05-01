@@ -24,7 +24,7 @@ import java.util.TreeMap;
 
 import matrix.util.MatrixException;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.user.workspace.Cue_mxJPO;
 import org.mxupdate.update.user.workspace.Filter_mxJPO;

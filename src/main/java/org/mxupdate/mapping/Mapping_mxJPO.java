@@ -27,6 +27,7 @@ import java.util.TreeSet;
 
 import matrix.util.MatrixException;
 
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
@@ -125,14 +126,7 @@ public class Mapping_mxJPO
      */
     private final Map<String,PropertyDef_mxJPO> propertyNames2Enum = new HashMap<String,PropertyDef_mxJPO>();
 
-    /**
-     * Maps from the name of the type definition group to the related type
-     * definition group instance.
-     *
-     * @see TypeDef_mxJPO#defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see #getTypeDef(String)
-     * @see #getTypeDefMap()
-     */
+    /** Maps from the name of the type definition group to the related type definition group instance. */
     private final Map<String,TypeDef_mxJPO> typeDefMap = new HashMap<String,TypeDef_mxJPO>();
 
     /**
@@ -141,16 +135,6 @@ public class Mapping_mxJPO
      * @see #getAllTypeDefsSorted()
      */
     private final Set<TypeDef_mxJPO> typeDefSorted = new TreeSet<TypeDef_mxJPO>();
-
-    /**
-     * Map between the JPO name and the class name used within MX for type
-     * definition.
-     *
-     * @see TypeDef_mxJPO#defineValue(ParameterCache_mxJPO, Mapping_mxJPO, String, String)
-     * @see TypeDef_mxJPO#defineJPOClass(ParameterCache_mxJPO, Mapping_mxJPO, String)
-     * @see #getTypeDefJPOsMap()
-     */
-    private final Map<String,String> typeDefJPOsMap = new HashMap<String,String>();
 
     /**
      * Maps from the name of the type definition group to the related type
@@ -219,7 +203,7 @@ public class Mapping_mxJPO
         } else if (_key.startsWith(Mapping_mxJPO.PREFIX_PROPERTYDEF))  {
             PropertyDef_mxJPO.defineValue(this, _key.substring(Mapping_mxJPO.LENGTH_PROPERTYDEF), _value);
         } else if (_key.startsWith("TypeDef."))  {
-            TypeDef_mxJPO.defineValue(_paramCache, this, _key.substring(8), _value);
+            TypeDef_mxJPO.defineValue(_paramCache, this.typeDefMap, _key.substring(8), _value);
         } else if (_key.startsWith("TypeDefGroup."))  {
             TypeDefGroup_mxJPO.defineValue(this, _key.substring(13), _value);
         } else if (_key.startsWith("TypeDefTree."))  {
@@ -360,32 +344,6 @@ public class Mapping_mxJPO
     public Collection<TypeDef_mxJPO> getAllTypeDefsSorted()
     {
         return this.typeDefSorted;
-    }
-
-    /**
-     * Returns the mapping between the type definition name and the related
-     * type definition instance.
-     *
-     * @return mapping between type definition name and the related type
-     *         definition instance
-     * @see #typeDefMap
-     */
-    protected Map<String,TypeDef_mxJPO> getTypeDefMap()
-    {
-        return this.typeDefMap;
-    }
-
-    /**
-     * Returns the mapping of JPOs between names used within MX and the related
-     * Java class name for type definition classes.
-     *
-     * @return mapping between type name and the related type definition
-     *         instance
-     * @see #typeDefJPOsMap
-     */
-    protected Map<String,String> getTypeDefJPOsMap()
-    {
-        return this.typeDefJPOsMap;
     }
 
     /**

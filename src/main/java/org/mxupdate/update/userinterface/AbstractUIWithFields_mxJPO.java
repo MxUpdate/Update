@@ -24,7 +24,7 @@ import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.userinterface.Form_mxJPO.Field;
 import org.mxupdate.update.userinterface.Table_mxJPO.Column;

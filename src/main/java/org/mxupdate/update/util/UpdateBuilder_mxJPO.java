@@ -18,7 +18,7 @@ package org.mxupdate.update.util;
 import java.text.MessageFormat;
 import java.util.Collection;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 
 /**

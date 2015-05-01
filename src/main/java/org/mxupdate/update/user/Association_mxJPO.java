@@ -21,7 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
-import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;

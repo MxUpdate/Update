@@ -17,7 +17,7 @@ package org.mxupdate.update.program;
 
 import matrix.util.MatrixException;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 

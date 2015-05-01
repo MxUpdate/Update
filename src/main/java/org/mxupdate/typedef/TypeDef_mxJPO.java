@@ -13,22 +13,26 @@
  *
  */
 
-package org.mxupdate.mapping;
+package org.mxupdate.typedef;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 
 import matrix.util.MatrixException;
 
-import org.mxupdate.action.mxnames.IFetchMxNames_mxJPO;
+import org.mxupdate.mapping.AbstractValue_mxJPO;
+import org.mxupdate.mapping.Mapping_mxJPO;
+import org.mxupdate.typedef.mxnames.IFetchMxNames_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
-import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
 
 /**
  * Enumeration for administration type definitions.
@@ -36,16 +40,9 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  * @author The MxUpdate Team
  */
 public final class TypeDef_mxJPO
-        extends AbstractValue_mxJPO
-        implements Comparable<TypeDef_mxJPO>
+    extends AbstractValue_mxJPO
+    implements Comparable<TypeDef_mxJPO>
 {
-    /**
-     * MQL command to list all MxUpdate JPOs.
-     *
-     * @see #defineJPOClass(ParameterCache_mxJPO, Mapping_mxJPO, String)
-     */
-    private static final String MQL_LISTPROG = "list prog org.mxupdate.* select name classname dump '\t'";
-
     /** Defines the name of the admin type. */
     private String adminType;
     /** Defines the suffix of the admin type. */
@@ -103,7 +100,7 @@ public final class TypeDef_mxJPO
      * Defines the values of the type definition.
      *
      * @param _paramCache   parameter cache
-     * @param _mapping      cache for all mapping
+     * @param _typeDefMap   type definition map
      * @param _key          key of the type definition (including the name of
      *                      type definition and the kind of the type definition
      *                      separated by a point)
@@ -114,19 +111,19 @@ public final class TypeDef_mxJPO
      * @see #defineJPOClass(ParameterCache_mxJPO, Mapping_mxJPO, String)
      */
     @SuppressWarnings("unchecked")
-    protected static void defineValue(final ParameterCache_mxJPO _paramCache,
-                                      final Mapping_mxJPO _mapping,
-                                      final String _key,
-                                      final String _value)
-            throws Exception
+    public static void defineValue(final ParameterCache_mxJPO _paramCache,
+                                   final Map<String,TypeDef_mxJPO> _typeDefMap,
+                                   final String _key,
+                                   final String _value)
+        throws Exception
     {
         final String enumName = _key.replaceAll("\\..*", "");
         final String key = _key.substring(enumName.length() + 1);
 
-        TypeDef_mxJPO typeDef = _mapping.getTypeDefMap().get(enumName);
+        TypeDef_mxJPO typeDef = _typeDefMap.get(enumName);
         if (typeDef == null)  {
             typeDef = new TypeDef_mxJPO(enumName);
-            _mapping.getTypeDefMap().put(enumName, typeDef);
+            _typeDefMap.put(enumName, typeDef);
         }
 
         Prefix prefix;
@@ -162,8 +159,8 @@ public final class TypeDef_mxJPO
 
                 case Icon:                  typeDef.iconPath = _value;break;
 
-                case JPO:                   typeDef.jpoClass        = (Class<? extends AbstractObject_mxJPO>) TypeDef_mxJPO.fetchJPOClass(_paramCache, _mapping, _value);break;
-                case JpoFetchMxNames:       typeDef.jpoFetchMxNames = (Class<? extends IFetchMxNames_mxJPO>) TypeDef_mxJPO.fetchJPOClass(_paramCache, _mapping, _value);break;
+                case JPO:                   typeDef.jpoClass        = (Class<? extends AbstractObject_mxJPO>) TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
+                case JpoFetchMxNames:       typeDef.jpoFetchMxNames = (Class<? extends IFetchMxNames_mxJPO>) TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
 
                 case OrderNo:               typeDef.orderNo = Integer.parseInt(_value);break;
 
@@ -178,7 +175,6 @@ public final class TypeDef_mxJPO
      * Defines the class for given JPO name.
      *
      * @param _paramCache   parameter cache
-     * @param _mapping      cache mapping
      * @param _jpoName      name of searched JPO
      * @throws Exception if the list of MxUdpate JPOs could not evaluated or
      *                   if the related class could not be found
@@ -186,20 +182,29 @@ public final class TypeDef_mxJPO
      * @see #jpoClass
      */
     private static Class<?> fetchJPOClass(final ParameterCache_mxJPO _paramCache,
-                                          final Mapping_mxJPO _mapping,
                                           final String _jpoName)
         throws Exception
     {
-        if (_mapping.getTypeDefJPOsMap().isEmpty())  {
-            final String tmp = MqlUtil_mxJPO.execMql(_paramCache, TypeDef_mxJPO.MQL_LISTPROG);
+        @SuppressWarnings("unchecked")
+        Map<String,String> jpos = (Map<String,String>) _paramCache.getCache(CacheKey.TypeDefJPOs);
+
+        if (jpos == null)  {
+            jpos = new HashMap<String,String>();
+            _paramCache.setCache(CacheKey.TypeDefJPOs, jpos);
+
+            final String tmp = MqlBuilder_mxJPO.mql()
+                    .cmd("escape list program ").arg("org.mxupdate.*")
+                    .cmd(" select ").arg("name").cmd(" ").arg("classname")
+                    .cmd(" dump ").arg("\t").exec(_paramCache);
+
             for (final String line : tmp.split("\n"))  {
                 final String[] arr = line.split("\t");
                 if (arr.length > 1)  {
-                    _mapping.getTypeDefJPOsMap().put(arr[0], arr[1]);
+                    jpos.put(arr[0], arr[1]);
                 }
             }
         }
-        final String jpoClassName = _mapping.getTypeDefJPOsMap().get(_jpoName);
+        final String jpoClassName = jpos.get(_jpoName);
         if (jpoClassName == null)  {
             throw new Exception("unknown jpo class definition for " + _jpoName);
         }

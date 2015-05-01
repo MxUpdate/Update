@@ -42,7 +42,7 @@ import matrix.util.MatrixException;
 import matrix.util.StringList;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
-import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.CompareToUtil_mxJPO;
 import org.mxupdate.update.util.FileHandlingUtil_mxJPO;

@@ -25,7 +25,7 @@ import java.util.TreeSet;
 
 import matrix.util.MatrixException;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.CompareToUtil_mxJPO;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;

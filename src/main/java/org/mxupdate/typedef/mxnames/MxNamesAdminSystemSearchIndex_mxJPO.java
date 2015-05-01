@@ -13,12 +13,12 @@
  *
  */
 
-package org.mxupdate.action.mxnames;
+package org.mxupdate.typedef.mxnames;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**

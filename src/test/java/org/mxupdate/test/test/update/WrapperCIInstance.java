@@ -19,8 +19,8 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.test.data.AbstractData;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractPropertyObject_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;

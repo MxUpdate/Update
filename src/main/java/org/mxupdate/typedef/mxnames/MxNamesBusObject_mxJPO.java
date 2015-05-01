@@ -13,7 +13,7 @@
  *
  */
 
-package org.mxupdate.action.mxnames;
+package org.mxupdate.typedef.mxnames;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -24,7 +24,7 @@ import matrix.db.Query;
 import matrix.util.MatrixException;
 import matrix.util.StringList;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 

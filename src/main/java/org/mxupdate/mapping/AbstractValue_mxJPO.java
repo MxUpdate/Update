@@ -22,7 +22,7 @@ import java.util.Collection;
  *
  * @author The MxUpdate Team
  */
-class AbstractValue_mxJPO
+public class AbstractValue_mxJPO
 {
     /**
      * Used parameter description within the property file.

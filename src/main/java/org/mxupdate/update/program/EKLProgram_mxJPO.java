@@ -15,7 +15,7 @@
 
 package org.mxupdate.update.program;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
 
 /**
  * The class is used to export, create, delete and update MQL programs within
