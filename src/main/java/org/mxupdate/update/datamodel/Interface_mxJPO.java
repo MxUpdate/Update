@@ -200,5 +200,7 @@ public class Interface_mxJPO
         DeltaUtil_mxJPO.calcLstOneCallDelta(_paramCache, _mql, "derived",
                 ErrorKey.DM_INTERFACE_REMOVE_PARENT, this.getName(),
                 ValueKeys.DMInterfaceParentIgnore, ValueKeys.DMInterfaceParentRemove,   this.derived,                       _current.derived);
+
+        this.getProperties().calcDelta(_mql, "", _current.getProperties());
     }
 }

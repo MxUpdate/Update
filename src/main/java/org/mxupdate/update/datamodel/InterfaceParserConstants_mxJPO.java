@@ -25,54 +25,52 @@ interface InterfaceParserConstants_mxJPO {
   /** RegularExpression Id. */
   int ATTRIBUTE = 11;
   /** RegularExpression Id. */
-  int STRING = 16;
+  int STRING = 12;
   /** RegularExpression Id. */
-  int SINGLE = 17;
+  int SINGLE = 13;
   /** RegularExpression Id. */
-  int APOSTROPHE = 18;
+  int MULTILINESTRING = 14;
   /** RegularExpression Id. */
-  int CHAR = 19;
+  int MULTILINESINGLE = 15;
   /** RegularExpression Id. */
-  int FOR = 20;
+  int FOR = 16;
   /** RegularExpression Id. */
-  int FOR_RELATIONSHIP_ALL = 25;
+  int FOR_RELATIONSHIP_ALL = 17;
   /** RegularExpression Id. */
-  int FOR_RELATIONSHIP = 26;
+  int FOR_RELATIONSHIP = 18;
   /** RegularExpression Id. */
-  int FOR_TYPE_ALL = 27;
+  int FOR_TYPE_ALL = 19;
   /** RegularExpression Id. */
-  int FOR_TYPE = 28;
+  int FOR_TYPE = 20;
   /** RegularExpression Id. */
-  int PROPERTY = 29;
+  int PROPERTY = 21;
   /** RegularExpression Id. */
-  int PROPERTYTO = 30;
+  int PROPERTYTO = 22;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 31;
+  int PROPERTYVAL = 23;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 36;
+  int ADMINTYPE_STRING = 24;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 37;
-  /** RegularExpression Id. */
-  int ADMINTYPE_APOSTROPHE = 38;
-  /** RegularExpression Id. */
-  int ADMINTYPE_CHAR = 39;
+  int ADMINTYPE_SINGLE = 25;
 
   /** Lexical state. */
-  int DEFAULT = 0;
+  int ADMINREF_EXPECTED = 0;
   /** Lexical state. */
-  int STRING_EXPECTED = 1;
+  int FOR_EXPECTED = 1;
   /** Lexical state. */
-  int FOR_EXPECTED = 2;
+  int MULTILINESTRING_EXPECTED = 2;
   /** Lexical state. */
-  int ADMINREF_EXPECTED = 3;
+  int STRING_EXPECTED = 3;
+  /** Lexical state. */
+  int DEFAULT = 4;
 
   /** Literal token values. */
   String[] tokenImage = {
     "<EOF>",
     "\" \"",
-    "\"\\r\"",
     "\"\\t\"",
     "\"\\n\"",
+    "<token of kind 4>",
     "\"description\"",
     "\"abstract\"",
     "\"!abstract\"",
@@ -80,19 +78,11 @@ interface InterfaceParserConstants_mxJPO {
     "\"hidden\"",
     "\"!hidden\"",
     "\"attribute\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<STRING>",
     "<SINGLE>",
-    "\"\\\"\"",
-    "<CHAR>",
+    "<MULTILINESTRING>",
+    "<MULTILINESINGLE>",
     "\"for\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<FOR_RELATIONSHIP_ALL>",
     "\"relationship\"",
     "<FOR_TYPE_ALL>",
@@ -100,14 +90,8 @@ interface InterfaceParserConstants_mxJPO {
     "\"property\"",
     "\"to\"",
     "\"value\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<ADMINTYPE_STRING>",
     "<ADMINTYPE_SINGLE>",
-    "\"\\\"\"",
-    "<ADMINTYPE_CHAR>",
   };
 
 }

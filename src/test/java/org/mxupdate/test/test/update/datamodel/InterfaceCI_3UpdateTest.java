@@ -13,7 +13,7 @@
  *
  */
 
-package org.mxupdate.test.ci.datamodel;
+package org.mxupdate.test.test.update.datamodel;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,27 +26,23 @@ import org.mxupdate.test.data.datamodel.RelationshipData;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.util.IssueLink;
+import org.mxupdate.update.datamodel.Interface_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Class is used to test interface exports.
+ * Tests the {@link Interface_mxJPO interface CI} export / update.
  *
  * @author The MxUpdate Team
  */
-public class InterfaceTest
+public class InterfaceCI_3UpdateTest
     extends AbstractDataExportUpdate<InterfaceData>
 {
-    @Override()
-    protected InterfaceData createNewData(final String _name)
-    {
-        return new InterfaceData(this, _name);
-    }
-
     /**
      * Data provider for test interfaces.
      *
@@ -103,22 +99,6 @@ public class InterfaceTest
     }
 
     /**
-     * Removes the MxUpdate attributes, interfaces, types and relationships.
-     *
-     * @throws Exception if MQL execution failed
-     */
-    @BeforeMethod()
-//    @AfterClass(groups = "close")
-    public void cleanup()
-        throws Exception
-    {
-        this.cleanup(CI.DM_ATTRIBUTE_STRING);
-        this.cleanup(CI.DM_INTERFACE);
-        this.cleanup(CI.DM_TYPE);
-        this.cleanup(CI.DM_RELATIONSHIP);
-    }
-
-    /**
      * Positive test with one attribute.
      *
      * @throws Exception if test failed
@@ -128,7 +108,7 @@ public class InterfaceTest
         throws Exception
     {
         this.createNewData("Test")
-                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
                 .create()
                 .checkExport()
                 .update("")
@@ -145,9 +125,9 @@ public class InterfaceTest
         throws Exception
     {
         this.createNewData("Test")
-                .addAttribute(new AttributeStringData(this, "Test Attribute 1"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute 1"))
                 .create()
-                .addAttribute(new AttributeStringData(this, "Test Attribute 2"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute 2"))
                 .createDependings()
                 .update("")
                 .checkExport();
@@ -163,7 +143,7 @@ public class InterfaceTest
         throws Exception
     {
         this.createNewData("Test")
-                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
                 .create();
         this.createNewData("Test")
                 .failureUpdate(UpdateException_mxJPO.ErrorKey.DM_INTERFACE_REMOVE_ATTRIBUTE);
@@ -179,12 +159,12 @@ public class InterfaceTest
         throws Exception
     {
         this.createNewData("Test")
-                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
                 .create();
         this.createNewData("Test")
                 .update("", ValueKeys.DMInterfaceAttrIgnore.name(), "*");
         this.createNewData("Test")
-                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
                 .checkExport();
     }
 
@@ -198,7 +178,7 @@ public class InterfaceTest
         throws Exception
     {
         this.createNewData("Test")
-                .addAttribute(new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
                 .create();
         this.createNewData("Test")
                 .update("", ValueKeys.DMInterfaceAttrRemove.name(), "*")
@@ -215,7 +195,7 @@ public class InterfaceTest
         throws Exception
     {
         this.createNewData("Test")
-                .addParent(new InterfaceData(this, "Test Parent"))
+                .defData("derived", new InterfaceData(this, "Test Parent"))
                 .create()
                 .checkExport()
                 .update("")
@@ -232,9 +212,9 @@ public class InterfaceTest
         throws Exception
     {
         this.createNewData("Test")
-                .addParent(new InterfaceData(this, "Test Parent 1"))
+                .defData("derived", new InterfaceData(this, "Test Parent 1"))
                 .create()
-                .addParent(new InterfaceData(this, "Test Parent 2"))
+                .defData("derived", new InterfaceData(this, "Test Parent 2"))
                 .createDependings()
                 .update("")
                 .checkExport();
@@ -250,7 +230,7 @@ public class InterfaceTest
         throws Exception
     {
         this.createNewData("Test")
-                .addParent(new InterfaceData(this, "TestParent"))
+                .defData("derived", new InterfaceData(this, "TestParent"))
                 .create();
         this.createNewData("Test")
                 .failureUpdate(UpdateException_mxJPO.ErrorKey.DM_INTERFACE_REMOVE_PARENT);
@@ -266,12 +246,12 @@ public class InterfaceTest
         throws Exception
     {
         this.createNewData("Test")
-                .addParent(new InterfaceData(this, "TestParent"))
+                .defData("derived", new InterfaceData(this, "TestParent"))
                 .create();
         this.createNewData("Test")
                 .update("", ValueKeys.DMInterfaceParentIgnore.name(), "*");
         this.createNewData("Test")
-                .addParent(new InterfaceData(this, "TestParent"))
+                .defData("derived", new InterfaceData(this, "TestParent"))
                 .checkExport();
     }
 
@@ -285,11 +265,11 @@ public class InterfaceTest
         throws Exception
     {
         this.createNewData("Test")
-                .addParent(new InterfaceData(this, "TestParent1"))
-                .addParent(new InterfaceData(this, "TestParent2"))
+                .defData("derived", new InterfaceData(this, "TestParent1"))
+                .defData("derived", new InterfaceData(this, "TestParent2"))
                 .create();
         this.createNewData("Test")
-                .addParent(new InterfaceData(this, "TestParent1"))
+                .defData("derived", new InterfaceData(this, "TestParent1"))
                 .update("", ValueKeys.DMInterfaceParentRemove.name(), "*")
                 .checkExport();
     }
@@ -304,7 +284,7 @@ public class InterfaceTest
         throws Exception
     {
         this.createNewData("Test")
-                .addParent(new InterfaceData(this, "TestParent"))
+                .defData("derived", new InterfaceData(this, "TestParent"))
                 .create();
         this.createNewData("Test")
                 .update("", ValueKeys.DMInterfaceParentRemove.name(), "*")
@@ -330,10 +310,10 @@ public class InterfaceTest
         final RelationshipData rel2 = new RelationshipData(this, "TestRel \" 2").create();
 
         final InterfaceData inter = new InterfaceData(this, "TestInterface \"")
-                .addParent(parent1)
-                .addParent(parent2)
-                .addAttribute(attr1)
-                .addAttribute(attr2)
+                .defData("derived", parent1)
+                .defData("derived", parent2)
+                .defData("attribute", attr1)
+                .defData("attribute", attr2)
                 .addType(type1)
                 .addType(type2)
                 .addRelationship(rel1)
@@ -374,5 +354,22 @@ public class InterfaceTest
                                     + AbstractTest.convertMql(inter.getName()) + "\" select relationship dump '\n'"),
                 resultRels,
                 "check that all relationships are defined");
+    }
+
+    @BeforeMethod()
+    @AfterClass(groups = "close" )
+    public void cleanup()
+        throws Exception
+    {
+        this.cleanup(CI.DM_ATTRIBUTE_STRING);
+        this.cleanup(CI.DM_INTERFACE);
+        this.cleanup(CI.DM_TYPE);
+        this.cleanup(CI.DM_RELATIONSHIP);
+    }
+
+    @Override()
+    protected InterfaceData createNewData(final String _name)
+    {
+        return new InterfaceData(this, _name);
     }
 }

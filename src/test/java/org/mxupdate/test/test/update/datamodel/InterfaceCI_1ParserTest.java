@@ -46,6 +46,9 @@ public class InterfaceCI_1ParserTest
             {"2b) description not defined",
                 "description \"\" !hidden",
                 "!hidden"},
+            {"2c) multi-line description",
+                "",
+                "description \"abc\ndef\" !hidden"},
             // abstract flag
             {"3a) not abstract",
                 "description \"\" !hidden",

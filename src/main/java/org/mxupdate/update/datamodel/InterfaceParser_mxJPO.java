@@ -49,13 +49,13 @@ class InterfaceParser_mxJPO
       case DESCRIPTION:{
         jj_consume_token(DESCRIPTION);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case STRING:{
-          tmp = jj_consume_token(STRING);
+        case MULTILINESTRING:{
+          tmp = jj_consume_token(MULTILINESTRING);
 this.setValue(_interface, "description",                       this.getString(tmp.image));
           break;
           }
-        case SINGLE:{
-          tmp = jj_consume_token(SINGLE);
+        case MULTILINESINGLE:{
+          tmp = jj_consume_token(MULTILINESINGLE);
 this.setValue(_interface, "description",                       this.getSingle(tmp.image));
           break;
           }
@@ -301,16 +301,11 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
   private int jj_gen;
   final private int[] jj_la1 = new int[14];
   static private int[] jj_la1_0;
-  static private int[] jj_la1_1;
   static {
       jj_la1_init_0();
-      jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x20100fe0,0x30000,0x30000,0x30000,0x30000,0x30000,0x1e000000,0x30000,0xc0000000,0x30000,0x0,0x30000,0xc0000000,0x20100fe0,};
-   }
-   private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x30,0x0,0x0,0x0,};
+      jj_la1_0 = new int[] {0x210fe0,0xc000,0x3000,0x3000,0x3000,0x3000,0x1e0000,0x3000,0xc00000,0x3000,0x3000000,0x3000,0xc00000,0x210fe0,};
    }
 
   /** Constructor with InputStream. */
@@ -435,7 +430,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[40];
+    boolean[] la1tokens = new boolean[26];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -446,13 +441,10 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
           if ((jj_la1_0[i] & (1<<j)) != 0) {
             la1tokens[j] = true;
           }
-          if ((jj_la1_1[i] & (1<<j)) != 0) {
-            la1tokens[32+j] = true;
-          }
         }
       }
     }
-    for (int i = 0; i < 40; i++) {
+    for (int i = 0; i < 26; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

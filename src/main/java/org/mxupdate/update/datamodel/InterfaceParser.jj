@@ -40,17 +40,14 @@ class InterfaceParser
     extends AbstractParser_mxJPO<Interface_mxJPO>
 {
 }
-PARSER_END(InterfaceParser)<DEFAULT> SKIP :
+PARSER_END(InterfaceParser)<*> SKIP :
 {
-    " "
-|   "\r"
-|   "\t"
-|   "\n"
+  " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
-<DEFAULT> TOKEN : /** first level */
+<DEFAULT> TOKEN :
 {
-      <DESCRIPTION:                         "description">                                  : STRING_EXPECTED
+      <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
     | <ABSTRACT_TRUE:                       "abstract">
     | <ABSTRACT_FALSE:                      "!abstract">
@@ -63,29 +60,25 @@ class InterfaceParser
     | <ATTRIBUTE:                           "attribute">                                    : STRING_EXPECTED
 }
 
-/************************************************************** Common String */
-<STRING_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
 
+/************************************************************** Common String */
 <STRING_EXPECTED> TOKEN :
 {
-      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "{" | "}" | " ")*<APOSTROPHE>)> : DEFAULT
-    | <SINGLE: (<CHAR>)+> : DEFAULT
-    | <#APOSTROPHE: "\"" >
-    | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
+    | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/*************************************************** Common Multi-Line-String */
+<MULTILINESTRING_EXPECTED> TOKEN :
+{
+      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
+    | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
 }
 
 /**************************************************** For Relationship / Type */
 <DEFAULT> TOKEN :
 {
       <FOR:                                 "for">                                          : FOR_EXPECTED
-}
-
-<FOR_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
 }
 
 <FOR_EXPECTED> TOKEN :
@@ -104,17 +97,10 @@ class InterfaceParser
     | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
 }
 
-<ADMINREF_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
-
 <ADMINREF_EXPECTED> TOKEN :
 {
-      <ADMINTYPE_STRING : (<ADMINTYPE_APOSTROPHE>(<ADMINTYPE_CHAR> | "\\\"" | "{" | "}" | " ")*<ADMINTYPE_APOSTROPHE>)> : STRING_EXPECTED
-    | <ADMINTYPE_SINGLE : (<ADMINTYPE_CHAR>)+> : STRING_EXPECTED
-    | <#ADMINTYPE_APOSTROPHE : "\"" >
-    | <#ADMINTYPE_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <ADMINTYPE_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
 }
 
 /**************************************************************************** */
@@ -129,8 +115,8 @@ void parse(final Interface_mxJPO _interface)
     Token tmp;
     AdminProperty property;
 } {
-    (   ( <DESCRIPTION>             ( tmp = <STRING>                        {this.setValue(_interface, "description",                       this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_interface, "description",                       this.getSingle(tmp.image));} ) )
+    (   ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_interface, "description",                       this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>               {this.setValue(_interface, "description",                       this.getSingle(tmp.image));} ) )
 
       | ( <ABSTRACT_TRUE>                                                   {this.setValue(_interface, "abstractFlag",                      true);} )
       | ( <ABSTRACT_FALSE>                                                  {this.setValue(_interface, "abstractFlag",                      false);} )

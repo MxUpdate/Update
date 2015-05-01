@@ -15,8 +15,6 @@
 
 package org.mxupdate.test.data.datamodel;
 
-import java.util.Arrays;
-
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
@@ -33,12 +31,6 @@ import org.mxupdate.test.data.util.DataList;
 public class InterfaceData
     extends AbstractAdminData<InterfaceData>
 {
-    /** All parent interfaces of this interface.*/
-    private final DataList<InterfaceData> parents = new DataList<InterfaceData>("derived ","derived ", false);
-
-    /** All attributes of this data with attribute instances. */
-    private final DataList<AbstractAttributeData<?>> attributes = new DataList<AbstractAttributeData<?>>("", "", true);
-
     /** All assigned relationships / types for this interface. */
     private final DataList<AbstractDataWithTrigger<?>> fors = new DataList<AbstractDataWithTrigger<?>>("for ", "", true);
 
@@ -53,41 +45,6 @@ public class InterfaceData
                          final String _name)
     {
         super(_test, AbstractTest.CI.DM_INTERFACE, _name);
-    }
-
-    /**
-     * Assigns the <code>_parent</code> interface to this interface.
-     *
-     * @param _parents  parent interfaces to assign
-     * @return this interface data instance
-     * @see #parents
-     */
-    public InterfaceData addParent(final InterfaceData... _parents)
-    {
-        this.parents.addAll(Arrays.asList(_parents));
-        return this;
-    }
-
-    /**
-     * Assigns the {@code attributes} to this data instance.
-     *
-     * @param _attributes       attribute to assign
-     * @return this data instance
-     */
-    public InterfaceData addAttribute(final AbstractAttributeData<?>... _attributes)
-    {
-        this.attributes.addAll(Arrays.asList(_attributes));
-        return this;
-    }
-
-    /**
-     * Return all {@link #parents parent interfaces}.
-     *
-     * @return all parent interfaces
-     */
-    public DataList<InterfaceData> getParents()
-    {
-        return this.parents;
     }
 
     /**
@@ -152,10 +109,10 @@ public class InterfaceData
         this.getFlags()     .append4Update("    ", strg);
         this.getValues()    .append4Update("    ", strg);
         this.getSingles()   .append4Update("    ", strg);
-        this.attributes     .append4Update("    ", strg);
+        this.getKeyValues() .append4Update("    ", strg);
+        this.getDatas()     .append4Update("    ", strg);
         this.getProperties().append4Update("    ", strg);
         this.fors           .append4Update("    ", strg);
-        this.parents        .append4Update("    ", strg);
 
         strg.append("}");
 
@@ -182,8 +139,6 @@ public class InterfaceData
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add interface \"").append(AbstractTest.convertMql(this.getName())).append('\"');
 
-            this.parents   .append4Create(cmd);
-            this.attributes.append4Create(cmd);
             this.fors      .append4Create(cmd);
 
             this.append4Create(cmd);
@@ -208,8 +163,6 @@ public class InterfaceData
     {
         super.createDependings();
 
-        this.parents      .createDependings();
-        this.attributes   .createDependings();
         this.fors         .createDependings();
 
         return this;
@@ -225,8 +178,6 @@ public class InterfaceData
     {
         super.checkExport(_exportParser);
 
-        this.attributes  .check4Export(_exportParser, "");
         this.fors        .check4Export(_exportParser, "");
-        this.parents     .check4Export(_exportParser, "");
     }
 }
