@@ -62,7 +62,8 @@ public class UpdateBuilder_mxJPO
     public UpdateBuilder_mxJPO start(final TypeDef_mxJPO _typeDef)
     {
         this.strg.append("mxUpdate ").append(_typeDef.getMxUpdateType()).append(" \"${NAME}\" ");
-        if (_typeDef.getMxBusType() != null)  {
+        // no type definition => business object!
+        if (_typeDef.getMxAdminName() == null)  {
             this.strg.append("\"${REVISION}\" ");
         }
         this.strg.append("{\n");
