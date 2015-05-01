@@ -35,6 +35,16 @@ import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 
 /**
  * Data model type class.
+ * The handled properties are:
+ * <ul>
+ * <li>description</li>
+ * <li>{@link #kind}</li>
+ * <li>hidden flag</li>
+ * <li>{@link #abstractFlag information about is the type abstract}</li>
+ * <li>{@link #derived from information from which type this type is
+ *     derived}</li>
+ * <li>{@link #attributes}</li>
+ * <li>{@link #methods type methods}</li>
  *
  * @author The MxUpdate Team
  */
@@ -44,6 +54,7 @@ public class Type_mxJPO
     /** Set of all ignored URLs from the XML definition for types. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
+        Type_mxJPO.IGNORED_URLS.add("/attributeDefRefList");
         Type_mxJPO.IGNORED_URLS.add("/derivedFrom");
         Type_mxJPO.IGNORED_URLS.add("/derivedFrom/typeRefList");
         Type_mxJPO.IGNORED_URLS.add("/localAttributes");
@@ -68,7 +79,7 @@ public class Type_mxJPO
     private Kind kind = Kind.Basic;
 
     /** Is the type abstract? */
-    private Boolean abstractFlag;
+    private boolean abstractFlag = false;
     /** From which type is this type derived? */
     private String derived;
 
@@ -165,7 +176,7 @@ public class Type_mxJPO
                 //              tag             | default | value                              | write?
                 .string(        "description",              this.getDescription())
                 .singleIfTrue(  "kind",                     this.kind.name().toLowerCase(),     (this.kind == Kind.Composed))
-                .flagIfTrue(    "abstract",          false, this.abstractFlag,                  (this.abstractFlag != null) && this.abstractFlag)
+                .flagIfTrue(    "abstract",          false, this.abstractFlag,                  this.abstractFlag)
                 .stringIfTrue(  "derived",                  this.derived,                       (this.derived != null) && !this.derived.isEmpty())
                 .flag(          "hidden",                   false, this.isHidden())
                 .write(this.getTriggers())

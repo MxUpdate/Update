@@ -27,66 +27,64 @@ interface TypeParserConstants_mxJPO {
   /** RegularExpression Id. */
   int ATTRIBUTE = 12;
   /** RegularExpression Id. */
-  int STRING = 17;
+  int STRING = 13;
   /** RegularExpression Id. */
-  int SINGLE = 18;
+  int SINGLE = 14;
   /** RegularExpression Id. */
-  int APOSTROPHE = 19;
+  int MULTILINESTRING = 15;
   /** RegularExpression Id. */
-  int CHAR = 20;
+  int MULTILINESINGLE = 16;
   /** RegularExpression Id. */
-  int KIND = 21;
+  int KIND = 17;
   /** RegularExpression Id. */
-  int BASIC = 26;
+  int BASIC = 18;
   /** RegularExpression Id. */
-  int COMPOSED = 27;
+  int COMPOSED = 19;
   /** RegularExpression Id. */
-  int TRIGGER = 28;
+  int TRIGGER = 20;
   /** RegularExpression Id. */
-  int INPUT = 29;
+  int INPUT = 21;
   /** RegularExpression Id. */
-  int TRIGEVENT = 34;
+  int TRIGEVENT = 22;
   /** RegularExpression Id. */
-  int ACTION = 39;
+  int ACTION = 23;
   /** RegularExpression Id. */
-  int CHECK = 40;
+  int CHECK = 24;
   /** RegularExpression Id. */
-  int OVERRIDE = 41;
+  int OVERRIDE = 25;
   /** RegularExpression Id. */
-  int PROPERTY = 42;
+  int PROPERTY = 26;
   /** RegularExpression Id. */
-  int PROPERTYTO = 43;
+  int PROPERTYTO = 27;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 44;
+  int PROPERTYVAL = 28;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 49;
+  int ADMINTYPE_STRING = 29;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 50;
-  /** RegularExpression Id. */
-  int ADMINTYPE_APOSTROPHE = 51;
-  /** RegularExpression Id. */
-  int ADMINTYPE_CHAR = 52;
+  int ADMINTYPE_SINGLE = 30;
 
   /** Lexical state. */
-  int DEFAULT = 0;
+  int ADMINREF_EXPECTED = 0;
   /** Lexical state. */
-  int STRING_EXPECTED = 1;
+  int TRIGKIND_EXPECTED = 1;
   /** Lexical state. */
-  int KIND_EXPECTED = 2;
+  int TRIGEVENT_EXPECTED = 2;
   /** Lexical state. */
-  int TRIGEVENT_EXPECTED = 3;
+  int KIND_EXPECTED = 3;
   /** Lexical state. */
-  int TRIGKIND_EXPECTED = 4;
+  int MULTILINESTRING_EXPECTED = 4;
   /** Lexical state. */
-  int ADMINREF_EXPECTED = 5;
+  int STRING_EXPECTED = 5;
+  /** Lexical state. */
+  int DEFAULT = 6;
 
   /** Literal token values. */
   String[] tokenImage = {
     "<EOF>",
     "\" \"",
-    "\"\\r\"",
     "\"\\t\"",
     "\"\\n\"",
+    "<token of kind 4>",
     "\"description\"",
     "\"abstract\"",
     "\"!abstract\"",
@@ -95,46 +93,24 @@ interface TypeParserConstants_mxJPO {
     "\"!hidden\"",
     "\"method\"",
     "\"attribute\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<STRING>",
     "<SINGLE>",
-    "\"\\\"\"",
-    "<CHAR>",
+    "<MULTILINESTRING>",
+    "<MULTILINESINGLE>",
     "\"kind\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "\"basic\"",
     "\"composed\"",
     "\"trigger\"",
     "\"input\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<TRIGEVENT>",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "\"action\"",
     "\"check\"",
     "\"override\"",
     "\"property\"",
     "\"to\"",
     "\"value\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<ADMINTYPE_STRING>",
     "<ADMINTYPE_SINGLE>",
-    "\"\\\"\"",
-    "<ADMINTYPE_CHAR>",
   };
 
 }

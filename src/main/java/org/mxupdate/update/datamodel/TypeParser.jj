@@ -40,22 +40,22 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
+/**
+ * Parses the update format for {@link Type_mxJPO}.
+ */
 @SuppressWarnings("unused")
 class TypeParser
     extends AbstractParser_mxJPO<Type_mxJPO>
 {
 }
-PARSER_END(TypeParser)<DEFAULT> SKIP :
+PARSER_END(TypeParser)<*> SKIP :
 {
-    " "
-|   "\r"
-|   "\t"
-|   "\n"
+  " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
 <DEFAULT> TOKEN : /** first level */
 {
-      <DESCRIPTION:                         "description">                                  : STRING_EXPECTED
+      <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
     | <ABSTRACT_TRUE:                       "abstract">
     | <ABSTRACT_FALSE:                      "!abstract">
@@ -70,29 +70,25 @@ class TypeParser
     | <ATTRIBUTE:                           "attribute">                                    : STRING_EXPECTED
 }
 
-/************************************************************** Common String */
-<STRING_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
 
+/************************************************************** Common String */
 <STRING_EXPECTED> TOKEN :
 {
-      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "{" | "}" | " ")*<APOSTROPHE>)> : DEFAULT
-    | <SINGLE: (<CHAR>)+> : DEFAULT
-    | <#APOSTROPHE: "\"" >
-    | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
+    | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/*************************************************** Common Multi-Line-String */
+<MULTILINESTRING_EXPECTED> TOKEN :
+{
+      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
+    | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
 }
 
 /*********************************************************************** Kind */
 <DEFAULT> TOKEN :
 {
       <KIND:                                "kind">                                         : KIND_EXPECTED
-}
-
-<KIND_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
 }
 
 <KIND_EXPECTED> TOKEN :
@@ -109,22 +105,12 @@ class TypeParser
 }
 
 /** Trigger Event */
-<TRIGEVENT_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
-
 <TRIGEVENT_EXPECTED> TOKEN :
 {
       <TRIGEVENT:           (~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"])+>         : TRIGKIND_EXPECTED
 }
 
 /** Trigger Kind */
-<TRIGKIND_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
-
 <TRIGKIND_EXPECTED> TOKEN :
 {      <ACTION:                              "action">                                       : STRING_EXPECTED
     | <CHECK:                               "check">                                        : STRING_EXPECTED
@@ -139,17 +125,10 @@ class TypeParser
     | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
 }
 
-<ADMINREF_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
-
 <ADMINREF_EXPECTED> TOKEN :
 {
-      <ADMINTYPE_STRING : (<ADMINTYPE_APOSTROPHE>(<ADMINTYPE_CHAR> | "\\\"" | "{" | "}" | " ")*<ADMINTYPE_APOSTROPHE>)> : STRING_EXPECTED
-    | <ADMINTYPE_SINGLE : (<ADMINTYPE_CHAR>)+> : STRING_EXPECTED
-    | <#ADMINTYPE_APOSTROPHE : "\"" >
-    | <#ADMINTYPE_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <ADMINTYPE_STRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
 }
 
 /**************************************************************************** */
@@ -165,8 +144,8 @@ void parse(final Type_mxJPO _type)
     AdminProperty property;
     Trigger trigger;
 } {
-    (   ( <DESCRIPTION>             ( tmp = <STRING>                        {this.setValue(_type, "description",                            this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_type, "description",                            this.getSingle(tmp.image));} ) )
+    (   ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_type, "description",                            this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>               {this.setValue(_type, "description",                            this.getSingle(tmp.image));} ) )
 
       | ( <KIND>                    ( <BASIC>                               {this.setValue(_type, "kind",                                   Kind.Basic);}
                                     | <COMPOSED>                            {this.setValue(_type, "kind",                                   Kind.Composed);} ) )

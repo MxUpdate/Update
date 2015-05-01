@@ -13,7 +13,7 @@
  *
  */
 
-package org.mxupdate.test.ci.datamodel;
+package org.mxupdate.test.test.update.datamodel;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
@@ -23,6 +23,7 @@ import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.program.MQLProgramData;
 import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.util.IssueLink;
+import org.mxupdate.update.datamodel.Type_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.Assert;
@@ -32,19 +33,13 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Class is used to test type updates.
+ * Tests the {@link Type_mxJPO type CI} export / update.
  *
  * @author The MxUpdate Team
  */
-public class TypeTest
+public class TypeCI_2UpdateTest
     extends AbstractDataExportUpdate<TypeData>
 {
-    @Override()
-    protected TypeData createNewData(final String _name)
-    {
-        return new TypeData(this, _name);
-    }
-
     /**
      * Data provider for test types.
      *
@@ -92,11 +87,11 @@ public class TypeTest
                                 .addTrigger(new AbstractDataWithTrigger.TriggerCheck( "modifyattribute", new MQLProgramData(this, "Test Program 2"))) },
                 // method
                 new Object[]{
-                        "4a) issue #36: type with one MQL program as method",
+                        "5a) issue #36: type with one MQL program as method",
                         new TypeData(this, "TestType \" 1")
                                 .defData("method", new MQLProgramData(this, "Test Program"))},
                 new Object[]{
-                        "4b) issue #36: type with two MQL programs as method",
+                        "5b) issue #36: type with two MQL programs as method",
                         new TypeData(this, "TestType \" 1")
                                 .defData("method", new MQLProgramData(this, "Test Program 1"))
                                 .defData("method", new MQLProgramData(this, "Test Program 2"))}
@@ -333,6 +328,12 @@ public class TypeTest
                 .failureUpdate(ErrorKey.DM_TYPE_NOT_BASIC_KIND)
                 .setSingle("kind", "composed")
                 .checkExport();
+    }
+
+    @Override()
+    protected TypeData createNewData(final String _name)
+    {
+        return new TypeData(this, _name);
     }
 
     @BeforeMethod()

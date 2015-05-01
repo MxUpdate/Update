@@ -18,6 +18,9 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
+/**
+ * Parses the update format for {@link Type_mxJPO}.
+ */
 @SuppressWarnings("unused")
 class TypeParser_mxJPO
     extends AbstractParser_mxJPO<Type_mxJPO> implements TypeParserConstants_mxJPO {
@@ -57,13 +60,13 @@ class TypeParser_mxJPO
       case DESCRIPTION:{
         jj_consume_token(DESCRIPTION);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case STRING:{
-          tmp = jj_consume_token(STRING);
+        case MULTILINESTRING:{
+          tmp = jj_consume_token(MULTILINESTRING);
 this.setValue(_type, "description",                            this.getString(tmp.image));
           break;
           }
-        case SINGLE:{
-          tmp = jj_consume_token(SINGLE);
+        case MULTILINESINGLE:{
+          tmp = jj_consume_token(MULTILINESINGLE);
 this.setValue(_type, "description",                            this.getSingle(tmp.image));
           break;
           }
@@ -358,16 +361,11 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
   private int jj_gen;
   final private int[] jj_la1 = new int[17];
   static private int[] jj_la1_0;
-  static private int[] jj_la1_1;
   static {
       jj_la1_init_0();
-      jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x10201fe0,0x60000,0xc000000,0x60000,0x0,0x60000,0x60000,0x20000000,0x60000,0x60000,0x60000,0x0,0x60000,0x0,0x60000,0x0,0x10201fe0,};
-   }
-   private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x400,0x0,0x0,0x0,0x380,0x0,0x0,0x0,0x0,0x0,0x0,0x1800,0x0,0x60000,0x0,0x1800,0x400,};
+      jj_la1_0 = new int[] {0x4121fe0,0x18000,0xc0000,0x6000,0x3800000,0x6000,0x6000,0x200000,0x6000,0x6000,0x6000,0x18000000,0x6000,0x60000000,0x6000,0x18000000,0x4121fe0,};
    }
 
   /** Constructor with InputStream. */
@@ -492,7 +490,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[53];
+    boolean[] la1tokens = new boolean[31];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -503,13 +501,10 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
           if ((jj_la1_0[i] & (1<<j)) != 0) {
             la1tokens[j] = true;
           }
-          if ((jj_la1_1[i] & (1<<j)) != 0) {
-            la1tokens[32+j] = true;
-          }
         }
       }
     }
-    for (int i = 0; i < 53; i++) {
+    for (int i = 0; i < 31; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
