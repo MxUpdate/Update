@@ -58,66 +58,69 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
                                      final Object[]... _datas)
     {
         final List<Object[]> ret = new ArrayList<Object[]>();
-        ret.add(new Object[]{
-                _logText + " with name",
-                this.createNewData("helloBlank")});
-        ret.add(new Object[]{
-                _logText + " with escaped name",
-                this.createNewData("hello \" test")});
 
-        // rule
-        ret.add(new Object[]{
-                _logText + " with rule",
-                this.createNewData("hello")
-                        .setRule(new RuleData(this, "Rule"))});
+        if (_logText != null)  {
+            ret.add(new Object[]{
+                    _logText + " with name",
+                    this.createNewData("helloBlank")});
+            ret.add(new Object[]{
+                    _logText + " with escaped name",
+                    this.createNewData("hello \" test")});
 
-         // triggers
-        ret.add(new Object[]{
-                _logText + " with modify action trigger",
-                this.createNewData("hello \" test")
-                        .addTrigger(new TriggerAction("modify", new MQLProgramData(this, "Test \" Program")))});
-        ret.add(new Object[]{
-                _logText + " with modify check trigger",
-                this.createNewData("hello \" test")
-                        .addTrigger(new TriggerCheck("modify", new MQLProgramData(this, "Test \" Program")))});
-        ret.add(new Object[]{
-                _logText + " with modify override trigger",
-                this.createNewData("hello \" test")
-                        .addTrigger(new TriggerOverride("modify", new MQLProgramData(this, "Test \" Program")))});
-        ret.add(new Object[]{
-                _logText + " with modify action, check and override trigger",
-                this.createNewData("hello \" test")
-                        .addTrigger(new TriggerAction("modify", new MQLProgramData(this, "Test \" Program 1")))
-                        .addTrigger(new TriggerCheck("modify", new MQLProgramData(this, "Test \" Program 2")))
-                        .addTrigger(new TriggerOverride("modify", new MQLProgramData(this, "Test \" Program 3")))});
+            // rule
+            ret.add(new Object[]{
+                    _logText + " with rule",
+                    this.createNewData("hello")
+                            .setRule(new RuleData(this, "Rule"))});
 
-        // default value
-        ret.add(new Object[]{
-                _logText + " with default value",
-                this.createNewData("hello")
-                        .setValue("default", _value1)});
+             // triggers
+            ret.add(new Object[]{
+                    _logText + " with modify action trigger",
+                    this.createNewData("hello \" test")
+                            .addTrigger(new TriggerAction("modify", new MQLProgramData(this, "Test \" Program")))});
+            ret.add(new Object[]{
+                    _logText + " with modify check trigger",
+                    this.createNewData("hello \" test")
+                            .addTrigger(new TriggerCheck("modify", new MQLProgramData(this, "Test \" Program")))});
+            ret.add(new Object[]{
+                    _logText + " with modify override trigger",
+                    this.createNewData("hello \" test")
+                            .addTrigger(new TriggerOverride("modify", new MQLProgramData(this, "Test \" Program")))});
+            ret.add(new Object[]{
+                    _logText + " with modify action, check and override trigger",
+                    this.createNewData("hello \" test")
+                            .addTrigger(new TriggerAction("modify", new MQLProgramData(this, "Test \" Program 1")))
+                            .addTrigger(new TriggerCheck("modify", new MQLProgramData(this, "Test \" Program 2")))
+                            .addTrigger(new TriggerOverride("modify", new MQLProgramData(this, "Test \" Program 3")))});
 
-        // reset on ? flags
-        ret.add(new Object[]{
-                _logText + " with reset on flag true",
-                this.createNewData("hello")
-                        .setValue("default", _value1)
-                        .setFlag("resetonclone", true)});
-        ret.add(new Object[]{
-                _logText + " with reset on flag false",
-                this.createNewData("hello")
-                        .setValue("default", _value1)
-                        .setFlag("resetonclone", false)});
-        ret.add(new Object[]{
-                _logText + " with reset on revision true",
-                this.createNewData("hello")
-                        .setValue("default", _value1)
-                        .setFlag("resetonrevision", true)});
-        ret.add(new Object[]{
-                _logText + " with reset on revision false",
-                this.createNewData("hello")
-                        .setValue("default", _value1)
-                        .setFlag("resetonrevision", false)});
+            // default value
+            ret.add(new Object[]{
+                    _logText + " with default value",
+                    this.createNewData("hello")
+                            .setValue("default", _value1)});
+
+            // reset on ? flags
+            ret.add(new Object[]{
+                    _logText + " with reset on flag true",
+                    this.createNewData("hello")
+                            .setValue("default", _value1)
+                            .setFlag("resetonclone", true)});
+            ret.add(new Object[]{
+                    _logText + " with reset on flag false",
+                    this.createNewData("hello")
+                            .setValue("default", _value1)
+                            .setFlag("resetonclone", false)});
+            ret.add(new Object[]{
+                    _logText + " with reset on revision true",
+                    this.createNewData("hello")
+                            .setValue("default", _value1)
+                            .setFlag("resetonrevision", true)});
+            ret.add(new Object[]{
+                    _logText + " with reset on revision false",
+                    this.createNewData("hello")
+                            .setValue("default", _value1)
+                            .setFlag("resetonrevision", false)});
+        }
 
         ret.addAll(Arrays.asList(_datas));
 

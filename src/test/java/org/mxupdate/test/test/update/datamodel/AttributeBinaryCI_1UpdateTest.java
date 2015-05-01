@@ -13,8 +13,9 @@
  *
  */
 
-package org.mxupdate.test.ci.datamodel;
+package org.mxupdate.test.test.update.datamodel;
 
+import org.mxupdate.test.ci.datamodel.AbstractAttributeTest;
 import org.mxupdate.test.data.datamodel.AttributeBinaryData;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -25,21 +26,9 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class AttributeBinaryTest
+public class AttributeBinaryCI_1UpdateTest
     extends AbstractAttributeTest<AttributeBinaryData>
 {
-    /**
-     * Creates for given {@code _name} a new binary attribute instance.
-     *
-     * @param _name     name of the attribute instance
-     * @return attribute instance
-     */
-    @Override()
-    protected AttributeBinaryData createNewData(final String _name)
-    {
-        return new AttributeBinaryData(this, _name);
-    }
-
     /**
      * Data provider for test binary attributes.
      *
@@ -49,5 +38,21 @@ public class AttributeBinaryTest
     public Object[][] getAttributes()
     {
         return this.prepareData("binary attribute", "TRUE", "FALSE");
+    }
+
+    /**
+     * Overrides original method so that the test is not executed (because
+     * binary attributes does not support multi-value flag!).
+     */
+    @Test(enabled = false)
+    @Override()
+    public void negativeTestUpdateMultiValueFlag()
+    {
+    }
+
+    @Override()
+    protected AttributeBinaryData createNewData(final String _name)
+    {
+        return new AttributeBinaryData(this, _name);
     }
 }

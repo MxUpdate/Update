@@ -13,11 +13,12 @@
  *
  */
 
-package org.mxupdate.test.ci.datamodel;
+package org.mxupdate.test.test.update.datamodel;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.mxupdate.test.ci.datamodel.AbstractAttributeWithRangesAndMultiValuesTest;
 import org.mxupdate.test.data.datamodel.AttributeDateData;
 import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.test.util.Version;
@@ -31,21 +32,9 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class AttributeDateTest
+public class AttributeDateCI_2UpdateTest
     extends AbstractAttributeWithRangesAndMultiValuesTest<AttributeDateData>
 {
-    /**
-     * Creates for given <code>_name</code> a new date attribute instance.
-     *
-     * @param _name     name of the attribute instance
-     * @return attribute instance
-     */
-    @Override()
-    protected AttributeDateData createNewData(final String _name)
-    {
-        return new AttributeDateData(this, _name);
-    }
-
     /**
      * Data provider for test date attributes.
      *
@@ -94,5 +83,11 @@ public class AttributeDateTest
                 .checkExport()
                 .setFlag("rangevalue", false)
                 .failureUpdate(ErrorKey.ABSTRACTATTRIBUTE_UPDATE_RANGEVALUEFLAG_UPDATED);
+    }
+
+    @Override()
+    protected AttributeDateData createNewData(final String _name)
+    {
+        return new AttributeDateData(this, _name);
     }
 }

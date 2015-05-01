@@ -53,6 +53,9 @@ public class AttributeStringCI_1ParserTest
             {"2b) description not defined",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\"",
                 "!hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\""},
+            {"2c) multi-line description",
+                "",
+                "description \"abc\ndef\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\""},
             // hidden flag
             {"3a) hidden",
                 "",

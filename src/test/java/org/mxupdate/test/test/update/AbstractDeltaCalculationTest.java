@@ -146,7 +146,7 @@ public abstract class AbstractDeltaCalculationTest<DATA extends AbstractAdminObj
         public void parse(final ParameterCache_mxJPO _paramCache)
             throws Exception
         {
-            final Method write = this.data.getClass().getDeclaredMethod("parse", ParameterCache_mxJPO.class);
+            final Method write = this.evalMethod("parse", ParameterCache_mxJPO.class);
             write.setAccessible(true);
             try {
                 write.invoke(this.data, _paramCache);
@@ -160,7 +160,12 @@ public abstract class AbstractDeltaCalculationTest<DATA extends AbstractAdminObj
                               final DATA _current)
             throws Exception
         {
-            final Method write = this.data.getClass().getDeclaredMethod("calcDelta", ParameterCache_mxJPO.class, MultiLineMqlBuilder.class, this.data.getClass());
+            Method write = this.evalMethod("calcDelta", ParameterCache_mxJPO.class, MultiLineMqlBuilder.class, this.data.getClass());
+            // if not found, try with parent class as parameter
+            // (e.g. attributes works then...)
+            if (write == null)  {
+                write = this.evalMethod("calcDelta", ParameterCache_mxJPO.class, MultiLineMqlBuilder.class, this.data.getClass().getSuperclass());
+            }
             write.setAccessible(true);
             try {
                 write.invoke(this.data, _paramCache, _mql, _current);
@@ -173,7 +178,7 @@ public abstract class AbstractDeltaCalculationTest<DATA extends AbstractAdminObj
             throws Exception
         {
             final StringBuilder generated = new StringBuilder();
-            final Method write = this.data.getClass().getDeclaredMethod("write", ParameterCache_mxJPO.class, Appendable.class);
+            final Method write = this.evalMethod("write", ParameterCache_mxJPO.class, Appendable.class);
             write.setAccessible(true);
             try {
                 write.invoke(this.data, _paramCache, generated);
@@ -181,6 +186,35 @@ public abstract class AbstractDeltaCalculationTest<DATA extends AbstractAdminObj
                 write.setAccessible(false);
             }
             return generated.toString();
+        }
+
+        /**
+         * Searches for method for given parameters.
+         *
+         * @param name              name of searched method
+         * @param parameterTypes    paramter types
+         * @return found method; {@code null} if not found
+         */
+        private Method evalMethod(final String name,
+                                  final Class<?>... parameterTypes)
+        {
+            Method ret = null;
+            Class<?> clazz = this.data.getClass();
+            try  {
+                ret = clazz.getDeclaredMethod(name, parameterTypes);
+            } catch (final NoSuchMethodException e)  {
+            }
+
+            while ((ret == null) && (clazz != null))  {
+                clazz = clazz.getSuperclass();
+                if (clazz != null)  {
+                    try  {
+                        ret = clazz.getDeclaredMethod(name, parameterTypes);
+                    } catch (final NoSuchMethodException e)  {
+                    }
+                }
+            }
+            return ret;
         }
     }
 }

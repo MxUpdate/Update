@@ -53,6 +53,9 @@ public class AttributeBooleanCI_1ParserTest
             {"2b) description not defined",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\"",
                 "!hidden !multivalue !resetonclone !resetonrevision default \"\""},
+            {"2c) multi-line description",
+                "",
+                "description \"abc\ndef\" !hidden !multivalue !resetonclone !resetonrevision default \"\""},
             // hidden flag
             {"3a) hidden",
                 "",

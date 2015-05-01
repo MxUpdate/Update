@@ -79,13 +79,10 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     /** Key used for the select statement. */
     private static final String SELECT_KEY = "@@@2@@@2@@@";
 
-    /**
-     * Set of all ignored URLs from the XML definition for attributes.
-     */
+    /** Set of all ignored URLs from the XML definition for attributes. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
         // max length only valid for string attributes!
-        AbstractAttribute_mxJPO.IGNORED_URLS.add("/maxlength");
         AbstractAttribute_mxJPO.IGNORED_URLS.add("/primitiveType");
         AbstractAttribute_mxJPO.IGNORED_URLS.add("/rangeList");
         AbstractAttribute_mxJPO.IGNORED_URLS.add("/rangeProgram");
@@ -154,7 +151,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
 
     // real / integer attribute
     /** Range value flag. */
-    private Boolean rangeValue = null;
+    private boolean rangeValue = false;
     /** Stores the reference to the dimension of an attribute. */
     private String dimension = null;
 
@@ -443,7 +440,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
                 // no break, because range value is also for integer / real!
             case Date:
                 if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagRangeValue))  {
-                    if (!this.rangeValue)  {
+                    if (!current.rangeValue)  {
                         DeltaUtil_mxJPO.calcFlagDelta(_mql, "rangevalue", false, this.rangeValue, current.rangeValue);
                     } else if (!this.rangeValue)  {
                         throw new UpdateException_mxJPO(
@@ -506,7 +503,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         private final String attrTypeCreate;
         /** Holds the attribute including the &quot;,&quot; returned from the {@kind list attribute} statement.*/
         private final String attrTypeList;
-}
+    }
 
     /**
      * Class holding range values of this attribute.

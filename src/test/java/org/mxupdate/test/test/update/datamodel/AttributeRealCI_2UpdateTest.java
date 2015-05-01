@@ -13,11 +13,12 @@
  *
  */
 
-package org.mxupdate.test.ci.datamodel;
+package org.mxupdate.test.test.update.datamodel;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.mxupdate.test.ci.datamodel.AbstractAttributeWithRangesAndMultiValuesTest;
 import org.mxupdate.test.data.datamodel.AttributeRealData;
 import org.mxupdate.test.data.datamodel.DimensionData;
 import org.mxupdate.test.data.datamodel.DimensionData.UnitData;
@@ -33,21 +34,9 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class AttributeRealTest
+public class AttributeRealCI_2UpdateTest
     extends AbstractAttributeWithRangesAndMultiValuesTest<AttributeRealData>
 {
-    /**
-     * Creates for given <code>_name</code> a new real attribute instance.
-     *
-     * @param _name     name of the attribute instance
-     * @return attribute instance
-     */
-    @Override()
-    protected AttributeRealData createNewData(final String _name)
-    {
-        return new AttributeRealData(this, _name);
-    }
-
     /**
      * Data provider for test real attributes.
      *
@@ -78,11 +67,11 @@ public class AttributeRealTest
 
         // dimension
         ret.add(new Object[]{
-                "real attribute with defined rangevalue flag 'true'",
+                "real attribute with dimension",
                 this.createNewData("hello")
                         .setDimension(new DimensionData(this, "Test Dimension")
                                 .addUnit(new UnitData("unit")
-                                        .setValueWOQuots("default", "true")
+                                        .setFlag("default", true)
                                         .setValueWithQuots("description", "\"\\\\ hello")
                                         .setValueWithQuots("label", "\"\\\\ label")
                                         .setValueWOQuots("multiplier", "1.0")
@@ -122,7 +111,7 @@ public class AttributeRealTest
         new AttributeRealData(this, "test")
                 .setDimension(new DimensionData(this, "Test Dimension")
                         .addUnit(new UnitData("unit")
-                                .setValueWOQuots("default", "true")
+                                .setFlag("default", true)
                                 .setValueWithQuots("description", "\"\\\\ hello")
                                 .setValueWithQuots("label", "\"\\\\ label")
                                 .setValueWOQuots("multiplier", "1.0")
@@ -132,5 +121,11 @@ public class AttributeRealTest
                 .checkExport()
                 .setDimension((DimensionData) null)
                 .failureUpdate(ErrorKey.ABSTRACTATTRIBUTE_UPDATE_DIMENSION_UPDATED);
+    }
+
+    @Override()
+    protected AttributeRealData createNewData(final String _name)
+    {
+        return new AttributeRealData(this, _name);
     }
 }

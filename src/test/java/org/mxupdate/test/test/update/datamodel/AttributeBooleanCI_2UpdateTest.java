@@ -13,8 +13,9 @@
  *
  */
 
-package org.mxupdate.test.ci.datamodel;
+package org.mxupdate.test.test.update.datamodel;
 
+import org.mxupdate.test.ci.datamodel.AbstractAttributeWithRangesAndMultiValuesTest;
 import org.mxupdate.test.data.datamodel.AttributeBooleanData;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -25,15 +26,9 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class AttributeBooleanTest
+public class AttributeBooleanCI_2UpdateTest
     extends AbstractAttributeWithRangesAndMultiValuesTest<AttributeBooleanData>
 {
-    /**
-     * Creates for given <code>_name</code> a new boolean attribute instance.
-     *
-     * @param _name     name of the attribute instance
-     * @return attribute instance
-     */
     @Override()
     protected AttributeBooleanData createNewData(final String _name)
     {

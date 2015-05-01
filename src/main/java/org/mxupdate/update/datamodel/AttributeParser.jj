@@ -47,18 +47,15 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 class AttributeParser
     extends AbstractParser_mxJPO<AbstractAttribute_mxJPO<?>>
 {
-}PARSER_END(AttributeParser)SKIP :
+}PARSER_END(AttributeParser)<*> SKIP :
 {
-    " "
-|   "\r"
-|   "\t"
-|   "\n"
+  " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
 TOKEN : /** first level */
 {
-      <DESCRIPTION:             "description">      : STRING_EXPECTED
-    | <DEFAULTVALUE:            "default">          : STRING_EXPECTED
+      <DESCRIPTION:             "description">                              : MULTILINESTRING_EXPECTED
+    | <DEFAULTVALUE:            "default">                                  : MULTILINESTRING_EXPECTED
     | <HIDDEN_TRUE:             "hidden">
     | <HIDDEN_FALSE:            "!hidden">
     | <MULTIVALUE_TRUE:         "multivalue">
@@ -71,32 +68,27 @@ TOKEN : /** first level */
     | <RANGEVALUE_FALSE:        "!rangevalue">
     | <MULTILINE_TRUE:          "multiline">
     | <MULTILINE_FALSE:         "!multiline">
-    | <MAXLENGTH:               "maxlength">        : MAXLENGTH_EXPECTED
-    | <RULE:                    "rule">             : STRING_EXPECTED
-    | <DIMENSION:               "dimension">        : STRING_EXPECTED
+    | <MAXLENGTH:               "maxlength">                                : MAXLENGTH_EXPECTED
+    | <RULE:                    "rule">                                     : STRING_EXPECTED
+    | <DIMENSION:               "dimension">                                : STRING_EXPECTED
     | <INPUT:                   "input">                                    : STRING_EXPECTED
 }
 
 /************************************************************** Common String */
-<STRING_EXPECTED> SKIP :
-{
-  " " | "\t" | "\n" | "\r"
-}
-
 <STRING_EXPECTED> TOKEN :
 {
-      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "{" | "}" | " " | "\n")*<APOSTROPHE>)> : DEFAULT
-    | <SINGLE: (<CHAR>)+> : DEFAULT
-    | <#APOSTROPHE: "\"" >
-    | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
+    | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/*************************************************** Common Multi-Line-String */
+<MULTILINESTRING_EXPECTED> TOKEN :
+{
+      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
+    | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
 }
 
 /****************************************************** Integer for Max Value */
-<MAXLENGTH_EXPECTED> SKIP :
-{
-  " " | "\t" | "\n" | "\r"
-}
-
 <MAXLENGTH_EXPECTED> TOKEN :
 {
       <MAXLENGTH_NUMBER : (["\u0030"-"\u0039"])+> : DEFAULT
@@ -109,22 +101,12 @@ TOKEN : /** first level */
 }
 
 /** Trigger Event */
-<TRIGEVENT_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
-
 <TRIGEVENT_EXPECTED> TOKEN :
 {
       <TRIGEVENT:           (~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"])+>         : TRIGKIND_EXPECTED
 }
 
 /** Trigger Kind */
-<TRIGKIND_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
-
 <TRIGKIND_EXPECTED> TOKEN :
 {
       <ACTION:                              "action">                                       : STRING_EXPECTED
@@ -135,24 +117,20 @@ TOKEN : /** first level */
 /********************************************************************* Ranges */
 
 <DEFAULT> TOKEN:
-{      <RANGE_EQUAL:             "range" ([" ","\t","\n","\r"])+ "=">        : STRING_EXPECTED
-    | <RANGE_GREATERTHAN:       "range" ([" ","\t","\n","\r"])+ ">">        : STRING_EXPECTED
-    | <RANGE_GREATERTHANEQUAL:  "range" ([" ","\t","\n","\r"])+ ">=">       : STRING_EXPECTED
-    | <RANGE_LESSTHAN:          "range" ([" ","\t","\n","\r"])+ "< ">       : STRING_EXPECTED
-    | <RANGE_LESSTHANEQUAL:     "range" ([" ","\t","\n","\r"])+ "<=">       : STRING_EXPECTED
-    | <RANGE_NOTEQUAL:          "range" ([" ","\t","\n","\r"])+ "!=">       : STRING_EXPECTED
-    | <RANGE_MATCH:             "range" ([" ","\t","\n","\r"])+ "match">    : STRING_EXPECTED
-    | <RANGE_NOTMATCH:          "range" ([" ","\t","\n","\r"])+ "!match">   : STRING_EXPECTED
-    | <RANGE_SMATCH:            "range" ([" ","\t","\n","\r"])+ "smatch">   : STRING_EXPECTED
-    | <RANGE_NOTSMATCH:         "range" ([" ","\t","\n","\r"])+ "!smatch">  : STRING_EXPECTED
-    | <RANGE_PROGRAM:           "range" ([" ","\t","\n","\r"])+ "program">  : STRING_EXPECTED
-    | <RANGE_BETWEEN:           "range" ([" ","\t","\n","\r"])+ "between">  : BETW1_EXPECTED
+{      <RANGE_EQUAL:                         "range" ([" ","\t","\n","\r"])+ "=">            : STRING_EXPECTED
+    | <RANGE_GREATERTHAN:                   "range" ([" ","\t","\n","\r"])+ ">">            : STRING_EXPECTED
+    | <RANGE_GREATERTHANEQUAL:              "range" ([" ","\t","\n","\r"])+ ">=">           : STRING_EXPECTED
+    | <RANGE_LESSTHAN:                      "range" ([" ","\t","\n","\r"])+ "< ">           : STRING_EXPECTED
+    | <RANGE_LESSTHANEQUAL:                 "range" ([" ","\t","\n","\r"])+ "<=">           : STRING_EXPECTED
+    | <RANGE_NOTEQUAL:                      "range" ([" ","\t","\n","\r"])+ "!=">           : STRING_EXPECTED
+    | <RANGE_MATCH:                         "range" ([" ","\t","\n","\r"])+ "match">        : STRING_EXPECTED
+    | <RANGE_NOTMATCH:                      "range" ([" ","\t","\n","\r"])+ "!match">       : STRING_EXPECTED
+    | <RANGE_SMATCH:                        "range" ([" ","\t","\n","\r"])+ "smatch">       : STRING_EXPECTED
+    | <RANGE_NOTSMATCH:                     "range" ([" ","\t","\n","\r"])+ "!smatch">      : STRING_EXPECTED
+    | <RANGE_PROGRAM:                       "range" ([" ","\t","\n","\r"])+ "program">      : STRING_EXPECTED
+    | <RANGE_BETWEEN:                       "range" ([" ","\t","\n","\r"])+ "between">      : BETW1_EXPECTED
 }
 
-<BETW1_EXPECTED> SKIP :
-{
-  " " | "\t" | "\n" | "\r"
-}
 <BETW1_EXPECTED> TOKEN :
 {
       <BETW1_STRING: (<BETW1_APOSTROPHE>(<BETW1_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<BETW1_APOSTROPHE>)> : BETW2_EXPECTED
@@ -161,20 +139,12 @@ TOKEN : /** first level */
     | <#BETW1_CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
 }
 
-<BETW2_EXPECTED> SKIP :
-{
-  " " | "\t" | "\n" | "\r"
-}
 <BETW2_EXPECTED> TOKEN :
 {
       <BETW2_INCLUSIVE: "inclusive"> : BETW3_EXPECTED
     | <BETW2_EXCLUSIVE: "exclusive"> : BETW3_EXPECTED
 }
 
-<BETW3_EXPECTED> SKIP :
-{
-  " " | "\t" | "\n" | "\r"
-}
 <BETW3_EXPECTED> TOKEN :
 {
       <BETW3_STRING: (<BETW3_APOSTROPHE>(<BETW3_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<BETW3_APOSTROPHE>)> : BETW4_EXPECTED
@@ -183,37 +153,27 @@ TOKEN : /** first level */
     | <#BETW3_CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
 }
 
-<BETW4_EXPECTED> SKIP :
-{
-  " " | "\t" | "\n" | "\r"
-}
 <BETW4_EXPECTED> TOKEN :
 {
       <BETW4_INCLUSIVE: "inclusive"> : DEFAULT
     | <BETW4_EXCLUSIVE: "exclusive"> : DEFAULT
 }
 
-/**************************************** Two Strings for Property Definition */
-
+/******************************************************************* Property */
 <DEFAULT> TOKEN :
-{      <PROPERTY:                "property">                                 : STRING_EXPECTED
-    | <PROPERTYTO:              "to">                                       : ADMINREF_EXPECTED
-    | <PROPERTYVAL:             "value">                                    : STRING_EXPECTED
-}
-
-<ADMINREF_EXPECTED> SKIP :
 {
-  " " | "\t" | "\n" | "\r"
+      <PROPERTY:                            "property">                                     : STRING_EXPECTED
+    | <PROPERTYTO:                          "to">                                           : ADMINREF_EXPECTED
+    | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
 }
 
 <ADMINREF_EXPECTED> TOKEN :
 {
-      <ADMINTYPE_STRING : (<ADMINTYPE_APOSTROPHE>(<ADMINTYPE_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<ADMINTYPE_APOSTROPHE>)> : STRING_EXPECTED
-    | <ADMINTYPE_SINGLE : (<ADMINTYPE_CHAR>)+> : STRING_EXPECTED
-    | <#ADMINTYPE_APOSTROPHE : "\"" >
-    | <#ADMINTYPE_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <ADMINTYPE_STRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
 }
 
+/**************************************************************************** */
 /**
  * Parses one complete attribute definition.
  *
@@ -227,10 +187,11 @@ void parse(final AbstractAttribute_mxJPO<?> _attr)
     Range range;
     AdminProperty property;
 } {
-    (   (<DESCRIPTION>              ( tmp = <STRING>                        {this.setValue(_attr, "description", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_attr, "description", this.getSingle(tmp.image));} ) )
-      | (<DEFAULTVALUE>             ( tmp = <STRING>                        {this.setValue(_attr, "defaultValue", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_attr, "defaultValue", this.getSingle(tmp.image));} ) )
+    (   (<DESCRIPTION>              ( tmp = <MULTILINESTRING>               {this.setValue(_attr, "description", this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>               {this.setValue(_attr, "description", this.getSingle(tmp.image));} ) )
+
+      | (<DEFAULTVALUE>             ( tmp = <MULTILINESTRING>               {this.setValue(_attr, "defaultValue", this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>               {this.setValue(_attr, "defaultValue", this.getSingle(tmp.image));} ) )
 
       | (<HIDDEN_TRUE>                                                      {this.setValue(_attr, "hidden", true);} )
       | (<HIDDEN_FALSE>                                                     {this.setValue(_attr, "hidden", false);} )
@@ -240,15 +201,21 @@ void parse(final AbstractAttribute_mxJPO<?> _attr)
 
       | (<RESETONCLONE_TRUE>                                                {this.setValue(_attr, "resetOnClone", true);} )
       | (<RESETONCLONE_FALSE>                                               {this.setValue(_attr, "resetOnClone", false);} )
+
       | (<RESETONREVISION_TRUE>                                             {this.setValue(_attr, "resetOnRevision", true);} )
       | (<RESETONREVISION_FALSE>                                            {this.setValue(_attr, "resetOnRevision", false);} )
+
       | (<RANGEVALUE_TRUE>                                                  {this.setValue(_attr, "rangeValue", true);} )
       | (<RANGEVALUE_FALSE>                                                 {this.setValue(_attr, "rangeValue", false);} )
+
       | (<MULTILINE_TRUE>                                                   {this.setValue(_attr, "multiline", true);} )
       | (<MULTILINE_FALSE>                                                  {this.setValue(_attr, "multiline", false);} )
+
       | (<MAXLENGTH>                ( tmp = <MAXLENGTH_NUMBER>              {this.setValue(_attr, "maxLength", this.getSingle(tmp.image));} ) )
+
       | (<RULE>                     ( tmp = <STRING>                        {this.setValue(_attr, "rules", Arrays.asList(new String[]{this.getString(tmp.image)}));}
                                     | tmp = <SINGLE>                        {this.setValue(_attr, "rules", Arrays.asList(new String[]{this.getSingle(tmp.image)}));} ) )
+
       | (<DIMENSION>                ( tmp = <STRING>                        {this.setValue(_attr, "dimension", this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.setValue(_attr, "dimension", this.getSingle(tmp.image));} ) )
 

@@ -53,6 +53,9 @@ public class AttributeIntegerCI_1ParserTest
             {"2b) description not defined",
                 "description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\"",
                 "!hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
+            {"2c) multi-line description",
+                "",
+                "description \"abc\ndef\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
             // hidden flag
             {"3a) hidden",
                 "",

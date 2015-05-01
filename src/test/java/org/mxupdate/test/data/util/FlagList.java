@@ -33,7 +33,7 @@ import org.testng.Assert;
 public class FlagList
 {
     /** All flags. */
-    private final HashMap<String,MutablePair<Boolean,Create>> flags = new HashMap<String,MutablePair<Boolean,Create>>();
+    private final Map<String,MutablePair<Boolean,Create>> flags = new HashMap<String,MutablePair<Boolean,Create>>();
 
     /**
      * Defines new flag with value.

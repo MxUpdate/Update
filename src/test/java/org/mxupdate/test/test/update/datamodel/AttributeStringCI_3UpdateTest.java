@@ -13,11 +13,12 @@
  *
  */
 
-package org.mxupdate.test.ci.datamodel;
+package org.mxupdate.test.test.update.datamodel;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.mxupdate.test.ci.datamodel.AbstractAttributeWithRangesAndMultiValuesTest;
 import org.mxupdate.test.data.datamodel.AttributeStringData;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -28,21 +29,9 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class AttributeStringTest
+public class AttributeStringCI_3UpdateTest
     extends AbstractAttributeWithRangesAndMultiValuesTest<AttributeStringData>
 {
-    /**
-     * Creates for given <code>_name</code> a new string attribute instance.
-     *
-     * @param _name     name of the attribute instance
-     * @return attribute instance
-     */
-    @Override()
-    protected AttributeStringData createNewData(final String _name)
-    {
-        return new AttributeStringData(this, _name);
-    }
-
     /**
      * Data provider for test string attributes.
      *
@@ -74,5 +63,11 @@ public class AttributeStringTest
                         .setFlag("multiline", false)});
 
         return super.prepareData("string attribute", "A \" B", "BCD", ret.toArray(new Object[ret.size()][]));
+    }
+
+    @Override()
+    protected AttributeStringData createNewData(final String _name)
+    {
+        return new AttributeStringData(this, _name);
     }
 }

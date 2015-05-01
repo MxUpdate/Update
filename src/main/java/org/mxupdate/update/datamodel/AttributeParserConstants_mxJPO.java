@@ -47,116 +47,114 @@ interface AttributeParserConstants_mxJPO {
   /** RegularExpression Id. */
   int INPUT = 22;
   /** RegularExpression Id. */
-  int STRING = 27;
+  int STRING = 23;
   /** RegularExpression Id. */
-  int SINGLE = 28;
+  int SINGLE = 24;
   /** RegularExpression Id. */
-  int APOSTROPHE = 29;
+  int MULTILINESTRING = 25;
   /** RegularExpression Id. */
-  int CHAR = 30;
+  int MULTILINESINGLE = 26;
   /** RegularExpression Id. */
-  int MAXLENGTH_NUMBER = 35;
+  int MAXLENGTH_NUMBER = 27;
   /** RegularExpression Id. */
-  int TRIGGER = 36;
+  int TRIGGER = 28;
   /** RegularExpression Id. */
-  int TRIGEVENT = 41;
+  int TRIGEVENT = 29;
   /** RegularExpression Id. */
-  int ACTION = 46;
+  int ACTION = 30;
   /** RegularExpression Id. */
-  int CHECK = 47;
+  int CHECK = 31;
   /** RegularExpression Id. */
-  int OVERRIDE = 48;
+  int OVERRIDE = 32;
   /** RegularExpression Id. */
-  int RANGE_EQUAL = 49;
+  int RANGE_EQUAL = 33;
   /** RegularExpression Id. */
-  int RANGE_GREATERTHAN = 50;
+  int RANGE_GREATERTHAN = 34;
   /** RegularExpression Id. */
-  int RANGE_GREATERTHANEQUAL = 51;
+  int RANGE_GREATERTHANEQUAL = 35;
   /** RegularExpression Id. */
-  int RANGE_LESSTHAN = 52;
+  int RANGE_LESSTHAN = 36;
   /** RegularExpression Id. */
-  int RANGE_LESSTHANEQUAL = 53;
+  int RANGE_LESSTHANEQUAL = 37;
   /** RegularExpression Id. */
-  int RANGE_NOTEQUAL = 54;
+  int RANGE_NOTEQUAL = 38;
   /** RegularExpression Id. */
-  int RANGE_MATCH = 55;
+  int RANGE_MATCH = 39;
   /** RegularExpression Id. */
-  int RANGE_NOTMATCH = 56;
+  int RANGE_NOTMATCH = 40;
   /** RegularExpression Id. */
-  int RANGE_SMATCH = 57;
+  int RANGE_SMATCH = 41;
   /** RegularExpression Id. */
-  int RANGE_NOTSMATCH = 58;
+  int RANGE_NOTSMATCH = 42;
   /** RegularExpression Id. */
-  int RANGE_PROGRAM = 59;
+  int RANGE_PROGRAM = 43;
   /** RegularExpression Id. */
-  int RANGE_BETWEEN = 60;
+  int RANGE_BETWEEN = 44;
   /** RegularExpression Id. */
-  int BETW1_STRING = 65;
+  int BETW1_STRING = 45;
   /** RegularExpression Id. */
-  int BETW1_SINGLE = 66;
+  int BETW1_SINGLE = 46;
   /** RegularExpression Id. */
-  int BETW1_APOSTROPHE = 67;
+  int BETW1_APOSTROPHE = 47;
   /** RegularExpression Id. */
-  int BETW1_CHAR = 68;
+  int BETW1_CHAR = 48;
   /** RegularExpression Id. */
-  int BETW2_INCLUSIVE = 73;
+  int BETW2_INCLUSIVE = 49;
   /** RegularExpression Id. */
-  int BETW2_EXCLUSIVE = 74;
+  int BETW2_EXCLUSIVE = 50;
   /** RegularExpression Id. */
-  int BETW3_STRING = 79;
+  int BETW3_STRING = 51;
   /** RegularExpression Id. */
-  int BETW3_SINGLE = 80;
+  int BETW3_SINGLE = 52;
   /** RegularExpression Id. */
-  int BETW3_APOSTROPHE = 81;
+  int BETW3_APOSTROPHE = 53;
   /** RegularExpression Id. */
-  int BETW3_CHAR = 82;
+  int BETW3_CHAR = 54;
   /** RegularExpression Id. */
-  int BETW4_INCLUSIVE = 87;
+  int BETW4_INCLUSIVE = 55;
   /** RegularExpression Id. */
-  int BETW4_EXCLUSIVE = 88;
+  int BETW4_EXCLUSIVE = 56;
   /** RegularExpression Id. */
-  int PROPERTY = 89;
+  int PROPERTY = 57;
   /** RegularExpression Id. */
-  int PROPERTYTO = 90;
+  int PROPERTYTO = 58;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 91;
+  int PROPERTYVAL = 59;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 96;
+  int ADMINTYPE_STRING = 60;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 97;
-  /** RegularExpression Id. */
-  int ADMINTYPE_APOSTROPHE = 98;
-  /** RegularExpression Id. */
-  int ADMINTYPE_CHAR = 99;
+  int ADMINTYPE_SINGLE = 61;
 
   /** Lexical state. */
-  int DEFAULT = 0;
+  int ADMINREF_EXPECTED = 0;
   /** Lexical state. */
-  int STRING_EXPECTED = 1;
+  int BETW4_EXPECTED = 1;
   /** Lexical state. */
-  int MAXLENGTH_EXPECTED = 2;
+  int BETW3_EXPECTED = 2;
   /** Lexical state. */
-  int TRIGEVENT_EXPECTED = 3;
+  int BETW2_EXPECTED = 3;
   /** Lexical state. */
-  int TRIGKIND_EXPECTED = 4;
+  int BETW1_EXPECTED = 4;
   /** Lexical state. */
-  int BETW1_EXPECTED = 5;
+  int TRIGKIND_EXPECTED = 5;
   /** Lexical state. */
-  int BETW2_EXPECTED = 6;
+  int TRIGEVENT_EXPECTED = 6;
   /** Lexical state. */
-  int BETW3_EXPECTED = 7;
+  int MAXLENGTH_EXPECTED = 7;
   /** Lexical state. */
-  int BETW4_EXPECTED = 8;
+  int MULTILINESTRING_EXPECTED = 8;
   /** Lexical state. */
-  int ADMINREF_EXPECTED = 9;
+  int STRING_EXPECTED = 9;
+  /** Lexical state. */
+  int DEFAULT = 10;
 
   /** Literal token values. */
   String[] tokenImage = {
     "<EOF>",
     "\" \"",
-    "\"\\r\"",
     "\"\\t\"",
     "\"\\n\"",
+    "<token of kind 4>",
     "\"description\"",
     "\"default\"",
     "\"hidden\"",
@@ -175,29 +173,13 @@ interface AttributeParserConstants_mxJPO {
     "\"rule\"",
     "\"dimension\"",
     "\"input\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<STRING>",
     "<SINGLE>",
-    "\"\\\"\"",
-    "<CHAR>",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
+    "<MULTILINESTRING>",
+    "<MULTILINESINGLE>",
     "<MAXLENGTH_NUMBER>",
     "\"trigger\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<TRIGEVENT>",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "\"action\"",
     "\"check\"",
     "\"override\"",
@@ -213,45 +195,23 @@ interface AttributeParserConstants_mxJPO {
     "<RANGE_NOTSMATCH>",
     "<RANGE_PROGRAM>",
     "<RANGE_BETWEEN>",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<BETW1_STRING>",
     "<BETW1_SINGLE>",
     "\"\\\"\"",
     "<BETW1_CHAR>",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "\"inclusive\"",
     "\"exclusive\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<BETW3_STRING>",
     "<BETW3_SINGLE>",
     "\"\\\"\"",
     "<BETW3_CHAR>",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "\"inclusive\"",
     "\"exclusive\"",
     "\"property\"",
     "\"to\"",
     "\"value\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<ADMINTYPE_STRING>",
     "<ADMINTYPE_SINGLE>",
-    "\"\\\"\"",
-    "<ADMINTYPE_CHAR>",
   };
 
 }
