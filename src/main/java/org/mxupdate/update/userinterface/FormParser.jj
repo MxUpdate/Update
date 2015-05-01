@@ -48,9 +48,11 @@ class FormParser
   " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
-<DEFAULT> TOKEN : /** first level */
+<DEFAULT> TOKEN :
 {
-      <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+
+    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
     | <HIDDEN_TRUE:                         "hidden">
     | <HIDDEN_FALSE:                        "!hidden">
@@ -137,7 +139,9 @@ void parse(final Form_mxJPO _form)
     Field field;
     Setting setting;
 } {
-    (   ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_form, "description",    this.getString(tmp.image));}
+    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_form, "symbolicNames", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_form, "symbolicNames", this.getSingle(tmp.image));} ) )
+      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_form, "description",    this.getString(tmp.image));}
                                     | tmp = <MULTILINESINGLE>               {this.setValue(_form, "description",    this.getSingle(tmp.image));} ) )
 
       | ( <HIDDEN_TRUE>                                                     {this.setValue(_form, "hidden",         true);} )

@@ -25,12 +25,14 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 /**
  * Tests the {@link Form_mxJPO form CI} delta calculator.
  *
  * @author The MxUpdate Team
  */
+@Test()
 public class FormCI_2DeltaCalculationTest
     extends AbstractDeltaCalculationTest<Form_mxJPO,FormData>
 {
@@ -39,7 +41,15 @@ public class FormCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
-            {   "",
+            {"1a) symbolic name",
+                new FormData(this, "Test"),
+                new FormData(this, "Test").setValue("symbolicname", "expression_123")},
+
+            {"1b) two symbolic name",
+                new FormData(this, "Test"),
+                new FormData(this, "Test").setValue("symbolicname", "expression_123").setValue("symbolicname", "expression_345")},
+
+            {"2) field add",
                 new FormData(this, "Form1"),
                 new FormData(this, "Form1")
                         .setValue("description", "\"\\\\ hello")
@@ -47,7 +57,7 @@ public class FormCI_2DeltaCalculationTest
                             .setValue("label", "an \"label\"")
                         .getFormTable() },
 
-            {   "",
+            {"3) two field add",
                 new FormData(this, "Form1"),
                 new FormData(this, "Form1")
                     .setValue("description", "\"\\\\ hello")
@@ -58,7 +68,7 @@ public class FormCI_2DeltaCalculationTest
                             .setValue("label", "an \"label\"")
                         .getFormTable() },
 
-            {   "",
+            {"4) field remove",
                 new FormData(this, "Form1")
                     .setValue("description", "description")
                         .newField("field")
@@ -70,7 +80,8 @@ public class FormCI_2DeltaCalculationTest
                 new FormData(this, "Form1")
                     .setValue("description", "description")},
 
-            {   "", new FormData(this, "Form1")
+            {"5) field insert",
+               new FormData(this, "Form1")
                     .setValue("description", "description")
                         .newField("field")
                             .setValue("label", "an \"label\"")
@@ -84,7 +95,8 @@ public class FormCI_2DeltaCalculationTest
                         .setValue("label", "an \"label\"")
                         .getFormTable() },
 
-            {   "", new FormData(this, "Form1")
+            {"6) field modify",
+                new FormData(this, "Form1")
                         .setValue("description", "description")
                             .newField("field")
                                 .setValue("label", "an \"label\"")

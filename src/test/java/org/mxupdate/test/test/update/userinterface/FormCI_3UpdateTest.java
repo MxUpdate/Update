@@ -13,25 +13,27 @@
  *
  */
 
-package org.mxupdate.test.ci.userinterface;
+package org.mxupdate.test.test.update.userinterface;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ci.userinterface.AbstractUITest;
 import org.mxupdate.test.data.user.RoleData;
 import org.mxupdate.test.data.userinterface.FormData;
+import org.mxupdate.update.userinterface.Form_mxJPO;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test cases for the export / update of web forms.
+ * Tests the {@link Form_mxJPO form CI} export / update.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class FormTest
+public class FormCI_3UpdateTest
     extends AbstractUITest<FormData>
 {
     /**
