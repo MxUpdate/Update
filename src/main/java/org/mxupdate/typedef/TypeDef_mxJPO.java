@@ -91,7 +91,7 @@ public final class TypeDef_mxJPO
     private String iconPath;
 
     /** JPO implementing the CI MxUpdate functionality. */
-    private Class<? extends AbstractObject_mxJPO> jpoClass;
+    private Class<? extends AbstractObject_mxJPO<?>> jpoClass;
     /** JPO implementing the export interface. */
     private Class<? extends IExport_mxJPO> jpoExport;
     /** JPO implementing the Match File Names interface. */
@@ -173,7 +173,7 @@ public final class TypeDef_mxJPO
 
                 case Icon:                  typeDef.iconPath = _value;break;
 
-                case JPO:                   typeDef.jpoClass            = (Class<? extends AbstractObject_mxJPO>)    TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
+                case JPO:                   typeDef.jpoClass            = (Class<? extends AbstractObject_mxJPO<?>>) TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
                 case JpoExport:             typeDef.jpoExport           = (Class<? extends IExport_mxJPO>)           TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
                 case JpoMatchFileNames:     typeDef.jpoMatchFileNames   = (Class<? extends IMatcherFileNames_mxJPO>) TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
                 case JpoMatchMxNames:       typeDef.jpoMatchMxNames     = (Class<? extends IMatcherMxNames_mxJPO>)   TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
@@ -506,7 +506,7 @@ public final class TypeDef_mxJPO
      *                                      {@link #jpoClass} itself throws an
      *                                      exception
      */
-    public AbstractObject_mxJPO newTypeInstance(final String _mxName)
+    public AbstractObject_mxJPO<?> newTypeInstance(final String _mxName)
             throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
         return this.jpoClass.getConstructor(TypeDef_mxJPO.class, String.class)

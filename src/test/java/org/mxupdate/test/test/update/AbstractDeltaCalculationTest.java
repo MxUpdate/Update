@@ -23,7 +23,7 @@ import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractData;
 import org.mxupdate.test.data.datamodel.PolicyData;
-import org.mxupdate.update.AbstractPropertyObject_mxJPO;
+import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -37,7 +37,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @param <DATA> class of the data
  */
-public abstract class AbstractDeltaCalculationTest<DATA extends AbstractPropertyObject_mxJPO<?>,TESTDATA extends AbstractData<?>>
+public abstract class AbstractDeltaCalculationTest<DATA extends AbstractObject_mxJPO<?>,TESTDATA extends AbstractData<?>>
     extends AbstractTest
 {
     /**

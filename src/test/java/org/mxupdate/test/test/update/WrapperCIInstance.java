@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 
 import org.mxupdate.test.data.AbstractData;
 import org.mxupdate.typedef.TypeDef_mxJPO;
-import org.mxupdate.update.AbstractPropertyObject_mxJPO;
+import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
@@ -33,7 +33,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  * @author The MxUpdate Team
  * @param <DATA> class of the CI data
  */
-public class WrapperCIInstance<DATA extends AbstractPropertyObject_mxJPO<?>>
+public class WrapperCIInstance<DATA extends AbstractObject_mxJPO<?>>
 {
     /** Data instance to wrap. */
     private final DATA data;

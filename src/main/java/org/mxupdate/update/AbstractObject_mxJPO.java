@@ -16,21 +16,27 @@
 package org.mxupdate.update;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * Abstract class from which must be derived for exporting and importing all
  * administration (business) objects.
  *
  * @author The MxUpdate Team
+ * @param <CLASS>   class derived from this class
  */
-public abstract class AbstractObject_mxJPO
+public abstract class AbstractObject_mxJPO<CLASS extends AbstractObject_mxJPO<CLASS>>
 {
     /** Defines the related type definition enumeration. */
     private final TypeDef_mxJPO typeDef;
@@ -65,16 +71,19 @@ public abstract class AbstractObject_mxJPO
     }
 
     /**
+     * Parses the given {@code _code} and updates this data instance.
      *
-     * @param _paramCache       parameter cache
-     * @param _out              appendable instance to write the TCL update
-     *                          code
-     * @throws IOException      if write of the TCL update failed
-     * @throws MatrixException  if MQL commands failed
+     * @param _code     code to parse
+     * @throws SecurityException
+     * @throws IllegalArgumentException
+     * @throws NoSuchMethodException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws ParseException
      */
-    public abstract void write(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
-            throws IOException, MatrixException;
+    public abstract void parseUpdate(final String _code)
+        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException;
 
     /**
      * Parses all information for given administration object.
@@ -86,6 +95,36 @@ public abstract class AbstractObject_mxJPO
      */
     public abstract void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, ParseException;
+
+    /**
+     * Writes the complete update code.
+     *
+     * @param _paramCache   parameter cache
+     * @param _out          writer instance
+     * @throws IOException  if the write of the TCL update to the writer
+     *                      instance failed
+     */
+    public void write(final ParameterCache_mxJPO _paramCache,
+                      final Appendable _out)
+        throws IOException
+    {
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(FileHandlingUtil_mxJPO.calcCIFileName(this.getTypeDef(), this.getName()), _paramCache);
+
+        updateBuilder.start(this.getTypeDef());
+
+        this.writeUpdate(updateBuilder);
+
+        updateBuilder.end();
+
+        _out.append(updateBuilder.toString());
+    }
+
+    /**
+     * Writes the update file content to the builder.
+     *
+     * @param _updateBuilder    update builder
+     */
+    protected abstract void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder);
 
     /**
      * Deletes administration object with given name.
@@ -121,6 +160,22 @@ public abstract class AbstractObject_mxJPO
                                         final String _code,
                                         final boolean _create)
         throws Exception;
+
+    /**
+     * Calculates the delta between given {@code _current} admin object
+     * definition and this target admin object definition and appends the MQL
+     * append commands to {@code _mql}.
+     *
+     * @param _paramCache   parameter cache
+     * @param _mql          builder to append the MQL commands
+     * @param _current      current admin object definition
+     * @throws UpdateException_mxJPO if update is not allowed (e.g. if data can
+     *                      be potentially lost)
+     */
+    protected abstract void calcDelta(final ParameterCache_mxJPO _paramCache,
+                                      final MultiLineMqlBuilder _mql,
+                                      final CLASS _current)
+        throws UpdateException_mxJPO;
 
     /**
      * Compiles this administration object. Because typically ad administration

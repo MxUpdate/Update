@@ -16,7 +16,7 @@
 package org.mxupdate.test.test.update;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.update.AbstractPropertyObject_mxJPO;
+import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
@@ -28,7 +28,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  * @param <DATA> class of the data
  */
-public abstract class AbstractParserTest<DATA extends AbstractPropertyObject_mxJPO<?>>
+public abstract class AbstractParserTest<DATA extends AbstractObject_mxJPO<?>>
     extends AbstractTest
 {
     /**

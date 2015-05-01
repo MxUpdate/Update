@@ -17,6 +17,7 @@ package org.mxupdate.update.user;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -38,15 +39,18 @@ import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  *
  * @author The MxUpdate Team
  */
 public class Person_mxJPO
-    extends AbstractObject_mxJPO
+    extends AbstractObject_mxJPO<Person_mxJPO>
 {
     /**
      * TCL procedure to update the state of a person business object.
@@ -1092,6 +1096,32 @@ public class Person_mxJPO
     @Override
     public void jpoCallExecute(final ParameterCache_mxJPO _paramCache, final String _file,
             final String _fileDate, final String _code, final boolean _create) throws Exception
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void parseUpdate(final String _code) throws SecurityException,
+            IllegalArgumentException, NoSuchMethodException,
+            InstantiationException, IllegalAccessException,
+            InvocationTargetException, ParseException
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+            final MultiLineMqlBuilder _mql, final Person_mxJPO _current)
+            throws UpdateException_mxJPO
     {
         // TODO Auto-generated method stub
 

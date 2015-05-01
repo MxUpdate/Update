@@ -62,7 +62,7 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
  * @author The MxUpdate Team
  */
 public class BusObject_mxJPO
-    extends AbstractPropertyObject_mxJPO<BusObject_mxJPO>
+    extends AbstractObject_mxJPO<BusObject_mxJPO>
 {
     /** String used to split the name and revision of administration business object. */
     public static final String SPLIT_NAME = "________";

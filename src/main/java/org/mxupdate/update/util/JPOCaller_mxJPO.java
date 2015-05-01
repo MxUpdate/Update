@@ -25,7 +25,6 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
-import org.mxupdate.update.AbstractPropertyObject_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 
@@ -178,7 +177,7 @@ public final class JPOCaller_mxJPO
                     final String name   = _args[4].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\");
                     final String revi   = _args[5].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\");
 
-                    final AbstractObject_mxJPO instance = typeDef.newTypeInstance((typeDef.getMxAdminName() != null) ? name : name + BusObject_mxJPO.SPLIT_NAME + revi);
+                    final AbstractObject_mxJPO<?> instance = typeDef.newTypeInstance((typeDef.getMxAdminName() != null) ? name : name + BusObject_mxJPO.SPLIT_NAME + revi);
 
                     instance.jpoCallExecute(
                             paramCache.clone(_context),

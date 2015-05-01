@@ -52,7 +52,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @param <CLASS> derived from this class
  */
 public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObject_mxJPO<CLASS>>
-    extends AbstractPropertyObject_mxJPO<CLASS>
+    extends AbstractObject_mxJPO<CLASS>
     implements AdminXMLExportObject_mxJPO
 {
     /**
