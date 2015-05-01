@@ -195,7 +195,7 @@ public class Dimension_mxJPO
         // write dimension description
         _out.append("mxUpdate dimension \"${NAME}\" {\n")
             .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n")
-            .append("    hidden \"").append(Boolean.toString(this.isHidden())).append("\"\n");
+            .append("    ").append(this.isHidden() ? "" : "!").append("hidden\n");
         for (final Unit unit : this.units)  {
             _out.append("    unit \"").append(StringUtil_mxJPO.convertUpdate(unit.name)).append("\" {\n");
             if (unit.defaultUnit)  {

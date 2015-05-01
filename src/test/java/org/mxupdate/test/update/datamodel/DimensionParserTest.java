@@ -68,22 +68,38 @@ public class DimensionParserTest
     {
         return new Object[][]{
                 new Object[]{
-                        "simple hidden dimension definition without units",
+                        "1) simple hidden dimension definition without units",
                         "",
-                        "description \"\" hidden \"true\""},
+                        "description \"\" hidden"},
                 new Object[]{
-                        "simple not hidden (in uppercase) dimension definition without units",
-                        "description \"\" hidden \"false\"",
+                        "2) simple not hidden dimension",
+                        "",
+                        "description \"\" !hidden"},
+                new Object[]{
+                        "3) simple not hidden dimension definition defined as value w/o apostrophe",
+                        "description \"\" !hidden",
                         "description \"\" hidden FALSE"},
                 new Object[]{
-                        "simple hidden (first character in uppercase) dimension definition without units",
-                        "description \"\" hidden \"true\"",
+                        "4) simple not hidden dimension definition defined as value with apostrophe",
+                        "description \"\" !hidden",
+                        "description \"\" hidden \"false\""},
+                new Object[]{
+                        "5) simple hidden dimension definition",
+                        "",
+                        "description \"\" hidden"},
+                new Object[]{
+                        "6) simple hidden dimension definition defined as value w/o apostrophe",
+                        "description \"\" hidden",
+                        "description \"\" hidden TRUE"},
+                new Object[]{
+                        "7) simple hidden dimension definition defined as value with apostrophe",
+                        "description \"\" hidden",
                         "description \"\" hidden \"True\""},
                 new Object[]{
-                        "complex dimension definition",
+                        "8) complex dimension definition",
                         "",
                           "description \"ein test\"\n"
-                        + "hidden \"false\"\n"
+                        + "!hidden\n"
                         + "unit \"name1\" {\n"
                         + "  default true\n"
                         + "  description \"description1\"\n"
@@ -108,10 +124,10 @@ public class DimensionParserTest
                         + "}",
                 },
                 new Object[]{
-                        "dimension with unit with negative offset",
+                        "9) dimension with unit with negative offset",
                         "",
                         "description \"ein test\"\n"
-                        + "hidden \"false\"\n"
+                        + "!hidden\n"
                         + "unit \"name1\" {\n"
                         + "  default true\n"
                         + "  description \"description1\"\n"
@@ -127,10 +143,10 @@ public class DimensionParserTest
                         + "}",
                 },
                 new Object[]{
-                        "dimension with unit with negative multiplier",
+                        "10) dimension with unit with negative multiplier",
                         "",
                         "description \"ein test\"\n"
-                        + "hidden \"false\"\n"
+                        + "!hidden\n"
                         + "unit \"name1\" {\n"
                         + "  default true\n"
                         + "  description \"description1\"\n"
@@ -146,9 +162,9 @@ public class DimensionParserTest
                         + "}",
                 },
                 new Object[]{
-                        "dimension with unit with integer number",
+                        "11) dimension with unit with integer number",
                         "description \"ein test\"\n"
-                        + "hidden \"false\"\n"
+                        + "!hidden\n"
                         + "unit \"name1\" {\n"
                         + "  default true\n"
                         + "  description \"\"\n"
@@ -157,7 +173,7 @@ public class DimensionParserTest
                         + "  offset 0.0\n"
                         + "}",
                         "description \"ein test\"\n"
-                        + "hidden \"false\"\n"
+                        + "!hidden\n"
                         + "unit \"name1\" {\n"
                         + "  default true\n"
                         + "  multiplier 1\n"
@@ -215,6 +231,6 @@ public class DimensionParserTest
             newDef.append(line.trim()).append(' ');
         }
 
-        Assert.assertEquals(oldDef.trim(), newDef.toString().trim());
+        Assert.assertEquals(newDef.toString().trim(), oldDef.trim());
     }
 }

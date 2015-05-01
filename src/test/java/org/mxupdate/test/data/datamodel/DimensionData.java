@@ -71,10 +71,9 @@ public class DimensionData
         strg.append("mxUpdate dimension \"${NAME}\" {\n")
             .append("    hidden \"").append(this.getFlags().get("hidden") != null ? this.getFlags().get("hidden") : false).append("\"\n");
 
-        // append values
         this.getValues().appendUpdate("    ", strg, "\n");
+        this.getFlags().append4CIFileValues("    ", strg, "\n");
 
-        // append state information
         for (final UnitData unit : this.units)
         {
             unit.append4CIFile(strg);
@@ -157,21 +156,6 @@ public class DimensionData
                                 "required check that minimum and maximum one " + valueName + " is defined");
         }
 
-        // check for defined values
-        this.getValues().checkExport(_exportParser);
-
-        // check for hidden flag
-        if ((this.getFlags().get("hidden") == null) || !this.getFlags().get("hidden"))  {
-            this.checkSingleValue(_exportParser,
-                                  "hidden flag (must be false)",
-                                  "hidden",
-                                   "\"false\"");
-        } else  {
-            this.checkSingleValue(_exportParser,
-                                  "hidden flag (must be true)",
-                                  "hidden",
-                                  "\"true\"");
-        }
 
         // check all units
         for (final UnitData unit : this.units)
@@ -179,7 +163,8 @@ public class DimensionData
             unit.checkExport(_exportParser);
         }
 
-        // check for properties
+        this.getValues().checkExport(_exportParser);
+        this.getFlags().checkExport(_exportParser.getRootLines().get(0), "");
         this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
     }
 

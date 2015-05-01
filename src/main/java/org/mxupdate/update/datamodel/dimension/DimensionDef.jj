@@ -46,7 +46,7 @@ public class DimensionDefParser
 }
 PARSER_END(DimensionDefParser)
 
-SKIP :
+<DEFAULT> SKIP :
 {
     " "
 |   "\r"
@@ -54,10 +54,15 @@ SKIP :
 |   "\n"
 }
 
-TOKEN : /** first level */
+<DEFAULT> TOKEN : /** first level */
 {
       <DESCRIPTION:                         "description">                                          : DESCRIPTION_EXPECTED
-    | <HIDDEN:                              "hidden">                                               : HIDDEN_EXCPECTED
+    | <HIDDEN_TRUE:                         "hidden">
+    | <HIDDEN_TRUE_VIA_VALUE:               "hidden" ([" ","\t","\n","\r"])+ ["t","T"] ["r","R"] ["u","U"] ["e","E"]>
+    | <HIDDEN_TRUE_VIA_VALUE_APOSTROPHE:    "hidden" ([" ","\t","\n","\r"])+ "\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"">
+    | <HIDDEN_FALSE:                        "!hidden">
+    | <HIDDEN_FALSE_VIA_VALUE:              "hidden" ([" ","\t","\n","\r"])+ ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"]>
+    | <HIDDEN_FALSE_VIA_VALUE_APOSTROPHE:   "hidden" ([" ","\t","\n","\r"])+ "\"" ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] "\"">
     | <UNIT:                                "unit">                                                 : UNITNAME_EXPECTED
 }
 
@@ -91,20 +96,6 @@ TOKEN : /** first level */
     | <PROPERTY_STRING_SINGLE : (<PROPERTY_STRING_CHAR>)+> : DEFAULT
     | <#PROPERTY_STRING_APOSTROPHE : "\"" >
     | <#PROPERTY_STRING_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
-}
-
-/*************************************************** Boolean for Hidden Value */
-<HIDDEN_EXCPECTED> SKIP :
-{
-  " " | "\t" | "\n" | "\r"
-}
-
-<HIDDEN_EXCPECTED> TOKEN :
-{
-      <HIDDEN_BOOLEAN_TRUE : (<HIDDEN_BOOLEAN_TRUESTR> | "\"" <HIDDEN_BOOLEAN_TRUESTR> "\"")> : DEFAULT
-    | <HIDDEN_BOOLEAN_FALSE : (<HIDDEN_BOOLEAN_FALSESTR> | "\"" <HIDDEN_BOOLEAN_FALSESTR> "\"")> : DEFAULT
-    | <#HIDDEN_BOOLEAN_TRUESTR : ["t","T"] ["r","R"] ["u","U"] ["e","E"]>
-    | <#HIDDEN_BOOLEAN_FALSESTR : ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"]>
 }
 
 /***************************************************** String for Description */
@@ -265,8 +256,12 @@ void parse(final Dimension_mxJPO _dimension)
 } {
     (   (<DESCRIPTION>  ( tmpToken = <DESCRIPTION_STRING>                       {this.setValue(_dimension, "description", this.getString(tmpToken.image));}
                         | tmpToken = <DESCRIPTION_SINGLE>                       {this.setValue(_dimension, "description", this.getSingle(tmpToken.image));} ) )
-      | (<HIDDEN>       ( <HIDDEN_BOOLEAN_TRUE>                                 {this.setValue(_dimension, "hidden", true);}
-                        | <HIDDEN_BOOLEAN_FALSE>                                {this.setValue(_dimension, "hidden", false);} ) )
+      | ( (   <HIDDEN_TRUE>
+            | <HIDDEN_TRUE_VIA_VALUE>
+            | <HIDDEN_TRUE_VIA_VALUE_APOSTROPHE> )                              {this.setValue(_dimension, "hidden", true);} )
+      | ( (   <HIDDEN_FALSE>
+            | <HIDDEN_FALSE_VIA_VALUE>
+            | <HIDDEN_FALSE_VIA_VALUE_APOSTROPHE> )                             {this.setValue(_dimension, "hidden", false);} )
       | (unit(_dimension))
       | (<PROPERTY>                                                             {tmpProp = new AdminProperty();this.appendValue(this.getValue(_dimension, "properties"), "propertiesStack", tmpProp);}
                 ( tmpToken = <PROPERTY_STRING_STRING>                           {this.setValue(tmpProp, "name", this.getString(tmpToken.image));}
