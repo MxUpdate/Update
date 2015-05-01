@@ -25,7 +25,6 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.datamodel.expression.ExpressionDefParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
@@ -74,7 +73,7 @@ public class Expression_mxJPO
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
-        new ExpressionDefParser_mxJPO(new StringReader(_code)).parse(this);
+        new ExpressionParser_mxJPO(new StringReader(_code)).parse(this);
         this.prepare();
     }
 

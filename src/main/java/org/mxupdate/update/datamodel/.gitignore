@@ -4,6 +4,9 @@
 /DimensionParser.java
 /DimensionParserConstants.java
 /DimensionParserTokenManager.java
+/ExpressionParser.java
+/ExpressionParserConstants.java
+/ExpressionParserTokenManager.java
 /InterfaceParser.java
 /InterfaceParserConstants.java
 /InterfaceParserTokenManager.java
