@@ -13,36 +13,25 @@
  *
  */
 
-package org.mxupdate.test.ci.datamodel;
+package org.mxupdate.test.test.update.datamodel;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.data.datamodel.ExpressionData;
-import org.testng.annotations.AfterMethod;
+import org.mxupdate.update.datamodel.Expression_mxJPO;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test class for expression exports and updates.
+ * Tests the {@link Expression_mxJPO expression CI} export / update.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class ExpressionTest
+public class ExpressionCI_2UpdateTest
     extends AbstractDataExportUpdate<ExpressionData>
 {
-    /**
-     * Creates for given <code>_name</code> a new expression instance.
-     *
-     * @param _name     name of the expression instance
-     * @return expression instance
-     */
-    @Override()
-    protected ExpressionData createNewData(final String _name)
-    {
-        return new ExpressionData(this, _name);
-    }
-
     /**
      * Data provider for test expressions.
      *
@@ -71,16 +60,17 @@ public class ExpressionTest
         );
     }
 
-    /**
-     * Removes the MxUpdate expression.
-     *
-     * @throws Exception if MQL execution failed
-     */
     @BeforeMethod()
-    @AfterMethod()
+    @AfterClass(groups = "close" )
     public void cleanup()
         throws Exception
     {
         this.cleanup(CI.DM_EXPRESSION);
+    }
+
+    @Override()
+    protected ExpressionData createNewData(final String _name)
+    {
+        return new ExpressionData(this, _name);
     }
 }

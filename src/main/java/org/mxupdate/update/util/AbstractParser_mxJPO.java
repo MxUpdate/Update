@@ -1163,7 +1163,7 @@ public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_
          * Replaces unprintable characters by their escaped (or unicode escaped)
          * equivalents in the given string
          */
-        protected static final String addEscapes(final String str)
+        public static final String addEscapes(final String str)
         {
             final StringBuffer retval = new StringBuffer();
             char ch;

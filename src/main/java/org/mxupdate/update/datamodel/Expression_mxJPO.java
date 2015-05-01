@@ -30,23 +30,26 @@ import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.xml.sax.SAXException;
 
 /**
  * Handles the export and the update of the expression configuration item.
+ * The handled properties are:
+ * <ul>
+ * <li>description</li>
+ * <li>hidden flag (only if hidden)</li>
+ * <li>{@link #value}</li>
+ * <li>properties</li>
+ * </ul>
  *
  * @author The MxUpdate Team
  */
 public class Expression_mxJPO
     extends AbstractAdminObject_mxJPO<Expression_mxJPO>
 {
-    /**
-     * Set of all ignored URLs from the XML definition for expressions.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     */
+    /** Set of all ignored URLs from the XML definition for expressions. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
         // to be ignored and read from method prepare because
@@ -116,14 +119,6 @@ public class Expression_mxJPO
         return parsed;
     }
 
-    /**
-     * Writes the TCL update file for this expression.
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the TCL update code could not be written to the
-     *                     writer instance
-     */
     @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)
@@ -131,15 +126,20 @@ public class Expression_mxJPO
     {
         this.writeHeader(_paramCache, _out);
 
-        _out.append("mxUpdate expression \"${NAME}\"  {\n")
-            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n");
-        if (this.isHidden())  {
-            _out.append("    ").append(this.isHidden() ? "" : "!").append("hidden\n");
-        }
-        _out.append("    value \"").append(StringUtil_mxJPO.convertUpdate(this.value)).append("\"\n");
-        this.getProperties().writeProperties(_paramCache, _out, "    ");
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
 
-        _out.append("}");
+        this.writeHeader(_paramCache, updateBuilder.getStrg());
+
+        updateBuilder
+                .start("expression")
+                //              tag             | default | value                              | write?
+                .string(        "description",              this.getDescription())
+                .flag(          "hidden",           false,  this.isHidden())
+                .string(        "value",                    this.value)
+                .properties(this.getProperties())
+                .end();
+
+        _out.append(updateBuilder.toString());
     }
 
     @Override()

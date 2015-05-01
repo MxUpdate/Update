@@ -19,72 +19,72 @@ options {
     ERROR_REPORTING = true;
     USER_TOKEN_MANAGER = false;
     GENERATE_BOILERPLATE = false;
+    SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
 }
-PARSER_BEGIN(ExpressionDefParser)
-package org.mxupdate.update.datamodel.expression;
+PARSER_BEGIN(ExpressionParser)
+package org.mxupdate.update.datamodel;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.datamodel.Expression_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
-import org.mxupdate.update.util.ParameterCache_mxJPO;
 
-public class ExpressionDefParser
+/**
+ * Parses the update format for {@link Expression_mxJPO}.
+ */
+@SuppressWarnings("unused")
+class ExpressionParser
     extends AbstractParser_mxJPO<Expression_mxJPO>
 {
 }
-PARSER_END(ExpressionDefParser)SKIP :
+PARSER_END(ExpressionParser)<*> SKIP :
 {
-    " "
-|   "\r"
-|   "\t"
-|   "\n"
+  " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
-TOKEN : /** first level */
+<DEFAULT> TOKEN :
 {
-      <DESCRIPTION:             "description">      : STRING_EXPECTED
-    | <HIDDEN_TRUE:             "hidden">
-    | <HIDDEN_FALSE:            "!hidden">
-    | <PROPERTY:                "property">         : STRING_EXPECTED
-    | <PROPERTYTO:              "to">               : ADMINREF_EXPECTED
-    | <PROPERTYVAL:             "value">            : STRING_EXPECTED
+      <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+
+    | <HIDDEN_TRUE:                         "hidden">
+    | <HIDDEN_FALSE:                        "!hidden">
+
+    | <VALUE:                               "value">                                        : STRING_EXPECTED
 }
 
 /************************************************************** Common String */
-<STRING_EXPECTED> SKIP :
-{
-  " " | "\t" | "\n" | "\r"
-}
-
 <STRING_EXPECTED> TOKEN :
 {
-      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<APOSTROPHE>)> : DEFAULT
-    | <SINGLE: (<CHAR>)+> : DEFAULT
-    | <#APOSTROPHE: "\"" >
-    | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
+    | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
 }
 
-/**************************************** Two Strings for Property Definition */
-<ADMINREF_EXPECTED> SKIP :
+/*************************************************** Common Multi-Line-String */
+<MULTILINESTRING_EXPECTED> TOKEN :
 {
-  " " | "\t" | "\n" | "\r"
+      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
+    | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/******************************************************************* Property */
+<DEFAULT> TOKEN :
+{
+      <PROPERTY:                            "property">                                     : STRING_EXPECTED
+    | <PROPERTYTO:                          "to">                                           : ADMINREF_EXPECTED
 }
 
 <ADMINREF_EXPECTED> TOKEN :
 {
-      <ADMINTYPE_STRING : (<ADMINTYPE_APOSTROPHE>(<ADMINTYPE_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<ADMINTYPE_APOSTROPHE>)> : STRING_EXPECTED
-    | <ADMINTYPE_SINGLE : (<ADMINTYPE_CHAR>)+> : STRING_EXPECTED
-    | <#ADMINTYPE_APOSTROPHE : "\"" >
-    | <#ADMINTYPE_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <ADMINTYPE_STRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
 }
+
+/**************************************************************************** */
 /**
  * Parses one complete expression definition.
  *
@@ -94,22 +94,31 @@ void parse(final Expression_mxJPO _expression)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
 : {
     Token tmp;
-    AdminProperty property;
+    String tmpStr;
+    AdminProperty property = null;
 } {
-    (   (<DESCRIPTION>              ( tmp = <STRING>           {this.setValue(_expression, "description", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(_expression, "description", this.getSingle(tmp.image));} ) )
-      | (<HIDDEN_TRUE>                                         {this.setValue(_expression, "hidden",       true);} )
-      | (<HIDDEN_FALSE>                                        {this.setValue(_expression, "hidden",       false);} )
-      | (<PROPERTYVAL>              ( tmp = <STRING>           {this.setValue(_expression, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(_expression, "value", this.getSingle(tmp.image));} ) )
-      | (<PROPERTY>                                            {property = new AdminProperty();this.appendValue(this.getValue(_expression, "properties"), "propertiesStack", property);}
-                                    ( tmp = <STRING>           {this.setValue(property, "name", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(property, "name", this.getSingle(tmp.image));} )
-              (   ( <PROPERTYVAL>   ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
-                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING> {this.setValue(property, "refAdminType", this.getString(tmp.image));}
-                                    | tmp = <ADMINTYPE_SINGLE> {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
-                                    ( tmp = <STRING>           {this.setValue(property, "refAdminName", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+    (   (<DESCRIPTION>              ( tmp = <MULTILINESTRING>               {this.setValue(_expression, "description", this.getString(tmp.image));property = null;}
+                                    | tmp = <MULTILINESINGLE>               {this.setValue(_expression, "description", this.getSingle(tmp.image));property = null;} ) )
+
+      | (<HIDDEN_TRUE>                                                      {this.setValue(_expression, "hidden",       true); property = null;} )
+      | (<HIDDEN_FALSE>                                                     {this.setValue(_expression, "hidden",       false);property = null;} )
+
+      | (<VALUE>                    ( tmp = <STRING>                        {tmpStr = this.getString(tmp.image);}
+                                    | tmp = <SINGLE>                        {tmpStr = this.getSingle(tmp.image);} )
+                                                                            {   // hint: token value is used twice
+                                                                                // (for property and es expression value)
+                                                                                // => staffed via property variable                                                                                if (property == null)  {
+                                                                                    this.setValue(_expression, "value", tmpStr);                                                                                } else  {
+                                                                                    this.setValue(property, "value", tmpStr);
+                                                                                    property = null;                                                                                }
+                                                                            } )
+
+      | (<PROPERTY>                                                         {property = new AdminProperty();this.appendValue(_expression, "properties", "propertiesStack", property);}
+                                    ( tmp = <STRING>                        {this.setValue(property, "name", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "name", this.getSingle(tmp.image));} )
+                  ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <ADMINTYPE_SINGLE>              {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                    ( tmp = <STRING>                        {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) )? )
     )*
 }
