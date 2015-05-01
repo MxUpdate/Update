@@ -22,6 +22,19 @@
         <packages>
             <package name="org.mxupdate.test.test.mapping"/>
             <package name="org.mxupdate.test.test.update.datamodel"/>
+            <package name="org.mxupdate.test.test.update.datamodel.attributeci"/>
+            <package name="org.mxupdate.test.test.update.datamodel.dimensionci"/>
+            <package name="org.mxupdate.test.test.update.datamodel.expressionci"/>
+            <package name="org.mxupdate.test.test.update.datamodel.formatci"/>
+            <package name="org.mxupdate.test.test.update.datamodel.interfaceci"/>
+            <package name="org.mxupdate.test.test.update.datamodel.notificationci"/>
+            <package name="org.mxupdate.test.test.update.datamodel.numbergeneratorci"/>
+            <package name="org.mxupdate.test.test.update.datamodel.ojectgeneratorci"/>
+            <package name="org.mxupdate.test.test.update.datamodel.policyci"/>
+            <package name="org.mxupdate.test.test.update.datamodel.relationshipci"/>
+            <package name="org.mxupdate.test.test.update.datamodel.ruleci"/>
+            <package name="org.mxupdate.test.test.update.datamodel.triggerci"/>
+            <package name="org.mxupdate.test.test.update.datamodel.typeci"/>
             <package name="org.mxupdate.test.test.update.datamodel.helper"/>
             <package name="org.mxupdate.test.test.update.parser"/>
             <package name="org.mxupdate.test.test.update.program"/>
