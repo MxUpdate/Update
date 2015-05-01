@@ -16,7 +16,9 @@
 package org.mxupdate.update.util;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.Stack;
@@ -25,6 +27,7 @@ import java.util.TreeSet;
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 
 /**
  * Handles properties for all kind of admin objects.
@@ -223,16 +226,29 @@ public final class AdminPropertyList_mxJPO
     public void writeProperties(final ParameterCache_mxJPO _paramCache,
                                 final UpdateBuilder_mxJPO _updateBuilder)
     {
+        // first, write information properties
+        final List<AdminProperty> infoProps = new ArrayList<AdminProperty>();
+        if (_paramCache.contains(ValueKeys.ExportInfoPropsList))  {
+            for (final String propKey : _paramCache.getValueList(ValueKeys.ExportInfoPropsList))  {
+                for (final AdminProperty prop : this.properties)  {
+                    if (propKey.equals(prop.getName()))  {
+                        infoProps.add(prop);
+                    }
+                }
+            }
+            if (!infoProps.isEmpty())  {
+                _updateBuilder.stepStartNewLine().stepSingle(_paramCache.getValueString(ValueKeys.ExportInfoPropsTextStart)).stepEndLine();
+                for (final AdminProperty prop : infoProps)  {
+                    prop.write(_updateBuilder);
+                }
+                _updateBuilder.stepStartNewLine().stepSingle(_paramCache.getValueString(ValueKeys.ExportInfoPropsTextEnd)).stepEndLine();
+            }
+        }
+
+        // now the rest of the properties w/o info properties
         for (final AdminProperty prop : this.properties)  {
-            if (PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null)  {
-                _updateBuilder.stepStartNewLine().stepSingle("property").stepString(prop.getName());
-                if (((prop.getRefAdminName()) != null) && (prop.getRefAdminType() != null))  {
-                    _updateBuilder.stepSingle("to").stepSingle(prop.getRefAdminType()).stepString(prop.getRefAdminName());
-                }
-                if (prop.getValue() != null)  {
-                    _updateBuilder.stepSingle("value").stepString(prop.getValue());
-                }
-                _updateBuilder.stepEndLine();
+            if ((PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null) && !infoProps.contains(prop))  {
+                prop.write(_updateBuilder);
             }
         }
     }
@@ -559,6 +575,23 @@ public final class AdminPropertyList_mxJPO
             ret = CompareToUtil_mxJPO.compare(ret, this.refAdminName, _toCompare.refAdminName);
             ret = CompareToUtil_mxJPO.compare(ret, this.value,        _toCompare.value);
             return ret;
+        }
+
+        /**
+         * Writes the information as property.
+         *
+         * @param _updateBuilder    update builder
+         */
+        private void write(final UpdateBuilder_mxJPO _updateBuilder)
+        {
+            _updateBuilder.stepStartNewLine().stepSingle("property").stepString(this.name);
+            if ((this.refAdminName != null) && (this.refAdminType != null))  {
+                _updateBuilder.stepSingle("to").stepSingle(this.refAdminType).stepString(this.refAdminName);
+            }
+            if (this.value != null)  {
+                _updateBuilder.stepSingle("value").stepString(this.value);
+            }
+            _updateBuilder.stepEndLine();
         }
 
         /**

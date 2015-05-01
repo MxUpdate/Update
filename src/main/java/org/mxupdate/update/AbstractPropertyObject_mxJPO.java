@@ -136,13 +136,13 @@ public abstract class AbstractPropertyObject_mxJPO
                 + "mql exec prog org.mxupdate.update.util.JPOCaller logTrace ${_sText}\n"
             + "}\n"
             + "proc mxUpdate {_sKind _sName _lsArgs}  {\n"
-                + "global APPLICATION AUTHOR FILEDATE FILENAME ORIGINALNAME VERSION\n"
+                + "global FILEDATE FILENAME\n"
                 + "regsub -all {\\\\} $_lsArgs {@0@0@} sArg\n"
                 + "regsub -all {'}    $sArg    {@1@1@} sArg\n"
                 + "regsub -all {\\\"} $sArg    {@2@2@} sArg\n"
                 + "regsub -all {\\\\\\[} $sArg {[} sArg\n"
                 + "regsub -all {\\\\\\]} $sArg {]} sArg\n"
-                + "mql exec prog org.mxupdate.update.util.JPOCaller mxUpdate $_sKind $_sName \"${sArg}\" \"$APPLICATION\" \"$AUTHOR\" \"$FILEDATE\" \"$FILENAME\" \"$ORIGINALNAME\" \"$VERSION\" \"END\"\n"
+                + "mql exec prog org.mxupdate.update.util.JPOCaller mxUpdate $_sKind $_sName \"${sArg}\" \"$FILEDATE\" \"$FILENAME\" \"END\"\n"
             + "}\n";
 
     /**

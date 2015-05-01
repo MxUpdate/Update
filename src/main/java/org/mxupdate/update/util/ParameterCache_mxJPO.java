@@ -723,10 +723,17 @@ public class ParameterCache_mxJPO
      */
     public enum ValueKeys
     {
-        /** Used default installer in the properties if not defined. */
+        /** Used default installer used within create / update if not defined as parameter. */
         DefaultInstaller,
-        /** Installer from the command line. */
+        /** Installer from the command line used within create / update. */
         Installer,
+
+        /** List of property names used as information in front of the list of properties. */
+        ExportInfoPropsList,
+        /** End text for the information properties. */
+        ExportInfoPropsTextEnd,
+        /** Start text for the information properties. */
+        ExportInfoPropsTextStart,
 
         /**
          * Name of the parameter to define that the &quot;dimension&quot;

@@ -709,30 +709,17 @@ final Object tmp = this;
                                final String... _args)
         throws Exception
     {
-        if ((_args.length == 11) && "mxUpdate".equals(_args[0]) && this.getTypeDef().getMxAdminName().equals(_args[1])) {
+        if ((_args.length == 7) && "mxUpdate".equals(_args[0]) && this.getTypeDef().getMxAdminName().equals(_args[1])) {
 
             final CLASS clazz = (CLASS) this.getTypeDef().newTypeInstance(_args[2]);
 
-            // TODO: hard coded properties...
-            // will be handled as standard property
-            clazz.getProperties().parse(_paramCache, "/property", "");
-            clazz.getProperties().parse(_paramCache, "/property/name", "application");
-            clazz.getProperties().parse(_paramCache, "/property/value", _args[4]);
-            clazz.getProperties().parse(_paramCache, "/property", "");
-            clazz.getProperties().parse(_paramCache, "/property/name", "author");
-            clazz.getProperties().parse(_paramCache, "/property/value", _args[5]);
-            clazz.getProperties().parse(_paramCache, "/property", "");
-            clazz.getProperties().parse(_paramCache, "/property/name", "file date");
-            clazz.getProperties().parse(_paramCache, "/property/value", _args[6]);
-            clazz.getProperties().parse(_paramCache, "/property", "");
-            clazz.getProperties().parse(_paramCache, "/property/name", "original name");
-            clazz.getProperties().parse(_paramCache, "/property/value", _args[8]);
-            clazz.getProperties().parse(_paramCache, "/property", "");
-            clazz.getProperties().parse(_paramCache, "/property/name", "version");
-            clazz.getProperties().parse(_paramCache, "/property/value", _args[9]);
-
             clazz.parseUpdate(_args[3].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\"));
 
+            // MxUpdate File Date => must be always overwritten if newer!
+            clazz.getProperties().setValue4KeyValue(
+                    _paramCache,
+                    PropertyDef_mxJPO.FILEDATE,
+                    _args[4]);
 
             // installed date => reuse if already defined, new is not
             final String curInstalledDate = this.getProperties().getValue4KeyValue(_paramCache, PropertyDef_mxJPO.INSTALLEDDATE);
@@ -759,7 +746,7 @@ final Object tmp = this;
             clazz.getProperties().setValue4KeyValue(
                     _paramCache,
                     PropertyDef_mxJPO.SUBPATH,
-                    FileHandlingUtil_mxJPO.extraceSubPath(_args[7], this.getTypeDef().getFilePath()));
+                    FileHandlingUtil_mxJPO.extraceSubPath(_args[5], this.getTypeDef().getFilePath()));
 
             // initialize MQL builder (with or w/o suffix!)
             final MultiLineMqlBuilder mql;
