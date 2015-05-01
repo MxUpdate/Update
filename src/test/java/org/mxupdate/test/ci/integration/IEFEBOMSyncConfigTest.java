@@ -18,29 +18,28 @@ package org.mxupdate.test.ci.integration;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.BusData;
 import org.mxupdate.test.data.datamodel.TypeData;
-import org.mxupdate.test.data.integration.IEFEBOMSyncConfigData;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Test cases for the export and update of IEF EBOM sync configuration objects.
  *
  * @author The MxUpdate Team
  */
+@Test()
 public class IEFEBOMSyncConfigTest
-    extends AbstractIEFTest<IEFEBOMSyncConfigData>
+    extends AbstractIEFTest
 {
-    /**
-     * {@inheritDoc}
-     * Returns new IEF EBOM sync configuration instance.
-     */
     @Override()
-    protected IEFEBOMSyncConfigData createNewData(final boolean _subType,
-                                                  final String _name)
+    protected BusData createNewData(final boolean _subType,
+                                    final String _name)
     {
-        return new IEFEBOMSyncConfigData(
+        return new BusData(
                 this,
+                CI.IEF_EBOMSYNC_CONFIG,
                 _subType ? new TypeData(this, "EBOMSync").setValue("derived", "IEF-EBOMSyncConfig") : null,
                 _name,
                 "-");
@@ -53,7 +52,7 @@ public class IEFEBOMSyncConfigTest
      * @throws MatrixException if cleanup failed
      */
     @BeforeMethod()
-    @AfterClass()
+    @AfterClass(groups = "close")
     public void cleanup()
         throws MatrixException
     {

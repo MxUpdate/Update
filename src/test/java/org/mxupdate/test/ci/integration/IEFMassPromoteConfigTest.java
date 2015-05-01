@@ -17,11 +17,11 @@ package org.mxupdate.test.ci.integration;
 
 import matrix.util.MatrixException;
 
-import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.BusData;
 import org.mxupdate.test.data.datamodel.TypeData;
-import org.mxupdate.test.data.integration.IEFMassPromoteConfigData;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Test cases for the export and update of integration mass promote
@@ -29,19 +29,17 @@ import org.testng.annotations.BeforeMethod;
  *
  * @author The MxUpdate Team
  */
+@Test()
 public class IEFMassPromoteConfigTest
-    extends AbstractIEFTest<IEFMassPromoteConfigData>
+    extends AbstractIEFTest
 {
-    /**
-     * {@inheritDoc}
-     * Returns new IEF mass promote configuration instance.
-     */
     @Override()
-    protected IEFMassPromoteConfigData createNewData(final boolean _subType,
-                                                     final String _name)
+    protected BusData createNewData(final boolean _subType,
+                                    final String _name)
     {
-        return new IEFMassPromoteConfigData(
+        return new BusData(
                 this,
+                CI.IEF_MASS_PROMOTE_CONFIG,
                 _subType ? new TypeData(this, "MassPromote").setValue("derived", "IEF-MassPromoteConfig") : null,
                 _name,
                 "-");
@@ -53,11 +51,11 @@ public class IEFMassPromoteConfigTest
      * @throws MatrixException if cleanup failed
      */
     @BeforeMethod()
-    @AfterClass()
+    @AfterClass(groups = "close")
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(AbstractTest.CI.IEF_MASS_PROMOTE_CONFIG);
-        this.cleanup(AbstractTest.CI.DM_TYPE);
+        this.cleanup(CI.IEF_MASS_PROMOTE_CONFIG);
+        this.cleanup(CI.DM_TYPE);
     }
 }

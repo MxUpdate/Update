@@ -17,11 +17,11 @@ package org.mxupdate.test.ci.integration;
 
 import matrix.util.MatrixException;
 
-import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.BusData;
 import org.mxupdate.test.data.datamodel.TypeData;
-import org.mxupdate.test.data.integration.IEFGlobalConfigData;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Test cases for the export and update of integration global configuration
@@ -29,19 +29,17 @@ import org.testng.annotations.BeforeMethod;
  *
  * @author The MxUpdate Team
  */
+@Test()
 public class IEFGlobalConfigTest
-    extends AbstractIEFTest<IEFGlobalConfigData>
+    extends AbstractIEFTest
 {
-    /**
-     * {@inheritDoc}
-     * Returns new IEF global configuration instance.
-     */
     @Override()
-    protected IEFGlobalConfigData createNewData(final boolean _subType,
-                                                final String _name)
+    protected BusData createNewData(final boolean _subType,
+                                   final String _name)
     {
-        return new IEFGlobalConfigData(
+        return new BusData(
                 this,
+                CI.IEF_GLOBAL_CONFIG,
                 _subType ? new TypeData(this, "GlobalConfig").setValue("derived", "MCADInteg-GlobalConfig") : null,
                 _name,
                 "1");
@@ -53,11 +51,11 @@ public class IEFGlobalConfigTest
      * @throws MatrixException if cleanup failed
      */
     @BeforeMethod()
-    @AfterClass()
+    @AfterClass(groups = "close")
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(AbstractTest.CI.IEF_GLOBAL_CONFIG);
-        this.cleanup(AbstractTest.CI.DM_TYPE);
+        this.cleanup(CI.IEF_GLOBAL_CONFIG);
+        this.cleanup(CI.DM_TYPE);
     }
 }

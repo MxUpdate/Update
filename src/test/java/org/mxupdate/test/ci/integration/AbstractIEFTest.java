@@ -22,7 +22,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.data.AbstractBusData;
+import org.mxupdate.test.data.BusData;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -30,9 +30,8 @@ import org.testng.annotations.Test;
  * Abstract class used for all IEF integration tests for export and update.
  *
  * @author The MxUpdate Team
- * @param <IEFCLASS>    IEF data class to test
  */
-public abstract class AbstractIEFTest<IEFCLASS extends AbstractBusData<IEFCLASS>>
+public abstract class AbstractIEFTest
     extends AbstractTest
 {
     /**
@@ -43,7 +42,7 @@ public abstract class AbstractIEFTest<IEFCLASS extends AbstractBusData<IEFCLASS>
      * @param _name         name of the instance
      * @return new instance
      */
-    protected abstract IEFCLASS createNewData(final boolean _subType,
+    protected abstract BusData createNewData(final boolean _subType,
                                               final String _name);
 
     /**
@@ -58,7 +57,7 @@ public abstract class AbstractIEFTest<IEFCLASS extends AbstractBusData<IEFCLASS>
         throws MatrixException
     {
         final List<Object[]> ret = new ArrayList<Object[]>();
-        final IEFCLASS tmp = this.createNewData(true, "HelloTest");
+        final BusData tmp = this.createNewData(true, "HelloTest");
 
         ret.add(new Object[]{
                         "simple object",
@@ -87,31 +86,10 @@ public abstract class AbstractIEFTest<IEFCLASS extends AbstractBusData<IEFCLASS>
                 ret.add(new Object[]{
                         "object with defined attribute '" + oneAttr + "'",
                         this.createNewData(false, "HelloTest")
-                                .setValue(oneAttr, "complex \"data\" 'and single 'apostrophe'")});
+                                .setKeyValue("attribute", oneAttr, "complex \"data\" 'and single 'apostrophe'")});
             }
         }
         return ret.toArray(new Object[ret.size()][]);
-    }
-
-    /**
-     * Tests a new created integration global configuration objects and the
-     * related export.
-     *
-     * @param _description      description of the test case
-     * @param _ief              IEF instance to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "busDatas",
-          description = "test export of new created IEF EBOM sync configuration objects")
-    public void testExport(final String _description,
-                           final IEFCLASS _ief)
-        throws Exception
-    {
-        if (_ief.getType() != null)  {
-            _ief.getType().create();
-        }
-        _ief.create();
-        _ief.checkExport(_ief.export());
     }
 
     /**
@@ -123,9 +101,9 @@ public abstract class AbstractIEFTest<IEFCLASS extends AbstractBusData<IEFCLASS>
      * @throws Exception if test failed
      */
     @Test(dataProvider = "busDatas",
-          description = "test update of non existing IEF EBOM sync configurations")
-    public void testUpdate(final String _description,
-                           final IEFCLASS _ief)
+          description = "positiveTest update of non existing IEF EBOM sync configurations")
+    public void positiveTestUpdate(final String _description,
+                                   final BusData _ief)
         throws Exception
     {
         if (_ief.getType() != null)  {
@@ -152,8 +130,8 @@ public abstract class AbstractIEFTest<IEFCLASS extends AbstractBusData<IEFCLASS>
      */
     @Test(dataProvider = "busDatas",
           description = "check if an update of a global object works while checking the file date")
-    public void testUpdateWithCheckFileDate(final String _description,
-                                            final IEFCLASS _ief)
+    public void positiveTestUpdateWithCheckFileDate(final String _description,
+                                                    final BusData _ief)
         throws Exception
     {
         if (_ief.getType() != null)  {

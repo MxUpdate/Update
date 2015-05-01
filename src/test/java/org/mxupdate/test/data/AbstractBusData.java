@@ -54,7 +54,6 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
                               final String _revision)
     {
         this(_test, _ci, null, _name, _revision);
-        this.getKeyValues().setCheckAllElemens(false);
     }
 
     /**
@@ -84,6 +83,7 @@ public abstract class AbstractBusData<DATA extends AbstractBusData<?>>
         this.type = _type;
         this.busName = AbstractTest.PREFIX + _name;
         this.busRevision = _revision;
+        this.getKeyValues().setCheckAllElemens(false);
     }
 
     /**

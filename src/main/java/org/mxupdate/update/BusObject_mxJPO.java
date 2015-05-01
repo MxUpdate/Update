@@ -280,10 +280,7 @@ public class BusObject_mxJPO
     protected void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
-        final BusinessObject bus = new BusinessObject(this.getBusType(),
-                                                      this.getBusName(),
-                                                      this.getBusRevision(),
-                                                      null);
+        final BusinessObject bus = new BusinessObject(this.busType, this.busName, this.busRevision, null);
         // id, vault, description and current MX state
         final StringList select = new StringList(4);
         select.addElement("description");
@@ -565,7 +562,7 @@ public class BusObject_mxJPO
             final String devi = _args[4].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\");
 
             final BusObject_mxJPO clazz = (BusObject_mxJPO) this.getTypeDef().newTypeInstance(name + BusObject_mxJPO.SPLIT_NAME + revi);
-
+            clazz.busType = this.busType;
             clazz.parseUpdate(devi);
 
             // MxUpdate File Date => must be always overwritten if newer!

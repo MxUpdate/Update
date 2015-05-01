@@ -230,7 +230,7 @@ public class ExportParser
     {
         final Collection<String> curList = this.getRootLines().get(0).getLines(_path + "/@value");
         for (final String elem : _list)  {
-            Assert.assertTrue(curList.contains(elem), "element " + elem + " is missed");
+            Assert.assertTrue(curList.contains(elem), "element " + elem + " is missed in " + curList);
         }
         return this;
     }

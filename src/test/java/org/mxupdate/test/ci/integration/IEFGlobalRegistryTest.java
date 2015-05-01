@@ -17,29 +17,27 @@ package org.mxupdate.test.ci.integration;
 
 import matrix.util.MatrixException;
 
-import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.integration.IEFGlobalRegistryData;
+import org.mxupdate.test.data.BusData;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Test cases for the export and update of integration global registry objects.
  *
  * @author The MxUpdate Team
  */
+@Test()
 public class IEFGlobalRegistryTest
-    extends AbstractIEFTest<IEFGlobalRegistryData>
+    extends AbstractIEFTest
 {
-    /**
-     * {@inheritDoc}
-     * Returns new IEF global registry instance.
-     */
     @Override()
-    protected IEFGlobalRegistryData createNewData(final boolean _subType,
-                                                  final String _name)
+    protected BusData createNewData(final boolean _subType,
+                                    final String _name)
     {
-        return new IEFGlobalRegistryData(
+        return new BusData(
                 this,
+                CI.IEF_GLOBAL_REGISTRY,
                 _name,
                 "1");
     }
@@ -54,6 +52,6 @@ public class IEFGlobalRegistryTest
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(AbstractTest.CI.IEF_GLOBAL_REGISTRY);
+        this.cleanup(CI.IEF_GLOBAL_REGISTRY);
     }
 }

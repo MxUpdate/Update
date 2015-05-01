@@ -17,11 +17,11 @@ package org.mxupdate.test.ci.integration;
 
 import matrix.util.MatrixException;
 
-import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.BusData;
 import org.mxupdate.test.data.datamodel.TypeData;
-import org.mxupdate.test.data.integration.IEFUnassignedRegistryData;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Test cases for the export and update of integration unassigned registry
@@ -29,19 +29,17 @@ import org.testng.annotations.BeforeMethod;
  *
  * @author The MxUpdate Team
  */
+@Test()
 public class IEFUnassignedRegistryTest
-    extends AbstractIEFTest<IEFUnassignedRegistryData>
+    extends AbstractIEFTest
 {
-    /**
-     * {@inheritDoc}
-     * Returns new IEF unassigned registry instance.
-     */
     @Override()
-    protected IEFUnassignedRegistryData createNewData(final boolean _subType,
-                                                      final String _name)
+    protected BusData createNewData(final boolean _subType,
+                                    final String _name)
     {
-        return new IEFUnassignedRegistryData(
+        return new BusData(
                 this,
+                CI.IEF_UNASSIGNED_REGISTRY,
                 _subType ? new TypeData(this, "UnassignedRegistry").setValue("derived", "IEF-UnassignedIntegRegistry") : null,
                 _name,
                 "-");
@@ -53,11 +51,11 @@ public class IEFUnassignedRegistryTest
      * @throws MatrixException if cleanup failed
      */
     @BeforeMethod()
-    @AfterClass()
+    @AfterClass(groups = "close")
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(AbstractTest.CI.IEF_UNASSIGNED_REGISTRY);
-        this.cleanup(AbstractTest.CI.DM_TYPE);
+        this.cleanup(CI.IEF_UNASSIGNED_REGISTRY);
+        this.cleanup(CI.DM_TYPE);
     }
 }
