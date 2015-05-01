@@ -144,9 +144,9 @@ public class Role_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .singleIfTrue(  "kind",                     this.kind.name().toLowerCase(),     (this.kind != Kind.Role))
                 .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
-                .singleIfTrue(  "kind",                     this.kind.name().toLowerCase(),     (this.kind != Kind.Role))
                 .flag(          "hidden",            false, this.isHidden())
                 .stringIfTrue(  "site",                     this.getSite(),                     (this.getSite() != null) && !this.getSite().isEmpty())
                 .list(          "parent",                   this.parentRoles)

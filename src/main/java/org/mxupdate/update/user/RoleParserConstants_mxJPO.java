@@ -23,85 +23,69 @@ interface RoleParserConstants_mxJPO {
   /** RegularExpression Id. */
   int SITE = 10;
   /** RegularExpression Id. */
-  int STRING = 15;
+  int STRING = 11;
   /** RegularExpression Id. */
-  int SINGLE = 16;
+  int SINGLE = 12;
   /** RegularExpression Id. */
-  int APOSTROPHE = 17;
+  int MULTILINESTRING = 13;
   /** RegularExpression Id. */
-  int CHAR = 18;
+  int MULTILINESINGLE = 14;
   /** RegularExpression Id. */
-  int KIND = 19;
+  int KIND = 15;
   /** RegularExpression Id. */
-  int ORGANIZATION = 24;
+  int ORGANIZATION = 16;
   /** RegularExpression Id. */
-  int PROJECT = 25;
+  int PROJECT = 17;
   /** RegularExpression Id. */
-  int ROLE = 26;
+  int ROLE = 18;
   /** RegularExpression Id. */
-  int PROPERTY = 27;
+  int PROPERTY = 19;
   /** RegularExpression Id. */
-  int PROPERTYTO = 28;
+  int PROPERTYTO = 20;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 29;
+  int PROPERTYVAL = 21;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 34;
+  int ADMINTYPE_STRING = 22;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 35;
-  /** RegularExpression Id. */
-  int ADMINTYPE_APOSTROPHE = 36;
-  /** RegularExpression Id. */
-  int ADMINTYPE_CHAR = 37;
+  int ADMINTYPE_SINGLE = 23;
 
   /** Lexical state. */
-  int DEFAULT = 0;
+  int ADMINREF_EXPECTED = 0;
   /** Lexical state. */
-  int STRING_EXPECTED = 1;
+  int KIND_EXPECTED = 1;
   /** Lexical state. */
-  int KIND_EXPECTED = 2;
+  int MULTILINESTRING_EXPECTED = 2;
   /** Lexical state. */
-  int ADMINREF_EXPECTED = 3;
+  int STRING_EXPECTED = 3;
+  /** Lexical state. */
+  int DEFAULT = 4;
 
   /** Literal token values. */
   String[] tokenImage = {
     "<EOF>",
     "\" \"",
-    "\"\\r\"",
     "\"\\t\"",
     "\"\\n\"",
+    "<token of kind 4>",
     "\"symbolicname\"",
     "\"description\"",
     "\"hidden\"",
     "\"!hidden\"",
     "\"parent\"",
     "\"site\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<STRING>",
     "<SINGLE>",
-    "\"\\\"\"",
-    "<CHAR>",
+    "<MULTILINESTRING>",
+    "<MULTILINESINGLE>",
     "\"kind\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "\"organization\"",
     "\"project\"",
     "\"role\"",
     "\"property\"",
     "\"to\"",
     "\"value\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<ADMINTYPE_STRING>",
     "<ADMINTYPE_SINGLE>",
-    "\"\\\"\"",
-    "<ADMINTYPE_CHAR>",
   };
 
 }

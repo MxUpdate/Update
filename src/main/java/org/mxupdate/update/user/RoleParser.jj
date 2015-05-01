@@ -42,18 +42,16 @@ class RoleParser
     extends AbstractParser_mxJPO<Role_mxJPO>
 {
 }
-PARSER_END(RoleParser)<DEFAULT> SKIP :
+PARSER_END(RoleParser)<*> SKIP :
 {
-    " "
-|   "\r"
-|   "\t"
-|   "\n"
+  " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
 <DEFAULT> TOKEN :
 {
       <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
-    | <DESCRIPTION:                         "description">                                  : STRING_EXPECTED
+
+    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
     | <HIDDEN_TRUE:                         "hidden">
     | <HIDDEN_FALSE:                        "!hidden">
@@ -64,28 +62,23 @@ class RoleParser
 }
 
 /************************************************************** Common String */
-<STRING_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
-
 <STRING_EXPECTED> TOKEN :
 {
-      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "{" | "}" | " ")*<APOSTROPHE>)> : DEFAULT
-    | <SINGLE: (<CHAR>)+> : DEFAULT
-    | <#APOSTROPHE: "\"" >
-    | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
+    | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/*************************************************** Common Multi-Line-String */
+<MULTILINESTRING_EXPECTED> TOKEN :
+{
+      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
+    | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
 }
 
 /*********************************************************************** Kind */
 <DEFAULT> TOKEN :
 {
       <KIND:                                "kind">                                         : KIND_EXPECTED
-}
-
-<KIND_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
 }
 
 <KIND_EXPECTED> TOKEN :
@@ -103,17 +96,10 @@ class RoleParser
     | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
 }
 
-<ADMINREF_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
-
 <ADMINREF_EXPECTED> TOKEN :
 {
-      <ADMINTYPE_STRING : (<ADMINTYPE_APOSTROPHE>(<ADMINTYPE_CHAR> | "\\\"" | "{" | "}" | " ")*<ADMINTYPE_APOSTROPHE>)> : STRING_EXPECTED
-    | <ADMINTYPE_SINGLE : (<ADMINTYPE_CHAR>)+> : STRING_EXPECTED
-    | <#ADMINTYPE_APOSTROPHE : "\"" >
-    | <#ADMINTYPE_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <ADMINTYPE_STRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
 }
 
 /**************************************************************************** */
@@ -128,11 +114,11 @@ void parse(final Role_mxJPO _role)
     Token tmp;
     AdminProperty property;
 } {
-    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_role, "symbolicNames",                     this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.appendValue(_role, "symbolicNames",                      this.getSingle(tmp.image));} ) )
+    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_role, "symbolicNames",                       this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_role, "symbolicNames",                       this.getSingle(tmp.image));} ) )
 
-      | ( <DESCRIPTION>             ( tmp = <STRING>                        {this.setValue(_role, "description",                            this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_role, "description",                            this.getSingle(tmp.image));} ) )
+      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_role, "description",                            this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>               {this.setValue(_role, "description",                            this.getSingle(tmp.image));} ) )
 
       | ( <KIND>                    ( <ORGANIZATION>                        {this.setValue(_role, "kind",                                   Kind.Organization);}
                                     | <PROJECT>                             {this.setValue(_role, "kind",                                   Kind.Project);}
