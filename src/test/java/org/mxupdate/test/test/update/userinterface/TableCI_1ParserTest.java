@@ -22,7 +22,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link Table_mxJPO table} parser.
+ * Tests the {@link Table_mxJPO table CI} parser.
  *
  * @author The MxUpdate Team
  */
@@ -37,9 +37,16 @@ public class TableCI_1ParserTest
     {
         return new Object[][]
         {
-            {"1) simple",
+            {"0) simple",
                     "",
                     "description \"\""},
+            // registered name
+            {"1a) symbolic name",
+                    "",
+                    "symbolicname \"table_abc\" description \"\""},
+            {"1b) two symbolic names",
+                    "symbolicname \"table_abc\" symbolicname \"table_def\" description \"\"",
+                    "symbolicname \"table_def\" symbolicname \"table_abc\" description \"\""},
             // description
             {"2a) description",
                     "",

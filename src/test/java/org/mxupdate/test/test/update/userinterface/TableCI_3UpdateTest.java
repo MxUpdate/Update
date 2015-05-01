@@ -13,25 +13,27 @@
  *
  */
 
-package org.mxupdate.test.ci.userinterface;
+package org.mxupdate.test.test.update.userinterface;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ci.userinterface.AbstractUITest;
 import org.mxupdate.test.data.user.RoleData;
 import org.mxupdate.test.data.userinterface.TableData;
+import org.mxupdate.update.userinterface.Table_mxJPO;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test cases for the export / update of web tables.
+ * Tests the {@link Table_mxJPO table CI} export / update.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class TableTest
+public class TableCI_3UpdateTest
     extends AbstractUITest<TableData>
 {
     /**

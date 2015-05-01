@@ -25,12 +25,14 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 /**
  * Tests the {@link Table_mxJPO table CI} delta calculation.
  *
  * @author The MxUpdate Team
  */
+@Test()
 public class TableCI_2DeltaCalculationTest
     extends AbstractDeltaCalculationTest<Table_mxJPO,TableData>
 {
@@ -39,24 +41,36 @@ public class TableCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
-           {"",   new TableData(this, "Table1"),
+            {"1a) symbolic name",
+                new TableData(this, "Test"),
+                new TableData(this, "Test").setValue("symbolicname", "expression_123")},
+
+            {"1b) two symbolic name",
+                new TableData(this, "Test"),
+                new TableData(this, "Test").setValue("symbolicname", "expression_123").setValue("symbolicname", "expression_345")},
+
+            {"2) add a column",
+                new TableData(this, "Table1"),
                 new TableData(this, "Table1")
                         .setValue("description", "\"\\\\ hello")
                         .newField("field").setValue("label", "an \"label\"").getFormTable() },
 
-           {"",   new TableData(this, "Table1"),
+           {"3) add tow column",
+                new TableData(this, "Table1"),
                 new TableData(this, "Table1")
                     .setValue("description", "\"\\\\ hello")
                         .newField("field1").setValue("label", "an \"label\"").getFormTable()
                         .newField("field2").setValue("label", "an \"label\"").getFormTable() },
 
-           {"",   new TableData(this, "Table1")
+           {"4) remove all columns",
+                new TableData(this, "Table1")
                     .setValue("description", "description")
                         .newField("field1").setValue("label", "an \"label\"").getFormTable()
                         .newField("field2").setValue("label", "an \"label\"").getFormTable(),
                 new TableData(this, "Table1").setValue("description", "description")},
 
-            {"",   new TableData(this, "Table1")
+            {"5) remove one column",
+                new TableData(this, "Table1")
                     .setValue("description", "description")
                     .newField("field1").setValue("label", "an \"label\"").getFormTable()
                     .newField("field2").setValue("label", "an \"label\"").getFormTable(),
@@ -64,7 +78,8 @@ public class TableCI_2DeltaCalculationTest
                     .setValue("description", "description")
                     .newField("field2").setValue("label", "an \"label\"").getFormTable() },
 
-            {"",   new TableData(this, "Table1")
+            {"6) add one column",
+                new TableData(this, "Table1")
                         .setValue("description", "description")
                             .newField("field1").setValue("label", "an \"label\"").getFormTable()
                             .newField("field2").setValue("label", "an \"label\"").getFormTable(),
@@ -74,14 +89,15 @@ public class TableCI_2DeltaCalculationTest
                         .newField("field2").setValue("label", "an \"label\"").getFormTable()
                         .newField("field3").setValue("label", "an \"label\"").getFormTable() },
             // sort type
-            {"",   new TableData(this, "Table1"),
+            {"7) sort type",
+                new TableData(this, "Table1"),
                 new TableData(this, "Table1")
                         .setValue("description", "")
                         .newField("field").setValue("label", "").setSingle("sorttype", "alpha").getFormTable() },
         };
     }
 
-    @Override
+    @Override()
     @BeforeMethod()
     @AfterClass(groups = "close" )
     public void cleanup()
