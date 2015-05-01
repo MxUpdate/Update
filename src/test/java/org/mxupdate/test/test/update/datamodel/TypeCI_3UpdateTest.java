@@ -37,7 +37,7 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-public class TypeCI_2UpdateTest
+public class TypeCI_3UpdateTest
     extends AbstractDataExportUpdate<TypeData>
 {
     /**
@@ -287,9 +287,11 @@ public class TypeCI_2UpdateTest
         this.createNewData("Test")
                 .create()
                 .setValue("derived", AbstractTest.PREFIX + "Parent1")
-                .update("")
+                .update("");
+        this.createNewData("Test")
                 .setValue("derived", AbstractTest.PREFIX + "Parent2")
-                .failureUpdate(ErrorKey.DM_TYPE_UPDATE_DERIVED)
+                .failureUpdate(ErrorKey.DM_TYPE_UPDATE_DERIVED);
+        this.createNewData("Test")
                 .setValue("derived", AbstractTest.PREFIX + "Parent1")
                 .checkExport();
     }
@@ -323,9 +325,11 @@ public class TypeCI_2UpdateTest
                 .create()
                 .setSingle("kind", "composed")
                 .update("")
-                .checkExport()
+                .checkExport();
+        this.createNewData("Test")
                 .setSingle("kind", "basic")
-                .failureUpdate(ErrorKey.DM_TYPE_NOT_BASIC_KIND)
+                .failureUpdate(ErrorKey.DM_TYPE_NOT_BASIC_KIND);
+        this.createNewData("Test")
                 .setSingle("kind", "composed")
                 .checkExport();
     }

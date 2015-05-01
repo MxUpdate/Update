@@ -11,57 +11,59 @@ interface TypeParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int DESCRIPTION = 5;
+  int SYMBOLICNAME = 5;
   /** RegularExpression Id. */
-  int ABSTRACT_TRUE = 6;
+  int DESCRIPTION = 6;
   /** RegularExpression Id. */
-  int ABSTRACT_FALSE = 7;
+  int ABSTRACT_TRUE = 7;
   /** RegularExpression Id. */
-  int DERIVED = 8;
+  int ABSTRACT_FALSE = 8;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 9;
+  int DERIVED = 9;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 10;
+  int HIDDEN_TRUE = 10;
   /** RegularExpression Id. */
-  int METHOD = 11;
+  int HIDDEN_FALSE = 11;
   /** RegularExpression Id. */
-  int ATTRIBUTE = 12;
+  int METHOD = 12;
   /** RegularExpression Id. */
-  int STRING = 13;
+  int ATTRIBUTE = 13;
   /** RegularExpression Id. */
-  int SINGLE = 14;
+  int STRING = 14;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 15;
+  int SINGLE = 15;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 16;
+  int MULTILINESTRING = 16;
   /** RegularExpression Id. */
-  int KIND = 17;
+  int MULTILINESINGLE = 17;
   /** RegularExpression Id. */
-  int BASIC = 18;
+  int KIND = 18;
   /** RegularExpression Id. */
-  int COMPOSED = 19;
+  int BASIC = 19;
   /** RegularExpression Id. */
-  int TRIGGER = 20;
+  int COMPOSED = 20;
   /** RegularExpression Id. */
-  int INPUT = 21;
+  int TRIGGER = 21;
   /** RegularExpression Id. */
-  int TRIGEVENT = 22;
+  int INPUT = 22;
   /** RegularExpression Id. */
-  int ACTION = 23;
+  int TRIGEVENT = 23;
   /** RegularExpression Id. */
-  int CHECK = 24;
+  int ACTION = 24;
   /** RegularExpression Id. */
-  int OVERRIDE = 25;
+  int CHECK = 25;
   /** RegularExpression Id. */
-  int PROPERTY = 26;
+  int OVERRIDE = 26;
   /** RegularExpression Id. */
-  int PROPERTYTO = 27;
+  int PROPERTY = 27;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 28;
+  int PROPERTYTO = 28;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 29;
+  int PROPERTYVAL = 29;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 30;
+  int ADMINTYPE_STRING = 30;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 31;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -85,6 +87,7 @@ interface TypeParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"symbolicname\"",
     "\"description\"",
     "\"abstract\"",
     "\"!abstract\"",
