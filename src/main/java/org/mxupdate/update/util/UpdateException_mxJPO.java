@@ -79,13 +79,13 @@ public class UpdateException_mxJPO
         /**
          * JPO caller method is called without any argument.
          */
-        ABSTRACT_PROPERTY_JPO_CALL_METHOD_NOT_DEFINED(60301,
+        JPOCALLER_JPO_CALL_METHOD_NOT_DEFINED(60301,
                 "jpo call is executed without any arguments"),
 
         /**
          * JPO caller method is called with wrong name for the method.
          */
-        ABSTRACT_PROPERTY_JPO_CALL_METHOD_UNKNOWN(60302,
+        JPOCALLER_JPO_CALL_METHOD_UNKNOWN(60302,
                 "unknown jpo call execute {0}"),
 
         /**

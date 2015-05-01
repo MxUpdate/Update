@@ -476,7 +476,8 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
      * @throws Exception if the update from derived class failed
      * @see #ignoreWorkspaceObjects(ParameterCache_mxJPO)
      */
-    @Override()
+// TODO:
+  /*  @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
                           final CharSequence _preMQLCode,
                           final CharSequence _postMQLCode,
@@ -529,7 +530,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
         preMQLCode.append(_preMQLCode);
 
         super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
-    }
+    }*/
 
     /**
      * Calculates if workspace objects for this user are not handled. This is

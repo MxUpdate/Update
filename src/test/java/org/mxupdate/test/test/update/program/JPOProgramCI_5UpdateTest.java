@@ -41,7 +41,7 @@ public class JPOProgramCI_5UpdateTest
     extends AbstractTest
 {
     /** Original files. */
-    private final File origDir, origJPO, origMXU, origWOJpoMXU, origPckJPO, origPckMXU, origPckWOJpoMXU;
+    private final File origDir, origJPO, origMXU, origPckJPO, origPckMXU;
 
     /**
      * Initialize the file handlers.
@@ -51,10 +51,8 @@ public class JPOProgramCI_5UpdateTest
         this.origDir         = new File(this.getResourcesDir(), "program/jpo");
         this.origJPO         = new File(this.origDir, "MXUPDATE_Test_mxJPO.java");
         this.origMXU         = new File(this.origDir, "MXUPDATE_Test_mxJPO.java.mxu");
-        this.origWOJpoMXU    = new File(this.origDir, "MXUPDATE_TestWOJpo_mxJPO.java.mxu");
         this.origPckJPO      = new File(this.origDir, "MXUPDATE_org/mxupdate/test/TestWithPackage_mxJPO.java");
         this.origPckMXU      = new File(this.origDir, "MXUPDATE_org.mxupdate.test.TestWithPackage_mxJPO.java.mxu");
-        this.origPckWOJpoMXU = new File(this.origDir, "MXUPDATE_org.mxupdate.test.TestWithPackageWOJpo_mxJPO.java.mxu");
     }
 
     @DataProvider(name = "data")
@@ -103,9 +101,6 @@ public class JPOProgramCI_5UpdateTest
             }
             @Override()
             protected void update(final ParameterCache_mxJPO _paramCache,
-                                  final CharSequence _preMQLCode,
-                                  final CharSequence _postMQLCode,
-                                  final CharSequence _preTCLCode,
                                   final Map<String,String> _tclVariables,
                                   final File _sourceFile)
                 throws Exception

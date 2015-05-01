@@ -125,7 +125,7 @@ public class Common
         final Exception ex = (Exception) bck.get("exception");
         Assert.assertTrue((ex != null), "an exception must be thrown");
         Assert.assertTrue(ex.getMessage().contains("UpdateError #"
-                                                    + ErrorKey.ABSTRACT_PROPERTY_JPO_CALL_METHOD_NOT_DEFINED.getCode()
+                                                    + ErrorKey.JPOCALLER_JPO_CALL_METHOD_NOT_DEFINED.getCode()
                                                     + ":"),
                           "correct error code is returned");
     }
@@ -150,7 +150,7 @@ public class Common
         final Exception ex = (Exception) bck.get("exception");
         Assert.assertTrue((ex != null), "an exception must be thrown");
         Assert.assertTrue(ex.getMessage().contains("UpdateError #"
-                                                    + ErrorKey.ABSTRACT_PROPERTY_JPO_CALL_METHOD_UNKNOWN.getCode()
+                                                    + ErrorKey.JPOCALLER_JPO_CALL_METHOD_UNKNOWN.getCode()
                                                     + ":"),
                           "correct error code is not returned " + ex.getMessage());
     }

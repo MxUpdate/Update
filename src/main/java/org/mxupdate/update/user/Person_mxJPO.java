@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,7 +38,6 @@ import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
-import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
@@ -676,6 +674,8 @@ public class Person_mxJPO
          * @param _sourceFile       souce file with the TCL code to update
          * @throws Exception if the update from derived class failed
          */
+// TODO:
+/*
         @Override()
         protected void update(final ParameterCache_mxJPO _paramCache,
                               final CharSequence _preMQLCode,
@@ -744,6 +744,7 @@ public class Person_mxJPO
                 MqlUtil_mxJPO.setHistoryOn(_paramCache);
             }
         }
+*/
     }
 
     /**
@@ -763,19 +764,19 @@ public class Person_mxJPO
          *
          * @see #parse(ParameterCache_mxJPO)
          */
-        private final Set<Person_mxJPO.ReferencedOrganization> employeeOf = new TreeSet<Person_mxJPO.ReferencedOrganization>();
+        private final Set<ReferencedOrganization> employeeOf = new TreeSet<ReferencedOrganization>();
 
         /**
          * Person is member of company.
          */
-        private final Set<Person_mxJPO.ReferencedOrganization> memberOf = new TreeSet<Person_mxJPO.ReferencedOrganization>();
+        private final Set<ReferencedOrganization> memberOf = new TreeSet<ReferencedOrganization>();
 
         /**
          * Set of all companies for which the person is company representative.
          *
          * @see #parse(ParameterCache_mxJPO)
          */
-        private final Set<Person_mxJPO.ReferencedOrganization> representativeOf = new TreeSet<Person_mxJPO.ReferencedOrganization>();
+        private final Set<ReferencedOrganization> representativeOf = new TreeSet<ReferencedOrganization>();
 
         /**
          * Constructor used to initialize the business object instance for

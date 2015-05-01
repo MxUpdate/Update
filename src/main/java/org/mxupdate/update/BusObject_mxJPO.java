@@ -325,12 +325,6 @@ public class BusObject_mxJPO
      * business object name and revision.
      *
      * @param _paramCache       parameter cache
-     * @param _preMQLCode       MQL statements which must be called before the
-     *                          TCL code is executed
-     * @param _postMQLCode      MQL statements which must be called after the
-     *                          TCL code is executed
-     * @param _preTCLCode       TCL code which is defined before the source
-     *                          file is sourced
      * @param _tclVariables     map of all TCL variables where the key is the
      *                          name and the value is value of the TCL variable
      *                          (the value is automatically converted to TCL
@@ -340,16 +334,13 @@ public class BusObject_mxJPO
      */
     @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
-                          final CharSequence _preMQLCode,
-                          final CharSequence _postMQLCode,
-                          final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
         throws Exception
     {
         _tclVariables.put("NAME",this.busName);
         _tclVariables.put("REVISION",this.busRevision);
-        super.update(_paramCache, _preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+        super.update(_paramCache, _tclVariables, _sourceFile);
     }
 
     /**
@@ -453,74 +444,69 @@ public class BusObject_mxJPO
 
     @Override()
     public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
-                               final String... _args)
+                               final String _file,
+                               final String _fileDate,
+                               final String _name,
+                               final String _revision,
+                               final String _code)
         throws Exception
     {
-        if ((_args.length == 8) && "mxUpdate".equals(_args[0]) && this.getTypeDef().getMxUpdateType().equals(_args[1])) {
+        final BusObject_mxJPO clazz = (BusObject_mxJPO) this.getTypeDef().newTypeInstance(_name + BusObject_mxJPO.SPLIT_NAME + _revision);
+        clazz.busType = this.busType;
+        clazz.parseUpdate(_code);
 
-            final String name = _args[2].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\");
-            final String revi = _args[3].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\");
-            final String devi = _args[4].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\");
-
-            final BusObject_mxJPO clazz = (BusObject_mxJPO) this.getTypeDef().newTypeInstance(name + BusObject_mxJPO.SPLIT_NAME + revi);
-            clazz.busType = this.busType;
-            clazz.parseUpdate(devi);
-
-            // MxUpdate File Date => must be always overwritten if newer!
-            final String attrFileDate = PropertyDef_mxJPO.FILEDATE.getAttrName(_paramCache);
-            if ((attrFileDate != null) && !attrFileDate.isEmpty())  {
-                clazz.attrValues.put(attrFileDate, _args[5]);
-            }
-
-            // installed date => reuse if already defined, new is not
-            final String attrInstDate = PropertyDef_mxJPO.INSTALLEDDATE.getAttrName(_paramCache);
-            if ((attrInstDate != null) && !attrInstDate.isEmpty())  {
-                final String curInstalledDate = this.attrValues.get(attrInstDate);
-                clazz.attrValues.put(
-                        attrInstDate,
-                        ((curInstalledDate != null) && !curInstalledDate.trim().isEmpty()) ? curInstalledDate : StringUtil_mxJPO.formatInstalledDate(_paramCache, new Date()));
-            }
-
-            // installer
-            // => check if already defined
-            // => check if installed via parameter
-            // => use default installer
-            final String attrInstaller = PropertyDef_mxJPO.INSTALLER.getAttrName(_paramCache);
-            if ((attrInstaller != null) && !attrInstaller.isEmpty())  {
-                final String curInstaller = this.attrValues.get(attrInstaller);
-                clazz.attrValues.put(
-                        attrInstaller,
-                        _paramCache.contains(ValueKeys.Installer)
-                                ? _paramCache.getValueString(ValueKeys.Installer)
-                                : ((curInstaller != null) && !curInstaller.isEmpty())
-                                        ? curInstaller
-                                        : _paramCache.getValueString(ValueKeys.DefaultInstaller));
-            }
-
-            // calc sub path always
-            final String attrSubPath = PropertyDef_mxJPO.SUBPATH.getAttrName(_paramCache);
-            if ((attrSubPath != null) && !attrSubPath.isEmpty())  {
-                clazz.attrValues.put(
-                        attrSubPath,
-                        FileHandlingUtil_mxJPO.extraceSubPath(_args[6], this.getTypeDef().getFilePath()));
-            }
-
-            // attributes to ignore
-            for (final String attrName : this.getTypeDef().getMxBusIgnoredAttributes())  {
-                if ((this.attrValues.get(attrName) != null) && !this.attrValues.get(attrName).isEmpty())  {
-                    clazz.attrValues.put(attrName, this.attrValues.get(attrName));
-                }
-            }
-
-            // initialize MQL builder
-            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine(new File(_args[6]), "escape mod bus $1 $2 $3", this.busType, this.busName, this.busRevision);
-
-            clazz.calcDelta(_paramCache, mql, this);
-
-            mql.exec(_paramCache);
-        } else  {
-            super.jpoCallExecute(_paramCache, _args);
+        // MxUpdate File Date => must be always overwritten if newer!
+        final String attrFileDate = PropertyDef_mxJPO.FILEDATE.getAttrName(_paramCache);
+        if ((attrFileDate != null) && !attrFileDate.isEmpty())  {
+            clazz.attrValues.put(attrFileDate, _fileDate);
         }
+
+        // installed date => reuse if already defined, new is not
+        final String attrInstDate = PropertyDef_mxJPO.INSTALLEDDATE.getAttrName(_paramCache);
+        if ((attrInstDate != null) && !attrInstDate.isEmpty())  {
+            final String curInstalledDate = this.attrValues.get(attrInstDate);
+            clazz.attrValues.put(
+                    attrInstDate,
+                    ((curInstalledDate != null) && !curInstalledDate.trim().isEmpty()) ? curInstalledDate : StringUtil_mxJPO.formatInstalledDate(_paramCache, new Date()));
+        }
+
+        // installer
+        // => check if already defined
+        // => check if installed via parameter
+        // => use default installer
+        final String attrInstaller = PropertyDef_mxJPO.INSTALLER.getAttrName(_paramCache);
+        if ((attrInstaller != null) && !attrInstaller.isEmpty())  {
+            final String curInstaller = this.attrValues.get(attrInstaller);
+            clazz.attrValues.put(
+                    attrInstaller,
+                    _paramCache.contains(ValueKeys.Installer)
+                            ? _paramCache.getValueString(ValueKeys.Installer)
+                            : ((curInstaller != null) && !curInstaller.isEmpty())
+                                    ? curInstaller
+                                    : _paramCache.getValueString(ValueKeys.DefaultInstaller));
+        }
+
+        // calc sub path always
+        final String attrSubPath = PropertyDef_mxJPO.SUBPATH.getAttrName(_paramCache);
+        if ((attrSubPath != null) && !attrSubPath.isEmpty())  {
+            clazz.attrValues.put(
+                    attrSubPath,
+                    FileHandlingUtil_mxJPO.extraceSubPath(_file, this.getTypeDef().getFilePath()));
+        }
+
+        // attributes to ignore
+        for (final String attrName : this.getTypeDef().getMxBusIgnoredAttributes())  {
+            if ((this.attrValues.get(attrName) != null) && !this.attrValues.get(attrName).isEmpty())  {
+                clazz.attrValues.put(attrName, this.attrValues.get(attrName));
+            }
+        }
+
+        // initialize MQL builder
+        final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine(new File(_file), "escape mod bus $1 $2 $3", this.busType, this.busName, this.busRevision);
+
+        clazz.calcDelta(_paramCache, mql, this);
+
+        mql.exec(_paramCache);
     }
 
     @Override()

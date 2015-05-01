@@ -18,7 +18,6 @@ package org.mxupdate.update;
 import java.io.File;
 import java.io.StringReader;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -280,12 +279,6 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
      * Then the update method of the super class is called.
      *
      * @param _paramCache       parameter cache
-     * @param _preMQLCode       MQL statements which must be called before the
-     *                          TCL code is executed
-     * @param _postMQLCode      MQL statements which must be called after the
-     *                          TCL code is executed
-     * @param _preTCLCode       TCL code which is defined before the source
-     *                          file is sourced
      * @param _tclVariables     map of all TCL variables where the key is the
      *                          name and the value is value of the TCL variable
      *                          (the value is automatically converted to TCL
@@ -295,28 +288,19 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
      */
     @Override()
     protected void update(final ParameterCache_mxJPO _paramCache,
-                          final CharSequence _preMQLCode,
-                          final CharSequence _postMQLCode,
-                          final CharSequence _preTCLCode,
                           final Map<String,String> _tclVariables,
                           final File _sourceFile)
         throws Exception
     {
-        // prepare map of all TCL variables incl. name of admin object
-        final Map<String,String> tclVariables = new HashMap<String,String>();
-        tclVariables.put("NAME", this.getName());
-        tclVariables.putAll(_tclVariables);
-
-        super.update(_paramCache, _preMQLCode, _postMQLCode, _preTCLCode, tclVariables, _sourceFile);
+        _tclVariables.put("NAME", this.getName());
+        _tclVariables.putAll(_tclVariables);
+        super.update(_paramCache, _tclVariables, _sourceFile);
     }
 
     /**
      * The method is called within the update of an administration object. The
      * method is called directly within the update.
      * <ul>
-     * <li>All <code>@0@0@</code> are replaced by quot's and all
-     *     <code>@1@1@</code> are replaced by apostroph's.</li>
-     * <li>The new policy definition is parsed.</li>
      * <li>A delta MQL script generated to update the policy to the new target
      *     definition.</li>
      * <li>All symbolic names for states are defined (as property on the
@@ -333,65 +317,60 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     @Override()
     @SuppressWarnings("unchecked")
     public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
-                               final String... _args)
+                               final String _file,
+                               final String _fileDate,
+                               final String _name,
+                               final String _revision,
+                               final String _code)
         throws Exception
     {
-        if ((_args.length == 8) && "mxUpdate".equals(_args[0]) && this.getTypeDef().getMxUpdateType().equals(_args[1])) {
+        final CLASS clazz = (CLASS) this.getTypeDef().newTypeInstance(_name);
+        clazz.parseUpdate(_code);
 
-            final String name = _args[2].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\");
-            final String devi = _args[4].replaceAll("@2@2@", "\\\"").replaceAll("@1@1@", "'").replaceAll("@0@0@", "\\\\");
+        // MxUpdate File Date => must be always overwritten if newer!
+        clazz.getProperties().setValue4KeyValue(
+                _paramCache,
+                PropertyDef_mxJPO.FILEDATE,
+                _fileDate);
 
-            final CLASS clazz = (CLASS) this.getTypeDef().newTypeInstance(name);
+        // installed date => reuse if already defined, new is not
+        final String curInstalledDate = this.getProperties().getValue4KeyValue(_paramCache, PropertyDef_mxJPO.INSTALLEDDATE);
+        clazz.getProperties().setValue4KeyValue(
+                _paramCache,
+                PropertyDef_mxJPO.INSTALLEDDATE,
+                ((curInstalledDate != null) && !curInstalledDate.isEmpty()) ? curInstalledDate : StringUtil_mxJPO.formatInstalledDate(_paramCache, new Date()));
 
-            clazz.parseUpdate(devi);
+        // installer
+        // => check if already defined
+        // => check if installed via parameter
+        // => use default installer
+        final String curInstaller = this.getProperties().getValue4KeyValue(_paramCache, PropertyDef_mxJPO.INSTALLER);
+        clazz.getProperties().setValue4KeyValue(
+                _paramCache,
+                PropertyDef_mxJPO.INSTALLER,
+                _paramCache.contains(ValueKeys.Installer)
+                        ? _paramCache.getValueString(ValueKeys.Installer)
+                        : ((curInstaller != null) && !curInstaller.isEmpty())
+                                ? curInstaller
+                                : _paramCache.getValueString(ValueKeys.DefaultInstaller));
 
-            // MxUpdate File Date => must be always overwritten if newer!
-            clazz.getProperties().setValue4KeyValue(
-                    _paramCache,
-                    PropertyDef_mxJPO.FILEDATE,
-                    _args[5]);
+        // calc sub path always
+        clazz.getProperties().setValue4KeyValue(
+                _paramCache,
+                PropertyDef_mxJPO.SUBPATH,
+                FileHandlingUtil_mxJPO.extraceSubPath(_file, this.getTypeDef().getFilePath()));
 
-            // installed date => reuse if already defined, new is not
-            final String curInstalledDate = this.getProperties().getValue4KeyValue(_paramCache, PropertyDef_mxJPO.INSTALLEDDATE);
-            clazz.getProperties().setValue4KeyValue(
-                    _paramCache,
-                    PropertyDef_mxJPO.INSTALLEDDATE,
-                    ((curInstalledDate != null) && !curInstalledDate.isEmpty()) ? curInstalledDate : StringUtil_mxJPO.formatInstalledDate(_paramCache, new Date()));
-
-            // installer
-            // => check if already defined
-            // => check if installed via parameter
-            // => use default installer
-            final String curInstaller = this.getProperties().getValue4KeyValue(_paramCache, PropertyDef_mxJPO.INSTALLER);
-            clazz.getProperties().setValue4KeyValue(
-                    _paramCache,
-                    PropertyDef_mxJPO.INSTALLER,
-                    _paramCache.contains(ValueKeys.Installer)
-                            ? _paramCache.getValueString(ValueKeys.Installer)
-                            : ((curInstaller != null) && !curInstaller.isEmpty())
-                                    ? curInstaller
-                                    : _paramCache.getValueString(ValueKeys.DefaultInstaller));
-
-            // calc sub path always
-            clazz.getProperties().setValue4KeyValue(
-                    _paramCache,
-                    PropertyDef_mxJPO.SUBPATH,
-                    FileHandlingUtil_mxJPO.extraceSubPath(_args[6], this.getTypeDef().getFilePath()));
-
-            // initialize MQL builder (with or w/o suffix!)
-            final MultiLineMqlBuilder mql;
-            if ((this.getTypeDef().getMxAdminSuffix() != null) && !this.getTypeDef().getMxAdminSuffix().isEmpty())  {
-                mql = MqlBuilder_mxJPO.multiLine(new File(_args[6]), "escape mod " + this.getTypeDef().getMxAdminName() + " $1 " + this.getTypeDef().getMxAdminSuffix(), this.getName());
-            } else  {
-                mql = MqlBuilder_mxJPO.multiLine(new File(_args[6]), "escape mod " + this.getTypeDef().getMxAdminName() + " $1", this.getName());
-            }
-
-            clazz.calcDelta(_paramCache, mql, (CLASS) this);
-
-            mql.exec(_paramCache);
+        // initialize MQL builder (with or w/o suffix!)
+        final MultiLineMqlBuilder mql;
+        if ((this.getTypeDef().getMxAdminSuffix() != null) && !this.getTypeDef().getMxAdminSuffix().isEmpty())  {
+            mql = MqlBuilder_mxJPO.multiLine(new File(_file), "escape mod " + this.getTypeDef().getMxAdminName() + " $1 " + this.getTypeDef().getMxAdminSuffix(), this.getName());
         } else  {
-            super.jpoCallExecute(_paramCache, _args);
+            mql = MqlBuilder_mxJPO.multiLine(new File(_file), "escape mod " + this.getTypeDef().getMxAdminName() + " $1", this.getName());
         }
+
+        clazz.calcDelta(_paramCache, mql, (CLASS) this);
+
+        mql.exec(_paramCache);
     }
 
     /**
