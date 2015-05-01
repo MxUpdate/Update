@@ -54,6 +54,8 @@ public class Relationship_mxJPO
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
         Relationship_mxJPO.IGNORED_URLS.add("/attributeDefRefList");
+        Relationship_mxJPO.IGNORED_URLS.add("/derivedFromRelationship");
+        Relationship_mxJPO.IGNORED_URLS.add("/derivedFromRelationship/relationshipDefRefList");
         Relationship_mxJPO.IGNORED_URLS.add("/localAttributes");
         Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList");
         Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef");
@@ -89,10 +91,15 @@ public class Relationship_mxJPO
     /** Kind of relationship. */
     private Kind kind = Kind.Basic;
 
+    /** Relationship is abstract. */
+    private Boolean abstractRel;
+    /** Relationship is derived from this relationship. */
+    private String derived;
+
     /** Set holding rule referencing this relationship. */
     private String rule;
     /** Prevent duplicates for this relationship. */
-    private Boolean preventDuplicates = null;
+    private Boolean preventDuplicates;
     /** From side information. */
     private final Side from = new Side("from");
     /** To side information. */
@@ -165,12 +172,19 @@ public class Relationship_mxJPO
         final boolean parsed;
         if (Relationship_mxJPO.IGNORED_URLS.contains(_url))  {
             parsed = true;
+        } else if ("/abstract".equals(_url))  {
+            this.abstractRel = true;
+            parsed = true;
         } else if ("/accessRuleRef".equals(_url))  {
             this.rule = _content;
             parsed = true;
 
         } else if (_url.startsWith("/attributeDefRefList"))  {
             parsed = this.attributeList.parse(_paramCache, _url.substring(20), _content);
+
+        } else if (_url.startsWith("/derivedFromRelationship/relationshipDefRefList/relationshipDefRef"))  {
+            this.derived = _content;
+            parsed = true;
 
         } else if ("/fromSide/cardinality".equals(_url))  {
             this.from.cardinality = _content.equalsIgnoreCase("1") ? "one" : _content.equalsIgnoreCase("N") ? "many" : _content;
@@ -260,9 +274,11 @@ public class Relationship_mxJPO
         }
 
         updateBuilder
+                .flagIfTrue("abstract", false, this.abstractRel)
+                .stringIfNotEmpty("derived", this.derived)
                 .flag("hidden", false, this.isHidden())
                 .flag("preventduplicates", false, this.preventDuplicates)
-                .stringIfNotNull("rule", this.rule);
+                .stringIfNotEmpty("rule", this.rule);
 
         this.getTriggers().write(updateBuilder);
         this.from.write(updateBuilder);
@@ -333,9 +349,10 @@ public class Relationship_mxJPO
                              final Relationship_mxJPO _current)
         throws UpdateException_mxJPO
     {
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "description",              this.getDescription(),  _current.getDescription());
-        DeltaUtil_mxJPO.calcFlagDelta( _mql, "hidden",            false, this.isHidden(),        _current.isHidden());
-        DeltaUtil_mxJPO.calcFlagDelta( _mql, "preventduplicates", false, this.preventDuplicates, _current.preventDuplicates);
+        DeltaUtil_mxJPO.calcValueDelta(  _mql, "description",              this.getDescription(),  _current.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(   _mql, "hidden",            false, this.isHidden(),        _current.isHidden());
+        DeltaUtil_mxJPO.calcFlagDelta(   _mql, "preventduplicates", false, this.preventDuplicates, _current.preventDuplicates);
+        DeltaUtil_mxJPO.calcValFlgDelta( _mql, "abstract",          false, this.abstractRel,       _current.abstractRel);
 
         // only one rule can exists maximum, but they must be technically handled like as list
         final Set<String> thisRules = new HashSet<String>(1);
@@ -352,6 +369,21 @@ public class Relationship_mxJPO
         this.to             .calcDelta(_paramCache, _mql, _current.to);
         this.attributeList  .calcDelta(_paramCache, _mql, _current.attributeList);
         this.getProperties().calcDelta(_mql, "", _current.getProperties());
+
+        // derived information
+        final String thisDerived = (this.derived == null) ? "" : this.derived;
+        final String currDerived = (_current.derived == null) ? "" : _current.derived;
+        if (!thisDerived.equals(currDerived))  {
+            if (!currDerived.isEmpty())  {
+                throw new UpdateException_mxJPO(
+                        UpdateException_mxJPO.Error.DM_RELATIONSHIP_UPDATE_DERIVED,
+                        this.getTypeDef().getLogging(),
+                        this.getName(),
+                        _current.kind,
+                        this.kind);
+            }
+            _mql.newLine().cmd("derived ").arg(thisDerived);
+        }
 
         // kind at least to ensure all properties are set
         if (this.kind != _current.kind)  {

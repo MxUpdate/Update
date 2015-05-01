@@ -26,7 +26,8 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.ExportParser.Line;
+import org.mxupdate.test.data.util.FlagList;
+import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.data.util.PropertyDefList;
 import org.testng.Assert;
@@ -54,7 +55,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     private String symbolicName;
 
     /** Defines flags for this data piece. */
-    private final Flags flags = new Flags();
+    private final FlagList flags = new FlagList();
 
     /**
      * Defines the flags and their default value which must be defined for an
@@ -144,7 +145,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
      *
      * @param _key          key (name) of the flag
      * @param _value        <i>true</i> to activate the flag; otherwise
-     *                      <i>false</i>; to undefine set to <code>null</code>
+     *                      <i>false</i>; to undefine set to {@code null}
      * @return this data instance
      * @see #flags
      */
@@ -152,7 +153,26 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     public DATA setFlag(final String _key,
                         final Boolean _value)
     {
-        this.flags.put(_key, _value);
+        this.flags.setFlag(_key, _value);
+        return (DATA) this;
+    }
+
+    /**
+     * Defines the flag and the value.
+     *
+     * @param _key          key (name) of the flag
+     * @param _value        <i>true</i> to activate the flag; otherwise
+     *                      <i>false</i>; to undefine set to {@code null}
+     * @param _createConf   create configuration
+     * @return this data instance
+     * @see #flags
+     */
+    @SuppressWarnings("unchecked")
+    public DATA setFlag(final String _key,
+                        final Boolean _value,
+                        final Create _createConf)
+    {
+        this.flags.setFlag(_key, _value, _createConf);
         return (DATA) this;
     }
 
@@ -161,7 +181,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
      *
      * @return all defined flags
      */
-    public Flags getFlags()
+    public FlagList getFlags()
     {
         return this.flags;
     }
@@ -347,8 +367,8 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         if (!this.requiredExportFlags.isEmpty())  {
             final Set<String> main = new HashSet<String>(_exportParser.getLines("/mql/"));
             for (final Map.Entry<String,Boolean> flag : this.requiredExportFlags.entrySet())  {
-                final boolean value = this.flags.containsKey(flag.getKey()) && (this.flags.get(flag.getKey()) != null)
-                                      ? this.flags.get(flag.getKey())
+                final boolean value = this.flags.contains(flag.getKey()) && (this.flags.getValue(flag.getKey()) != null)
+                                      ? this.flags.getValue(flag.getKey())
                                       : flag.getValue();
                 Assert.assertEquals(
                         main.contains(flag.getKey()) || main.contains(flag.getKey() + " \\"),
@@ -381,7 +401,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         // check hidden flag
         if (this.getCI() != null)  {
             final Set<String> main = new HashSet<String>(_exportParser.getLines("/mql/"));
-            if ((this.getFlags().get("hidden") != null) && this.getFlags().get("hidden"))  {
+            if ((this.getFlags().getValue("hidden") != null) && this.getFlags().getValue("hidden"))  {
                 Assert.assertTrue(
                         main.contains("hidden") || main.contains("hidden \\"),
                         "check that " + this.getCI().getMxType() + " '" + this.getName() + "' is hidden");
@@ -409,167 +429,5 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
      */
     protected void evalAdds4CheckExport(final Set<String> _needAdds)
     {
-    }
-
-    /**
-     * Flags with boolean values.
-     */
-    public static class Flags
-        extends HashMap<String,Boolean>
-    {
-        /** Serial Version UID. */
-        private static final long serialVersionUID = 7175584496473386072L;
-
-        /**
-         * Appends the defined flags to the TCL code {@code _cmd} of the
-         * configuration item file.
-         *
-         * @param _prefix   prefix in front of the values
-         * @param _cmd      string builder with the TCL commands of the
-         *                  configuration item file
-         */
-        public void appendUpdate(final String _prefix,
-                                 final StringBuilder _cmd)
-        {
-            for (final Map.Entry<String,Boolean> entry : this.entrySet())  {
-                if (entry.getValue() != null)  {
-                    _cmd.append(_prefix);
-                    if (!entry.getValue())  {
-                        _cmd.append('!');
-                    }
-                    _cmd.append(entry.getKey()).append('\n');
-                }
-            }
-        }
-
-        /**
-         * Appends the defined flags to the TCL code {@code _cmd} of the
-         * configuration item file.
-         *
-         * @param _prefix   prefix in front of the values
-         * @param _cmd      string builder with the TCL commands of the
-         *                  configuration item file
-         * @param _suffix   suffix after the values
-         */
-        @Deprecated()
-        public void append4CIFileValues(final String _prefix,
-                                        final StringBuilder _cmd,
-                                        final String _suffix)
-        {
-            for (final Map.Entry<String,Boolean> entry : this.entrySet())  {
-                if (entry.getValue() != null)  {
-                    _cmd.append(_prefix);
-                    if (!entry.getValue())  {
-                        _cmd.append('!');
-                    }
-                    _cmd.append(entry.getKey())
-                        .append(_suffix);
-                }
-            }
-        }
-
-        /**
-         * Appends the MQL commands to define all flags.
-         *
-         * @param _cmd  string builder used to append MQL commands
-         */
-        public void append4Create(final StringBuilder _cmd)
-        {
-            for (final Map.Entry<String,Boolean> entry : this.entrySet())  {
-                if (entry.getValue() != null)  {
-                    _cmd.append(' ');
-                    if (!entry.getValue())  {
-                        _cmd.append('!');
-                    }
-                    _cmd.append(entry.getKey());
-                }
-            }
-        }
-
-        /**
-         * Checks for all defined flags.
-         *
-         * @param _exportParser parsed export
-         * @param _url          URL where to find the flags
-         * @param _errorLabel   label used for shown error
-         */
-        @Deprecated()
-        public void checkExport(final ExportParser _exportParser,
-                                final String _url,
-                                final String _errorLabel)
-        {
-            final Set<String> main = new HashSet<String>(_exportParser.getLines(_url));
-            for (final Map.Entry<String,Boolean> flag : this.entrySet())  {
-                if (flag.getValue() != null)  {
-                    // check flag is defined
-                    final String key = flag.getValue() ? flag.getKey() : "!" + flag.getKey();
-                    Assert.assertTrue(
-                            main.contains(key) || main.contains(key + " \\"),
-                            "check that " + _errorLabel + "' contains flag " + key);
-                    // check that inverted flag is NOT defined
-                    final String keyInv = flag.getValue() ? "!" + flag.getKey() : flag.getKey();
-                    Assert.assertTrue(
-                            !main.contains(keyInv) && !main.contains(keyInv + " \\"),
-                            "check that " + _errorLabel + " does not contain flag " + keyInv);
-                }
-            }
-        }
-
-        /**
-         * Checks for all defined flags.
-         *
-         * @param _parentLine   parent line where the flags must be defined
-         * @param _errorLabel   label used for shown error
-         */
-        public void checkExport(final ExportParser _exportParser,
-                                final String _path)
-        {
-            for (final Map.Entry<String,Boolean> flag : this.entrySet())  {
-                _exportParser.checkFlag((_path.isEmpty() ? "" : _path + "/") + flag.getKey(), flag.getValue());
-            }
-        }
-
-        /**
-         * Checks for all defined flags.
-         *
-         * @param _parentLine   parent line where the flags must be defined
-         * @param _errorLabel   label used for shown error
-         */
-        @Deprecated()
-        public void checkExport(final Line _parentLine,
-                                final String _errorLabel)
-        {
-            for (final Map.Entry<String,Boolean> flag : this.entrySet())  {
-                if (flag.getValue() != null)  {
-                    // check flag is defined
-                    final String key = flag.getValue() ? flag.getKey() : "!" + flag.getKey();
-                    Assert.assertEquals(
-                            _parentLine.getLines(key + "/@name").size(),
-                            1,
-                            "check flag " + key + " is defined");
-                    Assert.assertEquals(
-                            _parentLine.getLines(key + "/@name").get(0),
-                            key,
-                            "check flag " + key + " is defined");
-                    // check that inverted flag is NOT defined
-                    final String keyInv = flag.getValue() ? "!" + flag.getKey() : flag.getKey();
-                    Assert.assertEquals(
-                            _parentLine.getLines(keyInv + "/@name").size(),
-                            0,
-                            "check that " + _errorLabel + " does not contain flag " + keyInv);
-                } else  {
-                    // check flag is NOT defined
-                    Assert.assertEquals(
-                            _parentLine.getLines(flag.getKey() + "/@name").size(),
-                            0,
-                            "check flag " + flag.getKey() + " is not defined");
-                    // check that inverted flag is NOT defined
-                    Assert.assertEquals(
-                            _parentLine.getLines("!" + flag.getKey() + "/@name").size(),
-                            0,
-                            "check flag !" + flag.getKey() + " is not defined");
-                }
-            }
-        }
     }
 }

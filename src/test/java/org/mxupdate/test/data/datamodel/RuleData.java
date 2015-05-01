@@ -163,8 +163,8 @@ public class RuleData
                 this.getSymbolicName(),
                 "check symbolic name");
 
-        this.getFlags().checkExport(_exportParser.getRootLines().get(0), "");
-        this.getValues().checkExport(_exportParser);
+        this.getFlags().checkExport(_exportParser, "");
+        this.getValues().checkExport(_exportParser, "");
         this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
 
         // access filter

@@ -269,9 +269,9 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         throws MatrixException
     {
         // check for defined values
-        this.getValues().checkExport(_exportParser);
+        this.getValues().checkExport(_exportParser, "");
         // check for defined flags
-        this.getFlags().checkExport(_exportParser.getRootLines().get(0), "");
+        this.getFlags().checkExport(_exportParser, "");
         // check for rule
         if (this.rule == null) {
             this.checkNotExistingSingleValue(_exportParser, "rule", "rule");

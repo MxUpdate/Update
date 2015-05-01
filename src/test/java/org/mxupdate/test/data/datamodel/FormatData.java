@@ -253,9 +253,9 @@ public class FormatData
         throws MatrixException
     {
         // check for defined values
-        this.getValues().checkExport(_exportParser);
+        this.getValues().checkExport(_exportParser, "");
         // check for defined flags
-        this.getFlags().checkExport(_exportParser.getRootLines().get(0), "");
+        this.getFlags().checkExport(_exportParser, "");
         // check for properties
         this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
 

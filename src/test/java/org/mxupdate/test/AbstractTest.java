@@ -492,23 +492,6 @@ public abstract class AbstractTest
     }
 
     /**
-     * Makes a clean up for given configuration item <code>_type</code> with
-     * <code>_name</code>. This means the configuration item object is deleted.
-     *
-     * @param _type     configuration item type to clean up (delete)
-     * @param _name     name of the configuration item to clean up (delete)
-     * @throws MatrixException if delete failed
-     */
-    protected void cleanup(final CI _type,
-                           final String _name)
-        throws MatrixException
-    {
-        if (!"".equals(this.mql("list " + _type.mxType + " '" + _name + "'")))  {
-            this.mql("delete " + _type.mxType + " '" + _name + "'");
-        }
-    }
-
-    /**
      * Cleanups given configuration <code>_type</code>. This means that all
      * existing administration object which starts with {@link #PREFIX} are
      * deleted. Only if {@link CI#wildcardSearch} is <i>true</i>, a search via
@@ -539,6 +522,11 @@ public abstract class AbstractTest
                     elements = this.mqlAsSet("escape list " + _type.mxType);
                 }
                 if (_type == AbstractTest.CI.DM_INTERFACE)  {
+                    for (final String element : elements)  {
+                        this.mql("escape mod " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\" remove derived");
+                    }
+                }
+                if ((_type == AbstractTest.CI.DM_RELATIONSHIP) && (this.getVersion().min(Version.V6R2013x)))  {
                     for (final String element : elements)  {
                         this.mql("escape mod " + _type.mxType + " \"" + AbstractTest.convertMql(element) + "\" remove derived");
                     }

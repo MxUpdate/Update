@@ -25,6 +25,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
+import org.mxupdate.test.data.util.FlagList;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.data.util.PropertyDefList;
 import org.testng.Assert;
@@ -68,8 +69,7 @@ public class DimensionData
 
         this.append4CIFileHeader(strg);
 
-        strg.append("mxUpdate dimension \"${NAME}\" {\n")
-            .append("    hidden \"").append(this.getFlags().get("hidden") != null ? this.getFlags().get("hidden") : false).append("\"\n");
+        strg.append("mxUpdate dimension \"${NAME}\" {\n");
 
         this.getValues().appendUpdate("    ", strg);
         this.getFlags().appendUpdate("    ", strg);
@@ -163,8 +163,8 @@ public class DimensionData
             unit.checkExport(_exportParser);
         }
 
-        this.getValues().checkExport(_exportParser);
-        this.getFlags().checkExport(_exportParser.getRootLines().get(0), "");
+        this.getValues()    .checkExport(_exportParser, "");
+        this.getFlags()     .checkExport(_exportParser, "");
         this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
     }
 
@@ -199,7 +199,7 @@ public class DimensionData
         /** Name of the unit. */
         private final String name;
         /** Flags of the unit data. */
-        private final Flags flags = new Flags();
+        private final FlagList flags = new FlagList();
         /** Values with quotations of this unit. */
         private final Map<String,String> valuesWithQuots = new HashMap<String,String>();
         /** Values w/o quotations of this unit. */
@@ -237,7 +237,7 @@ public class DimensionData
         public UnitData setFlag(final String _key,
                                 final boolean _value)
         {
-            this.flags.put(_key, _value);
+            this.flags.setFlag(_key, _value);
             return this;
         }
 

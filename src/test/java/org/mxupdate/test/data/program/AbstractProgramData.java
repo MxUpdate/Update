@@ -282,7 +282,7 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
             _cmd.append(" execute user \"").append(AbstractTest.convertMql(this.getUser().getName())).append("\"");
         }
         // hidden flag
-        if ((this.getFlags().get("hidden") != null) && this.getFlags().get("hidden"))  {
+        if ((this.getFlags().getValue("hidden") != null) && this.getFlags().getValue("hidden"))  {
             _cmd.append(" hidden");
         }
         // deferred flag
@@ -332,7 +332,7 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
             _cmd.append(" execute user \"").append(AbstractTest.convertTcl(this.getUser().getName())).append("\"");
         }
         // hidden flag
-        if ((this.getFlags().get("hidden") != null) && this.getFlags().get("hidden"))  {
+        if ((this.getFlags().getValue("hidden") != null) && this.getFlags().getValue("hidden"))  {
             _cmd.append(" hidden");
         }
         // deferred flag
@@ -381,7 +381,7 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
         // check hidden
         Assert.assertEquals(Boolean.valueOf(this.getTest().mql("escape print program \""
                                         + AbstractTest.convertMql(this.getName()) + "\" select hidden dump")).booleanValue(),
-                            (this.getFlags().get("hidden") != null) ? this.getFlags().get("hidden").booleanValue() : false,
+                            (this.getFlags().getValue("hidden") != null) ? this.getFlags().getValue("hidden").booleanValue() : false,
                             "hidden flag correct defined");
         // check description
         Assert.assertEquals(this.getTest().mql("escape print program \"" + AbstractTest.convertMql(this.getName()) + "\" select description dump"),

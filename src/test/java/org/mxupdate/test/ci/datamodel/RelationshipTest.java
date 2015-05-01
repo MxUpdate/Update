@@ -25,6 +25,8 @@ import org.mxupdate.test.data.datamodel.RelationshipData.Cardinality;
 import org.mxupdate.test.data.datamodel.RuleData;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.program.MQLProgramData;
+import org.mxupdate.test.data.util.FlagList.Create;
+import org.mxupdate.test.util.Version;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.testng.annotations.AfterClass;
@@ -70,16 +72,20 @@ public class RelationshipTest
                 new Object[]{
                         "relationship without defined preventduplicates flag (to test default value)",
                         new RelationshipData(this, "TestRelationship \" 1"),
-                        new RelationshipData(this, "TestRelationship \" 1")
-                                .setFlag("preventduplicates", false)},
+                        new RelationshipData(this, "TestRelationship \" 1").setFlag("preventduplicates", false)},
                 new Object[]{
                         "relationship with triggers (to test escaped triggers)",
-                        new RelationshipData(this, "TestRelationship \" 1")
-                                .addTrigger(new AbstractDataWithTrigger.TriggerAction("modify", new MQLProgramData(this, "Test Program")))},
+                        new RelationshipData(this, "TestRelationship \" 1").addTrigger(new AbstractDataWithTrigger.TriggerAction("modify", new MQLProgramData(this, "Test Program")))},
                 new Object[]{
                         "relationship with one rule (multiple are not working!)",
-                        new RelationshipData(this, "TestRelationship")
-                                .setRule(new RuleData(this, "Rule"))},
+                        new RelationshipData(this, "TestRelationship").setRule(new RuleData(this, "Rule"))},
+               new Object[]{
+                       "relationship abstract true",
+                       new RelationshipData(this, "TestRelationship").setFlag("abstract", true, Create.ViaValue).notSupported(Version.V6R2011x, Version.V6R2012x)},
+               new Object[]{
+                       "relationship abstract false",
+                       new RelationshipData(this, "TestRelationship").setFlag("abstract", false, Create.ViaValue).notSupported(Version.V6R2011x, Version.V6R2012x),
+                       new RelationshipData(this, "TestRelationship")},
                 // from side
                 new Object[]{
                         "relationship without from propagate connection",
@@ -535,6 +541,48 @@ public class RelationshipTest
                 .setSingle("kind", "basic")
                 .failureUpdate(UpdateException_mxJPO.Error.DM_RELATIONSHIP_NOT_BASIC_KIND)
                 .setSingle("kind", "compositional")
+                .checkExport();
+    }
+
+    /**
+     * Positive test that a derived relationship is defined.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "positive test that a derived relationship is defined")
+    public void positiveTestDerived()
+        throws Exception
+    {
+        this.createNewData("Parent")
+                .create();
+        this.createNewData("Test")
+                .create()
+                .update("")
+                .setValue("derived", AbstractTest.PREFIX + "Parent")
+                .update("")
+                .checkExport();
+    }
+
+    /**
+     * Negative test that an existing derived relationship is updated.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "negative test that derived relationship is changed")
+    public void negativeTestDerivedChanged()
+        throws Exception
+    {
+        this.createNewData("Parent1")
+                .create();
+        this.createNewData("Parent2")
+                .create();
+        this.createNewData("Test")
+                .create()
+                .setValue("derived", AbstractTest.PREFIX + "Parent1")
+                .update("")
+                .setValue("derived", AbstractTest.PREFIX + "Parent2")
+                .failureUpdate(UpdateException_mxJPO.Error.DM_RELATIONSHIP_UPDATE_DERIVED)
+                .setValue("derived", AbstractTest.PREFIX + "Parent1")
                 .checkExport();
     }
 

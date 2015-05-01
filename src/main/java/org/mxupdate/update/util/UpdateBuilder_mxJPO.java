@@ -77,10 +77,10 @@ public class UpdateBuilder_mxJPO
      * @param _value    value
      * @return this update builder instance
      */
-    public UpdateBuilder_mxJPO stringIfNotNull(final String _tag,
+    public UpdateBuilder_mxJPO stringIfNotEmpty(final String _tag,
                                                final String _value)
     {
-        if (_value != null)  {
+        if ((_value != null) && !_value.isEmpty())  {
             this.strg.append(this.prefix()).append(_tag).append(" \"").append(StringUtil_mxJPO.convertUpdate(_value)).append("\"\n");
         }
         return this;
@@ -113,13 +113,31 @@ public class UpdateBuilder_mxJPO
                                     final boolean _defaultValue,
                                     final Boolean _value)
     {
-        this.strg.append(this.prefix());
+        final boolean value = (_value != null) ? _value : _defaultValue;
 
-        if (((_value != null) && !_value) || ((_value == null) && !_defaultValue))  {
-            this.strg.append("!");
+        this.strg.append(this.prefix()).append(value ? "" : '!').append(_tag).append('\n');
+
+        return this;
+    }
+
+    /**
+     * Appends flag {@code _tag} for given {@code _value} if <i>true</i>.
+     *
+     * @param _tag              tag
+     * @param _defaultValue     default value for {@code _value} if
+     *                          {@code _value} is {@code null}
+     * @param _value            value
+     * @return this update builder instance
+     */
+    public UpdateBuilder_mxJPO flagIfTrue(final String _tag,
+                                          final boolean _defaultValue,
+                                          final Boolean _value)
+    {
+        final boolean value = (_value != null) ? _value : _defaultValue;
+
+        if (value)  {
+            this.strg.append(this.prefix()).append(_tag).append('\n');
         }
-
-        this.strg.append(_tag).append('\n');
 
         return this;
     }

@@ -201,8 +201,8 @@ public class CommandData
                 this.getSymbolicName(),
                 "check symbolic name");
 
-        this.getFlags().checkExport(_exportParser.getRootLines().get(0), "");
-        this.getValues().checkExport(_exportParser);
+        this.getFlags().checkExport(_exportParser, "");
+        this.getValues().checkExport(_exportParser, "");
         this.getSettings().checkExport(_exportParser.getLines("/mxUpdate/setting/@value"));
         this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
 

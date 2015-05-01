@@ -269,6 +269,22 @@ public class UpdateException_mxJPO
                 "The new kind ''{3}' can not be set for {0} ''{1}'', because kind ''{2}'' is already set. Kinds of relationship can be only set for ''basic'' relationships."),
 
         /**
+         * Derived of a relationship can not be changed because potentially some
+         * data can be lost.
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>administration type (should be relationship)</li>
+         * <li>name of the relationship</li>
+         * <li>current derived relationship</li>
+         * <li>new derived relationship (from the CI file)</li>
+         * </ol>
+         * </p>
+         */
+        DM_RELATIONSHIP_UPDATE_DERIVED(11402,
+                "The new derived ''{3}' can not be set for {0} ''{1}'', because derived ''{2}'' is already set and potentially some data can be lost."),
+
+        /**
          * <p>An interface is already derived from another interface, but
          * within the update this derived interface must be removed. This could
          * end in potentially losing data and so this action is not allowed.</p>

@@ -19,6 +19,7 @@ import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.PolicyData;
 import org.mxupdate.test.data.datamodel.PolicyData.State;
+import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.util.Version;
 import org.testng.annotations.BeforeMethod;
 
@@ -72,11 +73,11 @@ public abstract class AbstractPolicyTest
 
         // if delimiter is defined, must be also defined for new cleaned policy
         if (_original.getValue("delimiter") != null)  {
-            ret.setValue("delimiter", _original.getFlags().get("delimiter"));
+            ret.setValue("delimiter", _original.getFlags().getValue("delimiter"));
             // if delimiter is defined, major / minor sequence must be defined
             // (the trick: they are changed vvs.)
-            ret.setFlag("minorsequence", _original.getFlags().get("majorsequence"));
-            ret.setFlag("majorsequence", _original.getFlags().get("minorsequence"));
+            ret.setFlag("minorsequence", _original.getFlags().getValue("majorsequence"));
+            ret.setFlag("majorsequence", _original.getFlags().getValue("minorsequence"));
         } else  {
             ret.setValue("sequence",      "");
         }
@@ -86,7 +87,7 @@ public abstract class AbstractPolicyTest
             final State retState = new State().setName(state.getName());
 
             if (this.getVersion() != Version.V6R2011x)  {
-                retState.setFlag("published", false);
+                retState.setFlag("published", false, Create.ViaValue);
             }
 
             ret.addState(retState);

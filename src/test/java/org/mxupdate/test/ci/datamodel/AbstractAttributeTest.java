@@ -162,12 +162,12 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
         }
 
         // if multiple value is defined, must be also defined for new cleaned attribute
-        if (_original.getFlags().containsKey("multivalue") && _original.getFlags().get("multivalue"))  {
+        if (_original.getFlags().contains("multivalue") && _original.getFlags().getValue("multivalue"))  {
             ret.setFlag("multivalue", true);
         }
 
         // if range value is defined, must be also defined for new cleaned attribute
-        if (_original.getFlags().containsKey("rangevalue") && _original.getFlags().get("rangevalue"))  {
+        if (_original.getFlags().contains("rangevalue") && _original.getFlags().getValue("rangevalue"))  {
             ret.setFlag("rangevalue", true);
         }
 

@@ -24,6 +24,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.util.DataList;
+import org.mxupdate.test.data.util.FlagList;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.testng.Assert;
 
@@ -263,7 +264,7 @@ public class RelationshipData
         /** Information string about the side (value is to or from). */
         private final String side;
         /** Defines flags for this data piece. */
-        private final Flags flags = new Flags();
+        private final FlagList flags = new FlagList();
         /** Meaning of the side. */
         private String meaning;
         /** Cardinality of the side. */
@@ -304,7 +305,7 @@ public class RelationshipData
         public RelationshipData setFlag(final String _key,
                                         final Boolean _value)
         {
-            this.flags.put(_key, _value);
+            this.flags.setFlag(_key, _value);
             return RelationshipData.this;
         }
 

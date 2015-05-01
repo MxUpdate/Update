@@ -26,6 +26,7 @@ import org.mxupdate.test.data.datamodel.PolicyData.State;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.datamodel.helper.Access;
 import org.mxupdate.test.data.user.PersonAdminData;
+import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.test.util.Version;
@@ -233,21 +234,21 @@ public class PolicyTest
                         new PolicyData(this, "test")
                                 .addState(new State()
                                         .setName("create")
-                                        .setFlag("published", false))},
+                                        .setFlag("published", false, Create.ViaValue))},
                 new Object[]{
                         "issue #179: policy state with published true",
                         new PolicyData(this, "test")
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .setFlag("published", true))},
+                                        .setFlag("published", true, Create.ViaValue))},
                 new Object[]{
                         "issue #179: policy state with published false",
                         new PolicyData(this, "test")
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .setFlag("published", false))},
+                                        .setFlag("published", false, Create.ViaValue))},
                 // locking enforced flag
                 new Object[]{
                         "issue #182: policy state with enforce true",

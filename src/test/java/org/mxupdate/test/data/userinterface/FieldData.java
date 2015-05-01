@@ -458,7 +458,7 @@ public class FieldData<FORMTABLE extends AbstractAdminData<?>>
         }
 
         // hidden flag
-        this.checkValueExists(_exportParser, "column / field", "hidden", this.getFlags().get("hidden") != null ? this.getFlags().get("hidden") : false);
+        this.checkValueExists(_exportParser, "column / field", "hidden", this.getFlags().getValue("hidden") != null ? this.getFlags().getValue("hidden") : false);
 
         // size
         if ((this.width != null) && (this.height != null)

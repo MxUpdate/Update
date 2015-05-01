@@ -109,8 +109,8 @@ public class ExpressionData
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        this.getValues().checkExport(_exportParser);
-        this.getFlags().checkExport(_exportParser.getRootLines().get(0), "");
+        this.getValues().checkExport(_exportParser, "");
+        this.getFlags().checkExport(_exportParser, "");
         this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
     }
 }

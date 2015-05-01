@@ -33,6 +33,8 @@ import org.mxupdate.test.ExportParser.Line;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.datamodel.helper.Access;
 import org.mxupdate.test.data.user.AbstractUserData;
+import org.mxupdate.test.data.util.FlagList;
+import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.data.util.PropertyDefList;
 import org.testng.Assert;
@@ -208,7 +210,7 @@ public class PolicyData
         this.append4CIFileHeader(strg);
 
         strg.append("mxUpdate policy \"${NAME}\" {\n")
-            .append("    hidden \"").append(this.getFlags().get("hidden") != null ? this.getFlags().get("hidden") : false).append("\"\n");
+            .append("    hidden \"").append(this.getFlags().getValue("hidden") != null ? this.getFlags().getValue("hidden") : false).append("\"\n");
 
         // append values
         this.getValues().appendUpdate("    ", strg);
@@ -236,8 +238,8 @@ public class PolicyData
         }
 
         // enforce
-        if (this.getFlags().get("enforce") != null)  {
-            strg.append("    enforce \"").append(this.getFlags().get("enforce")).append("\"\n");
+        if (this.getFlags().getValue("enforce") != null)  {
+            strg.append("    enforce \"").append(this.getFlags().getValue("enforce")).append("\"\n");
         }
 
         if (this.allState != null)  {
@@ -486,7 +488,7 @@ public class PolicyData
         /** Values of this state. */
         private final Map<String,Object> values = new HashMap<String,Object>();
         /** Defines flags for this state. */
-        private final Flags flags = new Flags();
+        private final FlagList flags = new FlagList();
 
         /**
          * Appends a access filter definition.
@@ -531,7 +533,7 @@ public class PolicyData
          *
          * @param _key          key (name) of the flag
          * @param _value        <i>true</i> to activate the flag; otherwise
-         *                      <i>false</i>; to undefine set to <code>null</code>
+         *                      <i>false</i>; to undefine set to {@code null}
          * @return this data instance
          * @see #flags
          */
@@ -539,7 +541,26 @@ public class PolicyData
         public AS setFlag(final String _key,
                           final Boolean _value)
         {
-            this.flags.put(_key, _value);
+            this.flags.setFlag(_key, _value);
+            return (AS) this;
+        }
+
+        /**
+         * Defines the flag and the value.
+         *
+         * @param _key          key (name) of the flag
+         * @param _value        <i>true</i> to activate the flag; otherwise
+         *                      <i>false</i>; to undefine set to {@code null}
+         * @param _createConf   create configuration
+         * @return this data instance
+         * @see #flags
+         */
+        @SuppressWarnings("unchecked")
+        public AS setFlag(final String _key,
+                          final Boolean _value,
+                          final Create _createConf)
+        {
+            this.flags.setFlag(_key, _value, _createConf);
             return (AS) this;
         }
 
@@ -548,7 +569,7 @@ public class PolicyData
          *
          * @return all defined flags
          */
-        public Flags getFlags()
+        public FlagList getFlags()
         {
             return this.flags;
         }
@@ -642,19 +663,7 @@ public class PolicyData
                     .append(" \"").append(AbstractTest.convertMql(value.getValue().toString())).append('\"');
             }
 
-            for (final Map.Entry<String,Boolean> entry : this.getFlags().entrySet())  {
-                if (entry.getValue() != null)  {
-                    _cmd.append(' ');
-                    if ("enforcereserveaccess".equals(entry.getKey()))  {
-                        if (!entry.getValue())  {
-                            _cmd.append('!');
-                        }
-                        _cmd.append(entry.getKey());
-                    } else  {
-                        _cmd.append(entry.getKey()).append(' ').append(entry.getValue());
-                    }
-                }
-            }
+            this.getFlags().append4Create(_cmd);
 
             for (final Signature signature : this.signatures)
             {

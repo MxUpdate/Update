@@ -57,6 +57,9 @@ PARSER_END(RelationshipDefParser)
 <DEFAULT> TOKEN : /** first level */
 {
       <DESCRIPTION:                         "description">                                  : STRING_EXPECTED
+    | <ABSTRACT_TRUE:                       "abstract">
+    | <ABSTRACT_FALSE:                      "!abstract">
+    | <DERIVED:                             "derived">                                      : STRING_EXPECTED
     | <HIDDEN_TRUE:                         "hidden">
     | <HIDDEN_FALSE:                        "!hidden">
     | <PREVENTDUPLICATES_TRUE:              "preventduplicates">
@@ -213,6 +216,12 @@ void parse(final Relationship_mxJPO _relationship)
 
       | ( <KIND>                    ( <BASIC>                               {this.setValue(_relationship, "kind",                           Kind.Basic);}
                                     | <COMPOSITIONAL>                       {this.setValue(_relationship, "kind",                           Kind.Compositional);} ) )
+
+      | ( <ABSTRACT_TRUE>                                                   {this.setValue(_relationship, "abstractRel",                    true);} )
+      | ( <ABSTRACT_FALSE>                                                  {this.setValue(_relationship, "abstractRel",                    false);} )
+
+      | ( <DERIVED>                 ( tmp = <STRING>                        {this.setValue(_relationship, "derived",                        this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_relationship, "derived",                        this.getSingle(tmp.image));} ) )
 
       | ( <HIDDEN_TRUE>                                                     {this.setValue(_relationship, "hidden",                         true);} )
       | ( <HIDDEN_FALSE>                                                    {this.setValue(_relationship, "hidden",                         false);} )
