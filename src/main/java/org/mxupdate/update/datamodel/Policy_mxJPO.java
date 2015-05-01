@@ -101,14 +101,14 @@ public class Policy_mxJPO
     private boolean enforce;
 
     /** Delimiter between Major and Minor Revision. */
-    private String delimiter = null;
+    private String delimiter = "";
     /** Minor Sequence of this policy. */
     private String minorsequence = null;
     /** Major Sequence of this policy. */
     private String majorsequence = null;
 
     /** Store of this policy. */
-    private String store;
+     private String store;
 
     /** Set of all types of this policy. */
     private final SortedSet<String> types = new TreeSet<String>();

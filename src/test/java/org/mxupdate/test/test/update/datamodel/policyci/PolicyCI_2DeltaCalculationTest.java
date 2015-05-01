@@ -23,6 +23,7 @@ import org.mxupdate.test.data.datamodel.PolicyData.State;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -66,12 +67,23 @@ public class PolicyCI_2DeltaCalculationTest
                             .addState(new State().setName("A").setValue("registeredname", "state_A").setValue("registeredname", "state_A1")),
                     new PolicyData(this, "Test")
                             .addState(new State().setName("A").setValue("registeredname", "state_A"))},
+            // state
+            {"20a) new state",
+                    new PolicyData(this, "Test"),
+                    new PolicyData(this, "Test")
+                            .addState(new State().setName("A"))},
+            {"20b) append state",
+                    new PolicyData(this, "Test").addState(new State().setName("A")),
+                    new PolicyData(this, "Test").addState(new State().setName("A")).addState(new State().setName("B"))},
+            {"20c) insert state",
+                    new PolicyData(this, "Test").addState(new State().setName("A"))                                   .addState(new State().setName("C")),
+                    new PolicyData(this, "Test").addState(new State().setName("A")).addState(new State().setName("B")).addState(new State().setName("C"))},
        };
     }
 
     @Override()
     @BeforeMethod()
-//    @AfterClass(groups = "close" )
+    @AfterClass(groups = "close" )
     public void cleanup()
         throws MatrixException
     {
