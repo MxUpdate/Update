@@ -11,31 +11,33 @@ interface AssociationParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int DESCRIPTION = 5;
+  int SYMBOLICNAME = 5;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 6;
+  int DESCRIPTION = 6;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 7;
+  int HIDDEN_TRUE = 7;
   /** RegularExpression Id. */
-  int DEFINITION = 8;
+  int HIDDEN_FALSE = 8;
   /** RegularExpression Id. */
-  int STRING = 9;
+  int DEFINITION = 9;
   /** RegularExpression Id. */
-  int SINGLE = 10;
+  int STRING = 10;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 11;
+  int SINGLE = 11;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 12;
+  int MULTILINESTRING = 12;
   /** RegularExpression Id. */
-  int PROPERTY = 13;
+  int MULTILINESINGLE = 13;
   /** RegularExpression Id. */
-  int PROPERTYTO = 14;
+  int PROPERTY = 14;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 15;
+  int PROPERTYTO = 15;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 16;
+  int PROPERTYVAL = 16;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 17;
+  int ADMINTYPE_STRING = 17;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 18;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -53,6 +55,7 @@ interface AssociationParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"symbolicname\"",
     "\"description\"",
     "\"hidden\"",
     "\"!hidden\"",

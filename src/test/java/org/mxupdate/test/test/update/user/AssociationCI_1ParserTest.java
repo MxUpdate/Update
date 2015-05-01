@@ -36,9 +36,16 @@ public class AssociationCI_1ParserTest
     {
         return new Object[][]
         {
-            {"1) simple",
+            {"0) simple",
                 "",
                 "description \"\" !hidden definition \"\""},
+            // registered name
+            {"1a) symbolic name",
+                    "",
+                    "symbolicname \"association_abc\" description \"\" !hidden definition \"\""},
+            {"1b) two symbolic names",
+                    "symbolicname \"association_abc\" symbolicname \"association_def\" description \"\" !hidden definition \"\"",
+                    "symbolicname \"association_def\" symbolicname \"association_abc\" description \"\" !hidden definition \"\""},
             // description
             {"2a) description",
                 "",

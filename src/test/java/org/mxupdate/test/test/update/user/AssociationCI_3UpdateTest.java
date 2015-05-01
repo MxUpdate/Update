@@ -25,12 +25,12 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link Association_mxJPO package} update.
+ * Tests the {@link Association_mxJPO association CI} export / update.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class AssociationCI_2UpdateTest
+public class AssociationCI_3UpdateTest
     extends AbstractDataExportUpdate<AssociationData>
 {
     /**
