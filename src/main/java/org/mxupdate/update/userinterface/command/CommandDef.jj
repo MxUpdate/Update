@@ -60,6 +60,7 @@ TOKEN : /** first level */
     | <PROPERTY:                "property">                                     : STRING_EXPECTED
     | <PROPERTYTO:              "to">                                           : ADMINREF_EXPECTED
     | <PROPERTYVAL:             "value">                                        : STRING_EXPECTED
+    | <CODE:                    "code">                                         : STRING_EXPECTED
 }
 
 /************************************************************** Common String */
@@ -70,7 +71,7 @@ TOKEN : /** first level */
 
 <STRING_EXPECTED> TOKEN :
 {
-      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<APOSTROPHE>)> : DEFAULT
+      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "{" | "}" | " " | "\n")*<APOSTROPHE>)> : DEFAULT
     | <SINGLE: (<CHAR>)+> : DEFAULT
     | <#APOSTROPHE: "\"" >
     | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
@@ -147,6 +148,8 @@ Command_mxJPO command(final ParameterCache_mxJPO _paramCache,
                                     | tmp = <ADMINTYPE_SINGLE> {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
                                     ( tmp = <STRING>           {this.setValue(property, "refAdminName", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+      | (<CODE>                     ( tmp = <STRING>           {this.setValue(command, "code", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(command, "code", this.getSingle(tmp.image));} ) )
     )*
     {
         this.prepareObject(_paramCache, command);

@@ -33,29 +33,31 @@ public interface CommandDefParserConstants_mxJPO {
   /** RegularExpression Id. */
   int PROPERTYVAL = 15;
   /** RegularExpression Id. */
-  int STRING = 20;
+  int CODE = 16;
   /** RegularExpression Id. */
-  int SINGLE = 21;
+  int STRING = 21;
   /** RegularExpression Id. */
-  int APOSTROPHE = 22;
+  int SINGLE = 22;
   /** RegularExpression Id. */
-  int CHAR = 23;
+  int APOSTROPHE = 23;
   /** RegularExpression Id. */
-  int SETTING_STRING = 28;
+  int CHAR = 24;
   /** RegularExpression Id. */
-  int SETTING_SINGLE = 29;
+  int SETTING_STRING = 29;
   /** RegularExpression Id. */
-  int SETTING_APOSTROPHE = 30;
+  int SETTING_SINGLE = 30;
   /** RegularExpression Id. */
-  int SETTING_CHAR = 31;
+  int SETTING_APOSTROPHE = 31;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 36;
+  int SETTING_CHAR = 32;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 37;
+  int ADMINTYPE_STRING = 37;
   /** RegularExpression Id. */
-  int ADMINTYPE_APOSTROPHE = 38;
+  int ADMINTYPE_SINGLE = 38;
   /** RegularExpression Id. */
-  int ADMINTYPE_CHAR = 39;
+  int ADMINTYPE_APOSTROPHE = 39;
+  /** RegularExpression Id. */
+  int ADMINTYPE_CHAR = 40;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -84,6 +86,7 @@ public interface CommandDefParserConstants_mxJPO {
     "\"property\"",
     "\"to\"",
     "\"value\"",
+    "\"code\"",
     "\" \"",
     "\"\\t\"",
     "\"\\n\"",

@@ -46,7 +46,6 @@ public class Command_mxJPO
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
-        Command_mxJPO.IGNORED_URLS.add("/code");
         Command_mxJPO.IGNORED_URLS.add("/input");
         Command_mxJPO.IGNORED_URLS.add("/userRefList");
     }
@@ -59,6 +58,8 @@ public class Command_mxJPO
     private String href;
     /** Sorted list of assigned users of the command. */
     private final SortedSet<String> users = new TreeSet<String>();
+    /** Code of the command. */
+    private String code;
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -76,7 +77,9 @@ public class Command_mxJPO
      * Parses all command specific values. This includes:
      * <ul>
      * <li>{@link #alt}</li>
+     * <li>{@link #code}</li>
      * <li>{@link #href}</li>
+     * <li>{@link #label}</li>
      * <li>user references in {@link #users}</li>
      * </ul>
      *
@@ -96,6 +99,9 @@ public class Command_mxJPO
             parsed = true;
         } else if ("/alt".equals(_url))  {
             this.alt = _content;
+            parsed = true;
+        } else if ("/code".equals(_url))  {
+            this.code = _content;
             parsed = true;
         } else if ("/href".equals(_url))  {
             this.href = _content;
@@ -145,6 +151,11 @@ public class Command_mxJPO
         this.getProperties().writeSettings(_paramCache, _out, "    ");
         this.getProperties().writeProperties(_paramCache, _out, "    ");
 
+        if ((this.code != null) && !this.code.isEmpty())  {
+            _out.append("    code \"\n")
+                .append(StringUtil_mxJPO.convertUpdate(this.code)).append('\n')
+                .append("\"\n");
+        }
         _out.append("}");
     }
 
@@ -222,12 +233,13 @@ public class Command_mxJPO
                              final Command_mxJPO _target)
         throws UpdateException_mxJPO
     {
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "description", _target.getDescription(),   this.getDescription());
-        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      _target.isHidden(),         this.isHidden());
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "alt",         _target.alt,                this.alt);
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "href",        _target.href,               this.href);
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "label",       _target.label,              this.label);
-        DeltaUtil_mxJPO.calcListDelta(_mql, "user",         _target.users,              this.users);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "description", _target.getDescription(),                           this.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      _target.isHidden(),                                 this.isHidden());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "alt",         _target.alt,                                        this.alt);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "href",        _target.href,                                       this.href);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "label",       _target.label,                                      this.label);
+        DeltaUtil_mxJPO.calcListDelta(_mql,  "user",        _target.users,                                      this.users);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "code",        (_target.code == null) ? "" :_target.code.trim(),   this.code);
 
         _target.getProperties().calcDelta("", this.getProperties(), _mql);
     }

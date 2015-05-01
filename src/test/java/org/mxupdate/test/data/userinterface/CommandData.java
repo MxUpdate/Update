@@ -33,6 +33,8 @@ import org.testng.Assert;
 public class CommandData
     extends AbstractCommandData<CommandData>
 {
+    /** Command code. */
+    private String code;
     /** All users of the command. */
     private final Set<AbstractUserData<?>> users = new HashSet<AbstractUserData<?>>();
 
@@ -50,11 +52,22 @@ public class CommandData
     }
 
     /**
+     * Defines the {@code #code} of the command.
+     *
+     * @param _code     command code
+     * @return this command instance
+     */
+    public CommandData setCode(final String _code)
+    {
+        this.code = _code;
+        return this;
+    }
+
+    /**
      * Appends a new user to {@link #users}.
      *
      * @param _user     user to add
      * @return this command instance
-     * @see #users
      */
     public CommandData addUser(final AbstractUserData<?> _user)
     {
@@ -96,6 +109,11 @@ public class CommandData
         for (final String ciLine : this.getCILines())  {
             strg.append("    ").append(ciLine).append('\n');
         }
+        if (this.code != null)  {
+            strg.append("    code \"\n")
+                .append(AbstractTest.convertUpdate(this.code)).append('\n')
+                .append("\"\n");
+        }
         strg.append("}");
 
         return strg.toString();
@@ -132,6 +150,10 @@ public class CommandData
                 }
             }
             this.append4Create(cmd);
+
+            if (this.code != null)  {
+                cmd.append(" code \"").append(AbstractTest.convertMql(this.code)).append('\"');
+            }
 
             cmd.append(";\n")
                .append("escape add property ").append(this.getSymbolicName())
@@ -183,6 +205,16 @@ public class CommandData
         this.getValues().checkExport(_exportParser);
         this.getSettings().checkExport(_exportParser.getLines("/mxUpdate/setting/@value"));
         this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
+
+        // command code (existing or not existing!)
+        if ((this.code != null) && !this.code.isEmpty())  {
+            this.checkSingleValue(_exportParser, "code", "code", "\"");
+            Assert.assertTrue(
+                    _exportParser.getCode().contains("code \"\n" + AbstractTest.convertUpdate(this.code) + "\n\"\n"),
+                    "check code 'code \"\n" + AbstractTest.convertUpdate(this.code) + "\n\"\n is defined in " + _exportParser.getCode());
+        } else  {
+            this.checkNotExistingSingleValue(_exportParser, "code", "code");
+        }
 
         // users
         final Set<String> userDefs = new HashSet<String>(_exportParser.getLines("/mxUpdate/user/@value"));

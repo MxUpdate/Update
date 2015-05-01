@@ -72,7 +72,11 @@ public class CommandTest
                                 .setValue("href", "javascript(\\\"test\\\")")
                                 .setValue("alt", "${COMMON_DIR}/emxTreeAlt.jsp?\"mode=insert")
                                 .setSetting("Setting 1", "SettingValue\"1")
-                                .setSetting("Setting 2", "desc\"\\\\ription")});
+                                .setSetting("Setting 2", "desc\"\\\\ription")},
+                new Object[]{
+                        "issue #194: command with code",
+                        new CommandData(this, "command")
+                                .setCode("function beta()\n{\n    var idx = 1;\n    $[test]\n}")});
     }
 
     /**

@@ -39,6 +39,7 @@ public class CommandDefParser_mxJPO
       case USER:
       case SETTING:
       case PROPERTY:
+      case CODE:
         ;
         break;
       default:
@@ -239,6 +240,22 @@ public class CommandDefParser_mxJPO
             jj_consume_token(-1);
             throw new ParseException_mxJPO();
           }
+        }
+        break;
+      case CODE:
+        jj_consume_token(CODE);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case STRING:
+          tmp = jj_consume_token(STRING);
+                                                                this.setValue(command, "code", this.getString(tmp.image));
+          break;
+        case SINGLE:
+          tmp = jj_consume_token(SINGLE);
+                                                                this.setValue(command, "code", this.getSingle(tmp.image));
+          break;
+        default:
+          jj_consume_token(-1);
+          throw new ParseException_mxJPO();
         }
         break;
       default:
