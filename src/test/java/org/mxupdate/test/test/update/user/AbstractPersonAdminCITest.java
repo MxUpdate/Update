@@ -23,7 +23,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.ci.user.AbstractUserTest;
-import org.mxupdate.test.data.other.SiteData;
+import org.mxupdate.test.data.system.SiteData;
 import org.mxupdate.test.data.user.AbstractPersonAdminData;
 import org.mxupdate.test.data.user.GroupData;
 import org.mxupdate.test.data.user.RoleData;

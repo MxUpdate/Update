@@ -13,7 +13,7 @@
  *
  */
 
-package org.mxupdate.test.data.other;
+package org.mxupdate.test.data.system;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger;

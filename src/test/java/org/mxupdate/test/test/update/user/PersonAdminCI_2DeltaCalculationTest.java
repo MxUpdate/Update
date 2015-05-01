@@ -20,8 +20,8 @@ package org.mxupdate.test.test.update.user;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.other.SiteData;
 import org.mxupdate.test.data.system.ApplicationData;
+import org.mxupdate.test.data.system.SiteData;
 import org.mxupdate.test.data.user.GroupData;
 import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.data.user.RoleData;

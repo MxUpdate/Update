@@ -13,11 +13,12 @@
  *
  */
 
-package org.mxupdate.test.ci.user;
+package org.mxupdate.test.test.update.user;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ci.user.AbstractUserTest;
 import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.util.Version;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
@@ -33,7 +34,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class PersonAdminTest
+public class PersonAdminCI_3UpdateTest
     extends AbstractUserTest<PersonAdminData>
 {
     @DataProvider(name = "data")

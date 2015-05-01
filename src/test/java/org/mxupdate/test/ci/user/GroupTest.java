@@ -18,7 +18,7 @@ package org.mxupdate.test.ci.user;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.other.SiteData;
+import org.mxupdate.test.data.system.SiteData;
 import org.mxupdate.test.data.user.GroupData;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;

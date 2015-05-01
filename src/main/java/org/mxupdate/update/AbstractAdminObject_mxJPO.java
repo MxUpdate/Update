@@ -31,7 +31,6 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.user.PersonAdmin_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
@@ -566,109 +565,11 @@ final String propName = prop.getName().replaceAll(" ", "").toUpperCase();
         throws Exception
     {
         final StringBuilder preMQLCode = new StringBuilder();
-final Object tmp = this;
-        // remove all properties
-        // (only if not attribute, because attributes and formats uses calulated deltas)
-        if (tmp instanceof PersonAdmin_mxJPO)  {
-
-            for (final AdminProperty prop : this.properties.getProperties())  {
-                if (PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null)  {
-                    // must be done via modify because of properties without names
-                    preMQLCode.append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                              .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
-                              .append(this.getTypeDef().getMxAdminSuffix())
-                              .append(" remove property \"");
-                    if (prop.getName() != null)  {
-                        preMQLCode.append(StringUtil_mxJPO.convertMql(prop.getName()));
-                    }
-                    preMQLCode.append('\"');
-                    if ((prop.getRefAdminName() != null) && (prop.getRefAdminType() != null))  {
-                        preMQLCode.append(" to ").append(prop.getRefAdminType())
-                                  .append(" \"").append(StringUtil_mxJPO.convertMql(prop.getRefAdminName())).append('\"');
-                        // if target is a table, a system is required!
-                        if ("table".equals(prop.getRefAdminType()))  {
-                            preMQLCode.append(" system");
-                        }
-                    }
-                    preMQLCode.append(";\n");
-                }
-            }
-        }
 
         // append already existing pre MQL code
         preMQLCode.append(_preMQLCode);
 
         final StringBuilder postMQLCode = new StringBuilder();
-
-        if (tmp instanceof PersonAdmin_mxJPO)  {
-            // define version property
-            postMQLCode.append(_postMQLCode)
-                       .append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                       .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
-                       .append(this.getTypeDef().getMxAdminSuffix())
-                       .append(" add property \"")
-                       .append(StringUtil_mxJPO.convertMql(PropertyDef_mxJPO.VERSION.getPropName(_paramCache)))
-                       .append("\" value \"")
-                       .append(StringUtil_mxJPO.convertMql(_tclVariables.get(PropertyDef_mxJPO.VERSION.name())))
-                       .append('\"');
-            // define file date property
-            postMQLCode.append(" add property \"")
-                       .append(StringUtil_mxJPO.convertMql(PropertyDef_mxJPO.FILEDATE.getPropName(_paramCache)))
-                       .append("\" value \"")
-                       .append(StringUtil_mxJPO.convertMql(_tclVariables.get(PropertyDef_mxJPO.FILEDATE.name())))
-                       .append('\"');
-            // is installed date property defined?
-            if ((this.getInstallationDate() == null) || "".equals(this.getInstallationDate()))  {
-                final String date = StringUtil_mxJPO.formatInstalledDate(_paramCache, new Date());
-                _paramCache.logTrace("    - define installed date '" + date + "'");
-                postMQLCode.append(" add property \"")
-                           .append(StringUtil_mxJPO.convertMql(PropertyDef_mxJPO.INSTALLEDDATE.getPropName(_paramCache)))
-                           .append("\" value \"")
-                           .append(StringUtil_mxJPO.convertMql(date))
-                           .append('\"');
-            }
-            // exists no installer property or installer property not equal?
-            final String instVal = _tclVariables.get(PropertyDef_mxJPO.INSTALLER.name());
-            if ((this.getInstaller() == null) || !this.getInstaller().equals(instVal))  {
-                _paramCache.logTrace("    - define installer '" + instVal + "'");
-                postMQLCode.append(" add property \"")
-                           .append(StringUtil_mxJPO.convertMql(PropertyDef_mxJPO.INSTALLER.getPropName(_paramCache)))
-                           .append("\" value \"")
-                           .append(StringUtil_mxJPO.convertMql(instVal))
-                           .append('\"');
-            }
-            // is original name property defined?
-            final String origNameVal = _tclVariables.get(PropertyDef_mxJPO.ORIGINALNAME.name());
-            if ((this.getOriginalName() == null) || !this.getOriginalName().equals(origNameVal))  {
-                _paramCache.logTrace("    - define original name '" + origNameVal + "'");
-                postMQLCode.append(" add property \"")
-                           .append(StringUtil_mxJPO.convertMql(PropertyDef_mxJPO.ORIGINALNAME.getPropName(_paramCache)))
-                           .append("\" value \"")
-                           .append(StringUtil_mxJPO.convertMql(origNameVal))
-                           .append('\"');
-            }
-            // exists no application property or application property not equal?
-            final String applVal = _tclVariables.get(PropertyDef_mxJPO.APPLICATION.name());
-            if ((this.getApplication() == null) || !this.getApplication().equals(applVal))  {
-                _paramCache.logTrace("    - define application '" + applVal + "'");
-                postMQLCode.append(" add property \"")
-                           .append(StringUtil_mxJPO.convertMql(PropertyDef_mxJPO.APPLICATION.getPropName(_paramCache)))
-                           .append("\" value \"")
-                           .append(StringUtil_mxJPO.convertMql(applVal))
-                           .append('\"');
-            }
-            // exists no author property or author property not equal?
-            final String authVal = _tclVariables.get(PropertyDef_mxJPO.AUTHOR.name());
-            if ((this.getAuthor() == null) || !this.getAuthor().equals(authVal))  {
-                _paramCache.logTrace("    - define author '" + authVal + "'");
-                postMQLCode.append(" add property \"")
-                           .append(StringUtil_mxJPO.convertMql(PropertyDef_mxJPO.AUTHOR.getPropName(_paramCache)))
-                           .append("\" value \"")
-                           .append(StringUtil_mxJPO.convertMql(authVal))
-                           .append('\"');
-            }
-            postMQLCode.append(";\n");
-        }
 
         // append registration of symbolic names
         this.appendSymbolicNameRegistration(_paramCache,
