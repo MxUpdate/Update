@@ -13,16 +13,18 @@
  *
  */
 
-package org.mxupdate.test.ci.userinterface;
+package org.mxupdate.test.test.update.userinterface;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.ci.userinterface.AbstractUITest;
 import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.data.user.RoleData;
 import org.mxupdate.test.data.userinterface.CommandData;
 import org.mxupdate.test.util.IssueLink;
+import org.mxupdate.update.userinterface.Command_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -30,12 +32,12 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test cases for the export of commands.
+ * Tests the {@link Command_mxJPO command CI} export / update.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class CommandTest
+public class CommandCI_3UpdateTest
     extends AbstractUITest<CommandData>
 {
     /**

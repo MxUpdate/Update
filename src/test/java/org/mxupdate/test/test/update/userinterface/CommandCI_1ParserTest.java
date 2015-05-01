@@ -22,7 +22,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link Command_mxJPO command} parser.
+ * Tests the {@link Command_mxJPO command CI} parser.
  *
  * @author The MxUpdate Team
  */
@@ -36,10 +36,17 @@ public class CommandCI_1ParserTest
     {
         return new Object[][]
         {
-            {"1) simple",
+            {"0) simple",
                     "",
                     "description \"\" label \"\" href \"\" alt \"\""},
-            // description
+            // registered name
+            {"1a) symbolic name",
+                    "",
+                    "symbolicname \"command_abc\" description \"\" label \"\" href \"\" alt \"\""},
+            {"1b) two symbolic names",
+                    "symbolicname \"command_abc\" symbolicname \"command_def\" description \"\" label \"\" href \"\" alt \"\"",
+                    "symbolicname \"command_def\" symbolicname \"command_abc\" description \"\" label \"\" href \"\" alt \"\""},
+                    // description
             {"2a) description",
                     "",
                     "description \"abc def\" label \"\" href \"\" alt \"\""},

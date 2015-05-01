@@ -55,7 +55,8 @@ PARSER_END(CommandParser)
 
 TOKEN :
 {
-      <DESCRIPTION:             "description">                                  : MULTILINESTRING_EXPECTED
+      <SYMBOLICNAME:            "symbolicname">                                 : STRING_EXPECTED
+    | <DESCRIPTION:             "description">                                  : MULTILINESTRING_EXPECTED
     | <HIDDEN_TRUE:             "hidden">
     | <HIDDEN_FALSE:            "!hidden">
     | <ALT:                     "alt">                                          : STRING_EXPECTED
@@ -113,7 +114,10 @@ void parse(Command_mxJPO _command)
     Token tmp;
     AdminProperty property;
 } {
-    (   (<DESCRIPTION>              ( tmp = <MULTILINESTRING>  {this.setValue(_command, "description", this.getString(tmp.image));}
+    (   ( <SYMBOLICNAME>            ( tmp = <STRING>           {this.appendValue(_command, "symbolicNames", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.appendValue(_command, "symbolicNames", this.getSingle(tmp.image));} ) )
+
+      | (<DESCRIPTION>              ( tmp = <MULTILINESTRING>  {this.setValue(_command, "description", this.getString(tmp.image));}
                                     | tmp = <MULTILINESINGLE>  {this.setValue(_command, "description", this.getSingle(tmp.image));} ) )
 
       | (<HIDDEN_TRUE>                                         {this.setValue(_command, "hidden",       true);} )
