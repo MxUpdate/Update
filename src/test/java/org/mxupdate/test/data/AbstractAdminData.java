@@ -448,10 +448,8 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
          * Appends the MQL commands to define all flags.
          *
          * @param _cmd  string builder used to append MQL commands
-         * @throws MatrixException if used object could not be created
          */
         public void append4Create(final StringBuilder _cmd)
-            throws MatrixException
         {
             for (final Map.Entry<String,Boolean> entry : this.entrySet())  {
                 if (entry.getValue() != null)  {

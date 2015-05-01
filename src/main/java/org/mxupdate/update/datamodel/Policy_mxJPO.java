@@ -295,8 +295,9 @@ public class Policy_mxJPO
         throws IOException
     {
         this.writeHeader(_paramCache, _out);
-        _out.append("mxUpdate policy \"${NAME}\" {\n");
-        _out.append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n");
+        _out.append("mxUpdate policy \"${NAME}\" {\n")
+            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n")
+            .append("    ").append(this.isHidden() ? "" : "!").append("hidden\n");
 
         // types
         if (this.allTypes)  {
@@ -313,7 +314,7 @@ public class Policy_mxJPO
         }
         _out.append("    defaultformat \"").append(StringUtil_mxJPO.convertUpdate(this.defaultFormat)).append("\"\n");
         if (this.enforce)  {
-            _out.append("    enforce \"true\"\n");
+            _out.append("    enforce\n");
         }
 
         // major / minor sequence and delimiter
@@ -325,8 +326,7 @@ public class Policy_mxJPO
             _out.append("    sequence \"").append(StringUtil_mxJPO.convertUpdate(this.minorsequence)).append("\"\n");
         }
 
-        _out.append("    store \"").append(StringUtil_mxJPO.convertUpdate(this.store)).append("\"\n")
-            .append("    hidden \"").append(Boolean.toString(this.isHidden())).append("\"\n");
+        _out.append("    store \"").append(StringUtil_mxJPO.convertUpdate(this.store)).append("\"\n");
 
         // all state access
         if (this.allState)  {
@@ -834,19 +834,19 @@ throw new Exception("some states are not defined anymore!");
             }
             // major / minor revision (old / new format)
             if (_paramCache.getValueBoolean(ValueKeys.DMPolicySupportsMajorMinor))  {
-                _out.append("        majorrevision \"").append(Boolean.toString(this.majorrevisionable)).append("\"\n")
-                    .append("        minorrevision \"").append(Boolean.toString(this.minorrevisionable)).append("\"\n");
+                _out.append("        ").append(this.majorrevisionable ? "" : "!").append("majorrevision\n")
+                    .append("        ").append(this.minorrevisionable ? "" : "!").append("minorrevision\n");
             } else  {
-                _out.append("        revision \"").append(Boolean.toString(this.minorrevisionable)).append("\"\n");
+                _out.append("        ").append(this.minorrevisionable ? "" : "!").append("revision\n");
             }
 
             // other basics
-            _out.append("        version \"").append(Boolean.toString(this.versionable)).append("\"\n")
-                .append("        promote \"").append(Boolean.toString(this.autoPromotion)).append("\"\n")
-                .append("        checkouthistory \"").append(Boolean.toString(this.checkoutHistory)).append("\"\n");
+            _out.append("        ").append(this.versionable ? "" : "!").append("version\n")
+                .append("        ").append(this.autoPromotion ? "" : "!").append("promote\n")
+                .append("        ").append(this.checkoutHistory ? "" : "!").append("checkouthistory\n");
             // published flag (if supported)
             if (_paramCache.getValueBoolean(ValueKeys.DMPolicyStateSupportsPublished))  {
-                _out.append("        published \"").append(Boolean.toString(this.published)).append("\"\n");
+                _out.append("        ").append(this.published ? "" : "!").append("published\n");
             }
             // route
             if ((this.routeMessage != null) || !this.routeUsers.isEmpty())  {

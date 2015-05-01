@@ -45,15 +45,17 @@ import org.testng.Assert;
 public class PolicyData
     extends AbstractAdminData<PolicyData>
 {
-    /**
-     * Within export the description must be defined.
-     */
+    /** Within export the given values must be defined. */
     private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
     static  {
         PolicyData.REQUIRED_EXPORT_VALUES.put("description", "");
         PolicyData.REQUIRED_EXPORT_VALUES.put("defaultformat", "");
         PolicyData.REQUIRED_EXPORT_VALUES.put("store", "");
-        PolicyData.REQUIRED_EXPORT_VALUES.put("hidden", "false");
+    }
+    /** Within export the given flags must be defined. */
+    private static final Map<String,Boolean> REQUIRED_EXPORT_FLAGS = new HashMap<String,Boolean>();
+    static  {
+        PolicyData.REQUIRED_EXPORT_FLAGS.put("hidden", false);
     }
 
     /** Are all types assigned? */
@@ -82,7 +84,7 @@ public class PolicyData
     public PolicyData(final AbstractTest _test,
                       final String _name)
     {
-        super(_test, AbstractTest.CI.DM_POLICY, _name, PolicyData.REQUIRED_EXPORT_VALUES, null);
+        super(_test, AbstractTest.CI.DM_POLICY, _name, PolicyData.REQUIRED_EXPORT_VALUES, PolicyData.REQUIRED_EXPORT_FLAGS);
     }
 
     /**
@@ -297,13 +299,8 @@ public class PolicyData
                 }
                 cmd.append(" format ").append(AbstractTest.convertMql(',', true, formatNames, null));
             }
-            if (this.getFlags().get("enforce") != null)  {
-                cmd.append(' ');
-                if (!this.getFlags().get("enforce"))  {
-                    cmd.append("not");
-                }
-                cmd.append("enforce");
-            }
+
+            this.getFlags().append4Create(cmd);
 
             if (this.allState != null)  {
                 this.allState.append4Create(cmd);
@@ -392,21 +389,8 @@ public class PolicyData
                                 "required check that minimum and maximum one " + valueName + " is defined");
         }
 
-        // check for defined values
         this.getValues().checkExport(_exportParser);
-
-        // check for hidden flag
-        if ((this.getFlags().get("hidden") == null) || !this.getFlags().get("hidden"))  {
-            this.checkSingleValue(_exportParser,
-                                  "hidden flag (must be false)",
-                                  "hidden",
-                                   "\"false\"");
-        } else  {
-            this.checkSingleValue(_exportParser,
-                                  "hidden flag (must be true)",
-                                  "hidden",
-                                  "\"true\"");
-        }
+        this.getValues().checkExport(_exportParser);
 
         // check for types
         if (this.allTypes)  {
@@ -419,21 +403,6 @@ public class PolicyData
             this.checkSingleValue(_exportParser, "types", "type", "{" + AbstractTest.convertUpdate(true, typeNames, null) + "}");
         } else  {
             this.checkSingleValue(_exportParser, "types", "type", "{}");
-        }
-
-        // check for enforce flag
-        if (this.getFlags().get("enforce") == null)  {
-            this.checkSingleValue(
-                    _exportParser,
-                    "enforce flag must be not defined",
-                    "enforce",
-                    null);
-        } else  {
-            this.checkSingleValue(
-                    _exportParser,
-                    "enforce flag",
-                    "enforce",
-                    "\""+ this.getFlags().get("enforce") + "\"");
         }
 
         // check for formats
@@ -642,20 +611,19 @@ public class PolicyData
         {
             _cmd.append("    state \"").append(AbstractTest.convertUpdate(this.name)).append("\" {\n");
             for (final Access accessFilter : this.access)  {
-                _cmd.append("     ");
+                _cmd.append("        ");
                 accessFilter.append4CIFile(_cmd);
             }
-            this.getFlags().append4CIFileValues("      ", _cmd, "\n");
+            this.getFlags().append4CIFileValues("        ", _cmd, "\n");
             for (final Map.Entry<String,Object> value : this.getValues().entrySet())  {
-                _cmd.append("    ").append(value.getKey())
-                    .append(" \"").append(AbstractTest.convertUpdate(value.getValue().toString())).append("\"\n");
+                _cmd.append("        ").append(value.getKey()).append(" \"").append(AbstractTest.convertUpdate(value.getValue().toString())).append("\"\n");
             }
             for (final Signature signature : this.signatures)
             {
                 signature.append4CIFile(_cmd);
             }
-            this.properties.appendCIFileUpdateFormat("    ", _cmd);
-            _cmd.append("  }\n");
+            this.properties.appendCIFileUpdateFormat("        ", _cmd);
+            _cmd.append("    }\n");
         }
 
         /**
@@ -673,7 +641,21 @@ public class PolicyData
                 _cmd.append(' ').append(value.getKey())
                     .append(" \"").append(AbstractTest.convertMql(value.getValue().toString())).append('\"');
             }
-            this.getFlags().append4CIFileValues(" ", _cmd, " ");
+
+            for (final Map.Entry<String,Boolean> entry : this.getFlags().entrySet())  {
+                if (entry.getValue() != null)  {
+                    _cmd.append(' ');
+                    if ("enforcereserveaccess".equals(entry.getKey()))  {
+                        if (!entry.getValue())  {
+                            _cmd.append('!');
+                        }
+                        _cmd.append(entry.getKey());
+                    } else  {
+                        _cmd.append(entry.getKey()).append(' ').append(entry.getValue());
+                    }
+                }
+            }
+
             for (final Signature signature : this.signatures)
             {
                 _cmd.append(" signature \"").append(AbstractTest.convertMql(signature.name)).append('\"');

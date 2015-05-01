@@ -63,54 +63,108 @@ PARSER_END(PolicyDefParser)
 
 <DEFAULT> TOKEN : /** first level */
 {
-    <DESCRIPTION:     "description">      : STRING_EXPECTED
-  | <TYPE:            "type">             : LALL_EXPECTED
-  | <FORMAT:          "format">           : LALL_EXPECTED
-  | <STORE:           "store">            : STRING_EXPECTED
-  | <DEFAULTFORMAT:   "defaultformat">    : STRING_EXPECTED
-  | <ENFORCE:         "enforce">          : B_EXPECTED
-  | <DELIMITER:       "delimiter">        : D_EXPECTED
-  | <SEQUENCE:        "sequence">         : STRING_EXPECTED
-  | <MINORSEQUENCE:   "minorsequence">    : STRING_EXPECTED
-  | <MAJORSEQUENCE:   "majorsequence">    : STRING_EXPECTED
-  | <HIDDEN:          "hidden">           : B_EXPECTED
-  | <STATE:           "state">            : STRING_EXPECTED
-  | <ALLSTATE:        "allstate">         : DEFAULT
+      <DESCRIPTION:                                     "description">                                          : STRING_EXPECTED
+    | <TYPE:                                            "type">                                                 : LALL_EXPECTED
+    | <FORMAT:                                          "format">                                               : LALL_EXPECTED
+    | <STORE:                                           "store">                                                : STRING_EXPECTED
+    | <DEFAULTFORMAT:                                   "defaultformat">                                        : STRING_EXPECTED
+    | <ENFORCE_TRUE:                                    "enforce">
+    | <ENFORCE_TRUE_VIA_VALUE:                          "enforce" ([" ","\t","\n","\r"])+ ["t","T"] ["r","R"] ["u","U"] ["e","E"]>
+    | <ENFORCE_TRUE_VIA_VALUE_APOSTROPHE:               "enforce" ([" ","\t","\n","\r"])+ "\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"">
+    | <ENFORCE_FALSE:                                   "!enforce">
+    | <ENFORCE_FALSE_VIA_VALUE:                         "enforce" ([" ","\t","\n","\r"])+ ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"]>
+    | <ENFORCE_FALSE_VIA_VALUE_APOSTROPHE:              "enforce" ([" ","\t","\n","\r"])+ "\"" ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] "\"">
+    | <DELIMITER:                                       "delimiter">                                            : D_EXPECTED
+    | <SEQUENCE:                                        "sequence">                                             : STRING_EXPECTED
+    | <MINORSEQUENCE:                                   "minorsequence">                                        : STRING_EXPECTED
+    | <MAJORSEQUENCE:                                   "majorsequence">                                        : STRING_EXPECTED
+    | <HIDDEN_TRUE:                                     "hidden">
+    | <HIDDEN_TRUE_VIA_VALUE:                           "hidden" ([" ","\t","\n","\r"])+ ["t","T"] ["r","R"] ["u","U"] ["e","E"]>
+    | <HIDDEN_TRUE_VIA_VALUE_APOSTROPHE:                "hidden" ([" ","\t","\n","\r"])+ "\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"">
+    | <HIDDEN_FALSE:                                    "!hidden">
+    | <HIDDEN_FALSE_VIA_VALUE:                          "hidden" ([" ","\t","\n","\r"])+ ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"]>
+    | <HIDDEN_FALSE_VIA_VALUE_APOSTROPHE:               "hidden" ([" ","\t","\n","\r"])+ "\"" ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] "\"">
+    | <STATE:                                           "state">                                                : STRING_EXPECTED
+    | <ALLSTATE:                                        "allstate">                                             : DEFAULT
 }
 
 <DEFAULT> TOKEN : /** State and depending signature and trigger Tokens */
 {
-      <REGISTEREDNAME:                      "registeredName">                                       : STRING_EXPECTED
-    | <REVISION:                            "revision">                                             : B_EXPECTED
-    | <MINORREVISION:                       "minorrevision">                                        : B_EXPECTED
-    | <MAJORREVISION:                       "majorrevision">                                        : B_EXPECTED
-    | <VERSION:                             "version">                                              : B_EXPECTED
-    | <PROMOTE:                             "promote">                                              : B_EXPECTED
-    | <CHECKOUTHISTORY:                     "checkouthistory">                                      : B_EXPECTED
-    | <ENFORCERESERVEACCESS:                "enforcereserveaccess">                                 : DEFAULT
-    | <ENFORCERESERVEACCESS_TRUE:           "enforcereserveaccess" ([" ","\t","\n","\r"])+ (["t","T"] ["r","R"] ["u","U"] ["e","E"] | "\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"")>
-                                                                                                    : DEFAULT
-    | <ENFORCERESERVEACCESS_NOT:            "notenforcereserveaccess">                              : DEFAULT
-    | <ENFORCERESERVEACCESS_EXCLAMATION:    "!enforcereserveaccess">                                : DEFAULT
-    | <ENFORCERESERVEACCESS_FALSE:          "enforcereserveaccess" ([" ","\t","\n","\r"])+ (["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] | "\"" ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] "\"")>
-                                                                                                    : DEFAULT
-    | <PUBLISHED:                           "published">                                            : B_EXPECTED
-    | <REVOKE:                              "revoke">                                               : DEFAULT
-    | <LOGIN:                               "login">                                                : DEFAULT
-    | <OWNER:                               "owner">                                                : STATEACCESS_EXPECTED
-    | <PUBLIC:                              "public">                                               : STATEACCESS_EXPECTED
-    | <USER:                                "user">                                                 : STATEACCESS_STRING_EXPECTED
-    | <ACTION:                              "action">                                               : STRING_EXPECTED
-    | <CHECK:                               "check">                                                : STRING_EXPECTED
-    | <OVERRIDE:                            "override">                                             : STRING_EXPECTED
-    | <INPUT:                               "input">                                                : STRING_EXPECTED
-    | <TRIGGER:                             "trigger">                                              : STRING_EXPECTED
-    | <APPROVE:                             "approve">                                              : L_EXPECTED
-    | <IGNORE:                              "ignore">                                               : L_EXPECTED
-    | <REJECT:                              "reject">                                               : L_EXPECTED
-    | <BRANCH:                              "branch">                                               : STRING_EXPECTED
-    | <SIGNATURE:                           "signature">                                            : STRING_EXPECTED
-    | <ROUTE:                               "route">                                                : LS_EXPECTED
+      <REGISTEREDNAME:                                  "registeredName">                                       : STRING_EXPECTED
+
+    | <REVISION_TRUE:                                   "revision">
+    | <REVISION_TRUE_VIA_VALUE:                         "revision" ([" ","\t","\n","\r"])+ (["t","T"] ["r","R"] ["u","U"] ["e","E"])>
+    | <REVISION_TRUE_VIA_VALUE_APOSTROPHE:              "revision" ([" ","\t","\n","\r"])+ ("\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"")>
+    | <REVISION_FALSE:                                  "!revision">
+    | <REVISION_FALSE_VIA_VALUE:                        "revision" ([" ","\t","\n","\r"])+ (["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"])>
+    | <REVISION_FALSE_VIA_VALUE_APOSTROPHE:             "revision" ([" ","\t","\n","\r"])+ ("\"" ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] "\"")>
+
+    | <MINORREVISION_TRUE:                              "minorrevision">
+    | <MINORREVISION_TRUE_VIA_VALUE:                    "minorrevision" ([" ","\t","\n","\r"])+ (["t","T"] ["r","R"] ["u","U"] ["e","E"])>
+    | <MINORREVISION_TRUE_VIA_VALUE_APOSTROPHE:         "minorrevision" ([" ","\t","\n","\r"])+ ("\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"")>
+    | <MINORREVISION_FALSE:                             "!minorrevision">
+    | <MINORREVISION_FALSE_VIA_VALUE:                   "minorrevision" ([" ","\t","\n","\r"])+ (["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"])>
+    | <MINORREVISION_FALSE_VIA_VALUE_APOSTROPHE:        "minorrevision" ([" ","\t","\n","\r"])+ ("\"" ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] "\"")>
+
+    | <MAJORREVISION_TRUE:                              "majorrevision">
+    | <MAJORREVISION_TRUE_VIA_VALUE:                    "majorrevision" ([" ","\t","\n","\r"])+ (["t","T"] ["r","R"] ["u","U"] ["e","E"])>
+    | <MAJORREVISION_TRUE_VIA_VALUE_APOSTROPHE:         "majorrevision" ([" ","\t","\n","\r"])+ ("\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"")>
+    | <MAJORREVISION_FALSE:                             "!majorrevision">
+    | <MAJORREVISION_FALSE_VIA_VALUE:                   "majorrevision" ([" ","\t","\n","\r"])+ (["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"])>
+    | <MAJORREVISION_FALSE_VIA_VALUE_APOSTROPHE:        "majorrevision" ([" ","\t","\n","\r"])+ ("\"" ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] "\"")>
+
+    | <VERSION_TRUE:                                    "version">
+    | <VERSION_TRUE_VIA_VALUE:                          "version" ([" ","\t","\n","\r"])+ (["t","T"] ["r","R"] ["u","U"] ["e","E"])>
+    | <VERSION_TRUE_VIA_VALUE_APOSTROPHE:               "version" ([" ","\t","\n","\r"])+ ("\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"")>
+    | <VERSION_FALSE:                                   "!version">
+    | <VERSION_FALSE_VIA_VALUE:                         "version" ([" ","\t","\n","\r"])+ (["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"])>
+    | <VERSION_FALSE_VIA_VALUE_APOSTROPHE:              "version" ([" ","\t","\n","\r"])+ ("\"" ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] "\"")>
+
+    | <PROMOTE_TRUE:                                    "promote">
+    | <PROMOTE_TRUE_VIA_VALUE:                          "promote" ([" ","\t","\n","\r"])+ (["t","T"] ["r","R"] ["u","U"] ["e","E"])>
+    | <PROMOTE_TRUE_VIA_VALUE_APOSTROPHE:               "promote" ([" ","\t","\n","\r"])+ ("\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"")>
+    | <PROMOTE_FALSE:                                   "!promote">
+    | <PROMOTE_FALSE_VIA_VALUE:                         "promote" ([" ","\t","\n","\r"])+ (["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"])>
+    | <PROMOTE_FALSE_VIA_VALUE_APOSTROPHE:              "promote" ([" ","\t","\n","\r"])+ ("\"" ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] "\"")>
+
+    | <CHECKOUTHISTORY_TRUE:                            "checkouthistory">
+    | <CHECKOUTHISTORY_TRUE_VIA_VALUE:                  "checkouthistory" ([" ","\t","\n","\r"])+ (["t","T"] ["r","R"] ["u","U"] ["e","E"])>
+    | <CHECKOUTHISTORY_TRUE_VIA_VALUE_APOSTROPHE:       "checkouthistory" ([" ","\t","\n","\r"])+ ("\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"")>
+    | <CHECKOUTHISTORY_FALSE:                           "!checkouthistory">
+    | <CHECKOUTHISTORY_FALSE_VIA_VALUE:                 "checkouthistory" ([" ","\t","\n","\r"])+ (["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"])>
+    | <CHECKOUTHISTORY_FALSE_VIA_VALUE_APOSTROPHE:      "checkouthistory" ([" ","\t","\n","\r"])+ ("\"" ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] "\"")>
+
+    | <ENFORCERESERVEACCESS_TRUE:                       "enforcereserveaccess">
+    | <ENFORCERESERVEACCESS_TRUE_VIA_VALUE:             "enforcereserveaccess" ([" ","\t","\n","\r"])+ (["t","T"] ["r","R"] ["u","U"] ["e","E"])>
+    | <ENFORCERESERVEACCESS_TRUE_VIA_VALUE_APOSTROPHE:  "enforcereserveaccess" ([" ","\t","\n","\r"])+ ("\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"")>
+    | <ENFORCERESERVEACCESS_FALSE:                      "!enforcereserveaccess">
+    | <ENFORCERESERVEACCESS_FALSE_VIA_NOT:              "notenforcereserveaccess">
+    | <ENFORCERESERVEACCESS_FALSE_VIA_VALUE:            "enforcereserveaccess" ([" ","\t","\n","\r"])+ (["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"])>
+    | <ENFORCERESERVEACCESS_FALSE_VIA_VALUE_APOSTROPHE: "enforcereserveaccess" ([" ","\t","\n","\r"])+ ("\"" ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] "\"")>
+
+    | <PUBLISHED_TRUE:                                  "published">
+    | <PUBLISHED_TRUE_VIA_VALUE:                        "published" ([" ","\t","\n","\r"])+ (["t","T"] ["r","R"] ["u","U"] ["e","E"])>
+    | <PUBLISHED_TRUE_VIA_VALUE_APOSTROPHE:             "published" ([" ","\t","\n","\r"])+ ("\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"")>
+    | <PUBLISHED_FALSE:                                 "!published">
+    | <PUBLISHED_FALSE_VIA_VALUE:                       "published" ([" ","\t","\n","\r"])+ (["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"])>
+    | <PUBLISHED_FALSE_VIA_VALUE_APOSTROPHE:            "published" ([" ","\t","\n","\r"])+ ("\"" ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"] "\"")>
+
+    | <REVOKE:                                          "revoke">
+    | <LOGIN:                                           "login">
+    | <OWNER:                                           "owner">                                                : STATEACCESS_EXPECTED
+    | <PUBLIC:                                          "public">                                               : STATEACCESS_EXPECTED
+    | <USER:                                            "user">                                                 : STATEACCESS_STRING_EXPECTED
+    | <ACTION:                                          "action">                                               : STRING_EXPECTED
+    | <CHECK:                                           "check">                                                : STRING_EXPECTED
+    | <OVERRIDE:                                        "override">                                             : STRING_EXPECTED
+    | <INPUT:                                           "input">                                                : STRING_EXPECTED
+    | <TRIGGER:                                         "trigger">                                              : STRING_EXPECTED
+    | <APPROVE:                                         "approve">                                              : L_EXPECTED
+    | <IGNORE:                                          "ignore">                                               : L_EXPECTED
+    | <REJECT:                                          "reject">                                               : L_EXPECTED
+    | <BRANCH:                                          "branch">                                               : STRING_EXPECTED
+    | <SIGNATURE:                                       "signature">                                            : STRING_EXPECTED
+    | <ROUTE:                                           "route">                                                : LS_EXPECTED
 }
 
 /************************************************************** State Access */
@@ -197,20 +251,6 @@ PARSER_END(PolicyDefParser)
     | <SS_SINGLE : (<SS_CHAR>)+> : STRING_EXPECTED
     | <#SS_APOSTROPHE : "\"" >
     | <#SS_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
-}
-
-/*************************************************** Boolean for Hidden Value */
-<B_EXPECTED> SKIP :
-{
-  " " | "\t" | "\n" | "\r"
-}
-
-<B_EXPECTED> TOKEN :
-{
-      <BOOLEAN_TRUE : (<BOOLEAN_TRUESTR> | "\"" <BOOLEAN_TRUESTR> "\"")> : DEFAULT
-    | <BOOLEAN_FALSE : (<BOOLEAN_FALSESTR> | "\"" <BOOLEAN_FALSESTR> "\"")> : DEFAULT
-    | <#BOOLEAN_TRUESTR : ["t","T"] ["r","R"] ["u","U"] ["e","E"]>
-    | <#BOOLEAN_FALSESTR : ["f","F"] ["a","A"] ["l","L"] ["s","S"] ["e","E"]>
 }
 
 /*************************************************** Delimiter Chacter */
@@ -333,8 +373,12 @@ void parse(final Policy_mxJPO _policy)
       | ( type(_policy) )
       | ( <DEFAULTFORMAT>           ( tmp = <S_STRING>                          {this.setValue(_policy, "defaultFormat", this.getString(tmp.image));}
                                     | tmp = <S_SINGLE_STRING>                   {this.setValue(_policy, "defaultFormat", this.getSingle(tmp.image));} ) )
-      | ( <ENFORCE>                 ( <BOOLEAN_TRUE>                            {this.setValue(_policy, "enforce", true);}
-                                    | <BOOLEAN_FALSE>                           {this.setValue(_policy, "enforce", false);} ) )
+      | ( (   <ENFORCE_TRUE>
+            | <ENFORCE_TRUE_VIA_VALUE>
+            | <ENFORCE_TRUE_VIA_VALUE_APOSTROPHE> )                             {this.setValue(_policy, "enforce", true);} )
+      | ( (   <ENFORCE_FALSE>
+            | <ENFORCE_FALSE_VIA_VALUE>
+            | <ENFORCE_FALSE_VIA_VALUE_APOSTROPHE> )                            {this.setValue(_policy, "enforce", false);} )
       | ( <DELIMITER>               tmp = <DELIMITER_CHAR>                      {this.setValue(_policy, "delimiter", this.getSingle(tmp.image));} )
       | ( ( <SEQUENCE> | <MINORSEQUENCE> )
                                     ( tmp = <S_STRING>                          {this.setValue(_policy, "minorsequence", this.getString(tmp.image));}
@@ -343,8 +387,12 @@ void parse(final Policy_mxJPO _policy)
                                     | tmp = <S_SINGLE_STRING>                   {this.setValue(_policy, "majorsequence", this.getSingle(tmp.image));} ) )
       | ( <STORE>                   ( tmp = <S_STRING>                          {this.setValue(_policy, "store", this.getString(tmp.image));}
                                     | tmp = <S_SINGLE_STRING>                   {this.setValue(_policy, "store", this.getSingle(tmp.image));} ) )
-      | ( <HIDDEN>                  ( <BOOLEAN_TRUE>                            {this.setValue(_policy, "hidden", true);}
-                                    | <BOOLEAN_FALSE>                           {this.setValue(_policy, "hidden", false);} ) )
+      | ( (   <HIDDEN_TRUE>
+            | <HIDDEN_TRUE_VIA_VALUE>
+            | <HIDDEN_TRUE_VIA_VALUE_APOSTROPHE> )                              {this.setValue(_policy, "hidden", true);} )
+      | ( (   <HIDDEN_FALSE>
+            | <HIDDEN_FALSE_VIA_VALUE>
+            | <HIDDEN_FALSE_VIA_VALUE_APOSTROPHE> )                             {this.setValue(_policy, "hidden", false);} )
       | ( allstate(_policy) )
       | ( state(_policy) )
       | (<PROPERTY>                                                             {property = new AdminProperty();this.appendValue(this.getValue(_policy, "properties"), "propertiesStack", property);}
@@ -438,23 +486,63 @@ void state(final Policy_mxJPO _policy) : {
                                     | tmp = <S_SINGLE_STRING>                   {this.setValue(state, "name", this.getSingle(tmp.image));} ) )
     "{"
         (              ( <REGISTEREDNAME>    tmpStr = sString()                          {this.appendValue(state, "symbolicNames", tmpStr);} )
-            | ( <REVISION>          ( <BOOLEAN_TRUE>                            {this.getField(state, "minorrevisionable").set(true);}
-                                    | <BOOLEAN_FALSE>                           {this.getField(state, "minorrevisionable").set(false);} ) )
-            | ( <MINORREVISION>     ( <BOOLEAN_TRUE>                            {this.getField(state, "minorrevisionable").set(true);}
-                                    | <BOOLEAN_FALSE>                           {this.getField(state, "minorrevisionable").set(false);} ) )
-            | ( <MAJORREVISION>     ( <BOOLEAN_TRUE>                            {this.getField(state, "majorrevisionable").set(true);}
-                                    | <BOOLEAN_FALSE>                           {this.getField(state, "majorrevisionable").set(false);} ) )
-            | ( <VERSION>           ( <BOOLEAN_TRUE>                            {this.getField(state, "versionable").set(true);}
-                                    | <BOOLEAN_FALSE>                           {this.getField(state, "versionable").set(false);} ) )
-            | ( <PROMOTE>           ( <BOOLEAN_TRUE>                            {this.getField(state, "autoPromotion").set(true);}
-                                    | <BOOLEAN_FALSE>                           {this.getField(state, "autoPromotion").set(false);} ) )
-            | ( <CHECKOUTHISTORY>   ( <BOOLEAN_TRUE>                            {this.getField(state, "checkoutHistory").set(true);}
-                                    | <BOOLEAN_FALSE>                           {this.getField(state, "checkoutHistory").set(false);} ) )
-            | ( (<ENFORCERESERVEACCESS> | <ENFORCERESERVEACCESS_TRUE>)           {this.getField(state, "enforcereserveaccess").set(true);} )
-            | ( (<ENFORCERESERVEACCESS_NOT> | <ENFORCERESERVEACCESS_EXCLAMATION> | <ENFORCERESERVEACCESS_FALSE>)
-                                                                                {this.getField(state, "enforcereserveaccess").set(false);} )
-            | ( <PUBLISHED>         ( <BOOLEAN_TRUE>                            {this.getField(state, "published").set(true);}
-                                    | <BOOLEAN_FALSE>                           {this.getField(state, "published").set(false);} ) )
+
+            | ( ( <MINORREVISION_TRUE>
+                | <MINORREVISION_TRUE_VIA_VALUE>
+                | <MINORREVISION_TRUE_VIA_VALUE_APOSTROPHE>
+                | <REVISION_TRUE>
+                | <REVISION_TRUE_VIA_VALUE>
+                | <REVISION_TRUE_VIA_VALUE_APOSTROPHE>)                         {this.setValue(state, "minorrevisionable", true);} )
+            | ( ( <MINORREVISION_FALSE>
+                | <MINORREVISION_FALSE_VIA_VALUE>
+                | <MINORREVISION_FALSE_VIA_VALUE_APOSTROPHE>
+                | <REVISION_FALSE>
+                | <REVISION_FALSE_VIA_VALUE>
+                | <REVISION_FALSE_VIA_VALUE_APOSTROPHE>)                        {this.setValue(state, "minorrevisionable", false);} )
+
+            | ( ( <MAJORREVISION_TRUE>
+                | <MAJORREVISION_TRUE_VIA_VALUE>
+                | <MAJORREVISION_TRUE_VIA_VALUE_APOSTROPHE>)                    {this.setValue(state, "majorrevisionable", true);} )
+            | ( ( <MAJORREVISION_FALSE>
+                | <MAJORREVISION_FALSE_VIA_VALUE>
+                | <MAJORREVISION_FALSE_VIA_VALUE_APOSTROPHE>)                   {this.setValue(state, "majorrevisionable", false);} )
+
+            | ( ( <VERSION_TRUE>
+                | <VERSION_TRUE_VIA_VALUE>
+                | <VERSION_TRUE_VIA_VALUE_APOSTROPHE>)                          {this.setValue(state, "versionable", true);} )
+            | ( ( <VERSION_FALSE>
+                | <VERSION_FALSE_VIA_VALUE>
+                | <VERSION_FALSE_VIA_VALUE_APOSTROPHE>)                         {this.setValue(state, "versionable", false);} )
+
+            | ( ( <PROMOTE_TRUE>
+                | <PROMOTE_TRUE_VIA_VALUE>
+                | <PROMOTE_TRUE_VIA_VALUE_APOSTROPHE>)                          {this.setValue(state, "autoPromotion", true);} )
+            | ( ( <PROMOTE_FALSE>
+                | <PROMOTE_FALSE_VIA_VALUE>
+                | <PROMOTE_FALSE_VIA_VALUE_APOSTROPHE>)                         {this.setValue(state, "autoPromotion", false);} )
+
+            | ( ( <CHECKOUTHISTORY_TRUE>
+                | <CHECKOUTHISTORY_TRUE_VIA_VALUE>
+                | <CHECKOUTHISTORY_TRUE_VIA_VALUE_APOSTROPHE>)                  {this.setValue(state, "checkoutHistory", true);} )
+            | ( ( <CHECKOUTHISTORY_FALSE>
+                | <CHECKOUTHISTORY_FALSE_VIA_VALUE>
+                | <CHECKOUTHISTORY_FALSE_VIA_VALUE_APOSTROPHE>)                 {this.setValue(state, "checkoutHistory", false);} )
+
+            | ( ( <ENFORCERESERVEACCESS_TRUE>
+                | <ENFORCERESERVEACCESS_TRUE_VIA_VALUE>
+                | <ENFORCERESERVEACCESS_TRUE_VIA_VALUE_APOSTROPHE>)             {this.setValue(state, "enforcereserveaccess", true);} )
+            | ( ( <ENFORCERESERVEACCESS_FALSE>
+                | <ENFORCERESERVEACCESS_FALSE_VIA_NOT>
+                | <ENFORCERESERVEACCESS_FALSE_VIA_VALUE>
+                | <ENFORCERESERVEACCESS_FALSE_VIA_VALUE_APOSTROPHE>)            {this.setValue(state, "enforcereserveaccess", false);} )
+
+            | ( ( <PUBLISHED_TRUE>
+                | <PUBLISHED_TRUE_VIA_VALUE>
+                | <PUBLISHED_TRUE_VIA_VALUE_APOSTROPHE>)                        {this.setValue(state, "published", true);} )
+            | ( ( <PUBLISHED_FALSE>
+                | <PUBLISHED_FALSE_VIA_VALUE>
+                | <PUBLISHED_FALSE_VIA_VALUE_APOSTROPHE>)                       {this.setValue(state, "published", false);} )
+
             | stateOwnerAccess(Prefix.All, state)
             | statePublicAccess(Prefix.All, state)
             | stateUserAccess(Prefix.All, state)

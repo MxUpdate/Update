@@ -50,92 +50,347 @@ public class PolicyParserTest
     {
         return new Object[][]{
                 new Object[]{
-                        "1) simple hidden policy",
+                        "1) simple policy",
                         "",
-                        "description \"\"  type {} format {} defaultformat \"\" sequence \"\" store \"\" hidden \"true\""},
+                        "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\""},
+                // hidden flag
                 new Object[]{
-                        "2a) simple hidden policy with description special characters",
+                        "2a) simple not hidden policy",
                         "",
-                        "description \"{}\\\"\"  type {} format {} defaultformat \"\" sequence \"\" store \"\" hidden \"true\""},
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\""},
                 new Object[]{
-                        "2b) simple hidden policy with type special characters",
-                        "",
-                        "description \"\"  type {\"{}\\\"\"} format {} defaultformat \"\" sequence \"\" store \"\" hidden \"true\""},
+                        "2b) not hidden policy defined as value w/o apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\"",
+                        "description \"\" hidden false type {} format {} defaultformat \"\" sequence \"\" store \"\""},
                 new Object[]{
-                        "2c) simple hidden policy with format special characters",
-                        "",
-                        "description \"\"  type {} format {\"{}\\\"\"} defaultformat \"\" sequence \"\" store \"\" hidden \"true\""},
+                        "2c) not hidden policy defined as value with apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\"",
+                        "description \"\" hidden \"FAlse\" type {} format {} defaultformat \"\" sequence \"\" store \"\""},
                 new Object[]{
-                        "2d) simple hidden policy with defaultformat special characters",
+                        "2d) hidden policy",
                         "",
-                        "description \"\"  type {} format {} defaultformat \"{}\\\"\" sequence \"\" store \"\" hidden \"true\""},
+                        "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\""},
                 new Object[]{
-                        "2e) simple hidden policy with sequence special characters",
-                        "",
-                        "description \"\"  type {} format {} defaultformat \"\" sequence \"{}\\\"\" store \"\" hidden \"true\""},
+                        "2e) hidden hidden defined as value w/o apostrophe",
+                        "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\"",
+                        "description \"\" hidden TRUE type {} format {} defaultformat \"\" sequence \"\" store \"\""},
                 new Object[]{
-                        "2f) simple hidden policy with store special characters",
-                        "",
-                        "description \"\"  type {} format {} defaultformat \"\" sequence \"\" store \"{}\\\"\" hidden \"true\""},
+                        "2f) hidden policy defined as value with apostrophe",
+                        "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\"",
+                        "description \"\" hidden \"True\" type {} format {} defaultformat \"\" sequence \"\" store \"\""},
+                // enforce flag
                 new Object[]{
-                        "2g) simple hidden policy with delimeter / minor special characters",
+                        "3a) not enforce policy",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\"",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" !enforce sequence \"\" store \"\""},
+                new Object[]{
+                        "3b) not enforce policy defined as value w/o apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\"",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" enforce false sequence \"\" store \"\""},
+                new Object[]{
+                        "3c) not enforce policy defined as value with apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\"",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" enforce \"FAlse\" sequence \"\" store \"\""},
+                new Object[]{
+                        "3d) enforce policy",
                         "",
-                        "description \"\"  type {} format {} defaultformat \"\" delimiter . minorsequence \"{}\\\"\" majorsequence \"{}\\\"\" store \"\" hidden \"true\""},
+                        "description \"\" !hidden type {} format {} defaultformat \"\" enforce sequence \"\" store \"\""},
+                new Object[]{
+                        "3e) enforce policy defined as value w/o apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" enforce sequence \"\" store \"\"",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" enforce TRUE sequence \"\" store \"\""},
+                new Object[]{
+                        "3f) enforce policy defined as value with apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" enforce sequence \"\" store \"\"",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" enforce \"True\" sequence \"\" store \"\""},
+                // special characters
+                new Object[]{
+                        "4a) policy with description special characters",
+                        "",
+                        "description \"{}\\\"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\""},
+                new Object[]{
+                        "4b) policy with type special characters",
+                        "",
+                        "description \"\" hidden type {\"{}\\\"\"} format {} defaultformat \"\" sequence \"\" store \"\""},
+                new Object[]{
+                        "4c) policy with format special characters",
+                        "",
+                        "description \"\" hidden type {} format {\"{}\\\"\"} defaultformat \"\" sequence \"\" store \"\""},
+                new Object[]{
+                        "4d) policy with defaultformat special characters",
+                        "",
+                        "description \"\" hidden type {} format {} defaultformat \"{}\\\"\" sequence \"\" store \"\""},
+                new Object[]{
+                        "4e) policy with sequence special characters",
+                        "",
+                        "description \"\" hidden type {} format {} defaultformat \"\" sequence \"{}\\\"\" store \"\""},
+                new Object[]{
+                        "4f) policy with store special characters",
+                        "",
+                        "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"{}\\\"\""},
+                new Object[]{
+                        "4g) policy with delimeter / minor special characters",
+                        "",
+                        "description \"\" hidden type {} format {} defaultformat \"\" delimiter . minorsequence \"{}\\\"\" majorsequence \"{}\\\"\" store \"\""},
                 // policy property
                 new Object[]{
-                        "3a) policy with property special characters",
+                        "5a) policy with property special characters",
                         "",
-                        "description \"\"  type {} format {} defaultformat \"\" sequence \"\" store \"\" hidden \"true\" property \"{}\\\"\""},
+                        "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" property \"{}\\\"\""},
                 new Object[]{
-                        "3b) policy with property and value special characters",
+                        "5b) policy with property and value special characters",
                         "",
-                        "description \"\"  type {} format {} defaultformat \"\" sequence \"\" store \"\" hidden \"true\" property \"{}\\\"\" value \"{}\\\"\""},
+                        "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" property \"{}\\\"\" value \"{}\\\"\""},
                 new Object[]{
-                        "3c) policy with property link special characters",
+                        "5c) policy with property link special characters",
                         "",
-                        "description \"\"  type {} format {} defaultformat \"\" sequence \"\" store \"\" hidden \"true\" property \"{}\\\"\" to type \"{}\\\"\""},
+                        "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" property \"{}\\\"\" to type \"{}\\\"\""},
                 new Object[]{
-                        "3d) policy with property link and value special characters",
+                        "5d) policy with property link and value special characters",
                         "",
-                        "description \"\"  type {} format {} defaultformat \"\" sequence \"\" store \"\" hidden \"true\" property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\""},
-                // policy state
+                        "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\""},
+                // policy state with special characters
                 new Object[]{
-                        "4a) policy with state symbolic name special characters",
+                        "6a) policy with state symbolic name special characters",
                         "",
-                        "description \"\"  type {} format {} defaultformat \"\" sequence \"\" store \"\" hidden \"true\" state \"{}\\\"\" { registeredName \"{}\\\"\" !enforcereserveaccess majorrevision \"false\" minorrevision \"false\" version \"false\" promote \"false\" checkouthistory \"false\" published \"false\" action \"\" input \"\" check \"\" input \"\" }"},
+                        "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"{}\\\"\" { registeredName \"{}\\\"\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
                 new Object[]{
-                        "4b) policy with state action special characters",
+                        "6b) policy with state action special characters",
                         "",
-                        "description \"\"  type {} format {} defaultformat \"\" sequence \"\" store \"\" hidden \"true\" state \"A\" { registeredName \"A\" !enforcereserveaccess majorrevision \"false\" minorrevision \"false\" version \"false\" promote \"false\" checkouthistory \"false\" published \"false\" action \"{}\\\"\" input \"\" check \"\" input \"\" }"},
+                        "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"A\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"{}\\\"\" input \"\" check \"\" input \"\" }"},
                 new Object[]{
-                        "4c) policy with state action input special characters",
+                        "6c) policy with state action input special characters",
                         "",
-                        "description \"\"  type {} format {} defaultformat \"\" sequence \"\" store \"\" hidden \"true\" state \"A\" { registeredName \"A\" !enforcereserveaccess majorrevision \"false\" minorrevision \"false\" version \"false\" promote \"false\" checkouthistory \"false\" published \"false\" action \"A\" input \"{}\\\"\" check \"\" input \"\" }"},
+                        "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"A\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"A\" input \"{}\\\"\" check \"\" input \"\" }"},
                 new Object[]{
-                        "4d) policy with state check special characters",
+                        "6d) policy with state check special characters",
                         "",
-                        "description \"\"  type {} format {} defaultformat \"\" sequence \"\" store \"\" hidden \"true\" state \"A\" { registeredName \"A\" !enforcereserveaccess majorrevision \"false\" minorrevision \"false\" version \"false\" promote \"false\" checkouthistory \"false\" published \"false\" action \"\" input \"\" check \"{}\\\"\" input \"\" }"},
+                        "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"A\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"{}\\\"\" input \"\" }"},
                 new Object[]{
-                        "4e) policy with state check input special characters",
+                        "6e) policy with state check input special characters",
                         "",
-                        "description \"\"  type {} format {} defaultformat \"\" sequence \"\" store \"\" hidden \"true\" state \"A\" { registeredName \"A\" !enforcereserveaccess majorrevision \"false\" minorrevision \"false\" version \"false\" promote \"false\" checkouthistory \"false\" published \"false\" action \"\" input \"\" check \"A\" input \"{}\\\"\" }"},
+                        "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"A\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"A\" input \"{}\\\"\" }"},
                 // policy state property
                 new Object[]{
-                        "5a) policy with state property special characters",
+                        "7a) policy with state property special characters",
                         "",
-                        "description \"\"  type {} format {} defaultformat \"\" sequence \"\" store \"\" hidden \"true\" state \"A\" { registeredName \"\" !enforcereserveaccess majorrevision \"false\" minorrevision \"false\" version \"false\" promote \"false\" checkouthistory \"false\" published \"false\" action \"\" input \"\" check \"\" input \"\" property \"{}\\\"\" }"},
+                        "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" property \"{}\\\"\" }"},
                 new Object[]{
-                        "5b) policy with state property and value special characters",
+                        "7b) policy with state property and value special characters",
                         "",
-                        "description \"\"  type {} format {} defaultformat \"\" sequence \"\" store \"\" hidden \"true\" state \"A\" { registeredName \"\" !enforcereserveaccess majorrevision \"false\" minorrevision \"false\" version \"false\" promote \"false\" checkouthistory \"false\" published \"false\" action \"\" input \"\" check \"\" input \"\" property \"{}\\\"\" value \"{}\\\"\" }"},
+                        "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" property \"{}\\\"\" value \"{}\\\"\" }"},
                 new Object[]{
-                        "5c) policy with state property link special characters",
+                        "7c) policy with state property link special characters",
                         "",
-                        "description \"\"  type {} format {} defaultformat \"\" sequence \"\" store \"\" hidden \"true\" state \"A\" { registeredName \"\" !enforcereserveaccess majorrevision \"false\" minorrevision \"false\" version \"false\" promote \"false\" checkouthistory \"false\" published \"false\" action \"\" input \"\" check \"\" input \"\" property \"{}\\\"\" to type \"{}\\\"\" }"},
+                        "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" property \"{}\\\"\" to type \"{}\\\"\" }"},
                 new Object[]{
-                        "5d) policy with state property link and value special characters",
+                        "7d) policy with state property link and value special characters",
                         "",
-                        "description \"\"  type {} format {} defaultformat \"\" sequence \"\" store \"\" hidden \"true\" state \"A\" { registeredName \"\" !enforcereserveaccess majorrevision \"false\" minorrevision \"false\" version \"false\" promote \"false\" checkouthistory \"false\" published \"false\" action \"\" input \"\" check \"\" input \"\" property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\" }"},
+                        "description \"\" hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\" }"},
+                // policy state with enforce flag
+                new Object[]{
+                        "8a) policy state not enforcereserveaccess",
+                        "",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "8b) policy state not enforcereserveaccess defined as not",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" notenforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "8c) policy state not enforcereserveaccess defined as value w/o apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess false majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "8d) policy state not enforcereserveaccess defined as value with apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" !enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess \"FAlse\" majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "8e) policy state enforcereserveaccess",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "8f) policy state enforcereserveaccess defined as value w/o apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess TRUE majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "8g) policy state enforcereserveaccess defined as value with apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess \"True\" majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                // policy state with majorrevision flag
+                new Object[]{
+                        "9a) policy state not majorrevision",
+                        "",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess !majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "9b) policy state not majorrevision defined as value w/o apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess !majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision false minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "9c) policy state not majorrevision defined as value with apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess !majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision \"FAlse\" minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "9d) policy state majorrevision",
+                        "",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "9e) policy state majorrevision defined as value w/o apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision TRUE minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "9f) policy state majorrevision defined as value with apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision \"True\" minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                // policy state with minorrevision flag
+                new Object[]{
+                        "10a) policy state not minorrevision",
+                        "",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision !minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "10b) policy state not minorrevision defined as value w/o apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision !minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision false version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "10c) policy state not minorrevision defined as value with apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision !minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision \"FAlse\" version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "10d) policy state minorrevision",
+                        "",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "10e) policy state minorrevision defined as value w/o apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision TRUE version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "10f) policy state minorrevision defined as value with apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision \"True\" version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                // policy state with revision flag
+                new Object[]{
+                        "11a) policy state not revision",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision !minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision !revision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "11b) policy state not minorrevision defined as value w/o apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision !minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision revision false version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "11c) policy state not minorrevision defined as value with apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision !minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision revision \"FAlse\" version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "11d) policy state minorrevision",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision revision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "11e) policy state minorrevision defined as value w/o apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision revision TRUE version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "11f) policy state minorrevision defined as value with apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision revision \"True\" version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                // policy state with version flag
+                new Object[]{
+                        "12a) policy state not version",
+                        "",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision !version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "12b) policy state not version defined as value w/o apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision !version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version false promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "12c) policy state not version defined as value with apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision !version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version \"FAlse\" promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "12d) policy state version",
+                        "",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "12e) policy state version defined as value w/o apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version TRUE promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "12f) policy state version defined as value with apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version \"True\" promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                // policy state with promote flag
+                new Object[]{
+                        "13a) policy state not promote",
+                        "",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version !promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "13b) policy state not promote defined as value w/o apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version !promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote false checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "13c) policy state not promote defined as value with apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version !promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote \"FAlse\" checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "13d) policy state promote",
+                        "",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "13e) policy state promote defined as value w/o apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote TRUE checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "13f) policy state promote defined as value with apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote \"True\" checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                // policy state with checkouthistory flag
+                new Object[]{
+                        "14a) policy state not checkouthistory",
+                        "",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote !checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "14b) policy state not checkouthistory defined as value w/o apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote !checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory false published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "14c) policy state not checkouthistory defined as value with apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote !checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory \"FAlse\" published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "14d) policy state checkouthistory",
+                        "",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "14e) policy state checkouthistory defined as value w/o apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory TRUE published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "14f) policy state checkouthistory defined as value with apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory \"True\" published action \"\" input \"\" check \"\" input \"\" }"},
+                // policy state with published flag
+                new Object[]{
+                        "15a) policy state not published",
+                        "",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory !published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "15b) policy state not published defined as value w/o apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory !published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published false action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "15c) policy state not published defined as value with apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory !published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published \"FAlse\" action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "15d) policy state published",
+                        "",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "15e) policy state published defined as value w/o apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published TRUE action \"\" input \"\" check \"\" input \"\" }"},
+                new Object[]{
+                        "15f) policy state published defined as value with apostrophe",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published action \"\" input \"\" check \"\" input \"\" }",
+                        "description \"\" !hidden type {} format {} defaultformat \"\" sequence \"\" store \"\" state \"A\" { registeredName \"\" enforcereserveaccess majorrevision minorrevision version promote checkouthistory published \"True\" action \"\" input \"\" check \"\" input \"\" }"},
         };
     }
 

@@ -72,13 +72,13 @@ public class PolicyTest
             + "  defaultformat \"generic\"\n"
             + "  sequence \"1,2,3,...\"\n"
             + "  store \"\"\n"
-            + "  hidden \"false\"\n"
+            + "  !hidden\n"
             + "  state \"Pending\"  {\n"
             + "    registeredName \"state_Pending\"\n"
-            + "    revision \"true\"\n"
-            + "    version \"true\"\n"
-            + "    promote \"true\"\n"
-            + "    checkouthistory \"true\"\n"
+            + "    revision\n"
+            + "    version\n"
+            + "    promote\n"
+            + "    checkouthistory\n"
             + "    owner {read modify delete}\n"
             + "    public {read show}\n"
             + "    action \"\" input \"\"\n"
@@ -86,10 +86,10 @@ public class PolicyTest
             + "  }\n"
             + "  state \"Submitted\"  {\n"
             + "    registeredName \"state_Submitted\"\n"
-            + "    revision \"true\"\n"
-            + "    version \"true\"\n"
-            + "    promote \"true\"\n"
-            + "    checkouthistory \"true\"\n"
+            + "    revision\n"
+            + "    version\n"
+            + "    promote\n"
+            + "    checkouthistory\n"
             + "    owner {read modify checkout checkin}\n"
             + "    public {read show}\n"
             + "    action \"\" input \"\"\n"
@@ -111,10 +111,10 @@ public class PolicyTest
             + "  }\n"
             + "  state \"Review\"  {\n"
             + "    registeredName \"state_Review\"\n"
-            + "    revision \"true\"\n"
-            + "    version \"true\"\n"
-            + "    promote \"true\"\n"
-            + "    checkouthistory \"true\"\n"
+            + "    revision\n"
+            + "    version\n"
+            + "    promote\n"
+            + "    checkouthistory\n"
             + "    owner {read modify checkout}\n"
             + "    public {read show}\n"
             + "    action \"\" input \"\"\n"
@@ -122,10 +122,10 @@ public class PolicyTest
             + "  }\n"
             + "  state \"Approved\"  {\n"
             + "    registeredName \"state_Approved\"\n"
-            + "    revision \"true\"\n"
-            + "    version \"true\"\n"
-            + "    promote \"true\"\n"
-            + "    checkouthistory \"true\"\n"
+            + "    revision\n"
+            + "    version\n"
+            + "    promote\n"
+            + "    checkouthistory\n"
             + "    owner {read modify checkout checkin}\n"
             + "    public {read show}\n"
             + "    action \"\" input \"\"\n"
@@ -139,10 +139,10 @@ public class PolicyTest
             + "    }\n"
             + "  }\n"
             + "  state \"Rejected\"  {\n"
-            + "    revision \"true\"\n"
-            + "    version \"true\"\n"
-            + "    promote \"true\"\n"
-            + "    checkouthistory \"true\"\n"
+            + "    revision\n"
+            + "    version\n"
+            + "    promote\n"
+            + "    checkouthistory\n"
             + "    owner {read modify show}\n"
             + "    public {read show}\n"
             + "    action \"\" input \"\"\n"
@@ -233,21 +233,21 @@ public class PolicyTest
                         new PolicyData(this, "test")
                                 .addState(new State()
                                         .setName("create")
-                                        .setValue("published", "false"))},
+                                        .setFlag("published", false))},
                 new Object[]{
                         "issue #179: policy state with published true",
                         new PolicyData(this, "test")
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .setValue("published", "true"))},
+                                        .setFlag("published", true))},
                 new Object[]{
                         "issue #179: policy state with published false",
                         new PolicyData(this, "test")
                                 .notSupported(Version.V6R2011x)
                                 .addState(new State()
                                         .setName("create")
-                                        .setValue("published", "false"))},
+                                        .setFlag("published", false))},
                 // locking enforced flag
                 new Object[]{
                         "issue #182: policy state with enforce true",
