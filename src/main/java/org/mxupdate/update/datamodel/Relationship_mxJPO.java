@@ -26,8 +26,6 @@ import java.util.TreeSet;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
-import org.mxupdate.update.datamodel.helper.AttributeList_mxJPO;
-import org.mxupdate.update.datamodel.relationship.RelationshipDefParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
@@ -35,7 +33,9 @@ import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateList;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.xml.sax.SAXException;
 
 /**
@@ -105,7 +105,7 @@ public class Relationship_mxJPO
     /** To side information. */
     private final Side to = new Side("to");
     /** Attribute list. */
-    private final AttributeList_mxJPO attributeList = new AttributeList_mxJPO(this);
+    private final Set<String> attributes = new TreeSet<String>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -135,7 +135,7 @@ public class Relationship_mxJPO
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
-        new RelationshipDefParser_mxJPO(new StringReader(_code)).parse(this);
+        new RelationshipParser_mxJPO(new StringReader(_code)).parse(this);
         this.prepare();
     }
 
@@ -179,10 +179,9 @@ public class Relationship_mxJPO
         } else if ("/accessRuleRef".equals(_url))  {
             this.rule = _content;
             parsed = true;
-
-        } else if (_url.startsWith("/attributeDefRefList"))  {
-            parsed = this.attributeList.parse(_paramCache, _url.substring(20), _content);
-
+        } else if (_url.startsWith("/attributeDefRefList/attributeDefRef"))  {
+            this.attributes.add(_content);
+            parsed = true;
         } else if (_url.startsWith("/derivedFromRelationship/relationshipDefRefList/relationshipDefRef"))  {
             this.derived = _content;
             parsed = true;
@@ -268,28 +267,20 @@ public class Relationship_mxJPO
         this.writeHeader(_paramCache, updateBuilder.getStrg());
 
         updateBuilder.start("relationship")
-                .string("description", this.getDescription());
-
-        if (this.kind != Kind.Basic)  {
-            updateBuilder.single("kind", this.kind.name().toLowerCase());
-        }
-
-        updateBuilder
-                .flagIfTrue("abstract", false, this.abstractRel)
-                .stringIfNotEmpty("derived", this.derived)
-                .flag("hidden", false, this.isHidden())
-                .flag("preventduplicates", false, this.preventDuplicates)
-                .stringIfNotEmpty("rule", this.rule);
-
-        this.getTriggers().write(updateBuilder);
-        this.from.write(updateBuilder);
-        this.to.write(updateBuilder);
-
-        this.attributeList.write(updateBuilder);
-
-        this.getProperties().writeProperties(_paramCache, updateBuilder.getStrg(), updateBuilder.prefix());
-
-        updateBuilder.end();
+                //              tag             | default | value                              | write?
+                .string(        "description",              this.getDescription())
+                .singleIfTrue(  "kind",                     this.kind.name().toLowerCase(),     (this.kind != Kind.Basic))
+                .flagIfTrue(    "abstract",          false, this.abstractRel,                   (this.abstractRel != null) && this.abstractRel)
+                .stringIfTrue(  "derived",                  this.derived,                       (this.derived != null) && !this.derived.isEmpty())
+                .flag(          "hidden",                   false, this.isHidden())
+                .flag(          "preventduplicates", false, this.preventDuplicates)
+                .stringIfTrue(  "rule",                     this.rule,                          (this.rule != null) && !this.rule.isEmpty())
+                .write(this.getTriggers())
+                .write(this.from)
+                .write(this.to)
+                .list(          "attribute",                this.attributes)
+                .properties(this.getProperties())
+                .end();
 
         _out.append(updateBuilder.toString());
     }
@@ -300,10 +291,13 @@ public class Relationship_mxJPO
                              final Relationship_mxJPO _current)
         throws UpdateException_mxJPO
     {
-        DeltaUtil_mxJPO.calcValueDelta(  _mql, "description",              this.getDescription(),  _current.getDescription());
-        DeltaUtil_mxJPO.calcFlagDelta(   _mql, "hidden",            false, this.isHidden(),        _current.isHidden());
-        DeltaUtil_mxJPO.calcFlagDelta(   _mql, "preventduplicates", false, this.preventDuplicates, _current.preventDuplicates);
-        DeltaUtil_mxJPO.calcValFlgDelta( _mql, "abstract",          false, this.abstractRel,       _current.abstractRel);
+        DeltaUtil_mxJPO.calcValueDelta(  _mql,              "description",              this.getDescription(),  _current.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(   _mql,              "hidden",            false, this.isHidden(),        _current.isHidden());
+        DeltaUtil_mxJPO.calcFlagDelta(   _mql,              "preventduplicates", false, this.preventDuplicates, _current.preventDuplicates);
+        DeltaUtil_mxJPO.calcValFlgDelta( _mql,              "abstract",          false, this.abstractRel,       _current.abstractRel);
+        DeltaUtil_mxJPO.calcListDelta(_paramCache, _mql,    "attribute",
+                ErrorKey.DM_RELATION_REMOVE_ATTRIBUTE, this.getName(),
+                ValueKeys.DMRelationAttrIgnore, ValueKeys.DMRelationAttrRemove,         this.attributes,        _current.attributes);
 
         // only one rule can exists maximum, but they must be technically handled like as list
         final Set<String> thisRules = new HashSet<String>(1);
@@ -318,7 +312,6 @@ public class Relationship_mxJPO
 
         this.from           .calcDelta(_paramCache, _mql, _current.from);
         this.to             .calcDelta(_paramCache, _mql, _current.to);
-        this.attributeList  .calcDelta(_paramCache, _mql, _current.attributeList);
         this.getProperties().calcDelta(_mql, "", _current.getProperties());
 
         // derived information
@@ -327,7 +320,7 @@ public class Relationship_mxJPO
         if (!thisDerived.equals(currDerived))  {
             if (!currDerived.isEmpty())  {
                 throw new UpdateException_mxJPO(
-                        UpdateException_mxJPO.Error.DM_RELATIONSHIP_UPDATE_DERIVED,
+                        ErrorKey.DM_RELATION_UPDATE_DERIVED,
                         this.getTypeDef().getLogging(),
                         this.getName(),
                         _current.kind,
@@ -340,7 +333,7 @@ public class Relationship_mxJPO
         if (this.kind != _current.kind)  {
             if (_current.kind != Kind.Basic)  {
                 throw new UpdateException_mxJPO(
-                        UpdateException_mxJPO.Error.DM_RELATIONSHIP_NOT_BASIC_KIND,
+                        ErrorKey.DM_RELATION_NOT_BASIC_KIND,
                         this.getTypeDef().getLogging(),
                         this.getName(),
                         _current.kind,
@@ -365,6 +358,7 @@ public class Relationship_mxJPO
      * Stores the information for one side of a relationship.
      */
     private final class Side
+        implements UpdateList
     {
         /** Side string of the relationship. */
         private final String side;
@@ -461,30 +455,22 @@ public class Relationship_mxJPO
          * @param _updateBuilder    update builder
          * @see Relationship_mxJPO#writeObject(ParameterCache_mxJPO, Appendable)
          */
-        protected void write(final UpdateBuilder_mxJPO _updateBuilder)
+        @Override()
+        public void write(final UpdateBuilder_mxJPO _updateBuilder)
         {
             _updateBuilder
                     .childStart(this.side)
-                    .string("meaning", this.meaning)
-                    .single("cardinality", this.cardinality)
-                    .single("revision", this.revisionAction)
-                    .single("clone", this.cloneAction)
-                    .flag("propagatemodify", false, this.propagateModify)
-                    .flag("propagateconnection", false, this.propagateConnection);
-
-            if (this.typeAll)  {
-                _updateBuilder.single("type", "all");
-            } else  {
-                _updateBuilder.list("type", this.types);
-            }
-
-            if (this.relationAll)  {
-                _updateBuilder.single("relationship", "all");
-            } else  {
-                _updateBuilder.list("relationship", this.relations);
-            }
-
-            _updateBuilder.childEnd();
+                    .string(        "meaning",                      this.meaning)
+                    .single(        "cardinality",                  this.cardinality)
+                    .single(        "revision",                     this.revisionAction)
+                    .single(        "clone",                        this.cloneAction)
+                    .flag(          "propagatemodify",      false,  this.propagateModify)
+                    .flag(          "propagateconnection",  false,  this.propagateConnection)
+                    .singleIfTrue(  "type",                         "all",                      this.typeAll)
+                    .listIfTrue(    "type",                         this.types,                 !this.typeAll)
+                    .singleIfTrue(  "relationship",                 "all",                      this.relationAll)
+                    .listIfTrue(    "relationship",                 this.relations,             !this.relationAll)
+                    .childEnd();
         }
 
         /**
@@ -502,36 +488,14 @@ public class Relationship_mxJPO
         {
             _mql.pushPrefixByAppending(this.side);
 
-            DeltaUtil_mxJPO.calcValueDelta(_mql, "meaning",                    this.meaning,             _current.meaning);
-            DeltaUtil_mxJPO.calcValueDelta(_mql, "cardinality",                this.cardinality,         _current.cardinality);
-            DeltaUtil_mxJPO.calcValueDelta(_mql, "revision",                   this.revisionAction,      _current.revisionAction);
-            DeltaUtil_mxJPO.calcValueDelta(_mql, "clone",                      this.cloneAction,         _current.cloneAction);
-            DeltaUtil_mxJPO.calcFlagDelta( _mql, "propagatemodify",     false, this.propagateModify,     _current.propagateModify);
-            DeltaUtil_mxJPO.calcFlagDelta( _mql, "propagateconnection", false, this.propagateConnection, _current.propagateConnection);
-
-            if (this.typeAll)  {
-                DeltaUtil_mxJPO.calcListDelta( _mql, "type", new TreeSet<String>(), _current.types);
-                if (!_current.typeAll)  {
-                    _mql.newLine().cmd("add type all");
-                }
-            } else  {
-                if (_current.typeAll)  {
-                    _mql.newLine().cmd("remove type all");
-                }
-                DeltaUtil_mxJPO.calcListDelta( _mql, "type", this.types, _current.types);
-            }
-
-            if (this.relationAll)  {
-                DeltaUtil_mxJPO.calcListDelta( _mql, "relationship", new TreeSet<String>(), _current.relations);
-                if (!_current.relationAll)  {
-                    _mql.newLine().cmd("add relationship all");
-                }
-            } else  {
-                if (_current.relationAll)  {
-                    _mql.newLine().cmd("remove relationship all");
-                }
-                DeltaUtil_mxJPO.calcListDelta( _mql, "relationship", this.relations, _current.relations);
-            }
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "meaning",                    this.meaning,                        _current.meaning);
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "cardinality",                this.cardinality,                    _current.cardinality);
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "revision",                   this.revisionAction,                 _current.revisionAction);
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "clone",                      this.cloneAction,                    _current.cloneAction);
+            DeltaUtil_mxJPO.calcFlagDelta( _mql, "propagatemodify",     false, this.propagateModify,                _current.propagateModify);
+            DeltaUtil_mxJPO.calcFlagDelta( _mql, "propagateconnection", false, this.propagateConnection,            _current.propagateConnection);
+            DeltaUtil_mxJPO.calcListDelta(_mql,  "type",                       this.typeAll, this.types,            _current.typeAll, _current.types);
+            DeltaUtil_mxJPO.calcListDelta(_mql,  "relationship",               this.relationAll, this.relations,    _current.relationAll, _current.relations);
 
             _mql.popPrefix();
         }

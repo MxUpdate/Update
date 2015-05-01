@@ -19,7 +19,7 @@ import org.mxupdate.test.data.datamodel.PolicyData;
 import org.mxupdate.test.data.datamodel.PolicyData.State;
 import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.test.util.Version;
-import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -165,7 +165,7 @@ public class Policy_MajorMinorTest
                     .update((String) null)
                     .checkExport()
                     .setValue("delimiter", '|')
-                    .failureUpdate(UpdateException_mxJPO.Error.DM_POLICY_UPDATE_DELIMITER);
+                    .failureUpdate(ErrorKey.DM_POLICY_UPDATE_DELIMITER);
         }
     }
 }

@@ -28,7 +28,7 @@ import org.mxupdate.test.data.program.MQLProgramData;
 import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.util.Version;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
-import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -415,7 +415,7 @@ public class RelationshipTest
      * @throws Exception if test failed
      */
     @Test(description = "positive test with one attribute")
-    public void positiveTestWithAttribute()
+    public void t20a_positiveTestWithAttribute()
         throws Exception
     {
         this.createNewData("Test")
@@ -432,7 +432,7 @@ public class RelationshipTest
      * @throws Exception if test failed
      */
     @Test(description = "positive test with add of an attribute")
-    public void positiveTestAttributeAdded()
+    public void t20b_positiveTestAttributeAdded()
         throws Exception
     {
         this.createNewData("Test")
@@ -450,14 +450,14 @@ public class RelationshipTest
      * @throws Exception if test failed
      */
     @Test(description = "negative test if an attribute is removed")
-    public void negativeTestAttributesRemoved()
+    public void t20c_negativeTestAttributesRemoved()
         throws Exception
     {
         this.createNewData("Test")
                 .addAttribute(new AttributeStringData(this, "Test Attribute"))
                 .create();
         this.createNewData("Test")
-                .failureUpdate(UpdateException_mxJPO.Error.DM_ABSTRACTWITHATTRIBUTES_UPDATE_ATTRIBUTE_REMOVED);
+                .failureUpdate(ErrorKey.DM_RELATION_REMOVE_ATTRIBUTE);
     }
 
     /**
@@ -466,7 +466,7 @@ public class RelationshipTest
      * @throws Exception if test failed
      */
     @Test(description = "positive test if an ignored attribute is removed")
-    public void positiveTestIgnoredAttributesRemoved()
+    public void t20d_positiveTestIgnoredAttributesRemoved()
         throws Exception
     {
         this.createNewData("Test")
@@ -485,7 +485,7 @@ public class RelationshipTest
      * @throws Exception if test failed
      */
     @Test(description = "positive test if an attribute is removed")
-    public void positiveTestAttributesRemoved()
+    public void t20e_positiveTestAttributesRemoved()
         throws Exception
     {
         this.createNewData("Test")
@@ -502,7 +502,7 @@ public class RelationshipTest
      * @throws Exception if test failed
      */
     @Test(description = "positive test for kind compositional")
-    public void positiveTestKindCompositional()
+    public void t21a_positiveTestKindCompositional()
         throws Exception
     {
         this.createNewData("Test")
@@ -524,7 +524,7 @@ public class RelationshipTest
      * @throws Exception if test failed
      */
     @Test(description = "negative test if the kind is changed back to basic")
-    public void negativeTestChangeKindBackToBasic()
+    public void t21b_negativeTestChangeKindBackToBasic()
         throws Exception
     {
         this.createNewData("Test")
@@ -539,7 +539,7 @@ public class RelationshipTest
                 .update("")
                 .checkExport()
                 .setSingle("kind", "basic")
-                .failureUpdate(UpdateException_mxJPO.Error.DM_RELATIONSHIP_NOT_BASIC_KIND)
+                .failureUpdate(ErrorKey.DM_RELATION_NOT_BASIC_KIND)
                 .setSingle("kind", "compositional")
                 .checkExport();
     }
@@ -550,7 +550,7 @@ public class RelationshipTest
      * @throws Exception if test failed
      */
     @Test(description = "positive test that a derived relationship is defined")
-    public void positiveTestDerived()
+    public void t22a_positiveTestDerived()
         throws Exception
     {
         this.createNewData("Parent")
@@ -569,7 +569,7 @@ public class RelationshipTest
      * @throws Exception if test failed
      */
     @Test(description = "negative test that derived relationship is changed")
-    public void negativeTestDerivedChanged()
+    public void t22b_negativeTestDerivedChanged()
         throws Exception
     {
         this.createNewData("Parent1")
@@ -581,7 +581,7 @@ public class RelationshipTest
                 .setValue("derived", AbstractTest.PREFIX + "Parent1")
                 .update("")
                 .setValue("derived", AbstractTest.PREFIX + "Parent2")
-                .failureUpdate(UpdateException_mxJPO.Error.DM_RELATIONSHIP_UPDATE_DERIVED)
+                .failureUpdate(ErrorKey.DM_RELATION_UPDATE_DERIVED)
                 .setValue("derived", AbstractTest.PREFIX + "Parent1")
                 .checkExport();
     }

@@ -19,9 +19,10 @@ options {
     ERROR_REPORTING = true;
     USER_TOKEN_MANAGER = false;
     GENERATE_BOILERPLATE = false;
+    SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
 }
-PARSER_BEGIN(RelationshipDefParser)
-package org.mxupdate.update.datamodel.relationship;
+PARSER_BEGIN(RelationshipParser)
+package org.mxupdate.update.datamodel;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -40,11 +41,12 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
-public class RelationshipDefParser
+@SuppressWarnings("unused")
+class RelationshipParser
     extends AbstractParser_mxJPO<Relationship_mxJPO>
 {
 }
-PARSER_END(RelationshipDefParser)
+PARSER_END(RelationshipParser)
 
 <DEFAULT> SKIP :
 {
@@ -84,7 +86,8 @@ PARSER_END(RelationshipDefParser)
 
 /*********************************************************************** Kind */
 <DEFAULT> TOKEN :
-{      <KIND:                                "kind">                                         : KIND_EXPECTED
+{
+      <KIND:                                "kind">                                         : KIND_EXPECTED
 }
 
 <KIND_EXPECTED> SKIP :
@@ -95,7 +98,8 @@ PARSER_END(RelationshipDefParser)
 <KIND_EXPECTED> TOKEN :
 {
       <BASIC:                               "basic">                                        : DEFAULT
-    | <COMPOSITIONAL:                       "compositional">                                : DEFAULT}
+    | <COMPOSITIONAL:                       "compositional">                                : DEFAULT
+}
 
 /******************************************************************** Trigger */
 <DEFAULT> TOKEN :
@@ -268,8 +272,8 @@ void parse(final Relationship_mxJPO _relationship)
                 )*
           <FROMTO_END> )
 
-      | ( <ATTRIBUTE>               ( tmp = <STRING>                        {this.appendValue(_relationship, "attributeList", "attributes", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.appendValue(_relationship, "attributeList", "attributes", this.getSingle(tmp.image));} ) )
+      | ( <ATTRIBUTE>               ( tmp = <STRING>                        {this.appendValue(_relationship, "attributes",                  this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_relationship, "attributes",                  this.getSingle(tmp.image));} ) )
 
       | ( <PROPERTY>                                                        {property = new AdminProperty();this.appendValue(_relationship, "properties", "propertiesStack", property);}
                                     ( tmp = <STRING>                        {this.setValue(property, "name", this.getString(tmp.image));}

@@ -142,7 +142,7 @@ public abstract class AbstractAttributeNumeric_mxJPO<CLASS extends AbstractAttri
                 DeltaUtil_mxJPO.calcFlagDelta(_mql, "rangevalue", this.rangeValue, current.rangeValue);
             } else if (!this.rangeValue)  {
                 throw new UpdateException_mxJPO(
-                        UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_RANGEVALUEFLAG_UPDATED,
+                        UpdateException_mxJPO.ErrorKey.ABSTRACTATTRIBUTE_UPDATE_RANGEVALUEFLAG_UPDATED,
                         this.getName());
             }
         }
@@ -155,7 +155,7 @@ public abstract class AbstractAttributeNumeric_mxJPO<CLASS extends AbstractAttri
                 }
             } else if (!current.dimension.equals(this.dimension))  {
                 throw new UpdateException_mxJPO(
-                        UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_DIMENSION_UPDATED,
+                        UpdateException_mxJPO.ErrorKey.ABSTRACTATTRIBUTE_UPDATE_DIMENSION_UPDATED,
                         this.getName(),
                         current.dimension,
                         (this.dimension != null) ? this.dimension : "");

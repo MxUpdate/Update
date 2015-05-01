@@ -67,7 +67,7 @@ public class UpdateException_mxJPO
      * <p><b>Example:</b><br/>
      * 10601: 1 for data model, 06 for dimension, 01 for the error</p>
      */
-    public enum Error
+    public enum ErrorKey
     {
         /**
          * JPO caller method is called without any argument.
@@ -202,37 +202,37 @@ public class UpdateException_mxJPO
                 "The {0} ''{1}'' was called to update via CI update script, but {0} ''{2}'' was called in the procedure..."),
 
         /**
-         * <p>A wrong parameter was given the called TCL procedure
-         * <code>testParents</code> which defines the derived interfaces.</p>
+         * <p>The given attribute is not defined anymore but assigned to the
+         * interface object. The attribute is not automatically removed
+         * because otherwise potentially data could be lost.</p>
          *
          * <p>Parameters:
          * <ol>
-         * <li>wrong parameter</li>
+         * <li>attribute name</li>
+         * <li>interface which is tried to update</li>
          * </ol>
          * </p>
-         *
-         * @see org.mxupdate.update.datamodel.Interface_mxJPO
          */
-        DM_INTERFACE_UPDATE_UKNOWN_PARAMETER(10901, "Unknown parameter {0} defined."),
+        DM_INTERFACE_REMOVE_ATTRIBUTE(10901,
+                "Current attribute ''{0}'' is defined to be removed from interface ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
 
         /**
-         * <p>The name of the interface which calls the TCL procedure
-         * <code>testParents</code> and which is defined within the call as
-         * parameter is not equal.</p>
+         * <p>An interface is already derived from another interface, but
+         * within the update this derived interface must be removed. This could
+         * end in potentially losing data and so this action is not allowed.</p>
          *
-         * <p>Parameters:
+         * <p>Parameters:<br/>
          * <ol>
-         * <li>administration type (should be interface)</li>
-         * <li>name of the interface which calls the TCL update procedure</li>
-         * <li>name of the interface which is defined as parameter for the TCL
-         *     update procedure</li>
+         * <li>current derived interface which must be removed (but is not
+         *     allowed)</li>
+         * <li>interface which is tried to update</li>
          * </ol>
          * </p>
          *
          * @see org.mxupdate.update.datamodel.Interface_mxJPO
          */
-        DM_INTERFACE_UPDATE_WRONG_NAME(10902,
-                "{0} ''{1}'' was called to update via update script, but {0} ''{1}'' was called in the TCL procedure."),
+        DM_INTERFACE_REMOVE_PARENT(10902,
+                "Current parent interface ''{0}'' must be removed from interface ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
 
         /**
          * <p>The delimiter of an existing policy is not equal to the new
@@ -253,6 +253,21 @@ public class UpdateException_mxJPO
                 "The existing delimiter ''{2}'' of {0} ''{1}'' can be not updated to new delimiter ''{3}'' (limitation of MX)."),
 
         /**
+         * <p>The given attribute is not defined anymore but assigned to the
+         * interface object. The attribute is not automatically removed
+         * because otherwise potentially data could be lost.</p>
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>attribute name</li>
+         * <li>relationship which is tried to update</li>
+         * </ol>
+         * </p>
+         */
+        DM_RELATION_REMOVE_ATTRIBUTE(11401,
+                "Current attribute ''{0}'' is defined to be removed from relationship ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
+
+        /**
          * Kind of a relationship can not be changed if the current kind is not
          * basic.
          *
@@ -265,7 +280,7 @@ public class UpdateException_mxJPO
          * </ol>
          * </p>
          */
-        DM_RELATIONSHIP_NOT_BASIC_KIND(11401,
+        DM_RELATION_NOT_BASIC_KIND(11402,
                 "The new kind ''{3}' can not be set for {0} ''{1}'', because kind ''{2}'' is already set. Kinds of relationship can be only set for ''basic'' relationships."),
 
         /**
@@ -281,27 +296,8 @@ public class UpdateException_mxJPO
          * </ol>
          * </p>
          */
-        DM_RELATIONSHIP_UPDATE_DERIVED(11402,
+        DM_RELATION_UPDATE_DERIVED(11403,
                 "The new derived ''{3}' can not be set for {0} ''{1}'', because derived ''{2}'' is already set and potentially some data can be lost."),
-
-        /**
-         * <p>An interface is already derived from another interface, but
-         * within the update this derived interface must be removed. This could
-         * end in potentially losing data and so this action is not allowed.</p>
-         *
-         * <p>Parameters:<br/>
-         * <ol>
-         * <li>administration type (should be interface)</li>
-         * <li>interface which is tried to update</li>
-         * <li>current derived interface which must be removed (but is not
-         *     allowed)</li>
-         * </ol>
-         * </p>
-         *
-         * @see org.mxupdate.update.datamodel.Interface_mxJPO
-         */
-        DM_INTERFACE_UPDATE_REMOVING_PARENT(10903,
-                "Current parent {0} ''{2}'' must be removed from {0} ''{1}''. This is not allowed!"),
 
         /**
          * If the name of a configuration item could not be extracted from a
@@ -324,7 +320,7 @@ public class UpdateException_mxJPO
          * @param _code     error code
          * @param _text     error message
          */
-        Error(final int _code,
+        ErrorKey(final int _code,
               final String _text)
         {
             this.code = _code;
@@ -357,18 +353,18 @@ public class UpdateException_mxJPO
     /**
      * Related error enumerator of this update exception.
      */
-    private final Error error;
+    private final ErrorKey error;
 
     /**
      * Constructor to initialize this exception. The exception message will
-     * be a concatenation of the {@link Error#code} and {@link Error#text}.
+     * be a concatenation of the {@link ErrorKey#code} and {@link ErrorKey#text}.
      *
      * @param _error        error enumeration instance
      * @param _arguments    arguments for the exception text used to format the
      *                      message
      * @see #error
      */
-    public UpdateException_mxJPO(final Error _error,
+    public UpdateException_mxJPO(final ErrorKey _error,
                                  final Object... _arguments)
     {
         super("UpdateError #" + _error.getCode() + ": " +
@@ -382,7 +378,7 @@ public class UpdateException_mxJPO
      *         thrown
      * @see #error
      */
-    public Error getError()
+    public ErrorKey getError()
     {
         return this.error;
     }

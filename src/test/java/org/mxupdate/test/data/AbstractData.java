@@ -27,7 +27,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.util.Version;
-import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.Assert;
 
 /**
@@ -319,7 +319,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @return this data instance
      * @throws Exception if update failed
      */
-    public DATA failureUpdate(final UpdateException_mxJPO.Error _error,
+    public DATA failureUpdate(final ErrorKey _error,
                               final String... _params)
         throws Exception
     {
@@ -374,7 +374,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      */
     @SuppressWarnings("unchecked")
     public DATA failedUpdateWithCode(final String _code,
-                                     final UpdateException_mxJPO.Error _error,
+                                     final ErrorKey _error,
                                      final String... _params)
         throws Exception
     {

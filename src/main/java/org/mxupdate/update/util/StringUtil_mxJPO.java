@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.SimpleTimeZone;
 import java.util.Stack;
 
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
+
 /**
  * String utility class.
  *
@@ -369,7 +371,7 @@ public final class StringUtil_mxJPO
         throws UpdateException_mxJPO
     {
         if (_idx >= _charFileName.length)  {
-            throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.UTIL_STRINGUTIL_CONVERT_FROM_FILENAME);
+            throw new UpdateException_mxJPO(ErrorKey.UTIL_STRINGUTIL_CONVERT_FROM_FILENAME);
         }
         return _charFileName[_idx];
     }

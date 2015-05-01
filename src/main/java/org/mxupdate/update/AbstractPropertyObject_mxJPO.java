@@ -30,6 +30,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 
 /**
  * Abstract definition for objects with properties.
@@ -446,7 +447,7 @@ public abstract class AbstractPropertyObject_mxJPO
         throws Exception
     {
         if (_args.length == 0)  {
-            throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.ABSTRACT_PROPERTY_JPO_CALL_METHOD_NOT_DEFINED);
+            throw new UpdateException_mxJPO(ErrorKey.ABSTRACT_PROPERTY_JPO_CALL_METHOD_NOT_DEFINED);
         } else if ("logDebug".equals(_args[0]))  {
             _paramCache.logDebug(_args[1]);
         } else if ("logError".equals(_args[0]))  {
@@ -458,7 +459,7 @@ public abstract class AbstractPropertyObject_mxJPO
         } else if ("logWarning".equals(_args[0]))  {
             _paramCache.logWarning(_args[1]);
         } else  {
-            throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.ABSTRACT_PROPERTY_JPO_CALL_METHOD_UNKNOWN, Arrays.asList(_args));
+            throw new UpdateException_mxJPO(ErrorKey.ABSTRACT_PROPERTY_JPO_CALL_METHOD_UNKNOWN, Arrays.asList(_args));
         }
     }
 

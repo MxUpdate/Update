@@ -1,0 +1,165 @@
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
+options {
+    JDK_VERSION = "1.6";
+    STATIC = false;
+    ERROR_REPORTING = true;
+    USER_TOKEN_MANAGER = false;
+    GENERATE_BOILERPLATE = false;
+    SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
+}
+PARSER_BEGIN(InterfaceParser)
+package org.mxupdate.update.datamodel;
+
+import java.lang.reflect.InvocationTargetException;
+
+import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
+import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
+import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+
+/**
+ * Parses the update format for {@link Interface_mxJPO}. */
+@SuppressWarnings("unused")
+class InterfaceParser
+    extends AbstractParser_mxJPO<Interface_mxJPO>
+{
+}
+PARSER_END(InterfaceParser)<DEFAULT> SKIP :
+{
+    " "
+|   "\r"
+|   "\t"
+|   "\n"
+}
+
+<DEFAULT> TOKEN : /** first level */
+{
+      <DESCRIPTION:                         "description">                                  : STRING_EXPECTED
+
+    | <ABSTRACT_TRUE:                       "abstract">
+    | <ABSTRACT_FALSE:                      "!abstract">
+
+    | <DERIVED:                             "derived">                                      : STRING_EXPECTED
+
+    | <HIDDEN_TRUE:                         "hidden">
+    | <HIDDEN_FALSE:                        "!hidden">
+
+    | <ATTRIBUTE:                           "attribute">                                    : STRING_EXPECTED
+}
+
+/************************************************************** Common String */
+<STRING_EXPECTED> SKIP :
+{
+    " " | "\t" | "\n" | "\r"
+}
+
+<STRING_EXPECTED> TOKEN :
+{
+      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "{" | "}" | " ")*<APOSTROPHE>)> : DEFAULT
+    | <SINGLE: (<CHAR>)+> : DEFAULT
+    | <#APOSTROPHE: "\"" >
+    | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/**************************************************** For Relationship / Type */
+<DEFAULT> TOKEN :
+{
+      <FOR:                                 "for">                                          : FOR_EXPECTED
+}
+
+<FOR_EXPECTED> SKIP :
+{
+    " " | "\t" | "\n" | "\r"
+}
+
+<FOR_EXPECTED> TOKEN :
+{
+      <FOR_RELATIONSHIP_ALL:                "relationship" ([" ","\t","\n","\r"])+ "all">   : DEFAULT
+    | <FOR_RELATIONSHIP:                    "relationship">                                 : STRING_EXPECTED
+    | <FOR_TYPE_ALL:                        "type" ([" ","\t","\n","\r"])+ "all">           : DEFAULT
+    | <FOR_TYPE:                            "type">                                         : STRING_EXPECTED
+}
+
+/******************************************************************* Property */
+<DEFAULT> TOKEN :
+{
+      <PROPERTY:                            "property">                                     : STRING_EXPECTED
+    | <PROPERTYTO:                          "to">                                           : ADMINREF_EXPECTED
+    | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
+}
+
+<ADMINREF_EXPECTED> SKIP :
+{
+    " " | "\t" | "\n" | "\r"
+}
+
+<ADMINREF_EXPECTED> TOKEN :
+{
+      <ADMINTYPE_STRING : (<ADMINTYPE_APOSTROPHE>(<ADMINTYPE_CHAR> | "\\\"" | "{" | "}" | " ")*<ADMINTYPE_APOSTROPHE>)> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE : (<ADMINTYPE_CHAR>)+> : STRING_EXPECTED
+    | <#ADMINTYPE_APOSTROPHE : "\"" >
+    | <#ADMINTYPE_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/**************************************************************************** */
+/**
+ * Parses one complete interface definition.
+ *
+ * @param _interface    target interface to update with parsed values
+ */
+void parse(final Interface_mxJPO _interface)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+: {
+    Token tmp;
+    AdminProperty property;
+} {
+    (   ( <DESCRIPTION>             ( tmp = <STRING>                        {this.setValue(_interface, "description",                       this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(_interface, "description",                       this.getSingle(tmp.image));} ) )
+
+      | ( <ABSTRACT_TRUE>                                                   {this.setValue(_interface, "abstractFlag",                      true);} )
+      | ( <ABSTRACT_FALSE>                                                  {this.setValue(_interface, "abstractFlag",                      false);} )
+
+      | ( <DERIVED>                 ( tmp = <STRING>                        {this.appendValue(_interface, "derived",                        this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_interface, "derived",                        this.getSingle(tmp.image));} ) )
+
+      | ( <HIDDEN_TRUE>                                                     {this.setValue(_interface, "hidden",                            true);} )
+      | ( <HIDDEN_FALSE>                                                    {this.setValue(_interface, "hidden",                            false);} )
+
+      | ( <ATTRIBUTE>               ( tmp = <STRING>                        {this.appendValue(_interface, "attributes",                     this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_interface, "attributes",                     this.getSingle(tmp.image));} ) )
+
+      | ( <FOR>
+            ( <FOR_RELATIONSHIP_ALL>                                        {this.setValue(_interface, "relationAll",                       true);}
+            | <FOR_RELATIONSHIP>    ( tmp = <STRING>                        {this.appendValue(_interface, "relations",                      this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_interface, "relations",                      this.getSingle(tmp.image));} )
+            | <FOR_TYPE_ALL>                                                {this.setValue(_interface, "typeAll",                           true);}
+            | <FOR_TYPE>            ( tmp = <STRING>                        {this.appendValue(_interface, "types",                          this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_interface, "types",                          this.getSingle(tmp.image));} ) ) )
+
+      | ( <PROPERTY>                                                        {property = new AdminProperty();this.appendValue(_interface, "properties", "propertiesStack", property);}
+                                    ( tmp = <STRING>                        {this.setValue(property, "name", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "name", this.getSingle(tmp.image));} )
+              (   ( <PROPERTYVAL>   ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <ADMINTYPE_SINGLE>              {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                    ( tmp = <STRING>                        {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+    )*
+}

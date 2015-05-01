@@ -24,7 +24,7 @@ import java.util.Set;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.AbstractBusData;
-import org.mxupdate.update.util.UpdateException_mxJPO.Error;
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -100,7 +100,7 @@ public class Common
         final Exception ex = (Exception) bck.get("exception");
         Assert.assertTrue((ex != null), "an exception must be thrown");
         Assert.assertTrue(ex.getMessage().contains("UpdateError #"
-                                                    + Error.UTIL_STRINGUTIL_CONVERT_FROM_FILENAME.getCode()
+                                                    + ErrorKey.UTIL_STRINGUTIL_CONVERT_FROM_FILENAME.getCode()
                                                     + ":"),
                           "correct error code is returned");
     }
@@ -125,7 +125,7 @@ public class Common
         final Exception ex = (Exception) bck.get("exception");
         Assert.assertTrue((ex != null), "an exception must be thrown");
         Assert.assertTrue(ex.getMessage().contains("UpdateError #"
-                                                    + Error.ABSTRACT_PROPERTY_JPO_CALL_METHOD_NOT_DEFINED.getCode()
+                                                    + ErrorKey.ABSTRACT_PROPERTY_JPO_CALL_METHOD_NOT_DEFINED.getCode()
                                                     + ":"),
                           "correct error code is returned");
     }
@@ -150,7 +150,7 @@ public class Common
         final Exception ex = (Exception) bck.get("exception");
         Assert.assertTrue((ex != null), "an exception must be thrown");
         Assert.assertTrue(ex.getMessage().contains("UpdateError #"
-                                                    + Error.ABSTRACT_PROPERTY_JPO_CALL_METHOD_UNKNOWN.getCode()
+                                                    + ErrorKey.ABSTRACT_PROPERTY_JPO_CALL_METHOD_UNKNOWN.getCode()
                                                     + ":"),
                           "correct error code is not returned " + ex.getMessage());
     }

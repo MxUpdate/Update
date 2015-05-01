@@ -23,6 +23,7 @@ import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 
 /**
  * The class is used to evaluate information from date attributes within MX
@@ -115,7 +116,7 @@ public class AttributeDate_mxJPO
                 DeltaUtil_mxJPO.calcFlagDelta(_mql, "rangevalue", this.rangeValue, _current.rangeValue);
             } else if (!this.rangeValue)  {
                 throw new UpdateException_mxJPO(
-                        UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_RANGEVALUEFLAG_UPDATED,
+                        ErrorKey.ABSTRACTATTRIBUTE_UPDATE_RANGEVALUEFLAG_UPDATED,
                         this.getName());
             }
         }

@@ -26,6 +26,7 @@ import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateList;
 
 /**
  * Handles the list of all defined triggers.
@@ -34,6 +35,7 @@ import org.mxupdate.update.util.UpdateBuilder_mxJPO;
  */
 public class TriggerList_mxJPO
     extends TreeSet<Trigger>
+    implements UpdateList
 {
     /** Serial Version UID. */
     private static final long serialVersionUID = -7627052479042191366L;
@@ -119,19 +121,18 @@ public class TriggerList_mxJPO
         }
     }
 
-    /**
-     * Writes the sorted trigger information to the update builder
-     *
-     * @param _updateBuilder    update builder
-     */
+    @Override()
     public void write(final UpdateBuilder_mxJPO _updateBuilder)
     {
         for (final Trigger trigger : this)  {
-            _updateBuilder.line(
-                    new StringBuilder()
-                            .append("trigger ").append(trigger.eventType)
-                            .append(' ').append(trigger.kind).append(" \"").append(StringUtil_mxJPO.convertUpdate(trigger.program)).append("\"")
-                            .append(" input \"").append(StringUtil_mxJPO.convertUpdate(trigger.arguments)).append('\"'));
+            _updateBuilder
+                    .stepStartNewLine()
+                    .stepCmd("trigger").stepSpace()
+                    .stepCmd(trigger.eventType).stepSpace()
+                    .stepCmd(trigger.kind).stepSpace()
+                    .stepString(trigger.program).stepSpace()
+                    .stepCmd("input").stepSpace().stepString(trigger.arguments)
+                    .stepEndLine();
         }
     }
 

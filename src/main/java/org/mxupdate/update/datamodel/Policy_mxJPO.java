@@ -47,6 +47,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.xml.sax.SAXException;
 
 /**
@@ -391,7 +392,7 @@ public class Policy_mxJPO
                 || ((_current.delimiter != null) && !_current.delimiter.isEmpty() && (this.delimiter == null))
                 || ((_current.delimiter != null) && !_current.delimiter.equals(this.delimiter)))  {
             throw new UpdateException_mxJPO(
-                    UpdateException_mxJPO.Error.DM_POLICY_UPDATE_DELIMITER,
+                    ErrorKey.DM_POLICY_UPDATE_DELIMITER,
                     this.getTypeDef().getLogging(),
                     this.getName(),
                     _current.delimiter,

@@ -22,6 +22,7 @@ import java.util.Map;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.AbstractTest.CI;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.util.DataList;
 import org.mxupdate.test.data.util.FlagList;
@@ -272,13 +273,9 @@ public class RelationshipData
         /** Revise behavior of the side. */
         private Behavior revision = Behavior.NONE;
 
-        /** All types flag for the from side. */
-        private boolean allTypes;
         /** Defined types on the from side. */
         private final DataList<TypeData> types = new DataList<TypeData>();
 
-        /** All relationship flag for the from side. */
-        private boolean allRelationships;
         /** Defined relationships on the from side. */
         private final DataList<RelationshipData> relationships = new DataList<RelationshipData>();
 
@@ -381,7 +378,7 @@ public class RelationshipData
          */
         public RelationshipData addAllTypes()
         {
-            this.allTypes = true;
+            this.types.addAll(CI.DM_TYPE);
             return RelationshipData.this;
         }
 
@@ -408,7 +405,7 @@ public class RelationshipData
          */
         public RelationshipData addAllRelationships()
         {
-            this.allRelationships = true;
+            this.relationships.addAll(CI.DM_RELATIONSHIP);
             return RelationshipData.this;
         }
 
@@ -443,19 +440,8 @@ public class RelationshipData
                 _cmd.append("        revision ").append(this.revision.name().toLowerCase()).append("\n");
             }
 
-            // append from types
-            if (this.allTypes)  {
-                _cmd.append("        type all\n");
-            } else  {
-                this.types.appendUpdate("        ", _cmd);
-            }
-
-            // append from relationships
-            if (this.allRelationships)  {
-                _cmd.append("        relationship all\n");
-            } else  {
-                this.relationships.appendUpdate("        ", _cmd);
-            }
+            this.types.appendUpdate("        ", _cmd);
+            this.relationships.appendUpdate("        ", _cmd);
 
             _cmd.append("    }\n");
         }
@@ -472,7 +458,9 @@ public class RelationshipData
         {
             _cmd.append(' ').append(this.side);
 
-            this.flags.append4Create(_cmd);
+            this.flags        .append4Create(_cmd);
+            this.types        .append4Create(_cmd);
+            this.relationships.append4Create(_cmd);
 
             // meaning
             if (this.meaning != null)  {
@@ -496,19 +484,6 @@ public class RelationshipData
                 _cmd.append(" revision ").append(this.revision.name().toLowerCase());
             }
 
-            // append to types
-            if (this.allTypes)  {
-                _cmd.append(" type all");
-            } else  {
-                this.types.append4Create(_cmd);
-            }
-
-            // append to relationships
-            if (this.allRelationships)  {
-                _cmd.append(" relationship all");
-            } else if (!this.relationships.isEmpty())  {
-                this.relationships.append4Create(_cmd);
-            }
         }
 
         /**
@@ -520,15 +495,15 @@ public class RelationshipData
         protected void checkExport(final ExportParser _exportParser)
             throws MatrixException
         {
-            this.flags.checkExport(_exportParser, this.side);
+            this.flags        .checkExport(_exportParser, this.side);
+            this.types        .checkExport(_exportParser, this.side);
+            this.relationships.checkExport(_exportParser, this.side);
 
             _exportParser
                     .checkValue(this.side + "/meaning",      "\"" + StringUtil_mxJPO.convertUpdate(this.meaning) + "\"")
                     .checkValue(this.side + "/cardinality",  this.cardinality.name().toLowerCase())
                     .checkValue(this.side + "/clone",        this.clone.name().toLowerCase())
-                    .checkValue(this.side + "/revision",     this.revision.name().toLowerCase())
-                    .checkList( this.side + "/type",         this.allTypes ? Arrays.asList(new String[]{"all"}) : this.types.toUpdateStringList())
-                    .checkList( this.side + "/relationship", this.allRelationships ? Arrays.asList(new String[]{"all"}) : this.relationships.toUpdateStringList());
+                    .checkValue(this.side + "/revision",     this.revision.name().toLowerCase());
         }
     }
 }

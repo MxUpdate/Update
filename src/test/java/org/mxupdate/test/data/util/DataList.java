@@ -18,7 +18,6 @@ package org.mxupdate.test.data.util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -27,6 +26,7 @@ import matrix.util.MatrixException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.AbstractTest.CI;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractData;
 
@@ -45,13 +45,17 @@ public class DataList<DATA extends AbstractData<?>>
     private final String prefix4Update;
     /** Prefix used for create. */
     private final String prefix4Create;
+    private final boolean appendMxType;
+
+    /** All flag */
+    private final Set<CI> alls = new HashSet<CI>();
 
     /**
      * Default data list w/o any prefixes.
      */
     public DataList()
     {
-        this("", "");
+        this("", "", true);
     }
 
     /**
@@ -61,10 +65,32 @@ public class DataList<DATA extends AbstractData<?>>
      * @param _prefix4Create    prefix used for create
      */
     public DataList(final String _prefix4Update,
-                    final String _prefix4Create)
+                    final String _prefix4Create,
+                    final boolean _appendMxType)
     {
         this.prefix4Update = _prefix4Update;
         this.prefix4Create = _prefix4Create;
+        this.appendMxType  = _appendMxType;
+    }
+
+    /**
+     * Defines the {@link #alls}.
+     *
+     * @param _ci   CI for which all must be defined
+     */
+    public void addAll(final CI _ci)
+    {
+        this.alls.add(_ci);
+    }
+
+    /**
+     * Defines the {@link #alls}.
+     *
+     * @param _ci   CI for which all must be removed
+     */
+    public void removeAll(final CI _ci)
+    {
+        this.alls.remove(_ci);
     }
 
     /**
@@ -76,8 +102,12 @@ public class DataList<DATA extends AbstractData<?>>
     public void appendUpdate(final String _prefix,
                              final StringBuilder _cmd)
     {
+        for (final CI ci: this.alls)  {
+            _cmd.append(_prefix).append(this.prefix4Update).append(this.appendMxType ? ci.getMxType() : "").append(" all\n");
+        }
         for (final DATA data : this)  {
-            _cmd.append(_prefix).append(this.prefix4Update).append(data.getCI().getMxType()).append(" \"").append(AbstractTest.convertUpdate(data.getName())).append("\"\n");
+            _cmd.append(_prefix).append(this.prefix4Update).append(this.appendMxType ? data.getCI().getMxType(): "")
+                .append(" \"").append(AbstractTest.convertUpdate(data.getName())).append("\"\n");
         }
     }
 
@@ -88,6 +118,9 @@ public class DataList<DATA extends AbstractData<?>>
      */
     public void append4Create(final StringBuilder _cmd)
     {
+        for (final CI ci: this.alls)  {
+            _cmd.append(' ').append(this.prefix4Create).append(this.appendMxType ? ci.getMxType() : "").append(" all");
+        }
         if (!this.isEmpty())  {
             // sort all data elements by MX type
             final Map<String,Set<String>> dataElems = new HashMap<String,Set<String>>();
@@ -100,7 +133,7 @@ public class DataList<DATA extends AbstractData<?>>
 
             // append all elements
             for (final Entry<String,Set<String>> dataElem : dataElems.entrySet())  {
-                _cmd.append(' ').append(this.prefix4Create).append(dataElem.getKey()).append(' ').append(StringUtils.join(dataElem.getValue(), ","));
+                _cmd.append(' ').append(this.prefix4Create).append(this.appendMxType ? dataElem.getKey() : "").append(' ').append(StringUtils.join(dataElem.getValue(), ","));
             }
         }
     }
@@ -113,7 +146,7 @@ public class DataList<DATA extends AbstractData<?>>
     public void append4CreateViaAdd(final StringBuilder _cmd)
     {
         for (final DATA data : this)  {
-            _cmd.append(" add ").append(this.prefix4Create).append(data.getCI().getMxType()).append(" \"").append(data.getName()).append('\"');
+            _cmd.append(" add ").append(this.prefix4Create).append(this.appendMxType ? data.getCI().getMxType() : "").append(" \"").append(data.getName()).append('\"');
         }
     }
 
@@ -128,20 +161,6 @@ public class DataList<DATA extends AbstractData<?>>
         for (final DATA data : this)  {
             data.create();
         }
-    }
-
-    /**
-     * Returns a string list representation of this data list.
-     *
-     * @return string list
-     */
-    public List<String> toUpdateStringList()
-    {
-        final List<String> ret = new ArrayList<String>();
-        for (final DATA data : this)  {
-            ret.add("\"" + AbstractTest.convertUpdate(data.getName()) + "\"");
-        }
-        return ret;
     }
 
     /**

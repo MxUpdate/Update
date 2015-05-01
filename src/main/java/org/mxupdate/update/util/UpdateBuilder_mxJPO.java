@@ -82,16 +82,18 @@ public class UpdateBuilder_mxJPO
 
     /**
      * Appends given {@code _value} string surrounded with apostrophes if
-     * {@code _value} is not {@code null}.
+     * {@code _write} is <i>true</i>.
      *
      * @param _tag      tag
      * @param _value    value
+     * @param _write    flag must be <i>true</i> that the value is written
      * @return this update builder instance
      */
-    public UpdateBuilder_mxJPO stringIfNotEmpty(final String _tag,
-                                                final String _value)
+    public UpdateBuilder_mxJPO stringIfTrue(final String _tag,
+                                            final String _value,
+                                            final boolean _write)
     {
-        if ((_value != null) && !_value.isEmpty())  {
+        if (_write)  {
             this.string(_tag, _value);
         }
         return this;
@@ -107,7 +109,25 @@ public class UpdateBuilder_mxJPO
     public UpdateBuilder_mxJPO single(final String _tag,
                                       final String _value)
     {
-        return this.stepStartNewLine().stepCmd(_tag).stepSpace().stepString(_value).stepEndLine();
+        return this.stepStartNewLine().stepCmd(_tag).stepSpace().stepCmd(_value).stepEndLine();
+    }
+
+    /**
+     * Appends given single {@code _value} if {@code _write} is <i>true</i>.
+     *
+     * @param _tag      tag
+     * @param _value    value
+     * @param _write    flag must be <i>true</i> that the value is written
+     * @return this update builder instance
+     */
+    public UpdateBuilder_mxJPO singleIfTrue(final String _tag,
+                                            final String _value,
+                                            final boolean _write)
+    {
+        if (_write)  {
+            this.single(_tag, _value);
+        }
+        return this;
     }
 
     /**
@@ -129,22 +149,24 @@ public class UpdateBuilder_mxJPO
     }
 
     /**
-     * Appends flag {@code _tag} for given {@code _value} if <i>true</i>.
+     * Appends flag {@code _tag} for given {@code _value} if {@code _write} is
+     * <i>true</i>.
      *
-     * @param _tag              tag
-     * @param _defaultValue     default value for {@code _value} if
-     *                          {@code _value} is {@code null}
-     * @param _value            value
+     * @param _tag          tag
+     * @param _defaultValue default value for {@code _value} if {@code _value}
+     *                      is {@code null}
+     * @param _value        value
+     * @param _write        flag must be <i>true</i> that the value is written
      * @return this update builder instance
      */
     public UpdateBuilder_mxJPO flagIfTrue(final String _tag,
                                           final boolean _defaultValue,
-                                          final Boolean _value)
+                                          final Boolean _value,
+                                          final boolean _write)
     {
-        final boolean value = (_value != null) ? _value : _defaultValue;
 
-        if (value)  {
-            this.stepStartNewLine().stepCmd(value ? "" : "!").stepCmd(_tag).stepEndLine();
+        if (_write)  {
+            this.flag(_tag, _defaultValue, _value);
         }
 
         return this;
@@ -167,9 +189,26 @@ public class UpdateBuilder_mxJPO
     }
 
     /**
-     * Appends {@code _list} for {@code _tag}.
+     * Appends {@code _list} for {@code _tag} if {@code _write} is <i>true</i>.
      *
      * @param _tag      tag
+     * @param _list     list to append
+     * @param _write    flag must be <i>true</i> that the value is written
+     * @return this update builder instance
+     */
+    public UpdateBuilder_mxJPO listIfTrue(final String _tag,
+                                          final Collection<String> _list,
+                                          final boolean _write)
+    {
+        if (_write)  {
+            this.list(_tag, _list);
+        }
+        return this;
+    }
+
+    /**
+     * Appends {@code _list}.
+     *
      * @param _list     list to append
      * @return this update builder instance
      */
@@ -178,7 +217,18 @@ public class UpdateBuilder_mxJPO
         for (final UpdateLine value : _list)  {
             value.write(this);
         }
+        return this;
+    }
 
+    /**
+     * Appends {@code _list}.
+     *
+     * @param _list     list to append
+     * @return this update builder instance
+     */
+    public UpdateBuilder_mxJPO write(final UpdateList _list)
+    {
+        _list.write(this);
         return this;
     }
 
@@ -203,18 +253,6 @@ public class UpdateBuilder_mxJPO
     public UpdateBuilder_mxJPO settings(final AdminPropertyList_mxJPO _propList)
     {
         _propList.writeProperties(this.paramCache, this);
-        return this;
-    }
-
-    /**
-     * Appends {@code _line} in update format to this definition.
-     *
-     * @param _line     line in update format
-     * @return this update builder instance
-     */
-    public UpdateBuilder_mxJPO line(final CharSequence _line)
-    {
-        this.strg.append(this.prefix()).append(_line).append('\n');
         return this;
     }
 
@@ -308,7 +346,18 @@ public class UpdateBuilder_mxJPO
         return this.strg.toString();
     }
 
+    /**
+     * One line of the update.
+     */
     public interface UpdateLine
+    {
+        void write(final UpdateBuilder_mxJPO _updateBuilder);
+    }
+
+    /**
+     * List of elements which are written.
+     */
+    public interface UpdateList
     {
         void write(final UpdateBuilder_mxJPO _updateBuilder);
     }

@@ -15,9 +15,15 @@
 
 package org.mxupdate.update.util;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 
 /**
  * The JPO class holds utilities for calculating delta's.
@@ -54,29 +60,6 @@ public final class DeltaUtil_mxJPO
         if ((_curVal == null) || !curVal.equals(newVal))  {
             _mql.newLine()
                 .cmd(_kind).cmd(" ").arg(newVal);
-        }
-    }
-
-    /**
-     * Calculates the delta between the new and the old value. If a delta
-     * exists, the kind with the new delta is added to the string builder.
-     *
-     * @param _out      appendable instance where the delta must be append
-     * @param _kind     kind of the delta
-     * @param _newVal   new target value
-     * @param _curVal   current value in the database
-     */
-    @Deprecated()
-    public static void calcValueDelta(final StringBuilder _out,
-                                      final String _kind,
-                                      final String _newVal,
-                                      final String _curVal)
-    {
-        final String curVal = (_curVal == null) ? "" : _curVal;
-        final String newVal = (_newVal == null) ? "" : _newVal;
-
-        if (!curVal.equals(newVal))  {
-            _out.append(' ').append(_kind).append(" \"").append(StringUtil_mxJPO.convertMql(newVal)).append('\"');
         }
     }
 
@@ -152,30 +135,6 @@ public final class DeltaUtil_mxJPO
     }
 
     /**
-     * Calculates the delta between the new and the old value. If a delta
-     * exists, the kind with the new delta is added to the string builder.
-     *
-     * @param _out      appendable instance where the delta must be append
-     * @param _kind     kind of the delta
-     * @param _newVal   new target value
-     * @param _curVal   current value in the database
-     */
-    @Deprecated()
-    public static void calcFlagDelta(final StringBuilder _out,
-                                     final String _kind,
-                                     final boolean _newVal,
-                                     final Boolean _curVal)
-    {
-        if ((_curVal == null) || (_curVal != _newVal))  {
-            _out.append(' ');
-            if (!_newVal)  {
-                _out.append('!');
-            }
-            _out.append(_kind).append(' ');
-        }
-    }
-
-    /**
      * Calculates the delta between the new and the old list set. If a delta
      * exists, the different elements are added or removed.
      *
@@ -209,6 +168,214 @@ public final class DeltaUtil_mxJPO
                 if (!_current.contains(newValue))  {
                     _mql.newLine()
                         .cmd("add ").cmd(_kind).cmd(" ").arg(newValue);
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Calculates the delta between the new and the old list set and if all is
+     * defined. If a delta exists, the different elements are added or removed.
+     *
+     * @param _mql          MQL builder to append the delta
+     * @param _kind         kind of the delta
+     * @param _newAll       'all' elements are selected for the target
+     * @param _new          new target values
+     * @param _current      current values in MX
+     * @param _currentAll   'all' elements are selected for the current
+     */
+    public static void calcListDelta(final MultiLineMqlBuilder _mql,
+                                     final String _kind,
+                                     final boolean _newAll,
+                                     final Set<String> _new,
+                                     final boolean _currentAll,
+                                     final Set<String> _current)
+    {
+        if (_newAll)  {
+            DeltaUtil_mxJPO.calcListDelta( _mql, _kind, new TreeSet<String>(), _current);
+            if (!_currentAll)  {
+                _mql.newLine().cmd("add ").cmd(_kind).cmd(" all");
+            }
+        } else  {
+            if (_currentAll)  {
+                _mql.newLine().cmd("remove ").cmd(_kind).cmd(" all");
+            }
+            DeltaUtil_mxJPO.calcListDelta( _mql, _kind, _new, _current);
+        }
+    }
+
+    /**
+     * Calculates the delta between given {@code _current} list definition and
+     * the {@code _new} target list definition and appends the MQL append
+     * {@code add} / {@code remove} commands to {@code _mql}.
+     *
+     * @param _paramCache   parameter cache
+     * @param _mql          builder to append the MQL commands
+     * @param _parentName   name of parent name (needed for exception handling)
+     * @param _current      current attribute list definition
+     * @throws UpdateException_mxJPO if update is not allowed (because data can
+     *                      be lost)
+     */
+    public static void calcListDelta(final ParameterCache_mxJPO _paramCache,
+                                     final MultiLineMqlBuilder _mql,
+                                     final String _kind,
+                                     final ErrorKey _errorKey,
+                                     final String _parentName,
+                                     final ValueKeys _keyIgnore,
+                                     final ValueKeys _keyRemove,
+                                     final Set<String> _new,
+                                     final Set<String> _current)
+        throws UpdateException_mxJPO
+    {
+        final Set<String> ignoreElems = new HashSet<String>();
+        final Collection<String> tmp1 = _paramCache.getValueList(_keyIgnore);
+        if (tmp1 != null)  {
+            ignoreElems.addAll(tmp1);
+        }
+
+        final Set<String> removeElems = new HashSet<String>();
+        final Collection<String> tmp2 = _paramCache.getValueList(_keyRemove);
+        if (tmp2 != null)  {
+            removeElems.addAll(tmp2);
+        }
+
+        boolean equal = (_new.size() == _current.size());
+        if (equal)  {
+            for (final String attribute : _current)  {
+                if (!_new.contains(attribute))  {
+                    equal = false;
+                    break;
+                }
+            }
+        }
+        if (!equal)  {
+            for (final String curValue : _current)  {
+                if (!_new.contains(curValue))  {
+                    boolean ignore = false;
+                    for (final String ignoreAttr : ignoreElems)  {
+                        if (StringUtil_mxJPO.match(curValue, ignoreAttr))  {
+                            ignore = true;
+                            _paramCache.logDebug("    - " + _kind +" '" + curValue + "' is not assigned anymore and therefore ignored");
+                            break;
+                        }
+                    }
+                    if (!ignore)  {
+                        boolean remove = false;
+                        for (final String removeAttr : removeElems)  {
+                            if (StringUtil_mxJPO.match(curValue, removeAttr))  {
+                                remove = true;
+                                _paramCache.logDebug("    - " + _kind +" '" + curValue + "' is not assigned anymore and therefore removed");
+                                _mql.newLine().cmd("remove ").cmd(_kind).cmd(" ").arg(curValue);
+                                break;
+                            }
+                        }
+                        if (!remove)  {
+                            throw new UpdateException_mxJPO(_errorKey, curValue, _parentName);
+                        }
+                    }
+                }
+            }
+            for (final String newValue : _new)  {
+                if (!_current.contains(newValue))  {
+                    _paramCache.logDebug("    - " + _kind +" '" + newValue + "' is added");
+                    _mql.newLine().cmd("add ").cmd(_kind).cmd(" ").arg(newValue);
+                }
+            }
+        }
+    }
+
+    /**
+     * Calculates the delta between given {@code _current} list definition and
+     * the {@code _new} target list definition and appends one MQL append with
+     * complete new list.
+     *
+     * @param _paramCache   parameter cache
+     * @param _mql          builder to append the MQL commands
+     * @param _parentName   name of parent name (needed for exception handling)
+     * @param _current      current attribute list definition
+     * @throws UpdateException_mxJPO if update is not allowed (because data can
+     *                      be lost)
+     */
+    public static void calcLstOneCallDelta(final ParameterCache_mxJPO _paramCache,
+                                           final MultiLineMqlBuilder _mql,
+                                           final String _kind,
+                                           final ErrorKey _errorKey,
+                                           final String _parentName,
+                                           final ValueKeys _keyIgnore,
+                                           final ValueKeys _keyRemove,
+                                           final Set<String> _new,
+                                           final Set<String> _current)
+        throws UpdateException_mxJPO
+    {
+        final Set<String> ignoreElems = new HashSet<String>();
+        final Collection<String> tmp1 = _paramCache.getValueList(_keyIgnore);
+        if (tmp1 != null)  {
+            ignoreElems.addAll(tmp1);
+        }
+
+        final Set<String> removeElems = new HashSet<String>();
+        final Collection<String> tmp2 = _paramCache.getValueList(_keyRemove);
+        if (tmp2 != null)  {
+            removeElems.addAll(tmp2);
+        }
+
+        boolean equal = (_new.size() == _current.size());
+        if (equal)  {
+            for (final String attribute : _current)  {
+                if (!_new.contains(attribute))  {
+                    equal = false;
+                    break;
+                }
+            }
+        }
+        if (!equal)  {
+            final SortedSet<String> newComplVals = new TreeSet<String>(_new);
+
+            for (final String curValue : _current)  {
+                if (!_new.contains(curValue))  {
+                    boolean ignore = false;
+                    for (final String ignoreAttr : ignoreElems)  {
+                        if (StringUtil_mxJPO.match(curValue, ignoreAttr))  {
+                            newComplVals.add(curValue);
+                            ignore = true;
+                            _paramCache.logDebug("    - " + _kind +" '" + curValue + "' is not assigned anymore and therefore ignored");
+                            break;
+                        }
+                    }
+                    if (!ignore)  {
+                        boolean remove = false;
+                        for (final String removeAttr : removeElems)  {
+                            if (StringUtil_mxJPO.match(curValue, removeAttr))  {
+                                remove = true;
+                                _paramCache.logDebug("    - " + _kind +" '" + curValue + "' is not assigned anymore and therefore removed");
+                                break;
+                            }
+                        }
+                        if (!remove)  {
+                            throw new UpdateException_mxJPO(_errorKey, curValue, _parentName);
+                        }
+                    }
+                }
+            }
+            for (final String newValue : _new)  {
+                if (!_current.contains(newValue))  {
+                    _paramCache.logDebug("    - " + _kind +" '" + newValue + "' is added");
+                }
+            }
+            // prepare complete update
+            if (newComplVals.isEmpty())  {
+                _mql.newLine().cmd("remove ").cmd(_kind);
+            } else  {
+                _mql.newLine().cmd(_kind).cmd(" ");
+                boolean first = true;
+                for (final String elem : newComplVals)  {
+                    if (first)  {
+                        first = false;
+                    } else  {
+                        _mql.cmd(",");
+                    }
+                    _mql.arg(elem);
                 }
             }
         }

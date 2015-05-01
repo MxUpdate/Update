@@ -454,7 +454,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
                 DeltaUtil_mxJPO.calcFlagDelta(_mql, "multivalue", this.multiValue, current.multiValue);
             } else if (!this.multiValue)  {
                 throw new UpdateException_mxJPO(
-                        UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_MULTIVALUEFLAG_UPDATED,
+                        UpdateException_mxJPO.ErrorKey.ABSTRACTATTRIBUTE_UPDATE_MULTIVALUEFLAG_UPDATED,
                         _current.getName());
             }
         }

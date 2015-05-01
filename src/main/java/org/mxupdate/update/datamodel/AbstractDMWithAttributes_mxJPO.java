@@ -42,43 +42,11 @@ public abstract class AbstractDMWithAttributes_mxJPO<CLASS extends AbstractDMWit
 {
     /**
      * Name of parameter to define ignored attributes within the test
-     * attributes procedure for interfaces.
-     *
-     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
-     */
-    private static final String PARAM_IGNORE_INTERFACE = "DMWithAttrIgnoreIntAttr";
-
-    /**
-     * Name of parameter to define ignored attributes within the test
-     * attributes procedure for relationship.
-     *
-     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
-     */
-    private static final String PARAM_IGNORE_RELATIONSHIP = "DMWithAttrIgnoreRelAttr";
-
-    /**
-     * Name of parameter to define ignored attributes within the test
      * attributes procedure for types.
      *
      * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
      */
     private static final String PARAM_IGNORE_TYPE = "DMWithAttrIgnoreTypeAttr";
-
-    /**
-     * Name of parameter to define removed attributes within the test
-     * attributes procedure for interfaces.
-     *
-     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
-     */
-    private static final String PARAM_REMOVE_INTERFACE = "DMWithAttrRemoveIntAttr";
-
-    /**
-     * Name of parameter to define removed attributes within the test
-     * attributes procedure for relationship.
-     *
-     * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
-     */
-    private static final String PARAM_REMOVE_RELATIONSHIP = "DMWithAttrRemoveRelAttr";
 
     /**
      * Name of parameter to define removed attributes within the test
@@ -292,16 +260,6 @@ public abstract class AbstractDMWithAttributes_mxJPO<CLASS extends AbstractDMWit
                     attrStr = _args[++idx];
                 } else if ("-ignoreattr".equals(arg))  {
                     ignoreAttrs.add(this.jpoCallExecuteConvert(_args[++idx]));
-                } else if ("-interface".equals(arg) && this.getTypeDef().getMxAdminName().equals("interface"))  {
-                    name = this.jpoCallExecuteConvert(_args[++idx]);
-                    final Collection<String> tmp1 = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_IGNORE_INTERFACE);
-                    if (tmp1 != null)  {
-                        ignoreAllAttrs.addAll(tmp1);
-                    }
-                    final Collection<String> tmp2 = _paramCache.getValueList(AbstractDMWithAttributes_mxJPO.PARAM_REMOVE_INTERFACE);
-                    if (tmp2 != null)  {
-                        removeAllAttrs.addAll(tmp2);
-                    }
                 } else if ("-removeattr".equals(arg))  {
                     removeAttrs.add(this.jpoCallExecuteConvert(_args[++idx]));
                 } else if ("-type".equals(arg) && this.getTypeDef().getMxAdminName().equals("type"))  {
@@ -316,7 +274,7 @@ public abstract class AbstractDMWithAttributes_mxJPO<CLASS extends AbstractDMWit
                     }
                 } else  {
                     throw new UpdateException_mxJPO(
-                            UpdateException_mxJPO.Error.DM_ABSTRACTWITHATTRIBUTES_UPDATE_UKNOWN_PARAMETER,
+                            UpdateException_mxJPO.ErrorKey.DM_ABSTRACTWITHATTRIBUTES_UPDATE_UKNOWN_PARAMETER,
                             arg);
                 }
                 idx++;
@@ -325,7 +283,7 @@ public abstract class AbstractDMWithAttributes_mxJPO<CLASS extends AbstractDMWit
             // check for equal administration name
             if (!this.getName().equals(name))  {
                 throw new UpdateException_mxJPO(
-                        UpdateException_mxJPO.Error.DM_ABSTRACTWITHATTRIBUTES_UPDATE_WRONG_OBJECT,
+                        UpdateException_mxJPO.ErrorKey.DM_ABSTRACTWITHATTRIBUTES_UPDATE_WRONG_OBJECT,
                         this.getTypeDef().getLogging(),
                         this.getName(),
                         name);
@@ -392,7 +350,7 @@ public abstract class AbstractDMWithAttributes_mxJPO<CLASS extends AbstractDMWit
                     }
                     if (!remove)  {
                         throw new UpdateException_mxJPO(
-                                UpdateException_mxJPO.Error.DM_ABSTRACTWITHATTRIBUTES_UPDATE_ATTRIBUTE_REMOVED,
+                                UpdateException_mxJPO.ErrorKey.DM_ABSTRACTWITHATTRIBUTES_UPDATE_ATTRIBUTE_REMOVED,
                                 attr,
                                 this.getTypeDef().getLogging(),
                                 this.getName());

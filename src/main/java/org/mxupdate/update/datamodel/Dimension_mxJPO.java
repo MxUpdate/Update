@@ -37,6 +37,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 
 /**
  * The class is used to export and import / update dimension administration
@@ -267,7 +268,7 @@ public class Dimension_mxJPO
         for (final Map.Entry<String,Unit> curUnit : curUnits.entrySet())  {
             if (!tarUnits.containsKey(curUnit.getKey()))  {
                 if (!_paramCache.getValueBoolean(ValueKeys.DMDimAllowRemoveUnit))  {
-                    throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.DIMENSION_UPDATE_REMOVEUNIT);
+                    throw new UpdateException_mxJPO(ErrorKey.DIMENSION_UPDATE_REMOVEUNIT);
                 }
                 _mql.newLine().cmd("remove unit ").arg(curUnit.getKey());
             }
@@ -412,19 +413,19 @@ public class Dimension_mxJPO
             if (_current != null)  {
                 if (this.multiplier != _current.multiplier)  {
                     if (!_paramCache.getValueBoolean(ValueKeys.DMDimAllowUpdateUnitMult))  {
-                        throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.DIMENSION_UPDATE_MULTIPLIER);
+                        throw new UpdateException_mxJPO(ErrorKey.DIMENSION_UPDATE_MULTIPLIER);
                     }
                     _mql.newLine().cmd("multiplier ").arg(String.valueOf(this.multiplier)).arg(" ");
                 }
                 if (this.offset != _current.offset)  {
                     if (!_paramCache.getValueBoolean(ValueKeys.DMDimAllowUpdateUnitOffs))  {
-                        throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.DIMENSION_UPDATE_OFFSET);
+                        throw new UpdateException_mxJPO(ErrorKey.DIMENSION_UPDATE_OFFSET);
                     }
                     _mql.newLine().cmd("offset ").arg(String.valueOf(this.offset)).cmd(" ");
                 }
                 if (this.defaultUnit != _current.defaultUnit)  {
                     if (!_paramCache.getValueBoolean(ValueKeys.DMDimAllowUpdateDefUnit))  {
-                        throw new UpdateException_mxJPO(UpdateException_mxJPO.Error.DIMENSION_UPDATE_DEFAULTUNIT);
+                        throw new UpdateException_mxJPO(ErrorKey.DIMENSION_UPDATE_DEFAULTUNIT);
                     }
                     _mql.newLine();
                     if (!this.defaultUnit)  {

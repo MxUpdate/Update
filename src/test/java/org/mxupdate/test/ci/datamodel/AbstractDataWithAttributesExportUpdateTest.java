@@ -25,7 +25,7 @@ import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.AbstractAttributeData;
 import org.mxupdate.test.data.datamodel.AbstractDataWithAttribute;
 import org.mxupdate.test.data.datamodel.AttributeStringData;
-import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.annotations.Test;
 
 /**
@@ -143,7 +143,7 @@ public abstract class AbstractDataWithAttributesExportUpdateTest<DATAWITHATTRIBU
         this.createNewData("Test")
             .failedUpdateWithCode(
                     "testAttributes -wrongparameter",
-                    UpdateException_mxJPO.Error.DM_ABSTRACTWITHATTRIBUTES_UPDATE_UKNOWN_PARAMETER);
+                    ErrorKey.DM_ABSTRACTWITHATTRIBUTES_UPDATE_UKNOWN_PARAMETER);
     }
 
     /**
@@ -161,17 +161,17 @@ public abstract class AbstractDataWithAttributesExportUpdateTest<DATAWITHATTRIBU
         if (data.getCI() != AbstractTest.CI.DM_INTERFACE)  {
             data.failedUpdateWithCode(
                     "testAttributes -interface ${NAME}",
-                    UpdateException_mxJPO.Error.DM_ABSTRACTWITHATTRIBUTES_UPDATE_UKNOWN_PARAMETER);
+                    ErrorKey.DM_ABSTRACTWITHATTRIBUTES_UPDATE_UKNOWN_PARAMETER);
         }
         if (data.getCI() != AbstractTest.CI.DM_RELATIONSHIP)  {
             data.failedUpdateWithCode(
                     "testAttributes -relationship ${NAME}",
-                    UpdateException_mxJPO.Error.DM_ABSTRACTWITHATTRIBUTES_UPDATE_UKNOWN_PARAMETER);
+                    ErrorKey.DM_ABSTRACTWITHATTRIBUTES_UPDATE_UKNOWN_PARAMETER);
         }
         if (data.getCI() != AbstractTest.CI.DM_TYPE)  {
             data.failedUpdateWithCode(
                     "testAttributes -type ${NAME}",
-                    UpdateException_mxJPO.Error.DM_ABSTRACTWITHATTRIBUTES_UPDATE_UKNOWN_PARAMETER);
+                    ErrorKey.DM_ABSTRACTWITHATTRIBUTES_UPDATE_UKNOWN_PARAMETER);
         }
     }
 
@@ -190,7 +190,7 @@ public abstract class AbstractDataWithAttributesExportUpdateTest<DATAWITHATTRIBU
             .create()
             .failedUpdateWithCode(
                     "testAttributes -" + this.createNewData("").getCI().getMxType() + " MyTest",
-                    UpdateException_mxJPO.Error.DM_ABSTRACTWITHATTRIBUTES_UPDATE_WRONG_OBJECT);
+                    ErrorKey.DM_ABSTRACTWITHATTRIBUTES_UPDATE_WRONG_OBJECT);
     }
 
     /**
@@ -208,6 +208,6 @@ public abstract class AbstractDataWithAttributesExportUpdateTest<DATAWITHATTRIBU
             .create()
             .failedUpdateWithCode(
                     "testAttributes -" + this.createNewData("").getCI().getMxType() + " \"${NAME}\" -attributes [list]",
-                    UpdateException_mxJPO.Error.DM_ABSTRACTWITHATTRIBUTES_UPDATE_ATTRIBUTE_REMOVED);
+                    ErrorKey.DM_ABSTRACTWITHATTRIBUTES_UPDATE_ATTRIBUTE_REMOVED);
     }
 }

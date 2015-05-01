@@ -30,7 +30,7 @@ import org.mxupdate.test.data.datamodel.AttributeRealData;
 import org.mxupdate.test.data.datamodel.RuleData;
 import org.mxupdate.test.data.program.MQLProgramData;
 import org.mxupdate.test.util.IssueLink;
-import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -190,6 +190,6 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
                 .update((String) null)
                 .checkExport()
                 .setFlag("multivalue", false)
-                .failureUpdate(UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_MULTIVALUEFLAG_UPDATED);
+                .failureUpdate(ErrorKey.ABSTRACTATTRIBUTE_UPDATE_MULTIVALUEFLAG_UPDATED);
     }
 }

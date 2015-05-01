@@ -32,9 +32,9 @@ public class PackageData
     extends AbstractAdminData<PackageData>
 {
     /** All used packages. */
-    private final DataList<PackageData> usePackages = new DataList<PackageData>("uses", "uses");
+    private final DataList<PackageData> usePackages = new DataList<PackageData>("uses", "uses", true);
     /** All members. */
-    private final DataList<AbstractAdminData<?>> members = new DataList<AbstractAdminData<?>>("member ", "member ");
+    private final DataList<AbstractAdminData<?>> members = new DataList<AbstractAdminData<?>>("member ", "member ", true);
 
     /**
      * Initialize this package with given {@code _name}.

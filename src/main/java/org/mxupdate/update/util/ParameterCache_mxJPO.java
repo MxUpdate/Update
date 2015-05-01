@@ -772,6 +772,15 @@ public class ParameterCache_mxJPO
          */
         DMFormatSupportsPrograms,
 
+        /** List of removed attributes for interfaces to be ignored. */
+        DMInterfaceAttrIgnore,
+        /** List of removed attributes for interfaces to be removed. */
+        DMInterfaceAttrRemove,
+        /** List of removed parent interfaces for interfaces to be ignored. */
+        DMInterfaceParentIgnore,
+        /** List of removed parent interfaces for interfaces to be removed. */
+        DMInterfaceParentRemove,
+
         /** Boolean that the access of policies are sorted. */
         DMPolicyAllowExportAccessSorting,
         /** Boolean that policy supports the 'majorrevision' property for policies*/
@@ -781,9 +790,9 @@ public class ParameterCache_mxJPO
         /** Boolean that policy states supports the 'enforce reserve access' flag. */
         DMPolicyStateSupportsEnforceReserveAccess,
 
-        /** List of removed attributes to ignored. */
+        /** List of removed attributes for relationships to be ignored. */
         DMRelationAttrIgnore,
-        /** List of removed attributes to remove. */
+        /** List of removed attributes for relationships to be removed. */
         DMRelationAttrRemove,
         /** Boolean that connections between connections from current MX version are supported. */
         DMRelationSupportRelCons,

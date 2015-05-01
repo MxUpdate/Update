@@ -103,7 +103,7 @@ public abstract class AbstractTest
         DM_FORMAT("format", null, false, null, null, "Format", "FORMAT", "FORMAT_", "datamodel/format", true, "mxUpdate"),
 
         /** Configuration item Data Model Interface. */
-        DM_INTERFACE("interface", null, false, null, null, "Interface", "INTERFACE", "INTERFACE_", "datamodel/interface", true, "mql"),
+        DM_INTERFACE("interface", null, false, null, null, "Interface", "INTERFACE", "INTERFACE_", "datamodel/interface", true, "mxUpdate"),
 
         /** Configuration item IEF Global Configuration. */
         DM_NOTIFICATION(null, "Notification", false, "Business Rule", "eService Administration",

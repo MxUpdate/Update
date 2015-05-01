@@ -23,7 +23,7 @@ import org.mxupdate.test.data.datamodel.DimensionData;
 import org.mxupdate.test.data.datamodel.DimensionData.UnitData;
 import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.test.util.Version;
-import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -107,7 +107,7 @@ public class AttributeIntegerTest
                 .update((String) null)
                 .checkExport()
                 .setFlag("rangevalue", false)
-                .failureUpdate(UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_RANGEVALUEFLAG_UPDATED);
+                .failureUpdate(ErrorKey.ABSTRACTATTRIBUTE_UPDATE_RANGEVALUEFLAG_UPDATED);
     }
 
     /**
@@ -131,6 +131,6 @@ public class AttributeIntegerTest
                 .update((String) null)
                 .checkExport()
                 .setDimension((DimensionData) null)
-                .failureUpdate(UpdateException_mxJPO.Error.ABSTRACTATTRIBUTE_UPDATE_DIMENSION_UPDATED);
+                .failureUpdate(ErrorKey.ABSTRACTATTRIBUTE_UPDATE_DIMENSION_UPDATED);
     }
 }

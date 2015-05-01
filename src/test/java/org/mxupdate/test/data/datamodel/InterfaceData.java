@@ -16,15 +16,14 @@
 package org.mxupdate.test.data.datamodel;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.AbstractTest.CI;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.data.AbstractAdminData;
+import org.mxupdate.test.data.util.DataList;
 import org.testng.Assert;
 
 /**
@@ -33,65 +32,16 @@ import org.testng.Assert;
  * @author The MxUpdate Team
  */
 public class InterfaceData
-    extends AbstractDataWithAttribute<InterfaceData>
+    extends AbstractAdminData<InterfaceData>
 {
-    /**
-     * Within export the description and abstract must be defined.
-     */
-    private static final Map<String,Object> REQUIRED_EXPORT_VALUES = new HashMap<String,Object>();
-    static  {
-        InterfaceData.REQUIRED_EXPORT_VALUES.put("description", "");
-        InterfaceData.REQUIRED_EXPORT_VALUES.put("abstract", "false");
-    }
+    /** All parent interfaces of this interface.*/
+    private final DataList<InterfaceData> parents = new DataList<InterfaceData>("derived ","derived ", false);
 
-    /**
-     * All parent interfaces of this interface.
-     *
-     * @see #addParent(InterfaceData)
-     * @see #create()
-     * @see #checkExport(ExportParser)
-     */
-    private final Set<InterfaceData> parents = new HashSet<InterfaceData>();
+    /** All attributes of this data with attribute instances. */
+    private final DataList<AbstractAttributeData<?>> attributes = new DataList<AbstractAttributeData<?>>("", "", true);
 
-    /**
-     * All assigned types for this interface.
-     *
-     * @see #addType(TypeData)
-     * @see #create()
-     * @see #evalAdds4CheckExport(Set)
-     * @see #allTypes
-     */
-    private final Set<TypeData> types = new HashSet<TypeData>();
-
-    /**
-     * All types are allowed for this interface.
-     *
-     * @see #addAllTypes()
-     * @see #create()
-     * @see #evalAdds4CheckExport(Set)
-     * @see #types
-     */
-    private boolean allTypes = false;
-
-    /**
-     * All assigned relationships for this interface.
-     *
-     * @see #addRelationship(RelationshipData)
-     * @see #create()
-     * @see #evalAdds4CheckExport(Set)
-     * @see #allRelationships
-     */
-    private final Set<RelationshipData> relationships = new HashSet<RelationshipData>();
-
-    /**
-     * All types are allowed for this interface.
-     *
-     * @see #addAllRelationships()
-     * @see #create()
-     * @see #evalAdds4CheckExport(Set)
-     * @see #relationships
-     */
-    private boolean allRelationships = false;
+    /** All assigned relationships / types for this interface. */
+    private final DataList<AbstractDataWithTrigger<?>> fors = new DataList<AbstractDataWithTrigger<?>>("for ", "", true);
 
     /**
      * Initialize this interface data with given <code>_name</code>.
@@ -103,9 +53,7 @@ public class InterfaceData
     public InterfaceData(final AbstractTest _test,
                          final String _name)
     {
-        super(_test, AbstractTest.CI.DM_INTERFACE, _name,
-              InterfaceData.REQUIRED_EXPORT_VALUES,
-              null);
+        super(_test, AbstractTest.CI.DM_INTERFACE, _name, null, null);
     }
 
     /**
@@ -122,14 +70,14 @@ public class InterfaceData
     }
 
     /**
-     * Clears the list of all {@link #parents}.
+     * Assigns the {@code attributes} to this data instance.
      *
-     * @return this interface data instance
-     * @see #parents
+     * @param _attributes       attribute to assign
+     * @return this data instance
      */
-    public InterfaceData removeParents()
+    public InterfaceData addAttribute(final AbstractAttributeData<?>... _attributes)
     {
-        this.parents.clear();
+        this.attributes.addAll(Arrays.asList(_attributes));
         return this;
     }
 
@@ -137,9 +85,8 @@ public class InterfaceData
      * Return all {@link #parents parent interfaces}.
      *
      * @return all parent interfaces
-     * @see #parents
      */
-    public Set<InterfaceData> getParents()
+    public DataList<InterfaceData> getParents()
     {
         return this.parents;
     }
@@ -150,11 +97,10 @@ public class InterfaceData
      *
      * @param _type     type to assign
      * @return this interface data instance
-     * @see #types
      */
     public InterfaceData addType(final TypeData _type)
     {
-        this.types.add(_type);
+        this.fors.add(_type);
         return this;
     }
 
@@ -166,34 +112,8 @@ public class InterfaceData
      */
     public InterfaceData addAllTypes()
     {
-        this.allTypes = true;
+        this.fors.addAll(CI.DM_TYPE);
         return this;
-    }
-
-    /**
-     * Clears the list of all {@link #types} and unset's the information
-     * about {@link #allTypes all types}.
-     *
-     * @return this interface data instance
-     * @see #allTypes
-     * @see #types
-     */
-    public InterfaceData removeTypes()
-    {
-        this.allTypes = false;
-        this.types.clear();
-        return this;
-    }
-
-    /**
-     * Return all {@link #types} for this interface.
-     *
-     * @return all assigned types
-     * @see #types
-     */
-    public Set<TypeData> getTypes()
-    {
-        return this.types;
     }
 
     /**
@@ -207,7 +127,7 @@ public class InterfaceData
      */
     public InterfaceData addRelationship(final RelationshipData _relationship)
     {
-        this.relationships.add(_relationship);
+        this.fors.add(_relationship);
         return this;
     }
 
@@ -219,95 +139,28 @@ public class InterfaceData
      */
     public InterfaceData addAllRelationships()
     {
-        this.allRelationships = true;
+        this.fors.addAll(CI.DM_RELATIONSHIP);
         return this;
     }
 
-    /**
-     * Clears the list of all {@link #relationships} and unset's the information
-     * about {@link #allRelationships all relationships}.
-     *
-     * @return this interface data instance
-     * @see #allRelationships
-     * @see #relationships
-     */
-    public InterfaceData removeRelationships()
-    {
-        this.allRelationships = false;
-        this.relationships.clear();
-        return this;
-    }
-
-    /**
-     * Return all {@link #relationships} for this interface.
-     *
-     * @return all assigned relationships
-     * @see #relationships
-     */
-    public Set<RelationshipData> getRelationships()
-    {
-        return this.relationships;
-    }
-
-    /**
-     * Appends the adds for the {@link #types} and  {@link #relationships}.
-     *
-     * @param _needAdds     set with add strings used to append the adds
-     * @see #allTypes
-     * @see #types
-     */
-    @Override()
-    protected void evalAdds4CheckExport(final Set<String> _needAdds)
-    {
-        super.evalAdds4CheckExport(_needAdds);
-
-        // append types
-        if (this.allTypes)  {
-            _needAdds.add("type all");
-        } else  {
-            for (final TypeData type : this.types)  {
-                final StringBuilder cmd = new StringBuilder()
-                        .append("type \"").append(AbstractTest.convertTcl(type.getName())).append("\"");
-                _needAdds.add(cmd.toString());
-            }
-        }
-
-        // append relationships
-        if (this.allRelationships)  {
-            _needAdds.add("relationship all");
-        } else  {
-            for (final RelationshipData relationship : this.relationships)  {
-                final StringBuilder cmd = new StringBuilder()
-                        .append("relationship \"").append(AbstractTest.convertTcl(relationship.getName())).append("\"");
-                _needAdds.add(cmd.toString());
-            }
-        }
-    }
-
-    /**
-     * Returns the TCL update file of this interface data instance.
-     *
-     * @return TCL update file content
-     */
     @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("mql escape mod interface \"${NAME}\"");
+        final StringBuilder strg = new StringBuilder();
+        this.append4CIFileHeader(strg);
+        strg.append("mxUpdate interface \"${NAME}\" {\n");
 
-        this.append4CIFileValues(cmd);
+        this.getFlags()     .appendUpdate("    ", strg);
+        this.getValues()    .appendUpdate("    ", strg);
+        this.getSingles()   .appendUpdate("    ", strg);
+        this.attributes     .appendUpdate("    ", strg);
+        this.getProperties().appendUpdate("    ", strg);
+        this.fors           .appendUpdate("    ", strg);
+        this.parents        .appendUpdate("    ", strg);
 
-        // append attributes
-        this.append4CIAttributes(cmd);
+        strg.append("}");
 
-        // append parent interfaces
-        cmd.append("\n\ntestParents -interface \"${NAME}\" -parents [list \\\n");
-        for (final InterfaceData parent : this.parents)  {
-            cmd.append("    \"").append(AbstractTest.convertTcl(parent.getName())).append("\" \\\n");
-        }
-        cmd.append("]\n");
-
-        return cmd.toString();
+        return strg.toString();
     }
 
     /**
@@ -330,51 +183,9 @@ public class InterfaceData
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add interface \"").append(AbstractTest.convertMql(this.getName())).append('\"');
 
-            // add parent interfaces
-            if (!this.parents.isEmpty())  {
-                cmd.append(" derived ");
-                boolean first = true;
-                for (final InterfaceData parent : this.parents)  {
-                    if (first)  {
-                        first = false;
-                    } else  {
-                        cmd.append(',');
-                    }
-                    cmd.append("\"").append(AbstractTest.convertMql(parent.getName())).append("\"");
-                }
-            }
-
-            // add types
-            if (this.allTypes)  {
-                cmd.append(" type all");
-            } else if (!this.types.isEmpty())  {
-                cmd.append(" type ");
-                boolean first = true;
-                for (final TypeData type : this.types)  {
-                    if (first)  {
-                        first = false;
-                    } else  {
-                        cmd.append(',');
-                    }
-                    cmd.append("\"").append(AbstractTest.convertMql(type.getName())).append("\"");
-                }
-            }
-
-            // add relationships
-            if (this.allRelationships)  {
-                cmd.append(" relationship all");
-            } else if (!this.relationships.isEmpty())  {
-                cmd.append(" relationship ");
-                boolean first = true;
-                for (final RelationshipData relationship : this.relationships)  {
-                    if (first)  {
-                        first = false;
-                    } else  {
-                        cmd.append(',');
-                    }
-                    cmd.append("\"").append(AbstractTest.convertMql(relationship.getName())).append("\"");
-                }
-            }
+            this.parents   .append4Create(cmd);
+            this.attributes.append4Create(cmd);
+            this.fors      .append4Create(cmd);
 
             this.append4Create(cmd);
 
@@ -398,18 +209,9 @@ public class InterfaceData
     {
         super.createDependings();
 
-        // create parent interfaces
-        for (final InterfaceData inter : this.parents)  {
-            inter.create();
-        }
-        // create assigned types
-        for (final TypeData type : this.types)  {
-            type.create();
-        }
-        // create assigned relationships
-        for (final RelationshipData relation : this.relationships)  {
-            relation.create();
-        }
+        this.parents      .createDependings();
+        this.attributes   .createDependings();
+        this.fors         .createDependings();
 
         return this;
     }
@@ -424,17 +226,17 @@ public class InterfaceData
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        super.checkExport(_exportParser);
+        // check symbolic name
+        Assert.assertEquals(
+                _exportParser.getSymbolicName(),
+                this.getSymbolicName(),
+                "check symbolic name");
 
-        // check parent interfaces
-        final Set<String> pars = new HashSet<String>(_exportParser.getLines("/testParents/"));
-        for (final InterfaceData parent : this.parents)  {
-            final String parentName = "\"" + AbstractTest.convertTcl(parent.getName()) + "\" \\";
-            Assert.assertTrue(pars.contains(parentName),
-                              "check that parent interface '" + parent.getName() + "' is defined");
-        }
-        Assert.assertEquals(pars.size(),
-                            this.parents.size(),
-                            "check all parent interfaces are defined");
+        this.getFlags()  .checkExport(_exportParser, "");
+        this.getValues() .checkExport(_exportParser, "");
+        this.getSingles().checkExport(_exportParser, "");
+        this.attributes  .checkExport(_exportParser, "");
+        this.fors        .checkExport(_exportParser, "");
+        this.parents     .checkExport(_exportParser, "");
     }
 }
