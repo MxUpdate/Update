@@ -21,6 +21,7 @@ import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ci.user.AbstractUserTest;
 import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.util.Version;
+import org.mxupdate.update.user.PersonAdmin_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -28,8 +29,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test cases for the export and update of administration persons (without
- * related business object).
+ * Tests the {@link PersonAdmin_mxJPO person admin CI} export / update.
  *
  * @author The MxUpdate Team
  */

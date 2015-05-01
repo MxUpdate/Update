@@ -28,7 +28,6 @@ import org.mxupdate.test.data.user.RoleData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.test.util.Version;
 import org.mxupdate.update.user.PersonAdmin_mxJPO;
-import org.mxupdate.update.user.Role_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -36,7 +35,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link Role_mxJPO type CI} parser.
+ * Tests the {@link PersonAdmin_mxJPO person admin CI} delta calculation.
  *
  * @author The MxUpdate Team
  */
@@ -50,9 +49,15 @@ public class PersonAdminCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
-                {"1) simple",
+                {"0) simple",
                         new PersonAdminData(this, "Test"),
                         new PersonAdminData(this, "Test")},
+                {"1a) symbolic name",
+                        new PersonAdminData(this, "Test"),
+                        new PersonAdminData(this, "Test").setValue("symbolicname", "expression_123")},
+                {"1b) two symbolic name",
+                        new PersonAdminData(this, "Test"),
+                        new PersonAdminData(this, "Test").setValue("symbolicname", "expression_123").setValue("symbolicname", "expression_345")},
                 // comment
                 {"2a) add comment",
                         new PersonAdminData(this, "Test"),
@@ -243,6 +248,7 @@ public class PersonAdminCI_2DeltaCalculationTest
         };
     }
 
+    @Override
     @BeforeMethod()
     @AfterClass(groups = "close" )
     public void cleanup()
@@ -254,7 +260,6 @@ public class PersonAdminCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.SYS_APPLICATION);
         this.cleanup(AbstractTest.CI.SYS_SITE);
     }
-
 
     @Override
     protected PersonAdmin_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,

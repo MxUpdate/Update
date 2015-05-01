@@ -312,6 +312,7 @@ public class PersonAdmin_mxJPO
         _updateBuilder
                 //                  tag             | default | value                              | write?
                 .single(                 "kind",                 "admin")
+                .list(                   "symbolicname",         this.getSymbolicNames())
                 .string(                 "comment",              this.getDescription())
                 .flag(                   "active",        false, this.active)
                 .flag(                   "trusted",       false, this.trusted)
@@ -355,6 +356,7 @@ public class PersonAdmin_mxJPO
                              final PersonAdmin_mxJPO _current)
         throws UpdateException_mxJPO
     {
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
         // type (application, full, business, system, inactive, trusted)
         if (CompareToUtil_mxJPO.compare(0, this.types, _current.types) != 0 || this.active != _current.active || this.trusted != _current.trusted) {
             _mql.newLine().cmd("type ");
