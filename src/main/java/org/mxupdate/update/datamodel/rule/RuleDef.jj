@@ -55,23 +55,25 @@ public class RuleDefParser
 
 <DEFAULT> TOKEN : /** first level */
 {
-      <DESCRIPTION:             "description">      : STRING_EXPECTED
-    | <HIDDEN_TRUE:             "hidden">
-    | <HIDDEN_FALSE:            "!hidden">
-    | <PROPERTY:                "property">         : STRING_EXPECTED
-    | <PROPERTYTO:              "to">               : ADMINREF_EXPECTED
-    | <PROPERTYVAL:             "value">            : STRING_EXPECTED
+      <DESCRIPTION:                 "description">              : STRING_EXPECTED
+    | <HIDDEN_TRUE:                 "hidden">
+    | <HIDDEN_FALSE:                "!hidden">
+    | <ENFORCERESERVEACCESS_TRUE:   "enforcereserveaccess">
+    | <ENFORCERESERVEACCESS_FALSE:  "!enforcereserveaccess">
+    | <PROPERTY:                    "property">                 : STRING_EXPECTED
+    | <PROPERTYTO:                  "to">                       : ADMINREF_EXPECTED
+    | <PROPERTYVAL:                 "value">                    : STRING_EXPECTED
 }
 
 /*********************************************************** Access Definition */
 
 <DEFAULT> TOKEN :
 {
-      <REVOKE:                  "revoke">           : DEFAULT
-    | <LOGIN:                   "login">            : DEFAULT
-    | <OWNER:                   "owner">            : ACCESS_EXPECTED
-    | <PUBLIC:                  "public">           : ACCESS_EXPECTED
-    | <USER:                    "user">             : ACCESS_STRING_EXPECTED
+      <REVOKE:                      "revoke">                   : DEFAULT
+    | <LOGIN:                       "login">                    : DEFAULT
+    | <OWNER:                       "owner">                    : ACCESS_EXPECTED
+    | <PUBLIC:                      "public">                   : ACCESS_EXPECTED
+    | <USER:                        "user">                     : ACCESS_STRING_EXPECTED
 }
 
 <ACCESS_EXPECTED> SKIP :
@@ -84,8 +86,8 @@ public class RuleDefParser
 
 <ACCESS_EXPECTED> TOKEN:
 {
-      <KEY:                                 "key" >                                                 : ACCESS_STRING_EXPECTED
-    | <ACCESS:                              "{" ([" ","\t","\n","\r"])* (["a"-"z"]) (["a"-"z"," ","\t","\n","\r"])* "}">
+      <KEY:                         "key">                                                          : ACCESS_STRING_EXPECTED
+    | <ACCESS:                      "{" ([" ","\t","\n","\r"])* (["a"-"z"]) (["a"-"z"," ","\t","\n","\r"])* "}">
                                                                                                     : DEFAULT
 }
 /** String within Access */
@@ -182,6 +184,8 @@ void parse(final Rule_mxJPO _rule)
                                     | tmp = <SINGLE>           {this.setValue(_rule, "description", this.getSingle(tmp.image));} ) )
       | (<HIDDEN_TRUE>                                         {this.setValue(_rule, "hidden",       true);} )
       | (<HIDDEN_FALSE>                                        {this.setValue(_rule, "hidden",       false);} )
+      | (<ENFORCERESERVEACCESS_TRUE>                           {this.setValue(_rule, "enforcereserveaccess", true);} )
+      | (<ENFORCERESERVEACCESS_FALSE>                          {this.setValue(_rule, "enforcereserveaccess", false);} )
       | (<PROPERTY>                                            {property = new AdminProperty();this.appendValue(this.getValue(_rule, "properties"), "propertiesStack", property);}
                                     ( tmp = <STRING>           {this.setValue(property, "name", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.setValue(property, "name", this.getSingle(tmp.image));} )

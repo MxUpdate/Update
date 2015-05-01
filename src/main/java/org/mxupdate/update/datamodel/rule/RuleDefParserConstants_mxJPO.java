@@ -17,113 +17,117 @@ public interface RuleDefParserConstants_mxJPO {
   /** RegularExpression Id. */
   int HIDDEN_FALSE = 7;
   /** RegularExpression Id. */
-  int PROPERTY = 8;
+  int ENFORCERESERVEACCESS_TRUE = 8;
   /** RegularExpression Id. */
-  int PROPERTYTO = 9;
+  int ENFORCERESERVEACCESS_FALSE = 9;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 10;
+  int PROPERTY = 10;
   /** RegularExpression Id. */
-  int REVOKE = 11;
+  int PROPERTYTO = 11;
   /** RegularExpression Id. */
-  int LOGIN = 12;
+  int PROPERTYVAL = 12;
   /** RegularExpression Id. */
-  int OWNER = 13;
+  int REVOKE = 13;
   /** RegularExpression Id. */
-  int PUBLIC = 14;
+  int LOGIN = 14;
   /** RegularExpression Id. */
-  int USER = 15;
+  int OWNER = 15;
   /** RegularExpression Id. */
-  int KEY = 20;
+  int PUBLIC = 16;
   /** RegularExpression Id. */
-  int ACCESS = 21;
+  int USER = 17;
   /** RegularExpression Id. */
-  int ACCESS_STRING = 26;
+  int KEY = 22;
   /** RegularExpression Id. */
-  int ACCESS_SINGLE_STRING = 27;
+  int ACCESS = 23;
   /** RegularExpression Id. */
-  int ACCESS_STRING_APOSTROPHE = 28;
+  int ACCESS_STRING = 28;
   /** RegularExpression Id. */
-  int ACCESS_STRING_CHAR = 29;
+  int ACCESS_SINGLE_STRING = 29;
   /** RegularExpression Id. */
-  int FILTER = 30;
+  int ACCESS_STRING_APOSTROPHE = 30;
   /** RegularExpression Id. */
-  int LOCALFILTER = 31;
+  int ACCESS_STRING_CHAR = 31;
   /** RegularExpression Id. */
-  int ORGANIZATION_ANY = 32;
+  int FILTER = 32;
   /** RegularExpression Id. */
-  int ORGANIZATION_SINGLE = 33;
+  int LOCALFILTER = 33;
   /** RegularExpression Id. */
-  int ORGANIZATION_ANCESTOR = 34;
+  int ORGANIZATION_ANY = 34;
   /** RegularExpression Id. */
-  int ORGANIZATION_DESCENDANT = 35;
+  int ORGANIZATION_SINGLE = 35;
   /** RegularExpression Id. */
-  int ORGANIZATION_RELATED = 36;
+  int ORGANIZATION_ANCESTOR = 36;
   /** RegularExpression Id. */
-  int PROJECT_ANY = 37;
+  int ORGANIZATION_DESCENDANT = 37;
   /** RegularExpression Id. */
-  int PROJECT_SINGLE = 38;
+  int ORGANIZATION_RELATED = 38;
   /** RegularExpression Id. */
-  int PROJECT_ANCESTOR = 39;
+  int PROJECT_ANY = 39;
   /** RegularExpression Id. */
-  int PROJECT_DESCENDANT = 40;
+  int PROJECT_SINGLE = 40;
   /** RegularExpression Id. */
-  int PROJECT_RELATED = 41;
+  int PROJECT_ANCESTOR = 41;
   /** RegularExpression Id. */
-  int OWNER_ANY = 42;
+  int PROJECT_DESCENDANT = 42;
   /** RegularExpression Id. */
-  int OWNER_CONTEXT = 43;
+  int PROJECT_RELATED = 43;
   /** RegularExpression Id. */
-  int RESERVE_ANY = 44;
+  int OWNER_ANY = 44;
   /** RegularExpression Id. */
-  int RESERVE_CONTEXT = 45;
+  int OWNER_CONTEXT = 45;
   /** RegularExpression Id. */
-  int RESERVE_NO = 46;
+  int RESERVE_ANY = 46;
   /** RegularExpression Id. */
-  int RESERVE_INCLUSIVE = 47;
+  int RESERVE_CONTEXT = 47;
   /** RegularExpression Id. */
-  int MATURITY_ANY = 48;
+  int RESERVE_NO = 48;
   /** RegularExpression Id. */
-  int MATURITY_NO = 49;
+  int RESERVE_INCLUSIVE = 49;
   /** RegularExpression Id. */
-  int MATURITY_PUBLIC = 50;
+  int MATURITY_ANY = 50;
   /** RegularExpression Id. */
-  int MATURITY_PROTECTED = 51;
+  int MATURITY_NO = 51;
   /** RegularExpression Id. */
-  int MATURITY_PRIVATE = 52;
+  int MATURITY_PUBLIC = 52;
   /** RegularExpression Id. */
-  int MATURITY_NOTPRIVATE = 53;
+  int MATURITY_PROTECTED = 53;
   /** RegularExpression Id. */
-  int MATURITY_PPP = 54;
+  int MATURITY_PRIVATE = 54;
   /** RegularExpression Id. */
-  int CATEGORY_ANY = 55;
+  int MATURITY_NOTPRIVATE = 55;
   /** RegularExpression Id. */
-  int CATEGORY_OEM = 56;
+  int MATURITY_PPP = 56;
   /** RegularExpression Id. */
-  int CATEGORY_GOLDPARTNER = 57;
+  int CATEGORY_ANY = 57;
   /** RegularExpression Id. */
-  int CATEGORY_PARTNER = 58;
+  int CATEGORY_OEM = 58;
   /** RegularExpression Id. */
-  int CATEGORY_SUPPLIER = 59;
+  int CATEGORY_GOLDPARTNER = 59;
   /** RegularExpression Id. */
-  int CATEGORY_CUSTOMER = 60;
+  int CATEGORY_PARTNER = 60;
   /** RegularExpression Id. */
-  int CATEGORY_CONTRACTOR = 61;
+  int CATEGORY_SUPPLIER = 61;
   /** RegularExpression Id. */
-  int STRING = 66;
+  int CATEGORY_CUSTOMER = 62;
   /** RegularExpression Id. */
-  int SINGLE = 67;
+  int CATEGORY_CONTRACTOR = 63;
   /** RegularExpression Id. */
-  int APOSTROPHE = 68;
+  int STRING = 68;
   /** RegularExpression Id. */
-  int CHAR = 69;
+  int SINGLE = 69;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 74;
+  int APOSTROPHE = 70;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 75;
+  int CHAR = 71;
   /** RegularExpression Id. */
-  int ADMINTYPE_APOSTROPHE = 76;
+  int ADMINTYPE_STRING = 76;
   /** RegularExpression Id. */
-  int ADMINTYPE_CHAR = 77;
+  int ADMINTYPE_SINGLE = 77;
+  /** RegularExpression Id. */
+  int ADMINTYPE_APOSTROPHE = 78;
+  /** RegularExpression Id. */
+  int ADMINTYPE_CHAR = 79;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -146,6 +150,8 @@ public interface RuleDefParserConstants_mxJPO {
     "\"description\"",
     "\"hidden\"",
     "\"!hidden\"",
+    "\"enforcereserveaccess\"",
+    "\"!enforcereserveaccess\"",
     "\"property\"",
     "\"to\"",
     "\"value\"",

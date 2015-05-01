@@ -776,9 +776,14 @@ public class ParameterCache_mxJPO
         DMPolicyStateSupportsPublished,
         /**
          * Name of parameter to check that the policy states supports the
-         * published property.
+         * 'enforce reserve access' flag.
          */
         DMPolicyStateSupportsEnforceReserveAccess,
+        /**
+         * Name of the parameter to check that rules supports the 'enforce
+         * reserve access' flag.
+         */
+        DMRuleSupportsEnforceReserveAccess,
         /**
          * Name of the key within the parameter cache that the update continues
          * if a error was thrown.

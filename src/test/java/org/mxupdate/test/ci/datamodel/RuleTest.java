@@ -17,6 +17,7 @@ package org.mxupdate.test.ci.datamodel;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.data.datamodel.RuleData;
+import org.mxupdate.test.util.Version;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -53,7 +54,16 @@ public class RuleTest
         return this.prepareData("rule",
                 new Object[]{
                         "rule without anything (to test required fields)",
-                        new RuleData(this, "hello \" test")}
+                        new RuleData(this, "hello \" test")},
+                new Object[]{
+                        "issue #220: rule with enforce reserve access flag",
+                        new RuleData(this, "test").setFlag("enforcereserveaccess", true)
+                                .notSupported(Version.V6R2011x)},
+                new Object[]{
+                        "issue #220: rule with negative defined enforce reserve access flag (which will not part of the CI file)",
+                        new RuleData(this, "test").setFlag("enforcereserveaccess", false)
+                                .notSupported(Version.V6R2011x),
+                        new RuleData(this, "test")}
         );
     }
 

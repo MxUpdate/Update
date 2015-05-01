@@ -28,6 +28,7 @@ import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
@@ -51,6 +52,8 @@ public class Rule_mxJPO
 
     /** Access list. */
     private final AccessList_mxJPO accessList = new AccessList_mxJPO();
+    /** Enoforcereserveaccess flag */
+    private boolean enforcereserveaccess = false;
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -84,6 +87,9 @@ public class Rule_mxJPO
             parsed = true;
         } else if (this.accessList.parse(_paramCache, _url, _content))  {
             parsed = true;
+        } else if ("/enforceReserveAccess".equals(_url))  {
+            this.enforcereserveaccess = true;
+            parsed = true;
         } else  {
             parsed = super.parse(_paramCache, _url, _content);
         }
@@ -109,6 +115,10 @@ public class Rule_mxJPO
         _out.append("mxUpdate rule \"${NAME}\"  {\n")
             .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n")
             .append("    ").append(this.isHidden() ? "" : "!").append("hidden\n");
+        // enforcereserveaccess flag (if supported)
+        if (_paramCache.getValueBoolean(ValueKeys.DMRuleSupportsEnforceReserveAccess))  {
+            _out.append("    ").append(this.enforcereserveaccess ? "" : "!").append("enforcereserveaccess\n");
+        }
 
         this.accessList.write(_paramCache, "    ", _out);
         this.getProperties().writeProperties(_paramCache, _out, "  ");
@@ -188,6 +198,9 @@ public class Rule_mxJPO
     {
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description", _target.getDescription(),   this.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      _target.isHidden(),         this.isHidden());
+        if (_paramCache.getValueBoolean(ValueKeys.DMRuleSupportsEnforceReserveAccess))  {
+            DeltaUtil_mxJPO.calcFlagDelta(_mql, "enforcereserveaccess", _target.enforcereserveaccess, this.enforcereserveaccess);
+        }
 
         _target.accessList.cleanup(_mql);
         _target.accessList.update(_mql);

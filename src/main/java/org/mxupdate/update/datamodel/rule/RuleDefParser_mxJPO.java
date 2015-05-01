@@ -36,6 +36,8 @@ public class RuleDefParser_mxJPO
       case DESCRIPTION:
       case HIDDEN_TRUE:
       case HIDDEN_FALSE:
+      case ENFORCERESERVEACCESS_TRUE:
+      case ENFORCERESERVEACCESS_FALSE:
       case PROPERTY:{
         ;
         break;
@@ -73,6 +75,16 @@ this.setValue(_rule, "hidden",       true);
       case HIDDEN_FALSE:{
         jj_consume_token(HIDDEN_FALSE);
 this.setValue(_rule, "hidden",       false);
+        break;
+        }
+      case ENFORCERESERVEACCESS_TRUE:{
+        jj_consume_token(ENFORCERESERVEACCESS_TRUE);
+this.setValue(_rule, "enforcereserveaccess", true);
+        break;
+        }
+      case ENFORCERESERVEACCESS_FALSE:{
+        jj_consume_token(ENFORCERESERVEACCESS_FALSE);
+this.setValue(_rule, "enforcereserveaccess", false);
         break;
         }
       case PROPERTY:{
@@ -543,13 +555,13 @@ this.getField(_access, "key").set(key);
       jj_la1_init_2();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x1e0,0x0,0x0,0x600,0x0,0x0,0x0,0x600,0x1e0,0xc000000,0xc0300000,0xc000000,0x0,0x0,0xc0300000,};
+      jj_la1_0 = new int[] {0x7e0,0x0,0x0,0x1800,0x0,0x0,0x0,0x1800,0x7e0,0x30000000,0xc00000,0x30000000,0x0,0x0,0xc00000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x3fffffff,0x0,0x0,0x0,0x3fffffff,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xffffffff,0x0,0x0,0x0,0xffffffff,};
    }
    private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x0,0xc,0xc,0x0,0xc,0xc00,0xc,0x0,0x0,0x0,0x0,0x0,0xc,0xc,0x0,};
+      jj_la1_2 = new int[] {0x0,0x30,0x30,0x0,0x30,0x3000,0x30,0x0,0x0,0x0,0x0,0x0,0x30,0x30,0x0,};
    }
 
   /** Constructor with InputStream. */
@@ -674,7 +686,7 @@ this.getField(_access, "key").set(key);
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[78];
+    boolean[] la1tokens = new boolean[80];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -694,7 +706,7 @@ this.getField(_access, "key").set(key);
         }
       }
     }
-    for (int i = 0; i < 78; i++) {
+    for (int i = 0; i < 80; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
