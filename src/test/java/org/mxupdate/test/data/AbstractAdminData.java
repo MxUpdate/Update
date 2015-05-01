@@ -16,7 +16,6 @@
 package org.mxupdate.test.data;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +26,7 @@ import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.util.FlagList;
 import org.mxupdate.test.data.util.FlagList.Create;
+import org.mxupdate.test.data.util.KeyValueList;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.data.util.PropertyDefList;
 import org.testng.Assert;
@@ -55,7 +55,8 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
 
     /** Defines flags for this data piece. */
     private final FlagList flags = new FlagList();
-
+    /** All properties for this data piece. */
+    private final KeyValueList keyValues = new KeyValueList();
     /** All properties for this data piece. */
     private final PropertyDefList properties = new PropertyDefList();
 
@@ -112,24 +113,24 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     /**
      * Defines the flag and the value.
      *
-     * @param _key          key (name) of the flag
+     * @param _tag          tag (name) of the flag
      * @param _value        <i>true</i> to activate the flag; otherwise
      *                      <i>false</i>; to undefine set to {@code null}
      * @return this data instance
      * @see #flags
      */
     @SuppressWarnings("unchecked")
-    public DATA setFlag(final String _key,
+    public DATA setFlag(final String _tag,
                         final Boolean _value)
     {
-        this.flags.setFlag(_key, _value);
+        this.flags.setFlag(_tag, _value);
         return (DATA) this;
     }
 
     /**
      * Defines the flag and the value.
      *
-     * @param _key          key (name) of the flag
+     * @param _tag          tag (name) of the flag
      * @param _value        <i>true</i> to activate the flag; otherwise
      *                      <i>false</i>; to undefine set to {@code null}
      * @param _createConf   create configuration
@@ -137,11 +138,11 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
      * @see #flags
      */
     @SuppressWarnings("unchecked")
-    public DATA setFlag(final String _key,
+    public DATA setFlag(final String _tag,
                         final Boolean _value,
                         final Create _createConf)
     {
-        this.flags.setFlag(_key, _value, _createConf);
+        this.flags.setFlag(_tag, _value, _createConf);
         return (DATA) this;
     }
 
@@ -156,6 +157,23 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     }
 
     /**
+     * Defines key / value for given {@code _tag}.
+     *
+     * @param _tag          used tag (name) of the flag
+     * @param _key          key
+     * @param _value        value
+     * @return this data instance
+     */
+    @SuppressWarnings("unchecked")
+    public DATA setKeyValue(final String _tag,
+                            final String _key,
+                            final String _value)
+    {
+        this.keyValues.addKeyValue(_tag, _key, _value);
+        return (DATA) this;
+    }
+
+    /**
      * Assigns <code>_property</code> to this data piece.
      *
      * @param _property     property to add / assign
@@ -165,7 +183,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     @SuppressWarnings("unchecked")
     public DATA addProperty(final PropertyDef _property)
     {
-        this.properties.add(_property);
+        this.properties.addProperty(_property);
         return (DATA) this;
     }
 
@@ -201,6 +219,57 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     public List<String> getCILines()
     {
         return this.ciLines;
+    }
+
+    /**
+     * Returns the content for the configuration item update file for this
+     * admin data instance.
+     *
+     * @return configuration item update file
+     */
+    @Override()
+    public String ciFile()
+    {
+        final StringBuilder strg = new StringBuilder();
+        this.append4CIFileHeader(strg);
+        strg.append("mxUpdate " + this.getCI().getMxType() + " \"${NAME}\" {\n");
+
+        this.flags      .append4Update("    ", strg);
+        this.getValues().append4Update("    ", strg);
+        this.keyValues  .append4Update("    ", strg);
+        this.properties .append4Update("    ", strg);
+        for (final String ciLine : this.getCILines())  {
+            strg.append("    ").append(ciLine).append('\n');
+        }
+        strg.append("}");
+
+        return strg.toString();
+    }
+
+    /**
+     * Creates this data piece.
+     *
+     * @return this admin data instance
+     * @throws MatrixException if create failed
+     */
+    @Override()
+    @SuppressWarnings("unchecked")
+    public DATA create()
+        throws MatrixException
+    {
+        final StringBuilder cmd = new StringBuilder()
+                .append("escape add " + this.getCI().getMxType() + " \"" + AbstractTest.convertMql(this.getName()) + "\"");
+
+        this.append4Create(cmd);
+
+        cmd.append(";\n")
+           .append("escape add property ").append(this.getSymbolicName())
+           .append(" on program eServiceSchemaVariableMapping.tcl")
+           .append(" to " + this.getCI().getMxType() + " \"").append(AbstractTest.convertMql(this.getName())).append("\"");
+
+        this.getTest().mql(cmd);
+
+        return (DATA) this;
     }
 
     /**
@@ -244,31 +313,6 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     @Deprecated()
     protected void append4CIFileValues(final StringBuilder _cmd)
     {
-        // append flags
-        this.flags.append4CIFileValues("    ", _cmd, "\n");
-        // append values
-        this.getValues().appendUpdate("    ", _cmd);
-
-        // check for add values
-        final Set<String> needAdds = new HashSet<String>();
-        this.evalAdds4CheckExport(needAdds);
-        for (final String needAdd : needAdds)  {
-            _cmd.append(" add ").append(needAdd);
-        }
-        // properties
-        for (final PropertyDef property : this.getProperties())  {
-            _cmd.append(" property \"").append(AbstractTest.convertTcl(property.getName())).append("\"");
-            if (property.getTo() != null)  {
-                _cmd.append(" to ").append(property.getTo().getCI().getMxType()).append(" \"")
-                    .append(AbstractTest.convertTcl(property.getTo().getName())).append("\"");
-                if (property.getTo().getCI() == AbstractTest.CI.UI_TABLE)  {
-                    _cmd.append(" system");
-                }
-            }
-            if (property.getValue() != null)  {
-                _cmd.append(" value \"").append(AbstractTest.convertTcl(property.getValue())).append("\"");
-            }
-        }
     }
 
     /**
@@ -284,8 +328,8 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     protected void append4Create(final StringBuilder _cmd)
         throws MatrixException
     {
-        // flags
-        this.flags.append4Create(_cmd);
+        this.flags      .append4Create(_cmd);
+        this.keyValues  .append4Create(_cmd);
 
         // values
         for (final Map.Entry<String,String> entry : this.getValues().entrySet())  {
@@ -305,48 +349,17 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        super.checkExport(_exportParser);
-        this.properties.checkExportPropertiesAddFormat(_exportParser, this.getCI());
-        Assert.assertEquals(_exportParser.getSymbolicName(), this.getSymbolicName(), "check symbolic name");
-
-        // check for defined values
-        this.getValues().checkExport(_exportParser);
-
-        // check for defined flags
-        this.getFlags().checkExport(_exportParser, "/" + this.getCI().getUrlTag() + "/", this.getCI().getMxType() + " " + this.getName());
-
-        // check for add values
-        final Set<String> needAdds = new HashSet<String>();
-        this.evalAdds4CheckExport(needAdds);
-        final List<String> foundAdds = _exportParser.getLines("/mql/add/@value");
+        // check symbolic name
         Assert.assertEquals(
-                foundAdds.size(),
-                needAdds.size(),
-                "all adds defined (found adds = " + foundAdds + "; need adds = " + needAdds + ")");
-        for (final String foundAdd : foundAdds)  {
-            Assert.assertTrue(needAdds.contains(foundAdd), "check that add '" + foundAdd + "' is defined (found adds = " + foundAdds + "; need adds = " + needAdds + ")");
-        }
+                _exportParser.getSymbolicName(),
+                this.getSymbolicName(),
+                "check symbolic name");
 
-        // check hidden flag
-        if (this.getCI() != null)  {
-            final Set<String> main = new HashSet<String>(_exportParser.getLines("/mql/"));
-            if ((this.getFlags().getValue("hidden") != null) && this.getFlags().getValue("hidden"))  {
-                Assert.assertTrue(
-                        main.contains("hidden") || main.contains("hidden \\"),
-                        "check that " + this.getCI().getMxType() + " '" + this.getName() + "' is hidden");
-                Assert.assertTrue(
-                        !main.contains("!hidden") && !main.contains("!hidden \\"),
-                        "check that " + this.getCI().getMxType() + " '" + this.getName() + "' is hidden");
-            } else  {
-                Assert.assertTrue(
-                        !main.contains("hidden") && !main.contains("hidden \\"),
-                        "check that " + this.getCI().getMxType() + " '" + this.getName() + "' is hidden");
-// not required... especially for UI elements..
-//                Assert.assertTrue(
-//                        main.contains("!hidden") || main.contains("!hidden \\"),
-//                        "check that " + this.getCI().getMxType() + " '" + this.getName() + "' is hidden");
-            }
-        }
+        this.getValues() .check4Export(_exportParser, "");
+        this.getSingles().check4Export(_exportParser, "");
+        this.flags       .check4Export(_exportParser, "");
+        this.keyValues   .check4Export(_exportParser, "");
+        this.properties  .check4Export(_exportParser, "");
     }
 
     /**

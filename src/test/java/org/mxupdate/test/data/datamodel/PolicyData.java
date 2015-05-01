@@ -199,10 +199,10 @@ public class PolicyData
         strg.append("mxUpdate policy \"${NAME}\" {\n")
             .append("    hidden \"").append(this.getFlags().getValue("hidden") != null ? this.getFlags().getValue("hidden") : false).append("\"\n");
 
-        this.getValues()    .appendUpdate("    ", strg);
-        this.getSingles()   .appendUpdate("    ", strg);
-        this.getFlags()     .appendUpdate("    ", strg);
-        this.getProperties().appendUpdate("    ", strg);
+        this.getValues()    .append4Update("    ", strg);
+        this.getSingles()   .append4Update("    ", strg);
+        this.getFlags()     .append4Update("    ", strg);
+        this.getProperties().append4Update("    ", strg);
 
         // type definition
         if (this.allTypes)  {
@@ -365,9 +365,9 @@ public class PolicyData
                 this.getSymbolicName(),
                 "check symbolic name");
 
-        this.getValues()    .checkExport(_exportParser, "");
-        this.getSingles()   .checkExport(_exportParser, "");
-        this.getValues()    .checkExport(_exportParser, "");
+        this.getValues()    .check4Export(_exportParser, "");
+        this.getSingles()   .check4Export(_exportParser, "");
+        this.getValues()    .check4Export(_exportParser, "");
         this.getProperties().checkExport(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/property/@value"));
 
         // check for types
@@ -608,7 +608,7 @@ public class PolicyData
                 _cmd.append("        ");
                 accessFilter.append4CIFile(_cmd);
             }
-            this.getFlags().append4CIFileValues("        ", _cmd, "\n");
+            this.getFlags().append4Update("        ", _cmd);
             for (final Map.Entry<String,Object> value : this.getValues().entrySet())  {
                 _cmd.append("        ").append(value.getKey()).append(" \"").append(AbstractTest.convertUpdate(value.getValue().toString())).append("\"\n");
             }
@@ -616,7 +616,7 @@ public class PolicyData
             {
                 signature.append4CIFile(_cmd);
             }
-            this.properties.appendUpdate("        ", _cmd);
+            this.properties.append4Update("        ", _cmd);
             _cmd.append("    }\n");
         }
 
@@ -684,7 +684,7 @@ public class PolicyData
                     }
                 }
             }
-            this.properties.appendUpdate(" state", _cmd);
+            this.properties.append4Update(" state", _cmd);
         }
 
         /**
@@ -752,7 +752,7 @@ public class PolicyData
          */
         public State addProperty(final PropertyDef _property)
         {
-            this.properties.add(_property);
+            this.properties.addProperty(_property);
             return this;
         }
 

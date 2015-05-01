@@ -63,8 +63,8 @@ public class DimensionData
 
         strg.append("mxUpdate dimension \"${NAME}\" {\n");
 
-        this.getValues().appendUpdate("    ", strg);
-        this.getFlags().appendUpdate("    ", strg);
+        this.getValues().append4Update("    ", strg);
+        this.getFlags().append4Update("    ", strg);
 
         for (final UnitData unit : this.units)
         {
@@ -72,7 +72,7 @@ public class DimensionData
         }
 
         // append properties
-        this.getProperties().appendUpdate("    ", strg);
+        this.getProperties().append4Update("    ", strg);
 
         strg.append("}");
 
@@ -147,9 +147,9 @@ public class DimensionData
             unit.checkExport(_exportParser);
         }
 
-        this.getValues()    .checkExport(_exportParser, "");
-        this.getSingles()   .checkExport(_exportParser, "");
-        this.getFlags()     .checkExport(_exportParser, "");
+        this.getValues()    .check4Export(_exportParser, "");
+        this.getSingles()   .check4Export(_exportParser, "");
+        this.getFlags()     .check4Export(_exportParser, "");
         this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
     }
 
@@ -283,7 +283,7 @@ public class DimensionData
          */
         public UnitData addProperty(final PropertyDef _property)
         {
-            this.properties.add(_property);
+            this.properties.addProperty(_property);
             return this;
         }
 
@@ -302,7 +302,7 @@ public class DimensionData
                 _cmd.append("        ").append(value.getKey()).append(" ").append(AbstractTest.convertUpdate(value.getValue())).append("\n");
             }
 
-            this.properties.appendUpdate("        ", _cmd);
+            this.properties.append4Update("        ", _cmd);
 
             _cmd.append("  }\n");
         }

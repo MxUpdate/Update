@@ -82,13 +82,13 @@ public class TypeData
         this.append4CIFileHeader(strg);
         strg.append("mxUpdate type \"${NAME}\" {\n");
 
-        this.getFlags()     .appendUpdate("    ", strg);
-        this.getValues()    .appendUpdate("    ", strg);
-        this.getSingles()   .appendUpdate("    ", strg);
+        this.getFlags()     .append4Update("    ", strg);
+        this.getValues()    .append4Update("    ", strg);
+        this.getSingles()   .append4Update("    ", strg);
         this.getTriggers()  .appendUpdate("    ", strg);
-        this.methods        .appendUpdate("    ", strg);
-        this.attributes     .appendUpdate("    ", strg);
-        this.getProperties().appendUpdate("    ", strg);
+        this.methods        .append4Update("    ", strg);
+        this.attributes     .append4Update("    ", strg);
+        this.getProperties().append4Update("    ", strg);
 
         strg.append("}");
 
@@ -139,12 +139,12 @@ public class TypeData
                 this.getSymbolicName(),
                 "check symbolic name");
 
-        this.getFlags()     .checkExport(_exportParser, "");
-        this.getValues()    .checkExport(_exportParser, "");
-        this.getSingles()   .checkExport(_exportParser, "");
+        this.getFlags()     .check4Export(_exportParser, "");
+        this.getValues()    .check4Export(_exportParser, "");
+        this.getSingles()   .check4Export(_exportParser, "");
         this.getTriggers()  .checkExport(_exportParser, "");
-        this.methods        .checkExport(_exportParser, "");
-        this.attributes     .checkExport(_exportParser, "");
+        this.methods        .check4Export(_exportParser, "");
+        this.attributes     .check4Export(_exportParser, "");
         this.getProperties().checkExport(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/property/@value"));
     }
 }

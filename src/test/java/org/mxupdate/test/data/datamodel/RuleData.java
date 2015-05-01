@@ -78,15 +78,15 @@ public class RuleData
         this.append4CIFileHeader(strg);
         strg.append("mxUpdate rule \"${NAME}\" {\n");
 
-        this.getFlags().appendUpdate("    ", strg);
-        this.getValues().appendUpdate("    ", strg);
+        this.getFlags().append4Update("    ", strg);
+        this.getValues().append4Update("    ", strg);
 
         for (final Access access : this.accessList)  {
             strg.append("   ");
             access.append4CIFile(strg);
         }
 
-        this.getProperties().appendUpdate("    ", strg);
+        this.getProperties().append4Update("    ", strg);
         for (final String ciLine : this.getCILines())  {
             strg.append("    ").append(ciLine).append('\n');
         }
@@ -155,8 +155,8 @@ public class RuleData
                 this.getSymbolicName(),
                 "check symbolic name");
 
-        this.getFlags().checkExport(_exportParser, "");
-        this.getValues().checkExport(_exportParser, "");
+        this.getFlags().check4Export(_exportParser, "");
+        this.getValues().check4Export(_exportParser, "");
         this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
 
         // access filter

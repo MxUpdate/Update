@@ -100,7 +100,6 @@ public class RelationshipData
      */
     public RelationshipData setRule(final RuleData _rule)
     {
-        this.rules.clear();
         this.rules.add(_rule);
         return this;
     }
@@ -117,15 +116,15 @@ public class RelationshipData
         this.append4CIFileHeader(strg);
         strg.append("mxUpdate relationship \"${NAME}\" {\n");
 
-        this.getFlags()     .appendUpdate("    ", strg);
-        this.getValues()    .appendUpdate("    ", strg);
-        this.getSingles()   .appendUpdate("    ", strg);
+        this.getFlags()     .append4Update("    ", strg);
+        this.getValues()    .append4Update("    ", strg);
+        this.getSingles()   .append4Update("    ", strg);
         this.getTriggers()  .appendUpdate("    ", strg);
-        this.rules          .appendUpdate("    ", strg);
+        this.rules          .append4Update("    ", strg);
         this.from           .appendUpdate(strg);
         this.to             .appendUpdate(strg);
-        this.attributes     .appendUpdate("    ", strg);
-        this.getProperties().appendUpdate("    ", strg);
+        this.attributes     .append4Update("    ", strg);
+        this.getProperties().append4Update("    ", strg);
 
         strg.append("}");
 
@@ -210,14 +209,14 @@ public class RelationshipData
                 this.getSymbolicName(),
                 "check symbolic name");
 
-        this.getFlags()     .checkExport(_exportParser, "");
-        this.getValues()    .checkExport(_exportParser, "");
-        this.getSingles()   .checkExport(_exportParser, "");
+        this.getFlags()     .check4Export(_exportParser, "");
+        this.getValues()    .check4Export(_exportParser, "");
+        this.getSingles()   .check4Export(_exportParser, "");
         this.getTriggers()  .checkExport(_exportParser, "");
         this.from           .checkExport(_exportParser);
         this.to             .checkExport(_exportParser);
-        this.attributes     .checkExport(_exportParser, "");
-        this.rules          .checkExport(_exportParser, "");
+        this.attributes     .check4Export(_exportParser, "");
+        this.rules          .check4Export(_exportParser, "");
         this.getProperties().checkExport(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/property/@value"));
     }
 
@@ -408,7 +407,7 @@ public class RelationshipData
         {
             _cmd.append("    ").append(this.side).append(" {\n");
 
-            this.flags.appendUpdate("        ", _cmd);
+            this.flags.append4Update("        ", _cmd);
 
             // meaning
             if (this.meaning != null)  {
@@ -430,8 +429,8 @@ public class RelationshipData
                 _cmd.append("        revision ").append(this.revision.name().toLowerCase()).append("\n");
             }
 
-            this.types.appendUpdate("        ", _cmd);
-            this.relationships.appendUpdate("        ", _cmd);
+            this.types.append4Update("        ", _cmd);
+            this.relationships.append4Update("        ", _cmd);
 
             _cmd.append("    }\n");
         }
@@ -485,9 +484,9 @@ public class RelationshipData
         protected void checkExport(final ExportParser _exportParser)
             throws MatrixException
         {
-            this.flags        .checkExport(_exportParser, this.side);
-            this.types        .checkExport(_exportParser, this.side);
-            this.relationships.checkExport(_exportParser, this.side);
+            this.flags        .check4Export(_exportParser, this.side);
+            this.types        .check4Export(_exportParser, this.side);
+            this.relationships.check4Export(_exportParser, this.side);
 
             _exportParser
                     .checkValue(this.side + "/meaning",      "\"" + StringUtil_mxJPO.convertUpdate(this.meaning) + "\"")

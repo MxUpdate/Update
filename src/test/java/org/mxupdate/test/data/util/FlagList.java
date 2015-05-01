@@ -38,27 +38,27 @@ public class FlagList
     /**
      * Defines new flag with value.
      *
-     * @param _key          key
+     * @param _tag          used tag (name) of the flag
      * @param _value        value
      */
-    public void setFlag(final String _key,
+    public void setFlag(final String _tag,
                         final Boolean _value)
     {
-        this.flags.put(_key, new MutablePair<Boolean,Create>(_value, Create.ViaFlag));
+        this.flags.put(_tag, new MutablePair<Boolean,Create>(_value, Create.ViaFlag));
     }
 
     /**
      * Defines new flag with value.
      *
-     * @param _key          key
+     * @param _tag          used tag (name) of the flag
      * @param _value        value
      * @param _createConf   how the flag must be defined within MQL create
      */
-    public void setFlag(final String _key,
+    public void setFlag(final String _tag,
                         final Boolean _value,
                         final Create _createConf)
     {
-        this.flags.put(_key, new MutablePair<Boolean,Create>(_value, _createConf));
+        this.flags.put(_tag, new MutablePair<Boolean,Create>(_value, _createConf));
     }
 
     /**
@@ -92,8 +92,8 @@ public class FlagList
      * @param _cmd      string builder with the TCL commands of the
      *                  configuration item file
      */
-    public void appendUpdate(final String _prefix,
-                             final StringBuilder _cmd)
+    public void append4Update(final String _prefix,
+                              final StringBuilder _cmd)
     {
         for (final Map.Entry<String,MutablePair<Boolean,Create>> entry : this.flags.entrySet())  {
             if (entry.getValue().getLeft() != null)  {
@@ -102,32 +102,6 @@ public class FlagList
                     _cmd.append('!');
                 }
                 _cmd.append(entry.getKey()).append('\n');
-            }
-        }
-    }
-
-    /**
-     * Appends the defined flags to the TCL code {@code _cmd} of the
-     * configuration item file.
-     *
-     * @param _prefix   prefix in front of the values
-     * @param _cmd      string builder with the TCL commands of the
-     *                  configuration item file
-     * @param _suffix   suffix after the values
-     */
-    @Deprecated()
-    public void append4CIFileValues(final String _prefix,
-                                    final StringBuilder _cmd,
-                                    final String _suffix)
-    {
-        for (final Map.Entry<String,MutablePair<Boolean,Create>> entry : this.flags.entrySet())  {
-            if (entry.getValue().getLeft() != null)  {
-                _cmd.append(_prefix);
-                if (!entry.getValue().getLeft())  {
-                    _cmd.append('!');
-                }
-                _cmd.append(entry.getKey())
-                    .append(_suffix);
             }
         }
     }
@@ -188,8 +162,8 @@ public class FlagList
      * @param _parentLine   parent line where the flags must be defined
      * @param _errorLabel   label used for shown error
      */
-    public void checkExport(final ExportParser _exportParser,
-                            final String _path)
+    public void check4Export(final ExportParser _exportParser,
+                             final String _path)
     {
         for (final Map.Entry<String,MutablePair<Boolean,Create>> flag : this.flags.entrySet())  {
             _exportParser.checkFlag((_path.isEmpty() ? "" : _path + "/") + flag.getKey(), flag.getValue().getLeft());

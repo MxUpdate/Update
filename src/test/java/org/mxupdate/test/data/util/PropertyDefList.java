@@ -15,6 +15,7 @@
 
 package org.mxupdate.test.data.util;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,8 +23,6 @@ import java.util.Set;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.AbstractTest.CI;
-import org.mxupdate.test.ExportParser;
 import org.testng.Assert;
 
 /**
@@ -32,10 +31,20 @@ import org.testng.Assert;
  * @author The MxUpdate Team
  */
 public class PropertyDefList
-    extends HashSet<PropertyDef>
+    extends AbstractList
 {
-    /** Serial Version UID. */
-    private static final long serialVersionUID = -4233652216452909465L;
+    /** List of all properties */
+    private final List<PropertyDef> properties = new ArrayList<PropertyDef>();
+
+    /**
+     * Assigns {@code _property} to this data piece.
+     *
+     * @param _property     property to add / assign
+     */
+    public void addProperty(final PropertyDef _property)
+    {
+        this.properties.add(_property);
+    }
 
     /**
      * Creates all depending administration objects for given this instance.
@@ -47,13 +56,28 @@ public class PropertyDefList
     public PropertyDefList createDependings()
         throws MatrixException
     {
-        for (final PropertyDef prop : this)  {
+        for (final PropertyDef prop : this.properties)  {
             if (prop.getTo() != null)  {
                 prop.getTo().create();
             }
         }
 
         return this;
+    }
+
+    /**
+     * Appends the complete CI definition in update format.
+     *
+     * @param _prefix   prefix in front of a property definition
+     * @param _str      string builder
+     */
+    @Override
+    public void append4Update(final String _prefix,
+                              final StringBuilder _str)
+    {
+        for (final PropertyDef prop : this.properties)  {
+            _str.append(_prefix).append("property ").append(prop.getCIUpdateFormat()).append('\n');
+        }
     }
 
     /**
@@ -65,7 +89,7 @@ public class PropertyDefList
     public void append4Create(final StringBuilder _cmd)
         throws MatrixException
     {
-        for (final PropertyDef property : this)  {
+        for (final PropertyDef property : this.properties)  {
             _cmd.append(" property \"").append(AbstractTest.convertMql(property.getName())).append("\"");
             if (property.getTo() != null)  {
                 property.getTo().create();
@@ -85,42 +109,6 @@ public class PropertyDefList
      * Checks that all properties within the export file are correct defined
      * and equal to the defined properties of this CI file.
      *
-     * @param _exportParser     parsed export
-     * @deprecated replaced by new format embedded in delta description
-     */
-    @Deprecated()
-    public void checkExportPropertiesAddFormat(final ExportParser _exportParser,
-                                               final CI _ci)
-    {
-        // only if this instance is a configuration item the check is done..
-        if (_ci != null)  {
-            final Set<String> propDefs = new HashSet<String>();
-            for (final ExportParser.Line rootLine : _exportParser.getRootLines())  {
-                if (rootLine.getValue().startsWith("escape add property"))  {
-                    final StringBuilder propDef = new StringBuilder().append("mql ").append(rootLine.getValue());
-                    for (final ExportParser.Line childLine : rootLine.getChildren())  {
-                        propDef.append(' ').append(childLine.getTag()).append(' ')
-                               .append(childLine.getValue());
-                    }
-                    propDefs.add(propDef.toString());
-                }
-            }
-            for (final PropertyDef prop : this)  {
-                final String propDefStr = prop.getCITCLString(_ci);
-                Assert.assertTrue(
-                        propDefs.contains(propDefStr),
-                        "check that property is defined in ci file (have " + propDefStr + ", but found " + propDefs + ")");
-                propDefs.remove(propDefStr);
-            }
-
-            Assert.assertEquals(propDefs.size(), 0, "check that not too much properties are defined (have " + propDefs + ")");
-        }
-    }
-
-    /**
-     * Checks that all properties within the export file are correct defined
-     * and equal to the defined properties of this CI file.
-     *
      * @param _propLines    property lines
      */
     @Deprecated()
@@ -128,7 +116,7 @@ public class PropertyDefList
     {
         final Set<String> propDefs = new HashSet<String>(_propLines);
 
-        for (final PropertyDef prop : this)  {
+        for (final PropertyDef prop : this.properties)  {
             final String propDefStr = prop.getCIUpdateFormat();
             Assert.assertTrue(
                     propDefs.contains(propDefStr),
@@ -137,19 +125,5 @@ public class PropertyDefList
         }
 
         Assert.assertEquals(propDefs.size(), 0, "check that not too much properties are defined (have " + propDefs + ")");
-    }
-
-    /**
-     * Appends the complete CI definition in update format.
-     *
-     * @param _prefix   prefix in front of a property definition
-     * @param _str      string builder
-     */
-    public void appendUpdate(final String _prefix,
-                             final StringBuilder _str)
-    {
-        for (final PropertyDef prop : this)  {
-            _str.append(_prefix).append("property ").append(prop.getCIUpdateFormat()).append('\n');
-        }
     }
 }

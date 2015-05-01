@@ -98,10 +98,10 @@ public class PortalData
         final StringBuilder strg = new StringBuilder();
         this.append4CIFileHeader(strg);
         strg.append("mxUpdate portal \"${NAME}\" {\n");
-        this.getFlags().appendUpdate("    ", strg);
-        this.getValues().appendUpdate("    ", strg);
+        this.getFlags().append4Update("    ", strg);
+        this.getValues().append4Update("    ", strg);
         this.getSettings().appendUpdate("    ", strg, "\n");
-        this.getProperties().appendUpdate("    ", strg);
+        this.getProperties().append4Update("    ", strg);
         for (final String ciLine : this.getCILines())  {
             strg.append("    ").append(ciLine).append('\n');
         }
@@ -199,8 +199,8 @@ public class PortalData
                 this.getSymbolicName(),
                 "check symbolic name");
 
-        this.getFlags().checkExport(_exportParser, "");
-        this.getValues().checkExport(_exportParser, "");
+        this.getFlags().check4Export(_exportParser, "");
+        this.getValues().check4Export(_exportParser, "");
         this.getSettings().checkExport(_exportParser.getLines("/mxUpdate/setting/@value"));
         this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
 

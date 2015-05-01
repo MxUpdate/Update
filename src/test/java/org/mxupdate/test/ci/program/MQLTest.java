@@ -133,11 +133,7 @@ public class MQLTest
             _mqlProgram.getUser().create();
         }
         // create referenced property value
-        for (final PropertyDef prop : _mqlProgram.getProperties())  {
-            if (prop.getTo() != null)  {
-                prop.getTo().create();
-            }
-        }
+        _mqlProgram.getProperties().createDependings();
 
         // first update with original content
         _mqlProgram.update((String) null);

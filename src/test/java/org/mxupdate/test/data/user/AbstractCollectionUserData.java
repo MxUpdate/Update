@@ -73,11 +73,11 @@ public class AbstractCollectionUserData<DATA extends AbstractCollectionUserData<
         this.append4CIFileHeader(strg);
         strg.append("mxUpdate ").append(this.getCI().getMxType()).append(" \"${NAME}\" {\n");
 
-        this.getFlags()     .appendUpdate("    ", strg);
-        this.getValues()    .appendUpdate("    ", strg);
-        this.getSingles()   .appendUpdate("    ", strg);
-        this.getProperties().appendUpdate("    ", strg);
-        this.parents        .appendUpdate("    ", strg);
+        this.getFlags()     .append4Update("    ", strg);
+        this.getValues()    .append4Update("    ", strg);
+        this.getSingles()   .append4Update("    ", strg);
+        this.getProperties().append4Update("    ", strg);
+        this.parents        .append4Update("    ", strg);
 
         strg.append("}");
 
@@ -115,10 +115,10 @@ public class AbstractCollectionUserData<DATA extends AbstractCollectionUserData<
                 this.getSymbolicName(),
                 "check symbolic name");
 
-        this.getFlags()     .checkExport(_exportParser, "");
-        this.getValues()    .checkExport(_exportParser, "");
-        this.getSingles()   .checkExport(_exportParser, "");
-        this.parents        .checkExport(_exportParser, "");
+        this.getFlags()     .check4Export(_exportParser, "");
+        this.getValues()    .check4Export(_exportParser, "");
+        this.getSingles()   .check4Export(_exportParser, "");
+        this.parents        .check4Export(_exportParser, "");
         this.getProperties().checkExport(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/property/@value"));
     }
 }

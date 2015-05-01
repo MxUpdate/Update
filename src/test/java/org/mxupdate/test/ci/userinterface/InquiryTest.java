@@ -18,7 +18,9 @@ package org.mxupdate.test.ci.userinterface;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.userinterface.InquiryData;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -48,39 +50,52 @@ public class InquiryTest
                              .setValue("description", "test description")
                              .setValue("pattern", "${ID}|*")
                              .setValue("format", "${ID}")
-                             .setArgument("TYPE", "MY_TYPE")
-                             .setArgument("NAME", "MY_NAME")
-                             .setArgument("REVISION", "MY_REVISION")
-                             .setCode("print bus '${TYPE}' '${NAME}' '${REVISION}' select id dump")},
+                             .setKeyValue("argument", "TYPE", "MY_TYPE")
+                             .setKeyValue("argument", "NAME", "MY_NAME")
+                             .setKeyValue("argument", "REVISION", "MY_REVISION")},
                 new Object[]{
                         "complex inquiry with all values and one argument",
                         new InquiryData(this, "Test3 \" test")
                              .setValue("description", "test description \" '")
                              .setValue("pattern", "patternprefix \" patternsuffix")
                              .setValue("format", "formatprefix \" formatsuffix")
-                             .setArgument("ARGUMENT \" ARGSUFFIX", "argumentprefix \" argumentsuffix")
-                             .setCode("print bus '${TYPE}' '${NAME}' '${REVISION}' select id dump")});
+                             .setKeyValue("argument", "ARGUMENT \" ARGSUFFIX", "argumentprefix \" argumentsuffix")}
+        );
     }
 
     /**
-     * Cleanup all test inquiries.
+     * Positive test for update of code.
      *
-     * @throws MatrixException if cleanup failed
+     * @throws Exception if test failed
      */
+    @Test(description = "positive test for update of code")
+    public void positiveTestCodeUpdate()
+        throws Exception
+    {
+        final String code = "print bus '${TYPE}' '${NAME}' '${REVISION}' select id dump";
+
+        final InquiryData inquiry = new InquiryData(this, "Test").setValue("code", code).update("");
+
+        Assert.assertEquals(code, this.mql("print inquiry " + inquiry.getName() + " select code dump"));
+
+        final ExportParser exportParser = inquiry.export();
+
+        // remove code and update via export
+        this.mql("mod inquiry " + inquiry.getName() + " code ''");
+        inquiry.updateWithCode(exportParser.getCode(), "");
+
+        // and check result (so that the export of code is also checked!)
+        Assert.assertEquals(code, this.mql("print inquiry " + inquiry.getName() + " select code dump"));
+    }
+
     @BeforeMethod()
-    @AfterClass()
+    @AfterClass(groups = "close")
     public void cleanup()
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.UI_INQUIRY);
     }
 
-    /**
-     * Creates for given <code>_name</code> a new inquiry instance.
-     *
-     * @param _name     name of the inquiry instance
-     * @return inquiry instance
-     */
     @Override()
     protected InquiryData createNewData(final String _name)
     {

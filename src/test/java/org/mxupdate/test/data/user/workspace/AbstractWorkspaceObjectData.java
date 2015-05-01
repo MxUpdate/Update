@@ -26,7 +26,6 @@ import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.user.AbstractUserData;
-import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.Assert;
 
 /**
@@ -253,7 +252,7 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
                             "check that all visible users are defined");
 
         // check properties
-        final Set<String> foundProps = new HashSet<String>(_exportParser.getLines("/mql/property/@value"));
+/*        final Set<String> foundProps = new HashSet<String>(_exportParser.getLines("/mql/property/@value"));
         for (final PropertyDef property : this.getProperties())  {
             final StringBuilder key = new StringBuilder()
                     .append("\"").append(AbstractTest.convertTcl(property.getName())).append("\"");
@@ -266,6 +265,6 @@ abstract class AbstractWorkspaceObjectData<DATA extends AbstractWorkspaceObjectD
             }
             foundProps.remove(key.toString());
         }
-        Assert.assertTrue(foundProps.isEmpty(), "check that all properties are defined");
+        Assert.assertTrue(foundProps.isEmpty(), "check that all properties are defined");*/
     }
 }

@@ -85,14 +85,20 @@ public abstract class AbstractParserTest<DATA extends AbstractAdminObject_mxJPO<
         String oldDef = oldDefBuilder.toString();
         while (length != oldDef.length())  {
             length = oldDef.length();
-            oldDef = oldDef.replaceAll("    ", " ").replaceAll("  ", " ");
+            oldDef = oldDef.replaceAll("  ", " ");
         }
 
         final String startIndex = "mxUpdate " + data.getTypeDef().getMxAdminName() + " \"${NAME}\" {";
         final String temp = generated.substring(generated.indexOf(startIndex) + startIndex.length() + 1, generated.length() - 2).toString();
-        final StringBuilder newDef = new StringBuilder();
+        final StringBuilder newDefBuilder = new StringBuilder();
         for (final String line : temp.split("\n"))  {
-            newDef.append(line.trim()).append(' ');
+            newDefBuilder.append(line.trim()).append(' ');
+        }
+        length = 0;
+        String newDef = newDefBuilder.toString();
+        while (length != newDef.length())  {
+            length = newDef.length();
+            newDef = newDef.replaceAll("  ", " ");
         }
 
         Assert.assertEquals(newDef.toString().trim(), oldDef.trim());

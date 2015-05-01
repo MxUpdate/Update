@@ -203,11 +203,11 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
 
         strg.append("mxUpdate attribute \"${NAME}\" {\n");
 
-        this.getFlags()     .appendUpdate("    ", strg);
-        this.getValues()    .appendUpdate("    ", strg);
-        this.getSingles()   .appendUpdate("    ", strg);
+        this.getFlags()     .append4Update("    ", strg);
+        this.getValues()    .append4Update("    ", strg);
+        this.getSingles()   .append4Update("    ", strg);
         this.getTriggers()  .appendUpdate("    ", strg);
-        this.getProperties().appendUpdate("    ", strg);
+        this.getProperties().append4Update("    ", strg);
 
         // append rule
         if (this.rule != null) {
@@ -242,8 +242,8 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        this.getValues()    .checkExport(_exportParser, "");
-        this.getFlags()     .checkExport(_exportParser, "");
+        this.getValues()    .check4Export(_exportParser, "");
+        this.getFlags()     .check4Export(_exportParser, "");
         this.getTriggers()  .checkExport(_exportParser, "");
         this.getProperties().checkExport(_exportParser.getLines("/" + this.getCI().getUrlTag() + "/property/@value"));
 

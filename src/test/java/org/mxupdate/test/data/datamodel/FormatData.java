@@ -135,9 +135,9 @@ public class FormatData
         strg.append("mxUpdate format \"${NAME}\" {\n");
 
         // append flags
-        this.getFlags().appendUpdate("  ", strg);
+        this.getFlags().append4Update("  ", strg);
         // append values
-        this.getValues().appendUpdate("  ", strg);
+        this.getValues().append4Update("  ", strg);
 
         if (this.viewProgram != null)  {
             strg.append(" view \"").append(AbstractTest.convertUpdate(this.viewProgram.getName())).append("\"\n");
@@ -150,7 +150,7 @@ public class FormatData
         }
 
         // append properties
-        this.getProperties().appendUpdate("  ", strg);
+        this.getProperties().append4Update("  ", strg);
 
         strg.append("}");
 
@@ -235,9 +235,9 @@ public class FormatData
         throws MatrixException
     {
         // check for defined values
-        this.getValues().checkExport(_exportParser, "");
+        this.getValues().check4Export(_exportParser, "");
         // check for defined flags
-        this.getFlags().checkExport(_exportParser, "");
+        this.getFlags().check4Export(_exportParser, "");
         // check for properties
         this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
 

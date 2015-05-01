@@ -16,8 +16,10 @@
 package org.mxupdate.test.data.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -27,7 +29,6 @@ import matrix.util.MatrixException;
 import org.apache.commons.lang3.StringUtils;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.AbstractTest.CI;
-import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractData;
 
 /**
@@ -37,15 +38,16 @@ import org.mxupdate.test.data.AbstractData;
  * @param <DATA>
  */
 public class DataList<DATA extends AbstractData<?>>
-    extends ArrayList<DATA>
+    extends AbstractList
 {
-    /** Dummy serial UID. */
-    private static final long serialVersionUID = 1L;
     /** Prefix used for update. */
     private final String prefix4Update;
     /** Prefix used for create. */
     private final String prefix4Create;
     private final boolean appendMxType;
+
+    /** Data list. */
+    private final List<DATA> list = new ArrayList<DATA>();
 
     /** All flag */
     private final Set<CI> alls = new HashSet<CI>();
@@ -74,6 +76,26 @@ public class DataList<DATA extends AbstractData<?>>
     }
 
     /**
+     * Appends {@code _elem}.
+     *
+     * @param _elem     element to append
+     */
+    public void add(final DATA _elem)
+    {
+        this.list.add(_elem);
+    }
+
+    /**
+     * Appends {@code _elems}.
+     *
+     * @param _elems    elements to append
+     */
+    public void addAll(final Collection<DATA> _elems)
+    {
+        this.list.addAll(_elems);
+    }
+
+    /**
      * Defines the {@link #alls}.
      *
      * @param _ci   CI for which all must be defined
@@ -99,13 +121,14 @@ public class DataList<DATA extends AbstractData<?>>
      * @param _prefix   prefix
      * @param _cmd      string builder to append
      */
-    public void appendUpdate(final String _prefix,
-                             final StringBuilder _cmd)
+    @Override()
+    public void append4Update(final String _prefix,
+                              final StringBuilder _cmd)
     {
         for (final CI ci: this.alls)  {
             _cmd.append(_prefix).append(this.prefix4Update).append(this.appendMxType ? ci.getMxType() : "").append(" all\n");
         }
-        for (final DATA data : this)  {
+        for (final DATA data : this.list)  {
             _cmd.append(_prefix).append(this.prefix4Update).append(this.appendMxType ? data.getCI().getMxType(): "")
                 .append(" \"").append(AbstractTest.convertUpdate(data.getName())).append("\"\n");
         }
@@ -121,10 +144,10 @@ public class DataList<DATA extends AbstractData<?>>
         for (final CI ci: this.alls)  {
             _cmd.append(' ').append(this.prefix4Create).append(this.appendMxType ? ci.getMxType() : "").append(" all");
         }
-        if (!this.isEmpty())  {
+        if (!this.list.isEmpty())  {
             // sort all data elements by MX type
             final Map<String,Set<String>> dataElems = new HashMap<String,Set<String>>();
-            for (final DATA data : this)  {
+            for (final DATA data : this.list)  {
                 if (!dataElems.containsKey(data.getCI().getMxType()))  {
                     dataElems.put(data.getCI().getMxType(), new HashSet<String>());
                 }
@@ -145,7 +168,7 @@ public class DataList<DATA extends AbstractData<?>>
      */
     public void append4CreateViaAdd(final StringBuilder _cmd)
     {
-        for (final DATA data : this)  {
+        for (final DATA data : this.list)  {
             _cmd.append(" add ").append(this.prefix4Create).append(this.appendMxType ? data.getCI().getMxType() : "").append(" \"").append(data.getName()).append('\"');
         }
     }
@@ -158,38 +181,8 @@ public class DataList<DATA extends AbstractData<?>>
     public void createDependings()
         throws MatrixException
     {
-        for (final DATA data : this)  {
+        for (final DATA data : this.list)  {
             data.create();
-        }
-    }
-
-    /**
-     * Checks for all defined flags.
-     *
-     * @param _parentLine   parent line where the flags must be defined
-     * @param _errorLabel   label used for shown error
-     */
-    public void checkExport(final ExportParser _exportParser,
-                            final String _path)
-    {
-        final StringBuilder ciFile = new StringBuilder();
-        this.appendUpdate("", ciFile);
-
-        if (!ciFile.toString().trim().isEmpty())  {
-            final Map<String,Set<String>> allChecks = new HashMap<String,Set<String>>();
-            for (final String line : ciFile.toString().split("\n"))  {
-                final int idx = line.indexOf(' ');
-                final String key   = line.substring(0, idx).trim();
-                final String value = line.substring(idx).trim();
-                if (!allChecks.containsKey(key))  {
-                    allChecks.put(key, new HashSet<String>());
-                }
-                allChecks.get(key).add(value);
-            }
-
-            for (final Entry<String,Set<String>> checks : allChecks.entrySet())  {
-                _exportParser.checkList((_path.isEmpty() ? "" : _path + "/") + checks.getKey(), checks.getValue());
-            }
         }
     }
 }

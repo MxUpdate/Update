@@ -80,11 +80,11 @@ public class PackageData
         this.append4CIFileHeader(strg);
         strg.append("mxUpdate package \"${NAME}\" {\n");
 
-        this.getFlags()     .appendUpdate("    ", strg);
-        this.getValues()    .appendUpdate("    ", strg);
-        this.usePackages    .appendUpdate("    ", strg);
-        this.members        .appendUpdate("    ", strg);
-        this.getProperties().appendUpdate("    ", strg);
+        this.getFlags()     .append4Update("    ", strg);
+        this.getValues()    .append4Update("    ", strg);
+        this.usePackages    .append4Update("    ", strg);
+        this.members        .append4Update("    ", strg);
+        this.getProperties().append4Update("    ", strg);
 
         for (final String ciLine : this.getCILines())  {
             strg.append("    ").append(ciLine).append('\n');
@@ -139,10 +139,10 @@ public class PackageData
                 this.getSymbolicName(),
                 "check symbolic name");
 
-        this.getFlags()     .checkExport(_exportParser, "");
-        this.getValues()    .checkExport(_exportParser, "");
+        this.getFlags()     .check4Export(_exportParser, "");
+        this.getValues()    .check4Export(_exportParser, "");
         this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
-        this.usePackages    .checkExport(_exportParser, "");
-        this.members        .checkExport(_exportParser, "");
+        this.usePackages    .check4Export(_exportParser, "");
+        this.members        .check4Export(_exportParser, "");
     }
 }

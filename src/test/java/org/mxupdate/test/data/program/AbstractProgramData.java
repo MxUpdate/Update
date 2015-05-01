@@ -22,7 +22,6 @@ import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.user.AbstractPersonAdminData;
 import org.mxupdate.test.data.user.AbstractUserData;
-import org.mxupdate.test.data.util.PropertyDef;
 import org.testng.Assert;
 
 /**
@@ -410,7 +409,7 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
                                     + AbstractTest.convertMql(this.getName()) + "\" select ispipedprogram dump")).booleanValue(),
                             this.pipe,
                             "pipe flag");
-
+/*
         // check properties
         for (final PropertyDef prop : this.getProperties())  {
             Assert.assertTrue(!"".equals(this.getTest().mql("escape print program \"" + AbstractTest.convertMql(this.getName())
@@ -432,5 +431,6 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
                                     "to of property '" + prop.getName() + "' is not defined");
             }
         }
+*/
     }
 }

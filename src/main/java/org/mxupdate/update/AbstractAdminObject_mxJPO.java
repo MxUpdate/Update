@@ -33,7 +33,6 @@ import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.user.PersonAdmin_mxJPO;
 import org.mxupdate.update.userinterface.Form_mxJPO;
-import org.mxupdate.update.userinterface.Inquiry_mxJPO;
 import org.mxupdate.update.userinterface.Table_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
@@ -572,7 +571,6 @@ final Object tmp = this;
         // (only if not attribute, because attributes and formats uses calulated deltas)
         if ((tmp instanceof PersonAdmin_mxJPO)
                 || (tmp instanceof Form_mxJPO)
-                || (tmp instanceof Inquiry_mxJPO)
                 || (tmp instanceof Table_mxJPO))  {
 
             for (final AdminProperty prop : this.properties.getProperties())  {
@@ -606,7 +604,6 @@ final Object tmp = this;
 
         if ((tmp instanceof PersonAdmin_mxJPO)
                 || (tmp instanceof Form_mxJPO)
-                || (tmp instanceof Inquiry_mxJPO)
                 || (tmp instanceof Table_mxJPO))  {
             // define version property
             postMQLCode.append(_postMQLCode)

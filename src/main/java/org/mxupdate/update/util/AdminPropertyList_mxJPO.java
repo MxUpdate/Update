@@ -27,17 +27,20 @@ import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 
 /**
- *
+ * Handles properties for all kind of admin objects.
  *
  * @author The MxUpdate Team
  */
-public class AdminPropertyList_mxJPO
+public final class AdminPropertyList_mxJPO
 {
     /** Set of all ignored URLs from the XML definition for admin properties.*/
     private static final Set<String> IGNORED_URLS = new HashSet<String>(1);
     static  {
         AdminPropertyList_mxJPO.IGNORED_URLS.add("/property/adminRef");
     }
+
+    /** Tag name used for other properties (e.g. setting, argument, ...).  */
+    private String otherPropTag;
 
     /**
      * Stack of the properties used while parsing the XML definition of the
@@ -50,7 +53,17 @@ public class AdminPropertyList_mxJPO
     /** Properties. */
     private final SortedSet<AdminProperty> properties = new TreeSet<AdminProperty>();
     /** Settings. */
-    private final SortedSet<AdminProperty> settings = new TreeSet<AdminProperty>();
+    private final SortedSet<AdminProperty> otherProps = new TreeSet<AdminProperty>();
+
+    /**
+     * Defines the {@link #otherPropTag name of other property tag}.
+     *
+     * @param _otherPropTag     name of other property tag
+     */
+    public void setOtherPropTag(final String _otherPropTag)
+    {
+        this.otherPropTag = _otherPropTag;
+    }
 
     /**
      * Parsed administration object related XML tags. This includes:
@@ -104,11 +117,15 @@ public class AdminPropertyList_mxJPO
      */
     public void prepare()
     {
-        for (final AdminProperty prop : this.propertiesStack)  {
-            if (prop.isSetting())  {
-                this.settings.add(prop);
-            } else  {
-                this.properties.add(prop);
+        if (this.otherPropTag == null)  {
+            this.properties.addAll(this.propertiesStack);
+        } else  {
+            for (final AdminProperty prop : this.propertiesStack)  {
+                if (prop.isSetting())  {
+                    this.otherProps.add(prop);
+                } else  {
+                    this.properties.add(prop);
+                }
             }
         }
     }
@@ -134,7 +151,7 @@ public class AdminPropertyList_mxJPO
     @Deprecated()
     public SortedSet<AdminProperty> getSettings()
     {
-        return this.settings;
+        return this.otherProps;
     }
 
     /**
@@ -200,11 +217,11 @@ public class AdminPropertyList_mxJPO
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
      */
-    public void writeSettings(final ParameterCache_mxJPO _paramCache,
-                              final UpdateBuilder_mxJPO _updateBuilder)
+    public void writeOtherProps(final ParameterCache_mxJPO _paramCache,
+                                final UpdateBuilder_mxJPO _updateBuilder)
     {
-        for (final AdminProperty prop : this.properties)  {
-            _updateBuilder.stepStartNewLine().stepSingle("setting").stepString(prop.getSettingName()).stepString(prop.getValue()).stepEndLine();
+        for (final AdminProperty prop : this.otherProps)  {
+            _updateBuilder.stepStartNewLine().stepSingle(this.otherPropTag).stepString(prop.getSettingName()).stepString(prop.getValue()).stepEndLine();
         }
     }
 
@@ -216,7 +233,7 @@ public class AdminPropertyList_mxJPO
      * @param _out          appendable instance to the TCL update file
      * @param _typeDef      type definition
      * @throws IOException if the write to the TCL update file failed
-     * @deprecated replaced by {@link #writeSettings(ParameterCache_mxJPO, UpdateBuilder_mxJPO)}
+     * @deprecated replaced by {@link #writeOtherProps(ParameterCache_mxJPO, UpdateBuilder_mxJPO)}
      */
     @Deprecated()
     public void writeSettings(final ParameterCache_mxJPO _paramCache,
@@ -224,11 +241,13 @@ public class AdminPropertyList_mxJPO
                               final String _prefix)
         throws IOException
     {
-        for (final AdminProperty prop : this.settings)  {
-            _out.append(_prefix)
-                .append("setting \"").append(StringUtil_mxJPO.convertUpdate(prop.getSettingName())).append("\"")
-                .append(" \"").append(StringUtil_mxJPO.convertUpdate(prop.getValue())).append('\"')
-                .append('\n');
+        if (this.otherPropTag != null)  {
+            for (final AdminProperty prop : this.otherProps)  {
+                _out.append(_prefix)
+                    .append(this.otherPropTag).append(" \"").append(StringUtil_mxJPO.convertUpdate(prop.getSettingName())).append("\"")
+                    .append(" \"").append(StringUtil_mxJPO.convertUpdate(prop.getValue())).append('\"')
+                    .append('\n');
+            }
         }
     }
 
@@ -288,12 +307,12 @@ public class AdminPropertyList_mxJPO
         // properties / settings must be appended because they can be changed...
         final SortedSet<AdminProperty> thisProps = new TreeSet<AdminProperty>();
         thisProps.addAll(this.properties);
-        thisProps.addAll(this.settings);
+        thisProps.addAll(this.otherProps);
 
         final SortedSet<AdminProperty> currProps = new TreeSet<AdminProperty>();
         if (_currents != null)  {
             currProps.addAll(_currents.properties);
-            currProps.addAll(_currents.settings);
+            currProps.addAll(_currents.otherProps);
         }
 
         // check properties to remove
@@ -307,9 +326,9 @@ public class AdminPropertyList_mxJPO
                     }
                 }
                 if (!found)  {
-                    if (curProp.isSetting())  {
+                    if (curProp.isSetting() && (this.otherPropTag != null))  {
                         _mql.newLine()
-                            .cmd("remove ").cmd(_propPrefix).cmd("setting ").arg(curProp.getSettingName());
+                            .cmd("remove ").cmd(this.otherPropTag).cmd(" ").arg(curProp.getSettingName());
                     } else  {
                         _mql.newLine()
                             .cmd("remove ").cmd(_propPrefix).cmd("property ").arg(curProp.getName());
@@ -336,9 +355,9 @@ public class AdminPropertyList_mxJPO
                 }
             }
             if (!found)  {
-                if (tarProp.isSetting())  {
+                if (tarProp.isSetting() && (this.otherPropTag != null))  {
                     _mql.newLine()
-                        .cmd("add ").cmd(_propPrefix).cmd("setting ").arg(tarProp.getSettingName()).cmd(" ").arg(tarProp.getValue());
+                        .cmd("add ").cmd(this.otherPropTag).cmd(" ").arg(tarProp.getSettingName()).cmd(" ").arg(tarProp.getValue());
                 } else  {
                     _mql.newLine()
                         .cmd("add ").cmd(_propPrefix).cmd("property ").arg(tarProp.getName());
@@ -388,7 +407,7 @@ public class AdminPropertyList_mxJPO
          *
          * @return <i>true</i> if the property is a setting; otherwise <i>false</i>
          */
-        public boolean isSetting()
+        private boolean isSetting()
         {
             return ((this.name != null) && (this.name.charAt(0) == '%'));
         }

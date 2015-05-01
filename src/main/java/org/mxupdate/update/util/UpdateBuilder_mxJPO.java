@@ -289,9 +289,9 @@ public class UpdateBuilder_mxJPO
      * @param _propList property list
      * @return this update builder instance
      */
-    public UpdateBuilder_mxJPO settings(final AdminPropertyList_mxJPO _propList)
+    public UpdateBuilder_mxJPO otherProps(final AdminPropertyList_mxJPO _propList)
     {
-        _propList.writeProperties(this.paramCache, this);
+        _propList.writeOtherProps(this.paramCache, this);
         return this;
     }
 

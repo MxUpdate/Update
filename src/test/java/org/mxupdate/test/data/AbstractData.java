@@ -25,6 +25,7 @@ import java.util.Set;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.AbstractTest.CI;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.util.Version;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
@@ -97,7 +98,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @return configuration item type
      * @see #ci
      */
-    public AbstractTest.CI getCI()
+    public CI getCI()
     {
         return this.ci;
     }
@@ -639,7 +640,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
          * @param _cmd      string builder with the TCL commands of the
          *                  configuration item file
          */
-        public void appendUpdate(final String _prefix,
+        public void append4Update(final String _prefix,
                                  final StringBuilder _cmd)
         {
             for (final Entry<String,String> entry : this.entrySet())  {
@@ -655,7 +656,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
          * @param _exportParser     parsed export
          * @param _path             sub path
          */
-        public void checkExport(final ExportParser _exportParser,
+        public void check4Export(final ExportParser _exportParser,
                                 final String _path)
         {
             for (final Entry<String,String> single : this.entrySet())  {
@@ -681,7 +682,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
          * @param _cmd      string builder with the TCL commands of the
          *                  configuration item file
          */
-        public void appendUpdate(final String _prefix,
+        public void append4Update(final String _prefix,
                                  final StringBuilder _cmd)
         {
             for (final Entry<String,String> entry : this.entrySet())  {
@@ -697,7 +698,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
          * @param _exportParser     parsed export
          * @param _path             sub path
          */
-        public void checkExport(final ExportParser _exportParser,
+        public void check4Export(final ExportParser _exportParser,
                                 final String _path)
         {
             for (final Entry<String,String> entry : this.entrySet())  {

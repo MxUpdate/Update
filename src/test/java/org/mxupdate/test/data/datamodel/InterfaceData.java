@@ -150,13 +150,13 @@ public class InterfaceData
         this.append4CIFileHeader(strg);
         strg.append("mxUpdate interface \"${NAME}\" {\n");
 
-        this.getFlags()     .appendUpdate("    ", strg);
-        this.getValues()    .appendUpdate("    ", strg);
-        this.getSingles()   .appendUpdate("    ", strg);
-        this.attributes     .appendUpdate("    ", strg);
-        this.getProperties().appendUpdate("    ", strg);
-        this.fors           .appendUpdate("    ", strg);
-        this.parents        .appendUpdate("    ", strg);
+        this.getFlags()     .append4Update("    ", strg);
+        this.getValues()    .append4Update("    ", strg);
+        this.getSingles()   .append4Update("    ", strg);
+        this.attributes     .append4Update("    ", strg);
+        this.getProperties().append4Update("    ", strg);
+        this.fors           .append4Update("    ", strg);
+        this.parents        .append4Update("    ", strg);
 
         strg.append("}");
 
@@ -232,11 +232,11 @@ public class InterfaceData
                 this.getSymbolicName(),
                 "check symbolic name");
 
-        this.getFlags()  .checkExport(_exportParser, "");
-        this.getValues() .checkExport(_exportParser, "");
-        this.getSingles().checkExport(_exportParser, "");
-        this.attributes  .checkExport(_exportParser, "");
-        this.fors        .checkExport(_exportParser, "");
-        this.parents     .checkExport(_exportParser, "");
+        this.getFlags()  .check4Export(_exportParser, "");
+        this.getValues() .check4Export(_exportParser, "");
+        this.getSingles().check4Export(_exportParser, "");
+        this.attributes  .check4Export(_exportParser, "");
+        this.fors        .check4Export(_exportParser, "");
+        this.parents     .check4Export(_exportParser, "");
     }
 }

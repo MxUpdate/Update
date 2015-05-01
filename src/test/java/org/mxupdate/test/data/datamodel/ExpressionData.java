@@ -56,9 +56,9 @@ public class ExpressionData
 
         strg.append("mxUpdate expression \"${NAME}\" {\n");
 
-        this.getFlags().appendUpdate("    ", strg);
-        this.getValues().appendUpdate("    ", strg);
-        this.getProperties().appendUpdate("    ", strg);
+        this.getFlags().append4Update("    ", strg);
+        this.getValues().append4Update("    ", strg);
+        this.getProperties().append4Update("    ", strg);
 
         strg.append("}");
 
@@ -98,8 +98,8 @@ public class ExpressionData
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        this.getValues().checkExport(_exportParser, "");
-        this.getFlags().checkExport(_exportParser, "");
+        this.getValues().check4Export(_exportParser, "");
+        this.getFlags().check4Export(_exportParser, "");
         this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
     }
 }
