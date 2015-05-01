@@ -47,6 +47,8 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
  * The class is used to evaluate information from attributes within MX used to
  * export, delete and update an attribute. Following properties are handled:
  * <ul>
+ * <li>{@link #kind}</li>
+ * <li>symbolic names</li>
  * <li>flag &quot;{@link #multiValue multiple value}&quot; (if parameter
  *     {@link ValueKeys#DMAttrSupportsFlagMultiValue} is defined)</li>
  * <li>flag &quot;{@link #resetonclone}&quot; (if parameter
@@ -81,8 +83,6 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     /** Set of all ignored URLs from the XML definition for attributes. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
-        // max length only valid for string attributes!
-        AbstractAttribute_mxJPO.IGNORED_URLS.add("/primitiveType");
         AbstractAttribute_mxJPO.IGNORED_URLS.add("/rangeList");
         AbstractAttribute_mxJPO.IGNORED_URLS.add("/rangeProgram");
         AbstractAttribute_mxJPO.IGNORED_URLS.add("/triggerList");
@@ -109,11 +109,10 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     }
 
     /** Kind of the attribute. */
-    private final Kind kind;
+    private Kind kind;
 
     /** Set holding all rules referencing this attribute. */
     private final  SortedSet<String> rules = new TreeSet<String>();
-
 
     /**
      * If the range is a program the value references a program. Because only
@@ -159,9 +158,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
      *
      * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the attribute object
-     * @param _attrTypeCreate   attribute type used to create new attribute
-     * @param _attrTypeList     attribute type incl. &quot;,&quot; returned
-     *                          from the select list statement
+     * @param _kind     attribute kind
      */
     public AbstractAttribute_mxJPO(final TypeDef_mxJPO _typeDef,
                                    final String _mxName,
@@ -272,6 +269,15 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
             this.multiline = true;
             parsed = true;
 
+        } else if ("/primitiveType".equals(_url))  {
+            for (final Kind checkKind : Kind.values())  {
+                if (checkKind.attrTypeCreate.equals(_content))  {
+                    this.kind = checkKind;
+                    break;
+                }
+            }
+            parsed = (this.kind != null);
+
         } else if ("/resetonclone".equals(_url))  {
             this.resetOnClone = true;
             parsed = true;
@@ -357,6 +363,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .single(        "kind",                     this.kind.name().toLowerCase())
                 .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
                 .flag(          "hidden",                   false, this.isHidden())

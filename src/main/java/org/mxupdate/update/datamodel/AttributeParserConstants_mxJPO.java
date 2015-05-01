@@ -57,75 +57,89 @@ interface AttributeParserConstants_mxJPO {
   /** RegularExpression Id. */
   int MULTILINESINGLE = 27;
   /** RegularExpression Id. */
-  int MAXLENGTH_NUMBER = 28;
+  int KIND = 28;
   /** RegularExpression Id. */
-  int TRIGGER = 29;
+  int KIND_BINARY = 29;
   /** RegularExpression Id. */
-  int TRIGEVENT = 30;
+  int KIND_BOOLEAN = 30;
   /** RegularExpression Id. */
-  int ACTION = 31;
+  int KIND_DATE = 31;
   /** RegularExpression Id. */
-  int CHECK = 32;
+  int KIND_INTEGER = 32;
   /** RegularExpression Id. */
-  int OVERRIDE = 33;
+  int KIND_REAL = 33;
   /** RegularExpression Id. */
-  int RANGE_EQUAL = 34;
+  int KIND_STRING = 34;
   /** RegularExpression Id. */
-  int RANGE_GREATERTHAN = 35;
+  int MAXLENGTH_NUMBER = 35;
   /** RegularExpression Id. */
-  int RANGE_GREATERTHANEQUAL = 36;
+  int TRIGGER = 36;
   /** RegularExpression Id. */
-  int RANGE_LESSTHAN = 37;
+  int TRIGEVENT = 37;
   /** RegularExpression Id. */
-  int RANGE_LESSTHANEQUAL = 38;
+  int ACTION = 38;
   /** RegularExpression Id. */
-  int RANGE_NOTEQUAL = 39;
+  int CHECK = 39;
   /** RegularExpression Id. */
-  int RANGE_MATCH = 40;
+  int OVERRIDE = 40;
   /** RegularExpression Id. */
-  int RANGE_NOTMATCH = 41;
+  int RANGE_EQUAL = 41;
   /** RegularExpression Id. */
-  int RANGE_SMATCH = 42;
+  int RANGE_GREATERTHAN = 42;
   /** RegularExpression Id. */
-  int RANGE_NOTSMATCH = 43;
+  int RANGE_GREATERTHANEQUAL = 43;
   /** RegularExpression Id. */
-  int RANGE_PROGRAM = 44;
+  int RANGE_LESSTHAN = 44;
   /** RegularExpression Id. */
-  int RANGE_BETWEEN = 45;
+  int RANGE_LESSTHANEQUAL = 45;
   /** RegularExpression Id. */
-  int BETW1_STRING = 46;
+  int RANGE_NOTEQUAL = 46;
   /** RegularExpression Id. */
-  int BETW1_SINGLE = 47;
+  int RANGE_MATCH = 47;
   /** RegularExpression Id. */
-  int BETW1_APOSTROPHE = 48;
+  int RANGE_NOTMATCH = 48;
   /** RegularExpression Id. */
-  int BETW1_CHAR = 49;
+  int RANGE_SMATCH = 49;
   /** RegularExpression Id. */
-  int BETW2_INCLUSIVE = 50;
+  int RANGE_NOTSMATCH = 50;
   /** RegularExpression Id. */
-  int BETW2_EXCLUSIVE = 51;
+  int RANGE_PROGRAM = 51;
   /** RegularExpression Id. */
-  int BETW3_STRING = 52;
+  int RANGE_BETWEEN = 52;
   /** RegularExpression Id. */
-  int BETW3_SINGLE = 53;
+  int BETW1_STRING = 53;
   /** RegularExpression Id. */
-  int BETW3_APOSTROPHE = 54;
+  int BETW1_SINGLE = 54;
   /** RegularExpression Id. */
-  int BETW3_CHAR = 55;
+  int BETW1_APOSTROPHE = 55;
   /** RegularExpression Id. */
-  int BETW4_INCLUSIVE = 56;
+  int BETW1_CHAR = 56;
   /** RegularExpression Id. */
-  int BETW4_EXCLUSIVE = 57;
+  int BETW2_INCLUSIVE = 57;
   /** RegularExpression Id. */
-  int PROPERTY = 58;
+  int BETW2_EXCLUSIVE = 58;
   /** RegularExpression Id. */
-  int PROPERTYTO = 59;
+  int BETW3_STRING = 59;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 60;
+  int BETW3_SINGLE = 60;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 61;
+  int BETW3_APOSTROPHE = 61;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 62;
+  int BETW3_CHAR = 62;
+  /** RegularExpression Id. */
+  int BETW4_INCLUSIVE = 63;
+  /** RegularExpression Id. */
+  int BETW4_EXCLUSIVE = 64;
+  /** RegularExpression Id. */
+  int PROPERTY = 65;
+  /** RegularExpression Id. */
+  int PROPERTYTO = 66;
+  /** RegularExpression Id. */
+  int PROPERTYVAL = 67;
+  /** RegularExpression Id. */
+  int ADMINTYPE_STRING = 68;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 69;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -144,11 +158,13 @@ interface AttributeParserConstants_mxJPO {
   /** Lexical state. */
   int MAXLENGTH_EXPECTED = 7;
   /** Lexical state. */
-  int MULTILINESTRING_EXPECTED = 8;
+  int KIND_EXPECTED = 8;
   /** Lexical state. */
-  int STRING_EXPECTED = 9;
+  int MULTILINESTRING_EXPECTED = 9;
   /** Lexical state. */
-  int DEFAULT = 10;
+  int STRING_EXPECTED = 10;
+  /** Lexical state. */
+  int DEFAULT = 11;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -180,6 +196,13 @@ interface AttributeParserConstants_mxJPO {
     "<SINGLE>",
     "<MULTILINESTRING>",
     "<MULTILINESINGLE>",
+    "\"kind\"",
+    "\"binary\"",
+    "\"boolean\"",
+    "\"date\"",
+    "\"integer\"",
+    "\"real\"",
+    "\"string\"",
     "<MAXLENGTH_NUMBER>",
     "\"trigger\"",
     "<TRIGEVENT>",

@@ -28,9 +28,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
-import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO;
+import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO.Kind;
 import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO.Range;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -38,7 +37,6 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
-import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
  * Parses the update format for {@link AbstractAttribute_mxJPO}.
@@ -99,6 +97,22 @@ TOKEN : /** first level */
 {
       <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
     | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/*********************************************************************** Kind */
+<DEFAULT> TOKEN :
+{
+      <KIND:                                "kind">                                         : KIND_EXPECTED
+}
+
+<KIND_EXPECTED> TOKEN :
+{
+      <KIND_BINARY:                         "binary">                                       : DEFAULT
+    | <KIND_BOOLEAN:                        "boolean">                                      : DEFAULT
+    | <KIND_DATE:                           "date">                                         : DEFAULT
+    | <KIND_INTEGER:                        "integer">                                      : DEFAULT
+    | <KIND_REAL:                           "real">                                         : DEFAULT
+    | <KIND_STRING:                         "string">                                       : DEFAULT
 }
 
 /****************************************************** Integer for Max Value */
@@ -200,7 +214,14 @@ void parse(final AbstractAttribute_mxJPO<?> _attr)
     Range range;
     AdminProperty property;
 } {
-    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_attr, "symbolicNames",       this.getString(tmp.image));}
+    (   ( <KIND>                    ( <KIND_BINARY>                         {this.setValue(_attr, "kind",                   Kind.Binary);}
+                                    | <KIND_BOOLEAN>                        {this.setValue(_attr, "kind",                   Kind.Boolean);}
+                                    | <KIND_DATE>                           {this.setValue(_attr, "kind",                   Kind.Date);}
+                                    | <KIND_INTEGER>                        {this.setValue(_attr, "kind",                   Kind.Integer);}
+                                    | <KIND_REAL>                           {this.setValue(_attr, "kind",                   Kind.Real);}
+                                    | <KIND_STRING>                         {this.setValue(_attr, "kind",                   Kind.String);} ) )
+
+      | ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_attr, "symbolicNames",       this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.appendValue(_attr, "symbolicNames",       this.getSingle(tmp.image));} ) )
 
       | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_attr, "description",            this.getString(tmp.image));}
