@@ -13,6 +13,9 @@
 /MenuParser.java
 /MenuParserConstants.java
 /MenuParserTokenManager.java
+/PortalParser.java
+/PortalParserConstants.java
+/PortalParserTokenManager.java
 /TableParser.java
 /TableParserConstants.java
 /TableParserTokenManager.java
