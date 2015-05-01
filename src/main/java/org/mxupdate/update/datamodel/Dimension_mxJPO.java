@@ -327,6 +327,14 @@ public class Dimension_mxJPO
         private final AdminPropertyList_mxJPO properties = new AdminPropertyList_mxJPO();
 
         /**
+         * Constructor to initialize the {@link #properties}.
+         */
+        public Unit()
+        {
+            this.properties.setOtherPropTag("setting");
+        }
+
+        /**
          * Compares this dimension with <code>_toCompare</code> dimension. The
          * algorithm checks {@link #name} for both dimension and is defined as:
          * <ul>
