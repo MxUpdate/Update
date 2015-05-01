@@ -42,35 +42,18 @@ import org.xml.sax.SAXException;
 public abstract class AbstractObject_mxJPO
 {
     /**
-     * Key used to store the regular expression for allowed characters of
-     * symbolic names. All other characters are replaced by &quot;nothing&quot;.
-     *
-     * @see #calcDefaultSymbolicName(ParameterCache_mxJPO)
-     */
-    private static final String PARAM_CALC_SYMB_NAME_REG_EXP = "CalcSymbolicNameRegExp";
-
-    /**
      * Stores the version information of this object. If the value is
      * <code>null</code>, the version information is not defined.
-     *
-     * @see #getVersion()
-     * @see #setVersion(String)
      */
+    @Deprecated()
     private String version = null;
 
     /**
      * Defines the related type definition enumeration.
-     *
-     * @see #getTypeDef()
-     * @see #AbstractObject_mxJPO(TypeDef_mxJPO, String)
      */
     private final TypeDef_mxJPO typeDef;
 
-    /**
-     * MX Name of the administration object.
-     *
-     * @see #getName()
-     */
+    /** MX Name of the administration object. */
     private final String mxName;
 
     /**
@@ -79,6 +62,7 @@ public abstract class AbstractObject_mxJPO
      * @see #setAuthor(String)
      * @see #getAuthor()
      */
+    @Deprecated()
     private String author;
 
     /**
@@ -87,6 +71,7 @@ public abstract class AbstractObject_mxJPO
      * @see #setApplication(String)
      * @see #getApplication()
      */
+    @Deprecated()
     private String application;
 
     /**
@@ -103,6 +88,7 @@ public abstract class AbstractObject_mxJPO
      * @see #setInstallationDate(String)
      * @see #getInstallationDate()
      */
+    @Deprecated()
     private String installationDate;
 
     /**
@@ -111,6 +97,7 @@ public abstract class AbstractObject_mxJPO
      * @see #setInstaller(String)
      * @see #getInstaller()
      */
+    @Deprecated()
     private String installer;
 
     /**
@@ -119,6 +106,7 @@ public abstract class AbstractObject_mxJPO
      * @see #setOriginalName(String)
      * @see #getOriginalName()
      */
+    @Deprecated()
     private String originalName;
 
     /**
@@ -147,10 +135,9 @@ public abstract class AbstractObject_mxJPO
     }
 
     /**
-     * Returns the type definition instance.
+     * Returns the {@link #typeDef type definition} instance.
      *
      * @return type definition enumeration
-     * @see #typeDef
      */
     public final TypeDef_mxJPO getTypeDef()
     {
@@ -225,6 +212,7 @@ public abstract class AbstractObject_mxJPO
         this.parse(_paramCache);
         this.write(_paramCache, _out);
     }
+
     /**
      *
      * @param _paramCache       parameter cache
@@ -307,7 +295,6 @@ public abstract class AbstractObject_mxJPO
         }
         return mxName;
     }
-
 
     /**
      * Deletes administration object with given name.
@@ -414,6 +401,7 @@ public abstract class AbstractObject_mxJPO
      * @return value of instance variable {@link #author}.
      * @see #author
      */
+    @Deprecated()
     protected String getAuthor()
     {
         return this.author;
@@ -425,6 +413,7 @@ public abstract class AbstractObject_mxJPO
      * @param _author new value for instance variable {@link #author}
      * @see #author
      */
+    @Deprecated()
     protected void setAuthor(final String _author)
     {
         this.author = _author;
@@ -436,6 +425,7 @@ public abstract class AbstractObject_mxJPO
      * @return value of instance variable {@link #application}.
      * @see #application
      */
+    @Deprecated()
     protected String getApplication()
     {
         return this.application;
@@ -448,6 +438,7 @@ public abstract class AbstractObject_mxJPO
      *                          {@link #application}
      * @see #application
      */
+    @Deprecated()
     protected void setApplication(final String _application)
     {
         this.application = _application;
@@ -479,6 +470,7 @@ public abstract class AbstractObject_mxJPO
      * @return value of instance variable {@link #installationDate}.
      * @see #installationDate
      */
+    @Deprecated()
     protected String getInstallationDate()
     {
         return this.installationDate;
@@ -491,6 +483,7 @@ public abstract class AbstractObject_mxJPO
      *                              {@link #installationDate}
      * @see #installationDate
      */
+    @Deprecated()
     protected void setInstallationDate(final String _installationDate)
     {
         this.installationDate = _installationDate;
@@ -502,6 +495,7 @@ public abstract class AbstractObject_mxJPO
      * @return value of instance variable {@link #installer}.
      * @see #installer
      */
+    @Deprecated()
     protected String getInstaller()
     {
         return this.installer;
@@ -513,6 +507,7 @@ public abstract class AbstractObject_mxJPO
      * @param _installer new value for instance variable {@link #installer}
      * @see #installer
      */
+    @Deprecated()
     protected void setInstaller(final String _installer)
     {
         this.installer = _installer;
@@ -523,6 +518,7 @@ public abstract class AbstractObject_mxJPO
      *
      * @return value of instance variable {@link #originalName}.
      */
+    @Deprecated()
     protected String getOriginalName()
     {
         return this.originalName;
@@ -534,6 +530,7 @@ public abstract class AbstractObject_mxJPO
      * @param _originalName     new value for instance variable
      *                          {@link #originalName}.
      */
+    @Deprecated()
     protected void setOriginalName(final String _originalName)
     {
         this.originalName = _originalName;
@@ -546,43 +543,10 @@ public abstract class AbstractObject_mxJPO
      * @return version string
      * @see #version
      */
+    @Deprecated()
     protected String getVersion()
     {
         return this.version;
-    }
-
-    /**
-     * Must return all defined symbolic names for the object. If no symbolic
-     * names are defined, <code>null</code> must be returned
-     *
-     * @return all defined symbolic names; or <code>null</code> if not defined
-     */
-    protected abstract Set<String> getSymbolicNames();
-
-    /**
-     * <p>The calculates and returns the default symbolic name. A typical
-     * symbolic name has as prefix the admin type name, then an underscore and
-     * at least the name of the admin object. All not allowed special
-     * characters are replaced by &quot;nothing&quot; (zero length string).</p>
-     * <p>The characters to replace are defined as parameter with name
-     * {@link #PARAM_CALC_SYMB_NAME_REG_EXP}.</p>
-     *
-     * @param _paramCache   parameter cache
-     * @return calculated default symbolic name for administration objects (if
-     *         the administration object is a business object <code>null</code>
-     *         is returned)
-     * @see #PARAM_CALC_SYMB_NAME_REG_EXP
-     */
-    protected String calcDefaultSymbolicName(final ParameterCache_mxJPO _paramCache)
-    {
-        final String regExp = _paramCache.getValueString(AbstractObject_mxJPO.PARAM_CALC_SYMB_NAME_REG_EXP);
-        return (this.getTypeDef().getMxAdminName() == null)
-               ? null
-               : new StringBuilder()
-                        .append(this.getTypeDef().getMxAdminName())
-                        .append("_")
-                        .append(this.getName().replaceAll(regExp, ""))
-                        .toString();
     }
 
     /**
@@ -592,6 +556,7 @@ public abstract class AbstractObject_mxJPO
      * @param _version  new version to set
      * @see #version
      */
+    @Deprecated()
     protected void setVersion(final String _version)
     {
         this.version = _version;

@@ -34,11 +34,6 @@ import org.testng.Assert;
 public class ExportParser
 {
     /**
-     * Defines the string where the header of symbolic names starts.
-     */
-    private static final String HEADER_SYMBOLIC_NAME = "# SYMBOLIC NAME:\n# ~~~~~~~~~~~~~~\n#";
-
-    /**
      * Defines the string which defines the header start and end.
      */
     private static final String HEADER_START_END
@@ -46,12 +41,6 @@ public class ExportParser
 
     /** Reference to the configuration item enumeration. */
     private final CI ci;
-
-    /** Parsed name from the header. */
-    private final String name;
-
-    /** Parsed symbolic name from the header. */
-    private final String symbolicName;
 
     /** Original configuration item update code. */
     private final String origCode;
@@ -78,24 +67,6 @@ public class ExportParser
         this.origCode =_code;
         this.log = _log;
         this.ci = _ci;
-        // parse symbolic name
-        final int posSymbolicName = this.origCode.indexOf(ExportParser.HEADER_SYMBOLIC_NAME);
-        if (posSymbolicName >= 0)  {
-            final int start = posSymbolicName + ExportParser.HEADER_SYMBOLIC_NAME.length();
-            final int end = this.origCode.indexOf('\n', start);
-            this.symbolicName = this.origCode.substring(start, end).trim();
-        } else  {
-            this.symbolicName = null;
-        }
-        // parse name in the header
-        final int posName = this.origCode.indexOf("# " + this.ci.header + ":\n#");
-        if (posName >= 0)  {
-            final int start = posName + (this.ci.header.length() * 2) + 9;
-            final int end = this.origCode.indexOf('\n', start);
-            this.name = this.origCode.substring(start, end).trim();
-        } else  {
-            this.name = null;
-        }
         // extract update code
         this.code = this.extractUpdateCode(this.origCode);
         // parse all lines
@@ -111,55 +82,32 @@ public class ExportParser
      * @param _log          logging information
      * @param _rootLines    depending root lines
      */
-    public ExportParser(final String _name,
-                        final String _symbolicName,
-                        final String _log,
+    public ExportParser(final String _log,
                         final Line...  _rootLines)
     {
         this.origCode = null;
         this.ci = null;
-        this.symbolicName = _symbolicName;
         this.log = _log;
-        this.name = _name;
         this.code = null;
         this.rootLines.addAll(Arrays.asList(_rootLines));
-    }
-
-    /**
-     * Creates a new export parser used e.g. to check elements within a sub
-     * structure.
-     *
-     * @param _name         name of the administration object
-     * @param _log          logging information
-     * @param _rootLines    depending root lines
-     */
-    public ExportParser(final String _name,
-                        final String _log,
-                        final Line...  _rootLines)
-    {
-        this(_name, null, _log, _rootLines);
     }
 
     /**
      * Used to check an export depending on a deep hierarchy and to change the
      * tag of the root.
      *
-     * @param _name         name of the administration object
      * @param _log          logging information
      * @param _lineTag      tag of the parsed line
      * @param _lineValue    value of the parsed line
      * @param _children     all child lines of the parsed line
      */
-    public ExportParser(final String _name,
-                        final String _log,
+    public ExportParser(final String _log,
                         final String _lineTag,
                         final String _lineValue,
                         final List<Line> _children)
     {
         this.origCode = null;
         this.ci = null;
-        this.symbolicName = null;
-        this.name = _name;
         this.log = _log;
         this.code = null;
         this.rootLines.add(new Line(_lineTag, _lineValue, _children));
@@ -300,28 +248,6 @@ public class ExportParser
     public List<Line> getRootLines()
     {
         return this.rootLines;
-    }
-
-    /**
-     * Returns the name from the parsed header.
-     *
-     * @return parsed name
-     * @see #name
-     */
-    public String getName()
-    {
-        return this.name;
-    }
-
-    /**
-     * Returns the symbolic name from the parsed header.
-     *
-     * @return parsed symbolic name
-     * @see #symbolicName
-     */
-    public String getSymbolicName()
-    {
-        return this.symbolicName;
     }
 
     /**

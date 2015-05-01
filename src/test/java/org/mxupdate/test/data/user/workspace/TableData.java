@@ -156,7 +156,7 @@ public class TableData<USER extends AbstractUserData<?>>
         while (columnLinesIter.hasNext() && fieldsIter.hasNext())  {
             final FieldData<TableData<USER>> field = fieldsIter.next();
             final ExportParser.Line line = columnLinesIter.next();
-            field.checkExport(new ExportParser(field.getName(), _exportParser.getLog(), "mql", line.getValue(), line.getChildren()));
+            field.checkExport(new ExportParser(_exportParser.getLog(), "mql", line.getValue(), line.getChildren()));
         }
     }
 }

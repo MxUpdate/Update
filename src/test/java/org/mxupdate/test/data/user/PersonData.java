@@ -378,16 +378,12 @@ public class PersonData
 
         // check admin export
         final ExportParser adminExportParser = new ExportParser(
-                this.getName(),
-                _exportParser.getSymbolicName(),
                 _exportParser.getLog(),
                 adminLines.toArray(new ExportParser.Line[adminLines.size()]));
         super.checkExport(adminExportParser);
 
         // check bus export
         final ExportParser busExportParser = new ExportParser(
-                this.getName(),
-                _exportParser.getSymbolicName(),
                 _exportParser.getLog(),
                 busLines.toArray(new ExportParser.Line[busLines.size()]));
         // state

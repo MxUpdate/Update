@@ -49,7 +49,9 @@ class ExpressionParser
 
 <DEFAULT> TOKEN :
 {
-      <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+
+    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
     | <HIDDEN_TRUE:                         "hidden">
     | <HIDDEN_FALSE:                        "!hidden">
@@ -97,23 +99,26 @@ void parse(final Expression_mxJPO _expression)
     String tmpStr;
     AdminProperty property = null;
 } {
-    (   (<DESCRIPTION>              ( tmp = <MULTILINESTRING>               {this.setValue(_expression, "description", this.getString(tmp.image));property = null;}
-                                    | tmp = <MULTILINESINGLE>               {this.setValue(_expression, "description", this.getSingle(tmp.image));property = null;} ) )
+    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_expression, "symbolicNames", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_expression, "symbolicNames", this.getSingle(tmp.image));} ) )
 
-      | (<HIDDEN_TRUE>                                                      {this.setValue(_expression, "hidden",       true); property = null;} )
-      | (<HIDDEN_FALSE>                                                     {this.setValue(_expression, "hidden",       false);property = null;} )
+      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_expression, "description",      this.getString(tmp.image));property = null;}
+                                    | tmp = <MULTILINESINGLE>               {this.setValue(_expression, "description",      this.getSingle(tmp.image));property = null;} ) )
 
-      | (<VALUE>                    ( tmp = <MULTILINESTRING>               {tmpStr = this.getString(tmp.image);}
+      | ( <HIDDEN_TRUE>                                                     {this.setValue(_expression, "hidden",           true); property = null;} )
+      | ( <HIDDEN_FALSE>                                                    {this.setValue(_expression, "hidden",           false);property = null;} )
+
+      | ( <VALUE>                   ( tmp = <MULTILINESTRING>               {tmpStr = this.getString(tmp.image);}
                                     | tmp = <MULTILINESINGLE>               {tmpStr = this.getSingle(tmp.image);} )
                                                                             {   // hint: token value is used twice
-                                                                                // (for property and es expression value)
+                                                                                // (for property and as expression value)
                                                                                 // => staffed via property variable                                                                                if (property == null)  {
                                                                                     this.setValue(_expression, "value", tmpStr);                                                                                } else  {
                                                                                     this.setValue(property, "value", tmpStr);
                                                                                     property = null;                                                                                }
                                                                             } )
 
-      | (<PROPERTY>                                                         {property = new AdminProperty();this.appendValue(_expression, "properties", "propertiesStack", property);}
+      | ( <PROPERTY>                                                        {property = new AdminProperty();this.appendValue(_expression, "properties", "propertiesStack", property);}
                                     ( tmp = <STRING>                        {this.setValue(property, "name", this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.setValue(property, "name", this.getSingle(tmp.image));} )
                   ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}

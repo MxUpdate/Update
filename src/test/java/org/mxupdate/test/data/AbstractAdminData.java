@@ -29,7 +29,6 @@ import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.data.util.KeyValueList;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.data.util.PropertyDefList;
-import org.testng.Assert;
 
 /**
  * Defines common information from administration objects used to create,
@@ -404,12 +403,6 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     @Override()
     public void checkExport(final ExportParser _exportParser)
     {
-        // check symbolic name
-        Assert.assertEquals(
-                _exportParser.getSymbolicName(),
-                this.getSymbolicName(),
-                "check symbolic name");
-
         this.getValues() .check4Export(_exportParser, "");
         this.getSingles().check4Export(_exportParser, "");
         this.flags       .check4Export(_exportParser, "");

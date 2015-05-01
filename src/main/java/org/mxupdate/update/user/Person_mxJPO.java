@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import matrix.db.BusinessObject;
@@ -450,7 +451,6 @@ public class Person_mxJPO
      *
      * @return symbolic names from the administration part of the person
      */
-    @Override()
     protected Set<String> getSymbolicNames()
     {
         return this.personAdmin.getSymbolicNames();
@@ -569,7 +569,6 @@ public class Person_mxJPO
         this.personAdmin.write(_paramCache, _out);
         _out.append('\n');
         this.personBus.write(_paramCache, _out);
-        this.personAdmin.writeEnd(_paramCache, _out);
     }
 
     /**
@@ -603,7 +602,7 @@ public class Person_mxJPO
          *         person
          */
         @Override()
-        protected Set<String> getSymbolicNames()
+        protected SortedSet<String> getSymbolicNames()
         {
             return super.getSymbolicNames();
         }
@@ -645,7 +644,7 @@ public class Person_mxJPO
                 _out.append(" ").append(this.getTypeDef().getMxAdminSuffix());
             }
             _out.append(" \\\n    description \"").append(StringUtil_mxJPO.convertTcl(this.getDescription())).append("\"");
-            this.writeObject(_paramCache, _out);
+//            this.writeObject(_paramCache, _out);
             this.getProperties().writeAddFormat(_paramCache, _out, this.getTypeDef());
         }
 

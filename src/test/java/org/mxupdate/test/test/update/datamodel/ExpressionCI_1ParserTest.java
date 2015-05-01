@@ -35,9 +35,16 @@ public class ExpressionCI_1ParserTest
     public Object[][] getData()
     {
         return new Object[][]{
-            {"1) simple",
+            {"0) simple",
+                "",
+                "description \"\" !hidden value \"\""},
+            // registered name
+            {"1a) symbolic name",
                     "",
-                    "description \"\" !hidden value \"\""},
+                    "symbolicname \"expression_abc\" description \"\" !hidden value \"\""},
+            {"1b) two symbolic names",
+                    "symbolicname \"expression_abc\" symbolicname \"expression_def\" description \"\" !hidden value \"\"",
+                    "symbolicname \"expression_def\" symbolicname \"expression_abc\" description \"\" !hidden value \"\""},
             // description
             {"2a) description",
                     "",

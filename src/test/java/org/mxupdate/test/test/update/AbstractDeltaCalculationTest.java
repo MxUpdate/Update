@@ -15,7 +15,7 @@
 
 package org.mxupdate.test.test.update;
 
-import java.lang.reflect.Method;
+import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.test.AbstractTest;
@@ -27,6 +27,8 @@ import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -58,6 +60,16 @@ public abstract class AbstractDeltaCalculationTest<DATA extends AbstractAdminObj
                                           final String _name);
 
     /**
+     * Cleanups generated test data.
+     *
+     * @throws MatrixException if cleanup fails
+     */
+    @BeforeMethod()
+    @AfterClass(groups = "close" )
+    public abstract void cleanup()
+            throws MatrixException;
+
+    /**
      * Tests the delta calculation.
      *
      * @param _description  not used
@@ -85,34 +97,34 @@ public abstract class AbstractDeltaCalculationTest<DATA extends AbstractAdminObj
             _targetData.createDependings();
 
             // prepare the current
-            final Wrapper currentWrapper = new Wrapper(this.createNewData(paramCache, _currentData.getName()));
-            currentWrapper.data.create(paramCache);
-            currentWrapper.data.parseUpdate(this.strip(currentWrapper.data.getTypeDef(), _currentData.ciFile()));
+            final WrapperCIInstance<DATA> currentWrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()));
+            currentWrapper.create(paramCache);
+            currentWrapper.parseUpdate(this.strip(currentWrapper.getTypeDef(), _currentData.ciFile()));
             final MultiLineMqlBuilder mql1;
-            if ((currentWrapper.data.getTypeDef().getMxAdminSuffix()) != null && !currentWrapper.data.getTypeDef().getMxAdminSuffix().isEmpty())  {
-                mql1 = MqlBuilder_mxJPO.multiLine("escape mod " + currentWrapper.data.getTypeDef().getMxAdminName() + " $1 " + currentWrapper.data.getTypeDef().getMxAdminSuffix(), _currentData.getName());
+            if ((currentWrapper.getTypeDef().getMxAdminSuffix()) != null && !currentWrapper.getTypeDef().getMxAdminSuffix().isEmpty())  {
+                mql1 = MqlBuilder_mxJPO.multiLine("escape mod " + currentWrapper.getTypeDef().getMxAdminName() + " $1 " + currentWrapper.getTypeDef().getMxAdminSuffix(), _currentData.getName());
             } else  {
-                mql1 = MqlBuilder_mxJPO.multiLine("escape mod " + currentWrapper.data.getTypeDef().getMxAdminName() + " $1", _currentData.getName());
+                mql1 = MqlBuilder_mxJPO.multiLine("escape mod " + currentWrapper.getTypeDef().getMxAdminName() + " $1", _currentData.getName());
             }
-            currentWrapper.calcDelta(paramCache, mql1, this.createNewData(paramCache, _currentData.getName()));
+            currentWrapper.calcDelta(paramCache, mql1,  new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName())));
             mql1.exec(paramCache);
 
             // prepare the target form
-            final Wrapper targetWrapper = new Wrapper(this.createNewData(paramCache, _targetData.getName()));
-            targetWrapper.data.parseUpdate(this.strip(targetWrapper.data.getTypeDef(), _targetData.ciFile()));
+            final WrapperCIInstance<DATA> targetWrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _targetData.getName()));
+            targetWrapper.parseUpdate(this.strip(targetWrapper.getTypeDef(), _targetData.ciFile()));
 
             // delta between current and target
             final MultiLineMqlBuilder mql2;
-            if ((targetWrapper.data.getTypeDef().getMxAdminSuffix()) != null && !targetWrapper.data.getTypeDef().getMxAdminSuffix().isEmpty())  {
-                mql2 = MqlBuilder_mxJPO.multiLine("escape mod " + targetWrapper.data.getTypeDef().getMxAdminName() + " $1 " + targetWrapper.data.getTypeDef().getMxAdminSuffix(), _currentData.getName());
+            if ((targetWrapper.getTypeDef().getMxAdminSuffix()) != null && !targetWrapper.getTypeDef().getMxAdminSuffix().isEmpty())  {
+                mql2 = MqlBuilder_mxJPO.multiLine("escape mod " + targetWrapper.getTypeDef().getMxAdminName() + " $1 " + targetWrapper.getTypeDef().getMxAdminSuffix(), _currentData.getName());
             } else  {
-                mql2 = MqlBuilder_mxJPO.multiLine("escape mod " + targetWrapper.data.getTypeDef().getMxAdminName() + " $1", targetWrapper.data.getName());
+                mql2 = MqlBuilder_mxJPO.multiLine("escape mod " + targetWrapper.getTypeDef().getMxAdminName() + " $1", _targetData.getName());
             }
-            targetWrapper.calcDelta(paramCache, mql2, currentWrapper.data);
+            targetWrapper.calcDelta(paramCache, mql2, currentWrapper);
             mql2.exec(paramCache);
 
             // check result from MX defined from calculated delta
-            final Wrapper resultWrapper = new Wrapper(this.createNewData(paramCache, _targetData.getName()));
+            final WrapperCIInstance<DATA> resultWrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _targetData.getName()));
             resultWrapper.parse(paramCache);
             _targetData.checkExport(new ExportParser(_targetData.getCI(), resultWrapper.write(paramCache), ""));
         }
@@ -146,86 +158,5 @@ public abstract class AbstractDeltaCalculationTest<DATA extends AbstractAdminObj
      */
     private class Wrapper
     {
-        /** Data instance to wrap. */
-        private final DATA data;
-
-        public Wrapper(final DATA _data)
-        {
-            this.data = _data;
-        }
-
-        public void parse(final ParameterCache_mxJPO _paramCache)
-            throws Exception
-        {
-            final Method write = this.evalMethod("parse", ParameterCache_mxJPO.class);
-            write.setAccessible(true);
-            try {
-                write.invoke(this.data, _paramCache);
-            } finally  {
-                write.setAccessible(false);
-            }
-        }
-
-        public void calcDelta(final ParameterCache_mxJPO _paramCache,
-                              final MultiLineMqlBuilder _mql,
-                              final DATA _current)
-            throws Exception
-        {
-            Method write = this.evalMethod("calcDelta", ParameterCache_mxJPO.class, MultiLineMqlBuilder.class, this.data.getClass());
-            // if not found, try with parent class as parameter
-            // (e.g. attributes works then...)
-            if (write == null)  {
-                write = this.evalMethod("calcDelta", ParameterCache_mxJPO.class, MultiLineMqlBuilder.class, this.data.getClass().getSuperclass());
-            }
-            write.setAccessible(true);
-            try {
-                write.invoke(this.data, _paramCache, _mql, _current);
-            } finally  {
-                write.setAccessible(false);
-            }
-        }
-
-        public String write(final ParameterCache_mxJPO _paramCache)
-            throws Exception
-        {
-            final StringBuilder generated = new StringBuilder();
-            final Method write = this.evalMethod("write", ParameterCache_mxJPO.class, Appendable.class);
-            write.setAccessible(true);
-            try {
-                write.invoke(this.data, _paramCache, generated);
-            } finally  {
-                write.setAccessible(false);
-            }
-            return generated.toString();
-        }
-
-        /**
-         * Searches for method for given parameters.
-         *
-         * @param name              name of searched method
-         * @param parameterTypes    paramter types
-         * @return found method; {@code null} if not found
-         */
-        private Method evalMethod(final String name,
-                                  final Class<?>... parameterTypes)
-        {
-            Method ret = null;
-            Class<?> clazz = this.data.getClass();
-            try  {
-                ret = clazz.getDeclaredMethod(name, parameterTypes);
-            } catch (final NoSuchMethodException e)  {
-            }
-
-            while ((ret == null) && (clazz != null))  {
-                clazz = clazz.getSuperclass();
-                if (clazz != null)  {
-                    try  {
-                        ret = clazz.getDeclaredMethod(name, parameterTypes);
-                    } catch (final NoSuchMethodException e)  {
-                    }
-                }
-            }
-            return ret;
-        }
     }
 }

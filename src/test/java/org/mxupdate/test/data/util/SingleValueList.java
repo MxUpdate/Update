@@ -15,14 +15,13 @@
 
 package org.mxupdate.test.data.util;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.List;
 
 import matrix.util.MatrixException;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.ExportParser;
 
 /**
  * Single-value list.
@@ -32,8 +31,8 @@ import org.mxupdate.test.ExportParser;
 public class SingleValueList
     extends AbstractList
 {
-    /** Values. */
-    private final Map<String,String> values = new HashMap<String,String>();
+    /** Data list. */
+    private final List<ImmutablePair<String,String>> values = new ArrayList<ImmutablePair<String,String>>();
 
     /**
      * Defines a value.
@@ -41,10 +40,10 @@ public class SingleValueList
      * @param _key      key
      * @param _value    value
      */
-    public void put(final String _key,
+    public void def(final String _key,
                     final String _value)
     {
-        this.values.put(_key, _value);
+        this.values.add(new ImmutablePair<String,String>(_key, _value));
     }
 
     /**
@@ -59,7 +58,7 @@ public class SingleValueList
     public void append4Update(final String _prefix,
                              final StringBuilder _cmd)
     {
-        for (final Entry<String,String> entry : this.values.entrySet())  {
+        for (final ImmutablePair<String,String> entry : this.values)  {
             if (entry.getValue() != null ) {
                 _cmd.append(_prefix).append(entry.getKey()).append(" ")
                     .append(AbstractTest.convertUpdate(entry.getValue().toString()))
@@ -76,25 +75,10 @@ public class SingleValueList
      */
     public void append4Create(final StringBuilder _cmd)
     {
-        for (final Map.Entry<String,String> entry : this.values.entrySet())  {
+        for (final ImmutablePair<String,String> entry : this.values)  {
             if (entry.getValue() != null ) {
                 _cmd.append(' ').append(entry.getKey()).append(" ").append(AbstractTest.convertMql(entry.getValue().toString()));
             }
-        }
-    }
-
-    /**
-     * Checks for all defined values.
-     *
-     * @param _exportParser     parsed export
-     * @param _path             sub path
-     */
-    @Override()
-    public void check4Export(final ExportParser _exportParser,
-                            final String _path)
-    {
-        for (final Entry<String,String> single : this.values.entrySet())  {
-            _exportParser.checkValue((_path.isEmpty() ? "" : _path + "/") + single.getKey(), single.getValue());
         }
     }
 }

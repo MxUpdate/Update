@@ -132,7 +132,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     public DATA setValue(final String _key,
                          final String _value)
     {
-        this.values.put(_key, _value);
+        this.values.def(_key, _value);
         return (DATA) this;
     }
 
@@ -143,6 +143,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @return value for related <code>_key</code>; if not found
      *         <code>null</code>
      */
+    @Deprecated()
     public String getValue(final String _key)
     {
         return this.values.getValue(_key);
@@ -169,7 +170,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     public DATA setSingle(final String _key,
                           final String _value)
     {
-        this.singles.put(_key, _value);
+        this.singles.def(_key, _value);
         return (DATA) this;
     }
 
@@ -569,7 +570,6 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     public void checkExport(final ExportParser _exportParser)
         throws MatrixException
     {
-        Assert.assertEquals(_exportParser.getName(), this.getName(), "check name");
     }
 
     /**

@@ -110,19 +110,6 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
     }
 
     /**
-     * Must be implemented so that the class could be derived. The method is
-     * only a stub implementation.
-     *
-     * @param _paramCache   parameter cache; ignored
-     * @param _out          ignored
-     */
-    @Override()
-    protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
-    {
-    }
-
-    /**
      * Appends the TCL update code to <code>_out</code> for this MQL program.
      * This includes:
      * <ul>

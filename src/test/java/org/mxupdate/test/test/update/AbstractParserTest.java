@@ -15,8 +15,6 @@
 
 package org.mxupdate.test.test.update;
 
-import java.lang.reflect.Method;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -69,13 +67,10 @@ public abstract class AbstractParserTest<DATA extends AbstractAdminObject_mxJPO<
     {
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
 
-        final DATA data = this.createNewData(paramCache, AbstractTest.PREFIX + "_Test");
+        final WrapperCIInstance<DATA> data = new WrapperCIInstance<DATA>(this.createNewData(paramCache, AbstractTest.PREFIX + "_Test"));
         data.parseUpdate(_definition);
 
-        final StringBuilder generated = new StringBuilder();
-        final Method write = data.getClass().getDeclaredMethod("write", ParameterCache_mxJPO.class, Appendable.class);
-        write.setAccessible(true);
-        write.invoke(data, paramCache, generated);
+        final String generated = data.write(paramCache);
 
         final StringBuilder oldDefBuilder = new StringBuilder();
         for (final String line : _toTest.isEmpty() ? _definition.split("\n") : _toTest.split("\n"))  {

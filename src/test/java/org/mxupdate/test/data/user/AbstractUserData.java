@@ -552,7 +552,7 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                             .append("\"").toString();
                     if (key.equals(rootLine.getValue()))  {
                         tmpCues.remove(cue);
-                        cue.checkExport(new ExportParser(cue.getName(), _exportParser.getLog(), rootLine));
+                        cue.checkExport(new ExportParser(_exportParser.getLog(), rootLine));
                         break;
                     }
                 }
@@ -565,7 +565,7 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                             .append("\"").toString();
                     if (key.equals(rootLine.getValue()))  {
                         tmpFilters.remove(filter);
-                        filter.checkExport(new ExportParser(filter.getName(), _exportParser.getLog(), rootLine));
+                        filter.checkExport(new ExportParser(_exportParser.getLog(), rootLine));
                         break;
                     }
                 }
@@ -578,7 +578,7 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                             .append("\"").toString();
                     if (key.equals(rootLine.getValue()))  {
                         tmpQueries.remove(query);
-                        query.checkExport(new ExportParser(query.getName(), _exportParser.getLog(), rootLine));
+                        query.checkExport(new ExportParser(_exportParser.getLog(), rootLine));
                         break;
                     }
                 }
@@ -591,7 +591,7 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                             .append("\"").toString();
                     if (key.equals(rootLine.getValue()))  {
                         tmpTables.remove(table);
-                        table.checkExport(new ExportParser(table.getName(), _exportParser.getLog(), rootLine));
+                        table.checkExport(new ExportParser(_exportParser.getLog(), rootLine));
                         break;
                     }
                 }
@@ -604,7 +604,7 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                             .append("\"").toString();
                     if (key.equals(rootLine.getValue()))  {
                         tmpTips.remove(tip);
-                        tip.checkExport(new ExportParser(tip.getName(), _exportParser.getLog(), rootLine));
+                        tip.checkExport(new ExportParser(_exportParser.getLog(), rootLine));
                         break;
                     }
                 }
@@ -617,7 +617,7 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                             .append("\"").toString();
                     if (key.equals(rootLine.getValue()))  {
                         tmpToolSets.remove(toolSet);
-                        toolSet.checkExport(new ExportParser(toolSet.getName(), _exportParser.getLog(), rootLine));
+                        toolSet.checkExport(new ExportParser(_exportParser.getLog(), rootLine));
                         break;
                     }
                 }
@@ -630,7 +630,7 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
                             .append("\"").toString();
                     if (key.equals(rootLine.getValue()))  {
                         tmpViews.remove(view);
-                        view.checkExport(new ExportParser(view.getName(), _exportParser.getLog(), rootLine));
+                        view.checkExport(new ExportParser(_exportParser.getLog(), rootLine));
                         break;
                     }
                 }
@@ -642,8 +642,6 @@ public abstract class AbstractUserData<DATA extends AbstractUserData<?>>
 
         // and check all others
         super.checkExport(new ExportParser(
-                _exportParser.getName(),
-                _exportParser.getSymbolicName(),
                 _exportParser.getLog(),
                 lines.toArray(new ExportParser.Line[lines.size()])));
 

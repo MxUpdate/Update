@@ -736,6 +736,15 @@ public class ParameterCache_mxJPO
         ExportInfoPropsTextStart,
 
         /**
+         * Key used to store the name of the program where all administration
+         * objects must be registered with symbolic names. For an OOTB installation
+         * the value is typically &quot;eServiceSchemaVariableMapping.tcl&quot;.
+         */
+        RegisterSymbolicNames,
+
+        ////////////////////////////////////////////////////////////////////////
+
+        /**
          * Name of the parameter to define that the &quot;dimension&quot;
          * for attributes from current MX version is supported. The
          * parameter is needed to support the case that an old MX version is

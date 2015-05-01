@@ -16,7 +16,6 @@
 package org.mxupdate.update.user;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
@@ -392,32 +391,6 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
     }
 
     /**
-     * Writes specific information about the cached user to the given
-     * writer instance. This includes:
-     * <ul>
-     * <li>{@link #isHidden() hidden flag}</li>
-     * <li>{@link #site assigned site}</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the TCL update code for the group could not be
-     *                     written
-     */
-    @Override()
-    protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
-        throws IOException
-    {
-        _out.append(" \\\n    ").append(this.isHidden() ? "hidden" : "!hidden");
-
-        // site
-        if (this.site != null)  {
-            _out.append(" \\\n    site \"").append(StringUtil_mxJPO.convertTcl(this.site)).append('\"');
-        }
-    }
-
-    /**
      * <p>Writes specific information about the cached role to the given
      * writer instance. The included information is:
      * <ul>
@@ -438,7 +411,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
      * @throws IOException if the TCL update code could not written
      * @see #ignoreWorkspaceObjects(ParameterCache_mxJPO)
      */
-    @Override()
+/*    @Override()
     protected void writeEnd(final ParameterCache_mxJPO _paramCache,
                             final Appendable _out)
         throws IOException
@@ -474,7 +447,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
                 view.write(_paramCache, _out);
             }
         }
-    }
+    }*/
 
     /**
      * <p>The method overwrites the original method to append the MQL

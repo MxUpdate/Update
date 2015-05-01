@@ -263,7 +263,7 @@ public class RelationshipData
         public RelationshipData defSingle(final String _key,
                                           final String _value)
         {
-            this.singles.put(_key, _value);
+            this.singles.def(_key, _value);
             return RelationshipData.this;
         }
 
@@ -277,7 +277,7 @@ public class RelationshipData
         public RelationshipData defString(final String _key,
                                           final String _value)
         {
-            this.strings.put(_key, _value);
+            this.strings.def(_key, _value);
             return RelationshipData.this;
         }
 

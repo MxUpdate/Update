@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeSet;
 
@@ -33,14 +34,15 @@ import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
-import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MqlBuilder;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
@@ -60,27 +62,13 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     extends AbstractPropertyObject_mxJPO
 {
     /**
-     * Key used to store the name of the program where all administration
-     * objects must be registered with symbolic names. For an OOTB installation
-     * the value is typically &quot;eServiceSchemaVariableMapping.tcl&quot;.
-     *
-     * @see #readSymbolicNames(ParameterCache_mxJPO)
-     * @see #appendSymbolicNameRegistration(ParameterCache_mxJPO, String, StringBuilder)
-     */
-    private static final String PARAM_SYMB_NAME_PROG = "RegisterSymbolicNames";
-
-    /**
      * Name of the parameter to suppress warnings for not parsed URLs.
      *
      * @see PadSaxHandler#evaluate()
      */
     private static final String PARAM_SUPPRESS_URL_WARNINGS = "SuppressUrlWarnings";
 
-    /**
-     * Set of all ignored URLs from the XML definition for all admin objects.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     */
+    /** Set of all ignored URLs from the XML definition for all admin objects. */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
         AbstractAdminObject_mxJPO.IGNORED_URLS.add("/adminProperties");
@@ -104,7 +92,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     private boolean hidden = false;
 
     /** All current defined symbolic names for MX administration objects are stored. */
-    private final Set<String> symbolicNames = new TreeSet<String>();
+    private final SortedSet<String> symbolicNames = new TreeSet<String>();
 
     /** List of all properties. */
     private final AdminPropertyList_mxJPO properties = new AdminPropertyList_mxJPO();
@@ -119,92 +107,6 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
                                         final String _mxName)
     {
         super(_typeDef, _mxName);
-    }
-
-    /**
-     * Returns the set of all defined symbolic names of this administration
-     * (not business!) object. The method is the getter method for
-     * {@link #symbolicNames}.
-     *
-     * @return all defined symbolic names
-     * @see #symbolicNames
-     */
-    @Override()
-    protected Set<String> getSymbolicNames()
-    {
-        return this.symbolicNames;
-    }
-
-    /**
-     * Reads the symbolic names for current admin objects and stores them in
-     * {@link #symbolicNames}.
-     *
-     * @param _paramCache       parameter cache
-     * @throws MatrixException if the symbolic names could not be read
-     * @see #symbolicNames
-     */
-    protected void readSymbolicNames(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
-    {
-        // context must be checked if used within automatic tests
-        if ((this.getTypeDef().getMxAdminName() != null) && (_paramCache.getContext() != null))  {
-            final String symbProg = _paramCache.getValueString(AbstractAdminObject_mxJPO.PARAM_SYMB_NAME_PROG);
-            final String symbProgIdxOf = new StringBuilder()
-                    .append(" on program ").append(symbProg).append(' ').toString();
-            final StringBuilder cmd = new StringBuilder()
-                    .append("escape list property on program \"")
-                                .append(StringUtil_mxJPO.convertMql(symbProg)).append("\" to ")
-                        .append(this.getTypeDef().getMxAdminName())
-                        .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
-                        .append(this.getTypeDef().getMxAdminSuffix());
-            for (final String symbName : MqlUtil_mxJPO.execMql(_paramCache, cmd).split("\n"))  {
-                if (!"".equals(symbName))  {
-                    this.symbolicNames.add(symbName.substring(0, symbName.indexOf(symbProgIdxOf)));
-                }
-            }
-        }
-    }
-
-    /**
-     * Appends the escaped MQL code to register given symbolic name
-     * <code>_symbName</code> depending on current defined symbolic names
-     * {@link #symbolicNames}. If not registered, a new registration is done.
-     * If wrong symbolic names are defined, they are removed.
-     *
-     * @param _paramCache   parameter cache
-     * @param _symbName     symbolic name which must be set
-     * @param _mqlCode      string builder where the MQL command must be
-     *                      appended
-     * @see #symbolicNames
-     */
-    protected void appendSymbolicNameRegistration(final ParameterCache_mxJPO _paramCache,
-                                                  final String _symbName,
-                                                  final StringBuilder _mqlCode)
-    {
-        if (this.getTypeDef().getMxAdminName() != null)  {
-            final String symbProg = _paramCache.getValueString(AbstractAdminObject_mxJPO.PARAM_SYMB_NAME_PROG);
-            if (!this.symbolicNames.contains(_symbName))  {
-                _paramCache.logTrace("    - register symbolic name '" + _symbName + "'");
-                _mqlCode.append("escape add property \"").append(StringUtil_mxJPO.convertMql(_symbName)).append("\" ")
-                        .append(" on program \"").append(StringUtil_mxJPO.convertMql(symbProg)).append("\" to ")
-                        .append(this.getTypeDef().getMxAdminName())
-                        .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
-                        .append(this.getTypeDef().getMxAdminSuffix())
-                        .append(";\n");
-            }
-            for (final String exSymbName : this.symbolicNames)  {
-                if (!_symbName.equals(exSymbName))  {
-                    _paramCache.logTrace("    - remove symbolic name '" + exSymbName + "'");
-                    _mqlCode.append("escape delete property \"")
-                                    .append(StringUtil_mxJPO.convertMql(exSymbName)).append("\" ")
-                            .append(" on program \"").append(StringUtil_mxJPO.convertMql(symbProg)).append("\" to ")
-                            .append(this.getTypeDef().getMxAdminName())
-                            .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
-                            .append(this.getTypeDef().getMxAdminSuffix())
-                            .append(";\n");
-                }
-            }
-        }
     }
 
     /**
@@ -280,8 +182,6 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
      * @throws IOException      should not happen; only if the input source of
      *                          the string reader which embeds the XML document
      *                          failed
-     * @see #getExportMQL()                 used to get the MQL command to get
-     *                                      a XML representation
      * @see PadSaxHandler                   SAX handler to parse the XML file
      * @see #parse(ParameterCache_mxJPO, String, String)
      * @see #prepare(ParameterCache_mxJPO)
@@ -303,15 +203,27 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
         reader.parse(inputSource);
         // prepare post preparation
         this.prepare();
+
         // reads symbolic names of the administration objects
-        this.readSymbolicNames(_paramCache);
+        final String symbProg = _paramCache.getValueString(ValueKeys.RegisterSymbolicNames);
+        final String symbProgIdxOf = new StringBuilder().append(" on program ").append(symbProg).append(' ').toString();
+        final String symbNames = MqlBuilder_mxJPO.mql()
+                .cmd("escape list property on program ").arg(symbProg)
+                .cmd(" to ").cmd(this.getTypeDef().getMxAdminName())
+                .cmd(" ").arg(this.getName())
+                .cmd(" ").cmd(this.getTypeDef().getMxAdminSuffix())
+                .exec(_paramCache);
+        if (!symbNames.isEmpty())  {
+            for (final String symbName : symbNames.split("\n"))  {
+                this.symbolicNames.add(symbName.substring(0, symbName.indexOf(symbProgIdxOf)));
+            }
+        }
     }
 
     /**
-     * With the MQL commands from {@link #getExportMQL()} the XML export is
-     * executed and the result returned. The method could be used to overwrite
-     * the returned XML export; e.g. if the XML export from MX has some
-     * 'problems'.
+     * The XML export is executed and the result returned. The method could be
+     * used to overwrite the returned XML export; e.g. if the XML export from MX
+     * has some 'problems'.
      *
      * @param _paramCache   parameter cache
      * @return string from the XML export
@@ -320,23 +232,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     protected String execXMLExport(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
-        return MqlUtil_mxJPO.execMql(_paramCache, this.getExportMQL());
-    }
-
-    /**
-     * Returns the MQL export command to export the administration object as
-     * XML string.
-     *
-     * @return string value of the MQL command to export the administration
-     *         object as XML string
-     */
-    protected String getExportMQL()
-    {
-        return new StringBuilder()
-                .append("escape export ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName()))
-                .append("\" xml")
-                .toString();
+        return MqlBuilder_mxJPO.mql().cmd("escape export ").cmd(this.getTypeDef().getMxAdminName()).cmd(" ").arg(this.getName()).cmd(" xml").exec(_paramCache);
     }
 
     /**
@@ -386,54 +282,10 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     {
         // sort the properties
         this.properties.prepare();
-
-        // fetch all required properties
-        AdminProperty author = null, appl = null, installationDate = null, installer = null, origName = null, version = null;
-        for (final AdminProperty prop : this.properties.getProperties())  {
-            if ((prop.getRefAdminName() == null) && (prop.getRefAdminType() == null))  {
-final String propName = prop.getName().replaceAll(" ", "").toUpperCase();
-                if (PropertyDef_mxJPO.AUTHOR.name().equals(propName))  {
-                    author = prop;
-                } else if (PropertyDef_mxJPO.APPLICATION.name().equals(propName))  {
-                    appl = prop;
-                } else if (PropertyDef_mxJPO.INSTALLEDDATE.name().equals(propName))  {
-                    installationDate = prop;
-                } else if (PropertyDef_mxJPO.INSTALLER.name().equals(propName))  {
-                    installer = prop;
-                } else if (PropertyDef_mxJPO.ORIGINALNAME.name().equals(propName))  {
-                    origName = prop;
-                } else if (PropertyDef_mxJPO.VERSION.name().equals(propName))  {
-                    version = prop;
-                }
-            }
-        }
-        // set author depending on the properties
-        if (author != null)  {
-            this.setAuthor(author.getValue());
-        }
-        // set application depending on the properties
-        if (appl != null)  {
-            this.setApplication(appl.getValue());
-        }
-        // sets the installation date depending on the properties
-        if (installationDate != null)  {
-            this.setInstallationDate(installationDate.getValue());
-        }
-        // sets the installer depending on the properties
-        if (installer != null)  {
-            this.setInstaller(installer.getValue());
-        }
-        // sets the original name depending on the properties
-        if (origName != null)  {
-            this.setOriginalName(origName.getValue());
-        }
-        // sets the version depending on the properties
-        if (version != null)  {
-            this.setVersion(version.getValue());
-        }
     }
 
     /**
+     * Writes the complete update code.
      *
      * @param _paramCache   parameter cache
      * @param _out          writer instance
@@ -447,44 +299,26 @@ final String propName = prop.getName().replaceAll(" ", "").toUpperCase();
         throws IOException, MatrixException
     {
         this.writeHeader(_paramCache, _out);
-        _out.append("mql escape mod ")
-            .append(this.getTypeDef().getMxAdminName())
-            .append(" \"${NAME}\"");
-        if (!"".equals(this.getTypeDef().getMxAdminSuffix()))  {
-            _out.append(" ").append(this.getTypeDef().getMxAdminSuffix());
-        }
-        _out.append(" \\\n    description \"").append(StringUtil_mxJPO.convertTcl(this.getDescription())).append("\"");
-        this.writeObject(_paramCache, _out);
-        this.getProperties().writeAddFormat(_paramCache, _out, this.getTypeDef());
-        this.writeEnd(_paramCache, _out);
+
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
+
+        updateBuilder.start(this.getTypeDef().getMxAdminName());
+
+        this.writeUpdate(updateBuilder);
+
+        updateBuilder.end();
+
+        _out.append(updateBuilder.getStrg());
     }
 
     /**
+     * Writes the update file content to the builder.
      *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the TCL update code could not be written
+     * @param _updateBuilder    update builder
      */
-    protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
-        throws IOException
+    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
-    }
-
-    /**
-     * At the end of the write to the TCL update file in some cases some
-     * extensions must be defined. This &quot;extensions&quot; depends on the
-     * use cases. E.g. for an inquiry, the inquiry code must be written at the
-     * end of a TCL update file.
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @throws IOException if the extension could not be written
-     */
-    protected void writeEnd(final ParameterCache_mxJPO _paramCache,
-                            final Appendable _out)
-        throws IOException
-    {
+        throw new Error("not implemented");
     }
 
     /**
@@ -493,7 +327,7 @@ final String propName = prop.getName().replaceAll(" ", "").toUpperCase();
      * @param _paramCache   parameter cache
      * @throws Exception if delete failed
      */
-    @Override
+    @Override()
     public void delete(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
@@ -514,11 +348,11 @@ final String propName = prop.getName().replaceAll(" ", "").toUpperCase();
     public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        final StringBuilder cmd = new StringBuilder()
-                .append("escape add ").append(this.getTypeDef().getMxAdminName())
-                        .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
-                        .append(this.getTypeDef().getMxAdminSuffix()).append(";");
-        MqlUtil_mxJPO.execMql(_paramCache, cmd);
+        final MqlBuilder mql = MqlBuilder_mxJPO.mql().cmd("escape add ").cmd(this.getTypeDef().getMxAdminName()).cmd(" ").arg(this.getName());
+        if ((this.getTypeDef().getMxAdminSuffix() != null) && !this.getTypeDef().getMxAdminSuffix().isEmpty())  {
+            mql.cmd(" ").cmd(this.getTypeDef().getMxAdminSuffix());
+        }
+        mql.exec(_paramCache);
     }
 
     /**
@@ -564,24 +398,12 @@ final String propName = prop.getName().replaceAll(" ", "").toUpperCase();
                           final File _sourceFile)
         throws Exception
     {
-        final StringBuilder preMQLCode = new StringBuilder();
-
-        // append already existing pre MQL code
-        preMQLCode.append(_preMQLCode);
-
-        final StringBuilder postMQLCode = new StringBuilder();
-
-        // append registration of symbolic names
-        this.appendSymbolicNameRegistration(_paramCache,
-                                            _tclVariables.get("SYMBOLICNAME"),
-                                            postMQLCode);
-
         // prepare map of all TCL variables incl. name of admin object
         final Map<String,String> tclVariables = new HashMap<String,String>();
         tclVariables.put("NAME", this.getName());
         tclVariables.putAll(_tclVariables);
 
-        super.update(_paramCache, preMQLCode, postMQLCode, _preTCLCode, tclVariables, _sourceFile);
+        super.update(_paramCache, _preMQLCode, _postMQLCode, _preTCLCode, tclVariables, _sourceFile);
     }
 
     /**
@@ -689,6 +511,18 @@ final String propName = prop.getName().replaceAll(" ", "").toUpperCase();
     protected boolean isHidden()
     {
         return this.hidden;
+    }
+
+    /**
+     * Returns the set of all defined symbolic names of this administration
+     * (not business!) object. The method is the getter method for
+     * {@link #symbolicNames}.
+     *
+     * @return all defined symbolic names
+     */
+    protected SortedSet<String> getSymbolicNames()
+    {
+        return this.symbolicNames;
     }
 
     /**

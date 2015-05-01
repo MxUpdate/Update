@@ -184,18 +184,4 @@ throw new Exception("create of search index not possible!");
     {
         return null;
     }
-
-    /**
-     * Dummy implementation because the search index configuration does not
-     * support symbolic names (because exact one search index configuration
-     * exists in MX).
-     *
-     * @return always {@code null} because a search index configuration could
-     *         not have symbolic names
-     */
-    @Override()
-    protected Set<String> getSymbolicNames()
-    {
-        return null;
-    }
 }

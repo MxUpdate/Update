@@ -29,7 +29,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class ExpressionCI_2UpdateTest
+public class ExpressionCI_3UpdateTest
     extends AbstractDataExportUpdate<ExpressionData>
 {
     /**
