@@ -772,6 +772,8 @@ public class ParameterCache_mxJPO
         /** Boolean that policy states supports the 'enforce reserve access' flag. */
         DMPolicyStateSupportsEnforceReserveAccess,
 
+        /** Boolean that the access of rules are sorted. */
+        DMRuleAllowExportAccessSorting,
         /** Boolean that rules supports the 'enforce reserve access' flag. */
         DMRuleSupportsEnforceReserveAccess,
 

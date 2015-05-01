@@ -524,16 +524,18 @@ category     = "contractor";
         throw new ParseException();
       }
     }
-this.getField(_access, "key").set(key);
-        this.getField(_access, "filter").set(filter);
-        this.getField(_access, "localfilter").set(localfilter);
-        this.getField(_access, "organization").set(organization);
-        this.getField(_access, "project").set(project);
-        this.getField(_access, "owner").set(owner);
-        this.getField(_access, "reserve").set(reserve);
-        this.getField(_access, "maturity").set(maturity);
-        this.getField(_access, "category").set(category);
-        this.getField(_access, "access").set(new HashSet<String>(access == null ? null : Arrays.asList(access.split(" "))));
+this.setValue(_access, "key", key);
+        this.setValue(_access, "filter", filter);
+        this.setValue(_access, "localfilter", localfilter);
+        this.setValue(_access, "organization", organization);
+        this.setValue(_access, "project", project);
+        this.setValue(_access, "owner", owner);
+        this.setValue(_access, "reserve", reserve);
+        this.setValue(_access, "maturity", maturity);
+        this.setValue(_access, "category", category);
+        if (access != null)  {
+            this.setValue(_access, "access", Arrays.asList(access.split(" ")));
+        }
   }
 
   /** Generated Token Manager. */

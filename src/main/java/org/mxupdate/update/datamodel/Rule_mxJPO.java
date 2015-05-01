@@ -20,6 +20,8 @@ import java.io.StringReader;
 import java.util.HashSet;
 import java.util.Set;
 
+import matrix.util.MatrixException;
+
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
@@ -30,6 +32,7 @@ import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.xml.sax.SAXException;
 
 /**
  * The class is used to export and import / update rule configuration items.
@@ -65,6 +68,21 @@ public class Rule_mxJPO
                       final String _mxName)
     {
         super(_typeDef, _mxName);
+    }
+
+    /**
+     * {@inheritDoc}
+     * The rule {@link #accessList access} statements are sorted if defined.
+     */
+    @Override()
+    protected void parse(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException, SAXException, IOException
+    {
+        super.parse(_paramCache);
+
+        if (_paramCache.getValueBoolean(ValueKeys.DMRuleAllowExportAccessSorting))  {
+            this.accessList.sort();
+        }
     }
 
     /**
