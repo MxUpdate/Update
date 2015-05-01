@@ -11,45 +11,47 @@ interface RoleParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int DESCRIPTION = 5;
+  int SYMBOLICNAME = 5;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 6;
+  int DESCRIPTION = 6;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 7;
+  int HIDDEN_TRUE = 7;
   /** RegularExpression Id. */
-  int PARENT = 8;
+  int HIDDEN_FALSE = 8;
   /** RegularExpression Id. */
-  int SITE = 9;
+  int PARENT = 9;
   /** RegularExpression Id. */
-  int STRING = 14;
+  int SITE = 10;
   /** RegularExpression Id. */
-  int SINGLE = 15;
+  int STRING = 15;
   /** RegularExpression Id. */
-  int APOSTROPHE = 16;
+  int SINGLE = 16;
   /** RegularExpression Id. */
-  int CHAR = 17;
+  int APOSTROPHE = 17;
   /** RegularExpression Id. */
-  int KIND = 18;
+  int CHAR = 18;
   /** RegularExpression Id. */
-  int ORGANIZATION = 23;
+  int KIND = 19;
   /** RegularExpression Id. */
-  int PROJECT = 24;
+  int ORGANIZATION = 24;
   /** RegularExpression Id. */
-  int ROLE = 25;
+  int PROJECT = 25;
   /** RegularExpression Id. */
-  int PROPERTY = 26;
+  int ROLE = 26;
   /** RegularExpression Id. */
-  int PROPERTYTO = 27;
+  int PROPERTY = 27;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 28;
+  int PROPERTYTO = 28;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 33;
+  int PROPERTYVAL = 29;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 34;
+  int ADMINTYPE_STRING = 34;
   /** RegularExpression Id. */
-  int ADMINTYPE_APOSTROPHE = 35;
+  int ADMINTYPE_SINGLE = 35;
   /** RegularExpression Id. */
-  int ADMINTYPE_CHAR = 36;
+  int ADMINTYPE_APOSTROPHE = 36;
+  /** RegularExpression Id. */
+  int ADMINTYPE_CHAR = 37;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -67,6 +69,7 @@ interface RoleParserConstants_mxJPO {
     "\"\\r\"",
     "\"\\t\"",
     "\"\\n\"",
+    "\"symbolicname\"",
     "\"description\"",
     "\"hidden\"",
     "\"!hidden\"",

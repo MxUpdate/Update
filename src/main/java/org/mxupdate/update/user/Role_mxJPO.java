@@ -144,6 +144,7 @@ public class Role_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
                 .singleIfTrue(  "kind",                     this.kind.name().toLowerCase(),     (this.kind != Kind.Role))
                 .flag(          "hidden",            false, this.isHidden())
@@ -193,7 +194,7 @@ public class Role_mxJPO
                 _mql.newLine().cmd("asaproject");
             }
         }
-
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
         DeltaUtil_mxJPO.calcValueDelta(     _mql, "description",        this.getDescription(),  _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(      _mql, "hidden",      false, this.isHidden(),        _current.isHidden());
         DeltaUtil_mxJPO.calcValueDelta(     _mql, "site",               this.getSite(),         _current.getSite());

@@ -13,13 +13,15 @@
  *
  */
 
-package org.mxupdate.test.ci.user;
+package org.mxupdate.test.test.update.user;
 
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ci.user.AbstractUserTest;
 import org.mxupdate.test.data.system.SiteData;
 import org.mxupdate.test.data.user.RoleData;
+import org.mxupdate.update.user.Role_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -27,12 +29,12 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Test cases for the export and update of roles.
+ * Tests the {@link Role_mxJPO role CI} export / update.
  *
  * @author The MxUpdate Team
  */
 @Test()
-public class RoleTest
+public class RoleCI_3UpdateTest
     extends AbstractUserTest<RoleData>
 {
     /**
@@ -132,9 +134,11 @@ public class RoleTest
                 .create()
                 .setSingle("kind", "organization")
                 .update("")
-                .checkExport()
+                .checkExport();
+        this.createNewData("Test")
                 .setSingle("kind", "project")
-                .failureUpdate(ErrorKey.USER_ROLE_NOT_ROLE_KIND)
+                .failureUpdate(ErrorKey.USER_ROLE_NOT_ROLE_KIND);
+        this.createNewData("Test")
                 .setSingle("kind", "organization")
                 .checkExport();
     }
@@ -152,9 +156,11 @@ public class RoleTest
                 .create()
                 .setSingle("kind", "organization")
                 .update("")
-                .checkExport()
+                .checkExport();
+        this.createNewData("Test")
                 .setSingle("kind", "role")
-                .failureUpdate(ErrorKey.USER_ROLE_NOT_ROLE_KIND)
+                .failureUpdate(ErrorKey.USER_ROLE_NOT_ROLE_KIND);
+        this.createNewData("Test")
                 .setSingle("kind", "organization")
                 .checkExport();
     }
@@ -172,9 +178,11 @@ public class RoleTest
                 .create()
                 .setSingle("kind", "project")
                 .update("")
-                .checkExport()
+                .checkExport();
+        this.createNewData("Test")
                 .setSingle("kind", "organization")
-                .failureUpdate(ErrorKey.USER_ROLE_NOT_ROLE_KIND)
+                .failureUpdate(ErrorKey.USER_ROLE_NOT_ROLE_KIND);
+        this.createNewData("Test")
                 .setSingle("kind", "project")
                 .checkExport();
     }
@@ -192,9 +200,11 @@ public class RoleTest
                 .create()
                 .setSingle("kind", "project")
                 .update("")
-                .checkExport()
+                .checkExport();
+        this.createNewData("Test")
                 .setSingle("kind", "role")
-                .failureUpdate(ErrorKey.USER_ROLE_NOT_ROLE_KIND)
+                .failureUpdate(ErrorKey.USER_ROLE_NOT_ROLE_KIND);
+        this.createNewData("Test")
                 .setSingle("kind", "project")
                 .checkExport();
     }

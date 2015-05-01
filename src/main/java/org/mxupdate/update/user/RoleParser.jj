@@ -25,11 +25,7 @@ options {
 package org.mxupdate.update.user;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.user.Role_mxJPO.Kind;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -38,6 +34,9 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 
+/**
+ * Parses the update format for {@link Role_mxJPO}.
+ */
 @SuppressWarnings("unused")
 class RoleParser
     extends AbstractParser_mxJPO<Role_mxJPO>
@@ -51,9 +50,10 @@ class RoleParser
 |   "\n"
 }
 
-<DEFAULT> TOKEN : /** first level */
+<DEFAULT> TOKEN :
 {
-      <DESCRIPTION:                         "description">                                  : STRING_EXPECTED
+      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+    | <DESCRIPTION:                         "description">                                  : STRING_EXPECTED
 
     | <HIDDEN_TRUE:                         "hidden">
     | <HIDDEN_FALSE:                        "!hidden">
@@ -128,7 +128,10 @@ void parse(final Role_mxJPO _role)
     Token tmp;
     AdminProperty property;
 } {
-    (   ( <DESCRIPTION>             ( tmp = <STRING>                        {this.setValue(_role, "description",                            this.getString(tmp.image));}
+    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_role, "symbolicNames",                     this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_role, "symbolicNames",                      this.getSingle(tmp.image));} ) )
+
+      | ( <DESCRIPTION>             ( tmp = <STRING>                        {this.setValue(_role, "description",                            this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.setValue(_role, "description",                            this.getSingle(tmp.image));} ) )
 
       | ( <KIND>                    ( <ORGANIZATION>                        {this.setValue(_role, "kind",                                   Kind.Organization);}
