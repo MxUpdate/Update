@@ -38,6 +38,15 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * Handles the export and update of &quot;system packages&quot;.
+ * The handled properties are:
+ * <ul>
+ * <li>description</li>
+ * <li>hidden flag</li>
+ * <li>{@link #custom} flag</li>
+ * <li>{@link #usesPackages used packages}</li>
+ * <li>{@link #members member admin objects}</li>
+ * <li>properties</li>
+ * </ul>
  *
  * @author The MxUpdate Team
  */
@@ -79,23 +88,6 @@ public class PackageCI_mxJPO
         this.prepare();
     }
 
-    /**
-     * Parsed administration object related XML tags. This includes:
-     * <ul>
-     * <li>description</li>
-     * <li>is the object {@link #hidden}</li>
-     * <li>{@link #custom} flag</li>
-     * <li>{@link #usesPackages used packages}</li>
-     * <li>{@link #members referenced members}</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache with MX context
-     * @param _url          URL within the XML
-     * @param _content      value of the URL
-     * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
-     *         <i>false</i>
-     * @see #IGNORED_URLS
-     */
     @Override()
     protected boolean parse(final ParameterCache_mxJPO _paramCache,
                             final String _url,
@@ -141,21 +133,6 @@ public class PackageCI_mxJPO
         Collections.sort(this.members);
     }
 
-    /**
-     * Writes the update script for this package. The package information are:
-     * <ul>
-     * <li>description</li>
-     * <li>hidden flag</li>
-     * <li>{@link #custom} flag</li>
-     * <li>{@link #usesPackages used packages}</li>
-     * <li>{@link #members member admin objects}</li>
-     * <li>properties</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          writer instance
-     * @throws IOException if the TCL update code could not be written
-     */
     @Override()
     protected void write(final ParameterCache_mxJPO _paramCache,
                          final Appendable _out)

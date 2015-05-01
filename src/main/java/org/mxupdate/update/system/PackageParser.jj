@@ -19,6 +19,7 @@ options {
     ERROR_REPORTING = true;
     USER_TOKEN_MANAGER = false;
     GENERATE_BOILERPLATE = false;
+    SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
 }
 PARSER_BEGIN(PackageParser)
 package org.mxupdate.update.system;
@@ -35,21 +36,19 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 
 /**
  * Parses the update format for {@link PackageCI_mxJPO}. */
-public class PackageParser
+@SuppressWarnings("unused")
+class PackageParser
     extends AbstractParser_mxJPO<PackageCI_mxJPO>
 {
 }
-PARSER_END(PackageParser)<DEFAULT> SKIP :
+PARSER_END(PackageParser)<*> SKIP :
 {
-    " "
-|   "\r"
-|   "\t"
-|   "\n"
+  " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
-<DEFAULT> TOKEN : /** first level */
+<DEFAULT> TOKEN :
 {
-      <DESCRIPTION:                         "description">                                  : STRING_EXPECTED
+      <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
     | <HIDDEN_TRUE:                         "hidden">
     | <HIDDEN_FALSE:                        "!hidden">
@@ -62,17 +61,17 @@ public class PackageParser
 }
 
 /************************************************************** Common String */
-<STRING_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
-
 <STRING_EXPECTED> TOKEN :
 {
-      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "{" | "}" | " ")*<APOSTROPHE>)> : DEFAULT
-    | <SINGLE: (<CHAR>)+> : DEFAULT
-    | <#APOSTROPHE: "\"" >
-    | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
+    | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/*************************************************** Common Multi-Line-String */
+<MULTILINESTRING_EXPECTED> TOKEN :
+{
+      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
+    | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
 }
 
 /********************************************************************* Member */
@@ -81,17 +80,10 @@ public class PackageParser
       <MEMBER:                              "member">                                       : MEMBERREF_EXPECTED
 }
 
-<MEMBERREF_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
-
 <MEMBERREF_EXPECTED> TOKEN :
 {
-      <MEMBERTYPE_STRING : (<MEMBERTYPE_APOSTROPHE>(<MEMBERTYPE_CHAR> | "\\\"" | "{" | "}" | " ")*<MEMBERTYPE_APOSTROPHE>)> : STRING_EXPECTED
-    | <MEMBERTYPE_SINGLE : (<MEMBERTYPE_CHAR>)+> : STRING_EXPECTED
-    | <#MEMBERTYPE_APOSTROPHE : "\"" >
-    | <#MEMBERTYPE_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <MEMBERTYPE_STRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
+    | <MEMBERTYPE_SINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
 }
 
 /******************************************************************* Property */
@@ -102,17 +94,10 @@ public class PackageParser
     | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
 }
 
-<ADMINREF_EXPECTED> SKIP :
-{
-    " " | "\t" | "\n" | "\r"
-}
-
 <ADMINREF_EXPECTED> TOKEN :
 {
-      <ADMINTYPE_STRING : (<ADMINTYPE_APOSTROPHE>(<ADMINTYPE_CHAR> | "\\\"" | "{" | "}" | " ")*<ADMINTYPE_APOSTROPHE>)> : STRING_EXPECTED
-    | <ADMINTYPE_SINGLE : (<ADMINTYPE_CHAR>)+> : STRING_EXPECTED
-    | <#ADMINTYPE_APOSTROPHE : "\"" >
-    | <#ADMINTYPE_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+      <ADMINTYPE_STRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
 }
 
 /**************************************************************************** */
@@ -128,8 +113,8 @@ void parse(final PackageCI_mxJPO _package)
     MemberRef member;
     AdminProperty property;
 } {
-    (   ( <DESCRIPTION>             ( tmp = <STRING>                        {this.setValue(_package, "description",                    this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_package, "description",                    this.getSingle(tmp.image));} ) )
+    (   ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_package, "description",                    this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>               {this.setValue(_package, "description",                    this.getSingle(tmp.image));} ) )
 
       | ( <HIDDEN_TRUE>                                                     {this.setValue(_package, "hidden",                         true);} )
       | ( <HIDDEN_FALSE>                                                    {this.setValue(_package, "hidden",                         false);} )
