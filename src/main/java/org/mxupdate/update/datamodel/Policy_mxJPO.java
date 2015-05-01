@@ -38,7 +38,6 @@ import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO;
-import org.mxupdate.update.datamodel.policy.PolicyDefParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
@@ -47,6 +46,8 @@ import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateLine;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.xml.sax.SAXException;
@@ -114,13 +115,11 @@ public class Policy_mxJPO
 
     /** Set of all types of this policy. */
     private final SortedSet<String> types = new TreeSet<String>();
-
     /** Are all types allowed of this policy? */
     private boolean allTypes;
 
     /** Are access for all states defined? */
     private boolean allState = false;
-
     /** Access definitions for all states. */
     private final AccessList_mxJPO allStateAccess = new AccessList_mxJPO();
 
@@ -139,23 +138,11 @@ public class Policy_mxJPO
         super(_typeDef, _mxName);
     }
 
-    /**
-     * Parses the given {@code _code} and updates this policy instance.
-     *
-     * @param _code     code to parse
-     * @throws SecurityException
-     * @throws IllegalArgumentException
-     * @throws NoSuchMethodException
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws InvocationTargetException
-     * @throws ParseException
-     */
-    @Override
+    @Override()
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
-        new PolicyDefParser_mxJPO(new StringReader(_code)).parse(this);
+        new PolicyParser_mxJPO(new StringReader(_code)).parse(this);
         this.prepare();
     }
 
@@ -306,56 +293,43 @@ public class Policy_mxJPO
                          final Appendable _out)
         throws IOException
     {
-        this.writeHeader(_paramCache, _out);
-        _out.append("mxUpdate policy \"${NAME}\" {\n")
-            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n")
-            .append("    ").append(this.isHidden() ? "" : "!").append("hidden\n");
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(_paramCache);
 
-        // types
-        if (this.allTypes)  {
-            _out.append("    type all\n");
-        } else  {
-            _out.append("    type {").append(StringUtil_mxJPO.convertUpdate(true, this.types, null)).append("}\n");
-        }
+        this.writeHeader(_paramCache, updateBuilder.getStrg());
 
-        // formats and locking enforced
-        if (this.allFormats)  {
-            _out.append("    format all\n");
-        } else  {
-            _out.append("    format {").append(StringUtil_mxJPO.convertUpdate(true, this.formats, null)).append("}\n");
-        }
-        _out.append("    defaultformat \"").append(StringUtil_mxJPO.convertUpdate(this.defaultFormat)).append("\"\n");
-        if (this.enforce)  {
-            _out.append("    enforce\n");
-        }
-
-        // major / minor sequence and delimiter
-        if ((this.delimiter != null) && !this.delimiter.isEmpty())  {
-            _out.append("    delimiter ").append(StringUtil_mxJPO.convertUpdate(this.delimiter)).append('\n')
-                .append("    minorsequence \"").append(StringUtil_mxJPO.convertUpdate(this.minorsequence)).append("\"\n")
-                .append("    majorsequence \"").append(StringUtil_mxJPO.convertUpdate(this.majorsequence)).append("\"\n");
-        } else  {
-            _out.append("    sequence \"").append(StringUtil_mxJPO.convertUpdate(this.minorsequence)).append("\"\n");
-        }
-
-        _out.append("    store \"").append(StringUtil_mxJPO.convertUpdate(this.store)).append("\"\n");
+        updateBuilder.start("policy")
+                //                  tag             | default | value                                                                 | write?
+                .string(            "description",              this.getDescription())
+                .flag(              "hidden",            false, this.isHidden())
+                .singleIfTrue(      "type",                     "all",                                                                  this.allTypes)
+                .listOneLineIfTrue( "type",                     this.types,                                                             !this.allTypes)
+                .singleIfTrue(      "format",                   "all",                                                                  this.allFormats)
+                .listOneLineIfTrue("format",                    this.formats,                                                           !this.allFormats)
+                .string(            "defaultformat",            this.defaultFormat)
+                .flagIfTrue(        "enforce",           false, this.enforce,                                                           this.enforce)
+                .stringIfTrue(      "delimiter",                this.delimiter,                                                         (this.delimiter != null) && !this.delimiter.isEmpty())
+                .stringIfTrue(      "minorsequence",            this.minorsequence,                                                     (this.delimiter != null) && !this.delimiter.isEmpty())
+                .stringIfTrue(      "majorsequence",            this.majorsequence,                                                     (this.delimiter != null) && !this.delimiter.isEmpty())
+                .stringIfTrue(      "sequence",                 this.minorsequence,                                                     (this.delimiter == null) || this.delimiter.isEmpty())
+                .string(            "store",                    this.store);
 
         // all state access
         if (this.allState)  {
-            _out.append("    allstate {\n");
-            this.allStateAccess.write(_paramCache, "        ", _out);
-            _out.append("    }\n");
+            updateBuilder.childStart("allstate");
+            this.allStateAccess.write(updateBuilder);
+            updateBuilder.childEnd();
         }
 
         // all states
         for (final State state : this.states)  {
-            state.write(_paramCache, "    ", _out);
+            state.write(_paramCache, updateBuilder);
         }
 
-        // append properties
-        this.getProperties().writeProperties(_paramCache, _out, "    ");
+        updateBuilder
+                .properties(this.getProperties())
+                .end();
 
-        _out.append("}");
+        _out.append(updateBuilder.toString());
     }
 
     /**
@@ -455,39 +429,25 @@ public class Policy_mxJPO
             _mql.newLine().cmd("store ").arg("ADMINISTRATION");
         }
 
-        _current.calcAllStateAccess(_paramCache, _mql, this);
+        // all state access
+        if (this.allState)  {
+            if (!_current.allState)  {
+                _mql.newLine().cmd("add allstate public none owner none");
+            }
+
+            _mql.pushPrefixByAppending("allstate");
+            this.allStateAccess.calcDelta(_mql, (this.allStateAccess != null) ? this.allStateAccess : null);
+            _mql.popPrefix();
+        } else if (this.allState)  {
+            _mql.newLine().cmd("remove allstate");
+        }
+
+        // states delta
         _current.calcStatesDelta(_paramCache, _mql, this);
 
         // properties
         this.getProperties().calcDelta(_mql, "", _current.getProperties());
 
-    }
-
-    /**
-     * Calculates the delta for the all state definition between this policy
-     * and given new (target) policy <code>_newPolicy</code>.
-     *
-     * @param _paramCache   parameter cache (used for logging purposes)
-     * @param _mql          MQL builder for the MQL commands
-     * @param _newPolicy    new target policy definition
-     */
-    private void calcAllStateAccess(final ParameterCache_mxJPO _paramCache,
-                                    final MultiLineMqlBuilder _mql,
-                                    final Policy_mxJPO _newPolicy)
-    {
-        if (_newPolicy.allState)  {
-            if (!this.allState)  {
-                _mql.newLine().cmd("add allstate public none owner none");
-            }
-            if (this.allStateAccess != null)  {
-                _mql.pushPrefixByAppending("allstate");
-                this.allStateAccess.cleanup(_mql);
-                _mql.popPrefix();
-            }
-            _newPolicy.allStateAccess.update(_mql);
-        } else if (this.allState)  {
-            _mql.newLine().cmd("remove allstate");
-        }
     }
 
     /**
@@ -777,63 +737,41 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
          * </ul>
          */
         public void write(final ParameterCache_mxJPO _paramCache,
-                          final String _prefix,
-                          final Appendable _out)
-            throws IOException
+                          final UpdateBuilder_mxJPO _updateBuilder)
         {
-            // state name and registered name
-            _out.append("    state \"").append(StringUtil_mxJPO.convertUpdate(this.name)).append("\" {\n");
-            if (this.symbolicNames.isEmpty())  {
-                _out.append("        registeredName \"").append("state_").append(StringUtil_mxJPO.convertUpdate(this.name.replaceAll(" ", "_"))).append("\"\n");
-            } else  {
-                for (final String symbolicName : this.symbolicNames)  {
-                    _out.append("        registeredName \"").append(StringUtil_mxJPO.convertUpdate(symbolicName)).append("\"\n");
-                }
-            }
-            // enforcereserveaccess flag (if supported)
-            if (_paramCache.getValueBoolean(ValueKeys.DMPolicyStateSupportsEnforceReserveAccess))  {
-                _out.append("        ").append((this.enforcereserveaccess) ? "" : "!").append("enforcereserveaccess").append('\n');
-            }
-            // major / minor revision (old / new format)
-            if (_paramCache.getValueBoolean(ValueKeys.DMPolicySupportsMajorMinor))  {
-                _out.append("        ").append(this.majorrevisionable ? "" : "!").append("majorrevision\n")
-                    .append("        ").append(this.minorrevisionable ? "" : "!").append("minorrevision\n");
-            } else  {
-                _out.append("        ").append(this.minorrevisionable ? "" : "!").append("revision\n");
-            }
+//            if (this.symbolicNames.isEmpty())  {
+   //             _out.append("        registeredName \"").append("state_").append(StringUtil_mxJPO.convertUpdate(this.name.replaceAll(" ", "_"))).append("\"\n");
 
-            // other basics
-            _out.append("        ").append(this.versionable ? "" : "!").append("version\n")
-                .append("        ").append(this.autoPromotion ? "" : "!").append("promote\n")
-                .append("        ").append(this.checkoutHistory ? "" : "!").append("checkouthistory\n");
-            // published flag (if supported)
-            if (_paramCache.getValueBoolean(ValueKeys.DMPolicyStateSupportsPublished))  {
-                _out.append("        ").append(this.published ? "" : "!").append("published\n");
-            }
+            _updateBuilder
+                    .childStart("state \""+ StringUtil_mxJPO.convertUpdate(this.name) + "\"")
+                    .list(          "registeredName",              this.symbolicNames)
+                    .flagIfTrue(    "enforcereserveaccess", false, this.enforcereserveaccess,    _paramCache.getValueBoolean(ValueKeys.DMPolicyStateSupportsEnforceReserveAccess))
+                    .flagIfTrue(    "majorrevision",        false, this.majorrevisionable,       _paramCache.getValueBoolean(ValueKeys.DMPolicySupportsMajorMinor))
+                    .flagIfTrue(    "minorrevision",        false, this.minorrevisionable,       _paramCache.getValueBoolean(ValueKeys.DMPolicySupportsMajorMinor))
+                    .flagIfTrue(    "revision",             false, this.minorrevisionable,       !_paramCache.getValueBoolean(ValueKeys.DMPolicySupportsMajorMinor))
+                    .flag(          "version",              false, this.versionable)
+                    .flag(          "promote",              false, this.autoPromotion)
+                    .flag(          "checkouthistory",      false, this.checkoutHistory)
+                    .flagIfTrue(    "published",            false, this.published,          _paramCache.getValueBoolean(ValueKeys.DMPolicyStateSupportsPublished));
             // route
             if ((this.routeMessage != null) || !this.routeUsers.isEmpty())  {
-                _out.append("        route {")
-                    .append(StringUtil_mxJPO.convertUpdate(true, this.routeUsers, null))
-                    .append("} \"")
-                    .append(StringUtil_mxJPO.convertUpdate(this.routeMessage)).append("\"\n");
-            }
-            // write access statements
-            this.access.write(_paramCache, "        ", _out);
-            // write event statements
-            _out.append("        action \"").append(StringUtil_mxJPO.convertUpdate(this.actionProgram)).append("\" input \"").append(StringUtil_mxJPO.convertUpdate(this.actionInput)).append("\"\n")
-                .append("        check \"").append(StringUtil_mxJPO.convertUpdate(this.checkProgram))  .append("\" input \"").append(StringUtil_mxJPO.convertUpdate(this.checkInput)).append("\"\n");
-            // output of triggers, but sorted!
-            this.triggers.write(_out, "        ");
-            // signatures
-            for (final Signature signature : this.signatures)  {
-                signature.write(_out);
+                _updateBuilder.stepStartNewLine().stepSingle("route {" + StringUtil_mxJPO.convertUpdate(true, this.routeUsers, null) + "}").stepString(this.routeMessage).stepEndLine();
             }
 
-            // write properties
-            // (properties are first written with text and then new line flag)
-            this.properties.writeProperties(_paramCache, _out, "        ");
+            this.access.write(_updateBuilder);
 
-            _out.append("    }\n");
+            if (((this.actionProgram != null) && !this.actionProgram.isEmpty()) || ((this.actionInput != null) && !this.actionInput.isEmpty()))  {
+                _updateBuilder.stepStartNewLine().stepSingle("action").stepString(this.actionProgram).stepSingle("input").stepString(this.actionInput).stepEndLine();
+            }
+            if (((this.checkProgram != null) && !this.checkProgram.isEmpty()) || ((this.checkInput != null) && !this.checkInput.isEmpty()))  {
+                _updateBuilder.stepStartNewLine().stepSingle("check").stepString(this.checkProgram).stepSingle("input").stepString(this.checkInput).stepEndLine();
+            }
+
+            _updateBuilder
+                    .write(this.triggers)
+                    .list(this.signatures)
+                    .properties(this.properties)
+                    .childEnd();
         }
 
         /**
@@ -886,10 +824,7 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
             }
 
             // access list
-            if (_oldState != null)  {
-                _oldState.access.cleanup(_mql);
-            }
-            this.access.update(_mql);
+            this.access.calcDelta(_mql, (_oldState != null) ? _oldState.access : null);
 
             // triggers
             this.triggers.calcDelta(_mql, (_oldState != null) ? _oldState.triggers : null);
@@ -932,6 +867,7 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
      * Class defining a signature for a state.
      */
     public static class Signature
+        implements UpdateLine
     {
         /** Name of the signature. */
         private String name;
@@ -952,19 +888,19 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
          * Appends the signature information including the branch, filter and
          * the approve, ignore and reject users.
          *
-         * @param _out  appendable instance
-         * @throws IOException if the TCL update code could not appended
+         * @param _updateBuilder    update builder
          */
-        protected void write(final Appendable _out)
-            throws IOException
+        @Override()
+        public void write(final UpdateBuilder_mxJPO _updateBuilder)
         {
-            _out.append("        signature \"").append(StringUtil_mxJPO.convertUpdate(this.name)).append("\" {\n")
-                .append("            branch \"").append(StringUtil_mxJPO.convertUpdate(this.branch)).append("\"\n")
-                .append("            approve {").append(StringUtil_mxJPO.convertUpdate(true, this.approverUsers, null)).append("}\n")
-                .append("            ignore {").append(StringUtil_mxJPO.convertUpdate(true, this.ignoreUsers, null)).append("}\n")
-                .append("            reject {").append(StringUtil_mxJPO.convertUpdate(true, this.rejectUsers, null)).append("}\n")
-                .append("            filter \"").append(StringUtil_mxJPO.convertUpdate(this.filter)).append("\"\n")
-                .append("        }\n");
+            _updateBuilder
+                    .childStart(    "signature",    this.name)
+                    .string(        "branch",       this.branch)
+                    .listOneLine(   "approve",      this.approverUsers)
+                    .listOneLine(   "ignore",       this.ignoreUsers)
+                    .listOneLine(   "reject",       this.rejectUsers)
+                    .string(        "filter",       this.filter)
+                    .childEnd();
         }
 
         /**

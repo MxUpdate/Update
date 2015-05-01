@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.datamodel.helper;
 
-import java.io.IOException;
 import java.util.Stack;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -25,7 +24,6 @@ import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.util.CompareToUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateList;
 
@@ -105,26 +103,6 @@ public class TriggerList_mxJPO
                     .stepSingle("trigger").stepSingle(trigger.eventType).stepSingle(trigger.kind).stepString(trigger.program)
                     .stepSingle("input").stepString(trigger.arguments)
                     .stepEndLine();
-        }
-    }
-
-    /**
-     * Writes the sorted trigger information to the writer instance.
-     *
-     * @param _out      writer instance
-     * @param _prefix   prefix written before trigger definition
-     * @throws IOException if write failed
-     */
-    @Deprecated()
-    public void write(final Appendable _out,
-                      final String _prefix)
-        throws IOException
-    {
-        for (final Trigger trigger : this)  {
-            _out.append(_prefix)
-                .append("trigger ").append(trigger.eventType).append(' ').append(trigger.kind)
-                .append(" \"").append(StringUtil_mxJPO.convertUpdate(trigger.program)).append("\"")
-                .append(" input \"").append(StringUtil_mxJPO.convertUpdate(trigger.arguments)).append("\"\n");
         }
     }
 

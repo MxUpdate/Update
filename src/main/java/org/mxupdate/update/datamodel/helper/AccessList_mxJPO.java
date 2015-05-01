@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.datamodel.helper;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -50,8 +49,6 @@ public class AccessList_mxJPO
         private boolean revoke = false;
         /** Login access. */
         private boolean login = false;
-        /** Prefix for the access kind. */
-        private final Prefix prefix = Prefix.All;
         /** Access kind. */
         private String kind = "user";
         /** Holds the user references of a user access. */
@@ -148,7 +145,6 @@ public class AccessList_mxJPO
 
             ret = CompareToUtil_mxJPO.compare(ret, this.revoke ? "1" : "0", _compareTo.revoke ? "1" : "0");
             ret = CompareToUtil_mxJPO.compare(ret, this.login ? "1" : "0",  _compareTo.login ? "1" : "0");
-            ret = CompareToUtil_mxJPO.compare(ret, this.prefix.name(),      _compareTo.prefix.name());
             ret = CompareToUtil_mxJPO.compare(ret, this.kind,               _compareTo.kind);
             ret = CompareToUtil_mxJPO.compare(ret, this.userRef,            _compareTo.userRef);
             ret = CompareToUtil_mxJPO.compare(ret, this.key,                _compareTo.key);
@@ -294,16 +290,10 @@ public class AccessList_mxJPO
         for (final AccessList_mxJPO.Access access : this.accessList)  {
             if (!access.isEmpty())  {
                 _updateBuilder.stepStartNewLine();
-                // revoke?
-                if (access.prefix != Prefix.All)  {
-                    _updateBuilder.stepSingle(access.prefix.mxValue);
-                }
-
                 // revoke
                 if (access.revoke)  {
                     _updateBuilder.stepSingle("revoke");
                 }
-
                 // login
                 if (access.login)  {
                     _updateBuilder.stepSingle("login");
@@ -355,75 +345,6 @@ public class AccessList_mxJPO
             }
         }
     }
-    /**
-     * Writes specific information about all defined access definition to the
-     * given writer instance {@code _out}.
-     *
-     * @param _paramCache   parameter cache
-     * @param _prefix       prefix written in front of each line
-     * @param _out          writer instance
-     * @throws IOException if the TCL update code could not be written
-     */
-    public void write(final ParameterCache_mxJPO _paramCache,
-                      final String _prefix,
-                      final Appendable _out)
-        throws IOException
-    {
-        for (final AccessList_mxJPO.Access access : this.accessList)  {
-            if (!access.isEmpty())  {
-                _out.append(_prefix.substring(0, _prefix.length() - 1));
-
-                // revoke?
-                if (access.prefix != Prefix.All)  {
-                    _out.append(' ').append(access.prefix.mxValue);
-                }
-
-                // kind
-                _out.append(' ').append(access.kind);
-
-                // append user reference (only if not public / owner definition)
-                if (!"public".equals(access.kind) && !"owner".equals(access.kind))  {
-                    _out.append(" \"").append(StringUtil_mxJPO.convertUpdate(access.userRef)).append('\"');
-                }
-
-                // key
-                if ((access.key != null) && !access.key.isEmpty())  {
-                    _out.append(" key \"").append(StringUtil_mxJPO.convertUpdate(access.key)).append('\"');
-                }
-
-                // access
-                _out.append(" {").append(StringUtil_mxJPO.convertUpdate(false, access.access, null)).append('}');
-
-                // user items
-                if ((access.organization != null) && !access.organization.isEmpty() && !"any".equals(access.organization))  {
-                    _out.append(' ').append(access.organization).append(" organization");
-                }
-                if ((access.project != null) && !access.project.isEmpty() && !"any".equals(access.project))  {
-                    _out.append(' ').append(access.project).append(" project");
-                }
-                if ((access.owner != null) && !access.owner.isEmpty() && !"any".equals(access.owner))  {
-                    _out.append(' ').append(access.owner).append(" owner");
-                }
-                if ((access.reserve != null) && !access.reserve.isEmpty() && !"any".equals(access.reserve))  {
-                    _out.append(' ').append(access.reserve).append(" reserve");
-                }
-                if ((access.maturity != null) && !access.maturity.isEmpty() && !"any".equals(access.maturity))  {
-                    _out.append(' ').append(access.maturity).append(" maturity");
-                }
-                if ((access.category != null) && !access.category.isEmpty() && !"any".equals(access.category))  {
-                    _out.append(' ').append(access.category).append(" category");
-                }
-                if ((access.filter != null) && !access.filter.isEmpty())  {
-                    _out.append(" filter \"").append(StringUtil_mxJPO.convertUpdate(access.filter)).append('\"');
-                }
-                if ((access.localfilter != null) && !access.localfilter.isEmpty())  {
-                    _out.append(" localfilter \"").append(StringUtil_mxJPO.convertUpdate(access.localfilter)).append('\"');
-                }
-                _out.append('\n');
-            }
-        }
-    }
-
 
     /**
      * Calculates the delta between current access definition and this
@@ -460,9 +381,6 @@ public class AccessList_mxJPO
             .cmd("owner none filter ").arg("").cmd(" remove owner all");
         for (final AccessList_mxJPO.Access access : this.accessList)  {
             _mql.cmd(" remove");
-            if (access.prefix != Prefix.All)  {
-                _mql.cmd(" ").cmd(access.prefix.mxValue);
-            }
             // revoke
             if (access.revoke)  {
                 _mql.cmd(" revoke");
@@ -503,10 +421,6 @@ public class AccessList_mxJPO
                 // login
                 if (access.login)  {
                     _mql.cmd(" login");
-                }
-                // prefix login / revoke?
-                if (access.prefix != Prefix.All)  {
-                    _mql.cmd(" ").cmd(access.prefix.mxValue);
                 }
                 // kind
                 _mql.cmd(" ").cmd(access.kind);
@@ -559,32 +473,6 @@ public class AccessList_mxJPO
                     _mql.cmd(" localfilter ").arg(access.localfilter);
                 }
             }
-        }
-    }
-
-    /**
-     * Possible prefixes for the access definition.
-     */
-    public enum Prefix
-    {
-        /** All prefix. */
-        All(""),
-        /** Login prefix. */
-        Login("login"),
-        /** Revoke prefix. */
-        Revoke("revoke");
-
-        /** Internal used value. */
-        private final String mxValue;
-
-        /**
-         * Constructor.
-         *
-         * @param _mxValue      internal MX value
-         */
-        private Prefix(final String _mxValue)
-        {
-            this.mxValue = _mxValue;
         }
     }
 }

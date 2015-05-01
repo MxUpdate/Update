@@ -4,6 +4,9 @@
 /InterfaceParser.java
 /InterfaceParserConstants.java
 /InterfaceParserTokenManager.java
+/PolicyParser.java
+/PolicyParserConstants.java
+/PolicyParserTokenManager.java
 /RelationshipParser.java
 /RelationshipParserConstants.java
 /RelationshipParserTokenManager.java

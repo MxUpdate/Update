@@ -19,11 +19,12 @@ options {
     ERROR_REPORTING = true;
     USER_TOKEN_MANAGER = false;
     GENERATE_BOILERPLATE = false;
+    SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
 }
 
-PARSER_BEGIN(PolicyDefParser)
+PARSER_BEGIN(PolicyParser)
 
-package org.mxupdate.update.datamodel.policy;
+package org.mxupdate.update.datamodel;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -34,11 +35,8 @@ import java.util.Set;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
-import org.mxupdate.update.datamodel.Policy_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO.State;
-import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
-import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Prefix;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
@@ -47,11 +45,12 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
-public class PolicyDefParser
+@SuppressWarnings("unused")
+class PolicyParser
     extends AbstractParser_mxJPO<Policy_mxJPO>
 {
 }
-PARSER_END(PolicyDefParser)
+PARSER_END(PolicyParser)
 
 <DEFAULT> SKIP :
 {
@@ -366,6 +365,7 @@ void parse(final Policy_mxJPO _policy)
     String tmpStr;
     Token tmp;
     AdminProperty property;
+    Access access = new Access();
 } {
     (   ( <DESCRIPTION>             ( tmp = <S_STRING>                          {this.setValue(_policy, "description", this.getString(tmp.image));}
                                     | tmp = <S_SINGLE_STRING>                   {this.setValue(_policy, "description", this.getSingle(tmp.image));} ) )
@@ -393,7 +393,17 @@ void parse(final Policy_mxJPO _policy)
       | ( (   <HIDDEN_FALSE>
             | <HIDDEN_FALSE_VIA_VALUE>
             | <HIDDEN_FALSE_VIA_VALUE_APOSTROPHE> )                             {this.setValue(_policy, "hidden", false);} )
-      | ( allstate(_policy) )
+
+      | ( <ALLSTATE> "{"                                                        {this.setValue(_policy, "allState", true);}
+               ( ( <REVOKE>                                                     {this.setValue(access, "revoke", true);} ) ?
+                 ( <LOGIN>                                                      {this.setValue(access, "login", true);} ) ?
+                        ( <OWNER>                                               {this.setValue(access, "kind", "owner");}
+                        | <PUBLIC>                                              {this.setValue(access, "kind", "public");}
+                        | <USER>    ( tmp = <STATEACCESS_STRING>                {this.setValue(access, "kind", "user");this.setValue(access, "userRef", this.getString(tmp.image));}
+                                    | tmp = <STATEACCESS_SINGLE_STRING>         {this.setValue(access, "kind", "user");this.setValue(access, "userRef", this.getSingle(tmp.image));} ) )
+                                                stateAccessDef(access)          {this.appendValue(_policy, "allStateAccess", "accessList", access);/*reset*/access = new Access();} )*
+                                                        "}" )
+
       | ( state(_policy) )
       | (<PROPERTY>                                                             {property = new AdminProperty();this.appendValue(this.getValue(_policy, "properties"), "propertiesStack", property);}
                                     ( tmp = <S_STRING>                          {this.setValue(property, "name", this.getString(tmp.image));}
@@ -423,7 +433,7 @@ void format(final Policy_mxJPO _policy) :
       | ( set = lList() )
     )
     {
-        this.getField(_policy, "formats").set(set);
+        this.setValue(_policy, "formats", set);
     }
 }
 
@@ -443,30 +453,7 @@ void type(final Policy_mxJPO _policy) :
       | ( set = lList() )
     )
     {
-        this.getField(_policy, "types").set(set);
-    }
-}
-
-/**
- * Parses the all state definition.
- *
- * @param _policy   policy for which the all state definition is parsed
- */
-void allstate(final Policy_mxJPO _policy) : {
-    final AccessList_mxJPO accessList = this.getField(_policy, "allStateAccess").<AccessList_mxJPO>get();
-} {
-    <ALLSTATE>
-    "{"
-        (
-            stateOwnerAccess(Prefix.All, accessList)
-          | statePublicAccess(Prefix.All, accessList)
-          | stateUserAccess(Prefix.All, accessList)
-          | ( <REVOKE> ( stateOwnerAccess(Prefix.Revoke, accessList) | statePublicAccess(Prefix.Revoke, accessList) | stateUserAccess(Prefix.Revoke, accessList) ) )
-          | ( <LOGIN>  ( stateOwnerAccess(Prefix.Login,  accessList) | statePublicAccess(Prefix.Login,  accessList) | stateUserAccess(Prefix.Login,  accessList) ) )
-        )*
-    "}"
-    {
-        this.getField(_policy, "allState").set(true);
+        this.setValue(_policy, "types", set);
     }
 }
 
@@ -477,11 +464,11 @@ void allstate(final Policy_mxJPO _policy) : {
  */
 void state(final Policy_mxJPO _policy) : {
     final State state = new State();
-    final AccessList_mxJPO accessList = this.getField(state, "access").<AccessList_mxJPO>get();
     String tmpStr;
     Set<String> tmpSet;
     Token tmp;
     AdminProperty property;
+    Access access = new Access();
 } {
     ( <STATE>                       ( tmp = <S_STRING>                          {this.setValue(state, "name", this.getString(tmp.image));}
                                     | tmp = <S_SINGLE_STRING>                   {this.setValue(state, "name", this.getSingle(tmp.image));} ) )
@@ -544,11 +531,14 @@ void state(final Policy_mxJPO _policy) : {
                 | <PUBLISHED_FALSE_VIA_VALUE>
                 | <PUBLISHED_FALSE_VIA_VALUE_APOSTROPHE>)                       {this.setValue(state, "published", false);} )
 
-            | stateOwnerAccess(Prefix.All, accessList)
-            | statePublicAccess(Prefix.All, accessList)
-            | stateUserAccess(Prefix.All, accessList)
-            | ( <REVOKE> ( stateOwnerAccess(Prefix.Revoke, accessList) | statePublicAccess(Prefix.Revoke, accessList) | stateUserAccess(Prefix.Revoke, accessList) ) )
-            | ( <LOGIN>  ( stateOwnerAccess(Prefix.Login,  accessList) | statePublicAccess(Prefix.Login,  accessList) | stateUserAccess(Prefix.Login,  accessList) ) )
+            | ( ( <REVOKE>                                                      {this.setValue(access, "revoke", true);} ) ?
+                ( <LOGIN>                                                       {this.setValue(access, "login", true);} ) ?
+                        ( <OWNER>                                               {this.setValue(access, "kind", "owner");}
+                        | <PUBLIC>                                              {this.setValue(access, "kind", "public");}
+                        | <USER>    ( tmp = <STATEACCESS_STRING>                {this.setValue(access, "kind", "user");this.setValue(access, "userRef", this.getString(tmp.image));}
+                                    | tmp = <STATEACCESS_SINGLE_STRING>         {this.setValue(access, "kind", "user");this.setValue(access, "userRef", this.getSingle(tmp.image));} ) )
+                                                stateAccessDef(access)          {this.appendValue(state, "access", "accessList", access);/*reset*/access = new Access();} )
+
             | ( <ACTION>            ( tmp = <S_STRING>                          {this.setValue(state, "actionProgram", this.getString(tmp.image));}
                                     | tmp = <S_SINGLE_STRING>                   {this.setValue(state, "actionProgram", this.getSingle(tmp.image));} )
                            <INPUT>  ( tmp = <S_STRING>                          {this.setValue(state, "actionInput", this.getString(tmp.image));}
@@ -557,8 +547,8 @@ void state(final Policy_mxJPO _policy) : {
                                     | tmp = <S_SINGLE_STRING>                   {this.setValue(state, "checkProgram", this.getSingle(tmp.image));} )
                            <INPUT>  ( tmp = <S_STRING>                          {this.setValue(state, "checkInput", this.getString(tmp.image));}
                                     | tmp = <S_SINGLE_STRING>                   {this.setValue(state, "checkInput", this.getSingle(tmp.image));} ) )
-            | ( <ROUTE>             tmpSet = lsList()                           {this.getField(state, "routeUsers").set(tmpSet);}
-                                    tmpStr = sString()                          {this.getField(state, "routeMessage").set(tmpStr);})
+            | ( <ROUTE>             tmpSet = lsList()                           {this.setValue(state, "routeUsers", tmpSet);}
+                                    tmpStr = sString()                          {this.setValue(state, "routeMessage", tmpStr);})
             | stateTrigger(state)
             | stateSignature(state)
             | (<PROPERTY>                                                       {property = new AdminProperty();this.appendValue(this.getValue(state, "properties"), "propertiesStack", property);}
@@ -574,59 +564,6 @@ void state(final Policy_mxJPO _policy) : {
     "}"
     {
         this.appendValue(_policy, "states", state);
-    }
-}
-
-/**
- * Parses the access and filter expression for the owner definition.
- *
- * @param _prefix   access filter prefix
- * @param _access   current parsed access definition of the policy
- */
-void stateOwnerAccess(final Prefix _prefix, final AccessList_mxJPO _accessList) : {
-    final Access access = new Access();
-}  {
-    ( <OWNER> stateAccessDef(access) )
-    {
-        this.getField(access, "prefix").set(_prefix);
-        this.getField(access, "kind").set("owner");
-        ((Collection<Access>)(this.getValue(_accessList, "accessList"))).add(access);
-    }
-}
-
-/**
- * Parses the access and filter expression for the public definition.
- *
- * @param _prefix   access filter prefix
- * @param _access   current parsed access definition of the policy
- */
-void statePublicAccess(final Prefix _prefix, final AccessList_mxJPO _accessList) : {
-    final Access access = new Access();
-}  {
-    ( <PUBLIC> stateAccessDef(access) )
-    {
-        this.getField(access, "prefix").set(_prefix);
-        this.getField(access, "kind").set("public");
-        ((Collection<Access>)(this.getValue(_accessList, "accessList"))).add(access);
-    }
-}
-
-/**
- * Parses the access and filter expression for a user definition.
- *
- * @param _prefix   access filter prefix
- * @param _access   current parsed access definition of the policy
- */
-void stateUserAccess(final Prefix _prefix, final AccessList_mxJPO _accessList) : {
-    final Access access = new Access();
-    String user;
-}  {
-    ( <USER> user  = stateAccessString() stateAccessDef(access) )
-    {
-        this.getField(access, "prefix").set(_prefix);
-        this.getField(access, "kind").set("user");
-        this.getField(access, "userRef").set(user);
-        ((Collection<Access>)(this.getValue(_accessList, "accessList"))).add(access);
     }
 }
 
@@ -731,13 +668,13 @@ void stateSignature(final State _state) : {
     String tmpStr;
     Set<String> tmpSet;
 } {
-    <SIGNATURE> tmpStr = sString() {this.getField(signature, "name").set(tmpStr);}
+    <SIGNATURE> tmpStr = sString() {this.setValue(signature, "name", tmpStr);}
     "{"
-        ( (<BRANCH> tmpStr = sString()  {this.getField(signature, "branch").set(tmpStr);})
-        | (<APPROVE> tmpSet = lList()   {this.getField(signature, "approverUsers").set(tmpSet);})
-        | (<IGNORE> tmpSet = lList()    {this.getField(signature, "ignoreUsers").set(tmpSet);})
-        | (<REJECT> tmpSet = lList()    {this.getField(signature, "rejectUsers").set(tmpSet);})
-        | (<FILTER> tmpStr = sString()  {this.getField(signature, "filter").set(tmpStr);})) *
+        ( (<BRANCH> tmpStr = sString()  {this.setValue(signature, "branch", tmpStr);})
+        | (<APPROVE> tmpSet = lList()   {this.setValue(signature, "approverUsers", tmpSet);})
+        | (<IGNORE> tmpSet = lList()    {this.setValue(signature, "ignoreUsers", tmpSet);})
+        | (<REJECT> tmpSet = lList()    {this.setValue(signature, "rejectUsers", tmpSet);})
+        | (<FILTER> tmpStr = sString()  {this.setValue(signature, "filter", tmpStr);})) *
     "}"
     {
         this.appendValue(_state, "signatures", signature);

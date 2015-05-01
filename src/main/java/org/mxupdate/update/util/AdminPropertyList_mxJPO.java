@@ -286,7 +286,12 @@ public class AdminPropertyList_mxJPO
                           final AdminPropertyList_mxJPO _currents)
     {
         final SortedSet<AdminProperty> thisProps = new TreeSet<AdminProperty>(this.propertiesStack);
-        final SortedSet<AdminProperty> currProps = new TreeSet<AdminProperty>(_currents.propertiesStack);
+        final SortedSet<AdminProperty> currProps;
+        if (_currents != null)  {
+            currProps = new TreeSet<AdminProperty>(_currents.propertiesStack);
+        } else  {
+            currProps = new TreeSet<AdminProperty>();
+        }
 
         // check properties to remove
         if (_currents != null)  {

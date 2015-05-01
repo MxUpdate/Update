@@ -18,6 +18,7 @@ package org.mxupdate.test.update.datamodel.helper;
 import java.io.IOException;
 
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -34,7 +35,7 @@ public class AccessListTest
     {
         return new Object[][]
         {
-            {" user \"A\" {read}\n login user \"A\" {read}\n",
+            {"    user \"A\" {read}\n    login user \"A\" {read}\n",
                 new String[]{
                     "/userAccessList/userAccess", "",
                     "/userAccessList/userAccess/userRef", "A",
@@ -44,7 +45,7 @@ public class AccessListTest
                     "/userAccessList/userAccess/userRef", "A",
                     "/userAccessList/userAccess/access/ReadAccess", ""}
             },
-            {" user \"A\" {read}\n revoke user \"A\" {read}\n",
+            {"    user \"A\" {read}\n    revoke user \"A\" {read}\n",
                 new String[]{
                     "/userAccessList/userAccess", "",
                     "/userAccessList/userAccess/userRef", "A",
@@ -54,14 +55,14 @@ public class AccessListTest
                     "/userAccessList/userAccess/userRef", "A",
                     "/userAccessList/userAccess/access/ReadAccess", ""}
             },
-            {" owner {read}\n public {read}\n",
+            {"    owner {read}\n    public {read}\n",
                 new String[]{
                     "/publicAccess", "",
                     "/publicAccess/access/ReadAccess", "",
                     "/ownerAccess", "",
                     "/ownerAccess/access/ReadAccess", ""}
             },
-            {" user \"111\" {read}\n user \"222\" {read}\n",
+            {"    user \"111\" {read}\n    user \"222\" {read}\n",
                 new String[]{
                     "/userAccessList/userAccess", "",
                     "/userAccessList/userAccess/userRef", "222",
@@ -70,7 +71,7 @@ public class AccessListTest
                     "/userAccessList/userAccess/userRef", "111",
                     "/userAccessList/userAccess/access/ReadAccess", ""}
             },
-            {" user \"A\" key \"111\" {read}\n user \"A\" key \"222\" {read}\n",
+            {"    user \"A\" key \"111\" {read}\n    user \"A\" key \"222\" {read}\n",
                 new String[]{
                     "/userAccessList/userAccess", "",
                     "/userAccessList/userAccess/userRef", "A",
@@ -81,7 +82,7 @@ public class AccessListTest
                     "/userAccessList/userAccess/access/ReadAccess", "",
                     "/userAccessList/userAccess/userAccessKey", "111"}
             },
-            {" user \"A\" {read} 111 organization\n user \"A\" {read} 222 organization\n",
+            {"    user \"A\" {read} 111 organization\n    user \"A\" {read} 222 organization\n",
                 new String[]{
                     "/userAccessList/userAccess", "",
                     "/userAccessList/userAccess/userRef", "A",
@@ -92,7 +93,7 @@ public class AccessListTest
                     "/userAccessList/userAccess/access/ReadAccess", "",
                     "/userAccessList/userAccess/matchOrganization", "111"}
             },
-            {" user \"A\" {read} 111 project\n user \"A\" {read} 222 project\n",
+            {"    user \"A\" {read} 111 project\n    user \"A\" {read} 222 project\n",
                 new String[]{
                     "/userAccessList/userAccess", "",
                     "/userAccessList/userAccess/userRef", "A",
@@ -103,7 +104,7 @@ public class AccessListTest
                     "/userAccessList/userAccess/access/ReadAccess", "",
                     "/userAccessList/userAccess/matchProject", "111"}
             },
-            {" user \"A\" {read} 111 owner\n user \"A\" {read} 222 owner\n",
+            {"    user \"A\" {read} 111 owner\n    user \"A\" {read} 222 owner\n",
                 new String[]{
                     "/userAccessList/userAccess", "",
                     "/userAccessList/userAccess/userRef", "A",
@@ -114,7 +115,7 @@ public class AccessListTest
                     "/userAccessList/userAccess/access/ReadAccess", "",
                     "/userAccessList/userAccess/matchOwner", "111"}
             },
-            {" user \"A\" {read} 111 reserve\n user \"A\" {read} 222 reserve\n",
+            {"    user \"A\" {read} 111 reserve\n    user \"A\" {read} 222 reserve\n",
                 new String[]{
                     "/userAccessList/userAccess", "",
                     "/userAccessList/userAccess/userRef", "A",
@@ -125,7 +126,7 @@ public class AccessListTest
                     "/userAccessList/userAccess/access/ReadAccess", "",
                     "/userAccessList/userAccess/matchReserve", "111"}
             },
-            {" user \"A\" {read} 111 maturity\n user \"A\" {read} 222 maturity\n",
+            {"    user \"A\" {read} 111 maturity\n    user \"A\" {read} 222 maturity\n",
                 new String[]{
                     "/userAccessList/userAccess", "",
                     "/userAccessList/userAccess/userRef", "A",
@@ -136,7 +137,7 @@ public class AccessListTest
                     "/userAccessList/userAccess/access/ReadAccess", "",
                     "/userAccessList/userAccess/matchMaturity", "111"}
             },
-            {" user \"A\" {read} 111 category\n user \"A\" {read} 222 category\n",
+            {"    user \"A\" {read} 111 category\n    user \"A\" {read} 222 category\n",
                 new String[]{
                     "/userAccessList/userAccess", "",
                     "/userAccessList/userAccess/userRef", "A",
@@ -147,7 +148,7 @@ public class AccessListTest
                     "/userAccessList/userAccess/access/ReadAccess", "",
                     "/userAccessList/userAccess/matchCategory", "111"}
             },
-            {" user \"A\" {read} filter \"111\"\n user \"A\" {read} filter \"222\"\n",
+            {"    user \"A\" {read} filter \"111\"\n    user \"A\" {read} filter \"222\"\n",
                 new String[]{
                     "/userAccessList/userAccess", "",
                     "/userAccessList/userAccess/userRef", "A",
@@ -158,7 +159,7 @@ public class AccessListTest
                     "/userAccessList/userAccess/access/ReadAccess", "",
                     "/userAccessList/userAccess/expressionFilter", "111"}
             },
-            {" user \"A\" {read} localfilter \"111\"\n user \"A\" {read} localfilter \"222\"\n",
+            {"    user \"A\" {read} localfilter \"111\"\n    user \"A\" {read} localfilter \"222\"\n",
                 new String[]{
                     "/userAccessList/userAccess", "",
                     "/userAccessList/userAccess/userRef", "A",
@@ -193,10 +194,11 @@ public class AccessListTest
 
         list.sort();
 
-        final StringBuilder strg = new StringBuilder();
-        list.write(null, " ", strg);
-        System.out.println("strg?\n"+strg);
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(null);
+        list.write(updateBuilder);
+        System.out.println("strg?\n"+updateBuilder.getStrg());
 
-        Assert.assertEquals(strg.toString(), _expected);
+
+        Assert.assertEquals(updateBuilder.getStrg().toString(), _expected);
     }
 }

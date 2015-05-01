@@ -815,7 +815,7 @@ public class PolicyData
                     found++;
 
                     // prepare export definition
-                    String exportAccess  = "";
+                    final SortedSet<String> curAccess = new TreeSet<String>();
                     for (final Line subLine : line.getChildren())  {
                         if (subLine.getTag().equals("public")
                                 || subLine.getTag().equals("owner")
@@ -823,19 +823,17 @@ public class PolicyData
                                 || subLine.getTag().equals("login")
                                 || subLine.getTag().equals("revoke"))  {
 
-                            exportAccess += "      " + subLine.getTag() + ' ' + subLine.getValue() + '\n';
+                            curAccess.add(subLine.getTag() + ' ' + subLine.getValue());
                         }
                     }
                     // prepare expected definition
-                    final StringBuilder expAccess = new StringBuilder();
-                    for (final Access accessFilter : this.access)  {
-                        expAccess.append("     ");
-                        accessFilter.append4CIFile(expAccess);
+                    final SortedSet<String> expAccess = new TreeSet<String>();
+                    for (final Access access : this.access)  {
+                        final StringBuilder tmp = new StringBuilder();
+                        access.append4CIFile(tmp);
+                        expAccess.add(tmp.toString().trim());
                     }
-                    Assert.assertEquals(
-                            exportAccess,
-                            expAccess.toString(),
-                            "check access definition for allstate " + line.getValue());
+                    Assert.assertEquals(curAccess, expAccess, "check access definition for allstate " + line.getValue());
                 }
             }
             Assert.assertEquals(found, 1, "exact one allstate must be defined");

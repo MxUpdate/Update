@@ -273,8 +273,8 @@ public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_
      * @param _fieldNames   path of searched fields
      * @return found field with related object
      */
-    protected FieldObject getField(final Object _object,
-                                   final String... _fieldNames)
+    private FieldObject getField(final Object _object,
+                                 final String... _fieldNames)
     {
         FieldObject ret = new FieldObject();
         ret.object = _object;
@@ -366,7 +366,7 @@ public abstract class AbstractParser_mxJPO<TYPEIMPL extends AbstractAdminObject_
      *
      * @see AbstractParser_mxJPO#getField(Object, String...)
      */
-    protected static class FieldObject
+    private static class FieldObject
     {
         /** Field. */
         private Field field;

@@ -207,6 +207,45 @@ public class UpdateBuilder_mxJPO
     }
 
     /**
+     * Appends {@code _list} for {@code _tag} inside a single line.
+     *
+     * @param _tag      tag
+     * @param _list     list to append
+     * @return this update builder instance
+     */
+    public UpdateBuilder_mxJPO listOneLine(final String _tag,
+                                           final Collection<String> _list)
+    {
+        this.stepStartNewLine().stepSingle(_tag);
+        this.strg.append(" {");
+        for (final String value : _list)  {
+            this.stepString(value);
+        }
+        this.strg.append("}");
+        this.stepEndLine();
+        return this;
+    }
+
+    /**
+     * Appends {@code _list} for {@code _tag} inside a single line if
+     * {@code _write} is <i>true</i>.
+     *
+     * @param _tag      tag
+     * @param _list     list to append
+     * @param _write    flag must be <i>true</i> that the value is written
+     * @return this update builder instance
+     */
+    public UpdateBuilder_mxJPO listOneLineIfTrue(final String _tag,
+            final Collection<String> _list,
+            final boolean _write)
+    {
+        if (_write)  {
+            this.listOneLine(_tag, _list);
+        }
+        return this;
+    }
+
+    /**
      * Appends {@code _list}.
      *
      * @param _list     list to append
@@ -264,7 +303,22 @@ public class UpdateBuilder_mxJPO
      */
     public UpdateBuilder_mxJPO childStart(final String _tag)
     {
-        this.strg.append(this.prefix()).append(_tag).append(" {\n");
+        this.stepStartNewLine().stepSingle(_tag).stepSingle("{").stepEndLine();
+        this.prefixAmount++;
+        return this;
+    }
+
+    /**
+     * Starts a new child.
+     *
+     * @param _tag      tag
+     * @param _name     name for the tag as string value
+     * @return this update builder instance
+     */
+    public UpdateBuilder_mxJPO childStart(final String _tag,
+                                          final String _name)
+    {
+        this.stepStartNewLine().stepSingle(_tag).stepString(_name).stepSingle("{").stepEndLine();
         this.prefixAmount++;
         return this;
     }
@@ -277,7 +331,7 @@ public class UpdateBuilder_mxJPO
     public UpdateBuilder_mxJPO childEnd()
     {
         this.prefixAmount--;
-        this.strg.append(this.prefix()).append("}\n");
+        this.stepStartNewLine().stepSingle("}").stepEndLine();
         return this;
     }
 
