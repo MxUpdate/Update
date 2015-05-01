@@ -21,159 +21,144 @@ interface RuleParserConstants_mxJPO {
   /** RegularExpression Id. */
   int ENFORCERESERVEACCESS_FALSE = 9;
   /** RegularExpression Id. */
-  int PROPERTY = 10;
+  int STRING = 10;
   /** RegularExpression Id. */
-  int PROPERTYTO = 11;
+  int SINGLE = 11;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 12;
+  int MULTILINESTRING = 12;
   /** RegularExpression Id. */
-  int REVOKE = 13;
+  int MULTILINESINGLE = 13;
   /** RegularExpression Id. */
-  int LOGIN = 14;
+  int REVOKE = 14;
   /** RegularExpression Id. */
-  int OWNER = 15;
+  int LOGIN = 15;
   /** RegularExpression Id. */
-  int PUBLIC = 16;
+  int OWNER = 16;
   /** RegularExpression Id. */
-  int USER = 17;
+  int PUBLIC = 17;
   /** RegularExpression Id. */
-  int KEY = 22;
+  int USER = 18;
   /** RegularExpression Id. */
-  int ACCESS = 23;
+  int KEY = 19;
   /** RegularExpression Id. */
-  int ACCESS_STRING = 28;
+  int ACCESS = 20;
   /** RegularExpression Id. */
-  int ACCESS_SINGLE_STRING = 29;
+  int ACCESS_STRING = 21;
   /** RegularExpression Id. */
-  int ACCESS_STRING_APOSTROPHE = 30;
+  int ACCESS_SINGLE_STRING = 22;
   /** RegularExpression Id. */
-  int ACCESS_STRING_CHAR = 31;
+  int FILTER = 23;
   /** RegularExpression Id. */
-  int FILTER = 32;
+  int LOCALFILTER = 24;
   /** RegularExpression Id. */
-  int LOCALFILTER = 33;
+  int ORGANIZATION_ANY = 25;
   /** RegularExpression Id. */
-  int ORGANIZATION_ANY = 34;
+  int ORGANIZATION_SINGLE = 26;
   /** RegularExpression Id. */
-  int ORGANIZATION_SINGLE = 35;
+  int ORGANIZATION_ANCESTOR = 27;
   /** RegularExpression Id. */
-  int ORGANIZATION_ANCESTOR = 36;
+  int ORGANIZATION_DESCENDANT = 28;
   /** RegularExpression Id. */
-  int ORGANIZATION_DESCENDANT = 37;
+  int ORGANIZATION_RELATED = 29;
   /** RegularExpression Id. */
-  int ORGANIZATION_RELATED = 38;
+  int PROJECT_ANY = 30;
   /** RegularExpression Id. */
-  int PROJECT_ANY = 39;
+  int PROJECT_SINGLE = 31;
   /** RegularExpression Id. */
-  int PROJECT_SINGLE = 40;
+  int PROJECT_ANCESTOR = 32;
   /** RegularExpression Id. */
-  int PROJECT_ANCESTOR = 41;
+  int PROJECT_DESCENDANT = 33;
   /** RegularExpression Id. */
-  int PROJECT_DESCENDANT = 42;
+  int PROJECT_RELATED = 34;
   /** RegularExpression Id. */
-  int PROJECT_RELATED = 43;
+  int OWNER_ANY = 35;
   /** RegularExpression Id. */
-  int OWNER_ANY = 44;
+  int OWNER_CONTEXT = 36;
   /** RegularExpression Id. */
-  int OWNER_CONTEXT = 45;
+  int RESERVE_ANY = 37;
   /** RegularExpression Id. */
-  int RESERVE_ANY = 46;
+  int RESERVE_CONTEXT = 38;
   /** RegularExpression Id. */
-  int RESERVE_CONTEXT = 47;
+  int RESERVE_NO = 39;
   /** RegularExpression Id. */
-  int RESERVE_NO = 48;
+  int RESERVE_INCLUSIVE = 40;
   /** RegularExpression Id. */
-  int RESERVE_INCLUSIVE = 49;
+  int MATURITY_ANY = 41;
   /** RegularExpression Id. */
-  int MATURITY_ANY = 50;
+  int MATURITY_NO = 42;
   /** RegularExpression Id. */
-  int MATURITY_NO = 51;
+  int MATURITY_PUBLIC = 43;
   /** RegularExpression Id. */
-  int MATURITY_PUBLIC = 52;
+  int MATURITY_PROTECTED = 44;
   /** RegularExpression Id. */
-  int MATURITY_PROTECTED = 53;
+  int MATURITY_PRIVATE = 45;
   /** RegularExpression Id. */
-  int MATURITY_PRIVATE = 54;
+  int MATURITY_NOTPRIVATE = 46;
   /** RegularExpression Id. */
-  int MATURITY_NOTPRIVATE = 55;
+  int MATURITY_PPP = 47;
   /** RegularExpression Id. */
-  int MATURITY_PPP = 56;
+  int CATEGORY_ANY = 48;
   /** RegularExpression Id. */
-  int CATEGORY_ANY = 57;
+  int CATEGORY_OEM = 49;
   /** RegularExpression Id. */
-  int CATEGORY_OEM = 58;
+  int CATEGORY_GOLDPARTNER = 50;
   /** RegularExpression Id. */
-  int CATEGORY_GOLDPARTNER = 59;
+  int CATEGORY_PARTNER = 51;
   /** RegularExpression Id. */
-  int CATEGORY_PARTNER = 60;
+  int CATEGORY_SUPPLIER = 52;
   /** RegularExpression Id. */
-  int CATEGORY_SUPPLIER = 61;
+  int CATEGORY_CUSTOMER = 53;
   /** RegularExpression Id. */
-  int CATEGORY_CUSTOMER = 62;
+  int CATEGORY_CONTRACTOR = 54;
   /** RegularExpression Id. */
-  int CATEGORY_CONTRACTOR = 63;
+  int PROPERTY = 55;
   /** RegularExpression Id. */
-  int STRING = 68;
+  int PROPERTYTO = 56;
   /** RegularExpression Id. */
-  int SINGLE = 69;
+  int PROPERTYVAL = 57;
   /** RegularExpression Id. */
-  int APOSTROPHE = 70;
+  int ADMINTYPE_STRING = 58;
   /** RegularExpression Id. */
-  int CHAR = 71;
-  /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 76;
-  /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 77;
-  /** RegularExpression Id. */
-  int ADMINTYPE_APOSTROPHE = 78;
-  /** RegularExpression Id. */
-  int ADMINTYPE_CHAR = 79;
+  int ADMINTYPE_SINGLE = 59;
 
   /** Lexical state. */
-  int DEFAULT = 0;
+  int ADMINREF_EXPECTED = 0;
   /** Lexical state. */
-  int ACCESS_EXPECTED = 1;
+  int ACCESS_STRING_EXPECTED = 1;
   /** Lexical state. */
-  int ACCESS_STRING_EXPECTED = 2;
+  int ACCESS_EXPECTED = 2;
   /** Lexical state. */
-  int STRING_EXPECTED = 3;
+  int MULTILINESTRING_EXPECTED = 3;
   /** Lexical state. */
-  int ADMINREF_EXPECTED = 4;
+  int STRING_EXPECTED = 4;
+  /** Lexical state. */
+  int DEFAULT = 5;
 
   /** Literal token values. */
   String[] tokenImage = {
     "<EOF>",
     "\" \"",
-    "\"\\r\"",
     "\"\\t\"",
     "\"\\n\"",
+    "<token of kind 4>",
     "\"description\"",
     "\"hidden\"",
     "\"!hidden\"",
     "\"enforcereserveaccess\"",
     "\"!enforcereserveaccess\"",
-    "\"property\"",
-    "\"to\"",
-    "\"value\"",
+    "<STRING>",
+    "<SINGLE>",
+    "<MULTILINESTRING>",
+    "<MULTILINESINGLE>",
     "\"revoke\"",
     "\"login\"",
     "\"owner\"",
     "\"public\"",
     "\"user\"",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "\"key\"",
     "<ACCESS>",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
     "<ACCESS_STRING>",
     "<ACCESS_SINGLE_STRING>",
-    "\"\\\"\"",
-    "<ACCESS_STRING_CHAR>",
     "\"filter\"",
     "\"localfilter\"",
     "<ORGANIZATION_ANY>",
@@ -206,22 +191,11 @@ interface RuleParserConstants_mxJPO {
     "<CATEGORY_SUPPLIER>",
     "<CATEGORY_CUSTOMER>",
     "<CATEGORY_CONTRACTOR>",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
-    "<STRING>",
-    "<SINGLE>",
-    "\"\\\"\"",
-    "<CHAR>",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
+    "\"property\"",
+    "\"to\"",
+    "\"value\"",
     "<ADMINTYPE_STRING>",
     "<ADMINTYPE_SINGLE>",
-    "\"\\\"\"",
-    "<ADMINTYPE_CHAR>",
   };
 
 }

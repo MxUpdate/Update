@@ -13,14 +13,15 @@
  *
  */
 
-package org.mxupdate.test.ci.datamodel;
+package org.mxupdate.test.test.update.datamodel;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
-import org.mxupdate.test.ci.datamodel.AccessTestUtil.IAccessTest;
 import org.mxupdate.test.data.datamodel.RuleData;
 import org.mxupdate.test.data.datamodel.helper.Access;
+import org.mxupdate.test.test.update.datamodel.AccessTestUtil.IAccessTest;
 import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.update.datamodel.Rule_mxJPO;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -31,35 +32,10 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class Rule_AccessTest
+public class RuleCI_3AccessTest
     extends AbstractDataExportUpdate<RuleData>
     implements IAccessTest
 {
-    /**
-     * Creates for given {@code _name} a new rule instance.
-     *
-     * @param _name     name of the rule instance
-     * @return rule instance
-     */
-    @Override()
-    protected RuleData createNewData(final String _name)
-    {
-        return new RuleData(this, _name);
-    }
-
-    /**
-     * Removes the MxUpdate rules.
-     *
-     * @throws Exception if MQL execution failed
-     */
-    @BeforeMethod()
-    public void cleanup()
-        throws Exception
-    {
-        this.cleanup(CI.DM_RULE);
-        this.cleanup(CI.USR_PERSON);
-    }
-
     /**
      * Data provider for test policies.
      *
@@ -88,5 +64,20 @@ public class Rule_AccessTest
     public RuleData createTestData4Access(final Access... _accesss)
     {
         return new RuleData(this, "test").addAccess(_accesss);
+    }
+
+    @Override()
+    protected RuleData createNewData(final String _name)
+    {
+        return new RuleData(this, _name);
+    }
+
+    @BeforeMethod()
+    @AfterClass(groups = "close")
+    public void cleanup()
+        throws Exception
+    {
+        this.cleanup(CI.DM_RULE);
+        this.cleanup(CI.USR_PERSON);
     }
 }

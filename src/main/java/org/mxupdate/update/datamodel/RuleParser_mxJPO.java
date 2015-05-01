@@ -19,9 +19,14 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
+/**
+ * Parses the update format for {@link Rule_mxJPO}.
+ */
 @SuppressWarnings("unused")
 class RuleParser_mxJPO
     extends AbstractParser_mxJPO<Rule_mxJPO> implements RuleParserConstants_mxJPO {
+
+/**************************************************************************** */
 
 /**
  * Parses one complete rule definition.
@@ -39,12 +44,12 @@ class RuleParser_mxJPO
       case HIDDEN_FALSE:
       case ENFORCERESERVEACCESS_TRUE:
       case ENFORCERESERVEACCESS_FALSE:
-      case PROPERTY:
       case REVOKE:
       case LOGIN:
       case OWNER:
       case PUBLIC:
-      case USER:{
+      case USER:
+      case PROPERTY:{
         ;
         break;
         }
@@ -56,13 +61,13 @@ class RuleParser_mxJPO
       case DESCRIPTION:{
         jj_consume_token(DESCRIPTION);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case STRING:{
-          tmp = jj_consume_token(STRING);
+        case MULTILINESTRING:{
+          tmp = jj_consume_token(MULTILINESTRING);
 this.setValue(_rule, "description", this.getString(tmp.image));
           break;
           }
-        case SINGLE:{
-          tmp = jj_consume_token(SINGLE);
+        case MULTILINESINGLE:{
+          tmp = jj_consume_token(MULTILINESINGLE);
 this.setValue(_rule, "description", this.getSingle(tmp.image));
           break;
           }
@@ -160,7 +165,7 @@ this.appendValue(_rule, "accessList", "accessList", access);/*reset*/access = ne
         }
       case PROPERTY:{
         jj_consume_token(PROPERTY);
-property = new AdminProperty();this.appendValue(this.getValue(_rule, "properties"), "propertiesStack", property);
+property = new AdminProperty();this.appendValue(_rule, "properties", "propertiesStack", property);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case STRING:{
           tmp = jj_consume_token(STRING);
@@ -544,7 +549,7 @@ this.setValue(_access, "key", key);
         this.setValue(_access, "maturity", maturity);
         this.setValue(_access, "category", category);
         if (access != null)  {
-            this.setValue(_access, "access", Arrays.asList(access.split(" ")));
+            this.appendValues(_access, "access", Arrays.asList(access.split(" ")));
         }
   }
 
@@ -560,20 +565,15 @@ this.setValue(_access, "key", key);
   final private int[] jj_la1 = new int[18];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
-  static private int[] jj_la1_2;
   static {
       jj_la1_init_0();
       jj_la1_init_1();
-      jj_la1_init_2();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x3e7e0,0x0,0x2000,0x4000,0x30000000,0x38000,0x0,0x1800,0x0,0x0,0x0,0x1800,0x3e7e0,0xc00000,0x30000000,0x0,0x0,0xc00000,};
+      jj_la1_0 = new int[] {0x7c3e0,0x3000,0x4000,0x8000,0x600000,0x70000,0xc00,0x0,0xc00,0x0,0xc00,0x0,0x7c3e0,0xff980000,0x600000,0xc00,0xc00,0xff980000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xffffffff,0x0,0x0,0x0,0xffffffff,};
-   }
-   private static void jj_la1_init_2() {
-      jj_la1_2 = new int[] {0x0,0x30,0x0,0x0,0x0,0x0,0x30,0x0,0x30,0x3000,0x30,0x0,0x0,0x0,0x0,0x30,0x30,0x0,};
+      jj_la1_1 = new int[] {0x800000,0x0,0x0,0x0,0x0,0x0,0x0,0x3000000,0x0,0xc000000,0x0,0x3000000,0x800000,0x7fffff,0x0,0x0,0x0,0x7fffff,};
    }
 
   /** Constructor with InputStream. */
@@ -698,7 +698,7 @@ this.setValue(_access, "key", key);
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[80];
+    boolean[] la1tokens = new boolean[60];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -712,13 +712,10 @@ this.setValue(_access, "key", key);
           if ((jj_la1_1[i] & (1<<j)) != 0) {
             la1tokens[32+j] = true;
           }
-          if ((jj_la1_2[i] & (1<<j)) != 0) {
-            la1tokens[64+j] = true;
-          }
         }
       }
     }
-    for (int i = 0; i < 80; i++) {
+    for (int i = 0; i < 60; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

@@ -13,11 +13,12 @@
  *
  */
 
-package org.mxupdate.test.ci.datamodel;
+package org.mxupdate.test.test.update.datamodel;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.data.datamodel.RuleData;
 import org.mxupdate.test.util.Version;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -28,21 +29,9 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class RuleTest
+public class RuleCI_2UpdateTest
     extends AbstractDataExportUpdate<RuleData>
 {
-    /**
-     * Creates for given <code>_name</code> a new rule instance.
-     *
-     * @param _name     name of the rule instance
-     * @return rule instance
-     */
-    @Override()
-    protected RuleData createNewData(final String _name)
-    {
-        return new RuleData(this, _name);
-    }
-
     /**
      * Data provider for test rules.
      *
@@ -67,12 +56,14 @@ public class RuleTest
         );
     }
 
-    /**
-     * Removes the MxUpdate rules.
-     *
-     * @throws Exception if MQL execution failed
-     */
+    @Override()
+    protected RuleData createNewData(final String _name)
+    {
+        return new RuleData(this, _name);
+    }
+
     @BeforeMethod()
+    @AfterClass(groups = "close")
     public void cleanup()
         throws Exception
     {

@@ -44,7 +44,10 @@ public class RuleCI_1ParserTest
                         "description \"abc def\" !hidden !enforcereserveaccess"},
                 {"2b) description not defined",
                         "description \"\" !hidden !enforcereserveaccess",
-                        "!hidden"},
+                        "                 !hidden !enforcereserveaccess"},
+                {"2c) multi-line description",
+                        "",
+                        "description \"abc\ndef\" !hidden !enforcereserveaccess"},
                 // hidden flag
                 {"3a) hidden",
                         "",

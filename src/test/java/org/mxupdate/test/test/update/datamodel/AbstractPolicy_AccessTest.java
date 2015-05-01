@@ -15,8 +15,7 @@
 
 package org.mxupdate.test.test.update.datamodel;
 
-import org.mxupdate.test.ci.datamodel.AccessTestUtil;
-import org.mxupdate.test.ci.datamodel.AccessTestUtil.IAccessTest;
+import org.mxupdate.test.test.update.datamodel.AccessTestUtil.IAccessTest;
 import org.mxupdate.test.util.IssueLink;
 import org.testng.annotations.DataProvider;
 
