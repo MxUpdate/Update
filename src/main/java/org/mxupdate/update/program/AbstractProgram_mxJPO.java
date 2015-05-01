@@ -25,9 +25,10 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * Common definition for the code of a program.
  *
  * @author The MxUpdate Team
+ * @param <CLASS> derived from this class
  */
-public abstract class AbstractProgram_mxJPO
-    extends AbstractCode_mxJPO
+public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLASS>>
+    extends AbstractCode_mxJPO<CLASS>
 {
     /** User in which context the MQL program is executed. */
     private String user;

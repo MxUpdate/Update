@@ -159,21 +159,6 @@ public class Rule_mxJPO
         _out.append(updateBuilder.toString());
     }
 
-    /**
-     * Only implemented as stub because
-     * {@link #write(ParameterCache_mxJPO, Appendable)} is new implemented.
-     *
-     * @param _paramCache   parameter cache (not used)
-     * @param _out          appendable instance to the TCL update file (not
-     *                      used)
-     */
-    @Override()
-    protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out)
-        throws IOException
-    {
-    }
-
     @Override()
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,

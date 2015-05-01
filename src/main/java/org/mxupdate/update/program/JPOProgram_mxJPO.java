@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -38,12 +39,10 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
  * @author The MxUpdate Team
  */
 public class JPOProgram_mxJPO
-    extends AbstractProgram_mxJPO
+    extends AbstractProgram_mxJPO<JPOProgram_mxJPO>
 {
     /**
      * Set of all ignored URLs from the XML definition for JPO programs.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final Set<String> IGNORED_URLS = new HashSet<String>();
     static  {
@@ -228,6 +227,15 @@ public class JPOProgram_mxJPO
             }
         }
         return mxName;
+    }
+
+    /**
+     * Dummy implementation because not used.
+     */
+    @Override()
+    public void parseUpdate(final String _code)
+    {
+        throw new Error("not supported");
     }
 
     /**
@@ -451,5 +459,17 @@ public class JPOProgram_mxJPO
                               .append('\"'),
                               false);
         return true;
+    }
+
+
+    /**
+     * Dummy implementation because not used.
+     */
+    @Override()
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MultiLineMqlBuilder _mql,
+                             final JPOProgram_mxJPO _current)
+    {
+        throw new Error("not supported");
     }
 }

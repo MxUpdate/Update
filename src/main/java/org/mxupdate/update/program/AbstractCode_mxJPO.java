@@ -19,70 +19,56 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
  * Common definition for the code of a program or page object.
  *
  * @author The MxUpdate Team
+ * @param <CLASS> derived from this class
  */
-public abstract class AbstractCode_mxJPO
-    extends AbstractAdminObject_mxJPO<AbstractCode_mxJPO>
+public abstract class AbstractCode_mxJPO<CLASS extends AbstractCode_mxJPO<CLASS>>
+    extends AbstractAdminObject_mxJPO<CLASS>
 {
     /**
      * Defines the parameter for old MX versions which has the encoding problem
      * for double closing square brackets. Only if this parameter is defined
      * the encoding {@link #encodeXMLExport(String) work around method} is
      * executed.
-     *
-     * @see #execXMLExport(ParameterCache_mxJPO)
      */
     private static final String PARAM_ENCODING_WORKAROUND = "ProgramUseEncodingWorkAround";
 
     /**
      * Inserted text in the {@link #code} if the program includes a
      * <code>CDATA</code> (two closing squared brackets '&#93;&#93;').
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private static final String INSERT_TEXT = "Inserted" + "_by_" + "ENO" + "VIA";
 
     /**
      * Text which is used as replacement for two closing squared brackets
      * ('&#93;&#93;') which are not replaced from old MX versions.
-     *
-     * @see #encodeXMLExport(String)
      */
     private static final String REPLACE_TEXT = "]" + AbstractCode_mxJPO.INSERT_TEXT + "]" + AbstractCode_mxJPO.INSERT_TEXT;
 
     /**
      * Start string of the code section within the XML export of JPO / MQL
      * programs.
-     *
-     * @see #encodeXMLExport(String)
      */
     private static final String CODE_TAG_START = "<code><![CDATA[";
 
     /**
      * Length of the {@link #CODE_TAG_START} string.
-     *
-     * @see #encodeXMLExport(String)
      */
     private static final int LENGTH_CODE_TAG_START = AbstractCode_mxJPO.CODE_TAG_START.length();
 
     /**
      * End string of the code section within the XML export of JPO / MQL
      * programs.
-     *
-     * @see #encodeXMLExport(String)
      */
     private static final String CODE_TAG_END = "]]></code>";
 
     /**
      * Source code of this program.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
      */
     private String code;
 
@@ -97,15 +83,6 @@ public abstract class AbstractCode_mxJPO
                                  final String _mxName)
     {
         super(_typeDef, _mxName);
-    }
-
-    /**
-     * Dummy implementation because not used.
-     */
-    @Override()
-    public void parseUpdate(final String _code)
-    {
-        throw new Error("not supported");
     }
 
     /**
@@ -208,16 +185,5 @@ public abstract class AbstractCode_mxJPO
             parsed = super.parse(_paramCache, _url, _content);
         }
         return parsed;
-    }
-
-    /**
-     * Dummy implementation because not used.
-     */
-    @Override()
-    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MultiLineMqlBuilder _mql,
-                             final AbstractCode_mxJPO _current)
-    {
-        throw new Error("not supported");
     }
 }

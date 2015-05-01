@@ -15,8 +15,13 @@
 
 package org.mxupdate.test.ci.program;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.mxupdate.update.program.AbstractCode_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -109,13 +114,8 @@ public class TestOldXMLExportEncoding
      * {@link TestOldXMLExportEncoding#testEncoding(String) testEncoding(String)}.
      */
     private static final class TestCode
-        extends AbstractCode_mxJPO
+        extends AbstractCode_mxJPO<TestCode>
     {
-        /**
-         * Default serial ID (because class is not serialized).
-         */
-        private static final long serialVersionUID = 1L;
-
         /**
          * Default constructor where all parameters are initialized with
          * <code>null</code>.
@@ -136,16 +136,21 @@ public class TestOldXMLExportEncoding
             return this.encodeXMLExport(_xml);
         }
 
-        /**
-         * Only a stub method because not required for the test.
-         *
-         * @param _paramCache   parameter cache
-         * @param _out          TCL update file
-         */
-        @Override()
-        protected void writeObject(final ParameterCache_mxJPO _paramCache,
-                                   final Appendable _out)
+        @Override
+        public void parseUpdate(final String _code) throws SecurityException,
+                IllegalArgumentException, NoSuchMethodException,
+                InstantiationException, IllegalAccessException,
+                InvocationTargetException, ParseException
         {
+            // TODO Auto-generated method stub
+        }
+
+        @Override
+        protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                final MultiLineMqlBuilder _mql, final TestCode _current)
+                throws UpdateException_mxJPO
+        {
+            // TODO Auto-generated method stub
         }
     }
 }

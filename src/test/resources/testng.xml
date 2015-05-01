@@ -27,6 +27,9 @@
             <package name="org.mxupdate.test.update.userinterface"/>
             <package name="org.mxupdate.test.update.userinterface.helper"/>
             <package name="org.mxupdate.test.update.util"/>
+            <package name="org.mxupdate.test.test.update.parser"/>
+            <package name="org.mxupdate.test.test.update.program"/>
+            <package name="org.mxupdate.test.test.update.util"/>
         </packages>
     </test>
 
@@ -38,7 +41,6 @@
             <package name="org.mxupdate.test.ci.program"/>
             <package name="org.mxupdate.test.ci.user"/>
             <package name="org.mxupdate.test.ci.userinterface"/>
-            <package name="org.mxupdate.test.test.update.util"/>
         </packages>
     </test>
 

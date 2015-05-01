@@ -26,6 +26,7 @@ import java.util.TreeSet;
 import matrix.util.MatrixException;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -37,7 +38,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
  * @author The MxUpdate Team
  */
 public class MQLProgram_mxJPO
-    extends AbstractProgram_mxJPO
+    extends AbstractProgram_mxJPO<MQLProgram_mxJPO>
 {
     /**
      * Set of all ignored URLs from the XML definition for MQL programs.
@@ -129,6 +130,15 @@ public class MQLProgram_mxJPO
             }
         }
         return ret;
+    }
+
+    /**
+     * Dummy implementation because not used.
+     */
+    @Override()
+    public void parseUpdate(final String _code)
+    {
+        throw new Error("not supported");
     }
 
     /**
@@ -355,5 +365,16 @@ public class MQLProgram_mxJPO
                 tempFile.delete();
             }
         }
+    }
+
+    /**
+     * Dummy implementation because not used.
+     */
+    @Override()
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MultiLineMqlBuilder _mql,
+                             final MQLProgram_mxJPO _current)
+    {
+        throw new Error("not supported");
     }
 }

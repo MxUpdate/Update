@@ -15,11 +15,14 @@
 
 package org.mxupdate.test.ci.program;
 
+import matrix.util.MatrixException;
+
+import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.program.PageData;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -30,125 +33,75 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 public class PageTest
-    extends AbstractTest
+    extends AbstractDataExportUpdate<PageData>
 {
     /**
-     * Cleanups the MX system by deleting the test pages.
+     * Data provider for test pages.
      *
-     * @throws Exception if cleanup failed
+     * @return object array with all test pages
      */
-    @BeforeMethod()
-    @AfterMethod()
-    public void cleanup()
-        throws Exception
+    @DataProvider(name = "data")
+    public Object[][] getData()
     {
-        this.cleanup(CI.PRG_PAGE);
+        return this.prepareData("page",
+                new Object[]{
+                        "simple page",
+                        this.createNewData("Test1")
+                             .setValue("description", "test description")},
+                new Object[]{
+                        "hidden page with mime type",
+                        this.createNewData("Test3 \" test")
+                             .setValue("description", "test description \" '")
+                             .setValue("mime", "text/html")
+                             .setFlag("hidden", true)}
+        );
     }
 
-    /**
-     * Data provider for test MQL programs (with and without extensions).
-     *
-     * @return object array with all test MQL programs
-     */
-    @DataProvider(name = "pages")
-    public Object[][] getPagePrograms()
+    @DataProvider(name = "testCode")
+    public Object[][] getTestCode()
     {
-        return new Object[][]  {
-                new Object[]{
-                        "without extension with code",
-                        new PageData(this, "Test1").setContent("test")},
-                new Object[]{
-                        "without extension without code",
-                        new PageData(this, "Test2").setContent("")},
-                new Object[]{
-                        "with extension with code",
-                        new PageData(this, "Test3.tcl").setContent("test")},
-                new Object[]{
-                        "with extension without code",
-                        new PageData(this, "Test4.tcl").setContent("")},
-                new Object[]{
-                        "with extension without code",
-                        new PageData(this, "Test \" 5.tcl").setContent("")},
-                new Object[]{
-                        "with extension and CDATA tag end",
-                        new PageData(this, "Test.tcl").setContent("<]]>")},
-                new Object[]{
-                        "with description",
-                        new PageData(this, "Test")
-                                .setValue("description", "My \"Test\" description")
-                                .setContent("Test Code")},
-                new Object[]{
-                        "with mime type",
-                        new PageData(this, "Test")
-                                .setValue("mime", "text/plain")
-                                .setContent("Test Code")},
-                new Object[]{
-                        "without code",
-                        new PageData(this, "Test")},
+        return new Object[][]
+        {
+            {"print bus '${TYPE}' '${NAME}' '${REVISION}' select id dump"},
+            {"<]]>"},
         };
     }
 
     /**
-     * Checks that the new created pages is exported correctly.
+     * Positive test for update of code.
      *
-     * @param _description  description of the test data
-     * @param _page         page to test
      * @throws Exception if test failed
      */
-    @Test(dataProvider = "pages",
-          description = "test export of pages")
-    public void simpleExport(final String _description,
-                             final PageData _page)
+    @Test(description = "positive test for update of code",
+          dataProvider = "testCode")
+    public void positiveTestCodeUpdate(final String _code)
         throws Exception
     {
-        _page.create();
-        _page.checkExport(_page.export());
+        final PageData page = this.createNewData("Test").setValue("content", _code).update("");
+
+        Assert.assertEquals(this.mql("print page " + page.getName() + " select content dump"), _code);
+
+        final ExportParser exportParser = page.export();
+
+        // remove code and update via export
+        this.mql("mod page " + page.getName() + " content ''");
+        page.updateWithCode(exportParser.getCode(), "");
+
+        // and check result (so that the export of code is also checked!)
+        Assert.assertEquals(this.mql("print page " + page.getName() + " select content dump"), _code);
     }
 
-    /**
-     * Tests, if the MQL program within MX is created and registered with the
-     * correct symbolic name.
-     *
-     * @param _description  description of the test data
-     * @param _page         page to test
-     * @throws Exception if test failed
-     */
-    @Test(dataProvider = "pages",
-          description = "test update of non existing pages")
-    public void simpleUpdate(final String _description,
-                             final PageData _page)
-        throws Exception
+    @BeforeMethod()
+    @AfterClass(groups = "close")
+    public void cleanup()
+        throws MatrixException
     {
-        // first update with original content
-        _page.update((String) null);
-        final ExportParser exportParser = _page.export();
-        _page.checkExport(exportParser);
-
-        // second update with delivered content
-        _page.updateWithCode(exportParser.getOrigCode(), (String) null)
-             .checkExport();
-
-        // and check that both export code is equal
-        Assert.assertEquals(exportParser.getOrigCode(),
-                            _page.export().getOrigCode(),
-                            "check that first and second export is equal");
+        this.cleanup(AbstractTest.CI.PRG_PAGE);
     }
 
-
-    /**
-     * Check that the end tag of CDATA is correct translated to
-     * 'Inserted_by_ENOVIA'.
-     *
-     * @throws Exception if test failed
-     */
-    @Test(description = "check that the end tag of CDATA is correct translated to 'Inserted_by_ENOVIA'")
-    public void checkCDataTranslation()
-        throws Exception
+    @Override()
+    protected PageData createNewData(final String _name)
     {
-        final String name = AbstractTest.PREFIX + "_Test";
-        this.mql("add page " + name + " content '<]]>'");
-        final String xml = this.mql("export page " + name + " xml");
-        Assert.assertTrue(xml.indexOf("<pageContent><![CDATA[<]Inserted_by_ENOVIA]Inserted_by_ENOVIA>]]></pageContent>") >= 0,
-                          "check translation of the CDATA conversion");
+        return new PageData(this, _name);
     }
 }

@@ -94,7 +94,14 @@ public final class AdminPropertyList_mxJPO
             this.propertiesStack.peek().refAdminName = _content;
             parsed = true;
         } else if ("/property/adminRef/adminType".equals(_url))  {
-            this.propertiesStack.peek().refAdminType = "att".equals(_content) ? "attribute" : _content;
+            // fix admin names..
+            if ("att".equals(_content))  {
+                this.propertiesStack.peek().refAdminType = "attribute";
+            } else if ("pageobject".equals(_content))  {
+                this.propertiesStack.peek().refAdminType = "page";
+            } else  {
+                this.propertiesStack.peek().refAdminType = _content;
+            }
             parsed = true;
         } else if ("/property/flags".equals(_url))  {
             this.propertiesStack.peek().flags = _content;
