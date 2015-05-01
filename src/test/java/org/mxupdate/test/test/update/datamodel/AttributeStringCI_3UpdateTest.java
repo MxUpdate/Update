@@ -18,7 +18,6 @@ package org.mxupdate.test.test.update.datamodel;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mxupdate.test.ci.datamodel.AbstractAttributeWithRangesAndMultiValuesTest;
 import org.mxupdate.test.data.datamodel.AttributeStringData;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;

@@ -15,7 +15,6 @@
 
 package org.mxupdate.test.test.update.datamodel;
 
-import org.mxupdate.test.ci.datamodel.AbstractAttributeWithRangesAndMultiValuesTest;
 import org.mxupdate.test.data.datamodel.AttributeBooleanData;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;

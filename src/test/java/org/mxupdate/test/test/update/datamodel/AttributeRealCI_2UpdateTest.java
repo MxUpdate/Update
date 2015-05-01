@@ -18,7 +18,6 @@ package org.mxupdate.test.test.update.datamodel;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mxupdate.test.ci.datamodel.AbstractAttributeWithRangesAndMultiValuesTest;
 import org.mxupdate.test.data.datamodel.AttributeRealData;
 import org.mxupdate.test.data.datamodel.DimensionData;
 import org.mxupdate.test.data.datamodel.DimensionData.UnitData;

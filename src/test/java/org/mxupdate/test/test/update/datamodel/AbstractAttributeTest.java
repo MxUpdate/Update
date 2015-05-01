@@ -13,7 +13,7 @@
  *
  */
 
-package org.mxupdate.test.ci.datamodel;
+package org.mxupdate.test.test.update.datamodel;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -15,7 +15,6 @@
 
 package org.mxupdate.test.test.update.datamodel;
 
-import org.mxupdate.test.ci.datamodel.AbstractAttributeTest;
 import org.mxupdate.test.data.datamodel.AttributeBinaryData;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
