@@ -1,0 +1,155 @@
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
+options {
+  JDK_VERSION = "1.6";
+  STATIC = false;
+  ERROR_REPORTING = false;
+  USER_TOKEN_MANAGER = false;
+}
+
+PARSER_BEGIN(CommandDefParser)
+package org.mxupdate.update.userinterface.command;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+
+import org.mxupdate.mapping.TypeDef_mxJPO;
+import org.mxupdate.update.userinterface.Command_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
+
+public class CommandDefParser
+    extends AbstractParser_mxJPO
+{
+}
+
+PARSER_END(CommandDefParser)
+
+SKIP :
+{
+    " "
+|   "\r"
+|   "\t"
+|   "\n"
+}
+
+TOKEN : /** first level */
+{
+      <DESCRIPTION:             "description">                                  : STRING_EXPECTED
+    | <HIDDEN_TRUE:             "hidden">
+    | <HIDDEN_FALSE:            "!hidden">
+    | <ALT:                     "alt">                                          : STRING_EXPECTED
+    | <HREF:                    "href">                                         : STRING_EXPECTED
+    | <LABEL:                   "label">                                        : STRING_EXPECTED
+    | <USER:                    ("add" ([" ","\t","\n","\r"])+ )? "user">       : STRING_EXPECTED
+    | <SETTING:                 ("add" ([" ","\t","\n","\r"])+ )? "setting">    : SETTING_EXPECTED
+    | <PROPERTY:                "property">                                     : STRING_EXPECTED
+    | <PROPERTYTO:              "to">                                           : ADMINREF_EXPECTED
+    | <PROPERTYVAL:             "value">                                        : STRING_EXPECTED
+}
+
+/************************************************************** Common String */
+<STRING_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<STRING_EXPECTED> TOKEN :
+{
+      <STRING: (<APOSTROPHE>(<CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<APOSTROPHE>)> : DEFAULT
+    | <SINGLE: (<CHAR>)+> : DEFAULT
+    | <#APOSTROPHE: "\"" >
+    | <#CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/********************************************************* Setting Key String */
+<SETTING_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<SETTING_EXPECTED> TOKEN :
+{
+      <SETTING_STRING: (<SETTING_APOSTROPHE>(<SETTING_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<SETTING_APOSTROPHE>)> : STRING_EXPECTED
+    | <SETTING_SINGLE: (<SETTING_CHAR>)+> : DEFAULT
+    | <#SETTING_APOSTROPHE: "\"" >
+    | <#SETTING_CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/**************************************** Two Strings for Property Definition */
+<ADMINREF_EXPECTED> SKIP :
+{
+  " " | "\t" | "\n" | "\r"
+}
+
+<ADMINREF_EXPECTED> TOKEN :
+{
+      <ADMINTYPE_STRING : (<ADMINTYPE_APOSTROPHE>(<ADMINTYPE_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<ADMINTYPE_APOSTROPHE>)> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE : (<ADMINTYPE_CHAR>)+> : STRING_EXPECTED
+    | <#ADMINTYPE_APOSTROPHE : "\"" >
+    | <#ADMINTYPE_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+/**
+ * Parses one complete command definition.
+ *
+ * @param _paramCache   parameter cache
+ * @param _typeDef      type definition of the command (to instantiate the
+ *                      command)
+ * @param _mxName       MX name of the command
+ */
+Command_mxJPO command(final ParameterCache_mxJPO _paramCache,
+                      final TypeDef_mxJPO _typeDef,
+                      final String _mxName)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+: {
+    final Command_mxJPO command = (Command_mxJPO) _typeDef.newTypeInstance(_mxName);
+    Token tmp;
+    AdminProperty property;
+} {
+    (   (<DESCRIPTION>              ( tmp = <STRING>           {this.setValue(command, "description", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(command, "description", this.getSingle(tmp.image));} ) )
+      | (<HIDDEN_TRUE>                                         {this.setValue(command, "hidden",       true);} )
+      | (<HIDDEN_FALSE>                                        {this.setValue(command, "hidden",       false);} )
+      | (<ALT>                      ( tmp = <STRING>           {this.setValue(command, "alt", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(command, "alt", this.getSingle(tmp.image));} ) )
+      | (<HREF>                     ( tmp = <STRING>           {this.setValue(command, "href", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(command, "href", this.getSingle(tmp.image));} ) )
+      | (<LABEL>                    ( tmp = <STRING>           {this.setValue(command, "label", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(command, "label", this.getSingle(tmp.image));} ) )
+      | (<USER>                     ( tmp = <STRING>           {this.appendValue(command, "users", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.appendValue(command, "users", this.getSingle(tmp.image));} ) )
+      | (<SETTING>                                             {property = new AdminProperty();this.appendValue(this.getValue(command, "properties"), "propertiesStack", property);}
+                                    ( tmp = <SETTING_STRING>   {this.setValue(property, "name", "%" + this.getString(tmp.image));}
+                                    | tmp = <SETTING_SINGLE>   {this.setValue(property, "name", "%" + this.getSingle(tmp.image));})
+                                    ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+      | (<PROPERTY>                                            {property = new AdminProperty();this.appendValue(this.getValue(command, "properties"), "propertiesStack", property);}
+                                    ( tmp = <STRING>           {this.setValue(property, "name", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(property, "name", this.getSingle(tmp.image));} )
+              (   ( <PROPERTYVAL>   ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING> {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <ADMINTYPE_SINGLE> {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                    ( tmp = <STRING>           {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+    )*
+    {
+        this.prepareObject(_paramCache, command);
+        return command;
+    }
+}

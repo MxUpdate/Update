@@ -31,6 +31,8 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
+ * Abstract definition for objects with properties.
+ *
  * @author The MxUpdate Team
  */
 public abstract class AbstractPropertyObject_mxJPO
@@ -142,13 +144,18 @@ public abstract class AbstractPropertyObject_mxJPO
     private static final String TEST_EXECUTED = "MxUpdate Executed";
 
     /**
-     * Defines the TCL procedures for logging purposes which are executed by
-     * {@link #jpoCallExecute(ParameterCache_mxJPO, String...)}.
+     * <p>Defines the TCL procedures for updates and for logging purposes which
+     * are executed by {@link #jpoCallExecute(ParameterCache_mxJPO, String...)}.
+     * </p>
+     * <p><b>Hint:</b><br/>
+     * To get the complete definition, all quot's are replaced by {@code @0@0@}
+     * and all apostroph's are replaced by {@code @1@1@}.
+     * </p>
      *
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      * @see #jpoCallExecute(ParameterCache_mxJPO, String...)
      */
-    private static final String TCL_LOG_PROCS
+    private static final String TCL_PROCEDURES
             = "proc puts {_sText}  {\n"
                 + "mql exec prog org.mxupdate.update.util.JPOCaller logDebug ${_sText}\n"
             + "}\n"
@@ -166,6 +173,13 @@ public abstract class AbstractPropertyObject_mxJPO
             + "}\n"
             + "proc logTrace {_sText}  {\n"
                 + "mql exec prog org.mxupdate.update.util.JPOCaller logTrace ${_sText}\n"
+            + "}\n"
+            + "proc mxUpdate {_sKind _sName _lsArgs}  {\n"
+                + "regsub -all {'} $_lsArgs {@0@0@} sArg\n"
+                + "regsub -all {\\\"} $sArg {@1@1@} sArg\n"
+                + "regsub -all {\\\\\\[} $sArg {[} sArg\n"
+                + "regsub -all {\\\\\\]} $sArg {]} sArg\n"
+                + "mql exec prog org.mxupdate.update.util.JPOCaller mxUpdate $_sKind $_sName \"${sArg}\"\n"
             + "}\n";
 
     /**
@@ -305,7 +319,6 @@ public abstract class AbstractPropertyObject_mxJPO
         }
         _out.append("################################################################################\n\n");
     }
-
 
     /**
      * Updates this administration (business) object if the stored information
@@ -580,7 +593,7 @@ public abstract class AbstractPropertyObject_mxJPO
         // append TCL mode
         cmd.append("tcl;\n")
            .append("eval  {\n")
-           .append(AbstractPropertyObject_mxJPO.TCL_LOG_PROCS);
+           .append(AbstractPropertyObject_mxJPO.TCL_PROCEDURES);
 
 
         // define all TCL variables

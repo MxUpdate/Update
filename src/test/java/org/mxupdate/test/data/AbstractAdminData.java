@@ -15,6 +15,7 @@
 
 package org.mxupdate.test.data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -78,6 +79,9 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
 
     /** All properties for this data piece. */
     private final PropertyDefList properties = new PropertyDefList();
+
+    /** Update lines. */
+    private final List<String> ciLines = new ArrayList<String>();
 
     /**
      * Constructor to initialize this data piece.
@@ -162,6 +166,17 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     }
 
     /**
+     * Returns all {@link #requiredExportValues required export values}.
+     *
+     * @return required export values
+     * @see #requiredExportValues
+     */
+    public Map<String,Object> getRequiredExportValues()
+    {
+        return this.requiredExportValues;
+    }
+
+    /**
      * Assigns <code>_property</code> to this data piece.
      *
      * @param _property     property to add / assign
@@ -186,14 +201,27 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     }
 
     /**
-     * Returns all {@link #requiredExportValues required export values}.
+     * Assigns {@code _line} to this data piece used in the CI file.
      *
-     * @return required export values
-     * @see #requiredExportValues
+     * @param _line     line to append
+     * @return this data piece instance
+     * @see #properties
      */
-    public Map<String,Object> getRequiredExportValues()
+    @SuppressWarnings("unchecked")
+    public DATA addCILine(final String _line)
     {
-        return this.requiredExportValues;
+        this.ciLines.add(_line);
+        return (DATA) this;
+    }
+
+    /**
+     * Returns the {@link #ciLines lines} used only for the CI file.
+     *
+     * @return CI lines
+     */
+    public List<String> getCILines()
+    {
+        return this.ciLines;
     }
 
     /**
@@ -239,7 +267,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         // append flags
         this.getFlags().append4CIFileValues("    ", _cmd, "\n");
         // append values
-        this.getValues().append4CIFileValues("    ", _cmd, "\n");
+        this.getValues().appendUpdate("    ", _cmd, "\n");
 
         // check for add values
         final Set<String> needAdds = new HashSet<String>();

@@ -210,7 +210,7 @@ public class PolicyData
             .append("  hidden \"").append(this.getFlags().get("hidden") != null ? this.getFlags().get("hidden") : false).append("\"\n");
 
         // append values
-        this.getValues().append4CIFileValues("  ", strg, "\n");
+        this.getValues().appendUpdate("  ", strg, "\n");
 
         // type definition
         if (this.allTypes)  {
@@ -469,7 +469,7 @@ public class PolicyData
         }
 
         // check for properties
-        this.getProperties().checkExportPropertiesUpdateFormat(_exportParser.getLines("/updatePolicy/property/@value"));
+        this.getProperties().checkExport(_exportParser.getLines("/updatePolicy/property/@value"));
     }
 
 
@@ -775,7 +775,7 @@ public class PolicyData
                     }
 
                     this.getFlags().checkExport(line, "state " + this.name);
-                    this.properties.checkExportPropertiesUpdateFormat(line.getLines("property/@value"));
+                    this.properties.checkExport(line.getLines("property/@value"));
                 }
             }
             Assert.assertTrue(found, "check that state '" + this.name + "' is found");

@@ -264,7 +264,7 @@ public class Dimension_mxJPO
         }
 
         // append properties
-        this.getProperties().writeUpdateFormat(_paramCache, _out, "  ");
+        this.getProperties().writeProperties(_paramCache, _out, "  ");
 
         _out.append("}");
     }

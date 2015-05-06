@@ -88,6 +88,30 @@ public final class StringUtil_mxJPO
     }
 
     /**
+     * Converts given string by escaping all special characters for the specific
+     * MxUpdate CI format.
+     *
+     * @param _text     character stream to convert
+     * @return converted string
+     */
+    public static String convertUpdate(final CharSequence _text)
+    {
+        final String text;
+        if (_text == null)  {
+            text = "";
+        } else  {
+            text = _text.toString();
+        }
+        return text.replaceAll("\\\\", "\\\\\\\\")
+                   .replaceAll("\\\"", "\\\\\"")
+                   .replaceAll("\\" + "$", "\\\\\\" + "$")
+                   .replaceAll("\\{", "\\\\{")
+                   .replaceAll("\\}", "\\\\}")
+                   .replaceAll("\\[", "\\\\[")
+                   .replaceAll("\\]", "\\\\]");
+    }
+
+    /**
      * Converts given string by escaping all special characters for TCL.
      *
      * @param _text     character stream to convert

@@ -43,24 +43,17 @@ abstract class AbstractUITest<DATA extends AbstractAdminData<?>>
                                      final Object[]... _datas)
     {
         final List<Object[]> ret = new ArrayList<Object[]>();
-        ret.add(new Object[]{
-                _logText + " without anything (to test required fields)",
-                this.createNewData("hello \" test")});
-        ret.add(new Object[]{
-                _logText + " with other symbolic name",
-                this.createNewData("hello \" test").setSymbolicName(_logText + "_Test")});
-        ret.add(new Object[]{
-                _logText + " with description",
-                this.createNewData("hello \" test").setValue("description", "complex description \"test\"")});
-        ret.add(new Object[]{
-                _logText + " with default hidden flag",
-                this.createNewData("hello \" test").setFlag("hidden", null)});
-        ret.add(new Object[]{
-                _logText + " with hidden flag false",
-                this.createNewData("hello \" test").setFlag("hidden", false)});
-        ret.add(new Object[]{
-                _logText + " with hidden flag true",
-                this.createNewData("hello \" test").setFlag("hidden", true)});
+        if (_logText != null)  {
+            ret.add(new Object[]{
+                    _logText + " without anything (to test required fields)",
+                    this.createNewData("hello \" test")});
+            ret.add(new Object[]{
+                    _logText + " with other symbolic name",
+                    this.createNewData("hello \" test").setSymbolicName(_logText + "_Test")});
+            ret.add(new Object[]{
+                    _logText + " with description",
+                    this.createNewData("hello \" test").setValue("description", "complex description \"test\"")});
+        }
 
         ret.addAll(Arrays.asList(_datas));
         return super.prepareData(_logText, ret.toArray(new Object[ret.size()][]));

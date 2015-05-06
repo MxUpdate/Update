@@ -155,7 +155,7 @@ public class FormatData
         // append flags
         this.getFlags().append4CIFileValues("  ", strg, "\n");
         // append values
-        this.getValues().append4CIFileValues("  ", strg, "\n");
+        this.getValues().appendUpdate("  ", strg, "\n");
 
         if (this.viewProgram != null)  {
             strg.append(" view \"").append(AbstractTest.convertTcl(this.viewProgram.getName())).append("\"\n");
@@ -257,7 +257,7 @@ public class FormatData
         // check for defined flags
         this.getFlags().checkExport(_exportParser, "/" + this.getCI().getUrlTag() + "/", this.getCI().getMxType() + " " + this.getName());
         // check for properties
-        this.getProperties().checkExportPropertiesUpdateFormat(_exportParser.getLines("/updateFormat/property/@value"));
+        this.getProperties().checkExport(_exportParser.getLines("/updateFormat/property/@value"));
 
         if (this.getTest().getVersion().max(Version.V6R2013x))  {
             this.checkSingleValue(_exportParser, "view program", "view",

@@ -232,7 +232,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         // append flags
         this.getFlags().append4CIFileValues("  ", strg, "\n");
         // append values
-        this.getValues().append4CIFileValues("  ", strg, "\n");
+        this.getValues().appendUpdate("  ", strg, "\n");
 
         // append rule
         if (this.rule != null) {
@@ -303,7 +303,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
             Assert.assertTrue(needAdds.contains(foundAdd), "check that add '" + foundAdd + "' is defined (found adds = " + foundAdds + "; need adds = " + needAdds + ")");
         }
         // check for properties
-        this.getProperties().checkExportPropertiesUpdateFormat(_exportParser.getLines("/updateAttribute/property/@value"));
+        this.getProperties().checkExport(_exportParser.getLines("/updateAttribute/property/@value"));
     }
 
     /**

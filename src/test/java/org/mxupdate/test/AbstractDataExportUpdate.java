@@ -49,11 +49,11 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
             tmp.add(new Object[]{
                     _logText + " with property name",
                     this.createNewData("hello \" test")
-                                    .addProperty(new PropertyDef("my test \"property\""))});
+                                    .addProperty(new PropertyDef("my test \"property\" desc\"\\\\ription"))});
             tmp.add(new Object[]{
                     _logText + " property name and value",
                     this.createNewData("hello \" test")
-                                    .addProperty(new PropertyDef("my test \"property\"", "my \"value\""))});
+                                    .addProperty(new PropertyDef("my test \"property\"", "my \"value\" desc\"\\\\ription"))});
             tmp.add(new Object[]{
                     _logText + " property name, value and referenced admin object",
                     this.createNewData("hello \" test")
@@ -62,21 +62,21 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
                     _logText + " with multiple properties",
                     this.createNewData("hello \" test")
                                     .addProperty(new PropertyDef("my test \"property\" 1"))
-                                    .addProperty(new PropertyDef("my test \"property\" 2", "my \"value\""))
+                                    .addProperty(new PropertyDef("my test \"property\" 2", "my \"value\" desc\"\\\\ription"))
                                     .addProperty(new PropertyDef("my test \"property\" 3", this.createNewData("property \" admin " + _logText)))});
+
             // hidden flag
             tmp.add(new Object[]{
                     _logText + " with hidden flag true",
-                    this.createNewData("hello \" test")
-                            .setFlag("hidden", true)});
+                    this.createNewData("hello \" test").setFlag("hidden", true)});
             tmp.add(new Object[]{
                     _logText + " with hidden flag false",
-                    this.createNewData("hello \" test")
-                            .setFlag("hidden", false)});
+                    this.createNewData("hello \" test").setFlag("hidden", false),
+                    this.createNewData("hello \" test")});
             tmp.add(new Object[]{
-                    _logText + " without hidden flag",
-                    this.createNewData("hello \" test")
-                            .setFlag("hidden", null)});
+                    _logText + " with default hidden flag",
+                    this.createNewData("hello \" test").setFlag("hidden", null),
+                    this.createNewData("hello \" test")});
         }
 
         final List<Object[]> ret = new ArrayList<Object[]>();

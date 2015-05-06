@@ -167,7 +167,7 @@ public abstract class AbstractTest
         /** Configuration item channel. */
         UI_CHANNEL("channel", null, false, null, null, "Channel", "CHANNEL", "CHANNEL_", "userinterface/channel", true, "mql"),
         /** Configuration item command. */
-        UI_COMMAND("command", null, false, null, null, "Command", "COMMAND", "COMMAND_", "userinterface/command", true, "mql"),
+        UI_COMMAND("command", null, false, null, null, "Command", "COMMAND", "COMMAND_", "userinterface/command", true, "mxUpdate"),
         /** Configuration item form. */
         UI_FORM("form", null, false, null, null, "Form", "FORM", "FORM_", "userinterface/form", true, "mql"),
         /** Configuration item inquiry. */
@@ -719,6 +719,31 @@ public abstract class AbstractTest
      * @param _text     character sequence to convert
      * @return converted string
      */
+    public static String convertUpdate(final CharSequence _text)
+    {
+        final String text;
+        if (_text == null)  {
+            text = "";
+        } else  {
+            text = _text.toString();
+        }
+        return text.replaceAll("\\\\", "\\\\\\\\")
+                   .replaceAll("\\\"", "\\\\\"")
+                   .replaceAll("\\$", "\\\\\\$")
+                   .replaceAll("\\]", "\\\\]")
+                   .replaceAll("\\[", "\\\\[")
+                   .replaceAll("\\}", "\\\\}")
+                   .replaceAll("\\{", "\\\\{");
+    }
+
+    /**
+     * Converts given string to MQL by escaping the &quot; so that in escape
+     * mode on string could be handled with &quot; and '.
+     *
+     * @param _text     character sequence to convert
+     * @return converted string
+     */
+    @Deprecated()
     public static String convertTcl(final CharSequence _text)
     {
         final String text;
@@ -735,24 +760,6 @@ public abstract class AbstractTest
                    .replaceAll("\\[", "\\\\[")
                    .replaceAll("\\}", "\\\\}")
                    .replaceAll("\\{", "\\\\{");
-    }
-
-    /**
-     * Converts given string to MQL by escaping the &quot; so that in escape
-     * mode on string could be handled with &quot; and '.
-     *
-     * @param _text     character sequence to convert
-     * @return converted string
-     */
-    public static String convertTclDoubleEscaped(final CharSequence _text)
-    {
-        return (_text != null)
-               ? _text.toString().replaceAll("\\\\", "\\\\\\\\")
-                                 .replaceAll("\\\"", "\\\\\\\\\\\\\"")
-                                 .replaceAll("\\$", "\\\\\\$")
-                                 .replaceAll("\\}", "\\\\}")
-                                 .replaceAll("\\{", "\\\\{")
-               : "";
     }
 
     /**

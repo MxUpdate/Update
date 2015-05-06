@@ -104,6 +104,35 @@ public class AdminPropertyList_mxJPO
         this.addAll(this.propertiesStack);
     }
 
+    /**
+     * Writes the MQL code to add all none standard properties to the TCL
+     * update file.
+     *
+     * @param _paramCache   parameter cache
+     * @param _out          appendable instance to the TCL update file
+     * @param _typeDef      type definition
+     * @throws IOException if the write to the TCL update file failed
+     */
+    public void writeProperties(final ParameterCache_mxJPO _paramCache,
+                                final Appendable _out,
+                                final String _prefix)
+        throws IOException
+    {
+        for (final AdminProperty prop : this)  {
+            if ((PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null) && !prop.isSetting())  {
+                _out.append(_prefix)
+                    .append("property \"").append(StringUtil_mxJPO.convertUpdate(prop.getName())).append("\"");
+                if (((prop.getRefAdminName()) != null) && (prop.getRefAdminType() != null))  {
+                    _out.append(" to ").append(prop.getRefAdminType())
+                        .append(" \"").append(StringUtil_mxJPO.convertUpdate(prop.getRefAdminName())).append("\"");
+                }
+                if (prop.getValue() != null)  {
+                    _out.append(" value \"").append(StringUtil_mxJPO.convertUpdate(prop.getValue())).append('\"');
+                }
+                _out.append('\n');
+            }
+        }
+    }
 
     /**
      * Writes the MQL code to add all none standard properties to the TCL
@@ -114,23 +143,17 @@ public class AdminPropertyList_mxJPO
      * @param _typeDef      type definition
      * @throws IOException if the write to the TCL update file failed
      */
-    public void writeUpdateFormat(final ParameterCache_mxJPO _paramCache,
-                                  final Appendable _out,
-                                  final String _prefix)
+    public void writeSettings(final ParameterCache_mxJPO _paramCache,
+                              final Appendable _out,
+                              final String _prefix)
         throws IOException
     {
         for (final AdminProperty prop : this)  {
-            if ((PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null) && !prop.isSetting())  {
+            if (prop.isSetting())  {
                 _out.append(_prefix)
-                    .append("property \"").append(StringUtil_mxJPO.convertTcl(prop.getName())).append("\"");
-                if (((prop.getRefAdminName()) != null) && (prop.getRefAdminType() != null))  {
-                    _out.append(" to ").append(prop.getRefAdminType())
-                        .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getRefAdminName())).append("\"");
-                }
-                if (prop.getValue() != null)  {
-                    _out.append(" value \"").append(StringUtil_mxJPO.convertTcl(prop.getValue())).append('\"');
-                }
-                _out.append('\n');
+                    .append("setting \"").append(StringUtil_mxJPO.convertUpdate(prop.getSettingName())).append("\"")
+                    .append(" \"").append(StringUtil_mxJPO.convertUpdate(prop.getValue())).append('\"')
+                    .append('\n');
             }
         }
     }
@@ -199,13 +222,18 @@ public class AdminPropertyList_mxJPO
                     }
                 }
                 if (!found)  {
-                    _mql.newLine()
-                        .cmd("remove ").cmd(_propPrefix).cmd("property ").arg(curProp.getName());
-                    if ((curProp.getRefAdminName() != null) && (curProp.getRefAdminType() != null))  {
-                        _mql.cmd(" to ").cmd(curProp.getRefAdminType()).cmd(" ").arg(curProp.getRefAdminName());
-                        // if target is a table, a system is required!
-                        if ("table".equals(curProp.getRefAdminType()))  {
-                            _mql.cmd(" system");
+                    if (curProp.isSetting())  {
+                        _mql.newLine()
+                            .cmd("remove ").cmd(_propPrefix).cmd("setting ").arg(curProp.getSettingName());
+                    } else  {
+                        _mql.newLine()
+                            .cmd("remove ").cmd(_propPrefix).cmd("property ").arg(curProp.getName());
+                        if ((curProp.getRefAdminName() != null) && (curProp.getRefAdminType() != null))  {
+                            _mql.cmd(" to ").cmd(curProp.getRefAdminType()).cmd(" ").arg(curProp.getRefAdminName());
+                            // if target is a table, a system is required!
+                            if ("table".equals(curProp.getRefAdminType()))  {
+                                _mql.cmd(" system");
+                            }
                         }
                     }
                 }
@@ -223,90 +251,22 @@ public class AdminPropertyList_mxJPO
                 }
             }
             if (!found)  {
-                _mql.newLine()
-                    .cmd("add ").cmd(_propPrefix).cmd("property ").arg(tarProp.getName());
-                if ((tarProp.getRefAdminName() != null) && (tarProp.getRefAdminType() != null))  {
-                    _mql.cmd(" to ").cmd(tarProp.getRefAdminType()).cmd(" ").arg(tarProp.getRefAdminName());
-                    // if target is a table, a system is required!
-                    if ("table".equals(tarProp.getRefAdminType()))  {
-                        _mql.cmd(" system");
+                if (tarProp.isSetting())  {
+                    _mql.newLine()
+                        .cmd("add ").cmd(_propPrefix).cmd("setting ").arg(tarProp.getSettingName()).cmd(" ").arg(tarProp.getValue());
+                } else  {
+                    _mql.newLine()
+                        .cmd("add ").cmd(_propPrefix).cmd("property ").arg(tarProp.getName());
+                    if ((tarProp.getRefAdminName() != null) && (tarProp.getRefAdminType() != null))  {
+                        _mql.cmd(" to ").cmd(tarProp.getRefAdminType()).cmd(" ").arg(tarProp.getRefAdminName());
+                        // if target is a table, a system is required!
+                        if ("table".equals(tarProp.getRefAdminType()))  {
+                            _mql.cmd(" system");
+                        }
                     }
-                }
-                if (tarProp.getValue() != null)  {
-                    _mql.cmd(" value ").arg(tarProp.getValue());
-                }
-            }
-        }
-    }
-
-    /**
-     * Calculates the delta between current properties definition and this
-     * properties definitions.
-     *
-     * @param _current  current properties
-     * @param _cmd      MQL string builder to append the delta
-     */
-    @Deprecated()
-    public void calcDelta(final AdminPropertyList_mxJPO _currents,
-                          final StringBuilder _modUnitCmd,
-                          final StringBuilder _cmd)
-    {
-        // check properties to remove
-        if (_currents != null)  {
-            for (final AdminProperty curProp : _currents)  {
-                boolean found = false;
-                for (final AdminProperty tarProp : this)  {
-                    if (tarProp.compareTo(curProp) == 0)  {
-                        found = true;
-                        break;
+                    if (tarProp.getValue() != null)  {
+                        _mql.cmd(" value ").arg(tarProp.getValue());
                     }
-                }
-                if (!found)  {
-                    _cmd.append(_modUnitCmd)
-                        .append("remove property \"");
-                    if (curProp.getName() != null)  {
-                        _cmd.append(StringUtil_mxJPO.convertMql(curProp.getName()));
-                    }
-                    _cmd.append("\" ");
-                    if ((curProp.getRefAdminName() != null) && (curProp.getRefAdminType() != null))  {
-                        _cmd.append(" to \"")
-                        .append(StringUtil_mxJPO.convertMql(curProp.getRefAdminType()))
-                        .append("\" \"")
-                        .append(StringUtil_mxJPO.convertMql(curProp.getRefAdminName()))
-                        .append("\" ");
-                    }
-                }
-            }
-        }
-        // check properties to add
-        for (final AdminProperty tarProp : this)  {
-            boolean found = false;
-            if (_currents != null)  {
-                for (final AdminProperty curProp : _currents)  {
-                    if (tarProp.compareTo(curProp) == 0)  {
-                        found = true;
-                        break;
-                    }
-                }
-            }
-            if (!found)  {
-                _cmd.append(_modUnitCmd)
-                    .append("property \"");
-                if (tarProp.getName() != null)  {
-                    _cmd.append(StringUtil_mxJPO.convertMql(tarProp.getName()));
-                }
-                _cmd.append("\" ");
-                if ((tarProp.getRefAdminName() != null) && (tarProp.getRefAdminType() != null))  {
-                    _cmd.append(" to \"")
-                    .append(StringUtil_mxJPO.convertMql(tarProp.getRefAdminType()))
-                    .append("\" \"")
-                    .append(StringUtil_mxJPO.convertMql(tarProp.getRefAdminName()))
-                    .append("\" ");
-                }
-                if (tarProp.getValue() != null)  {
-                    _cmd.append(" value \"")
-                        .append(StringUtil_mxJPO.convertMql(tarProp.getValue()))
-                        .append("\" ");
                 }
             }
         }
@@ -368,6 +328,16 @@ public class AdminPropertyList_mxJPO
         public String getRefAdminName()
         {
             return this.refAdminName;
+        }
+
+        /**
+         * Returns the name of setting.
+         *
+         * @return setting name: {@code null} if property is no setting
+         */
+        public String getSettingName()
+        {
+            return this.isSetting() ? this.name.substring(1) : null;
         }
 
         /**

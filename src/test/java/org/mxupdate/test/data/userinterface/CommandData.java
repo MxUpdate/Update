@@ -21,7 +21,9 @@ import java.util.Set;
 import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.user.AbstractUserData;
+import org.testng.Assert;
 
 /**
  * Used to define a command, create them and test the result.
@@ -31,14 +33,7 @@ import org.mxupdate.test.data.user.AbstractUserData;
 public class CommandData
     extends AbstractCommandData<CommandData>
 {
-    /**
-     * All users of the command.
-     *
-     * @see #addUser(AbstractUserData)
-     * @see #getUsers()
-     * @see #create()
-     * @see #evalAdds4CheckExport(Set)
-     */
+    /** All users of the command. */
     private final Set<AbstractUserData<?>> users = new HashSet<AbstractUserData<?>>();
 
     /**
@@ -87,17 +82,23 @@ public class CommandData
     @Override()
     public String ciFile()
     {
-        final StringBuilder cmd = new StringBuilder();
-        this.append4CIFileHeader(cmd);
-        cmd.append("mql escape mod command \"${NAME}\"");
+        final StringBuilder strg = new StringBuilder();
+        this.append4CIFileHeader(strg);
+        strg.append("mxUpdate command \"${NAME}\" {\n");
 
         for (final AbstractUserData<?> user : this.users)  {
-            cmd.append(" add user \"")
-               .append(AbstractTest.convertTcl(user.getName())).append('\"');
+            strg.append("    user \"").append(AbstractTest.convertUpdate(user.getName())).append("\"\n");
         }
-        this.append4CIFileValues(cmd);
+        this.getFlags().append4CIFileValues("    ", strg, "\n");
+        this.getValues().appendUpdate("    ", strg, "\n");
+        this.getSettings().appendUpdate("    ", strg, "\n");
+        this.getProperties().appendCIFileUpdateFormat("    ", strg);
+        for (final String ciLine : this.getCILines())  {
+            strg.append("    ").append(ciLine).append('\n');
+        }
+        strg.append("}");
 
-        return cmd.toString();
+        return strg.toString();
     }
 
     /**
@@ -163,19 +164,35 @@ public class CommandData
     }
 
     /**
-     * Evaluates all 'adds' in the configuration item file (e.g. add user, add
-     * setting, ...).
+     * Checks the export of this data piece if all values are correct defined.
      *
-     * @param _needAdds     set with add strings used to append the adds for
-     *                      {@link #users}
-     * @see #users
+     * @param _exportParser     parsed export
+     * @throws MatrixException if check failed
      */
     @Override()
-    protected void evalAdds4CheckExport(final Set<String> _needAdds)
+    public void checkExport(final ExportParser _exportParser)
+        throws MatrixException
     {
-        super.evalAdds4CheckExport(_needAdds);
+        // check symbolic name
+        Assert.assertEquals(
+                _exportParser.getSymbolicName(),
+                this.getSymbolicName(),
+                "check symbolic name");
+
+        this.getFlags().checkExport(_exportParser.getRootLines().get(0), "");
+        this.getValues().checkExport(_exportParser);
+        this.getSettings().checkExport(_exportParser.getLines("/mxUpdate/setting/@value"));
+        this.getProperties().checkExport(_exportParser.getLines("/mxUpdate/property/@value"));
+
+        // users
+        final Set<String> userDefs = new HashSet<String>(_exportParser.getLines("/mxUpdate/user/@value"));
         for (final AbstractUserData<?> user : this.users)  {
-            _needAdds.add("user \"" + AbstractTest.convertTcl(user.getName()) + "\"");
+            final String userDefStr = '\"' + AbstractTest.convertUpdate(user.getName()) + '\"';
+            Assert.assertTrue(
+                    userDefs.contains(userDefStr),
+                    "check that user is defined in ci file (have " + userDefStr + ", but found " + userDefs + ")");
+            userDefs.remove(userDefStr);
         }
+        Assert.assertEquals(userDefs.size(), 0, "check that not too much users are defined (have " + userDefs + ")");
     }
 }

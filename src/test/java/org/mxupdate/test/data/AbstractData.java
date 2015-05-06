@@ -329,7 +329,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
         }
 
         if (bck.get("exception") != null)  {
-            throw (Exception) bck.get("exception");
+            throw new Exception((Exception) bck.get("exception"));
         }
         return (DATA) this;
     }
@@ -609,17 +609,16 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
          *                  configuration item file
          * @param _suffix   suffix after the values
          */
-        public void append4CIFileValues(final String _prefix,
-                                        final StringBuilder _cmd,
-                                        final String _suffix)
+        public void appendUpdate(final String _prefix,
+                                 final StringBuilder _cmd,
+                                 final String _suffix)
         {
             for (final Map.Entry<String,Object> entry : this.entrySet())  {
                 if ((entry.getValue() instanceof Character) || (entry.getValue() instanceof Integer))  {
                     _cmd.append(_prefix).append(entry.getKey()).append(' ').append(entry.getValue()).append(_suffix);
                 } else  {
-                    _cmd.append(_prefix).append(entry.getKey()).append(" \"")
-                        .append(AbstractTest.convertTcl(entry.getValue().toString()))
-                        .append('\"')
+                    _cmd.append(_prefix).append(entry.getKey()).append(" ")
+                        .append("\"").append(AbstractTest.convertUpdate(entry.getValue().toString())).append('\"')
                         .append(_suffix);
                 }
             }
@@ -644,7 +643,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
                             _exportParser,
                             entry.getKey(),
                             entry.getKey(),
-                            "\"" + AbstractTest.convertTcl(entry.getValue().toString()) + "\"");
+                            "\"" + AbstractTest.convertUpdate(entry.getValue().toString()) + "\"");
                 }
             }
         }

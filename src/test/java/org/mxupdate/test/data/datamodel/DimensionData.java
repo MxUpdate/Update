@@ -73,7 +73,7 @@ public class DimensionData
             .append("  hidden \"").append(this.getFlags().get("hidden") != null ? this.getFlags().get("hidden") : false).append("\"\n");
 
         // append values
-        this.getValues().append4CIFileValues("  ", strg, "\n");
+        this.getValues().appendUpdate("  ", strg, "\n");
 
         // append state information
         for (final UnitData unit : this.units)
@@ -181,7 +181,7 @@ public class DimensionData
         }
 
         // check for properties
-        this.getProperties().checkExportPropertiesUpdateFormat(_exportParser.getLines("/updateDimension/property/@value"));
+        this.getProperties().checkExport(_exportParser.getLines("/updateDimension/property/@value"));
     }
 
     /**
@@ -398,7 +398,7 @@ public class DimensionData
             Assert.assertTrue(found, "check that state '" + this.name + "' is found");
 
             // check properties
-            this.properties.checkExportPropertiesUpdateFormat(propLines);
+            this.properties.checkExport(propLines);
         }
     }
 }

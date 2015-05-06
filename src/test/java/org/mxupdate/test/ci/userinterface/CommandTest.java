@@ -71,8 +71,46 @@ public class CommandTest
                                 .setValue("description", "desc\"\\\\ription")
                                 .setValue("href", "javascript(\\\"test\\\")")
                                 .setValue("alt", "${COMMON_DIR}/emxTreeAlt.jsp?\"mode=insert")
-                                .setSetting("Setting 1", "SettingValue\"1")});
+                                .setSetting("Setting 1", "SettingValue\"1")
+                                .setSetting("Setting 2", "desc\"\\\\ription")});
     }
+
+    /**
+     * Command with 'add setting' syntax.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "command with 'add setting' syntax")
+    public void testUpdateWithAddSettingSyntax()
+        throws Exception
+    {
+        final CommandData orgData = new CommandData(this, "command").addCILine("add setting \"Key\" \"Value\"");
+        final CommandData expData = new CommandData(this, "command").setSetting("Key", "Value");
+
+        orgData.update("");
+
+        expData.checkExport(expData.export());
+    }
+
+    /**
+     * Command with 'add user' syntax.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "command with 'add user' syntax")
+    public void testUpdateWithAddUserSyntax()
+        throws Exception
+    {
+        final CommandData orgData = new CommandData(this, "command").addCILine("add user \"" + AbstractTest.PREFIX + "adminuser" + "\"");
+        final CommandData expData = new CommandData(this, "command").addUser(new PersonAdminData(this, "adminuser"));
+
+        expData.createDependings();
+
+        orgData.update("");
+
+        expData.checkExport(expData.export());
+    }
+
 
     /**
      * Cleanup all test commands.

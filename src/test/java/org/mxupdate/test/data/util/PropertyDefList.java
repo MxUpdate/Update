@@ -117,14 +117,13 @@ public class PropertyDefList
         }
     }
 
-
     /**
      * Checks that all properties within the export file are correct defined
      * and equal to the defined properties of this CI file.
      *
      * @param _propLines    property lines
      */
-    public void checkExportPropertiesUpdateFormat(final List<String> _propLines)
+    public void checkExport(final List<String> _propLines)
     {
         final Set<String> propDefs = new HashSet<String>(_propLines);
 

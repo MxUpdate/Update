@@ -16,6 +16,8 @@
 package org.mxupdate.test.data.userinterface;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,6 +25,7 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.AbstractAdminData;
+import org.testng.Assert;
 
 /**
  * Handles user interface test data with settings.
@@ -33,15 +36,8 @@ import org.mxupdate.test.data.AbstractAdminData;
 abstract class AbstractUIWithSettingData<T extends AbstractUIWithSettingData<?>>
     extends AbstractAdminData<T>
 {
-    /**
-     * All settings of this command.
-     *
-     * @see #append4Create(StringBuilder)
-     * @see #getSettings()
-     * @see #setSetting(String, String)
-     * @see #evalAdds4CheckExport(Set)
-     */
-    private final Map<String,String> settings = new HashMap<String,String>();
+    /** All settings of this command. */
+    private final Settings settings = new Settings();
 
     /**
      *
@@ -83,7 +79,7 @@ abstract class AbstractUIWithSettingData<T extends AbstractUIWithSettingData<?>>
      * @return settings definitions
      * @see #settings
      */
-    protected Map<String,String> getSettings()
+    protected Settings getSettings()
     {
         return this.settings;
     }
@@ -143,6 +139,57 @@ abstract class AbstractUIWithSettingData<T extends AbstractUIWithSettingData<?>>
         {
             _needAdds.add("setting \"" + AbstractTest.convertTcl(entry.getKey())
                     + "\" \"" + AbstractTest.convertTcl(entry.getValue()) +  "\"");
+        }
+    }
+
+    /**
+     * Settings.
+     */
+    public static class Settings
+        extends HashMap<String,String>
+    {
+        /** Dummy ID. */
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * Appends the defined settings to the update code {@code _strg} of the
+         * configuration item file.
+         *
+         * @param _prefix   prefix in front of the values
+         * @param _strg     string builder with the TCL commands of the
+         *                  configuration item file
+         * @param _suffix   suffix after the values
+         */
+        public void appendUpdate(final String _prefix,
+                                 final StringBuilder _strg,
+                                 final String _suffix)
+        {
+            for (final Map.Entry<String,String> entry : this.entrySet())  {
+                _strg.append(_prefix)
+                     .append("setting \"").append(AbstractTest.convertUpdate(entry.getKey())).append("\" ")
+                     .append('\"').append(AbstractTest.convertUpdate(entry.getValue())).append('\"')
+                     .append(_suffix);
+            }
+        }
+
+        /**
+         * Checks that all settings within the export file are correct defined
+         * and equal to the defined properties of this CI file.
+         *
+         * @param _setLines    setting lines
+         */
+        public void checkExport(final List<String> _setLines)
+        {
+            final Set<String> setDefs = new HashSet<String>(_setLines);
+
+            for (final Map.Entry<String,String> entry : this.entrySet())  {
+                final String setDefStr = "\"" + AbstractTest.convertUpdate(entry.getKey()) + "\" \"" + AbstractTest.convertUpdate(entry.getValue()) + '\"';
+                Assert.assertTrue(
+                        setDefs.contains(setDefStr),
+                        "check that setting is defined in ci file (have " + setDefStr + ", but found " + setDefs + ")");
+                setDefs.remove(setDefStr);
+            }
+            Assert.assertEquals(setDefs.size(), 0, "check that not too much settings are defined (have " + setDefs + ")");
         }
     }
 }

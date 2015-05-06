@@ -417,7 +417,7 @@ public abstract class AbstractAttribute_mxJPO<CLASS extends AbstractAttribute_mx
         this.rangesSorted.write(_out);
 
         // append properties
-        this.getProperties().writeUpdateFormat(_paramCache, _out, "  ");
+        this.getProperties().writeProperties(_paramCache, _out, "  ");
 
         _out.append("}");
     }

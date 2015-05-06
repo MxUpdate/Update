@@ -34,6 +34,7 @@ import org.mxupdate.update.datamodel.AbstractAttribute_mxJPO;
 import org.mxupdate.update.datamodel.Dimension_mxJPO;
 import org.mxupdate.update.datamodel.Format_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
+import org.mxupdate.update.userinterface.Command_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
@@ -552,7 +553,8 @@ public abstract class AbstractAdminObject_mxJPO
         if (!(this instanceof AbstractAttribute_mxJPO)
                 && !(this instanceof Format_mxJPO)
                 && !(this instanceof Dimension_mxJPO)
-                && !(this instanceof Policy_mxJPO))  {
+                && !(this instanceof Policy_mxJPO)
+                && !(this instanceof Command_mxJPO))  {
 
             for (final AdminProperty prop : this.properties)  {
                 // % must be ignored because this means settings

@@ -360,7 +360,7 @@ public class Policy_mxJPO
 
         // append properties
         _out.append("\n");
-        this.getProperties().writeUpdateFormat(_paramCache, _out, "  ");
+        this.getProperties().writeProperties(_paramCache, _out, "  ");
 
         _out.append("}");
     }
@@ -928,7 +928,7 @@ throw new Exception("some states are not defined anymore!");
             // write properties
             // (properties are first written with text and then new line flag)
             _out.append("\n");
-            this.properties.writeUpdateFormat(_paramCache, _out, "    ");
+            this.properties.writeProperties(_paramCache, _out, "    ");
 
             _out.append("  }");
         }

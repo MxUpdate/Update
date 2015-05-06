@@ -135,6 +135,7 @@ public class PropertyDef
      * @param _ci   CI type where this property is defined
      * @return CI TCL string
      */
+    @Deprecated()
     public String getCITCLString(final AbstractTest.CI _ci)
     {
         final StringBuilder propDef = new StringBuilder()
@@ -165,13 +166,13 @@ public class PropertyDef
     String getCIUpdateFormat()
     {
         final StringBuilder propDef = new StringBuilder()
-                .append('\"').append(AbstractTest.convertTcl(this.name)).append('\"');
+                .append('\"').append(AbstractTest.convertUpdate(this.name)).append('\"');
         if (this.to != null)  {
             propDef.append(" to ").append(this.to.getCI().getMxType())
-                   .append(" \"").append(AbstractTest.convertTcl(this.to.getName())).append('\"');
+                   .append(" \"").append(AbstractTest.convertUpdate(this.to.getName())).append('\"');
         }
         if (this.value != null)  {
-            propDef.append(" value \"").append(AbstractTest.convertTcl(this.value)).append('\"');
+            propDef.append(" value \"").append(AbstractTest.convertUpdate(this.value)).append('\"');
         }
         return propDef.toString();
     }

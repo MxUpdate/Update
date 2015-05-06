@@ -15,18 +15,21 @@
 
 package org.mxupdate.update.userinterface;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+import org.mxupdate.update.userinterface.command.CommandDefParser_mxJPO;
+import org.mxupdate.update.util.DeltaUtil_mxJPO;
+import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * The class is used to export and import / update command configuration items.
@@ -48,37 +51,14 @@ public class Command_mxJPO
         Command_mxJPO.IGNORED_URLS.add("/userRefList");
     }
 
-    /**
-     * Alt label of the command.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
+    /** Alt label of the command. */
     private String alt;
-
-    /**
-     * Label of the command.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
+    /** Label of the command. */
     private String label;
-
-    /**
-     * HRef of the command.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
+    /** HRef of the command. */
     private String href;
-
-    /**
-     * Sorted list of assigned users of the command.
-     *
-     * @see #parse(ParameterCache_mxJPO, String, String)
-     * @see #writeObject(ParameterCache_mxJPO, Appendable)
-     */
-    private final Set<String> users = new TreeSet<String>();
+    /** Sorted list of assigned users of the command. */
+    private final SortedSet<String> users = new TreeSet<String>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -133,6 +113,45 @@ public class Command_mxJPO
     }
 
     /**
+     * Writes the update script for this policy.
+     * The policy specific information are:
+     * <ul>
+     * <li>{@link #allState all state access flag}</li>
+     * </ul>
+     *
+     * @param _paramCache   parameter cache
+     * @param _out          writer instance
+     * @throws IOException if the TCL update code could not be written
+     */
+    @Override()
+    protected void write(final ParameterCache_mxJPO _paramCache,
+                         final Appendable _out)
+        throws IOException
+    {
+        this.writeHeader(_paramCache, _out);
+
+        _out.append("mxUpdate command \"${NAME}\"  {\n")
+            .append("    description \"").append(StringUtil_mxJPO.convertUpdate(this.getDescription())).append("\"\n");
+        if (this.isHidden())  {
+            _out.append("    hidden\n");
+        }
+        _out.append("    label \"").append(StringUtil_mxJPO.convertUpdate(this.label)).append("\"\n")
+            .append("    href \"").append(StringUtil_mxJPO.convertUpdate(this.href)).append("\"\n")
+            .append("    alt \"").append(StringUtil_mxJPO.convertUpdate(this.alt)).append("\"\n");
+        // users
+        for (final String user : this.users)  {
+            _out.append("    user \"").append(StringUtil_mxJPO.convertUpdate(user)).append("\"\n");
+        }
+        this.getProperties().writeSettings(_paramCache, _out, "    ");
+        this.getProperties().writeProperties(_paramCache, _out, "    ");
+
+        _out.append("}");
+    }
+
+    /**
+     * Only implemented as stub because
+     * {@link #write(ParameterCache_mxJPO, Appendable)} is new implemented.
+     *
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
      * @throws IOException if the TCL update code for the command could not be
@@ -143,79 +162,73 @@ public class Command_mxJPO
                                final Appendable _out)
         throws IOException
     {
-        if (this.isHidden())  {
-            _out.append(" \\\n    hidden");
-        }
-        _out.append(" \\\n    label \"").append(StringUtil_mxJPO.convertTcl(this.label)).append("\"")
-            .append(" \\\n    href \"").append(StringUtil_mxJPO.convertTcl(this.href)).append("\"")
-            .append(" \\\n    alt \"").append(StringUtil_mxJPO.convertTcl(this.alt)).append("\"");
-        // users must be sorted alpha-numerically
-        for (final String user : this.users)  {
-            _out.append(" \\\n    add user \"").append(StringUtil_mxJPO.convertTcl(user)).append("\"");
-        }
-        for (final AdminProperty prop : this.getProperties())  {
-            if (prop.isSetting())  {
-                _out.append(" \\\n    add setting \"")
-                    .append(StringUtil_mxJPO.convertTcl(prop.getName().substring(1))).append("\"")
-                    .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getValue())).append("\"");
+    }
+
+    /**
+     * The method is called from the TCL update code to define the this
+     * attribute. If the correct use case is defined method
+     * {@link #updateDimension(ParameterCache_mxJPO, String)} is called.
+     *
+     * @param _paramCache   parameter cache
+     * @param _args         first index defines the use case (must be
+     *                      &quot;updateAttribute&quot; that the attribute
+     *                      is updated); second index the name of the attribute
+     *                      to update
+     * @throws Exception if the update of the dimension failed or for all other
+     *                   use cases from super JPO call
+     */
+    @Override()
+    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
+                               final String... _args)
+        throws Exception
+    {
+        // check if dimension is defined
+        if ((_args.length == 4) && "mxUpdate".equals(_args[0]) && "command".equals(_args[1])) {
+// TODO: Exception Handling
+            // check that command names are equal
+            if (!this.getName().equals(_args[2]))  {
+                throw new Exception("wrong command '" + _args[1] + "' is set to update (currently command '" + this.getName() + "' is updated!)");
             }
+
+            final String code = _args[3].replaceAll("@0@0@", "'").replaceAll("@1@1@", "\\\"");
+
+            final CommandDefParser_mxJPO parser = new CommandDefParser_mxJPO(new StringReader(code));
+            final Command_mxJPO command = parser.command(_paramCache, this.getTypeDef(), this.getName());
+
+            final MqlBuilder_mxJPO mql = MqlBuilder_mxJPO.init("escape mod command $1", this.getName());
+
+            this.calcDelta(_paramCache, mql, command);
+
+            mql.exec(_paramCache);
+
+        } else  {
+            super.jpoCallExecute(_paramCache, _args);
         }
     }
 
     /**
-     * The method overwrites the original method to append the MQL statements
-     * in the <code>_preMQLCode</code> to reset this command. Following steps
-     * are done:
-     * <ul>
-     * <li>HRef, description, alt and label is set to empty string</li>
-     * <li>all settings and users are removed</li>
-     * </ul>
+     * Calculates the delta between this current command definition and the
+     * {@code _target} command definition and appends the MQL append commands
+     * to {@code _cmd}.
      *
-     * @param _paramCache       parameter cache
-     * @param _preMQLCode       MQL statements which must be called before the
-     *                          TCL code is executed
-     * @param _postMQLCode      MQL statements which must be called after the
-     *                          TCL code is executed
-     * @param _preTCLCode       TCL code which is defined before the source
-     *                          file is sourced
-     * @param _tclVariables     map of all TCL variables where the key is the
-     *                          name and the value is value of the TCL variable
-     *                          (the value is automatically converted to TCL
-     *                          syntax!)
-     * @param _sourceFile       souce file with the TCL code to update
-     * @throws Exception if the update from derived class failed
+     * @param _paramCache   parameter cache
+     * @param _cmd          string builder to append the MQL commands
+     * @param _target       target format definition
+     * @throws UpdateException_mxJPO if update is not allowed (because data can
+     *                      be lost)
      */
-    @Override()
-    protected void update(final ParameterCache_mxJPO _paramCache,
-                          final CharSequence _preMQLCode,
-                          final CharSequence _postMQLCode,
-                          final CharSequence _preTCLCode,
-                          final Map<String,String> _tclVariables,
-                          final File _sourceFile)
-        throws Exception
+    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
+                             final MqlBuilder_mxJPO _mql,
+                             final Command_mxJPO _target)
+        throws UpdateException_mxJPO
     {
-        // reset HRef, description, alt and label
-        final StringBuilder preMQLCode = new StringBuilder()
-                .append("escape mod ").append(this.getTypeDef().getMxAdminName())
-                .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append('\"')
-                .append(" !hidden href \"\" description \"\" alt \"\" label \"\"");
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "description", _target.getDescription(),   this.getDescription());
+        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      _target.isHidden(),         this.isHidden());
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "alt",         _target.alt,                this.alt);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "href",        _target.href,               this.href);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "label",       _target.label,              this.label);
+        DeltaUtil_mxJPO.calcListDelta(_mql, "user",         _target.users,              this.users);
 
-        // reset settings
-        for (final AdminProperty prop : this.getProperties())  {
-            if (prop.isSetting())  {
-                preMQLCode.append(" remove setting \"").append(StringUtil_mxJPO.convertMql(prop.getName().substring(1))).append('\"');
-            }
-        }
-
-        // reset users
-        for (final String user : this.users)  {
-            preMQLCode.append(" remove user \"").append(StringUtil_mxJPO.convertMql(user)).append('\"');
-        }
-
-        // append already existing pre MQL code
-        preMQLCode.append(";\n")
-                  .append(_preMQLCode);
-
-        super.update(_paramCache, preMQLCode, _postMQLCode, _preTCLCode, _tclVariables, _sourceFile);
+        _target.getProperties().calcDelta("", this.getProperties(), _mql);
     }
 }
