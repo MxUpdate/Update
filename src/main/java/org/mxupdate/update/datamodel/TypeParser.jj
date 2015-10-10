@@ -459,6 +459,11 @@ void parse(final Type_mxJPO _type)
                                                               | <KIND_INTEGER>                {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Integer);}
                                                               | <KIND_REAL>                   {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Real);}
                                                               | <KIND_STRING>                 {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.String);} ) )
+                                          | ( <UUID>                                          {property = new AdminProperty();
+                                                                                               this.appendValue(this.getValue(localAttr, "properties"), "propertiesStack", property);
+                                                                                               this.setValue(property, "name",  "UUID");}
+                                                              ( tmp = <STRING>                {this.setValue(property, "value", this.getString(tmp.image));}
+                                                              | tmp = <SINGLE>                {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
                                           | ( <SYMBOLICNAME>  ( tmp = <STRING>                {this.appendValue(localAttr, "symbolicNames",                   this.getString(tmp.image));}
                                                               | tmp = <SINGLE>                {this.appendValue(localAttr, "symbolicNames",                   this.getSingle(tmp.image));} ) )
                                           | ( <DESCRIPTION>   ( tmp = <MULTILINESTRING>       {this.setValue(localAttr, "description",                        this.getString(tmp.image));}
