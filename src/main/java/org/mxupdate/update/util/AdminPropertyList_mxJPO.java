@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.util;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -25,7 +24,6 @@ import java.util.Stack;
 import java.util.TreeSet;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
-import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 
@@ -37,7 +35,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 public final class AdminPropertyList_mxJPO
 {
     /** Set of all ignored URLs from the XML definition for admin properties.*/
-    private static final Set<String> IGNORED_URLS = new HashSet<String>(1);
+    private static final Set<String> IGNORED_URLS = new HashSet<>(1);
     static  {
         AdminPropertyList_mxJPO.IGNORED_URLS.add("/property/adminRef");
     }
@@ -51,12 +49,12 @@ public final class AdminPropertyList_mxJPO
      * in the properties map {@link #propertiesMap} from
      * {@link #prepare(ParameterCache_mxJPO)}.
      */
-    private final Stack<AdminProperty> propertiesStack = new Stack<AdminProperty>();
+    private final Stack<AdminProperty> propertiesStack = new Stack<>();
 
     /** Properties. */
-    private final SortedSet<AdminProperty> properties = new TreeSet<AdminProperty>();
+    private final SortedSet<AdminProperty> properties = new TreeSet<>();
     /** Settings. */
-    private final SortedSet<AdminProperty> otherProps = new TreeSet<AdminProperty>();
+    private final SortedSet<AdminProperty> otherProps = new TreeSet<>();
 
     /**
      * Defines the {@link #otherPropTag name of other property tag}.
@@ -267,7 +265,7 @@ public final class AdminPropertyList_mxJPO
                                 final UpdateBuilder_mxJPO _updateBuilder)
     {
         // first, write information properties
-        final List<AdminProperty> infoProps = new ArrayList<AdminProperty>();
+        final List<AdminProperty> infoProps = new ArrayList<>();
         if (_paramCache.contains(ValueKeys.ExportInfoPropsListAdmin))  {
             for (final String propKey : _paramCache.getValueList(ValueKeys.ExportInfoPropsListAdmin))  {
                 for (final AdminProperty prop : this.properties)  {
@@ -299,110 +297,12 @@ public final class AdminPropertyList_mxJPO
      *
      * @param _paramCache   parameter cache
      * @param _out          appendable instance to the TCL update file
-     * @param _typeDef      type definition
-     * @throws IOException if the write to the TCL update file failed
-     * @deprecated replaced by {@link #writeProperties(ParameterCache_mxJPO, UpdateBuilder_mxJPO)}
-     */
-    @Deprecated()
-    public void writeProperties(final ParameterCache_mxJPO _paramCache,
-                                final Appendable _out,
-                                final String _prefix)
-        throws IOException
-    {
-        for (final AdminProperty prop : this.properties)  {
-            if (PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null)  {
-                _out.append(_prefix)
-                    .append("property \"").append(StringUtil_mxJPO.convertUpdate(prop.getName())).append("\"");
-                if (((prop.getRefAdminName()) != null) && (prop.getRefAdminType() != null))  {
-                    _out.append(" to ").append(prop.getRefAdminType())
-                        .append(" \"").append(StringUtil_mxJPO.convertUpdate(prop.getRefAdminName())).append("\"");
-                }
-                if (prop.getValue() != null)  {
-                    _out.append(" value \"").append(StringUtil_mxJPO.convertUpdate(prop.getValue())).append('\"');
-                }
-                _out.append('\n');
-            }
-        }
-    }
-
-    /**
-     * Writes the MQL code to add all none standard properties to the TCL
-     * update file.
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
      */
     public void writeOtherProps(final ParameterCache_mxJPO _paramCache,
                                 final UpdateBuilder_mxJPO _updateBuilder)
     {
         for (final AdminProperty prop : this.otherProps)  {
             _updateBuilder.stepStartNewLine().stepSingle(this.otherPropTag).stepString(prop.getSettingName()).stepString(prop.getValue()).stepEndLine();
-        }
-    }
-
-    /**
-     * Writes the MQL code to add all none standard properties to the TCL
-     * update file.
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @param _typeDef      type definition
-     * @throws IOException if the write to the TCL update file failed
-     * @deprecated replaced by {@link #writeOtherProps(ParameterCache_mxJPO, UpdateBuilder_mxJPO)}
-     */
-    @Deprecated()
-    public void writeSettings(final ParameterCache_mxJPO _paramCache,
-                              final Appendable _out,
-                              final String _prefix)
-        throws IOException
-    {
-        if (this.otherPropTag != null)  {
-            for (final AdminProperty prop : this.otherProps)  {
-                _out.append(_prefix)
-                    .append(this.otherPropTag).append(" \"").append(StringUtil_mxJPO.convertUpdate(prop.getSettingName())).append("\"")
-                    .append(" \"").append(StringUtil_mxJPO.convertUpdate(prop.getValue())).append('\"')
-                    .append('\n');
-            }
-        }
-    }
-
-    /**
-     * Writes the MQL code to add all none standard properties to the TCL
-     * update file.
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          appendable instance to the TCL update file
-     * @param _typeDef      type definition
-     * @throws IOException if the write to the TCL update file failed
-     * @deprecated old format
-     */
-    @Deprecated()
-    public void writeAddFormat(final ParameterCache_mxJPO _paramCache,
-                               final Appendable _out,
-                               final TypeDef_mxJPO _typeDef)
-        throws IOException
-    {
-        for (final AdminProperty prop : this.properties)  {
-            if (PropertyDef_mxJPO.getEnumByPropName(_paramCache, prop.getName()) == null)  {
-                _out.append("\nmql escape add property \"").append(StringUtil_mxJPO.convertTcl(prop.getName())).append("\"")
-                    .append(" \\\n    on ")
-                    .append(_typeDef.getMxAdminName())
-                    .append(" \"${NAME}\"");
-                if (!_typeDef.getMxAdminSuffix().isEmpty())  {
-                    _out.append(' ').append(_typeDef.getMxAdminSuffix());
-                }
-                if (((prop.getRefAdminName()) != null) && (prop.getRefAdminType() != null))  {
-                    _out.append("  \\\n    to ").append(prop.getRefAdminType())
-                        .append(" \"").append(StringUtil_mxJPO.convertTcl(prop.getRefAdminName())).append("\"");
-                    // if target is a table, a system is required!
-                    if ("table".equals(prop.getRefAdminType()))  {
-                        _out.append(" system");
-                    }
-                }
-                if (prop.getValue() != null)  {
-                    _out.append(" \\\n    value \"").append(StringUtil_mxJPO.convertTcl(prop.getValue())).append("\"");
-                }
-            }
         }
     }
 
@@ -420,11 +320,11 @@ public final class AdminPropertyList_mxJPO
                           final AdminPropertyList_mxJPO _currents)
     {
         // properties / settings must be appended because they can be changed...
-        final SortedSet<AdminProperty> thisProps = new TreeSet<AdminProperty>();
+        final SortedSet<AdminProperty> thisProps = new TreeSet<>();
         thisProps.addAll(this.properties);
         thisProps.addAll(this.otherProps);
 
-        final SortedSet<AdminProperty> currProps = new TreeSet<AdminProperty>();
+        final SortedSet<AdminProperty> currProps = new TreeSet<>();
         if (_currents != null)  {
             currProps.addAll(_currents.properties);
             currProps.addAll(_currents.otherProps);
