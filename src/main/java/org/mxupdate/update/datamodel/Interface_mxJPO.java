@@ -25,6 +25,7 @@ import java.util.TreeSet;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
@@ -47,7 +48,7 @@ public class Interface_mxJPO
      *
      * @see #parseAdminXMLExportEvent(ParameterCache_mxJPO, String, String)
      */
-    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    private static final Set<String> IGNORED_URLS = new HashSet<>();
     static  {
         Interface_mxJPO.IGNORED_URLS.add("/attributeDefRefList");
         Interface_mxJPO.IGNORED_URLS.add("/derivedFromInterface");
@@ -74,20 +75,22 @@ public class Interface_mxJPO
     /** Is the interface abstract? */
     private Boolean abstractFlag;
     /** From which interfaces is this interface derived? */
-    private final SortedSet<String> derived = new TreeSet<String>();
+    private final SortedSet<String> derived = new TreeSet<>();
 
     /** Attribute list. */
-    private final SortedSet<String> attributes = new TreeSet<String>();
+    private final SortedSet<String> attributes = new TreeSet<>();
 
     /** Are all types allowed for this interface? */
     private boolean typeAll;
     /** Information about all allowed types for this interface. */
-    private final SortedSet<String> types = new TreeSet<String>();
+    private final SortedSet<String> types = new TreeSet<>();
+    /** Local Attributes. */
+    private final LocalAttributeList_mxJPO localAttributes = new LocalAttributeList_mxJPO();
 
     /** Are all relationships allowed for this interface? */
     private boolean relationAll;
     /** Information about all allowed relationships for this interface. */
-    private final SortedSet<String> relations = new TreeSet<String>();
+    private final SortedSet<String> relations = new TreeSet<>();
 
     /**
      * Constructor used to initialize the interface class instance.
@@ -154,6 +157,17 @@ public class Interface_mxJPO
         return parsed;
     }
 
+    /**
+     * After the interface is parsed, the interface and local attributes must be
+     * prepared.
+     */
+    @Override()
+    protected void prepare()
+    {
+        super.prepare();
+        this.localAttributes.prepare();
+    }
+
     @Override()
     protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
@@ -164,6 +178,7 @@ public class Interface_mxJPO
                 .list(          "derived",                  this.derived)
                 .flag(          "hidden",           false,  this.isHidden())
                 .list(          "attribute",                this.attributes)
+                .write(this.localAttributes)
                 .singleIfTrue(  "for relationship",         "all",                  this.relationAll)
                 .listIfTrue(    "for relationship",         this.relations,         !this.relationAll)
                 .singleIfTrue(  "for type",                 "all",                  this.typeAll)

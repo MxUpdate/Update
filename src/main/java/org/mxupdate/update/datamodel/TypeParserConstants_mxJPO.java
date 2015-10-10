@@ -79,11 +79,11 @@ interface TypeParserConstants_mxJPO {
   /** RegularExpression Id. */
   int MULTILINE_FALSE = 38;
   /** RegularExpression Id. */
-  int MAXLENGTH = 39;
+  int RULE = 39;
   /** RegularExpression Id. */
-  int RULE = 40;
+  int DIMENSION = 40;
   /** RegularExpression Id. */
-  int DIMENSION = 41;
+  int MAXLENGTH = 41;
   /** RegularExpression Id. */
   int MAXLENGTH_NUMBER = 42;
   /** RegularExpression Id. */
@@ -223,9 +223,9 @@ interface TypeParserConstants_mxJPO {
     "\"!rangevalue\"",
     "\"multiline\"",
     "\"!multiline\"",
-    "\"maxlength\"",
     "\"rule\"",
     "\"dimension\"",
+    "\"maxlength\"",
     "<MAXLENGTH_NUMBER>",
     "<RANGE_EQUAL>",
     "<RANGE_GREATERTHAN>",

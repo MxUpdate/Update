@@ -128,21 +128,22 @@ class TypeParser
     | <MULTILINE_TRUE:                      "multiline">                                    : DEFAULT
     | <MULTILINE_FALSE:                     "!multiline">                                   : DEFAULT
 
-    | <MAXLENGTH:                           "maxlength">                                    : MAXLENGTH_EXPECTED
-
     | <RULE:                                "rule">                                         : STRING_EXPECTED
 
     | <DIMENSION:                           "dimension">                                    : STRING_EXPECTED
 }
 
-/** Integer for Max Value */
+/** Max Length */
+<DEFAULT> TOKEN:
+{
+      <MAXLENGTH:                           "maxlength">                                    : MAXLENGTH_EXPECTED
+}
 <MAXLENGTH_EXPECTED> TOKEN :
 {
       <MAXLENGTH_NUMBER : (["\u0030"-"\u0039"])+> : DEFAULT
 }
 
 /** Ranges */
-
 <DEFAULT> TOKEN:
 {
       <RANGE_EQUAL:                         "range" ([" ","\t","\n","\r"])+ "=">            : STRING_EXPECTED

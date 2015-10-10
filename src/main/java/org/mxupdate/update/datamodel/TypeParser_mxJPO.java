@@ -307,9 +307,9 @@ localAttr = new LocalAttribute(this.getSingle(tmp.image));this.appendValue(_type
           case RANGEVALUE_FALSE:
           case MULTILINE_TRUE:
           case MULTILINE_FALSE:
-          case MAXLENGTH:
           case RULE:
           case DIMENSION:
+          case MAXLENGTH:
           case RANGE_EQUAL:
           case RANGE_GREATERTHAN:
           case RANGE_GREATERTHANEQUAL:
