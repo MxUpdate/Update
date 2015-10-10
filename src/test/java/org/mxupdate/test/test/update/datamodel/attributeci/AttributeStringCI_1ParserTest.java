@@ -72,22 +72,22 @@ public class AttributeStringCI_1ParserTest
             // multivalue flag
             {"4a) multivalue",
                     "",
-                    "kind string description \"\" !hidden multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\""},
+                    "kind string description \"\" !hidden multivalue  !resetonclone !resetonrevision !multiline maxlength 0 default \"\""},
             {"4b) not multivalue not defined",
                     "kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\"",
                     "kind string description \"\" !hidden             !resetonclone !resetonrevision !multiline maxlength 0 default \"\""},
-            // multivalue flag
-            {"5a) multivalue",
+            // resetonclone flag
+            {"5a) resetonclone",
                     "",
-                    "kind string description \"\" !hidden !multivalue resetonclone !resetonrevision !multiline maxlength 0 default \"\""},
-            {"5b) not multivalue not defined",
+                    "kind string description \"\" !hidden !multivalue resetonclone  !resetonrevision !multiline maxlength 0 default \"\""},
+            {"5b) not resetonclone not defined",
                     "kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\"",
-                    "kind string description \"\" !hidden !multivalue                !resetonrevision !multiline maxlength 0 default \"\""},
+                    "kind string description \"\" !hidden !multivalue               !resetonrevision !multiline maxlength 0 default \"\""},
             // resetonrevision flag
-            {"6a) multivalue",
+            {"6a) resetonrevision",
                     "",
-                    "kind string description \"\" !hidden !multivalue !resetonclone resetonrevision !multiline maxlength 0 default \"\""},
-            {"6b) not multivalue not defined",
+                    "kind string description \"\" !hidden !multivalue !resetonclone resetonrevision  !multiline maxlength 0 default \"\""},
+            {"6b) not resetonrevision not defined",
                     "kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\"",
                     "kind string description \"\" !hidden !multivalue !resetonclone                  !multiline maxlength 0 default \"\""},
             // multiline flag

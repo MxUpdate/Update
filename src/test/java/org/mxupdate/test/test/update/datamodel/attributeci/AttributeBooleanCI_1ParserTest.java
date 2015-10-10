@@ -76,18 +76,18 @@ public class AttributeBooleanCI_1ParserTest
             {"4b) not multivalue not defined",
                     "kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\"",
                     "kind boolean description \"\" !hidden             !resetonclone !resetonrevision default \"\""},
-            // multivalue flag
-            {"5a) multivalue",
+            // resetonclone flag
+            {"5a) resetonclone",
                     "",
                     "kind boolean description \"\" !hidden !multivalue resetonclone !resetonrevision default \"\""},
-            {"5b) not multivalue not defined",
+            {"5b) not resetonclone not defined",
                     "kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\"",
                     "kind boolean description \"\" !hidden !multivalue                !resetonrevision default \"\""},
             // resetonrevision flag
-            {"6a) multivalue",
+            {"6a) resetonrevision",
                     "",
                     "kind boolean description \"\" !hidden !multivalue !resetonclone resetonrevision default \"\""},
-            {"6b) not multivalue not defined",
+            {"6b) not resetonrevision not defined",
                     "kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\"",
                     "kind boolean description \"\" !hidden !multivalue !resetonclone                  default \"\""},
             // default value

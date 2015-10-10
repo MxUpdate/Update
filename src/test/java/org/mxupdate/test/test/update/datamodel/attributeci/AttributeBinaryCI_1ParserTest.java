@@ -70,9 +70,19 @@ public class AttributeBinaryCI_1ParserTest
                     "kind binary description \"\" !hidden !resetonclone !resetonrevision default \"\"",
                     "kind binary description \"\"         !resetonclone !resetonrevision default \"\""},
             // multivalue flag must be ignored
-            {"4b) multivalue defined, but must be ignored",
+            {"4a) multivalue defined, but must be ignored",
                     "kind binary description \"\" !hidden             !resetonclone !resetonrevision default \"\"",
                     "kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\""},
+            {"4b) multivalue defined, but must be ignored",
+                    "kind binary description \"\" !hidden             !resetonclone !resetonrevision default \"\"",
+                    "kind binary description \"\" !hidden  multivalue !resetonclone !resetonrevision default \"\""},
+            // resetonclone flag
+            {"5a) resetonclone",
+                    "",
+                    "kind binary description \"\" !hidden resetonclone  !resetonrevision default \"\""},
+            {"5b) not resetonclone not defined",
+                    "kind binary description \"\" !hidden !resetonclone !resetonrevision default \"\"",
+                    "kind binary description \"\" !hidden               !resetonrevision default \"\""},
             // resetonrevision flag
             {"6a) resetonrevision",
                     "",
