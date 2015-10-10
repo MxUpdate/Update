@@ -73,14 +73,37 @@ public class PathTypeCI_1Parser2LocalAttributTest
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind string  description \"\" !hidden !multivalue !resetonclone !resetonrevision             !multiline maxlength 0 default \"\" }"},
 
+            // uuid
+            {"1a) local attribute uuid with minus separator",
+                    "",
+                    "description \"\" !hidden "
+                            + "from { cardinality many } "
+                            + "to { } "
+                            + "local attribute \"ATTRNAME\" { kind boolean uuid \"FDA75674-9792-11E6-AE22-56B6B6499611\" description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
+            {"1b) local attribute uuid w/o minus separator",
+                    "",
+                    "description \"\" !hidden "
+                            + "from { cardinality many } "
+                            + "to { } "
+                            + "local attribute \"ATTRNAME\" { kind boolean uuid \"FDA75674979211E6AE2256B6B6499611\"     description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
+            {"1c) local attribute uuid convert from single to string",
+                    "description \"\" !hidden "
+                            + "from { cardinality many } "
+                            + "to { } "
+                            + "local attribute \"ATTRNAME\" { kind boolean uuid \"FDA7-5674979211-E6AE2256B6-B6499611\"  description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
+                    "description \"\" !hidden "
+                            + "from { cardinality many } "
+                            + "to { } "
+                            + "local attribute \"ATTRNAME\" { kind boolean uuid   FDA7-5674979211-E6AE2256B6-B6499611    description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
+
              // attribute registered name
-            {"1a) attribute symbolic name",
+            {"2a) local attribute symbolic name",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind boolean symbolicname \"attribute_abc\"                                description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
-            {"1b) attribute two symbolic names",
+            {"2b) local attribute two symbolic names",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
@@ -91,13 +114,13 @@ public class PathTypeCI_1Parser2LocalAttributTest
                             + "local attribute \"ATTRNAME\" { kind boolean symbolicname \"attribute_def\" symbolicname \"attribute_abc\" description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
 
             // attribute description
-            {"2a) attribute description",
+            {"3a) local attribute description",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"abc def\"  !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
-            {"2b) attribute description not defined",
+            {"3b) local attribute description not defined",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
@@ -106,7 +129,7 @@ public class PathTypeCI_1Parser2LocalAttributTest
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind boolean                          !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
-            {"2c) multi-line attribute description",
+            {"3c) local multi-line attribute description",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
@@ -114,13 +137,13 @@ public class PathTypeCI_1Parser2LocalAttributTest
                             + "local attribute \"ATTRNAME\" { kind boolean description \"abc\ndef\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
 
             // attribute hidden flag
-            {"3a) attribute hidden",
+            {"4a) local attribute hidden",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" hidden  !multivalue !resetonclone !resetonrevision default \"\" }"},
-            {"3b) attribute not hidden (not defined)",
+            {"4b) local attribute not hidden (not defined)",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
@@ -131,13 +154,13 @@ public class PathTypeCI_1Parser2LocalAttributTest
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\"         !multivalue !resetonclone !resetonrevision default \"\" }"},
 
             // attribute multivalue flag
-            {"4a) attribute multivalue flag",
+            {"5a) local attribute multivalue flag",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden multivalue  !resetonclone !resetonrevision default \"\" }"},
-            {"4b) attribute multivalue flag not defined",
+            {"5b) local attribute multivalue flag not defined",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
@@ -148,13 +171,13 @@ public class PathTypeCI_1Parser2LocalAttributTest
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden             !resetonclone !resetonrevision default \"\" }"},
 
             // attribute resetonclone flag
-            {"5a) attribute resetonclone flag",
+            {"6a) local attribute resetonclone flag",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue resetonclone  !resetonrevision default \"\" }"},
-            {"5b) attribute resetonclone flag not defined",
+            {"6b) local attribute resetonclone flag not defined",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
@@ -165,13 +188,13 @@ public class PathTypeCI_1Parser2LocalAttributTest
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue               !resetonrevision default \"\" }"},
 
             // attribute resetonrevision flag
-            {"6a) attribute resetonrevision flag",
+            {"7a) local attribute resetonrevision flag",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone resetonrevision  default \"\" }"},
-            {"6b) attribute resetonrevision flag not defined",
+            {"7b) local attribute resetonrevision flag not defined",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
@@ -182,13 +205,13 @@ public class PathTypeCI_1Parser2LocalAttributTest
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone                  default \"\" }"},
 
             // attribute default value
-            {"7a) attribute default value",
+            {"8a) local attribute default value",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc def\"  }"},
-            {"7b) attribute default value not defined",
+            {"8b) local attribute default value not defined",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
@@ -197,7 +220,7 @@ public class PathTypeCI_1Parser2LocalAttributTest
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision                      }"},
-            {"7c) multi-line attribute default value",
+            {"8c) local multi-line attribute default value",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
@@ -205,13 +228,13 @@ public class PathTypeCI_1Parser2LocalAttributTest
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc\ndef\" }"},
 
             // real attribute rangevalue flag
-            {"8a) real attribute rangevalue flag",
+            {"9a) local real attribute rangevalue flag",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind real description \"\" !hidden !multivalue !resetonclone !resetonrevision rangevalue  default \"\" }"},
-            {"8b) real attribute rangevalue flag not defined",
+            {"9b) local real attribute rangevalue flag not defined",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
@@ -222,13 +245,13 @@ public class PathTypeCI_1Parser2LocalAttributTest
                             + "local attribute \"ATTRNAME\" { kind real description \"\" !hidden !multivalue !resetonclone !resetonrevision             default \"\" }"},
 
             // string attribute multiline flag
-            {"9a) attribute multiline flag",
+            {"10a) local attribute multiline flag",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision multiline  maxlength 0 default \"\" }"},
-            {"9b) attribute multiline flag not defined",
+            {"10b) local attribute multiline flag not defined",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
@@ -239,13 +262,13 @@ public class PathTypeCI_1Parser2LocalAttributTest
                             + "local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision            maxlength 0 default \"\" }"},
 
              // string attribute maxlength
-            {"10a) attribute maxlength",
+            {"11a) local attribute maxlength",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision multiline  maxlength 125 default \"\" }"},
-            {"10b) attribute maxlength not defined",
+            {"11b) local attribute maxlength not defined",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
@@ -256,13 +279,13 @@ public class PathTypeCI_1Parser2LocalAttributTest
                             + "local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline               default \"\" }"},
 
             // attribute rule
-            {"11a) attribute rule",
+            {"12a) local attribute rule",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision rule \"A\"            default \"\"  }"},
-            {"11a) attribute rule list (if more than one none)",
+            {"12a) local attribute rule list (if more than one none)",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
@@ -273,7 +296,7 @@ public class PathTypeCI_1Parser2LocalAttributTest
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision rule \"A\" rule \"B\" default \"\"  }"},
 
             // attribute dimension
-            {"12a) real attribute dimension",
+            {"13) local real attribute dimension",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
@@ -281,13 +304,13 @@ public class PathTypeCI_1Parser2LocalAttributTest
                             + "local attribute \"ATTRNAME\" { kind real description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue dimension \"DIM\" default \"\"  }"},
 
             // attribute action trigger
-            {"20a) action trigger with input",
+            {"20a) local attribute action trigger with input",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify action \"{}\\\"\" input \"{}\\\"\" }"},
-            {"20b) action trigger w/o input",
+            {"20b) local attribute action trigger w/o input",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
@@ -297,13 +320,13 @@ public class PathTypeCI_1Parser2LocalAttributTest
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify action \"{}\\\"\" }"},
             //  attribute check trigger
-            {"21a) check trigger with input",
+            {"21a) local attribute check trigger with input",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify check \"{}\\\"\" input \"{}\\\"\" }"},
-            {"21b) check trigger w/o input",
+            {"21b) local attribute check trigger w/o input",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
@@ -313,13 +336,13 @@ public class PathTypeCI_1Parser2LocalAttributTest
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify check \"{}\\\"\" }"},
             //  attribute override trigger
-            {"22a) override trigger with input",
+            {"22a) local attribute override trigger with input",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify override \"{}\\\"\" input \"{}\\\"\" }"},
-            {"22b) override trigger w/o input",
+            {"22b) local attribute override trigger w/o input",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
@@ -330,91 +353,91 @@ public class PathTypeCI_1Parser2LocalAttributTest
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify override \"{}\\\"\" }"},
 
             // attribute ranges
-            {"30a) attribute range",
+            {"30a) local attribute range",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range = \"VALUE1\" }"},
-            {"30b) attribute range",
+            {"30b) local attribute range",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range = \"VALUE1\" range = \"VALUE2\" }"},
-            {"30c) attribute range >",
+            {"30c) local attribute range >",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range > \"VALUE1\" }"},
-            {"30d) attribute range >=",
+            {"30d) local attribute range >=",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range >= \"VALUE1\" }"},
-            {"30e) attribute range <",
+            {"30e) local attribute range <",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range < \"VALUE1\" }"},
-            {"30f) attribute range <=",
+            {"30f) local attribute range <=",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range <= \"VALUE1\" }"},
-            {"30g) attribute range !=",
+            {"30g) local attribute range !=",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range != \"VALUE1\" }"},
-            {"30h) attribute range match",
+            {"30h) local attribute range match",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range match \"VALUE1\" }"},
-            {"30i) attribute range !match",
+            {"30i) local attribute range !match",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range !match \"VALUE1\" }"},
-            {"30j) attribute range smatch",
+            {"30j) local attribute range smatch",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range smatch \"VALUE1\" }"},
-            {"30k) attribute range !smatch",
+            {"30k) local attribute range !smatch",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range !smatch \"VALUE1\" }"},
-            {"30l) attribute range program",
+            {"30l) local attribute range program",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range program \"VALUE1\" }"},
-            {"30m) attribute range program input",
+            {"30m) local attribute range program input",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range program \"VALUE1\" input \"VALUE2\" }"},
-            {"30n) attribute range between inclusive",
+            {"30n) local attribute range between inclusive",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range between \"VALUE1\" inclusive \"VALUE2\" inclusive }"},
-            {"30o) attribute range between exclusive",
+            {"30o) local attribute range between exclusive",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
@@ -422,25 +445,25 @@ public class PathTypeCI_1Parser2LocalAttributTest
                             + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range between \"VALUE1\" exclusive \"VALUE2\" exclusive }"},
 
             // attribute property
-            {"40a) attribute property special characters",
+            {"40a) local attribute property special characters",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" property \"{}\\\"\" }"},
-            {"40b) attribute property and value special characters",
+            {"40b) local attribute property and value special characters",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" property \"{}\\\"\" value \"{}\\\"\" }"},
-            {"40c) attribute property link special characters",
+            {"40c) local attribute property link special characters",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to { } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" property \"{}\\\"\" to type \"{}\\\"\" }"},
-            {"40d) attribute property link and value special characters",
+            {"40d) local attribute property link and value special characters",
                     "",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
