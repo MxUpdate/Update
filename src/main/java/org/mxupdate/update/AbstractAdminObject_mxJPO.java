@@ -24,8 +24,6 @@ import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeSet;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -43,6 +41,8 @@ import org.mxupdate.update.zparser.AdminXMLExportParser_mxJPO;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
+
+import matrix.util.MatrixException;
 
 /**
  * The class is used to export, create, delete and update administration
@@ -63,8 +63,13 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     private static final String PARAM_SUPPRESS_URL_WARNINGS = "SuppressUrlWarnings";
 
     /** Set of all ignored URLs from the XML definition for all admin objects. */
-    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    private static final Set<String> IGNORED_URLS = new HashSet<>();
     static  {
+        AbstractAdminObject_mxJPO.IGNORED_URLS.add("");
+        AbstractAdminObject_mxJPO.IGNORED_URLS.add("/release");
+        AbstractAdminObject_mxJPO.IGNORED_URLS.add("/datetime");
+        AbstractAdminObject_mxJPO.IGNORED_URLS.add("/event");
+        AbstractAdminObject_mxJPO.IGNORED_URLS.add("/dtdInfo");
         AbstractAdminObject_mxJPO.IGNORED_URLS.add("/adminProperties");
         AbstractAdminObject_mxJPO.IGNORED_URLS.add("/adminProperties/creationInfo");
         AbstractAdminObject_mxJPO.IGNORED_URLS.add("/adminProperties/creationInfo/datetime");
@@ -86,7 +91,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     private boolean hidden = false;
 
     /** All current defined symbolic names for MX administration objects are stored. */
-    private final SortedSet<String> symbolicNames = new TreeSet<String>();
+    private final SortedSet<String> symbolicNames = new TreeSet<>();
 
     /** List of all properties. */
     private final AdminPropertyList_mxJPO properties = new AdminPropertyList_mxJPO();
@@ -415,7 +420,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
          * @see #startElement(String, String, String, Attributes)
          * @see #endElement(String, String, String)
          */
-        private final Stack<String> stack = new Stack<String>();
+        private final Stack<String> stack = new Stack<>();
 
         /**
          * Holds the string content within a XML tag. The content is build by
