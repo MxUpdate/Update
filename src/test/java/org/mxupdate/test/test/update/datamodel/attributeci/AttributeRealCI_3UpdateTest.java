@@ -33,9 +33,9 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class AttributeRealCI_3UpdateTest
-    extends AbstractAttributeWithRangesAndMultiValuesTest<AttributeRealData>
+    extends Abstract_3UpdateWithRangesAndMultiValuesTest<AttributeRealData>
 {
     /**
      * Data provider for test real attributes.
@@ -45,7 +45,7 @@ public class AttributeRealCI_3UpdateTest
     @DataProvider(name = "data")
     public Object[][] getAttributes()
     {
-        final List<Object[]> ret = new ArrayList<Object[]>();
+        final List<Object[]> ret = new ArrayList<>();
 
         // range value flag
         ret.add(new Object[]{
@@ -90,7 +90,7 @@ public class AttributeRealCI_3UpdateTest
     public void negativeTestUpdateRangeValueFlag()
         throws Exception
     {
-        new AttributeRealData(this, "test")
+        this.createNewData("test")
                 .setFlag("rangevalue", true)
                 .create()
                 .update((String) null)
@@ -108,7 +108,7 @@ public class AttributeRealCI_3UpdateTest
     public void negativeTestUpdateDelimiter()
         throws Exception
     {
-        new AttributeRealData(this, "test")
+        this.createNewData("test")
                 .setDimension(new DimensionData(this, "Test Dimension")
                         .addUnit(new UnitData("unit")
                                 .setFlag("default", true)
@@ -123,9 +123,15 @@ public class AttributeRealCI_3UpdateTest
                 .failureUpdate(ErrorKey.ABSTRACTATTRIBUTE_UPDATE_DIMENSION_UPDATED);
     }
 
-    @Override()
+    @Override
     protected AttributeRealData createNewData(final String _name)
     {
-        return new AttributeRealData(this, _name);
+        return new AttributeRealData(this, _name).setSingle("kind", this.getKind());
+    }
+
+    @Override
+    protected String getKind()
+    {
+        return "real";
     }
 }

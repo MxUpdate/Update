@@ -34,9 +34,9 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class AttributeIntegerCI_3UpdateTest
-    extends AbstractAttributeWithRangesAndMultiValuesTest<AttributeIntegerData>
+    extends Abstract_3UpdateWithRangesAndMultiValuesTest<AttributeIntegerData>
 {
     /**
      * Data provider for test integer attributes.
@@ -46,7 +46,7 @@ public class AttributeIntegerCI_3UpdateTest
     @DataProvider(name = "data")
     public Object[][] getAttributes()
     {
-        final List<Object[]> ret = new ArrayList<Object[]>();
+        final List<Object[]> ret = new ArrayList<>();
 
         // range value flag
         ret.add(new Object[]{
@@ -91,7 +91,7 @@ public class AttributeIntegerCI_3UpdateTest
     public void negativeTestUpdateRangeValueFlag()
         throws Exception
     {
-        new AttributeIntegerData(this, "test")
+        this.createNewData("test")
                 .setFlag("rangevalue", true)
                 .create()
                 .update((String) null)
@@ -109,7 +109,7 @@ public class AttributeIntegerCI_3UpdateTest
     public void negativeTestUpdateDimension()
         throws Exception
     {
-        new AttributeIntegerData(this, "test")
+        this.createNewData("test")
                 .setDimension(new DimensionData(this, "Test Dimension")
                         .addUnit(new UnitData("unit")
                                 .setFlag("default", true)
@@ -124,9 +124,15 @@ public class AttributeIntegerCI_3UpdateTest
                 .failureUpdate(ErrorKey.ABSTRACTATTRIBUTE_UPDATE_DIMENSION_UPDATED);
     }
 
-    @Override()
+    @Override
     protected AttributeIntegerData createNewData(final String _name)
     {
-        return new AttributeIntegerData(this, _name);
+        return new AttributeIntegerData(this, _name).setSingle("kind", this.getKind());
+    }
+
+    @Override
+    protected String getKind()
+    {
+        return "integer";
     }
 }

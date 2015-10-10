@@ -25,9 +25,9 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class AttributeBinaryCI_3UpdateTest
-    extends AbstractAttributeTest<AttributeBinaryData>
+    extends Abstract_3UpdateTest<AttributeBinaryData>
 {
     /**
      * Data provider for test binary attributes.
@@ -44,15 +44,21 @@ public class AttributeBinaryCI_3UpdateTest
      * Overrides original method so that the test is not executed (because
      * binary attributes does not support multi-value flag!).
      */
+    @Override
     @Test(enabled = false)
-    @Override()
     public void negativeTestUpdateMultiValueFlag()
     {
     }
 
-    @Override()
+    @Override
     protected AttributeBinaryData createNewData(final String _name)
     {
-        return new AttributeBinaryData(this, _name);
+        return new AttributeBinaryData(this, _name).setSingle("kind", this.getKind());
+    }
+
+    @Override
+    protected String getKind()
+    {
+        return "binary";
     }
 }

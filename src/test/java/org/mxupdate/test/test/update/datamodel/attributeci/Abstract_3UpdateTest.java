@@ -19,8 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.data.datamodel.AbstractAttributeData;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger.TriggerAction;
@@ -34,15 +32,24 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import matrix.util.MatrixException;
+
 /**
  * Test cases for the update and export of attributes.
  *
  * @author The MxUpdate Team
  * @param <ATTRIBUTEDATA>   attribute data class
  */
-public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttributeData<?>>
+public abstract class Abstract_3UpdateTest<ATTRIBUTEDATA extends AbstractAttributeData<?>>
     extends AbstractDataExportUpdate<ATTRIBUTEDATA>
 {
+    /**
+     * Returns the kind of attribute.
+     *
+     * @return kind of attribute
+     */
+    protected abstract String getKind();
+
     /**
      * Prepares the test data.
      *
@@ -57,7 +64,7 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
                                      final String _value2,
                                      final Object[]... _datas)
     {
-        final List<Object[]> ret = new ArrayList<Object[]>();
+        final List<Object[]> ret = new ArrayList<>();
 
         if (_logText != null)  {
             ret.add(new Object[]{
@@ -157,6 +164,8 @@ public abstract class AbstractAttributeTest<ATTRIBUTEDATA extends AbstractAttrib
     protected ATTRIBUTEDATA createCleanNewData(final ATTRIBUTEDATA _original)
     {
         final ATTRIBUTEDATA ret = super.createCleanNewData(_original);
+
+        ret.setSingle("kind", this.getKind());
 
         // if dimension is defined, must be also defined for new cleaned attribute
         if (_original.getDimension() != null)  {

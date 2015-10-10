@@ -18,11 +18,11 @@ package org.mxupdate.test.data.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import matrix.util.MatrixException;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+
+import matrix.util.MatrixException;
 
 /**
  * Single-value list.
@@ -33,7 +33,7 @@ public class SingleValueList
     extends AbstractList
 {
     /** Data list. */
-    private final List<ImmutablePair<String,String>> values = new ArrayList<ImmutablePair<String,String>>();
+    private final List<ImmutablePair<String,String>> values = new ArrayList<>();
 
     /**
      * Defines a value.
@@ -44,7 +44,25 @@ public class SingleValueList
     public void def(final String _key,
                     final String _value)
     {
-        this.values.add(new ImmutablePair<String,String>(_key, _value));
+        this.values.add(new ImmutablePair<>(_key, _value));
+    }
+
+    /**
+     * Removes given {@code _key} from the {@link #values} list.
+     *
+     * @param _key  search key
+     * @return removed values
+     */
+    public String remove(final String _key)
+    {
+        String ret = null;
+        for (final ImmutablePair<String,String> entry : new ArrayList<>(this.values))  {
+            if (_key.equals(entry.getKey()))  {
+                ret = entry.getValue();
+                this.values.remove(entry);
+            }
+        }
+        return ret;
     }
 
     /**
@@ -55,7 +73,7 @@ public class SingleValueList
      * @param _cmd      string builder with the TCL commands of the
      *                  configuration item file
      */
-    @Override()
+    @Override
     public void append4Update(final String _prefix,
                              final StringBuilder _cmd)
     {

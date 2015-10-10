@@ -150,6 +150,7 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
         final TypeDef_mxJPO typeDef = paramCache.getMapping().getTypeDef(_orgData.getCI().updateType);
         final WrapperCIInstance<?> currentWrapper = new WrapperCIInstance<>(typeDef.newTypeInstance(_orgData.getName()));
+        currentWrapper.parseUpdate(this.createNewData(_orgData.getName()));
         currentWrapper.create(paramCache);
         // create the depending objects to be able to connect to them
         _orgData.createDependings();
@@ -189,6 +190,7 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
         final TypeDef_mxJPO typeDef = paramCache.getMapping().getTypeDef(_orgData.getCI().updateType);
         final WrapperCIInstance<?> currentWrapper = new WrapperCIInstance<>(typeDef.newTypeInstance(_orgData.getName()));
+        currentWrapper.parseUpdate(this.createNewData(_orgData.getName()));
         currentWrapper.create(paramCache);
         // create the depending objects to be able to connect to them
         _orgData.createDependings();

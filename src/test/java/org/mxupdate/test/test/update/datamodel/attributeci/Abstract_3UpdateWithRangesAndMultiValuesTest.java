@@ -28,8 +28,8 @@ import org.mxupdate.test.util.Version;
  * @author The MxUpdate Team
  * @param <ATTRIBUTEDATA>   attribute data class
  */
-public abstract class AbstractAttributeWithRangesAndMultiValuesTest<ATTRIBUTEDATA extends AbstractAttributeData<?>>
-    extends AbstractAttributeTest<ATTRIBUTEDATA>
+public abstract class Abstract_3UpdateWithRangesAndMultiValuesTest<ATTRIBUTEDATA extends AbstractAttributeData<?>>
+    extends Abstract_3UpdateTest<ATTRIBUTEDATA>
 {
     /**
      * Prepares the test data.

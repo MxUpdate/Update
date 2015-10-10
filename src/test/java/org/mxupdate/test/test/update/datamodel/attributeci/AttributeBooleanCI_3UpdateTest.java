@@ -26,24 +26,25 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class AttributeBooleanCI_3UpdateTest
-    extends AbstractAttributeWithRangesAndMultiValuesTest<AttributeBooleanData>
+    extends Abstract_3UpdateWithRangesAndMultiValuesTest<AttributeBooleanData>
 {
-    @Override()
+    @Override
     protected AttributeBooleanData createNewData(final String _name)
     {
-        return new AttributeBooleanData(this, _name);
+        return new AttributeBooleanData(this, _name).setSingle("kind", this.getKind());
     }
 
-    /**
-     * Data provider for test boolean attributes.
-     *
-     * @return object array with all test boolean attributes
-     */
     @DataProvider(name = "data")
     public Object[][] getAttributes()
     {
         return this.prepareData("boolean attribute", "TRUE", "FALSE");
+    }
+
+    @Override
+    protected String getKind()
+    {
+        return "boolean";
     }
 }

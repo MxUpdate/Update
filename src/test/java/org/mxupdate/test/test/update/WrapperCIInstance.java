@@ -131,6 +131,9 @@ public class WrapperCIInstance<DATA extends AbstractObject_mxJPO<?>>
         throws Exception
     {
         this.data.createOld(_paramCache);
+        if (this.data instanceof AbstractAdminObject_mxJPO)  {
+            ((AbstractAdminObject_mxJPO<?>)  this.data).create(_paramCache);
+        }
     }
 
     /**

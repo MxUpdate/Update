@@ -121,7 +121,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * @return this attribute instance
      * @throws MatrixException if create failed
      */
-    @Override()
+    @Override
     @SuppressWarnings("unchecked")
     public T create()
         throws MatrixException
@@ -131,9 +131,11 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
 
             this.createDependings();
 
+            final String kind = this.getSingles().remove("kind");
+
             final StringBuilder cmd = new StringBuilder();
             cmd.append("escape add attribute \"").append(AbstractTest.convertMql(this.getName()))
-               .append("\" type ").append(this.attrType);
+               .append("\" type ").append(kind);
 
             this.append4Create(cmd);
 
@@ -153,6 +155,8 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
             }
 
             this.getTest().mql(cmd);
+
+            this.setSingle("kind", kind);
         }
         return (T) this;
     }
@@ -161,7 +165,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * {@inheritDoc}
      * Creates depending range programs.
      */
-    @Override()
+    @Override
     @SuppressWarnings("unchecked")
     public T createDependings()
         throws MatrixException
@@ -194,7 +198,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      *
      * @return code for the configuration item update file
      */
-    @Override()
+    @Override
     public String ciFile()
     {
         final StringBuilder strg = new StringBuilder();
@@ -248,7 +252,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      *
      * @param _exportParser     parsed export
      */
-    @Override()
+    @Override
     public void checkExport(final ExportParser _exportParser)
     {
         super.checkExport(_exportParser);
@@ -533,7 +537,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
          *
          * @param _cmd  string builder where the MQL commands will be appended
          */
-        @Override()
+        @Override
         protected void appendCreate(final StringBuilder _cmd)
         {
             _cmd.append(" range ").append(this.comparator)
@@ -548,7 +552,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
          * @param _needAdds     set with add strings used to append the adds
          *                      for this range
          */
-        @Override()
+        @Override
         protected void evalAdds4CheckExport(final Set<String> _needAdds)
         {
             final StringBuilder cmd = new StringBuilder()
@@ -601,7 +605,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
          *
          * @param _cmd  string builder where the MQL commands will be appended
          */
-        @Override()
+        @Override
         protected void appendCreate(final StringBuilder _cmd)
         {
             _cmd.append(" range ").append(this.comparator)
@@ -617,7 +621,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
          * @param _needAdds     set with add strings used to append the adds
          *                      for this range
          */
-        @Override()
+        @Override
         protected void evalAdds4CheckExport(final Set<String> _needAdds)
         {
             final StringBuilder cmd = new StringBuilder()

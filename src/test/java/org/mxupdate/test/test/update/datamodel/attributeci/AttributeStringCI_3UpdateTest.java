@@ -28,9 +28,9 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class AttributeStringCI_3UpdateTest
-    extends AbstractAttributeWithRangesAndMultiValuesTest<AttributeStringData>
+    extends Abstract_3UpdateWithRangesAndMultiValuesTest<AttributeStringData>
 {
     /**
      * Data provider for test string attributes.
@@ -40,7 +40,7 @@ public class AttributeStringCI_3UpdateTest
     @DataProvider(name = "data")
     public Object[][] getAttributes()
     {
-        final List<Object[]> ret = new ArrayList<Object[]>();
+        final List<Object[]> ret = new ArrayList<>();
 
         // max length property
         ret.add(new Object[]{
@@ -65,9 +65,15 @@ public class AttributeStringCI_3UpdateTest
         return super.prepareData("string attribute", "A \" B", "BCD", ret.toArray(new Object[ret.size()][]));
     }
 
-    @Override()
+    @Override
     protected AttributeStringData createNewData(final String _name)
     {
-        return new AttributeStringData(this, _name);
+        return new AttributeStringData(this, _name).setSingle("kind", this.getKind());
+    }
+
+    @Override
+    protected String getKind()
+    {
+        return "string";
     }
 }

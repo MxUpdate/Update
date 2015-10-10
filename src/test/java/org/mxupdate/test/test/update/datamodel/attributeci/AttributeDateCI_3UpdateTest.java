@@ -31,9 +31,9 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class AttributeDateCI_3UpdateTest
-    extends AbstractAttributeWithRangesAndMultiValuesTest<AttributeDateData>
+    extends Abstract_3UpdateWithRangesAndMultiValuesTest<AttributeDateData>
 {
     /**
      * Data provider for test date attributes.
@@ -43,7 +43,7 @@ public class AttributeDateCI_3UpdateTest
     @DataProvider(name = "data")
     public Object[][] getAttributes()
     {
-        final List<Object[]> ret = new ArrayList<Object[]>();
+        final List<Object[]> ret = new ArrayList<>();
 
         // range value flag
         ret.add(new Object[]{
@@ -76,7 +76,7 @@ public class AttributeDateCI_3UpdateTest
     public void negativeTestUpdateRangeValueFlag()
         throws Exception
     {
-        new AttributeDateData(this, "test")
+        this.createNewData("test")
                 .setFlag("rangevalue", true)
                 .create()
                 .update((String) null)
@@ -85,9 +85,15 @@ public class AttributeDateCI_3UpdateTest
                 .failureUpdate(ErrorKey.ABSTRACTATTRIBUTE_UPDATE_RANGEVALUEFLAG_UPDATED);
     }
 
-    @Override()
+    @Override
     protected AttributeDateData createNewData(final String _name)
     {
-        return new AttributeDateData(this, _name);
+        return new AttributeDateData(this, _name).setSingle("kind", this.getKind());
+    }
+
+    @Override
+    protected String getKind()
+    {
+        return "date";
     }
 }

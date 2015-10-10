@@ -481,22 +481,25 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
                                      final Object... _params)
         throws Exception
     {
-        InvocationTargetException ex = null;
+        boolean hasError = false;
         try {
             this.update((String) null, _params);
-        } catch (final InvocationTargetException e)  {
-            ex = e;
+        } catch (final UpdateException_mxJPO ex)  {
+            Assert.assertTrue(
+                    ex.getMessage().indexOf("UpdateError #" + _error.getCode() + ":") >= 0,
+                    "check for correct error code #" + _error.getCode() + " (have: " + ex.getMessage() + ")");
+            hasError = true;
+        } catch (final InvocationTargetException ex)  {
+            Assert.assertTrue(
+                    ex.getCause() instanceof UpdateException_mxJPO,
+                    "check update exception is thrown");
+            Assert.assertTrue(
+                    ex.getCause().getMessage().indexOf("UpdateError #" + _error.getCode() + ":") >= 0,
+                    "check for correct error code #" + _error.getCode() + " (have: " + ex.getCause().getMessage() + ")");
+            hasError = true;
         }
 
-        Assert.assertNotNull(
-                ex,
-                "check exception is thrown");
-        Assert.assertTrue(
-                ex.getCause() instanceof UpdateException_mxJPO,
-                "check update exception is thrown");
-        Assert.assertTrue(
-                ex.getCause().getMessage().indexOf("UpdateError #" + _error.getCode() + ":") >= 0,
-                "check for correct error code #" + _error.getCode() + " (have: " + ex.getCause().getMessage() + ")");
+        Assert.assertTrue(hasError, "check that error occurred");
 
         return (DATA) this;
     }
