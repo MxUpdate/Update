@@ -15,8 +15,22 @@
 
 package org.mxupdate.action;
 
+import java.io.File;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import org.mxupdate.mapping.PropertyDef_mxJPO;
+import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
-import org.mxupdate.util.UpdateUtil_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * Implements the update action used within MxUpdate.
@@ -51,6 +65,166 @@ public class UpdateAction_mxJPO
     public void execute()
         throws Exception
     {
-        UpdateUtil_mxJPO.update(this.paramCache, this.selects.evalMatches(this.paramCache));
+        this.update(this.paramCache, this.selects.evalMatches(this.paramCache));
     }
+
+    /**
+    *
+    * @param _paramCache       parameter cache
+    * @param _clazz2names      depending on the type definition the related
+    *                          files with MX name which must be updated
+    * @throws Exception if update failed
+    */
+   public void update(final ParameterCache_mxJPO _paramCache,
+                      final Map<TypeDef_mxJPO,Map<String,File>> _clazz2names)
+       throws Exception
+   {
+       // fetch existing CI's
+       final Map<TypeDef_mxJPO,Set<String>> existingNames = this.getExistingCIs(_paramCache, _clazz2names.keySet());
+
+       // create if needed (and not in the list of existing objects)
+       this.create(_paramCache, existingNames, _clazz2names);
+
+       // update
+       final List<AbstractObject_mxJPO<?>> compiles = new ArrayList<>();
+       for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
+           final Map<String,File> clazzMap = _clazz2names.get(typeDef);
+           if (clazzMap != null)  {
+               final Set<String> existings = existingNames.get(typeDef);
+
+               for (final Entry<String,File> fileEntry : clazzMap.entrySet())  {
+                   _paramCache.logInfo("check " + typeDef.getLogging() + " '" + fileEntry.getKey() + "'");
+
+                   final boolean update;
+                   if (_paramCache.getValueBoolean(ValueKeys.UpdateCheckFileDate))  {
+                       final AbstractObject_mxJPO<?> instance = typeDef.newTypeInstance(fileEntry.getKey());
+                       final Date fileDate = new Date(fileEntry.getValue().lastModified());
+                       final String instDateString;
+                       if (existings.contains(fileEntry.getKey()))  {
+                           instDateString = instance.getPropValue(_paramCache, PropertyDef_mxJPO.FILEDATE);
+                       } else  {
+                           instDateString = null;
+                       }
+                       Date instDate;
+                       if ((instDateString == null) || instDateString.isEmpty())  {
+                           instDate = null;
+                       } else  {
+                           try {
+                               instDate = StringUtil_mxJPO.parseFileDate(_paramCache, instDateString);
+                           } catch (final ParseException e) {
+                               instDate = null;
+                           }
+                       }
+                       if (fileDate.equals(instDate))  {
+                           update = false;
+                       } else  {
+                           update = true;
+                           _paramCache.logDebug("    - update to version from " + fileDate);
+                       }
+                   } else  {
+                       update = true;
+                       _paramCache.logDebug("    - update");
+                   }
+                   // execute update
+                   if (update)  {
+                       boolean commit = false;
+                       final boolean transActive = _paramCache.getContext().isTransactionActive();
+                       try  {
+                           if (!transActive)  {
+                               _paramCache.getContext().start(true);
+                           }
+                           typeDef.update(_paramCache, !existings.contains(fileEntry.getKey()), fileEntry.getKey(), fileEntry.getValue());
+                           if (!transActive)  {
+                               _paramCache.getContext().commit();
+                           }
+                           commit = true;
+                           if (_paramCache.getValueBoolean(ValueKeys.Compile))  {
+                               compiles.add(typeDef.newTypeInstance(fileEntry.getKey()));
+                           }
+                       } finally  {
+                           if (!commit && !transActive && _paramCache.getContext().isTransactionActive())  {
+                               _paramCache.getContext().abort();
+                           }
+                       }
+                   }
+
+               }
+           }
+       }
+
+       // compile
+       this.compile(_paramCache, compiles);
+   }
+
+   /**
+    * Searches for given <code>_typeDefs</code> related existing CI's.
+    *
+    * @param _paramCache   parameter cache (used to get the MX context)
+    * @param _typeDefs     set of type definitions for which existing CI's are
+    *                      searched
+    * @return found existing CI's
+    * @throws Exception if existing CI's could not be found
+    */
+   protected Map<TypeDef_mxJPO,Set<String>> getExistingCIs(final ParameterCache_mxJPO _paramCache,
+                                                           final Set<TypeDef_mxJPO> _typeDefs)
+       throws Exception
+   {
+       final Map<TypeDef_mxJPO,Set<String>> existingNames = new HashMap<>();
+       for (final TypeDef_mxJPO clazz : _typeDefs)  {
+           existingNames.put(clazz, clazz.matchMxNames(_paramCache, null));
+       }
+       return existingNames;
+   }
+
+   /**
+    * Creates not existing CI's.
+    *
+    * @param _paramCache       parameter cache (used to get the MX context)
+    * @param _existingNames    already existing names
+    * @param _clazz2names      depending on the type definition the related
+    *                          files with MX name which must be updated
+    * @throws Exception if create failed
+    */
+   protected void create(final ParameterCache_mxJPO _paramCache,
+                         final Map<TypeDef_mxJPO,Set<String>> _existingNames,
+                         final Map<TypeDef_mxJPO,Map<String,File>> _clazz2names)
+       throws Exception
+   {
+       // create if needed (and not in the list of existing objects)
+       for (final TypeDef_mxJPO clazz : _paramCache.getMapping().getAllTypeDefsSorted())  {
+           final Map<String,File> clazzMap = _clazz2names.get(clazz);
+           if (clazzMap != null)  {
+               for (final Entry<String,File> fileEntry : clazzMap.entrySet())  {
+                   final Set<String> existings = _existingNames.get(clazz);
+                   if (!existings.contains(fileEntry.getKey()))  {
+                       final AbstractObject_mxJPO<?> instance = clazz.newTypeInstance(fileEntry.getKey());
+                       _paramCache.logInfo("create "+instance.getTypeDef().getLogging() + " '" + fileEntry.getKey() + "'");
+                       instance.create(_paramCache);
+                   }
+               }
+           }
+       }
+   }
+
+   /**
+    * Compiles given <code>_compiles</code> files.
+    *
+    * @param _paramCache   parameter cache (used for logging purposes)
+    * @param _compiles     list of files to compile
+    */
+   protected void compile(final ParameterCache_mxJPO _paramCache,
+                          final List<AbstractObject_mxJPO<?>> _compiles)
+   {
+       for (final AbstractObject_mxJPO<?> instance : _compiles)  {
+           try  {
+               if (instance.compile(_paramCache))  {
+                   _paramCache.logInfo("compile " + instance.getTypeDef().getLogging()
+                          + " '" + instance.getName() + "'");
+               }
+           } catch (final Exception e)  {
+               _paramCache.logError("compile of " + instance.getTypeDef().getLogging()
+                      + " '" + instance.getName() + "' failed:\n" + e.toString());
+           }
+       }
+   }
 }

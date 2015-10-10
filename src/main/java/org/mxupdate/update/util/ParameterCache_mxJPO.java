@@ -760,6 +760,11 @@ public class ParameterCache_mxJPO
         /** Start text for the information properties. */
         ExportInfoPropsTextStart,
 
+        /** Compiles all updated JPOs. */
+        Compile,
+        /** Check if an update is required by comparing the defined last modified date against the value of the file date property. */
+        UpdateCheckFileDate,
+
         /**
          * Key used to store the name of the program where all administration
          * objects must be registered with symbolic names. For an OOTB installation
