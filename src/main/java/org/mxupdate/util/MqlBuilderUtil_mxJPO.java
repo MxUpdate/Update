@@ -13,7 +13,7 @@
  *
  */
 
-package org.mxupdate.update.util;
+package org.mxupdate.util;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -25,6 +25,8 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.mxupdate.update.util.ParameterCache_mxJPO;
+
 import matrix.db.Context;
 import matrix.db.MQLCommand;
 import matrix.util.MatrixException;
@@ -34,7 +36,7 @@ import matrix.util.MatrixException;
  *
  * @author The MxUpdate Team
  */
-public final class MqlBuilder_mxJPO
+public final class MqlBuilderUtil_mxJPO
 {
     // hint: to avoid challenges with backslashes, they are defined directly via character
     /** Regular expression for the matcher in the converter. */
@@ -51,7 +53,7 @@ public final class MqlBuilder_mxJPO
     /**
      * Private constructor to avoid external initialization.
      */
-    private MqlBuilder_mxJPO()
+    private MqlBuilderUtil_mxJPO()
     {
     }
 
@@ -398,7 +400,7 @@ public final class MqlBuilder_mxJPO
         {
             final StringBuilder ret = new StringBuilder();
             final String tmpCmd = this.cmd.toString();
-            final Matcher matcher = Pattern.compile(MqlBuilder_mxJPO.MQL_MATCHER).matcher(this.cmd.toString());
+            final Matcher matcher = Pattern.compile(MqlBuilderUtil_mxJPO.MQL_MATCHER).matcher(this.cmd.toString());
             int startIdx = 0;
             while (matcher.find())  {
                 final int argIdx = Integer.parseInt(matcher.group().substring(1));
@@ -406,8 +408,8 @@ public final class MqlBuilder_mxJPO
                 if (this.args.size() >= argIdx)  {
                     replace = "\""
                             + this.args.get(argIdx - 1)
-                            .replaceAll(MqlBuilder_mxJPO.MQL_CONVERT_BACKSLASH_FROM, MqlBuilder_mxJPO.MQL_CONVERT_BACKSLASH_TO)
-                            .replaceAll(MqlBuilder_mxJPO.MQL_CONVERT_QUOTATION_FROM, MqlBuilder_mxJPO.MQL_CONVERT_QUOTATION_TO)
+                            .replaceAll(MqlBuilderUtil_mxJPO.MQL_CONVERT_BACKSLASH_FROM, MqlBuilderUtil_mxJPO.MQL_CONVERT_BACKSLASH_TO)
+                            .replaceAll(MqlBuilderUtil_mxJPO.MQL_CONVERT_QUOTATION_FROM, MqlBuilderUtil_mxJPO.MQL_CONVERT_QUOTATION_TO)
                             + "\"";
                 } else  {
                     replace = matcher.group();

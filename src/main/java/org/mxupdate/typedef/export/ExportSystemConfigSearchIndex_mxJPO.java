@@ -24,8 +24,8 @@ import matrix.util.MatrixException;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 
 /**
  * Handles the export of the search index.
@@ -51,7 +51,7 @@ public class ExportSystemConfigSearchIndex_mxJPO
     {
         // extract code of search index
         final String code;
-        final String tmp = MqlBuilder_mxJPO.mql().cmd(ExportSystemConfigSearchIndex_mxJPO.MQL_GET_INDEX).exec(_paramCache);
+        final String tmp = MqlBuilderUtil_mxJPO.mql().cmd(ExportSystemConfigSearchIndex_mxJPO.MQL_GET_INDEX).exec(_paramCache);
         if (tmp.startsWith(ExportSystemConfigSearchIndex_mxJPO.START_KEYWORD))  {
             code = tmp.substring(ExportSystemConfigSearchIndex_mxJPO.START_KEYWORD_LENGTH);
         } else  {

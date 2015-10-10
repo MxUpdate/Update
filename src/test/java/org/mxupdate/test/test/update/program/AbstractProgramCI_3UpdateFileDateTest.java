@@ -24,9 +24,9 @@ import org.mxupdate.script.ScriptContext_mxJPO;
 import org.mxupdate.script.statement.MxUpdateStatement_mxJPO;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.update.program.ProgramCI_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -85,28 +85,28 @@ public abstract class AbstractProgramCI_3UpdateFileDateTest
         this.testJPO.setLastModified(10000l);
 
         new MxUpdateStatement_mxJPO().setMxUpdateType("program").setCode("file \"" + this.testJPO + "\" kind " + this.getKind()).execute(context);;
-        Assert.assertEquals(MqlBuilder_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "A");
+        Assert.assertEquals(MqlBuilderUtil_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "A");
 
         // other file content, but same modified date
         // => code is NOT updated
         FileUtils.write(this.testJPO, "B");
         this.testJPO.setLastModified(10000l);
         new MxUpdateStatement_mxJPO().setMxUpdateType("program").setCode("file \"" + this.testJPO + "\" kind " + this.getKind()).execute(context);;
-        Assert.assertEquals(MqlBuilder_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "A");
+        Assert.assertEquals(MqlBuilderUtil_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "A");
 
         // other file content, other modified date
         // => code is updated
         FileUtils.write(this.testJPO, "C");
         this.testJPO.setLastModified(20000l);
         new MxUpdateStatement_mxJPO().setMxUpdateType("program").setCode("file \"" + this.testJPO + "\" kind " + this.getKind()).execute(context);;
-        Assert.assertEquals(MqlBuilder_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "C");
+        Assert.assertEquals(MqlBuilderUtil_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "C");
 
         // other file content, other CI file fate
         // => code is updated
         FileUtils.write(this.testJPO, "D");
         this.testJPO.setLastModified(20000l);
         new MxUpdateStatement_mxJPO().setMxUpdateType("program").setCode("file \"" + this.testJPO + "\" kind " + this.getKind()).execute(context.defVar("FILEDATE", "9999-01-01"));;
-        Assert.assertEquals(MqlBuilder_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "D");
+        Assert.assertEquals(MqlBuilderUtil_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "D");
     }
 
     /**
@@ -137,28 +137,28 @@ public abstract class AbstractProgramCI_3UpdateFileDateTest
         FileUtils.write(this.testJPO, "A");
         this.testJPO.setLastModified(10000l);
         new MxUpdateStatement_mxJPO().setMxUpdateType("program").setCode("file \"" + this.testJPO + "\" kind " + this.getKind()).execute(context);;
-        Assert.assertEquals(MqlBuilder_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "A");
+        Assert.assertEquals(MqlBuilderUtil_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "A");
 
         // other file content, but same modified date
         // => code is NOT updated
         FileUtils.write(this.testJPO, "B");
         this.testJPO.setLastModified(10000l);
         new MxUpdateStatement_mxJPO().setMxUpdateType("program").setCode("file \"" + this.testJPO + "\" kind " + this.getKind()).execute(context);;
-        Assert.assertEquals(MqlBuilder_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "B");
+        Assert.assertEquals(MqlBuilderUtil_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "B");
 
         // other file content, other modified date
         // => code is updated
         FileUtils.write(this.testJPO, "C");
         this.testJPO.setLastModified(20000l);
         new MxUpdateStatement_mxJPO().setMxUpdateType("program").setCode("file \"" + this.testJPO + "\" kind " + this.getKind()).execute(context);;
-        Assert.assertEquals(MqlBuilder_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "C");
+        Assert.assertEquals(MqlBuilderUtil_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "C");
 
         // other file content, other CI file fate
         // => code is updated
         FileUtils.write(this.testJPO, "D");
         this.testJPO.setLastModified(20000l);
         new MxUpdateStatement_mxJPO().setMxUpdateType("program").setCode("file \"" + this.testJPO + "\" kind " + this.getKind()).execute(context.defVar("FILEDATE", "9999-01-01"));;
-        Assert.assertEquals(MqlBuilder_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "D");
+        Assert.assertEquals(MqlBuilderUtil_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "D");
     }
 
     /**

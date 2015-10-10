@@ -18,8 +18,8 @@ package org.mxupdate.typedef.update;
 import java.io.File;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 
 /**
  * Updates given admin system config system search index.
@@ -37,7 +37,7 @@ public class UpdateSystemConfigSearchIndex_mxJPO
                        final File _file)
         throws Exception
     {
-        MqlBuilder_mxJPO.mql()
+        MqlBuilderUtil_mxJPO.mql()
                 .cmd("escape set system searchindex file ").arg(_file.toString())
                 .exec(_paramCache);
     }

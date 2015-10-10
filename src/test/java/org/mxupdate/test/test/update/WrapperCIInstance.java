@@ -25,10 +25,10 @@ import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 
 /**
@@ -184,13 +184,13 @@ public class WrapperCIInstance<DATA extends AbstractObject_mxJPO<?>>
         if (this.data instanceof AbstractAdminObject_mxJPO<?>)  {
             final EMxAdmin_mxJPO mxClassDef = ((AbstractAdminObject_mxJPO<?>) this.data).mxClassDef();
             if (mxClassDef.hasMxClassSuffix())  {
-                ret = MqlBuilder_mxJPO.multiLine(_file, "escape mod " + mxClassDef.mxClass() + " $1 " + mxClassDef.mxClassSuffix(), _current.data.getName());
+                ret = MqlBuilderUtil_mxJPO.multiLine(_file, "escape mod " + mxClassDef.mxClass() + " $1 " + mxClassDef.mxClassSuffix(), _current.data.getName());
             } else  {
-                ret = MqlBuilder_mxJPO.multiLine(_file, "escape mod " + mxClassDef.mxClass() + " $1", this.data.getName());
+                ret = MqlBuilderUtil_mxJPO.multiLine(_file, "escape mod " + mxClassDef.mxClass() + " $1", this.data.getName());
             }
         } else  {
             final BusObject_mxJPO bus = (BusObject_mxJPO) this.data;
-            ret = MqlBuilder_mxJPO.multiLine(_file, "escape mod bus $1 $2 $3", bus.getBusType(), bus.getBusName(), bus.getBusRevision());
+            ret = MqlBuilderUtil_mxJPO.multiLine(_file, "escape mod bus $1 $2 $3", bus.getBusType(), bus.getBusName(), bus.getBusRevision());
         }
 
         // casting is work-arround so that calc delta method can be called

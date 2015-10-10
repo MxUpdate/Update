@@ -13,22 +13,22 @@
  *
  */
 
-package org.mxupdate.test.test.update.util;
+package org.mxupdate.test.test.util;
 
 import junit.framework.Assert;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.TypeData;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
- * Tests the JPO {@link MqlBuilder_mxJPO}.
+ * Tests the JPO {@link MqlBuilderUtil_mxJPO}.
  *
  * @author The MxUpdate Team
  */
-public class MqlBuilder_SingleLineTest
+public class MqlBuilderUtil_SingleLineTest
     extends AbstractTest
 {
     /**
@@ -57,7 +57,7 @@ public class MqlBuilder_SingleLineTest
         type.create();
 
         Assert.assertEquals(
-                MqlBuilder_mxJPO.mql()
+                MqlBuilderUtil_mxJPO.mql()
                         .cmd("escape print type ").arg(AbstractTest.PREFIX + "name").cmd(" select ").arg("name").cmd(" dump")
                         .exec(this.getContext()),
                 AbstractTest.PREFIX + "name");

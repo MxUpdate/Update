@@ -25,6 +25,7 @@ import java.util.SimpleTimeZone;
 import java.util.Stack;
 
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 
 /**
  * String utility class.
@@ -218,7 +219,7 @@ public final class StringUtil_mxJPO
      *
      * @param _text     character stream to convert
      * @return converted string
-     * @deprecated use {@link MqlBuilder_mxJPO}
+     * @deprecated use {@link MqlBuilderUtil_mxJPO}
      */
     @Deprecated()
     public static String convertMql(final CharSequence _text)

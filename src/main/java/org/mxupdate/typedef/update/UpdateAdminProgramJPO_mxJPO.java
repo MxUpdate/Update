@@ -22,12 +22,12 @@ import java.util.Map;
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.program.ProgramCI_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.util.FileUtil_mxJPO;
 import org.mxupdate.util.JPOUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
 /**
  * Updates given admin program JPO CI.
@@ -60,10 +60,10 @@ public class UpdateAdminProgramJPO_mxJPO
         if (_file.getName().endsWith(ProgramCI_mxJPO.JPO_NAME_SUFFIX_EXTENDSION))  {
             final String propName = PropertyDef_mxJPO.FILEDATE.getPropName(_paramCache);
 
-            final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine(_file, "");
+            final MultiLineMqlBuilder mql = MqlBuilderUtil_mxJPO.multiLine(_file, "");
 
             // check property already exists => remove property
-            final String propExists = MqlBuilder_mxJPO.mql().cmd("escape print program ").arg(_name).cmd(" select ").arg("property[" + propName + "]").exec(_paramCache);
+            final String propExists = MqlBuilderUtil_mxJPO.mql().cmd("escape print program ").arg(_name).cmd(" select ").arg("property[" + propName + "]").exec(_paramCache);
             if (!propExists.isEmpty())  {
                 mql.newLine().cmd("escape mod program ").arg(_name).cmd(" remove property ").arg(propName);
             }

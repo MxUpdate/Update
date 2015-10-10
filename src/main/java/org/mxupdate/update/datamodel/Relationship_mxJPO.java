@@ -28,14 +28,14 @@ import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalPathTypeList_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateList;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
 import matrix.util.MatrixException;
 
@@ -404,7 +404,7 @@ public class Relationship_mxJPO
             throws MatrixException
         {
             // evaluate all to types
-            final String[] toTypesArr = MqlBuilder_mxJPO.mql()
+            final String[] toTypesArr = MqlBuilderUtil_mxJPO.mql()
                             .cmd("escape print rel ").arg(Relationship_mxJPO.this.getName())
                             .cmd(" select ").arg(this.side + "type")
                             .cmd(" dump ").arg("\n")
@@ -423,7 +423,7 @@ public class Relationship_mxJPO
             // are connections between relationships allowed?
             if (_paramCache.getValueBoolean(ValueKeys.DMRelationSupportRelCons))  {
                 // evaluate all from relationships
-                final String[] fromRelsArr = MqlBuilder_mxJPO.mql()
+                final String[] fromRelsArr = MqlBuilderUtil_mxJPO.mql()
                                 .cmd("escape print rel ").arg(Relationship_mxJPO.this.getName())
                                 .cmd(" select ").arg(this.side + "rel")
                                 .cmd(" dump ").arg("\n")

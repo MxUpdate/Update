@@ -26,14 +26,14 @@ import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MqlBuilder;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.zparser.AdminXMLExportObject_mxJPO;
 import org.mxupdate.update.zparser.AdminXMLExportParser_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MqlBuilder;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
@@ -156,7 +156,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
         // reads symbolic names of the administration objects
         final String symbProg = _paramCache.getValueString(ValueKeys.RegisterSymbolicNames);
         final String symbProgIdxOf = new StringBuilder().append(" on program ").append(symbProg).append(' ').toString();
-        final String symbNames = MqlBuilder_mxJPO.mql()
+        final String symbNames = MqlBuilderUtil_mxJPO.mql()
                 .cmd("escape list property on program ").arg(symbProg)
                 .cmd(" to ").cmd(this.mxClassDef().mxClass())
                 .cmd(" ").arg(this.getName())
@@ -181,7 +181,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     protected String execXMLExport(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
-        return MqlBuilder_mxJPO.mql().cmd("escape export ").cmd(this.mxClassDef().mxClass()).cmd(" ").arg(this.getName()).cmd(" xml").exec(_paramCache);
+        return MqlBuilderUtil_mxJPO.mql().cmd("escape export ").cmd(this.mxClassDef().mxClass()).cmd(" ").arg(this.getName()).cmd(" xml").exec(_paramCache);
     }
 
     /**
@@ -261,7 +261,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        final MqlBuilder mql = MqlBuilder_mxJPO.mql().cmd("escape add ").cmd(this.mxClassDef().mxClass()).cmd(" ").arg(this.getName());
+        final MqlBuilder mql = MqlBuilderUtil_mxJPO.mql().cmd("escape add ").cmd(this.mxClassDef().mxClass()).cmd(" ").arg(this.getName());
         if (this.mxClassDef().hasMxClassSuffix())  {
             mql.cmd(" ").cmd(this.mxClassDef().mxClassSuffix());
         }

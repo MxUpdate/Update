@@ -22,9 +22,9 @@ import java.util.TreeSet;
 import matrix.util.MatrixException;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 
 /**
  * Searches for all administration object of given type definition and
@@ -41,7 +41,7 @@ public class MxNamesAdmin_mxJPO
                                    final Collection<String> _matches)
         throws MatrixException
     {
-        final String listStr = MqlBuilder_mxJPO.mql()
+        final String listStr = MqlBuilderUtil_mxJPO.mql()
                 .cmd("escape list ").cmd(_typeDef.getMxAdminName()).cmd(" ").arg("*").cmd(" ").cmd(_typeDef.getMxAdminSuffix())
                 .exec(_paramCache);
 

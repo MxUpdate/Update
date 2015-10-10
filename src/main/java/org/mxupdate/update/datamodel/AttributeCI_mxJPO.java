@@ -31,13 +31,13 @@ import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateList;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
@@ -341,7 +341,7 @@ public class AttributeCI_mxJPO
     public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        MqlBuilder_mxJPO.mql()
+        MqlBuilderUtil_mxJPO.mql()
                 .cmd("escape add attribute ").arg(this.getName()).cmd(" type ").cmd(this.kind.attrTypeCreate)
                 .exec(_paramCache);
     }

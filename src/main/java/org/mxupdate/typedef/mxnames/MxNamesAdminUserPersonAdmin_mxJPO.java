@@ -21,8 +21,8 @@ import java.util.SortedSet;
 import matrix.util.MatrixException;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 
 /**
  * Fetches all admin persons and removes the persons for which a business object
@@ -41,7 +41,7 @@ public class MxNamesAdminUserPersonAdmin_mxJPO
     {
         final SortedSet<String> ret = super.match(_paramCache, _typeDef, _matches);
 
-        final String personStr = MqlBuilder_mxJPO.mql()
+        final String personStr = MqlBuilderUtil_mxJPO.mql()
                 .cmd("escape temp query bus ").arg(_typeDef.getMxBusType()).cmd(" ").arg("*").cmd(" ").arg("*")
                 .cmd(" select ").arg("name")
                 .cmd(" dump ").arg("\t")

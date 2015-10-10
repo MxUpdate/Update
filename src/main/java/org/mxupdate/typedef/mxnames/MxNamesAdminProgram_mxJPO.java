@@ -22,10 +22,10 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MqlBuilder;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 import matrix.util.MatrixException;
@@ -52,7 +52,7 @@ public class MxNamesAdminProgram_mxJPO
 
         if (progs == null)  {
             // prepare MQL statement
-            final MqlBuilder mql = MqlBuilder_mxJPO.mql()
+            final MqlBuilder mql = MqlBuilderUtil_mxJPO.mql()
                     .cmd("escape list program ").arg("*").cmd(" select ").arg("name")
                             .cmd(" ").arg("isjavaprogram")
                             .cmd(" ").arg("iseklprogram")

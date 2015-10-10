@@ -24,9 +24,9 @@ import java.util.Set;
 
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
@@ -80,7 +80,7 @@ public class Form_mxJPO
         throws MatrixException, ParseException
     {
         super.parse(_paramCache);
-        final String ret = MqlBuilder_mxJPO.mql().cmd("escape print form ").arg(this.getName()).cmd(" select ").arg("field.number").cmd(" dump").exec(_paramCache);
+        final String ret = MqlBuilderUtil_mxJPO.mql().cmd("escape print form ").arg(this.getName()).cmd(" select ").arg("field.number").cmd(" dump").exec(_paramCache);
         if ((ret != null) && !ret.isEmpty())  {
             this.minFieldIdx = Integer.parseInt(ret.split(",")[0]);
         }
@@ -137,7 +137,7 @@ public class Form_mxJPO
     public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        MqlBuilder_mxJPO.mql().cmd("escape add form ").arg(this.getName()).cmd(" web; ").exec(_paramCache);
+        MqlBuilderUtil_mxJPO.mql().cmd("escape add form ").arg(this.getName()).cmd(" web; ").exec(_paramCache);
     }
 
     @Override

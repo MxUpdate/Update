@@ -27,14 +27,14 @@ import java.util.TreeSet;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
 import matrix.util.MatrixException;
 
@@ -109,7 +109,7 @@ public class Role_mxJPO
 
         // must the role type evaluated?
         if (_paramCache.getValueBoolean(ValueKeys.UserRoleSupportRoleType))  {
-            final String testRoleType = MqlBuilder_mxJPO.mql()
+            final String testRoleType = MqlBuilderUtil_mxJPO.mql()
                     .cmd("escape print role ").arg(this.getName()).cmd(" select ").arg("isanorg").cmd(" ").arg("isaproject").cmd(" dump")
                     .exec(_paramCache);
             if ("FALSE,TRUE".equals(testRoleType))  {

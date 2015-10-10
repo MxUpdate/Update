@@ -20,7 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;

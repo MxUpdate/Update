@@ -25,10 +25,10 @@ import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
@@ -141,9 +141,9 @@ public class MxUpdateStatement_mxJPO
         // initialize MQL builder (with or w/o suffix!)
         final MultiLineMqlBuilder mql;
         if (target.mxClassDef().hasMxClassSuffix())  {
-            mql = MqlBuilder_mxJPO.multiLine(_file, "escape mod " + target.mxClassDef().mxClass() + " $1 " + target.mxClassDef().mxClassSuffix(), target.getName());
+            mql = MqlBuilderUtil_mxJPO.multiLine(_file, "escape mod " + target.mxClassDef().mxClass() + " $1 " + target.mxClassDef().mxClassSuffix(), target.getName());
         } else  {
-            mql = MqlBuilder_mxJPO.multiLine(_file, "escape mod " + target.mxClassDef().mxClass() + " $1", target.getName());
+            mql = MqlBuilderUtil_mxJPO.multiLine(_file, "escape mod " + target.mxClassDef().mxClass() + " $1", target.getName());
         }
 
         if (_mxClass == EMxAdmin_mxJPO.Policy)  {
@@ -235,7 +235,7 @@ public class MxUpdateStatement_mxJPO
         }
 
         // initialize MQL builder
-        final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine(_file, "escape mod bus $1 $2 $3", target.getBusType(), target.getBusName(), target.getBusRevision());
+        final MultiLineMqlBuilder mql = MqlBuilderUtil_mxJPO.multiLine(_file, "escape mod bus $1 $2 $3", target.getBusType(), target.getBusName(), target.getBusRevision());
 
         target.calcDelta(_paramCache, mql, current);
 

@@ -24,11 +24,11 @@ import java.util.TreeSet;
 import matrix.util.MatrixException;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MqlBuilder;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
@@ -56,7 +56,7 @@ public class MxNamesAdminAttribute_mxJPO
             final MqlBuilder mql;
             if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsOwner))  {
                 // new enovia version => only attribute w/o defined owner...
-                mql = MqlBuilder_mxJPO.mql()
+                mql = MqlBuilderUtil_mxJPO.mql()
                         .cmd("escape list attribute ").arg("*")
                                 .cmd(" where ").arg("owner==\"\"")
                                 .cmd(" select ").arg("type").cmd(" ").arg("name")
@@ -64,7 +64,7 @@ public class MxNamesAdminAttribute_mxJPO
 
             } else  {
                 // old enovia version w/o support for owners...
-                mql = MqlBuilder_mxJPO.mql()
+                mql = MqlBuilderUtil_mxJPO.mql()
                         .cmd("escape list attribute ").arg("*")
                                 .cmd(" select ").arg("type").cmd(" ").arg("name")
                                 .cmd(" dump ").arg(MxNamesAdminAttribute_mxJPO.SELECT_KEY);

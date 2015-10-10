@@ -15,6 +15,8 @@
 
 package org.mxupdate.update.util;
 
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+
 import matrix.db.Context;
 import matrix.db.MQLCommand;
 import matrix.util.MatrixException;
@@ -42,7 +44,7 @@ public final class MqlUtil_mxJPO
      * @param _cmd          MQL command to execute
      * @return trimmed result of the MQL execution
      * @throws MatrixException if MQL execution failed
-     * @deprecated replaced by {@link MqlBuilder_mxJPO}
+     * @deprecated replaced by {@link MqlBuilderUtil_mxJPO}
      */
     @Deprecated()
     public static String execMql(final ParameterCache_mxJPO _paramCache,
@@ -65,7 +67,7 @@ public final class MqlUtil_mxJPO
      * @throws MatrixException if MQL execution failed; includes the MQL
      *                         command if <code>_includeMQLCommand</code> is
      *                         set to <i>true</i>
-     * @deprecated replaced by {@link MqlBuilder_mxJPO}
+     * @deprecated replaced by {@link MqlBuilderUtil_mxJPO}
      */
     @Deprecated()
     public static String execMql(final Context _context,

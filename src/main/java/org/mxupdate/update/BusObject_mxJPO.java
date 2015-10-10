@@ -34,13 +34,13 @@ import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.CompareToUtil_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateLine;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 
 import matrix.db.Attribute;
@@ -215,7 +215,7 @@ public class BusObject_mxJPO
                                final PropertyDef_mxJPO _prop)
         throws MatrixException
     {
-        return MqlBuilder_mxJPO.mql()
+        return MqlBuilderUtil_mxJPO.mql()
                 .cmd("escape print bus ").arg(this.busType).cmd(" ").arg(this.busName).cmd(" ").arg(this.busRevision)
                 .cmd(" select ").arg("attribute[" + _prop.getAttrName(_paramCache) + "]").cmd(" dump")
                 .exec(_paramCache);

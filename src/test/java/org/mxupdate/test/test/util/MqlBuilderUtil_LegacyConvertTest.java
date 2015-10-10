@@ -13,23 +13,23 @@
  *
  */
 
-package org.mxupdate.test.test.update.util;
+package org.mxupdate.test.test.util;
 
 import java.lang.reflect.Method;
 
 import junit.framework.Assert;
 
-import org.mxupdate.update.util.MqlBuilder_mxJPO;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MqlBuilder;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MqlBuilder;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the legacy convert of MQL statements in JPO {@link MqlBuilder_mxJPO}.
+ * Tests the legacy convert of MQL statements in JPO {@link MqlBuilderUtil_mxJPO}.
  *
  * @author The MxUpdate Team
  */
-public class MqlBuilder_LegacyConvertTest
+public class MqlBuilderUtil_LegacyConvertTest
 {
     /**
      * Returns the test data.
@@ -69,7 +69,7 @@ public class MqlBuilder_LegacyConvertTest
             final String[] _args)
         throws Exception
     {
-        final MqlBuilder mql = MqlBuilder_mxJPO.mql().cmd(_prefix);
+        final MqlBuilder mql = MqlBuilderUtil_mxJPO.mql().cmd(_prefix);
         for (final String arg : _args)  {
             mql.cmd("").arg(arg);
         }
