@@ -37,8 +37,8 @@ import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
-import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 
 import matrix.util.MatrixException;
 
@@ -213,7 +213,7 @@ public final class TypeDef_mxJPO
                 final String tmp = MqlBuilderUtil_mxJPO.mql()
                         .cmd("escape list program ").arg("org.mxupdate.*")
                         .cmd(" select ").arg("name").cmd(" ").arg("classname")
-                        .cmd(" dump ").arg("\t").exec(_paramCache);
+                        .cmd(" dump ").arg("\t").exec(_paramCache.getContext());
 
                 for (final String line : tmp.split("\n"))  {
                     final String[] arr = line.split("\t");
@@ -291,7 +291,7 @@ public final class TypeDef_mxJPO
     public boolean existsBusType(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
-        final String tmp = MqlBuilderUtil_mxJPO.mql() .cmd("escape list type ").arg(this.busType).exec(_paramCache);
+        final String tmp = MqlBuilderUtil_mxJPO.mql() .cmd("escape list type ").arg(this.busType).exec(_paramCache.getContext());
         return (tmp.length() > 0);
     }
 

@@ -27,9 +27,9 @@ import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
-import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 
 /**
  * Wrapper for CI instances.
@@ -212,7 +212,7 @@ public class WrapperCIInstance<DATA extends AbstractObject_mxJPO<?>>
     {
         final WrapperCIInstance<DATA> newInstance = this.newInstance();
         newInstance.parse(_paramCache);
-        this.calcDelta(_paramCache, _file, newInstance).exec(_paramCache);
+        this.calcDelta(_paramCache, _file, newInstance).exec(_paramCache.getContext());
     }
 
     /**

@@ -408,7 +408,7 @@ public class Relationship_mxJPO
                             .cmd("escape print rel ").arg(Relationship_mxJPO.this.getName())
                             .cmd(" select ").arg(this.side + "type")
                             .cmd(" dump ").arg("\n")
-                            .exec(_paramCache)
+                            .exec(_paramCache.getContext())
                             .split("\n");
             for (final String toType : toTypesArr)  {
                 if ("all".equals(toType))  {
@@ -427,7 +427,7 @@ public class Relationship_mxJPO
                                 .cmd("escape print rel ").arg(Relationship_mxJPO.this.getName())
                                 .cmd(" select ").arg(this.side + "rel")
                                 .cmd(" dump ").arg("\n")
-                                .exec(_paramCache)
+                                .exec(_paramCache.getContext())
                                 .split("\n");
                 for (final String fromRel : fromRelsArr)  {
                     if ("all".equals(fromRel))  {

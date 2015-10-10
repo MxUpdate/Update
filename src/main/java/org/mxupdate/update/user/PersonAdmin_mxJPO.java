@@ -26,14 +26,14 @@ import java.util.TreeSet;
 
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
-import org.mxupdate.util.MqlBuilderUtil_mxJPO;
-import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.CompareToUtil_mxJPO;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
 import matrix.util.MatrixException;
 
@@ -297,7 +297,7 @@ public class PersonAdmin_mxJPO
     protected String execXMLExport(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
-        return MqlBuilderUtil_mxJPO.mql().cmd("escape export person ").arg(this.getName()).cmd(" !mail !set xml").exec(_paramCache);
+        return MqlBuilderUtil_mxJPO.mql().cmd("escape export person ").arg(this.getName()).cmd(" !mail !set xml").exec(_paramCache.getContext());
     }
 
     /**

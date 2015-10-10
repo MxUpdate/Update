@@ -36,9 +36,9 @@ import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateList;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
-import org.mxupdate.update.util.UpdateException_mxJPO;
 
 /**
  * The class is used to evaluate information from attributes within MX used to
@@ -343,7 +343,7 @@ public class AttributeCI_mxJPO
     {
         MqlBuilderUtil_mxJPO.mql()
                 .cmd("escape add attribute ").arg(this.getName()).cmd(" type ").cmd(this.kind.attrTypeCreate)
-                .exec(_paramCache);
+                .exec(_paramCache.getContext());
     }
 
     @Override

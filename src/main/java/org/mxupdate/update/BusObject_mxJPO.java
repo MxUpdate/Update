@@ -39,9 +39,9 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateLine;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
-import org.mxupdate.update.util.UpdateException_mxJPO;
 
 import matrix.db.Attribute;
 import matrix.db.AttributeList;
@@ -218,7 +218,7 @@ public class BusObject_mxJPO
         return MqlBuilderUtil_mxJPO.mql()
                 .cmd("escape print bus ").arg(this.busType).cmd(" ").arg(this.busName).cmd(" ").arg(this.busRevision)
                 .cmd(" select ").arg("attribute[" + _prop.getAttrName(_paramCache) + "]").cmd(" dump")
-                .exec(_paramCache);
+                .exec(_paramCache.getContext());
     }
 
     /**

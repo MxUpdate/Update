@@ -24,12 +24,12 @@ import java.util.Set;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
-import org.mxupdate.util.MqlBuilderUtil_mxJPO;
-import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
 import matrix.util.MatrixException;
 
@@ -90,7 +90,7 @@ public class Expression_mxJPO
 
         this.value = MqlBuilderUtil_mxJPO.mql()
                 .cmd("escape print expression ").arg(this.getName()).cmd(" select ").arg("value").cmd(" dump")
-                .exec(_paramCache);
+                .exec(_paramCache.getContext());
     }
 
     /**

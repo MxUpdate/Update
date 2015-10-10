@@ -229,12 +229,14 @@ eval  {
   pInstallProperties "${sPath}" "${VERSION}" "org.mxupdate.mapping.properties"
 
   if ${bIsOrigStructure}  {
-    pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.install.Insert"     "${VERSION}"
-    pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.util.JPOHandler"    "${VERSION}"
+    pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.install.Insert"       "${VERSION}"
+    pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.util.JPOHandler"      "${VERSION}"
+    pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.util.MqlBuilderUtil"  "${VERSION}"
     mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}" "java"] "${VERSION}" "$asMapping(ParameterDef.InstallFileDateFormatJava.Default)"
   } else  {
-    pInstallJPO       [file join "${sPath}"]        "org.mxupdate.install.Insert"     "${VERSION}"
-    pInstallJPO       [file join "${sPath}"]        "org.mxupdate.util.JPOHandler"    "${VERSION}"
+    pInstallJPO       [file join "${sPath}"]        "org.mxupdate.install.Insert"       "${VERSION}"
+    pInstallJPO       [file join "${sPath}"]        "org.mxupdate.util.JPOHandler"      "${VERSION}"
+    pInstallJPO       [file join "${sPath}"]        "org.mxupdate.util.MqlBuilderUtil"  "${VERSION}"
     mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}"] "${VERSION}" "$asMapping(ParameterDef.InstallFileDateFormatJava.Default)"
   }
 

@@ -242,7 +242,7 @@ public class ProgramCI_mxJPO
     public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        MqlBuilderUtil_mxJPO.mql().cmd("escape add program ").arg(this.getName()).cmd(" ").cmd(this.kind.name().toLowerCase()).exec(_paramCache);
+        MqlBuilderUtil_mxJPO.mql().cmd("escape add program ").arg(this.getName()).cmd(" ").cmd(this.kind.name().toLowerCase()).exec(_paramCache.getContext());
     }
 
     @Override
@@ -348,7 +348,7 @@ public class ProgramCI_mxJPO
         throws Exception
     {
         if (this.kind == Kind.JAVA)  {
-            MqlBuilderUtil_mxJPO.mql().cmd("escape compile prog ").arg(this.getName()).exec(_paramCache);
+            MqlBuilderUtil_mxJPO.mql().cmd("escape compile prog ").arg(this.getName()).exec(_paramCache.getContext());
         }
         return true;
     }

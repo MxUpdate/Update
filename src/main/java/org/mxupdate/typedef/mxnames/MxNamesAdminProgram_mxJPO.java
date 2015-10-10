@@ -24,9 +24,9 @@ import java.util.TreeSet;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MqlBuilder;
-import org.mxupdate.update.util.StringUtil_mxJPO;
 
 import matrix.util.MatrixException;
 
@@ -60,14 +60,14 @@ public class MxNamesAdminProgram_mxJPO
                             .cmd(" dump ").arg(MxNamesAdminProgram_mxJPO.SELECT_KEY);
 
             // prepare list of programs
-            progs = new HashMap<String,SortedSet<String>>();
+            progs = new HashMap<>();
             progs.put("java",       new TreeSet<String>());
             progs.put("ekl",        new TreeSet<String>());
             progs.put("external",   new TreeSet<String>());
             progs.put("mql",        new TreeSet<String>());
 
             // evaluate list of programs
-            for (final String lineStr : mql.exec(_paramCache).split("\n"))  {
+            for (final String lineStr : mql.exec(_paramCache.getContext()).split("\n"))  {
                 final String[] lineArr = lineStr.split(MxNamesAdminProgram_mxJPO.SELECT_KEY);
                 if ("TRUE".equals(lineArr[1]))  {
                     progs.get("java").add(lineArr[0]);
@@ -87,7 +87,7 @@ public class MxNamesAdminProgram_mxJPO
         if (_matches == null)  {
             ret = progs.get(_typeDef.getMxUpdateKind());
         } else  {
-            ret = new TreeSet<String>();
+            ret = new TreeSet<>();
             for (final String mxName : progs.get(_typeDef.getMxUpdateKind()))  {
                 if (StringUtil_mxJPO.match(mxName, _matches))  {
                     ret.add(mxName);

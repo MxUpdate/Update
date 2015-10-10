@@ -63,7 +63,7 @@ public class UpdateAdminProgramJPO_mxJPO
             final MultiLineMqlBuilder mql = MqlBuilderUtil_mxJPO.multiLine(_file, "");
 
             // check property already exists => remove property
-            final String propExists = MqlBuilderUtil_mxJPO.mql().cmd("escape print program ").arg(_name).cmd(" select ").arg("property[" + propName + "]").exec(_paramCache);
+            final String propExists = MqlBuilderUtil_mxJPO.mql().cmd("escape print program ").arg(_name).cmd(" select ").arg("property[" + propName + "]").exec(_paramCache.getContext());
             if (!propExists.isEmpty())  {
                 mql.newLine().cmd("escape mod program ").arg(_name).cmd(" remove property ").arg(propName);
             }
@@ -75,7 +75,7 @@ public class UpdateAdminProgramJPO_mxJPO
             mql.newLine().cmd("escape mod program ").arg(_name).cmd(" code ").arg(JPOUtil_mxJPO.convertJavaToJPOCode(_name, FileUtil_mxJPO.readFileToString(_file).toString()));
 
             // and execute all
-            mql.exec(_paramCache);
+            mql.exec(_paramCache.getContext());
         } else  {
             super.update(_paramCache, _typeDef, _create, _name, _file);
         }

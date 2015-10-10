@@ -27,9 +27,9 @@ import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
-import org.mxupdate.update.util.StringUtil_mxJPO;
 
 /**
  * Statement to update a MxUpdate object.
@@ -152,7 +152,7 @@ public class MxUpdateStatement_mxJPO
 
         ((AbstractAdminObject_mxJPO) target).calcDelta(_paramCache, mql, current);
 
-        mql.exec(_paramCache);
+        mql.exec(_paramCache.getContext());
     }
 
     /**
@@ -239,7 +239,7 @@ public class MxUpdateStatement_mxJPO
 
         target.calcDelta(_paramCache, mql, current);
 
-        mql.exec(_paramCache);
+        mql.exec(_paramCache.getContext());
     }
 
 

@@ -21,15 +21,15 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MqlBuilder;
-import org.mxupdate.update.util.StringUtil_mxJPO;
+
+import matrix.util.MatrixException;
 
 /**
  * Searches for all attribute objects depending on the attribute type.
@@ -71,8 +71,8 @@ public class MxNamesAdminAttribute_mxJPO
             }
 
             // evaluate list of attributes
-            attrs = new HashMap<String,SortedSet<String>>();
-            for (final String typeOwnerNameStr : mql.exec(_paramCache).split("\n"))  {
+            attrs = new HashMap<>();
+            for (final String typeOwnerNameStr : mql.exec(_paramCache.getContext()).split("\n"))  {
                 final String[] typeOwnerNameArr = typeOwnerNameStr.split(MxNamesAdminAttribute_mxJPO.SELECT_KEY);
                 String kind = typeOwnerNameArr[0];
                 // fix wrong type in list to correct kind definition
@@ -97,7 +97,7 @@ public class MxNamesAdminAttribute_mxJPO
         if (_matches == null)  {
             ret = attrs.get(_typeDef.getMxUpdateKind());
         } else  {
-            ret = new TreeSet<String>();
+            ret = new TreeSet<>();
             for (final String mxName : attrs.get(_typeDef.getMxUpdateKind()))  {
                 if (StringUtil_mxJPO.match(mxName, _matches))  {
                     ret.add(mxName);

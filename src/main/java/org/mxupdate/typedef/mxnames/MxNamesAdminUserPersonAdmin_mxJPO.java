@@ -18,11 +18,11 @@ package org.mxupdate.typedef.mxnames;
 import java.util.Collection;
 import java.util.SortedSet;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+
+import matrix.util.MatrixException;
 
 /**
  * Fetches all admin persons and removes the persons for which a business object
@@ -46,7 +46,7 @@ public class MxNamesAdminUserPersonAdmin_mxJPO
                 .cmd(" select ").arg("name")
                 .cmd(" dump ").arg("\t")
                 .cmd(" recordsep ").arg("\n")
-                .exec(_paramCache);
+                .exec(_paramCache.getContext());
         for (final String lineStr : personStr.split("\n"))  {
             final String[] lineArr = lineStr.split("\t");
             ret.remove(lineArr[3]);

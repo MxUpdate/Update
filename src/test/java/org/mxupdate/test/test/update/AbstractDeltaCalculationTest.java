@@ -101,7 +101,7 @@ public abstract class AbstractDeltaCalculationTest<DATA extends AbstractObject_m
             currentWrapper.create(paramCache);
             final WrapperCIInstance<DATA> tmp = new WrapperCIInstance<>(this.createNewData(paramCache, _currentData.getName()));
             tmp.parse(paramCache);
-            currentWrapper.calcDelta(paramCache,  (File) null, tmp).exec(paramCache);
+            currentWrapper.calcDelta(paramCache,  (File) null, tmp).exec(paramCache.getContext());
             _currentData.checkExport(new ExportParser(_currentData.getCI(), currentWrapper.write(paramCache), ""));
 
             // prepare the target form
@@ -111,7 +111,7 @@ public abstract class AbstractDeltaCalculationTest<DATA extends AbstractObject_m
             // delta between current and target
             final WrapperCIInstance<DATA> tmp2 = new WrapperCIInstance<>(this.createNewData(paramCache, _targetData.getName()));
             tmp2.parse(paramCache);
-            targetWrapper.calcDelta(paramCache, (File) null, tmp2).exec(paramCache);
+            targetWrapper.calcDelta(paramCache, (File) null, tmp2).exec(paramCache.getContext());
 
             // check result from MX defined from calculated delta
             final WrapperCIInstance<DATA> resultWrapper = new WrapperCIInstance<>(this.createNewData(paramCache, _targetData.getName()));

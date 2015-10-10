@@ -25,8 +25,6 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.mxupdate.update.util.ParameterCache_mxJPO;
-
 import matrix.db.Context;
 import matrix.db.MQLCommand;
 import matrix.util.MatrixException;
@@ -90,9 +88,9 @@ public final class MqlBuilderUtil_mxJPO
         /** File which is currently executed. */
         private final File file;
         /** Prefix line for all executed lines. */
-        private final Stack<MqlBuilder> prefix = new Stack<MqlBuilder>();
+        private final Stack<MqlBuilder> prefix = new Stack<>();
         /** All lines. */
-        private final List<MqlBuilder> lines = new ArrayList<MqlBuilder>();
+        private final List<MqlBuilder> lines = new ArrayList<>();
         /** Latest appended line. */
         private MqlBuilder lastLine;
 
@@ -114,7 +112,7 @@ public final class MqlBuilderUtil_mxJPO
         }
 
         /**
-         * Returns the {@link #file} which is executed.
+         * Returns the {@link #file} which is executed.
          *
          * @return file
          */
@@ -231,18 +229,6 @@ public final class MqlBuilderUtil_mxJPO
          * @param _paramCache       parameter cache with the context
          * @throws MatrixException if execute failed
          */
-        public void exec(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
-        {
-            this.exec(_paramCache.getContext());
-        }
-
-        /**
-         * Executes all lines of the MQL builder.
-         *
-         * @param _paramCache       parameter cache with the context
-         * @throws MatrixException if execute failed
-         */
         public void exec(final Context _context)
             throws MatrixException
         {
@@ -270,7 +256,7 @@ public final class MqlBuilderUtil_mxJPO
         /** MQL line. */
         private final StringBuilder cmd = new StringBuilder();
         /** Arguments of the line. */
-        final List<String> args = new ArrayList<String>();
+        final List<String> args = new ArrayList<>();
 
         /**
          * Private constructor to avoid external initialization.
@@ -306,18 +292,6 @@ public final class MqlBuilderUtil_mxJPO
             this.cmd.append("$").append(this.args.size() + 1);
             this.args.add((_argument != null) ? _argument : "");
             return this;
-        }
-
-        /**
-         * Executes given MQL command.
-         *
-         * @param _paramCache       parameter cache with the context
-         * @throws MatrixException if execute failed
-         */
-        public String exec(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
-        {
-            return this.exec(_paramCache.getContext());
         }
 
         /**

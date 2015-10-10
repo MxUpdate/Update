@@ -455,7 +455,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
         cur.parseUpdate(_code);
         final WrapperCIInstance<AbstractObject_mxJPO<?>> tmp = new WrapperCIInstance<AbstractObject_mxJPO<?>>(typeDef.newTypeInstance(this.getName()));
         tmp.parse(paramCache);
-        cur.calcDelta(paramCache,  (File) null, tmp).exec(paramCache);
+        cur.calcDelta(paramCache,  (File) null, tmp).exec(paramCache.getContext());
 
 // TODO: check log messages
 //        if (_expLogText != null)  {

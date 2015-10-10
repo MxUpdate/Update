@@ -111,7 +111,7 @@ public class Role_mxJPO
         if (_paramCache.getValueBoolean(ValueKeys.UserRoleSupportRoleType))  {
             final String testRoleType = MqlBuilderUtil_mxJPO.mql()
                     .cmd("escape print role ").arg(this.getName()).cmd(" select ").arg("isanorg").cmd(" ").arg("isaproject").cmd(" dump")
-                    .exec(_paramCache);
+                    .exec(_paramCache.getContext());
             if ("FALSE,TRUE".equals(testRoleType))  {
                 this.kind = Kind.Project;
             } else if ("TRUE,FALSE".equals(testRoleType)) {

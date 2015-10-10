@@ -17,8 +17,6 @@ package org.mxupdate.test.test.update;
 
 import java.io.File;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.datamodel.PolicyData;
@@ -30,6 +28,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Common definitions for delta calculation tests.
@@ -91,16 +91,16 @@ public abstract class AbstractDeltaNoChangeTest<DATA extends AbstractAdminObject
             _currentData.createDependings();
 
             // prepare the current
-            final WrapperCIInstance<DATA> currentWrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()));
+            final WrapperCIInstance<DATA> currentWrapper = new WrapperCIInstance<>(this.createNewData(paramCache, _currentData.getName()));
             currentWrapper.create(paramCache);
             currentWrapper.parseUpdate(_currentData);
-            currentWrapper.calcDelta(paramCache, (File) null, new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()))).exec(paramCache);
+            currentWrapper.calcDelta(paramCache, (File) null, new WrapperCIInstance<>(this.createNewData(paramCache, _currentData.getName()))).exec(paramCache.getContext());
 
             // read from MX
-            final WrapperCIInstance<DATA> currentWrapper2Mx = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()));
+            final WrapperCIInstance<DATA> currentWrapper2Mx = new WrapperCIInstance<>(this.createNewData(paramCache, _currentData.getName()));
             currentWrapper2Mx.parse(paramCache);
             // parse again (to ensure empty not changed values!)
-            final WrapperCIInstance<DATA> currentWrapper2Update = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()));
+            final WrapperCIInstance<DATA> currentWrapper2Update = new WrapperCIInstance<>(this.createNewData(paramCache, _currentData.getName()));
             currentWrapper2Update.parseUpdate(_currentData);
             // calculate delta between MX and new parsed
             final MultiLineMqlBuilder mql = currentWrapper2Update.calcDelta(paramCache, (File) null, currentWrapper2Mx);
@@ -123,9 +123,9 @@ public abstract class AbstractDeltaNoChangeTest<DATA extends AbstractAdminObject
     {
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
 
-        final WrapperCIInstance<DATA> currentWrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, AbstractTest.PREFIX + "Test"));
+        final WrapperCIInstance<DATA> currentWrapper = new WrapperCIInstance<>(this.createNewData(paramCache, AbstractTest.PREFIX + "Test"));
         currentWrapper.create(paramCache);
-        final MultiLineMqlBuilder mql = currentWrapper.calcDelta(paramCache, (File) null, new WrapperCIInstance<DATA>(this.createNewData(paramCache, AbstractTest.PREFIX + "Test")));
+        final MultiLineMqlBuilder mql = currentWrapper.calcDelta(paramCache, (File) null, new WrapperCIInstance<>(this.createNewData(paramCache, AbstractTest.PREFIX + "Test")));
 
         Assert.assertFalse(mql.hasNewLines(), "no MQL update needed, but found:\n" + mql);
     }

@@ -19,12 +19,12 @@ import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+
+import matrix.util.MatrixException;
 
 /**
  * Searches for all administration object of given type definition and
@@ -43,9 +43,9 @@ public class MxNamesAdminUserInterfaceTable_mxJPO
     {
         final String listStr = MqlBuilderUtil_mxJPO.mql()
                 .cmd("escape list ").cmd(_typeDef.getMxAdminName()).cmd(" system")
-                .exec(_paramCache);
+                .exec(_paramCache.getContext());
 
-        final SortedSet<String> ret = new TreeSet<String>();
+        final SortedSet<String> ret = new TreeSet<>();
         if (!listStr.isEmpty())  {
             for (final String mxName : listStr.split("\n"))  {
                 if (StringUtil_mxJPO.match(mxName, _matches))  {

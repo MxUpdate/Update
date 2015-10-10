@@ -20,12 +20,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+
+import matrix.util.MatrixException;
 
 /**
  * Handles the export of the search index.
@@ -51,7 +51,7 @@ public class ExportSystemConfigSearchIndex_mxJPO
     {
         // extract code of search index
         final String code;
-        final String tmp = MqlBuilderUtil_mxJPO.mql().cmd(ExportSystemConfigSearchIndex_mxJPO.MQL_GET_INDEX).exec(_paramCache);
+        final String tmp = MqlBuilderUtil_mxJPO.mql().cmd(ExportSystemConfigSearchIndex_mxJPO.MQL_GET_INDEX).exec(_paramCache.getContext());
         if (tmp.startsWith(ExportSystemConfigSearchIndex_mxJPO.START_KEYWORD))  {
             code = tmp.substring(ExportSystemConfigSearchIndex_mxJPO.START_KEYWORD_LENGTH);
         } else  {

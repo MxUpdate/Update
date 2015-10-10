@@ -161,7 +161,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
                 .cmd(" to ").cmd(this.mxClassDef().mxClass())
                 .cmd(" ").arg(this.getName())
                 .cmd(" ").cmd(this.mxClassDef().mxClassSuffix())
-                .exec(_paramCache);
+                .exec(_paramCache.getContext());
         if (!symbNames.isEmpty())  {
             for (final String symbName : symbNames.split("\n"))  {
                 this.symbolicNames.add(symbName.substring(0, symbName.indexOf(symbProgIdxOf)));
@@ -181,7 +181,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     protected String execXMLExport(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
-        return MqlBuilderUtil_mxJPO.mql().cmd("escape export ").cmd(this.mxClassDef().mxClass()).cmd(" ").arg(this.getName()).cmd(" xml").exec(_paramCache);
+        return MqlBuilderUtil_mxJPO.mql().cmd("escape export ").cmd(this.mxClassDef().mxClass()).cmd(" ").arg(this.getName()).cmd(" xml").exec(_paramCache.getContext());
     }
 
     /**
@@ -265,7 +265,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
         if (this.mxClassDef().hasMxClassSuffix())  {
             mql.cmd(" ").cmd(this.mxClassDef().mxClassSuffix());
         }
-        mql.exec(_paramCache);
+        mql.exec(_paramCache.getContext());
     }
 
     /**

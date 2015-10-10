@@ -39,6 +39,6 @@ public class UpdateSystemConfigSearchIndex_mxJPO
     {
         MqlBuilderUtil_mxJPO.mql()
                 .cmd("escape set system searchindex file ").arg(_file.toString())
-                .exec(_paramCache);
+                .exec(_paramCache.getContext());
     }
 }
