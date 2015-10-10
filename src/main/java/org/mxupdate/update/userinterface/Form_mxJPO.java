@@ -139,7 +139,7 @@ public class Form_mxJPO
     public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        MqlBuilder_mxJPO.mql().cmd("escape add ").cmd(this.getTypeDef().getMxAdminName()).cmd(" ").arg(this.getName()).cmd(" web; ").exec(_paramCache);
+        MqlBuilder_mxJPO.mql().cmd("escape add form ").arg(this.getName()).cmd(" web; ").exec(_paramCache);
     }
 
     @Override()
