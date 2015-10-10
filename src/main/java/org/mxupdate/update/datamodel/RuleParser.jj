@@ -22,7 +22,23 @@ options {
     SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
     UNICODE_INPUT = true;
 }
-PARSER_BEGIN(RuleParser)
+
+PARSER_BEGIN(RuleParser)
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
 package org.mxupdate.update.datamodel;
 
 import java.lang.reflect.InvocationTargetException;
@@ -31,7 +47,6 @@ import java.util.Arrays;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
-import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
@@ -45,14 +60,19 @@ class RuleParser
     extends AbstractParser_mxJPO
 {
 }
-PARSER_END(RuleParser)<*> SKIP :
+
+PARSER_END(RuleParser)
+
+<*> SKIP :
 {
   " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
 <DEFAULT> TOKEN :
 {
-      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+      <UUID:                                "uuid">                                         : STRING_EXPECTED
+
+    | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
 
     | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
@@ -105,22 +125,27 @@ class RuleParser
 {
       <FILTER:                              "filter">                                               : MULTILINESTRING_EXPECTED
     | <LOCALFILTER:                         "localfilter">                                          : MULTILINESTRING_EXPECTED
+
     | <ORGANIZATION_ANY:                    "any"         ([" ","\t","\n"])+ "organization">        : DEFAULT
     | <ORGANIZATION_SINGLE:                 "single"      ([" ","\t","\n"])+ "organization">        : DEFAULT
     | <ORGANIZATION_ANCESTOR:               "ancestor"    ([" ","\t","\n"])+ "organization">        : DEFAULT
     | <ORGANIZATION_DESCENDANT:             "descendant"  ([" ","\t","\n"])+ "organization">        : DEFAULT
     | <ORGANIZATION_RELATED:                "related"     ([" ","\t","\n"])+ "organization">        : DEFAULT
+
     | <PROJECT_ANY:                         "any"         ([" ","\t","\n"])+ "project">             : DEFAULT
     | <PROJECT_SINGLE:                      "single"      ([" ","\t","\n"])+ "project">             : DEFAULT
     | <PROJECT_ANCESTOR:                    "ancestor"    ([" ","\t","\n"])+ "project">             : DEFAULT
     | <PROJECT_DESCENDANT:                  "descendant"  ([" ","\t","\n"])+ "project">             : DEFAULT
     | <PROJECT_RELATED:                     "related"     ([" ","\t","\n"])+ "project">             : DEFAULT
+
     | <OWNER_ANY:                           "any"         ([" ","\t","\n"])+ "owner">               : DEFAULT
     | <OWNER_CONTEXT:                       "context"     ([" ","\t","\n"])+ "owner">               : DEFAULT
+
     | <RESERVE_ANY:                         "any"         ([" ","\t","\n"])+ "reserve">             : DEFAULT
     | <RESERVE_CONTEXT:                     "context"     ([" ","\t","\n"])+ "reserve">             : DEFAULT
     | <RESERVE_NO:                          "no"          ([" ","\t","\n"])+ "reserve">             : DEFAULT
     | <RESERVE_INCLUSIVE:                   "inclusive"   ([" ","\t","\n"])+ "reserve">             : DEFAULT
+
     | <MATURITY_ANY:                        "any"         ([" ","\t","\n"])+ "maturity">            : DEFAULT
     | <MATURITY_NO:                         "no"          ([" ","\t","\n"])+ "maturity">            : DEFAULT
     | <MATURITY_PUBLIC:                     "public"      ([" ","\t","\n"])+ "maturity">            : DEFAULT
@@ -128,6 +153,7 @@ class RuleParser
     | <MATURITY_PRIVATE:                    "private"     ([" ","\t","\n"])+ "maturity">            : DEFAULT
     | <MATURITY_NOTPRIVATE:                 "notprivate"  ([" ","\t","\n"])+ "maturity">            : DEFAULT
     | <MATURITY_PPP:                        "ppp"         ([" ","\t","\n"])+ "maturity">            : DEFAULT
+
     | <CATEGORY_ANY:                        "any"         ([" ","\t","\n"])+ "category">            : DEFAULT
     | <CATEGORY_OEM:                        "oem"         ([" ","\t","\n"])+ "category">            : DEFAULT
     | <CATEGORY_GOLDPARTNER:                "goldpartner" ([" ","\t","\n"])+ "category">            : DEFAULT
@@ -152,7 +178,7 @@ class RuleParser
 }
 
 /**************************************************************************** */
-/**
+/**
  * Parses one complete rule definition.
  *
  * @param _rule   target rule to update with parsed values
@@ -164,7 +190,13 @@ void parse(final Rule_mxJPO _rule)
     AdminProperty property;
     Access access = new Access();
 } {
-    (   ( <SYMBOLICNAME>            ( tmp = <STRING>            {this.appendValue(_rule, "symbolicNames",       this.getString(tmp.image));}
+    (   ( <UUID>                                                {property = new AdminProperty();
+                                                                 this.appendValue(this.getValue(_rule, "properties"), "propertiesStack", property);
+                                                                 this.setValue(property, "name",  "UUID");}
+                                    ( tmp = <STRING>            {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>            {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+
+      | ( <SYMBOLICNAME>            ( tmp = <STRING>            {this.appendValue(_rule, "symbolicNames",       this.getString(tmp.image));}
                                     | tmp = <SINGLE>            {this.appendValue(_rule, "symbolicNames",       this.getSingle(tmp.image));} ) )
 
       | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>   {this.setValue(_rule, "description",            this.getString(tmp.image));}

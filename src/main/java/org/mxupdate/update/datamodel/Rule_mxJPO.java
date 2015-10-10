@@ -21,6 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
@@ -28,13 +29,22 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
-import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
 import matrix.util.MatrixException;
 
 /**
  * The class is used to export and import / update rule configuration items.
+ * The handles properties are
+ * <ul>
+ * <li>uuid<li>
+ * <li>symbolic names</li>
+ * <li>description</li>
+ * <li>{@link #accessList access list}</li>
+ * <li>{@link #enforcereserveaccess enforce reserve access}</li>
+ * <li>properties</li>
+ * </ul>
  *
  * @author The MxUpdate Team
  */
@@ -67,7 +77,7 @@ public class Rule_mxJPO
         super(EMxAdmin_mxJPO.Rule, _mxName);
     }
 
-    @Override()
+    @Override
     public void parseUpdate(final File _file,
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
@@ -80,7 +90,7 @@ public class Rule_mxJPO
      * {@inheritDoc}
      * The rule {@link #accessList access} statements are sorted if defined.
      */
-    @Override()
+    @Override
     public void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, ParseException
     {
@@ -100,7 +110,7 @@ public class Rule_mxJPO
      * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
      *         <i>false</i>
      */
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -119,7 +129,7 @@ public class Rule_mxJPO
         return parsed;
     }
 
-    @Override()
+    @Override
     protected void prepare()
     {
         super.prepare();
@@ -131,7 +141,8 @@ public class Rule_mxJPO
     {
         _updateBuilder
                 //              tag                 | default | value                              | write?
-                .list(          "symbolicname",             this.getSymbolicNames())
+                .stringNotNull( "uuid",                         this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
+                .list(          "symbolicname",                 this.getSymbolicNames())
                 .string(        "description",                  this.getDescription())
                 .flag(          "hidden",               false,  this.isHidden())
                 .flagIfTrue(    "enforcereserveaccess", false,  this.enforcereserveaccess,          _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMRuleSupportsEnforceReserveAccess))
