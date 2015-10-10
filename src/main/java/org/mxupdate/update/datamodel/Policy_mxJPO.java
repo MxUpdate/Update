@@ -39,6 +39,7 @@ import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+import org.mxupdate.update.util.CompareToUtil_mxJPO;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
@@ -642,6 +643,11 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
             // sort the properties
             this.properties.prepare();
 
+            // sort signatures
+            final SortedSet<Signature> tmpSigs = new TreeSet<>(this.signatures);
+            this.signatures.clear();
+            this.signatures.addAll(tmpSigs);
+
             // fix filters of signature
             if (!this.signatures.isEmpty())  {
                 // map between keys and access (key must be also equal signature)
@@ -858,7 +864,7 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
      * Class defining a signature for a state.
      */
     public static class Signature
-        implements UpdateLine
+        implements UpdateLine, Comparable<Signature>
     {
         /** Name of the signature. */
         private String name;
@@ -881,7 +887,7 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
          *
          * @param _updateBuilder    update builder
          */
-        @Override()
+        @Override
         public void write(final UpdateBuilder_mxJPO _updateBuilder)
         {
             _updateBuilder
@@ -953,6 +959,19 @@ throw new Error("branch '" + _oldSignature.branch + "' exists for signature " + 
                     }
                 }
             }
+        }
+
+        @Override
+        public int compareTo(final Signature _compareTo)
+        {
+            int ret = 0;
+            ret = CompareToUtil_mxJPO.compare(ret, this.name,           _compareTo.name);
+            ret = CompareToUtil_mxJPO.compare(ret, this.branch,         _compareTo.branch);
+            ret = CompareToUtil_mxJPO.compare(ret, this.filter,         _compareTo.filter);
+            ret = CompareToUtil_mxJPO.compare(ret, this.approverUsers,  _compareTo.approverUsers);
+            ret = CompareToUtil_mxJPO.compare(ret, this.ignoreUsers,    _compareTo.ignoreUsers);
+            ret = CompareToUtil_mxJPO.compare(ret, this.rejectUsers,    _compareTo.rejectUsers);
+            return ret;
         }
     }
 }
