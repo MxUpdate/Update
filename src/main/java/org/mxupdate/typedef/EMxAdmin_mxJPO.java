@@ -219,12 +219,28 @@ public enum EMxAdmin_mxJPO
     }
 
     /**
+     * Checks if the given object with {@code _mxName} already exists in the
+     * database.
+     *
+     * @param _paramCache   parameter cache
+     * @param _mxName       MX name
+     * @return <i>true</i> if object exists; otherwise <i>false</i>
+     * @throws MatrixException if check failed
+     */
+    public boolean exist(final ParameterCache_mxJPO _paramCache,
+                         final String _mxName)
+        throws MatrixException
+    {
+        return this.evalList(_paramCache).contains(_mxName);
+    }
+
+    /**
      * Checks if the current list of objects exists and if not evaluates the
      * list of all objects.
      *
      * @param _paramCache   parameter cache
      * @return set of all object names
-     * @throws MatrixException
+     * @throws MatrixException if evaluate failed
      */
     public SortedSet<String> evalList(final ParameterCache_mxJPO _paramCache)
         throws MatrixException

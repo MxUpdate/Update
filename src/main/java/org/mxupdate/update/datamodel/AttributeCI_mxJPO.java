@@ -330,6 +330,11 @@ public class AttributeCI_mxJPO
                 .properties(this.getProperties());
     }
 
+    @Override
+    public void createOld(final ParameterCache_mxJPO _paramCache)
+    {
+    }
+
     /**
      * Creates given attribute from given type with given name. Because the
      * type of the attribute must defined, the original create method must be
@@ -338,10 +343,9 @@ public class AttributeCI_mxJPO
      * @param _paramCache   parameter cache
      * @throws Exception if the new attribute for given type could not be
      *                   created
-     * @see #attrTypeCreate
      */
     @Override
-    public void createOld(final ParameterCache_mxJPO _paramCache)
+    public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
         MqlBuilderUtil_mxJPO.mql()

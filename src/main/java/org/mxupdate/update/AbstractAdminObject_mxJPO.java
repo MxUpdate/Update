@@ -269,6 +269,18 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     }
 
     /**
+     * Creates a new administration object with given name.
+     *
+     * @param _paramCache   parameter cache
+     * @throws Exception if create failed
+     */
+    public void create(final ParameterCache_mxJPO _paramCache)
+        throws Exception
+    {
+// TODO
+    }
+
+    /**
      * Getter method for instance variable {@link #hidden}.
      *
      * @return value of instance variable {@link #hidden}.

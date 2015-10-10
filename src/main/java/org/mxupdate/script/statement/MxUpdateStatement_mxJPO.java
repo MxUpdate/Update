@@ -107,6 +107,10 @@ public class MxUpdateStatement_mxJPO
     {
         final AbstractAdminObject_mxJPO<?> target  = _mxClass.newTypeInstance(_mxName);
         target.parseUpdate(_file, this.code);
+        if (!_mxClass.exist(_paramCache, _mxName))  {
+            _paramCache.logDebug("    - create");
+            target.create(_paramCache);
+        }
 
         final AbstractAdminObject_mxJPO<?> current  = _mxClass.newTypeInstance(_mxName);
         current.parse(_paramCache);
